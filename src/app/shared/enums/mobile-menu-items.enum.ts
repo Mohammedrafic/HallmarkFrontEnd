@@ -9,4 +9,5 @@ export enum MobileMenuItems {
   Unlock = 'Unlock',
   Upload = 'Upload',
   Lock = 'Lock',
+  Save = 'Save'
 }

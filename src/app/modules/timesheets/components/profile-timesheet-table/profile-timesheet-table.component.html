@@ -36,7 +36,7 @@
             <app-tooltip-container
               [ngClass]="{ 'middle-tablet': isMiddleContentWidth }"
               [showToolTip]="!hasPermissions"
-              *ngIf="!isEditOn; else editHandlers"
+              *ngIf="!isEditOn; else isMobile ? editMobileBtnHandlers : editHandlers"
             >
               <button
                 (click)="editTimesheets()"
@@ -62,6 +62,20 @@
               </ng-template>
             </button>
           </div>
+        </ng-template>
+
+        <ng-template #editMobileBtnHandlers>
+            <app-tooltip-container>
+              <button
+                ejs-dropdownbutton
+                iconCss="e-icons"
+                cssClass="e-caret-hide primary-icon-button menu-mobile"
+                [items]="mobileEditMenuActions"
+                (select)="onMobileEditMenuSelect($event)"
+              >
+                <i-feather name="more-vertical" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
         </ng-template>
 
         <div class="desktop-tablet-btn-group" *ngIf="!isSmallContentWidth">

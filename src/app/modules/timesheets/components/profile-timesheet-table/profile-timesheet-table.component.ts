@@ -6,7 +6,7 @@ import { combineLatest, Observable, Subject, takeUntil } from 'rxjs';
 import { debounceTime, filter, skip, switchMap, take, tap, throttleTime, map } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
+import { MenuEventArgs, SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { ComponentStateChangedEvent, GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 
@@ -33,6 +33,7 @@ import { TimesheetDetails } from '../../store/actions/timesheet-details.actions'
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
+import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -161,6 +162,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private readonly componentStateChanged$: Subject<ComponentStateChangedEvent> = new Subject();
 
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
+
+  public mobileEditMenuActions = [{ text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Save }];
 
   private resizeObserver: ResizeObserverModel;
 
@@ -568,5 +571,14 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.isTablet = data.breakpoints[BreakpointQuery.TABLET_MAX];
       this.isMobile = data.breakpoints[BreakpointQuery.MOBILE_MAX];
     });
+  }
+
+  public onMobileEditMenuSelect({ item: { text }}: MenuEventArgs): void {
+    if(text === MobileMenuItems.Cancel) {
+      this.cancelChanges();
+    }
+    if(text === MobileMenuItems.Save) {
+      this.saveChanges();
+    }
   }
 }
