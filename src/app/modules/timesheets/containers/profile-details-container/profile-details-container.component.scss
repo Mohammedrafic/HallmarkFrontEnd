@@ -290,6 +290,10 @@ app-navigation-panel {
 @media #{$max-mobile} {
   .profile-hours-statistics {
     flex-direction: column;
+
+    .profile-attachments {
+      max-width: 100%;
+    }
   }
 
   .order-header {
