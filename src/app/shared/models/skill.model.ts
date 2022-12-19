@@ -120,3 +120,11 @@ export interface AssignedSkillsByOrganization  {
   skillDescription: string;
   name: string
 }
+
+export interface IrpPrimarySkill {
+  id: number;
+  businessUnitId: number;
+  skillAbbr: string;
+  skillDescription: string;
+  isDefault: boolean;
+}

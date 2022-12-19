@@ -29,7 +29,7 @@ export abstract class AbstractOrderCandidateListComponent
 
   @Input() candidatesList: OrderCandidatesListPage | null;
   @Input() order: AgencyOrder;
-  @Input() includeDeployedCandidates: boolean = true;
+  @Input() includeDeployedCandidates = true;
 
   @Output() getCandidatesList = new EventEmitter<CandidateListEvent>();
 
