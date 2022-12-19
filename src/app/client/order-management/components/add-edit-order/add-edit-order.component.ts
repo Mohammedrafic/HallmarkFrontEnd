@@ -37,10 +37,12 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { OrderJobDistribution } from '@shared/enums/job-distibution';
 import {
-  JOB_DISTRIBUTION_TITLE, ORDER_DISTRIBUTED_TO_ALL,
+  JOB_DISTRIBUTION_TITLE,
+  ORDER_DISTRIBUTED_TO_ALL,
   PROCEED_FOR_ALL_AGENCY,
   PROCEED_FOR_TIER_LOGIC,
 } from '@shared/constants';
+import { OrderCredentialsService } from "@client/order-management/services";
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { DateTimeHelper } from '@core/helpers';
 import { formatDate } from '@angular/common';
@@ -106,6 +108,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public isTemplate = false;
 
   public constructor(
+    private orderCredentialsService: OrderCredentialsService,
     private store: Store,
     private router: Router,
     private route: ActivatedRoute,
@@ -228,28 +231,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
-  public onCredentialChanged(cred: IOrderCredentialItem): void {
-    const isExist = this.orderCredentials.find(
-      ({ credentialId }: IOrderCredentialItem) => cred.credentialId === credentialId
-    );
-    if (isExist) {
-      Object.assign(isExist, cred);
-    } else {
-      this.orderCredentials.push(cred);
-    }
-
+  public updateOrderCredentials(credential: IOrderCredentialItem): void {
+    this.orderCredentialsService.updateOrderCredentials(this.orderCredentials, credential);
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
-  public onCredentialDeleted(cred: IOrderCredentialItem): void {
-    const credToDelete = this.orderCredentials.find(
-      ({ credentialId }: IOrderCredentialItem) => cred.credentialId === credentialId
-    ) as IOrderCredentialItem;
-    if (credToDelete) {
-      const index = this.orderCredentials.indexOf(credToDelete);
-      this.orderCredentials.splice(index, 1);
-    }
-
+  public deleteOrderCredential(credential: IOrderCredentialItem): void {
+    this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
