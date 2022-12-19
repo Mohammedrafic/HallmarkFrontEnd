@@ -7,7 +7,9 @@ import { Select } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
-import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { PermissionService } from '../../../../../security/services/permission.service';
 

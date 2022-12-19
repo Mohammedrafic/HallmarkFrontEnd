@@ -7,7 +7,7 @@
   <ejs-grid #grid class="e-gridwithheader"
             [dataSource]="billRatesData"
             [allowSelection]="false"
-            [height]="billRatesData.length? billRatesData.length * rowHeight : rowHeight"
+            [height]="billRatesData?.length? billRatesData.length * rowHeight : rowHeight"
             [rowHeight]="rowHeight"
             [enableVirtualization]="true"
             [resizeSettings]="resizeSettings"

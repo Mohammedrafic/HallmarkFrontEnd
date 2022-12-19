@@ -1,15 +1,15 @@
-import { JobCancellation } from '@shared/models/candidate-cancellation.model';
-import { PageOfCollections } from '@shared/models/page.model';
-import { Document } from '@shared/models/document.model';
-import { OrderStatus } from '@shared/enums/order-management';
-import { OrderType } from '@shared/enums/order-type';
+import { CandidateModel } from '@client/order-management/components/add-edit-reorder/models/candidate.model';
+import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
 import { Duration } from '@shared/enums/durations';
 import { JobClassification } from '@shared/enums/job-classification';
+import { OrderStatus } from '@shared/enums/order-management';
+import { OrderType } from '@shared/enums/order-type';
+import { FilterOrderStatusText } from '@shared/enums/status';
+import { JobCancellation } from '@shared/models/candidate-cancellation.model';
+import { Document } from '@shared/models/document.model';
+import { PageOfCollections } from '@shared/models/page.model';
 import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
-import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
-import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
-import { FilterOrderStatusText } from '@shared/enums/status';
 
 export class OrderManagement {
   id: number;
@@ -55,6 +55,68 @@ export class OrderManagement {
   extensionFromId?: number | null;
 }
 
+export interface IRPOrderManagement {
+  criticalOrder: boolean;
+  shiftStartDateTime: string;
+  shiftEndDateTime: string;
+  id: number;
+  organizationId: number;
+  organizationPrefix: string;
+  publicId: number;
+  status: number;
+  statusText: string;
+  isCritical: boolean;
+  orderType: number;
+  skillId: number;
+  skillName: string;
+  numberOfPositions: number;
+  numberOfOpenPositions: number;
+  regionId: number;
+  regionName: string;
+  locationId: number;
+  locationName: string;
+  departmentId: number;
+  departmentName: string;
+  startDate: string;
+  endDate: string;
+  jobDate: string;
+  shiftStartTime: string;
+  shiftEndTime: string;
+  irpCandidatesCount: number;
+  vmsCandidatesCount: number;
+  creationDate: string;
+  isLocked: boolean;
+  acceptedCandidates: null;
+  acceptedEmployees: null;
+  isMoreMenuWithDeleteButton?: boolean;
+  children: OrderManagementChild[];
+}
+
+export interface IRPOrderPosition {
+  orderId: number;
+  organizationId: number;
+  candidateStatus: number;
+  employeeId: number;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  primarySkillId: number;
+  primarySkillName: string;
+  option: string;
+  contract: boolean;
+  lastShiftScheduledStartTime: string;
+  lastShiftScheduledEndTime: string;
+  nextShiftScheduledStartTime: string;
+  nextShiftScheduledEndTime: string;
+  scheduledWeeklyHours: number;
+  overtime: number;
+}
+
+export interface IRPOrderPositionMain {
+  orderId: number;
+  irpOrderPositionsMainInfoDto: IRPOrderPosition[];
+}
+
 export class OrderManagementFilter {
   orderBy: string;
   pageNumber: number;
@@ -68,6 +130,7 @@ export class OrderManagementFilter {
 }
 
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
+export type IRPOrderManagementPage = PageOfCollections<IRPOrderManagement>;
 
 export type AgencyOrderManagement = {
   orderId: number;
@@ -256,6 +319,13 @@ export class GetPredefinedBillRatesData {
   jobEndDate?: string;
 }
 
+export interface IRPMetaData {
+  orderId: number;
+  contact: boolean;
+  weekend: boolean;
+  holiday: boolean;
+}
+
 export class Order {
   id: number;
   publicId?: number;
@@ -298,7 +368,10 @@ export class Order {
   statusText: string;
   locationName?: string;
   departmentName?: string;
+  jobDistributionValue?: number[];
+  isIRPOnly?: boolean;
   orderOpenDate?: Date;
+  irpOrderMetadata?: IRPMetaData;
   isLocked?: boolean;
   groupedCredentials?: Object;
   isSubmit: boolean;
@@ -329,6 +402,15 @@ export class Order {
   hasParentExtension?: boolean;
   hasExtensions?: boolean;
   extensionInitialOrderPublicId?: number;
+  regionName?: string;
+  /**
+   * Mispelling on BE, should be - contract.
+   */
+  contact?: boolean;
+  weekend?: boolean;
+  holiday?: boolean;
+  distributedOn?: string;
+  creationDate?: string;
 }
 
 export class ReOrder {
@@ -529,6 +611,7 @@ export class OrderFilter {
   projectTypeIds?: number | null;
   projectNameIds?: number | null;
   poNumberIds?: number | null;
+  orderType?: number | null;
 }
 
 export class SortModel {

@@ -35,4 +35,9 @@
     background: $primary-active-blue-10 !important;
     color: $white !important;
   }
+
+  &.disabled {
+    color: $secondary-dark-blue-40 !important;
+    pointer-events: none !important;
+  }
 }

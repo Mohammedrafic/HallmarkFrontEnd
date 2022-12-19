@@ -23,14 +23,14 @@ import {
   Sliders,
   Trash2,
   User,
-  Flag
+  Flag,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
   NumericTextBoxAllModule,
   NumericTextBoxModule,
   TextBoxModule,
-  UploaderModule
+  UploaderModule,
 } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -67,7 +67,7 @@ import {
   PageService,
   ResizeService,
   SortService,
-  ToolbarService
+  ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
 import { OrderCandidatesListComponent } from './components/order-candidate-list/order-candidates-list/order-candidates-list.component';
 import { OrderReOrdersListComponent } from './components/order-reorders-list/order-re-orders-list.component';
@@ -106,7 +106,7 @@ import { CandidateAvatarPipe } from './pipes/candidate-avatar.pipe';
 import { GridSubrowReorderComponent } from './components/grid-subrow-reorder/grid-subrow-reorder.component';
 import { GeneralOrderPerDiemInfoComponent } from '@shared/components/general-order-per-diem-info/general-order-per-diem-info.component';
 import { GeneralReorderInfoComponent } from './components/general-reorder-info/general-reorder-info.component';
-import { OrderReOrdersContainerComponent } from '@client/order-management/order-reorders-container/order-reorders-container.component';
+import { OrderReOrdersContainerComponent } from '@client/order-management/components/order-reorders-container/order-reorders-container.component';
 import { OrderPerDiemCandidatesListComponent } from './components/order-candidate-list/order-per-diem-candidates-list/order-per-diem-candidates-list.component';
 import { CandidatesStatusModalComponent } from './components/order-candidate-list/order-per-diem-candidates-list/candidates-status-modal/candidates-status-modal.component';
 import { ReorderCandidatesListComponent } from './components/order-candidate-list/reorder-candidates-list/reorder-candidates-list.component';
@@ -142,6 +142,7 @@ import { CustomSideDialogComponent } from './components/custom-side-dialog/custo
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { HideByCandidateStatusPipe } from './pipes/hide-by-candidate-status.pipe';
 import { ValidateDirectiveModule } from './directives/validate-directive/validate-directive.module';
+import { BoolValuePipeModule } from './pipes/bool-values/bool-values-pipe.module';
 
 const icons = {
   AlertCircle,
@@ -164,7 +165,7 @@ const icons = {
   EyeOff,
   DollarSign,
   Percent,
-  Flag
+  Flag,
 };
 
 const COMPONENTS = [
@@ -273,6 +274,7 @@ const COMPONENTS = [
     TreeViewAllModule,
     SplitButtonModule,
     ValidateDirectiveModule,
+    BoolValuePipeModule,
   ],
   exports: [
     ...COMPONENTS,
@@ -287,7 +289,7 @@ const COMPONENTS = [
 
     ImportDialogContentComponent,
     MultiSelectModule,
-    TooltipModule
+    TooltipModule,
   ],
   declarations: [
     ...COMPONENTS,

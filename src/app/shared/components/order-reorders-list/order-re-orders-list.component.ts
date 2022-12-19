@@ -4,11 +4,11 @@ import { Select, Store } from '@ngxs/store';
 import { debounceTime, Observable, Subject } from 'rxjs';
 import { AgencyOrderManagement, Order, OrderManagement, ReOrder } from '@shared/models/order-management.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
-import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
+import { AddEditReorderService } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.service';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import { AppState } from 'src/app/store/app.state';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
-import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { UserState } from '../../../store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
 

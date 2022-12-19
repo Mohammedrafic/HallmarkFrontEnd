@@ -1,3 +1,5 @@
+import { SystemType } from "@shared/enums/system-type.enum";
+
 export interface TierDTO {
   organizationTierId: number;
   regionIds: number[];
@@ -10,6 +12,7 @@ export interface TierDTO {
   tierExceptionId?: number;
   includeInIRP?: boolean;
   includeInVMS?: boolean;
+  systemType?: SystemType;
 }
 
 export interface TierConfig {

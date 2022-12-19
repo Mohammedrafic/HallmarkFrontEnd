@@ -20,7 +20,7 @@ export const TAB_ADMIN_TIMESHEETS: TabConfig[] = [
   {
     title: 'Rejected',
     value: [5],
-  }
+  },
 ];
 
 export const MapTimesheetsStatuses: Map<TIMETHEETS_STATUSES, number> = new Map()

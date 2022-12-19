@@ -26,6 +26,8 @@ import {
 import { SecurityState } from 'src/app/security/store/security.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { Query } from "@syncfusion/ej2-data";
+import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
 
 @Component({
   selector: 'app-add-edit-visibility',
@@ -56,6 +58,11 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
   public locations: Location[] = [];
   public departments: Department[] = [];
   public showForm: boolean;
+  public allRegions: boolean = false;
+  public allLocations: boolean = false;
+  public allDepartments: boolean = false;
+  public maxDepartmentsLength = 1000;
+  public query: Query = new Query().take(this.maxDepartmentsLength);
 
   private editVisibility: UserVisibilitySetting | null;
   private readonly allOrganisationId = -1;
@@ -100,9 +107,9 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
       const value = this.form.getRawValue();
       this.store.dispatch(
         new SaveUserVisibilitySettings({
-          regionIds: value.regionIds.length === this.regions.length ? [] : value.regionIds,
-          locationIds: value.locationIds.length === this.locations.length ? [] : value.locationIds,
-          departmentIds: value.departmentIds.length === this.departments.length ? [] : value.departmentIds,
+          regionIds: this.allRegions ? null : value.regionIds,
+          locationIds: this.allLocations ? null : value.locationIds,
+          departmentIds: this.allDepartments ? null : value.departmentIds,
           organisationIds: value.organisationIds === this.allOrganisationId ? [] : [value.organisationIds],
           userId: this.createdUser?.id as string,
           id: (this.editVisibility?.id as number) || null,
@@ -128,6 +135,58 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
     }
   }
 
+  public onDepartmentsFiltering(e: FilteringEventArgs): void {
+    const char = e.text.length + 1;
+    let query: Query = new Query();
+    query =
+      e.text !== ""
+        ? query.where("name", "contains", e.text, true).take(char * 15)
+        : query;
+    e.updateData(this.departments, query);
+  };
+
+  public allRegionsChange(event: { checked: boolean }): void {
+    this.allRegions = event.checked;
+    if (this.allRegions) {
+      this.regionsControl.setValue(null);
+      this.regionsControl.disable();
+      let locations: Location[] = [];
+      this.regions.forEach((region: Region) => {
+        const filteredLocation = this.getFilteredControlValues(region.locations, 'locationName', region);
+        locations = [...locations, ...filteredLocation] as Location[];
+      });
+      this.locations = sortByField(locations, 'name');
+    } else {
+      this.regionsControl.enable();
+    }
+  }
+
+  public allLocationsChange(event: { checked: boolean }): void {
+    this.allLocations = event.checked;
+    if (this.allLocations) {
+      this.locationsControl.setValue(null);
+      this.locationsControl.disable();
+      let departments: Department[] = [];
+      this.locations?.forEach((location: Location) => {
+        const filteredDepartments = this.getFilteredControlValues(location.departments, 'locationName', location);
+        departments = [...departments, ...filteredDepartments] as Department[];
+      });
+      this.departments = sortByField(departments, 'name');
+    } else {
+      this.locationsControl.enable();
+    }
+  }
+
+  public allDepartmentsChange(event: { checked: boolean }): void {
+    this.allDepartments = event.checked;
+    if (this.allDepartments) {
+      this.departmentsControl.setValue(null);
+      this.departmentsControl.disable();
+    } else {
+      this.departmentsControl.enable();
+    }
+  }
+
   private subscribeOnOpenEvent(): void {
     this.openEvent.pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.showForm = true;
@@ -136,15 +195,23 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
           this.title = 'Edit';
           this.editVisibility = {
             ...data,
-            uniqRegionId: this.getUniqIdForVisibility(data.organizationId, data.regionId),
-            uniqLocationId: this.getUniqIdForVisibility(data.organizationId, data.locationId),
-            uniqDepartmentId: this.getUniqIdForVisibility(data.organizationId, data.departmentId),
+            uniqRegionId: data.regionId ? this.getUniqIdForVisibility(data.organizationId, data.regionId) : null,
+            uniqLocationId: data.locationId ? this.getUniqIdForVisibility(data.organizationId, data.locationId) : null,
+            uniqDepartmentId: data.departmentId ? this.getUniqIdForVisibility(data.organizationId, data.departmentId) : null,
           };
           this.organisationsControl?.setValue(
             this.editVisibility.organizationId === null ? this.allOrganisationId : this.editVisibility.organizationId
           );
+          setTimeout(() => {
+            this.allRegionsChange({ checked: !data.regionId });
+            this.allLocationsChange({ checked: !data.locationId });
+            this.allDepartmentsChange({ checked: !data.departmentId });
+          }, 100);
         } else {
           this.title = 'Add';
+          this.allRegionsChange({ checked: false });
+          this.allLocationsChange({ checked: false });
+          this.allDepartmentsChange({ checked: false });
           if (this.isOrganisationUser) {
             this.organisationsControl?.setValue(this.organisations[0].organizationId);
           }
@@ -167,7 +234,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
   private onOrganizationControlChanges(): void {
     this.organisationsControl?.valueChanges.pipe(delay(100), takeUntil(this.destroy$)).subscribe((value: number) => {
       if (value || value === null) {
-        this.regionMultiselect.refresh();
+        this.regionMultiselect?.refresh();
         const selectedOrganisation = this.organisations.find(
           (organisation: Organisation) => organisation.organizationId === value
         );
@@ -183,11 +250,11 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
             regionsList = [...regionsList, ...filteredRegions] as Region[];
           });
         } else {
-          const filteredRegions = this.getFilteredControlValues(
+          const filteredRegions = selectedOrganisation ? this.getFilteredControlValues(
             selectedOrganisation?.regions!,
             'organisationName',
             selectedOrganisation!
-          );
+          ) : [];
           regionsList = [...regionsList, ...filteredRegions] as Region[];
         }
 
@@ -285,7 +352,6 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
 
   private setControlValue(control: FormControl, controlDataSource: any[], value?: string | null): void {
     if (value === null) {
-      control.setValue(controlDataSource.map((item) => item.uniqId));
       return;
     }
 

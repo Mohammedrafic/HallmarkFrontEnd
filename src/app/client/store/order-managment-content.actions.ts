@@ -7,7 +7,7 @@ import {
   Order,
   OrderFilter,
   OrderManagement,
-  OrderManagementFilter
+  OrderManagementFilter,
 } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
@@ -19,6 +19,11 @@ import { ImportedOrder, OrderImportResult } from '@shared/models/imported-order.
 export class GetOrders {
   static readonly type = '[order management] Get Orders';
   constructor(public payload: OrderManagementFilter | object, public isIncomplete?: boolean | undefined) {}
+}
+
+export class GetIRPOrders {
+  static readonly type = '[order management] Get IRP Orders';
+  constructor(public payload: OrderManagementFilter | object) {}
 }
 
 export class ClearOrders {
@@ -85,6 +90,10 @@ export class GetProjectTypes {
 export class GetOrganisationCandidateJob {
   static readonly type = '[order management] Get Organisation Candidate Job';
   constructor(public organizationId: number, public jobId: number) {}
+}
+
+export class ClearOrganisationCandidateJob {
+  static readonly type = '[order management] Glear Organisation Candidate Job';
 }
 
 export class UpdateOrganisationCandidateJob {
@@ -157,10 +166,23 @@ export class SaveOrder {
   ) {}
 }
 
+export class SaveIrpOrderSucceeded {
+  static readonly type = '[order management] Save Irp Order Succeeded';
+}
+
+export class SaveIrpOrder {
+  static readonly type = '[order management] Save Irp Order';
+  constructor(
+    public order: CreateOrderDto,
+    public documents: Blob[],
+  ) {}
+}
+
 export class SaveOrderSucceeded {
   static readonly type = '[order management] Save Order Succeeded';
   constructor(public order: Order) {}
 }
+
 export class SaveCloseOrderSucceeded {
   static readonly type = '[order management] Save Close Order Succeeded';
   constructor(public order: Order| OrderManagement) {}
@@ -172,6 +194,14 @@ export class EditOrder {
     public readonly order: EditOrderDto,
     public readonly documents: Blob[],
     public readonly message?: string | null
+  ) {}
+}
+
+export class EditIrpOrder {
+  static readonly type = '[order management] Edit Irp Order';
+  constructor(
+    public readonly order: EditOrderDto,
+    public readonly documents: Blob[],
   ) {}
 }
 

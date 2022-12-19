@@ -9,13 +9,22 @@ import { tabsConfig } from '@client/candidates/add-edit-candidate/tabs-config.co
 })
 export class AddEditCandidateComponent implements OnInit {
   public readonly tabsConfig = tabsConfig;
-  constructor(private router: Router, private route: ActivatedRoute) {}
+  constructor(private router: Router, private route: ActivatedRoute) {
+    if (route.snapshot.paramMap.get('id')) {
+      // EDIT
+      const candidateID = parseInt(route.snapshot.paramMap.get('id') as string);
+      // TODO: Fetch and patch irp candidate value
+    } else {
+      // CREATE
+
+    }
+  }
 
   ngOnInit(): void {
   }
 
   public navigateBack(): void {
-    this.router.navigate(['..'], { relativeTo: this.route });
+    this.router.navigate(['/client/candidates']);
   }
 
   public saveCandidate(): void {

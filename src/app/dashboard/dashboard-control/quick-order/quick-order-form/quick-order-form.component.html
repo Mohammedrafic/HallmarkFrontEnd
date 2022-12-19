@@ -179,7 +179,7 @@
                 formControlName="skillId"
                 appValidateWithMessage
                 [allowFiltering]="true"
-                [dataSource]="skillDataSource"
+                [dataSource]="organizationSkills$ | async"
                 [fields]="skillFields"
               >
               </ejs-dropdownlist>

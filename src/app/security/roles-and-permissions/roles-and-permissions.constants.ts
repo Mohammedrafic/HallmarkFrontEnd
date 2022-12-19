@@ -23,3 +23,7 @@ export const rolesFilterColumns: FilterColumnsModel = {
     valueId: 'id',
   },
 };
+
+export const AddRolesDialogTitle = 'Add Role';
+
+export const EditRolesDialogTitle = 'Edit Role';

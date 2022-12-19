@@ -1,0 +1,24 @@
+<ejs-tab class="stepper">
+  <e-tabitems>
+    <e-tabitem *ngFor="let tab of tabsConfig; trackBy: trackByFn">
+      <ng-template #headerText>
+        <div class="stepper-header">
+          <div class="stepper-title">{{tab.title}}<span *ngIf="tab.required" class="required">*</span></div>
+          <div class="stepper-sub-title">{{tab.subTitle}}</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        <ng-container [ngSwitch]="tab.content">
+          <app-order-details-irp *ngSwitchCase="tabs.Details"></app-order-details-irp>
+          <app-order-credentials
+            *ngSwitchCase="tabs.Credential"
+            [isActive]="tab.content === tabs.Credential"
+            [credentials]="orderCredentials"
+            (credentialChanged)="updateOrderCredentials($event)"
+            (credentialDeleted)="deleteOrderCredential($event)"
+          ></app-order-credentials>
+        </ng-container>
+      </ng-template>
+    </e-tabitem>
+  </e-tabitems>
+</ejs-tab>

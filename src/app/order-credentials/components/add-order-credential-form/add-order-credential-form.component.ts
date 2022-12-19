@@ -1,4 +1,15 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { GetAllCredentials, GetAllCredentialTypes } from '@order-credentials/store/credentials.actions';
@@ -12,7 +23,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-add-order-credential-form',
   templateUrl: './add-order-credential-form.component.html',
-  styleUrls: ['./add-order-credential-form.component.scss']
+  styleUrls: ['./add-order-credential-form.component.scss'],
 })
 export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDestroy {
 
@@ -21,6 +32,8 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
   @Input() form: FormGroup;
   @Input() addedCredentials: IOrderCredentialItem[] = [];
   @Input() formSubmitted = false;
+
+  @Output() selectCredentialItem: EventEmitter<Credential> = new EventEmitter();
 
   @Select(OrderCandidatesCredentialsState.allCredentials)
   allCredentials$: Observable<Credential[]>;
@@ -35,7 +48,7 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
   private unsubscribe$: Subject<void> = new Subject();
   private allCredentialsOrigin: Credential[] = [];
 
-  constructor(private store: Store) { }
+  constructor(private store: Store, private cd: ChangeDetectorRef) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     const { addedCredentials, formSubmitted } = changes;
@@ -74,19 +87,21 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
     }
   }
 
-  public selectCredential(event: any): void {
+  public selectCredential(event: { data: Credential }): void {
     this.form.get('credentialId')?.setValue(event.data.id);
     this.form.get('credentialName')?.setValue(event.data.name);
     this.form.get('credentialType')?.setValue(event.data.credentialTypeName);
+    this.selectCredentialItem.emit(event.data);
   }
 
   public deselectCredential(): void {
     this.form.get('credentialId')?.setValue(0);
     this.form.get('credentialName')?.setValue(null);
     this.form.get('credentialType')?.setValue(null);
+    this.selectCredentialItem.emit({} as Credential);
   }
 
-  public searchCredential(event: any): void {
+  public searchCredential(event: KeyboardEvent): void {
     if (this.searchGrid) {
       this.searchGrid.search((event.target as HTMLInputElement).value);
     }
@@ -102,6 +117,6 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
     this.filteredCreds = allCredentials.filter(credential => {
       return !(this.addedCredentials.find(addedCred => addedCred.credentialId === credential.id));
     });
+    this.cd.markForCheck();
   }
-
 }

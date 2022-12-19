@@ -7,6 +7,27 @@ export enum OrganizationOrderManagementTabs {
   OrderTemplates = 'Order Templates',
 }
 
+export enum OrderManagementIRPTabs {
+  AllOrders = 'All',
+  PerDiem = 'Per Diem',
+  LTA = 'LTA',
+  Incomplete = 'Incomplete',
+}
+
+export enum OrderManagementIRPTabsIndex {
+  AllOrders,
+  PerDiem,
+  Lta,
+  Incomplete
+}
+
+export enum OrderManagementIRPSystemId {
+  All = 1,
+  IRP,
+  VMS,
+  OrderJourney
+}
+
 export enum AgencyOrderManagementTabs {
   MyAgency = 'My Agency',
   OtherAgencies = 'Other Agencies',

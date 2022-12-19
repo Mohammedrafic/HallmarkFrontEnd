@@ -1,4 +1,3 @@
-import { ModuleRegistry } from '@ag-grid-enterprise/all-modules';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -8,7 +7,7 @@ import { MultiselectDropdownModule } from "@shared/components/form-controls/mult
 import { SharedModule } from '@shared/shared.module';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { Sliders, Edit, Trash2, Plus } from 'angular-feather/icons';
-import { ButtonAllModule, ChipListModule, SwitchAllModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonAllModule, ChipListModule, SwitchAllModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { TabAllModule, TreeViewAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { GridAllModule, PagerAllModule } from '@syncfusion/ej2-angular-grids';
@@ -32,7 +31,7 @@ import { RolesFiltersComponent } from './roles-and-permissions/roles-grid/roles-
 import { UsersFiltersComponent } from './user-list/user-grid/users-filters/users-filters.component';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 
-const scurityIcons = {
+const securityIcons = {
   Sliders,
   Edit,
   Plus,
@@ -76,8 +75,9 @@ const scurityIcons = {
     MultiselectDropdownModule,
     InputModule,
     TooltipContainerModule,
+    CheckBoxModule,
 
-    FeatherModule.pick(scurityIcons),
+    FeatherModule.pick(securityIcons),
   ],
 })
 export class SecurityModule {}

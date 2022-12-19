@@ -20,3 +20,11 @@ export const OrderTypeOptions = [
   { id: OrderType.PermPlacement, name: 'Perm. Placement' },
   { id: OrderType.Traveler, name: 'Traveler' }  
 ];
+
+export const IrpOrderTypes = [
+  { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
+  { id: OrderType.OpenPerDiem, name: 'Per Diem' },
+  { id: OrderType.PermPlacement, name: 'Perm. Placement' },
+  { id: OrderType.ReOrder,name: 'Re-Order' },
+  { id: OrderType.Traveler, name: 'LTA' },
+];
