@@ -17,7 +17,8 @@
   <app-order-per-diem-candidates-list *ngSwitchCase="orderType.OpenPerDiem" [candidatesList]="orderCandidatePage$ | async"
                                       (getCandidatesList)="onGetCandidatesList($event)"
                                       [includeDeployedCandidates]="!excludeDeployed"
-                                      [order]="orderCandidates">
+                                      [order]="orderCandidates"
+                                      [selectedOrder]="order">
   </app-order-per-diem-candidates-list>
   <app-order-candidates-list *ngSwitchDefault [candidatesList]="orderCandidatePage$ | async"
                              [includeDeployedCandidates]="!excludeDeployed"

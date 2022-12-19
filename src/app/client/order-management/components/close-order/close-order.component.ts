@@ -65,6 +65,9 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   public ngOnChanges(changes: SimpleChanges) {
+    if (!changes['currentValue']) {
+      return;
+    }
     const {
       order: { currentValue },
     } = changes;

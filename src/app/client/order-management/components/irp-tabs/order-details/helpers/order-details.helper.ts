@@ -12,6 +12,7 @@ import { IrpJobDistribution, IrpTiersLogic } from '@client/order-management/comp
 import { Order } from '@shared/models/order-management.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { FieldType } from '@core/enums';
+import { FormGroup } from '@angular/forms';
 
 export const setDataSource = (fields: OrderFormInput[], fieldName: string, source: DataSourceContainer): void => {
   fields.forEach((fields: OrderFormInput) => {
@@ -85,6 +86,7 @@ export const mapStructureToEditedOrder = (selectedOrder: Order) => {
     ...selectedOrder,
     ...modifyJobDistribution(selectedOrder),
     ...selectedOrder.irpOrderMetadata,
+    jobDates: selectedOrder.jobStartDate,
   };
 };
 
@@ -96,4 +98,14 @@ export const modifyJobDistribution = (selectedOrder: Order) => {
       agencyId: distribution.agencyId,
     };
   }, { jobDistributionValue: [], agencyId: null });
+};
+
+export const setDefaultPrimaryContact = (forms: FormGroup[]): void  => {
+  const isPrimarySelected = forms.map((currentForm: FormGroup) => {
+    return currentForm.value.isPrimaryContact;
+  }).some((value: boolean) => value);
+
+  if(!isPrimarySelected) {
+  forms[0].get('isPrimaryContact')?.patchValue(true);
+  }
 };

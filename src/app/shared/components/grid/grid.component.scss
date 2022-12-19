@@ -25,19 +25,30 @@ app-grid {
     position: relative;
     padding-top: 57px;
 
-    .title {
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       background-color: var(--grid-background-color);
       position: absolute;
       top: 0;
       width: 100%;
       box-sizing: border-box;
-      margin: 0;
       padding: 17px;
       border: 1px solid var(--grid-border-color);
-      font-weight: bold;
-      font-size: 16px;
       border-top-left-radius: var(--grid-border-radius);
       border-top-right-radius: var(--grid-border-radius);
+
+      .title {
+        font-weight: bold;
+        font-size: 16px;
+        margin: 0;
+      }
+
+      .action-btn {
+        font-size: 16px;
+        color: $primary-active-blue
+      }
     }
 
     .ag-root-wrapper {

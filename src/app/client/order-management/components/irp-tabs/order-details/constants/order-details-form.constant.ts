@@ -101,7 +101,7 @@ export const GeneralInformationConfigLTA: OrderFormsConfig  = {
   ],
 };
 
-export const GeneralInformationConfigPO: OrderFormsConfig  = {
+export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
   title: 'General Information',
   formName: 'generalInformationForm',
   cssClass: 'general-information-po-wrapper',
@@ -175,7 +175,7 @@ export const GeneralInformationConfigPO: OrderFormsConfig  = {
       type: FieldType.Time,
     },
   ],
-};
+});
 
 export const JobDistributionConfigLTA: OrderFormsConfig  = {
   title: 'Job Distribution',
@@ -433,26 +433,26 @@ export const WorkLocationFrom = (stateSource?: AssociateAgency[]): OrderFormInpu
   },
 ];
 
-export const ContactDetailsConfig = (): OrderFormsArrayConfig[] => [
+export const ContactDetailsConfig = (form: OrderFormInput[]): OrderFormsArrayConfig[] => [
   {
     title: 'Contact Details',
     buttonText: 'Add Contact',
     formList: 'contactDetailsList',
     buttonType: ButtonType.addContact,
     forms: [
-      ContactDetailsForm(),
+      form,
     ],
   },
 ];
 
-export const WorkLocationConfig = (): OrderFormsArrayConfig[] => [
+export const WorkLocationConfig = (form: OrderFormInput[]): OrderFormsArrayConfig[] => [
   {
     title: 'Work Location',
     buttonText: 'Add More',
     formList: 'workLocationList',
     buttonType: ButtonType.addMore,
     forms: [
-      WorkLocationFrom(),
+      form,
     ],
   },
 ];
@@ -463,10 +463,10 @@ export const LongTermAssignmentConfig: OrderFormsConfig[] = [
   JobDescriptionConfig,
 ];
 
-export const perDiemConfig: OrderFormsConfig[] = [
-  GeneralInformationConfigPO,
+export const perDiemConfig = (): OrderFormsConfig[] => ([
+  GeneralInformationConfigPO(),
   JobDistributionConfigPO,
   JobDescriptionConfig,
   SpecialConfigProject,
-];
+]);
 

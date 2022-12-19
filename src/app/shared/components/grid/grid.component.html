@@ -1,5 +1,9 @@
 <div [class.grid-title]="title" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
-  <p *ngIf="title" class="title">{{ title }}</p>
+  <div class="header">
+    <p *ngIf="title" class="title">{{ title }}</p>
+    <ng-content select="[action-button]"></ng-content>
+  </div>
+
   <ag-grid-angular
     (gridReady)="handleGridReadyEvent($event)"
     (selectionChanged)="handleMultiSelectionChanged($event)"
