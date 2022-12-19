@@ -22,12 +22,12 @@ export class OrderManagementIrpSubrowService {
       masterDetail: true,
       animateRows: true,
       detailCellRenderer: TableRowDetailComponent,
-      isRowMaster: (dataItem: IRPOrderManagement) => !!dataItem?.acceptedCandidates || true,
+      isRowMaster: (dataItem: IRPOrderManagement) => !!dataItem?.acceptedCandidates,
       getRowHeight: (params: RowHeightParams) => {
         if (params?.node?.detail) {
           const data = params.data;
 
-          return (data.acceptedCandidates || 1) * params.api.getSizesForCurrentTheme().rowHeight + 1;
+          return data.acceptedCandidates * params.api.getSizesForCurrentTheme().rowHeight + 1;
         }
 
         return null;
