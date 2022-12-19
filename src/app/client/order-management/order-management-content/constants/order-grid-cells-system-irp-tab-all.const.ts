@@ -33,18 +33,6 @@ export const GridCellsSystemIRPTabAll = (
     cellRendererParams: (params: ICellRendererParams) => {
       return {
         actionsConfig: [
-          (OrderType.OpenPerDiem === params.data.orderType && !isIncompleteTab && {
-            action: () => {
-              params.context.componentParent.createReorder(params.data);
-            },
-            iconName: 'calendar',
-            buttonClass: 'default',
-            disabled: !canCreateOrder
-              || params.data.status === OrderStatus.PreOpen
-              || params.data.status === OrderStatus.Closed
-              || !settingsIsReordered
-              || !hasCreateEditOrderPermission,
-          }),
           {
             action: () => {
               // TODO open IRP Order detail
@@ -53,7 +41,7 @@ export const GridCellsSystemIRPTabAll = (
             buttonClass: 'default',
             useBadge: true,
             badgeValue: params.data.unreadComments,
-            disabled: !hasCreateEditOrderPermission,
+            disabled: true,
           },
           (!isIncompleteTab && {
             action: () => {
@@ -62,10 +50,7 @@ export const GridCellsSystemIRPTabAll = (
             iconName: params.data.isLocked ? 'lock' : 'unlock',
             buttonClass: params.data.isLocked ? 'e-danger' : '',
             isCustomIcon: !params.data.isLocked,
-            disabled: !canCreateOrder
-              || ![OrderStatus.Open, OrderStatus.InProgress, OrderStatus.Filled].includes(params.data.status)
-              || params.data.extensionFromId
-              || !hasCreateEditOrderPermission,
+            disabled: true,
           }),
           {
             action: (itemId: number) => {
@@ -73,8 +58,7 @@ export const GridCellsSystemIRPTabAll = (
             },
             iconName: 'more-vertical',
             buttonClass: 'e-primary',
-            disabled: params.data.orderType === OrderType.ReOrder && params.data.status === OrderStatus.Closed
-              || !hasCreateEditOrderPermission,
+            disabled: true,
             menuItems: PrepareMenuItems(params.data, threeDotsMenuOptions),
           },
         ],
@@ -140,18 +124,18 @@ export const GridCellsSystemIRPTabAll = (
     width: 100,
     minWidth: 90,
     maxWidth: 200,
+    cellClass: 'wrap-cell',
   },
   {
     ...DefaultOrderCol,
     field: 'numberOfPositions',
-    headerName: 'AVAIL POSITIONS',
+    headerName: 'AVAIL POS.',
     type: 'rightAligned',
     width: 135,
     minWidth: 110,
     maxWidth: 180,
     valueFormatter: (params: ValueFormatterParams) =>
-      params.data.orderType !== OrderType.OpenPerDiem
-        ? `${params.data.numberOfOpenPositions || ''}/${params.data.numberOfPositions || ''}` : '',
+      `${params.data.numberOfOpenPositions ?? 0}/${params.data.numberOfPositions ?? 0}`,
   },
   {
     ...DefaultOrderCol,
