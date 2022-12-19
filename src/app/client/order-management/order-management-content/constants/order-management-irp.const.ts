@@ -152,7 +152,6 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
     field: 'primarySkillName',
     headerName: 'Primary skill',
     width: 100,
-    valueFormatter: (params) => params.value.slice(0, 3),
     cellRendererSelector: titleValueCellRendererSelector,
   },
   {
