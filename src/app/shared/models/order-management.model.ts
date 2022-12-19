@@ -403,7 +403,6 @@ export class Order {
   hasExtensions?: boolean;
   extensionInitialOrderPublicId?: number;
   regionName?: string;
-  isIRPOnly?: boolean;
   /**
    * Mispelling on BE, should be - contract.
    */
