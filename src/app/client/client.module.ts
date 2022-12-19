@@ -108,15 +108,16 @@ import { ImportDialogContentModule } from '@shared/components/import-dialog-cont
 import { CreateEditOrderModule } from '@client/order-management/create-edit-order.module';
 import { OrganizationCandidatesModule } from '@client/candidates/organization-candidates.module';
 import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
-import { GridHeaderActionsModule } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.module';
-import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
 import {
-  OrderManagementIrpSubrowService,
-} from '@client/order-management/order-management-content/services/order-management-irp-subrow.service';
-import { TableRowDetailModule } from '@shared/components/grid/cell-renderers/table-row-detail/table-row-detail.module';
+  GridHeaderActionsModule,
+} from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.module';
+import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
 import { SwitchEditorModule } from '@shared/components/switch-editor/switch-editor.module';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
+import {
+  OrderManagementIrpRowPositionModule,
+} from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.module';
 
 const gridIcons = {
   MessageSquare,
@@ -213,7 +214,7 @@ const gridIcons = {
     OrganizationCandidatesModule,
     ButtonGroupModule,
     GridHeaderActionsModule,
-    TableRowDetailModule,
+    OrderManagementIrpRowPositionModule,
     SwitchEditorModule,
     BoolValuePipeModule,
   ],
@@ -230,7 +231,6 @@ const gridIcons = {
     MaskedDateTimeService,
     SettingsViewService,
     OrderDetailsService,
-    OrderManagementIrpSubrowService,
     OrderManagementIrpApiService,
   ],
 })

@@ -1,11 +1,28 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MatMenuTrigger } from '@angular/material/menu';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, Module, RowNode, RowSelectedEvent, SortChangedEvent } from '@ag-grid-community/core';
+import {
+  ColDef,
+  GridApi,
+  GridOptions,
+  GridReadyEvent,
+  Module,
+  RowNode,
+  RowSelectedEvent,
+  SortChangedEvent,
+} from '@ag-grid-community/core';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
@@ -26,28 +43,21 @@ import {
   Subscription,
   take,
   takeUntil,
-  throttleTime
+  throttleTime,
 } from 'rxjs';
 
 import { ORDERS_GRID_CONFIG } from '@client/client.config';
 import { AddEditReorderService } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.service';
-import { OrderDetailsDialogComponent } from '@client/order-management/components/order-details-dialog/order-details-dialog.component';
-import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import {
-  TabNavigationComponent
+  OrderDetailsDialogComponent,
+} from '@client/order-management/components/order-details-dialog/order-details-dialog.component';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
+import {
+  TabNavigationComponent,
 } from '@client/order-management/components/order-management-content/tab-navigation/tab-navigation.component';
 import { ReOpenOrderService } from '@client/order-management/components/reopen-order/reopen-order.service';
-import {
-  DetectActiveSystem,
-  IRPTabRequestTypeMap,
-  IRPTabsConfig,
-  SystemGroupConfig,
-  ThreeDotsMenuOptions
-} from '@client/order-management/order-management-content/constants/order-management-irp.const';
-import { OrderManagementIrpGridHelper } from '@client/order-management/order-management-content/helpers/order-management-irp-grid.helper';
-import {
-  OrderManagementIrpSubrowService
-} from '@client/order-management/order-management-content/services/order-management-irp-subrow.service';
 import {
   ApproveOrder,
   ClearOrders,
@@ -70,7 +80,7 @@ import {
   LockUpdatedSuccessfully,
   ReloadOrganisationOrderCandidatesLists,
   SelectNavigationTab,
-  SetLock
+  SetLock,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -79,7 +89,7 @@ import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '
 import {
   GetAssignedSkillsByOrganization,
   GetOrganizationById,
-  GetOrganizationSettings
+  GetOrganizationSettings,
 } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
@@ -96,7 +106,7 @@ import { OrderStatus } from '@shared/enums/order-management';
 import {
   OrderManagementIRPSystemId,
   OrderManagementIRPTabsIndex,
-  OrganizationOrderManagementTabs
+  OrganizationOrderManagementTabs,
 } from '@shared/enums/order-management-tabs.enum';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { SettingsKeys } from '@shared/enums/settings';
@@ -117,10 +127,15 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementChild,
-  OrderManagementPage
+  OrderManagementPage,
 } from '@shared/models/order-management.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import {
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
 import { PreservedFilters } from '@shared/models/preserved-filters.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { Skill } from '@shared/models/skill.model';
@@ -135,7 +150,7 @@ import {
   ShowExportDialog,
   ShowFilterDialog,
   ShowSideDialog,
-  ShowToast
+  ShowToast,
 } from 'src/app/store/app.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { UserState } from 'src/app/store/user.state';
@@ -155,8 +170,16 @@ import {
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  ROW_HEIGHT
+  ROW_HEIGHT,
 } from './order-management-content.constants';
+import { OrderManagementIrpGridHelper, OrderManagementIrpSubrowHelper } from '@client/order-management/helpers';
+import {
+  DetectActiveSystem,
+  IRPTabRequestTypeMap,
+  IRPTabsConfig,
+  SystemGroupConfig,
+  ThreeDotsMenuOptions,
+} from '@client/order-management/constants';
 
 @Component({
   selector: 'app-order-management-content',
@@ -336,12 +359,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService,
     private cd: ChangeDetectorRef,
-    private orderManagementIrpSubrowService: OrderManagementIrpSubrowService
   ) {
     super(store);
 
     this.context = { componentParent: this };
-    this.gridOptions = this.orderManagementIrpSubrowService.configureOrderGridSubRowOptions(this.context);
+    this.gridOptions = OrderManagementIrpSubrowHelper.configureOrderGridSubRowOptions(this.context);
 
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
 

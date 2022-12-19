@@ -10,7 +10,7 @@ import {
   GridCellsSystemIRPTabAll,
   GridCellsSystemIRPTabLta,
   GridCellsSystemIRPTabPerDiem,
-} from '@client/order-management/order-management-content/constants';
+} from '@client/order-management/constants';
 
 export class OrderManagementIrpGridHelper {
   static prepareColDefs(

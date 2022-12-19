@@ -6,14 +6,9 @@ import { OrderManagement } from '@shared/models/order-management.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
-import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
-import { titleValueCellRendererSelector } from '../../../../modules/invoices/constants';
-import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
-import { OrderStatusText } from '@shared/enums/status';
 import {
   MoreMenuType,
 } from '@client/order-management/components/order-management-content/order-management-content.constants';
-import { formatDate } from '@angular/common';
 
 export const SystemGroupConfig = (isIRPIncluded = false, isVMSIncluded = false): ButtonModel[] => {
   const buttons = [];
@@ -30,6 +25,7 @@ export const SystemGroupConfig = (isIRPIncluded = false, isVMSIncluded = false):
     buttons.push({
       id: OrderManagementIRPSystemId.IRP,
       title: 'IRP',
+      active: !isVMSIncluded,
     });
   }
 
@@ -165,29 +161,22 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
     field: 'name',
     headerName: 'Employee',
     width: 200,
-    valueFormatter: (params: ValueFormatterParams) =>
-      `${params.data.lastName} ${params.data.firstName}`,
-    cellRendererSelector: titleValueCellRendererSelector,
   },
   {
     field: 'candidateStatus',
-    cellRenderer: TableStatusCellComponent,
-    valueFormatter: (params: ValueFormatterParams) => OrderStatusText[params.value],
     width: 215,
   },
   {
     field: 'primarySkillName',
     headerName: 'Primary skill',
-    width: 100,
-    cellRendererSelector: titleValueCellRendererSelector,
+    width: 160,
   },
   {
     field: 'contract',
     headerName: 'Contract Employee',
     width: 160,
-    valueFormatter: (params) => params.value ? 'Yes': 'No',
-    cellRendererSelector: titleValueCellRendererSelector,
   },
+/* TODO future iteration
   {
     field: 'lastShiftScheduledStartTime',
     headerName: 'Last Shift Scheduled',
@@ -239,5 +228,5 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
     headerName: 'Overtime',
     width: 100,
     cellRendererSelector: titleValueCellRendererSelector,
-  },
+  },*/
 ];
