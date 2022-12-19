@@ -110,6 +110,9 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   public defaultRegions:(number|undefined)[] =[];
   public defaultLocations:(number|undefined)[]=[];
   public defaultDepartments:(number|undefined)[]=[];
+  public defaultSkillCategories: (number | undefined)[] = [];
+  public defaultOrderTypes: (number | undefined)[] = [];
+  public defaultSkills: (number | undefined)[] = [];
   public regionsList: Region[] = [];
   public locationsList: Location[] = [];
   public departmentsList: Department[] = [];
@@ -133,16 +136,14 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   private nullValue = "null";
   private joinString = ",";
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
-  changeDetectorRef: ChangeDetectorRef;  
   filterOptionsData: CommonReportFilterOptions;
-  public defaultSkillCategories: (number | undefined)[] = [];
-  public defaultOrderTypes: (number | undefined)[] = [];
-  public defaultSkills: (number | undefined)[] = [];
   skillCategoryIdControl: AbstractControl;
   skillIdControl: AbstractControl;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
-    private filterService: FilterService, @Inject(APP_SETTINGS) private appSettings: AppSettings) {
+    private filterService: FilterService,    
+    private changeDetectorRef: ChangeDetectorRef,
+     @Inject(APP_SETTINGS) private appSettings: AppSettings) {
       this.baseUrl = this.appSettings.host.replace("https://", "").replace("http://", "");
       this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
       this.initForm();
@@ -174,7 +175,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
 
   private initForm(): void {
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
+    startDate.setDate(startDate.getDate() - 30);
     this.candidateJourneyForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
@@ -354,7 +355,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
       jobStatuses, locationIds, orderTypes,regionIds, skillCategoryIds, skillIds, startDate, endDate } 
       = this.candidateJourneyForm.getRawValue();
     if (!this.candidateJourneyForm.dirty) {
-      this.message = "Default filter selected with all regions, locations and departments for 90 days";
+      this.message = "Default filter selected with all regions, locations and departments for 30 days";
     }
     else {
       this.isResetFilter = false;
