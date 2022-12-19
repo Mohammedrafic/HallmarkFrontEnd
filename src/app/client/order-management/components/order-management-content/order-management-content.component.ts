@@ -1,8 +1,5 @@
-import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy,
-  OnInit, ViewChild,
-} from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -16,45 +13,73 @@ import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-g
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { isArray, isUndefined } from 'lodash';
 import isNil from 'lodash/fp/isNil';
-import { catchError, combineLatest, debounceTime, delay, EMPTY, filter, Observable, of,
-  Subject, Subscription, take, takeUntil, throttleTime } from 'rxjs';
+import {
+  catchError,
+  combineLatest,
+  debounceTime,
+  delay,
+  EMPTY,
+  filter,
+  Observable,
+  of,
+  Subject,
+  Subscription,
+  take,
+  takeUntil,
+  throttleTime
+} from 'rxjs';
 
 import { ORDERS_GRID_CONFIG } from '@client/client.config';
 import { AddEditReorderService } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.service';
+import { OrderDetailsDialogComponent } from '@client/order-management/components/order-details-dialog/order-details-dialog.component';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import {
-  OrderDetailsDialogComponent,
-} from '@client/order-management/components/order-details-dialog/order-details-dialog.component';
-import {
-  OrderManagementService,
-} from '@client/order-management/components/order-management-content/order-management.service';
-import {
-  TabNavigationComponent,
+  TabNavigationComponent
 } from '@client/order-management/components/order-management-content/tab-navigation/tab-navigation.component';
 import { ReOpenOrderService } from '@client/order-management/components/reopen-order/reopen-order.service';
 import {
+  DetectActiveSystem,
+  IRPTabRequestTypeMap,
   IRPTabsConfig,
   SystemGroupConfig,
-  ThreeDotsMenuOptions,
+  ThreeDotsMenuOptions
 } from '@client/order-management/order-management-content/constants/order-management-irp.const';
-import { OrderManagementIrpGridHelper,
-} from '@client/order-management/order-management-content/helpers/order-management-irp-grid.helper';
+import { OrderManagementIrpGridHelper } from '@client/order-management/order-management-content/helpers/order-management-irp-grid.helper';
 import {
-  OrderManagementIrpSubrowService,
+  OrderManagementIrpSubrowService
 } from '@client/order-management/order-management-content/services/order-management-irp-subrow.service';
 import {
-  ApproveOrder, ClearOrders, ClearSelectedOrder, DeleteOrder, DeleteOrderSucceeded,
-  DuplicateOrder, DuplicateOrderSuccess, ExportOrders, GetAgencyOrderCandidatesList, GetAvailableSteps, GetIRPOrders,
-  GetOrderById, GetOrderByIdSucceeded, GetOrderFilterDataSources, GetOrders, GetOrganisationCandidateJob,
-  GetProjectSpecialData, GetSelectedOrderById, LockUpdatedSuccessfully, ReloadOrganisationOrderCandidatesLists,
-  SelectNavigationTab, SetLock,
+  ApproveOrder,
+  ClearOrders,
+  ClearSelectedOrder,
+  DeleteOrder,
+  DeleteOrderSucceeded,
+  DuplicateOrder,
+  DuplicateOrderSuccess,
+  ExportOrders,
+  GetAgencyOrderCandidatesList,
+  GetAvailableSteps,
+  GetIRPOrders,
+  GetOrderById,
+  GetOrderByIdSucceeded,
+  GetOrderFilterDataSources,
+  GetOrders,
+  GetOrganisationCandidateJob,
+  GetProjectSpecialData,
+  GetSelectedOrderById,
+  LockUpdatedSuccessfully,
+  ReloadOrganisationOrderCandidatesLists,
+  SelectNavigationTab,
+  SetLock
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
 import { Permission } from '@core/interface';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
-  GetAssignedSkillsByOrganization, GetOrganizationById,
-  GetOrganizationSettings,
+  GetAssignedSkillsByOrganization,
+  GetOrganizationById,
+  GetOrganizationSettings
 } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
@@ -69,8 +94,9 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderStatus } from '@shared/enums/order-management';
 import {
-  OrderManagementIRPSystemId, OrderManagementIRPTabsIndex,
-  OrganizationOrderManagementTabs,
+  OrderManagementIRPSystemId,
+  OrderManagementIRPTabsIndex,
+  OrganizationOrderManagementTabs
 } from '@shared/enums/order-management-tabs.enum';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { SettingsKeys } from '@shared/enums/settings';
@@ -82,14 +108,19 @@ import { ButtonModel } from '@shared/models/buttons-group.model';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import {
-  FilterOrderStatus, FilterStatus, Order, OrderCandidateJob, OrderFilter, OrderFilterDataSource,
-  OrderManagement, OrderManagementChild, OrderManagementPage, IRPOrderManagement,
+  FilterOrderStatus,
+  FilterStatus,
+  IRPOrderManagement,
+  Order,
+  OrderCandidateJob,
+  OrderFilter,
+  OrderFilterDataSource,
+  OrderManagement,
+  OrderManagementChild,
+  OrderManagementPage
 } from '@shared/models/order-management.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
-import {
-  OrganizationDepartment, OrganizationLocation, OrganizationRegion,
-  OrganizationStructure,
-} from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { PreservedFilters } from '@shared/models/preserved-filters.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { Skill } from '@shared/models/skill.model';
@@ -104,7 +135,7 @@ import {
   ShowExportDialog,
   ShowFilterDialog,
   ShowSideDialog,
-  ShowToast,
+  ShowToast
 } from 'src/app/store/app.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { UserState } from 'src/app/store/user.state';
@@ -124,7 +155,7 @@ import {
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  ROW_HEIGHT,
+  ROW_HEIGHT
 } from './order-management-content.constants';
 
 @Component({
@@ -247,8 +278,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     = OrganizationOrderManagementTabs.AllOrders;
   public activeIRPTabIndex: OrderManagementIRPTabsIndex = OrderManagementIRPTabsIndex.AllOrders;
   public isIRPFlagEnabled = false;
-  public systemGroupConfig: ButtonModel[] = SystemGroupConfig;
-  public activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
+  public systemGroupConfig: ButtonModel[];
+  public activeSystem: OrderManagementIRPSystemId;
   public tabsListConfig: TabsListConfig[] = IRPTabsConfig;
   public columnDefs: ColDef[] = [];
   public threeDotsMenuOptions: Record<string, ItemModel[]>;
@@ -486,7 +517,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters.orderBy = this.orderBy;
       this.filters.pageNumber = this.currentPage;
       this.filters.pageSize = this.pageSize;
-      this.filters.orderType = this.activeIRPTabIndex ? this.activeIRPTabIndex - 1 : null;
+      this.filters.orderType = IRPTabRequestTypeMap.get(this.activeIRPTabIndex) ?? null;
 
       this.store.dispatch(new GetIRPOrders(this.filters));
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
@@ -779,7 +810,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   setGridApi(params: GridReadyEvent): void {
     this.gridApi = params.api;
   }
-  
+
   public onRowClick(event: any): void {
     if (event.target) {
       this.orderManagementService.excludeDeployed = false;
@@ -1792,8 +1823,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
       this.isOrgIRPEnabled = !!isIRPEnabled;
       this.isOrgVMSEnabled = !!isVMCEnabled;
+      this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+      this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
 
       this.initGridColumns();
+      this.getOrders();
     });
   }
 

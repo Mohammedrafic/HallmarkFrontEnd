@@ -127,7 +127,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public ngOnInit(): void {
     if (this.orderId > 0) {
-      this.store.dispatch(new GetSelectedOrderById(this.orderId));
       this.selectedOrder$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((order: Order) => {
         this.order = order;
         this.publicId = order?.publicId as number;

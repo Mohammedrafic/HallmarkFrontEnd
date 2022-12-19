@@ -4,9 +4,11 @@ import { ToastUtility } from '@syncfusion/ej2-notifications';
 
 import { FieldName } from '@client/order-management/enums';
 import { FormArrayList } from '@client/order-management/containers/irp-container/irp-container.constant';
-import { OrderDetailsValidationMessage } from '@client/order-management/constants';
+import { ErrorContentMessageForCredential, OrderDetailsValidationMessage } from '@client/order-management/constants';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 import { JobDistributionList, ListControls, ListOfKeyForms } from '@client/order-management/interfaces';
+import { Order } from '@shared/models/order-management.model';
+import { IOrderCredentialItem } from '@order-credentials/types';
 
 export const collectInvalidFieldsFromForm = (controls: { [key: string]: AbstractControl }, fields: string[]) => {
   for (const name in controls) {
@@ -22,7 +24,7 @@ export const createJobDistributionList = (distributionForm: FormGroup): JobDistr
       id: 0,
       jobDistributionOption: value,
       agencyId: value === IrpOrderJobDistribution.SelectedExternal ?
-       distributionForm.value.agency : null,
+       distributionForm.value.agencyId : null,
     };
   });
 };
@@ -41,6 +43,15 @@ export const showInvalidFormControl = (controls: ListControls[]): void => {
   ToastUtility.show({
     title: OrderDetailsValidationMessage.title,
     content: OrderDetailsValidationMessage.content + fields,
+    position: OrderDetailsValidationMessage.position,
+    cssClass: OrderDetailsValidationMessage.cssClass,
+  });
+};
+
+export const showMessageForInvalidCredentials = ():void => {
+  ToastUtility.show({
+    title: OrderDetailsValidationMessage.title,
+    content: ErrorContentMessageForCredential,
     position: OrderDetailsValidationMessage.position,
     cssClass: OrderDetailsValidationMessage.cssClass,
   });
@@ -73,27 +84,16 @@ export const getFormsList = (list: ListOfKeyForms): FormGroup[] => {
   return formList as FormGroup[];
 };
 
-//TODO: remove credential, after implementation
-export const createOrderDTO = (formState: ListOfKeyForms) => ({
+export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCredentialItem[]) => ({
   ...formState.orderType.getRawValue(),
   ...formState.generalInformationForm.getRawValue(),
   ...formState.jobDescriptionForm.getRawValue(),
   ...formState.jobDistributionForm.getRawValue(),
+  ...formState.specialProjectForm?.getRawValue(),
   jobDistributions: createJobDistributionList(formState.jobDistributionForm),
   contactDetails: [],
   workLocations: [],
-  credentials: [
-    {
-      comment: null,
-      credentialId: 234,
-      credentialName: "Color Vision Screening",
-      credentialType: "Personal Health History",
-      id: 0,
-      optional: false,
-      orderId: 0,
-      reqForOnboard: false,
-    },
-  ],
+  credentials: [...credentials],
   isSubmit: true,
   isTemplate: false,
 });
@@ -102,4 +102,12 @@ export const getValuesFromList = (formList: FormGroup[]) => {
   return formList.map((form: FormGroup) => {
     return form.getRawValue();
   });
+};
+
+export const createFormData = (order: Order[], documents: Blob[]) => {
+  const formData = new FormData();
+  const orderIds = order.map((order: Order) => order.id);
+  documents.forEach((document: Blob) => formData.append('document', document));
+  orderIds.forEach((id: number) => formData.append('orderIds', `${id}`));
+  return formData;
 };

@@ -8,10 +8,11 @@ import { GridPaginationModule } from '@shared/components/grid/grid-pagination/gr
 import { TitleValueCellRendererComponent } from './components/title-value-cell-renderer/title-value-cell-renderer.component';
 import { GridCellLinkComponent } from './components/grid-cell-link/grid-cell-link.component';
 import { RouterModule } from '@angular/router';
+import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 
 @NgModule({
   declarations: [GridComponent, TitleValueCellRendererComponent, GridCellLinkComponent],
-  imports: [CommonModule, AgGridModule, GridPaginationModule, RouterModule],
-  exports: [GridComponent],
+  imports: [CommonModule, AgGridModule, GridPaginationModule, RouterModule, ButtonModule],
+  exports: [GridComponent]
 })
 export class GridModule {}

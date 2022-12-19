@@ -241,6 +241,19 @@
   height: 100%;
 
   &::ng-deep {
+    & ag-grid-angular .ag-cell {
+      display: flex;
+      align-items: center;
+
+      &.wrap-cell {
+        white-space: normal;
+        line-height: 20px;
+      }
+
+      &.ag-right-aligned-cell {
+        justify-content: flex-end;
+      }
+    }
     .empty-table {
       .ag-body-viewport {
         height: 100px;

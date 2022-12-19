@@ -1,5 +1,6 @@
 import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 import { OrderStatus } from "@shared/enums/order-management";
+import { OrderType } from "@shared/enums/order-type";
 
 export class CommonReportFilterOptions {
   orderStatuses: OrderStatusDto[];
@@ -75,3 +76,10 @@ export class AgencyDto {
     lastName:string;
     fullName:string;
   }
+  export const OrderTypeOptionsForReport = [
+    { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
+    { id: OrderType.OpenPerDiem, name: 'Open Per Diem' },
+    { id: OrderType.PermPlacement, name: 'Perm. Placement' },
+    {id:OrderType.ReOrder,name:'Re-Order'},
+    { id: OrderType.Traveler, name: 'Traveler' }  
+  ];

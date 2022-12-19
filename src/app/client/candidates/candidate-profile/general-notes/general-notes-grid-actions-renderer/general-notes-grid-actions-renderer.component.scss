@@ -1,0 +1,29 @@
+@import "colors";
+
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content {
+  padding-top: 2px;
+}
+
+.icon {
+  cursor: pointer;
+}
+
+.edit-action {
+  color: $primary-active-blue-10;
+
+  &.disable {
+    color: $secondary-dark-blue-30;
+    cursor: default;
+  }
+}
+
+.delete-action {
+  color: $supportive-red;
+  margin-left: 17px;
+}

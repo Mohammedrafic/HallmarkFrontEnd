@@ -52,6 +52,7 @@
       (select)="exportSelected($event)"
       id="importButton"
       cssClass="e-outline button-export"
+      [disabled]="isIRPFlagEnabled"
     >
       <div class="button-export-container">Export<i-feather name="download" class="icon"></i-feather></div>
     </button>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { filter, map, Observable, switchMap } from 'rxjs';
+import { map, Observable, switchMap } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import {
@@ -26,7 +26,7 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
-import { HistoricalEvent } from '../models/historical-event.model';
+import { HistoricalEvent } from '@shared/models';
 import { ExportPayload } from '@shared/models/export.model';
 import { AgencyOrderManagementTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
@@ -331,30 +331,16 @@ export class OrderManagementContentService {
       );
   }
 
-  //todo: add when backend will be ready
-  public saveIrpOrder(order: CreateOrderDto, documents: Blob[],): Observable<Order[]>{
-    return this.http.post<Order[]>('/api/IRPOrders', order);
-      /*.pipe(
-      switchMap((createdOrders: Order[]) => {
-        const formData = new FormData();
-        const orderIds = createdOrders.map((order: Order) => order.id);
-        documents.forEach((document: Blob) => formData.append('document', document));
-        orderIds.forEach((id: number) => formData.append('orderIds', `${id}`));
-        return this.http.post(`/api/IRPOrders/documents`, formData).pipe(map(() => createdOrders));
-      }),
-    );*/
+  public saveIrpOrder(order: CreateOrderDto): Observable<Order[]>{
+    return this.http.post<Order[]>('/api/IRPOrders', this.changeDateToUtc(order));
   }
-//todo: add when backend will be ready
-  public editIrpOrder(order: EditOrderDto, documents: Blob[]): Observable<Order[]> {
-    return this.http.put<Order[]>('/api/IRPOrders', order);
-      /*.pipe(
-      filter((createdOrders: Order[]) => !!createdOrders[0]?.documents?.length),
-      switchMap((editedOrder: Order[]) => {
-        const formData = new FormData();
-        documents.forEach((document: Blob) => formData.append('documents', document));
-        return this.http.post(`/api/Orders/${editedOrder[0].id}/documents`, formData) as Observable<Blob>;
-      })
-    );*/
+
+  public saveDocumentsForIrpOrder(formData: FormData): Observable<Blob[]> {
+    return this.http.post<Blob[]>(`/api/IRPOrders/documents`, formData) as Observable<Blob[]>;
+  }
+
+  public editIrpOrder(order: EditOrderDto): Observable<Order[]> {
+    return this.http.put<Order[]>('/api/IRPOrders', this.changeDateToUtc(order));
   }
 
   /**

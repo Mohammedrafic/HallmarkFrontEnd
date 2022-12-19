@@ -36,3 +36,5 @@ export const OrderDetailsValidationMessage = {
   position: { X: 'Center', Y: 'Top' },
   cssClass: 'error-toast',
 };
+
+export const ErrorContentMessageForCredential = 'Please add Credentials in Credentials tab';

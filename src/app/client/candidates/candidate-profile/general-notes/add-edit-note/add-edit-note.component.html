@@ -1,0 +1,30 @@
+<form class="note-form">
+  <app-datepicker
+    [formGroupInstance]="noteForm"
+    [required]="true"
+    controlName="date"
+    label="Date"
+    id="date"
+  >
+  </app-datepicker>
+  <app-dropdown
+    [dataSource]="categories$ | async"
+    [fields]="categoryFields"
+    [formGroupInstance]="noteForm"
+    [required]="true"
+    [hideBorder]="false"
+    label="Category"
+    id="category"
+    controlName="categoryId"
+  >
+    >
+  </app-dropdown>
+  <app-textarea
+    [formGroupInstance]="noteForm"
+    controlName="note"
+    label="Note"
+    id="note"
+  >
+    >
+  </app-textarea>
+</form>

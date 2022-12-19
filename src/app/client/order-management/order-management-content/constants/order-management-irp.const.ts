@@ -10,29 +10,59 @@ import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entit
 import { titleValueCellRendererSelector } from '../../../../modules/invoices/constants';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 import { OrderStatusText } from '@shared/enums/status';
-import { MoreMenuType } from '@client/order-management/components/order-management-content/order-management-content.constants';
+import {
+  MoreMenuType,
+} from '@client/order-management/components/order-management-content/order-management-content.constants';
+import { formatDate } from '@angular/common';
 
-export const SystemGroupConfig: ButtonModel[] = [
-  {
-    id: OrderManagementIRPSystemId.All,
-    title: 'All',
-    disabled: true,
-  },
-  {
-    id: OrderManagementIRPSystemId.IRP,
-    title: 'IRP',
-  },
-  {
-    id: OrderManagementIRPSystemId.VMS,
-    title: 'VMS',
-    active: true,
-  },
-  {
-    id: OrderManagementIRPSystemId.OrderJourney,
-    title: 'Order Journey',
-    disabled: true,
-  },
-];
+export const SystemGroupConfig = (isIRPIncluded = false, isVMSIncluded = false): ButtonModel[] => {
+  const buttons = [];
+
+  if (isIRPIncluded && isVMSIncluded) {
+    buttons.push({
+      id: OrderManagementIRPSystemId.All,
+      title: 'All',
+      disabled: true,
+    });
+  }
+
+  if (isIRPIncluded) {
+    buttons.push({
+      id: OrderManagementIRPSystemId.IRP,
+      title: 'IRP',
+    });
+  }
+
+  if (isVMSIncluded) {
+    buttons.push({
+      id: OrderManagementIRPSystemId.VMS,
+      title: 'VMS',
+      active: true,
+    });
+  }
+
+  if (isIRPIncluded && isVMSIncluded) {
+    buttons.push({
+      id: OrderManagementIRPSystemId.OrderJourney,
+      title: 'Order Journey',
+      disabled: true,
+    });
+  }
+
+  return buttons;
+};
+
+export const DetectActiveSystem = (isIRPIncluded = false, isVMSIncluded = false): number => {
+  if (isIRPIncluded && isVMSIncluded) {
+    return OrderManagementIRPSystemId.VMS;
+  }
+
+  if (isIRPIncluded) {
+    return OrderManagementIRPSystemId.IRP;
+  }
+
+  return OrderManagementIRPSystemId.VMS;
+};
 
 export const IRPTabsConfig: TabsListConfig[] = [
   {
@@ -48,6 +78,12 @@ export const IRPTabsConfig: TabsListConfig[] = [
     title: OrderManagementIRPTabs.Incomplete,
   },
 ];
+
+export const IRPTabRequestTypeMap: Map<number, number | null> = new Map<number, number | null>()
+  .set(0, null)
+  .set(1, 2)
+  .set(2, 1)
+  .set(3, 0);
 
 export const MapSystemWithTabs: Map<OrderManagementIRPSystemId, TabsListConfig[]> =
   new Map<OrderManagementIRPSystemId, TabsListConfig[]>()
@@ -150,6 +186,58 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
     headerName: 'Contract Employee',
     width: 160,
     valueFormatter: (params) => params.value ? 'Yes': 'No',
+    cellRendererSelector: titleValueCellRendererSelector,
+  },
+  {
+    field: 'lastShiftScheduledStartTime',
+    headerName: 'Last Shift Scheduled',
+    width: 160,
+    valueFormatter: (params) =>
+      params.value ? formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC') : '',
+    cellRendererSelector: titleValueCellRendererSelector,
+  },
+  {
+    field: 'lastShiftScheduledStartTime',
+    headerName: 'Last Shift',
+    width: 160,
+    valueFormatter: (params: ValueFormatterParams) => {
+      const startShiftTime = formatDate(params.data.lastShiftScheduledStartTime, 'shortTime', 'en-US');
+      const endShiftTime = formatDate(params.data.lastShiftScheduledEndTime, 'shortTime', 'en-US');
+
+      return `${startShiftTime}-${endShiftTime}`;
+    },
+    cellRendererSelector: titleValueCellRendererSelector,
+  },
+  {
+    field: 'nextShiftScheduledStartTime',
+    headerName: 'Next Shift Scheduled',
+    width: 160,
+    valueFormatter: (params) =>
+      params.value ? formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC') : '',
+    cellRendererSelector: titleValueCellRendererSelector,
+  },
+  {
+    field: 'nextShiftScheduledStartTime',
+    headerName: 'Next Shift',
+    width: 160,
+    valueFormatter: (params: ValueFormatterParams) => {
+      const startShiftTime = formatDate(params.data.nextShiftScheduledStartTime, 'shortTime', 'en-US');
+      const endShiftTime = formatDate(params.data.nextShiftScheduledStartTime, 'shortTime', 'en-US');
+
+      return `${startShiftTime}-${endShiftTime}`;
+    },
+    cellRendererSelector: titleValueCellRendererSelector,
+  },
+  {
+    field: 'scheduledWeeklyHours',
+    headerName: 'Sch Weekly Hours',
+    width: 150,
+    cellRendererSelector: titleValueCellRendererSelector,
+  },
+  {
+    field: 'overtime',
+    headerName: 'Overtime',
+    width: 100,
     cellRendererSelector: titleValueCellRendererSelector,
   },
 ];

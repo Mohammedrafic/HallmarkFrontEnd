@@ -1,4 +1,10 @@
-<ejs-tab #tabComponent class="stepper" (selected)="selectEmitter.emit($event)" (created)="onCreated($event)">
+<ejs-tab
+  #tabComponent
+  class="stepper"
+  (selected)="selectEmitter.emit($event)"
+  (created)="onCreated($event)"
+  (selecting)="onSelecting($event)"
+>
   <div class="e-tab-header">
     <div *ngFor="let tab of tabs">
       <div class="stepper-header">
