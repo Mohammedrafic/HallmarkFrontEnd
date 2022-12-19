@@ -150,11 +150,10 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
         filter(Boolean),
         takeUntil(this.componentDestroy())
       ).subscribe((organization: Organization) => {
-        if (this.isIrpFlagEnabled) {
-          const isMspUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.MSP;
-          this.showSystemButtons = !!organization.preferences.isIRPEnabled
-            && !!organization.preferences.isVMCEnabled
-            && !isMspUser;
+        const isMspUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.MSP;
+
+        if (this.isIrpFlagEnabled && !isMspUser) {
+          this.showSystemButtons = !!organization.preferences.isIRPEnabled && !!organization.preferences.isVMCEnabled;
           this.selectedSystemType = this.showSystemButtons || !!organization.preferences.isIRPEnabled
             ? SystemType.IRP
             : SystemType.VMS;
