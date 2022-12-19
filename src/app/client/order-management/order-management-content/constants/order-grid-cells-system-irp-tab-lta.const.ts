@@ -186,12 +186,12 @@ export const GridCellsSystemIRPTabLta = (
     minWidth: 135,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) =>
-      formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
+      params.value ? formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC') : '',
   },
   {
     ...DefaultOrderCol,
     field: 'shiftDateTime',
-    headerName: 'SHIFT TIME',
+    headerName: 'SHIFT',
     width: 160,
     minWidth: 80,
     maxWidth: 200,

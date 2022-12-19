@@ -32,6 +32,7 @@ import {
 } from '@client/order-management/components/order-management-content/tab-navigation/tab-navigation.component';
 import { ReOpenOrderService } from '@client/order-management/components/reopen-order/reopen-order.service';
 import {
+  IRPTabRequestTypeMap,
   IRPTabsConfig,
   SystemGroupConfig,
   ThreeDotsMenuOptions,
@@ -486,7 +487,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters.orderBy = this.orderBy;
       this.filters.pageNumber = this.currentPage;
       this.filters.pageSize = this.pageSize;
-      this.filters.orderType = this.activeIRPTabIndex ? this.activeIRPTabIndex - 1 : null;
+      this.filters.orderType = IRPTabRequestTypeMap.get(this.activeIRPTabIndex) ?? null;
 
       this.store.dispatch(new GetIRPOrders(this.filters));
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
@@ -779,7 +780,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   setGridApi(params: GridReadyEvent): void {
     this.gridApi = params.api;
   }
-  
+
   public onRowClick(event: any): void {
     if (event.target) {
       this.orderManagementService.excludeDeployed = false;

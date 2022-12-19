@@ -181,7 +181,7 @@ export const GridCellsSystemIRPTabPerDiem = (
   {
     ...DefaultOrderCol,
     field: 'shiftDateTime',
-    headerName: 'SHIFT TIME',
+    headerName: 'SHIFT',
     width: 160,
     minWidth: 80,
     maxWidth: 200,
