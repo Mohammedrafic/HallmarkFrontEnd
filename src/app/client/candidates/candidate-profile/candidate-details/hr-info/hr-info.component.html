@@ -1,48 +1,62 @@
 <h2 class="title">HR Info</h2>
 <form class="hr-info__form">
   <app-dropdown
-    [dataSource]="[]"
+    [dataSource]="hrCompanyCodes"
     [fields]="fieldsSettings"
     [formGroupInstance]="candidateForm"
     [hideBorder]="false"
     label="HR Company Code"
     id="hr-company-code"
-    controlName="hrCompanyCode"
+    controlName="hrCompanyCodeId"
   ></app-dropdown>
 
   <app-dropdown
-    [dataSource]="[]"
+    [dataSource]="hrInternalTransfersRecruitments"
     [fields]="fieldsSettings"
     [formGroupInstance]="candidateForm"
     [hideBorder]="false"
+    placeholder="Select"
     label="Internal transfer/recruitment"
     id="internal-transfer-recruitment"
-    controlName="internalTransferRecruitment"
+    controlName="internalTransferId"
   ></app-dropdown>
 
   <app-dropdown
-    [dataSource]="[]"
+    [dataSource]="orientationConfigurations"
     [fields]="fieldsSettings"
     [formGroupInstance]="candidateForm"
     [hideBorder]="false"
+    placeholder="Select"
     label="Orientation Configuration"
     id="orientation-configuration"
-    controlName="orientationConfiguration"
+    controlName="orientationConfigurationId"
   ></app-dropdown>
 
   <app-datepicker
     [formGroupInstance]="candidateForm"
-    [enableMask]="true"
-    [maskPlaceholder]="datepickerMask"
-    id="organizationOrientationDate"
+    id="organization-orientation-date"
     controlName="organizationOrientationDate"
     label="Organization Orientation Date"
-    format="MM/dd/yyyy"
-    placeholder="MM/DD/YYYY"
   ></app-datepicker>
 
   <div>
-    <ejs-switch id="contract" controlName="contract"></ejs-switch>
+    <ejs-switch id="contract" (change)="listenContractChanges($event)"></ejs-switch>
     <label for="contract">Contract</label>
   </div>
+
+  <app-datepicker
+    [formGroupInstance]="candidateForm"
+    [disabled]="true"
+    id="contract-start-date"
+    controlName="contractStartDate"
+    label="Contract Start Date"
+  ></app-datepicker>
+
+  <app-datepicker
+    [formGroupInstance]="candidateForm"
+    [disabled]="true"
+    id="contract-end-date"
+    controlName="contractEndDate"
+    label="Contract End Date"
+  ></app-datepicker>
 </form>

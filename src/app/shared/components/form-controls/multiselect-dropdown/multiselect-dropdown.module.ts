@@ -7,11 +7,12 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MultiselectDropdownComponent } from './multiselect-dropdown.component';
 import { FormControlWrapperModule } from '@shared/components/form-controls/form-control-wrapper/form-control-wrapper.module';
 import { SharedModule } from '@shared/shared.module';
+import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 
 @NgModule({
   declarations: [MultiselectDropdownComponent],
-  imports: [CommonModule, MultiSelectModule, FormControlWrapperModule, ReactiveFormsModule, SharedModule],
+  imports: [CommonModule, MultiSelectModule, FormControlWrapperModule, ReactiveFormsModule, SharedModule, ValidateDirectiveModule],
   exports: [MultiselectDropdownComponent],
-  providers: [CheckBoxSelectionService],
+  providers: [CheckBoxSelectionService]
 })
 export class MultiselectDropdownModule {}

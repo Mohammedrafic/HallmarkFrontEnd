@@ -1,21 +1,35 @@
 @import "colors";
 
+%common-style {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: 0 2px 3px 0 rgb(0 0 0 / 16%);
+
+  &:hover {
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 22%)
+  }
+}
+
 .candidate-profile {
   display: grid;
-  grid-template-columns: repeat(2, auto);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: 2fr 1fr;
   grid-column-gap: 24px;
   grid-row-gap: 24px;
 
-  .general-info {
-    grid-area: 1 / 1 / 2 / 5;
+  .candidate-details {
+    @extend %common-style;
+
+    grid-area: 1 / 1 / 2 / 2;
   }
 
   .general-notes {
-    grid-area: 2 / 1 / 3 / 5;
+    @extend %common-style;
+
+    grid-area: 2 / 1 / 3 / 2;
   }
 
   .photo {
-    grid-area: 1 / 5 / 2 / 6;
+    grid-area: 1 / 2 / 2 / 3;
   }
 }
