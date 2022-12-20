@@ -1049,7 +1049,7 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
       ]).pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(([departmentId, skillId]) => {
-      if (!departmentId || !skillId) {
+      if (!departmentId || !skillId || this.isEditMode) {
         return;
       }
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, TrackByFunction } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges, TrackByFunction } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 
@@ -10,6 +10,7 @@ import { IrpTabConfig } from '@client/order-management/containers/irp-container/
 import { IrpTabs } from '@client/order-management/enums';
 import { ListOfKeyForms, TabsConfig } from '@client/order-management/interfaces';
 import { Destroyable } from '@core/helpers';
+import { OrderCredentialsService } from "@client/order-management/services";
 import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
 import {
   createOrderDTO,
@@ -17,11 +18,12 @@ import {
   getFormsList,
   getValuesFromList,
   isFormsValid,
-  showInvalidFormControl,
+  showInvalidFormControl, showMessageForInvalidCredentials,
 } from '@client/order-management/helpers';
-import { EditIrpOrder, SaveIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
+import { SaveIrpOrder, EditIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 import { Order } from '@shared/models/order-management.model';
+import { IOrderCredentialItem } from "@order-credentials/types";
 
 @Component({
   selector: 'app-irp-container',
@@ -29,14 +31,16 @@ import { Order } from '@shared/models/order-management.model';
   styleUrls: ['./irp-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IrpContainerComponent extends Destroyable implements OnInit {
+export class IrpContainerComponent extends Destroyable implements OnInit, OnChanges {
   @Input('handleSaveEvents') public handleSaveEvents$: Subject<void | MenuEventArgs>;
   @Input() public selectedOrder: Order;
 
   public tabsConfig: TabsConfig[] = IrpTabConfig;
   public tabs = IrpTabs;
+  public orderCredentials: IOrderCredentialItem[] = [];
 
   constructor(
+    private orderCredentialsService: OrderCredentialsService,
     private irpStateService: IrpContainerStateService,
     private store: Store,
     private actions$: Actions,
@@ -50,7 +54,21 @@ export class IrpContainerComponent extends Destroyable implements OnInit {
     this.watchForSucceededSaveOrder();
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedOrder'].currentValue) {
+      this.orderCredentials = [...this.selectedOrder.credentials];
+    }
+  }
+
   public trackByFn: TrackByFunction<TabsConfig> = (_: number, tab: TabsConfig) => tab.id;
+
+  public updateOrderCredentials(credential: IOrderCredentialItem): void {
+    this.orderCredentialsService.updateOrderCredentials(this.orderCredentials, credential);
+  }
+
+  public deleteOrderCredential(credential: IOrderCredentialItem): void {
+    this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
+  }
 
   private watchForSucceededSaveOrder(): void {
     this.actions$.pipe(
@@ -85,7 +103,15 @@ export class IrpContainerComponent extends Destroyable implements OnInit {
       //Todo: add condition, when will be implement save for Template
       this.saveOrder(formState);
     } else {
+      this.checkIsCredentialsValid(formState);
+    }
+  }
+
+  private checkIsCredentialsValid(formState: ListOfKeyForms): void {
+    if(this.orderCredentials?.length) {
       this.saveOrder(formState);
+    } else {
+      showMessageForInvalidCredentials();
     }
   }
 
@@ -95,12 +121,12 @@ export class IrpContainerComponent extends Destroyable implements OnInit {
 
     if(orderType === IrpOrderType.LongTermAssignment) {
       createdOrder = {
-        ...createOrderDTO(formState),
+        ...createOrderDTO(formState, this.orderCredentials),
         contactDetails: getValuesFromList(formState.contactDetailsList),
       };
     } else {
       createdOrder = {
-        ...createOrderDTO(formState),
+        ...createOrderDTO(formState, this.orderCredentials),
         contactDetails: getValuesFromList(formState.contactDetailsList),
         workLocations: getValuesFromList(formState.workLocationList as FormGroup[]),
         isSubmit: false,

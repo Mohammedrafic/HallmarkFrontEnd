@@ -11,6 +11,8 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronRight,
+  Clipboard,
+  Clock,
   Copy,
   Download,
   Edit,
@@ -31,8 +33,9 @@ import {
   User,
   X,
   XCircle,
-  Clipboard,
-  Clock,
+  Flag,
+  Mail,
+  Compass,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -46,13 +49,8 @@ import {
   SortService,
   ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
-import {
-  ButtonModule,
-  CheckBoxModule,
-  ChipListModule,
-  RadioButtonModule,
-  SwitchModule,
-} from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule,
+  SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
@@ -60,37 +58,31 @@ import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, MaskedDateTimeService, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 import { ClientRoutingModule } from './client-routing.module';
-import {
-  OrderManagementContentComponent,
+import { OrderManagementContentComponent,
 } from './order-management/components/order-management-content/order-management-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
 import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
-import {
-  TabNavigationComponent,
+import { TabNavigationComponent,
 } from './order-management/components/order-management-content/tab-navigation/tab-navigation.component';
 import { SharedModule } from '@shared/shared.module';
 import { OrderCredentialsModule } from '@order-credentials/order-credentials.module';
 import { NgxsModule } from '@ngxs/store';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import {
-  OrderDetailsDialogComponent,
+import { OrderDetailsDialogComponent,
 } from './order-management/components/order-details-dialog/order-details-dialog.component';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import {
-  OrderDetailsContainerComponent,
+import { OrderDetailsContainerComponent,
 } from './order-management/components/order-details-container/order-details-container.component';
-import {
-  OrderCandidatesContainerComponent,
+import { OrderCandidatesContainerComponent,
 } from './order-management/components/order-candidates-container/order-candidates-container.component';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { AddEditReorderModule } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.module';
-import {
-  SaveTemplateDialogModule,
+import { SaveTemplateDialogModule,
 } from '@client/order-management/components/save-template-dialog/save-template-dialog.module';
 import { CloseOrderModule } from '@client/order-management/components/close-order/close-order.module';
 import { CandidateListModule } from '@shared/components/candidate-list/candidate-list.module';
@@ -106,17 +98,18 @@ import { SettingsViewService } from '@shared/services';
 import { OrderImportComponent } from './order-management/components/order-import/order-import.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
 import { CreateEditOrderModule } from '@client/order-management/create-edit-order.module';
-import { OrganizationCandidatesModule } from '@client/candidates/organization-candidates.module';
 import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
-import { GridHeaderActionsModule } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.module';
+import { GridHeaderActionsModule,
+} from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.module';
 import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
-import {
-  OrderManagementIrpSubrowService,
+import { OrderManagementIrpSubrowService,
 } from '@client/order-management/order-management-content/services/order-management-irp-subrow.service';
 import { TableRowDetailModule } from '@shared/components/grid/cell-renderers/table-row-detail/table-row-detail.module';
 import { SwitchEditorModule } from '@shared/components/switch-editor/switch-editor.module';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
+import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
+import { OrganizationCandidatesModule } from '@client/candidates/organization-candidates.module';
 
 const gridIcons = {
   MessageSquare,
@@ -148,6 +141,9 @@ const gridIcons = {
   ChevronRight,
   Clipboard,
   Clock,
+  Flag,
+  Mail,
+  Compass,
 };
 
 @NgModule({
@@ -210,12 +206,12 @@ const gridIcons = {
     ImportDialogContentModule,
     ListBoxModule,
     CreateEditOrderModule,
-    OrganizationCandidatesModule,
     ButtonGroupModule,
     GridHeaderActionsModule,
     TableRowDetailModule,
     SwitchEditorModule,
     BoolValuePipeModule,
+    OrganizationCandidatesModule,
   ],
   providers: [
     ResizeService,
@@ -232,6 +228,7 @@ const gridIcons = {
     OrderDetailsService,
     OrderManagementIrpSubrowService,
     OrderManagementIrpApiService,
+    OrderCandidateApiService,
   ],
 })
 export class ClientModule {}

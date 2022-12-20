@@ -14,13 +14,13 @@ export const tabsConfig: TabsModel<CandidateProfileComponent>[] = [
     subtitle: 'Department details',
     isRequired: false,
     disabled: true,
-    component: CandidateProfileComponent
+    component: null
   },
   {
     title: 'Credentials',
     subtitle: 'Additional info here',
     isRequired: false,
     disabled: true,
-    component: CandidateProfileComponent
+    component: null
   }
 ];

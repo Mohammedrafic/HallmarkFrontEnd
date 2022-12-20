@@ -1,6 +1,6 @@
 <div class="candidate-profile">
-  <div class="general-info e-card">
-    <app-candidate-details></app-candidate-details>
+  <div class="candidate-details">
+    <app-candidate-details [candidateForm]="candidateForm"></app-candidate-details>
   </div>
   <div class="photo">
     <app-image-uploader
@@ -10,7 +10,7 @@
       [logo]="photo">
     </app-image-uploader>
   </div>
-  <div class="general-notes e-card">
+  <div class="general-notes">
     <app-general-notes></app-general-notes>
   </div>
 </div>

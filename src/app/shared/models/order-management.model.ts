@@ -10,7 +10,10 @@ import { Document } from '@shared/models/document.model';
 import { PageOfCollections } from '@shared/models/page.model';
 import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
-
+import { IrpPrimarySkill } from './skill.model';
+/**
+ * TODO: rework classes with interfaces.
+ */
 export class OrderManagement {
   id: number;
   publicId?: number;
@@ -403,7 +406,6 @@ export class Order {
   hasExtensions?: boolean;
   extensionInitialOrderPublicId?: number;
   regionName?: string;
-  isIRPOnly?: boolean;
   /**
    * Mispelling on BE, should be - contract.
    */
@@ -664,3 +666,30 @@ export type CandidateListEvent = {
   pageSize: number;
   excludeDeployed: boolean;
 };
+
+interface IrpCandidateShiftTime {
+  lastShiftTime: string;
+  nextShiftTime: string;
+}
+
+export interface IrpOrderCandidateDto {
+  id: number;
+  candidateProfileId: number;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  profileStatus: number;
+  primarySkill: IrpPrimarySkill;
+  option: string;
+  isOriented: boolean;
+  isContract: boolean;
+  lastShiftFrom: string;
+  lastShiftTo: string;
+  nextShiftFrom: string;
+  nextShiftTo: string;
+  weeklyHoursSchedule: number;
+  weekOvertime: number;
+  payRate: number;
+}
+
+export type IrpOrderCandidate = IrpOrderCandidateDto & IrpCandidateShiftTime;

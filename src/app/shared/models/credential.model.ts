@@ -13,6 +13,9 @@ export class Credential {
   system?: string;
   includeInIRP?: boolean;
   includeInVMS?: boolean;
+  reqSubmission?: boolean;
+  reqOnboard?: boolean;
+  optional?: boolean;
 
   constructor(credential: Credential) {
     if (credential.id) {
@@ -26,6 +29,9 @@ export class Credential {
     this.includeInIRP = credential.includeInIRP;
     this.includeInVMS = credential.includeInVMS;
     this.irpComment = credential.irpComment;
+    this.reqOnboard = credential.reqOnboard;
+    this.reqSubmission = credential.reqSubmission;
+    this.optional = credential.optional;
   }
 }
 

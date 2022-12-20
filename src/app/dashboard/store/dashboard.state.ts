@@ -6,7 +6,17 @@ import { Observable, tap } from 'rxjs';
 import lodashMap from 'lodash/fp/map';
 
 import { DashboardService } from '../services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, SetFilteredItems, SwitchMonthWeekTimeSelection, GetAllSkills } from './dashboard.actions';
+import {
+  GetDashboardData,
+  SetPanels,
+  SaveDashboard,
+  ResetState,
+  IsMobile,
+  SetFilteredItems,
+  SwitchMonthWeekTimeSelection,
+  GetOrganizationSkills,
+  GetAllSkills,
+} from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import { DashboardDataModel } from '../models/dashboard-data.model';
@@ -14,6 +24,7 @@ import { widgetTypeToConfigurationMapper } from '../constants/widget-type-to-con
 import { FilteredItem } from '@shared/models/filter.model';
 import { DASHBOARD_FILTER_STATE, TIME_SELECTION_OF_CHART_LINE } from '@shared/constants';
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
+import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 
 export interface DashboardStateModel {
@@ -24,6 +35,7 @@ export interface DashboardStateModel {
   filteredItems: FilteredItem[];
   positionTrendTimeSelection: TimeSelectionEnum;
   skills: AllOrganizationsSkill[];
+  organizationSkills: AssignedSkillsByOrganization[];
 }
 
 @State<DashboardStateModel>({
@@ -35,6 +47,7 @@ export interface DashboardStateModel {
     isMobile: false,
     filteredItems: JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [],
     positionTrendTimeSelection: JSON.parse(window.localStorage.getItem(TIME_SELECTION_OF_CHART_LINE) as string) || TimeSelectionEnum.Monthly,
+    organizationSkills: [],
     skills: [],
   },
 })
@@ -71,13 +84,18 @@ export class DashboardState {
   }
 
   @Selector()
-    static getTimeSelection(state: DashboardStateModel): DashboardStateModel['positionTrendTimeSelection'] {
-      return state.positionTrendTimeSelection;
-    }
+  static getTimeSelection(state: DashboardStateModel): DashboardStateModel['positionTrendTimeSelection'] {
+    return state.positionTrendTimeSelection;
+  }
 
   @Selector()
-    static getAllOrganizationSkills(state: DashboardStateModel): DashboardStateModel['skills'] {
-      return state.skills;
+  static getAllOrganizationSkills(state: DashboardStateModel): DashboardStateModel['skills'] {
+    return state.skills;
+  }
+
+  @Selector()
+  static getOrganizationSkills(state: DashboardStateModel): DashboardStateModel['organizationSkills'] {
+    return state.organizationSkills;
   }
 
   public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
@@ -104,7 +122,7 @@ export class DashboardState {
           ...widgetTypeToConfigurationMapper[panel.id as WidgetTypeEnum],
         }))
       : payload;
-      patchState({ panels });
+    patchState({ panels });
 
     return this.dashboardService.saveDashboard(panels);
   }
@@ -125,24 +143,38 @@ export class DashboardState {
   }
 
   @Action(SetFilteredItems)
-  private setFilteredItems({patchState}: StateContext<DashboardStateModel>, { payload }: SetFilteredItems) {
-    patchState({filteredItems: payload});
+  private setFilteredItems({ patchState }: StateContext<DashboardStateModel>, { payload }: SetFilteredItems) {
+    patchState({ filteredItems: payload });
     window.localStorage.setItem(DASHBOARD_FILTER_STATE, JSON.stringify(payload));
-    
   }
 
   @Action(SwitchMonthWeekTimeSelection)
-  private switchMonthWeekTimeSelection({patchState}: StateContext<DashboardStateModel>, { payload }: SwitchMonthWeekTimeSelection) {
-    patchState({positionTrendTimeSelection: payload})
+  private switchMonthWeekTimeSelection(
+    { patchState }: StateContext<DashboardStateModel>,
+    { payload }: SwitchMonthWeekTimeSelection
+  ) {
+    patchState({ positionTrendTimeSelection: payload });
     window.localStorage.setItem(TIME_SELECTION_OF_CHART_LINE, JSON.stringify(payload));
   }
 
   @Action(GetAllSkills)
-  private getAllSkills({patchState}: StateContext<DashboardStateModel>) {
+  private getAllSkills({ patchState }: StateContext<DashboardStateModel>) {
     return this.dashboardService.getAllSkills().pipe(
       tap((payload: AllOrganizationsSkill[]) => {
         patchState({ skills: payload });
       })
-    )
+    );
+  }
+
+  @Action(GetOrganizationSkills)
+  private GetOrganizationSkills(
+    { patchState }: StateContext<DashboardStateModel>,
+    { businessUnitId }: GetOrganizationSkills
+  ): Observable<AssignedSkillsByOrganization[]> {
+    return this.dashboardService.getOrganizationSkills(businessUnitId).pipe(
+      tap((payload: AssignedSkillsByOrganization[]) => {
+        patchState({ organizationSkills: payload });
+      })
+    );
   }
 }

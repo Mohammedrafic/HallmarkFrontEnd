@@ -5,5 +5,5 @@ export interface TabsModel<T> {
   subtitle: string;
   isRequired: boolean;
   disabled: boolean;
-  component: Type<T>;
+  component: Type<T> | null;
 }

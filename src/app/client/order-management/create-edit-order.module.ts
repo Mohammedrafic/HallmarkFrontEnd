@@ -12,7 +12,6 @@ import { CreateEditOrderComponent } from './create-edit-order.component';
 import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
 import { IrpContainerComponent } from './containers/irp-container/irp-container.component';
 import { OrderDetailsIrpComponent } from './components/irp-tabs/order-details/order-details-irp.component';
-import { OrderCredentialComponent } from './components/irp-tabs/order-credential/order-credential.component';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { FeatherModule } from 'angular-feather';
 import { AddEditOrderComponent } from '@client/order-management/components/add-edit-order/add-edit-order.component';
@@ -30,14 +29,13 @@ import {
 import { MultiDatePickerModule } from '@shared/components/multi-date-picker/multi-date-picker.module';
 import { GridIcons } from '@client/order-management/constants';
 import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
-
+import { OrderCredentialsService } from "@client/order-management/services";
 
 @NgModule({
   declarations: [
     CreateEditOrderComponent,
     IrpContainerComponent,
     OrderDetailsIrpComponent,
-    OrderCredentialComponent,
     AddEditOrderComponent,
     OrderDetailsFormComponent,
   ],
@@ -66,6 +64,7 @@ import { IrpContainerStateService } from '@client/order-management/containers/ir
   providers: [
     OrderDetailsIrpService,
     IrpContainerStateService,
+    OrderCredentialsService,
   ],
 })
 export class CreateEditOrderModule { }

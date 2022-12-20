@@ -4,8 +4,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 
 import { Select, Store } from '@ngxs/store';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { CandidateListEvent, OrderCandidatesListPage } from '@shared/models/order-management.model';
-import { Order } from '@shared/models/order-management.model';
+import { CandidateListEvent, OrderCandidatesListPage, Order } from '@shared/models/order-management.model';
 import { Observable, takeUntil } from 'rxjs';
 import { OrderType } from '@shared/enums/order-type';
 import { OrderManagementService } from '../order-management-content/order-management.service';

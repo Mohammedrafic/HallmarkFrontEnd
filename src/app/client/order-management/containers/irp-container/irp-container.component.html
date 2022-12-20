@@ -10,7 +10,13 @@
       <ng-template #content>
         <ng-container [ngSwitch]="tab.content">
           <app-order-details-irp *ngSwitchCase="tabs.Details"></app-order-details-irp>
-          <app-order-credential *ngSwitchCase="tabs.Credential"></app-order-credential>
+          <app-order-credentials
+            *ngSwitchCase="tabs.Credential"
+            [isActive]="tab.content === tabs.Credential"
+            [credentials]="orderCredentials"
+            (credentialChanged)="updateOrderCredentials($event)"
+            (credentialDeleted)="deleteOrderCredential($event)"
+          ></app-order-credentials>
         </ng-container>
       </ng-template>
     </e-tabitem>
