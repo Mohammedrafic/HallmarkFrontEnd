@@ -99,17 +99,18 @@ import { OrderImportComponent } from './order-management/components/order-import
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
 import { CreateEditOrderModule } from '@client/order-management/create-edit-order.module';
 import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
-import { GridHeaderActionsModule,
+import {
+  GridHeaderActionsModule,
 } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.module';
 import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
-import { OrderManagementIrpSubrowService,
-} from '@client/order-management/order-management-content/services/order-management-irp-subrow.service';
-import { TableRowDetailModule } from '@shared/components/grid/cell-renderers/table-row-detail/table-row-detail.module';
 import { SwitchEditorModule } from '@shared/components/switch-editor/switch-editor.module';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
 import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
 import { OrganizationCandidatesModule } from '@client/candidates/organization-candidates.module';
+import {
+  OrderManagementIrpRowPositionModule,
+} from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.module';
 
 const gridIcons = {
   MessageSquare,
@@ -208,7 +209,7 @@ const gridIcons = {
     CreateEditOrderModule,
     ButtonGroupModule,
     GridHeaderActionsModule,
-    TableRowDetailModule,
+    OrderManagementIrpRowPositionModule,
     SwitchEditorModule,
     BoolValuePipeModule,
     OrganizationCandidatesModule,
@@ -226,7 +227,6 @@ const gridIcons = {
     MaskedDateTimeService,
     SettingsViewService,
     OrderDetailsService,
-    OrderManagementIrpSubrowService,
     OrderManagementIrpApiService,
     OrderCandidateApiService,
   ],

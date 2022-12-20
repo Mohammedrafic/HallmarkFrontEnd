@@ -115,6 +115,27 @@ export interface IRPOrderPosition {
   overtime: number;
 }
 
+export interface IRPOrderPositionDisplay {
+  orderId: number;
+  organizationId: number;
+  candidateStatus: string;
+  employeeId: number;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  primarySkillId: number;
+  primarySkillName: string;
+  option: string;
+  contract: string;
+  lastShiftScheduledStartTime: string;
+  lastShiftScheduledEndTime: string;
+  nextShiftScheduledStartTime: string;
+  nextShiftScheduledEndTime: string;
+  scheduledWeeklyHours: number;
+  overtime: number;
+  name: string;
+}
+
 export interface IRPOrderPositionMain {
   orderId: number;
   irpOrderPositionsMainInfoDto: IRPOrderPosition[];

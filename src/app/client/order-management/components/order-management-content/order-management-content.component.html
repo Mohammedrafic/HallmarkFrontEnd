@@ -16,12 +16,18 @@
       *ngIf="isIRPFlagEnabled"
       ejs-button
       appHideBeforeSyncfusionLoad
-      cssClass="e-outline button-template">
+      cssClass="e-outline button-template"
+      [disabled]="isActiveSystemIRP">
       <div class="filter-button-content">
         Templates <i-feather name="clipboard" class="icon"></i-feather>
       </div>
     </button>
-    <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter" (click)="showFilters()">
+    <button
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      cssClass="e-outline button-filter"
+      [disabled]="isActiveSystemIRP"
+      (click)="showFilters()">
       <div class="filter-button-content">
         <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{
           filteredItems.length
@@ -31,7 +37,7 @@
     </button>
     <app-tooltip-container [message]="toolTipMessage" [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
       <button
-        [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+        [disabled]="isActiveSystemIRP || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
         ejs-button
         appHideBeforeSyncfusionLoad
         (click)="openImportDialog()"
@@ -52,7 +58,7 @@
       (select)="exportSelected($event)"
       id="importButton"
       cssClass="e-outline button-export"
-      [disabled]="isIRPFlagEnabled"
+      [disabled]="isActiveSystemIRP"
     >
       <div class="button-export-container">Export<i-feather name="download" class="icon"></i-feather></div>
     </button>
@@ -101,6 +107,7 @@
       [gridOptions]="gridOptions"
       [class.empty-table]="!(ordersPage$ | async)?.items?.length"
       [overlayNoRowsTemplate]="gridEmptyMessage"
+      [rowSelection]="'multiple'"
       class="ag-theme-alpine app-grid__component"
       (gridReady)="setGridApi($event)"
       (sortChanged)="gridSortHandler($event)"

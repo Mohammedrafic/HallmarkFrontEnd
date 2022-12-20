@@ -7,7 +7,7 @@ import { BaseObservable } from '@core/helpers';
 
 @Directive()
 export abstract class GridRowDetailsCellRenderer<T> extends GridCellRenderer<IDetailCellRendererParams> implements OnDestroy {
-  public rowData: T[];
+  public rowData: any[];
   public colDefs: ColDef[];
   public rowId: string;
   public rowDataSubj: BaseObservable<T[]> = new BaseObservable<T[]>([]);

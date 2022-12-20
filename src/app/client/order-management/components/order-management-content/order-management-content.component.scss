@@ -241,19 +241,35 @@
   height: 100%;
 
   &::ng-deep {
-    & ag-grid-angular .ag-cell {
-      display: flex;
-      align-items: center;
+    & .e-checkbox-wrapper .e-frame.e-check {
+      background: $primary-active-blue-70 !important;
+      border-color: $primary-active-blue-70 !important;
+    }
 
-      &.wrap-cell {
-        white-space: normal;
-        line-height: 20px;
+    & ag-grid-angular {
+      & .ag-row-selected {
+        background: $primary-active-blue-70 !important;
       }
 
-      &.ag-right-aligned-cell {
-        justify-content: flex-end;
+      .ag-cell {
+        display: flex;
+        align-items: center;
+
+        &.wrap-cell {
+          white-space: normal;
+          line-height: 20px;
+        }
+
+        &.ag-right-aligned-cell {
+          justify-content: flex-end;
+        }
       }
     }
+
+    & .ag-row.ag-row-level-1.ag-full-width-row {
+      background: $secondary-dark-blue-50 !important;
+    }
+
     .empty-table {
       .ag-body-viewport {
         height: 100px;
