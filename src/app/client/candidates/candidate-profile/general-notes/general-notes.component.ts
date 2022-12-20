@@ -7,9 +7,10 @@ import { ShowSideDialog } from '../../../../store/app.actions';
 import { AddEditNoteComponent } from '@client/candidates/candidate-profile/general-notes/add-edit-note/add-edit-note.component';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
 import { distinctUntilChanged, map, Observable, takeUntil } from 'rxjs';
-import { ValueFormatterParams } from '@ag-grid-community/core';
+import { ICellRendererParams, ValueFormatterParams } from '@ag-grid-community/core';
 import { CategoryModel } from '@client/candidates/candidate-profile/general-notes/models/category.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { GeneralNotesGridCategoryRendererComponent } from '@client/candidates/candidate-profile/general-notes/general-notes-grid-category-renderer/general-notes-grid-category-renderer.component';
 
 @Component({
   selector: 'app-general-notes',
@@ -35,7 +36,8 @@ export class GeneralNotesComponent extends DestroyableDirective implements OnIni
     {
       field: 'categoryId',
       headerName: 'Category',
-      valueFormatter: (params: ValueFormatterParams) => this.getCategoryName(params.value),
+      cellRenderer: GeneralNotesGridCategoryRendererComponent,
+      cellRendererParams: (params: ICellRendererParams) => this.getCategoryById(params.value),
       minWidth: 185
     },
     {
@@ -88,8 +90,8 @@ export class GeneralNotesComponent extends DestroyableDirective implements OnIni
     return this.getFormattedDateWithFormat(date, 'MM/dd/yyyy');
   }
 
-  private getCategoryName(id: number): string {
-    return this.categories.find((category: CategoryModel) => category.id === id)?.categoryName ?? '';
+  private getCategoryById(id: number): CategoryModel | null {
+    return this.categories.find((category: CategoryModel) => category.id === id) ?? null;
   }
 
   private isDialogOpened(): Observable<boolean> {

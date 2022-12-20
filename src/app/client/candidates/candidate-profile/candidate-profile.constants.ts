@@ -1,6 +1,6 @@
 export enum ProfileStatusesEnum {
-  Active,
   Inactive,
+  Active,
   OnHold,
   Terminated
 }

@@ -18,9 +18,10 @@ import { GeneralNotesGridActionsRendererComponent } from './general-notes/genera
 import { AddEditNoteComponent } from './general-notes/add-edit-note/add-edit-note.component';
 import { SharedModule } from '@shared/shared.module';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
+import { GeneralNotesGridCategoryRendererComponent } from './general-notes/general-notes-grid-category-renderer/general-notes-grid-category-renderer.component';
 
 @NgModule({
-  declarations: [GeneralNotesComponent, CandidateDetailsComponent, GeneralInfoComponent, HrInfoComponent, ContactDetailsComponent, GeneralNotesGridActionsRendererComponent, AddEditNoteComponent],
+  declarations: [GeneralNotesComponent, CandidateDetailsComponent, GeneralInfoComponent, HrInfoComponent, ContactDetailsComponent, GeneralNotesGridActionsRendererComponent, AddEditNoteComponent, GeneralNotesGridCategoryRendererComponent],
   exports: [CandidateDetailsComponent, GeneralNotesComponent],
   imports: [CommonModule, InputModule, DatepickerModule, DropdownModule, MultiselectDropdownModule, SwitchModule, TextareaModule, NumericTextboxModule, GridModule, FeatherModule, ButtonModule, SharedModule, DropDownListModule]
 })
