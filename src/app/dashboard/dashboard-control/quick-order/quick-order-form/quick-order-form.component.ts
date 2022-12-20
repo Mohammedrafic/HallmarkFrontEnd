@@ -576,7 +576,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private populateJobDistributionForm(): void {
-    this.jobDistributionControl.patchValue([OrderJobDistribution.All]);
+    this.jobDistributionControl.patchValue(OrderJobDistribution.All);
   }
 
   private populateShiftTimes() {
