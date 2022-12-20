@@ -8,7 +8,7 @@ import { Select, Store } from '@ngxs/store';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { Observable } from 'rxjs';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
-import { CandidateProfileService } from '@client/candidates/candidate-profile/candidate-profile.service';
+import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 
 @Component({
   selector: 'app-general-info',
@@ -27,14 +27,15 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   public readonly profileStatuses = ProfileStatuses;
   public readonly companyCodes = ProfileStatuses;
   public readonly terminationReason = TerminationReasons;
+  public readonly today = new Date();
 
   constructor(
     private formBuilder: FormBuilder,
     private store: Store,
     protected override cdr: ChangeDetectorRef,
-    protected override candidateProfileService: CandidateProfileService
+    protected override candidateProfileFormService: CandidateProfileFormService
   ) {
-    super(cdr, candidateProfileService);
+    super(cdr, candidateProfileFormService);
   }
 
   override ngOnInit(): void {

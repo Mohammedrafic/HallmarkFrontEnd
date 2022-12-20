@@ -1,18 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
-import { Observable } from 'rxjs';
+import { Observable, takeUntil } from 'rxjs';
 import { CategoryModel } from '@client/candidates/candidate-profile/general-notes/models/category.model';
 import { Store } from '@ngxs/store';
 import { ShowSideDialog } from '../../../../../store/app.actions';
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
+import { EditGeneralNoteModel, GeneralNotesModel } from '../general-notes.model';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
   selector: 'app-add-edit-note',
   templateUrl: './add-edit-note.component.html',
   styleUrls: ['./add-edit-note.component.scss']
 })
-export class AddEditNoteComponent implements OnInit {
+export class AddEditNoteComponent extends DestroyableDirective implements OnInit {
   public noteForm: FormGroup;
   public categories$: Observable<CategoryModel[]>;
 
@@ -23,17 +25,18 @@ export class AddEditNoteComponent implements OnInit {
     private generalNotesService: GeneralNotesService,
     private store: Store
   ) {
+    super();
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.listenEditMode();
   }
 
-  public initNoteForm(note?: any): void {
+  public initNoteForm(note: GeneralNotesModel | undefined): void {
     this.categories$ = this.generalNotesService.getCategories();
     this.noteForm = this.formBuilder.group({
       date: [note?.date ?? null, [Validators.required]],
-      categoryId: [note?.category ?? null],
+      categoryId: [note?.categoryId ?? null],
       note: [note?.note ?? null, [Validators.maxLength(250)]]
     });
   }
@@ -43,15 +46,21 @@ export class AddEditNoteComponent implements OnInit {
       this.noteForm.markAllAsTouched();
     } else {
       this.generalNotesService.addNote(this.noteForm.value);
-      this.store.dispatch(new ShowSideDialog(false));
+      this.toggleSideDialog(false);
     }
 
   }
 
   private listenEditMode(): void {
-    this.generalNotesService.editMode$.subscribe((note: any) => {
-      this.initNoteForm(note?.data);
-    });
+    this.generalNotesService.editMode$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((note: EditGeneralNoteModel | null) => {
+        this.initNoteForm(note?.data);
+      });
+  }
+
+  private toggleSideDialog(state: boolean): void {
+    this.store.dispatch(new ShowSideDialog(state));
   }
 
 

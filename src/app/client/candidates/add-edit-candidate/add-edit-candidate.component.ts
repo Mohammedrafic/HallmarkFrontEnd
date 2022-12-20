@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { tabsConfig } from '@client/candidates/add-edit-candidate/tabs-config.constants';
-import { CandidateProfileService } from '@client/candidates/candidate-profile/candidate-profile.service';
+import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -15,7 +15,7 @@ export class AddEditCandidateComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private candidateProfileService: CandidateProfileService,
+    private candidateProfileFormService: CandidateProfileFormService,
     private cdr: ChangeDetectorRef
   ) {
     if (route.snapshot.paramMap.get('id')) {
@@ -36,10 +36,10 @@ export class AddEditCandidateComponent implements OnInit {
   }
 
   public saveCandidate(): void {
-    this.candidateProfileService.saveEvent$.next();
+    this.candidateProfileFormService.triggerSaveEvent();
   }
 
   public clearForm(): void {
-    this.candidateProfileService.resetCandidateForm();
+    this.candidateProfileFormService.resetCandidateForm();
   }
 }

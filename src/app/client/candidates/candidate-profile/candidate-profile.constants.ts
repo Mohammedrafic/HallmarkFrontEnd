@@ -8,8 +8,8 @@ export enum ProfileStatusesEnum {
 export const ProfileStatuses = [
   { id: ProfileStatusesEnum.Active, name: 'Active' },
   { id: ProfileStatusesEnum.Inactive, name: 'Inactive' },
-  { id: ProfileStatusesEnum.OnHold, name: 'On Hold. (waiting for next increment)' },
-  { id: ProfileStatusesEnum.Terminated, name: 'Terminated. (waiting for next increment)' }
+  { id: ProfileStatusesEnum.OnHold, name: 'On Hold' },
+  { id: ProfileStatusesEnum.Terminated, name: 'Terminated' }
 ];
 
 export const HrInternalTransfersRecruitments = [

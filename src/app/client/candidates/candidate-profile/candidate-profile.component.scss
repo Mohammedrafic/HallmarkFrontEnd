@@ -13,23 +13,18 @@
 .candidate-profile {
   display: grid;
   grid-template-columns: 3fr 1fr;
-  grid-template-rows: 2fr 1fr;
+  grid-template-rows: 1fr 0.5fr;
   grid-column-gap: 24px;
   grid-row-gap: 24px;
 
   .candidate-details {
     @extend %common-style;
-
-    grid-area: 1 / 1 / 2 / 2;
   }
 
   .general-notes {
     @extend %common-style;
-
-    grid-area: 2 / 1 / 3 / 2;
   }
 
   .photo {
-    grid-area: 1 / 2 / 2 / 3;
   }
 }

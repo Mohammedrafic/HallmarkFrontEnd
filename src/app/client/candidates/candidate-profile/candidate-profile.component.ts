@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { NavigationWrapperService } from '@shared/services/navigation-wrapper.service';
 import { CandidateProfileService } from '@client/candidates/candidate-profile/candidate-profile.service';
 import { Router } from '@angular/router';
+import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 
 @Component({
   selector: 'app-candidate-profile',
@@ -20,6 +21,7 @@ export class CandidateProfileComponent implements OnInit, OnDestroy {
 
 
   constructor(
+    private candidateProfileFormService: CandidateProfileFormService,
     private candidateProfileService: CandidateProfileService,
     private cdr: ChangeDetectorRef,
     private router: Router,
@@ -28,23 +30,23 @@ export class CandidateProfileComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.candidateForm = this.candidateProfileService.candidateForm;
+    this.candidateForm = this.candidateProfileFormService.candidateForm;
     this.navigationWrapperService.areUnsavedChanges = this.hasUnsavedChanges.bind(this);
 
-    this.candidateProfileService.saveEvent$.subscribe(() => {
-      if (this.candidateProfileService.candidateForm.invalid) {
-        this.candidateProfileService.markCandidateFormAsTouched();
+    this.candidateProfileFormService.saveEvent$.subscribe(() => {
+      if (this.candidateProfileFormService.candidateForm.invalid) {
+        this.candidateProfileFormService.markCandidateFormAsTouched();
       } else {
         this.candidateProfileService.saveCandidate(this.filesDetails[0])
           .subscribe(() => {
-            this.candidateProfileService.candidateForm.markAsPristine();
+            this.candidateProfileFormService.candidateForm.markAsPristine();
           });
       }
     });
   }
 
   public ngOnDestroy(): void {
-    this.candidateProfileService.resetCandidateForm();
+    this.candidateProfileFormService.resetCandidateForm();
   }
 
   private hasUnsavedChanges(): boolean {

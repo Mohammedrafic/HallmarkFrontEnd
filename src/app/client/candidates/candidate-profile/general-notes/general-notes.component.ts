@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { GeneralNotesGridActionsRendererComponent } from '@client/candidates/candidate-profile/general-notes/general-notes-grid-actions-renderer/general-notes-grid-actions-renderer.component';
@@ -6,15 +6,17 @@ import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 import { ShowSideDialog } from '../../../../store/app.actions';
 import { AddEditNoteComponent } from '@client/candidates/candidate-profile/general-notes/add-edit-note/add-edit-note.component';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
-import { distinctUntilChanged, map, Observable } from 'rxjs';
+import { distinctUntilChanged, map, Observable, takeUntil } from 'rxjs';
 import { ValueFormatterParams } from '@ag-grid-community/core';
+import { CategoryModel } from '@client/candidates/candidate-profile/general-notes/models/category.model';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
   selector: 'app-general-notes',
   templateUrl: './general-notes.component.html',
-  styleUrls: ['./general-notes.component.scss']
+  styleUrls: ['./general-notes.component.scss'],
 })
-export class GeneralNotesComponent {
+export class GeneralNotesComponent extends DestroyableDirective implements OnInit {
   @ViewChild(AddEditNoteComponent) public addEditNoteComponent: AddEditNoteComponent;
 
   public readonly columnDef: ColumnDefinitionModel[] = [
@@ -22,8 +24,7 @@ export class GeneralNotesComponent {
       field: '',
       headerName: '',
       cellRenderer: GeneralNotesGridActionsRendererComponent,
-      maxWidth: 80,
-      cellClass: 'extension-buttons'
+      maxWidth: 80
     },
     {
       field: 'date',
@@ -32,8 +33,9 @@ export class GeneralNotesComponent {
       maxWidth: 140
     },
     {
-      field: 'category',
+      field: 'categoryId',
       headerName: 'Category',
+      valueFormatter: (params: ValueFormatterParams) => this.getCategoryName(params.value),
       minWidth: 185
     },
     {
@@ -47,17 +49,22 @@ export class GeneralNotesComponent {
 
   public sideDialogTitle$ = this.generalNotesService.sideDialogTitle$;
   public generalNotes$ = this.generalNotesService.notes$;
+  public categories: CategoryModel[];
 
   public readonly isSideDialogOpened$: Observable<boolean> = this.isDialogOpened();
-
 
   public constructor(
     private actions: Actions,
     private datePipe: DatePipe,
     private store: Store,
-    private generalNotesService: GeneralNotesService) {
+    private generalNotesService: GeneralNotesService
+  ) {
+    super();
   }
 
+  public ngOnInit(): void {
+    this.getCategories();
+  }
 
   public addNote(): void {
     this.generalNotesService.setSideDialogTitle('Add Note');
@@ -65,6 +72,13 @@ export class GeneralNotesComponent {
     this.generalNotesService.resetEditMode();
   }
 
+  public onCancel() {
+    this.toggleSideDialog(false);
+  }
+
+  public onSave() {
+    this.addEditNoteComponent.saveNote();
+  }
 
   private getFormattedDateWithFormat(date: string, format: string): string {
     return this.datePipe.transform(date, format, 'UTC') ?? '';
@@ -74,12 +88,8 @@ export class GeneralNotesComponent {
     return this.getFormattedDateWithFormat(date, 'MM/dd/yyyy');
   }
 
-  onCancel() {
-    this.toggleSideDialog(false);
-  }
-
-  onSave() {
-    this.addEditNoteComponent.saveNote();
+  private getCategoryName(id: number): string {
+    return this.categories.find((category: CategoryModel) => category.id === id)?.categoryName ?? '';
   }
 
   private isDialogOpened(): Observable<boolean> {
@@ -89,8 +99,15 @@ export class GeneralNotesComponent {
     );
   }
 
-
   private toggleSideDialog(state: boolean): void {
     this.store.dispatch(new ShowSideDialog(state));
+  }
+
+  private getCategories(): void {
+    this.generalNotesService.getCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((categories: CategoryModel[]) => {
+        this.categories = categories;
+      });
   }
 }

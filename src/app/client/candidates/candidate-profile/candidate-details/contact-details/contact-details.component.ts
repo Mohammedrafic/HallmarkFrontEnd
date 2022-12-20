@@ -4,7 +4,7 @@ import { formatDate, PhoneMask, ZipCodeMask } from '@shared/constants';
 import { COUNTRIES } from '@shared/constants/countries-list';
 import { BehaviorSubject } from 'rxjs';
 import { CanadaStates, Country, UsaStates } from '@shared/enums/states';
-import { CandidateProfileService } from '@client/candidates/candidate-profile/candidate-profile.service';
+import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 
 @Component({
   selector: 'app-contact-details',
@@ -23,9 +23,9 @@ export class ContactDetailsComponent extends AbstractContactDetails implements O
 
   constructor(
     protected override cdr: ChangeDetectorRef,
-    protected override candidateProfileService: CandidateProfileService
+    protected override candidateProfileFormService: CandidateProfileFormService
   ) {
-    super(cdr, candidateProfileService);
+    super(cdr, candidateProfileFormService);
   }
 
   public override ngOnInit(): void {

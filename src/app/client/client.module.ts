@@ -47,7 +47,7 @@ import {
   PageService,
   ResizeService,
   SortService,
-  ToolbarService,
+  ToolbarService
 } from '@syncfusion/ej2-angular-grids';
 import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule,
   SwitchModule } from '@syncfusion/ej2-angular-buttons';

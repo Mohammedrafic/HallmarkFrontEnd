@@ -6,7 +6,7 @@ import {
   OrientationConfigurations
 } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { ChangeEventArgs } from '@syncfusion/ej2-buttons';
-import { CandidateProfileService } from '@client/candidates/candidate-profile/candidate-profile.service';
+import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 
 @Component({
   selector: 'app-hr-info',
@@ -20,9 +20,9 @@ export class HrInfoComponent extends AbstractContactDetails implements OnInit {
 
   constructor(
     protected override cdr: ChangeDetectorRef,
-    protected override candidateProfileService: CandidateProfileService
+    protected override candidateProfileFormService: CandidateProfileFormService
   ) {
-    super(cdr, candidateProfileService);
+    super(cdr, candidateProfileFormService);
   }
 
   public override ngOnInit(): void {
