@@ -235,12 +235,12 @@
             </div>
           </ng-template>
         </e-column>
-        <e-column field="profileStatus" headerText="Status" textAlign="Left" width="150">
+        <e-column field="orderStatusText" headerText="Status" textAlign="Left" width="150">
           <ng-template #template let-data>
             <div class="status-cell">
               <ejs-chiplist>
                 <e-chips>
-                  <e-chip [text]="data.profileStatus" [cssClass]="data.statusName | chipsCssClass"></e-chip>
+                  <e-chip [text]="data.orderStatusText" [cssClass]="data.orderStatusText | chipsCssClass"></e-chip>
                 </e-chips>
               </ejs-chiplist>
             </div>
@@ -249,7 +249,7 @@
         <e-column field="primarySkill" headerText="Primary Skill" textAlign="Left" width="180">
           <ng-template #template let-data>
             <div>
-              {{data.primarySkill.skillAbbr}}
+              {{data.primarySkill.skillDescription}}
             </div>
           </ng-template>
         </e-column>

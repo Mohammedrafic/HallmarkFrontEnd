@@ -7,8 +7,8 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { combineLatest, delay, filter, map, Observable, Subject, switchMap, take, takeUntil, throttleTime } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { combineLatest, delay, filter, map, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
+import { concatMap, tap } from 'rxjs/operators';
 
 import { TakeUntilDestroy } from '@core/decorators';
 import { FieldType, UserPermissions } from '@core/enums';
@@ -171,9 +171,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
     this.store.dispatch(new GetAllBusinessLines());
-    this.store.dispatch(new GetRegions()).subscribe((data) => {
-      this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
-    });
+    // this.getRegionsData();
   }
 
   ngOnDestroy(): void {
@@ -627,6 +625,15 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         this.grid.getColumnByField('invoiceId').visible = this.isOrgVMSEnabled || !this.isFeatureIrpEnabled;
         this.grid.refreshColumns();
       }),
+      concatMap(() => this.store.dispatch(new GetRegions())),
+      tap((data) => {
+        this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
+        this.selectedRegion = data.organizationManagement.regions[0];
+        
+      }),
+      filter(() => !!this.selectedRegion),
+      tap(() => { this.getLocations(); }),
+      takeUntil(this.componentDestroy()),
     ).subscribe();
   }
 
@@ -641,6 +648,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       map(([locationTypes, timeZones, states, phoneTypes]) => {
         const locationOpts: DropdownOption[] = locationTypes
         .map((type) => ({ text: type.name, value: type.locationTypeId }));
+
         const zoneOpts: DropdownOption[] = timeZones
         .map((zone) => ({ text: zone.systemTimeZoneName, value: zone.timeZoneId }));
 
@@ -707,4 +715,16 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       return column;
     });
   }
+
+  // private getRegionsData(): void {
+  //   this.store.dispatch(new GetRegions())
+  //   .pipe(
+
+
+  //     takeUntil(this.componentDestroy()),
+  //   )
+  //   .subscribe(() => {
+      
+  //   });
+  // }
 }

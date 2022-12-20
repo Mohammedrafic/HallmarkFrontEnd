@@ -7,7 +7,8 @@ import { Permission, PermissionGrid } from '@core/interface';
 import { UserPermissions } from '@core/enums';
 import { REQUIRED_PERMISSIONS } from '@shared/constants';
 import { UserState } from 'src/app/store/user.state';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { AbstractGridConfigurationComponent,
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 
 
 @Directive()
