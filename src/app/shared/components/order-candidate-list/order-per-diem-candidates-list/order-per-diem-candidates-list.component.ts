@@ -12,6 +12,7 @@ import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate
 import { UserState } from 'src/app/store/user.state';
 import { OrderCandidateApiService } from '../order-candidate-api.service';
 import { PageOfCollections } from '@shared/models/page.model';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-order-per-diem-candidates-list',
@@ -26,6 +27,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
   public candidateJob: OrderCandidateJob | null;
   public agencyActionsAllowed: boolean;
   public irpCandidates: PageOfCollections<IrpOrderCandidate>;
+  public isFeatureIrpEnabled = false;
 
   constructor(
     protected override store: Store,
@@ -33,6 +35,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     private candidateApiService: OrderCandidateApiService,
     ) {
     super(store, router);
+    this.setIrpFeatureFlag();
   }
 
   override ngOnInit(): void {
@@ -116,5 +119,9 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     .subscribe((candidates) => {
       this.irpCandidates = candidates;
     });
+  }
+
+  private setIrpFeatureFlag(): void {
+    this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   }
 }

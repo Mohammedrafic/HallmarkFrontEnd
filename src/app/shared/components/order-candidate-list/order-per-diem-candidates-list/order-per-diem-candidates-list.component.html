@@ -5,7 +5,7 @@
     </div>
   </div>
 
-  <ng-container *ngIf="!selectedOrder.isIRPOnly; else irpCandiadtes">
+  <ng-container *ngIf="!selectedOrder.isIRPOnly || !isFeatureIrpEnabled; else irpCandiadtes">
     <ejs-grid
     #orderCandidatesGrid
     id="users-grid"

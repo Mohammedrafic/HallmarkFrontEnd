@@ -26,6 +26,7 @@ import { OnboardedCandidateComponent } from './onboarded-candidate/onboarded-can
 import { OrderType } from '@shared/enums/order-type';
 import { OrderCandidateApiService } from '../order-candidate-api.service';
 import { PageOfCollections } from '@shared/models/page.model';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -66,6 +67,9 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   ];
   public orderTypes = OrderType;
   public irpCandidates: PageOfCollections<IrpOrderCandidate> = {
+    /**
+     * TODO: move to constants
+     */
     items: [],
     pageNumber: 1,
     totalPages: 1,
@@ -73,6 +77,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     hasPreviousPage: false,
     hasNextPage: false,
   };
+  public isFeatureIrpEnabled = false;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -85,6 +90,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     private candidateApiService: OrderCandidateApiService,
   ) {
     super(store, router);
+    this.setIrpFeatureFlag();
   }
 
   override ngOnInit(): void {
@@ -266,5 +272,9 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.grid.refresh();
       this.grid.dataSource = this.irpCandidates.items;
     });
+  }
+
+  private setIrpFeatureFlag(): void {
+    this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   }
 }
