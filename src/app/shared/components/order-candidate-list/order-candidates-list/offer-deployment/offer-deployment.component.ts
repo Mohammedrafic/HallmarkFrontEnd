@@ -325,7 +325,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private setFormValue(data: OrderCandidateJob): void {
     this.formGroup.setValue({
       jobId: `${data.organizationPrefix}-${data.orderPublicId}`,
-      jobDate: [DateTimeHelper.formatDateUTC(data.order.jobStartDate.toString(), 'MM/dd/yyyy'), DateTimeHelper.formatDateUTC(data.order.jobEndDate.toString(), 'MM/dd/yyyy')],
+      jobDate: [DateTimeHelper.formatDateUTC(data.order.jobStartDate.toString(), 'MM/dd/yyyy'), data.order.jobEndDate ? DateTimeHelper.formatDateUTC(data.order.jobEndDate.toString(), 'MM/dd/yyyy') : null],
       offeredBillRate: PriceUtils.formatNumbers(data.offeredBillRate || data.order.hourlyRate),
       orderBillRate: data.order.hourlyRate && PriceUtils.formatNumbers(data.order.hourlyRate),
       locationName: data.order.locationName,
@@ -341,7 +341,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private getComments(): void {
-    this.commentsService
+    this.candidateJob?.commentContainerId && this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((comments: Comment[]) => {

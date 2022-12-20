@@ -597,7 +597,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private getComments(): void {
-    this.commentsService
+    this.candidateJob?.commentContainerId && this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((comments: Comment[]) => {

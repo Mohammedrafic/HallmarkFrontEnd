@@ -19,7 +19,7 @@ export class BillRatesGridComponent extends AbstractGridConfigurationComponent i
   @Input() set readOnlyMode(value: boolean) {
     this.readOnly = value;
     setTimeout(() => {
-      this.grid.refreshColumns();
+      this.grid.contentModule && this.grid.refreshColumns();
     });
   }
   public readOnly: boolean = false;
