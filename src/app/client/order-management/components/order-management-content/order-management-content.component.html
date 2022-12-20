@@ -419,70 +419,74 @@
               </ejs-tooltip>
             </ng-container>
 
-          <ng-container *ngIf="data.agency?.length > 5">
-            <span id="agencyName" class="agency-name">Multiple Agencies</span>
-          </ng-container>
-        </ng-template>
-      </e-column>
-      <e-column
-        field="shiftsNext90Days"
-        headerText="# of Shifts Next 90 Days "
-        textAlign="Right"
-        headerTextAlign="Right"
-        width="220"
-        minWidth="200"
-        maxWidth="260"
-        [visible]="false"
-      ></e-column>
-      <e-column
-        field="annualSalaryRangeFrom"
-        headerText="Annual Salary From"
-        textAlign="Right"
-        headerTextAlign="Right"
-        width="200"
-        minWidth="180"
-        maxWidth="260"
-        [visible]="false"
-      >
-        <ng-template #template let-data>
-          <span>{{ data.annualSalaryRangeFrom | currency: 'USD':'symbol':'1.0-2' }}</span>
-        </ng-template>
-      </e-column>
-      <e-column
-        field="annualSalaryRangeTo"
-        headerText="Annual Salary To"
-        textAlign="Right"
-        headerTextAlign="Right"
-        width="200"
-        minWidth="160"
-        maxWidth="260"
-        [visible]="false"
-      >
-        <ng-template #template let-data>
-          <span>{{ data.annualSalaryRangeTo | currency: 'USD':'symbol':'1.0-2' }}</span>
-        </ng-template>
-      </e-column>
-      <e-column field="endDate" headerText="End Date" width="130" minWidth="105" maxWidth="200">
-        <ng-template #template let-data>
-          <span>{{ data.endDate | date: formatDate:'UTC' }}</span>
-        </ng-template>
-      </e-column>
-      <e-column field="shiftStartTime" headerText="SHIFT" width="160" minWidth="80" maxWidth="200">
-        <ng-template #template let-data>
-          <span>{{ data.shiftStartTime | date: 'shortTime' }}-{{ data.shiftEndTime | date: 'shortTime' }}</span>
-        </ng-template>
-      </e-column>
-      <e-column field="candidates" headerText="CAND." headerTextAlign="Right" width="90" minWidth="80" maxWidth="160">
-        <ng-template #template let-data>
-          <div class="align-right">{{ data.candidates }}</div>
-        </ng-template>
-      </e-column>
-      <e-column field="creationDate" headerText="Creation Date" width="150" minWidth="140" maxWidth="200">
-        <ng-template #template let-data>
-          <span>{{ data.creationDate | date: formatDate }}</span>
-        </ng-template>
-      </e-column>
-    </e-columns>
+            <ng-container *ngIf="data.agency?.length > 5">
+              <span id="agencyName" class="agency-name">Multiple Agencies</span>
+            </ng-container>
+          </ng-template>
+        </e-column>
+        <e-column
+          field="shiftsNext90Days"
+          headerText="# of Shifts Next 90 Days "
+          textAlign="Right"
+          headerTextAlign="Right"
+          width="220"
+          minWidth="200"
+          maxWidth="260"
+          [visible]="false"
+        ></e-column>
+        <e-column
+          field="annualSalaryRangeFrom"
+          headerText="Annual Salary From"
+          textAlign="Right"
+          headerTextAlign="Right"
+          width="200"
+          minWidth="180"
+          maxWidth="260"
+          [visible]="false"
+        >
+          <ng-template #template let-data>
+            <span>{{ data.annualSalaryRangeFrom | currency: 'USD':'symbol':'1.0-2' }}</span>
+          </ng-template>
+        </e-column>
+        <e-column
+          field="annualSalaryRangeTo"
+          headerText="Annual Salary To"
+          textAlign="Right"
+          headerTextAlign="Right"
+          width="200"
+          minWidth="160"
+          maxWidth="260"
+          [visible]="false"
+        >
+          <ng-template #template let-data>
+            <span>{{ data.annualSalaryRangeTo | currency: 'USD':'symbol':'1.0-2' }}</span>
+          </ng-template>
+        </e-column>
+        <e-column field="endDate" headerText="End Date" width="130" minWidth="105" maxWidth="200">
+          <ng-template #template let-data>
+            <span>{{ data.endDate | date: formatDate:'UTC' }}</span>
+          </ng-template>
+        </e-column>
+        <e-column field="shiftStartTime" headerText="SHIFT" width="160" minWidth="80" maxWidth="200">
+          <ng-template #template let-data>
+            <span
+              >{{ data.shiftStartTime | date: 'shortTime':'UTC' }}-{{
+                data.shiftEndTime | date: 'shortTime':'UTC'
+              }}</span
+            >
+          </ng-template>
+        </e-column>
+        <e-column field="candidates" headerText="CAND." headerTextAlign="Right" width="90" minWidth="80" maxWidth="160">
+          <ng-template #template let-data>
+            <div class="align-right">{{ data.candidates }}</div>
+          </ng-template>
+        </e-column>
+        <e-column field="creationDate" headerText="Creation Date" width="150" minWidth="140" maxWidth="200">
+          <ng-template #template let-data>
+            <span>{{ data.creationDate | date: formatDate }}</span>
+          </ng-template>
+        </e-column>
+      </e-columns>
 
       <ng-template #detailTemplate let-data>
         <div class="subrow-wrapper">

@@ -8,6 +8,7 @@
       <ng-container *ngSwitchCase="orderType.PermPlacement">
         <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="region"></ng-container>
         <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
@@ -16,16 +17,18 @@
         <ng-container [ngTemplateOutlet]="annualSalaryRange"></ng-container>
         <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
       </ng-container>
-  
+
       <ng-container *ngSwitchDefault>
         <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="region"></ng-container>
         <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
-        <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
         <div class="column last-column">
           <ng-container [ngTemplateOutlet]="billRate"></ng-container>
         </div>
+        <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
+        <div class="column last-column"></div>
         <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
       </ng-container>
@@ -49,10 +52,6 @@
           {{ orderInformation.shiftEndTime | date: 'hh:mm a':'UTC' }}
         </div>
         <div class="sup-title">Shift</div>
-      </div>
-      <div class="column">
-        <div class="title">{{ orderInformation.regionName }}</div>
-        <div class="sup-title">Region</div>
       </div>
       <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
         <div class="title">
@@ -102,6 +101,7 @@
         </div>
       </div>
       <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="region"></ng-container>
       <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
       <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
       <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
@@ -110,8 +110,10 @@
           <i-feather name="folder" class="icon"></i-feather>
         </div>
         <div>
-          <div class="title">{{ orderInformation.shiftStartTime | date: 'hh:mm a': 'utc' }}
-            - {{ orderInformation.shiftEndTime | date: 'hh:mm a': 'utc'}}</div>
+          <div class="title">
+            {{ orderInformation.shiftStartTime | date: 'hh:mm a':'utc' }} -
+            {{ orderInformation.shiftEndTime | date: 'hh:mm a':'utc' }}
+          </div>
           <div class="sup-title">Shift</div>
         </div>
       </div>
@@ -285,6 +287,18 @@
     </div>
     <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
       Previous Extension: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #region>
+  <div class="column">
+    <div class="icon">
+      <i-feather name="map-pin" class="icon"></i-feather>
+    </div>
+    <div>
+      <div class="title">{{ orderInformation.regionName }}</div>
+      <div class="sup-title">Region</div>
     </div>
   </div>
 </ng-template>

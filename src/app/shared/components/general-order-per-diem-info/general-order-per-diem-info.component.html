@@ -21,6 +21,18 @@
       </div>
       <div class="column">
         <div class="icon">
+          <i-feather name="map-pin" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation.regionName }}</div>
+          <div class="sup-title">Region</div>
+        </div>
+      </div>
+
+      <div class="column empty-column"></div>
+
+      <div class="column">
+        <div class="icon">
           <i-feather name="folder" class="icon"></i-feather>
         </div>
         <div>
@@ -28,9 +40,6 @@
           <div class="sup-title">Department</div>
         </div>
       </div>
-  
-      <div class="column empty-column"></div>
-  
       <div class="column">
         <div class="icon">
           <i-feather name="briefcase" class="icon"></i-feather>
@@ -49,11 +58,11 @@
           <div class="sup-title">Skill</div>
         </div>
       </div>
-  
+
       <div class="column"></div>
     </div>
   </section>
-  
+
   <section class="candidates-additional-info" *ngIf="orderInformation">
     <div class="container-row justify-content-normal">
       <div class="column">
@@ -72,10 +81,6 @@
         <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy':'UTC') || '-' }}</div>
         <div class="sup-title">Distributed On</div>
       </div>
-      <div class="column">
-        <div class="title">{{ orderInformation.regionName }}</div>
-        <div class="sup-title">Region</div>
-      </div>
     </div>
   </section>
 </ng-container>
@@ -85,7 +90,6 @@
     <ng-template [ngSwitchCase]="orderType.OpenPerDiem">
       <section class="candidates-info" *ngIf="orderInformation">
         <div class="container-row">
-    
           <div class="column">
             <div class="icon">
               <i-feather name="briefcase" class="icon"></i-feather>
@@ -95,7 +99,7 @@
               <div class="sup-title">Skill</div>
             </div>
           </div>
-    
+
           <div class="column">
             <div class="icon">
               <i-feather name="folder" class="icon"></i-feather>
@@ -105,7 +109,7 @@
               <div class="sup-title">Region</div>
             </div>
           </div>
-    
+
           <div class="column">
             <div class="icon">
               <i-feather name="map-pin" class="icon"></i-feather>
@@ -115,7 +119,7 @@
               <div class="sup-title">Location</div>
             </div>
           </div>
-    
+
           <div class="column">
             <div class="icon">
               <i-feather name="folder" class="icon"></i-feather>
@@ -125,17 +129,17 @@
               <div class="sup-title">Department</div>
             </div>
           </div>
-    
+
           <div class="column">
             <div class="icon">
               <i-feather name="calendar" class="icon"></i-feather>
             </div>
             <div>
-              <div class="title">{{ orderInformation.jobStartDate | date: 'MM/dd/yyyy': 'utc' }}</div>
+              <div class="title">{{ orderInformation.jobStartDate | date: 'MM/dd/yyyy':'utc' }}</div>
               <div class="sup-title">Job Date</div>
             </div>
           </div>
-    
+
           <div class="column">
             <div class="icon">
               <i-feather name="briefcase" class="icon"></i-feather>
@@ -145,14 +149,16 @@
               <div class="sup-title">Reason for Requisition</div>
             </div>
           </div>
-    
+
           <div class="column">
             <div class="icon">
               <i-feather name="clock" class="icon"></i-feather>
             </div>
             <div>
-              <div class="title">{{ orderInformation.shiftStartTime | date: 'hh:mm a': 'utc' }}
-                - {{ orderInformation.shiftEndTime | date: 'hh:mm a': 'utc'}}</div>
+              <div class="title">
+                {{ orderInformation.shiftStartTime | date: 'hh:mm a':'utc' }} -
+                {{ orderInformation.shiftEndTime | date: 'hh:mm a':'utc' }}
+              </div>
               <div class="sup-title">Shift</div>
             </div>
           </div>
@@ -174,7 +180,7 @@
             <div class="title">{{ orderInformation.criticalOrder | boolValueToText }}</div>
             <div class="sup-title">Critical Order</div>
           </div>
-        
+
           <div class="column">
             <div class="title">{{ orderInformation.contact | boolValueToText }}</div>
             <div class="sup-title">Contract</div>
@@ -203,5 +209,4 @@
       </section>
     </ng-template>
   </ng-container>
-
 </ng-template>

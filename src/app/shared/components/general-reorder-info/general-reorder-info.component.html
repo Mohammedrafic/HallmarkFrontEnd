@@ -20,16 +20,25 @@
     </div>
     <div class="column">
       <div class="icon">
+        <i-feather name="map-pin" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{ orderInformation.regionName }}</div>
+        <div class="sup-title">Region</div>
+      </div>
+    </div>
+    <div class="column last-column">
+      <div class="cost">${{ orderInformation.hourlyRate }}</div>
+      <div class="sup-title">Bill Rate</div>
+    </div>
+    <div class="column">
+      <div class="icon">
         <i-feather name="folder" class="icon"></i-feather>
       </div>
       <div>
         <div class="title">{{ orderInformation.departmentName }}</div>
         <div class="sup-title">Department</div>
       </div>
-    </div>
-    <div class="column last-column">
-      <div class="cost">${{ orderInformation.hourlyRate }}</div>
-      <div class="sup-title">Bill Rate</div>
     </div>
     <div class="column" *ngIf="(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
       <div class="icon">
@@ -49,6 +58,7 @@
         <div class="sup-title">Reason for Requisition</div>
       </div>
     </div>
+    <div class="last-column"></div>
     <div class="column">
       <div class="icon">
         <i-feather name="briefcase" class="icon"></i-feather>
@@ -59,6 +69,8 @@
       </div>
     </div>
     <div class="column" *ngIf="!(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea"></div>
+    <div class="column empty-column"></div>
+    <div class="column empty-column"></div>
     <div class="column">
       <div class="accent link" (click)="moveToPerDiem()">
         Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}
@@ -91,10 +103,6 @@
         <div class="title">{{ orderInformation?.jobStartDate | date: 'MM/dd/yyy':'UTC' }}</div>
         <div class="sup-title">Date</div>
       </div>
-    </div>
-    <div class="column">
-      <div class="title">{{ orderInformation.regionName }}</div>
-      <div class="sup-title">Region</div>
     </div>
   </div>
 </section>
