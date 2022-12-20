@@ -1,13 +1,12 @@
 <ejs-dialog
   #sideDialog
+  id="dialog"
+  cssClass="dialog quick-order-dialog"
   [animationSettings]="{ effect: 'SlideRight' }"
   [isModal]="true"
   [visible]="false"
-  [showCloseIcon]="isMobile"
+  [showCloseIcon]="false"
   [target]="targetElement"
-  cssClass="dialog quick-order-dialog"
-  [ngClass]="{ filter: isMobile }"
-  id="dialog"
 >
   <ng-template #header>
     <section class="container">
@@ -18,21 +17,23 @@
             <button ejs-button cssClass="e-outline calcel" (click)="onClose()">Cancel</button>
             <button ejs-button [isPrimary]="true" (click)="onSubmitQuickOrder()">Submit</button>
           </div>
+          <div *ngIf="isMobile" class="mobile-close-button">
+            <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
+              <i-feather name="x" class="icon"></i-feather>
+            </button>
+          </div>
         </div>
       </section>
     </section>
   </ng-template>
   <ng-template #content>
     <app-quick-order-form
-      #quickOrderForm
       *ngIf="isFormShown"
       [submitQuickOrder$]="submitQuickOrder$"
       [allOrganizations]="allOrganizations"
       [userIsAdmin]="userIsAdmin"
       [organizationStructure]="organizationStructure"
-      [openEvent]="openEvent"
       [isMobile]="isMobile"
-      (submit)="onSubmitQuickOrder()"
     ></app-quick-order-form>
   </ng-template>
 </ejs-dialog>

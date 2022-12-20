@@ -2,17 +2,14 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  EventEmitter,
   Input,
   OnChanges,
   OnInit,
-  Output,
   SimpleChanges,
-  ViewChild,
 } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { ChangeEventArgs, FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import {
   combineLatest,
   debounceTime,
@@ -85,7 +82,7 @@ import {
 import { QuickOrderConditions } from '../interfaces';
 import { QuickOrderService } from '../services';
 
-import { GetOrganizationSkills } from 'src/app/dashboard/store/dashboard.actions';
+import { GetOrganizationSkills, ToggleQuickOrderDialog } from 'src/app/dashboard/store/dashboard.actions';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 
@@ -99,13 +96,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   @Input() public allOrganizations: Organisation[];
   @Input() public userIsAdmin: boolean;
   @Input() public organizationStructure: OrganizationStructure;
-  @Input() public openEvent: Subject<boolean>;
   @Input() public submitQuickOrder$: Subject<boolean>;
   @Input() public isMobile: boolean;
-
-  @ViewChild('multiselect') public readonly multiselect: MultiSelectComponent;
-
-  @Output() public submit: EventEmitter<void> = new EventEmitter();
 
   public organizationForm: FormGroup;
   public orderTypeForm: FormGroup;
@@ -118,7 +110,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public shiftStartTimeField: AbstractControl;
   public shiftEndTimeField: AbstractControl;
 
-  public readonly quickOrderConditions: QuickOrderConditions = QuickOrderCondition;
+  public readonly quickOrderConditions: QuickOrderConditions = { ...QuickOrderCondition };
   public readonly optionFields: FieldSettingsModel = optionFields;
   public readonly skillFields: FieldSettingsModel = skillsFields;
   public readonly organizationTypeFields: FieldSettingsModel = organizationFields;
@@ -209,7 +201,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.handleDurationControlValueChanges();
     this.populateQuickOrderFormValues();
     this.populateShiftTimes();
-    this.refreshMultiSelectAfterOpenDialog();
     this.handleOrganizationUserDataStructure();
     this.subscribeForSettings();
     this.getContactDetails();
@@ -576,7 +567,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private populateJobDistributionForm(): void {
-    this.jobDistributionControl.patchValue([OrderJobDistribution.All]);
+    this.jobDistributionControl.patchValue(OrderJobDistribution.All);
   }
 
   private populateShiftTimes() {
@@ -595,16 +586,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         this.generalInformationForm.contains(name) && this.generalInformationForm.setValidators(null);
       });
     }
-  }
-
-  private refreshMultiSelectAfterOpenDialog(): void {
-    this.openEvent.pipe(
-      takeUntil(this.destroy$),
-      filter(Boolean),
-      debounceTime(300)
-    ).subscribe(() => {
-        this.multiselect.refresh();
-    });
   }
 
   private handleAgencyValueChanges(): void {
@@ -707,7 +688,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       const selectedBusinessUnitId = this.organizationForm.value.organization;
       this.store.dispatch(new SaveOrder(order, [], undefined, selectedBusinessUnitId));
       this.actions$.pipe(takeUntil(this.destroy$), ofActionSuccessful(SaveOrder)).subscribe(() => {
-        this.openEvent.next(false);
+        this.store.dispatch(new ToggleQuickOrderDialog(false));
       });
     } else {
       this.organizationForm.markAllAsTouched();

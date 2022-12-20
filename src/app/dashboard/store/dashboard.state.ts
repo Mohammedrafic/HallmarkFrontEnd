@@ -16,6 +16,7 @@ import {
   SwitchMonthWeekTimeSelection,
   GetOrganizationSkills,
   GetAllSkills,
+  ToggleQuickOrderDialog,
 } from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
@@ -36,6 +37,7 @@ export interface DashboardStateModel {
   positionTrendTimeSelection: TimeSelectionEnum;
   skills: AllOrganizationsSkill[];
   organizationSkills: AssignedSkillsByOrganization[];
+  toggleQuickOrderDialog: boolean
 }
 
 @State<DashboardStateModel>({
@@ -49,6 +51,7 @@ export interface DashboardStateModel {
     positionTrendTimeSelection: JSON.parse(window.localStorage.getItem(TIME_SELECTION_OF_CHART_LINE) as string) || TimeSelectionEnum.Monthly,
     organizationSkills: [],
     skills: [],
+    toggleQuickOrderDialog: false,
   },
 })
 @Injectable()
@@ -98,6 +101,10 @@ export class DashboardState {
     return state.organizationSkills;
   }
 
+  @Selector()
+  static toggleQuickOrderDialog(state: DashboardStateModel): DashboardStateModel['toggleQuickOrderDialog'] {
+    return state.toggleQuickOrderDialog;
+  }
   public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
 
   @Action(GetDashboardData)
@@ -176,5 +183,10 @@ export class DashboardState {
         patchState({ organizationSkills: payload });
       })
     );
+  }
+
+  @Action(ToggleQuickOrderDialog)
+  private ToggleQuickOrderDialog ({ patchState }: StateContext<DashboardStateModel>, { isOpen }: ToggleQuickOrderDialog): void {
+    patchState({ toggleQuickOrderDialog: isOpen })
   }
 }

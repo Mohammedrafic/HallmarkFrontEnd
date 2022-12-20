@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, takeUntil } from 'rxjs';
 
 import { ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -18,6 +18,7 @@ import { FilterName } from '../models/dashboard-filters.model';
 import { FilterKeys } from '../constants/filter-keys';
 import { FilterColumnTypeEnum } from '../enums/dashboard-filter-fields.enum';
 import { BusinessUnitType } from '../../shared/enums/business-unit-type';
+import { ToggleQuickOrderDialog } from '../store/dashboard.actions';
 
 @Component({
   selector: 'app-dashboard-control',
@@ -43,7 +44,6 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   @Select(UserState.organizationStructure) public readonly organizationStructure$: Observable<OrganizationStructure>;
   @Select(UserState.isAgencyUser) public readonly isAgencyUser: Observable<boolean>;
 
-  public readonly isOpenQuickOrderDialod$: Subject<boolean> = new Subject<boolean>();
   public orderedFilters: Record<FilterName, FilteredItem[]>;
 
 
@@ -71,7 +71,7 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   }
 
   public onCreateOrder(): void {
-    this.isOpenQuickOrderDialod$.next(true);
+    this.store.dispatch(new ToggleQuickOrderDialog(true));
   }
 
   private toPutInOrderFilters(filters: FilteredItem[]): void {
