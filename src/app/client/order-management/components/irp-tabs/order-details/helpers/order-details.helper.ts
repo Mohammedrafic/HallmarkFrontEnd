@@ -4,11 +4,10 @@ import { Department } from '@shared/models/department.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import {
   DataSourceContainer, JobDistribution,
-  OrderFormInput,
+  OrderFormInput, OrderFormsConfig,
   SpecialProjectStructure,
   StateList,
 } from '@client/order-management/interfaces';
-import { IrpJobDistribution, IrpTiersLogic } from '@client/order-management/components/irp-tabs/order-details/constants';
 import { Order } from '@shared/models/order-management.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { FieldType } from '@core/enums';
@@ -28,6 +27,12 @@ export const changeTypeField = (config: OrderFormInput[], field: string, fieldTy
       item.type = fieldType;
     }
   });
+};
+
+export const getAgencyIdFiled = (config: OrderFormsConfig) => {
+  return config?.fields.find((control: OrderFormInput) => {
+    return control.field === 'agencyId';
+  }) as OrderFormInput;
 };
 
 export const mapDepartmentStructure = (departments: Department[]): Department[] => {
@@ -76,10 +81,10 @@ const mapSpecialProjectDataToCorrectFormat =
     name: itm[key],
   }));
 };
-
-export const getDistributionSource = (isSelect: boolean) => {
+//todo: uncomment logic for IRP tiers
+/*export const getDistributionSource = (isSelect: boolean) => {
   return isSelect ? [...IrpJobDistribution,...IrpTiersLogic] : IrpJobDistribution;
-};
+};*/
 
 export const mapStructureToEditedOrder = (selectedOrder: Order) => {
   return {

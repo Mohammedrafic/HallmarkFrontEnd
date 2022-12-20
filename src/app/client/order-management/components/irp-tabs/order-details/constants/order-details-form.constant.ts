@@ -52,6 +52,7 @@ export const GeneralInformationConfigLTA: OrderFormsConfig  = {
       title: '# Open Positions',
       cssClass: 'item5',
       required: true,
+      show: true,
       type: FieldType.Input,
     },
     {
@@ -142,6 +143,7 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
       field: 'openPositions',
       title: '# Open Positions',
       required: true,
+      show: true,
       cssClass: 'item5',
       type: FieldType.Input,
     },
@@ -201,6 +203,7 @@ export const JobDistributionConfigLTA: OrderFormsConfig  = {
       field: 'hourlyRate',
       title: 'Hourly Rate',
       required: false,
+      show: false,
       type: FieldType.Number,
     },
   ],
@@ -229,6 +232,7 @@ export const JobDistributionConfigPO: OrderFormsConfig = {
     {
       field: 'billRate',
       title: 'Bill Rate',
+      show: false,
       required: false,
       type: FieldType.Input,
     },

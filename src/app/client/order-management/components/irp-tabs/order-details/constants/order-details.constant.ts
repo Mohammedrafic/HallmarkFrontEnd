@@ -17,12 +17,7 @@ export const JobDistributionForm = 'jobDistributionForm';
 export const SpecialProjectForm = 'specialProjectForm';
 export const WorkLocationList = 'workLocationList';
 export const ContactDetailsList = 'contactDetailsList';
-export const IrpTiersLogic = [
-  { id: IrpOrderJobDistribution.TieringLogicInternal, name: 'Tiering logic Internal' },
-  { id: IrpOrderJobDistribution.TieringLogicExternal, name: 'Tiering logic External' },
-];
 export const IrpJobDistribution = [
   { id: IrpOrderJobDistribution.AllInternal, name: 'All Internal' },
-  { id: IrpOrderJobDistribution.AllExternal, name: 'All External'},
   { id: IrpOrderJobDistribution.SelectedExternal, name: 'Selected External' },
 ];

@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, TrackByFunction } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 
-import { filter, map, Observable, switchMap, takeUntil } from 'rxjs';
+import { filter, map, Observable, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -47,14 +47,15 @@ import {
 } from '@organization-management/store/organization-management.actions';
 import { Location } from '@shared/models/location.model';
 import {
-  changeTypeField,
-  getDistributionSource,
+  changeTypeField, getAgencyIdFiled,
   mapAssociateAgencyStructure,
   mapDepartmentStructure,
   mapReasonsStructure,
   mapSpecialProjectStructure,
-  mapStatesStructure, mapStructureToEditedOrder,
-  setDataSource, setDefaultPrimaryContact,
+  mapStatesStructure,
+  mapStructureToEditedOrder,
+  setDataSource,
+  setDefaultPrimaryContact,
 } from '@client/order-management/components/irp-tabs/order-details/helpers';
 import { Department } from '@shared/models/department.model';
 import { ListOfSkills } from '@shared/models/skill.model';
@@ -66,9 +67,7 @@ import {
   OrderDetailsIrpService,
 } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.service';
 import { ButtonType, IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
-import { ORDER_CONTACT_DETAIL_TITLES, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
-import { TierLogic } from '@shared/enums/tier-logic.enum';
-import { SettingsViewService } from '@shared/services';
+import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
@@ -84,7 +83,7 @@ import { OrderType } from '@shared/enums/order-type';
   styleUrls: ['./order-details-irp.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
+export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnDestroy {
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
@@ -140,7 +139,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     private changeDetection: ChangeDetectorRef,
     private store: Store,
     private durationService: DurationService,
-    private settingsViewService: SettingsViewService,
     private irpStateService: IrpContainerStateService
   ) {
     super();
@@ -153,6 +151,12 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForDataSources();
     this.watchForSaveAction();
     this.watchForSelectOrder();
+  }
+
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
+
+    this.clearConfigs();
   }
 
   public addFields(config: OrderFormsArrayConfig): void {
@@ -431,7 +435,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.changeDetection.markForCheck();
     });
 
-    this.generalInformationForm.get('departmentId')?.valueChanges
+    //todo: uncomment logic for IRP tiers
+    /*this.generalInformationForm.get('departmentId')?.valueChanges
       .pipe(
         filter(Boolean),
         switchMap((id: number) => {
@@ -453,17 +458,25 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           this.jobDistributionForm.get('jobDistribution')?.patchValue(this.selectedOrder.jobDistributionValue);
         }
         this.changeDetection.markForCheck();
-    });
+    });*/
 
     this.jobDistributionForm.get('jobDistribution')?.valueChanges.pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number[]) => {
-        if(value.includes(IrpOrderJobDistribution.SelectedExternal)) {
-          this.jobDistributionForm.get('agencyId')?.enable();
-        } else {
-          this.jobDistributionForm.get('agencyId')?.disable();
-        }
+      const selectedConfig = this.getSelectedFormConfig(JobDistributionForm);
+      const agencyConfigControl = getAgencyIdFiled(selectedConfig);
+      const rateConfigControl = this.getRateConfigControl(selectedConfig);
+
+      if(value.includes(IrpOrderJobDistribution.SelectedExternal)) {
+        agencyConfigControl.enabled = true;
+        rateConfigControl.show = true;
+      } else {
+        agencyConfigControl.enabled = false;
+        rateConfigControl.show = false;
+      }
+
+        this.changeDetection.markForCheck();
     });
   }
 
@@ -536,19 +549,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
       if(this.selectedOrder) {
-        this.irpStateService.setFormState({
-          orderType: this.orderTypeForm,
-          ...this.listOfKeyForms,
-        });
-
         this.irpStateService.deleteDocuments(this.deleteDocumentsGuids);
-      } else {
-        this.irpStateService.setFormState({
-          orderType: this.orderTypeForm,
-          ...this.listOfKeyForms,
-        });
       }
 
+      this.irpStateService.setFormState({
+        orderType: this.orderTypeForm,
+        ...this.listOfKeyForms,
+      });
       this.irpStateService.setDocuments(this.documents);
       this.changeDetection.markForCheck();
     });
@@ -582,6 +589,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.jobDistributionForm.patchValue(selectedOrder);
     this.jobDescriptionForm.patchValue(selectedOrder);
     this.specialProjectForm.patchValue(selectedOrder);
+    this.jobDistributionForm.get('jobDistribution')?.patchValue(this.selectedOrder.jobDistributionValue);
 
     if(selectedOrder.orderType === OrderType.OpenPerDiem) {
       const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
@@ -650,5 +658,22 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     workLocationForm.forms.forEach((form: OrderFormInput[]) => {
       setDataSource(form,'state', state ?? this.dataSourceContainer.state as StateList[]);
     });
+  }
+
+  private getRateConfigControl(config: OrderFormsConfig): OrderFormInput {
+    const orderType = this.orderTypeForm.get('orderType')?.value;
+    const controlType = orderType === IrpOrderType.LongTermAssignment ? 'hourlyRate': 'billRate';
+
+    return config?.fields.find((control: OrderFormInput) => {
+      return control.field === controlType;
+    }) as OrderFormInput;
+  }
+
+  private clearConfigs(): void {
+    const selectedConfig = this.getSelectedFormConfig(JobDistributionForm);
+    getAgencyIdFiled(selectedConfig).enabled = false;
+    this.getRateConfigControl(selectedConfig).show = false;
+    this.isLocationLoad = true;
+    this.isDepartmentLoad = true;
   }
 }

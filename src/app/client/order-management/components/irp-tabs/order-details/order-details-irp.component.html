@@ -69,7 +69,7 @@
                 </ng-template>
 
                 <ng-template [ngSwitchCase]="FieldTypes.Input">
-                  <div class="{{item.cssClass}} input-container">
+                  <div class="{{item.cssClass}} input-container" *ngIf="item.show">
                     <label [for]="item.field">
                       {{ item.title }} <span *ngIf="item.required" class="required">*</span>
                     </label>
@@ -146,7 +146,7 @@
                 </ng-template>
 
                 <ng-template [ngSwitchCase]="FieldTypes.Number">
-                  <div class="{{item.cssClass}} input-container">
+                  <div class="{{item.cssClass}} input-container" *ngIf="item.show">
                     <label [for]="item.field">
                       {{ item.title }} <span *ngIf="item.required" class="required">*</span>
                     </label>
