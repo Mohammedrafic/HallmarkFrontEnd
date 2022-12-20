@@ -171,7 +171,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
     this.store.dispatch(new GetAllBusinessLines());
-    // this.getRegionsData();
   }
 
   ngOnDestroy(): void {
@@ -715,16 +714,4 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       return column;
     });
   }
-
-  // private getRegionsData(): void {
-  //   this.store.dispatch(new GetRegions())
-  //   .pipe(
-
-
-  //     takeUntil(this.componentDestroy()),
-  //   )
-  //   .subscribe(() => {
-      
-  //   });
-  // }
 }
