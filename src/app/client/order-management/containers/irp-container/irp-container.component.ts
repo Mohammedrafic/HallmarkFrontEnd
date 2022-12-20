@@ -101,7 +101,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   private saveValidOrder(saveType: MenuEventArgs | void, formState: ListOfKeyForms): void {
     if(saveType) {
       //Todo: add condition, when will be implement save for Template
-      this.saveOrder(formState);
+      this.saveOrder(formState, saveType);
     } else {
       this.checkIsCredentialsValid(formState);
     }
@@ -115,14 +115,15 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     }
   }
 
-  private saveOrder(formState: ListOfKeyForms): void {
+  private saveOrder(formState: ListOfKeyForms, saveType?: MenuEventArgs): void {
     const { orderType } = formState.orderType.getRawValue();
     let createdOrder;
-
+    
     if(orderType === IrpOrderType.LongTermAssignment) {
       createdOrder = {
         ...createOrderDTO(formState, this.orderCredentials),
         contactDetails: getValuesFromList(formState.contactDetailsList),
+        isSubmit: !saveType,
       };
     } else {
       createdOrder = {

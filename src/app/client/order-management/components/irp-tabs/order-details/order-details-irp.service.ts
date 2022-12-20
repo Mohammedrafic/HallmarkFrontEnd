@@ -92,9 +92,9 @@ export class OrderDetailsIrpService {
 
   public createSpecialProject(): FormGroup {
     return this.formBuilder.group({
-      projectTypeId: [''],
-      projectNameId: [''],
-      poNumberId: [''],
+      projectTypeId: [null],
+      projectNameId: [null],
+      poNumberId: [null],
     });
   }
 
