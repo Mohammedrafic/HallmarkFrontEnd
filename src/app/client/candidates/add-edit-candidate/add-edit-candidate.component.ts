@@ -7,7 +7,7 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
   selector: 'app-add-edit-candidate',
   templateUrl: './add-edit-candidate.component.html',
   styleUrls: ['./add-edit-candidate.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddEditCandidateComponent implements OnInit {
   public readonly tabsConfig = tabsConfig;
@@ -15,7 +15,7 @@ export class AddEditCandidateComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private candidateProfileFormService: CandidateProfileFormService,
+    public candidateProfileFormService: CandidateProfileFormService,
     private cdr: ChangeDetectorRef
   ) {
     if (route.snapshot.paramMap.get('id')) {
@@ -24,11 +24,13 @@ export class AddEditCandidateComponent implements OnInit {
       // TODO: Fetch and patch irp candidate value
     } else {
       // CREATE
-
     }
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void {}
+
+  public get isCandidateFormPristine(): boolean {
+    return this.candidateProfileFormService.candidateForm.pristine;
   }
 
   public navigateBack(): void {

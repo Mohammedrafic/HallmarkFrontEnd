@@ -10,9 +10,11 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { Store } from '@ngxs/store';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
+import { DateTimeHelper } from '@core/helpers';
+import pick from 'lodash/fp/pick';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CandidateProfileService {
   constructor(
@@ -20,12 +22,13 @@ export class CandidateProfileService {
     private formBuilder: FormBuilder,
     private store: Store,
     private candidateProfileForm: CandidateProfileFormService,
-    private generalNotesService: GeneralNotesService) {
-  }
+    private generalNotesService: GeneralNotesService
+  ) {}
 
   public saveCandidateProfile(): Observable<CandidateModel> {
     const candidate = this.candidateProfileForm.candidateForm.value;
-    const payload = { ...candidate, generalNotes: this.generalNotesService.notes$.getValue() };
+    const candidateDateInUTC = { ...candidate, ...this.convertDatesToUTC(candidate) };
+    const payload = { ...candidateDateInUTC, generalNotes: this.generalNotesService.notes$.getValue() };
 
     return this.http.post<CandidateModel>('/api/employee/create', payload).pipe(
       tap(() => {
@@ -44,19 +47,35 @@ export class CandidateProfileService {
 
   public saveCandidate(file: Blob): Observable<void | CandidateModel> {
     if (file) {
-      return this.saveCandidateProfile()
-        .pipe(
-          mergeMap((candidate) => (this.saveCandidatePhoto(file, candidate.id)))
-        );
+      return this.saveCandidateProfile().pipe(mergeMap((candidate) => this.saveCandidatePhoto(file, candidate.id)));
     } else {
       return this.saveCandidateProfile();
     }
   }
 
-
   public saveCandidatePhoto(file: Blob, id: number): Observable<any> {
     const formData = new FormData();
     formData.append('photo', file);
     return this.http.post(`/api/Employee/photo?candidateProfileId=${id}`, formData);
+  }
+
+  private convertDatesToUTC(candidate: CandidateModel): Partial<CandidateModel> {
+    const props = [
+      'dob',
+      'hireDate',
+      'contractStartDate',
+      'contractEndDate',
+      'holdStartDate',
+      'holdEndDate',
+      'terminationDate',
+      'organizationOrientationDate',
+    ];
+    const dates = pick(props, candidate);
+
+    return Object.fromEntries(
+      Object.entries(dates).map(([key, value]: [string, any]) => {
+        return [key, value ? DateTimeHelper.toUtcFormat(value) : value];
+      })
+    );
   }
 }
