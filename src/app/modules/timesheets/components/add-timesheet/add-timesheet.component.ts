@@ -27,13 +27,13 @@ import { createUniqHashObj } from '@core/helpers/functions.helper';
 export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> implements OnInit {
   @Input() profileId: number;
 
+  @Input() public container: HTMLElement | null = null;
+
   public readonly dialogConfig = RecordAddDialogConfig;
 
   public formType: RecordFields = RecordFields.Time;
 
   public onCallId: number;
-
-  public readonly targetDialogElement: HTMLElement | null = document.body.querySelector('#main');
 
   @Select(TimesheetsState.addDialogOpen)
   public readonly dialogState$: Observable<TimesheetDetailsAddDialogState>;
