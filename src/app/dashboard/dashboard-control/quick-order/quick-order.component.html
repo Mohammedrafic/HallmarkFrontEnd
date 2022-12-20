@@ -1,13 +1,13 @@
 <ejs-dialog
   #sideDialog
+  id="dialog"
+  cssClass="dialog quick-order-dialog"
   [animationSettings]="{ effect: 'SlideRight' }"
   [isModal]="true"
   [visible]="false"
   [showCloseIcon]="isMobile"
   [target]="targetElement"
-  cssClass="dialog quick-order-dialog"
   [ngClass]="{ filter: isMobile }"
-  id="dialog"
 >
   <ng-template #header>
     <section class="container">
@@ -24,13 +24,11 @@
   </ng-template>
   <ng-template #content>
     <app-quick-order-form
-      #quickOrderForm
       *ngIf="isFormShown"
       [submitQuickOrder$]="submitQuickOrder$"
       [allOrganizations]="allOrganizations"
       [userIsAdmin]="userIsAdmin"
       [organizationStructure]="organizationStructure"
-      [openEvent]="openEvent"
       [isMobile]="isMobile"
       (submit)="onSubmitQuickOrder()"
     ></app-quick-order-form>
