@@ -186,7 +186,7 @@ export class DashboardState {
   }
 
   @Action(ToggleQuickOrderDialog)
-  private ToggleQuickOrderDialog ({ patchState }: StateContext<DashboardStateModel>, {isOpen}: ToggleQuickOrderDialog): void {
-    patchState({toggleQuickOrderDialog: isOpen})
+  private ToggleQuickOrderDialog ({ patchState }: StateContext<DashboardStateModel>, { isOpen }: ToggleQuickOrderDialog): void {
+    patchState({ toggleQuickOrderDialog: isOpen })
   }
 }

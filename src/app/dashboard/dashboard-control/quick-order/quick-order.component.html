@@ -5,9 +5,8 @@
   [animationSettings]="{ effect: 'SlideRight' }"
   [isModal]="true"
   [visible]="false"
-  [showCloseIcon]="isMobile"
+  [showCloseIcon]="false"
   [target]="targetElement"
-  [ngClass]="{ filter: isMobile }"
 >
   <ng-template #header>
     <section class="container">
@@ -17,6 +16,11 @@
           <div *ngIf="!isMobile">
             <button ejs-button cssClass="e-outline calcel" (click)="onClose()">Cancel</button>
             <button ejs-button [isPrimary]="true" (click)="onSubmitQuickOrder()">Submit</button>
+          </div>
+          <div *ngIf="isMobile" class="mobile-close-button">
+            <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
+              <i-feather name="x" class="icon"></i-feather>
+            </button>
           </div>
         </div>
       </section>
@@ -30,7 +34,6 @@
       [userIsAdmin]="userIsAdmin"
       [organizationStructure]="organizationStructure"
       [isMobile]="isMobile"
-      (submit)="onSubmitQuickOrder()"
     ></app-quick-order-form>
   </ng-template>
 </ejs-dialog>

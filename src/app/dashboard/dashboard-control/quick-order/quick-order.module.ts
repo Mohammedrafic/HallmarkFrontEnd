@@ -9,7 +9,7 @@ import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angula
 import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { FeatherModule } from 'angular-feather';
-import { Edit3 } from 'angular-feather/icons';
+import { Edit3, X } from 'angular-feather/icons';
 import { SharedModule } from '@shared/shared.module';
 import { SettingsViewService } from '@shared/services';
 import { QuickOrderService } from './services';
@@ -28,7 +28,7 @@ import { ValidateDirectiveModule } from '@shared/directives/validate-directive/v
     TimePickerModule,
     TextBoxModule,
     NumericTextBoxModule,
-    FeatherModule.pick({Edit3}),
+    FeatherModule.pick({Edit3, X}),
     SharedModule,
     AccordionModule,
     ValidateDirectiveModule

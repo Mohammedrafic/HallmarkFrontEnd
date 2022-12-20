@@ -28,7 +28,7 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
   @Select(OrderManagementContentState.isDirtyQuickOrderForm)
   private isFormDirty$: Observable<boolean>;
 
-  @Select(DashboardState.toggleQuickOrderDialog) public readonly toggleQuickOrderDialog$: Observable<boolean>;
+  @Select(DashboardState.toggleQuickOrderDialog) private readonly toggleQuickOrderDialog$: Observable<boolean>;
 
   public submitQuickOrder$ = new Subject<boolean>();
 

@@ -2,11 +2,9 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  EventEmitter,
   Input,
   OnChanges,
   OnInit,
-  Output,
   SimpleChanges,
 } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -100,8 +98,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   @Input() public organizationStructure: OrganizationStructure;
   @Input() public submitQuickOrder$: Subject<boolean>;
   @Input() public isMobile: boolean;
-
-  @Output() public submit: EventEmitter<void> = new EventEmitter();
 
   public organizationForm: FormGroup;
   public orderTypeForm: FormGroup;
