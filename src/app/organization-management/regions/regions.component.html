@@ -20,13 +20,13 @@
       id="importButton"
       cssClass="e-outline button-import"
       [class.hidden]="true"
-      (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
+      (click)="onImportDataClick()">Import <i-feather name="download" class="icon"></i-feather></button>
     <button
       ejs-dropdownbutton
       [items]="exportOptions"
       (select)="exportSelected($event)"
       id="importButton"
-      cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+      cssClass="e-outline button-export">Export <i-feather name="upload" class="icon"></i-feather></button>
 
       <button
         ejs-button

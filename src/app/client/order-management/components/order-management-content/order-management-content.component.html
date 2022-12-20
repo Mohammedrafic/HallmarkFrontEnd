@@ -43,7 +43,7 @@
         (click)="openImportDialog()"
         class="e-outline"
       >
-        <div class="button-import-container">Import<i-feather name="upload" class="icon"></i-feather></div>
+        <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
       </button>
     </app-tooltip-container>
     <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
@@ -60,7 +60,7 @@
       cssClass="e-outline button-export"
       [disabled]="isActiveSystemIRP"
     >
-      <div class="button-export-container">Export<i-feather name="download" class="icon"></i-feather></div>
+      <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
     </button>
     <app-tooltip-container [message]="toolTipMessage" [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
       <button
