@@ -3,7 +3,7 @@ import { IOrderCredentialItem } from '@order-credentials/types';
 export class GetAllCredentials {
   static readonly type = '[order candidates credentials] Get All Credentials';
 
-  constructor(public includeInIRP: boolean) {
+  constructor(public readonly includeInIRP: boolean) {
   }
 }
 

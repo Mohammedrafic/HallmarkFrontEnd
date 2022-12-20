@@ -566,7 +566,11 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
     this.regions$
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
-        this.generalInformationForm.controls['regionId'].patchValue(order.regionId);
+        const regionFormControl = this.generalInformationForm.get('regionId');
+
+        if (order.regionId && !regionFormControl?.value) {
+          regionFormControl?.patchValue(order.regionId);
+        }
       });
 
     this.generalInformationForm.controls['hourlyRate'].patchValue(hourlyRate);
