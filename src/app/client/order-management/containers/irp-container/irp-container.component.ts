@@ -21,7 +21,6 @@ import {
   showInvalidFormControl, showMessageForInvalidCredentials,
 } from '@client/order-management/helpers';
 import { SaveIrpOrder, EditIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 import { Order } from '@shared/models/order-management.model';
 import { IOrderCredentialItem } from "@order-credentials/types";
 
@@ -116,25 +115,14 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   }
 
   private saveOrder(formState: ListOfKeyForms, saveType?: MenuEventArgs): void {
-    const { orderType } = formState.orderType.getRawValue();
-    let createdOrder;
-    
-    if(orderType === IrpOrderType.LongTermAssignment) {
-      createdOrder = {
-        ...createOrderDTO(formState, this.orderCredentials),
-        contactDetails: getValuesFromList(formState.contactDetailsList),
-        isSubmit: !saveType,
-      };
-    } else {
-      createdOrder = {
-        ...createOrderDTO(formState, this.orderCredentials),
-        contactDetails: getValuesFromList(formState.contactDetailsList),
-        workLocations: getValuesFromList(formState.workLocationList as FormGroup[]),
-        isSubmit: false,
-      };
-    }
+    const createdOrder = {
+      ...createOrderDTO(formState, this.orderCredentials),
+      contactDetails: getValuesFromList(formState.contactDetailsList),
+      workLocations: getValuesFromList(formState.workLocationList as FormGroup[]),
+      isSubmit: !saveType,
+    };
 
-    if(this.selectedOrder) {
+   if(this.selectedOrder) {
       this.store.dispatch(new EditIrpOrder({
         ...createdOrder,
         id: this.selectedOrder.id,

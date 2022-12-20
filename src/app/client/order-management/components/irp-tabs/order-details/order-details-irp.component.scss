@@ -193,16 +193,16 @@ ejs-textbox.e-control {
 
   .itm1 { grid-area: itm1; }
   .itm2 { grid-area: itm2; }
-  .itm3 { grid-area: itm3; }
+  .itm3 {
+    grid-area: itm3;
+    margin-top: 15px;
+    display: flex;
+  }
   .itm4 { grid-area: itm4; }
   .itm5 { grid-area: itm5; }
 
-  .itm3 {
-    margin-top: 15px;
-  }
-
-  .order-box { margin-left: 14%; }
-  .order-box1 { margin-left: 31%; }
-  .order-box2 { margin-left: 51%; }
-  .order-box3 { margin-left: 67%; }
+  .order-box { margin-left: 17%; }
+  .order-box1 { margin-left: 39%; }
+  .order-box2 { margin-left: 64%; }
+  .order-box3 { margin-left: 85%; }
 }

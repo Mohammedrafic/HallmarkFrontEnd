@@ -49,7 +49,6 @@ export class OrderDetailsIrpService {
     return this.formBuilder.group({
       jobDistribution: [null, Validators.required],
       agencyId: [null],
-      minYrsRequired: [null, Validators.required],
       hourlyRate: [null],
     });
   }

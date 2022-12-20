@@ -103,7 +103,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   //TODO: Remove any (ListOfKeyForms)
   public listOfKeyForms: any;
   public orderFormsConfig: OrderFormsConfig[] = LongTermAssignmentConfig;
-  public orderFormsArrayConfig: OrderFormsArrayConfig[] = ContactDetailsConfig(ContactDetailsForm());
+  public orderFormsArrayConfig: OrderFormsArrayConfig[] =
+    [...ContactDetailsConfig(ContactDetailsForm()), ...WorkLocationConfig(WorkLocationFrom())];
   public contactDetailsFormsList: FormGroup[] = [];
   public workLocationFormsList: FormGroup[] = [];
   public documents: Blob[] = [];
@@ -219,30 +220,22 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.initGeneralForms(isLongTermAssignment);
     this.jobDescriptionForm =  this.orderDetailsService.createJobDescriptionForm();
     this.contactDetailsForm = this.orderDetailsService.createContactDetailsForm();
+    this.specialProjectForm = this.orderDetailsService.createSpecialProject();
+    this.workLocationForm = this.orderDetailsService.createWorkLocationForm();
+
     if(!this.selectedOrder) {
       this.contactDetailsFormsList.push(this.contactDetailsForm);
+      this.workLocationFormsList.push(this.workLocationForm);
     }
 
-    const listOfKeysTermAssignment = {
+    this.listOfKeyForms = {
       generalInformationForm: this.generalInformationForm,
       jobDistributionForm: this.jobDistributionForm,
       jobDescriptionForm: this.jobDescriptionForm,
       contactDetailsList: this.contactDetailsFormsList,
+      specialProjectForm: this.specialProjectForm,
+      workLocationList: this.workLocationFormsList,
     };
-
-    if(!isLongTermAssignment) {
-      this.specialProjectForm = this.orderDetailsService.createSpecialProject();
-      this.workLocationForm = this.orderDetailsService.createWorkLocationForm();
-      this.createWorkLocationList();
-
-      this.listOfKeyForms = {
-        ...listOfKeysTermAssignment,
-        specialProjectForm: this.specialProjectForm,
-        workLocationList: this.workLocationFormsList,
-      };
-    } else {
-      this.listOfKeyForms = listOfKeysTermAssignment;
-    }
 
     this.watchForFormValueChanges();
   }
@@ -264,7 +257,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.clearFormLists();
 
       if (value === IrpOrderType.LongTermAssignment) {
-        this.orderFormsArrayConfig = [...ContactDetailsConfig(ContactDetailsForm())];
+        this.orderFormsArrayConfig =
+          [...ContactDetailsConfig(ContactDetailsForm()), ...WorkLocationConfig(WorkLocationFrom())];
         this.orderFormsConfig = LongTermAssignmentConfig;
       } else {
         this.orderFormsArrayConfig =
@@ -273,12 +267,12 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       }
 
       this.initForms(value);
-      this.setConfigDataSources(value);
+      this.setConfigDataSources();
       this.changeDetection.markForCheck();
     });
   }
 
-  private setConfigDataSources(value: number): void {
+  private setConfigDataSources(): void {
     const generalInformationForm = this.getSelectedFormConfig(GeneralInformationForm);
     setDataSource(generalInformationForm.fields, 'regionId', this.dataSourceContainer.regions as Region[]);
     setDataSource(generalInformationForm.fields, 'locationId', this.dataSourceContainer.locations as Location[]);
@@ -291,17 +285,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     const jobDescriptionForm = this.getSelectedFormConfig(JobDescriptionForm);
     setDataSource(jobDescriptionForm.fields, 'orderRequisitionReasonId', this.dataSourceContainer.reasons as RejectReason[]);
 
-    if(value === IrpOrderType.PerDiem) {
-      const specialProjectForm = this.getSelectedFormConfig(SpecialProjectForm);
-      setDataSource(specialProjectForm.fields, 'projectTypeId', this.dataSourceContainer.specialProjectCategories as SpecialProjectCategories[]);
-      setDataSource(specialProjectForm.fields, 'projectNameId', this.dataSourceContainer.projectNames as ProjectNames[]);
-      setDataSource(specialProjectForm.fields, 'poNumberId', this.dataSourceContainer.poNumbers as PoNumbers[]);
+    this.setDataSourceForSpecialProject();
+    this.setDataSourceForWorkLocationList();
 
-      const workLocationForm = this.getSelectedConfigFromList(WorkLocationList);
-      workLocationForm.forms.forEach((form: OrderFormInput[]) => {
-        setDataSource(form,'state', this.dataSourceContainer.state as StateList[]);
-      });
-    }
     this.changeDetection.markForCheck();
   }
 
@@ -389,6 +375,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.updateDataSourceFormList('specialProjectCategories', data.specialProjectCategories);
       this.updateDataSourceFormList('projectNames', data.projectNames);
       this.updateDataSourceFormList('poNumbers', data.poNumbers);
+      this.setDataSourceForSpecialProject(data);
+      this.changeDetection.markForCheck();
     });
 
     this.organizationStatesWithKeyCode$.pipe(
@@ -397,6 +385,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((state: StateList[]) => {
       this.updateDataSourceFormList('state', state);
+      this.setDataSourceForWorkLocationList(state);
+      this.changeDetection.markForCheck();
     });
   }
 
@@ -582,10 +572,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.setConfigType(selectedOrder);
       this.patchFormValues(selectedOrder);
       this.createPatchContactDetails(selectedOrder);
-
-      if(selectedOrder.orderType === OrderType.OpenPerDiem) {
-        this.createPatchWorkLocation(selectedOrder);
-      }
+      this.createPatchWorkLocation(selectedOrder);
     });
   }
 
@@ -594,6 +581,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.generalInformationForm.patchValue(selectedOrder);
     this.jobDistributionForm.patchValue(selectedOrder);
     this.jobDescriptionForm.patchValue(selectedOrder);
+    this.specialProjectForm.patchValue(selectedOrder);
 
     if(selectedOrder.orderType === OrderType.OpenPerDiem) {
       const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
@@ -626,7 +614,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private createPatchWorkLocation(selectedOrder: Order): void {
-    this.specialProjectForm.patchValue(selectedOrder);
     const selectedConfig = this.getSelectedArrayFormsConfig({formList: WorkLocationList} as OrderFormsArrayConfig);
 
     selectedOrder.workLocations.forEach((workLocation: OrderWorkLocation) => {
@@ -639,9 +626,29 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.showHideFormAction(selectedConfig, this.contactDetailsFormsList);
   }
 
-  private createWorkLocationList(): void {
-    if(!this.selectedOrder) {
-      this.workLocationFormsList.push(this.workLocationForm);
-    }
+  private setDataSourceForSpecialProject(data?: SpecialProjectStructure): void {
+    const specialProjectForm = this.getSelectedFormConfig(SpecialProjectForm);
+    setDataSource(
+      specialProjectForm.fields,
+      'projectTypeId',
+      data?.specialProjectCategories ?? this.dataSourceContainer.specialProjectCategories as SpecialProjectCategories[]
+    );
+    setDataSource(
+      specialProjectForm.fields,
+      'projectNameId',
+      data?.projectNames ?? this.dataSourceContainer.projectNames as ProjectNames[]
+    );
+    setDataSource(
+      specialProjectForm.fields,
+      'poNumberId',
+      data?.poNumbers ?? this.dataSourceContainer.poNumbers as PoNumbers[]
+    );
+  }
+
+  private setDataSourceForWorkLocationList(state?: StateList[]): void {
+    const workLocationForm = this.getSelectedConfigFromList(WorkLocationList);
+    workLocationForm.forms.forEach((form: OrderFormInput[]) => {
+      setDataSource(form,'state', state ?? this.dataSourceContainer.state as StateList[]);
+    });
   }
 }

@@ -7,7 +7,7 @@ import { ButtonType } from '@client/order-management/components/irp-tabs/order-d
 import {
   IrpJobDistribution,
 } from '@client/order-management/components/irp-tabs/order-details/constants/order-details.constant';
-import { OrderFormInput, OrderFormsArrayConfig, OrderFormsConfig, StateList } from '@client/order-management/interfaces';
+import { OrderFormInput, OrderFormsArrayConfig, OrderFormsConfig } from '@client/order-management/interfaces';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 
 export const GeneralInformationConfigLTA: OrderFormsConfig  = {
@@ -196,12 +196,6 @@ export const JobDistributionConfigLTA: OrderFormsConfig  = {
       enabled: false,
       type: FieldType.Dropdown,
       dataSource: [],
-    },
-    {
-      field: 'minYrsRequired',
-      title: 'Min Years of Exp',
-      required: true,
-      type: FieldType.Input,
     },
     {
       field: 'hourlyRate',
@@ -461,6 +455,7 @@ export const LongTermAssignmentConfig: OrderFormsConfig[] = [
   GeneralInformationConfigLTA,
   JobDistributionConfigLTA,
   JobDescriptionConfig,
+  SpecialConfigProject,
 ];
 
 export const perDiemConfig = (): OrderFormsConfig[] => ([

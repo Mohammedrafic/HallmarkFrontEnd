@@ -103,8 +103,8 @@ export interface ListOfKeyForms {
   jobDistributionForm: FormGroup;
   jobDescriptionForm: FormGroup;
   contactDetailsList: FormGroup[];
-  workLocationList?: FormGroup[];
-  specialProjectForm?: FormGroup;
+  workLocationList: FormGroup[];
+  specialProjectForm: FormGroup;
   orderType: FormGroup;
 }
 

@@ -89,7 +89,7 @@ export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCre
   ...formState.generalInformationForm.getRawValue(),
   ...formState.jobDescriptionForm.getRawValue(),
   ...formState.jobDistributionForm.getRawValue(),
-  ...formState.specialProjectForm?.getRawValue(),
+  ...formState.specialProjectForm.getRawValue(),
   jobDistributions: createJobDistributionList(formState.jobDistributionForm),
   contactDetails: [],
   workLocations: [],
