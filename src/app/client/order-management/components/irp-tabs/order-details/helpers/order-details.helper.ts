@@ -12,6 +12,7 @@ import { Order } from '@shared/models/order-management.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { FieldType } from '@core/enums';
 import { FormGroup } from '@angular/forms';
+import { DateTimeHelper } from '@core/helpers';
 
 export const setDataSource = (fields: OrderFormInput[], fieldName: string, source: DataSourceContainer): void => {
   fields.forEach((fields: OrderFormInput) => {
@@ -92,9 +93,10 @@ export const mapStructureToEditedOrder = (selectedOrder: Order) => {
     ...modifyJobDistribution(selectedOrder),
     ...selectedOrder.irpOrderMetadata,
     jobDates: selectedOrder.jobStartDate,
+    shiftStartTime: DateTimeHelper.convertDateToUtc(selectedOrder.shiftStartTime.toString()),
+    shiftEndTime: DateTimeHelper.convertDateToUtc(selectedOrder.shiftEndTime.toString()),
   };
 };
-
 
 export const modifyJobDistribution = (selectedOrder: Order) => {
   return selectedOrder.jobDistributions.reduce((acc: JobDistribution, distribution: JobDistributionModel) => {
