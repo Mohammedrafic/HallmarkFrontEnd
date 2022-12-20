@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -232,7 +232,8 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
     private commentsService: CommentsService,
     private durationService: DurationService,
     private settingsViewService: SettingsViewService,
-    private orderDetailsService: OrderDetailsService
+    private orderDetailsService: OrderDetailsService,
+    private cd: ChangeDetectorRef,
   ) {
     super();
     this.initOrderForms();
@@ -421,6 +422,7 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
           this.setRequiredFieldsForSpecialProject();
           updateValidationToForm(this.specialProject, SpecialProjectControlsConfig);
         }
+        this.cd.markForCheck();
     });
   }
 
