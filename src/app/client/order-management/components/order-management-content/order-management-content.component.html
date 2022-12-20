@@ -27,7 +27,8 @@
       appHideBeforeSyncfusionLoad
       cssClass="e-outline button-filter"
       [disabled]="isActiveSystemIRP"
-      (click)="showFilters()">
+      (click)="showFilters()"
+    >
       <div class="filter-button-content">
         <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{
           filteredItems.length
@@ -85,14 +86,16 @@
     *ngIf="activeSystem === OrderManagementIRPSystemId.IRP"
     #tabNavigation
     [tabConfig]="tabsListConfig"
-    (changeTab)="irpTabSelected($event)">
+    (changeTab)="irpTabSelected($event)"
+  >
   </app-tabs-list>
   <app-tab-navigation
     class="table-tabs vms"
     *ngIf="activeSystem === OrderManagementIRPSystemId.VMS"
     #tabNavigation
     [hideTemplatesTab]="false"
-    (selectedTab)="tabSelected($event)">
+    (selectedTab)="tabSelected($event)"
+  >
   </app-tab-navigation>
 </ng-container>
 
@@ -112,7 +115,7 @@
       (gridReady)="setGridApi($event)"
       (sortChanged)="gridSortHandler($event)"
       (rowClicked)="openIrpDetails($event)"
-      >
+    >
     </ag-grid-angular>
     <app-grid-pagination
       [currentPage]="currentPage"
@@ -188,48 +191,63 @@
             <div *ngIf="!data?.isTemplate; else templateButtons" [class.hidden]="!isLoaded" class="row-tool-buttons">
               <button
                 *ngIf="
-                activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType
-              "
+                  activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType
+                "
                 (click)="createReorder(data)"
                 ejs-button
                 cssClass="e-flat default-icon-button"
                 [disabled]="
-                !canCreateOrder ||
-                data.status === orderStatus.PreOpen ||
-                data.status === orderStatus.Closed ||
-                !settings[SettingsKeys.IsReOrder]?.value ||
-                !hasCreateEditOrderPermission
-              "
+                  !canCreateOrder ||
+                  data.status === orderStatus.PreOpen ||
+                  data.status === orderStatus.Closed ||
+                  !settings[SettingsKeys.IsReOrder]?.value ||
+                  !hasCreateEditOrderPermission
+                "
               >
                 <span><i-feather name="calendar" class="icon"></i-feather></span>
               </button>
-              <button ejs-button [disabled]="!hasCreateEditOrderPermission" cssClass="e-flat default-icon-button with-badge">
+              <button
+                ejs-button
+                [disabled]="!hasCreateEditOrderPermission"
+                cssClass="e-flat default-icon-button with-badge"
+              >
                 <span><i-feather name="message-square" class="icon"></i-feather></span>
                 <span *ngIf="data.unreadComments > 0" class="e-badge e-badge-success e-badge-pill right-overflow">{{
                   data.unreadComments
-                  }}</span>
+                }}</span>
               </button>
               <button
                 ejs-button
                 cssClass="e-flat secondary-icon-button"
                 [class.green-background]="!data.isLocked"
-                [disabled]="!canCreateOrder || disabledLock(data.status) || data?.extensionFromId || !hasCreateEditOrderPermission"
+                [disabled]="
+                  !canCreateOrder || disabledLock(data.status) || data?.extensionFromId || !hasCreateEditOrderPermission
+                "
                 (click)="lockOrder(data); $event.stopPropagation()"
                 *ngIf="isLockMenuButtonsShown"
               >
                 <span *ngIf="data.isLocked"><i-feather name="lock" class="icon"></i-feather></span>
                 <span *ngIf="!data.isLocked"
-                ><app-custom-icon name="unlock" class="icon supportive-green-10"></app-custom-icon
+                  ><app-custom-icon name="unlock" class="icon supportive-green-10"></app-custom-icon
                 ></span>
               </button>
               <button
                 ejs-button
                 [matMenuTriggerFor]="menu"
                 (click)="$event.stopPropagation()"
-                [disabled]="data.orderType === orderTypes.ReOrder && data.status === orderStatus.Closed || !hasCreateEditOrderPermission"
-                [matMenuTriggerData]="{data: data, items: (data.status === orderStatus.Closed && threeDotsMenuOptions['closedOrderMenu']) ||
-                (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
-                (data.isMoreMenuWithDeleteButton ? threeDotsMenuOptions['moreMenuWithDeleteButton'] : getMoreMenu(data))}"
+                [disabled]="
+                  (data.orderType === orderTypes.ReOrder && data.status === orderStatus.Closed) ||
+                  !hasCreateEditOrderPermission
+                "
+                [matMenuTriggerData]="{
+                  data: data,
+                  items:
+                    (data.status === orderStatus.Closed && threeDotsMenuOptions['closedOrderMenu']) ||
+                    (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
+                    (data.isMoreMenuWithDeleteButton
+                      ? threeDotsMenuOptions['moreMenuWithDeleteButton']
+                      : getMoreMenu(data))
+                }"
                 cssClass="e-flat primary-icon-button"
               >
                 <span><i-feather name="more-vertical" class="icon"></i-feather></span>
@@ -249,16 +267,16 @@
         </e-column>
         <e-column field="id" isPrimaryKey="true" width="140" minWidth="120" maxWidth="200">
           <ng-template #headerTemplate let-data>
-          <span class="e-headertext">
-            {{ activeTab !== OrganizationOrderManagementTabs.OrderTemplates ? 'ORDER ID' : 'TEMPLATE ID' }}
-          </span>
+            <span class="e-headertext">
+              {{ activeTab !== OrganizationOrderManagementTabs.OrderTemplates ? 'ORDER ID' : 'TEMPLATE ID' }}
+            </span>
           </ng-template>
           <ng-template #template let-data>
             <ng-container
               *ngIf="
-              data.orderType === orderTypes.OpenPerDiem ? !data.reOrders?.length : !data.children?.length;
-              else withToggle
-            "
+                data.orderType === orderTypes.OpenPerDiem ? !data.reOrders?.length : !data.children?.length;
+                else withToggle
+              "
             >
               <div>
                 <b>
@@ -338,15 +356,6 @@
           maxWidth="200"
         ></e-column>
         <e-column
-          field="regionName"
-          headerText="REGION"
-          textAlign="Left"
-          width="150"
-          minWidth="90"
-          maxWidth="200"
-          [visible]="true"
-        ></e-column>
-        <e-column
           field="openPositions"
           headerText="AVAIL POS."
           headerTextAlign="Right"
@@ -360,6 +369,15 @@
             </ng-container>
           </ng-template>
         </e-column>
+        <e-column
+          field="regionName"
+          headerText="REGION"
+          textAlign="Left"
+          width="150"
+          minWidth="90"
+          maxWidth="200"
+          [visible]="true"
+        ></e-column>
         <e-column
           field="locationName"
           headerText="LOCATION"
@@ -392,9 +410,9 @@
         </e-column>
         <e-column field="startDate" width="155" minWidth="135" maxWidth="200">
           <ng-template #headerTemplate let-data>
-          <span class="e-headertext">
-            {{ activeTab !== OrganizationOrderManagementTabs.ReOrders ? 'START DATE' : 'RE-ORDER DATE' }}
-          </span>
+            <span class="e-headertext">
+              {{ activeTab !== OrganizationOrderManagementTabs.ReOrders ? 'START DATE' : 'RE-ORDER DATE' }}
+            </span>
           </ng-template>
           <ng-template #template let-data>
             <span>{{ data.startDate | date: 'MM/dd/yyy':'UTC' }}</span>
@@ -407,10 +425,10 @@
             </ng-container>
 
             <ng-container *ngIf="data.agency?.length === 2 || data.agency?.length === 1">
-            <span *ngFor="let agency of data.agency; let i = index" class="agency-name">
-              {{ agency }}
-              <span class="agency-name" *ngIf="i !== data.agency.length - 1">, </span>
-            </span>
+              <span *ngFor="let agency of data.agency; let i = index" class="agency-name">
+                {{ agency }}
+                <span class="agency-name" *ngIf="i !== data.agency.length - 1">, </span>
+              </span>
             </ng-container>
 
             <ng-container *ngIf="data.agency?.length >= 3 && data.agency?.length <= 5">
@@ -495,7 +513,9 @@
               *ngFor="let child of data.reOrders"
               [reOrder]="child"
               [order]="data"
-              [selected]="selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id"
+              [selected]="
+                selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id
+              "
               (clickEvent)="onOpenReorderDialog($event, data)"
             ></app-grid-subrow-reorder>
           </ng-container>
@@ -507,9 +527,9 @@
             [candidat]="child"
             [order]="data"
             [selected]="
-            selectedCandidate?.selected?.order === data.id &&
-            selectedCandidate?.selected.positionId === child.positionId
-          "
+              selectedCandidate?.selected?.order === data.id &&
+              selectedCandidate?.selected.positionId === child.positionId
+            "
             [isAgency]="true"
             (clickEvent)="onOpenCandidateDialog($event, data, i)"
           ></app-grid-subrow-candidate>
@@ -543,9 +563,7 @@
                   (change)="onGoToClick($event)"
                 >
                 </ejs-numerictextbox>
-                <div class="total-rows">
-                  Total Rows: {{(ordersPage$ | async)?.totalCount}}
-                </div>
+                <div class="total-rows">Total Rows: {{ (ordersPage$ | async)?.totalCount }}</div>
               </section>
               <section class="right-side-pager-controls">
                 <ejs-pager
