@@ -17,7 +17,7 @@
       ejs-button
       appHideBeforeSyncfusionLoad
       cssClass="e-outline button-template"
-      [disabled]="isActiveSystemIRP">
+      [disabled]="isIRPFlagEnabled">
       <div class="filter-button-content">
         Templates <i-feather name="clipboard" class="icon"></i-feather>
       </div>
@@ -91,7 +91,7 @@
     class="table-tabs vms"
     *ngIf="activeSystem === OrderManagementIRPSystemId.VMS"
     #tabNavigation
-    [hideTemplatesTab]="true"
+    [hideTemplatesTab]="false"
     (selectedTab)="tabSelected($event)">
   </app-tab-navigation>
 </ng-container>
