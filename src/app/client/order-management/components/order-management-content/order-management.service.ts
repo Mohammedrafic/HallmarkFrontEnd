@@ -3,6 +3,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +26,7 @@ export class OrderManagementService extends DestroyableDirective {
   public excludeDeployed: boolean;
 
   private _selectedOrderAfterRedirect: OrderTab | null;
+  private orderManagementSystem: OrderManagementIRPSystemId;
 
   constructor(
     private fb: FormBuilder,
@@ -75,5 +77,13 @@ export class OrderManagementService extends DestroyableDirective {
       projectNameIds: new FormControl(null),
       poNumberIds: new FormControl(null),
     });
+  }
+
+  public setOrderManagementSystem(system: OrderManagementIRPSystemId) {
+    this.orderManagementSystem = system;
+  }
+
+  public getOrderManagementSystem(): OrderManagementIRPSystemId {
+    return this.orderManagementSystem;
   }
 }

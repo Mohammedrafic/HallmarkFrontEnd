@@ -918,6 +918,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public navigateToOrderForm(): void {
     this.router.navigate(['./add'], { relativeTo: this.route });
+    this.orderManagementService.setOrderManagementSystem(this.activeSystem);
   }
 
   public navigateToOrderTemplateForm(): void {

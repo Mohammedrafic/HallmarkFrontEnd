@@ -2,13 +2,14 @@ import { AbstractControl, FormGroup } from '@angular/forms';
 
 import { ToastUtility } from '@syncfusion/ej2-notifications';
 
-import { FieldName } from '@client/order-management/enums';
+import { FieldName, OrderSystem } from '@client/order-management/enums';
 import { FormArrayList } from '@client/order-management/containers/irp-container/irp-container.constant';
 import { ErrorContentMessageForCredential, OrderDetailsValidationMessage } from '@client/order-management/constants';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 import { JobDistributionList, ListControls, ListOfKeyForms } from '@client/order-management/interfaces';
 import { Order } from '@shared/models/order-management.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
+import { ButtonModel } from '@shared/models/buttons-group.model';
 
 export const collectInvalidFieldsFromForm = (controls: { [key: string]: AbstractControl }, fields: string[]) => {
   for (const name in controls) {
@@ -110,4 +111,10 @@ export const createFormData = (order: Order[], documents: Blob[]) => {
   documents.forEach((document: Blob) => formData.append('document', document));
   orderIds.forEach((id: number) => formData.append('orderIds', `${id}`));
   return formData;
+};
+
+export const updateSystemConfig = (config: ButtonModel[], activeSystem: OrderSystem) => {
+  config.forEach((config: ButtonModel) => {
+    config.active = config.id === activeSystem;
+  });
 };

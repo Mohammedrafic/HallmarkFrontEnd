@@ -30,6 +30,11 @@ import { Organization } from '@shared/models/organization.model';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { UserState } from '../../store/user.state';
 import { SelectSystem } from '@client/order-management/interfaces';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { updateSystemConfig } from '@client/order-management/helpers';
 
 @Component({
   selector: 'app-create-edit-order',
@@ -40,7 +45,7 @@ import { SelectSystem } from '@client/order-management/interfaces';
 export class CreateEditOrderComponent extends Destroyable implements OnInit {
   public saveEvents: Subject<void | MenuEventArgs> = new Subject<void | MenuEventArgs>();
   public title: string;
-  public readonly orderSystemConfig:ButtonModel[] = OrderSystemConfig;
+  public orderSystemConfig:ButtonModel[] = OrderSystemConfig;
   public submitButtonConfig: ItemModel[];
   public selectedOrder: Order;
   public activeSystem: OrderSystem;
@@ -63,7 +68,8 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private store: Store,
-    private changeDetection: ChangeDetectorRef
+    private changeDetection: ChangeDetectorRef,
+    private orderManagementService: OrderManagementService
   ) {
     super();
     this.setPageHeader();
@@ -110,11 +116,11 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
           this.selectedOrder = selectedOrder;
           this.activeSystem = selectedOrder?.isIRPOnly ? OrderSystem.IRP : OrderSystem.VMS;
           this.showSystemToggle = false;
-          this.changeDetection.markForCheck();
       });
     }
 
     this.setTitle(selectedOrderId);
+    this.changeDetection.markForCheck();
   }
 
   private setTitle(isSelectedOrder: string | null): void {
@@ -146,6 +152,8 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((organization: Organization) => {
       const isIRPFlag = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+      const orderManagementSystem = this.orderManagementService.getOrderManagementSystem();
+
       this.selectedSystem = {
         isIRP: !!organization.preferences.isIRPEnabled,
         isVMS: !!organization.preferences.isVMCEnabled,
@@ -158,7 +166,14 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
         this.selectedSystem.isIRPFlag;
 
       this.setSubmitButtonConfig();
-      this.activeSystem = this.selectedSystem.isIRP ? OrderSystem.IRP : OrderSystem.VMS;
+
+      if( orderManagementSystem ) {
+        this.activeSystem = orderManagementSystem === OrderManagementIRPSystemId.IRP ? OrderSystem.IRP : OrderSystem.VMS;
+      } else {
+        this.activeSystem = this.selectedSystem.isIRP ? OrderSystem.IRP : OrderSystem.VMS;
+      }
+
+      updateSystemConfig(this.orderSystemConfig, this.activeSystem);
       this.changeDetection.markForCheck();
     });
   }
