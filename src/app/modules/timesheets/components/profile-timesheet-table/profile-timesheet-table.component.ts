@@ -34,6 +34,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
+import { MiddleTabletWidth, SmallTabletWidth } from '@shared/constants/media-query-breakpoints';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -550,17 +551,15 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public listenResizeContent(): void {
-    if (this.isTablet) {
-      const smallTabletWidth = 490;
-      const middleTabletWidth = 640;
+    if (this.isTablet) { 
       this.resizeObserver.resize$
         .pipe(
           map((data) => data[0].contentRect.width),
           takeUntil(this.componentDestroy())
         )
         .subscribe((containerWidth) => {
-          this.isSmallContentWidth = containerWidth <= smallTabletWidth || this.isMobile;
-          this.isMiddleContentWidth = containerWidth <= middleTabletWidth;
+          this.isSmallContentWidth = containerWidth <= SmallTabletWidth || this.isMobile;
+          this.isMiddleContentWidth = containerWidth <= MiddleTabletWidth;
           this.cd.markForCheck();
         });
     }
