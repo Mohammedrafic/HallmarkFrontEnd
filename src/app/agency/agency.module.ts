@@ -107,6 +107,7 @@ import { TooltipContainerModule } from "@shared/components/tooltip-container/too
 import { CredentialStorageFacadeService } from "./services/credential-storage-facade.service";
 import { CredentialStorageService } from "./services/credential-storage.service";
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
+import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
 
 const sidebarIcons = {
   Sliders,
@@ -223,6 +224,7 @@ const sidebarIcons = {
     CredentialGridService,
     CredentialStorageService,
     CredentialStorageFacadeService,
+    OrderCandidateApiService,
   ],
 })
 export class AgencyModule {}

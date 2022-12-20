@@ -21,6 +21,7 @@
     [candidatesList]="orderCandidatePage$ | async"
     (getCandidatesList)="onGetCandidatesList($event)"
     [order]="orderCandidates"
+    [selectedOrder]="currentOrder"
   >
   </app-order-per-diem-candidates-list>
   <app-reorder-candidates-list
