@@ -20,7 +20,7 @@
         cssClass="e-outline button-import"
         (click)="onImportDataClick()"
       >
-        Import <i-feather name="upload" class="icon"></i-feather>
+        Import <i-feather name="download" class="icon"></i-feather>
       </button>
     </app-tooltip-container>
     <button
@@ -29,7 +29,7 @@
       (select)="exportSelected($event)"
       cssClass="e-outline button-export"
     >
-      <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
+      <div class="button-export-container">Export <i-feather name="upload" class="icon"></i-feather></div>
     </button>
     <app-tooltip-container
       [message]="toolTipMessage"
