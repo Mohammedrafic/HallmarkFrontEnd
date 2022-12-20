@@ -8,6 +8,7 @@ import { ListOfSkills } from '@shared/models/skill.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { AbstractControl, FormGroup } from '@angular/forms';
+import { OrganizationRegion } from '@shared/models/organization.model';
 
 export interface TabsConfig {
   id: number;
@@ -74,7 +75,7 @@ export interface PoNumbers {
 }
 
 export type DataSourceContainer =
-  Region[] |
+  OrganizationRegion[] |
   Location[] |
   Department[] |
   ListOfSkills[] |

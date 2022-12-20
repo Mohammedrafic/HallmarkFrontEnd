@@ -41,15 +41,10 @@ import PriceUtils from '@shared/utils/price.utils';
 import { Destroyable } from '@core/helpers';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Region } from '@shared/models/region.model';
-import {
-  GetDepartmentsByLocationId,
-  GetLocationsByRegionId,
-} from '@organization-management/store/organization-management.actions';
 import { Location } from '@shared/models/location.model';
 import {
   changeTypeField, getAgencyIdFiled,
   mapAssociateAgencyStructure,
-  mapDepartmentStructure,
   mapReasonsStructure,
   mapSpecialProjectStructure,
   mapStatesStructure,
@@ -65,7 +60,7 @@ import { RejectReasonState } from '@organization-management/store/reject-reason.
 import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.model';
 import {
   OrderDetailsIrpService,
-} from '@client/order-management/components/irp-tabs/order-details/order-details-irp.service';
+} from '@client/order-management/components/irp-tabs/services/order-details-irp.service';
 import { ButtonType, IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
@@ -76,6 +71,9 @@ import { Document } from '@shared/models/document.model';
 import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
 import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
+import { UserState } from '../../../../../store/user.state';
+import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { OrganizationStructureService } from '@client/order-management/components/irp-tabs/services';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -110,17 +108,12 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
   public deleteDocumentsGuids: string[] = [];
   public orderStatus = Incomplete;
   public selectedOrder: Order;
+  public regionsStructure: OrganizationRegion[] = [];
 
   private dataSourceContainer: OrderDataSourceContainer = {};
   private isLocationLoad = true;
   private isDepartmentLoad = true;
 
-  @Select(OrganizationManagementState.sortedRegions)
-  private regions$: Observable<Region[]>;
-  @Select(OrganizationManagementState.sortedLocationsByRegionId)
-  private locations$: Observable<Location[]>;
-  @Select(OrganizationManagementState.sortedDepartments)
-  private departments$: Observable<Department[]>;
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   private skills$: Observable<ListOfSkills[]>;
   @Select(RejectReasonState.sortedOrderRequisition)
@@ -133,13 +126,16 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
   private projectSpecialData$: Observable<ProjectSpecialData>;
   @Select(OrderManagementContentState.selectedOrder)
   private selectedOrder$: Observable<Order>;
+  @Select(UserState.organizationStructure)
+  private organizationStructure$: Observable<OrganizationStructure>;
 
   constructor(
     private orderDetailsService: OrderDetailsIrpService,
     private changeDetection: ChangeDetectorRef,
     private store: Store,
     private durationService: DurationService,
-    private irpStateService: IrpContainerStateService
+    private irpStateService: IrpContainerStateService,
+    private organizationStructureService: OrganizationStructureService
   ) {
     super();
   }
@@ -151,6 +147,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
     this.watchForDataSources();
     this.watchForSaveAction();
     this.watchForSelectOrder();
+    this.watchForOrganizationStructure();
   }
 
   override ngOnDestroy(): void {
@@ -296,49 +293,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
   }
 
   private watchForDataSources(): void {
-    this.regions$.pipe(
-      filter(Boolean),
-      takeUntil(this.componentDestroy())
-    ).subscribe((regions: Region[]) => {
-      this.updateDataSourceFormList('regions', regions);
-      const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
-      setDataSource(selectedForm.fields, 'regionId', regions);
-      this.changeDetection.markForCheck();
-    });
-
-    this.locations$.pipe(
-      filter(Boolean),
-      takeUntil(this.componentDestroy())
-    ).subscribe((locations: Location[]) => {
-      this.updateDataSourceFormList('locations', locations);
-      const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
-      setDataSource(selectedForm.fields, 'locationId', locations);
-
-      if(this.selectedOrder && this.isLocationLoad) {
-        this.generalInformationForm.get('locationId')?.patchValue(this.selectedOrder?.locationId, { emitEvent: false });
-        this.isLocationLoad = false;
-      }
-
-      this.changeDetection.markForCheck();
-    });
-
-    this.departments$.pipe(
-      filter(Boolean),
-      map((departments: Department[]) => mapDepartmentStructure(departments)),
-      takeUntil(this.componentDestroy())
-    ).subscribe((departments: Department[]) => {
-      this.updateDataSourceFormList('departments', departments);
-      const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
-      setDataSource(selectedForm.fields, 'departmentId', departments);
-
-      if(this.selectedOrder && this.isDepartmentLoad) {
-        this.generalInformationForm.get('departmentId')?.patchValue(this.selectedOrder?.departmentId, { emitEvent: false });
-        this.isDepartmentLoad = false;
-      }
-
-      this.changeDetection.markForCheck();
-    });
-
     this.skills$.pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy())
@@ -399,14 +353,26 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
-      this.store.dispatch(new GetLocationsByRegionId(value, undefined, true));
+      const locations = this.organizationStructureService.getLocationsById(value);
+
+      this.updateDataSourceFormList('locations', locations);
+      const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
+      setDataSource(selectedForm.fields, 'locationId', locations);
+
+      this.changeDetection.markForCheck();
     });
 
     this.generalInformationForm.get('locationId')?.valueChanges.pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
-      this.store.dispatch(new GetDepartmentsByLocationId(value, undefined, true));
+      const departments = this.organizationStructureService.getDepartmentsById(value);
+
+      this.updateDataSourceFormList('departments', departments);
+      const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
+      setDataSource(selectedForm.fields, 'departmentId', departments);
+
+      this.changeDetection.markForCheck();
     });
 
 
@@ -675,5 +641,22 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
     this.getRateConfigControl(selectedConfig).show = false;
     this.isLocationLoad = true;
     this.isDepartmentLoad = true;
+  }
+
+  private watchForOrganizationStructure(): void {
+    this.organizationStructure$
+      .pipe(
+        filter(Boolean),
+        map((structure: OrganizationStructure) =>
+          this.organizationStructureService.getOrgStructureForIrp(structure.regions)
+        ),
+        takeUntil(this.componentDestroy())
+      ).subscribe((structure: OrganizationRegion[]) => {
+
+      this.updateDataSourceFormList('regions', structure);
+      const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
+      setDataSource(selectedForm.fields, 'regionId', structure);
+      this.changeDetection.markForCheck();
+    });
   }
 }

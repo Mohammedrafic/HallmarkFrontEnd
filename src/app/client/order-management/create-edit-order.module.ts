@@ -25,11 +25,12 @@ import {
 } from '@client/order-management/components/save-template-dialog/save-template-dialog.module';
 import {
   OrderDetailsIrpService,
-} from '@client/order-management/components/irp-tabs/order-details/order-details-irp.service';
+} from '@client/order-management/components/irp-tabs/services/order-details-irp.service';
 import { MultiDatePickerModule } from '@shared/components/multi-date-picker/multi-date-picker.module';
 import { GridIcons } from '@client/order-management/constants';
 import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
 import { OrderCredentialsService } from "@client/order-management/services";
+import { OrganizationStructureService } from '@client/order-management/components/irp-tabs/services';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { OrderCredentialsService } from "@client/order-management/services";
     OrderDetailsIrpService,
     IrpContainerStateService,
     OrderCredentialsService,
+    OrganizationStructureService
   ],
 })
 export class CreateEditOrderModule { }

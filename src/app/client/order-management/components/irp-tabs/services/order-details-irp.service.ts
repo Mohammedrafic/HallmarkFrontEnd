@@ -85,6 +85,7 @@ export class OrderDetailsIrpService {
         Validators.required,
         Validators.minLength(5),
         Validators.pattern(/^[0-9]+$/),
+        Validators.maxLength(6),
       ]],
     });
   }
