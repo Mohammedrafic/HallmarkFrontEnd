@@ -76,6 +76,7 @@
 
     @media #{$max-mobile} {
       margin-left: 0px !important;
+      overflow-x: hidden;
     }
   }
 
@@ -118,22 +119,23 @@
 
     @media #{$max-mobile} {
       display: flex;
+
+      .logo {
+        margin: 10px 0 0 22px;
+      }
     }
 
     .close-btn {
-      //width: 18px;
       height: 8px;
       width: 8px;
-      left: 4px;
+      left: 0;
       top: 4px;
       border-radius: 0px;
-
 
       margin-right: 10px;
       position: relative;
       cursor: pointer;
       color: #3E7FFF;
-
 
       &::before {
         content: '\2715';
@@ -143,7 +145,6 @@
         top: 0px;
         left: 8px;
       }
-
     }
 
     .logo {
@@ -193,7 +194,6 @@
     .e-list-item.e-active > .e-text-content .e-list-text {
       color: #fff;
     }
-
 
     .e-list-text {
       display: block;
@@ -410,6 +410,7 @@
   &.left {
     margin-right: 40px;
   }
+
   @media #{$max-mobile} {
     padding-right: 30px;
   }

@@ -16,7 +16,11 @@
 
       <div class="action-buttons">
         <ng-container *ngIf="isEditEnabled">
-          <app-tooltip-container [showToolTip]="!hasPermissions" *ngIf="!actionsDisabled && (currentTab !== tableTypes.Expenses)">
+          <app-tooltip-container
+            [ngClass]="{ 'middle-tablet': isMiddleContentWidth }"
+            [showToolTip]="!hasPermissions"
+            *ngIf="!actionsDisabled && currentTab !== tableTypes.Expenses"
+          >
             <button
               class="add-action spaced"
               cssClass="e-action-button"
@@ -24,20 +28,25 @@
               [disabled]="disableAnyAction || !hasPermissions"
               (click)="openAddDialog()"
             >
-              <i-feather name="plus" class="icon"></i-feather> <span class="action-text" *ngIf="!isSmallTablet">Add Record</span>
+              <i-feather name="plus" class="icon"></i-feather> <span class="action-text">Add Record</span>
             </button>
           </app-tooltip-container>
 
           <ng-container *ngIf="!actionsDisabled && (recordsToShow?.[currentTab]?.[modeValues.Edit]?.length || isEditOn)">
-            <app-tooltip-container [showToolTip]="!hasPermissions" *ngIf="!isEditOn; else editHandlers">
+            <app-tooltip-container
+              [ngClass]="{ 'middle-tablet': isMiddleContentWidth }"
+              [showToolTip]="!hasPermissions"
+              *ngIf="!isEditOn; else isMobile ? editMobileBtnHandlers : editHandlers"
+            >
               <button
                 (click)="editTimesheets()"
                 [disabled]="disableAnyAction || !hasPermissions"
                 ejs-button
                 cssClass="e-action-button"
-                class="add-action">
+                class="add-action"
+              >
                 <i-feather name="edit" class="icon"></i-feather>
-                <span class="action-text" *ngIf="!isSmallTablet">Edit</span>
+                <span class="action-text">Edit</span>
               </button>
             </app-tooltip-container>
           </ng-container>
@@ -55,7 +64,21 @@
           </div>
         </ng-template>
 
-        <div class="desktop-tablet-btn-group" *ngIf="!isSmallTablet">
+        <ng-template #editMobileBtnHandlers>
+            <app-tooltip-container>
+              <button
+                ejs-dropdownbutton
+                iconCss="e-icons"
+                cssClass="e-caret-hide primary-icon-button menu-mobile"
+                [items]="mobileEditMenuActions"
+                (select)="onMobileEditMenuSelect($event)"
+              >
+                <i-feather name="more-vertical" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
+        </ng-template>
+
+        <div class="desktop-tablet-btn-group" *ngIf="!isSmallContentWidth">
           <ng-container *ngTemplateOutlet="btnGroup"></ng-container>
         </div>
       </div>
@@ -80,7 +103,7 @@
       >
       </ag-grid-angular>
     </div>
-    <div [ngClass]="{ 'mobile-btn-group': true, 'small-tablet': isSmallTablet }">
+    <div [ngClass]="{ 'mobile-btn-group': true, 'small-tablet': isSmallContentWidth }">
       <ng-container *ngTemplateOutlet="btnGroup"></ng-container>
     </div>
   </div>

@@ -6,7 +6,7 @@ import { combineLatest, Observable, Subject, takeUntil } from 'rxjs';
 import { debounceTime, filter, skip, switchMap, take, tap, throttleTime, map } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
+import { MenuEventArgs, SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { ComponentStateChangedEvent, GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 
@@ -33,6 +33,8 @@ import { TimesheetDetails } from '../../store/actions/timesheet-details.actions'
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
+import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
+import { MiddleTabletWidth, SmallTabletWidth } from '@shared/constants/media-query-breakpoints';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -126,7 +128,13 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public submitText: string;
 
-  public isSmallTablet = false;
+  public isTablet = false;
+
+  public isMobile = false;
+
+  public isMiddleContentWidth = false;
+
+  public isSmallContentWidth = false;
 
   public readonly getRowStyle = (params: any) => {
     if (params.data.stateText === RecordStatus.New) {
@@ -156,6 +164,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
 
+  public mobileEditMenuActions = [{ text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Save }];
+
   private resizeObserver: ResizeObserverModel;
 
   constructor(
@@ -170,6 +180,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.context = {
       componentParent: this,
     };
+    this.listenMediaQueryBreakpoints();
   }
 
   ngOnChanges(): void {
@@ -540,10 +551,33 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public listenResizeContent(): void {
-    const smallTabletWidth = 500;
-    this.resizeObserver.resize$.pipe(map((data) => data[0].contentRect.width), takeUntil(this.componentDestroy())).subscribe((containerWidth) => {
-      this.isSmallTablet = containerWidth <= smallTabletWidth;
-      this.cd.markForCheck();
+    if (this.isTablet) { 
+      this.resizeObserver.resize$
+        .pipe(
+          map((data) => data[0].contentRect.width),
+          takeUntil(this.componentDestroy())
+        )
+        .subscribe((containerWidth) => {
+          this.isSmallContentWidth = containerWidth <= SmallTabletWidth || this.isMobile;
+          this.isMiddleContentWidth = containerWidth <= MiddleTabletWidth;
+          this.cd.markForCheck();
+        });
+    }
+  }
+
+  private listenMediaQueryBreakpoints(): void {
+    this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX, BreakpointQuery.MOBILE_MAX]).pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
+      this.isTablet = data.breakpoints[BreakpointQuery.TABLET_MAX];
+      this.isMobile = data.breakpoints[BreakpointQuery.MOBILE_MAX];
     });
+  }
+
+  public onMobileEditMenuSelect({ item: { text }}: MenuEventArgs): void {
+    if(text === MobileMenuItems.Cancel) {
+      this.cancelChanges();
+    }
+    if(text === MobileMenuItems.Save) {
+      this.saveChanges();
+    }
   }
 }

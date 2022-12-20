@@ -59,8 +59,8 @@ export class ProfileDetailsJobInfoComponent implements OnChanges {
       {
         title: 'Start - End Date',
         icon: 'calendar',
-        value: `${formatDate(data.jobStartDate, 'MM/dd/yyyy', 'utc')}
-         - ${formatDate(data.jobEndDate, 'MM/dd/yyyy', 'utc')}`,
+        value: `${formatDate(data.jobStartDate, 'MM/dd/yyyy', 'en-US', 'utc')}
+         - ${formatDate(data.jobEndDate, 'MM/dd/yyyy', 'en-US', 'utc')}`,
       },
       {
         title: !this.isAgency ? 'Agency' : 'Organization',
