@@ -8,6 +8,20 @@
   }
 }
 
+@media #{$max-mobile} {
+  .candidate-title {
+    margin-bottom: 16px !important;
+  }
+
+  .candidat-status {
+    flex-direction: column;
+  }
+
+  .bill-rates {
+    margin-bottom: 90px;
+  }
+}
+
 .button-container {
   button:not(:last-child) {
     margin-right: 12px;
@@ -44,7 +58,7 @@
   display: none;
   border-top: 1px solid $secondary-dark-blue-45;
 
-  &.tab{
+  &.tab {
     bottom: 0;
   }
 
@@ -75,4 +89,3 @@
     flex-direction: column;
   }
 }
-
