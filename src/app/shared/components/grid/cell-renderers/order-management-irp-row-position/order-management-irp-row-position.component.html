@@ -1,7 +1,8 @@
-<div
-  *ngFor="let data of displayRows"
-  (click)="selectRow($event, data)"
-  class="custom-row">
+<ng-container *ngIf="displayRows.length; else emptyMessageTemplate">
+  <div
+    *ngFor="let data of displayRows"
+    (click)="selectRow($event, data)"
+    class="custom-row">
     <ng-container *ngFor="let cell of colDefs">
       <div
         [ngStyle]="{
@@ -25,4 +26,10 @@
         </ng-template>
       </div>
     </ng-container>
-</div>
+  </div>
+</ng-container>
+<ng-template #emptyMessageTemplate>
+  <div class="empty-message">
+    <p>{{ emptyMessage }}</p>
+  </div>
+</ng-template>

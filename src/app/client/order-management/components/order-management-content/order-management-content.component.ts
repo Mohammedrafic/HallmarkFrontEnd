@@ -379,6 +379,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.OrderFilterFormGroup = this.orderManagementService.createFilterForm();
   }
 
+  public get isActiveSystemIRP(): boolean {
+    return this.isIRPFlagEnabled && this.activeSystem === this.OrderManagementIRPSystemId.IRP;
+  }
+
   override ngOnInit(): void {
     super.ngOnInit();
 

@@ -13,6 +13,7 @@ import {
   OrderManagementIrpRowPositionAdapter,
 } from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.adapter';
 import { OrderManagementIRPSubGridCells } from '@client/order-management/constants';
+import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 
 @TakeUntilDestroy
 @Component({
@@ -25,6 +26,7 @@ export class OrderManagementIrpRowPositionComponent extends Destroyable implemen
   public params: ICellRendererParams;
   public displayRows: IRPOrderPositionDisplay[] | any[] = [];
   public colDefs: ColDef[] = OrderManagementIRPSubGridCells;
+  public emptyMessage = GRID_EMPTY_MESSAGE;
 
   constructor(
     private cdr: ChangeDetectorRef,

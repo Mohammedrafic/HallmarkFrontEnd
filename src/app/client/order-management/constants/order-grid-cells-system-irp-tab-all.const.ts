@@ -116,6 +116,7 @@ export const GridCellsSystemIRPTabAll = (
     width: 85,
     minWidth: 70,
     maxWidth: 110,
+    cellClass: 'font-weight-bold',
   },
   {
     ...DefaultOrderCol,
