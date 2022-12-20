@@ -7,7 +7,7 @@ import { ItemModel } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
 import { SetHeaderState } from '../../store/app.actions';
-import { OrderSystemConfig, SubmitAsTemplate, SubmitForLater } from '@client/order-management/constants';
+import { OrderSystemConfig, SaveForLate, SubmitAsTemplate, SubmitForLater } from '@client/order-management/constants';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Order } from '@shared/models/order-management.model';
 import { Destroyable } from '@core/helpers';
@@ -78,7 +78,6 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   ngOnInit(): void {
     this.watchForOrganizationChnage();
     this.setSelectedOrder();
-    this.setSubmitButtonConfig();
     this.getInitialData();
   }
 
@@ -116,6 +115,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
           this.selectedOrder = selectedOrder;
           this.activeSystem = selectedOrder?.isIRPOnly ? OrderSystem.IRP : OrderSystem.VMS;
           this.showSystemToggle = false;
+          this.setSubmitButtonConfig();
       });
     }
 
@@ -128,7 +128,11 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   }
 
   private setSubmitButtonConfig(): void {
-    this.submitButtonConfig = this.activeSystem === OrderSystem.IRP? [SubmitForLater] : [SubmitForLater, SubmitAsTemplate] ;
+    if(!this.selectedOrder) {
+      this.submitButtonConfig = this.activeSystem === OrderSystem.IRP? [SubmitForLater] : [SubmitForLater, SubmitAsTemplate];
+    } else {
+      this.submitButtonConfig = this.activeSystem === OrderSystem.IRP? [SaveForLate] : [SaveForLate, SubmitAsTemplate];
+    }
   }
 
   private getInitialData(): void {

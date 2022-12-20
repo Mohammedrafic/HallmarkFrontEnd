@@ -9,6 +9,7 @@ export const GridIcons = {
 };
 export const OptionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 export const SubmitForLater = { id: SubmitButton.SaveForLater, text: 'Save For Later' };
+export const SaveForLate = { id: SubmitButton.Save, text: 'Save' };
 export const SubmitAsTemplate = { id: SubmitButton.SaveAsTemplate, text: 'Save as Template' };
 export const JobClassifications = [
   { id: JobClassification.Alumni, name: 'Alumni' },
