@@ -1,5 +1,5 @@
 <section class="candidates-list">
-  <ng-container *ngIf="!selectedOrder.isIRPOnly || !isFeatureIrpEnabled; else irpTableHeader">
+  <ng-container *ngIf="!selectedOrder.isIRPOnly || !isFeatureIrpEnabled || isAgency; else irpTableHeader">
     <div class="e-gridcustomheader">
       <div class="title">
         <h3>Candidates List</h3>
@@ -36,7 +36,7 @@
     </div>
   </ng-template>
 
-  <ng-container *ngIf="!selectedOrder.isIRPOnly || !isFeatureIrpEnabled">
+  <ng-container *ngIf="!selectedOrder.isIRPOnly || !isFeatureIrpEnabled || isAgency">
     <ejs-grid
       #orderCandidatesGrid
       id="users-grid"
@@ -177,7 +177,8 @@
   </ejs-grid>
   </ng-container>
 
-  <ng-container *ngIf="selectedOrder.isIRPOnly && selectedOrder.orderType === orderTypes.Traveler">
+  <ng-container *ngIf="selectedOrder.isIRPOnly && selectedOrder.orderType === orderTypes.Traveler
+    && isFeatureIrpEnabled && !isAgency">
     <ejs-grid
       #orderCandidatesGrid
       id="users-grid"
