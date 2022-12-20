@@ -32,6 +32,7 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
   @Input() form: FormGroup;
   @Input() addedCredentials: IOrderCredentialItem[] = [];
   @Input() formSubmitted = false;
+  @Input() includeInIRP = false;
 
   @Output() selectCredentialItem: EventEmitter<Credential> = new EventEmitter();
 
@@ -66,7 +67,7 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
   }
 
   ngOnInit(): void {
-    this.store.dispatch([new GetAllCredentials(), new GetAllCredentialTypes()]);
+    this.store.dispatch([new GetAllCredentials(this.includeInIRP), new GetAllCredentialTypes()]);
     this.form.statusChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(status => {
       this.credSelectionInvalid = this.formSubmitted && (status === 'INVALID');
     });

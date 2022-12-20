@@ -19,6 +19,7 @@ export class OrderCredentialsComponent {
   @ViewChild('addCred') addCred: AddOrderCredentialFormComponent;
   @ViewChild('editCred') editCred: EditOrderCredentialFormComponent;
   @Input() credentials: IOrderCredentialItem[];
+  @Input() includeInIRP = false;
   @Input() isActive = false;
   @Output() credentialChanged: EventEmitter<IOrderCredentialItem> = new EventEmitter();
   @Output() credentialDeleted: EventEmitter<IOrderCredentialItem> = new EventEmitter();
