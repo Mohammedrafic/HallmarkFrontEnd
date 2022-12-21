@@ -10,7 +10,11 @@ import {
   MoreMenuType,
 } from '@client/order-management/components/order-management-content/order-management-content.constants';
 
-export const SystemGroupConfig = (isIRPIncluded = false, isVMSIncluded = false): ButtonModel[] => {
+export const SystemGroupConfig = (
+  isIRPIncluded = false,
+  isVMSIncluded = false,
+  selectedSystemId: OrderManagementIRPSystemId | undefined,
+): ButtonModel[] => {
   const buttons = [];
 
   if (isIRPIncluded && isVMSIncluded) {
@@ -25,7 +29,7 @@ export const SystemGroupConfig = (isIRPIncluded = false, isVMSIncluded = false):
     buttons.push({
       id: OrderManagementIRPSystemId.IRP,
       title: 'IRP',
-      active: !isVMSIncluded,
+      active: selectedSystemId === OrderManagementIRPSystemId.IRP || !isVMSIncluded,
     });
   }
 
@@ -33,7 +37,7 @@ export const SystemGroupConfig = (isIRPIncluded = false, isVMSIncluded = false):
     buttons.push({
       id: OrderManagementIRPSystemId.VMS,
       title: 'VMS',
-      active: true,
+      active: selectedSystemId === OrderManagementIRPSystemId.VMS || !isIRPIncluded || !selectedSystemId,
     });
   }
 
