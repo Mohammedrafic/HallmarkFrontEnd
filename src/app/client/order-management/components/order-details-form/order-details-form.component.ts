@@ -1114,7 +1114,6 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
         this.jobDistributionForm.controls['jobDistributions'].value.find(
           (item: JobDistributionModel) => item.agencyId === id
         )?.id || 0;
-
       this.agencyControlEnabled = jobDistributionId === OrderJobDistribution.Selected;
       const selectedJobDistributions: JobDistributionModel[] = [];
       if (this.agencyControlEnabled) {
@@ -1150,6 +1149,8 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
       this.orderControlsConfig.jobDistributionsControl.patchValue(
         [jobDistributions, ...selectedJobDistributions], { emitEvent: false }
       );
+
+      this.cd.markForCheck();
     });
 
     this.orderControlsConfig.agencyControl.valueChanges.pipe(
