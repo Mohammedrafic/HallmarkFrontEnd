@@ -653,7 +653,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
         ),
         takeUntil(this.componentDestroy())
       ).subscribe((structure: OrganizationRegion[]) => {
-
       this.updateDataSourceFormList('regions', structure);
       const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
       setDataSource(selectedForm.fields, 'regionId', structure);

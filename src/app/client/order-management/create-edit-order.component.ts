@@ -35,6 +35,7 @@ import {
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { updateSystemConfig } from '@client/order-management/helpers';
+import { GetOrganizationStructure } from '../../store/user.actions';
 
 @Component({
   selector: 'app-create-edit-order',
@@ -116,11 +117,12 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
           this.activeSystem = selectedOrder?.isIRPOnly ? OrderSystem.IRP : OrderSystem.VMS;
           this.showSystemToggle = false;
           this.setSubmitButtonConfig();
+
+          this.changeDetection.markForCheck();
       });
     }
 
     this.setTitle(selectedOrderId);
-    this.changeDetection.markForCheck();
   }
 
   private setTitle(isSelectedOrder: string | null): void {
@@ -143,6 +145,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
       new GetAssociateAgencies(),
       new GetOrganizationStatesWithKeyCode(),
       new GetProjectSpecialData(),
+      new GetOrganizationStructure(),
     ]);
   }
 
