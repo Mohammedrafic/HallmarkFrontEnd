@@ -162,5 +162,17 @@
         </div>
       </div>
     </div>
+    <ng-container *ngIf="isEditMode && true && isHallmarkUser || isHallmarkUser && !isEditMode">
+    <div class="bootstrap checkbox-container">
+      <label>Is Msp</label>
+      <div class="checkbox-group">
+        <ejs-checkbox
+          [value]="isEditMode ? true : agencyIsMsp"
+          [disabled]="isEditMode && agencyIsMsp"
+          (change)="onChangeMspCheckbox($event)"
+        ></ejs-checkbox>
+      </div>
+    </div>
+  </ng-container>
   </form>
 </div>

@@ -69,6 +69,9 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   public createUnderFields = OPRION_FIELDS;
   public title = 'Add';
   public isAgencyUser = false;
+  public isHallmarkUser = false;
+  public agencyIsMsp = false;
+  public isEditMode = false;
   public readonly agencyStatus = AgencyStatus;
   public activeUser: User;
   public readonly businessUnitType = BusinessUnitType;
@@ -165,7 +168,9 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       .subscribe((agency: { payload: Agency }) => {
         this.agencyId = agency.payload.agencyDetails.id as number;
         this.fetchedAgency = agency.payload;
+        this.agencyIsMsp = !!agency.payload.isMsp;
         this.patchAgencyFormValue(this.fetchedAgency);
+        console.error(agency);
       });
   
     this.actions$
@@ -178,6 +183,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       });
 
     if (this.route.snapshot.paramMap.get('id')) {
+      this.isEditMode = true;
       this.title = 'Edit';
       this.store.dispatch(new GetAgencyById(parseInt(this.route.snapshot.paramMap.get('id') as string)));
       this.store.dispatch(new GetAgencyLogo(parseInt(this.route.snapshot.paramMap.get('id') as string)));
@@ -222,6 +228,8 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     this.agencyForm.markAllAsTouched();
     if (this.agencyForm.valid) {
       const agency = this.valueToAngency(this.agencyForm.getRawValue());
+      console.error(agency);
+      
       this.store.dispatch(new SaveAgency(agency));
     }
   }
@@ -328,6 +336,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     agencyPaymentDetails.forEach((payment) => (payment.agencyId = id));
 
     return {
+      isMsp: this.agencyIsMsp,
       agencyDetails: { ...agencyFormValue.agencyDetails, id },
       agencyBillingDetails: {
         ...agencyFormValue.agencyBillingDetails,
@@ -369,6 +378,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   private checkAgencyUser(): void {
     const user = this.store.selectSnapshot(UserState.user);
     this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
+    this.isHallmarkUser = user?.businessUnitType === BusinessUnitType.Hallmark;
   }
 
   private createPaymentDetails(paymentDetails: PaymentDetails[] | ElectronicPaymentDetails[]): FormGroup[] {
@@ -391,5 +401,17 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
 
   private getAgencyRegionsSkills(): void {
     this.store.dispatch(new GetAgencyRegionsSkills());
+  }
+
+  public onMspCheckboxChecked(event: boolean): void {
+    this.agencyIsMsp = event;
+    const parentBusinessUnitControl = this.agencyForm.get('parentBusinessUnitId');
+    if(this.agencyIsMsp) {
+      parentBusinessUnitControl?.setValue(0);
+      parentBusinessUnitControl?.disable();
+    } else {
+      parentBusinessUnitControl?.reset();
+      parentBusinessUnitControl?.enable();
+    }
   }
 }

@@ -6,6 +6,7 @@ import {
 import { AgencyStatus, FilterOrderStatusText } from "@shared/enums/status";
 
 export type Agency = {
+  isMsp?: boolean | null,
   createUnder?: AgencyCreateUnder;
   parentBusinessUnitId: number | null;
   agencyId?: number;

@@ -54,7 +54,13 @@
                 </div>
 
                 <div class="e-card-content">
-                  <app-general-info-group [isAgencyUser]="isAgencyUser" [formGroup]="$any(agencyControl)"></app-general-info-group>
+                  <app-general-info-group
+                    [isAgencyUser]="isAgencyUser"
+                    [isHallmarkUser]="isHallmarkUser"
+                    [isEditMode]="isEditMode"
+                    [agencyIsMsp]="agencyIsMsp"
+                    [formGroup]="$any(agencyControl)"
+                    (mspCheckbox)="onMspCheckboxChecked($event)"></app-general-info-group>
 
                   <div class="e-card-title-wrapper">
                     <div class="e-card-title">Job Distribution</div>

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select } from '@ngxs/store';
 import { Observable, Subject, takeWhile } from 'rxjs';
@@ -12,6 +12,7 @@ import PriceUtils from '@shared/utils/price.utils';
 import { AgencyStatusesModel } from "@shared/models/agency.model";
 import { ALPHANUMERIC } from '@shared/constants';
 import { COUNTRIES } from '@shared/constants/countries-list';
+import { ChangeEventArgs } from '@syncfusion/ej2-angular-buttons';
 
 @Component({
   selector: 'app-general-info-group',
@@ -21,6 +22,11 @@ import { COUNTRIES } from '@shared/constants/countries-list';
 export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   @Input() formGroup: FormGroup;
   @Input() isAgencyUser: boolean;
+  @Input() isHallmarkUser: boolean;
+  @Input() isEditMode: boolean;
+  @Input() agencyIsMsp: boolean;
+
+  @Output() private mspCheckbox: EventEmitter<boolean> = new EventEmitter();
 
   public countries = COUNTRIES;
   public priceUtils = PriceUtils;
@@ -83,10 +89,15 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       fax: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       status: new FormControl(AgencyStatus.InProgress, [Validators.required]),
       website: new FormControl(''),
+      isMsp: new FormControl(null),
     });
   }
 
   private setDefultStatus(): void {
     this.formGroup.get('status')?.patchValue(0);
+  }
+
+  public onChangeMspCheckbox(event: ChangeEventArgs): void {
+    this.mspCheckbox.emit(event.checked);
   }
 }
