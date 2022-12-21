@@ -12,7 +12,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 @Component({
   selector: 'app-add-edit-note',
   templateUrl: './add-edit-note.component.html',
-  styleUrls: ['./add-edit-note.component.scss']
+  styleUrls: ['./add-edit-note.component.scss'],
 })
 export class AddEditNoteComponent extends DestroyableDirective implements OnInit {
   public noteForm: FormGroup;
@@ -36,8 +36,8 @@ export class AddEditNoteComponent extends DestroyableDirective implements OnInit
     this.categories$ = this.generalNotesService.getCategories();
     this.noteForm = this.formBuilder.group({
       date: [note?.date ?? null, [Validators.required]],
-      categoryId: [note?.categoryId ?? null],
-      note: [note?.note ?? null, [Validators.maxLength(250)]]
+      categoryId: [note?.categoryId ?? null, [Validators.required]],
+      note: [note?.note ?? null, [Validators.maxLength(250)]],
     });
   }
 
@@ -48,20 +48,15 @@ export class AddEditNoteComponent extends DestroyableDirective implements OnInit
       this.generalNotesService.addNote(this.noteForm.value);
       this.toggleSideDialog(false);
     }
-
   }
 
   private listenEditMode(): void {
-    this.generalNotesService.editMode$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((note: EditGeneralNoteModel | null) => {
-        this.initNoteForm(note?.data);
-      });
+    this.generalNotesService.editMode$.pipe(takeUntil(this.destroy$)).subscribe((note: EditGeneralNoteModel | null) => {
+      this.initNoteForm(note?.data);
+    });
   }
 
   private toggleSideDialog(state: boolean): void {
     this.store.dispatch(new ShowSideDialog(state));
   }
-
-
 }
