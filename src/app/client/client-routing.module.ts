@@ -60,7 +60,7 @@ const routes: Routes = [
       },
       {
         path: 'order-management/add/:fromTemplate',
-        component: AddEditOrderComponent,
+        component: CreateEditOrderComponent,
         data: {
           isOrganizationArea: true,
           isEditing: false,
