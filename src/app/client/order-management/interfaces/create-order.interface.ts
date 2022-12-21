@@ -137,3 +137,9 @@ export interface JobDistribution {
   jobDistributionValue: number[];
   agencyId: null | number;
 }
+
+export interface ContactDetailsUser {
+  name: string;
+  email: string;
+  mobilePhone: string;
+}

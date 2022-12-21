@@ -3,8 +3,11 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { Department } from '@shared/models/department.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import {
-  DataSourceContainer, JobDistribution,
-  OrderFormInput, OrderFormsConfig,
+  ContactDetailsUser,
+  DataSourceContainer,
+  JobDistribution,
+  OrderFormInput,
+  OrderFormsConfig,
   SpecialProjectStructure,
   StateList,
 } from '@client/order-management/interfaces';
@@ -116,3 +119,9 @@ export const setDefaultPrimaryContact = (forms: FormGroup[]): void  => {
   forms[0].get('isPrimaryContact')?.patchValue(true);
   }
 };
+
+export const mapperForContactDetail = (contactDetails: Department): ContactDetailsUser => ({
+  name: contactDetails.facilityContact,
+  email: contactDetails.facilityPhoneNo,
+  mobilePhone: contactDetails.facilityPhoneNo,
+});
