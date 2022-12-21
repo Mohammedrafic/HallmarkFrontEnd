@@ -80,6 +80,19 @@
   }
 }
 
+.flex-width {
+  @media #{$max-tablet} {
+    min-width: 50px !important;
+  }
+}
+
+.flex-width-date {
+  @media #{$max-tablet} {
+    overflow: hidden;
+    min-width: 80px !important;
+  }
+}
+
 @media (max-width: $tablet-min) {
   .extension-container {
     padding: 0 !important;
