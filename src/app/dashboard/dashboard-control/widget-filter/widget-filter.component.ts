@@ -100,9 +100,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.widgetFilterColumnsSetup();
   }
 
-  public ngOnInit(): void {
-    this.onSkillDataLoadHandler();
-    this.onOrganizationStructureDataLoadHandler();
+  public ngOnInit(): void { 
     this.isFilterDialogOpened();
     this.onFilterControlValueChangedHandler();
   }
@@ -190,13 +188,10 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     if (this.userIsAdmin) {
       this.widgetFilterFormGroup
         .get(FilterColumnTypeEnum.ORGANIZATION)
-        ?.valueChanges.pipe(throttleTime(100))
+        ?.valueChanges.pipe(throttleTime(100), takeUntil(this.destroy$))
         .subscribe((val: number[]) => {
-          this.cdr.markForCheck();
           if (val?.length) {
-            const selectedOrganizations: Organisation[] = val.map(
-              (id) => this.allOrganizations.find((org) => org.organizationId === id) as Organisation
-            );
+            const selectedOrganizations: Organisation[] = val.map((id) => this.allOrganizations.find((org) => org.organizationId === id) as Organisation);
 
             this.filterColumns.regionIds.dataSource = [];
             this.filterColumns.skillIds.dataSource = [];
@@ -219,6 +214,8 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
             this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.setValue([]);
             this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
           }
+
+          this.cdr.markForCheck();
         });
     }
   }
@@ -226,8 +223,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   public onFilterControlValueChangedHandler(): void {
     this.subscribeToOrganizationChanges();
 
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.valueChanges.pipe(throttleTime(100)).subscribe((val: number[]) => {
-      this.cdr.markForCheck();
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.valueChanges.pipe(throttleTime(100), takeUntil(this.destroy$)).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = val.map((id) => {
           return this.userIsAdmin
@@ -247,10 +243,11 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         this.widgetFilterFormGroup.get(FilterColumnTypeEnum.LOCATION)?.setValue([]);
         this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
       }
+
+      this.cdr.markForCheck();
     });
 
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.LOCATION)?.valueChanges.pipe(throttleTime(100)).subscribe((val: number[]) => {
-      this.cdr.markForCheck();
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.LOCATION)?.valueChanges.pipe(throttleTime(100), takeUntil(this.destroy$)).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = val.map((id) => (this.filterColumns.locationIds.dataSource as any[]).find((location: OrganizationLocation) => location.id === id));
        const locationDepartments: OrganizationDepartment[] = [];
@@ -264,18 +261,20 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.setValue([]);
         this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
       }
+
+      this.cdr.markForCheck();
     });
 
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.valueChanges.pipe(throttleTime(100)).subscribe(() => this.cdr.markForCheck());
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.valueChanges.pipe(throttleTime(100), takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
 
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.valueChanges.pipe(throttleTime(100)).subscribe(() => this.cdr.markForCheck());
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.valueChanges.pipe(throttleTime(100), takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
   }
 
   private onOrganizationStructureDataLoadHandler(): void {
     if(this.organizationStructure && !this.userIsAdmin) {
-        this.cdr.markForCheck();
         this.regions = this.organizationStructure.regions;
         this.filterColumns.regionIds.dataSource = this.regions;
+        this.cdr.markForCheck();
     }
   }
 
@@ -298,7 +297,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
           }
         });
       } else {
-        skills = this.allSkills.filter((skill) => !!skill.businessUnitId);
+        skills = this.allSkills;
       }
       this.filterColumns.skillIds.dataSource = skills;
     }
