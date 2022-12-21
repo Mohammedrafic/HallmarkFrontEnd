@@ -19,7 +19,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { AllOrganizationsSkill } from 'src/app/dashboard/models/all-organization-skill.model';
 import { DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
-import { isEqual } from 'lodash';
+import { isEqual, uniqBy } from 'lodash';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 
@@ -187,35 +187,40 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   private subscribeToOrganizationChanges(): void {
-    if(this.userIsAdmin) {
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.ORGANIZATION)?.valueChanges.pipe(throttleTime(100)).subscribe((val: number[]) => {
-      this.cdr.markForCheck();
-      if(val?.length) {
-        const selectedOrganizations: Organisation[] = val.map((id) => this.allOrganizations.find((org) => org.organizationId === id) as Organisation);
-      
-        this.filterColumns.regionIds.dataSource = [];
-        this.filterColumns.skillIds.dataSource = [];
-        const allOrganizationSkills: AllOrganizationsSkill[] = [];
-        const organizationRegions: OrganizationRegion[] = []; 
-        
-        selectedOrganizations.forEach((organization: Organisation) => {
-          this.sortedSkillsByOrgId[organization.organizationId] && allOrganizationSkills.push(...this.sortedSkillsByOrgId[organization.organizationId]);
-          organization.regions?.forEach((region: OrganizationRegion) => (region.orgName = organization.name));
-          organizationRegions.push(...(organization.regions as []));
-        })
-        
-        const sortedSkills: AllOrganizationsSkill[] = sortByField(allOrganizationSkills, 'skillDescription');
-        this.filterColumns.skillIds.dataSource.push(...sortedSkills as []);
-        this.filterColumns.regionIds.dataSource.push(...sortByField(organizationRegions, 'name'));
-      } else {
-        this.filterColumns.regionIds.dataSource = [];
-        this.filterColumns.skillIds.dataSource = [];
-        this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.setValue([]);
-        this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.setValue([]);
-        this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns)
-      }
-    })
-  }
+    if (this.userIsAdmin) {
+      this.widgetFilterFormGroup
+        .get(FilterColumnTypeEnum.ORGANIZATION)
+        ?.valueChanges.pipe(throttleTime(100))
+        .subscribe((val: number[]) => {
+          this.cdr.markForCheck();
+          if (val?.length) {
+            const selectedOrganizations: Organisation[] = val.map(
+              (id) => this.allOrganizations.find((org) => org.organizationId === id) as Organisation
+            );
+
+            this.filterColumns.regionIds.dataSource = [];
+            this.filterColumns.skillIds.dataSource = [];
+            const allOrganizationSkills: AllOrganizationsSkill[] = [];
+            const organizationRegions: OrganizationRegion[] = [];
+
+            selectedOrganizations.forEach((organization: Organisation) => {
+              this.sortedSkillsByOrgId[organization.organizationId] && allOrganizationSkills.push(...this.sortedSkillsByOrgId[organization.organizationId]);
+              organization.regions?.forEach((region: OrganizationRegion) => (region.orgName = organization.name));
+              organizationRegions.push(...(organization.regions as []));
+            });
+
+            const uniqSkills = uniqBy(allOrganizationSkills, 'id');
+            this.filterColumns.skillIds.dataSource.push(...sortByField(uniqSkills, 'skillDescription'));
+            this.filterColumns.regionIds.dataSource.push(...sortByField(organizationRegions, 'name'));
+          } else {
+            this.filterColumns.regionIds.dataSource = [];
+            this.filterColumns.skillIds.dataSource = [];
+            this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.setValue([]);
+            this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.setValue([]);
+            this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
+          }
+        });
+    }
   }
 
   public onFilterControlValueChangedHandler(): void {
@@ -300,20 +305,19 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   private getFilterState(): void {
-        this.cdr.markForCheck();
-        this.filters = {} as DashboardFiltersModel; 
-        this.savedFilterItems.forEach((item: FilteredItem) => {
-          const filterKey = item.column as keyof DashboardFiltersModel;
-          if (filterKey in this.filters) {
-            this.filters[filterKey].push(item.value);
-          } else {
-            this.filters[filterKey] = [item.value];
-          }
-        });
+    this.filters = {} as DashboardFiltersModel;
+    this.savedFilterItems.forEach((item: FilteredItem) => {
+      const filterKey = item.column as keyof DashboardFiltersModel;
+      if (filterKey in this.filters) {
+        this.filters[filterKey].push(item.value);
+      } else {
+        this.filters[filterKey] = [item.value];
+      }
+    });
+    this.cdr.markForCheck();
   }
 
   private setFormControlValue(): void {
-    this.cdr.markForCheck();
     const formControls = Object.entries(this.widgetFilterFormGroup.controls);
     formControls.forEach(([field, control]) => {
       const value = this.filters[field as keyof DashboardFiltersModel];
@@ -323,6 +327,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         control.reset(null, { emitEvent: false });
       }
     });
+    this.cdr.markForCheck();
   }
 
   public setFilterState(): void {
