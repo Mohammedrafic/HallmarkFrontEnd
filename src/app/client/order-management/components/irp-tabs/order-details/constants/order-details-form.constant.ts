@@ -300,6 +300,7 @@ export const JobDescriptionConfig: OrderFormsConfig = {
       title: 'Job Description',
       cssClass: 'itm4',
       required: false,
+      maxLength: 4000,
       type: FieldType.TextArea,
     },
     {
@@ -307,6 +308,7 @@ export const JobDescriptionConfig: OrderFormsConfig = {
       title: 'Unit Description',
       cssClass: 'itm5',
       required: false,
+      maxLength: 500,
       type: FieldType.TextArea,
     },
   ],
@@ -380,6 +382,7 @@ export const JobDescriptionConfigPO: OrderFormsConfig = {
       title: 'Job Description',
       cssClass: 'itm9',
       required: false,
+      maxLength: 4000,
       type: FieldType.TextArea,
     },
     {
@@ -387,6 +390,7 @@ export const JobDescriptionConfigPO: OrderFormsConfig = {
       title: 'Unit Description',
       cssClass: 'itm10',
       required: false,
+      maxLength: 500,
       type: FieldType.TextArea,
     },
   ],

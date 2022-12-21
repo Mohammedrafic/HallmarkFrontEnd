@@ -182,6 +182,7 @@
                       class="e-input"
                       type="text"
                       [multiline]="true"
+                      [maxlength]="item.maxLength || 4000"
                       appValidateWithMessage
                       [formControlName]="item.field">
                     </ejs-textbox>

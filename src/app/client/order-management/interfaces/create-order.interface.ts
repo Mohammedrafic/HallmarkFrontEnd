@@ -28,6 +28,7 @@ export interface OrderFormInput {
   type: FieldType;
   required: boolean;
   field: string;
+  maxLength?: string | number | null;
   title?: string;
   enabled?: boolean;
   cssClass?: string;

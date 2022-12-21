@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
-import { AbstractControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 
 import { filter, map, Observable, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
@@ -355,6 +355,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
       const locations = this.organizationStructureService.getLocationsById(value);
+      this.generalInformationForm.get('locationId')?.reset();
+      this.generalInformationForm.get('departmentId')?.reset();
 
       this.updateDataSourceFormList('locations', locations);
       const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
@@ -433,17 +435,24 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
     ).subscribe((value: number[]) => {
       const selectedConfig = this.getSelectedFormConfig(JobDistributionForm);
       const agencyConfigControl = getAgencyIdFiled(selectedConfig);
+      const agencyFormControl = this.jobDistributionForm.get('agencyId');
       const rateConfigControl = this.getRateConfigControl(selectedConfig);
 
       if(value.includes(IrpOrderJobDistribution.SelectedExternal)) {
         agencyConfigControl.enabled = true;
         rateConfigControl.show = true;
+        agencyFormControl?.addValidators([Validators.required]);
+        agencyConfigControl.required = true;
       } else {
         agencyConfigControl.enabled = false;
         rateConfigControl.show = false;
+        agencyFormControl?.removeValidators(Validators.required);
+        agencyFormControl?.reset();
+        agencyConfigControl.required = false;
       }
 
-        this.changeDetection.markForCheck();
+      agencyFormControl?.updateValueAndValidity();
+      this.changeDetection.markForCheck();
     });
   }
 
