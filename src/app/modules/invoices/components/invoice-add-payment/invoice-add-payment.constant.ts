@@ -12,12 +12,12 @@ import { PaymentMode } from '../../enums';
 
 export const PaymentOptions: DropdownOption[] = [
   {
-    text: 'Electronic',
-    value: PaymentMode.Electronic,
-  },
-  {
     text: 'Check',
     value: PaymentMode.Check,
+  },
+  {
+    text: 'Electronic',
+    value: PaymentMode.Electronic,
   },
 ];
 
