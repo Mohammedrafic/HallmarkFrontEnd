@@ -604,7 +604,8 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
         .pipe(
           take(1),
           takeUntil(this.componentDestroy())
-        ).subscribe(() => {
+        ).subscribe((data) => {
+          this.selectedLocation = data.organizationManagement.locations?.find((location: Location) => location.id === order.locationId);
           this.generalInformationForm.controls['locationId'].patchValue(order.locationId);
         });
     }
@@ -615,7 +616,8 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
         .pipe(
           take(1),
           takeUntil(this.componentDestroy())
-        ).subscribe(() => {
+        ).subscribe((data) => {
+          this.selectedDepartment = data.organizationManagement.departments?.find((department: Department) => department.departmentId === order.departmentId);
           this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
         });
     }
