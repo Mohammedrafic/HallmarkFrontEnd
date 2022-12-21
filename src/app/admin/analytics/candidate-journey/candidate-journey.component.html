@@ -96,7 +96,7 @@
     <div class="form-element">
       <div class="group">
         <div class="input-container calendar">
-          <label>Start Date<span class="required">*</span></label>
+          <label>Order Start Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
               appValidateWithMessage formControlName="startDate">
@@ -104,7 +104,7 @@
           </div>
         </div>
         <div class="input-container calendar">
-          <label>End Date</label>
+          <label>Order End Date</label>
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
               formControlName="endDate" [min]="candidateJourneyForm.controls['startDate'].value">
