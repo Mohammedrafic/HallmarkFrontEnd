@@ -94,3 +94,18 @@ export class GetGroupEmailById {
     public id: number
   ) { }
 }
+export class GetGroupEmailRoles {
+  static readonly type = '[groupemail] Get Group Email roles By organization id';
+  constructor(
+    public id: number
+  ) { }
+}
+
+export class GetGroupEmailInternalUsers {
+  static readonly type = '[groupemail] Get Group Email Users By region id, location id and roles';
+  constructor(
+    public regionId: number,
+    public locationId: number,
+    public roles: string    
+  ) { }
+}

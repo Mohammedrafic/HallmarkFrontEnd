@@ -1,16 +1,17 @@
 import { Injectable } from "@angular/core";
 import { UserSubscriptionPage, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
 import { Action, Selector, StateContext} from '@ngxs/store';
-import { AlertTrigger, ClearAlertTemplateState, DismissAlert, DismissAllAlerts, GetAlertsTemplatePage, GetGroupEmailById, GetGroupMailByBusinessUnitIdPage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, SendGroupEmail, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
+import { AlertTrigger, ClearAlertTemplateState, DismissAlert, DismissAllAlerts, GetAlertsTemplatePage, GetGroupEmailById, GetGroupEmailInternalUsers, GetGroupEmailRoles, GetGroupMailByBusinessUnitIdPage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, SendGroupEmail, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
 import { catchError, Observable ,tap} from "rxjs";
 import { AlertsService } from "@shared/services/alerts.service";
 import { BusinessUnitService } from "@shared/services/business-unit.service";
 import { AlertsTemplate, AlertsTemplatePage, AlertTriggerDto, DismissAlertDto, EditAlertsTemplate } from "@shared/models/alerts-template.model";
-import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailRequest } from "@shared/models/group-email.model";
+import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailRequest, GroupEmailRole } from "@shared/models/group-email.model";
 import { GroupEmailService } from "@shared/services/group-email.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ShowToast } from "../../store/app.actions";
 import { MessageTypes } from "../../shared/enums/message-types";
+import { User } from "@shared/models/user.model";
 
 interface AlertsStateModel {
   userSubscriptionPage: UserSubscriptionPage | null;
@@ -23,6 +24,8 @@ interface AlertsStateModel {
     groupEmailByBusinessUnitIdPage: GroupEmailByBusinessUnitIdPage ;
     sendGroupEmail:GroupEmail;
     groupEmailData:GroupEmail;
+    groupEmailRoleData:GroupEmailRole;
+    groupEmailUserData:User;
 }
 
 @Injectable()
@@ -64,6 +67,14 @@ export class AlertsState {
   @Selector()
   static GetGroupEmailById(state:AlertsStateModel):GroupEmail{
     return state.groupEmailData;
+  }
+  @Selector()
+  static GetGroupRolesByOrgId(state:AlertsStateModel):GroupEmailRole{
+    return state.groupEmailRoleData;
+  }
+  @Selector()
+  static GetGroupEmailInternalUsers(state:AlertsStateModel):User{
+    return state.groupEmailUserData;
   }
 
  
@@ -241,6 +252,38 @@ export class AlertsState {
     return this.groupEmailService.GetGroupEmailById(id).pipe(
       tap((payload) => {
         patchState({ groupEmailData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailRoles)
+  GetGroupEmailRoles(
+    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { id }: GetGroupEmailRoles
+  ): Observable<GroupEmailRole | void> {
+    return this.groupEmailService.GetGroupEmailRolesByOrgId(id).pipe(
+      tap((payload) => {
+        patchState({ groupEmailRoleData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailInternalUsers)
+  GetGroupEmailInternalUsers(
+    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { regionId, locationId, roles }: GetGroupEmailInternalUsers
+  ): Observable<User | void> {
+    return this.groupEmailService.GetGroupEmailUsersByRegionLocation(regionId, locationId, roles).pipe(
+      tap((payload) => {
+        patchState({ groupEmailUserData: payload });
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {

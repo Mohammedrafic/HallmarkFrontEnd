@@ -1,3 +1,7 @@
+import { AgencyDto } from './../../../analytics/models/common-report.model';
+import { GetGroupEmailRoles, GetGroupEmailInternalUsers } from './../../../store/alerts.actions';
+import { GroupEmailRole } from '@shared/models/group-email.model';
+import { takeUntil } from 'rxjs';
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { HtmlEditorService, ImageService, LinkService, RichTextEditorComponent, TableService, ToolbarService, ToolbarType } from '@syncfusion/ej2-angular-richtexteditor';
@@ -5,7 +9,7 @@ import { Observable, Subject, takeWhile, filter } from 'rxjs';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor, User_DATA_FIELDS } from '../../alerts.constants';
 import { Actions, Select, Store } from '@ngxs/store';
-import { GetBusinessByUnitType, GetAllUsersPage } from 'src/app/security/store/security.actions';
+import { GetBusinessByUnitType, GetAllUsersPage, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { GetUserSubscriptionPage } from '@admin/store/alerts.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { UserState } from 'src/app/store/user.state';
@@ -19,6 +23,11 @@ import { UserSubscriptionFilters, UserSubscriptionPage } from '@shared/models/us
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { AgencyUserType, OrganizationUserType } from '@admin/alerts/group-email.enum';
+import { Organisation, Region, Location } from '@shared/models/visibility-settings.model';
+import { uniqBy } from 'lodash';
+import { CommonReportFilter, CommonReportFilterOptions } from '@admin/analytics/models/common-report.model';
+import { GetCommonReportFilterOptions } from '@organization-management/store/logi-report.action';
+import { LogiReportState } from '@organization-management/store/logi-report.state';
 
 @Component({
   selector: 'app-send-group-email',
@@ -48,6 +57,9 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   @Select(SecurityState.allUsersPage)
   public userData$: Observable<UsersPage>;
 
+  @Select(AlertsState.GetGroupEmailInternalUsers)
+  public groupEmailUserData$: Observable<User[]>;
+
   @Select(AlertsState.UserSubscriptionPage)
   public userSubscriptionPage$: Observable<UserSubscriptionPage>;
 
@@ -60,10 +72,28 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   @Select(AppState.shouldDisableUserDropDown)
   public shouldDisableUserDropDown$: Observable<boolean>;
 
+  @Select(SecurityState.organisations)
+  public organizationData$: Observable<Organisation[]>;
+
+  @Select(AlertsState.GetGroupRolesByOrgId)
+  public roleData$: Observable<GroupEmailRole[]>;
+  
+  @Select(LogiReportState.commonReportFilterData)
+  public CommonReportFilterData$: Observable<CommonReportFilterOptions>;
+
+  
+  public organizations: Organisation[] = [];
+  public agencies: AgencyDto[] = [];
+  public regionsList: Region[] = [];
+  public locationsList: Location[] = [];
+  public regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
+
   @ViewChild('RTEGroupEmail') public rteObj: RichTextEditorComponent;
   private listboxEle: HTMLElement;
   private editArea: HTMLElement;
   public userData: User[];
+  public roleData: GroupEmailRole[];
   public range: Range = new Range();
   public isBusinessFormDisabled = false;
   public businessUnits = BUSINESS_UNITS_VALUES;
@@ -112,6 +142,22 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
 
     return this.groupEmailTemplateForm.get('emailBody') as AbstractControl;
   }
+
+  get regionControl(): AbstractControl {
+    return this.groupEmailTemplateForm.get('region') as AbstractControl;
+  }
+
+  get locationControl(): AbstractControl {
+    return this.groupEmailTemplateForm.get('location') as AbstractControl;
+  }
+
+  get rolesControl(): AbstractControl {
+    return this.groupEmailTemplateForm.get('roles') as AbstractControl;
+  }
+
+  get userTypeControl(): AbstractControl {
+    return this.groupEmailTemplateForm.get('userType') as AbstractControl;
+  }
   private dispatchNewPage(user: any, sortModel: any = null, filterModel: any = null): void {
     const { businessUnit } = this.groupEmailTemplateForm?.getRawValue();
     if (user != 0 &&businessUnit!=null) {
@@ -127,6 +173,8 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     this.onBusinessUnitValueChanged();
     this.onBusinessValueChanged();
     this.onUserValueChanged();
+    this.onRolesValueChanged();
+    this.onUserTypeValueChanged();
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
     if (user?.businessUnitType) {
@@ -174,10 +222,11 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
         var val = parseInt(orgUserTypes[i - (orgUserTypes.length / 2)]);
         this.userType.push({ name: v, value: val, isAgency: false})
       }
-    });
-
-    console.log(this.userType);
+    });   
+    
+    this.store.dispatch(new GetOrganizationsStructureAll(user?.id!));
   }
+
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -229,30 +278,31 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
         this.userData = [];
         this.dispatchNewPage(null);
 
-        this.store.dispatch(new GetBusinessByUnitType(value));
-        console.log(value);
+        this.store.dispatch(new GetBusinessByUnitType(value));        
         this.filteredUserType = [];
         if(value == 3) {
-          this.filteredUserType = this.userType.filter((i:any)=>i.isAgency == false);
-          //.map((j:any) => {j.name, j.value});
+          this.filteredUserType = this.userType.filter((i:any)=>i.isAgency == false);          
         }
         if(value == 4) {
-          this.filteredUserType = this.userType.filter((i:any)=>i.isAgency == true);
-          //.map((j:any) => {j.name, j.value});
+          this.filteredUserType = this.userType.filter((i:any)=>i.isAgency == true);          
         }
-        console.log(this.filteredUserType);
         if (value == 1) {
           this.dispatchUserPage([]);
         }
         else {
-          this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+          this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {            
             if (!this.isBusinessFormDisabled && data.length > 0) {
               if (this.groupEmailTemplateForm.controls['business'].value != data[0].id) {
                 this.groupEmailTemplateForm.controls['business'].setValue(data[0].id);
               }
+            }            
+          });
+          this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {            
+            this.organizations = [];
+            if (data != null && data.length > 0) {
+              this.organizations = uniqBy(data, 'organizationId');        
             }
           });
-
           this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
            
           });
@@ -263,22 +313,71 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   private onBusinessValueChanged(): void {
     this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (this.isSend == true) {
-      this.userData = [];
-      this.ResetForm();
-      this.dispatchNewPage(null);
-      let businessUnitIds = [];
-      if (value != 0 && value != null) {
-        businessUnitIds.push(this.businessControl.value);        
-      }
-      this.dispatchUserPage(businessUnitIds);
-    }
+        this.userData = [];
+        this.ResetForm();
+        this.dispatchNewPage(null);
+        let businessUnitIds = [];
+        if (value != 0 && value != null) {
+          businessUnitIds.push(this.businessControl.value);        
+        }
+        this.dispatchUserPage(businessUnitIds);
+        let orgList = this.organizations?.filter((x) => value == x.organizationId);
+        this.regionsList = [];
+        this.locationsList = [];
+        orgList.forEach((value) => {
+          this.regionsList.push(...value.regions);
+          value.regions.forEach((region) => {
+            this.locationsList.push(...region.locations);              
+          });
+        });
 
+        if(value != undefined && value > 0){
+          this.store.dispatch(new GetGroupEmailRoles(value));
+          this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data)=>{
+            this.roleData = data;
+          });
+        }
+      }
     });
   }
   private onUserValueChanged(): void {
     this.usersControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (this.isSend == true && value!=null && value!=undefined) {
       this.emailTo=this.userData?.filter(item => value.indexOf(item.id) !== -1)?.map(item=>item.email)?.join(", ")
+      }
+    });
+  }
+
+  private onRolesValueChanged(): void{    
+    this.rolesControl.valueChanges.pipe(takeWhile(()=> this.isAlive)).subscribe((value)=>{
+      this.userData = [];
+      var regionId = this.regionControl.value;
+      var locationId = this.locationControl.value;
+      var roles = value.join()
+      this.store.dispatch(new GetGroupEmailInternalUsers(regionId, locationId, roles));
+      this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data)=>{
+        this.userData = data;
+      });
+    });
+  }
+
+  private onUserTypeValueChanged(): void {
+    this.userTypeControl.valueChanges.pipe(takeWhile(()=> this.isAlive)).subscribe((value)=>{
+      debugger;
+      var businessUnit = this.businessUnitControl.value;      
+      var businessId = this.businessControl.value;
+      if(businessUnit == 3 && value == 2){
+        let businessIdData:number[] = [];
+          businessIdData.push(businessId);
+          let filter: CommonReportFilter = {
+            businessUnitIds: businessIdData
+          };
+          this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          this.CommonReportFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
+            if (data != null) {
+              this.agencies = data.agencies;              
+            }
+          });
       }
     });
   }
@@ -318,6 +417,10 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     return new FormGroup({
       businessUnit: new FormControl(),
       business: new FormControl(0),
+      userType: new FormControl(0),
+      region: new FormControl(),
+      location: new FormControl(),
+      roles: new FormControl([]),
       user: new FormControl([]),
       emailCc: new FormControl('', [Validators.email, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
       emailTo: new FormControl('', [Validators.required, Validators.email, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),

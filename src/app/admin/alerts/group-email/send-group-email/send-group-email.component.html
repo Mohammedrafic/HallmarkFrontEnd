@@ -40,6 +40,57 @@
           </div>
           <div class="dropdown-container">
             <div class="input-group dropdown">
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="agencies"
+                                [fields]="commonFields"
+                                [dataSource]="agencies"
+                                [value]="agencyFields"
+                                [allowFiltering]="true"
+                                placeholder="Agencies">
+              </ejs-dropdownlist>
+            </div>
+          </div>               
+        </div>
+        <div class="bootstrap business-dropdowns">
+          <div class="dropdown-container">
+            <div class="input-group dropdown">
+              <ejs-dropdownlist formControlName="region"
+                               [allowFiltering]="true"
+                               appValidateWithMessage
+                               [fields]="regionFields"
+                               [dataSource]="regionsList"
+                               placeholder="Region">
+              </ejs-dropdownlist>
+            </div>
+          </div>
+          <div class="dropdown-container">
+            <div class="input-group dropdown">
+              <ejs-dropdownlist formControlName="location"
+                               [allowFiltering]="true"
+                               appValidateWithMessage
+                               [fields]="regionFields"
+                               [dataSource]="locationsList"
+                               placeholder="Location">
+              </ejs-dropdownlist>
+            </div>
+          </div>
+          <div class="dropdown-container">
+            <div class="input-group dropdown">
+              <ejs-multiselect mode="CheckBox"
+                               formControlName="roles"
+                               [placeholder]='placeholderValue'
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               appValidateWithMessage
+                               [fields]="businessDataFields"
+                               [dataSource]="roleData"
+                               [selectAllText]='allOption'
+                               showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>      
+          <div class="dropdown-container">
+            <div class="input-group dropdown">
               <ejs-multiselect mode="CheckBox"
                                formControlName="user"
                                [placeholder]='placeholderValue'
@@ -52,22 +103,7 @@
                                showSelectAll=true>
               </ejs-multiselect>
             </div>
-          </div>
-          <!-- <div class="dropdown-container">
-            <div class="input-group dropdown">
-              <ejs-multiselect mode="CheckBox"
-                               formControlName="candidate"
-                               [placeholder]='placeholderValue'
-                               [allowFiltering]="true"
-                               [showDropDownIcon]="true"
-                               appValidateWithMessage
-                               [fields]="userDataFields"
-                               [dataSource]="candidateData"
-                               [selectAllText]='allOption'
-                               showSelectAll=true>
-              </ejs-multiselect>
-            </div>
-          </div> -->
+          </div>     
         </div>
         <div class="input-container bootstrap top-container">
 

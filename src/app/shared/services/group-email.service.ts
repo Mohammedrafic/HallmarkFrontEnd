@@ -1,3 +1,5 @@
+import { User } from './../models/user.model';
+import { GroupEmailRole } from './../models/group-email.model';
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailFilters, GroupEmailRequest, SendGroupEmailRequest } from "@shared/models/group-email.model";
@@ -56,5 +58,32 @@ import { Observable } from "rxjs";
       id:number    
     ): Observable<GroupEmail> {  
        return this.http.get<GroupEmail>(`/api/GroupMail/getgroupmailbyid?Id=`+id);
+    }
+
+    /**
+   * Get Group Email Roles By Organization Id
+   * @param id   
+   *
+   * @return GroupEmail
+   */
+     public GetGroupEmailRolesByOrgId(
+      id:number    
+    ): Observable<GroupEmailRole> {  
+       return this.http.get<GroupEmailRole>(`/api/GroupMail/getroles?OrganizationId=`+id);
+    }
+
+    /**
+   * Get Group Email internal users By regionId, locationId and roles
+   * @param regionId   
+   * @param locationId
+   * @param roles
+   * @return User
+   */
+     public GetGroupEmailUsersByRegionLocation(
+      regionId:number,
+      locationId:number,
+      roles:string
+    ): Observable<User> {  
+       return this.http.get<User>(`/api/GroupMail/getinternalusers?regionId=${regionId}&locationId=${locationId}&roles=${roles}`);
     }
   }
