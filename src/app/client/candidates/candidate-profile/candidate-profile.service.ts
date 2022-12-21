@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, EMPTY, mergeMap, Observable, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, EMPTY, mergeMap, Observable, tap } from 'rxjs';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
 import { FormBuilder } from '@angular/forms';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
@@ -31,6 +31,7 @@ export class CandidateProfileService {
     const payload = { ...candidateDateInUTC, generalNotes: this.generalNotesService.notes$.getValue() };
 
     return this.http.post<CandidateModel>('/api/employee/create', payload).pipe(
+      distinctUntilChanged(),
       tap(() => {
         if (candidate.id) {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
@@ -56,7 +57,7 @@ export class CandidateProfileService {
   public saveCandidatePhoto(file: Blob, id: number): Observable<any> {
     const formData = new FormData();
     formData.append('photo', file);
-    return this.http.post(`/api/Employee/photo?candidateProfileId=${id}`, formData);
+    return this.http.post(`/api/Employee/photo?candidateProfileId=${id}`, formData).pipe(distinctUntilChanged());
   }
 
   private convertDatesToUTC(candidate: CandidateModel): Partial<CandidateModel> {
