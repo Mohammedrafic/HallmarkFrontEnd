@@ -172,13 +172,13 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
         this.selectedSystem.isVMS &&
         this.selectedSystem.isIRPFlag;
 
-      this.setSubmitButtonConfig();
-
       if( orderManagementSystem ) {
         this.activeSystem = orderManagementSystem === OrderManagementIRPSystemId.IRP ? OrderSystem.IRP : OrderSystem.VMS;
       } else {
         this.activeSystem = this.selectedSystem.isIRP ? OrderSystem.IRP : OrderSystem.VMS;
       }
+
+      this.setSubmitButtonConfig();
 
       updateSystemConfig(this.orderSystemConfig, this.activeSystem);
       this.changeDetection.markForCheck();

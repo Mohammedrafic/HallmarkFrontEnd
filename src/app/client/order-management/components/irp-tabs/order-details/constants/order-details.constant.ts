@@ -3,8 +3,8 @@ import { IrpOrderType } from '@client/order-management/components/irp-tabs/order
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 
 export const OrderTypeList: OrderTypes[] = [
-  { id: IrpOrderType.LongTermAssignment, name: 'Long Term Assignment (LTA)' },
-  { id: IrpOrderType.PerDiem, name: 'Per Diem (PO)' },
+  { id: IrpOrderType.LongTermAssignment, name: 'Long Term Assignment' },
+  { id: IrpOrderType.PerDiem, name: 'Per Diem' },
 ];
 export const DateFormat = 'MM/dd/yyyy';
 export const DateMask = { month: 'MM', day: 'DD', year: 'YYYY' };
