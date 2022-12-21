@@ -206,3 +206,29 @@ ejs-textbox.e-control {
   .order-box2 { margin-left: 64%; }
   .order-box3 { margin-left: 85%; }
 }
+
+.job-description-po-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 4fr;
+  gap: 16px;
+  grid-template-areas:
+    "itm1 itm1 itm2 itm2 itm3 itm4 itm5 itm6 itm7 itm8"
+    "itm9 itm9 itm9 itm9 itm9 itm10 itm10 itm10 itm10 itm10";
+
+  .itm1 { grid-area: itm1; }
+  .itm2 { grid-area: itm2; }
+  .itm3 { grid-area: itm3; }
+  .itm4 { grid-area: itm4; }
+  .itm5 { grid-area: itm5; }
+  .itm6 { grid-area: itm6; }
+  .itm7 { grid-area: itm7; }
+  .itm8 { grid-area: itm8; }
+  .itm9 { grid-area: itm9; }
+  .itm10 { grid-area: itm10; }
+
+  .itm3,.itm4,.itm5,
+  .itm6,.itm7,.itm8 {
+    margin-top: 30px;
+  }
+}

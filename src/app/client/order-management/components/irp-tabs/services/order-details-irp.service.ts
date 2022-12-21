@@ -91,6 +91,21 @@ export class OrderDetailsIrpService {
     });
   }
 
+  public createJobDescriptionPOForm(): FormGroup {
+    return this.formBuilder.group({
+      orderRequisitionReasonId: [null, Validators.required],
+      classifications: [null],
+      onCallRequired: [false],
+      asapStart: [false],
+      criticalOrder: [false],
+      weekend: [false],
+      holiday: [false],
+      contract: [false],
+      jobDescription: ['', Validators.maxLength(4000)],
+      unitDescription: ['', Validators.maxLength(500)],
+    });
+  }
+
   public createSpecialProject(): FormGroup {
     return this.formBuilder.group({
       projectTypeId: [null],

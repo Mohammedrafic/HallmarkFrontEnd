@@ -219,7 +219,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
     const isLongTermAssignment = value === IrpOrderType.LongTermAssignment;
 
     this.initGeneralForms(isLongTermAssignment);
-    this.jobDescriptionForm =  this.orderDetailsService.createJobDescriptionForm();
     this.contactDetailsForm = this.orderDetailsService.createContactDetailsForm();
     this.specialProjectForm = this.orderDetailsService.createSpecialProject();
     this.workLocationForm = this.orderDetailsService.createWorkLocationForm();
@@ -245,9 +244,11 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
     if(isLongTermAssignment) {
       this.jobDistributionForm = this.orderDetailsService.createJobDistributionForm();
       this.generalInformationForm = this.orderDetailsService.createGeneralInformationForm();
+      this.jobDescriptionForm =  this.orderDetailsService.createJobDescriptionForm();
     } else {
       this.generalInformationForm = this.orderDetailsService.createGeneralInformationPOForm();
       this.jobDistributionForm = this.orderDetailsService.createJobDistributionPOForm();
+      this.jobDescriptionForm =  this.orderDetailsService.createJobDescriptionPOForm();
     }
   }
 

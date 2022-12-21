@@ -47,4 +47,8 @@ export enum FieldName {
   'minYears' = 'Min Years of Exp',
   'name' = 'Contact Person',
   'email' = 'Email',
+  'address' = 'Address',
+  'state' = 'State',
+  'city' = 'City',
+  'zipCode' = 'Zip Code',
 }
