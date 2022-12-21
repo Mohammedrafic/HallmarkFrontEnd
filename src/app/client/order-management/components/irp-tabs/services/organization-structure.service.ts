@@ -38,7 +38,7 @@ export class OrganizationStructureService {
     structure: OrganizationLocation[] | OrganizationRegion[], id: number, type: string
   ): OrganizationLocation[] | OrganizationDepartment[] {
     const containers: OrganizationLocation[] | OrganizationDepartment[] = [];
-    structure.forEach((value: any) => {
+    structure?.forEach((value: any) => {
       if (value.id === id) {
         containers.push(value[type]);
       }
