@@ -18,7 +18,6 @@ import { Destroyable } from '@core/helpers';
 import { CalendarComponent } from '@syncfusion/ej2-angular-calendars';
 
 // TODO need to do:
-//  design chips;
 //  open calendar -> select dates -> press Cancel -> open again calendar -> dates MUST BE NOT selected;
 @Component({
   selector: 'app-multi-date-picker',
@@ -30,7 +29,6 @@ export class MultiDatePickerComponent extends Destroyable implements OnInit, Aft
   @ViewChild('inputWrapper') inputWrapper: ElementRef;
 
   @Input() datesControl: FormControl = new FormControl([]);
-  @Input() title: string;
   @Input() set valueSetter(dates: Date[]) {
     this.datesControl.setValue(dates);
   }
@@ -40,6 +38,7 @@ export class MultiDatePickerComponent extends Destroyable implements OnInit, Aft
   isCalendarShow = false;
   datesValues: Date[] = [];
 
+  private appliedDatesValues: Date[] = [];
   private outerClickRemover: () => void;
   private applyListenerRemover: () => void;
   private cancelListenerRemover: () => void;
@@ -53,21 +52,15 @@ export class MultiDatePickerComponent extends Destroyable implements OnInit, Aft
   }
 
   ngAfterViewInit(): void {
-    this.outerClickRemover = this.renderer2.listen('document', 'click', this.targetClickListener.bind(this));
+    this.outerClickRemover = this.renderer2.listen('document', 'click', this.outerClickListener.bind(this));
   }
 
   override ngOnDestroy(): void {
-    super.ngOnDestroy();
-
     this.outerClickRemover();
   }
 
   openMenu(): void {
     this.isCalendarShow = !this.isCalendarShow;
-  }
-
-  calendarCreated(ejCalendar: CalendarComponent): void {
-    this.createCalendarButtons(ejCalendar);
   }
 
   calendarDestroyed(): void {
@@ -87,37 +80,7 @@ export class MultiDatePickerComponent extends Destroyable implements OnInit, Aft
     this.cdr.detectChanges();
   }
 
-  private targetClickListener(event: MouseEvent): void {
-    const clickedInside = this.inputWrapper.nativeElement.contains(event.target);
-
-    if (!clickedInside) {
-      this.isCalendarShow = false;
-      this.cdr.detectChanges();
-    }
-  }
-
-  private applyListener(): void {
-    this.appliedDates.emit(this.datesValues);
-    this.datesControl.setValue(this.datesValues);
-    this.isCalendarShow = false;
-    this.cdr.detectChanges();
-  }
-
-  private cancelListener(): void {
-    this.isCalendarShow = false;
-    this.cdr.detectChanges();
-  }
-
-  private startDatesControlWatching(): void {
-    this.datesControl.valueChanges.pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe((value) => {
-      this.datesValues = value;
-      this.cdr.detectChanges();
-    });
-  }
-
-  private createCalendarButtons(ejCalendar: CalendarComponent): void {
+  createCalendarButtons(ejCalendar: CalendarComponent): void {
     const applyBtn: HTMLElement = this.renderer2.createElement('button');
     const cancelBtn: HTMLElement = this.renderer2.createElement('button');
     const calendarFooterElement = this.renderer2.createElement('div');
@@ -139,5 +102,44 @@ export class MultiDatePickerComponent extends Destroyable implements OnInit, Aft
       this.renderer2.listen(cancelBtn, 'click', this.cancelListener.bind(this));
 
     this.cdr.detectChanges();
+  }
+
+  private outerClickListener(event: MouseEvent): void {
+    const clickedInside = this.inputWrapper.nativeElement.contains(event.target);
+
+    if (!clickedInside) {
+      this.isCalendarShow = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private applyListener(): void {
+    this.appliedDatesValues = this.datesValues;
+    this.appliedDates.emit(this.datesValues);
+    this.datesControl.setValue(this.datesValues);
+    this.isCalendarShow = false;
+    this.cdr.detectChanges();
+  }
+
+  private cancelListener(): void {
+    const appliedDatesHash = this.appliedDatesValues.reduce((acc: Record<string, Date>, date) => {
+      acc[date.toISOString()] = date;
+
+      return acc;
+    }, {});
+
+    this.datesValues = this.datesValues.filter(el => appliedDatesHash[el.toISOString()]);
+
+    this.isCalendarShow = false;
+    this.cdr.detectChanges();
+  }
+
+  private startDatesControlWatching(): void {
+    this.datesControl.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((value) => {
+      this.datesValues = value;
+      this.cdr.detectChanges();
+    });
   }
 }
