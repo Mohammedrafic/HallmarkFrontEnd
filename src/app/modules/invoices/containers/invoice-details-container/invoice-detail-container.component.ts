@@ -75,6 +75,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
 
   public paymentDialogTitle = PaymentDialogTitle.Add;
 
+  public targetElement = document.body.querySelector('#main');
+
   constructor(
     private cdr: ChangeDetectorRef,
     private chipPipe: ChipsCssClass,
