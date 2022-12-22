@@ -1,0 +1,28 @@
+<div class="grid-wrapper">
+  <div class="grid-header">
+    <div class="left">
+      <app-search class="search-input" placeholder="Name or ID"></app-search>
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        cssClass="e-outline sorting-btn"
+      >
+        <i-feather name="sliders" class="sorting-icon"></i-feather>
+      </button>
+    </div>
+    <div class="right">
+<!--      TODO DEN! - DATE PICKER-->
+      <div class="date-periods">
+        <div *ngFor="let datePeriod of datesPeriods"
+             [class.active]="datePeriod.id === activePeriod"
+             class="date-item"
+             (click)="changeActiveDatePeriod(datePeriod.id)"
+        >
+          {{ datePeriod.text }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-body"></div>
+  <div class="grid-footer"></div>
+</div>

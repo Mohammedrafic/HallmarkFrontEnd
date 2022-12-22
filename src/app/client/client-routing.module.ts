@@ -103,6 +103,10 @@ const routes: Routes = [
         },
       },
       {
+        path: 'schedule',
+        loadChildren: () => import('../modules/schedule/schedule.module').then((m) => m.ScheduleModule),
+      },
+      {
         path: 'organization-management',
         loadChildren: () =>
           import('../organization-management/organization-management.module').then(
