@@ -17,8 +17,6 @@ import { takeUntil } from 'rxjs';
 import { Destroyable } from '@core/helpers';
 import { CalendarComponent } from '@syncfusion/ej2-angular-calendars';
 
-// TODO need to do:
-//  open calendar -> select dates -> press Cancel -> open again calendar -> dates MUST BE NOT selected;
 @Component({
   selector: 'app-multi-date-picker',
   templateUrl: './multi-date-picker.component.html',
