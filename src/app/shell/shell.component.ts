@@ -427,6 +427,12 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   initSidebarFields(): void {
     this.menu$.pipe(takeUntil(this.unsubscribe$)).subscribe((menu: Menu) => {
       if (menu.menuItems.length) {
+        menu.menuItems[1].children.push({
+          title: 'Schedule',
+          route: 'client/schedule',
+          icon: '',
+          anch: 'Organization/Schedule',
+        } as any); // TODO DEN! - REMOVE
         this.sideBarMenu = menu.menuItems;
         if (this.router.url === '/') {
           this.router.navigate([this.sideBarMenu[0].route]);
