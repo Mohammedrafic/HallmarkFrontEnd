@@ -4,14 +4,11 @@
   position: relative;
 }
 
-.input-container {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.input-group {
+.multi-date {
   position: relative;
+  min-width: 200px;
+  margin-right: 12px;
+  float: left;
 
   & .e-input {
     padding-right: 25px;
@@ -51,32 +48,36 @@
   }
 }
 
-.chips-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
 .chip {
-  padding: 4px 8px;
-  border: 1px solid $secondary-dark-blue-30;
-  border-radius: 8px;
-  display: flex;
+  margin: 14px 12px 0 0;
+  padding: 3px 12px;
+  border: 1px solid $secondary-dark-blue-40;
+  border-radius: 16px;
+  display: inline-flex;
   align-items: center;
-  background: $white;
+  background: $secondary-dark-blue-50;
+
+  &__text {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: $black;
+  }
 
   &__icon {
     width: 16px;
     height: 16px;
-    margin-left: 10px;
+    margin-left: 8px;
     cursor: pointer;
+    color: $black;
+    stroke-width: 2px;
   }
 }
 
 .calendar {
   position: absolute;
   top: 42px;
-  right: 0;
+  left: 0;
   z-index: 100;
   box-shadow: 0 5px 5px -3px rgb(0 0 0 / 20%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%) !important;
 }

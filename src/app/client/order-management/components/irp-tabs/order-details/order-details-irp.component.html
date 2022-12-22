@@ -60,11 +60,9 @@
                     <label [for]="item.field">
                       {{ item.title }} <span *ngIf="item.required" class="required">*</span>
                     </label>
-                    <div class="input-group">
-                      <app-multi-date-picker
-                        [datesControl]="listOfKeyForms[form.formName].get(item.field)"
-                      ></app-multi-date-picker>
-                    </div>
+                    <app-multi-date-picker
+                      [datesControl]="listOfKeyForms[form.formName].get(item.field)"
+                    ></app-multi-date-picker>
                   </div>
                 </ng-template>
 
