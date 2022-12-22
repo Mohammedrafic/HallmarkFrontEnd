@@ -1,0 +1,69 @@
+@import "colors";
+
+.grid-wrapper {
+  width: 100%;
+  height: calc(100vh - 194px);
+  border: 1px solid $secondary-dark-blue-45;
+  border-radius: 12px;
+  filter: drop-shadow(0px 2px 20px rgba(0, 0, 0, 0.05));
+  background: $white;
+}
+
+.grid-header {
+  width: 100%;
+  padding: 12px 12px 11px;
+  display: flex;
+  align-items: center;
+
+  & .left, & .right {
+    display: flex;
+    align-items: center;
+  }
+
+  & .right {
+    padding-left: 8px;
+    justify-content: space-between;
+  }
+
+  & .search-input {
+    width: 168px;
+    margin-right: 12px;
+
+    &::ng-deep .search-with-icon {
+      box-sizing: border-box;
+    }
+  }
+
+  & .sorting-btn {
+    width: 40px;
+    margin-right: 8px;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  & .date-periods {
+    display: flex;
+    align-items: center;
+
+    & .date-item {
+      padding: 11px 12px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18px;
+      color: $secondary-dark-blue-10;
+      cursor: pointer;
+
+      &.active {
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+.sorting-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 0 !important;
+}

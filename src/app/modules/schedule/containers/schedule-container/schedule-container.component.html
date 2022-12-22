@@ -1,0 +1,21 @@
+<app-page-toolbar>
+  <ng-container left>
+    <app-tabs-list
+      class="table-tabs irp"
+      [tabConfig]="tabsListConfig"
+      (changeTab)="changeTab($event)"
+    >
+    </app-tabs-list>
+  </ng-container>
+  <ng-container right>
+    <app-schedule-filters></app-schedule-filters>
+  </ng-container>
+</app-page-toolbar>
+
+<div class="content">
+  <ng-container *ngIf="activeTabIndex === tabIndex.Scheduling">
+    <app-schedule-grid></app-schedule-grid>
+  </ng-container>
+  <ng-container *ngIf="activeTabIndex === tabIndex.Analytics">
+  </ng-container>
+</div>
