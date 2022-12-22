@@ -214,7 +214,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
             this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.setValue([]);
             this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
           }
-
           this.cdr.markForCheck();
         });
     }
@@ -243,7 +242,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         this.widgetFilterFormGroup.get(FilterColumnTypeEnum.LOCATION)?.setValue([]);
         this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
       }
-
       this.cdr.markForCheck();
     });
 
