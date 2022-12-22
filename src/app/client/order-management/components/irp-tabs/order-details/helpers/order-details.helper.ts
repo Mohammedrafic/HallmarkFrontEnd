@@ -122,6 +122,6 @@ export const setDefaultPrimaryContact = (forms: FormGroup[]): void  => {
 
 export const mapperForContactDetail = (contactDetails: Department): ContactDetailsUser => ({
   name: contactDetails.facilityContact,
-  email: contactDetails.facilityPhoneNo,
+  email: contactDetails.facilityEmail,
   mobilePhone: contactDetails.facilityPhoneNo,
 });
