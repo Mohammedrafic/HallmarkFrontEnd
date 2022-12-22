@@ -1,4 +1,4 @@
-import { CommonReportFilter, CommonCandidateSearchFilter } from "@admin/analytics/models/common-report.model";
+import { CommonReportFilter, CommonCandidateSearchFilter, CommonCredentialSearchFilter } from "@admin/analytics/models/common-report.model";
 import { DepartmentsByLocationsFilter } from "@shared/models/department.model";
 import { LocationsByRegionsFilter } from "@shared/models/location.model";
 import { regionFilter } from "@shared/models/region.model";
@@ -34,5 +34,9 @@ export class GetCommonReportCandidateSearch{
 export class GetJobDetailSummaryReportFilterOptions {
   static readonly type = '[LogiReport] Get Job Detail Summary Report Filter Options';
   constructor(public filter: JobDetailSummaryFilter) { }
+}
+export class GetCommonReportCredentialSearch{
+  static readonly type = '[LogiReport] Get Common Credential Search';
+  constructor(public filter: CommonCredentialSearchFilter) { }
 }
 

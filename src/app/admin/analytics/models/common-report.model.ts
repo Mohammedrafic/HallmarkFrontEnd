@@ -83,3 +83,15 @@ export class AgencyDto {
     {id:OrderType.ReOrder,name:'Re-Order'},
     { id: OrderType.Traveler, name: 'Traveler' }  
   ];
+  export class CommonCredentialSearchFilter{
+    searchText:string;
+    businessUnitIds:number[]|null;
+  }
+  export class SearchCredential{
+    id:number;
+    name:string;
+    expireDateApplicable:boolean;
+    credentialTypeId:number;
+    credentialTypeName:string;
+  }
+  
