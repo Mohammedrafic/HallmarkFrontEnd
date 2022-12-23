@@ -128,3 +128,16 @@ export interface IrpPrimarySkill {
   skillDescription: string;
   isDefault: boolean;
 }
+
+export interface MasterSkill {
+  id: number;
+  name: string;
+  description: string;
+  abbr: string;
+  organizationId: number;
+  skillCategoryId: number;
+  skillCode: string;
+  skillCategoryName: string;
+  includeInIRP: boolean;
+  includeInVMS: boolean;
+}
