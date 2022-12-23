@@ -94,6 +94,7 @@ export interface InvoiceDetailsSettings {
   paymentDetailsOpen: boolean;
   addPaymentOpen: boolean;
   isTablet: boolean;
+  isMiddleTabletWidth: boolean;
   isMobile: boolean;
 }
 

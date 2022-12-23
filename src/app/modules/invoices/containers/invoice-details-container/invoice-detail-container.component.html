@@ -31,25 +31,42 @@
         <div class="spacer"></div>
 
         <div class="header-controls">
-          <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
-          <app-export-button style="display: none" (optionSelected)="export($event)"></app-export-button>
+          <ng-container *ngIf="!invoiceDetailsConfig.isMiddleTabletWidth">
+            <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
+            <app-export-button (optionSelected)="export($event)" #btn></app-export-button>
+            <button ejs-button cssClass="e-outline print-btn" (click)="printInvoice()">
+              Print
+              <i-feather name="printer" class="icon"></i-feather>
+            </button>
+          </ng-container>
           <button
-            ejs-button
-            cssClass="e-outline print-btn"
-            (click)="printInvoice()">
-            Print
-            <i-feather name="printer" class="icon"></i-feather>
+            *ngIf="invoiceDetailsConfig.isMiddleTabletWidth || invoiceDetailsConfig.isMobile"
+            appHideBeforeSyncfusionLoad
+            iconCss="e-icons"
+            cssClass="e-caret-hide primary-icon-button menu-mobile"
+            ejs-dropdownbutton
+            [items]="mobileMenuOptions"
+            (select)="onMenuSelected($event)"
+          >
+            <i-feather name="more-vertical" class="icon"></i-feather>
           </button>
-          <div class="separator"></div>
+
+          <div class="separator" *ngIf="!(invoiceDetailsConfig.isMiddleTabletWidth || invoiceDetailsConfig.isMobile)"></div>
           <button
             *ngIf="actionBtnText"
             ejs-button
             [disabled]="invoiceDetailsConfig.isActionBtnDisabled"
             cssClass="e-primary"
             class="relative"
-            (click)="changeInvoiceStatus()">
+            (click)="changeInvoiceStatus()"
+          >
             {{ actionBtnText }}
-            <ejs-tooltip *ngIf="invoiceDetailsConfig.isActionBtnDisabled" class="tooltip" content="Separate permission right is required" position="BottomCenter">
+            <ejs-tooltip
+              *ngIf="invoiceDetailsConfig.isActionBtnDisabled"
+              class="tooltip"
+              content="Separate permission right is required"
+              position="BottomCenter"
+            >
             </ejs-tooltip>
           </button>
         </div>
@@ -60,7 +77,10 @@
       </div>
 
       <div class="job-general-info tile-dark-blue">
-        <app-invoice-detail-invoice-info [invoiceInfo]="invoiceDetail" (detailsOpen)="openPaymentDetails()"></app-invoice-detail-invoice-info>
+        <app-invoice-detail-invoice-info
+          [invoiceInfo]="invoiceDetail"
+          (detailsOpen)="openPaymentDetails()"
+        ></app-invoice-detail-invoice-info>
       </div>
 
       <div class="profile-table-block">
@@ -93,12 +113,12 @@
       </div>
     </section>
     <app-navigation-panel
-            prevLabel="Previous Order"
-            nextLabel="Next Order"
-            [prevDisabled]="(prevId$ | async) === null"
-            [nextDisabled]="(nextId$ | async) === null"
-            (prevClick)="onNextPreviousOrder(false)"
-            (nextClick)="onNextPreviousOrder(true)"
+      prevLabel="Previous Order"
+      nextLabel="Next Order"
+      [prevDisabled]="(prevId$ | async) === null"
+      [nextDisabled]="(nextId$ | async) === null"
+      (prevClick)="onNextPreviousOrder(false)"
+      (nextClick)="onNextPreviousOrder(true)"
     ></app-navigation-panel>
   </ng-template>
 </ejs-dialog>
@@ -127,7 +147,8 @@
   *ngIf="invoiceDetailsConfig.paymentDetailsOpen"
   (destroyDialog)="closePaymentDetails()"
   (editPaymentCheck)="openEditPayment($event)"
-  (addPayment)="openAddPayment()">
+  (addPayment)="openAddPayment()"
+>
 </app-invoice-payment-details>
 
 <app-invoice-add-payment
@@ -135,5 +156,6 @@
   [invoicesToPay]="paymentRecords"
   [checkNumber]="editCheckNumber"
   [dialogTitle]="paymentDialogTitle"
-  (destroyDialog)="closeAddPayment()">
+  (destroyDialog)="closeAddPayment()"
+>
 </app-invoice-add-payment>
