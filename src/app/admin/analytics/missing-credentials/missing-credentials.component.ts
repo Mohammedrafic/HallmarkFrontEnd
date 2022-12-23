@@ -54,9 +54,9 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
     "BearerParamMSR": "",
     "BusinessUnitIdParamMSR": "",
     "HostName": "",
-    "AccrualReportFilterTypeMSR": ""
+    "TodayMSR":"",
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/MissingCredentials/MissingCredentials.wls" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/MissingCredentials/MissingCredentials.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/MissingCredentials/MissingCredentials.cat" };
   public title: string = "Missing Credentials";
   public message: string = "";
@@ -144,6 +144,10 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
+  private dateFormat = 'MM/dd/yyyy';
+  private culture = 'en-US';
+  private nullValue = "null";
+  private joinString = ",";  
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -337,23 +341,23 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
     }
     this.paramsData =
     {
-      "OrganizationParamMSR":this.selectedOrganizations?.length==0?"null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "StartDateParamMSR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamMSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamMSR": regionIds.length==0?"null" : regionIds.join(","),
-      "LocationParamMSR":locationIds.length==0?"null" : locationIds.join(","),
-      "DepartmentParamMSR":departmentIds.length==0?"null" :  departmentIds.join(","),      
-      "CredentialParamMSR": credentialName == null || credentialName == "" ? "null" : credentialName.toString(),
-      "CandidateNameParamMSR": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
-      "CandidateStatusesParamMSR": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
-      "JobIdParamMSR": jobId == null || jobId == "" ? "null" : jobId,
+      "OrganizationParamMSR":this.selectedOrganizations?.length==0?this.nullValue: this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
+      "StartDateParamMSR": formatDate(startDate, this.dateFormat, this.culture),
+      "EndDateParamMSR": endDate==null?"null":formatDate(endDate, this.dateFormat, this.culture),
+      "RegionParamMSR": regionIds.length==0?this.nullValue : regionIds.join(this.joinString),
+      "LocationParamMSR":locationIds.length==0?this.nullValue : locationIds.join(this.joinString),
+      "DepartmentParamMSR":departmentIds.length==0?this.nullValue :  departmentIds.join(this.joinString),      
+      "CredentialParamMSR": credentialName == null || credentialName == "" ? this.nullValue : credentialName.toString(),
+      "CandidateNameParamMSR": candidateName == null || candidateName == "" ? this.nullValue : candidateName.toString(),
+      "CandidateStatusesParamMSR": candidateStatuses.length == 0 ? this.nullValue : candidateStatuses.join(this.joinString),
+      "JobIdParamMSR": jobId == null || jobId == "" ? this.nullValue : jobId,
       "BearerParamMSR": auth,
       "BusinessUnitIdParamMSR": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "AccrualReportFilterTypeMSR": accrualReportTypes.toString()
+      "TodayMSR":formatDate(new Date(),this.dateFormat,this.culture)
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
