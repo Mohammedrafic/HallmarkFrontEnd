@@ -33,7 +33,7 @@
         <div class="header-controls">
           <ng-container *ngIf="!invoiceDetailsConfig.isMiddleTabletWidth">
             <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
-            <app-export-button (optionSelected)="export($event)" #btn></app-export-button>
+            <app-export-button style="display: none" (optionSelected)="export($event)"></app-export-button>
             <button ejs-button cssClass="e-outline print-btn" (click)="printInvoice()">
               Print
               <i-feather name="printer" class="icon"></i-feather>
