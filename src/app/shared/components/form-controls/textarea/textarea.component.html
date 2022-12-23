@@ -8,6 +8,7 @@
         <ejs-textbox
           [formControlName]="controlName"
           cssClass="textarea"
+          (blur)="onBlur()"
           [multiline]="true"
           maxlength="2000">
         </ejs-textbox>

@@ -5,6 +5,7 @@
       <app-input
         [formGroupInstance]="candidateForm"
         [required]="true"
+        maxlength="25"
         controlName="employeeId"
         id="employeeId"
         label="Employee ID"
@@ -13,6 +14,7 @@
       <app-input
         [formGroupInstance]="candidateForm"
         [required]="true"
+        maxlength="50"
         controlName="firstName"
         id="first-name"
         label="First Name"
@@ -21,6 +23,7 @@
 
     <app-input
       [formGroupInstance]="candidateForm"
+      maxlength="10"
       controlName="middleName"
       id="middle-name"
       label="Middle Name"
@@ -29,6 +32,7 @@
     <app-input
       [formGroupInstance]="candidateForm"
       [required]="true"
+      maxlength="50"
       controlName="lastName"
       id="last-name"
       label="Last Name"
@@ -87,6 +91,7 @@
       [formGroupInstance]="candidateForm"
       [required]="true"
       [strictMode]="true"
+      [decimals]="1"
       format="#.#"
       id="fte"
       label="FTE"

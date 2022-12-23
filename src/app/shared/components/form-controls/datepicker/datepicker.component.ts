@@ -12,8 +12,8 @@ import { datepickerMask } from '@shared/constants';
   styleUrls: ['./datepicker.component.scss'],
   providers: [
     { provide: NG_VALIDATORS, useExisting: forwardRef(() => DatepickerComponent), multi: true },
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DatepickerComponent), multi: true }
-  ]
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DatepickerComponent), multi: true },
+  ],
 })
 export class DatepickerComponent extends BaseFormControlDirective {
   @Input() format: string | FormatObject = 'MM/dd/yyyy';
@@ -22,4 +22,8 @@ export class DatepickerComponent extends BaseFormControlDirective {
   @Input() min: Date | null;
   @Input() max: Date | null;
   @Input() public override placeholder = 'MM/DD/YYYY';
+
+  public onBlur(): void {
+    this.getControl().updateValueAndValidity();
+  }
 }
