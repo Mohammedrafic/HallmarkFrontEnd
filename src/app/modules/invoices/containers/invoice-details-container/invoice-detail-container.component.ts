@@ -25,6 +25,7 @@ import { InvoicesContainerService } from '../../services/invoices-container/invo
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesState } from '../../store/state/invoices.state';
+import { BreakpointObserverService } from '@core/services';
 
 @Component({
   selector: 'app-invoice-detail-container',
@@ -67,6 +68,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     isActionBtnDisabled: false,
     paymentDetailsOpen: false,
     addPaymentOpen: false,
+    isTablet: false,
+    isMobile: false,
   };
 
   public paymentRecords: InvoicePaymentData[] = [];
@@ -84,6 +87,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     private invoicesContainerService: InvoicesContainerService,
     private printingService: InvoicePrintingService,
     private chipsCssClass: ChipsCssClass,
+    private breakpointObserver: BreakpointObserverService,
   ) {
     super();
   }
@@ -91,6 +95,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   ngOnInit(): void {
     this.isAgency = this.invoicesContainerService.isAgency();
     this.getDialogState();
+    this.getDeviceTypeResolution();
   }
 
   public closeInvoiceDetails(): void {
@@ -254,5 +259,14 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);
       this.chipList.text = this.invoiceDetail.meta.invoiceStateText.toUpperCase();
     }
+  }
+
+  private getDeviceTypeResolution(): void {
+    this.breakpointObserver.getBreakpointMediaRanges()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(({ isTablet, isMobile }) => {
+        this.invoiceDetailsConfig.isTablet = isTablet;
+        this.invoiceDetailsConfig.isMobile = isMobile;
+      });
   }
 }
