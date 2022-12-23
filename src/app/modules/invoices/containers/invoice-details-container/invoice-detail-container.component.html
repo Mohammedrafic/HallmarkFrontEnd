@@ -46,7 +46,7 @@
             cssClass="e-caret-hide primary-icon-button menu-mobile"
             ejs-dropdownbutton
             [items]="mobileMenuOptions"
-            (select)="onMenuSelected($event)"
+            (select)="onSelectMenuItem($event)"
           >
             <i-feather name="more-vertical" class="icon"></i-feather>
           </button>
@@ -79,6 +79,7 @@
       <div class="job-general-info tile-dark-blue">
         <app-invoice-detail-invoice-info
           [invoiceInfo]="invoiceDetail"
+          [isMiddleTabletWidth]="invoiceDetailsConfig.isMiddleTabletWidth"
           (detailsOpen)="openPaymentDetails()"
         ></app-invoice-detail-invoice-info>
       </div>
