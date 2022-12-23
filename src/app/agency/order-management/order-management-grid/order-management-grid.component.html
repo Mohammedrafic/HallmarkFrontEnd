@@ -235,7 +235,7 @@
     <e-column field="shiftStartTime" headerText="SHIFT" width="160" minWidth="80" maxWidth="200">
       <ng-template #template let-data>
         <span
-          >{{ data.shiftStartTime | date: 'shortTime':'UTC' }}-{{ data.shiftEndTime | date: 'shortTime':'UTC' }}</span
+          >{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}-{{ data.shiftEndTime | date: 'HH:mm':'UTC' }}</span
         >
       </ng-template>
     </e-column>

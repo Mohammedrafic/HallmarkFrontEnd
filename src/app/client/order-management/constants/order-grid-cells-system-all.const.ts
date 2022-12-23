@@ -219,8 +219,8 @@ export const GridCellsSystemAll = (
     minWidth: 80,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) => {
-      const startShiftTime = formatDate(params.data.shiftStartTime, 'shortTime', 'en-US');
-      const endShiftTime = formatDate(params.data.shiftEndTime, 'shortTime', 'en-US');
+      const startShiftTime = formatDate(params.data.shiftStartTime, 'HH:mm', 'en-US');
+      const endShiftTime = formatDate(params.data.shiftEndTime, 'HH:mm', 'en-US');
 
       return `${startShiftTime}-${endShiftTime}`;
     },
