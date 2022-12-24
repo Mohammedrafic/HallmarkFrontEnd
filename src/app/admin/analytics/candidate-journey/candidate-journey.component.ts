@@ -366,7 +366,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
     {
       "OrganizationParamCJR":this.selectedOrganizations?.length==0?this.nullValue: this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
       "StartDateParamCJR": formatDate(startDate, this.dateFormat, this.culture),
-      "EndDateParamCJR": formatDate(endDate, this.dateFormat, this.culture),
+      "EndDateParamCJR": endDate==null?"null":formatDate(endDate, this.dateFormat, this.culture),
       "RegionParamCJR": regionIds.length==0?this.nullValue : regionIds.join(this.joinString),
       "LocationParamCJR":locationIds.length==0?this.nullValue : locationIds.join(this.joinString),
       "DepartmentParamCJR":departmentIds.length==0?this.nullValue :  departmentIds.join(this.joinString),
