@@ -214,11 +214,14 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
   private setWeekPeriod(range: string, value: Date | string): void {
     this.startDateValue = typeof value === 'string' ? DateTimeHelper.getWeekStartEnd(value)[0].toDateString()
     : value.toDateString();
+
+
     this.dateControl.setValue(range, { emitEvent: false });
 
     this.weekService.setRange([
       DateTimeHelper.toUtcFormat(new Date(this.startDateValue)),
-      DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(this.startDateValue, false, this.rangeType)),
+      DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(this.startDateValue, false, this.rangeType, this.firstDayOfWeek,
+        !!this.maxDate)),
     ]);
 
     this.compareDates();
