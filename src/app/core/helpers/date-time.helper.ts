@@ -88,12 +88,16 @@ export class DateTimeHelper {
       firstDay = new Date(curr.getDate() - firstWeekDay).getTime();
     }
 
+    if (rangeOption === DatesRangeType.Day) {
+      firstDay = curr.getTime();
+    }
+
     const lastDay = firstDay + CalcDaysMs((RangeDaysOptions[rangeOption] - 1));
 
     let last = new Date(lastDay).getTime();
     let first = firstDay;
 
-    if (maxDateExist && lastDay > new Date().getTime()) {
+    if (maxDateExist && lastDay > new Date().getTime() && rangeOption !== DatesRangeType.Day) {
       last = new Date().getTime();
       first = last - CalcDaysMs(new Date(last).getDay());
     }
