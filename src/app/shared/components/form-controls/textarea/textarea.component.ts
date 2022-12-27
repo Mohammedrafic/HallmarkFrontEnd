@@ -12,7 +12,7 @@ import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
   ]
 })
 export class TextareaComponent extends BaseFormControlDirective implements OnInit {
-  @Input() public maxlength: number;
+  @Input() public maxlength: string;
   @Input() public cssClass: string;
   @Input() public htmlAttributes: { [key: string]: string }[];
 

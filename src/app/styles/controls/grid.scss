@@ -1,10 +1,11 @@
-@import "../variables/mixins";
-@import "../../styles/variables/colors";
+@import '../variables/mixins';
+@import '../../styles/variables/colors';
 
 $grid-border-radius: 10px;
 $grid-box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
 
-body.light, body.dark {
+body.light,
+body.dark {
   .e-grid.e-resize-lines {
     .e-headercell .e-rhandler {
       height: 20px !important;
@@ -21,7 +22,7 @@ body.light, body.dark {
     }
 
     .e-spinner-pane {
-      display: none!important;
+      display: none !important;
     }
 
     .checkbox-header {
@@ -39,7 +40,8 @@ body.light, body.dark {
         padding-bottom: 16px;
       }
 
-      .sub-header, .e-stackedheadercell {
+      .sub-header,
+      .e-stackedheadercell {
         .e-rhandler.e-rcursor {
           height: 100%;
           margin-top: 2px;
@@ -47,7 +49,8 @@ body.light, body.dark {
       }
     }
 
-    .e-gridchkbox, .e-headercell {
+    .e-gridchkbox,
+    .e-headercell {
       .e-checkbox-wrapper {
         vertical-align: middle;
 
@@ -93,35 +96,35 @@ body.light, body.dark {
         }
 
         .e-table {
-          tr[role="row"]:not(.e-editedrow):hover
-          .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell),
+          tr[role='row']:not(.e-editedrow):hover
+            .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell),
           .e-frozenhover {
             background-color: $primary-active-blue-90;
-        }
+          }
 
-        .e-rowcell {
-          font-size: 14px;
-        }
-
-        .e-emptyrow {
-          height: 100%;
-          position: absolute;
-          width: 100%;
-          background-color: $secondary-dark-blue-45;
-          display: flex;
-          justify-content: center;
-
-          &::before {
-            content: "There are no records to display yet!";
-            color: $secondary-dark-blue-30;
+          .e-rowcell {
             font-size: 14px;
-            padding-top: 25px;
           }
 
-          td {
-            display: none;
+          .e-emptyrow {
+            height: 100%;
+            position: absolute;
+            width: 100%;
+            background-color: $secondary-dark-blue-45;
+            display: flex;
+            justify-content: center;
+
+            &::before {
+              content: 'There are no records to display yet!';
+              color: $secondary-dark-blue-30;
+              font-size: 14px;
+              padding-top: 25px;
+            }
+
+            td {
+              display: none;
+            }
           }
-        }
         }
       }
     }
@@ -240,19 +243,18 @@ body.light, body.dark {
           }
 
           &.green-background {
-
             &:hover {
               background-color: $supportive-green-40;
             }
 
-          &:focus {
-            background-color: $supportive-green-15;
+            &:focus {
+              background-color: $supportive-green-15;
 
-            .supportive-green-10  {
+              .supportive-green-10 {
                 color: $white;
+              }
             }
           }
-        }
 
           &[disabled] {
             pointer-events: none;
@@ -348,11 +350,11 @@ body.light, body.dark {
       }
 
       .e-icon-ascending::before {
-        content: "\e910";
+        content: '\e910';
       }
 
       .e-icon-descending::before {
-        content: "\e916";
+        content: '\e916';
       }
     }
 
@@ -378,13 +380,13 @@ body.light, body.dark {
     tbody tr {
       td.e-detailrowcollapse {
         div.e-icons.e-dtdiagonalright.e-icon-grightarrow::before {
-          content: "\e913" !important;
+          content: '\e913' !important;
         }
       }
 
       td.e-detailrowexpand {
         div.e-icons.e-dtdiagonaldown.e-icon-gdownarrow::before {
-          content: "\e916" !important;
+          content: '\e916' !important;
         }
       }
     }
@@ -412,7 +414,9 @@ body.light, body.dark {
     }
 
     &.e-gridwithchildrow {
-      .e-detailrowcollapse, .e-detailrowexpand, .e-detailheadercell {
+      .e-detailrowcollapse,
+      .e-detailrowexpand,
+      .e-detailheadercell {
         visibility: hidden;
       }
 
@@ -443,7 +447,6 @@ body.light, body.dark {
       background: $primary-active-blue-10;
     }
   }
-
 
   .empty-grid {
     background-color: $secondary-dark-blue-45 !important;
@@ -608,7 +611,7 @@ body.dark {
   .e-gridheader {
     .e-headertext,
     .e-stackedheadercelldiv {
-        font-weight:700 !important;
+      font-weight: 700 !important;
       color: $secondary-dark-blue-30 !important;
     }
   }
