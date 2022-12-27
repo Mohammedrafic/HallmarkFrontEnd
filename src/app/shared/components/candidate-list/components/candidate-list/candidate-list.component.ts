@@ -3,7 +3,7 @@ import { debounceTime, filter, map, merge, Observable, Subject, switchMap, takeU
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { CandidatesStatusText, CandidateStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { CandidatesStatusText, CandidateStatus, EmployeeStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../../../store/user.state';
 import { SaveCandidateSucceeded } from '@agency/store/candidate.actions';
@@ -99,6 +99,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public CandidateFilterFormGroup: FormGroup;
   public filterColumns: CandidateListFiltersColumn = filterColumns;
   public readonly statusEnum = CandidateStatus;
+  public readonly employeeStatusEnum = EmployeeStatus;
   public readonly candidateStatus = CandidatesStatusText;
   public candidates$: Observable<CandidateList | IRPCandidateList>;
   public readonly userPermissions = UserPermissions;
@@ -243,7 +244,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       candidateStatus: null,
       orderId: null,
     };
-    this.router.navigate(['./edit', (data as CandidateRow).candidateProfileId || (data as IRPCandidate).employeeId], { relativeTo: this.route, state: credentialParams });
+    this.router.navigate(['./edit', (data as CandidateRow).candidateProfileId || (data as IRPCandidate).id], { relativeTo: this.route, state: credentialParams });
   }
 
   public onRemove(id: number): void {
@@ -365,7 +366,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return (
       candidates &&
       candidates.map((candidate: IRPCandidate) => {
-        if (candidate.employeeSkills.length > 2) {
+        if (candidate.employeeSkills?.length > 2) {
           const [first, second] = candidate.employeeSkills;
           candidate = {
             ...candidate,
