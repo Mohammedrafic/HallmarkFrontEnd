@@ -1,14 +1,7 @@
 import get from 'lodash/fp/get';
 
 import { Directive, Input, OnChanges, SimpleChanges } from '@angular/core';
-import {
-  AbstractControl,
-  ControlValueAccessor,
-  FormControl,
-  FormGroup,
-  ValidationErrors,
-  Validator,
-} from '@angular/forms';
+import { AbstractControl, ControlValueAccessor, FormControl, FormGroup, ValidationErrors, Validator } from '@angular/forms';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
@@ -52,6 +45,10 @@ export class BaseFormControlDirective
 
   public getControl(): AbstractControl {
     return this.formGroupInstance && this.formGroupInstance.get(this.controlName)!;
+  }
+
+  public onBlur(): void {
+    this.getControl().updateValueAndValidity();
   }
 
   public validate(c: FormControl): ValidationErrors | null {

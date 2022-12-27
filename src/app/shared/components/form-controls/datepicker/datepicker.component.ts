@@ -22,8 +22,4 @@ export class DatepickerComponent extends BaseFormControlDirective {
   @Input() min: Date | null;
   @Input() max: Date | null;
   @Input() public override placeholder = 'MM/DD/YYYY';
-
-  public onBlur(): void {
-    this.getControl().updateValueAndValidity();
-  }
 }

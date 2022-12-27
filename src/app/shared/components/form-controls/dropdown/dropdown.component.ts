@@ -10,11 +10,11 @@ import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
   styleUrls: ['./dropdown.component.scss'],
   providers: [
     { provide: NG_VALIDATORS, useExisting: forwardRef(() => DropdownComponent), multi: true },
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true }
-  ]
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true },
+  ],
 })
 export class DropdownComponent<T> extends BaseFormControlDirective {
   @Input() public dataSource: T[] | null | undefined;
   @Input() public fields: FieldSettingsModel;
-  @Input() public hideBorder: boolean = true;
+  @Input() public hideBorder = true;
 }
