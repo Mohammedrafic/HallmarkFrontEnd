@@ -545,6 +545,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/alerts-template',
     },
+    51: {
+      // VMS Invoice Report
+      icon: '',
+      route: '/analytics/vms-invoice-report',
+    },
     81: {
       // Document Management
       icon: 'file',
@@ -731,6 +736,11 @@ export const MENU_CONFIG: any = {
       // Timesheet Report
       icon: '',
       route: '/analytics/timesheet-report',
+    },
+    51: {
+      // VMS Invoice Report
+      icon: '',
+      route: '/analytics/vms-invoice-report',
     },
     53: {
       // Fill Rate
@@ -1054,6 +1064,11 @@ export const MENU_CONFIG: any = {
       // Timesheet Report
       icon: '',
       route: '/analytics/timesheet-report',
+    },
+    51: {
+      // VMS Invoice Report
+      icon: '',
+      route: '/analytics/vms-invoice-report',
     },
     53: {
       // Fill Rate
