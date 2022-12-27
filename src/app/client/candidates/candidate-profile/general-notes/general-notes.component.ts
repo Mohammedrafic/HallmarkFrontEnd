@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
-import { GeneralNotesGridActionsRendererComponent } from '@client/candidates/candidate-profile/general-notes/general-notes-grid-actions-renderer/general-notes-grid-actions-renderer.component';
+import { GeneralNotesGridActionsRendererComponent } from './general-notes-grid-actions-renderer/general-notes-grid-actions-renderer.component';
 import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 import { ShowSideDialog } from '../../../../store/app.actions';
 import { AddEditNoteComponent } from '@client/candidates/candidate-profile/general-notes/add-edit-note/add-edit-note.component';
@@ -10,22 +10,23 @@ import { distinctUntilChanged, map, Observable, takeUntil } from 'rxjs';
 import { ICellRendererParams, ValueFormatterParams } from '@ag-grid-community/core';
 import { CategoryModel } from '@client/candidates/candidate-profile/general-notes/models/category.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { GeneralNotesGridCategoryRendererComponent } from '@client/candidates/candidate-profile/general-notes/general-notes-grid-category-renderer/general-notes-grid-category-renderer.component';
+import { GeneralNotesGridCategoryRendererComponent } from './general-notes-grid-category-renderer/general-notes-grid-category-renderer.component';
 
 @Component({
   selector: 'app-general-notes',
   templateUrl: './general-notes.component.html',
   styleUrls: ['./general-notes.component.scss'],
 })
-export class GeneralNotesComponent extends DestroyableDirective implements OnInit {
+export class GeneralNotesComponent extends DestroyableDirective implements OnInit, OnDestroy {
   @ViewChild(AddEditNoteComponent) public addEditNoteComponent: AddEditNoteComponent;
+  public rowSelection = undefined;
 
   public readonly columnDef: ColumnDefinitionModel[] = [
     {
       field: '',
       headerName: '',
       cellRenderer: GeneralNotesGridActionsRendererComponent,
-      maxWidth: 80,
+      maxWidth: 100,
     },
     {
       field: 'date',
@@ -67,6 +68,11 @@ export class GeneralNotesComponent extends DestroyableDirective implements OnIni
     this.getCategories();
   }
 
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.generalNotesService.resetNoteList();
+  }
+
   public addNote(): void {
     this.generalNotesService.setSideDialogTitle('Add Note');
     this.store.dispatch(new ShowSideDialog(true));
@@ -82,7 +88,7 @@ export class GeneralNotesComponent extends DestroyableDirective implements OnIni
   }
 
   private getFormattedDateWithFormat(date: string, format: string): string {
-    return this.datePipe.transform(date, format, 'UTC') ?? '';
+    return this.datePipe.transform(date, format) ?? '';
   }
 
   private getFormattedDate(date: string): string {

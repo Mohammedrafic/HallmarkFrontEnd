@@ -371,3 +371,8 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 .tooltip [disabled] {
   pointer-events: none;
 }
+
+.menu-mobile {
+  margin-right: 12px;
+  border: 1px solid $primary-active-blue-40 !important;
+}

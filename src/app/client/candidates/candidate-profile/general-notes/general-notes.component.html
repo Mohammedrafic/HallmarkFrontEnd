@@ -2,6 +2,7 @@
   title="General Notes"
   [rowData]="generalNotes$ | async"
   [columnDefinitions]="columnDef"
+  [rowSelection]="rowSelection"
   [totalRecordsCount]="(generalNotes$ | async)?.length!"
 >
   <button
