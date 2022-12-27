@@ -1,4 +1,4 @@
-@import "colors";
+@import 'colors';
 
 :host {
   display: flex;
@@ -7,23 +7,52 @@
 }
 
 .content {
-  padding-top: 2px;
-}
+  button.e-control.e-btn {
+    padding: 10px;
 
-.icon {
-  cursor: pointer;
-}
-
-.edit-action {
-  color: $primary-active-blue-10;
-
-  &.disable {
-    color: $secondary-dark-blue-30;
-    cursor: default;
+    i-feather {
+      margin: 0;
+    }
   }
-}
 
-.delete-action {
-  color: $supportive-red;
-  margin-left: 17px;
+  .primary-icon-button {
+    color: $primary-active-blue-10;
+
+    &.e-active,
+    &:focus {
+      color: $white;
+      background-color: $primary-active-blue;
+    }
+
+    &:hover {
+      color: $primary-active-blue-10;
+      background-color: $primary-active-blue-70;
+    }
+
+    &[disabled] {
+      pointer-events: none;
+      background-color: transparent;
+      color: $primary-active-blue-50;
+    }
+  }
+
+  .secondary-icon-button {
+    color: $supportive-red;
+
+    &.e-active,
+    &:focus {
+      color: $white;
+      background-color: $supportive-red-00;
+    }
+
+    &:hover {
+      background-color: $supportive-red-40;
+    }
+
+    &[disabled] {
+      pointer-events: none;
+      background-color: transparent;
+      color: $supportive-red-40;
+    }
+  }
 }
