@@ -9,6 +9,7 @@ import { DateWeekService } from '@core/services';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { DatesRangeType } from '@shared/enums';
+
 import { UserState } from '../../../../store/user.state';
 import { DatesPeriods } from '../../constants/schedule-grid.conts';
 import { ScheduleItem, ScheduleModel } from '../../interface/schedule.model';
@@ -104,7 +105,13 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy()),
     )
     .subscribe((range) => {
-      console.log(range);
+      if (this.activePeriod === DatesRangeType.Day) {
+        this.datesRanges = DateTimeHelper.getDatesBetween(range[0], range[0]);
+      } else {
+        this.datesRanges = DateTimeHelper.getDatesBetween(range[0], range[1]);
+      }
+
+      this.cdr.detectChanges();
     });
   }
 }

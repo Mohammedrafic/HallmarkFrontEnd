@@ -9,7 +9,7 @@ import { Destroyable } from '@core/helpers';
 
 import { TabListConfig } from '../../constants';
 import { SetHeaderState } from '../../../../store/app.actions';
-import { ActiveTabIndex } from '../../enums/schedule.enum';
+import { ActiveTabIndex } from '../../enums';
 import { ScheduleModel } from '../../interface/schedule.model';
 
 @Component({
@@ -44,5 +44,8 @@ export class ScheduleContainerComponent extends Destroyable implements OnInit {
 
   private initScheduleData(): void {
     this.scheduleData$ = this.scheduleApiService.getScheduleData();
+    this.scheduleApiService.getScheduleEmployees().pipe().subscribe((candidates) => {
+      console.log(candidates, 'candidates');
+    });
   }
 }

@@ -1,20 +1,35 @@
 <div class="card-wrapper">
   <div class="block block--name">
     <p class="name">{{ candidate.lastName }}, {{ candidate.firstName }}</p>
-    <i-feather
+
+    <ejs-tooltip
       *ngIf="candidateIconNameMap.get(candidate.type) as iconName"
-      [name]="iconName"
-      class="icon"
-    ></i-feather>
+      [content]="iconTooltipMessage"
+      position="TopCenter"
+      [showTipPointer]="false"
+    >
+      <i-feather
+        [name]="iconName"
+        class="icon"
+      ></i-feather>
+    </ejs-tooltip>
   </div>
   <div class="block">
-    <span>{{ candidate.id }}</span>
+    <ejs-tooltip content="ID" position="TopCenter" [showTipPointer]="false">
+      <span>{{ candidate.id }}</span>
+    </ejs-tooltip>
     <span class="separator">|</span>
-    <span class="direction">{{ candidate.direction }}</span>
+    <ejs-tooltip content="Primary Skill" position="TopCenter" [showTipPointer]="false">
+      <span class="direction">{{ candidate.direction }}</span>
+    </ejs-tooltip>
   </div>
   <div class="block">
-    <span>{{ candidate.date | date: 'MM/dd' }}</span>
+    <ejs-tooltip content="Assigned Hours Per Week 1/Week 2" position="TopCenter" [showTipPointer]="false">
+      <span>{{ candidate.date | date: 'MM/dd' }}</span>
+    </ejs-tooltip>
     <span class="separator">|</span>
-    <span>{{ candidate.text }}</span>
+    <ejs-tooltip content="Work Commitment" position="TopCenter" [showTipPointer]="false">
+      <span>{{ candidate.text }}</span>
+    </ejs-tooltip>
   </div>
 </div>

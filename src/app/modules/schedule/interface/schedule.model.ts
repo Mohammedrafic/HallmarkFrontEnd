@@ -32,7 +32,17 @@ export interface ScheduleModel {
 export interface ScheduleCardConfig {
   title: string;
   iconName: string;
-  bgColor: string;
-  iconColor: string;
+  bgColor?: string;
+  iconColor?: string;
   isLocDep?: boolean;
+}
+
+export interface ScheduleFilters {
+  firstLastNameOrId?: string[];
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentIds?: number[];
+  skillIds?: number[];
+  pageNumber?: number;
+  pageSize?: number;
 }

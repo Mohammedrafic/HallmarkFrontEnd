@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { CandidateCardComponent } from './candidate-card.component';
+import { TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
 import { Compass, Flag } from 'angular-feather/icons';
+
+import { CandidateCardComponent } from './candidate-card.component';
 
 const icons = {
   Compass,
@@ -17,6 +19,7 @@ const icons = {
   imports: [
     CommonModule,
     FeatherModule.pick(icons),
+    TooltipModule,
   ],
   exports: [CandidateCardComponent],
 })

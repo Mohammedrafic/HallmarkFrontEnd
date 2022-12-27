@@ -89,7 +89,7 @@ export class DateTimeHelper {
     }
 
     const lastDay = firstDay + CalcDaysMs((RangeDaysOptions[rangeOption] - 1));
-    
+
     let last = new Date(lastDay).getTime();
     let first = firstDay;
 
@@ -173,7 +173,7 @@ export class DateTimeHelper {
     return result;
   }
 
-  public static getDatesBetween(sDate: Date | null = null, eDate: Date | null = null): string[] {
+  public static getDatesBetween(sDate: Date | string | null = null, eDate: Date | string | null = null): string[] {
     const startDate = sDate || new Date();
     const endDate = eDate || new Date().setDate(new Date().getDate() + 14); // default 14 days - 2 week view
 

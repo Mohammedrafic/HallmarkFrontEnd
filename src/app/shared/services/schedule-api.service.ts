@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable, of } from 'rxjs';
 
-import { ScheduleModel } from '../../modules/schedule/interface/schedule.model';
+import { ScheduleFilters, ScheduleModel } from '../../modules/schedule/interface/schedule.model';
 import { MOK_DATA } from '../../modules/schedule/constants';
 
 @Injectable()
@@ -13,5 +13,13 @@ export class ScheduleApiService {
 
   getScheduleData(filters: any = null): Observable<ScheduleModel[]> {
     return of(MOK_DATA);
+  }
+
+  getScheduleEmployees(filters: ScheduleFilters | null = null): Observable<ScheduleModel[]> {
+    return this.http.post<ScheduleModel[]>('/api/Schedules/employees', filters);
+  }
+
+  getSchedulesByEmployeesIds(employeeIds: number[]): Observable<ScheduleModel[]> {
+    return this.http.post<ScheduleModel[]>('/api/Schedules/employees', { employeeIds });
   }
 }

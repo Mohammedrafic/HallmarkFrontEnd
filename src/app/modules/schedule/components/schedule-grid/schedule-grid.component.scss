@@ -1,5 +1,11 @@
 @import "colors";
 
+:host {
+  & * {
+    box-sizing: border-box;
+  }
+}
+
 .grid-wrapper {
   width: 100%;
   height: calc(100vh - 194px);
@@ -23,6 +29,7 @@
   }
 
   & .right {
+    width: 100%;
     padding-left: 8px;
     justify-content: space-between;
   }
@@ -102,10 +109,11 @@ th, td {
     min-width: 112px;
   }
 
-  &.candidates-cell {
+  &.candidates-head-cell {
     z-index: 30;
-    width: 241px;
-    min-width: 241px;
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
   }
 }
 
@@ -128,6 +136,12 @@ th, td {
       transition: all .2s linear;
     }
   }
+
+  &.candidates-cell {
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
+  }
 }
 
 .fixed {
@@ -147,4 +161,5 @@ th, td {
 
 .grid-footer {
   height: 52px;
+  border-top: 1px solid $secondary-dark-blue-45;
 }

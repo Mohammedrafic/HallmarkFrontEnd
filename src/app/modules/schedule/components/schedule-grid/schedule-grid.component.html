@@ -9,13 +9,14 @@
       >
         <i-feather name="sliders" class="sorting-icon"></i-feather>
       </button>
+    </div>
+    <div class="right">
       <app-date-week-picker
         [initDates]="weekPeriod"
         [rangeType]="activePeriod"
         [firstDayOfWeek]="orgFirstDayOfWeek"
       ></app-date-week-picker>
-    </div>
-    <div class="right">
+
       <div class="date-periods">
         <div *ngFor="let datePeriod of datesPeriods; trackBy: trackByPeriods"
              [class.active]="datePeriod.id === activePeriod"
@@ -31,7 +32,7 @@
     <table>
       <thead>
         <tr>
-          <th class="table-title candidates-cell fixed fixed--left fixed--top">## Candidates</th>
+          <th class="table-title candidates-head-cell fixed fixed--left fixed--top">## Candidates</th>
           <th
             *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
             class="table-title date fixed fixed--top"
@@ -42,7 +43,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let scheduleItem of scheduleData; trackBy: trackByScheduleData" class="table-row">
-          <td class="table-cell fixed fixed--left">
+          <td class="table-cell candidates-cell fixed fixed--left">
             <app-candidate-card
               [candidate]="scheduleItem.candidate"
             ></app-candidate-card>
