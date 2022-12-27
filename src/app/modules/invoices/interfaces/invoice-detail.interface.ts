@@ -93,6 +93,9 @@ export interface InvoiceDetailsSettings {
   isActionBtnDisabled: boolean;
   paymentDetailsOpen: boolean;
   addPaymentOpen: boolean;
+  isTablet: boolean;
+  isMiddleTabletWidth: boolean;
+  isMobile: boolean;
 }
 
 export interface InvoicePaymentData {

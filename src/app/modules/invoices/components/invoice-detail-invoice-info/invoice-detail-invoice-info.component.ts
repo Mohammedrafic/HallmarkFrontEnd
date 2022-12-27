@@ -18,6 +18,7 @@ import { InvoicesContainerService } from '../../services/invoices-container/invo
 })
 export class InvoiceDetailInvoiceInfoComponent implements OnChanges {
   @Input() invoiceInfo: InvoiceDetail;
+  @Input() isMiddleTabletWidth: boolean;
 
   @Output() detailsOpen: EventEmitter<void> = new EventEmitter();
 
