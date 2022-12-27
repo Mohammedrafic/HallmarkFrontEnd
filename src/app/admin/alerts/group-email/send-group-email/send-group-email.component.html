@@ -42,9 +42,8 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist appValidateWithMessage
                                 formControlName="agencies"
-                                [fields]="commonFields"
-                                [dataSource]="agencies"
-                                [value]="agencyFields"
+                                [fields]="agencyFields"
+                                [dataSource]="agencyData"                                
                                 [allowFiltering]="true"
                                 placeholder="Agencies">
               </ejs-dropdownlist>
@@ -52,6 +51,17 @@
           </div>               
         </div>
         <div class="bootstrap business-dropdowns">
+          <div class="dropdown-container">
+            <div class="input-group dropdown">
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="skills"
+                                [fields]="regionFields"
+                                [dataSource]="skillData"                                
+                                [allowFiltering]="true"
+                                placeholder="Skills">
+              </ejs-dropdownlist>
+            </div>
+          </div>
           <div class="dropdown-container">
             <div class="input-group dropdown">
               <ejs-dropdownlist formControlName="region"
@@ -72,6 +82,34 @@
                                [dataSource]="locationsList"
                                placeholder="Location">
               </ejs-dropdownlist>
+            </div>
+          </div>
+          <div class="dropdown-container">
+            <div class="input-group dropdown">
+              <ejs-multiselect formControlName="orderType"
+                               [allowFiltering]="true"
+                               appValidateWithMessage
+                               [fields]="regionFields"
+                               [dataSource]="orderTypes"
+                               placeholder="Order Type"
+                               [showDropDownIcon]="true"
+                               [selectAllText]='allOption'
+                               showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="dropdown-container">
+            <div class="input-group dropdown">
+              <ejs-multiselect formControlName="candidateStatus"
+                               [allowFiltering]="true"
+                               appValidateWithMessage
+                               [fields]="candidateStatusFields"
+                               [dataSource]="candidateStatusData"
+                               placeholder="Order Type"
+                               [showDropDownIcon]="true"
+                               [selectAllText]='allOption'
+                               showSelectAll=true>
+              </ejs-multiselect>
             </div>
           </div>
           <div class="dropdown-container">

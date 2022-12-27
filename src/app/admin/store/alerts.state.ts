@@ -1,7 +1,8 @@
+import { AgencyDto, CandidateStatusAndReasonFilterOptionsDto, MasterSkillDto } from './../analytics/models/common-report.model';
 import { Injectable } from "@angular/core";
 import { UserSubscriptionPage, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
 import { Action, Selector, StateContext} from '@ngxs/store';
-import { AlertTrigger, ClearAlertTemplateState, DismissAlert, DismissAllAlerts, GetAlertsTemplatePage, GetGroupEmailById, GetGroupEmailInternalUsers, GetGroupEmailRoles, GetGroupMailByBusinessUnitIdPage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, SendGroupEmail, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
+import { AlertTrigger, ClearAlertTemplateState, DismissAlert, DismissAllAlerts, GetAlertsTemplatePage, GetGroupEmailAgencies, GetGroupEmailById, GetGroupEmailCandidateStatuses, GetGroupEmailInternalUsers, GetGroupEmailRoles, GetGroupEmailSkills, GetGroupMailByBusinessUnitIdPage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, SendGroupEmail, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
 import { catchError, Observable ,tap} from "rxjs";
 import { AlertsService } from "@shared/services/alerts.service";
 import { BusinessUnitService } from "@shared/services/business-unit.service";
@@ -26,6 +27,9 @@ interface AlertsStateModel {
     groupEmailData:GroupEmail;
     groupEmailRoleData:GroupEmailRole;
     groupEmailUserData:User;
+    groupEmailAgencyData:AgencyDto;
+    groupEmailSkillsData:MasterSkillDto;
+    groupEmailCandidateStatusData:CandidateStatusAndReasonFilterOptionsDto;
 }
 
 @Injectable()
@@ -75,6 +79,18 @@ export class AlertsState {
   @Selector()
   static GetGroupEmailInternalUsers(state:AlertsStateModel):User{
     return state.groupEmailUserData;
+  }
+  @Selector()
+  static GetGroupEmailAgencies(state:AlertsStateModel):AgencyDto{
+    return state.groupEmailAgencyData;
+  }
+  @Selector()
+  static GetGroupEmailSkills(state:AlertsStateModel):MasterSkillDto{
+    return state.groupEmailSkillsData;
+  }
+  @Selector()
+  static GetGroupEmailCandidateStatuses(state:AlertsStateModel):CandidateStatusAndReasonFilterOptionsDto{
+    return state.groupEmailCandidateStatusData;
   }
 
  
@@ -284,6 +300,54 @@ export class AlertsState {
     return this.groupEmailService.GetGroupEmailUsersByRegionLocation(regionId, locationId, roles).pipe(
       tap((payload) => {
         patchState({ groupEmailUserData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailAgencies)
+  GetGroupEmailAgencies(
+    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { businessUnitId }: GetGroupEmailAgencies
+  ): Observable<AgencyDto | void> {
+    return this.groupEmailService.GetGroupEmailAgenciesByBusinessUnit(businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ groupEmailAgencyData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailSkills)
+  GetGroupEmailSkills(
+    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { businessUnitId }: GetGroupEmailSkills
+  ): Observable<MasterSkillDto | void> {
+    return this.groupEmailService.GetGroupEmailSkillsByBusinessUnit(businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ groupEmailSkillsData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailCandidateStatuses)
+  GetGroupEmailCandidateStatuses(
+    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { businessUnitId }: GetGroupEmailCandidateStatuses
+  ): Observable<CandidateStatusAndReasonFilterOptionsDto | void> {
+    return this.groupEmailService.GetGroupEmailCandidateStatusesByBusinessUnit(businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ groupEmailCandidateStatusData: payload });
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {

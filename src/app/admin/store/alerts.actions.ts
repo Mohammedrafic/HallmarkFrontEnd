@@ -109,3 +109,24 @@ export class GetGroupEmailInternalUsers {
     public roles: string    
   ) { }
 }
+
+export class GetGroupEmailAgencies {
+  static readonly type = '[groupemail] Get Group Email Agencies by business unit';
+  constructor(
+    public businessUnitId: number
+  ) { }
+}
+
+export class GetGroupEmailSkills {
+  static readonly type = '[groupemail] Get Group Email skills by business unit';
+  constructor(
+    public businessUnitId: number
+  ) { }
+}
+
+export class GetGroupEmailCandidateStatuses {
+  static readonly type = '[groupemail] Get Group Email candidate statuses by business unit';
+  constructor(
+    public businessUnitId: number
+  ) { }
+}

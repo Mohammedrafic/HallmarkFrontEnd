@@ -1,5 +1,6 @@
-import { AgencyDto } from './../../../analytics/models/common-report.model';
-import { GetGroupEmailRoles, GetGroupEmailInternalUsers } from './../../../store/alerts.actions';
+import { OrderTypeOptions } from './../../../../shared/enums/order-type';
+import { AgencyDto, CandidateStatusAndReasonFilterOptionsDto, MasterSkillDto } from './../../../analytics/models/common-report.model';
+import { GetGroupEmailRoles, GetGroupEmailInternalUsers, GetGroupEmailAgencies, GetGroupEmailSkills, GetGroupEmailCandidateStatuses } from './../../../store/alerts.actions';
 import { GroupEmailRole } from '@shared/models/group-email.model';
 import { takeUntil } from 'rxjs';
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
@@ -78,22 +79,33 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   @Select(AlertsState.GetGroupRolesByOrgId)
   public roleData$: Observable<GroupEmailRole[]>;
   
-  @Select(LogiReportState.commonReportFilterData)
-  public CommonReportFilterData$: Observable<CommonReportFilterOptions>;
+  @Select(AlertsState.GetGroupEmailAgencies)
+  public agencyData$: Observable<AgencyDto[]>;
 
+  @Select(AlertsState.GetGroupEmailSkills)
+  public skillData$: Observable<MasterSkillDto[]>;
+  
+  @Select(AlertsState.GetGroupEmailSkills)
+  public candidateStatusData$: Observable<CandidateStatusAndReasonFilterOptionsDto[]>;
   
   public organizations: Organisation[] = [];
   public agencies: AgencyDto[] = [];
   public regionsList: Region[] = [];
+  public candidateStatusData: CandidateStatusAndReasonFilterOptionsDto[] = [];
+  public orderTypes: any[] = OrderTypeOptions
+  public defaultOrderTypes: (number | undefined)[] = OrderTypeOptions.map((list) => list.id);
   public locationsList: Location[] = [];
   public regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
+  public candidateStatusFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
 
   @ViewChild('RTEGroupEmail') public rteObj: RichTextEditorComponent;
   private listboxEle: HTMLElement;
   private editArea: HTMLElement;
   public userData: User[];
+  public agencyData: AgencyDto[];
   public roleData: GroupEmailRole[];
+  public skillData: MasterSkillDto[];
   public range: Range = new Range();
   public isBusinessFormDisabled = false;
   public businessUnits = BUSINESS_UNITS_VALUES;
@@ -322,6 +334,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
         }
         this.dispatchUserPage(businessUnitIds);
         let orgList = this.organizations?.filter((x) => value == x.organizationId);
+        console.log(orgList);
         this.regionsList = [];
         this.locationsList = [];
         orgList.forEach((value) => {
@@ -361,23 +374,28 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     });
   }
 
-  private onUserTypeValueChanged(): void {
+  private onUserTypeValueChanged(): void {    
     this.userTypeControl.valueChanges.pipe(takeWhile(()=> this.isAlive)).subscribe((value)=>{
       debugger;
       var businessUnit = this.businessUnitControl.value;      
       var businessId = this.businessControl.value;
-      if(businessUnit == 3 && value == 2){
-        let businessIdData:number[] = [];
-          businessIdData.push(businessId);
-          let filter: CommonReportFilter = {
-            businessUnitIds: businessIdData
-          };
-          this.store.dispatch(new GetCommonReportFilterOptions(filter));
-          this.CommonReportFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
-            if (data != null) {
-              this.agencies = data.agencies;              
-            }
+      if(businessUnit == 3) {
+        if(value == 2) {
+          this.store.dispatch(new GetGroupEmailAgencies(businessId));
+          this.agencyData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+            this.agencyData = data;
           });
+
+          this.store.dispatch(new GetGroupEmailSkills(businessId));
+          this.skillData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+            this.skillData = data;
+          });
+
+          this.store.dispatch(new GetGroupEmailCandidateStatuses(businessId));
+          this.candidateStatusData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+            this.candidateStatusData = data;
+          });
+        }
       }
     });
   }
