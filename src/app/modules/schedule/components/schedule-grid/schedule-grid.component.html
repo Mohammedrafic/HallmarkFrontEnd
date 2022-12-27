@@ -9,11 +9,15 @@
       >
         <i-feather name="sliders" class="sorting-icon"></i-feather>
       </button>
+      <app-date-week-picker
+        [initDates]="weekPeriod"
+        [rangeType]="activePeriod"
+        [firstDayOfWeek]="orgFirstDayOfWeek"
+      ></app-date-week-picker>
     </div>
     <div class="right">
-<!--      TODO DEN! - DATE PICKER-->
       <div class="date-periods">
-        <div *ngFor="let datePeriod of datesPeriods"
+        <div *ngFor="let datePeriod of datesPeriods; trackBy: trackByPeriods"
              [class.active]="datePeriod.id === activePeriod"
              class="date-item"
              (click)="changeActiveDatePeriod(datePeriod.id)"
@@ -23,6 +27,49 @@
       </div>
     </div>
   </div>
-  <div class="grid-body"></div>
+  <div class="grid-body">
+    <table>
+      <thead>
+        <tr>
+          <th class="table-title candidates-cell fixed fixed--left fixed--top">## Candidates</th>
+          <th
+            *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
+            class="table-title date fixed fixed--top"
+          >
+            {{ dateHead | date: 'EEEE dd' }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let scheduleItem of scheduleData; trackBy: trackByScheduleData" class="table-row">
+          <td class="table-cell fixed fixed--left">
+            <app-candidate-card
+              [candidate]="scheduleItem.candidate"
+            ></app-candidate-card>
+          </td>
+          <ng-container *ngFor="let dateSlot of datesRanges; trackBy: trackByDatesRange">
+            <td
+              *ngIf="dateSlot | calendarDateSlot: scheduleItem.schedule as schedule; else emptyCell"
+              class="table-cell date-slot"
+              [class.selected]="scheduleItem.candidate.id === selectedCandidateId && schedule.id === selectedScheduleCard?.id"
+            >
+              <app-schedule-card
+                [schedule]="schedule"
+                (click)="selectScheduleCard(schedule, scheduleItem.candidate.id)"
+              ></app-schedule-card>
+            </td>
+
+            <ng-template #emptyCell>
+              <td
+                class="table-cell date-slot empty-cell"
+                [class.selected]="scheduleItem.candidate.id === selectedCandidateId && dateSlot === selectedDateSlot"
+                (click)="selectDateSlot(dateSlot, scheduleItem.candidate.id)"
+              ></td>
+            </ng-template>
+          </ng-container>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <div class="grid-footer"></div>
 </div>

@@ -1,0 +1,20 @@
+<div class="card-wrapper">
+  <div class="block block--name">
+    <p class="name">{{ candidate.lastName }}, {{ candidate.firstName }}</p>
+    <i-feather
+      *ngIf="candidateIconNameMap.get(candidate.type) as iconName"
+      [name]="iconName"
+      class="icon"
+    ></i-feather>
+  </div>
+  <div class="block">
+    <span>{{ candidate.id }}</span>
+    <span class="separator">|</span>
+    <span class="direction">{{ candidate.direction }}</span>
+  </div>
+  <div class="block">
+    <span>{{ candidate.date | date: 'MM/dd' }}</span>
+    <span class="separator">|</span>
+    <span>{{ candidate.text }}</span>
+  </div>
+</div>

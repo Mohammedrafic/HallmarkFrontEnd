@@ -1,0 +1,54 @@
+@import "colors";
+
+:host {
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  & * {
+    box-sizing: border-box;
+  }
+}
+
+.card-wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  border: 0.5px solid $primary-active-blue-90;
+  background: $secondary-dark-blue-45;
+}
+
+.title {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &__text {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    text-align: left;
+    color: $black;
+
+    &.bordered {
+      padding: 1px 8px;
+      border: 1px solid $secondary-dark-blue-40;
+      border-radius: 16px;
+      background: $secondary-dark-blue-50;
+    }
+  }
+}
+
+.time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &__text {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: $black;
+  }
+}

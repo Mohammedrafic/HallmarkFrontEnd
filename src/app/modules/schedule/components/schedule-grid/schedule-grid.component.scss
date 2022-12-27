@@ -11,9 +11,11 @@
 
 .grid-header {
   width: 100%;
+  max-height: 63px;
   padding: 12px 12px 11px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   & .left, & .right {
     display: flex;
@@ -46,6 +48,7 @@
   & .date-periods {
     display: flex;
     align-items: center;
+    margin-right: 12px;
 
     & .date-item {
       padding: 11px 12px;
@@ -66,4 +69,82 @@
   width: 16px;
   height: 16px;
   margin-left: 0 !important;
+}
+
+.grid-body {
+  height: calc(100% - 115px);
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-spacing: 0;
+}
+
+tr {
+  position: relative;
+}
+
+th, td {
+  border: 0.5px solid $secondary-dark-blue-45;
+}
+
+.table-title {
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  text-align: left;
+  white-space: nowrap;
+  color: $secondary-dark-blue-20;
+
+  &.date {
+    min-width: 112px;
+  }
+
+  &.candidates-cell {
+    z-index: 30;
+    width: 241px;
+    min-width: 241px;
+  }
+}
+
+.table-row, .table-cell {
+  height: 90px;
+}
+
+.table-cell {
+  transition: all .2s linear;
+
+  &.selected {
+    border: 1.5px solid $primary-active-blue;
+  }
+
+  &.date-slot {
+    cursor: pointer;
+
+    &:hover {
+      border-color: $primary-active-blue-10;
+      transition: all .2s linear;
+    }
+  }
+}
+
+.fixed {
+  position: sticky;
+  z-index: 10;
+  background: $white;
+
+  &--top {
+    top: 0;
+    z-index: 20;
+  }
+
+  &--left {
+    left: 0;
+  }
+}
+
+.grid-footer {
+  height: 52px;
 }

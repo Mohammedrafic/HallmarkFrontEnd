@@ -7,6 +7,7 @@ import { ScheduleContainerComponent } from './containers/schedule-container/sche
 import { ScheduleRoutingModule } from './schedule-routing.module';
 import { ScheduleFiltersModule } from './components/schedule-filters/schedule-filters.module';
 import { ScheduleGridModule } from './components/schedule-grid/schedule-grid.module';
+import { ScheduleApiService } from '@shared/services/schedule-api.service';
 
 @NgModule({
   declarations: [ScheduleContainerComponent],
@@ -17,5 +18,6 @@ import { ScheduleGridModule } from './components/schedule-grid/schedule-grid.mod
     ScheduleFiltersModule,
     ScheduleGridModule,
   ],
+  providers: [ScheduleApiService],
 })
 export class ScheduleModule {}

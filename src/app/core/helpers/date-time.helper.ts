@@ -1,5 +1,9 @@
 import { formatDate } from '@angular/common';
 
+import { RangeDaysOptions } from '@shared/components/date-week-picker/date-week.constant';
+import { DatesRangeType } from '@shared/enums';
+import { CalcDaysMs } from './functions.helper';
+
 export class DateTimeHelper {
   public static getLastDayOfWeekFromFirstDay(startDate: string, days: number): Date {
     const start = new Date(startDate);
@@ -75,26 +79,39 @@ export class DateTimeHelper {
     return new Date(new Date().toLocaleString('en-US', { timeZone: timeZone }));
   }
 
-  public static getWeekDate(date: string | Date, isStart = false): Date {
+  public static getWeekDate(date: string | Date, isStart = false,
+    rangeOption: DatesRangeType, firstWeekDay: number | null = null, maxDateExist = true): Date {
     const curr = new Date(date);
-    const firstDay = curr.getTime() - curr.getDay() * 24 * 60 * 60 * 1000;
-    const lastDay = firstDay + 6 * 24 * 60 * 60 * 1000;
+    let firstDay = curr.getTime() - CalcDaysMs(curr.getDay());
+
+    if (firstWeekDay) {
+      firstDay = new Date(curr.getDate() - firstWeekDay).getTime();
+    }
+
+    const lastDay = firstDay + CalcDaysMs((RangeDaysOptions[rangeOption] - 1));
+    
     let last = new Date(lastDay).getTime();
     let first = firstDay;
 
-    if (lastDay > new Date().getTime()) {
+    if (maxDateExist && lastDay > new Date().getTime()) {
       last = new Date().getTime();
-      first = last - new Date(last).getDay() * 24 * 60 * 60 * 1000;
+      first = last - CalcDaysMs(new Date(last).getDay());
     }
 
     return new Date(isStart ? first : last);
   }
 
-  public static getDynamicWeekDate(date: string | Date, isStart = false, weekStartDay: Date): Date {
+  public static getDynamicWeekDate(
+    date: string | Date, isStart = false, weekStartDay: Date, rangeOption: DatesRangeType,
+    firstWeekDay: number | null = null, maxDateExist = true): Date {
     const curr = new Date(date);
-    const startDayNum = weekStartDay.getDay();
+    const startDayNum = firstWeekDay !== null && firstWeekDay !== undefined ? firstWeekDay : weekStartDay.getDay();
     const currDayNum = curr.getDay();
     let dayDiff: number;
+
+    if (rangeOption === DatesRangeType.Day) {
+      return new Date(curr.getTime());
+    }
 
     if (currDayNum >= startDayNum) {
       dayDiff = currDayNum - startDayNum;
@@ -102,15 +119,15 @@ export class DateTimeHelper {
       dayDiff = 7 - startDayNum + currDayNum;
     }
 
-    const firstDay = curr.getTime() - dayDiff * 24 * 60 * 60 * 1000;
+    const firstDay = curr.getTime() - CalcDaysMs(dayDiff);
+    const lastDay = firstDay + CalcDaysMs(RangeDaysOptions[rangeOption] - 1);
 
-    const lastDay = firstDay + 6 * 24 * 60 * 60 * 1000;
     let last = new Date(lastDay).getTime();
     let first = firstDay;
 
-    if (lastDay > new Date().getTime()) {
+    if (lastDay > new Date().getTime() && maxDateExist) {
       last = new Date().getTime();
-      first = last - new Date(last).getDay() * 24 * 60 * 60 * 1000;
+      first = last - CalcDaysMs(new Date(last).getDay());
     }
 
     return new Date(isStart ? first : last);
@@ -124,10 +141,12 @@ export class DateTimeHelper {
     return [from, to];
   }
 
-  public static getRange(date: string | Date, startDate: Date): string {
-    let startWeekDay, endWeekDay;
-    startWeekDay = formatDate(DateTimeHelper.getDynamicWeekDate(date, true, startDate), 'MM/dd/YYYY', 'en-US');
-    endWeekDay = formatDate(DateTimeHelper.getDynamicWeekDate(date, false, startDate), 'MM/dd/YYYY', 'en-US');
+  public static getRange(date: string | Date, startDate: Date,
+    rangeOption = DatesRangeType.OneWeek, firstWeekDay: number | null = null, maxDateExist: boolean): string {
+    const startWeekDay = formatDate(DateTimeHelper.getDynamicWeekDate(
+      date, true, startDate, rangeOption, firstWeekDay, maxDateExist), 'MM/dd/YYYY', 'en-US');
+    const endWeekDay = formatDate(DateTimeHelper.getDynamicWeekDate(
+      date, false, startDate, rangeOption, firstWeekDay, maxDateExist), 'MM/dd/YYYY', 'en-US');
 
     return `${startWeekDay} - ${endWeekDay}`;
   }
@@ -150,6 +169,19 @@ export class DateTimeHelper {
         result = idx;
       }
     });
+
+    return result;
+  }
+
+  public static getDatesBetween(sDate: Date | null = null, eDate: Date | null = null): string[] {
+    const startDate = sDate || new Date();
+    const endDate = eDate || new Date().setDate(new Date().getDate() + 14); // default 14 days - 2 week view
+
+    const result = [];
+
+    for(let curDate = new Date(startDate); curDate <= new Date(endDate); curDate.setDate(curDate.getDate()+1)) {
+      result.push(new Date(curDate).toISOString().split('T')[0]);
+    }
 
     return result;
   }

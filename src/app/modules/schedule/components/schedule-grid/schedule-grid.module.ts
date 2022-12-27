@@ -1,12 +1,17 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 
-import { SharedModule } from '@shared/shared.module';
-
-import { ScheduleGridComponent } from './schedule-grid.component';
+import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import { Search } from 'angular-feather/icons';
-import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+
+import { DateWeekService } from '@core/services';
+import { DateWeekPickerModule } from '@shared/components/date-week-picker';
+import { SharedModule } from '@shared/shared.module';
+import { CalendarDateSlotModule } from '../../pipes/calendar-date-slot/calendar-date-slot.module';
+import { CandidateCardModule } from '../candidate-card/candidate-card.module';
+import { ScheduleCardModule } from '../schedule-card/schedule-card.module';
+import { ScheduleGridComponent } from './schedule-grid.component';
 
 const icons = {
   Search,
@@ -20,8 +25,13 @@ const icons = {
     CommonModule,
     FeatherModule.pick(icons),
     SharedModule,
-    ButtonModule
+    ButtonModule,
+    DateWeekPickerModule,
+    CandidateCardModule,
+    ScheduleCardModule,
+    CalendarDateSlotModule,
   ],
   exports: [ScheduleGridComponent],
+  providers: [DateWeekService],
 })
 export class ScheduleGridModule { }
