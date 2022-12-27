@@ -63,7 +63,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
     {
       field: 'weekDate',
       headerName: 'Week',
-      width: 100,
+      width: 140,
       minWidth: 90,
       autoHeight: true,
       wrapText: true,
@@ -76,7 +76,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
     {
       field: 'timeIn',
       headerName: 'Time in',
-      width: 125,
+      width: 150,
       minWidth: 95,
       type: 'rightAligned',
       autoHeight: true,
@@ -88,7 +88,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
     {
       field: 'timeOut',
       headerName: 'Time out',
-      width: 125,
+      width: 150,
       minWidth: 95,
       type: 'rightAligned',
       autoHeight: true,
@@ -100,8 +100,8 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
     {
       field: 'billRateConfigName',
       headerName: 'Bill rate type',
-      width: 120,
-      minWidth: 90,
+      width: 140,
+      minWidth: 100,
       autoHeight: true,
       wrapText: true,
       cellClass: 'custom-line-height',
@@ -130,7 +130,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
     {
       field: '',
       headerName: 'Candidate name',
-      width: 150,
+      width: 160,
       minWidth: 120,
       autoHeight: true,
       wrapText: true,
@@ -161,7 +161,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
     {
       field: 'value',
       headerName: 'Hours /Miles',
-      width: 120,
+      width: 135,
       minWidth: 100,
       type: 'rightAligned',
       cellClass: 'font-weight-bold align-right',
@@ -171,7 +171,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
     {
       field: 'rate',
       headerName: 'Bill rate',
-      width: 105,
+      width: 110,
       minWidth: 85,
       type: 'rightAligned',
       cellClass: 'font-weight-bold align-right',
@@ -247,7 +247,8 @@ export const invoiceSummaryColumnDefs = (location: string): ColDef[] => [
   {
     field: 'calculatedTotal',
     headerName: 'Amount to be Paid',
-    width: 150,
+    width: 175,
+    minWidth: 135,
     type: 'rightAligned',
     cellClass: 'font-weight-bold align-right',
     headerClass: 'custom-wrap align-right',

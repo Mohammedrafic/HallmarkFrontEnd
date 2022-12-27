@@ -171,7 +171,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
           if (breakpoint.matches) {
             event.api.sizeColumnsToFit();
           } else {
-            event.columnApi.autoSizeAllColumns();
+            event.columnApi.resetColumnState();
           }
         });
     }
