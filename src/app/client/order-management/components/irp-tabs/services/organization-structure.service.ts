@@ -26,14 +26,16 @@ export class OrganizationStructureService {
   }
 
   public getLocationsById(id: number): OrganizationLocation[] {
-    return this.selectedLocations = this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[];
+    return this.selectedLocations = (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[])
+    .filter((location) => !location.isDeactivated);
   }
 
   public getDepartmentsById(id: number): OrganizationDepartment[] {
-    return this.getSources(this.selectedLocations, id, 'departments');
+    return this.getSources(this.selectedLocations, id, 'departments')
+    .filter((department) => !department.isDeactivated);
   }
 
-  //todo: add correct model
+  //TODO: add correct model, and enum for type param
   private getSources(
     structure: OrganizationLocation[] | OrganizationRegion[], id: number, type: string
   ): OrganizationLocation[] | OrganizationDepartment[] {

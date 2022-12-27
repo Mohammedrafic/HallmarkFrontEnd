@@ -125,6 +125,7 @@ export class OrganizationDepartment {
   regionId?: number | null;
   locationId?: number;
   includeInIRP?: boolean;
+  isDeactivated?: boolean;
 }
 
 export class OrganizationLocation {
@@ -136,6 +137,7 @@ export class OrganizationLocation {
   regionId?: number | null;
   locationId?: number;
   includeInIRP?: boolean;
+  isDeactivated?: boolean;
 }
 
 export class OrganizationRegion {
