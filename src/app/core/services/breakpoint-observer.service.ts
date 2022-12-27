@@ -5,27 +5,18 @@ import { map, Observable } from 'rxjs';
 
 import { DeviceTypeResolution } from '@core/interface';
 import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
+import { MediaQueryBreakpoints } from '@core/constants/media-query-breakpoints';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class BreakpointObserverService {
-  private mediaQueryBreakpoints = [
-    BreakpointQuery.DESKTOP_LG_MAX,
-    BreakpointQuery.DESKTOP_LG_MIN,
-    BreakpointQuery.DESKTOP_SM_MAX,
-    BreakpointQuery.DESKTOP_SM_MIN,
-    BreakpointQuery.TABLET_MAX,
-    BreakpointQuery.TABLET_MIN,
-    BreakpointQuery.MOBILE_MAX,
-    BreakpointQuery.MOBILE_MIN,
-  ];
 
   constructor(private readonly breakpointObserver: BreakpointObserver) {}
 
   private listenMediaQueryBreakpoints(): Observable<DeviceTypeResolution> {
-    return this.breakpointObserver.observe(this.mediaQueryBreakpoints).pipe(
+    return this.breakpointObserver.observe(MediaQueryBreakpoints).pipe(
       map(({ breakpoints }) => {
         return {
           isDesktopLarge: breakpoints[BreakpointQuery.DESKTOP_LG_MAX] && breakpoints[BreakpointQuery.DESKTOP_LG_MIN],

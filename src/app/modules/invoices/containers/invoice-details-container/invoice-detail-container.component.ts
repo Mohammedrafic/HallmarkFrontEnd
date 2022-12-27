@@ -29,6 +29,8 @@ import { BreakpointObserverService } from '@core/services';
 import { ItemModel, MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
+import { MiddleTabletScreenWidth } from '../../constants';
+
 
 @Component({
   selector: 'app-invoice-detail-container',
@@ -302,7 +304,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
         takeUntil(this.componentDestroy())
       )
       .subscribe((contentWidth) => {
-        this.invoiceDetailsConfig.isMiddleTabletWidth = contentWidth <= 700;
+        this.invoiceDetailsConfig.isMiddleTabletWidth = contentWidth <= MiddleTabletScreenWidth;
         this.cdr.markForCheck();
       });
   }
