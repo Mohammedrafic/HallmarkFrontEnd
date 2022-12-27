@@ -10,6 +10,7 @@
     (rowClicked)="handleSelectionChanged($event)"
     (sortChanged)="handleSortChanged($event)"
     (rowDragEnd)="handleRowDragEvent($event)"
+    (componentStateChanged)="handleComponentStateChangeEvent($event)"
     [columnDefs]="columnDefinitions"
     [defaultColDef]="defaultColumnDefinition"
     [modules]="modules"

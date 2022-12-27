@@ -94,6 +94,7 @@
             [totalRecordsCount]="invoiceDetail.invoiceRecords.length"
             [gridOptions]="gridOptions"
             [paginationPanel]="false"
+            [adjustColumnsWidth]="true"
           ></app-grid>
           <ng-container *ngTemplateOutlet="tableFooter"></ng-container>
 
@@ -107,6 +108,7 @@
               [totalRecordsCount]="summaryObj.items.length"
               [gridOptions]="gridSummaryOptions"
               [paginationPanel]="false"
+              [adjustColumnsWidth]="true"
             ></app-grid>
           </ng-container>
           <ng-container *ngTemplateOutlet="tableFooter; context: { $implicit: true }"></ng-container>
