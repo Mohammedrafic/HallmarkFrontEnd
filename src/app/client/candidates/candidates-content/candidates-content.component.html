@@ -32,7 +32,15 @@
       </button>
     </div>
     <div class="button-group" *ngIf="isIRP">
-      <button ejs-button appHideBeforeSyncfusionLoad id="addIRPCandidate" cssClass="e-primary" (click)="addIRPCandidate()">
+      <button
+        *ngIf="(currentUserPermissions$ | async) as userPermission"
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        id="addIRPCandidate"
+        cssClass="e-primary"
+        [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
+        (click)="addIRPCandidate()"
+      >
         Add Candidate
       </button>
     </div>

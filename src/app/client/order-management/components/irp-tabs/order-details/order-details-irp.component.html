@@ -234,6 +234,7 @@
                               <input
                                 class="e-input"
                                 [name]="item.field"
+                                [maxlength]="item.maxLength"
                                 appValidateWithMessage
                                 [formControlName]="item.field"
                               />
@@ -250,6 +251,7 @@
                                 mask="000-000-0000"
                                 appValidateWithMessage
                                 [formControlName]="item.field"
+                                [maxlength]="item.maxLength"
                                 placeholder=" "
                                 maxlength="10"
                               >

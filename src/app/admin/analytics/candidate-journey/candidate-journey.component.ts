@@ -134,7 +134,8 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   private dateFormat = 'MM/dd/yyyy';
   private culture = 'en-US';
   private nullValue = "null";
-  private joinString = ",";
+  private joinString = ",";  
+  private fixedJobStatusesTypes:number[]=[1,2,3,5];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   filterOptionsData: CommonReportFilterOptions;
   skillCategoryIdControl: AbstractControl;
@@ -251,7 +252,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
-              this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons;
+              this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons.filter(i=>!this.fixedJobStatusesTypes.includes(i.status));
               this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
               this.defaultOrderTypes = OrderTypeOptionsForReport.map((list) => list.id);
@@ -365,7 +366,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
     {
       "OrganizationParamCJR":this.selectedOrganizations?.length==0?this.nullValue: this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
       "StartDateParamCJR": formatDate(startDate, this.dateFormat, this.culture),
-      "EndDateParamCJR": formatDate(endDate, this.dateFormat, this.culture),
+      "EndDateParamCJR": endDate==null?"null":formatDate(endDate, this.dateFormat, this.culture),
       "RegionParamCJR": regionIds.length==0?this.nullValue : regionIds.join(this.joinString),
       "LocationParamCJR":locationIds.length==0?this.nullValue : locationIds.join(this.joinString),
       "DepartmentParamCJR":departmentIds.length==0?this.nullValue :  departmentIds.join(this.joinString),

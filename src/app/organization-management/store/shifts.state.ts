@@ -36,14 +36,15 @@ export class ShiftsState {
   constructor(private shiftsService: ShiftsService) {}
 
   @Action(GetShiftsByPage)
-  GetShiftsByPage({ patchState }: StateContext<ShiftsStateModel>, { pageNumber, pageSize }: GetShiftsByPage): Observable<ShiftsPage> {
+  GetShiftsByPage({ patchState }: StateContext<ShiftsStateModel>,
+    { pageNumber, pageSize }: GetShiftsByPage): Observable<ShiftsPage> {
     patchState({ isShiftLoading: true });
     return this.shiftsService.getShifts(pageNumber, pageSize).pipe(
       tap((payload) => {
         payload.items.map((val) => {
-          val.standardStartTime = militaryToStandard(val.startTime);
-          val.standardEndTime = militaryToStandard(val.endTime);
-        })
+          val.standardStartTime = val.startTime.slice(0, val.startTime.length - 3);
+          val.standardEndTime = val.endTime.slice(0, val.endTime.length - 3);
+        });
         patchState({ isShiftLoading: false, shiftsPage: payload });
         return payload;
       })

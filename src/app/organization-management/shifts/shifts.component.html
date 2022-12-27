@@ -17,7 +17,9 @@
       <app-tooltip-container
         [message]="toolTipMessage"
         [showToolTip]="!userPermission[userPermissions.CanEditShifts]">
-          <button ejs-button id="addDepartmentButton" [isPrimary]="true" (click)="addShift()" [disabled]="!userPermission[userPermissions.CanEditShifts]">Add Shift</button>
+          <button ejs-button id="addDepartmentButton" [isPrimary]="true"
+            (click)="addShift()"
+            [disabled]="!userPermission[userPermissions.CanEditShifts]">Add Shift</button>
       </app-tooltip-container>
     </section>
   </section>
@@ -45,7 +47,8 @@
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editShift(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteShift(data, $event)" [disabled]="!userPermission[userPermissions.CanEditShifts]">
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteShift(data, $event)"
+            [disabled]="!userPermission[userPermissions.CanEditShifts]">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -108,7 +111,8 @@
   </ejs-grid>
 </section>
 
-<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName"
+(cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
   [disableSaveButton]="!userPermission[userPermissions.CanEditShifts]"
@@ -142,7 +146,7 @@
                           name="startTime"
                           formControlName="startTime"
                           placeholder="HH:MM"
-                          format="hh:mm a"
+                          format="HH:mm"
                           [enableMask]="true"
                           [maskPlaceholder]="maskPlaceholderValue"
                           [step]="30">
@@ -159,7 +163,7 @@
                           name="endTime"
                           formControlName="endTime"
                           placeholder="HH:MM"
-                          format="hh:mm a"
+                          format="HH:mm"
                           [enableMask]="true"
                           [maskPlaceholder]="maskPlaceholderValue"
                           [step]="30">

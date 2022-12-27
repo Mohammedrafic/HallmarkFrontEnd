@@ -8,7 +8,7 @@ import { BaseFormControlDirective } from '@shared/components/form-controls/base-
   styleUrls: ['./input.component.scss'],
 })
 export class InputComponent extends BaseFormControlDirective {
-  @Input() public maxlength: number;
+  @Input() public maxlength: number | string;
   @Input() public mask: string;
   @Input() public override placeholder: string = '';
 }

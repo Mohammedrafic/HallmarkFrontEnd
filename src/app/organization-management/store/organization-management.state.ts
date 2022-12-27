@@ -727,7 +727,7 @@ export class OrganizationManagementState {
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error,
-          (error.error.errors != null && error.error.errors != undefined) ? 'Dependencies:'+error.error.errors.EntityInUse[0] : error.error.detail));
+          (error.error.errors != null && error.error.errors != undefined) ? 'Region cannot be deleted. This Region was used in '+error.error.errors.EntityInUse[0] : error.error.detail));
       })
     );
   }

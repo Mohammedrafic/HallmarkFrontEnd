@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { catchError, Observable, of, tap } from 'rxjs';
 
@@ -16,7 +17,7 @@ import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { Candidate, CandidatePage, CandidateStateModel } from 'src/app/shared/models/candidate.model';
 import { Education } from 'src/app/shared/models/education.model';
 import { Experience } from 'src/app/shared/models/experience.model';
-import { ListOfSkills } from 'src/app/shared/models/skill.model';
+import { MasterSkill } from 'src/app/shared/models/skill.model';
 import { SkillsService } from 'src/app/shared/services/skills.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { CandidateService } from '../services/candidates.service';
@@ -95,7 +96,7 @@ export class CandidateState {
   }
 
   @Selector()
-  static skills(state: CandidateStateModel): ListOfSkills[] {
+  static skills(state: CandidateStateModel): MasterSkill[] {
     return state.skills;
   }
 
@@ -176,16 +177,15 @@ export class CandidateState {
   }
 
   @Action(RemoveCandidateFromStore)
-  RemoveCandidateFromStore({ patchState }: StateContext<CandidateStateModel>, {}: GetAllSkills): void {
+  RemoveCandidateFromStore({ patchState }: StateContext<CandidateStateModel>): void {
     patchState({ candidate: null });
   }
 
   @Action(GetAllSkills)
-  GetAllSkills({ patchState }: StateContext<CandidateStateModel>, {}: GetAllSkills): Observable<ListOfSkills[]> {
-    return this.skillsService.getAssignedSkillsByOrganization().pipe(
-      tap((payload) => {
-        patchState({ skills: payload.map(({id, masterSkillId, skillDescription}) => ({id, masterSkillId, name: skillDescription}))});
-        return payload;
+  GetAllSkills({ patchState }: StateContext<CandidateStateModel>): Observable<MasterSkill[]> {
+    return this.skillsService.getAllMasterSkillList().pipe(
+      tap((skills: MasterSkill[]) => {
+        patchState({ skills });
       })
     );
   }
@@ -226,10 +226,7 @@ export class CandidateState {
   }
 
   @Action(GetExperienceByCandidateId)
-  GetExperienceByCandidateId(
-    { patchState, dispatch, getState }: StateContext<CandidateStateModel>,
-    {}: GetExperienceByCandidateId
-  ): Observable<Experience[]> {
+  GetExperienceByCandidateId({ patchState, getState }: StateContext<CandidateStateModel>): Observable<Experience[]> {
     const id = getState().candidate?.id as number;
     return this.candidateService.getExperienceByCandidateId(id).pipe(
       tap((payload) => {

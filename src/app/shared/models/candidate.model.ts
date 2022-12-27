@@ -3,7 +3,7 @@ import { CredentialType } from "./credential-type.model";
 import { Credential } from "./credential.model";
 import { Education } from "./education.model";
 import { Experience } from "./experience.model";
-import { ListOfSkills } from "./skill.model";
+import { MasterSkill } from "./skill.model";
 import { PageOfCollections } from './page.model';
 import { JobDistributionMasterSkills } from './associate-organizations.model';
 
@@ -38,7 +38,7 @@ export class Candidate {
     this.profileStatus = candidateForm.generalInfo.profileStatus;
     this.candidateAgencyStatus = candidateForm.generalInfo.candidateAgencyStatus;
     this.candidateProfileSkills = candidateForm.generalInfo.candidateProfileSkills;
-    this.candidateProfileRegions = candidateForm.generalInfo.candidateProfileRegions
+    this.candidateProfileRegions = candidateForm.generalInfo.candidateProfileRegions;
 
   }
 }
@@ -84,7 +84,7 @@ export type CandidatePage = PageOfCollections<Candidate>;
 export interface CandidateStateModel {
   isCandidateLoading: boolean;
   candidate: Candidate | null;
-  skills: ListOfSkills[];
+  skills: MasterSkill[];
   experiences: Experience[];
   educations: Education[];
   candidatePage: CandidatePage | null;

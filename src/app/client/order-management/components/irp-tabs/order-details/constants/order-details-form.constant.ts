@@ -446,18 +446,21 @@ export const ContactDetailsForm = (): OrderFormInput[] => [
     field: 'name',
     title: 'Contact Person',
     required: true,
+    maxLength: 50,
     type: FieldType.Input,
   },
   {
     field: 'mobilePhone',
     title: 'Mobile Phone',
     required: false,
+    maxLength: 20,
     type: FieldType.Phone,
   },
   {
     field: 'email',
     title: 'Email',
     required: true,
+    maxLength: 100,
     type: FieldType.Input,
   },
   {
@@ -483,6 +486,7 @@ export const WorkLocationFrom = (stateSource?: AssociateAgency[]): OrderFormInpu
     field: 'address',
     title: 'Address',
     required: true,
+    maxLength: 100,
     type: FieldType.Input,
   },
   {
@@ -496,12 +500,14 @@ export const WorkLocationFrom = (stateSource?: AssociateAgency[]): OrderFormInpu
     field: 'city',
     title: 'City',
     required: true,
+    maxLength: 20,
     type: FieldType.Input,
   },
   {
     field: 'zipCode',
     title: 'Zip Code',
     required: true,
+    maxLength: 6,
     type: FieldType.Input,
   },
   {

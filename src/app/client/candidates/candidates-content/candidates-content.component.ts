@@ -10,6 +10,8 @@ import { TabConfig } from '../interface';
 import { UserState } from 'src/app/store/user.state';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { UserPermissions } from '@core/enums';
+import { Permission } from '@core/interface';
 
 @Component({
   selector: 'app-candidates-content',
@@ -22,12 +24,16 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   public exportUsers$ = new Subject<ExportedFileType>();
   public search$ = new Subject<string>();
   public activeTabIndex: number;
-  public isIRP: boolean = false;
-  public preferencesLoaded: boolean = false;
+  public isIRP = false;
+  public preferencesLoaded = false;
   public readonly tabConfig: TabConfig[] = TAB_CANDIDATES;
+  public readonly userPermissions = UserPermissions;
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
+
+  @Select(UserState.userPermission)
+  currentUserPermissions$: Observable<Permission>;
 
   private unsubscribe$: Subject<void> = new Subject();
 

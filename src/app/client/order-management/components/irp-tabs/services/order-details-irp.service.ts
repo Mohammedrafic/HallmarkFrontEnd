@@ -84,7 +84,6 @@ export class OrderDetailsIrpService {
       zipCode: ['', [
         Validators.required,
         Validators.minLength(5),
-        Validators.maxLength(6),
         Validators.pattern(/^[0-9]+$/),
         Validators.maxLength(6),
       ]],

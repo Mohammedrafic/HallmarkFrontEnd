@@ -23,4 +23,8 @@ export class TextareaComponent extends BaseFormControlDirective implements OnIni
   ngOnInit(): void {
   }
 
+  public onBlur(): void {
+    this.getControl().updateValueAndValidity();
+  }
+
 }

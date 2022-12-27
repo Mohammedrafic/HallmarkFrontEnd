@@ -25,29 +25,28 @@ export class GeneralNotesComponent extends DestroyableDirective implements OnIni
       field: '',
       headerName: '',
       cellRenderer: GeneralNotesGridActionsRendererComponent,
-      maxWidth: 80
+      maxWidth: 80,
     },
     {
       field: 'date',
       headerName: 'Date',
       valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
-      maxWidth: 140
+      maxWidth: 140,
     },
     {
       field: 'categoryId',
       headerName: 'Category',
       cellRenderer: GeneralNotesGridCategoryRendererComponent,
       cellRendererParams: (params: ICellRendererParams) => this.getCategoryById(params.value),
-      minWidth: 185
+      minWidth: 185,
     },
     {
       field: 'note',
       headerName: 'Note',
       flex: 1,
-      minWidth: 185
-    }
+      minWidth: 185,
+    },
   ];
-
 
   public sideDialogTitle$ = this.generalNotesService.sideDialogTitle$;
   public generalNotes$ = this.generalNotesService.notes$;
@@ -106,7 +105,8 @@ export class GeneralNotesComponent extends DestroyableDirective implements OnIni
   }
 
   private getCategories(): void {
-    this.generalNotesService.getCategories()
+    this.generalNotesService
+      .getCategories()
       .pipe(takeUntil(this.destroy$))
       .subscribe((categories: CategoryModel[]) => {
         this.categories = categories;
