@@ -384,7 +384,7 @@ export class YtdSummaryComponent implements OnInit {
 
       "HostName": this.baseUrl,
       "BearerParamYTDS": auth,
-      "BusinessUnitIdYTDS": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "BusinessUnitIdParamYTDS": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
@@ -395,7 +395,9 @@ export class YtdSummaryComponent implements OnInit {
       "skillCategoryYTDS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
       "skillYTDS": skillIds.length == 0 ? "null" : skillIds.join(","),
       "startDateYTDS": year,
-      "endDateYTDS": month
+      "endDateYTDS": month,
+      "yearYTDS": year,
+      "monthYTDS": month,
 
       };
     this.logiReportComponent.paramsData = this.paramsData;
