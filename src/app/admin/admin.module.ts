@@ -61,6 +61,10 @@ import { NgxMaskModule } from 'ngx-mask';
 import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
 import { CredentialListModule } from '@shared/components/credentials-list/credential-list.module';
 import { MasterSkillsService } from './master-data/skills/skills-grid/skills-grid.service';
+import { CommitmentComponent } from './master-data/commitment/commitment.component';
+import { GridModule as AppGridModule } from '@shared/components/grid/grid.module';
+import { CommitmentGridActionRendererComponent } from './master-data/commitment/grid-action-renderer/grid-action-renderer.component';
+import { MasterCommitmentState } from './store/commitment.state';
 
 const sidebarIcons = {
   Download,
@@ -94,6 +98,8 @@ const sidebarIcons = {
     RejectReasonMasterComponent,
     ManualInvoiceReasonsComponent,
     OrganizationProfileComponent,
+    CommitmentComponent,
+    CommitmentGridActionRendererComponent
   ],
   imports: [
     CommonModule,
@@ -127,6 +133,7 @@ const sidebarIcons = {
     TimesheetsModule,
     TooltipContainerModule,
     CredentialListModule,
+    AppGridModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     //STORE
@@ -136,6 +143,7 @@ const sidebarIcons = {
       RejectReasonMasterState,
       ManualInvoiceReasonsState,
       OrganizationManagementState,
+      MasterCommitmentState,
     ]),
   ],
   providers: [

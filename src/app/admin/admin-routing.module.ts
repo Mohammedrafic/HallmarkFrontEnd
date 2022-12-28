@@ -18,6 +18,7 @@ import { OrganizationProfileComponent } from './organization-profile/organizatio
 import { AlertsComponent } from './alerts/alerts.component';
 import { MasterCredentialsComponent } from './master-data/master-credentials/master-credentials.component';
 import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
+import { CommitmentComponent } from './master-data/commitment/commitment.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -86,6 +87,10 @@ const routes: Routes = [
           {
             path: 'manual-invoice-reasons',
             component: ManualInvoiceReasonsComponent
+          },
+          {
+            path: 'commitment',
+            component: CommitmentComponent
           }
         ]
       },

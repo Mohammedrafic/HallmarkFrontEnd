@@ -1,0 +1,49 @@
+<section class="flex-column commitments">
+  <app-page-toolbar>
+    <ng-container left>
+      <h3>Work Commitment</h3>
+    </ng-container>
+    <ng-container right>
+      <div class="tools-button-group">
+        <button
+          [disabled]="!userPermission[userPermissions.CanManageMasterWorkCommitmentData]"
+          ejs-button
+          [isPrimary]="true"
+          (click)="addCommitment()"
+        >
+          Add Commitment
+        </button>
+      </div>
+    </ng-container>
+  </app-page-toolbar>
+  <app-grid
+    (navigateToPageEmitter)="handleChangePage($event)"
+    (pageSizeChangeEmitter)="handleChangePageSize($event)"
+    (gridReadyEmitter)="gridReady($event)"
+    [columnDefinitions]="columnDefinitions"
+    [rowData]="(commitmentsPage$ | async)?.items"
+    [pageSize]="pageSize"
+    [currentPage]="pageNumber"
+    [totalRecordsCount]="(commitmentsPage$ | async)?.totalCount || 0"
+  >
+  </app-grid>
+</section>
+
+<app-side-dialog
+  header="{{ title }} Commitment"
+  (formSaveClicked)="saveCommitment()"
+  (formCancelClicked)="closeDialog()"
+>
+  <form [formGroup]="form" class="commitment-form">
+    <div class="input-container bootstrap">
+      <label>Name<span class="required">*</span></label>
+      <div class="input-group">
+        <input class="e-input"
+               type="text"
+               appValidateWithMessage
+               maxlength="100"
+               formControlName="name"/>
+      </div>
+    </div>
+  </form>
+</app-side-dialog>

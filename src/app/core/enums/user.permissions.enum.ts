@@ -162,4 +162,8 @@ export enum UserPermissions {
 
   // Manage Credentials
   ManageCredentialWithinOrderScope = 4110,
+
+  // Manage Work Commitments
+  CanViewMasterWorkCommitmentData = 4151,
+  CanManageMasterWorkCommitmentData = 4152,
 }
