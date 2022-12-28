@@ -100,7 +100,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
       !!this.maxDate);
 
     // this.startDateValue = DateTimeHelper.getWeekStartEnd(dateRange)[0].toDateString();
-    this.changeRange(dateRange, dateRange);
+    this.changeRange(dateRange, weekStart);
   }
 
   public clearControl(): void {
