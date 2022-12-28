@@ -76,3 +76,28 @@ export type AssignedCredentialTreeData = {
   assignedCredentialIds: string[];
 };
 
+export interface MissingCredentialsRequestBody {
+  orderId: number;
+  candidateProfileId: number;
+  validateForDate: string;
+}
+
+export interface MissingCredential {
+  id: number;
+  orderId: number;
+  credentialId: number;
+  credentialName: string;
+  credentialTypeId: number;
+  credentialType: string;
+  reqForSubmission: boolean;
+  reqForOnboard: boolean;
+  optional: boolean;
+  comment: string;
+}
+
+export interface MissingCredentialsResponse {
+  submissionPercentage: number;
+  submissionRequiredPercentage: number;
+  onboardingPercentage: number;
+  missingCredentials: MissingCredential[];
+}
