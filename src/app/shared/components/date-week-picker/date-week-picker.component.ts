@@ -1,6 +1,6 @@
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, Renderer2, ViewChild
-} from '@angular/core';
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, Renderer2,
+  ViewChild} from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import { RenderDayCellEventArgs } from '@syncfusion/ej2-angular-calendars';
