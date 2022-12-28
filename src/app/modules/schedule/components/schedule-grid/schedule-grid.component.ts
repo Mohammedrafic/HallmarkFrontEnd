@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, TrackByFunction } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  TrackByFunction,
+} from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
@@ -12,7 +21,13 @@ import { DatesRangeType } from '@shared/enums';
 
 import { UserState } from '../../../../store/user.state';
 import { DatesPeriods } from '../../constants/schedule-grid.conts';
-import { ScheduleItem, ScheduleModel } from '../../interface/schedule.model';
+import {
+  ScheduleDateItem,
+  ScheduleFilters,
+  ScheduleItem,
+  ScheduleModel,
+  ScheduleModelPage,
+} from '../../interface/schedule.model';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -24,7 +39,9 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
 
-  @Input() scheduleData: ScheduleModel[] | null = [];
+  @Input() scheduleData: ScheduleModelPage | null;
+
+  @Output() changeFilter: EventEmitter<ScheduleFilters> = new EventEmitter<ScheduleFilters>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
@@ -38,7 +55,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
 
   selectedDateSlot: string | null = null;
 
-  selectedCandidateId: string;
+  selectedCandidateId: number;
 
   orgFirstDayOfWeek: number;
 
@@ -66,18 +83,22 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
     this.cdr.detectChanges();
   }
 
-  selectScheduleCard(schedule: ScheduleItem, candidateId: string): void {
-    this.selectedScheduleCard = schedule;
+  selectScheduleCard(schedule: ScheduleDateItem, candidateId: number): void {
+    this.selectedScheduleCard = schedule.daySchedules[0];
     this.selectedCandidateId = candidateId;
     this.selectedDateSlot = null;
     this.cdr.detectChanges();
   }
 
-  selectDateSlot(dateSlot: string, candidateId: string): void {
+  selectDateSlot(dateSlot: string, candidateId: number): void {
     this.selectedDateSlot = dateSlot;
     this.selectedCandidateId = candidateId;
     this.selectedScheduleCard = null;
     this.cdr.detectChanges();
+  }
+
+  searchCandidate(event: KeyboardEvent): void {
+    this.changeFilter.emit({ firstLastNameOrId: (event.target as HTMLInputElement).value });
   }
 
   private startOrgIdWatching(): void {
@@ -96,20 +117,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
   private checkOrgPreferences(): void {
     const preferences = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences;
     this.orgFirstDayOfWeek = preferences?.weekStartsOn as number;
+
     this.cdr.markForCheck();
   }
 
   private watchForRangeChange(): void {
-    this.weekService.getRangeStream()
-    .pipe(
+    this.weekService.getRangeStream().pipe(
       takeUntil(this.componentDestroy()),
-    )
-    .subscribe((range) => {
-      if (this.activePeriod === DatesRangeType.Day) {
-        this.datesRanges = DateTimeHelper.getDatesBetween(range[0], range[0]);
-      } else {
-        this.datesRanges = DateTimeHelper.getDatesBetween(range[0], range[1]);
-      }
+    ).subscribe(([startDate, endDate]: [string, string]) => {
+      console.log([startDate, endDate], '[startDate, endDate]');
+      this.datesRanges = DateTimeHelper.getDatesBetween(startDate, endDate);
+      this.changeFilter.emit({ startDate, endDate });
 
       this.cdr.detectChanges();
     });

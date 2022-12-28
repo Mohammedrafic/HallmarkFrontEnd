@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
-import { ScheduleCardConfig, ScheduleItem } from '../../interface/schedule.model';
+import { ScheduleCardConfig, ScheduleDateItem, ScheduleItem } from '../../interface/schedule.model';
 import { GetScheduleCardConfig } from '../../constants/schedule-grid.conts';
 
 @Component({
@@ -10,13 +10,31 @@ import { GetScheduleCardConfig } from '../../constants/schedule-grid.conts';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleCardComponent implements OnInit {
-  @Input() schedule: ScheduleItem;
+  @Input() dateSchedule: ScheduleDateItem;
+
+  firstDaySchedule: ScheduleItem;
 
   cardConfig: ScheduleCardConfig | undefined;
+
   tooltipMessage: string;
 
+  additionalTooltipMessage: string;
+
   ngOnInit(): void {
-    this.cardConfig = GetScheduleCardConfig(this.schedule);
-    this.tooltipMessage = `OrderID${this.schedule.orderId} ${this.schedule.location} ${this.schedule.department}`;
+    this.cardConfig = GetScheduleCardConfig(this.dateSchedule);
+
+    this.createTooltips();
+  }
+
+  private createTooltips(): void {
+    this.firstDaySchedule = this.dateSchedule.daySchedules[0];
+
+    this.tooltipMessage =
+      `OrderID${this.firstDaySchedule.orderId} ${this.firstDaySchedule.location} ${this.firstDaySchedule.department}`;
+    this.additionalTooltipMessage =
+      `<pre class="schedule-custom-tooltip-container">${
+      this.dateSchedule.daySchedules.slice(1).map(el => `OrderID${ el.orderId } ${ el.location } ${ el.department }`)
+        .join(`<br>`)
+    }</pre>`;
   }
 }

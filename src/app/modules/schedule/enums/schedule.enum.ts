@@ -15,16 +15,10 @@ export enum DatePeriodId {
   Month = 'Month',
 }
 
-export enum ScheduleCandidateType {
-  Default = 'Default',
-  Urgent = 'Urgent',
-  NotFilled = 'NotFilled',
-}
-
 export enum ScheduleType {
-  Available = 'Available',
-  Unavailable = 'Unavailable',
-  Normal = 'Normal',
+  Book = 'Book',
+  Availability = 'Availability',
+  Unavailability = 'Unavailability',
 }
 
 export enum ScheduleOrderType {

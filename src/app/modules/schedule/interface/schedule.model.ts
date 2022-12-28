@@ -1,44 +1,63 @@
-import { ScheduleCandidateType, ScheduleOrderType, ScheduleType } from '../enums';
+import { ScheduleOrderType, ScheduleType } from '../enums';
+import { PageOfCollections } from '@shared/models/page.model';
 
 export interface ScheduleCandidate {
+  id: number;
   firstName: string;
   lastName: string;
-  id: string;
-  direction: string;
-  date: string;
-  text: string;
-  type: ScheduleCandidateType;
+  skill: string;
+  workCommitment: string;
+  employeeNote: string;
+  workHours: number[];
+  isOriented: boolean;
 }
 
 export interface ScheduleItem {
-  id: string;
+  id: number;
   date: string;
   startDate: string;
   endDate: string;
-  type: ScheduleType;
+  scheduleType: ScheduleType;
   orderId: number;
-  orderType: ScheduleOrderType;
-  location?: string;
-  department?: string;
-  isInDifferentDepartments?: boolean;
+  scheduleOrderType: ScheduleOrderType;
+  location: string;
+  department: string;
+  isInDifferentDepartments: boolean;
 }
 
 export interface ScheduleModel {
   candidate: ScheduleCandidate;
-  schedule: ScheduleItem[];
+  schedule: ScheduleDateItem[];
   id: number;
 }
+
+export interface CandidateSchedules {
+  employeeId: number;
+  schedules: ScheduleDateItem[];
+}
+
+export interface ScheduleDateItem {
+  date: string;
+  extendedDays: number;
+  daySchedules: ScheduleItem[];
+}
+
+export type ScheduleCandidatesPage = PageOfCollections<ScheduleCandidate>;
+export type ScheduleModelPage = PageOfCollections<ScheduleModel>;
 
 export interface ScheduleCardConfig {
   title: string;
   iconName: string;
   bgColor?: string;
   iconColor?: string;
-  isLocDep?: boolean;
+  showTitleToolTip?: boolean;
+  showAdditionalTooltip?: boolean;
 }
 
 export interface ScheduleFilters {
-  firstLastNameOrId?: string[];
+  firstLastNameOrId?: string;
+  startDate?: string;
+  endDate?: string;
   regionIds?: number[];
   locationIds?: number[];
   departmentIds?: number[];

@@ -1,8 +1,9 @@
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { DatesRangeType } from '@shared/enums';
-import { DatePeriodId, ScheduleCandidateType, ScheduleType } from '../enums';
-import { ScheduleCardConfig, ScheduleItem } from '../interface/schedule.model';
+
+import { DatePeriodId, ScheduleType } from '../enums';
+import { ScheduleCandidate, ScheduleCardConfig, ScheduleDateItem } from '../interface/schedule.model';
 
 export const DatesPeriods: ItemModel[] = [
   {
@@ -19,27 +20,37 @@ export const DatesPeriods: ItemModel[] = [
   },
 ];
 
-export const CandidateIconNameMap: Map<ScheduleCandidateType, string> = new Map<ScheduleCandidateType, string>()
-  .set(ScheduleCandidateType.Default, '')
-  .set(ScheduleCandidateType.Urgent, 'flag')
-  .set(ScheduleCandidateType.NotFilled, 'compass');
+export const CandidateIconName = (scheduleCandidate: ScheduleCandidate): string => {
+  if (!scheduleCandidate.isOriented) {
+    return 'compass';
+  }
+
+  if (scheduleCandidate.employeeNote) {
+    return 'flag';
+  }
+
+  return '';
+};
 
 export const ScheduleCardTypeMap: Map<ScheduleType, ScheduleCardConfig> = new Map<ScheduleType, ScheduleCardConfig>()
-  .set(ScheduleType.Normal, {
+  .set(ScheduleType.Book, {
     bgColor: '#C5D9FF',
     title: 'LOC-DEP',
     iconName: 'calendar',
     iconColor: '#3E7FFF',
-    isLocDep: true,
+    showTitleToolTip: true,
+    showAdditionalTooltip: true,
   })
-  .set(ScheduleType.Unavailable, { bgColor: '#EAECF2', title: 'PTO', iconName: 'alert-triangle', iconColor: '#FF5858' })
-  .set(ScheduleType.Available, { bgColor: '#D1EACE', title: 'Available', iconName: 'clock', iconColor: '#70B16E' });
+  .set(ScheduleType.Unavailability, { bgColor: '#EAECF2', title: 'PTO', iconName: 'alert-triangle', iconColor: '#FF5858' })
+  .set(ScheduleType.Availability, { bgColor: '#D1EACE', title: 'Available', iconName: 'clock', iconColor: '#70B16E' });
 
-export const GetScheduleCardConfig = (scheduleItem: ScheduleItem): ScheduleCardConfig | undefined => {
-  const scheduleCardConfig = ScheduleCardTypeMap.get(scheduleItem.type);
+export const GetScheduleCardConfig = (scheduleItem: ScheduleDateItem): ScheduleCardConfig | undefined => {
+  const firstDaySchedule = scheduleItem.daySchedules[0];
+  const scheduleCardConfig = ScheduleCardTypeMap.get(firstDaySchedule?.scheduleType);
 
-  if (scheduleCardConfig && scheduleItem.location && scheduleItem.department) {
-    scheduleCardConfig.title = `${scheduleItem.location.slice(0, 3)}-${scheduleItem.department.slice(0, 3)}`;
+  if (scheduleCardConfig && firstDaySchedule?.scheduleType === ScheduleType.Book) {
+    scheduleCardConfig.title = `${firstDaySchedule.location.slice(0, 3)}-${firstDaySchedule.department.slice(0, 3)}`;
+    scheduleCardConfig.iconName = scheduleItem.daySchedules.length > 1 ? 'briefcase' : 'calendar';
   }
 
   return scheduleCardConfig;

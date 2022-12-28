@@ -5,7 +5,7 @@
 >
   <app-tooltip-container
     [message]="tooltipMessage"
-    [showToolTip]="!!cardConfig.isLocDep"
+    [showToolTip]="!!cardConfig.showTitleToolTip"
     position="TopCenter"
   >
     <div class="title">
@@ -15,7 +15,7 @@
         class="icon"
       ></i-feather>
       <span
-        [class.bordered]="schedule.isInDifferentDepartments"
+        [class.bordered]="firstDaySchedule.isInDifferentDepartments && cardConfig.showAdditionalTooltip"
         class="title__text"
       >
       {{ cardConfig.title }}
@@ -24,9 +24,25 @@
   </app-tooltip-container>
 
   <div class="time">
-    <span class="time__text">{{ schedule.startDate | date: 'HH:mm' }}</span>
+    <span class="time__text">{{ firstDaySchedule.startDate | date: 'HH:mm' }}</span>
     <span class="time__text">-</span>
-    <span class="time__text">{{ schedule.endDate | date: 'HH:mm' }}</span>
-    <span *ngIf="schedule.orderType" class="time__text">{{ schedule.orderType.slice(0, 1) }}</span>
+    <span class="time__text">{{ firstDaySchedule.endDate | date: 'HH:mm' }}</span>
+    <span
+      *ngIf="firstDaySchedule.scheduleOrderType"
+      class="time__text"
+    >
+      {{ firstDaySchedule.scheduleOrderType.slice(0, 1) }}
+    </span>
   </div>
+
+  <ejs-tooltip
+    *ngIf="firstDaySchedule.isInDifferentDepartments && cardConfig.showAdditionalTooltip"
+    [content]="additionalTooltipMessage"
+    position="TopCenter"
+    [showTipPointer]="false"
+  >
+    <div class="badge">
+      +{{ dateSchedule.daySchedules.length - 1 }}
+    </div>
+  </ejs-tooltip>
 </div>

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
-import { AlertTriangle, Calendar, Clock } from 'angular-feather/icons';
+import { AlertTriangle, Briefcase, Calendar, Clock } from 'angular-feather/icons';
 import { FeatherModule } from 'angular-feather';
 
 import { ScheduleCardComponent } from './schedule-card.component';
@@ -12,6 +12,7 @@ const icons = {
   AlertTriangle,
   Calendar,
   Clock,
+  Briefcase,
 };
 
 @NgModule({
@@ -25,7 +26,7 @@ const icons = {
     CommonModule,
     FeatherModule.pick(icons),
     TooltipModule,
-    TooltipContainerModule
-  ]
+    TooltipContainerModule,
+  ],
 })
 export class ScheduleCardModule { }

@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
 import { ScheduleCandidate } from '../../interface/schedule.model';
-import { CandidateIconNameMap } from '../../constants/schedule-grid.conts';
-import { ScheduleCandidateType } from '../../enums';
+import { CandidateIconName } from '../../constants/schedule-grid.conts';
 
 @Component({
   selector: 'app-candidate-card',
@@ -13,11 +12,12 @@ import { ScheduleCandidateType } from '../../enums';
 export class CandidateCardComponent implements OnInit {
   @Input() candidate: ScheduleCandidate;
 
-  candidateIconNameMap: Map<ScheduleCandidateType, string> = CandidateIconNameMap;
+  candidateIconName: string;
 
   iconTooltipMessage = '';
 
   ngOnInit(): void {
-    this.iconTooltipMessage = this.candidate.type === ScheduleCandidateType.NotFilled ? 'Not Oriented' : 'General Note';
+    this.iconTooltipMessage = this.candidate.isOriented ? this.candidate.employeeNote : 'Not Oriented';
+    this.candidateIconName = CandidateIconName(this.candidate);
   }
 }
