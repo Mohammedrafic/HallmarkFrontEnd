@@ -10,7 +10,7 @@ import { FilterService } from '@shared/services/filter.service';
 import { Destroyable } from '@core/helpers/destroyable.helper';
 import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
-import { leftOnlyValidValues } from '@core/helpers/validators.helper';
+import { LeftOnlyValidValues } from '@core/helpers/validators.helper';
 import { APP_FILTERS_CONFIG, filterOptionFields } from '@core/constants/filters-helper.constant';
 
 import { findSelectedItems } from './functions.helper';
@@ -54,7 +54,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   }
 
   public applyFilters(): void {
-    const filters: F = leftOnlyValidValues(this.formGroup);
+    const filters: F = LeftOnlyValidValues(this.formGroup);
     const preservedFiltersState = this.formGroup.getRawValue();
 
     this.updateTableByFilters.emit(filters);

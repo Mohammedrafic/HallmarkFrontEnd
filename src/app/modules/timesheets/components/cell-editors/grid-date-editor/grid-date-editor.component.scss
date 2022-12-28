@@ -12,6 +12,14 @@
     height: 40px;
     width: 100%;
 
+    &.errored {
+      ejs-timepicker.e-timepicker {
+        .e-input-group.e-control-wrapper.e-time-wrapper {
+          border-color: $supportive-red!important;
+        }
+      }
+    }
+
     ejs-timepicker.e-timepicker {
       .e-input-group.e-control-wrapper.e-time-wrapper {
         height: 40px!important;
