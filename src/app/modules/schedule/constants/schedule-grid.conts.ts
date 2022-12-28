@@ -50,7 +50,7 @@ export const GetScheduleCardConfig = (scheduleItem: ScheduleDateItem): ScheduleC
 
   if (scheduleCardConfig && firstDaySchedule?.scheduleType === ScheduleType.Book) {
     scheduleCardConfig.title = `${firstDaySchedule.location.slice(0, 3)}-${firstDaySchedule.department.slice(0, 3)}`;
-    scheduleCardConfig.iconName = scheduleItem.daySchedules.length > 1 ? 'briefcase' : 'calendar';
+    scheduleCardConfig.iconName = scheduleItem.isInDifferentDepartments ? 'briefcase' : 'calendar';
   }
 
   return scheduleCardConfig;

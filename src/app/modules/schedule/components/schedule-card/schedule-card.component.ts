@@ -31,6 +31,7 @@ export class ScheduleCardComponent implements OnInit {
 
     this.tooltipMessage =
       `OrderID${this.firstDaySchedule.orderId} ${this.firstDaySchedule.location} ${this.firstDaySchedule.department}`;
+
     this.additionalTooltipMessage =
       `<pre class="schedule-custom-tooltip-container">${
       this.dateSchedule.daySchedules.slice(1).map(el => `OrderID${ el.orderId } ${ el.location } ${ el.department }`)

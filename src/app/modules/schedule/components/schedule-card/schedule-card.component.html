@@ -15,7 +15,7 @@
         class="icon"
       ></i-feather>
       <span
-        [class.bordered]="firstDaySchedule.isInDifferentDepartments && cardConfig.showAdditionalTooltip"
+        [class.bordered]="dateSchedule.isInDifferentDepartments"
         class="title__text"
       >
       {{ cardConfig.title }}
@@ -36,7 +36,7 @@
   </div>
 
   <ejs-tooltip
-    *ngIf="firstDaySchedule.isInDifferentDepartments && cardConfig.showAdditionalTooltip"
+    *ngIf="dateSchedule.isInDifferentDepartments && cardConfig.showAdditionalTooltip"
     [content]="additionalTooltipMessage"
     position="TopCenter"
     [showTipPointer]="false"

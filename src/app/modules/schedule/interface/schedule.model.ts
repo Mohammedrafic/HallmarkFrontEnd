@@ -22,7 +22,6 @@ export interface ScheduleItem {
   scheduleOrderType: ScheduleOrderType;
   location: string;
   department: string;
-  isInDifferentDepartments: boolean;
 }
 
 export interface ScheduleModel {
@@ -40,6 +39,7 @@ export interface ScheduleDateItem {
   date: string;
   extendedDays: number;
   daySchedules: ScheduleItem[];
+  isInDifferentDepartments: boolean;
 }
 
 export type ScheduleCandidatesPage = PageOfCollections<ScheduleCandidate>;
