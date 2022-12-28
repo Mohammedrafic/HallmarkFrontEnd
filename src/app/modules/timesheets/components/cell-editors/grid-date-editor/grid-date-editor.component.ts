@@ -7,7 +7,7 @@ import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 import { DateTimeHelper, TimesheetDateHelper } from '@core/helpers';
 import { EditFieldTypes } from '@core/enums';
-import { takeUntil } from 'rxjs';
+import { Subscription, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-grid-date-editor',
@@ -26,6 +26,8 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
 
   public type: EditFieldTypes;
 
+  private controlSub: Subscription;
+
   constructor(
     private cd: ChangeDetectorRef,
   ) {
@@ -34,7 +36,6 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
 
   public agInit(params: ICellRendererParams): void {
     this.setData(params);
-    this.watchForValidation();
     this.cd.markForCheck();
   }
 
@@ -72,6 +73,10 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
         }
       }
     }
+
+    if (!this.controlSub && this.control) {
+      this.watchForValidation();
+    }
   }
 
   private calculateDateValue(date: string): string | null {
@@ -84,7 +89,7 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   }
 
   private watchForValidation(): void {
-    this.control.statusChanges
+    this.controlSub = this.control.statusChanges
     .pipe(
       takeUntil(this.componentDestroy())
     )
