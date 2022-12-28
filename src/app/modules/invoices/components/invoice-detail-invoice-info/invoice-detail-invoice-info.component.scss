@@ -1,5 +1,6 @@
 @import "colors";
 @import "mixins";
+@import "adaptive-response";
 
 .job-info-container {
   width: 100%;
@@ -64,11 +65,25 @@
     "section section"
     "section section";
 
+  .amount,
   .details-action-block {
+    justify-content: flex-start;
+  }
+}
+
+@media #{$max-mobile} {
+  .job-info-container {
+    grid-template-areas:
+      "amount"
+      "action";
+  }
+
+  .details-action-block {
+    margin-left: 21px;
     justify-content: flex-start;
   }
 
   .amount {
-    justify-content: flex-start;
+    justify-content: flex-start !important;
   }
 }

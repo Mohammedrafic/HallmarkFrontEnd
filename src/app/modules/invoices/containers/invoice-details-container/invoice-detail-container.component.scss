@@ -396,6 +396,11 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
     align-items: flex-start;
   }
 
+  .container,
+  .profile-table-block {
+    padding-bottom: 16px !important;
+  }
+
   .close-button {
     margin: 0 5px !important;
     padding-right: 0 !important;
@@ -411,5 +416,9 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
   .change-status-btn {
     width: 312px;
+  }
+
+  .table-footer {
+    justify-content: space-evenly !important;
   }
 }
