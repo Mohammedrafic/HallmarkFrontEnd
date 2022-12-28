@@ -38,7 +38,7 @@
               <ng-container [ngSwitch]="item.type">
 
                 <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
-                  <div class="{{item.cssClass}} input-container">
+                  <div class="{{item.cssClass}} input-container" *ngIf="item.show">
                     <label [for]="item.field">
                       {{ item.title }} <span *ngIf="item.required" class="required">*</span>
                     </label>
@@ -134,6 +134,26 @@
                         [dataSource]="item.dataSource"
                         [fields]="optionFields"
                         [showSelectAll]="true"
+                        [allowFiltering]="true"
+                        [showDropDownIcon]="true"
+                        [formControlName]="item.field"
+                      >
+                      </ejs-multiselect>
+                    </div>
+                  </div>
+                </ng-template>
+
+                <ng-template [ngSwitchCase]="FieldTypes.MultiCheckBoxDropdown">
+                  <div class="{{item.cssClass}} input-container">
+                    <label [for]="item.field">
+                      {{ item.title }} <span *ngIf="item.required" class="required">*</span>
+                    </label>
+                    <div class="input-group">
+                      <ejs-multiselect
+                        appValidateWithMessage
+                        mode="CheckBox"
+                        [dataSource]="item.dataSource"
+                        [fields]="optionFields"
                         [allowFiltering]="true"
                         [showDropDownIcon]="true"
                         [formControlName]="item.field"

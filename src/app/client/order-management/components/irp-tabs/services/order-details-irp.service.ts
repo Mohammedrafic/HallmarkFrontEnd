@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ONLY_NUMBER } from '@shared/constants';
 import { Duration } from '@shared/enums/durations';
 import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { jobDistributionValidator } from '@client/order-management/components/irp-tabs/order-details/validators';
 
 @Injectable()
 export class OrderDetailsIrpService {
@@ -50,14 +51,18 @@ export class OrderDetailsIrpService {
       jobDistribution: [null, Validators.required],
       agencyId: [null],
       hourlyRate: [null],
+    },{
+      validators: jobDistributionValidator('jobDistribution'),
     });
   }
 
   public createJobDistributionPOForm(): FormGroup {
     return this.formBuilder.group({
-      jobDistribution: [null, Validators.required],
+      jobDistribution: [null, Validators.required ],
       agencyId: [null],
       billRate: [null],
+    }, {
+        validators: jobDistributionValidator('jobDistribution'),
     });
   }
 

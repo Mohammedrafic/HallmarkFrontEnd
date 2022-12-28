@@ -8,7 +8,7 @@ import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 
 import { IrpTabConfig } from '@client/order-management/containers/irp-container/irp-container.constant';
 import { IrpTabs } from '@client/order-management/enums';
-import { ListOfKeyForms, TabsConfig } from '@client/order-management/interfaces';
+import { ListOfKeyForms, SelectSystem, TabsConfig } from '@client/order-management/interfaces';
 import { Destroyable } from '@core/helpers';
 import { OrderCredentialsService } from "@client/order-management/services";
 import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
@@ -33,6 +33,7 @@ import { IOrderCredentialItem } from "@order-credentials/types";
 export class IrpContainerComponent extends Destroyable implements OnInit, OnChanges {
   @Input('handleSaveEvents') public handleSaveEvents$: Subject<void | MenuEventArgs>;
   @Input() public selectedOrder: Order;
+  @Input() selectedSystem: SelectSystem;
 
   public tabsConfig: TabsConfig[] = IrpTabConfig;
   public tabs = IrpTabs;
@@ -54,7 +55,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedOrder'].currentValue) {
+    if (changes['selectedOrder']?.currentValue) {
       this.orderCredentials = [...this.selectedOrder.credentials];
     }
   }

@@ -9,7 +9,10 @@
       </ng-template>
       <ng-template #content>
         <ng-container [ngSwitch]="tab.content">
-          <app-order-details-irp *ngSwitchCase="tabs.Details"></app-order-details-irp>
+          <app-order-details-irp
+            *ngSwitchCase="tabs.Details"
+            [system]="selectedSystem"
+          ></app-order-details-irp>
           <app-order-credentials
             *ngSwitchCase="tabs.Credential"
             [isActive]="tab.content === tabs.Credential"

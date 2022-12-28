@@ -1,7 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
-import { AbstractControl, FormGroup, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+  TrackByFunction,
+} from '@angular/core';
+import { AbstractControl, FormGroup } from '@angular/forms';
 
-import { filter, map, Observable, takeUntil } from 'rxjs';
+import { filter, map, Observable, switchMap, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -16,6 +23,7 @@ import {
   OrderTypes,
   PoNumbers,
   ProjectNames,
+  SelectSystem,
   SpecialProjectCategories,
   SpecialProjectStructure,
   StateList,
@@ -27,7 +35,11 @@ import {
   Incomplete,
   JobDescriptionForm,
   JobDistributionForm,
-  OrderTypeList, SpecialProjectForm, TimeMask, TitleField, WorkLocationList,
+  OrderTypeList,
+  SpecialProjectForm,
+  TierExternalJob,
+  TimeMask,
+  WorkLocationList,
 } from '@client/order-management/components/irp-tabs/order-details/constants/order-details.constant';
 import {
   ContactDetailsConfig,
@@ -44,16 +56,20 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { Region } from '@shared/models/region.model';
 import { Location } from '@shared/models/location.model';
 import {
+  adaptOrder,
+  changeTypeEditButton,
   changeTypeField,
-  getAgencyIdFiled,
+  getDataSourceForJobDistribution,
   mapAssociateAgencyStructure,
   mapperForContactDetail,
   mapReasonsStructure,
   mapSpecialProjectStructure,
   mapStatesStructure,
-  mapStructureToEditedOrder,
+  removeFields,
   setDataSource,
   setDefaultPrimaryContact,
+  showHideFormAction,
+  updateJobDistributionControls,
 } from '@client/order-management/components/irp-tabs/order-details/helpers';
 import { Department } from '@shared/models/department.model';
 import { ListOfSkills } from '@shared/models/skill.model';
@@ -65,8 +81,7 @@ import {
   OrderDetailsIrpService,
 } from '@client/order-management/components/irp-tabs/services/order-details-irp.service';
 import { ButtonType, IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
-import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
-import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
+import { ORDER_CONTACT_DETAIL_TITLES, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
@@ -75,9 +90,17 @@ import { IrpContainerStateService } from '@client/order-management/containers/ir
 import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { UserState } from '../../../../../store/user.state';
-import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { Organization, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationStructureService } from '@client/order-management/components/irp-tabs/services';
-import { GetContactDetails, GetSuggestedDetails } from '@client/store/order-managment-content.actions';
+import {
+  GetContactDetails,
+  GetOrganizationStatesWithKeyCode,
+  GetProjectSpecialData,
+  GetSuggestedDetails,
+} from '@client/store/order-managment-content.actions';
+import { SettingsViewService } from '@shared/services';
+import { ShowToast } from '../../../../../store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -85,7 +108,16 @@ import { GetContactDetails, GetSuggestedDetails } from '@client/store/order-mana
   styleUrls: ['./order-details-irp.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnDestroy {
+export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
+  @Input() set system(value: SelectSystem) {
+    this.selectedSystem = value;
+
+    if(!this.selectedOrder) {
+      this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem);
+      this.setConfigDataSources();
+    }
+  }
+
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
@@ -103,7 +135,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
   public readonly timeMask = TimeMask;
   //TODO: Remove any (ListOfKeyForms)
   public listOfKeyForms: any;
-  public orderFormsConfig: OrderFormsConfig[] = LongTermAssignmentConfig;
+  public orderFormsConfig: OrderFormsConfig[];
   public orderFormsArrayConfig: OrderFormsArrayConfig[] =
     [...ContactDetailsConfig(ContactDetailsForm()), ...WorkLocationConfig(WorkLocationFrom())];
   public contactDetailsFormsList: FormGroup[] = [];
@@ -115,8 +147,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
   public regionsStructure: OrganizationRegion[] = [];
 
   private dataSourceContainer: OrderDataSourceContainer = {};
-  private isLocationLoad = true;
-  private isDepartmentLoad = true;
+  private selectedSystem: SelectSystem;
 
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   private skills$: Observable<ListOfSkills[]>;
@@ -136,6 +167,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
   private contactDetails$: Observable<Department>;
   @Select(OrderManagementContentState.suggestedDetails)
   private suggestedDetails$: Observable<SuggestedDetails | null>;
+  @Select(OrganizationManagementState.organization)
+  private readonly organization$: Observable<Organization>;
 
   constructor(
     private orderDetailsService: OrderDetailsIrpService,
@@ -143,7 +176,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
     private store: Store,
     private durationService: DurationService,
     private irpStateService: IrpContainerStateService,
-    private organizationStructureService: OrganizationStructureService
+    private organizationStructureService: OrganizationStructureService,
+    private settingsViewService: SettingsViewService,
   ) {
     super();
   }
@@ -158,12 +192,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
     this.watchForOrganizationStructure();
   }
 
-  override ngOnDestroy(): void {
-    super.ngOnDestroy();
-
-    this.clearConfigs();
-  }
-
   public addFields(config: OrderFormsArrayConfig): void {
     const selectedConfig = this.getSelectedArrayFormsConfig(config);
 
@@ -172,11 +200,11 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
       this.contactDetailsFormsList.push(
         this.orderDetailsService.createContactDetailsForm(this.contactDetailsFormsList.length)
       );
-      this.showHideFormAction(selectedConfig, this.contactDetailsFormsList);
+      showHideFormAction(selectedConfig, this.contactDetailsFormsList);
     } else {
       selectedConfig?.forms.push(WorkLocationFrom(this.dataSourceContainer.state));
       this.workLocationFormsList.push(this.orderDetailsService.createWorkLocationForm());
-      this.showHideFormAction(selectedConfig, this.workLocationFormsList);
+      showHideFormAction(selectedConfig, this.workLocationFormsList);
     }
   }
 
@@ -193,14 +221,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
 
     switch (item.buttonType) {
       case ButtonType.RemoveContact:
-        this.removeFields(selectedConfig, index, this.contactDetailsFormsList);
+        removeFields(selectedConfig, index, this.contactDetailsFormsList);
         setDefaultPrimaryContact(this.contactDetailsFormsList);
         break;
       case ButtonType.RemoveWorkLocation:
-        this.removeFields(selectedConfig, index, this.workLocationFormsList);
+        removeFields(selectedConfig, index, this.workLocationFormsList);
         break;
       case ButtonType.Edit:
-        this.changeTypeEditButton(selectedConfig, index);
+        changeTypeEditButton(selectedConfig, index);
         break;
     }
   }
@@ -231,7 +259,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
     this.specialProjectForm = this.orderDetailsService.createSpecialProject();
     this.workLocationForm = this.orderDetailsService.createWorkLocationForm();
 
-    if(!this.selectedOrder) {
+   if(!this.selectedOrder) {
       this.contactDetailsFormsList.push(this.contactDetailsForm);
       this.workLocationFormsList.push(this.workLocationForm);
     }
@@ -265,15 +293,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
       this.clearFormLists();
-
       if (value === IrpOrderType.LongTermAssignment) {
         this.orderFormsArrayConfig =
           [...ContactDetailsConfig(ContactDetailsForm()), ...WorkLocationConfig(WorkLocationFrom())];
-        this.orderFormsConfig = LongTermAssignmentConfig;
+        this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem);
       } else {
         this.orderFormsArrayConfig =
           [...ContactDetailsConfig(ContactDetailsForm()), ...WorkLocationConfig(WorkLocationFrom())];
-        this.orderFormsConfig = perDiemConfig();
+        this.orderFormsConfig = perDiemConfig(this.selectedSystem);
       }
 
       this.initForms(value);
@@ -433,74 +460,54 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
     });
 
     this.generalInformationForm.get('departmentId')?.valueChanges.pipe(
-      filter((value: number) => !!value && !this.selectedOrder),
+      filter(Boolean),
+      map((id: number) => this.getContactDetailsById(id)),
+      filter((id: number) => !!id && this.selectedSystem.isIRP && this.selectedSystem.isVMS),
+      switchMap((id: number) => {
+        return this.settingsViewService.getViewSettingKey(
+          OrganizationSettingKeys.TieringLogic,
+          OrganizationalHierarchy.Department,
+          id);
+      }),
       takeUntil(this.componentDestroy())
-    ).subscribe((value: number) => {
-        this.store.dispatch(new GetContactDetails(value));
+    ).subscribe(({ TieringLogic }) => {
+      const jobDistributionForm = this.getSelectedFormConfig(JobDistributionForm);
+      const sourceForJobDistribution = getDataSourceForJobDistribution(this.selectedSystem);
+
+      if(TieringLogic) {
+        setDataSource(jobDistributionForm.fields, 'jobDistribution', [
+          sourceForJobDistribution[0],
+          sourceForJobDistribution[1],
+          TierExternalJob,
+          sourceForJobDistribution[2],
+        ]);
+      } else {
+        setDataSource(jobDistributionForm.fields, 'jobDistribution', sourceForJobDistribution);
+      }
+      this.jobDistributionForm.reset();
+      this.changeDetection.markForCheck();
     });
-
-    //todo: uncomment logic for IRP tiers
-    /*this.generalInformationForm.get('departmentId')?.valueChanges
-      .pipe(
-        filter(Boolean),
-        switchMap((id: number) => {
-          return this.settingsViewService.getViewSettingKey(
-            OrganizationSettingKeys.TieringLogic,
-            OrganizationalHierarchy.Department,
-            id);
-        }),
-        takeUntil(this.componentDestroy())
-      ).subscribe(({ TieringLogic }) => {
-        const selectedForm = this.getSelectedFormConfig(JobDistributionForm);
-        setDataSource(
-          selectedForm.fields,
-        'jobDistribution',
-          getDistributionSource(TieringLogic === TierLogic.Show)
-        );
-
-        if(this.selectedOrder) {
-          this.jobDistributionForm.get('jobDistribution')?.patchValue(this.selectedOrder.jobDistributionValue);
-        }
-        this.changeDetection.markForCheck();
-    });*/
 
     this.jobDistributionForm.get('jobDistribution')?.valueChanges.pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number[]) => {
       const selectedConfig = this.getSelectedFormConfig(JobDistributionForm);
-      const agencyConfigControl = getAgencyIdFiled(selectedConfig);
-      const agencyFormControl = this.jobDistributionForm.get('agencyId');
-      const rateConfigControl = this.getRateConfigControl(selectedConfig);
-
-      if(value.includes(IrpOrderJobDistribution.SelectedExternal)) {
-        agencyConfigControl.enabled = true;
-        rateConfigControl.show = true;
-        agencyFormControl?.addValidators([Validators.required]);
-        agencyConfigControl.required = true;
-      } else {
-        agencyConfigControl.enabled = false;
-        rateConfigControl.show = false;
-        agencyFormControl?.removeValidators(Validators.required);
-        agencyFormControl?.reset();
-        agencyConfigControl.required = false;
-      }
-
+      const agencyFormControl = this.jobDistributionForm.get('agencyId') as AbstractControl;
+      updateJobDistributionControls(value, selectedConfig, this.orderTypeForm, agencyFormControl);
       agencyFormControl?.updateValueAndValidity();
+      this.showDistributionErrorMessage();
+
       this.changeDetection.markForCheck();
     });
   }
 
-  private showHideFormAction(config: OrderFormsArrayConfig, list: FormGroup[]): void {
-    config.forms.forEach((form: OrderFormInput[]) => {
-      form.forEach((field: OrderFormInput) => {
-        if (
-          (field.type === FieldType.Button || field.type === FieldType.RadioButton) && field.buttonType !== ButtonType.Edit
-        ) {
-          field.show = list.length > 1;
-        }
-      });
-    });
+  private showDistributionErrorMessage(): void {
+    const distributionControl = this.jobDistributionForm.get('jobDistribution');
+    if(distributionControl?.errors) {
+      distributionControl.markAsTouched();
+      this.store.dispatch(new ShowToast(MessageTypes.Error, distributionControl?.errors['errorMessage']));
+    }
   }
 
   private updateDataSourceFormList(name: string, value: DataSourceContainer): void {
@@ -508,15 +515,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
       ...this.dataSourceContainer,
       [name]: value,
     };
-  }
-
-  private removeFields(config: OrderFormsArrayConfig, index: number, form: FormGroup[]): void {
-    config?.forms.splice(index, 1);
-    form.splice(index, 1);
-
-    if (form.length < 2) {
-      this.showHideFormAction(config, this.contactDetailsFormsList);
-    }
   }
 
   private getSelectedArrayFormsConfig(config: OrderFormsArrayConfig): OrderFormsArrayConfig {
@@ -539,14 +537,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
 
   private initOrderTypeForm(): void {
     this.orderTypeForm = this.orderDetailsService.createOrderTypeForm();
-  }
-
-  private changeTypeEditButton(config: OrderFormsArrayConfig, index: number): void {
-    config?.forms[index].forEach((field: OrderFormInput) => {
-      if(field.field === TitleField) {
-        field.type = field.type === FieldType.Input ? FieldType.Dropdown : FieldType.Input;
-      }
-    });
   }
 
   private getSelectedConfigFromList(formName: string): OrderFormsArrayConfig {
@@ -580,7 +570,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
   private watchForSelectOrder(): void {
     this.selectedOrder$.pipe(
       filter(Boolean),
-      map((selectedOrder: Order) => mapStructureToEditedOrder(selectedOrder)),
+      map((selectedOrder: Order) => adaptOrder(selectedOrder)),
       takeUntil(this.componentDestroy())
     ).subscribe((selectedOrder: Order) => {
       this.selectedOrder = selectedOrder;
@@ -610,9 +600,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
 
   private setConfigType(selectedOrder: Order): void {
     if(selectedOrder.orderType === OrderType.OpenPerDiem) {
-      this.orderFormsConfig = perDiemConfig();
+      this.orderFormsConfig = perDiemConfig(this.selectedSystem);
     } else {
-      this.orderFormsConfig = LongTermAssignmentConfig;
+      this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem);
     }
   }
 
@@ -621,7 +611,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
 
     selectedOrder.contactDetails.forEach((contact: OrderContactDetails, index: number) => {
       if(!ORDER_CONTACT_DETAIL_TITLES.includes(contact.name)) {
-        this.changeTypeEditButton(selectedConfig, index);
+        changeTypeEditButton(selectedConfig, index);
       }
 
       const contactForm = this.orderDetailsService.createContactDetailsForm(this.contactDetailsFormsList.length);
@@ -629,7 +619,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
       selectedConfig?.forms.push(ContactDetailsForm());
       this.contactDetailsFormsList.push(contactForm);
     });
-    this.showHideFormAction(selectedConfig, this.contactDetailsFormsList);
+
+    showHideFormAction(selectedConfig, this.contactDetailsFormsList);
   }
 
   private createPatchWorkLocation(selectedOrder: Order): void {
@@ -642,7 +633,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
       this.workLocationFormsList.push(workLocationForm);
     });
 
-    this.showHideFormAction(selectedConfig, this.contactDetailsFormsList);
+    showHideFormAction(selectedConfig, this.contactDetailsFormsList);
   }
 
   private setDataSourceForSpecialProject(data?: SpecialProjectStructure): void {
@@ -671,23 +662,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
     });
   }
 
-  private getRateConfigControl(config: OrderFormsConfig): OrderFormInput {
-    const orderType = this.orderTypeForm.get('orderType')?.value;
-    const controlType = orderType === IrpOrderType.LongTermAssignment ? 'hourlyRate': 'billRate';
-
-    return config?.fields.find((control: OrderFormInput) => {
-      return control.field === controlType;
-    }) as OrderFormInput;
-  }
-
-  private clearConfigs(): void {
-    const selectedConfig = this.getSelectedFormConfig(JobDistributionForm);
-    getAgencyIdFiled(selectedConfig).enabled = false;
-    this.getRateConfigControl(selectedConfig).show = false;
-    this.isLocationLoad = true;
-    this.isDepartmentLoad = true;
-  }
-
   private watchForOrganizationStructure(): void {
     this.organizationStructure$
       .pipe(
@@ -697,10 +671,38 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
         ),
         takeUntil(this.componentDestroy())
       ).subscribe((structure: OrganizationRegion[]) => {
-      this.updateDataSourceFormList('regions', structure);
-      const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
-      setDataSource(selectedForm.fields, 'regionId', structure);
+        if(!this.selectedOrder) {
+          this.generalInformationForm.get('regionId')?.reset();
+        }
+        this.updateDataSourceFormList('regions', structure);
+        const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
+        setDataSource(selectedForm.fields, 'regionId', structure);
+        this.changeDetection.markForCheck();
+    });
+
+    this.organization$.pipe(
+      filter((organisation: Organization) => !!organisation && !this.selectedOrder),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.orderTypeForm.get('orderType')?.patchValue(IrpOrderType.LongTermAssignment);
+      this.store.dispatch([
+        new GetProjectSpecialData(),
+        new GetOrganizationStatesWithKeyCode(),
+      ]);
+
+      this.generalInformationForm.reset();
+      this.jobDistributionForm.reset();
+      this.jobDescriptionForm.reset();
+      this.specialProjectForm.reset();
+
       this.changeDetection.markForCheck();
     });
+  }
+
+  private getContactDetailsById(id: number): number {
+    if(!this.selectedOrder) {
+      this.store.dispatch(new GetContactDetails(id));
+    }
+    return id;
   }
 }

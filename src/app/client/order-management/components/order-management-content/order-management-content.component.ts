@@ -587,6 +587,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           break;
       }
 
+      this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.VMS);
       this.checkSelectedChildrenItem();
     }
 
@@ -1022,6 +1023,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   buttonGroupChange(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
+    this.orderManagementService.setOrderManagementSystem(this.activeSystem);
 
     this.clearFilters();
     this.initGridColumns();
@@ -1852,7 +1854,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.isOrgVMSEnabled = !!isVMCEnabled;
 
       const previousSelectedSystemId = this.orderManagementService.getOrderManagementSystem();
-
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, previousSelectedSystemId);
       this.activeSystem = previousSelectedSystemId
         ?? DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);

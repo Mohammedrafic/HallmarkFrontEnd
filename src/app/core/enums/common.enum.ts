@@ -6,6 +6,7 @@ export enum FieldType {
   Number = 'number',
   Dropdown = 'dropdown',
   MultiSelectDropdown = 'multiSelectDropdown',
+  MultiCheckBoxDropdown = 'multiCheckBoxDropdown',
   Date = 'date',
   SearchDD = 'searchDD',
   Toggle = 'toggle',

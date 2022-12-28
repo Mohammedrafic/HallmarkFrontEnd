@@ -4,13 +4,11 @@ import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shi
 import { JobClassifications } from '@client/order-management/constants';
 import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
 import { ButtonType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
-import {
-  IrpJobDistribution,
-} from '@client/order-management/components/irp-tabs/order-details/constants/order-details.constant';
-import { OrderFormInput, OrderFormsArrayConfig, OrderFormsConfig } from '@client/order-management/interfaces';
+import { OrderFormInput, OrderFormsArrayConfig, OrderFormsConfig, SelectSystem } from '@client/order-management/interfaces';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
+import { getDataSourceForJobDistribution } from '@client/order-management/components/irp-tabs/order-details/helpers';
 
-export const GeneralInformationConfigLTA: OrderFormsConfig  = {
+export const GeneralInformationConfigLTA = (): OrderFormsConfig  => ({
   title: 'General Information',
   formName: 'generalInformationForm',
   cssClass: 'general-information-wrapper',
@@ -20,6 +18,7 @@ export const GeneralInformationConfigLTA: OrderFormsConfig  = {
       title: 'Region',
       cssClass: 'item1',
       required: true,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -28,6 +27,7 @@ export const GeneralInformationConfigLTA: OrderFormsConfig  = {
       title: 'Location',
       cssClass: 'item2',
       required: true,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -36,6 +36,7 @@ export const GeneralInformationConfigLTA: OrderFormsConfig  = {
       title: 'Department',
       cssClass: 'item3',
       required: true,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -44,6 +45,7 @@ export const GeneralInformationConfigLTA: OrderFormsConfig  = {
       title: 'Skill',
       cssClass: 'item4',
       required: true,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -60,6 +62,7 @@ export const GeneralInformationConfigLTA: OrderFormsConfig  = {
       title: 'Duration',
       cssClass: 'item6',
       required: true,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: ORDER_DURATION_LIST,
     },
@@ -82,6 +85,7 @@ export const GeneralInformationConfigLTA: OrderFormsConfig  = {
       title: 'Shift Name',
       cssClass: 'item9',
       required: true,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: ORDER_MASTER_SHIFT_NAME_LIST,
     },
@@ -100,7 +104,7 @@ export const GeneralInformationConfigLTA: OrderFormsConfig  = {
       type: FieldType.Time,
     },
   ],
-};
+});
 
 export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
   title: 'General Information',
@@ -112,6 +116,7 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
       title: 'Region',
       required: true,
       cssClass: 'item1',
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -120,6 +125,7 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
       title: 'Location',
       required: true,
       cssClass: 'item2',
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -128,6 +134,7 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
       title: 'Department',
       required: true,
       cssClass: 'item3',
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -136,6 +143,7 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
       title: 'Skill',
       required: true,
       cssClass: 'item4',
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -159,6 +167,7 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
       title: 'Shift Name',
       cssClass: 'item7',
       required: true,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: ORDER_MASTER_SHIFT_NAME_LIST,
     },
@@ -179,7 +188,7 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
   ],
 });
 
-export const JobDistributionConfigLTA: OrderFormsConfig  = {
+export const JobDistributionConfigLTA = (selectedSystem: SelectSystem): OrderFormsConfig => ({
   title: 'Job Distribution',
   formName: 'jobDistributionForm',
   cssClass: 'job-distribution-wrapper',
@@ -188,14 +197,15 @@ export const JobDistributionConfigLTA: OrderFormsConfig  = {
       field: 'jobDistribution',
       title: 'Job Distribution',
       required: true,
-      type: FieldType.MultiSelectDropdown,
-      dataSource: IrpJobDistribution,
+      type: FieldType.MultiCheckBoxDropdown,
+      dataSource: getDataSourceForJobDistribution(selectedSystem),
     },
     {
       field: 'agencyId',
       title: 'Agency',
       required: false,
-      enabled: false,
+      enabled: true,
+      show: false,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -207,9 +217,9 @@ export const JobDistributionConfigLTA: OrderFormsConfig  = {
       type: FieldType.Number,
     },
   ],
-};
+});
 
-export const JobDistributionConfigPO: OrderFormsConfig = {
+export const JobDistributionConfigPO = (selectedSystem: SelectSystem): OrderFormsConfig => ({
   title: 'Job Distribution',
   formName: 'jobDistributionForm',
   cssClass: 'job-distribution-wrapper',
@@ -218,14 +228,15 @@ export const JobDistributionConfigPO: OrderFormsConfig = {
       field: 'jobDistribution',
       title: 'Job Distribution',
       required: true,
-      type: FieldType.MultiSelectDropdown,
-      dataSource: IrpJobDistribution,
+      type: FieldType.MultiCheckBoxDropdown,
+      dataSource: getDataSourceForJobDistribution(selectedSystem),
     },
     {
       field: 'agencyId',
       title: 'Agency',
       required: false,
-      enabled: false,
+      enabled: true,
+      show: false,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -237,9 +248,9 @@ export const JobDistributionConfigPO: OrderFormsConfig = {
       type: FieldType.Input,
     },
   ],
-};
+});
 
-export const JobDescriptionConfig: OrderFormsConfig = {
+export const JobDescriptionConfig = (): OrderFormsConfig => ({
   title: 'Job Description',
   formName: 'jobDescriptionForm',
   cssClass: 'job-description-wrapper',
@@ -249,6 +260,7 @@ export const JobDescriptionConfig: OrderFormsConfig = {
       title: 'Reason for Requisition',
       cssClass: 'itm1',
       required: true,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -312,9 +324,9 @@ export const JobDescriptionConfig: OrderFormsConfig = {
       type: FieldType.TextArea,
     },
   ],
-};
+});
 
-export const JobDescriptionConfigPO: OrderFormsConfig = {
+export const JobDescriptionConfigPO = (): OrderFormsConfig => ({
   title: 'Job Description',
   formName: 'jobDescriptionForm',
   cssClass: 'job-description-po-wrapper',
@@ -324,6 +336,7 @@ export const JobDescriptionConfigPO: OrderFormsConfig = {
       title: 'Reason for Requisition',
       cssClass: 'itm1',
       required: true,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -394,9 +407,9 @@ export const JobDescriptionConfigPO: OrderFormsConfig = {
       type: FieldType.TextArea,
     },
   ],
-};
+});
 
-export const SpecialConfigProject: OrderFormsConfig = {
+export const SpecialConfigProject = (): OrderFormsConfig => ({
   title: 'Special Project',
   formName: 'specialProjectForm',
   cssClass: 'special-project-wrapper',
@@ -405,6 +418,7 @@ export const SpecialConfigProject: OrderFormsConfig = {
       field: 'projectTypeId',
       title: 'Special Project Category',
       required: false,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -412,6 +426,7 @@ export const SpecialConfigProject: OrderFormsConfig = {
       field: 'projectNameId',
       title: 'Project Name',
       required: false,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
@@ -419,11 +434,12 @@ export const SpecialConfigProject: OrderFormsConfig = {
       field: 'poNumberId',
       title: 'PO#',
       required: false,
+      show: true,
       type: FieldType.Dropdown,
       dataSource: [],
     },
   ],
-};
+});
 
 export const ContactDetailsForm = (): OrderFormInput[] => [
   {
@@ -545,17 +561,17 @@ export const WorkLocationConfig = (form: OrderFormInput[]): OrderFormsArrayConfi
   },
 ];
 
-export const LongTermAssignmentConfig: OrderFormsConfig[] = [
-  GeneralInformationConfigLTA,
-  JobDistributionConfigLTA,
-  JobDescriptionConfig,
-  SpecialConfigProject,
-];
+export const LongTermAssignmentConfig = (selectedSystem: SelectSystem): OrderFormsConfig[] => ([
+  GeneralInformationConfigLTA(),
+  JobDistributionConfigLTA(selectedSystem),
+  JobDescriptionConfig(),
+  SpecialConfigProject(),
+]);
 
-export const perDiemConfig = (): OrderFormsConfig[] => ([
+export const perDiemConfig = (selectedSystem: SelectSystem): OrderFormsConfig[] => ([
   GeneralInformationConfigPO(),
-  JobDistributionConfigPO,
-  JobDescriptionConfigPO,
-  SpecialConfigProject,
+  JobDistributionConfigPO(selectedSystem),
+  JobDescriptionConfigPO(),
+  SpecialConfigProject(),
 ]);
 

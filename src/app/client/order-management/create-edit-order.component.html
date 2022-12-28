@@ -37,6 +37,7 @@
         *ngSwitchCase="orderSystem.IRP"
         [handleSaveEvents]="saveEvents"
         [selectedOrder]="selectedOrder"
+        [selectedSystem]="selectedSystem"
       ></app-irp-container>
       <app-add-edit-order *ngSwitchCase="orderSystem.VMS" [handleSaveEvents]="saveEvents"></app-add-edit-order>
   </ng-container>

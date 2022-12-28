@@ -5,9 +5,9 @@ export enum OrderJobDistribution {
 }
 
 export enum IrpOrderJobDistribution {
+  AllExternal = 0,
+  TieringLogicExternal = 1,
+  SelectedExternal = 2,
   AllInternal = 3,
-  TieringLogicInternal = 4,
-  AllExternal = 5,
-  TieringLogicExternal = 6,
-  SelectedExternal = 7
+  TieringLogicInternal = 4
 }
