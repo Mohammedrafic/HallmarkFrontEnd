@@ -343,7 +343,7 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
     {
       "OrganizationParamMSR":this.selectedOrganizations?.length==0?this.nullValue: this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
       "StartDateParamMSR": formatDate(startDate, this.dateFormat, this.culture),
-      "EndDateParamMSR": endDate==null?"null":formatDate(endDate, this.dateFormat, this.culture),
+      "EndDateParamMSR": endDate==null?"01/01/0001":formatDate(endDate, this.dateFormat, this.culture),
       "RegionParamMSR": regionIds.length==0?this.nullValue : regionIds.join(this.joinString),
       "LocationParamMSR":locationIds.length==0?this.nullValue : locationIds.join(this.joinString),
       "DepartmentParamMSR":departmentIds.length==0?this.nullValue :  departmentIds.join(this.joinString),      
