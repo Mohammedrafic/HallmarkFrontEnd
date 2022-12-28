@@ -397,8 +397,7 @@ export class YtdSummaryComponent implements OnInit {
       "startDateYTDS": year,
       "endDateYTDS": month,
       "yearYTDS": year,
-      "monthYTDS": month,
-
+      "monthYTDS": month
       };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
