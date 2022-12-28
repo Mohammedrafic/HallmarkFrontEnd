@@ -183,10 +183,10 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     this.dateControl.patchValue(dateRange, { emitEvent: false });
 
     this.weekService.setRange([
-      DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(value, true, this.rangeType, this.firstDayOfWeek,
-        !!this.maxDate)),
-      DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(value, false, this.rangeType, this.firstDayOfWeek,
-        !!this.maxDate)),
+      DateTimeHelper.toUtcFormat(DateTimeHelper.getDynamicWeekDate(value, true, this.startDate, this.rangeType, 
+        this.firstDayOfWeek, !!this.maxDate)),
+      DateTimeHelper.toUtcFormat(DateTimeHelper.getDynamicWeekDate(value, false, this.startDate, this.rangeType, 
+        this.firstDayOfWeek, !!this.maxDate)),
     ]);
     this.compareDates();
   }
@@ -219,9 +219,10 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     this.dateControl.setValue(range, { emitEvent: false });
 
     this.weekService.setRange([
-      DateTimeHelper.toUtcFormat(new Date(this.startDateValue)),
-      DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(this.startDateValue, false, this.rangeType, this.firstDayOfWeek,
-        !!this.maxDate)),
+      DateTimeHelper.toUtcFormat(DateTimeHelper.getDynamicWeekDate(value, true, this.startDate, this.rangeType, 
+        this.firstDayOfWeek, !!this.maxDate)),
+      DateTimeHelper.toUtcFormat(DateTimeHelper.getDynamicWeekDate(value, false, this.startDate, this.rangeType, 
+        this.firstDayOfWeek, !!this.maxDate)),
     ]);
 
     this.compareDates();
