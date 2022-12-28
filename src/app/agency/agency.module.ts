@@ -108,6 +108,10 @@ import { CredentialStorageFacadeService } from "./services/credential-storage-fa
 import { CredentialStorageService } from "./services/credential-storage.service";
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
 import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
+import {
+  CandidateGeneralInfoService,
+} from "@agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.service";
+
 
 const sidebarIcons = {
   Sliders,
@@ -225,6 +229,7 @@ const sidebarIcons = {
     CredentialStorageService,
     CredentialStorageFacadeService,
     OrderCandidateApiService,
+    CandidateGeneralInfoService,
   ],
 })
 export class AgencyModule {}

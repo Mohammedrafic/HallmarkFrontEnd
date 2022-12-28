@@ -2,7 +2,7 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { QuickOrderConditions } from '../interfaces';
 
 export const optionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-export const skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
+export const skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'masterSkillId' };
 export const organizationFields: FieldSettingsModel = { text: 'name', value: 'organizationId' };
 export const associateAgencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
 export const specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };

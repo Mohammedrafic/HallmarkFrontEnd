@@ -431,13 +431,13 @@
   border-color: $white;
   border-style: solid;
   background-color: $primary-btn-hover;
-  border-radius: 50%;
-  color: $secondary-dark-blue-15;
+  border-radius: 14px;
+  color: $secondary-dark-blue-50;
   padding: 2px 6px;
   font-size: 11px;
   position: absolute;
-  top: 0;
-  right: 6px;
+  bottom: 27px;
+  left: 27px;
 
   &.empty-chat {
     height: 10px;
@@ -557,11 +557,11 @@
   .sidebar-header {
     display: flex;
     height: 50px !important;
-    width:156px;
-    height:32px;
-    top:34px;
-    left:24px;
-    right:260;
+    width: 156px;
+    height: 32px;
+    top: 34px;
+    left: 24px;
+    right: 260;
     font-family: Open Sans;
     font-size: 18px;
     line-height: 32px;
@@ -597,9 +597,9 @@
       padding: 0.55rem 0.2rem 0rem 0rem;
       font-size: 14px;
       line-height: 20px;
-      top:10px;
+      top: 10px;
       right: 50px;
-      display:flex;
+      display: flex;
 
       button {
         padding: 0.3rem 0.5rem !important;
@@ -612,6 +612,10 @@
         background-color: transparent !important;
         cursor: pointer;
         color: $primary-active-blue-10;
+      }
+
+      span {
+        cursor: pointer;
       }
     }
 
@@ -665,7 +669,8 @@
         display: flex;
         align-items: center;
 
-        &__flex-child {}
+        &__flex-child {
+        }
 
         &__flex-child:first-child {
         }
@@ -683,7 +688,6 @@
           line-height: 28px;
           letter-spacing: 0.015em;
           text-align: left;
-
         }
 
         &__date {
@@ -743,10 +747,10 @@
       }
 
       .alert-panel-footer {
-
         right: 15px;
         align-items: center;
-        margin-bottom: 10px;;
+        margin-bottom: 10px;
+        ;
         color: $primary-active-blue-10;
 
         &__footer_flex-child {

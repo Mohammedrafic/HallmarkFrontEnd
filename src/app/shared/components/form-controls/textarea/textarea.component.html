@@ -8,8 +8,9 @@
         <ejs-textbox
           [formControlName]="controlName"
           cssClass="textarea"
+          (blur)="onBlur()"
           [multiline]="true"
-          maxlength="2000">
+          [maxlength]="maxlength">
         </ejs-textbox>
         <app-error-message [control]="getControl()"></app-error-message>
       </div>

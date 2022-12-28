@@ -1,4 +1,4 @@
-import {  CommonReportFilterOptions, SearchCandidate} from "@admin/analytics/models/common-report.model";
+import {  CommonReportFilterOptions, SearchCandidate, SearchCredential} from "@admin/analytics/models/common-report.model";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { sortByField } from "@shared/helpers/sort-by-field.helper";
@@ -73,6 +73,13 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
    */
  public getCommonCandidateSearch(filter:any): Observable<SearchCandidate[]> {
   return this.http.post<SearchCandidate[]>(`/api/LogiReport/financialtimesheet/candidatesearch`,filter);
+}
+/**
+   * Get the Common Credential Search
+   * @return SearchCredential
+   */
+ public getCommonCredentialSearch(filter:any): Observable<SearchCredential[]> {
+  return this.http.post<SearchCredential[]>(`/api/LogiReport/common/credentialsearch`,filter);
 }
 
 }

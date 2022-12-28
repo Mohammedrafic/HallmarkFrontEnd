@@ -6,13 +6,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FeatherModule } from 'angular-feather';
 import { X } from 'angular-feather/icons';
 
-const icons = {
-  X,
-};
-
 @NgModule({
   declarations: [MultiDatePickerComponent],
-  imports: [CommonModule, CalendarModule, ReactiveFormsModule, FeatherModule.pick(icons)],
+  imports: [CommonModule, CalendarModule, ReactiveFormsModule, FeatherModule.pick({ X })],
   exports: [MultiDatePickerComponent],
 })
 export class MultiDatePickerModule {}

@@ -41,6 +41,18 @@ export const accrualConstants = {
     InvoiceType :'invoiceType'
   }
 }
+export const ytdSummaryConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    SkillCategoryIds: 'skillCategoryIds',
+    SkillIds: 'skillIds',
+    Year: 'year',
+    Month: 'month',
+  }
+}
 
 export const invoiceSummaryConstants = {
   formControlNames: {
@@ -126,6 +138,15 @@ export const ageGroups: { name: string; id: number }[] = [
   {name:"Above 90",id:5}
 
 ];
+
+export type Year = {
+  id: number;
+  name: string;
+};
+export type Month = {
+  id: number;
+  name: string;
+};
 
 
 

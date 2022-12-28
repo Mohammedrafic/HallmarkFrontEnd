@@ -91,12 +91,12 @@
       <e-column field="holidayName" headerText="holiday name" width="100%"></e-column>
       <e-column field="startDateTime" headerText="start date & time" width="100%">
         <ng-template #template let-data>
-          {{ data.startDateTime | date: "MM/dd/yyyy hh:mm a":"utc": "en-US" }}
+          {{ data.startDateTime | date: "MM/dd/yyyy HH:mm":"utc": "en-US" }}
         </ng-template>
       </e-column>
       <e-column field="endDateTime" headerText="end date & time" width="100%">
         <ng-template #template let-data>
-          {{ data.endDateTime | date: "MM/dd/yyyy hh:mm a":"utc": "en-US" }}
+          {{ data.endDateTime | date: "MM/dd/yyyy HH:mm":"utc": "en-US" }}
         </ng-template>
       </e-column>
     </e-columns>
@@ -317,6 +317,8 @@
                           name="startDateTime"
                           formControlName="startDateTime"
                           placeholder="Select Date and Time"
+                          format="MM/dd/yyyy HH:mm"
+                          timeFormat="HH:mm"
                           [step]="30">
           </ejs-datetimepicker>
         </div>
@@ -331,6 +333,8 @@
                           name="endDateTime"
                           formControlName="endDateTime"
                           placeholder="Select Date and Time"
+                          format="MM/dd/yyyy HH:mm"
+                          timeFormat="HH:mm"
                           [step]="30">
           </ejs-datetimepicker>
         </div>

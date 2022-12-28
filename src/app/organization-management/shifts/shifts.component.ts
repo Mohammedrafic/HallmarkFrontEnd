@@ -8,7 +8,8 @@ import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SetDirtyState } from '../store/organization-management.actions';
-import { DeleteShift, DeleteShiftSucceeded, ExportShifts, GetShiftsByPage, SaveShift, SaveShiftSucceeded } from '../store/shifts.actions';
+import { DeleteShift, DeleteShiftSucceeded, ExportShifts, GetShiftsByPage,
+  SaveShift, SaveShiftSucceeded } from '../store/shifts.actions';
 import { ShiftsState } from '../store/shifts.state';
 import {
   CANCEL_CONFIRM_TEXT,
@@ -30,7 +31,7 @@ import { AbstractPermissionGrid } from "@shared/helpers/permissions";
   selector: 'app-shifts',
   templateUrl: './shifts.component.html',
   styleUrls: ['./shifts.component.scss'],
-  providers: [SortService, MaskedDateTimeService]
+  providers: [SortService, MaskedDateTimeService],
 })
 export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();
@@ -47,7 +48,7 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
 
   public ShiftFormGroup: FormGroup;
   public optionFields = {
-    text: 'name', value: 'id'
+    text: 'name', value: 'id',
   };
   public title = '';
   public showForm = true;
@@ -115,10 +116,10 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
     this.showForm = true;
     this.addActiveCssClass(event);
     this.title = 'Edit';
-    let [startH, startM, startS] = getHoursMinutesSeconds(data.startTime);
-    let [endH, endM, endS] = getHoursMinutesSeconds(data.endTime);
-    let startDate = new Date();
-    let endDate = new Date();
+    const [startH, startM, startS] = getHoursMinutesSeconds(data.startTime);
+    const [endH, endM, endS] = getHoursMinutesSeconds(data.endTime);
+    const startDate = new Date();
+    const endDate = new Date();
     startDate.setHours(startH, startM, startS);
     endDate.setHours(endH, endM, endS);
     this.ShiftFormGroup.setValue({
@@ -137,7 +138,7 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .subscribe((confirm) => {
         if (confirm) {
@@ -153,7 +154,7 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
       .confirm(CANCEL_CONFIRM_TEXT, {
         title: DELETE_CONFIRM_TITLE,
         okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       }).pipe(filter(confirm => !!confirm))
       .subscribe(() => {
         this.showForm = false;

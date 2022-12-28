@@ -7,6 +7,7 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 import { OptionFields } from '@client/order-management/constants';
 import {
+  ContactDetailsUser,
   DataSourceContainer,
   OrderDataSourceContainer,
   OrderFormInput,
@@ -43,8 +44,10 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { Region } from '@shared/models/region.model';
 import { Location } from '@shared/models/location.model';
 import {
-  changeTypeField, getAgencyIdFiled,
+  changeTypeField,
+  getAgencyIdFiled,
   mapAssociateAgencyStructure,
+  mapperForContactDetail,
   mapReasonsStructure,
   mapSpecialProjectStructure,
   mapStatesStructure,
@@ -69,11 +72,12 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { Document } from '@shared/models/document.model';
 import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
-import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
+import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { UserState } from '../../../../../store/user.state';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationStructureService } from '@client/order-management/components/irp-tabs/services';
+import { GetContactDetails, GetSuggestedDetails } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -128,6 +132,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
   private selectedOrder$: Observable<Order>;
   @Select(UserState.organizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;
+  @Select(OrderManagementContentState.contactDetails)
+  private contactDetails$: Observable<Department>;
+  @Select(OrderManagementContentState.suggestedDetails)
+  private suggestedDetails$: Observable<SuggestedDetails | null>;
 
   constructor(
     private orderDetailsService: OrderDetailsIrpService,
@@ -347,6 +355,22 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
       this.setDataSourceForWorkLocationList(state);
       this.changeDetection.markForCheck();
     });
+
+    this.contactDetails$.pipe(
+      filter(Boolean),
+      map((contactDetails: Department) => mapperForContactDetail(contactDetails)),
+      takeUntil(this.componentDestroy())
+    ).subscribe((contactDetails: ContactDetailsUser) => {
+      this.contactDetailsForm.patchValue(contactDetails);
+    });
+
+    this.suggestedDetails$.pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy())
+    ).subscribe((suggestedDetails: SuggestedDetails) => {
+      const { address, state, city, zipCode } = suggestedDetails.workLocation;
+      this.workLocationForm.patchValue({ address, state, city, zipCode });
+    });
   }
 
   private watchForFormValueChanges(): void {
@@ -370,10 +394,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
       const departments = this.organizationStructureService.getDepartmentsById(value);
+      this.generalInformationForm.get('departmentId')?.reset();
 
       this.updateDataSourceFormList('departments', departments);
       const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
       setDataSource(selectedForm.fields, 'departmentId', departments);
+      if(!this.selectedOrder) {
+        this.store.dispatch(new GetSuggestedDetails(value));
+      }
 
       this.changeDetection.markForCheck();
     });
@@ -402,6 +430,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit, OnD
 
       this.autoSetupJobEndDateControl(duration, value);
       this.changeDetection.markForCheck();
+    });
+
+    this.generalInformationForm.get('departmentId')?.valueChanges.pipe(
+      filter((value: number) => !!value && !this.selectedOrder),
+      takeUntil(this.componentDestroy())
+    ).subscribe((value: number) => {
+        this.store.dispatch(new GetContactDetails(value));
     });
 
     //todo: uncomment logic for IRP tiers

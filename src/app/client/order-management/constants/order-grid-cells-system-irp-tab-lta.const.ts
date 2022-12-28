@@ -180,8 +180,8 @@ export const GridCellsSystemIRPTabLta = (
     minWidth: 80,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) => {
-      const startShiftTime = formatDate(params.data.shiftStartDateTime, 'shortTime', 'en-US');
-      const endShiftTime = formatDate(params.data.shiftEndDateTime, 'shortTime', 'en-US');
+      const startShiftTime = formatDate(params.data.shiftStartDateTime, 'HH:mm', 'en-US');
+      const endShiftTime = formatDate(params.data.shiftEndDateTime, 'HH:mm', 'en-US');
 
       return `${startShiftTime}-${endShiftTime}`;
     },

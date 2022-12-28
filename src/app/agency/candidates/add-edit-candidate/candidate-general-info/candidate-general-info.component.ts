@@ -1,27 +1,21 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+
 import { Select, Store } from '@ngxs/store';
-import { ListOfSkills, Skill } from '@shared/models/skill.model';
+import { filter, Observable, takeUntil } from 'rxjs';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { CheckBoxSelectionService } from '@syncfusion/ej2-angular-dropdowns';
-import { filter, Observable, takeUntil } from 'rxjs';
+
+import { MasterSkill, Skill } from '@shared/models/skill.model';
 import { GetAllSkills } from 'src/app/agency/store/candidate.actions';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
-import { CandidateStatus, CreatedCandidateStatus } from 'src/app/shared/enums/status';
-import { valuesOnly } from 'src/app/shared/utils/enum.utils';
 import { JobDistributionMasterSkills } from '@shared/models/associate-organizations.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { GetRegionList } from '@shared/components/candidate-list/store/candidate-list.actions';
 import { CandidateListState } from '@shared/components/candidate-list/store/candidate-list.state';
+import { Classifications, DefaultOptionFields, SkillFields } from "./candidate-general-info.constants";
+import { CandidateGeneralInfoService } from "./candidate-general-info.service";
 
-enum Classification {
-  Alumni = 0,
-  International = 1,
-  Interns = 2,
-  Locums = 3,
-  Students = 4,
-  Volunteers = 5,
-}
 @Component({
   selector: 'app-candidate-general-info',
   templateUrl: './candidate-general-info.component.html',
@@ -34,45 +28,32 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
 
   @Input() set isCandidateCreated(value: boolean | null) {
     this.enableStatusFields = value as boolean;
-    this.statuses = Object.values(value ? CreatedCandidateStatus : CandidateStatus)
-      .filter(valuesOnly)
-      .map((text, id) => ({ text, id })).sort((a, b) => a.text.localeCompare(b.text));
+    this.statuses = this.candidateGeneralInfoService.getStatuses(value);
   }
 
-  @Select(CandidateState.skills)
-  private skills$: Observable<ListOfSkills[]>;
   @Select(CandidateListState.listOfRegions)
   public regions$: Observable<string[]>;
 
-  public skills: ListOfSkills[];
-  public readonly limitDate: Date = new Date();
+  @Select(CandidateState.skills)
+  private skills$: Observable<MasterSkill[]>;
+
+  public skills: MasterSkill[];
+  public statuses: { text: string, id: number }[];
   public enableStatusFields = false;
-  public agencyFields = {
-    text: 'createUnder.name',
-    value: 'createUnder.id',
-  };
-  public optionFields = {
-    text: 'text',
-    value: 'id',
-  };
-  public skillsFields = {
-    text: 'name',
-    value: 'masterSkillId',
-  };
-  public statuses: any;
-  public classifications = Object.values(Classification)
-    .filter(valuesOnly)
-    .map((text, id) => ({ text, id }));
 
-  constructor(private store: Store) {
+  public readonly limitDate: Date = new Date();
+  public readonly optionFields = DefaultOptionFields;
+  public readonly skillsFields = SkillFields;
+  public readonly classifications = Classifications;
+
+  constructor(private store: Store,
+              private candidateGeneralInfoService: CandidateGeneralInfoService) {
     super();
-
-    store.dispatch(new GetAllSkills());
   }
 
   ngOnInit(): void {
     this.getCandidateSkills();
-    this.getRegions();
+    this.store.dispatch([new GetAllSkills(), new GetRegionList()]);
   }
 
   static createFormGroup(): FormGroup {
@@ -93,17 +74,13 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   private getCandidateSkills(): void {
     this.skills$
       .pipe(
-        filter((skills: ListOfSkills[]) => skills?.length !== 0),
+        filter((skills: MasterSkill[]) => !!skills?.length),
         takeUntil(this.destroy$)
       )
-      .subscribe((skills: ListOfSkills[]) => {
+      .subscribe((skills: MasterSkill[]) => {
         this.skills = skills;
         const updatedSkills = this.selectedSkills?.map((skill: Skill) => skill.id);
         this.formGroup.get('candidateProfileSkills')?.patchValue(updatedSkills);
       });
-  }
-
-  private getRegions(): void {
-    this.store.dispatch(new GetRegionList());
   }
 }
