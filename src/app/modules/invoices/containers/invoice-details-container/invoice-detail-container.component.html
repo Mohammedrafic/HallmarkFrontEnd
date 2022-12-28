@@ -40,24 +40,8 @@
               class="separator"
               *ngIf="!(invoiceDetailsConfig.isMiddleTabletWidth || invoiceDetailsConfig.isMobile)"
             ></div>
-            
-            <button
-              *ngIf="actionBtnText && !invoiceDetailsConfig.isMobile"
-              ejs-button
-              [disabled]="invoiceDetailsConfig.isActionBtnDisabled"
-              cssClass="e-primary"
-              class="relative"
-              (click)="changeInvoiceStatus()"
-            >
-              {{ actionBtnText }}
-              <ejs-tooltip
-                *ngIf="invoiceDetailsConfig.isActionBtnDisabled"
-                class="tooltip"
-                content="Separate permission right is required"
-                position="BottomCenter"
-              >
-              </ejs-tooltip>
-            </button>
+
+            <ng-container *ngIf="!invoiceDetailsConfig.isMobile" [ngTemplateOutlet]="changeStatusBtn"></ng-container>
           </div>
 
           <button ejs-button type="submit" cssClass="e-flat close-button" (click)="closeInvoiceDetails()">
@@ -118,6 +102,10 @@
           <ng-container *ngTemplateOutlet="tableFooter; context: { $implicit: true }"></ng-container>
         </ng-container>
       </div>
+
+      <div class="mobile-change-status-btn" *ngIf="invoiceDetailsConfig.isMobile">
+        <ng-container [ngTemplateOutlet]="changeStatusBtn"></ng-container>
+      </div>
     </section>
     <app-navigation-panel
       prevLabel="Previous Order"
@@ -129,6 +117,7 @@
     ></app-navigation-panel>
   </ng-template>
 </ejs-dialog>
+
 <ng-template #tableFooter let-showHours>
   <div class="table-footer">
     <div *ngIf="showHours" class="total">
@@ -148,6 +137,26 @@
       <p class="total__text">Total Amount</p>
     </div>
   </div>
+</ng-template>
+
+<ng-template #changeStatusBtn>
+  <button
+    *ngIf="actionBtnText"
+    ejs-button
+    [disabled]="invoiceDetailsConfig.isActionBtnDisabled"
+    cssClass="e-primary"
+    class="relative change-status-btn"
+    (click)="changeInvoiceStatus()"
+  >
+    {{ actionBtnText }}
+    <ejs-tooltip
+      *ngIf="invoiceDetailsConfig.isActionBtnDisabled"
+      class="tooltip"
+      content="Separate permission right is required"
+      position="BottomCenter"
+    >
+    </ejs-tooltip>
+  </button>
 </ng-template>
 
 <app-invoice-payment-details

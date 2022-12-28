@@ -383,6 +383,10 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   border: 1px solid $primary-active-blue-40 !important;
 }
 
+.mobile-change-status-btn {
+  @include flex-center;
+}
+
 @media #{$max-mobile} {
   .menu-mobile {
     margin: 0;
@@ -403,5 +407,9 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
   .separator {
     height: 22px;
+  }
+
+  .change-status-btn {
+    width: 312px;
   }
 }
