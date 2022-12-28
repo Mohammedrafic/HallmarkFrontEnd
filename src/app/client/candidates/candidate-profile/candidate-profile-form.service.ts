@@ -4,9 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class CandidateProfileFormService {
   public readonly candidateForm: FormGroup = this.createForm();
   public saveEvent$: Subject<void> = new Subject<void>();

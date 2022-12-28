@@ -3,12 +3,10 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { shareReplay } from 'rxjs/operators';
 import { CategoryModel } from '@client/candidates/candidate-profile/general-notes/models/category.model';
-import { EditGeneralNoteModel, GeneralNotesModel } from '@client/candidates/candidate-profile/general-notes/general-notes.model';
+import { EditGeneralNoteModel, GeneralNotesModel } from './general-notes.model';
 import { NavigationWrapperService } from '@shared/services/navigation-wrapper.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class GeneralNotesService {
   private _sideDialogTitle$: Subject<string> = new Subject<string>();
   private _editMode$: BehaviorSubject<EditGeneralNoteModel | null> = new BehaviorSubject<EditGeneralNoteModel | null>(

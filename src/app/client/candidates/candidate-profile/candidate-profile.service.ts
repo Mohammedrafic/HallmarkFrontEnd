@@ -13,9 +13,7 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
 import { DateTimeHelper } from '@core/helpers';
 import pick from 'lodash/fp/pick';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class CandidateProfileService {
   constructor(
     private http: HttpClient,

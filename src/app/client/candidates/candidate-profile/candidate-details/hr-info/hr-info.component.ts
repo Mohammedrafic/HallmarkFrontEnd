@@ -34,5 +34,4 @@ export class HrInfoComponent extends AbstractContactDetails implements OnInit {
     this.candidateForm.get('contractStartDate')?.[checked ? 'enable' : 'disable']();
     this.candidateForm.get('contractEndDate')?.[checked ? 'enable' : 'disable']();
   }
-
 }

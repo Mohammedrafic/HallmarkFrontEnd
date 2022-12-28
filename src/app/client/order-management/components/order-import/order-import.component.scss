@@ -5,6 +5,7 @@
 
   &-list {
     width: 20%;
+    border-right: 1px solid $grid-row-border;
 
     .e-listbox-wrapper {
       .e-list-item {
@@ -29,14 +30,21 @@
   }
 
   &-grids {
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    row-gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(8, auto);
+    grid-row-gap: 20px;
+    width: 100%;
+    margin: 24px;
 
     .records-grid {
-      height: 123px;
-      min-height: 150px;
+        display: flex;
+        height: 123px;
+        flex-direction: column;
+
+      &.title {
+        height: 154px;
+      }
     }
 
   }
