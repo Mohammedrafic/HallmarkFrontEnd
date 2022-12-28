@@ -217,6 +217,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         switchMap(() => idStream),
         debounceTime(600),
         filter((id) => !!id),
+        distinctUntilChanged(),
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {
         this.store.dispatch(new Timesheets.ResetFiltersState());
@@ -326,7 +327,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   private initComponentState(): void {
     let preservedFilters = null;
     let preservedFiltersAgency = null;
-    
+
     if (this.filterService.canPreserveFilters()) {
       preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
       preservedFiltersAgency = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersTimesheets);
@@ -353,7 +354,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
           new Timesheets.GetFiltersDataSource(),
         ]);
       }
-      
+
     }
   }
 
