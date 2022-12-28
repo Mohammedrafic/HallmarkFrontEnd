@@ -7,6 +7,7 @@ import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 import { DateTimeHelper, TimesheetDateHelper } from '@core/helpers';
 import { EditFieldTypes } from '@core/enums';
+import { takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-grid-date-editor',
@@ -33,6 +34,7 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
 
   public agInit(params: ICellRendererParams): void {
     this.setData(params);
+    this.watchForValidation();
     this.cd.markForCheck();
   }
 
@@ -45,6 +47,16 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   public handleTimeChange(event: ChangeEventArgs): void {
     this.control.markAsTouched();
     this.control.patchValue(this.calculateDateValue(event.value as string));
+  }
+
+  private setData(params: ICellRendererParams): void {
+    this.dateValue = params.value && new Date(DateTimeHelper.convertDateToUtc(params.value));
+    this.value = params.value;
+
+    this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
+    this.type = (params.colDef as ColDef).cellRendererParams.type;
+    this.setdateBoundsForDay(DateTimeHelper.convertDateToUtc(params.value).toISOString());
+    this.setFormControl(params);
   }
 
   private setFormControl(params: ICellRendererParams): void {
@@ -62,16 +74,6 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
     }
   }
 
-  private setData(params: ICellRendererParams): void {
-    this.dateValue = params.value && new Date(DateTimeHelper.convertDateToUtc(params.value));
-    this.value = params.value;
-
-    this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
-    this.type = (params.colDef as ColDef).cellRendererParams.type;
-    this.setdateBoundsForDay(DateTimeHelper.convertDateToUtc(params.value).toISOString());
-    this.setFormControl(params);
-  }
-
   private calculateDateValue(date: string): string | null {
     const today = new Date().toISOString();
     const splitStartDate = (this.value || today).split('T')[0];
@@ -79,5 +81,15 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
     const splitValue = (dateStr as string)?.split('T')[1];
 
     return dateStr && splitStartDate ? `${splitStartDate}T${splitValue}` : null;
+  }
+
+  private watchForValidation(): void {
+    this.control.statusChanges
+    .pipe(
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe(() => {
+      this.cd.markForCheck();
+    });
   }
 }

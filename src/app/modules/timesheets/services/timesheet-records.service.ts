@@ -175,9 +175,12 @@ export class TimesheetRecordsService {
   }
 
   checkFormsValidation(forms:  Record<string, FormGroup>): boolean {
-    return Object.keys(forms).every((key) => {
+    Object.keys(forms).forEach((key) => {
       forms[key].updateValueAndValidity();
       forms[key].markAllAsTouched();
+    });
+
+    return Object.keys(forms).every((key) => {
       return forms[key].valid;
     });
   }
