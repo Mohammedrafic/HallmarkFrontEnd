@@ -341,8 +341,8 @@ export class DashboardService {
     );
   }
 
-  public redirectToUrl(url: string,orderStatus? :number): void {
-    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus} });
+  public redirectToUrl(url: string,orderStatus? :number,status? : string): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: status} });
   }
 
   private getTasksWidgetData(): Observable<string> {

@@ -30,6 +30,8 @@ import { toCorrectTimezoneFormat } from '../../utils/date-time.utils';
 import { GRID_CONFIG } from '@shared/constants';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { PreservedFilters } from '@shared/models/preserved-filters.model';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-candidate-details',
@@ -78,14 +80,17 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   public pageSize = GRID_CONFIG.initialRowsPerPage;
   private selectedTab: number | null;
   private filterApplied = false;
-
+  public CandidateStatus: string;
   constructor(
     private store: Store,
+    private router: Router,
     private formBuilder: FormBuilder,
     private filterService: FilterService,
     private datePipe: DatePipe
   ) {
     super();
+    const routerState = this.router.getCurrentNavigation()?.extras?.state;
+    this.CandidateStatus = (routerState?.['status']);
   }
 
   ngOnInit(): void {
@@ -142,7 +147,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       });
       this.filters.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
     }
-    
+
     this.filterService.setPreservedFIlters(this.filters, 'regionsIds');
   }
 
@@ -235,7 +240,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   private subscribeOnSkills(): Observable<MasterSkillByOrganization[]> {
     return this.candidateSkills$.pipe(
-      tap((skills: MasterSkillByOrganization[]) => (this.filterColumns.skillsIds.dataSource = skills.filter((v, i, a)=>a.findIndex(skill => (skill.masterSkillId === v.masterSkillId)) === i)))
+      tap((skills: MasterSkillByOrganization[]) => (this.filterColumns.skillsIds.dataSource = skills.filter((v, i, a) => a.findIndex(skill => (skill.masterSkillId === v.masterSkillId)) === i)))
     );
   }
 
@@ -247,7 +252,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private subscribeOnCandidatePage(): Observable<CandidateDetailsPage> {
-    return this.candidates$.pipe(tap((page: CandidateDetailsPage) => (this.candidatesPage = page)));
+    return this.candidates$.pipe(tap((page: CandidateDetailsPage) => (this.candidatesPage = page
+    )));
+
   }
 
   private createFilterForm(): void {
