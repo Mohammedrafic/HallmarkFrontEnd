@@ -1,0 +1,48 @@
+<div
+  *ngIf="cardConfig"
+  [style.background]="cardConfig.bgColor"
+  class="card-wrapper"
+>
+  <app-tooltip-container
+    [message]="tooltipMessage"
+    [showToolTip]="!!cardConfig.showTitleToolTip"
+    position="TopCenter"
+  >
+    <div class="title">
+      <i-feather
+        [style.color]="cardConfig.iconColor"
+        [name]="cardIconName"
+        class="icon"
+      ></i-feather>
+      <span
+        [class.bordered]="dateSchedule.isInDifferentDepartments"
+        class="title__text"
+      >
+      {{ cardTitle }}
+    </span>
+    </div>
+  </app-tooltip-container>
+
+  <div class="time">
+    <span class="time__text">{{ firstDaySchedule.startDate | date: 'HH:mm': 'UTC' }}</span>
+    <span class="time__text">-</span>
+    <span class="time__text">{{ firstDaySchedule.endDate | date: 'HH:mm': 'UTC' }}</span>
+    <span
+      *ngIf="firstDaySchedule.scheduleOrderType"
+      class="time__text"
+    >
+      {{ firstDaySchedule.scheduleOrderType.slice(0, 1) }}
+    </span>
+  </div>
+
+  <ejs-tooltip
+    *ngIf="dateSchedule.isInDifferentDepartments"
+    [content]="additionalTooltipMessage"
+    position="TopCenter"
+    [showTipPointer]="false"
+  >
+    <div class="badge">
+      +{{ dateSchedule.daySchedules.length - 1 }}
+    </div>
+  </ejs-tooltip>
+</div>
