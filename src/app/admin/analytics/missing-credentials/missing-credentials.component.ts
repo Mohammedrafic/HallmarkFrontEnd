@@ -181,7 +181,6 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
 
-      this.missingCredentialReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
       this.onFilterControlValueChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.missingCredentialReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.missingCredentialReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
@@ -463,7 +462,7 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
-    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(0);
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.CredentialName)?.setValue([]);
     this.filteredItems = [];
   }
   public onFilterApply(): void {

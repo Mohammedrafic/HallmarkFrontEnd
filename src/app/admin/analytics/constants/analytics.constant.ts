@@ -21,7 +21,9 @@ export const analyticsConstants = {
     InvoiceStatuses: 'invoiceStatuses',
     InvoiceID: 'invoiceID',
     AgingGroupIds:'agingGroupIds',
-    TimesheetStatuses:'timesheetStatuses'
+    TimesheetStatuses:'timesheetStatuses',
+    ReportDate:'reportDate',
+    CredentialName:'credentialName'
   }
 }
 
