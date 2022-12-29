@@ -58,6 +58,8 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     isIRPFlag: false,
   };
 
+  private orderManagementSystem: OrderManagementIRPSystemId | null;
+
   @Select(OrderManagementContentState.selectedOrder)
   private selectedOrder$: Observable<Order>;
   @Select(OrganizationManagementState.organization)
@@ -77,6 +79,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setOrderManagementSystem();
     this.watchForOrganizationChnage();
     this.setSelectedOrder();
     this.getInitialData();
@@ -100,6 +103,10 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
 
   public selectTypeSave(saveType: MenuEventArgs): void {
     this.saveEvents.next(saveType);
+  }
+
+  private setOrderManagementSystem(): void {
+    this.orderManagementSystem = this.orderManagementService.getOrderManagementSystem();
   }
 
   private setPageHeader(): void {
@@ -160,7 +167,6 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((organization: Organization) => {
       const isIRPFlag = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
-      const orderManagementSystem = this.orderManagementService.getOrderManagementSystem();
       this.selectedSystem = {...createSystem(organization, isIRPFlag)};
 
       this.showSystemToggle =
@@ -168,8 +174,10 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
         this.selectedSystem.isVMS &&
         this.selectedSystem.isIRPFlag;
 
-      if( orderManagementSystem ) {
-        this.activeSystem = orderManagementSystem === OrderManagementIRPSystemId.IRP ? OrderSystem.IRP : OrderSystem.VMS;
+      if( this.orderManagementSystem ) {
+        this.activeSystem =
+          this.orderManagementSystem === OrderManagementIRPSystemId.IRP ? OrderSystem.IRP : OrderSystem.VMS;
+        this.orderManagementSystem = null;
       } else {
         this.activeSystem = this.selectedSystem.isIRP ? OrderSystem.IRP : OrderSystem.VMS;
       }
