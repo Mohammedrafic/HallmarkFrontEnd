@@ -161,6 +161,7 @@
 
 <app-invoice-payment-details
   *ngIf="invoiceDetailsConfig.paymentDetailsOpen"
+  [container]="sideDialog.element"
   (destroyDialog)="closePaymentDetails()"
   (editPaymentCheck)="openEditPayment($event)"
   (addPayment)="openAddPayment()"
