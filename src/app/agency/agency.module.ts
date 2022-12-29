@@ -111,6 +111,7 @@ import { OrderCandidateApiService } from '@shared/components/order-candidate-lis
 import {
   CandidateGeneralInfoService,
 } from "@agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.service";
+import { AgencyNameComponent } from './agency-list/agency-name/agency-name.component';
 
 
 const sidebarIcons = {
@@ -180,6 +181,7 @@ const sidebarIcons = {
     PaymentDialogComponent,
     JobDistributionComponent,
     OrderMatchColumnComponent,
+    AgencyNameComponent,
   ],
   imports: [
     CommonModule,
