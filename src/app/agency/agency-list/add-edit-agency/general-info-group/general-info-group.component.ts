@@ -89,7 +89,6 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       fax: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       status: new FormControl(AgencyStatus.InProgress, [Validators.required]),
       website: new FormControl(''),
-      isMsp: new FormControl(null),
     });
   }
 
