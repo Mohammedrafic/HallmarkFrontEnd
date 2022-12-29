@@ -42,9 +42,14 @@ export interface ScheduleDateItem {
   isInDifferentDepartments: boolean;
 }
 
-export interface ScheduleSelectedSlot {
+export interface ScheduleDateSlot {
   candidate: ScheduleCandidate;
   dates: Set<string>;
+}
+
+export interface ScheduleSelectedSlots {
+  candidates: ScheduleCandidate[];
+  dates: string[];
 }
 
 export type ScheduleCandidatesPage = PageOfCollections<ScheduleCandidate>;

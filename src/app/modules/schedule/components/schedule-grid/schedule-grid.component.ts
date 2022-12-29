@@ -7,7 +7,7 @@ import {
   OnInit,
   Output,
   TrackByFunction,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
@@ -25,12 +25,13 @@ import { UserState } from '../../../../store/user.state';
 import { DatesPeriods } from '../../constants/schedule-grid.conts';
 import {
   ScheduleCandidate,
-  ScheduleDateItem,
+  ScheduleDateItem, ScheduleDateSlot,
   ScheduleFilters,
   ScheduleModel,
   ScheduleModelPage,
-  ScheduleSelectedSlot,
+  ScheduleSelectedSlots,
 } from '../../interface/schedule.model';
+import { ScheduleGridAdapter } from '../../adapters/shedule-grid.adapter';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -48,6 +49,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   @Output() changeFilter: EventEmitter<ScheduleFilters> = new EventEmitter<ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
+  @Output() selectedCells: EventEmitter<ScheduleSelectedSlots> = new EventEmitter<ScheduleSelectedSlots>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
@@ -57,7 +59,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   datesRanges: string[] = DateTimeHelper.getDatesBetween();
 
-  selectedCandidatesSlot: Map<number, ScheduleSelectedSlot> = new Map<number, ScheduleSelectedSlot>();
+  selectedCandidatesSlot: Map<number, ScheduleDateSlot> = new Map<number, ScheduleDateSlot>();
 
   orgFirstDayOfWeek: number;
 
@@ -106,6 +108,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     } else {
       this.selectedCandidatesSlot.set(candidate.id, { candidate, dates: new Set<string>().add(date) });
     }
+
+    this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
 
     this.cdr.detectChanges();
   }

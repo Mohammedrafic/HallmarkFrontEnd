@@ -16,6 +16,7 @@ import {
   ScheduleCandidatesPage,
   ScheduleFilters,
   ScheduleModelPage,
+  ScheduleSelectedSlots,
 } from '../../interface/schedule.model';
 import { ScheduleGridAdapter } from '../../adapters/shedule-grid.adapter';
 
@@ -76,6 +77,8 @@ export class ScheduleContainerComponent extends Destroyable {
 
     this.initScheduleData();
   }
+
+  selectedCells(cells: ScheduleSelectedSlots): void {}
 
   private initScheduleData(isLoadMore = false): void {
     this.scheduleApiService.getScheduleEmployees(this.scheduleFilters).pipe(
