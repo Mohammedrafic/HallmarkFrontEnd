@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { switchMap } from 'rxjs';
@@ -25,7 +25,7 @@ import { ScheduleGridAdapter } from '../../adapters/shedule-grid.adapter';
   styleUrls: ['./schedule-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ScheduleContainerComponent extends Destroyable implements OnInit {
+export class ScheduleContainerComponent extends Destroyable {
   tabsListConfig: TabsListConfig[] = TabListConfig;
 
   activeTabIndex: ActiveTabIndex = ActiveTabIndex.Scheduling;
@@ -54,10 +54,6 @@ export class ScheduleContainerComponent extends Destroyable implements OnInit {
     super();
 
     store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'file-text' }));
-  }
-
-  ngOnInit(): void {
-    // this.initScheduleData();
   }
 
   changeTab(tabIndex: ActiveTabIndex): void {
