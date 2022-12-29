@@ -18,6 +18,7 @@
       [scheduleData]="scheduleData"
       (changeFilter)="changeFilters($event)"
       (loadMoreData)="loadMoreData($event)"
+      (selectedCells)="selectedCells($event)"
     ></app-schedule-grid>
   </ng-container>
   <ng-container *ngIf="activeTabIndex === tabIndex.Analytics">

@@ -1,9 +1,11 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component, ElementRef,
+  Component,
+  ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
   TrackByFunction,
@@ -12,7 +14,7 @@ import {
 
 import { Select, Store } from '@ngxs/store';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { debounceTime, fromEvent, Observable, switchMap, takeUntil } from 'rxjs';
+import { debounceTime, fromEvent, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
@@ -24,12 +26,15 @@ import { DatesRangeType } from '@shared/enums';
 import { UserState } from '../../../../store/user.state';
 import { DatesPeriods } from '../../constants/schedule-grid.conts';
 import {
+  ScheduleCandidate,
   ScheduleDateItem,
+  ScheduleDateSlot,
   ScheduleFilters,
-  ScheduleItem,
   ScheduleModel,
   ScheduleModelPage,
+  ScheduleSelectedSlots,
 } from '../../interface/schedule.model';
+import { ScheduleGridAdapter } from '../../adapters/shedule-grid.adapter';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -37,7 +42,7 @@ import {
   styleUrls: ['./schedule-grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ScheduleGridComponent extends Destroyable implements OnInit {
+export class ScheduleGridComponent extends Destroyable implements OnInit, OnChanges {
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
 
@@ -47,6 +52,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
 
   @Output() changeFilter: EventEmitter<ScheduleFilters> = new EventEmitter<ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
+  @Output() selectedCells: EventEmitter<ScheduleSelectedSlots> = new EventEmitter<ScheduleSelectedSlots>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
@@ -56,11 +62,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
 
   datesRanges: string[] = DateTimeHelper.getDatesBetween();
 
-  selectedScheduleCard: ScheduleItem | null = null;
-
-  selectedDateSlot: string | null = null;
-
-  selectedCandidateId: number;
+  selectedCandidatesSlot: Map<number, ScheduleDateSlot> = new Map<number, ScheduleDateSlot>();
 
   orgFirstDayOfWeek: number;
 
@@ -82,8 +84,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
 
   ngOnInit(): void {
     this.startOrgIdWatching();
-    this.watchForRangeChange();
     this.watchForScroll();
+  }
+
+  ngOnChanges(): void {
+    this.selectedCandidatesSlot.clear();
   }
 
   changeActiveDatePeriod(selectedPeriod: string | undefined): void {
@@ -91,22 +96,29 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
     this.cdr.detectChanges();
   }
 
-  selectScheduleCard(schedule: ScheduleDateItem, candidateId: number): void {
-    this.selectedScheduleCard = schedule.daySchedules[0];
-    this.selectedCandidateId = candidateId;
-    this.selectedDateSlot = null;
-    this.cdr.detectChanges();
-  }
+  selectScheduleCard(schedule: ScheduleDateItem, candidate: ScheduleCandidate): void {}
 
-  selectDateSlot(dateSlot: string, candidateId: number): void {
-    this.selectedDateSlot = dateSlot;
-    this.selectedCandidateId = candidateId;
-    this.selectedScheduleCard = null;
+  selectDateSlot(date: string, candidate: ScheduleCandidate): void {
+    const candidateSelectedSlot = this.selectedCandidatesSlot.get(candidate.id);
+
+    if (candidateSelectedSlot) {
+      if (candidateSelectedSlot.dates.has(date)) {
+        candidateSelectedSlot.dates.delete(date);
+      } else {
+        candidateSelectedSlot.dates.add(date);
+      }
+    } else {
+      this.selectedCandidatesSlot.set(candidate.id, { candidate, dates: new Set<string>().add(date) });
+    }
+
+    this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
+
     this.cdr.detectChanges();
   }
 
   searchCandidate(event: KeyboardEvent): void {
     this.changeFilter.emit({ firstLastNameOrId: (event.target as HTMLInputElement).value });
+    this.scrollArea.nativeElement.scrollTo(0, 0);
   }
 
   private startOrgIdWatching(): void {
@@ -116,10 +128,13 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
 
         return this.store.dispatch(new GetOrganizationById(id));
       }),
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.checkOrgPreferences();
-    });
+      switchMap(() => {
+        this.checkOrgPreferences();
+
+        return this.watchForRangeChange();
+      }),
+      takeUntil(this.componentDestroy()),
+    ).subscribe();
   }
 
   private checkOrgPreferences(): void {
@@ -129,17 +144,18 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
     this.cdr.markForCheck();
   }
 
-  private watchForRangeChange(): void {
-    this.weekService.getRangeStream().pipe(
-      debounceTime(100),
+  private watchForRangeChange(): Observable<[string, string]> {
+    return this.weekService.getRangeStream().pipe(
+      debounceTime(200),
       filter(([startDate, endDate]: [string, string]) => !!startDate && !!endDate),
-      takeUntil(this.componentDestroy()),
-    ).subscribe(([startDate, endDate]: [string, string]) => {
-      this.datesRanges = DateTimeHelper.getDatesBetween(startDate, endDate);
-      this.changeFilter.emit({ startDate, endDate });
+      tap(([startDate, endDate]: [string, string]) => {
+        this.datesRanges = DateTimeHelper.getDatesBetween(startDate, endDate);
+        this.changeFilter.emit({ startDate, endDate });
+        this.scrollArea.nativeElement.scrollTo(0, 0);
 
-      this.cdr.detectChanges();
-    });
+        this.cdr.detectChanges();
+      }),
+    );
   }
 
   private watchForScroll(): void {
