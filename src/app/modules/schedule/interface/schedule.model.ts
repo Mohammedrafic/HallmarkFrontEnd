@@ -42,6 +42,11 @@ export interface ScheduleDateItem {
   isInDifferentDepartments: boolean;
 }
 
+export interface ScheduleSelectedSlot {
+  candidate: ScheduleCandidate;
+  dates: Set<string>;
+}
+
 export type ScheduleCandidatesPage = PageOfCollections<ScheduleCandidate>;
 export type ScheduleModelPage = PageOfCollections<ScheduleModel>;
 

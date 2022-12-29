@@ -58,20 +58,18 @@
               *ngIf="dateSlot | calendarDateSlot: scheduleItem.schedule as dateSchedule; else emptyCell"
               class="table-cell date-slot"
               [attr.colspan]="dateSchedule.extendedDays"
-              [class.selected]="(scheduleItem.candidate.id === selectedCandidateId)
-               && (dateSchedule && dateSchedule.daySchedules[0]?.id === selectedScheduleCard?.id)"
             >
               <app-schedule-card
                 [dateSchedule]="dateSchedule"
-                (click)="selectScheduleCard(dateSchedule, scheduleItem.candidate.id)"
+                (click)="selectScheduleCard(dateSchedule, scheduleItem.candidate)"
               ></app-schedule-card>
             </td>
 
             <ng-template #emptyCell>
               <td
                 class="table-cell date-slot empty-cell"
-                [class.selected]="scheduleItem.candidate.id === selectedCandidateId && dateSlot === selectedDateSlot"
-                (click)="selectDateSlot(dateSlot, scheduleItem.candidate.id)"
+                [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
+                (click)="selectDateSlot(dateSlot, scheduleItem.candidate)"
               ></td>
             </ng-template>
           </ng-container>

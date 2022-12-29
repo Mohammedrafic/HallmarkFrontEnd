@@ -3,11 +3,11 @@ import {
   ChangeDetectorRef,
   Component, ElementRef,
   EventEmitter,
-  Input,
+  Input, OnChanges,
   OnInit,
   Output,
   TrackByFunction,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
@@ -24,11 +24,12 @@ import { DatesRangeType } from '@shared/enums';
 import { UserState } from '../../../../store/user.state';
 import { DatesPeriods } from '../../constants/schedule-grid.conts';
 import {
+  ScheduleCandidate,
   ScheduleDateItem,
   ScheduleFilters,
-  ScheduleItem,
   ScheduleModel,
   ScheduleModelPage,
+  ScheduleSelectedSlot,
 } from '../../interface/schedule.model';
 
 @Component({
@@ -37,7 +38,7 @@ import {
   styleUrls: ['./schedule-grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ScheduleGridComponent extends Destroyable implements OnInit {
+export class ScheduleGridComponent extends Destroyable implements OnInit, OnChanges {
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
 
@@ -56,11 +57,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
 
   datesRanges: string[] = DateTimeHelper.getDatesBetween();
 
-  selectedScheduleCard: ScheduleItem | null = null;
-
-  selectedDateSlot: string | null = null;
-
-  selectedCandidateId: number;
+  selectedCandidatesSlot: Map<number, ScheduleSelectedSlot> = new Map<number, ScheduleSelectedSlot>();
 
   orgFirstDayOfWeek: number;
 
@@ -86,22 +83,30 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
     this.watchForScroll();
   }
 
+  ngOnChanges(): void {
+    this.selectedCandidatesSlot.clear();
+  }
+
   changeActiveDatePeriod(selectedPeriod: string | undefined): void {
     this.activePeriod = selectedPeriod as DatesRangeType;
     this.cdr.detectChanges();
   }
 
-  selectScheduleCard(schedule: ScheduleDateItem, candidateId: number): void {
-    this.selectedScheduleCard = schedule.daySchedules[0];
-    this.selectedCandidateId = candidateId;
-    this.selectedDateSlot = null;
-    this.cdr.detectChanges();
-  }
+  selectScheduleCard(schedule: ScheduleDateItem, candidate: ScheduleCandidate): void {}
 
-  selectDateSlot(dateSlot: string, candidateId: number): void {
-    this.selectedDateSlot = dateSlot;
-    this.selectedCandidateId = candidateId;
-    this.selectedScheduleCard = null;
+  selectDateSlot(date: string, candidate: ScheduleCandidate): void {
+    const candidateSelectedSlot = this.selectedCandidatesSlot.get(candidate.id);
+
+    if (candidateSelectedSlot) {
+      if (candidateSelectedSlot.dates.has(date)) {
+        candidateSelectedSlot.dates.delete(date);
+      } else {
+        candidateSelectedSlot.dates.add(date);
+      }
+    } else {
+      this.selectedCandidatesSlot.set(candidate.id, { candidate, dates: new Set<string>().add(date) });
+    }
+
     this.cdr.detectChanges();
   }
 
