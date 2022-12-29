@@ -380,7 +380,6 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
 .menu-mobile {
   margin-right: 12px;
-  border: 1px solid $primary-active-blue-40 !important;
 }
 
 .mobile-change-status-btn {
@@ -402,8 +401,8 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   }
 
   .close-button {
-    margin: 0 5px !important;
-    padding-right: 0 !important;
+    margin: 0 5px 0 0 !important;
+    padding: 0 5px !important;
   }
 
   .grouped {
@@ -420,5 +419,10 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
   .table-footer {
     justify-content: space-evenly !important;
+  }
+
+  .e-dropdown-btn,
+  .e-dropdown-btn.e-btn {
+    padding: 0 5px 0 0 !important;
   }
 }

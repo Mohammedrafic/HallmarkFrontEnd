@@ -9,6 +9,7 @@ import { X, Edit } from 'angular-feather/icons';
 
 import { InvoicePaymentDetailsComponent } from './invoice-payment-details.component';
 import { EditPaymentRendererComponent } from './cell-renderers/edit-payment-renderer/edit-payment-renderer.component';
+import { GridModule } from '@shared/components/grid/grid.module';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { EditPaymentRendererComponent } from './cell-renderers/edit-payment-rend
     FeatherModule.pick({ X, Edit }),
     ButtonModule,
     AgGridModule,
+    GridModule
   ],
   declarations: [InvoicePaymentDetailsComponent, EditPaymentRendererComponent],
   exports: [InvoicePaymentDetailsComponent],
