@@ -18,6 +18,7 @@ export class CandidateProfileFormService {
   public resetCandidateForm(): void {
     this.candidateForm.reset({
       profileStatus: ProfileStatusesEnum.Active,
+      isContract: false,
     });
   }
 
