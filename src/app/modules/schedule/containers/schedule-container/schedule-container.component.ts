@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { Observable, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
@@ -32,7 +32,7 @@ export class ScheduleContainerComponent extends Destroyable implements OnInit {
 
   tabIndex = ActiveTabIndex;
 
-  scheduleData$: Observable<ScheduleModelPage>;
+  scheduleData: ScheduleModelPage;
 
   scheduleFilters: ScheduleFilters = {
     firstLastNameOrId: '',
@@ -57,24 +57,32 @@ export class ScheduleContainerComponent extends Destroyable implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initScheduleData();
+    // this.initScheduleData();
   }
 
   changeTab(tabIndex: ActiveTabIndex): void {
     this.activeTabIndex = tabIndex;
   }
 
+  loadMoreData(pageNumber: number): void {
+    this.scheduleFilters.pageNumber = pageNumber;
+
+    this.initScheduleData(true);
+  }
+
   changeFilters(filters: ScheduleFilters): void {
     this.scheduleFilters = {
       ...this.scheduleFilters,
       ...filters,
+      pageNumber: 1,
+      pageSize: 30,
     };
 
     this.initScheduleData();
   }
 
-  private initScheduleData(): void {
-    this.scheduleData$ = this.scheduleApiService.getScheduleEmployees(this.scheduleFilters).pipe(
+  private initScheduleData(isLoadMore = false): void {
+    this.scheduleApiService.getScheduleEmployees(this.scheduleFilters).pipe(
       switchMap((candidates: ScheduleCandidatesPage) =>
         this.scheduleApiService.getSchedulesByEmployeesIds(candidates.items.map(el => el.id)).pipe(
           map((candidateSchedules: CandidateSchedules[]): ScheduleModelPage =>
@@ -82,6 +90,17 @@ export class ScheduleContainerComponent extends Destroyable implements OnInit {
           )
         )
       )
-    );
+    ).subscribe((scheduleData: ScheduleModelPage) => {
+      if (isLoadMore) {
+        this.scheduleData = {
+          ...scheduleData,
+          items: [...this.scheduleData.items, ...scheduleData.items],
+        };
+      } else {
+        this.scheduleData = scheduleData;
+      }
+
+      this.cdr.detectChanges();
+    });
   }
 }

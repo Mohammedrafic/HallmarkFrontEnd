@@ -27,7 +27,7 @@ export interface ScheduleItem {
 export interface ScheduleModel {
   candidate: ScheduleCandidate;
   schedule: ScheduleDateItem[];
-  id: number;
+  id: string;
 }
 
 export interface CandidateSchedules {
@@ -51,7 +51,6 @@ export interface ScheduleCardConfig {
   bgColor?: string;
   iconColor?: string;
   showTitleToolTip?: boolean;
-  showAdditionalTooltip?: boolean;
 }
 
 export interface ScheduleFilters {

@@ -35,23 +35,14 @@ export const CandidateIconName = (scheduleCandidate: ScheduleCandidate): string 
 export const ScheduleCardTypeMap: Map<ScheduleType, ScheduleCardConfig> = new Map<ScheduleType, ScheduleCardConfig>()
   .set(ScheduleType.Book, {
     bgColor: '#C5D9FF',
-    title: 'LOC-DEP',
-    iconName: 'calendar',
+    title: '',
+    iconName: '',
     iconColor: '#3E7FFF',
     showTitleToolTip: true,
-    showAdditionalTooltip: true,
   })
   .set(ScheduleType.Unavailability, { bgColor: '#EAECF2', title: 'PTO', iconName: 'alert-triangle', iconColor: '#FF5858' })
   .set(ScheduleType.Availability, { bgColor: '#D1EACE', title: 'Available', iconName: 'clock', iconColor: '#70B16E' });
 
 export const GetScheduleCardConfig = (scheduleItem: ScheduleDateItem): ScheduleCardConfig | undefined => {
-  const firstDaySchedule = scheduleItem.daySchedules[0];
-  const scheduleCardConfig = ScheduleCardTypeMap.get(firstDaySchedule?.scheduleType);
-
-  if (scheduleCardConfig && firstDaySchedule?.scheduleType === ScheduleType.Book) {
-    scheduleCardConfig.title = `${firstDaySchedule.location.slice(0, 3)}-${firstDaySchedule.department.slice(0, 3)}`;
-    scheduleCardConfig.iconName = scheduleItem.isInDifferentDepartments ? 'briefcase' : 'calendar';
-  }
-
-  return scheduleCardConfig;
+  return ScheduleCardTypeMap.get(scheduleItem.daySchedules[0]?.scheduleType);
 };

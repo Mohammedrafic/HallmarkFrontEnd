@@ -1,3 +1,5 @@
+import { GenerateUniqueId } from '@core/helpers/functions.helper';
+
 import {
   CandidateSchedules,
   ScheduleCandidate,
@@ -17,7 +19,7 @@ export class ScheduleGridAdapter {
         schedule: candidateSchedules.find(candidateSchedulesItem =>
           candidateSchedulesItem.employeeId === candidate.id
         )?.schedules || [],
-        id: candidate.id,
+        id: GenerateUniqueId(),
       })),
     };
   }

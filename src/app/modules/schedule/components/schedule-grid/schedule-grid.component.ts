@@ -1,17 +1,19 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, ElementRef,
   EventEmitter,
   Input,
   OnInit,
   Output,
   TrackByFunction,
+  ViewChild,
 } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { Observable, switchMap, takeUntil } from 'rxjs';
+import { debounceTime, fromEvent, Observable, switchMap, takeUntil } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
@@ -39,9 +41,12 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
 
+  @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
+
   @Input() scheduleData: ScheduleModelPage | null;
 
   @Output() changeFilter: EventEmitter<ScheduleFilters> = new EventEmitter<ScheduleFilters>();
+  @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
@@ -58,6 +63,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
   selectedCandidateId: number;
 
   orgFirstDayOfWeek: number;
+
+  private itemsPerPage = 30;
 
   constructor(
     private store: Store,
@@ -76,6 +83,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
   ngOnInit(): void {
     this.startOrgIdWatching();
     this.watchForRangeChange();
+    this.watchForScroll();
   }
 
   changeActiveDatePeriod(selectedPeriod: string | undefined): void {
@@ -123,13 +131,34 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
 
   private watchForRangeChange(): void {
     this.weekService.getRangeStream().pipe(
+      debounceTime(100),
+      filter(([startDate, endDate]: [string, string]) => !!startDate && !!endDate),
       takeUntil(this.componentDestroy()),
     ).subscribe(([startDate, endDate]: [string, string]) => {
-      console.log([startDate, endDate], '[startDate, endDate]');
       this.datesRanges = DateTimeHelper.getDatesBetween(startDate, endDate);
       this.changeFilter.emit({ startDate, endDate });
 
       this.cdr.detectChanges();
     });
+  }
+
+  private watchForScroll(): void {
+    fromEvent(this.scrollArea.nativeElement, 'scroll')
+      .pipe(
+        debounceTime(500),
+        filter(() => {
+          const { scrollTop, scrollHeight, offsetHeight } = this.scrollArea.nativeElement;
+
+          return scrollTop + offsetHeight >= scrollHeight;
+        }),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        const { items, totalCount } = this.scheduleData || {};
+
+        if ((items?.length || 0) < (totalCount || 0)) {
+          this.loadMoreData.emit(Math.ceil((items?.length || 1) / this.itemsPerPage));
+        }
+      });
   }
 }

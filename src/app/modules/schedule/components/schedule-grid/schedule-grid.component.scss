@@ -143,7 +143,7 @@ th, td {
   transition: all .2s linear;
 
   &.selected {
-    border: 1.5px solid $primary-active-blue;
+    border: 0.5px solid $primary-active-blue;
   }
 
   &.date-slot {

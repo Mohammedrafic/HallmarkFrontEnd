@@ -33,7 +33,7 @@
       </div>
     </div>
   </div>
-  <div class="grid-body">
+  <div #scrollArea class="grid-body">
     <table *ngIf="scheduleData?.items?.length; else emptyTable">
       <thead>
         <tr>
@@ -58,8 +58,8 @@
               *ngIf="dateSlot | calendarDateSlot: scheduleItem.schedule as dateSchedule; else emptyCell"
               class="table-cell date-slot"
               [attr.colspan]="dateSchedule.extendedDays"
-              [class.selected]="scheduleItem.candidate.id === selectedCandidateId
-               && dateSchedule && dateSchedule.daySchedules[0]?.id === selectedScheduleCard?.id"
+              [class.selected]="(scheduleItem.candidate.id === selectedCandidateId)
+               && (dateSchedule && dateSchedule.daySchedules[0]?.id === selectedScheduleCard?.id)"
             >
               <app-schedule-card
                 [dateSchedule]="dateSchedule"

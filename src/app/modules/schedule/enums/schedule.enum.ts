@@ -22,7 +22,9 @@ export enum ScheduleType {
 }
 
 export enum ScheduleOrderType {
-  LTA = 'LTA',
-  PD = 'PD',
-  NO = '',
+  ContractToPerm = 'ContractToPerm',
+  OpenPerDiem = 'OpenPerDiem',
+  PermPlacement = 'PermPlacement',
+  Traveler = 'Traveler',
+  ReOrder = 'ReOrder',
 }

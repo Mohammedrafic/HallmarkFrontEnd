@@ -50,3 +50,7 @@ export function GetQueryParams<T> (params: T): HttpParams {
 export const CalcDaysMs = (dayNum: number) => {
   return dayNum * 24 * 60 * 60 * 1000;
 };
+
+export const GenerateUniqueId = (): string => {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+};
