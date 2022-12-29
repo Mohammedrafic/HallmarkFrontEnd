@@ -4,6 +4,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +30,7 @@ export class OrderManagementService extends DestroyableDirective {
   private orderManagementSystem: OrderManagementIRPSystemId | null;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: FormBuilder, private readonly router: Router
   ) {
     super();
     this.selectedOrderAfterRedirect$
@@ -86,4 +87,9 @@ export class OrderManagementService extends DestroyableDirective {
   public getOrderManagementSystem(): OrderManagementIRPSystemId | null {
     return this.orderManagementSystem;
   }
+  public redirectToUrl(url: string,orderStatus? :string): void {
+    this.router.navigateByUrl('/', {skipLocationChange: true}).then(()=>
+   this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus} }));
+ }
+
 }
