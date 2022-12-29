@@ -6,4 +6,4 @@ export * from './timesheets.constant';
 export * from './timsheets-details.constant';
 export * from './export-options';
 export * from './confirm-messages.constant';
-export * from './media-query-breakpoints';
+export * from '../../../shared/constants/media-query-breakpoints';

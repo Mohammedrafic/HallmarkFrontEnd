@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BreakpointObserver } from '@angular/cdk/layout';
+import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
 import { map, Observable } from 'rxjs';
 
@@ -30,5 +30,9 @@ export class BreakpointObserverService {
 
   public getBreakpointMediaRanges(): Observable<DeviceTypeResolution> {
     return this.listenMediaQueryBreakpoints();
+  }
+
+  public listenBreakpoint(breakpoint: BreakpointQuery []): Observable<BreakpointState> {
+    return this.breakpointObserver.observe(breakpoint);
   }
 }

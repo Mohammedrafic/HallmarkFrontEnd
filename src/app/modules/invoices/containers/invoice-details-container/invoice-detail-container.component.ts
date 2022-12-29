@@ -282,6 +282,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       .subscribe(({ isTablet, isMobile }) => {
         this.invoiceDetailsConfig.isTablet = isTablet;
         this.invoiceDetailsConfig.isMobile = isMobile;
+        this.cdr.markForCheck();
       });
   }
 

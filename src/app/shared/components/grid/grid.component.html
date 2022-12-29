@@ -10,6 +10,7 @@
     (rowClicked)="handleSelectionChanged($event)"
     (sortChanged)="handleSortChanged($event)"
     (rowDragEnd)="handleRowDragEvent($event)"
+    (componentStateChanged)="handleComponentStateChangeEvent($event)"
     [columnDefs]="columnDefinitions"
     [defaultColDef]="defaultColumnDefinition"
     [modules]="modules"
@@ -22,6 +23,7 @@
     [rowDragManaged]="rowDragManaged"
     [suppressMoveWhenRowDragging]="suppressMoveWhenRowDragging"
     [overlayNoRowsTemplate]="gridEmptyMessage"
+    [context]="context"
     class="ag-theme-alpine app-grid__component"
   ></ag-grid-angular>
   <app-grid-pagination *ngIf="paginationPanel"
