@@ -142,6 +142,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   private watchForRangeChange(): Observable<[string, string]> {
     return this.weekService.getRangeStream().pipe(
+      debounceTime(200),
       filter(([startDate, endDate]: [string, string]) => !!startDate && !!endDate),
       tap(([startDate, endDate]: [string, string]) => {
         this.datesRanges = DateTimeHelper.getDatesBetween(startDate, endDate);

@@ -66,6 +66,11 @@ export const MENU_CONFIG: any = {
       icon: 'file-text',
       route: 'agency/candidates',
     },
+    38: {
+      // Scheduling
+      icon: '',
+      route: 'client/scheduling',
+    },
     15: {
       // Timesheets
       icon: 'clock',

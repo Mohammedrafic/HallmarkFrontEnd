@@ -103,7 +103,7 @@ const routes: Routes = [
         },
       },
       {
-        path: 'schedule',
+        path: 'scheduling',
         loadChildren: () => import('../modules/schedule/schedule.module').then((m) => m.ScheduleModule),
         data: {
           isOrganizationArea: true,
