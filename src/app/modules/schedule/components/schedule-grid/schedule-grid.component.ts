@@ -12,7 +12,7 @@ import {
 
 import { Select, Store } from '@ngxs/store';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { debounceTime, fromEvent, Observable, switchMap, takeUntil } from 'rxjs';
+import { debounceTime, fromEvent, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
@@ -81,7 +81,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   ngOnInit(): void {
     this.startOrgIdWatching();
-    this.watchForRangeChange();
     this.watchForScroll();
   }
 
@@ -125,10 +124,13 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
         return this.store.dispatch(new GetOrganizationById(id));
       }),
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.checkOrgPreferences();
-    });
+      switchMap(() => {
+        this.checkOrgPreferences();
+
+        return this.watchForRangeChange();
+      }),
+      takeUntil(this.componentDestroy()),
+    ).subscribe();
   }
 
   private checkOrgPreferences(): void {
@@ -138,17 +140,16 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.markForCheck();
   }
 
-  private watchForRangeChange(): void {
-    this.weekService.getRangeStream().pipe(
-      debounceTime(100),
+  private watchForRangeChange(): Observable<[string, string]> {
+    return this.weekService.getRangeStream().pipe(
       filter(([startDate, endDate]: [string, string]) => !!startDate && !!endDate),
-      takeUntil(this.componentDestroy()),
-    ).subscribe(([startDate, endDate]: [string, string]) => {
-      this.datesRanges = DateTimeHelper.getDatesBetween(startDate, endDate);
-      this.changeFilter.emit({ startDate, endDate });
+      tap(([startDate, endDate]: [string, string]) => {
+        this.datesRanges = DateTimeHelper.getDatesBetween(startDate, endDate);
+        this.changeFilter.emit({ startDate, endDate });
 
-      this.cdr.detectChanges();
-    });
+        this.cdr.detectChanges();
+      }),
+    );
   }
 
   private watchForScroll(): void {
