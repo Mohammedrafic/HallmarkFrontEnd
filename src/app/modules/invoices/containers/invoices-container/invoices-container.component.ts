@@ -139,7 +139,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public paymentRecords: InvoicePaymentData[] = [];
 
-  public OrgName: string;
+  public businessUnitId?: number;
   public Org: DataSourceItem[];
   constructor(
     private cdr: ChangeDetectorRef,
@@ -149,21 +149,18 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     private printingService: InvoicePrintingService,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
     store: Store,
-    private readonly router: Router
   ) {
     super(store);
 
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
 
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
-    const routerState = this.router.getCurrentNavigation()?.extras?.state;
-    this.OrgName = routerState?.['orderStatus'] || ""
     this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
   }
 
   public ngOnInit(): void {
-    this.OrgName = JSON.parse(localStorage.getItem('ORGName') || '') as string;
-    window.localStorage.setItem("ORGName", JSON.stringify(""));
+    this.businessUnitId = JSON.parse(localStorage.getItem('BussinessUnitID') || '') as number;
+    window.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
     if (this.isAgency) {
       this.checkActionsAllowed();
     }
@@ -191,7 +188,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         .pipe(
           distinctUntilChanged(),
           switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
-          switchMap(() => this.organizations$),
+        switchMap(() => this.organizations$),
           filter((organizations: DataSourceItem[]) => !!organizations.length),
           tap((organizations: DataSourceItem[]) => this.Org = organizations,
           ),
@@ -199,8 +196,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           //takeUntil(this.componentDestroy())
         )
         .subscribe((orgId: number) => {
-          if (this.OrgName) {
-            this.organizationControl.setValue((this.Org || []).filter(f => f.name == this.OrgName)[0].id, { emitEvent: true, onlySelf: false });
+          if (this.businessUnitId) {
+            this.organizationControl.setValue((this.Org || []).filter(f => f.id == this.businessUnitId)[0].id, { emitEvent: true, onlySelf: false });
           } else {
             this.organizationControl.setValue(orgId, { emitEvent: true, onlySelf: false });
           }

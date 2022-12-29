@@ -198,7 +198,7 @@
             <div><span>{{item.createdAt | date: 'hh:mm:ss a'}}</span></div>
           </div>
         </div>
-        <div class="alert-content alert-title-header-body-color" (click)="GetContentDetails(item.content)" [innerHTML]="item.content"></div>
+        <div class="alert-content alert-title-header-body-color" (click)="GetContentDetails(item.businessUnitId)" [innerHTML]="item.content"></div>
         <div class="alert-panel-footer">
           <div class="alert-panel-footer__footer_flex-child"></div>
           <div class="alert-panel-footer__footer_flex-child" (click)="alertDismiss(item.id)">

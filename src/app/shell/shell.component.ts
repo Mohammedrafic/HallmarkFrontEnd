@@ -660,16 +660,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   contactUs() {
     this.store.dispatch(new ShowCustomSideDialog(true));
   }
-  GetContentDetails(str: string) {
-    if (str) {
-      let NotificationTitle:string = (str).replace(/<[^>]+>/g, '');
-      if (NotificationTitle.includes("Manual Invoice: Submitted")) {
-        let splitted :string[] = str.split("<p>", 2);
-        let OrgName :string = (splitted[1].toString()).replace(/<[^>]+>/g, '');
+  GetContentDetails(businessUnitId?: number) {
+    if (businessUnitId) {
         this.alertSideBarCloseClick()
-        this.orderManagementService.redirectToUrl('/agency/invoices', OrgName);
-        window.localStorage.setItem("ORGName",JSON.stringify(OrgName));
-      }
+        window.localStorage.setItem("BussinessUnitID",JSON.stringify(businessUnitId));
     } 
   }
 }
