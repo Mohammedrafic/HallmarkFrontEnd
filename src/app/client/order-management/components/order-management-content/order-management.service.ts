@@ -26,7 +26,7 @@ export class OrderManagementService extends DestroyableDirective {
   public excludeDeployed: boolean;
 
   private _selectedOrderAfterRedirect: OrderTab | null;
-  private orderManagementSystem: OrderManagementIRPSystemId;
+  private orderManagementSystem: OrderManagementIRPSystemId | null;
 
   constructor(
     private fb: FormBuilder,
@@ -79,11 +79,11 @@ export class OrderManagementService extends DestroyableDirective {
     });
   }
 
-  public setOrderManagementSystem(system: OrderManagementIRPSystemId) {
+  public setOrderManagementSystem(system: OrderManagementIRPSystemId | null) {
     this.orderManagementSystem = system;
   }
 
-  public getOrderManagementSystem(): OrderManagementIRPSystemId {
+  public getOrderManagementSystem(): OrderManagementIRPSystemId | null {
     return this.orderManagementSystem;
   }
 }

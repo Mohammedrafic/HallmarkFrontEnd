@@ -6,12 +6,13 @@ import { FieldName, OrderSystem } from '@client/order-management/enums';
 import { FormArrayList } from '@client/order-management/containers/irp-container/irp-container.constant';
 import { ErrorContentMessageForCredential, OrderDetailsValidationMessage } from '@client/order-management/constants';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
-import { JobDistributionList, ListControls, ListOfKeyForms } from '@client/order-management/interfaces';
+import { JobDistributionList, ListControls, ListOfKeyForms, SelectSystem } from '@client/order-management/interfaces';
 import { Order } from '@shared/models/order-management.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
 import { ButtonModel } from '@shared/models/buttons-group.model';
+import { Organization } from '@shared/models/organization.model';
 
-export const collectInvalidFieldsFromForm = (controls: { [key: string]: AbstractControl }, fields: string[]) => {
+export const collectInvalidFieldsFromForm = (controls: { [key: string]: AbstractControl }, fields: string[]): void => {
   for (const name in controls) {
     if (controls[name].invalid) {
       fields.push(` \u2022 ${FieldName[name as keyof typeof FieldName]}`);
@@ -49,7 +50,7 @@ export const showInvalidFormControl = (controls: ListControls[]): void => {
   });
 };
 
-export const showMessageForInvalidCredentials = ():void => {
+export const showMessageForInvalidCredentials = (): void => {
   ToastUtility.show({
     title: OrderDetailsValidationMessage.title,
     content: ErrorContentMessageForCredential,
@@ -58,7 +59,7 @@ export const showMessageForInvalidCredentials = ():void => {
   });
 };
 
-export const collectInvalidFields = (formControlList: ListControls[]) => {
+export const collectInvalidFields = (formControlList: ListControls[]): string[] => {
   const fields: string[] = [];
   formControlList.forEach((form: ListControls) => collectInvalidFieldsFromForm(form, fields));
   return fields;
@@ -99,13 +100,13 @@ export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCre
   isTemplate: false,
 });
 
-export const getValuesFromList = (formList: FormGroup[]) => {
+export const getValuesFromList = (formList: FormGroup[]): FormGroup[] => {
   return formList.map((form: FormGroup) => {
     return form.getRawValue();
   });
 };
 
-export const createFormData = (order: Order[], documents: Blob[]) => {
+export const createFormData = (order: Order[], documents: Blob[]): FormData => {
   const formData = new FormData();
   const orderIds = order.map((order: Order) => order.id);
   documents.forEach((document: Blob) => formData.append('document', document));
@@ -113,8 +114,14 @@ export const createFormData = (order: Order[], documents: Blob[]) => {
   return formData;
 };
 
-export const updateSystemConfig = (config: ButtonModel[], activeSystem: OrderSystem) => {
+export const updateSystemConfig = (config: ButtonModel[], activeSystem: OrderSystem): void => {
   config.forEach((config: ButtonModel) => {
     config.active = config.id === activeSystem;
   });
 };
+
+export const createSystem = (organization: Organization, isIRPFlag: boolean): SelectSystem => ({
+  isIRP: !!organization.preferences.isIRPEnabled,
+  isVMS: !!organization.preferences.isVMCEnabled,
+  isIRPFlag,
+});

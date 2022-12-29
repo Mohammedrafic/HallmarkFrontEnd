@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Subject } from 'rxjs';
 
-import { ListOfKeyForms } from '@client/order-management/interfaces';
+import { ListOfKeyForms} from '@client/order-management/interfaces';
 
 @Injectable()
 export class IrpContainerStateService {

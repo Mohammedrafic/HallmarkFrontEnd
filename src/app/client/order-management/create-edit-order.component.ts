@@ -34,7 +34,7 @@ import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
-import { updateSystemConfig } from '@client/order-management/helpers';
+import { createSystem, updateSystemConfig } from '@client/order-management/helpers';
 import { GetOrganizationStructure } from '../../store/user.actions';
 
 @Component({
@@ -70,7 +70,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     private route: ActivatedRoute,
     private store: Store,
     private changeDetection: ChangeDetectorRef,
-    private orderManagementService: OrderManagementService
+    private orderManagementService: OrderManagementService,
   ) {
     super();
     this.setPageHeader();
@@ -84,6 +84,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
 
   public navigateBack(): void {
     this.router.navigate(['/client/order-management']);
+    this.selectSystemForOrderManagement();
   }
 
   public changeSystem(event: ButtonModel): void {
@@ -93,6 +94,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
 
   public save(): void {
     this.saveEvents.next();
+    this.selectSystemForOrderManagement();
   }
 
   public selectTypeSave(saveType: MenuEventArgs): void {
@@ -114,7 +116,6 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
           takeUntil(this.componentDestroy())
         ).subscribe((selectedOrder: Order) => {
           this.selectedOrder = selectedOrder;
-          this.activeSystem = selectedOrder?.isIRPOnly ? OrderSystem.IRP : OrderSystem.VMS;
           this.showSystemToggle = false;
           this.setSubmitButtonConfig();
 
@@ -160,12 +161,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     ).subscribe((organization: Organization) => {
       const isIRPFlag = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
       const orderManagementSystem = this.orderManagementService.getOrderManagementSystem();
-
-      this.selectedSystem = {
-        isIRP: !!organization.preferences.isIRPEnabled,
-        isVMS: !!organization.preferences.isVMCEnabled,
-        isIRPFlag,
-      };
+      this.selectedSystem = {...createSystem(organization, isIRPFlag)};
 
       this.showSystemToggle =
         this.selectedSystem.isIRP &&
@@ -183,5 +179,11 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
       updateSystemConfig(this.orderSystemConfig, this.activeSystem);
       this.changeDetection.markForCheck();
     });
+  }
+
+  private selectSystemForOrderManagement(): void {
+    this.orderManagementService.setOrderManagementSystem(
+      this.activeSystem === OrderSystem.IRP ? OrderManagementIRPSystemId.IRP : OrderManagementIRPSystemId.VMS
+    );
   }
 }

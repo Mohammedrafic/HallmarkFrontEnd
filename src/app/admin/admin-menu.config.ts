@@ -6,4 +6,5 @@ export const MASTER_DATA_CONFIG: MenuSettings[] = [
   { text: 'Holidays', id: 3, route: './holidays', permissionKeys: ['CanViewMasterHolidays'] },
   { text: 'Reasons for Rejection', id: 4, route: './reject-reason', permissionKeys: ['CanOrganizationViewOrders'] },
   { text: 'Manual invoice reasons', id: 5, route: './manual-invoice-reasons'},
+  { text: 'Work Commitment', id: 6, route: './commitment', permissionKeys: ['CanViewMasterWorkCommitmentData']},
 ];

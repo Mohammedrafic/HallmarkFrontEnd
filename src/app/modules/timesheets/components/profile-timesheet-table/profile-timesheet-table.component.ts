@@ -34,7 +34,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
-import { MiddleTabletWidth, SmallTabletWidth } from 'src/app/modules/timesheets/constants/media-query-breakpoints';
+import { MiddleTabletWidth, SmallTabletWidth } from '@shared/constants/media-query-breakpoints';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -277,6 +277,11 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public saveChanges(): void {
+    if (!this.timesheetRecordsService.checkFormsValidation(this.formControls)) {
+      this.cd.markForCheck();
+      return;
+    }
+
     if (this.checkTabStatusApproved()) {
       this.confirmService.confirm(TimesheetConfirmMessages.confirmEdit, {
         title: 'Edit Timesheet',
@@ -294,8 +299,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     }
   }
 
-  public trackByIndex(index: number, item: TabConfig): number {
-    return index;
+  public trackByTitle(index: number, item: TabConfig): string {
+    return item.title;
   }
 
   public deleteRecord(id: number): void {
@@ -330,6 +335,34 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public uploadAttachments(id: number, attachments: Attachment[]): void {
     this.uploadSideDialog.emit({ id, attachments });
+  }
+
+  public onMobileEditMenuSelect({ item: { text }}: MenuEventArgs): void {
+    if(text === MobileMenuItems.Cancel) {
+      this.cancelChanges();
+    }
+    if(text === MobileMenuItems.Save) {
+      this.saveChanges();
+    }
+  }
+
+  public listenResizeContent(): void {
+    if (this.isTablet) { 
+      this.resizeObserver.resize$
+        .pipe(
+          map((data) => data[0].contentRect.width),
+          takeUntil(this.componentDestroy())
+        )
+        .subscribe((containerWidth) => {
+          this.isSmallContentWidth = containerWidth <= SmallTabletWidth || this.isMobile;
+          this.isMiddleContentWidth = containerWidth <= MiddleTabletWidth;
+          this.cd.markForCheck();
+        });
+    }
+  }
+
+  public onComponentStateChanged(event: ComponentStateChangedEvent): void {
+    this.componentStateChanged$.next(event);
   }
 
   private selectTab(index: number): void {
@@ -532,7 +565,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   private adjustColumnWidth(): void {
-    combineLatest([ this.componentStateChanged$.pipe(throttleTime(150)), this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX])])
+    combineLatest([ this.componentStateChanged$.pipe(throttleTime(150)),
+      this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX])])
     .pipe(debounceTime(200), takeUntil(this.componentDestroy())).subscribe(([event, data]) => {
         if(data.matches) {
             event.api.sizeColumnsToFit();   
@@ -542,42 +576,17 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     });
   }
 
-  public onComponentStateChanged(event: ComponentStateChangedEvent): void {
-    this.componentStateChanged$.next(event);
-  }
-
   private initResizeObserver(): void {
     this.resizeObserver = ResizeObserverService.init(this.targetElement!);
   }
 
-  public listenResizeContent(): void {
-    if (this.isTablet) { 
-      this.resizeObserver.resize$
-        .pipe(
-          map((data) => data[0].contentRect.width),
-          takeUntil(this.componentDestroy())
-        )
-        .subscribe((containerWidth) => {
-          this.isSmallContentWidth = containerWidth <= SmallTabletWidth || this.isMobile;
-          this.isMiddleContentWidth = containerWidth <= MiddleTabletWidth;
-          this.cd.markForCheck();
-        });
-    }
-  }
-
   private listenMediaQueryBreakpoints(): void {
-    this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX, BreakpointQuery.MOBILE_MAX]).pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
+    this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX, BreakpointQuery.MOBILE_MAX])
+    .pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
       this.isTablet = data.breakpoints[BreakpointQuery.TABLET_MAX];
       this.isMobile = data.breakpoints[BreakpointQuery.MOBILE_MAX];
     });
   }
 
-  public onMobileEditMenuSelect({ item: { text }}: MenuEventArgs): void {
-    if(text === MobileMenuItems.Cancel) {
-      this.cancelChanges();
-    }
-    if(text === MobileMenuItems.Save) {
-      this.saveChanges();
-    }
-  }
+
 }

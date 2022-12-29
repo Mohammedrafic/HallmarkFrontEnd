@@ -9,6 +9,7 @@
       [formControlName]="controlName"
       [fields]="fields"
       [placeholder]="placeholder"
+      (blur)="onBlur()"
     ></ejs-dropdownlist>
     <app-error-message [control]="getControl()"></app-error-message>
   </div>

@@ -7,33 +7,41 @@ import {
   DataSourceContainer,
   JobDistribution,
   OrderFormInput,
+  OrderFormsArrayConfig,
   OrderFormsConfig,
+  SelectSystem,
   SpecialProjectStructure,
   StateList,
 } from '@client/order-management/interfaces';
 import { Order } from '@shared/models/order-management.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { FieldType } from '@core/enums';
-import { FormGroup } from '@angular/forms';
-import { DateTimeHelper } from '@core/helpers';
+import { AbstractControl, FormGroup, Validators } from '@angular/forms';
+import {
+  JobDistributionIrpOnly,
+  JobDistributionIrpVms,
+  TitleField,
+} from '@client/order-management/components/irp-tabs/order-details/constants';
+import { ButtonType, IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 
 export const setDataSource = (fields: OrderFormInput[], fieldName: string, source: DataSourceContainer): void => {
   fields.forEach((fields: OrderFormInput) => {
-    if( fields.field === fieldName) {
+    if (fields.field === fieldName) {
       fields.dataSource = source;
     }
   });
 };
 
-export const changeTypeField = (config: OrderFormInput[], field: string, fieldType: FieldType) => {
+export const changeTypeField = (config: OrderFormInput[], field: string, fieldType: FieldType): void => {
   config.forEach((item: OrderFormInput) => {
-    if(item.field === field) {
+    if (item.field === field) {
       item.type = fieldType;
     }
   });
 };
 
-export const getAgencyIdFiled = (config: OrderFormsConfig) => {
+export const getAgencyIdFiled = (config: OrderFormsConfig): OrderFormInput => {
   return config?.fields.find((control: OrderFormInput) => {
     return control.field === 'agencyId';
   }) as OrderFormInput;
@@ -79,27 +87,12 @@ export const mapSpecialProjectStructure = (data: ProjectSpecialData): SpecialPro
 };
 
 const mapSpecialProjectDataToCorrectFormat =
-  <T extends { id: number}, U extends keyof T>(list: T[], key: U) => {
-  return list.map((itm: T) => ({
-    id: itm.id,
-    name: itm[key],
-  }));
-};
-//todo: uncomment logic for IRP tiers
-/*export const getDistributionSource = (isSelect: boolean) => {
-  return isSelect ? [...IrpJobDistribution,...IrpTiersLogic] : IrpJobDistribution;
-};*/
-
-export const mapStructureToEditedOrder = (selectedOrder: Order) => {
-  return {
-    ...selectedOrder,
-    ...modifyJobDistribution(selectedOrder),
-    ...selectedOrder.irpOrderMetadata,
-    jobDates: selectedOrder.jobStartDate,
-    shiftStartTime: DateTimeHelper.convertDateToUtc(selectedOrder.shiftStartTime.toString()),
-    shiftEndTime: DateTimeHelper.convertDateToUtc(selectedOrder.shiftEndTime.toString()),
+  <T extends { id: number }, U extends keyof T>(list: T[], key: U) => {
+    return list.map((itm: T) => ({
+      id: itm.id,
+      name: itm[key],
+    }));
   };
-};
 
 export const modifyJobDistribution = (selectedOrder: Order) => {
   return selectedOrder.jobDistributions.reduce((acc: JobDistribution, distribution: JobDistributionModel) => {
@@ -110,13 +103,13 @@ export const modifyJobDistribution = (selectedOrder: Order) => {
   }, { jobDistributionValue: [], agencyId: null });
 };
 
-export const setDefaultPrimaryContact = (forms: FormGroup[]): void  => {
+export const setDefaultPrimaryContact = (forms: FormGroup[]): void => {
   const isPrimarySelected = forms.map((currentForm: FormGroup) => {
     return currentForm.value.isPrimaryContact;
   }).some((value: boolean) => value);
 
-  if(!isPrimarySelected) {
-  forms[0].get('isPrimaryContact')?.patchValue(true);
+  if (!isPrimarySelected) {
+    forms[0].get('isPrimaryContact')?.patchValue(true);
   }
 };
 
@@ -125,3 +118,80 @@ export const mapperForContactDetail = (contactDetails: Department): ContactDetai
   email: contactDetails.facilityEmail,
   mobilePhone: contactDetails.facilityPhoneNo,
 });
+
+export const getDataSourceForJobDistribution = (selectedSystem: SelectSystem) => {
+  if (selectedSystem.isIRP && selectedSystem.isVMS) {
+    return JobDistributionIrpVms;
+  } else {
+    return JobDistributionIrpOnly;
+  }
+};
+
+export const showHideFormAction = (config: OrderFormsArrayConfig, list: FormGroup[]): void => {
+  config.forms.forEach((form: OrderFormInput[]) => {
+    form.forEach((field: OrderFormInput) => {
+      if (
+        (field.type === FieldType.Button || field.type === FieldType.RadioButton) && field.buttonType !== ButtonType.Edit
+      ) {
+        field.show = list.length > 1;
+      }
+    });
+  });
+};
+
+export const removeFields = (config: OrderFormsArrayConfig, index: number, form: FormGroup[]): void => {
+  config?.forms.splice(index, 1);
+  form.splice(index, 1);
+
+  if (form.length < 2) {
+    showHideFormAction(config, form);
+  }
+};
+
+export const changeTypeEditButton = (config: OrderFormsArrayConfig, index: number): void => {
+  config?.forms[index].forEach((field: OrderFormInput) => {
+    if (field.field === TitleField) {
+      field.type = field.type === FieldType.Input ? FieldType.Dropdown : FieldType.Input;
+    }
+  });
+};
+
+export const getRateConfigControl = (config: OrderFormsConfig, form: FormGroup): OrderFormInput => {
+  const orderType = form.get('orderType')?.value;
+  const controlType = orderType === IrpOrderType.LongTermAssignment ? 'hourlyRate': 'billRate';
+
+  return config?.fields.find((control: OrderFormInput) => {
+    return control.field === controlType;
+  }) as OrderFormInput;
+};
+
+export const updateJobDistributionControls =
+  (value: number[], selectedConfig: OrderFormsConfig, orderTypeForm: FormGroup, agencyFormControl: AbstractControl): void => {
+  const agencyConfigControl = getAgencyIdFiled(selectedConfig);
+  const rateConfigControl = getRateConfigControl(selectedConfig, orderTypeForm);
+
+  if(
+    value.includes(IrpOrderJobDistribution.SelectedExternal) ||
+    value.includes(IrpOrderJobDistribution.AllExternal) ||
+    value.includes(IrpOrderJobDistribution.TieringLogicExternal)
+  ) {
+    agencyConfigControl.show = true;
+    rateConfigControl.show = true;
+    agencyFormControl?.addValidators([Validators.required]);
+    agencyConfigControl.required = true;
+  } else {
+    agencyConfigControl.show = false;
+    rateConfigControl.show = false;
+    agencyFormControl?.removeValidators(Validators.required);
+    agencyFormControl?.reset();
+    agencyConfigControl.required = false;
+  }
+};
+
+export const isDistributionIncludeExternalOptions = (list: number[]): number[] => {
+  return [
+    IrpOrderJobDistribution.AllExternal,
+    IrpOrderJobDistribution.SelectedExternal,
+    IrpOrderJobDistribution.TieringLogicExternal,
+  ].filter((distribution: number) => list?.includes(distribution));
+};

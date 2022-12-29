@@ -1,8 +1,9 @@
 @import "colors.scss";
 
 .grid-container {
-  margin: 24px 24px 0;
-  height: 400px;
+  height: inherit;
+  display: flex;
+  flex-direction: column;
 
   .grid-title {
     margin-bottom: 12px;

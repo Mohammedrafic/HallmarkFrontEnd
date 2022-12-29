@@ -13,7 +13,7 @@ import {
 export const SystemGroupConfig = (
   isIRPIncluded = false,
   isVMSIncluded = false,
-  selectedSystemId: OrderManagementIRPSystemId | undefined,
+  selectedSystemId: OrderManagementIRPSystemId | undefined | null,
 ): ButtonModel[] => {
   const buttons = [];
 

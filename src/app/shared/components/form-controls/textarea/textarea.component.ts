@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
 import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
 import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -11,7 +11,7 @@ import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TextareaComponent), multi: true }
   ]
 })
-export class TextareaComponent extends BaseFormControlDirective implements OnInit {
+export class TextareaComponent extends BaseFormControlDirective{
   @Input() public maxlength: string;
   @Input() public cssClass: string;
   @Input() public htmlAttributes: { [key: string]: string }[];
@@ -19,12 +19,4 @@ export class TextareaComponent extends BaseFormControlDirective implements OnIni
   constructor() {
     super();
   }
-
-  ngOnInit(): void {
-  }
-
-  public onBlur(): void {
-    this.getControl().updateValueAndValidity();
-  }
-
 }

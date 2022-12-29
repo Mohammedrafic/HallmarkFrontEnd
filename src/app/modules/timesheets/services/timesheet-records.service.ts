@@ -1,4 +1,4 @@
-import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { FormGroup, Validators, FormBuilder, AbstractControlOptions } from '@angular/forms';
 import { Injectable } from '@angular/core';
 
 import { ColDef } from '@ag-grid-community/core';
@@ -9,6 +9,7 @@ import { DropdownOption } from '@core/interface';
 import { TimesheetRecordsDto, RecordValue } from './../interface';
 import { RecordFields, RecordsMode, RecordStatus } from '../enums';
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
+import { AllTimesheetTimeSet } from '@core/helpers';
 
 @Injectable()
 export class TimesheetRecordsService {
@@ -16,17 +17,17 @@ export class TimesheetRecordsService {
     private fb: FormBuilder,
   ) {}
 
-  public setCostOptions(defs: ColDef[], options: DropdownOption[]): void {
+  setCostOptions(defs: ColDef[], options: DropdownOption[]): void {
     const idx = defs.findIndex((item) => item.field === 'costCenter');
     defs[idx].cellRendererParams.options = options;
   }
 
-  public setBillRatesOptions(defs: ColDef[], options: DropdownOption[]): void {
+  setBillRatesOptions(defs: ColDef[], options: DropdownOption[]): void {
     const idx = defs.findIndex((item) => item.field === 'billRateType');
     defs[idx].cellRendererParams.options = options;
   }
 
-  public createEditForm(
+  createEditForm(
     records: TimesheetRecordsDto,
     currentTab: RecordFields,
     colDefs: ColDef[],
@@ -49,13 +50,13 @@ export class TimesheetRecordsService {
       controls['timeIn'] = [record['timeIn'] || ''];
       controls['isTimeInNull'] = [record['isTimeInNull'] || false];
 
-      formGroups[record.id] = this.fb.group(controls);
+      formGroups[record.id] = this.fb.group(controls, { validators: [AllTimesheetTimeSet]} as AbstractControlOptions);
     });
 
     return formGroups;
   }
 
-  public findDiffs(
+  findDiffs(
     data: RecordValue[], forms: Record<string, FormGroup>, defs: ColDef[],
     ): RecordValue[] {
     const diffs: Record<string, string | number  | boolean>[] = [];
@@ -90,17 +91,17 @@ export class TimesheetRecordsService {
     return diffs as unknown as RecordValue[];
   }
 
-  public watchFormChanges(controls: Record<string, FormGroup>): Observable<unknown> {
+  watchFormChanges(controls: Record<string, FormGroup>): Observable<unknown> {
     return merge(
       ...Object.keys(controls).map((key) => controls[key].valueChanges)
     );
   }
 
-  public checkIfFormTouched(controls: Record<string, FormGroup>): boolean {
+  checkIfFormTouched(controls: Record<string, FormGroup>): boolean {
     return Object.keys(controls).some((key) => controls[key].touched);
   }
 
-  public getCurrentTabName(idx: number): RecordFields {
+  getCurrentTabName(idx: number): RecordFields {
     if (idx === 1) {
       return  RecordFields.Miles;
     }
@@ -111,7 +112,7 @@ export class TimesheetRecordsService {
     return RecordFields.Time;
   }
 
-  public controlTabsVisibility(billRates: DropdownOption[], tabs: TabComponent, records: TimesheetRecordsDto): void {
+  controlTabsVisibility(billRates: DropdownOption[], tabs: TabComponent, records: TimesheetRecordsDto): void {
     const isMilageAvaliable = billRates.some((rate) => rate.text.includes('Mileage'));
     const isExpensesAvaliable = !!records.expenses.viewMode.length;
 
@@ -119,13 +120,13 @@ export class TimesheetRecordsService {
     tabs.hideTab(2, !isExpensesAvaliable);
   }
 
-  public checkForStatus(data: RecordValue[]): boolean {
+  checkForStatus(data: RecordValue[]): boolean {
     return data.some((record) => {
       return record.stateText === RecordStatus.Deleted || record.stateText === RecordStatus.New;
     });
   }
 
-  public createEditColDef(
+  createEditColDef(
     editOn: boolean,
     currentTab: RecordFields,
     formControls: Record<string, FormGroup>,
@@ -170,6 +171,17 @@ export class TimesheetRecordsService {
         def.cellRendererParams.formGroup = formControls;
       }
       return def;
+    });
+  }
+
+  checkFormsValidation(forms:  Record<string, FormGroup>): boolean {
+    Object.keys(forms).forEach((key) => {
+      forms[key].updateValueAndValidity();
+      forms[key].markAllAsTouched();
+    });
+
+    return Object.keys(forms).every((key) => {
+      return forms[key].valid;
     });
   }
 }

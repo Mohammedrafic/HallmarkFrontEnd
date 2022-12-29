@@ -19,11 +19,41 @@ import { AddEditNoteComponent } from './general-notes/add-edit-note/add-edit-not
 import { SharedModule } from '@shared/shared.module';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { GeneralNotesGridCategoryRendererComponent } from './general-notes/general-notes-grid-category-renderer/general-notes-grid-category-renderer.component';
+import { CandidateProfileService } from '@client/candidates/candidate-profile/candidate-profile.service';
+import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
+import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
 
 @NgModule({
-  declarations: [GeneralNotesComponent, CandidateDetailsComponent, GeneralInfoComponent, HrInfoComponent, ContactDetailsComponent, GeneralNotesGridActionsRendererComponent, AddEditNoteComponent, GeneralNotesGridCategoryRendererComponent],
+  declarations: [
+    GeneralNotesComponent,
+    CandidateDetailsComponent,
+    GeneralInfoComponent,
+    HrInfoComponent,
+    ContactDetailsComponent,
+    GeneralNotesGridActionsRendererComponent,
+    AddEditNoteComponent,
+    GeneralNotesGridCategoryRendererComponent,
+  ],
   exports: [CandidateDetailsComponent, GeneralNotesComponent],
-  imports: [CommonModule, InputModule, DatepickerModule, DropdownModule, MultiselectDropdownModule, SwitchModule, TextareaModule, NumericTextboxModule, GridModule, FeatherModule, ButtonModule, SharedModule, DropDownListModule]
+  imports: [
+    CommonModule,
+    InputModule,
+    DatepickerModule,
+    DropdownModule,
+    MultiselectDropdownModule,
+    SwitchModule,
+    TextareaModule,
+    NumericTextboxModule,
+    GridModule,
+    FeatherModule,
+    ButtonModule,
+    SharedModule,
+    DropDownListModule,
+  ],
+  providers: [
+    CandidateProfileService,
+    CandidateProfileFormService,
+    GeneralNotesService,
+  ]
 })
-export class CandidateProfileModule {
-}
+export class CandidateProfileModule {}

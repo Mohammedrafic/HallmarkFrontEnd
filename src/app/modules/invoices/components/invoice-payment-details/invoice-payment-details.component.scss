@@ -64,6 +64,11 @@
       .ag-root-wrapper-body {
         height: auto !important;
       }
+
+      .ag-header-cell-text {
+        text-overflow: initial !important;
+        white-space: normal !important;
+      }
     }
   }
   

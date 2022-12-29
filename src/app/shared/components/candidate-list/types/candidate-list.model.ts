@@ -17,6 +17,7 @@ export type CandidateRow = {
 };
 
 export type IRPCandidate = {
+  id?: number;
   hasRedFlag: boolean;
   redFlagDescription: string;
   employeeId: number

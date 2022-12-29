@@ -4,7 +4,7 @@
       <div [ngClass]="{ 'first-tab': isFirstSelected }" class="tab-wrapper">
         <ejs-tab id="tab_default" #tabs (selected)="onTabSelect($event)">
           <e-tabitems>
-            <e-tabitem *ngFor="let tab of tabsConfig; trackBy: trackByIndex">
+            <e-tabitem *ngFor="let tab of tabsConfig; trackBy: trackByTitle">
               <ng-template #headerText>
                 <div>{{ tab.title }}</div>
               </ng-template>

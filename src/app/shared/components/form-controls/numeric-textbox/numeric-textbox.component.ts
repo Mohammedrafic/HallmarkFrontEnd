@@ -28,8 +28,4 @@ export class NumericTextboxComponent extends BaseFormControlDirective {
   public handleChangeEvent(event: ChangeEventArgs): void {
     this.changeValueEmitter.emit(event.value);
   }
-
-  public onBlur(): void {
-    this.getControl().updateValueAndValidity();
-  }
 }

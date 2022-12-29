@@ -3,10 +3,10 @@ import { debounceTime, filter, map, merge, Observable, Subject, switchMap, takeU
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { CandidatesStatusText, CandidateStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { CandidatesStatusText, CandidateStatus, EmployeeStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../../../store/user.state';
-import { SaveCandidateSucceeded } from '@agency/store/candidate.actions';
+import { GetAllSkills, SaveCandidateSucceeded } from '@agency/store/candidate.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialParams } from "@shared/models/candidate-credential.model";
@@ -29,12 +29,12 @@ import { Candidate } from '@shared/models/candidate.model';
 import {
   ChangeCandidateProfileStatus,
   ExportCandidateList,
-  GetAllSkills,
   GetCandidatesByPage,
   GetIRPCandidatesByPage,
   GetRegionList,
 } from '../../store/candidate-list.actions';
-import { ListOfSkills } from '@shared/models/skill.model';
+import { MasterSkill } from '@shared/models/skill.model';
+import { CandidateState } from "@agency/store/candidate.state";
 import { ExportColumn, ExportOptions } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
@@ -62,8 +62,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Select(CandidateListState.IRPCandidates)
   private _IRPCandidates$: Observable<IRPCandidateList>;
 
-  @Select(CandidateListState.listOfSkills)
-  private skills$: Observable<ListOfSkills[]>;
+  @Select(CandidateState.skills)
+  private skills$: Observable<MasterSkill[]>;
 
   @Select(UserState.lastSelectedAgencyId)
   lastSelectedAgencyId$: Observable<number>;
@@ -99,6 +99,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public CandidateFilterFormGroup: FormGroup;
   public filterColumns: CandidateListFiltersColumn = filterColumns;
   public readonly statusEnum = CandidateStatus;
+  public readonly employeeStatusEnum = EmployeeStatus;
   public readonly candidateStatus = CandidatesStatusText;
   public candidates$: Observable<CandidateList | IRPCandidateList>;
   public readonly userPermissions = UserPermissions;
@@ -119,12 +120,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
   };
-  public optionFields = optionFields;
-  public regionFields = regionFields;
-  public skillFields: FieldSettingsModel = { text: 'name', value: 'masterSkillId' };
+  public readonly optionFields = optionFields;
+  public readonly regionFields = regionFields;
 
   private pageSubject = new Subject<number>();
-  private includeDeployedCandidates: boolean = true;
+  private includeDeployedCandidates = true;
   private unsubscribe$: Subject<void> = new Subject();
   private isAlive = true;
   private activeTab: number;
@@ -243,7 +243,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       candidateStatus: null,
       orderId: null,
     };
-    this.router.navigate(['./edit', (data as CandidateRow).candidateProfileId || (data as IRPCandidate).employeeId], { relativeTo: this.route, state: credentialParams });
+    this.router.navigate(
+      ['./edit', (data as CandidateRow).candidateProfileId || (data as IRPCandidate).id],
+      { relativeTo: this.route, state: credentialParams }
+    );
   }
 
   public onRemove(id: number): void {
@@ -308,7 +311,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       tab: this.activeTab ?? 0,
       includeDeployedCandidates: this.includeDeployedCandidates,
     };
-    this.store.dispatch(this.isIRP ? new GetIRPCandidatesByPage(candidateListRequest) : new GetCandidatesByPage(candidateListRequest));
+    this.store.dispatch(
+      this.isIRP
+        ? new GetIRPCandidatesByPage(candidateListRequest)
+        : new GetCandidatesByPage(candidateListRequest)
+    );
   }
 
   public regionTrackBy(index: number, region: string): string {
@@ -365,7 +372,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return (
       candidates &&
       candidates.map((candidate: IRPCandidate) => {
-        if (candidate.employeeSkills.length > 2) {
+        if (candidate.employeeSkills?.length > 2) {
           const [first, second] = candidate.employeeSkills;
           candidate = {
             ...candidate,
@@ -462,11 +469,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private subscribeOnSkills(): void {
     this.skills$
       .pipe(
-        filter((skill) => !!skill),
+        filter(Boolean),
         takeUntil(this.unsubscribe$)
       )
       .subscribe((skills) => {
-        this.filterColumns.skillsIds.dataSource = skills.filter((v, i, a)=>a.findIndex(skill => (skill.masterSkillId === v.masterSkillId)) === i);
+        this.filterColumns.skillsIds.dataSource = skills;
       });
   }
 
