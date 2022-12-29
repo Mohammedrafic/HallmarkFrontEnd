@@ -90,6 +90,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   public changeSystem(event: ButtonModel): void {
     this.activeSystem = event.id;
     this.setSubmitButtonConfig();
+    this.getSkillsByActiveSystem();
   }
 
   public save(): void {
@@ -141,7 +142,6 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   private getInitialData(): void {
     this.store.dispatch([
       new GetRegions(),
-      new GetAssignedSkillsByOrganization(),
       new GetOrderRequisitionByPage(),
       new GetAssociateAgencies(),
       new GetOrganizationStatesWithKeyCode(),
@@ -175,7 +175,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
       }
 
       this.setSubmitButtonConfig();
-
+      this.getSkillsByActiveSystem();
       updateSystemConfig(this.orderSystemConfig, this.activeSystem);
       this.changeDetection.markForCheck();
     });
@@ -185,5 +185,11 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     this.orderManagementService.setOrderManagementSystem(
       this.activeSystem === OrderSystem.IRP ? OrderManagementIRPSystemId.IRP : OrderManagementIRPSystemId.VMS
     );
+  }
+
+  private getSkillsByActiveSystem(): void {
+    this.store.dispatch(new GetAssignedSkillsByOrganization({
+      params: { SystemType: this.activeSystem === OrderSystem.IRP ? OrderSystem.VMS : OrderSystem.IRP },
+    }));
   }
 }
