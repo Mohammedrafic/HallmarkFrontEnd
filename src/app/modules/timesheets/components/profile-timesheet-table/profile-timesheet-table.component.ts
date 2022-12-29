@@ -34,7 +34,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
-import { MiddleTabletWidth, SmallTabletWidth } from 'src/app/modules/timesheets/constants/media-query-breakpoints';
+import { MiddleTabletWidth, SmallTabletWidth } from '@shared/constants/media-query-breakpoints';
 
 /**
  * TODO: move tabs into separate component if possible

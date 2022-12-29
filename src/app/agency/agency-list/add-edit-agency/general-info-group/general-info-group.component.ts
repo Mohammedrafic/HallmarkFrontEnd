@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select } from '@ngxs/store';
 import { Observable, Subject, takeWhile } from 'rxjs';
@@ -9,9 +9,10 @@ import { AgencyStatus } from 'src/app/shared/enums/status';
 
 import { agencyStatusCreationOptions, agencyStatusOptions } from '../../agency-list.constants';
 import PriceUtils from '@shared/utils/price.utils';
-import { AgencyStatusesModel } from "@shared/models/agency.model";
+import { AgencyConfig, AgencyStatusesModel } from "@shared/models/agency.model";
 import { ALPHANUMERIC } from '@shared/constants';
 import { COUNTRIES } from '@shared/constants/countries-list';
+import { ChangeEventArgs } from '@syncfusion/ej2-angular-buttons';
 
 @Component({
   selector: 'app-general-info-group',
@@ -20,7 +21,9 @@ import { COUNTRIES } from '@shared/constants/countries-list';
 })
 export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   @Input() formGroup: FormGroup;
-  @Input() isAgencyUser: boolean;
+  @Input() public agencyConfig: AgencyConfig
+
+  @Output() private mspCheckboxEmitter: EventEmitter<boolean> = new EventEmitter();
 
   public countries = COUNTRIES;
   public priceUtils = PriceUtils;
@@ -60,7 +63,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
     this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive)).subscribe((isCreated) => {
       this.statuses = isCreated ? agencyStatusOptions : agencyStatusCreationOptions;
 
-      if (this.isAgencyUser) {
+      if (this.agencyConfig.isAgencyUser) {
         this.formGroup.get('status')?.disable();
       }
     });
@@ -88,5 +91,9 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
 
   private setDefultStatus(): void {
     this.formGroup.get('status')?.patchValue(0);
+  }
+
+  public onChangeMspCheckbox(event: ChangeEventArgs): void {
+    this.mspCheckboxEmitter.emit(event.checked);
   }
 }

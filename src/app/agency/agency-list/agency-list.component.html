@@ -60,7 +60,14 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="agencyDetails.name" headerText="AGENCY NAME" width="430"></e-column>
+      <e-column headerText="AGENCY NAME" width="430">
+        <ng-template #template let-data>
+          <app-agency-name
+            [agencyName]="data.agencyDetails.name"
+            [isMsp]="data.isMsp"
+          ></app-agency-name>
+        </ng-template>
+      </e-column>
       <e-column field="agencyDetails.status" headerText="AGENCY STATUS" width=200>
         <ng-template #template let-data>
           <div>

@@ -172,12 +172,12 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
     this.selectedEntries$.next(nextValue);
   }
 
-  public redirectToSourceContent(): void {
+  public redirectToSourceContent(status : string ): void {
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
       this.dashboardService.redirectToUrl('agency/order-management');
     } else {
-      this.dashboardService.redirectToUrl('client/order-management');
+      this.dashboardService.redirectToUrl('client/order-management',undefined,status);
     }
   }
 

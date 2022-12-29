@@ -20,6 +20,7 @@ import { ExportPayload } from '@shared/models/export.model';
 import { GRID_CONFIG } from '@shared/constants';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { sortBy } from '@shared/helpers/sort-array.helper';
+import { SkillParams } from '@client/order-management/interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class SkillsService {
@@ -128,8 +129,8 @@ export class SkillsService {
     return this.http.put<number[]>(`/api/AssignedSkills/assignSkills`, treeValue);
   }
 
-  public getAssignedSkillsByOrganization(): Observable<AssignedSkillsByOrganization[]> {
-    return this.http.get<AssignedSkillsByOrganization[]>(`/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit`)
+  public getAssignedSkillsByOrganization(params?: SkillParams): Observable<AssignedSkillsByOrganization[]> {
+    return this.http.get<AssignedSkillsByOrganization[]>('/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit', params)
       .pipe(map((data) => sortByField(data, 'skillDescription')));
   }
 

@@ -71,6 +71,7 @@ export const CheckPaymentsDefs: ColDef[] = [
     headerName: '',
     type: 'leftAligned',
     width: 55,
+    minWidth: 45,
     sortable: false,
     resizable: true,
     cellRenderer: PaymentDeleteRendererComponent,
@@ -78,8 +79,13 @@ export const CheckPaymentsDefs: ColDef[] = [
   {
     field: 'invoiceNumber',
     headerName: 'Invoice Number',
-    type:  'rightAligned',
     width: 185,
+    minWidth: 108,
+    flex: 1,
+    wrapText: true,
+    autoHeight: true,
+    type:  'rightAligned',
+    headerClass: 'custom-wrap',
     ...commonColumn,
   },
   {
@@ -87,6 +93,7 @@ export const CheckPaymentsDefs: ColDef[] = [
     headerName: 'Amount',
     type:  'rightAligned',
     width: 148,
+    minWidth: 108,
     ...commonColumn,
     valueFormatter: (params: ValueFormatterParams) => {
       return formatCurrency(params.value, 'en', '$');
@@ -97,6 +104,7 @@ export const CheckPaymentsDefs: ColDef[] = [
     headerName: 'Payment',
     type:  'leftAligned',
     width: 155,
+    minWidth: 109,
     cellRenderer: InputEditorComponent,
     sortable: false,
     resizable: true,
@@ -107,6 +115,7 @@ export const CheckPaymentsDefs: ColDef[] = [
     type:  'rightAligned',
     cellRenderer: BalanceRendererComponent,
     width: 147,
+    minWidth: 110,
     sortable: false,
     resizable: true,
     ...commonColumn,

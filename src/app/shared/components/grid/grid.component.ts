@@ -1,7 +1,24 @@
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import type { GridOptions, Module, RowDragEvent, SelectionChangedEvent, SortChangedEvent } from '@ag-grid-community/core';
+import type {
+  ComponentStateChangedEvent,
+  GridOptions,
+  Module,
+  RowDragEvent,
+  SelectionChangedEvent,
+  SortChangedEvent,
+} from '@ag-grid-community/core';
 import { RowNode } from '@ag-grid-community/core';
-import { BehaviorSubject, combineLatest, delay, filter, Observable, takeUntil } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  delay,
+  filter,
+  Observable,
+  takeUntil,
+  debounceTime,
+  Subject,
+  throttleTime,
+} from 'rxjs';
 
 import {
   ChangeDetectionStrategy,
@@ -12,7 +29,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
-  ViewEncapsulation
+  ViewEncapsulation,
 } from '@angular/core';
 
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
@@ -22,6 +39,8 @@ import { GRID_CONFIG } from '@shared/constants';
 import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 import { Select } from '@ngxs/store';
 import { AppState } from '../../../store/app.state';
+import { BreakpointObserverService } from '@core/services';
+import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 
 @Component({
   selector: 'app-grid',
@@ -47,6 +66,8 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Input() public gridOptions: GridOptions;
   @Input() public paginationPanel = true;
   @Input() public title: string;
+  @Input() public adjustColumnsWidth = false;
+  @Input() public context: Object;
 
   @Input() set changeTableSelectedIndex(next: number | null) {
     if (next !== null) {
@@ -71,7 +92,6 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Output() public multiSelectionChanged: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
   @Output() public dragRowEmitter: EventEmitter<RowDragEvent> = new EventEmitter<RowDragEvent>();
 
-
   public readonly defaultColumnDefinition: ColumnDefinitionModel = { minWidth: 100, resizable: true };
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public readonly modules: Module[] = [ClientSideRowModelModule];
@@ -83,6 +103,12 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   private readonly gridInstance$: BehaviorSubject<GridReadyEventModel | null> =
     new BehaviorSubject<GridReadyEventModel | null>(null);
 
+  private readonly componentStateChanged$: Subject<ComponentStateChangedEvent> = new Subject();
+
+  constructor(private readonly breakpointObserver: BreakpointObserverService) {
+    super();
+  }
+
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
 
@@ -92,10 +118,12 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
 
   public ngOnInit(): void {
     this.initLoadingStateChangesListener();
+    this.adjustColumnWidth();
   }
 
   public handleGridReadyEvent(event: GridReadyEventModel): void {
     this.gridInstance$.next(event);
+    this.componentStateChanged$.next(event);
     this.gridReadyEmitter.emit(event);
   }
 
@@ -117,6 +145,10 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
     this.dragRowEmitter.emit(event);
   }
 
+  public handleComponentStateChangeEvent(event: ComponentStateChangedEvent): void {
+    this.componentStateChanged$.next(event);
+  }
+
   private initLoadingStateChangesListener(): void {
     combineLatest([this.gridInstance$, this.isLoading$])
       .pipe(
@@ -127,5 +159,22 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
       .subscribe(([grid, isLoading]: [GridReadyEventModel | null, boolean]) => {
         isLoading ? grid?.api.showLoadingOverlay() : this.rowData?.length && grid?.api.hideOverlay();
       });
+  }
+
+  private adjustColumnWidth(): void {
+    if (this.adjustColumnsWidth) {
+      combineLatest([
+        this.componentStateChanged$.pipe(throttleTime(150)),
+        this.breakpointObserver.listenBreakpoint([BreakpointQuery.TABLET_MAX]),
+      ])
+        .pipe(debounceTime(300), takeUntil(this.destroy$))
+        .subscribe(([event, breakpoint]) => {
+          if (breakpoint.matches) {
+            event.api.sizeColumnsToFit();
+          } else {
+            event.columnApi.resetColumnState();
+          }
+        });
+    }
   }
 }

@@ -8,6 +8,7 @@ import { SetPageNumber, SetPageSize } from '@shared/components/candidate-details
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { CandidateDetailsPage } from '@shared/components/candidate-details/models/candidate.model';
 import { ColDef } from '@ag-grid-community/core';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-candidate-grid',
@@ -15,8 +16,40 @@ import { ColDef } from '@ag-grid-community/core';
   styleUrls: ['./candidate-grid.component.scss'],
 })
 export class CandidateGridComponent extends DestroyableDirective implements OnInit {
+  @Input() public CandidateStatus: string;
   @Input() set candidatesPage(page: CandidateDetailsPage) {
-    this.candidatePage = page;
+    let Enumvalues: number;
+    switch (this.CandidateStatus) {
+      case "Applied":
+        Enumvalues = CandidatStatus.Applied;
+        break
+      case "Shortlisted":
+        Enumvalues = CandidatStatus.Shortlisted;
+        break;
+      case "Offered":
+        Enumvalues = CandidatStatus.Offered;
+        break;
+      case "Accepted":
+        Enumvalues = CandidatStatus.Accepted;
+        break;
+      case "Onboard":
+        Enumvalues = CandidatStatus.OnBoard;
+        break;
+      default:
+        Enumvalues = 0;
+    }
+
+    if (Enumvalues > 0) {
+      this.candidatePage = page;
+      this.candidatePage.items = (this.candidatePage.items || []).filter(f => f.status == Enumvalues);
+      this.candidatePage.totalCount = this.candidatePage.items.length
+    } else {
+      this.candidatePage = page;
+    }
+    // this.CandidateStatus=="Onboard"? 'OnBoard':''
+    // let Enumindex=Object.keys(CandidatStatus).indexOf(this.CandidateStatus=="Onboard"? 'OnBoard':''||"");
+    // let Enumvalues =Object.values(CandidatStatus)[Enumindex]
+    ;
   }
 
   @Input() public pageNumber: number;

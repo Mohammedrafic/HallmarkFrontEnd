@@ -95,12 +95,19 @@ const mapSpecialProjectDataToCorrectFormat =
   };
 
 export const modifyJobDistribution = (selectedOrder: Order) => {
-  return selectedOrder.jobDistributions.reduce((acc: JobDistribution, distribution: JobDistributionModel) => {
+  const selectedDistribution = selectedOrder.jobDistributions.reduce(
+    (acc: JobDistribution, distribution: JobDistributionModel): JobDistribution => {
     return {
       jobDistributionValue: [...acc.jobDistributionValue, distribution.jobDistributionOption],
-      agencyId: distribution.agencyId,
+      agencyId: [...acc.agencyId as number[], distribution.agencyId as number],
     };
-  }, { jobDistributionValue: [], agencyId: null });
+  }, { jobDistributionValue: [], agencyId: [] });
+
+  return {
+    ...selectedDistribution,
+    jobDistributionValue: selectedDistribution.jobDistributionValue?.filter((distribution, index) =>
+      index === selectedDistribution.jobDistributionValue?.indexOf(distribution)),
+  };
 };
 
 export const setDefaultPrimaryContact = (forms: FormGroup[]): void => {
@@ -165,23 +172,21 @@ export const getRateConfigControl = (config: OrderFormsConfig, form: FormGroup):
   }) as OrderFormInput;
 };
 
-export const updateJobDistributionControls =
+export const updateJobDistributionForm =
   (value: number[], selectedConfig: OrderFormsConfig, orderTypeForm: FormGroup, agencyFormControl: AbstractControl): void => {
   const agencyConfigControl = getAgencyIdFiled(selectedConfig);
   const rateConfigControl = getRateConfigControl(selectedConfig, orderTypeForm);
 
-  if(
-    value.includes(IrpOrderJobDistribution.SelectedExternal) ||
+  rateConfigControl.show = value.includes(IrpOrderJobDistribution.SelectedExternal) ||
     value.includes(IrpOrderJobDistribution.AllExternal) ||
-    value.includes(IrpOrderJobDistribution.TieringLogicExternal)
-  ) {
+    value.includes(IrpOrderJobDistribution.TieringLogicExternal);
+
+  if(value.includes(IrpOrderJobDistribution.SelectedExternal)) {
     agencyConfigControl.show = true;
-    rateConfigControl.show = true;
     agencyFormControl?.addValidators([Validators.required]);
     agencyConfigControl.required = true;
   } else {
     agencyConfigControl.show = false;
-    rateConfigControl.show = false;
     agencyFormControl?.removeValidators(Validators.required);
     agencyFormControl?.reset();
     agencyConfigControl.required = false;

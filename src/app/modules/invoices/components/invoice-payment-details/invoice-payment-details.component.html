@@ -31,15 +31,15 @@
         </div>
       </div>
       <div class="grid-table-container">
-        <ag-grid-angular #grid
-          [columnDefs]="paymentTableDefs"
+        <app-grid
+          [columnDefinitions]="paymentTableDefs"
           [rowData]="tableData"
-          [rowHeight]="64"
-          [pagination]="false"
+          [paginationPanel]="false"
+          [adjustColumnsWidth]="true"
           [context]="context"
-          (gridReady)="setGridApi($event)"
-          class="ag-theme-alpine app-grid__component">
-        </ag-grid-angular>
+          (gridReadyEmitter)="setGridApi($event)"
+          class="ag-theme-alpine app-grid__component"
+        ></app-grid>
       </div>
     </div>
   </ng-template>
