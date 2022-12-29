@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { OutsideZone } from '@core/decorators';
 
@@ -101,7 +101,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public openFileViewerDialog = new EventEmitter<number>();
   public today = new Date();
   public disableAddCredentialButton: boolean;
-  public showCertifiedFields: boolean;
+  public requiredCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
   public existingFiles: FilesPropModel[] = [];
   public hideFileSize = false;
@@ -176,6 +176,14 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   private get organizatonId(): number | null {
     return this.isOrganizationSide ? this.store.selectSnapshot(UserState.lastSelectedOrganizationId) : null;
+  }
+
+  private get createdOnControl(): AbstractControl | null {
+    return this.addCredentialForm.get('createdOn');
+  }
+
+  private get createdUntilControl(): AbstractControl | null {
+    return this.addCredentialForm.get('createdUntil');
   }
 
   private get credentialRequestParams(): CredentialRequestParams {
@@ -335,7 +343,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     }: CandidateCredential
   ) {
     event.stopPropagation();
-    this.showCertifiedFields = !!expireDateApplicable;
+    this.checkCertifiedFields(!!expireDateApplicable);
     this.credentialId = id as number;
     this.credentialStatus = status as CredentialStatus;
     this.masterCredentialId = masterCredentialId;
@@ -417,7 +425,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public selectMasterCredentialId(event: { data: Credential }): void {
     this.masterCredentialId = event.data.id as number;
-    this.showCertifiedFields = event.data.expireDateApplicable;
+    this.checkCertifiedFields(event.data.expireDateApplicable);
   }
 
   public clearMasterCredentialId(): void {
@@ -670,5 +678,22 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.userPermission[this.userPermissions.CanEditCandidateCredentials] ||
       this.userPermission[this.userPermissions.ManageCredentialWithinOrderScope]
     );
+  }
+
+  private checkCertifiedFields(expireDateApplicable: boolean): void {
+    this.requiredCertifiedFields = expireDateApplicable;
+
+    if (this.requiredCertifiedFields) {
+      this.createdOnControl?.setValidators([Validators.required]);
+      this.createdUntilControl?.setValidators([Validators.required]);
+    } else {
+      this.createdOnControl?.setValidators([]);
+      this.createdUntilControl?.setValidators([]);
+      this.createdOnControl?.setValue(null);
+      this.createdUntilControl?.setValue(null);
+    }
+
+    this.createdOnControl?.updateValueAndValidity();
+    this.createdUntilControl?.updateValueAndValidity();
   }
 }
