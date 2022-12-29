@@ -1,7 +1,12 @@
 <div class="grid-wrapper">
   <div class="grid-header">
     <div class="left">
-      <app-search class="search-input" placeholder="Name or ID"></app-search>
+      <app-search
+        #searchComponent
+        class="search-input"
+        placeholder="Name or ID"
+        (inputKeyUpEnter)="searchCandidate($event)"
+      ></app-search>
       <button
         ejs-button
         appHideBeforeSyncfusionLoad
@@ -9,13 +14,14 @@
       >
         <i-feather name="sliders" class="sorting-icon"></i-feather>
       </button>
+    </div>
+    <div class="right">
       <app-date-week-picker
         [initDates]="weekPeriod"
         [rangeType]="activePeriod"
         [firstDayOfWeek]="orgFirstDayOfWeek"
       ></app-date-week-picker>
-    </div>
-    <div class="right">
+
       <div class="date-periods">
         <div *ngFor="let datePeriod of datesPeriods; trackBy: trackByPeriods"
              [class.active]="datePeriod.id === activePeriod"
@@ -27,11 +33,11 @@
       </div>
     </div>
   </div>
-  <div class="grid-body">
-    <table>
+  <div #scrollArea class="grid-body">
+    <table *ngIf="scheduleData?.items?.length; else emptyTable">
       <thead>
         <tr>
-          <th class="table-title candidates-cell fixed fixed--left fixed--top">## Candidates</th>
+          <th class="table-title candidates-head-cell fixed fixed--left fixed--top">{{ scheduleData?.totalCount || 0 }} Candidates</th>
           <th
             *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
             class="table-title date fixed fixed--top"
@@ -41,21 +47,23 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let scheduleItem of scheduleData; trackBy: trackByScheduleData" class="table-row">
-          <td class="table-cell fixed fixed--left">
+        <tr *ngFor="let scheduleItem of scheduleData?.items; trackBy: trackByScheduleData" class="table-row">
+          <td class="table-cell candidates-cell fixed fixed--left">
             <app-candidate-card
               [candidate]="scheduleItem.candidate"
             ></app-candidate-card>
           </td>
           <ng-container *ngFor="let dateSlot of datesRanges; trackBy: trackByDatesRange">
             <td
-              *ngIf="dateSlot | calendarDateSlot: scheduleItem.schedule as schedule; else emptyCell"
+              *ngIf="dateSlot | calendarDateSlot: scheduleItem.schedule as dateSchedule; else emptyCell"
               class="table-cell date-slot"
-              [class.selected]="scheduleItem.candidate.id === selectedCandidateId && schedule.id === selectedScheduleCard?.id"
+              [attr.colspan]="dateSchedule.extendedDays"
+              [class.selected]="(scheduleItem.candidate.id === selectedCandidateId)
+               && (dateSchedule && dateSchedule.daySchedules[0]?.id === selectedScheduleCard?.id)"
             >
               <app-schedule-card
-                [schedule]="schedule"
-                (click)="selectScheduleCard(schedule, scheduleItem.candidate.id)"
+                [dateSchedule]="dateSchedule"
+                (click)="selectScheduleCard(dateSchedule, scheduleItem.candidate.id)"
               ></app-schedule-card>
             </td>
 
@@ -70,6 +78,10 @@
         </tr>
       </tbody>
     </table>
+    <ng-template #emptyTable>
+      <div class="empty-wrapper">
+        <p class="empty-wrapper__text">Search fot the candidate or use filter(s).</p>
+      </div>
+    </ng-template>
   </div>
-  <div class="grid-footer"></div>
 </div>

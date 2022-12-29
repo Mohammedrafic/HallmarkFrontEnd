@@ -14,7 +14,11 @@
 
 <div class="content">
   <ng-container *ngIf="activeTabIndex === tabIndex.Scheduling">
-    <app-schedule-grid [scheduleData]="scheduleData$ | async"></app-schedule-grid>
+    <app-schedule-grid
+      [scheduleData]="scheduleData"
+      (changeFilter)="changeFilters($event)"
+      (loadMoreData)="loadMoreData($event)"
+    ></app-schedule-grid>
   </ng-container>
   <ng-container *ngIf="activeTabIndex === tabIndex.Analytics">
   </ng-container>

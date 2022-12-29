@@ -4,6 +4,9 @@ import { RangeDaysOptions } from '@shared/components/date-week-picker/date-week.
 import { DatesRangeType } from '@shared/enums';
 import { CalcDaysMs } from './functions.helper';
 
+/**
+ * TODO: need to refactor, cleanup, change naming, params etc.
+ */
 export class DateTimeHelper {
   public static getLastDayOfWeekFromFirstDay(startDate: string, days: number): Date {
     const start = new Date(startDate);
@@ -82,18 +85,29 @@ export class DateTimeHelper {
   public static getWeekDate(date: string | Date, isStart = false,
     rangeOption: DatesRangeType, firstWeekDay: number | null = null, maxDateExist = true): Date {
     const curr = new Date(date);
+    const startDayNum = firstWeekDay !== null && firstWeekDay !== undefined ? firstWeekDay : curr.getDay();
+    const currDayNum = curr.getDay();
     let firstDay = curr.getTime() - CalcDaysMs(curr.getDay());
+    let dayDiff: number;
 
     if (firstWeekDay) {
       firstDay = new Date(curr.getDate() - firstWeekDay).getTime();
     }
 
+    if (currDayNum >= startDayNum) {
+      dayDiff = currDayNum - startDayNum;
+    } else {
+      dayDiff = 7 - startDayNum + currDayNum;
+    }
+
+    firstDay = curr.getTime() - CalcDaysMs(dayDiff);
+
     if (rangeOption === DatesRangeType.Day) {
       firstDay = curr.getTime();
     }
-
+  
     const lastDay = firstDay + CalcDaysMs((RangeDaysOptions[rangeOption] - 1));
-    
+
     let last = new Date(lastDay).getTime();
     let first = firstDay;
 
@@ -177,7 +191,7 @@ export class DateTimeHelper {
     return result;
   }
 
-  public static getDatesBetween(sDate: Date | null = null, eDate: Date | null = null): string[] {
+  public static getDatesBetween(sDate: Date | string | null = null, eDate: Date | string | null = null): string[] {
     const startDate = sDate || new Date();
     const endDate = eDate || new Date().setDate(new Date().getDate() + 14); // default 14 days - 2 week view
 

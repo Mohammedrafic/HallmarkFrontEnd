@@ -1,17 +1,35 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, TrackByFunction } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component, ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  TrackByFunction,
+  ViewChild,
+} from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { Observable, switchMap, takeUntil } from 'rxjs';
+import { debounceTime, fromEvent, Observable, switchMap, takeUntil } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { DatesRangeType } from '@shared/enums';
+
 import { UserState } from '../../../../store/user.state';
 import { DatesPeriods } from '../../constants/schedule-grid.conts';
-import { ScheduleItem, ScheduleModel } from '../../interface/schedule.model';
+import {
+  ScheduleDateItem,
+  ScheduleFilters,
+  ScheduleItem,
+  ScheduleModel,
+  ScheduleModelPage,
+} from '../../interface/schedule.model';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -23,7 +41,12 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
 
-  @Input() scheduleData: ScheduleModel[] | null = [];
+  @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
+
+  @Input() scheduleData: ScheduleModelPage | null;
+
+  @Output() changeFilter: EventEmitter<ScheduleFilters> = new EventEmitter<ScheduleFilters>();
+  @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
@@ -37,9 +60,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
 
   selectedDateSlot: string | null = null;
 
-  selectedCandidateId: string;
+  selectedCandidateId: number;
 
   orgFirstDayOfWeek: number;
+
+  private itemsPerPage = 30;
 
   constructor(
     private store: Store,
@@ -58,6 +83,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
   ngOnInit(): void {
     this.startOrgIdWatching();
     this.watchForRangeChange();
+    this.watchForScroll();
   }
 
   changeActiveDatePeriod(selectedPeriod: string | undefined): void {
@@ -65,18 +91,22 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
     this.cdr.detectChanges();
   }
 
-  selectScheduleCard(schedule: ScheduleItem, candidateId: string): void {
-    this.selectedScheduleCard = schedule;
+  selectScheduleCard(schedule: ScheduleDateItem, candidateId: number): void {
+    this.selectedScheduleCard = schedule.daySchedules[0];
     this.selectedCandidateId = candidateId;
     this.selectedDateSlot = null;
     this.cdr.detectChanges();
   }
 
-  selectDateSlot(dateSlot: string, candidateId: string): void {
+  selectDateSlot(dateSlot: string, candidateId: number): void {
     this.selectedDateSlot = dateSlot;
     this.selectedCandidateId = candidateId;
     this.selectedScheduleCard = null;
     this.cdr.detectChanges();
+  }
+
+  searchCandidate(event: KeyboardEvent): void {
+    this.changeFilter.emit({ firstLastNameOrId: (event.target as HTMLInputElement).value });
   }
 
   private startOrgIdWatching(): void {
@@ -95,16 +125,40 @@ export class ScheduleGridComponent extends Destroyable implements OnInit {
   private checkOrgPreferences(): void {
     const preferences = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences;
     this.orgFirstDayOfWeek = preferences?.weekStartsOn as number;
+
     this.cdr.markForCheck();
   }
 
   private watchForRangeChange(): void {
-    this.weekService.getRangeStream()
-    .pipe(
+    this.weekService.getRangeStream().pipe(
+      debounceTime(100),
+      filter(([startDate, endDate]: [string, string]) => !!startDate && !!endDate),
       takeUntil(this.componentDestroy()),
-    )
-    .subscribe((range) => {
-      console.log(range);
+    ).subscribe(([startDate, endDate]: [string, string]) => {
+      this.datesRanges = DateTimeHelper.getDatesBetween(startDate, endDate);
+      this.changeFilter.emit({ startDate, endDate });
+
+      this.cdr.detectChanges();
     });
+  }
+
+  private watchForScroll(): void {
+    fromEvent(this.scrollArea.nativeElement, 'scroll')
+      .pipe(
+        debounceTime(500),
+        filter(() => {
+          const { scrollTop, scrollHeight, offsetHeight } = this.scrollArea.nativeElement;
+
+          return scrollTop + offsetHeight >= scrollHeight;
+        }),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        const { items, totalCount } = this.scheduleData || {};
+
+        if ((items?.length || 0) < (totalCount || 0)) {
+          this.loadMoreData.emit(Math.ceil((items?.length || 1) / this.itemsPerPage));
+        }
+      });
   }
 }

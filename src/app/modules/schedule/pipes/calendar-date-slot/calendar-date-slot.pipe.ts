@@ -1,13 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { ScheduleItem } from '../../interface/schedule.model';
+import { ScheduleDateItem } from '../../interface/schedule.model';
 
 @Pipe({
   name: 'calendarDateSlot',
 })
 export class CalendarDateSlotPipe implements PipeTransform {
-  transform(dateSlot: string, scheduleItems: ScheduleItem[]): ScheduleItem | undefined {
-    return scheduleItems.find((el: ScheduleItem) =>
+  transform(dateSlot: string, scheduleItems: ScheduleDateItem[]): ScheduleDateItem | undefined {
+    return scheduleItems.find((el: ScheduleDateItem) =>
       CalendarDateSlotPipe.prepareScheduleDate(el.date) === new Date(dateSlot).toISOString()
     );
   }

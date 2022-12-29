@@ -1,5 +1,11 @@
 @import "colors";
 
+:host {
+  & * {
+    box-sizing: border-box;
+  }
+}
+
 .grid-wrapper {
   width: 100%;
   height: calc(100vh - 194px);
@@ -23,6 +29,7 @@
   }
 
   & .right {
+    width: 100%;
     padding-left: 8px;
     justify-content: space-between;
   }
@@ -72,8 +79,24 @@
 }
 
 .grid-body {
-  height: calc(100% - 115px);
+  height: calc(100% - 63px);
   overflow: auto;
+}
+
+.empty-wrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  justify-content: center;
+  background: $secondary-dark-blue-45;
+
+  &__text {
+    margin-top: 10%;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
+  }
 }
 
 table {
@@ -90,6 +113,7 @@ th, td {
 }
 
 .table-title {
+  height: 40px;
   padding: 8px;
   font-size: 12px;
   font-weight: 400;
@@ -102,10 +126,11 @@ th, td {
     min-width: 112px;
   }
 
-  &.candidates-cell {
+  &.candidates-head-cell {
     z-index: 30;
-    width: 241px;
-    min-width: 241px;
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
   }
 }
 
@@ -114,10 +139,11 @@ th, td {
 }
 
 .table-cell {
+  padding: 0;
   transition: all .2s linear;
 
   &.selected {
-    border: 1.5px solid $primary-active-blue;
+    border: 0.5px solid $primary-active-blue;
   }
 
   &.date-slot {
@@ -127,6 +153,12 @@ th, td {
       border-color: $primary-active-blue-10;
       transition: all .2s linear;
     }
+  }
+
+  &.candidates-cell {
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
   }
 }
 
@@ -143,8 +175,4 @@ th, td {
   &--left {
     left: 0;
   }
-}
-
-.grid-footer {
-  height: 52px;
 }

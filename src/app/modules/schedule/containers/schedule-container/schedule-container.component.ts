@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { switchMap } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { ScheduleApiService } from '@shared/services/schedule-api.service';
@@ -9,8 +10,14 @@ import { Destroyable } from '@core/helpers';
 
 import { TabListConfig } from '../../constants';
 import { SetHeaderState } from '../../../../store/app.actions';
-import { ActiveTabIndex } from '../../enums/schedule.enum';
-import { ScheduleModel } from '../../interface/schedule.model';
+import { ActiveTabIndex } from '../../enums';
+import {
+  CandidateSchedules,
+  ScheduleCandidatesPage,
+  ScheduleFilters,
+  ScheduleModelPage,
+} from '../../interface/schedule.model';
+import { ScheduleGridAdapter } from '../../adapters/shedule-grid.adapter';
 
 @Component({
   selector: 'app-schedule-container',
@@ -18,11 +25,26 @@ import { ScheduleModel } from '../../interface/schedule.model';
   styleUrls: ['./schedule-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ScheduleContainerComponent extends Destroyable implements OnInit {
+export class ScheduleContainerComponent extends Destroyable {
   tabsListConfig: TabsListConfig[] = TabListConfig;
+
   activeTabIndex: ActiveTabIndex = ActiveTabIndex.Scheduling;
+
   tabIndex = ActiveTabIndex;
-  scheduleData$: Observable<ScheduleModel[]>;
+
+  scheduleData: ScheduleModelPage;
+
+  scheduleFilters: ScheduleFilters = {
+    firstLastNameOrId: '',
+    startDate: '',
+    endDate: '',
+    regionIds: [0],
+    locationIds: [0],
+    departmentIds: [0],
+    skillIds: [0],
+    pageNumber: 1,
+    pageSize: 30,
+  };// TODO DEN! - REMOVE required fields when they will not be required
 
   constructor(
     private store: Store,
@@ -34,15 +56,47 @@ export class ScheduleContainerComponent extends Destroyable implements OnInit {
     store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'file-text' }));
   }
 
-  ngOnInit(): void {
-    this.initScheduleData();
-  }
-
-  changeTab(tabIndex: ActiveTabIndex) {
+  changeTab(tabIndex: ActiveTabIndex): void {
     this.activeTabIndex = tabIndex;
   }
 
-  private initScheduleData(): void {
-    this.scheduleData$ = this.scheduleApiService.getScheduleData();
+  loadMoreData(pageNumber: number): void {
+    this.scheduleFilters.pageNumber = pageNumber;
+
+    this.initScheduleData(true);
+  }
+
+  changeFilters(filters: ScheduleFilters): void {
+    this.scheduleFilters = {
+      ...this.scheduleFilters,
+      ...filters,
+      pageNumber: 1,
+      pageSize: 30,
+    };
+
+    this.initScheduleData();
+  }
+
+  private initScheduleData(isLoadMore = false): void {
+    this.scheduleApiService.getScheduleEmployees(this.scheduleFilters).pipe(
+      switchMap((candidates: ScheduleCandidatesPage) =>
+        this.scheduleApiService.getSchedulesByEmployeesIds(candidates.items.map(el => el.id)).pipe(
+          map((candidateSchedules: CandidateSchedules[]): ScheduleModelPage =>
+            ScheduleGridAdapter.combineCandidateData(candidates, candidateSchedules)
+          )
+        )
+      )
+    ).subscribe((scheduleData: ScheduleModelPage) => {
+      if (isLoadMore) {
+        this.scheduleData = {
+          ...scheduleData,
+          items: [...this.scheduleData.items, ...scheduleData.items],
+        };
+      } else {
+        this.scheduleData = scheduleData;
+      }
+
+      this.cdr.detectChanges();
+    });
   }
 }
