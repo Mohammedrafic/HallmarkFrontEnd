@@ -173,6 +173,9 @@ export class YtdSummaryComponent implements OnInit {
 
           if (this.isInitialLoad) {
             //ToDo: To add a spinner & may need to check if in 3seconds, skills and departments also get loaded
+            let currentDate = new Date();
+            this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Year)?.setValue(currentDate.getFullYear());
+            this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Month)?.setValue(currentDate.getMonth()+1); 
             setTimeout(() => { this.SearchReport(); }, 3000)
             this.isInitialLoad = false;
           }
