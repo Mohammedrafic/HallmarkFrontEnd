@@ -5,6 +5,7 @@
   [visible]="false"
   [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
+  [target]="container"
 >
   <ng-template #content>
     <div class="dialog-container">
@@ -113,15 +114,15 @@
         <div class="table-header">Invoices</div>
 
         <div class="grid-table-container">
-          <ag-grid-angular #grid
-            [columnDefs]="checkTableDef"
+          <app-grid
+            class="ag-theme-alpine app-grid__component"
+            [columnDefinitions]="checkTableDef"
             [rowData]="tableData"
-            [rowHeight]="64"
-            [pagination]="false"
+            [paginationPanel]="false"
+            [adjustColumnsWidth]="true"
             [context]="tableContext"
-            (gridReady)="setGridApi($event)"
-            class="ag-theme-alpine app-grid__component">
-          </ag-grid-angular>
+            (gridReadyEmitter)="setGridApi($event)"
+          ></app-grid>
         </div>
       </div>
     </div>
