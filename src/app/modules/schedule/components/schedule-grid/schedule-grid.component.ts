@@ -1,9 +1,11 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component, ElementRef,
+  Component,
+  ElementRef,
   EventEmitter,
-  Input, OnChanges,
+  Input,
+  OnChanges,
   OnInit,
   Output,
   TrackByFunction,
@@ -25,7 +27,8 @@ import { UserState } from '../../../../store/user.state';
 import { DatesPeriods } from '../../constants/schedule-grid.conts';
 import {
   ScheduleCandidate,
-  ScheduleDateItem, ScheduleDateSlot,
+  ScheduleDateItem,
+  ScheduleDateSlot,
   ScheduleFilters,
   ScheduleModel,
   ScheduleModelPage,
