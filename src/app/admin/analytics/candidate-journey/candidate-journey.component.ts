@@ -135,7 +135,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   private culture = 'en-US';
   private nullValue = "null";
   private joinString = ",";  
-  private fixedJobStatusesTypes:number[]=[1,2,3,5];
+  private fixedJobStatusesTypes:number[]=[1,2,5];
   private fixedCandidateStatusesNotIncluded:number[]=[6,8,9];
   private orderTypesList=OrderTypeOptionsForReport.filter(i=>i.id!=1);
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
