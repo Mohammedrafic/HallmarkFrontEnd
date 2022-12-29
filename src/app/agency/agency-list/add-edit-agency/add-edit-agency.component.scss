@@ -4,6 +4,27 @@
 .general-info-container {
   display: flex;
   padding-bottom: 12px;
+  .e-card {
+    .e-card-header {
+      .e-card-header-caption {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+        height: 20px;
+
+        .msp-agency {
+          .e-chip {
+            width: 100%;
+
+            &.msp-chip {
+              width: 70px;
+            }
+          }
+        }
+      }
+    }
+  }
 
   .left {
     width: 70%;

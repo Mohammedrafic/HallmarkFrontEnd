@@ -1,6 +1,6 @@
 <app-page-toolbar>
   <ng-container left>
-    <button *ngIf="!isAgencyUser" ejs-button cssClass="e-outline" (click)="onBack()">Back</button>
+    <button *ngIf="!agencyConfig.isAgencyUser" ejs-button cssClass="e-outline" (click)="onBack()">Back</button>
     <h3>{{ title }} Agency</h3>
   </ng-container>
   <ng-container right>
@@ -31,7 +31,7 @@
       <ng-template #content>
         <!-- General info step -->
         <form [formGroup]="agencyForm" id="agencyFormFirstStep">
-          <div class="dropdown-container bootstrap create-under" *ngIf="createUnderAvailable && isAddMode">
+          <div class="dropdown-container bootstrap create-under" *ngIf="createUnderAvailable && !agencyConfig.isEditMode">
             <label>Create Under<span class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist
@@ -50,11 +50,21 @@
                 <div class="e-card-header">
                   <div class="e-card-header-caption">
                     <div class="e-card-title">Agency Details</div>
+                    <div *ngIf="agencyConfig.agencyIsMsp" class="msp-agency">
+                      <ejs-chiplist>
+                        <e-chips>
+                          <e-chip text="Is Msp" cssClass="e-success msp-chip"></e-chip>
+                        </e-chips>
+                      </ejs-chiplist>
+                    </div>
                   </div>
                 </div>
 
                 <div class="e-card-content">
-                  <app-general-info-group [isAgencyUser]="isAgencyUser" [formGroup]="$any(agencyControl)"></app-general-info-group>
+                  <app-general-info-group
+                    [agencyConfig]="agencyConfig"
+                    [formGroup]="$any(agencyControl)"
+                    (mspCheckboxEmitter)="onMspCheckboxChecked($event)"></app-general-info-group>
 
                   <div class="e-card-title-wrapper">
                     <div class="e-card-title">Job Distribution</div>
