@@ -120,7 +120,7 @@ export interface StateList {
 export interface JobDistributionList {
   id: number;
   jobDistributionOption: number;
-  agencyId: number;
+  agencyId: number | null;
 }
 
 export interface ListControls {
@@ -135,7 +135,7 @@ export interface SelectSystem {
 
 export interface JobDistribution {
   jobDistributionValue: number[];
-  agencyId: null | number;
+  agencyId: number[];
 }
 
 export interface ContactDetailsUser {
