@@ -10,6 +10,7 @@ import { DELETE_RECORD_TEXT } from '@shared/constants/messages';
 import {
   Agency,
   AgencyBillingDetails,
+  AgencyConfig,
   AgencyContactDetails,
   AgencyDetails,
   AgencyRegionSkills,
@@ -68,13 +69,15 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   public createUnderAvailable = false;
   public createUnderFields = OPRION_FIELDS;
   public title = 'Add';
-  public isAgencyUser = false;
-  public isHallmarkUser = false;
-  public agencyIsMsp = false;
-  public isEditMode = false;
   public readonly agencyStatus = AgencyStatus;
   public activeUser: User;
   public readonly businessUnitType = BusinessUnitType;
+  public readonly agencyConfig: AgencyConfig = {
+    isAgencyUser: false,
+    isHallmarkUser: false,
+    agencyIsMsp: false,
+    isEditMode: false,
+  }
 
   get contacts(): FormArray {
     return this.agencyForm.get('agencyContactDetails') as FormArray;
@@ -164,7 +167,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       .subscribe((agency: { payload: Agency }) => {
         this.agencyId = agency.payload.agencyDetails.id as number;
         this.fetchedAgency = agency.payload;
-        this.agencyIsMsp = !!agency.payload.isMsp;
+        this.agencyConfig.agencyIsMsp = !!agency.payload.isMsp;
         this.patchAgencyFormValue(this.fetchedAgency);
       });
   
@@ -178,7 +181,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       });
 
     if (this.route.snapshot.paramMap.get('id')) {
-      this.isEditMode = true;
+      this.agencyConfig.isEditMode = true;
       this.title = 'Edit';
       this.store.dispatch(new GetAgencyById(parseInt(this.route.snapshot.paramMap.get('id') as string)));
       this.store.dispatch(new GetAgencyLogo(parseInt(this.route.snapshot.paramMap.get('id') as string)));
@@ -329,7 +332,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     agencyPaymentDetails.forEach((payment) => (payment.agencyId = id));
 
     return {
-      isMsp: this.agencyIsMsp,
+      isMsp: this.agencyConfig.agencyIsMsp,
       agencyDetails: { ...agencyFormValue.agencyDetails, id },
       agencyBillingDetails: {
         ...agencyFormValue.agencyBillingDetails,
@@ -370,8 +373,8 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
 
   private checkAgencyUser(): void {
     const user = this.store.selectSnapshot(UserState.user);
-    this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
-    this.isHallmarkUser = user?.businessUnitType === BusinessUnitType.Hallmark;
+    this.agencyConfig.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
+    this.agencyConfig.isHallmarkUser = user?.businessUnitType === BusinessUnitType.Hallmark;
   }
 
   private createPaymentDetails(paymentDetails: PaymentDetails[] | ElectronicPaymentDetails[]): FormGroup[] {
@@ -397,9 +400,9 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   }
 
   public onMspCheckboxChecked(event: boolean): void {
-    this.agencyIsMsp = event;
+    this.agencyConfig.agencyIsMsp = event;
     const parentBusinessUnitControl = this.agencyForm.get('parentBusinessUnitId');
-    if(this.agencyIsMsp) {
+    if(this.agencyConfig.agencyIsMsp) {
       parentBusinessUnitControl?.setValue(0);
       parentBusinessUnitControl?.disable();
     } else {

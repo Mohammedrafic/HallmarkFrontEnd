@@ -9,7 +9,7 @@ import { AgencyStatus } from 'src/app/shared/enums/status';
 
 import { agencyStatusCreationOptions, agencyStatusOptions } from '../../agency-list.constants';
 import PriceUtils from '@shared/utils/price.utils';
-import { AgencyStatusesModel } from "@shared/models/agency.model";
+import { AgencyConfig, AgencyStatusesModel } from "@shared/models/agency.model";
 import { ALPHANUMERIC } from '@shared/constants';
 import { COUNTRIES } from '@shared/constants/countries-list';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-buttons';
@@ -21,10 +21,7 @@ import { ChangeEventArgs } from '@syncfusion/ej2-angular-buttons';
 })
 export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   @Input() formGroup: FormGroup;
-  @Input() isAgencyUser: boolean;
-  @Input() isHallmarkUser: boolean;
-  @Input() isCreating: boolean;
-  @Input() agencyIsMsp: boolean;
+  @Input() public agencyConfig: AgencyConfig
 
   @Output() private mspCheckboxEmitter: EventEmitter<boolean> = new EventEmitter();
 
@@ -66,7 +63,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
     this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive)).subscribe((isCreated) => {
       this.statuses = isCreated ? agencyStatusOptions : agencyStatusCreationOptions;
 
-      if (this.isAgencyUser) {
+      if (this.agencyConfig.isAgencyUser) {
         this.formGroup.get('status')?.disable();
       }
     });

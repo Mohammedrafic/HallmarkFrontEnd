@@ -139,3 +139,10 @@ export interface AgencyStatusesModel {
   text: string | AgencyStatus;
   id: number;
 }
+
+export interface AgencyConfig {
+  isAgencyUser: boolean;
+  isHallmarkUser: boolean;
+  agencyIsMsp: boolean;
+  isEditMode: boolean;
+}
