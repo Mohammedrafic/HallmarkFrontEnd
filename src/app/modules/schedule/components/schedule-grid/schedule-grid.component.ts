@@ -115,6 +115,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   searchCandidate(event: KeyboardEvent): void {
     this.changeFilter.emit({ firstLastNameOrId: (event.target as HTMLInputElement).value });
+    this.scrollArea.nativeElement.scrollTo(0, 0);
   }
 
   private startOrgIdWatching(): void {
@@ -147,6 +148,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       tap(([startDate, endDate]: [string, string]) => {
         this.datesRanges = DateTimeHelper.getDatesBetween(startDate, endDate);
         this.changeFilter.emit({ startDate, endDate });
+        this.scrollArea.nativeElement.scrollTo(0, 0);
 
         this.cdr.detectChanges();
       }),
