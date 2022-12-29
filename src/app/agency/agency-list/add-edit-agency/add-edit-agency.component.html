@@ -31,7 +31,7 @@
       <ng-template #content>
         <!-- General info step -->
         <form [formGroup]="agencyForm" id="agencyFormFirstStep">
-          <div class="dropdown-container bootstrap create-under" *ngIf="createUnderAvailable && isAddMode">
+          <div class="dropdown-container bootstrap create-under" *ngIf="createUnderAvailable && !isEditMode">
             <label>Create Under<span class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist
@@ -50,6 +50,13 @@
                 <div class="e-card-header">
                   <div class="e-card-header-caption">
                     <div class="e-card-title">Agency Details</div>
+                    <div *ngIf="agencyIsMsp" class="msp-agency">
+                      <ejs-chiplist>
+                        <e-chips>
+                          <e-chip text="Is Msp" cssClass="e-success msp-chip"></e-chip>
+                        </e-chips>
+                      </ejs-chiplist>
+                    </div>
                   </div>
                 </div>
 
@@ -57,10 +64,10 @@
                   <app-general-info-group
                     [isAgencyUser]="isAgencyUser"
                     [isHallmarkUser]="isHallmarkUser"
-                    [isEditMode]="isEditMode"
+                    [isCreating]="!isEditMode"
                     [agencyIsMsp]="agencyIsMsp"
                     [formGroup]="$any(agencyControl)"
-                    (mspCheckbox)="onMspCheckboxChecked($event)"></app-general-info-group>
+                    (mspCheckboxEmitter)="onMspCheckboxChecked($event)"></app-general-info-group>
 
                   <div class="e-card-title-wrapper">
                     <div class="e-card-title">Job Distribution</div>

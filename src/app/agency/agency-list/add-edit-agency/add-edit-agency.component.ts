@@ -88,10 +88,6 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     return this.agencyForm.get('agencyPaymentDetails') as FormArray;
   }
 
-  get isAddMode(): boolean {
-    return this.title === 'Add';
-  }
-
   get billingControl(): AbstractControl | null {
     return this.agencyForm.get('agencyBillingDetails');
   }
@@ -170,7 +166,6 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
         this.fetchedAgency = agency.payload;
         this.agencyIsMsp = !!agency.payload.isMsp;
         this.patchAgencyFormValue(this.fetchedAgency);
-        console.error(agency);
       });
   
     this.actions$
@@ -228,8 +223,6 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     this.agencyForm.markAllAsTouched();
     if (this.agencyForm.valid) {
       const agency = this.valueToAngency(this.agencyForm.getRawValue());
-      console.error(agency);
-      
       this.store.dispatch(new SaveAgency(agency));
     }
   }

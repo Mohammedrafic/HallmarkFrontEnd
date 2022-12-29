@@ -23,10 +23,10 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   @Input() formGroup: FormGroup;
   @Input() isAgencyUser: boolean;
   @Input() isHallmarkUser: boolean;
-  @Input() isEditMode: boolean;
+  @Input() isCreating: boolean;
   @Input() agencyIsMsp: boolean;
 
-  @Output() private mspCheckbox: EventEmitter<boolean> = new EventEmitter();
+  @Output() private mspCheckboxEmitter: EventEmitter<boolean> = new EventEmitter();
 
   public countries = COUNTRIES;
   public priceUtils = PriceUtils;
@@ -98,6 +98,6 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   }
 
   public onChangeMspCheckbox(event: ChangeEventArgs): void {
-    this.mspCheckbox.emit(event.checked);
+    this.mspCheckboxEmitter.emit(event.checked);
   }
 }
