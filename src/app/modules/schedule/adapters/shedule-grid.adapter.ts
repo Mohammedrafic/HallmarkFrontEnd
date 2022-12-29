@@ -3,8 +3,10 @@ import { GenerateUniqueId } from '@core/helpers/functions.helper';
 import {
   CandidateSchedules,
   ScheduleCandidate,
-  ScheduleCandidatesPage, ScheduleDateSlot,
-  ScheduleModelPage, ScheduleSelectedSlots,
+  ScheduleCandidatesPage,
+  ScheduleDateSlot,
+  ScheduleModelPage,
+  ScheduleSelectedSlots,
 } from '../interface/schedule.model';
 
 export class ScheduleGridAdapter {
