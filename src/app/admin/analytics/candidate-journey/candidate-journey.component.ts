@@ -135,7 +135,9 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   private culture = 'en-US';
   private nullValue = "null";
   private joinString = ",";  
-  private fixedJobStatusesTypes:number[]=[1,2,3,5];
+  private fixedJobStatusesTypes:number[]=[1,2,5];
+  private fixedCandidateStatusesNotIncluded:number[]=[6,8,9];
+  private orderTypesList=OrderTypeOptionsForReport.filter(i=>i.id!=1);
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   filterOptionsData: CommonReportFilterOptions;
   skillCategoryIdControl: AbstractControl;
@@ -253,9 +255,9 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
               this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons.filter(i=>!this.fixedJobStatusesTypes.includes(i.status));
-              this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons;
+              this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.filter(i=>!this.fixedCandidateStatusesNotIncluded.includes(i.status));
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-              this.defaultOrderTypes = OrderTypeOptionsForReport.map((list) => list.id);
+              this.defaultOrderTypes = this.orderTypesList.map((list) => list.id);
               this.candidateJourneyForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
               this.changeDetectorRef.detectChanges();
             }
@@ -448,7 +450,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
       orderTypes: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
-        dataSource: OrderTypeOptionsForReport,
+        dataSource: this.orderTypesList,
         valueField: 'name',
         valueId: 'id',
       },
