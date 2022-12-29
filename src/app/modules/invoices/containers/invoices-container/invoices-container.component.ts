@@ -192,7 +192,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           tap((organizations: DataSourceItem[]) => this.Org = organizations,
           ),
           map(([firstOrganization]: DataSourceItem[]) => firstOrganization.id),
-          //takeUntil(this.componentDestroy())
         )
         .subscribe((orgId: number) => {
           if (this.businessUnitId) {
