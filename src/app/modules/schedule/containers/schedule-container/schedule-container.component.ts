@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { switchMap } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { switchMap, takeUntil } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { ScheduleApiService } from '@shared/services/schedule-api.service';
@@ -79,13 +79,16 @@ export class ScheduleContainerComponent extends Destroyable {
 
   private initScheduleData(isLoadMore = false): void {
     this.scheduleApiService.getScheduleEmployees(this.scheduleFilters).pipe(
+      take(1),
       switchMap((candidates: ScheduleCandidatesPage) =>
         this.scheduleApiService.getSchedulesByEmployeesIds(candidates.items.map(el => el.id)).pipe(
+          take(1),
           map((candidateSchedules: CandidateSchedules[]): ScheduleModelPage =>
             ScheduleGridAdapter.combineCandidateData(candidates, candidateSchedules)
           )
         )
-      )
+      ),
+      takeUntil(this.componentDestroy()),
     ).subscribe((scheduleData: ScheduleModelPage) => {
       if (isLoadMore) {
         this.scheduleData = {
