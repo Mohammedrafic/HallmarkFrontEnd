@@ -41,7 +41,6 @@ import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-invoices-container',
