@@ -30,8 +30,10 @@ import {
   ManualInvoice, ManualInvoicesData, PrintingPostDto, SelectedInvoiceRow,
 } from '../../interfaces';
 import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
-import { PendingInvoice, PendingInvoiceRecord,
-  PendingInvoicesData } from '../../interfaces/pending-invoice-record.interface';
+import {
+  PendingInvoice, PendingInvoiceRecord,
+  PendingInvoicesData
+} from '../../interfaces/pending-invoice-record.interface';
 import { InvoicePrintingService, InvoicesService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
@@ -54,7 +56,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public rejectReasonInputDialogComponent: RejectReasonInputDialogComponent;
 
   @Select(InvoicesState.invoicesOrganizations)
-  readonly organizations$: Observable<DataSourceItem[]>;
+  public readonly organizations$: Observable<DataSourceItem[]>;
 
   @Select(InvoicesState.pendingInvoicesData)
   public readonly pendingInvoicesData$: Observable<PendingInvoicesData>;
@@ -136,6 +138,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public paymentRecords: InvoicePaymentData[] = [];
 
+  public businessUnitId?: number;
+  public Org: DataSourceItem[];
   constructor(
     private cdr: ChangeDetectorRef,
     private invoicesService: InvoicesService,
@@ -154,6 +158,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public ngOnInit(): void {
+    this.businessUnitId = JSON.parse(localStorage.getItem('BussinessUnitID') || '') as number;
+    window.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
     if (this.isAgency) {
       this.checkActionsAllowed();
     }
@@ -181,13 +187,18 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         .pipe(
           distinctUntilChanged(),
           switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
-          switchMap(() => this.organizations$),
+        switchMap(() => this.organizations$),
           filter((organizations: DataSourceItem[]) => !!organizations.length),
+          tap((organizations: DataSourceItem[]) => this.Org = organizations,
+          ),
           map(([firstOrganization]: DataSourceItem[]) => firstOrganization.id),
-          takeUntil(this.componentDestroy())
         )
         .subscribe((orgId: number) => {
-          this.organizationControl.setValue(orgId, {emitEvent: true, onlySelf: false});
+          if (this.businessUnitId) {
+            this.organizationControl.setValue((this.Org || []).filter(f => f.id == this.businessUnitId)[0].id, { emitEvent: true, onlySelf: false });
+          } else {
+            this.organizationControl.setValue(orgId, { emitEvent: true, onlySelf: false });
+          }
         });
     }
   }
@@ -266,9 +277,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     };
 
     this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
-      { organizationId: this.organizationId,
+      {
+        organizationId: this.organizationId,
         canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay
-        || this.invoiceContainerConfig.invoicePayAllowed && this.payInvoiceEnabled,
+          || this.invoiceContainerConfig.invoicePayAllowed && this.payInvoiceEnabled,
         canEdit: this.invoiceContainerConfig.agencyActionsAllowed && this.approveInvoiceEnabled,
       });
 
@@ -395,7 +407,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       });
   }
 
-  public onInvoiceGrouping({items}: { items: GroupInvoicesOption[] }): void {
+  public onInvoiceGrouping({ items }: { items: GroupInvoicesOption[] }): void {
     this.groupInvoicesBy = items[0];
     this.hideGroupingOverlay();
   }
@@ -433,18 +445,18 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     };
 
     this.store.dispatch(new Invoices.GetPrintData(dto, this.isAgency))
-    .pipe(
-      filter((state) => !!state.invoices.printData),
-      map((state) => state.invoices.printData),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe((data) => {
-      if (this.isAgency) {
-        this.printingService.printAgencyInvoice(data);
-      } else {
-        this.printingService.printInvoice(data);
-      }
-    });
+      .pipe(
+        filter((state) => !!state.invoices.printData),
+        map((state) => state.invoices.printData),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe((data) => {
+        if (this.isAgency) {
+          this.printingService.printAgencyInvoice(data);
+        } else {
+          this.printingService.printInvoice(data);
+        }
+      });
   }
 
   public openAddPayment(createRecords = false): void {
@@ -468,12 +480,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   private watchForInvoiceStatusChange(): void {
     this.actions$
-    .pipe(
-      ofActionSuccessful(Invoices.ChangeInvoiceState),
-      takeUntil(this.componentDestroy()),
-    ).subscribe(() => {
-      this.invoicesContainerService.getRowData(this.selectedTabIdx, this.organizationId);
-    });
+      .pipe(
+        ofActionSuccessful(Invoices.ChangeInvoiceState),
+        takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
+        this.invoicesContainerService.getRowData(this.selectedTabIdx, this.organizationId);
+      });
   }
 
   private checkActionsAllowed(): void {
@@ -481,14 +493,14 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.store.select(UserState.agencyActionsAllowed),
       this.store.select(UserState.agencyInvoicesActionsAllowed),
     ])
-    .pipe(
-      distinctUntilChanged(),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe(([agencyActive, payAllowed]) => {
-      this.invoiceContainerConfig.agencyActionsAllowed = agencyActive;
-      this.invoiceContainerConfig.invoicePayAllowed = payAllowed;
-    });
+      .pipe(
+        distinctUntilChanged(),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(([agencyActive, payAllowed]) => {
+        this.invoiceContainerConfig.agencyActionsAllowed = agencyActive;
+        this.invoiceContainerConfig.invoicePayAllowed = payAllowed;
+      });
   }
 
   private createInvoicesForPayment(): void {
@@ -497,36 +509,36 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   private watchForOpenPayment(): void {
     this.actions$
-    .pipe(
-      ofActionSuccessful(Invoices.OpenPaymentAddDialog),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe(() => {
-      const paymentData = this.store.selectSnapshot(InvoicesState.selectedPayment) as InvoicePaymentData;
-      this.paymentRecords = [paymentData];
-      this.openAddPayment();
-    });
+      .pipe(
+        ofActionSuccessful(Invoices.OpenPaymentAddDialog),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        const paymentData = this.store.selectSnapshot(InvoicesState.selectedPayment) as InvoicePaymentData;
+        this.paymentRecords = [paymentData];
+        this.openAddPayment();
+      });
   }
 
   private watchForSavePaymentAction(): void {
     this.actions$
-    .pipe(
-      ofActionSuccessful(Invoices.SavePayment),
-      takeUntil(this.componentDestroy()),
-    ).subscribe(() => {
-      this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
-      this.store.dispatch(
-        new Invoices.ToggleInvoiceDialog(
-          DialogAction.Open,
-          this.isAgency,
-          {
-            invoiceIds: this.gridSelections.selectedInvoiceIds,
-            organizationIds: [this.organizationId],
-          },
-          null,
-          null,
-        ));
-      this.cdr.markForCheck();
-    });
+      .pipe(
+        ofActionSuccessful(Invoices.SavePayment),
+        takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
+        this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
+        this.store.dispatch(
+          new Invoices.ToggleInvoiceDialog(
+            DialogAction.Open,
+            this.isAgency,
+            {
+              invoiceIds: this.gridSelections.selectedInvoiceIds,
+              organizationIds: [this.organizationId],
+            },
+            null,
+            null,
+          ));
+        this.cdr.markForCheck();
+      });
   }
 }

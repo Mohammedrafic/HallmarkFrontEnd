@@ -29,7 +29,7 @@ export class OrderManagementService extends DestroyableDirective {
   private orderManagementSystem: OrderManagementIRPSystemId | null;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: FormBuilder
   ) {
     super();
     this.selectedOrderAfterRedirect$
@@ -86,4 +86,6 @@ export class OrderManagementService extends DestroyableDirective {
   public getOrderManagementSystem(): OrderManagementIRPSystemId | null {
     return this.orderManagementSystem;
   }
+
+
 }

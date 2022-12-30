@@ -45,6 +45,7 @@
                 [initDates]="weekPeriod"
                 [availibleDates]="workWeeks"
                 [isAbleToChange]="isChangesSaved"
+                [rangeType]="rangeType"
               >
               </app-date-week-picker>
 
@@ -102,7 +103,10 @@
           </div>
         </div>
         <div *ngIf="isMobile" class="profile-details__mobile-date-picker">
-          <app-date-week-picker [initDates]="weekPeriod" [availibleDates]="workWeeks" [isAbleToChange]="isChangesSaved">
+          <app-date-week-picker
+            [initDates]="weekPeriod"
+            [availibleDates]="workWeeks"
+            [isAbleToChange]="isChangesSaved">
           </app-date-week-picker>
         </div>
       </div>

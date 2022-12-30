@@ -171,8 +171,10 @@ export class YtdSummaryComponent implements OnInit {
           this.filterColumns.skillIds.dataSource = [];
           this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
 
-          if (this.isInitialLoad) {
-            //ToDo: To add a spinner & may need to check if in 3seconds, skills and departments also get loaded
+          if (this.isInitialLoad) {            let currentDate = new Date();
+            this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Month)?.setValue(currentDate.getMonth() + 1); 
+            this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Year)?.setValue(currentDate.getFullYear());
+            
             setTimeout(() => { this.SearchReport(); }, 3000)
             this.isInitialLoad = false;
           }
@@ -394,8 +396,6 @@ export class YtdSummaryComponent implements OnInit {
       "departmentYTDS": departmentIds.length == 0 ? "null" : departmentIds.join(","),
       "skillCategoryYTDS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
       "skillYTDS": skillIds.length == 0 ? "null" : skillIds.join(","),
-      "startDateYTDS": year,
-      "endDateYTDS": month,
       "yearYTDS": year,
       "monthYTDS": month
       };

@@ -21,15 +21,26 @@ export const collectInvalidFieldsFromForm = (controls: { [key: string]: Abstract
 };
 
 export const createJobDistributionList = (distributionForm: FormGroup): JobDistributionList[] => {
-  return distributionForm.value.jobDistribution?.map((value: number) => {
-    return {
-      id: 0,
-      jobDistributionOption: value,
-      agencyId: value === IrpOrderJobDistribution.SelectedExternal ?
-       distributionForm.value.agencyId : null,
-    };
+  const jobDistributionList: JobDistributionList[] = [];
+
+  distributionForm.value.jobDistribution.forEach((value: number) => {
+    if(value === IrpOrderJobDistribution.SelectedExternal) {
+      distributionForm.value.agencyId.forEach((agencyId: number) => {
+        jobDistributionList.push(createDistribution(value, agencyId));
+      });
+    } else {
+      jobDistributionList.push(createDistribution(value));
+    }
   });
+
+  return jobDistributionList;
 };
+
+export const createDistribution = (value: number, agencyId?: number): JobDistributionList => ({
+  id: 0,
+  jobDistributionOption: value,
+  agencyId: agencyId ?? null,
+});
 
 export const getControlsList = (formGroups: FormGroup[]): ListControls[] => {
   const controlList = [];

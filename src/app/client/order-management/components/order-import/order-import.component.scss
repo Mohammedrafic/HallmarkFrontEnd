@@ -10,16 +10,21 @@
     &__item {
       display: flex;
       align-items: center;
-      width: 100%;
       padding-left: 24px;
       overflow: hidden;
 
       .job-title {
-        display: inline-block;
-        width: 55%;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        display: grid;
+        width: 214px;
+        align-items: center;
+        grid-template-columns: auto auto;
+        padding-right: 25px;
+
+        &__text {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
 
       .alert-icon {

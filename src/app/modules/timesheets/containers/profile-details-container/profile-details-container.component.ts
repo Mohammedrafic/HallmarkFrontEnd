@@ -1,9 +1,11 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
+  Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { BreakpointObserver } from '@angular/cdk/layout';
 
-import { combineLatest, distinctUntilChanged, filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, Observable,
+  switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
@@ -29,14 +31,14 @@ import {
   TimesheetAttachments,
   TimesheetDetailsModel,
   UploadDocumentsModel,
-  WorkWeek
+  WorkWeek,
 } from '../../interface';
 import {
   ConfirmApprovedTimesheetDeleteDialogContent,
   ConfirmDeleteTimesheetDialogContent,
   rejectTimesheetDialogData,
   TimesheetConfirmMessages,
-  TimesheetDetailsExportOptions
+  TimesheetDetailsExportOptions,
 } from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
@@ -52,6 +54,7 @@ import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { FileExtensionsString } from '@core/constants';
 import { UploadFileAreaComponent } from '@shared/components/upload-file-area/upload-file-area.component';
+import { DatesRangeType } from '@shared/enums';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -84,11 +87,11 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   @Output() readonly nextPreviousOrderEvent = new EventEmitter<boolean>();
 
-  public rejectReasonDialogVisible: boolean = false;
+  public rejectReasonDialogVisible = false;
 
   public isAgency: boolean;
 
-  public fileName: string = '';
+  public fileName = '';
 
   public isChangesSaved = true;
 
@@ -112,6 +115,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   
   public readonly maxFileSize: number = FileSize.MB_20;
 
+  public rangeType = DatesRangeType.TwoWeeks;
+
   private jobId: number;
 
   @Select(TimesheetsState.isTimesheetOpen)
@@ -132,7 +137,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public attachmentsListConfig$: Observable<AttachmentsListConfig>;
 
-  public isDNWEnabled: boolean = false;
+  public isDNWEnabled = false;
 
   public isNavigationAvaliable = true;
 
@@ -155,7 +160,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
    * */
-  private isTimesheetOrMileagesUpdate: boolean = true;
+  private isTimesheetOrMileagesUpdate = true;
 
   constructor(
     protected override store: Store,
@@ -171,7 +176,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
     this.attachmentsListConfig$ = this.timesheetDetails$.pipe(
       map(({id}) => this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId, this.isAgency))
-    )
+    );
   }
 
   public get isNextDisabled(): boolean {
@@ -188,7 +193,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.setOrgId();
     this.watchForRangeChange();
     this.initResizeObserver();
-    this.listenResizeToolbar()
+    this.listenResizeToolbar();
   }
 
   public onOpen(args: { preventFocus: boolean }): void {
@@ -221,7 +226,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public openAddDialog(meta: OpenAddDialogMeta): void {
-    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open, meta.currentTab, meta.startDate, meta.endDate));
+    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open,
+      meta.currentTab, meta.startDate, meta.endDate));
   }
 
   public openUploadSideDialog(timesheetAttachments: TimesheetAttachments): void {
@@ -271,7 +277,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         ))
       )
       .subscribe(() => {
-        this.store.dispatch(new Timesheets.GetAll())
+        this.store.dispatch(new Timesheets.GetAll());
         this.refreshData();
         this.closeDialog();
       }) : this.store.dispatch(
@@ -305,7 +311,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         organizationId: this.organizationId,
         targetStatus: status,
         reason: null,
-        ...data
+        ...data,
       })
     );
   }
@@ -376,10 +382,11 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       switchMap((details) => {
         this.timesheetId = details.id;
         this.mileageTimesheetId = details.mileageTimesheetId;
-        this.isMileageStatusAvailable = details.mileageStatusText.toLocaleLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST;
+        this.isMileageStatusAvailable = details.mileageStatusText
+        .toLocaleLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST;
 
         return this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
-          details.id, details.organizationId, this.isAgency))
+          details.id, details.organizationId, this.isAgency));
       }),
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
@@ -413,7 +420,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       new TimesheetDetails.Export(
         new ExportPayload(fileType),
       )
-    )
+    );
   }
 
   public customExport(event: CustomExport): void {
@@ -497,7 +504,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       filter(Boolean),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId, candidateWorkPeriods, canEditTimesheet, allowDNWInTimesheets, agencyStatus }) => {
+    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId,
+      candidateWorkPeriods, canEditTimesheet, allowDNWInTimesheets, agencyStatus }) => {
       this.organizationId = this.isAgency ? organizationId : null;
       this.jobId = jobId;
       this.weekPeriod = [
@@ -563,8 +571,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public listenResizeToolbar(): void {
-    const tabletBreakPoint$: Observable<boolean> = this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX]).pipe(map((data) => data.matches));
-    const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$.pipe(map((data) => data[0].contentRect.width), distinctUntilChanged());
+    const tabletBreakPoint$: Observable<boolean> = this.breakpointObserver
+    .observe([BreakpointQuery.TABLET_MAX]).pipe(map((data) => data.matches));
+    const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$
+    .pipe(map((data) => data[0].contentRect.width), distinctUntilChanged());
     
     const smallTabletScreenWidth = 760;
     const mobileScreenWidth = +BreakpointQuery.MOBILE_MAX.replace(/\D/g, ""); 
