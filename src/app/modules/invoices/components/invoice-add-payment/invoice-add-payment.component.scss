@@ -13,10 +13,10 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 46px;
-}
 
-.title {
-  @include dialog-title;
+  .title {
+    @include dialog-title;
+  }
 }
 
 .button-cancel {
