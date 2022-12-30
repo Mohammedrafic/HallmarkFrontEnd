@@ -78,14 +78,14 @@ export class GroupEmailService {
 
   /**
    * Get Group Email internal users By regionId, locationId and roles
-   * @param regionId
-   * @param locationId
+   * @param regionIds
+   * @param locationIds
    * @param roles
    * @return User
    */
-  public GetGroupEmailUsersByRegionLocation(regionId: number, locationId: number, roles: string): Observable<User> {
+  public GetGroupEmailUsersByRegionLocation(regionIds: string, locationIds: string, roles: string): Observable<User> {
     return this.http.get<User>(
-      `/api/GroupMail/getinternalusers?regionId=${regionId}&locationId=${locationId}&roles=${roles}`
+      `/api/GroupMail/getinternalusers?regionIds=${regionIds}&locationIds=${locationIds}&roles=${roles}`
     );
   }
 
@@ -103,8 +103,10 @@ export class GroupEmailService {
    * @param businessUnitId
    * @return skills
    */
-  public GetGroupEmailSkillsByBusinessUnit(businessUnitId: number): Observable<MasterSkillDto> {
-    return this.http.get<MasterSkillDto>(`/api/GroupMail/getskills?businessUnitId=${businessUnitId}`);
+  public GetGroupEmailSkillsByBusinessUnit(businessUnitId: number, isAgency: number): Observable<MasterSkillDto> {
+    return this.http.get<MasterSkillDto>(
+      `/api/GroupMail/getskills?businessUnitId=${businessUnitId}&isAgency=${isAgency==1?true:false}`
+    );
   }
 
   /**
@@ -117,6 +119,35 @@ export class GroupEmailService {
   ): Observable<CandidateStatusAndReasonFilterOptionsDto> {
     return this.http.get<CandidateStatusAndReasonFilterOptionsDto>(
       `/api/GroupMail/getcandidatestatuses?businessUnitId=${businessUnitId}`
+    );
+  }
+
+  /**
+   * Get Group Email candidates
+   * @param agencies
+   * @param skills
+   * @param regionIds
+   * @param locationIds
+   * @param orderTypes
+   * @param statuses
+   * @param jobID
+   * @param isAgency
+   * @param businessUnitId
+   * @return User
+   */
+  public GetGroupEmailCandidates(
+    agencies: string,
+    skills: string,
+    regionIds: string,
+    locationIds: string,
+    orderTypes: string,
+    statuses: string,
+    jobID: string,
+    isAgency: boolean,
+    businessUnitId: number
+  ): Observable<User> {
+    return this.http.get<User>(
+      `/api/GroupMail/getcandidates?agencies=${agencies}&skills=${skills}&regions=${regionIds}&locations=${locationIds}&orderTypes=${orderTypes}&statuses=${statuses}&jobID=${jobID}&isAgency=${isAgency}&businessUnitId=${businessUnitId}`
     );
   }
 }
