@@ -28,6 +28,7 @@ export class CommitmentComponent extends AbstractPermission implements OnInit {
   @Select(MasterCommitmentState.commitmentsPage)
   public commitmentsPage$: Observable<MasterCommitmentsPage>;
 
+  public rowSelection = undefined;
   public form: FormGroup;
   public pageNumber = GRID_CONFIG.initialPage;
   public pageSize = GRID_CONFIG.initialRowsPerPage;
@@ -111,7 +112,7 @@ export class CommitmentComponent extends AbstractPermission implements OnInit {
   private createForm(): void {
     this.form = new FormGroup({
       id: new FormControl(0),
-      name: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3)])
+      name: new FormControl('', [Validators.required, Validators.maxLength(50), Validators.minLength(3)])
     })
   }
 
