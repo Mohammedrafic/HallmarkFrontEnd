@@ -38,22 +38,22 @@
 
 
   <ejs-grid class="grid grid-component"
-    #grid
-    [dataSource]="(regions$ | async)"
-    [allowPaging]="allowPaging"
-    [pageSettings]="pageSettings"
-    [height]="fullScreenGridHeight"
-    [rowHeight]="rowHeight"
-    [enableVirtualization]="true"
-    [resizeSettings]="resizeSettings"
-    [allowSorting]="allowSorting"
-    [allowResizing]="allowResizing"
-    (actionBegin)="actionBegin($event)"
-    (rowSelected)="rowSelected($event, grid)"
-    (rowDeselected)="rowDeselected($event, grid)"
-    (dataBound)="gridDataBound(grid)"
-    [selectionSettings]="selectionSettings"
-  >
+            #grid
+            [dataSource]="(regionsPageList$ | async)?.items"
+            [allowPaging]="allowPaging"
+            [pageSettings]="pageSettings"
+            [height]="fullScreenGridHeight"
+            [rowHeight]="rowHeight"
+            [enableVirtualization]="true"
+            [resizeSettings]="resizeSettings"
+            [allowSorting]="allowSorting"
+            [allowResizing]="allowResizing"
+            (actionBegin)="actionBegin($event)"
+            (rowSelected)="rowSelected($event, grid)"
+            (rowDeselected)="rowDeselected($event, grid)"
+            (dataBound)="gridDataBound(grid)"
+            [selectionSettings]="selectionSettings"
+            >
     <e-columns>
 
       <e-column  [customAttributes]='customAttributes'>
@@ -78,41 +78,40 @@
           <div class="content-wrapper">
             <section class="left-side-pager-controls">
               <ejs-dropdownlist
-                id="rowsPerPage"
-                class="dropdown-no-border"
-                [allowFiltering]="true"
-                [dataSource]="rowsPerPageDropDown"
-                [(value)]="activeRowsPerPageDropDown"
-                (change)="onRowsDropDownChanged()"
-              >
+                                id="rowsPerPage"
+                                class="dropdown-no-border"
+                                [allowFiltering]="true"
+                                [dataSource]="rowsPerPageDropDown"
+                                [(value)]="activeRowsPerPageDropDown"
+                                (change)="onRowsDropDownChanged()"
+                                >
               </ejs-dropdownlist>
               <ejs-numerictextbox
-                id="goToPage"
-                class="numeric-input-no-border"
-                format="#"
-                [validateDecimalOnType]="validateDecimalOnType"
-                [decimals]="decimals"
-                placeholder="Go to:"
-                min="1"
-                [max]="(regions$ | async)"
-                [showSpinButton]="false"
-                (change)="onGoToClick($event)"
-              >
+                                  id="goToPage"
+                                  class="numeric-input-no-border"
+                                  format="#"
+                                  [validateDecimalOnType]="validateDecimalOnType"
+                                  [decimals]="decimals"
+                                  placeholder="Go to:"
+                                  min="1"
+                                  [max]="(regionsPageList$ | async)?.totalPages"
+                                  [showSpinButton]="false"
+                                  (change)="onGoToClick($event)">
               </ejs-numerictextbox>
               <div class="total-rows">
-                Total Rows: {{(regions$ | async)?.length}}
+                Total Rows: {{(regionsPageList$ | async)?.totalCount}}
               </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
-                id="gridPager"
-                #gridPager
-                [pageSize]="pageSize"
-                [totalRecordsCount]="(regions$ | async)"
-                [enablePagerMessage]="false"
-                [currentPage]="currentPage"
-                (click)="onGoToClick($event)"
-              >
+                         id="gridPager"
+                         #gridPager
+                         [pageSize]="pageSize"
+                         [totalRecordsCount]="(regionsPageList$ | async)?.totalCount"
+                         [enablePagerMessage]="false"
+                         [currentPage]="currentPage"
+                         (click)="onGoToClick($event)"
+                         >
               </ejs-pager>
             </section>
           </div>

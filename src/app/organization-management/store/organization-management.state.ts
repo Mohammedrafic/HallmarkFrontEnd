@@ -64,6 +64,7 @@ import {
   GetRegionsImportErrorsSucceeded,
   GetRegionsImportTemplate,
   GetRegionsImportTemplateSucceeded,
+  GetRegionsPage,
   GetSkillDataSources,
   GetSkillsCategoriesByPage,
   GetUSCanadaTimeZoneIds,
@@ -123,7 +124,7 @@ import {
   UploadRegionsFileSucceeded,
 } from './organization-management.actions';
 import { Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
-import { ImportedRegion, Region, regionFilter } from '@shared/models/region.model';
+import { ImportedRegion, Region, regionFilter, regionsPage } from '@shared/models/region.model';
 import {
   ImportedLocation,
   Location,
@@ -196,6 +197,7 @@ export interface OrganizationManagementStateModel {
   isLocationLoading: boolean;
   departments: Department[] | DepartmentsPage;
   regions: Region[];
+  regionsPage: regionsPage | null;
   masterRegions: Region[];
   locations: Location[] | LocationsPage;
   location: Location | null;
@@ -253,6 +255,7 @@ export interface OrganizationManagementStateModel {
     isLocationLoading: false,
     departments: [],
     regions: [],
+    regionsPage: null,
     masterRegions: [],
     locations: [],
     location: null,
@@ -343,6 +346,11 @@ export class OrganizationManagementState {
   @Selector()
   static regions(state: OrganizationManagementStateModel): Region[] {
     return state.regions;
+  }
+
+  @Selector()
+  static regionsPage(state: OrganizationManagementStateModel): regionsPage | null {
+    return state.regionsPage;
   }
 
   @Selector()
@@ -679,6 +687,16 @@ export class OrganizationManagementState {
     );
   }
 
+  @Action(GetRegionsPage)
+  GetRegionsPage({ patchState }: StateContext<OrganizationManagementStateModel>, { filter }: any): Observable<regionsPage> {
+    return this.regionService.getRegionsByOrganizationId(filter).pipe(
+      tap((payload: any) => {
+        patchState({ regionsPage: payload });
+        return payload;
+      })
+    );
+  }
+
   @Action(SaveRegion)
   SaveRegion(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
@@ -722,7 +740,6 @@ export class OrganizationManagementState {
       tap((payload) => {
         patchState({ isLocationLoading: false });
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
-        dispatch(new GetRegions());
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {
