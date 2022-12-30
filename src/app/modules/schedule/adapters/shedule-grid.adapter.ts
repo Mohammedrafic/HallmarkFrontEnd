@@ -16,13 +16,20 @@ export class ScheduleGridAdapter {
   ): ScheduleModelPage {
     return {
       ...candidates,
-      items: candidates.items.map((candidate: ScheduleCandidate) => ({
-        candidate,
-        schedule: candidateSchedules.find(candidateSchedulesItem =>
+      items: candidates.items.map((candidate: ScheduleCandidate) => {
+        const foundCandidateSchedule = candidateSchedules.find(candidateSchedulesItem =>
           candidateSchedulesItem.employeeId === candidate.id
-        )?.schedules || [],
-        id: GenerateUniqueId(),
-      })),
+        );
+
+        return {
+          candidate: {
+            ...candidate,
+            workHours: foundCandidateSchedule?.workHours || [],
+          },
+          schedule: foundCandidateSchedule?.schedules || [],
+          id: GenerateUniqueId(),
+        };
+      }),
     };
   }
 

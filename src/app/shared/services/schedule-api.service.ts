@@ -18,7 +18,10 @@ export class ScheduleApiService {
     return this.http.post<ScheduleCandidatesPage>('/api/Schedules/employees', filters);
   }
 
-  getSchedulesByEmployeesIds(employeeIds: number[]): Observable<CandidateSchedules[]> {
-    return this.http.post<CandidateSchedules[]>('/api/Schedules/byEmployeesIds', { employeeIds });
+  getSchedulesByEmployeesIds(
+    employeeIds: number[],
+    filters: { startDate: string; endDate: string }
+  ): Observable<CandidateSchedules[]> {
+    return this.http.post<CandidateSchedules[]>('/api/Schedules/byEmployeesIds', { employeeIds, ...filters });
   }
 }

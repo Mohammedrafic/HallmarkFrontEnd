@@ -33,6 +33,7 @@ export interface ScheduleModel {
 export interface CandidateSchedules {
   employeeId: number;
   schedules: ScheduleDateItem[];
+  workHours: number[];
 }
 
 export interface ScheduleDateItem {
