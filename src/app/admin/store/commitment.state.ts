@@ -62,7 +62,7 @@ export class MasterCommitmentState {
         } else {
           if(state.commitmentsPage){
             const items = [payload, ...state.commitmentsPage?.items];
-            const commitmentsPage = { ...state.commitmentsPage, items };
+            const commitmentsPage = { ...state.commitmentsPage, items, totalCount: state.commitmentsPage?.totalCount + 1 };
             patchState({ commitmentsPage });
           }
           dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
