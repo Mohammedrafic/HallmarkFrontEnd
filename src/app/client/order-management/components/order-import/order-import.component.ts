@@ -18,7 +18,6 @@ import { takeUntil } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderImportComponent extends AbstractImport implements OnInit {
-
   public readonly titleImport = 'Import';
   public readonly recordsListField: FieldSettingsModel = recordsListField;
   public readonly selectionSettings: SelectionSettingsModel = selectionSettings;
@@ -48,10 +47,11 @@ export class OrderImportComponent extends AbstractImport implements OnInit {
   public tabChange(errorTabSelected: boolean): void {
     this.activeErrorTab = errorTabSelected;
     this.dataSource = this.activeErrorTab ? this.errorGridList : this.successGridList;
+    this.selectFirstItemFactory();
   }
 
   public selectFirstItemFactory(): void {
-    if (this.activeErrorTab || this.errorListBox.length) {
+    if (this.activeErrorTab && this.errorListBox.length) {
       this.selectFirstItem('error-record-list', this.errorListBox);
     } else {
       this.selectFirstItem('success-record-list', this.successListBox);
@@ -64,13 +64,14 @@ export class OrderImportComponent extends AbstractImport implements OnInit {
     if (instance) {
       const [firstItem] = recordList;
       const list = getInstance(instance, ListBox) as ListBox;
+      list.selectAll(false);
       list.selectItems([firstItem.name]);
     }
   }
 
   public selectItem(event: ListBoxChangeEventArgs): void {
     const [item] = event.items as ListBoxItem[];
-    this.selectedIndex = this.dataSource.findIndex((record: ImportedOrderGrid) => item.id === record.tempOrderId);
+    this.selectedIndex = item?.id ?? 0;
   }
 
   public trackByErrorHandler(index: number, grid: OrderGrid): string {
@@ -82,7 +83,8 @@ export class OrderImportComponent extends AbstractImport implements OnInit {
   }
 
   private listenOrderImportParser(): void {
-    this.actions$.pipe(ofActionSuccessful(UploadOrderImportFileSucceeded))
+    this.actions$
+      .pipe(ofActionSuccessful(UploadOrderImportFileSucceeded))
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         const { succesfullRecords, errorRecords } = this.importResponse || {};
@@ -90,6 +92,6 @@ export class OrderImportComponent extends AbstractImport implements OnInit {
         this.successGridList = this.orderImportService.buildOrderGrids(succesfullRecords as ImportedOrder[]);
         this.errorListBox = this.orderImportService.getListBoxData(errorRecords as ImportedOrder[]);
         this.errorGridList = this.orderImportService.buildOrderGrids(errorRecords as ImportedOrder[]);
-    });
+      });
   }
 }

@@ -56,10 +56,10 @@ export const columnDefs = {
     annualSalaryRangeTo: 'Annual Salary Range To',
   },
   jobDistribution: {
-    jobDistribution: 'Job Distribution',
-    agency: 'Agency',
+    jobDistributionName: 'Job Distribution',
+    agencyName: 'Agency',
     reasonForRequisition: 'Reason for Req.',
-    classification: 'Classification',
+    classificationName: 'Classification',
     onCallRequired: 'On Call Req',
     asapStart: 'Asap Start',
     criticalOrder: 'Critical Order',

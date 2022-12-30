@@ -1,15 +1,7 @@
 import { Injectable } from '@angular/core';
 import { columnDefs } from '@client/order-management/components/order-import/order-import.config';
-import {
-  GridErroredCellComponent,
-} from '@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component';
-import {
-  ImportedOrder,
-  ImportedOrderGrid,
-  ListBoxItem,
-  OrderGrid,
-  OrderImportResult,
-} from '@shared/models/imported-order.model';
+import { GridErroredCellComponent } from '@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component';
+import { ImportedOrder, ImportedOrderGrid, ListBoxItem, OrderGrid, OrderImportResult } from '@shared/models/imported-order.model';
 import { ColDef, ValueFormatterParams } from '@ag-grid-community/core';
 import { Order } from '@shared/models/order-management.model';
 import { Observable } from 'rxjs';
@@ -18,13 +10,11 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root',
 })
-
 export class OrderImportService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   public getImportOrderTemplate(): Observable<any> {
-    return this.http.post('/api/Orders/template', [],{ responseType: 'blob' });
+    return this.http.post('/api/Orders/template', [], { responseType: 'blob' });
   }
 
   public getImportOrderErrors(errorRecords: ImportedOrder[]): Observable<any> {
@@ -45,7 +35,6 @@ export class OrderImportService {
   public buildOrderGrids(importedOrders: ImportedOrder[]): ImportedOrderGrid[] {
     return importedOrders.map((importedOrder: ImportedOrder) => {
       return {
-        tempOrderId: importedOrder.tempOrderId,
         grids: [
           {
             gridName: 'General Info',
@@ -55,7 +44,7 @@ export class OrderImportService {
           this.createGrid(columnDefs.generalInfoBottom, importedOrder.orderImport),
           {
             gridName: 'Job Distribution & Description',
-            ...this.createGrid(columnDefs.jobDistribution, this.margeProperties(importedOrder)),
+            ...this.createGrid(columnDefs.jobDistribution, importedOrder.orderImport),
           },
           this.createGrid(columnDefs.jobDescription, importedOrder.orderImport),
           {
@@ -75,27 +64,12 @@ export class OrderImportService {
     });
   }
   public getListBoxData(records: ImportedOrder[]): ListBoxItem[] {
-    return records.map((record: ImportedOrder) => {
+    return records.map((record: ImportedOrder, index: number) => {
       return {
-        name: record.orderImport.jobTitle || record.orderImport.tempOrderId,
-        id: record.orderImport.tempOrderId,
+        name: record.orderImport.jobTitle,
+        id: index,
       };
     });
-  }
-
-  private margeProperties(importedOrder: ImportedOrder): any {
-    const { orderImport } = importedOrder;
-
-    const classification = orderImport.classificationName;
-    const jobDistribution = orderImport.jobDistributionName;
-    const agency = orderImport.agencyName;
-
-    return {
-      ...orderImport,
-      classification,
-      jobDistribution,
-      agency,
-    };
   }
 
   private createColumnDef(gridConfig: { [key: string]: string }): ColDef[] {

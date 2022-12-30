@@ -28,7 +28,7 @@
     </ejs-listbox>
     <div class="records-grids">
       <app-import-grid
-        *ngFor="let grid of successGridList[selectedIndex]?.grids; trackBy: trackByErrorHandler"
+        *ngFor="let grid of successGridList[selectedIndex]?.grids; trackBy: trackBySuccessHandler"
         [gridName]="grid?.gridName"
         class="records-grid"
         [class.title]="grid?.gridName"
@@ -55,7 +55,7 @@
     </ejs-listbox>
     <div class="records-grids">
       <app-import-grid
-        *ngFor="let grid of errorGridList[selectedIndex]?.grids; trackBy: trackBySuccessHandler"
+        *ngFor="let grid of errorGridList[selectedIndex]?.grids; trackBy: trackByErrorHandler"
         [gridName]="grid?.gridName"
         class="records-grid"
         [class.title]="grid?.gridName"
@@ -69,7 +69,10 @@
 <ng-template #recordItem let-data>
   <div class="records-list__item">
     <app-tooltip-container [message]="data?.name" [showToolTip]="true">
-      <span class="job-title" *ngIf="data?.name">{{ data?.name }}</span>
+      <div *ngIf="data?.name as jobTitle" class="job-title">
+        <i-feather *ngIf="jobTitle?.length > 50" name="alert-circle" class="alert-icon"></i-feather>
+        <span class="job-title__text">{{ jobTitle }}</span>
+      </div>
     </app-tooltip-container>
     <i-feather *ngIf="!data?.name" name="alert-circle" class="alert-icon"></i-feather>
   </div>
