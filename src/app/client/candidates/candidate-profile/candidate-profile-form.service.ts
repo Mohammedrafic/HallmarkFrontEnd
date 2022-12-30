@@ -3,6 +3,8 @@ import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candid
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
+import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
+import pick from 'lodash/fp/pick';
 
 @Injectable()
 export class CandidateProfileFormService {
@@ -45,6 +47,10 @@ export class CandidateProfileFormService {
         orientationConfigurationId: [null],
         organizationOrientationDate: [null],
         isContract: [false],
+        holdStartDate: [null],
+        holdEndDate: [null],
+        terminationDate: [null],
+        terminationReasonId: [null],
         contractStartDate: [null, [Validators.required]],
         contractEndDate: [null, [Validators.required]],
         address1: [null, [Validators.maxLength(100)]],
@@ -60,8 +66,17 @@ export class CandidateProfileFormService {
         phone1: [null, [Validators.required]],
         phone2: [null],
         professionalSummary: [null],
+        generalNotes: [],
       },
       { validators: greaterThanValidator('contractStartDate', 'contractEndDate') }
     );
+  }
+
+  public populateCandidateForm(candidate: CandidateModel): void {
+    this.candidateForm.patchValue(this.getPartialFormValueByControls(candidate));
+  }
+
+  private getPartialFormValueByControls(value: CandidateModel): any {
+    return pick(Object.keys(this.candidateForm.controls), value);
   }
 }

@@ -12,12 +12,12 @@ const routes: Routes = [
   {
     path: 'add',
     component: AddEditCandidateComponent,
-    canDeactivate: [NavigateWithChangesGuard]
+    canDeactivate: [NavigateWithChangesGuard],
   },
   {
     path: 'edit/:id',
     component: AddEditCandidateComponent,
-    canActivate: [],
+    canDeactivate: [NavigateWithChangesGuard],
   },
 ];
 

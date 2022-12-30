@@ -14,7 +14,7 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
   selector: 'app-general-info',
   templateUrl: './general-info.component.html',
   styleUrls: ['./general-info.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GeneralInfoComponent extends AbstractContactDetails implements OnInit {
   public isOnHoldSelected: boolean;
@@ -49,8 +49,8 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       const handlers = {
         [ProfileStatusesEnum.OnHold]: () => this.handleOnHoldProfileStatus(),
         [ProfileStatusesEnum.Terminated]: () => this.handleTerminatedProfileStatus(),
-        [ProfileStatusesEnum.Active]: () => this.removeControl(),
-        [ProfileStatusesEnum.Inactive]: () => this.removeControl()
+        [ProfileStatusesEnum.Active]: () => this.removeValidators(),
+        [ProfileStatusesEnum.Inactive]: () => this.removeValidators(),
       };
 
       handlers[profileStatus]();
@@ -62,25 +62,23 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   private handleOnHoldProfileStatus(): void {
     this.isOnHoldSelected = true;
     this.isTerminatedSelected = false;
-    this.candidateForm.addControl('holdStartDate', this.formBuilder.control(null, [Validators.required]));
-    this.candidateForm.addControl('holdEndDate', this.formBuilder.control(null));
-
+    this.candidateForm.get('holdStartDate')?.setValidators([Validators.required]);
   }
 
   private handleTerminatedProfileStatus(): void {
     this.isTerminatedSelected = true;
     this.isOnHoldSelected = false;
-    this.candidateForm.addControl('terminationDate', this.formBuilder.control(null, [Validators.required]));
-    this.candidateForm.addControl('terminationReasonId', this.formBuilder.control(null, [Validators.required]));
+    this.candidateForm.get('terminationDate')?.setValidators([Validators.required]);
+    this.candidateForm.get('terminationReasonId')?.setValidators([Validators.required]);
   }
 
-  private removeControl(): void {
+  private removeValidators(): void {
     this.isTerminatedSelected = false;
     this.isOnHoldSelected = false;
-    const controls = ['holdStartDate', 'holdEndDate', 'terminationDate', 'terminationReasonId'];
+    const controls = ['holdStartDate', 'terminationDate', 'terminationReasonId'];
 
-    controls.forEach((controlName: string) => {
-      this.candidateForm.removeControl(controlName);
+    controls.forEach(() => {
+      this.candidateForm.removeValidators(Validators.required);
     });
   }
 }

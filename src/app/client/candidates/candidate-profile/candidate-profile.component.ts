@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
 import { NavigationWrapperService } from '@shared/services/navigation-wrapper.service';
 import { CandidateProfileService } from '@client/candidates/candidate-profile/candidate-profile.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { EMPTY, Observable, switchMap, takeUntil } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
+import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
 
 @Component({
   selector: 'app-candidate-profile',
@@ -17,25 +17,27 @@ import { CandidateModel } from '@client/candidates/candidate-profile/candidate.m
 export class CandidateProfileComponent extends DestroyableDirective implements OnInit, OnDestroy {
   public photo: Blob | null = null;
   public readonlyMode = false;
-  public candidateForm: FormGroup;
 
   private filesDetails: Blob[] = [];
   private isRemoveLogo: boolean;
+  private candidateId: number;
 
   constructor(
     private candidateProfileFormService: CandidateProfileFormService,
     private candidateProfileService: CandidateProfileService,
+    private generalNotesService: GeneralNotesService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private navigationWrapperService: NavigationWrapperService,
+    private route: ActivatedRoute,
+    private navigationWrapperService: NavigationWrapperService
   ) {
     super();
   }
 
   public ngOnInit(): void {
-    this.candidateForm = this.candidateProfileFormService.candidateForm;
     this.navigationWrapperService.areUnsavedChanges = this.hasUnsavedChanges.bind(this);
     this.listenSaveEvent();
+    this.handleEditingCandidate();
   }
 
   public override ngOnDestroy(): void {
@@ -48,7 +50,9 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
       this.candidateProfileFormService.markCandidateFormAsTouched();
       return EMPTY;
     } else {
-      return this.candidateProfileService.saveCandidate(this.filesDetails[0]).pipe(takeUntil(this.destroy$));
+      return this.candidateProfileService
+        .saveCandidate(this.filesDetails[0], this.candidateId)
+        .pipe(takeUntil(this.destroy$));
     }
   }
 
@@ -65,7 +69,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   }
 
   private hasUnsavedChanges(): boolean {
-    return this.candidateForm.dirty;
+    return this.candidateProfileFormService.candidateForm.dirty;
   }
 
   public onImageSelect(event: Blob | null) {
@@ -75,6 +79,19 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     } else {
       this.filesDetails = [];
       this.isRemoveLogo = true;
+    }
+  }
+
+  private handleEditingCandidate(): void {
+    if (this.route.snapshot.paramMap.get('id')) {
+      this.candidateId = parseInt(this.route.snapshot.paramMap.get('id') as string);
+      this.candidateProfileService
+        .getCandidateById(this.candidateId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((candidate) => {
+          this.candidateProfileFormService.populateCandidateForm(candidate);
+          this.generalNotesService.notes$.next(candidate.generalNotes);
+        });
     }
   }
 }

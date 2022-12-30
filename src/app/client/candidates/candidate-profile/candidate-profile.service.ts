@@ -23,15 +23,17 @@ export class CandidateProfileService {
     private generalNotesService: GeneralNotesService
   ) {}
 
-  public saveCandidateProfile(): Observable<CandidateModel> {
-    const candidate = this.candidateProfileForm.candidateForm.value;
+  public saveCandidateProfile(candidateId: number): Observable<CandidateModel> {
+    const { value } = this.candidateProfileForm.candidateForm;
+    const candidate = candidateId ? { id: candidateId, ...value } : value;
     const candidateDateInUTC = { ...candidate, ...this.convertDatesToUTC(candidate) };
     const payload = { ...candidateDateInUTC, generalNotes: this.generalNotesService.notes$.getValue() };
+    const endpoint = `/api/employee/${candidateId ? 'update' : 'create'}`;
 
-    return this.http.post<CandidateModel>('/api/employee/create', payload).pipe(
+    return this.http[candidateId ? 'put' : 'post']<CandidateModel>(endpoint, payload).pipe(
       distinctUntilChanged(),
       tap(() => {
-        if (candidate.id) {
+        if (candidateId) {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         } else {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
@@ -44,11 +46,13 @@ export class CandidateProfileService {
     );
   }
 
-  public saveCandidate(file: Blob): Observable<void | CandidateModel> {
+  public saveCandidate(file: Blob, candidateId: number): Observable<void | CandidateModel> {
     if (file) {
-      return this.saveCandidateProfile().pipe(mergeMap((candidate) => this.saveCandidatePhoto(file, candidate.id)));
+      return this.saveCandidateProfile(candidateId).pipe(
+        mergeMap((candidate) => this.saveCandidatePhoto(file, candidate.id))
+      );
     } else {
-      return this.saveCandidateProfile();
+      return this.saveCandidateProfile(candidateId);
     }
   }
 
@@ -56,6 +60,15 @@ export class CandidateProfileService {
     const formData = new FormData();
     formData.append('photo', file);
     return this.http.post(`/api/Employee/photo?candidateProfileId=${id}`, formData).pipe(distinctUntilChanged());
+  }
+
+  public getCandidateById(id: number): Observable<CandidateModel> {
+    return this.http.get<CandidateModel>(`/api/employee/${id}`).pipe(
+      catchError((errorResponse: HttpErrorResponse) => {
+        this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));
+        return EMPTY;
+      })
+    );
   }
 
   private convertDatesToUTC(candidate: CandidateModel): Partial<CandidateModel> {

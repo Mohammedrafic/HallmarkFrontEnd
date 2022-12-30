@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { tabsConfig } from '@client/candidates/add-edit-candidate/tabs-config.constants';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 
@@ -14,20 +14,15 @@ export class AddEditCandidateComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute,
     public candidateProfileFormService: CandidateProfileFormService,
     private cdr: ChangeDetectorRef
   ) {
-    if (route.snapshot.paramMap.get('id')) {
-      // EDIT
-      const candidateID = parseInt(route.snapshot.paramMap.get('id') as string);
-      // TODO: Fetch and patch irp candidate value
-    } else {
-      // CREATE
-    }
+
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+
+  }
 
   public get isCandidateFormPristine(): boolean {
     return this.candidateProfileFormService.candidateForm.pristine;

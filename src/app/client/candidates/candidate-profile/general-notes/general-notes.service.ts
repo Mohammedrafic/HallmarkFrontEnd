@@ -5,6 +5,8 @@ import { shareReplay } from 'rxjs/operators';
 import { CategoryModel } from '@client/candidates/candidate-profile/general-notes/models/category.model';
 import { EditGeneralNoteModel, GeneralNotesModel } from './general-notes.model';
 import { NavigationWrapperService } from '@shared/services/navigation-wrapper.service';
+import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
+import isEqual from 'lodash/fp/isEqual';
 
 @Injectable()
 export class GeneralNotesService {
@@ -17,7 +19,11 @@ export class GeneralNotesService {
   public sideDialogTitle$: Observable<string> = this._sideDialogTitle$.asObservable();
   public editMode$: Observable<EditGeneralNoteModel | null> = this._editMode$.asObservable();
 
-  constructor(private http: HttpClient, private navigationWrapperService: NavigationWrapperService) {}
+  constructor(
+    private http: HttpClient,
+    private navigationWrapperService: NavigationWrapperService,
+    private candidateProfileFormService: CandidateProfileFormService
+  ) {}
 
   public setSideDialogTitle(title: string) {
     this._sideDialogTitle$.next(title);
@@ -57,8 +63,8 @@ export class GeneralNotesService {
   }
 
   public hasUnsavedChanges(): boolean {
-    //TODO: update logic for edit mode
-    return  this.notes$.getValue().length > 0;
+    const newValue = this.notes$.getValue();
+    const oldValue = this.candidateProfileFormService.candidateForm.get('generalNotes')?.value;
+    return !isEqual(newValue, oldValue);
   }
-
 }

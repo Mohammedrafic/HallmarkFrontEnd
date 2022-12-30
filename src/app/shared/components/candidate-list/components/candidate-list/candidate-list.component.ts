@@ -9,7 +9,7 @@ import { UserState } from '../../../../../store/user.state';
 import { GetAllSkills, SaveCandidateSucceeded } from '@agency/store/candidate.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CredentialParams } from "@shared/models/candidate-credential.model";
+import { CredentialParams } from '@shared/models/candidate-credential.model';
 import { FilterService } from '@shared/services/filter.service';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from '../../../../../store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -23,18 +23,19 @@ import {
   CandidateListRequest,
   CandidateRow,
   IRPCandidate,
-  IRPCandidateList,
+  IRPCandidateList
 } from '../../types/candidate-list.model';
 import { Candidate } from '@shared/models/candidate.model';
 import {
   ChangeCandidateProfileStatus,
+  DeleteIRPCandidate,
   ExportCandidateList,
   GetCandidatesByPage,
   GetIRPCandidatesByPage,
-  GetRegionList,
+  GetRegionList
 } from '../../store/candidate-list.actions';
 import { MasterSkill } from '@shared/models/skill.model';
-import { CandidateState } from "@agency/store/candidate.state";
+import { CandidateState } from '@agency/store/candidate.state';
 import { ExportColumn, ExportOptions } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
@@ -45,7 +46,7 @@ import { filterColumns, IRPCandidates, VMSCandidates } from './candidate-list.co
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-candidate-list',
@@ -387,7 +388,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private inactivateCandidate(id: number) {
     if (this.isIRP) {
-       // TODO: employee inactivation endpoint is not ready yet
+       this.store.dispatch(new DeleteIRPCandidate(id));
        this.dispatchNewPage();
     } else {
       this.store
