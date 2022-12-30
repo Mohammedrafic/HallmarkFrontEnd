@@ -21,7 +21,7 @@ export class NumericTextboxComponent extends BaseFormControlDirective {
   @Input() public strictMode: boolean;
   @Input() public fieldValue: number | null;
   @Input() public htmlAttributes: { [key: string]: string };
-  @Input() public decimals: number | null = null;
+  @Input() public decimals: number | null = 0;
 
   @Output() public changeValueEmitter: EventEmitter<number> = new EventEmitter();
 

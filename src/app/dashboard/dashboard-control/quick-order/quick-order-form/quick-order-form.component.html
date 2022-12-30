@@ -100,7 +100,7 @@
     </ejs-accordion>
   </section>
 
-  <button class="mobile-submit-btn" *ngIf="isMobile" ejs-button [isPrimary]="true" (click)="submit.emit()">Submit</button>
+  <button class="mobile-submit-btn" *ngIf="isMobile" ejs-button [isPrimary]="true" (click)="submitQuickOrderForm()">Submit</button>
 </div>
 
 <!-- General Information -->
@@ -179,7 +179,7 @@
                 formControlName="skillId"
                 appValidateWithMessage
                 [allowFiltering]="true"
-                [dataSource]="skillDataSource"
+                [dataSource]="organizationSkills$ | async"
                 [fields]="skillFields"
               >
               </ejs-dropdownlist>
@@ -383,7 +383,7 @@
                 placeholder="HH:MM"
                 formControlName="shiftStartTime"
                 appValidateWithMessage
-                format="hh:mm a"
+                format="HH:mm"
                 [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                 [enableMask]="true"
                 maskPlaceholder="HH:MM"
@@ -400,7 +400,7 @@
                 placeholder="HH:MM"
                 formControlName="shiftEndTime"
                 appValidateWithMessage
-                format="hh:mm a"
+                format="HH:mm"
                 [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                 [enableMask]="true"
                 maskPlaceholder="HH:MM"

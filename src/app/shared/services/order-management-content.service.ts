@@ -26,12 +26,12 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
-import { HistoricalEvent } from '../models/historical-event.model';
+import { HistoricalEvent } from '@shared/models';
 import { ExportPayload } from '@shared/models/export.model';
 import { AgencyOrderManagementTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper } from '@core/helpers';
-import { orderFieldsConfig } from '@client/order-management/add-edit-order/order-fields';
+import { orderFieldsConfig } from '@client/order-management/components/add-edit-order/order-fields';
 import { Penalty } from '@shared/models/penalty.model';
 import { JobCancellationReason } from '@shared/enums/candidate-cancellation';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
@@ -329,6 +329,18 @@ export class OrderManagementContentService {
           return this.http.post(`/api/Orders/${createdOrder.id}/documents`, formData).pipe(map(() => createdOrder));
         })
       );
+  }
+
+  public saveIrpOrder(order: CreateOrderDto): Observable<Order[]>{
+    return this.http.post<Order[]>('/api/IRPOrders', this.changeDateToUtc(order));
+  }
+
+  public saveDocumentsForIrpOrder(formData: FormData): Observable<Blob[]> {
+    return this.http.post<Blob[]>(`/api/IRPOrders/documents`, formData) as Observable<Blob[]>;
+  }
+
+  public editIrpOrder(order: EditOrderDto): Observable<Order[]> {
+    return this.http.put<Order[]>('/api/IRPOrders', this.changeDateToUtc(order));
   }
 
   /**

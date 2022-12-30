@@ -16,7 +16,7 @@ export class WidgetLegendComponent {
   @Input() public isPositionTrend: boolean=false;
   @Input() public description: string;
 
-  @Output() onClickLegend: EventEmitter<void> = new EventEmitter();
+  @Output() onClickLegend: EventEmitter<string> = new EventEmitter();
   @Output() changeCheckbox: EventEmitter<string> = new EventEmitter();
 
   private mousePosition = {
@@ -33,9 +33,9 @@ export class WidgetLegendComponent {
     this.mousePosition.y = $event.screenY;
   }
 
-  public onClickLegendRow(event: MouseEvent): void {
+  public onClickLegendRow(event: MouseEvent,legend:string): void {
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
-      this.onClickLegend.emit();
+      this.onClickLegend.emit(legend);
     }
   }
 

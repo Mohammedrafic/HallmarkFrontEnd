@@ -1,48 +1,68 @@
 <h2 class="title">HR Info</h2>
 <form class="hr-info__form">
-  <app-dropdown
-    [dataSource]="[]"
-    [fields]="fieldsSettings"
-    [formGroupInstance]="candidateForm"
-    [hideBorder]="false"
-    label="HR Company Code"
-    id="hr-company-code"
-    controlName="hrCompanyCode"
-  ></app-dropdown>
+  <div class="hr-info__form_first">
+    <app-dropdown
+      [dataSource]="hrCompanyCodes"
+      [fields]="fieldsSettings"
+      [formGroupInstance]="candidateForm"
+      [hideBorder]="false"
+      label="HR Company Code"
+      id="hr-company-code"
+      controlName="hrCompanyCodeId"
+    ></app-dropdown>
 
-  <app-dropdown
-    [dataSource]="[]"
-    [fields]="fieldsSettings"
-    [formGroupInstance]="candidateForm"
-    [hideBorder]="false"
-    label="Internal transfer/recruitment"
-    id="internal-transfer-recruitment"
-    controlName="internalTransferRecruitment"
-  ></app-dropdown>
+    <app-dropdown
+      [dataSource]="hrInternalTransfersRecruitments"
+      [fields]="fieldsSettings"
+      [formGroupInstance]="candidateForm"
+      [hideBorder]="false"
+      placeholder="Select"
+      label="Internal transfer/recruitment"
+      id="internal-transfer-recruitment"
+      controlName="internalTransferId"
+    ></app-dropdown>
 
-  <app-dropdown
-    [dataSource]="[]"
-    [fields]="fieldsSettings"
-    [formGroupInstance]="candidateForm"
-    [hideBorder]="false"
-    label="Orientation Configuration"
-    id="orientation-configuration"
-    controlName="orientationConfiguration"
-  ></app-dropdown>
+    <app-dropdown
+      [dataSource]="orientationConfigurations"
+      [fields]="fieldsSettings"
+      [formGroupInstance]="candidateForm"
+      [hideBorder]="false"
+      placeholder="Select"
+      label="Orientation Configuration"
+      id="orientation-configuration"
+      controlName="orientationConfigurationId"
+    ></app-dropdown>
 
-  <app-datepicker
-    [formGroupInstance]="candidateForm"
-    [enableMask]="true"
-    [maskPlaceholder]="datepickerMask"
-    id="organizationOrientationDate"
-    controlName="organizationOrientationDate"
-    label="Organization Orientation Date"
-    format="MM/dd/yyyy"
-    placeholder="MM/DD/YYYY"
-  ></app-datepicker>
+    <app-datepicker
+      [formGroupInstance]="candidateForm"
+      id="organization-orientation-date"
+      controlName="organizationOrientationDate"
+      label="Organization Orientation Date"
+    ></app-datepicker>
+  </div>
 
-  <div>
-    <ejs-switch id="contract" controlName="contract"></ejs-switch>
-    <label for="contract">Contract</label>
+  <div class="hr-info__form_second">
+    <div>
+      <ejs-switch formControlName="isContract" id="contract" (change)="listenContractChanges($event)"></ejs-switch>
+      <label for="contract">Contract</label>
+    </div>
+
+    <app-datepicker
+      [formGroupInstance]="candidateForm"
+      [disabled]="true"
+      [required]="true"
+      id="contract-start-date"
+      controlName="contractStartDate"
+      label="Contract Start Date"
+    ></app-datepicker>
+
+    <app-datepicker
+      [formGroupInstance]="candidateForm"
+      [disabled]="true"
+      [required]="true"
+      id="contract-end-date"
+      controlName="contractEndDate"
+      label="Contract End Date"
+    ></app-datepicker>
   </div>
 </form>

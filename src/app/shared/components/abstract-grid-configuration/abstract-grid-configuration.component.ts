@@ -136,7 +136,7 @@ export abstract class AbstractGridConfigurationComponent {
 
   clearSelection(grid: any): void {
     this.selectedItems = [];
-    grid.clearSelection();
+    grid?.clearSelection();
   }
 
   addActiveCssClass(event: any): void {

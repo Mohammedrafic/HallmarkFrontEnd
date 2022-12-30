@@ -11,6 +11,7 @@ import { FeatherModule } from 'angular-feather';
 import { SharedModule } from '@shared/shared.module';
 import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { DropDownButtonAllModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { ChildOrderDialogService } from "./child-order-dialog.service";
 
 @NgModule({
   declarations: [ChildOrderDialogComponent],
@@ -31,5 +32,6 @@ import { DropDownButtonAllModule } from '@syncfusion/ej2-angular-splitbuttons';
     ReactiveFormsModule,
   ],
   exports: [ChildOrderDialogComponent],
+  providers: [ChildOrderDialogService],
 })
 export class ChildOrderDialogModule {}

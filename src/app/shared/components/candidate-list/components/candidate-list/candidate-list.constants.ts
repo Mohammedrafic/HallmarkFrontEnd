@@ -15,7 +15,7 @@ export const filterColumns: CandidateListFiltersColumn = {
     valueType: ValueType.Id,
     dataSource: [],
     valueField: 'name',
-    valueId: 'masterSkillId',
+    valueId: 'id',
   },
   profileStatuses: {
     type: ControlTypes.Multiselect,

@@ -1,75 +1,212 @@
-<section class="candidates-info" *ngIf="orderInformation">
-  <div class="container-row">
-    <div class="column">
-      <div class="icon">
-        <i-feather name="user" class="icon"></i-feather>
+<ng-container *ngIf="!orderInformation.isIRPOnly; else irpOrderInfo">
+  <section class="candidates-info" *ngIf="orderInformation">
+    <div class="container-row">
+      <div class="column">
+        <div class="icon">
+          <i-feather name="user" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation.title }}</div>
+          <div class="sup-title">Job title</div>
+        </div>
       </div>
-      <div>
-        <div class="title">{{orderInformation.title}}</div>
-        <div class="sup-title">Job title</div>
+      <div class="column">
+        <div class="icon">
+          <i-feather name="map-pin" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation.regionName }}</div>
+          <div class="sup-title">Region</div>
+        </div>
       </div>
-    </div>
-    <div class="column">
-      <div class="icon">
-        <i-feather name="map-pin" class="icon"></i-feather>
+      <div class="column">
+        <div class="icon">
+          <i-feather name="map-pin" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation.locationName }}</div>
+          <div class="sup-title">Location</div>
+        </div>
       </div>
-      <div>
-        <div class="title">{{orderInformation.locationName}}</div>
-        <div class="sup-title">Location</div>
-      </div>
-    </div>
-    <div class="column">
-      <div class="icon">
-        <i-feather name="folder" class="icon"></i-feather>
-      </div>
-      <div>
-        <div class="title">{{orderInformation.departmentName}}</div>
-        <div class="sup-title">Department</div>
-      </div>
-    </div>
 
-    <div class="column empty-column"></div>
+      <div class="column empty-column"></div>
 
-    <div class="column">
-      <div class="icon">
-        <i-feather name="briefcase" class="icon"></i-feather>
+      <div class="column">
+        <div class="icon">
+          <i-feather name="folder" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation.departmentName }}</div>
+          <div class="sup-title">Department</div>
+        </div>
       </div>
-      <div>
-        <div class="title">{{orderInformation.orderRequisitionReasonName || '-'}}</div>
-        <div class="sup-title">Reason for Requisition</div>
+      <div class="column">
+        <div class="icon">
+          <i-feather name="briefcase" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation.orderRequisitionReasonName || '-' }}</div>
+          <div class="sup-title">Reason for Requisition</div>
+        </div>
       </div>
-    </div>
-    <div class="column">
-      <div class="icon">
-        <i-feather name="briefcase" class="icon"></i-feather>
+      <div class="column">
+        <div class="icon">
+          <i-feather name="briefcase" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation?.skillName }}</div>
+          <div class="sup-title">Skill</div>
+        </div>
       </div>
-      <div>
-        <div class="title">{{orderInformation?.skillName}}</div>
-        <div class="sup-title">Skill</div>
-      </div>
-    </div>
 
-    <div class="column"></div>
-  </div>
-</section>
+      <div class="column"></div>
+    </div>
+  </section>
 
-<section class="candidates-additional-info" *ngIf="orderInformation">
-  <div class="container-row justify-content-normal">
-    <div class="column">
-      <div class="title">{{ orderType[orderInformation.orderType] }}</div>
-      <div class="sup-title">Job Type</div>
+  <section class="candidates-additional-info" *ngIf="orderInformation">
+    <div class="container-row justify-content-normal">
+      <div class="column">
+        <div class="title">{{ orderType[orderInformation.orderType] }}</div>
+        <div class="sup-title">Job Type</div>
+      </div>
+      <div class="column">
+        <div class="title">{{ activeValue(orderInformation.onCallRequired) }}</div>
+        <div class="sup-title">Oncall</div>
+      </div>
+      <div class="column">
+        <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No' }}</div>
+        <div class="sup-title">Critical Order</div>
+      </div>
+      <div class="column">
+        <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy':'UTC') || '-' }}</div>
+        <div class="sup-title">Distributed On</div>
+      </div>
     </div>
-    <div class="column">
-      <div class="title">{{activeValue(orderInformation.onCallRequired)}}</div>
-      <div class="sup-title">Oncall</div>
-    </div>
-    <div class="column">
-      <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No'}}</div>
-      <div class="sup-title">Critical Order</div>
-    </div>
-    <div class="column">
-      <div class="title">{{(orderInformation.orderOpenDate | date: 'MM/dd/yyy' : 'UTC') || '-'}}</div>
-      <div class="sup-title">Distributed On</div>
-    </div>
-  </div>
-</section>
+  </section>
+</ng-container>
+
+<ng-template #irpOrderInfo>
+  <ng-container [ngSwitch]="orderInformation.orderType">
+    <ng-template [ngSwitchCase]="orderType.OpenPerDiem">
+      <section class="candidates-info" *ngIf="orderInformation">
+        <div class="container-row">
+          <div class="column">
+            <div class="icon">
+              <i-feather name="briefcase" class="icon"></i-feather>
+            </div>
+            <div>
+              <div class="title">{{ orderInformation?.skillName }}</div>
+              <div class="sup-title">Skill</div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="icon">
+              <i-feather name="folder" class="icon"></i-feather>
+            </div>
+            <div>
+              <div class="title">{{ orderInformation?.regionName }}</div>
+              <div class="sup-title">Region</div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="icon">
+              <i-feather name="map-pin" class="icon"></i-feather>
+            </div>
+            <div>
+              <div class="title">{{ orderInformation.locationName }}</div>
+              <div class="sup-title">Location</div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="icon">
+              <i-feather name="folder" class="icon"></i-feather>
+            </div>
+            <div>
+              <div class="title">{{ orderInformation.departmentName }}</div>
+              <div class="sup-title">Department</div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="icon">
+              <i-feather name="calendar" class="icon"></i-feather>
+            </div>
+            <div>
+              <div class="title">{{ orderInformation.jobStartDate | date: 'MM/dd/yyyy':'utc' }}</div>
+              <div class="sup-title">Job Date</div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="icon">
+              <i-feather name="briefcase" class="icon"></i-feather>
+            </div>
+            <div>
+              <div class="title">{{ orderInformation.orderRequisitionReasonName || '-' }}</div>
+              <div class="sup-title">Reason for Requisition</div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="icon">
+              <i-feather name="clock" class="icon"></i-feather>
+            </div>
+            <div>
+              <div class="title">
+                {{ orderInformation.shiftStartTime | date: 'HH:mm':'utc' }} -
+                {{ orderInformation.shiftEndTime | date: 'HH:mm':'utc' }}
+              </div>
+              <div class="sup-title">Shift</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="candidates-additional-info" *ngIf="orderInformation">
+        <div class="container-row justify-content-normal">
+          <div class="column">
+            <div class="title">{{ orderInformation.onCallRequired | boolValueToText }}</div>
+            <div class="sup-title">On-Call</div>
+          </div>
+
+          <div class="column">
+            <div class="title">{{ orderInformation.asapStart | boolValueToText }}</div>
+            <div class="sup-title">ASAP Start</div>
+          </div>
+
+          <div class="column">
+            <div class="title">{{ orderInformation.criticalOrder | boolValueToText }}</div>
+            <div class="sup-title">Critical Order</div>
+          </div>
+
+          <div class="column">
+            <div class="title">{{ orderInformation.contact | boolValueToText }}</div>
+            <div class="sup-title">Contract</div>
+          </div>
+
+          <div class="column">
+            <div class="title">{{ orderInformation.weekend | boolValueToText }}</div>
+            <div class="sup-title">Weekend</div>
+          </div>
+
+          <div class="column">
+            <div class="title">{{ orderInformation.holiday | boolValueToText }}</div>
+            <div class="sup-title">Holiday</div>
+          </div>
+
+          <div class="column">
+            <div class="title">{{ (orderInformation.creationDate | date: 'MM/dd/yyy':'UTC') || '-' }}</div>
+            <div class="sup-title">Creation Date</div>
+          </div>
+
+          <div class="column">
+            <div class="title">{{ (orderInformation.distributedOn | date: 'MM/dd/yyy':'UTC') || '-' }}</div>
+            <div class="sup-title">Distributed On</div>
+          </div>
+        </div>
+      </section>
+    </ng-template>
+  </ng-container>
+</ng-template>

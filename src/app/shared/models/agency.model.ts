@@ -6,6 +6,7 @@ import {
 import { AgencyStatus, FilterOrderStatusText } from "@shared/enums/status";
 
 export type Agency = {
+  isMsp?: boolean,
   createUnder?: AgencyCreateUnder;
   parentBusinessUnitId: number | null;
   agencyId?: number;
@@ -137,4 +138,11 @@ export type AgencyRegionSkills = {
 export interface AgencyStatusesModel {
   text: string | AgencyStatus;
   id: number;
+}
+
+export interface AgencyConfig {
+  isAgencyUser: boolean;
+  isHallmarkUser: boolean;
+  agencyIsMsp: boolean;
+  isEditMode: boolean;
 }

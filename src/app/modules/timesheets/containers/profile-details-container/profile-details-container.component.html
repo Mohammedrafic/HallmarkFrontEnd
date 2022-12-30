@@ -45,6 +45,7 @@
                 [initDates]="weekPeriod"
                 [availibleDates]="workWeeks"
                 [isAbleToChange]="isChangesSaved"
+                [rangeType]="rangeType"
               >
               </app-date-week-picker>
 
@@ -102,7 +103,10 @@
           </div>
         </div>
         <div *ngIf="isMobile" class="profile-details__mobile-date-picker">
-          <app-date-week-picker [initDates]="weekPeriod" [availibleDates]="workWeeks" [isAbleToChange]="isChangesSaved">
+          <app-date-week-picker
+            [initDates]="weekPeriod"
+            [availibleDates]="workWeeks"
+            [isAbleToChange]="isChangesSaved">
           </app-date-week-picker>
         </div>
       </div>
@@ -213,7 +217,7 @@
   (rejectReasonChange)="handleReject($event)"
 ></app-reject-reason-input-dialog>
 
-<app-add-timesheet></app-add-timesheet>
+<app-add-timesheet [container]="candidateDialog.element"></app-add-timesheet>
 
 <app-upload-documents (fileChange)="saveFilesOnRecord($event)"></app-upload-documents>
 

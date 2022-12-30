@@ -1,4 +1,4 @@
-import { SaveLastSelectedOrganizationAgencyId } from './../../store/user.actions';
+import { SaveLastSelectedOrganizationAgencyId } from '../../store/user.actions';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { getAllErrors } from '@shared/utils/error.utils';
@@ -17,14 +17,14 @@ import {
   DeleteOrder,
   DeleteOrderSucceeded,
   DuplicateOrder,
-  DuplicateOrderSuccess,
+  DuplicateOrderSuccess, EditIrpOrder,
   EditOrder,
   ExportOrders,
   GetAgencyOrderCandidatesList,
   GetAssociateAgencies,
   GetAvailableSteps,
   GetContactDetails,
-  GetHistoricalData,
+  GetHistoricalData, GetIRPOrders,
   GetOrderById,
   GetOrderByIdSucceeded,
   GetOrderFilterDataSources,
@@ -46,7 +46,7 @@ import {
   GetWorkflows,
   LockUpdatedSuccessfully,
   RejectCandidateForOrganisationSuccess,
-  RejectCandidateJob,
+  RejectCandidateJob, SaveIrpOrder, SaveIrpOrderSucceeded,
   SaveOrder,
   SaveOrderImportResult,
   SaveOrderImportResultSucceeded,
@@ -59,7 +59,7 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
   UploadOrderImportFile,
-  UploadOrderImportFileSucceeded
+  UploadOrderImportFileSucceeded,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -71,7 +71,7 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementPage,
-  SuggestedDetails
+  SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -87,7 +87,7 @@ import {
   ORDER_WITHOUT_CREDENTIALS,
   RECORD_ADDED,
   RECORD_MODIFIED,
-  updateCandidateJobMessage
+  updateCandidateJobMessage,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -107,8 +107,10 @@ import { createUniqHashObj } from '@core/helpers/functions.helper';
 import { DateTimeHelper } from '@core/helpers';
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { OrderImportService } from '@client/order-management/order-import/order-import.service';
+import { OrderImportService } from '@client/order-management/components/order-import/order-import.service';
 import { OrderImportResult } from '@shared/models/imported-order.model';
+import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
+import { createFormData } from '@client/order-management/helpers';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -331,6 +333,7 @@ export class OrderManagementContentState {
 
   constructor(
     private orderManagementService: OrderManagementContentService,
+    private orderManagementIrpApiService: OrderManagementIrpApiService,
     private projectsService: ProjectsService,
     private departmentService: DepartmentsService,
     private rejectReasonService: RejectReasonService,
@@ -357,6 +360,20 @@ export class OrderManagementContentState {
             patchState({ ordersPage: payload });
           })
         );
+  }
+
+  @Action(GetIRPOrders, { cancelUncompleted: true })
+  GetIRPOrders(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { payload }: GetIRPOrders
+  ) {
+    patchState({ ordersPage: null });
+
+    return this.orderManagementIrpApiService.getOrders(payload).pipe(
+      tap((orders) => {
+        patchState({ ordersPage: orders as unknown as OrderManagementPage });
+      }),
+    );
   }
 
   @Action(ClearOrders)
@@ -662,6 +679,27 @@ export class OrderManagementContentState {
     patchState({ isDirtyOrderForm });
   }
 
+  @Action(SaveIrpOrder)
+  SaveIrpOrder(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { order, documents }: SaveIrpOrder
+  ): Observable<void | Blob[] | Order> {
+    return this.orderManagementService.saveIrpOrder(order).pipe(
+      switchMap((order: Order[]) => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new SaveIrpOrderSucceeded(),
+        ]);
+          if (documents.length) {
+            return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
+          } else {
+            return order;
+          }
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+    );
+  }
+
   @Action(SaveOrder)
   SaveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
@@ -709,6 +747,27 @@ export class OrderManagementContentState {
         ]);
 
         return payload;
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+    );
+  }
+
+  @Action(EditIrpOrder)
+  EditIrpOrder(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { order, documents }: EditIrpOrder
+  ): Observable<void | Blob[] | Order> {
+    return this.orderManagementService.editIrpOrder(order).pipe(
+      switchMap((order: Order[]) => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new SaveIrpOrderSucceeded(),
+        ]);
+        if (documents.length) {
+          return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
+        } else {
+          return order;
+        }
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );

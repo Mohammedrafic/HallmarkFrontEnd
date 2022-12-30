@@ -14,9 +14,10 @@
   }
 
   .tabs {
-    max-width: 85vw;
+    max-width: calc(100vw - 50px) !important;
+    overflow: hidden !important;
     .e-hscroll-content {
-      padding: 0 42px;
+      padding: 0;
     }
   }
 }

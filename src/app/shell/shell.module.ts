@@ -48,6 +48,7 @@ import { AnalyticByClickModule } from '@shared/directives/analytics/analytics-by
 import { ContactusComponent } from './components/contactus/contactus.component';
 import { UploaderModule  } from '@syncfusion/ej2-angular-inputs';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
 
 
 const sidebarIcons = {
@@ -98,7 +99,8 @@ const sidebarIcons = {
     FormsModule,
     FontAwesomeModule,
     UserChatModule,
-    AnalyticByClickModule
+    AnalyticByClickModule,
+    BoolValuePipeModule
   ],
   providers: [],
 })

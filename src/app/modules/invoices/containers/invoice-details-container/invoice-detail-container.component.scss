@@ -1,5 +1,6 @@
-@import 'colors';
-@import 'mixins';
+@import "colors";
+@import "mixins";
+@import "adaptive-response";
 
 $chip-margin: 8px;
 
@@ -24,9 +25,10 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   width: initial;
 }
 
-.wrapper {
+.chip-container {
   display: flex;
   align-items: center;
+  padding-bottom: 24px;
 }
 
 .grouped {
@@ -58,10 +60,6 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   display: flex;
 }
 
-.flex-column {
-  flex-direction: column;
-}
-
 .align-center {
   align-items: center;
 }
@@ -82,10 +80,11 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 .profile-details-header {
   position: sticky;
   top: 0;
-  padding: 24px 0;
+  padding: 24px 0 8px;
   z-index: 100;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   background: white;
 
   .e-avatar {
@@ -97,6 +96,12 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
     font-weight: 700;
     font-size: 24px;
     margin-bottom: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
   }
 
   .header-controls {
@@ -229,7 +234,8 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   }
 }
 
-.e-file-select-wrap, .e-upload-actions {
+.e-file-select-wrap,
+.e-upload-actions {
   display: none;
 }
 
@@ -370,4 +376,53 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
 .tooltip [disabled] {
   pointer-events: none;
+}
+
+.menu-mobile {
+  margin-right: 12px;
+}
+
+.mobile-change-status-btn {
+  @include flex-center;
+}
+
+@media #{$max-mobile} {
+  .menu-mobile {
+    margin: 0;
+  }
+
+  .profile-details-header {
+    align-items: flex-start;
+  }
+
+  .container,
+  .profile-table-block {
+    padding-bottom: 16px !important;
+  }
+
+  .close-button {
+    margin: 0 5px 0 0 !important;
+    padding: 0 5px !important;
+  }
+
+  .grouped {
+    margin: 0;
+  }
+
+  .separator {
+    height: 22px;
+  }
+
+  .change-status-btn {
+    width: 312px;
+  }
+
+  .table-footer {
+    justify-content: space-evenly !important;
+  }
+
+  .e-dropdown-btn,
+  .e-dropdown-btn.e-btn {
+    padding: 0 5px 0 0 !important;
+  }
 }

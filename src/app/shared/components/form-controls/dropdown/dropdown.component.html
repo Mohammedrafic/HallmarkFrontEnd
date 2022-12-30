@@ -1,8 +1,16 @@
-<app-form-control-wrapper [formGroup]="formGroupInstance" [label]="label" [id]="id" [class.app-dropdown]="hideBorder">
-  <ejs-dropdownlist
-    [allowFiltering]="true"
-    [dataSource]="dataSource"
-    [formControlName]="controlName"
-    [fields]="fields"
-  ></ejs-dropdownlist>
+<app-form-control-wrapper [formGroup]="formGroupInstance"
+                          [label]="label" [id]="id"
+                          [required]="required"
+                          [class.app-dropdown]="hideBorder">
+  <div class="input-group dropdown">
+    <ejs-dropdownlist
+      [allowFiltering]="true"
+      [dataSource]="dataSource"
+      [formControlName]="controlName"
+      [fields]="fields"
+      [placeholder]="placeholder"
+      (blur)="onBlur()"
+    ></ejs-dropdownlist>
+    <app-error-message [control]="getControl()"></app-error-message>
+  </div>
 </app-form-control-wrapper>

@@ -1,0 +1,44 @@
+<div class="create-order-header">
+  <div class="navigation-wrapper">
+    <div>
+      <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
+    </div>
+    <div class="title">
+      <h3>{{ title }} Order</h3>
+      <span *ngIf="selectedOrder" class="order-id">
+        ID: <span *ngIf="selectedOrder?.isTemplate">{{ selectedOrder?.orderId }}</span>
+        <span *ngIf="!selectedOrder?.isTemplate">
+          {{ selectedOrder?.organizationPrefix }}-{{ selectedOrder?.publicId }}
+        </span>
+      </span>
+    </div>
+  </div>
+  <div *ngIf="showSystemToggle && !selectedOrder">
+    <app-button-group
+      [buttonOptions]="orderSystemConfig"
+      (buttonChange)="changeSystem($event)"
+    ></app-button-group>
+  </div>
+  <div class="controls-form">
+    <ejs-splitbutton
+      content="Submit"
+      cssClass="e-primary"
+      [items]="submitButtonConfig"
+      (click)="save()"
+      (select)="selectTypeSave($event)"
+    >
+    </ejs-splitbutton>
+  </div>
+</div>
+<div class="split-line"></div>
+<div class="content-wrapper">
+  <ng-container [ngSwitch]="activeSystem">
+      <app-irp-container
+        *ngSwitchCase="orderSystem.IRP"
+        [handleSaveEvents]="saveEvents"
+        [selectedOrder]="selectedOrder"
+        [selectedSystem]="selectedSystem"
+      ></app-irp-container>
+      <app-add-edit-order *ngSwitchCase="orderSystem.VMS" [handleSaveEvents]="saveEvents"></app-add-edit-order>
+  </ng-container>
+</div>

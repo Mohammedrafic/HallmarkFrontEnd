@@ -21,7 +21,9 @@ export const analyticsConstants = {
     InvoiceStatuses: 'invoiceStatuses',
     InvoiceID: 'invoiceID',
     AgingGroupIds:'agingGroupIds',
-    TimesheetStatuses:'timesheetStatuses'
+    TimesheetStatuses:'timesheetStatuses',
+    ReportDate:'reportDate',
+    CredentialName:'credentialName'
   }
 }
 
@@ -39,6 +41,34 @@ export const accrualConstants = {
     StartDate: 'startDate',
     EndDate:'endDate',
     InvoiceType :'invoiceType'
+  }
+}
+export const ytdSummaryConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    SkillCategoryIds: 'skillCategoryIds',
+    SkillIds: 'skillIds',
+    Year: 'year',
+    Month: 'month',
+  }
+}
+
+export const vmsInvoiceConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    AgencyIds: 'agencyIds',
+    Year: 'year',
+    Month: 'month',
+    InvoiceStatus: 'invoiceStatus',
+    InvoiceId: 'invoiceId',
+    StartDate: 'startDate',
+    EndDate: 'endDate'
   }
 }
 
@@ -126,6 +156,20 @@ export const ageGroups: { name: string; id: number }[] = [
   {name:"Above 90",id:5}
 
 ];
+
+export type Year = {
+  id: number;
+  name: string;
+};
+export type Month = {
+  id: number;
+  name: string;
+};
+
+export type InvoiceStatus = {
+  id: number;
+  name: string;
+};
 
 
 

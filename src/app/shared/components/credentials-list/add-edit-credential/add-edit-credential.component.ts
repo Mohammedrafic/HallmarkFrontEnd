@@ -110,7 +110,13 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
 
   public saveCredential(): void {
     if (this.credentialForm.valid && this.isSystemSelected()) {
-      this.store.dispatch(new SaveCredential(this.credentialForm.getRawValue()));
+      const credential: Credential = {
+        ...this.credentialForm.getRawValue(),
+        includeInVMS: this.credentialForm.get('includeInVMS')?.value ?? this.selectedSystem.isVMS,
+        includeInIRP: this.credentialForm.get('includeInIRP')?.value ?? this.selectedSystem.isIRP,
+      };
+
+      this.store.dispatch(new SaveCredential(credential));
       this.credentialForm.reset();
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, ErrorMessageForSystem));

@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { combineLatest, filter, map, Observable, takeWhile } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, Observable, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { DrawNodeEventArgs, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
@@ -110,7 +110,8 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.onUsersAssignedToRoleFetched();
     this.subOnBusinessUnitControlChange();
 
-    this.copyRoleData$ = this.store.select(SecurityState.copyRoleData).pipe(
+    this.copyRoleData$ = this.store.select(SecurityState.copyRoleData)
+    .pipe(
       map((roles) => {
         const id = this.form.value.id;
         return id ? roles.filter((role) => role.id !== id) : roles;
@@ -164,11 +165,13 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   private onBusinessUnitOrIdChange(): void {
     const businessUnitTypeControl = this.form.get('businessUnitType');
     const businessUnitIdControl = this.form.get('businessUnitId');
+
     if (businessUnitTypeControl && businessUnitIdControl) {
       combineLatest([businessUnitTypeControl.valueChanges, businessUnitIdControl.valueChanges])
         .pipe(
+          distinctUntilChanged((prev, next) => prev[0] === next[0] && prev[1] === next[1]),
+          filter((values) => values.every((value) => typeof value === 'number')),
           takeWhile(() => this.isAlive),
-          filter((values) => values.every((value) => typeof value === 'number'))
         )
         .subscribe(([type, id]) => {
           this.copyRoleControl.reset();
@@ -203,6 +206,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.businessUnitControl?.valueChanges
       .pipe(
         filter((value) => !!value),
+        distinctUntilChanged(),
         takeWhile(() => this.isAlive)
       )
       .subscribe((value) => {
@@ -212,7 +216,8 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private onRoleTreeFieldChanged(): void {
-    this.roleTreeField$.pipe(takeWhile(() => this.isAlive)).subscribe((roleTreeField) => {
+    this.roleTreeField$.pipe(takeWhile(() => this.isAlive))
+    .subscribe((roleTreeField) => {
       this.notAssignableIds = roleTreeField.dataSource
         .filter(({ isAssignable, isAvailable }) => !isAssignable || !isAvailable)
         .map(({ id }) => id);
@@ -220,13 +225,17 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private onNewRoleBussinesDataFetched(): void {
-    this.actions$.pipe(ofActionSuccessful(GetNewRoleBusinessByUnitTypeSucceeded), takeWhile(() => this.isAlive)).subscribe(({ type }) => {
+    this.actions$.pipe(
+      ofActionSuccessful(GetNewRoleBusinessByUnitTypeSucceeded),
+      takeWhile(() => this.isAlive))
+    .subscribe(() => {
       const user = this.store.selectSnapshot(UserState.user);
-      this.newRoleBussinesData = this.store.selectSnapshot(SecurityState.newRoleBussinesData)(user?.businessUnitType as BusinessUnitType);
+      this.newRoleBussinesData =
+      this.store.selectSnapshot(SecurityState.newRoleBussinesData)(user?.businessUnitType as BusinessUnitType);
       if (user?.businessUnitType !== BusinessUnitType.Hallmark) {
         this.defaultBusinessValue = this.newRoleBussinesData[0]?.id;
       }
-    })
+    });
   }
 
   private onUsersAssignedToRoleFetched(): void {

@@ -122,34 +122,100 @@ button.e-control.e-btn.e-dropdown-btn {
     }
   }
 
-  .light {
-    .e-control.e-btn.e-outline {
+.light {
+  .e-control.e-btn.e-outline {
+    background-color: #fff;
+    color: $primary-active-blue-10 !important;
+
+    &:hover {
+      background-color: rgba(139, 178, 255, .7) !important;
+    }
+
+    &:active {
       background-color: #fff;
-      color: $primary-active-blue-10 !important;
-
-      &:hover {
-        background-color: rgba(139, 178, 255, .7) !important;
-      }
-
-      &:active {
-        background-color: #fff;
-        border-color: $primary-active-blue;
-      }
-
-      &:disabled {
-        color: $secondary-dark-blue-30 !important;
-        border-color: $secondary-dark-blue-40 !important;
-        background-color: $secondary-dark-blue-50 !important;
-      }
+      border-color: $primary-active-blue;
     }
 
-    .e-control.e-btn.e-danger {
-      background-color: $supportive-red;
+    &:disabled {
+      color: $secondary-dark-blue-30 !important;
+      border-color: $secondary-dark-blue-40 !important;
+      background-color: $secondary-dark-blue-50 !important;
     }
   }
 
-  .btn-icon__disabled {
-    pointer-events: none;
-    background-color: transparent !important;
-    color: $primary-active-blue-50 !important;
+  .e-control.e-btn.e-danger {
+    background-color: $supportive-red;
   }
+}
+
+.btn-icon__disabled {
+  pointer-events: none;
+  background-color: transparent !important;
+  color: $primary-active-blue-50 !important;
+}
+
+.row-tool-buttons.action-renderer.ag-grid-cell-renderer {
+  button.e-control.e-btn {
+    i-feather {
+      margin: 0;
+    }
+  }
+
+  .default-icon-button,
+  .secondary-icon-button,
+  .primary-icon-button {
+    padding: 10px;
+    border: none;
+    &.e-ripple {
+      overflow: initial;
+      position: initial;
+      transform: none;
+    }
+  }
+
+  .secondary-icon-button {
+    color: $supportive-red;
+
+    &.e-active,
+    &:focus {
+      color: $white;
+      background-color: $supportive-red-00;
+    }
+
+    &:hover {
+      color: $supportive-red;
+      background-color: $supportive-red-40;
+    }
+
+    &[disabled] {
+      pointer-events: none;
+      background-color: transparent;
+      color: $supportive-red-40;
+
+      app-custom-icon.icon.supportive-green-10 {
+        color: $supportive-green-40;
+      }
+    }
+  }
+
+  .primary-icon-button {
+    color: $primary-active-blue-10;
+
+    &.e-active,
+    &:focus {
+      color: $white;
+      background-color: $primary-active-blue;
+    }
+
+    &:hover {
+      color: $primary-active-blue-10;
+      background-color: $primary-active-blue-70;
+    }
+
+    &[disabled] {
+      pointer-events: none;
+      background-color: transparent;
+      color: $primary-active-blue-50;
+    }
+  }
+}

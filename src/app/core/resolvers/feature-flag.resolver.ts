@@ -23,6 +23,6 @@ export class FeatureFlagResolverService implements Resolve<boolean> {
       tap((value) => {
         this.store.dispatch(new SetIrpFlag(value));
       }),
-    )
+    );
   }
 }

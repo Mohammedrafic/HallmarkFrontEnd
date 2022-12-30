@@ -3,7 +3,8 @@ import { Order } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { Select, Store } from '@ngxs/store';
 import { AppState } from '../../../store/app.state';
-import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import { OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { Observable } from 'rxjs';

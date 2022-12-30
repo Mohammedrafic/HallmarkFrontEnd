@@ -42,9 +42,15 @@ export class SkillsService {
 
   adaptFilters(filters: SkillFilters, filterForm: FormGroup): SkillFilters {
     const filterValues = filterForm.getRawValue();
+    /**
+     * IRP flags have to be converted to bool as BE does not work with null values.
+     */
+    filterValues.includeInIRP = !!filterValues.includeInIRP;
+    filterValues.includeInVMS = !!filterValues.includeInVMS;
 
     return ({
       ...filters,
+      ...filterValues,
       ...filterValues.skillCode ? { skillCodes: [filterValues.skillCode] } : { skillCodes: null },
     }) as SkillFilters;
   } 

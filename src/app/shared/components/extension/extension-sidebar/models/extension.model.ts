@@ -10,6 +10,7 @@ export interface ExtensionModel {
   billRates: BillRate[];
   jobId: number;
   duration: Duration;
+  ignoreMissingCredentials: boolean
 }
 
 export interface ExtensionGridModel extends ExtensionModel {

@@ -4,18 +4,14 @@
   [id]="id"
   [required]="required"
 >
-  <div class="input-container">
-    <div class="input-group">
-      <div class="input-group">
+      <div class="input-group textarea-wrapper">
         <ejs-textbox
-          appValidateWithMessage
           [formControlName]="controlName"
           cssClass="textarea"
+          (blur)="onBlur()"
           [multiline]="true"
-          maxlength="2000">
+          [maxlength]="maxlength">
         </ejs-textbox>
+        <app-error-message [control]="getControl()"></app-error-message>
       </div>
-      <app-error-message [control]="getControl()"></app-error-message>
-    </div>
-  </div>
 </app-form-control-wrapper>

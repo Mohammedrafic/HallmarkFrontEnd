@@ -37,7 +37,6 @@
   }
 }
 
-
 @media #{$max-mobile} {
   .e-dlg-content {
     padding-bottom: 24px !important;
@@ -46,9 +45,5 @@
 
   .e-dlg-header-content {
     background-color: $background !important;
-  }
-
-  .e-dlg-header {
-    width: 80% !important;
   }
 }

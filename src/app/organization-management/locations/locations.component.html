@@ -15,8 +15,8 @@
         ejs-button
         cssClass="e-flat button-with-icon"
         (click)="openAddRegionDialog()"
-        [class.hidden]="!isLoaded"
-      ><i-feather name="plus" class="icon"></i-feather> Add Region</button>
+        [class.hidden]="true"
+        ><i-feather name="plus" class="icon"></i-feather> Add Region</button>
     </section>
 
     <section [class.hidden]="!isLoaded">
@@ -38,7 +38,7 @@
         ejs-button
         id="importButton"
         cssClass="e-outline button-import"
-        (click)="openImportDialog()">Import <i-feather name="upload" class="icon"></i-feather></button>
+        (click)="openImportDialog()">Import <i-feather name="download" class="icon"></i-feather></button>
       <button
         ejs-dropdownbutton
         [items]="exportOptions"
@@ -46,7 +46,7 @@
         id="exportButton"
         cssClass="e-outline button-export">
         <div class="button-export-container">
-          Export <i-feather name="download" class="icon"></i-feather>
+          Export <i-feather name="upload" class="icon"></i-feather>
         </div>
       </button>
       <button
@@ -488,4 +488,5 @@
   [irpFlagEnabled]="isFeatureIrpEnabled"
   [orgIrpEnabled]="isOrgIrpEnabled"
   [orgVMSEnabled]="isOrgVMSEnabled"
-  (reloadItemsList)="updatePage()"></app-import-locations>
+  (reloadItemsList)="updatePage()">
+</app-import-locations>

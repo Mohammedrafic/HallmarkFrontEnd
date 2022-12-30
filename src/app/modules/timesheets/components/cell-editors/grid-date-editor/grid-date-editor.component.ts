@@ -7,6 +7,7 @@ import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 import { DateTimeHelper, TimesheetDateHelper } from '@core/helpers';
 import { EditFieldTypes } from '@core/enums';
+import { Subscription, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-grid-date-editor',
@@ -25,6 +26,8 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
 
   public type: EditFieldTypes;
 
+  private controlSub: Subscription;
+
   constructor(
     private cd: ChangeDetectorRef,
   ) {
@@ -37,7 +40,7 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   }
 
   public refresh(params: ICellRendererParams): boolean {
-    this.setData(params)
+    this.setData(params);
     this.cd.markForCheck();
     return true;
   }
@@ -45,20 +48,6 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   public handleTimeChange(event: ChangeEventArgs): void {
     this.control.markAsTouched();
     this.control.patchValue(this.calculateDateValue(event.value as string));
-  }
-
-  private setFormControl(params: ICellRendererParams): void {
-    if (params.colDef?.cellRendererParams.formGroup?.[params.data.id]) {
-      const group = params.colDef?.cellRendererParams.formGroup[params.data.id] as FormGroup;
-      this.control = group.get((params.colDef as ColDef).field as string) as AbstractControl;
-      if (this.type === EditFieldTypes.Time) {
-        if (group.get('isTimeInNull')?.value) {
-          this.dateValue = null;
-          this.control.patchValue(null);
-          this.control.markAsTouched();
-        }
-      }
-    }
   }
 
   private setData(params: ICellRendererParams): void {
@@ -71,6 +60,25 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
     this.setFormControl(params);
   }
 
+  private setFormControl(params: ICellRendererParams): void {
+    if (params.colDef?.cellRendererParams.formGroup?.[params.data.id]) {
+      const group = params.colDef?.cellRendererParams.formGroup[params.data.id] as FormGroup;
+      this.control = group.get((params.colDef as ColDef).field as string) as AbstractControl;
+
+      if (this.type === EditFieldTypes.Time) {
+        if (group.get('isTimeInNull')?.value) {
+          this.dateValue = null;
+          this.control.patchValue(null);
+          this.control.markAsTouched();
+        }
+      }
+    }
+
+    if (!this.controlSub && this.control) {
+      this.watchForValidation();
+    }
+  }
+
   private calculateDateValue(date: string): string | null {
     const today = new Date().toISOString();
     const splitStartDate = (this.value || today).split('T')[0];
@@ -78,5 +86,15 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
     const splitValue = (dateStr as string)?.split('T')[1];
 
     return dateStr && splitStartDate ? `${splitStartDate}T${splitValue}` : null;
+  }
+
+  private watchForValidation(): void {
+    this.controlSub = this.control.statusChanges
+    .pipe(
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe(() => {
+      this.cd.markForCheck();
+    });
   }
 }

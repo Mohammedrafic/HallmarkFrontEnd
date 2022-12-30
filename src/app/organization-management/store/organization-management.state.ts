@@ -727,7 +727,7 @@ export class OrganizationManagementState {
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error,
-          (error.error.errors != null && error.error.errors != undefined) ? 'Dependencies:'+error.error.errors.EntityInUse[0] : error.error.detail));
+          (error.error.errors != null && error.error.errors != undefined) ? 'Region cannot be deleted. This Region was used in '+error.error.errors.EntityInUse[0] : error.error.detail));
       })
     );
   }
@@ -872,10 +872,13 @@ export class OrganizationManagementState {
   }
 
   @Action(GetAssignedSkillsByOrganization)
-  GetAssignedSkillsByOrganization({ patchState, }: StateContext<OrganizationManagementStateModel>): Observable<AssignedSkillsByOrganization[]> {
-    return this.skillsService.getAssignedSkillsByOrganization().pipe(
+  GetAssignedSkillsByOrganization(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { params }: GetAssignedSkillsByOrganization,
+  ): Observable<AssignedSkillsByOrganization[]> {
+    return this.skillsService.getAssignedSkillsByOrganization(params).pipe(
       tap((payload) => {
-        patchState({ assignedSkillsByOrganization: payload.map((skill) => ({...skill, id: skill.masterSkillId, name: skill.skillDescription})) });
+       patchState({ assignedSkillsByOrganization: payload.map((skill) => ({...skill, id: skill.masterSkillId, name: skill.skillDescription})) });
       })
     );
   }

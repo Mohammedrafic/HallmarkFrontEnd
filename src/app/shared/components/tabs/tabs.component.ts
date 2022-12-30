@@ -42,11 +42,18 @@ export class TabsComponent<T> implements AfterViewInit {
     this.createdEmitter.emit(event);
   }
 
+  public onSelecting(event: SelectEventArgs): void {
+    if (event.isSwiped) {
+      event.cancel = true;
+    }
+  }
+
   private loadComponent(): void {
     this.dynamic.map((vcr: ViewContainerRef, i: number) => {
-      vcr.clear();
-      this.componentRef = vcr.createComponent(this.tabs[i].component);
-      console.log(this.componentRef.instance);
+      if (this.tabs[i].component) {
+        vcr.clear();
+        this.componentRef = vcr.createComponent(this.tabs[i].component!);
+      }
     });
   }
 

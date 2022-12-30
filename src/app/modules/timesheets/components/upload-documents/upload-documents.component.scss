@@ -1,11 +1,8 @@
 @import "colors";
+@import "adaptive-response";
 
 .upload-custom-dialog {
   &::ng-deep {
-    & .e-dlg-header {
-      width: 100% !important;
-    }
-
     & .e-dlg-content {
       padding: 0 24px 24px !important;
     }
@@ -14,9 +11,15 @@
 
 .dialog-header {
   margin-bottom: 6px;
+  padding-top: 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
 }
 
 .title {
@@ -43,4 +46,12 @@
 .button-clear {
   width: 100%;
   margin-top: 28px;
+}
+
+@media #{$max-mobile} {
+  .dialog-header {
+    .title {
+      font-size: 14px !important;
+    }
+  }
 }

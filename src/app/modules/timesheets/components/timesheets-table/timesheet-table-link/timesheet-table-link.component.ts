@@ -7,7 +7,9 @@ import { ICellRendererParams } from '@ag-grid-community/core';
 import { Timesheet } from '../../../interface';
 import { TimesheetsTableColumns } from '../../../enums';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
-import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-timesheet-table-link',

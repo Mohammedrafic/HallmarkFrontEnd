@@ -1,7 +1,6 @@
 <div #inputWrapper class="bootstrap">
   <div class="input-container">
-    <label *ngIf="title">{{ title }}</label>
-    <div class="input-group">
+    <div class="input-group multi-date">
       <input
         class="e-input"
         [class.active]="isCalendarShow"
@@ -29,7 +28,7 @@
     [isMultiSelection]="true"
     [showTodayButton]="false"
     (valuesChange)="datesValuesChange($event)"
-    (created)="calendarCreated(ejCalendar)"
+    (created)="createCalendarButtons(ejCalendar)"
     (destroyed)="calendarDestroyed()"
     class="calendar">
   </ejs-calendar>

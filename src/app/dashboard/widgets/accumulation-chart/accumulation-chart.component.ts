@@ -57,13 +57,23 @@ export class AccumulationChartComponent
     super();
   }
 
-  public redirectToSourceContent(): void {
+  public redirectToSourceContent(status: string): void {
     const user = this.store.selectSnapshot(UserState.user);
-    if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
-      this.dashboardService.redirectToUrl('agency/candidate-details');
-    } else {
-      this.dashboardService.redirectToUrl('client/order-management');
+    if (this.chartData?.title == "Candidates") {
+      if (this.chartData?.title)
+        if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+          this.dashboardService.redirectToUrl('agency/candidate-details');
+        } else {
+          this.dashboardService.redirectToUrl('client/candidate-details', undefined, status);
+        }
+    } else if (this.chartData?.title == "Active Positions") {
+      if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+        this.dashboardService.redirectToUrl('agency/candidate-details');
+      } else {
+        this.dashboardService.redirectToUrl('client/order-management', undefined, status);
+      }
     }
+
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -75,12 +85,12 @@ export class AccumulationChartComponent
   }
 
   public ngOnInit(): void {
-    this.datalabel = {visible: true };
+    this.datalabel = { visible: true };
     this.filteredChartData$ = this.getFilteredChartData();
   }
 
   public onClickLegend(label: string): void {
-   
+
     const currentValue = this.selectedEntries$.value;
     const nextValue = includes(label, currentValue)
       ? lodashFilter((currentValueLabel: string) => currentValueLabel !== label, currentValue)

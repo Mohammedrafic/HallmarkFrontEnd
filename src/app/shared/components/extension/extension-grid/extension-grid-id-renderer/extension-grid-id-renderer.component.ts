@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
-import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 
 @Component({

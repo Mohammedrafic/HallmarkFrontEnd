@@ -4,13 +4,13 @@ import { OrganizationStructure } from '@shared/models/organization.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
-import { AllOrganizationsSkill } from '../../models/all-organization-skill.model';
-import { QuickOrderFormComponent } from './quick-order-form/quick-order-form.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Select, Store } from '@ngxs/store';
 import { SetIsDirtyQuickOrderForm } from '@client/store/order-managment-content.actions';
+import { DashboardState } from '../../store/dashboard.state';
+import { ToggleQuickOrderDialog } from '../../store/dashboard.actions';
 
 @Component({
   selector: 'app-quick-order',
@@ -18,18 +18,17 @@ import { SetIsDirtyQuickOrderForm } from '@client/store/order-managment-content.
   styleUrls: ['./quick-order.component.scss'],
 })
 export class QuickOrderComponent extends DestroyableDirective implements OnInit {
-  @Input() openEvent: Subject<boolean>;
   @Input() public allOrganizations: Organisation[];
   @Input() public userIsAdmin: boolean;
-  @Input() public skills: AllOrganizationsSkill[];
   @Input() public organizationStructure: OrganizationStructure;
   @Input() public isMobile: boolean;
 
   @ViewChild('sideDialog', { static: true }) public sideDialog: DialogComponent;
-  @ViewChild('quickOrderForm') public quickOrderForm: QuickOrderFormComponent;
 
   @Select(OrderManagementContentState.isDirtyQuickOrderForm)
   private isFormDirty$: Observable<boolean>;
+
+  @Select(DashboardState.toggleQuickOrderDialog) private readonly toggleQuickOrderDialog$: Observable<boolean>;
 
   public submitQuickOrder$ = new Subject<boolean>();
 
@@ -49,13 +48,12 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
   }
 
   private onOpenEvent(): void {
-    this.openEvent.pipe(takeUntil(this.destroy$)).subscribe((isOpen) => {
+    this.toggleQuickOrderDialog$.pipe(takeUntil(this.destroy$)).subscribe((isOpen) => {
       this.isFormShown = isOpen;
       if (isOpen) {
         this.sideDialog.show();
       } else {
         this.sideDialog.hide();
-        setTimeout(() => this.sideDialog.refresh(), 300);
       }
     });
   }
@@ -82,7 +80,7 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
   }
 
   private closeDialog(): void {
-    this.openEvent.next(false);
+    this.store.dispatch(new ToggleQuickOrderDialog(false));
     this.store.dispatch(new SetIsDirtyQuickOrderForm(false));
   }
 

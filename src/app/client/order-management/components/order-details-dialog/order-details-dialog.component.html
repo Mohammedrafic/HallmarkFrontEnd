@@ -1,0 +1,244 @@
+<ejs-dialog
+  id="dialog"
+  #sideDialog
+  cssClass="dialog order-details-dialog"
+  [target]="targetElement"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">
+              {{ isReOrder ? 'Re-Order' : 'Order' }} ID {{ order?.organizationPrefix }}-{{ order?.publicId }}
+            </h3>
+            <div class="order-statuses">
+              <ejs-chiplist #chipList>
+                <e-chips>
+                  <e-chip [text]="order?.statusText"></e-chip>
+                  <e-chip *ngIf="order?.extensionFromId" text="E" cssClass="e-warning ex-chip"></e-chip>
+                </e-chips>
+              </ejs-chiplist>
+              <div class="vertical-divider"></div>
+              <div *ngIf="order" class="order-other-statuses">
+                <span class="custom-chip" *ngIf="!isReOrder">{{ order.orderType | orderTypeName: order.isIRPOnly }}</span>
+                <span *ngIf="orderType.ReOrder !== order?.orderType" class="custom-chip">
+                  {{ order.isLocked ? 'Locked' : 'Unlocked' }}</span
+                >
+                <span class="custom-chip" *ngIf="order.isIRPOnly">IRP</span>
+              </div>
+            </div>
+          </div>
+          <div class="e-card-content dialog-controls">
+            <div class="order-actions" *ngIf="showApproveAndCancel">
+              <button ejs-button cssClass="e-outline" (click)="cancelOrder(order.id)">Cancel</button>
+              <button ejs-button cssClass="e-primary" (click)="approveOrder(order.id)">Approve</button>
+              <div class="vertical-divider"></div>
+            </div>
+
+            <app-tooltip-container [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-outline edit-button"
+                [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission"
+                (click)="editOrder(order)"
+              >
+                <i-feather name="edit" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="!canCloseOrder" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-outline"
+                [class.custom-order-btn]="showApproveAndCancel"
+                [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission"
+                (click)="closeOrder(order)"
+              >
+                Close Order
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="canReOpen" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-outline"
+                [class.custom-order-btn]="showApproveAndCancel"
+                [disabled]="!canCloseOrderPermission || !hasCreateEditOrderPermission"
+                (click)="reOpenOrder(order)"
+              >
+                Re-Open
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="showCreateReOrder" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-outline"
+                [class.custom-order-btn]="showApproveAndCancel"
+                (click)="createReOrder()"
+                [disabled]="disableCreateReOrder || !canCreateOrder || !hasCreateEditOrderPermission"
+              >
+                Create Re-Order
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="!showCloseButton" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-primary delete-button"
+                [class.custom-order-btn]="showApproveAndCancel"
+                [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
+                (click)="deleteOrder(order.id)"
+              >
+                Delete
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="desktopSmallMenu.length && showApproveAndCancel" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-dropdownbutton
+                [items]="desktopSmallMenu"
+                [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
+                (select)="onMobileMenuSelect($event)"
+                cssClass="e-caret-hide e-outline edit-button primary-icon-button menu-desktop-small"
+              >
+                <i-feather name="more-vertical" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="tabletMenu.length" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-dropdownbutton
+                [items]="tabletMenu"
+                [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
+                (select)="onMobileMenuSelect($event)"
+                cssClass="e-caret-hide e-outline edit-button primary-icon-button menu-tablet"
+              >
+                <i-feather name="more-vertical" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
+
+            <app-tooltip-container *ngIf="showLockOrder" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-outline"
+                [class.custom-order-btn]="showApproveAndCancel"
+                [isPrimary]="true"
+                (click)="lockOrder()"
+                [disabled]="disabledLock || !canCreateOrder || !hasCreateEditOrderPermission"
+              >
+                {{ order?.isLocked ? 'Unlock' : 'Lock' }}
+                <i-feather *ngIf="!order?.isLocked" name="lock" class="icon"></i-feather>
+                <app-custom-icon *ngIf="order?.isLocked" name="unlock" class="icon"></app-custom-icon>
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="mobileMenu.length" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-dropdownbutton
+                [items]="mobileMenu"
+                [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
+                (select)="onMobileMenuSelect($event)"
+                iconCss="e-icons"
+                cssClass="e-caret-hide primary-icon-button menu-mobile"
+              >
+                <i-feather name="more-vertical" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
+
+            <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
+              <i-feather name="x" class="icon"></i-feather>
+            </button>
+          </div>
+        </div>
+      </section>
+      <div class="order-tabs">
+        <ejs-tab #tab *ngIf="orderStatus.Incomplete !== order?.status" (selecting)="onTabSelecting($event)">
+          <e-tabitems>
+            <e-tabitem>
+              <ng-template #headerText>{{ isReOrder ? 'Re-Order' : 'Order' }} Details</ng-template>
+              <ng-template #content>
+                <app-order-details-container *ngIf="sideDialog.visible" [currentOrder]="order"></app-order-details-container>
+              </ng-template>
+            </e-tabitem>
+            <e-tabitem>
+              <ng-template #headerText>
+                {{ order?.extensionFromId ? 'Candidate' : 'Candidates' }}
+                <span class="e-badge e-badge-success e-badge-pill">{{ orderCandidatesLength$ | async }}</span>
+              </ng-template>
+              <ng-template #content>
+                <app-extension-candidate
+                  [currentOrder]="order"
+                  [candidateOrder]="candidateOrderPage"
+                  [dialogEvent]="openEvent"
+                  *ngIf="order?.extensionFromId; else candidateOrder"
+                >
+                </app-extension-candidate>
+                <ng-template #candidateOrder>
+                  <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
+                </ng-template>
+              </ng-template>
+            </e-tabitem>
+            <e-tabitem *ngIf="orderType.OpenPerDiem === order?.orderType">
+              <ng-template #headerText>
+                Re-Orders
+                <span class="e-badge e-badge-success e-badge-pill"> {{ order?.reOrders?.length || '0' }}</span>
+              </ng-template>
+              <ng-template #content>
+                <app-order-reorders-container
+                  (selectReOrder)="selectReOrder.emit($event)"
+                  (editReorder)="editNestedReOrder($event)"
+                  [currentOrder]="order"
+                >
+                </app-order-reorders-container>
+              </ng-template>
+            </e-tabitem>
+            <e-tabitem
+              *ngIf="
+                (order?.orderType === orderType.Traveler || order?.orderType === orderType.ContractToPerm) &&
+                !isReOrder &&
+                order?.extensionFromId
+              "
+            >
+              <ng-template #headerText>Extensions</ng-template>
+              <ng-template #content>
+                <section class="job-details">
+                  <app-general-order-info [orderInformation]="order"></app-general-order-info>
+                </section>
+                <hr />
+                <app-extension-grid [data]="extensions" class="extension-grid"></app-extension-grid>
+              </ng-template>
+            </e-tabitem>
+          </e-tabitems>
+        </ejs-tab>
+        <ejs-tab #tab *ngIf="orderStatus.Incomplete === order?.status" (selecting)="onTabSelecting($event)">
+          <e-tabitems>
+            <e-tabitem>
+              <ng-template #headerText>Order Details</ng-template>
+              <ng-template #content>
+                <app-order-details-container [currentOrder]="order"></app-order-details-container>
+              </ng-template>
+            </e-tabitem>
+          </e-tabitems>
+        </ejs-tab>
+        <app-side-dialog
+          [header]="reOrderDialogTitle$ | async"
+          (formCancelClicked)="clearEditReOrder()"
+          (formSaveClicked)="onSaveReOrder()"
+        >
+          <app-add-edit-reorder
+            *ngIf="isReOrderDialogOpened$ | async"
+            [order]="reOrderToEdit || order"
+            (saveEmitter)="saveReOrder()"
+          >
+          </app-add-edit-reorder>
+        </app-side-dialog>
+      </div>
+    </section>
+  </ng-template>
+  <ng-template #footerTemplate>
+    <app-dialog-next-previous
+      *ngIf="orderDialogOptions$ | async as options"
+      [title]="isReOrder ? 'Re-Order' : 'Order'"
+      [options]="options"
+      (nextEvent)="onNextPreviousOrder(true)"
+      (previousEvent)="onNextPreviousOrder(false)"
+    ></app-dialog-next-previous>
+  </ng-template>
+</ejs-dialog>

@@ -6,11 +6,15 @@ export enum FieldType {
   Number = 'number',
   Dropdown = 'dropdown',
   MultiSelectDropdown = 'multiSelectDropdown',
+  MultiCheckBoxDropdown = 'multiCheckBoxDropdown',
   Date = 'date',
   SearchDD = 'searchDD',
   Toggle = 'toggle',
   TextArea = 'textarea',
   CheckBox = 'checkBox',
+  Button = 'button',
+  RadioButton = 'radioButton',
+  Phone = 'phone',
   CheckBoxGroup = 'checkBoxGroup',
  }
 

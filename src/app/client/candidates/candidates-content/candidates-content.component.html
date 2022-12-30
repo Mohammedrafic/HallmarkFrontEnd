@@ -18,7 +18,7 @@
         (select)="exportSelected($event)"
       >
         <div class="button-export-container">
-          Export <i-feather name="download" class="icon"></i-feather>
+          Export <i-feather name="upload" class="icon"></i-feather>
         </div>
       </button>
       <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
@@ -32,7 +32,15 @@
       </button>
     </div>
     <div class="button-group" *ngIf="isIRP">
-      <button ejs-button appHideBeforeSyncfusionLoad id="addIRPCandidate" cssClass="e-primary" (click)="addIRPCandidate()">
+      <button
+        *ngIf="(currentUserPermissions$ | async) as userPermission"
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        id="addIRPCandidate"
+        cssClass="e-primary"
+        [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
+        (click)="addIRPCandidate()"
+      >
         Add Candidate
       </button>
     </div>

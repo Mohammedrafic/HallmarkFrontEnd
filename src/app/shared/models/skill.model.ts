@@ -63,7 +63,7 @@ export class SkillFilters {
   orderBy?: string;
   includeInIRP?: boolean;
   includeInVMS?: boolean;
-  skillCodes?: string[];
+  skillCode?: string[];
 }
 
 export class MasterSkillFilters {
@@ -119,4 +119,25 @@ export interface AssignedSkillsByOrganization  {
   skillAbbr: string;
   skillDescription: string;
   name: string
+}
+
+export interface IrpPrimarySkill {
+  id: number;
+  businessUnitId: number;
+  skillAbbr: string;
+  skillDescription: string;
+  isDefault: boolean;
+}
+
+export interface MasterSkill {
+  id: number;
+  name: string;
+  description: string;
+  abbr: string;
+  organizationId: number;
+  skillCategoryId: number;
+  skillCode: string;
+  skillCategoryName: string;
+  includeInIRP: boolean;
+  includeInVMS: boolean;
 }

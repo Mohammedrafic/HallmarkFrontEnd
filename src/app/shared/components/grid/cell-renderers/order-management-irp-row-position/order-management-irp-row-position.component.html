@@ -1,0 +1,35 @@
+<ng-container *ngIf="displayRows.length; else emptyMessageTemplate">
+  <div
+    *ngFor="let data of displayRows"
+    (click)="selectRow($event, data)"
+    class="custom-row">
+    <ng-container *ngFor="let cell of colDefs">
+      <div
+        [ngStyle]="{
+           width: cell.width + 'px',
+           'min-width': cell.minWidth + 'px',
+           'max-width': cell.maxWidth + 'px'
+         }"
+        class="custom-cell">
+        <ng-container *ngIf="cell.field !== 'candidateStatus'; else statusCell">
+          <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
+          <h3 class="custom-cell__title">{{ cell.headerName }}</h3>
+        </ng-container>
+        <ng-template #statusCell>
+          <ng-container *ngIf="data[cell?.field || ''] as cellValue">
+            <ejs-chiplist>
+              <e-chips>
+                <e-chip [text]="cellValue" [cssClass]="(cellValue | chipsCssClass)"></e-chip>
+              </e-chips>
+            </ejs-chiplist>
+          </ng-container>
+        </ng-template>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>
+<ng-template #emptyMessageTemplate>
+  <div class="empty-message">
+    <p>{{ emptyMessage }}</p>
+  </div>
+</ng-template>

@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
@@ -125,7 +125,8 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
     private filterService: FilterService,
-    private regionService:RegionService
+    private regionService: RegionService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     super();
 
@@ -141,12 +142,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
     });
 
-    this.store.dispatch(new GetMasterRegions());
-    this.masterRegions$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.masterRegion = data;
-      ;
-
-    });
+    this.getMasterRegionData();
     this.filterColumns = {
 
       names: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
@@ -167,7 +163,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
       this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
         .subscribe((data) => {
           this.defaultValue = data.organizationManagement.regions[0]?.id;
-        });;
+        });
     });
 
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
@@ -192,7 +188,24 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     }
   }
 
-
+  public getMasterRegionData() {
+    this.store.dispatch(new GetMasterRegions());
+    this.masterRegions$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.masterRegion = data;
+      this.regions$.subscribe((regionsData) => {
+        let filterMasterData: Region[] = [];
+        if (regionsData && regionsData.length > 0) {
+          let regionNameData = regionsData.map(x => x.name);
+          let masterData = data;
+          filterMasterData = masterData.filter((item) => {
+            return !regionNameData.includes(item.name);
+          });
+          this.masterRegion = filterMasterData;
+        }
+        this.changeDetectorRef.detectChanges();
+      });
+    });
+  }
 
   public override updatePage(): void {
     this.getRegions();
@@ -275,10 +288,9 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     this.filters.orderBy = this.orderBy;
     this.filters.pageNumber = this.currentPage;
     this.filters.pageSize = this.pageSize;
-    this.store.dispatch([
-      new GetRegions(this.filters),
-
-    ]);
+    this.store.dispatch([new GetRegions(this.filters)]).pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data) => {
+      });
   }
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
@@ -341,6 +353,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
       .subscribe((confirm) => {
         if (confirm && region.id ) {
           this.store.dispatch(new DeleteRegionById(region.id));
+          this.getMasterRegionData();
           this.regionFormGroup.reset();
         }
         this.removeActiveCssClass();

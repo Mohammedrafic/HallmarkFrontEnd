@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { Credential } from "@shared/models/credential.model";
 import { ConfirmService } from '@shared/services/confirm.service';
 import { filter } from 'rxjs';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -14,10 +15,11 @@ import { IOrderCredential, IOrderCredentialItem } from './types';
   templateUrl: './order-credentials.component.html',
   styleUrls: ['./order-credentials.component.scss'],
 })
-export class OrderCredentialsComponent implements OnChanges {
+export class OrderCredentialsComponent {
   @ViewChild('addCred') addCred: AddOrderCredentialFormComponent;
   @ViewChild('editCred') editCred: EditOrderCredentialFormComponent;
   @Input() credentials: IOrderCredentialItem[];
+  @Input() includeInIRP = false;
   @Input() isActive = false;
   @Output() credentialChanged: EventEmitter<IOrderCredentialItem> = new EventEmitter();
   @Output() credentialDeleted: EventEmitter<IOrderCredentialItem> = new EventEmitter();
@@ -41,14 +43,21 @@ export class OrderCredentialsComponent implements OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-  }
-
   public addNew(): void {
     this.credentialFormHeader = 'Add Credential';
     this.isEditMode = false;
     this.showForm = true;
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  public prePopulateData(data: Credential): void {
+    const { comment = '', reqSubmission = false, reqOnboard = false, optional = false } = data;
+    this.CredentialForm.patchValue({
+      comment,
+      reqForSubmission: reqSubmission,
+      reqForOnboard: reqOnboard,
+      optional,
+    });
   }
 
   public onEdit(credential: IOrderCredentialItem): void {
@@ -124,7 +133,7 @@ export class OrderCredentialsComponent implements OnChanges {
     this.isEditMode = false;
   }
 
-  
+
   private resetToDefault(): void {
     this.CredentialForm.setValue({
       credentialId: 0,

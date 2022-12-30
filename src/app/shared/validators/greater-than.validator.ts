@@ -1,11 +1,12 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { DateTimeHelper } from '@core/helpers';
 
 export function greaterThanValidator(primaryControlName: string, secondaryControlName: string): ValidatorFn {
   return (formGroup: AbstractControl): ValidationErrors | null => {
     const primaryControl = formGroup.get(primaryControlName)!;
     const secondaryControl = formGroup.get(secondaryControlName)!;
-    const primaryControlValue = parseFloat(primaryControl?.value);
-    const secondaryControlValue = parseFloat(secondaryControl?.value);
+    const primaryControlValue = adaptValue(primaryControl?.value);
+    const secondaryControlValue = adaptValue(secondaryControl?.value);
     const invalidTimeError = { invalidTime: true };
 
     if (!Boolean(primaryControl && secondaryControl && primaryControlValue && secondaryControlValue)) {
@@ -32,4 +33,11 @@ export function greaterThanValidator(primaryControlName: string, secondaryContro
 
     return null;
   };
+}
+
+function adaptValue(value: Date | string): number {
+  if (value instanceof Date) {
+    return DateTimeHelper.convertDateToUtc(value.toString()).getTime();
+  }
+  return parseFloat(value);
 }

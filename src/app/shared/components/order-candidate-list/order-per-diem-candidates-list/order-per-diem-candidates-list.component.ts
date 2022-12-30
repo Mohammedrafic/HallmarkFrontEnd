@@ -1,14 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+
 import { Store } from '@ngxs/store';
 import { distinctUntilChanged, filter, merge, Subject, takeUntil } from 'rxjs';
 
-import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { IrpOrderCandidate, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { UserState } from 'src/app/store/user.state';
+import { OrderCandidateApiService } from '../order-candidate-api.service';
+import { PageOfCollections } from '@shared/models/page.model';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-order-per-diem-candidates-list',
@@ -16,13 +20,22 @@ import { UserState } from 'src/app/store/user.state';
   styleUrls: ['./order-per-diem-candidates-list.component.scss'],
 })
 export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit {
+  @Input() selectedOrder: Order;
+
   public templateState: Subject<any> = new Subject();
   public candidate: OrderCandidatesList;
   public candidateJob: OrderCandidateJob | null;
   public agencyActionsAllowed: boolean;
+  public irpCandidates: PageOfCollections<IrpOrderCandidate>;
+  public isFeatureIrpEnabled = false;
 
-  constructor(protected override store: Store, protected override router: Router) {
+  constructor(
+    protected override store: Store,
+    protected override router: Router,
+    private candidateApiService: OrderCandidateApiService,
+    ) {
     super(store, router);
+    this.setIrpFeatureFlag();
   }
 
   override ngOnInit(): void {
@@ -31,6 +44,10 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
 
     if (this.isAgency) {
       this.checkForAgencyStatus();
+    }
+
+    if (this.selectedOrder.isIRPOnly) {
+      this.getIrpCandidates();
     }
   }
 
@@ -92,5 +109,19 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     .subscribe((value) => {
       this.agencyActionsAllowed = value;
     });
+  }
+
+  private getIrpCandidates(): void {
+    this.candidateApiService.getIrpCandidates(this.selectedOrder.irpOrderMetadata?.orderId as number)
+    .pipe(
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((candidates) => {
+      this.irpCandidates = candidates;
+    });
+  }
+
+  private setIrpFeatureFlag(): void {
+    this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   }
 }

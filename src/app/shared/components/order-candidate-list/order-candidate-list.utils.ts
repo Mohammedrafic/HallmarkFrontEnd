@@ -1,5 +1,8 @@
-import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
-import { ApplicantStatus as AvailableStatus } from "@shared/models/order-management.model";
+import { DateTimeHelper } from '@core/helpers';
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as AvailableStatus, IrpOrderCandidate, IrpOrderCandidateDto,
+} from '@shared/models/order-management.model';
+import { PageOfCollections } from '@shared/models/page.model';
 
 export const getCandidatePositionId = (organizationPrefix: string, publicId: number, positionId: number): string => {
   if (organizationPrefix) {
@@ -27,8 +30,33 @@ export const hasEditOrderBillRatesPermission = (applicantStatus: ApplicantStatus
     || applicantStatus === ApplicantStatus.BillRatePending
     || applicantStatus === ApplicantStatus.OfferedBR
   ) {
-    return !!statuses.find(status => status.applicantStatus === ApplicantStatus.OnBoarded)
+    return !!statuses.find(status => status.applicantStatus === ApplicantStatus.OnBoarded);
   }
 
   return true;
-}
+};
+
+export const AdaptIrpCandidates = (
+  response: PageOfCollections<IrpOrderCandidateDto>): PageOfCollections<IrpOrderCandidate> => {
+  const candidatesData: PageOfCollections<IrpOrderCandidate> = {
+    ...response,
+    items: response.items.map((candidate) => {
+      const timeFormat = 'HH:mm';
+      const lastTimeFrom = DateTimeHelper.formatDateUTC(candidate.lastShiftFrom, timeFormat);
+      const lastTimeTo = DateTimeHelper.formatDateUTC(candidate.lastShiftTo, timeFormat);
+      const nextTimeFrom = DateTimeHelper.formatDateUTC(candidate.nextShiftFrom, timeFormat);
+      const nextTimeTo = DateTimeHelper.formatDateUTC(candidate.nextShiftTo, timeFormat);
+  
+  
+      const irpCandidate: IrpOrderCandidate = {
+        ...candidate,
+        lastShiftTime: `${lastTimeFrom} - ${lastTimeTo}`,
+        nextShiftTime: `${nextTimeFrom} - ${nextTimeTo}`,
+      };
+  
+      return irpCandidate;
+    }),
+  };
+
+  return candidatesData;
+};

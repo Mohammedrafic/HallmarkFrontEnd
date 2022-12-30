@@ -37,6 +37,7 @@ export const STATUS_COLOR_GROUP = {
     'in progress (pending)',
     'ex',
     'OnHold',
+    'On Hold',
     INVOICES_STATUSES.PENDING_PAYMENT,
     TIMETHEETS_STATUSES.NO_MILEAGES_EXIST,
   ], // yellow
@@ -84,6 +85,13 @@ export enum CandidateStatus {
   Inactive,
   Active,
   Incomplete,
+}
+
+export enum EmployeeStatus {
+  Inactive,
+  Active,
+  'On Hold',
+  Terminated
 }
 
 export enum CreatedCandidateStatus {

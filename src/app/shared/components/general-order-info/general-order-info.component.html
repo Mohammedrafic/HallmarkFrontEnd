@@ -1,77 +1,165 @@
-<section class="candidates-info" *ngIf="orderInformation">
-  <div class="container-row" [class.extension]="orderInformation.extensionFromId"
-       [ngSwitch]="orderInformation.orderType">
-    <ng-container *ngSwitchCase="orderType.PermPlacement">
-      <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="orderPlacementFee"></ng-container>
-      <ng-container [ngTemplateOutlet]="annualSalaryRange"></ng-container>
-      <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
-    </ng-container>
+<ng-container *ngIf="!orderInformation.isIRPOnly; else irpOrderInfo">
+  <section class="candidates-info" *ngIf="orderInformation">
+    <div
+      class="container-row"
+      [class.extension]="orderInformation.extensionFromId"
+      [ngSwitch]="orderInformation.orderType"
+    >
+      <ng-container *ngSwitchCase="orderType.PermPlacement">
+        <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="region"></ng-container>
+        <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="orderPlacementFee"></ng-container>
+        <ng-container [ngTemplateOutlet]="annualSalaryRange"></ng-container>
+        <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
+      </ng-container>
 
-    <ng-container *ngSwitchDefault>
-      <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
-      <div class="column last-column">
-        <ng-container [ngTemplateOutlet]="billRate"></ng-container>
+      <ng-container *ngSwitchDefault>
+        <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="region"></ng-container>
+        <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
+        <div class="column last-column">
+          <ng-container [ngTemplateOutlet]="billRate"></ng-container>
+        </div>
+        <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
+        <div class="column last-column"></div>
+        <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
+      </ng-container>
+    </div>
+  </section>
+  <section class="candidates-additional-info" *ngIf="orderInformation">
+    <div class="container-row justify-content-space-between">
+      <div class="column">
+        <div class="title">{{ orderType[orderInformation.orderType] }}</div>
+        <div class="sup-title">Job Type</div>
       </div>
+      <div class="column" *ngIf="!orderInformation.extensionFromId">
+        <div class="title accent positions">
+          {{ orderInformation.acceptedPositions }} / {{ orderInformation.openPositions }}
+        </div>
+        <div class="sup-title">Open Positions</div>
+      </div>
+      <div class="column">
+        <div class="title">
+          {{ orderInformation.shiftStartTime | date: 'HH:mm':'UTC' }} -
+          {{ orderInformation.shiftEndTime | date: 'HH:mm':'UTC' }}
+        </div>
+        <div class="sup-title">Shift</div>
+      </div>
+      <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
+        <div class="title">
+          ${{ orderInformation.joiningBonus || 0 | currency: '':'' }} / ${{
+            orderInformation.compBonus || 0 | currency: '':''
+          }}
+        </div>
+        <div class="sup-title">Start / End Bonus</div>
+      </div>
+      <ng-container *ngIf="orderInformation.orderType !== orderType.ReOrder">
+        <div class="column">
+          <div class="title">{{ activeValue(orderInformation.onCallRequired) }}</div>
+          <div class="sup-title">Oncall</div>
+        </div>
+        <div class="column">
+          <div class="title">{{ orderInformation.asapStart ? 'Yes' : 'No' }}</div>
+          <div class="sup-title">ASAP Start</div>
+        </div>
+        <div class="column">
+          <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No' }}</div>
+          <div class="sup-title">Critical Order</div>
+        </div>
+        <div class="column">
+          <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
+          <div class="sup-title">Distributed On</div>
+        </div>
+      </ng-container>
+    </div>
+  </section>
+</ng-container>
+
+<ng-template #irpOrderInfo>
+  <section class="candidates-info" *ngIf="orderInformation">
+    <div
+      class="container-row"
+      [class.extension]="orderInformation.extensionFromId"
+      [ngSwitch]="orderInformation.orderType"
+    >
+      <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
+      <div class="column">
+        <div class="icon">
+          <i-feather name="folder" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation.regionName }}</div>
+          <div class="sup-title">Region</div>
+        </div>
+      </div>
+      <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="region"></ng-container>
+      <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
       <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
       <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
-    </ng-container>
-  </div>
-</section>
-<section class="candidates-additional-info" *ngIf="orderInformation">
-  <div class="container-row justify-content-space-between">
-    <div class="column">
-      <div class="title">{{ orderType[orderInformation.orderType] }}</div>
-      <div class="sup-title">Job Type</div>
-    </div>
-    <div class="column" *ngIf="!orderInformation.extensionFromId">
-      <div class="title accent positions">{{ orderInformation.acceptedPositions }} / {{ orderInformation.openPositions }}</div>
-      <div class="sup-title">Open Positions</div>
-    </div>
-    <div class="column">
-      <div class="title">
-        {{ orderInformation.shiftStartTime | date: 'hh:mm a':'UTC' }} -
-        {{ orderInformation.shiftEndTime | date: 'hh:mm a':'UTC' }}
-      </div>
-      <div class="sup-title">Shift</div>
-    </div>
-    <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
-      <div class="title">
-        ${{ orderInformation.joiningBonus || 0 | currency: '':'' }} / ${{
-          orderInformation.compBonus || 0 | currency: '':''
-        }}
-      </div>
-      <div class="sup-title">Start / End Bonus</div>
-    </div>
-    <ng-container *ngIf="orderInformation.orderType !== orderType.ReOrder">
       <div class="column">
-        <div class="title">{{ activeValue(orderInformation.onCallRequired) }}</div>
-        <div class="sup-title">Oncall</div>
+        <div class="icon">
+          <i-feather name="folder" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">
+            {{ orderInformation.shiftStartTime | date: 'HH:mm':'utc' }} -
+            {{ orderInformation.shiftEndTime | date: 'HH:mm':'utc' }}
+          </div>
+          <div class="sup-title">Shift</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="candidates-additional-info" *ngIf="orderInformation">
+    <div class="container-row justify-content-space-between">
+      <div class="column">
+        <div class="title">{{ orderInformation.onCallRequired | boolValueToText }}</div>
+        <div class="sup-title">On-Call</div>
       </div>
       <div class="column">
-        <div class="title">{{ orderInformation.asapStart ? 'Yes' : 'No' }}</div>
+        <div class="title">{{ orderInformation.asapStart | boolValueToText }}</div>
         <div class="sup-title">ASAP Start</div>
       </div>
       <div class="column">
-        <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No'}}</div>
+        <div class="title">{{ orderInformation.criticalOrder | boolValueToText }}</div>
         <div class="sup-title">Critical Order</div>
       </div>
       <div class="column">
-        <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
+        <div class="title">{{ orderInformation.contact || false | boolValueToText }}</div>
+        <div class="sup-title">Contract</div>
+      </div>
+
+      <div class="column">
+        <div class="title">{{ orderInformation.weekend || false | boolValueToText }}</div>
+        <div class="sup-title">Weekend</div>
+      </div>
+
+      <div class="column">
+        <div class="title">{{ orderInformation.holiday || false | boolValueToText }}</div>
+        <div class="sup-title">Holiday</div>
+      </div>
+
+      <div class="column">
+        <div class="title">{{ (orderInformation.creationDate | date: 'MM/dd/yyy':'UTC') || '-' }}</div>
+        <div class="sup-title">Creation Date</div>
+      </div>
+
+      <div class="column">
+        <div class="title">{{ (orderInformation.distributedOn | date: 'MM/dd/yyy':'UTC') || '-' }}</div>
         <div class="sup-title">Distributed On</div>
       </div>
-    </ng-container>
-  </div>
-</section>
+    </div>
+  </section>
+</ng-template>
 
 <ng-template #jobInfoTemplate>
   <div class="column">
@@ -116,9 +204,9 @@
     </div>
     <div>
       <div class="title">
-        {{ orderInformation.jobStartDate | date: 'MM/dd/yyy': 'utc' }}
+        {{ orderInformation.jobStartDate | date: 'MM/dd/yyy':'utc' }}
         <ng-container *ngIf="!hideEndDate">
-          -&nbsp;{{ orderInformation.jobEndDate | date: 'MM/dd/yyy': 'utc' }}
+          -&nbsp;{{ orderInformation.jobEndDate | date: 'MM/dd/yyy':'utc' }}
         </ng-container>
       </div>
       <div class="sup-title">
@@ -140,7 +228,7 @@
       <i-feather name="briefcase" class="icon"></i-feather>
     </div>
     <div>
-      <div class="title">{{ orderInformation.orderRequisitionReasonName || '-'}}</div>
+      <div class="title">{{ orderInformation.orderRequisitionReasonName || '-' }}</div>
       <div class="sup-title">Reason for Requisition</div>
     </div>
   </div>
@@ -164,7 +252,9 @@
       <i-feather name="percent" class="icon"></i-feather>
     </div>
     <div>
-      <div class="title">{{ orderInformation?.orderPlacementFee ? orderInformation?.orderPlacementFee + '%' : '-'}}</div>
+      <div class="title">
+        {{ orderInformation?.orderPlacementFee ? orderInformation?.orderPlacementFee + '%' : '-' }}
+      </div>
       <div class="sup-title">Order Placement Fee</div>
     </div>
   </div>
@@ -186,19 +276,29 @@
 </ng-template>
 
 <ng-template #billRate>
-  <div class="cost">${{ orderInformation.hourlyRate | number : '1.2-2'}}</div>
+  <div class="cost">${{ orderInformation.hourlyRate | number: '1.2-2' }}</div>
   <div class="sup-title">Bill Rate</div>
 </ng-template>
 
 <ng-template #orderInfo>
   <div class="column" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension">
     <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
-      Initial Order ID: {{ orderInformation.organizationPrefix }}-{{
-      orderInformation?.extensionInitialOrderPublicId
-      }}
+      Initial Order ID: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionInitialOrderPublicId }}
     </div>
     <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
       Previous Extension: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #region>
+  <div class="column">
+    <div class="icon">
+      <i-feather name="map-pin" class="icon"></i-feather>
+    </div>
+    <div>
+      <div class="title">{{ orderInformation.regionName }}</div>
+      <div class="sup-title">Region</div>
     </div>
   </div>
 </ng-template>

@@ -1,1 +1,26 @@
-<p>general-notes works!</p>
+<app-grid
+  title="General Notes"
+  [rowData]="generalNotes$ | async"
+  [columnDefinitions]="columnDef"
+  [rowSelection]="rowSelection"
+  [totalRecordsCount]="(generalNotes$ | async)?.length!"
+>
+  <button
+    action-button
+    class="add-action"
+    cssClass="e-action-button"
+    ejs-button
+    (click)="addNote()"
+  >
+    <i-feather name="plus" class="icon"></i-feather>
+    Add Note
+  </button>
+</app-grid>
+
+<app-side-dialog
+  [header]="sideDialogTitle$ | async"
+  (formCancelClicked)="onCancel()"
+  (formSaveClicked)="onSave()"
+>
+  <app-add-edit-note *ngIf="isSideDialogOpened$ | async" #addEditNoteComponent></app-add-edit-note>
+</app-side-dialog>

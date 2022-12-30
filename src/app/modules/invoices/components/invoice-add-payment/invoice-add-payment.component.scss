@@ -2,6 +2,7 @@
 @import 'mixins';
 @import '@ag-grid-community/core/dist/styles/ag-grid.scss';
 @import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
+@import "adaptive-response";
 
 .dialog-container {
   padding: 24px;
@@ -106,6 +107,13 @@
   .custom-scroll {
     overflow-y: auto;
   }
+
+  .custom-wrap {
+    .ag-header-cell-text {
+      text-overflow: initial !important;
+      white-space: normal !important;
+    }
+  }
 }
 
 .form-container {
@@ -144,4 +152,15 @@
 .amount-text {
   font-weight: 700;
   color: $black;
+}
+
+
+@media #{$max-mobile} {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wide {
+    margin-top: 12px;
+  }
 }

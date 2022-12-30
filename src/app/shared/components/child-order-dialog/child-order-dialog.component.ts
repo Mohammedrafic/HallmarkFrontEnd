@@ -12,6 +12,12 @@ import {
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
+
+import { DateTimeHelper } from "@core/helpers";
+import { OrganizationManagementState } from "@organization-management/store/organization-management.state";
+import { ExpiredCredentialsMessage } from "@shared/components/child-order-dialog/child-order-dialog.constants";
+import { ChildOrderDialogService } from "@shared/components/child-order-dialog/child-order-dialog.service";
+import { MissingCredentialsRequestBody, MissingCredentialsResponse } from "@shared/models/credential.model";
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { AbstractPermission } from "@shared/helpers/permissions";
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
@@ -25,7 +31,7 @@ import {
 } from '@syncfusion/ej2-angular-navigations';
 import { ClearAgencyCandidateJob, ClearAgencyOrderCandidatesList, GetAgencyExtensions, GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
+import { ReOpenOrderService } from '@client/order-management/components/reopen-order/reopen-order.service';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
@@ -83,7 +89,6 @@ import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
-import { DateTimeHelper } from '@core/helpers';
 
 enum Template {
   accept,
@@ -182,7 +187,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public readonly orderStatus = OrderStatus;
 
   private isAlive = true;
-  private isLastExtension: boolean = false;
+  private isLastExtension = false;
+  private ignoreMissingCredentials = false;
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
@@ -236,7 +242,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     private orderCandidateListViewService: OrderCandidateListViewService,
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private childOrderDialogService: ChildOrderDialogService,
   ) {
     super(store);
   }
@@ -398,7 +405,27 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   public showExtensionDialog(): void {
-    this.isExtensionSidebarShown = true;
+    const isVMCEnabled = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences.isVMCEnabled;
+    const isIrpFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+
+    this.ignoreMissingCredentials = false;
+
+    if (isIrpFlagEnabled && !isVMCEnabled) {
+      this.isExtensionSidebarShown = true;
+
+      return;
+    }
+
+    this.childOrderDialogService.getMissingCredentials(this.getMissingCredentialsRequestBody())
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((response: MissingCredentialsResponse) => {
+        if (response.missingCredentials.length) {
+          this.showMissingCredentialsWarningMessage();
+        } else {
+          this.isExtensionSidebarShown = true;
+          this.changeDetectorRef.markForCheck();
+        }
+      });
   }
 
   public closeExtensionSidebar(): void {
@@ -409,9 +436,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
+        .pipe(filter(Boolean))
         .subscribe(() => {
           this.isExtensionSidebarShown = false;
+          this.changeDetectorRef.markForCheck();
         });
     } else {
       this.isExtensionSidebarShown = false;
@@ -419,7 +447,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   public saveExtension(): void {
-    this.extensionSidebarComponent.saveExtension(this.sideDialog);
+    this.extensionSidebarComponent.saveExtension(this.sideDialog, this.ignoreMissingCredentials);
   }
 
   public getExtensions(): void {
@@ -598,7 +626,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private getComments(): void {
-    this.commentsService
+    this.candidateJob?.commentContainerId && this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((comments: Comment[]) => {
@@ -752,5 +780,30 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public clearCandidateJobState(): void {
     const ClearCandidateJob = this.isAgency ? ClearAgencyCandidateJob : ClearOrganisationCandidateJob;
     this.store.dispatch(new ClearCandidateJob());
+  }
+
+  private showMissingCredentialsWarningMessage(): void {
+    this.confirmService
+      .confirm(ExpiredCredentialsMessage, {
+        title: 'Add Extension',
+        okButtonLabel: 'Yes',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(filter(Boolean))
+      .subscribe(() => {
+        this.isExtensionSidebarShown = true;
+        this.ignoreMissingCredentials = true;
+        this.changeDetectorRef.markForCheck();
+      });
+  }
+
+  private getMissingCredentialsRequestBody(): MissingCredentialsRequestBody {
+    return {
+      orderId: this.order.orderId || this.order.id,
+      candidateProfileId: this.candidate.candidateId,
+      validateForDate: DateTimeHelper.setInitHours(
+        DateTimeHelper.toUtcFormat(addDays(this.candidateJob?.actualEndDate as string, 1) as Date)
+      ),
+    };
   }
 }

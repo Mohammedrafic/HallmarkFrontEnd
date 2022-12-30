@@ -8,6 +8,20 @@
   }
 }
 
+@media #{$max-mobile} {
+  .candidate-title {
+    margin-bottom: 16px !important;
+  }
+
+  .candidat-status {
+    flex-direction: column;
+  }
+
+  .bill-rates {
+    margin-bottom: 90px;
+  }
+}
+
 .button-container {
   button:not(:last-child) {
     margin-right: 12px;
@@ -44,7 +58,7 @@
   display: none;
   border-top: 1px solid $secondary-dark-blue-45;
 
-  &.tab{
+  &.tab {
     bottom: 0;
   }
 
@@ -66,6 +80,19 @@
   }
 }
 
+.flex-width {
+  @media #{$max-tablet} {
+    min-width: 50px !important;
+  }
+}
+
+.flex-width-date {
+  @media #{$max-tablet} {
+    overflow: hidden;
+    min-width: 80px !important;
+  }
+}
+
 @media (max-width: $tablet-min) {
   .extension-container {
     padding: 0 !important;
@@ -75,4 +102,3 @@
     flex-direction: column;
   }
 }
-

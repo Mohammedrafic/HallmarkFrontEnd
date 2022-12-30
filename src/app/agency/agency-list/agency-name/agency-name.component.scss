@@ -1,0 +1,13 @@
+.agency-name {
+  display: flex;
+  align-items: center;
+
+  .e-chip {
+    width: 100%;
+    margin-left: 15px;
+
+    &.msp-chip {
+      width: 70px;
+    }
+  }
+}

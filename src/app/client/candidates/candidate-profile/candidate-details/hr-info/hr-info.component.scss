@@ -1,7 +1,17 @@
 .hr-info__form {
   display: grid;
-  grid-auto-flow: row;
   grid-gap: 12px;
-  grid-template-columns: repeat(4, 1fr);
-  grid-row-gap: 30px;
+
+  &_first {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 12px;
+  }
+
+  &_second {
+    display: grid;
+    grid-template-columns: 110px 160px 160px;
+    grid-gap: 12px;
+    align-items: center;
+  }
 }

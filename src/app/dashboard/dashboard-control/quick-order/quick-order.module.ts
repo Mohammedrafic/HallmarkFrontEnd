@@ -9,11 +9,12 @@ import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angula
 import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { FeatherModule } from 'angular-feather';
-import { Edit3 } from 'angular-feather/icons';
+import { Edit3, X } from 'angular-feather/icons';
 import { SharedModule } from '@shared/shared.module';
 import { SettingsViewService } from '@shared/services';
 import { QuickOrderService } from './services';
 import { AccordionModule } from '@syncfusion/ej2-angular-navigations';
+import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 
 @NgModule({
   imports: [
@@ -27,12 +28,13 @@ import { AccordionModule } from '@syncfusion/ej2-angular-navigations';
     TimePickerModule,
     TextBoxModule,
     NumericTextBoxModule,
-    FeatherModule.pick({Edit3}),
+    FeatherModule.pick({Edit3, X}),
     SharedModule,
-    AccordionModule
+    AccordionModule,
+    ValidateDirectiveModule
   ],
   declarations: [QuickOrderComponent, QuickOrderFormComponent],
   exports: [QuickOrderComponent],
-  providers: [SettingsViewService,QuickOrderService]
+  providers: [SettingsViewService, QuickOrderService]
 })
 export class QuickOrderModule {}

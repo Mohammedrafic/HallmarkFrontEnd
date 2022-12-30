@@ -1,0 +1,76 @@
+@import "src/app/styles/variables/colors";
+
+.records {
+  display: flex;
+
+  &-list {
+    width: 20%;
+    border-right: 1px solid $grid-row-border;
+
+    &__item {
+      display: flex;
+      align-items: center;
+      padding-left: 24px;
+      overflow: hidden;
+
+      .job-title {
+        display: grid;
+        width: 214px;
+        align-items: center;
+        grid-template-columns: auto auto;
+        padding-right: 25px;
+
+        &__text {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      .alert-icon {
+        color: $supportive-red;
+      }
+    }
+
+    .e-listbox-wrapper {
+      .e-list-item {
+        height: 50px;
+        display: flex;
+        align-items: center;
+
+        &:not(:last-child) {
+          border-bottom: 1px solid $secondary-dark-blue-45;
+        }
+
+        &:hover:not(.e-selected):not(.e-disabled), {
+          background-color: $primary-active-blue-70;
+        }
+
+        &.e-selected {
+          background-color: $primary-active-blue;;
+          color: $white;
+        }
+      }
+    }
+  }
+
+  &-grids {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(8, auto);
+    grid-row-gap: 20px;
+    width: 100%;
+    margin: 24px;
+
+    .records-grid {
+        display: flex;
+        height: 123px;
+        flex-direction: column;
+
+      &.title {
+        height: 154px;
+      }
+    }
+
+  }
+}

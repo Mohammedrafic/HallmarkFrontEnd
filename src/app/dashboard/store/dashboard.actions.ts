@@ -41,3 +41,13 @@ export class SwitchMonthWeekTimeSelection {
 export class GetAllSkills {
   static readonly type = `${dashboardStatePrefix} Get All Skills`;
 }
+
+export class GetOrganizationSkills {
+  static readonly type = `${dashboardStatePrefix} Get Organization Skill`;
+  constructor(public readonly businessUnitId?: number ) {}
+}
+
+export class ToggleQuickOrderDialog {
+  static readonly type = `${dashboardStatePrefix} Toggle Quick Order Dialog`;
+  constructor(public readonly isOpen: boolean ) {}
+}

@@ -17,7 +17,7 @@ export class TimesheetsService {
   /**
    * TODO: remove any.
    */
-  private currentSelectedTableRowIndex: BaseObservable<number> = new BaseObservable<number>(null as any);
+  private currentSelectedTableRowIndex: BaseObservable<number> = new BaseObservable<number>(null as unknown as number);
 
   constructor(
     private fb: FormBuilder,

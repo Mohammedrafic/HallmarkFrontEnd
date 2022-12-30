@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-
 import { AgGridModule } from '@ag-grid-community/angular';
 import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
@@ -11,7 +10,8 @@ import { NgxsModule } from '@ngxs/store';
 import { FeatherModule } from 'angular-feather';
 import { DialogAllModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ButtonModule, CheckBoxModule, ChipListModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
-import { DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { DateTimePickerModule, TimePickerModule,
+  DatePickerModule, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { FileText, ChevronRight, AlignJustify, Briefcase, Calendar, CheckCircle, ChevronDown,
   Copy, Download, Edit, Edit3, Folder, Lock, MapPin, Menu, MessageSquare, MoreVertical, Plus, Search, Sliders, Trash2,
@@ -21,7 +21,6 @@ import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 import { NumericTextBoxModule, TextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
-import { DatePickerModule, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { AccumulationChartAllModule, ChartAllModule } from '@syncfusion/ej2-angular-charts';
 
 import { ControlConverterModule } from '@shared/pipes/control-converter/control-converter.module';
@@ -76,8 +75,8 @@ import { RecordStatusCellComponent } from './components/cell-editors/record-stat
 import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
 import { UploadDocumentsComponent } from './components/upload-documents/upload-documents.component';
 import { TimesheetDetailsTableService } from './services';
-import { SwitchEditorComponent } from './components/cell-editors/switch-editor/switch-editor.component';
 import { UploadFileAreaModule } from '@shared/components/upload-file-area/upload-file-area.module';
+import { SwitchEditorModule } from '@shared/components/switch-editor/switch-editor.module';
 
 const gridIcons = {
   MessageSquare,
@@ -129,7 +128,6 @@ const gridIcons = {
     TimesheetsTabsComponent,
     RecordStatusCellComponent,
     UploadDocumentsComponent,
-    SwitchEditorComponent,
   ],
   imports: [
     CommonModule,
@@ -171,7 +169,8 @@ const gridIcons = {
     RejectReasonInputDialogModule,
     TableStatusCellModule,
     TooltipContainerModule,
-    UploadFileAreaModule
+    UploadFileAreaModule,
+    SwitchEditorModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

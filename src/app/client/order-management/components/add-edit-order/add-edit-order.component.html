@@ -1,0 +1,71 @@
+<ejs-tab class="stepper" #stepper (created)="onStepperCreated()">
+  <e-tabitems>
+    <e-tabitem>
+      <ng-template #headerText>
+        <div class="stepper-header">
+          <div class="stepper-title">Order Details<span class="required">*</span></div>
+          <div class="stepper-sub-title">Overall Order Info</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        <ng-container>
+          <section class="order-details-form-section">
+            <app-order-details-form
+              #orderDetailsForm
+              (orderTypeChanged)="onOrderTypeChange($event)"
+              [disableOrderType]="disableOrderType"
+              [isActive]="selectedTab === SelectedTab.OrderDetails"
+              (hourlyRateSync)="hourlyRateToBillRateSync($event)"
+            ></app-order-details-form>
+          </section>
+        </ng-container>
+      </ng-template>
+    </e-tabitem>
+
+    <e-tabitem>
+      <ng-template #headerText>
+        <div class="stepper-header">
+          <div class="stepper-title">Credentials<span class="required">*</span></div>
+          <div class="stepper-sub-title">Set Credentials</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        <app-order-credentials
+          [isActive]="selectedTab === SelectedTab.Credentials"
+          [credentials]="orderCredentials"
+          (credentialChanged)="updateOrderCredentials($event)"
+          (credentialDeleted)="deleteOrderCredential($event)"
+        ></app-order-credentials>
+      </ng-template>
+    </e-tabitem>
+
+    <e-tabitem>
+      <ng-template #headerText>
+        <div class="stepper-header">
+          <div class="stepper-title">Bill Rates<span class="required">*</span></div>
+          <div class="stepper-sub-title">Set Bill Rates</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        <section class="bill-rates-section">
+          <app-bill-rates
+            #billRates
+            [billRates]="orderBillRates"
+            [isActive]="selectedTab === SelectedTab.BillRates"
+            [isOrderPage]="true"
+            (billRatesChanged)="onBillRatesChanged()"
+            (hourlyRateSync)="hourlyRateToOrderSync($event)"
+          >
+          </app-bill-rates>
+        </section>
+      </ng-template>
+    </e-tabitem>
+  </e-tabitems>
+</ejs-tab>
+
+<app-save-template-dialog
+  *ngIf="isSaveForTemplate"
+  [order]="generalInformationForm"
+  (closeEmitter)="closeSaveTemplateDialog()"
+  (createEmitter)="createTemplate($event)"
+></app-save-template-dialog>

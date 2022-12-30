@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import lodashMap from 'lodash/fp/map';
 import lodashMapPlain from 'lodash/map';
@@ -53,6 +53,7 @@ import { DashboartFilterDto } from '../models/dashboard-filter-dto.model';
 import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 import { DateTimeHelper } from '@core/helpers';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 
 @Injectable()
 export class DashboardService {
@@ -340,8 +341,8 @@ export class DashboardService {
     );
   }
 
-  public redirectToUrl(url: string,orderStatus? :number): void {
-    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus} });
+  public redirectToUrl(url: string,orderStatus? :number,status? : string): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: status} });
   }
 
   private getTasksWidgetData(): Observable<string> {
@@ -415,5 +416,12 @@ export class DashboardService {
 
   public getAllSkills(): Observable<AllOrganizationsSkill[]> {
     return this.httpClient.get<AllOrganizationsSkill[]>(`/api/AssignedSkills/forOrganizations`).pipe(map((data) => sortByField(data, 'skillDescription')));
+  }
+
+  public getOrganizationSkills(businessUnitId?: number): Observable<AssignedSkillsByOrganization[]> {
+    const headers = businessUnitId ? new HttpHeaders({ 'selected-businessunit-id': `${businessUnitId}` }) : {};
+    return this.httpClient
+      .get<AssignedSkillsByOrganization[]>('/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit', { headers })
+      .pipe(map((data) => sortByField(data, 'skillDescription')));
   }
 }

@@ -7,7 +7,7 @@ import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { map, Observable, takeUntil, throttleTime } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { distinctUntilChanged, filter } from 'rxjs/operators';
 
 import { DialogAction } from '@core/enums';
 import { Destroyable } from '@core/helpers';
@@ -25,6 +25,12 @@ import { InvoicesContainerService } from '../../services/invoices-container/invo
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesState } from '../../store/state/invoices.state';
+import { BreakpointObserverService } from '@core/services';
+import { ItemModel, MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
+import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
+import { MiddleTabletScreenWidth } from '../../constants';
+
 
 @Component({
   selector: 'app-invoice-detail-container',
@@ -67,6 +73,9 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     isActionBtnDisabled: false,
     paymentDetailsOpen: false,
     addPaymentOpen: false,
+    isTablet: false,
+    isMiddleTabletWidth: false,
+    isMobile: false,
   };
 
   public paymentRecords: InvoicePaymentData[] = [];
@@ -75,6 +84,15 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
 
   public paymentDialogTitle = PaymentDialogTitle.Add;
 
+  private resizeObserver: ResizeObserverModel; 
+
+  public targetElement: HTMLElement | null = document.body.querySelector('#main');
+
+  public mobileMenuOptions: ItemModel[] = [
+    { text: MobileMenuItems.Print, id: '0' },
+  ];
+
+
   constructor(
     private cdr: ChangeDetectorRef,
     private chipPipe: ChipsCssClass,
@@ -82,6 +100,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     private invoicesContainerService: InvoicesContainerService,
     private printingService: InvoicePrintingService,
     private chipsCssClass: ChipsCssClass,
+    private breakpointObserver: BreakpointObserverService,
   ) {
     super();
   }
@@ -89,6 +108,9 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   ngOnInit(): void {
     this.isAgency = this.invoicesContainerService.isAgency();
     this.getDialogState();
+    this.getDeviceTypeResolution();
+    this.initResizeObserver();
+    this.listenResizeContent();
   }
 
   public closeInvoiceDetails(): void {
@@ -252,5 +274,39 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);
       this.chipList.text = this.invoiceDetail.meta.invoiceStateText.toUpperCase();
     }
+  }
+
+  private getDeviceTypeResolution(): void {
+    this.breakpointObserver.getBreakpointMediaRanges()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(({ isTablet, isMobile }) => {
+        this.invoiceDetailsConfig.isTablet = isTablet;
+        this.invoiceDetailsConfig.isMobile = isMobile;
+        this.cdr.markForCheck();
+      });
+  }
+
+  public onSelectMenuItem({ item: { text }}: MenuEventArgs): void {
+    if(text === MobileMenuItems.Print) {
+      this.printInvoice();
+    }
+  }
+
+  private initResizeObserver(): void {
+    this.resizeObserver = ResizeObserverService.init(this.targetElement!);
+  }
+
+  private listenResizeContent(): void {
+    this.resizeObserver.resize$
+      .pipe(
+        filter(() => this.invoiceDetailsConfig.isTablet),
+        map((data) => data[0].contentRect.width),
+        distinctUntilChanged(),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((contentWidth) => {
+        this.invoiceDetailsConfig.isMiddleTabletWidth = contentWidth <= MiddleTabletScreenWidth;
+        this.cdr.markForCheck();
+      });
   }
 }

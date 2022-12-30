@@ -73,8 +73,8 @@ export enum PermissionCodes {
 }
 
 export enum PaymentMode {
-  Electronic,
   Check,
+  Electronic,
 }
 
 export enum PaymentDialogTitle {

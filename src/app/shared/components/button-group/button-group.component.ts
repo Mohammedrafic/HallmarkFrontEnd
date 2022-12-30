@@ -15,8 +15,10 @@ export class ButtonGroupComponent {
 
   public trackByFn: TrackByFunction<ButtonModel> = (_: number, btn: ButtonModel) => btn.id;
 
-  btnClick(btn: ButtonModel): void {
+  selectButton(btn: ButtonModel): void {
+    if (!btn.active) {
+      this.buttonChange.emit(btn);
+    }
     this.buttonOptions = this.buttonOptions.map(el => ({ ...el, active: btn.id === el.id }));
-    this.buttonChange.emit(btn);
   }
 }

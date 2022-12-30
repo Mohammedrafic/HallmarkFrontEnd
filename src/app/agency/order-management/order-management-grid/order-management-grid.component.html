@@ -158,6 +158,15 @@
       maxWidth="200"
     ></e-column>
     <e-column
+      field="regionName"
+      headerText="REGION"
+      textAlign="Left"
+      width="150"
+      minWidth="90"
+      maxWidth="200"
+      [visible]="true"
+    ></e-column>
+    <e-column
       field="location"
       headerText="LOCATION"
       textAlign="Left"
@@ -178,11 +187,6 @@
       </ng-template>
       <ng-template #template let-data>
         {{ data.jobStartDate | date: 'MM/dd/yyy':'UTC' }}
-      </ng-template>
-    </e-column>
-    <e-column field="shift" headerText="SHIFT" width="160" minWidth="80" maxWidth="200" [visible]="false">
-      <ng-template #template let-data>
-        <span>{{ data.shiftStartTime | date: 'shortTime' }}-{{ data.shiftEndTime | date: 'shortTime' }}</span>
       </ng-template>
     </e-column>
     <e-column
@@ -225,7 +229,14 @@
     </e-column>
     <e-column field="endDate" headerText="End Date" width="130" minWidth="105" maxWidth="200">
       <ng-template #template let-data>
-        <span>{{ data.endDate | date: formatDate: 'UTC' }}</span>
+        <span>{{ data.endDate | date: formatDate:'UTC' }}</span>
+      </ng-template>
+    </e-column>
+    <e-column field="shiftStartTime" headerText="SHIFT" width="160" minWidth="80" maxWidth="200">
+      <ng-template #template let-data>
+        <span
+          >{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}-{{ data.shiftEndTime | date: 'HH:mm':'UTC' }}</span
+        >
       </ng-template>
     </e-column>
     <e-column
@@ -302,9 +313,7 @@
               (change)="onGoToClick($event)"
             >
             </ejs-numerictextbox>
-            <div class="total-rows">
-              Total Rows: {{ordersPage?.totalCount}}
-            </div>
+            <div class="total-rows">Total Rows: {{ ordersPage?.totalCount }}</div>
           </section>
           <section class="right-side-pager-controls">
             <ejs-pager

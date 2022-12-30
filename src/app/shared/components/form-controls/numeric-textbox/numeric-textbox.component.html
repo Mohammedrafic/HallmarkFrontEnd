@@ -8,7 +8,7 @@
   <div class="input-group">
     <ejs-numerictextbox
       (change)="handleChangeEvent($event)"
-      [decimals]="0"
+      (blur)="onBlur()"
       [formControlName]="controlName"
       [id]="id"
       [max]="max"

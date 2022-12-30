@@ -2,23 +2,38 @@
 <form class="contact-details__form">
   <app-input
     [formGroupInstance]="candidateForm"
-    controlName="address"
+    maxlength="100"
+    controlName="address1"
     id="address"
     label="Address"
   ></app-input>
 
   <app-dropdown
-    [dataSource]="[]"
-    [fields]="fieldsSettings"
+    [dataSource]="countries"
+    [fields]="addressFieldSettings"
     [formGroupInstance]="candidateForm"
     [hideBorder]="false"
-    label="Internal transfer/recruitment"
-    id="internal-transfer-recruitment"
+    [required]="true"
+    label="Country"
+    id="country"
+    controlName="country"
+  ></app-dropdown>
+
+  <app-dropdown
+    [dataSource]="states$ | async"
+    [fields]="addressFieldSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    [required]="true"
+    label="State"
+    id="state"
     controlName="state"
   ></app-dropdown>
 
   <app-input
     [formGroupInstance]="candidateForm"
+    [required]="true"
+    maxlength="20"
     controlName="city"
     id="city"
     label="City"
@@ -34,13 +49,16 @@
 
   <app-input
     [formGroupInstance]="candidateForm"
-    controlName="email"
+    [required]="true"
+    maxlength="200"
+    controlName="personalEmail"
     id="email"
     label="Email"
   ></app-input>
 
   <app-input
     [formGroupInstance]="candidateForm"
+    maxlength="200"
     controlName="workEmail"
     id="work-email"
     label="Work Email"
@@ -49,7 +67,8 @@
   <app-input
     [formGroupInstance]="candidateForm"
     [mask]="phoneMask"
-    controlName="cellphone"
+    [required]="true"
+    controlName="phone1"
     id="cellphone"
     label="Cellphone"
   ></app-input>
@@ -57,7 +76,7 @@
   <app-input
     [formGroupInstance]="candidateForm"
     [mask]="phoneMask"
-    controlName="alternativePhone"
+    controlName="phone2"
     id="alternativePhone"
     label="Alternative Phone"
   ></app-input>

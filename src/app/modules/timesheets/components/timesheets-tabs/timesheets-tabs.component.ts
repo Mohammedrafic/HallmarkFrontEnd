@@ -1,12 +1,13 @@
 import {
   ChangeDetectionStrategy, Component, EventEmitter,
-  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild
+  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild,
 } from '@angular/core';
 
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { Destroyable } from '@core/helpers';
 import { OutsideZone } from '@core/decorators';
+import { TabConfig } from '../../interface';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -19,7 +20,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
   public tabComponent: TabComponent;
 
   @Input()
-  public tabConfig: TabsListConfig[];
+  public tabConfig: TabConfig[];
 
   @Input()
   public isDisabled: boolean = false;

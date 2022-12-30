@@ -1,18 +1,21 @@
-@import 'colors';
-@import 'mixins';
+@import "colors";
+@import "mixins";
+@import "adaptive-response";
 
 .job-info-container {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   grid-gap: 20px 30px;
-
+  grid-template-areas:
+    "section section section amount"
+    "section section section action";
   .job-info-section {
     display: flex;
   }
 
   .amount {
     justify-content: flex-end;
+    grid-area: amount;
 
     .value {
       margin-bottom: 5px;
@@ -52,4 +55,35 @@
 .details-action-block {
   display: flex;
   justify-content: flex-end;
+  grid-area: action;
+}
+
+.tablet-container {
+  grid-template-areas:
+    "amount action"
+    "section section"
+    "section section"
+    "section section";
+
+  .amount,
+  .details-action-block {
+    justify-content: flex-start;
+  }
+}
+
+@media #{$max-mobile} {
+  .job-info-container {
+    grid-template-areas:
+      "amount"
+      "action";
+  }
+
+  .details-action-block {
+    margin-left: 21px;
+    justify-content: flex-start;
+  }
+
+  .amount {
+    justify-content: flex-start !important;
+  }
 }

@@ -13,6 +13,7 @@ import { DashboardWidgetsModule } from './dashboard-widgets/dashboard-widgets.mo
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { AccumulationDataLabelService } from '@syncfusion/ej2-angular-charts';
+import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 
 @NgModule({
   declarations: [DashboardComponent],
@@ -24,6 +25,6 @@ import { AccumulationDataLabelService } from '@syncfusion/ej2-angular-charts';
     ReactiveFormsModule,
     DashboardWidgetsModule,
   ],
-  providers: [DashboardService, AccumulationDataLabelService],
+  providers: [DashboardService, AccumulationDataLabelService, OrderManagementIrpApiService],
 })
 export class DashboardModule {}

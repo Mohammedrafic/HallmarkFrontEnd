@@ -17,7 +17,7 @@
           cssClass="e-outline"
           (click)="onImport()"
           [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">
-          Import <span><i-feather name="upload" class="icon"></i-feather></span>
+          Import <span><i-feather name="download" class="icon"></i-feather></span>
         </button>
       </app-tooltip-container>
       <button
@@ -27,7 +27,7 @@
         [items]="exportOptions"
         (select)="exportSelected($event)">
         <div class="button-export-container">
-          Export <i-feather name="download" class="icon"></i-feather>
+          Export <i-feather name="upload" class="icon"></i-feather>
         </div>
       </button>
       <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">

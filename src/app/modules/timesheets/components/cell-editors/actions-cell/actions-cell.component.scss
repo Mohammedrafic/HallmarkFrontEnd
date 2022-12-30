@@ -1,7 +1,8 @@
-@import 'colors';
+@import "colors";
+@import "adaptive-response";
 
 .remove-button {
-  color: #FF5858;
+  color: $supportive-red;
 }
 
 .upload-button {
@@ -11,5 +12,12 @@
 .custom-btn {
   &.disabled {
     opacity: 0.5;
+  }
+}
+
+@media #{$max-mobile} {
+  .custom-btn {
+    padding-left: 0 !important;
+    margin: auto auto 5px -5px;
   }
 }

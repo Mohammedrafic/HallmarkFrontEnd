@@ -20,10 +20,11 @@
     width: 100%;
   }
 
-  .input-container, .dropdown-container {
+  .input-container,
+  .dropdown-container {
     margin-bottom: 15px;
     margin-right: 10px;
-    flex: 1 1 0px
+    flex: 1 1 0px;
   }
 
   .input-container label,
@@ -32,12 +33,20 @@
     display: block;
   }
 
-  input[type='number'] {
-    -moz-appearance:textfield;
+  input[type="number"] {
+    -moz-appearance: textfield;
   }
 
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
     -webkit-appearance: none;
+  }
+
+  .checkbox-container {
+    display: flex;
+
+    label {
+      margin-right: 12px;
+    }
   }
 }

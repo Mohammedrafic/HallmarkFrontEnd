@@ -42,8 +42,11 @@ export class OrderCandidatesCredentialsState {
   }
 
   @Action(GetAllCredentials)
-  GetAllCredentials({ patchState }: StateContext<OrderCandidatesCredentialsStateModel>, {}: GetAllCredentials): Observable<Credential[]> {
-    return this.credentialsService.getAllCredentials().pipe(tap((payload) => {
+  GetAllCredentials(
+    { patchState }: StateContext<OrderCandidatesCredentialsStateModel>,
+    { includeInIRP }: GetAllCredentials
+  ): Observable<Credential[]> {
+    return this.credentialsService.getAllCredentials(includeInIRP).pipe(tap((payload) => {
       patchState({ allCredentials: payload });
       return payload;
     }));

@@ -15,11 +15,13 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'Candidates', column: 'CandidatesCount' },
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Skill', column: 'OrderSkill' },
+  { text: 'Region', column: 'Region'},
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
   { text: 'Type', column: 'OrderType' },
   { text: 'Start Date', column: 'StartDate' },
   { text: 'End Date', column: 'EndDate' },
+  { text: 'Shift', column: 'Shift' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
   { text: 'Special Project Category', column: 'SpecialProjectCategory' },
@@ -44,6 +46,7 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Skill', column: 'Skill' },
+  { text: 'Region', column: 'Region' },
   { text: '# of Positions', column: 'CountOfPosition' },
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
@@ -76,6 +79,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Organization', column: 'OrganizationName' },
   { text: 'Candidates', column: 'CandidatesCount' },
   { text: 'Skill', column: 'Skill' },
+  { text: 'Region', column: 'Region' },
   { text: 'Location', column: 'LocationName' },
   { text: 'Department', column: 'DepartmentName' },
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
@@ -114,7 +118,11 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
     visible: false,
   },
   {
-    fieldName: 'shift',
+    fieldName: 'regionName',
+    visible: true,
+  },
+  {
+    fieldName: 'shiftStartTime',
     visible: true,
   },
   {
@@ -177,8 +185,12 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     visible: false,
   },
   {
-    fieldName: 'shift',
-    visible: false,
+    fieldName: 'regionName',
+    visible: true,
+  },
+  {
+    fieldName: 'shiftStartTime',
+    visible: true,
   },
   {
     fieldName: 'shiftsNext90Days',
@@ -220,7 +232,11 @@ export const PerDiemColumnsConfig = [
     visible: false,
   },
   {
-    fieldName: 'shift',
+    fieldName: 'regionName',
+    visible: true,
+  },
+  {
+    fieldName: 'shiftStartTime',
     visible: false,
   },
   {
@@ -267,8 +283,12 @@ export const PermPlacementColumnsConfig = [
     visible: false,
   },
   {
-    fieldName: 'shift',
-    visible: false,
+    fieldName: 'regionName',
+    visible: true,
+  },
+  {
+    fieldName: 'shiftStartTime',
+    visible: true,
   },
   {
     fieldName: 'numberOfPositions',

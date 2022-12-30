@@ -1,14 +1,16 @@
-import { ClearDeployedCandidateOrderInfo, GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { ClearDeployedCandidateOrderInfo, GetCandidateJob,
+  GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { GetAvailableSteps, GetOrganisationCandidateJob, GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
+import { GetAvailableSteps, GetOrganisationCandidateJob,
+  GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import { Order, OrderCandidatesList } from '@shared/models/order-management.model';
+import { IrpOrderCandidate, Order, OrderCandidatesList } from '@shared/models/order-management.model';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -21,6 +23,10 @@ import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.co
 import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.component';
 import { OfferDeploymentComponent } from './offer-deployment/offer-deployment.component';
 import { OnboardedCandidateComponent } from './onboarded-candidate/onboarded-candidate.component';
+import { OrderType } from '@shared/enums/order-type';
+import { OrderCandidateApiService } from '../order-candidate-api.service';
+import { PageOfCollections } from '@shared/models/page.model';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -59,6 +65,19 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     ApplicantStatus.NotApplied,
     ApplicantStatus.Withdraw,
   ];
+  public orderTypes = OrderType;
+  public irpCandidates: PageOfCollections<IrpOrderCandidate> = {
+    /**
+     * TODO: move to constants
+     */
+    items: [],
+    pageNumber: 1,
+    totalPages: 1,
+    totalCount: 1,
+    hasPreviousPage: false,
+    hasNextPage: false,
+  };
+  public isFeatureIrpEnabled = false;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -67,9 +86,11 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   constructor(
     protected override store: Store,
     protected override router: Router,
-    private orderCandidateListViewService: OrderCandidateListViewService
+    private orderCandidateListViewService: OrderCandidateListViewService,
+    private candidateApiService: OrderCandidateApiService,
   ) {
     super(store, router);
+    this.setIrpFeatureFlag();
   }
 
   override ngOnInit(): void {
@@ -83,6 +104,10 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     if (this.isAgency) {
       this.checkForAgencyStatus();
       this.subscribeToDeployedCandidateOrdersInfo();
+    }
+
+    if (this.selectedOrder.isIRPOnly) {
+      this.getIrpCandidates();
     }
   }
 
@@ -235,5 +260,21 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     if (this.deployedCandidateOrderIds.length) {
       this.store.dispatch(new ClearDeployedCandidateOrderInfo());
     }
+  }
+
+  private getIrpCandidates(): void {
+    this.candidateApiService.getIrpCandidates(this.selectedOrder.irpOrderMetadata?.orderId as number)
+    .pipe(
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((candidates) => {
+      this.irpCandidates = candidates;
+      this.grid.refresh();
+      this.grid.dataSource = this.irpCandidates.items;
+    });
+  }
+
+  private setIrpFeatureFlag(): void {
+    this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   }
 }

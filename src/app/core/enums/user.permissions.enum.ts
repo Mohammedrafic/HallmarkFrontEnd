@@ -56,6 +56,9 @@ export enum UserPermissions {
   Candidate = 899,
   CanViewCandidateProfile = 900,
   CanEditCandidateProfile = 901,
+  IrpCandidates = 910,
+  CanViewIrpCandidateProfile = 911,
+  ManageIrpCandidateProfile = 912,
   CanViewExperience = 1000,
   CanEditExperience = 1001,
   CanViewEducation = 1100,
@@ -159,4 +162,8 @@ export enum UserPermissions {
 
   // Manage Credentials
   ManageCredentialWithinOrderScope = 4110,
+
+  // Manage Work Commitments
+  CanViewMasterWorkCommitmentData = 4151,
+  CanManageMasterWorkCommitmentData = 4152,
 }

@@ -84,7 +84,7 @@ import { CandidatDetailsComponent } from './order-management/order-management-gr
 import { NgxMaskModule } from 'ngx-mask';
 import { AgencyOrderFiltersComponent } from './order-management/order-management-grid/agency-order-filters/agency-order-filters.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
-import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
+import { AddEditReorderModule } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.module';
 import { AgencyListFiltersComponent } from './agency-list/agency-list-filters/agency-list-filters.component';
 import { ImportCandidatesComponent } from './candidates/import-candidates/import-candidates.component';
 import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
@@ -106,6 +106,13 @@ import { OrderMatchColumnComponent } from './candidates/add-edit-candidate/crede
 import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { CredentialStorageFacadeService } from "./services/credential-storage-facade.service";
 import { CredentialStorageService } from "./services/credential-storage.service";
+import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
+import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
+import {
+  CandidateGeneralInfoService,
+} from "@agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.service";
+import { AgencyNameComponent } from './agency-list/agency-name/agency-name.component';
+
 
 const sidebarIcons = {
   Sliders,
@@ -174,6 +181,7 @@ const sidebarIcons = {
     PaymentDialogComponent,
     JobDistributionComponent,
     OrderMatchColumnComponent,
+    AgencyNameComponent,
   ],
   imports: [
     CommonModule,
@@ -215,12 +223,15 @@ const sidebarIcons = {
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
     CandidateListModule,
     ChildOrderDialogModule,
+    BoolValuePipeModule,
   ],
   exports: [FileViewerComponent],
   providers: [
     CredentialGridService,
     CredentialStorageService,
     CredentialStorageFacadeService,
+    OrderCandidateApiService,
+    CandidateGeneralInfoService,
   ],
 })
 export class AgencyModule {}

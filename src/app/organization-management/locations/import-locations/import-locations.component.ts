@@ -32,13 +32,13 @@ export class ImportLocationsComponent extends AbstractImport implements OnChange
     super(actions$, store, LocationsImportConfig, cdr);
   }
 
-   ngOnChanges(): void {
+  ngOnChanges(): void {
     if (this.irpFlagEnabled) {
       this.setIrpColumnsConfig();
     }
-   }
+  }
 
-   private setIrpColumnsConfig(): void {
+  private setIrpColumnsConfig(): void {
     this.columnDefs = JSON.parse(JSON.stringify(LocationsIrpColumnsConfig));
     
     if (!this.orgVMSEnabled) {
@@ -48,5 +48,5 @@ export class ImportLocationsComponent extends AbstractImport implements OnChange
     if (!(this.orgIrpEnabled && this.orgVMSEnabled)) {
       this.columnDefs = this.columnDefs.filter((column) => !FieldsToHideInVms.includes(column.field as string));
     }
-   }
+  }
 }

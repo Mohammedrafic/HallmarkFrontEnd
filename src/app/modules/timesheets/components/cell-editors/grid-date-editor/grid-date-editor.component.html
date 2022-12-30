@@ -13,7 +13,7 @@
   </ng-template>
 
   <ng-template [ngSwitchCase]="true">
-    <div class="wrapper">
+    <div class="wrapper" [ngClass]="{'errored': control.invalid && control.touched}">
       <ejs-timepicker
         placeholder="HH:MM"
         format="HH:mm"

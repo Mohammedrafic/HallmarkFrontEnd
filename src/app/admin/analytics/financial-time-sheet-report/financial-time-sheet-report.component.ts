@@ -28,8 +28,8 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
-import { CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SearchCandidate, SkillCategoryDto } from '../models/common-report.model';
-import { OrderTypeOptions } from '@shared/enums/order-type';
+import { CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, 
+  MasterSkillDto, SearchCandidate, SkillCategoryDto ,OrderTypeOptionsForReport} from '../models/common-report.model';
 import { OutsideZone } from "@core/decorators";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
@@ -267,7 +267,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
               this.filterColumns.jobStatuses.dataSource = data.jobStatusesAndReasons;
               this.filterColumns.candidateStatuses.dataSource = data.candidateStatusesAndReasons;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-              this.defaultOrderTypes = OrderTypeOptions.map((list) => list.id);
+              this.defaultOrderTypes = OrderTypeOptionsForReport.map((list) => list.id);
               this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
               this.changeDetectorRef.detectChanges();
             }
@@ -453,7 +453,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       orderTypes: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
-        dataSource: OrderTypeOptions,
+        dataSource: OrderTypeOptionsForReport,
         valueField: 'name',
         valueId: 'id',
       },

@@ -1,51 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AbstractContactDetails } from '@client/candidates/candidate-profile/candidate-details/abstract-contact-details';
+import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 
 @Component({
   selector: 'app-candidate-details',
   templateUrl: './candidate-details.component.html',
-  styleUrls: ['./candidate-details.component.scss']
+  styleUrls: ['./candidate-details.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CandidateDetailsComponent implements OnInit {
-  public candidateForm: FormGroup;
-
-  public readonly textAreaAttributes = [{ rows: '5' }];
-
-  constructor(private formBuilder: FormBuilder) {
+export class CandidateDetailsComponent extends AbstractContactDetails implements OnInit {
+  constructor(
+    protected override cdr: ChangeDetectorRef,
+    protected override candidateProfileFormService: CandidateProfileFormService
+  ) {
+    super(cdr, candidateProfileFormService);
   }
 
-  ngOnInit(): void {
-    this.createForm();
+  public override ngOnInit(): void {
+    super.ngOnInit();
   }
-
-  private createForm(): void {
-    this.candidateForm = this.formBuilder.group({
-      employeeId: [null, [Validators.required, Validators.maxLength(50)]],
-      firstName: [null, [Validators.required, Validators.maxLength(50)]],
-      middleName: [null, [Validators.maxLength(10)]],
-      lastName: [null, [Validators.required, Validators.maxLength(50)]],
-      dob: [null, [Validators.required, Validators.maxLength(100)]],
-      primarySkill: [null, [Validators.required]],
-      skill: [null, [Validators.required]],
-      classification: [null],
-      hireDate: [null, [Validators.required]],
-      fte: [''],
-      profileStatus: [''],
-      hrCompanyCode: [''],
-      internalTransferRecruitment: [''],
-      orientationConfiguration: [''],
-      organizationOrientationDate: [''],
-      contract: [''],
-      address: [''],
-      state: [''],
-      city: [''],
-      zipCode: [''],
-      email: [''],
-      workEmail: [''],
-      cellphone: [''],
-      alternativePhone: [''],
-      professionalSummary: ['']
-    });
-  }
-
 }

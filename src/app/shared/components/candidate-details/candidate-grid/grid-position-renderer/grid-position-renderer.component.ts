@@ -8,7 +8,9 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { UserState } from '../../../../../store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { SetLastSelectedOrganizationAgencyId } from '../../../../../store/user.actions';
-import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
 
 @Component({

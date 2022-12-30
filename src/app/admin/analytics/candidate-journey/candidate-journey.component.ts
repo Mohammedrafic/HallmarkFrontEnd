@@ -23,8 +23,7 @@ import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { OrderTypeOptions } from '@shared/enums/order-type';
-import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto } from '../models/common-report.model';
+import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto,OrderTypeOptionsForReport } from '../models/common-report.model';
 import { User } from '@shared/models/user.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
@@ -111,6 +110,9 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   public defaultRegions:(number|undefined)[] =[];
   public defaultLocations:(number|undefined)[]=[];
   public defaultDepartments:(number|undefined)[]=[];
+  public defaultSkillCategories: (number | undefined)[] = [];
+  public defaultOrderTypes: (number | undefined)[] = [];
+  public defaultSkills: (number | undefined)[] = [];
   public regionsList: Region[] = [];
   public locationsList: Location[] = [];
   public departmentsList: Department[] = [];
@@ -129,18 +131,22 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];  
   public baseUrl: string = '';
-
+  private dateFormat = 'MM/dd/yyyy';
+  private culture = 'en-US';
+  private nullValue = "null";
+  private joinString = ",";  
+  private fixedJobStatusesTypes:number[]=[1,2,5];
+  private fixedCandidateStatusesNotIncluded:number[]=[6,8,9];
+  private orderTypesList=OrderTypeOptionsForReport.filter(i=>i.id!=1);
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
-  changeDetectorRef: ChangeDetectorRef;  
   filterOptionsData: CommonReportFilterOptions;
-  public defaultSkillCategories: (number | undefined)[] = [];
-  public defaultOrderTypes: (number | undefined)[] = [];
-  public defaultSkills: (number | undefined)[] = [];
   skillCategoryIdControl: AbstractControl;
   skillIdControl: AbstractControl;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
-    private filterService: FilterService, @Inject(APP_SETTINGS) private appSettings: AppSettings) {
+    private filterService: FilterService,    
+    private changeDetectorRef: ChangeDetectorRef,
+     @Inject(APP_SETTINGS) private appSettings: AppSettings) {
       this.baseUrl = this.appSettings.host.replace("https://", "").replace("http://", "");
       this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
       this.initForm();
@@ -172,7 +178,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
 
   private initForm(): void {
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
+    startDate.setDate(startDate.getDate() - 30);
     this.candidateJourneyForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
@@ -248,10 +254,10 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
-              this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons;
-              this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons;
+              this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons.filter(i=>!this.fixedJobStatusesTypes.includes(i.status));
+              this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.filter(i=>!this.fixedCandidateStatusesNotIncluded.includes(i.status));
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-              this.defaultOrderTypes = OrderTypeOptions.map((list) => list.id);
+              this.defaultOrderTypes = this.orderTypesList.map((list) => list.id);
               this.candidateJourneyForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
               this.changeDetectorRef.detectChanges();
             }
@@ -352,7 +358,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
       jobStatuses, locationIds, orderTypes,regionIds, skillCategoryIds, skillIds, startDate, endDate } 
       = this.candidateJourneyForm.getRawValue();
     if (!this.candidateJourneyForm.dirty) {
-      this.message = "Default filter selected with all regions, locations and departments for 90 days";
+      this.message = "Default filter selected with all regions, locations and departments for 30 days";
     }
     else {
       this.isResetFilter = false;
@@ -360,24 +366,25 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
     }
     this.paramsData =
     {
-      "OrganizationParamCJR":this.selectedOrganizations?.length==0?"null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "StartDateParamCJR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamCJR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamCJR": regionIds.length==0?"null" : regionIds.join(","),
-      "LocationParamCJR":locationIds.length==0?"null" : locationIds.join(","),
-      "DepartmentParamCJR":departmentIds.length==0?"null" :  departmentIds.join(","),
-      "SkillCategoriesParamCJR": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
-      "SkillsParamCJR": skillIds.length == 0 ? "null" : skillIds.join(","),"CandidateStatusesParamCJR": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
-      "OrderTypesParamCJR": orderTypes.length == 0 ? "null" : orderTypes.join(","),
-      "JobStatusesParamCJR": jobStatuses.length == 0 ? "null" : jobStatuses.join(","),
-      "OrderIdParamCJR": jobId == null || jobId == "" ? "null" : jobId,
+      "OrganizationParamCJR":this.selectedOrganizations?.length==0?this.nullValue: this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
+      "StartDateParamCJR": formatDate(startDate, this.dateFormat, this.culture),
+      "EndDateParamCJR":endDate==null?"01/01/0001": formatDate(endDate, this.dateFormat, this.culture),
+      "RegionParamCJR": regionIds.length==0?this.nullValue : regionIds.join(this.joinString),
+      "LocationParamCJR":locationIds.length==0?this.nullValue : locationIds.join(this.joinString),
+      "DepartmentParamCJR":departmentIds.length==0?this.nullValue :  departmentIds.join(this.joinString),
+      "SkillCategoriesParamCJR": skillCategoryIds.length == 0 ? this.nullValue : skillCategoryIds.join(this.joinString),
+      "SkillsParamCJR": skillIds.length == 0 ? this.nullValue : skillIds.join(this.joinString),
+      "CandidateStatusesParamCJR": candidateStatuses.length == 0 ? this.nullValue : candidateStatuses.join(this.joinString),
+      "OrderTypesParamCJR": orderTypes.length == 0 ? this.nullValue : orderTypes.join(this.joinString),
+      "JobStatusesParamCJR": jobStatuses.length == 0 ? this.nullValue : jobStatuses.join(this.joinString),
+      "OrderIdParamCJR": jobId == null || jobId == "" ? this.nullValue : jobId,
       "BearerParamCJR": auth,
       "BusinessUnitIdParamCJR": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "TodayCJR":formatDate(new Date(),'MM/dd/yyyy','en-US')
+      "TodayCJR":formatDate(new Date(),this.dateFormat,this.culture)
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -443,7 +450,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
       orderTypes: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
-        dataSource: OrderTypeOptions,
+        dataSource: this.orderTypesList,
         valueField: 'name',
         valueId: 'id',
       },

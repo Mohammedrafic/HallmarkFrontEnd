@@ -1,114 +1,151 @@
 <h2 class="title">General Info</h2>
 <form class="general-info__form">
-  <app-input
-    [formGroupInstance]="candidateForm"
-    [required]="true"
-    controlName="employeeId"
-    id="employeeId"
-    label="Employee ID"
-    class="employee-id"
-  ></app-input>
-  <app-input
-    [formGroupInstance]="candidateForm"
-    [required]="true"
-    controlName="firstName"
-    id="first-name"
-    label="First Name"
-    class="first-name"
-  ></app-input>
+  <div class="row">
+    <div class="two-controls">
+      <app-input
+        [formGroupInstance]="candidateForm"
+        [required]="true"
+        maxlength="25"
+        controlName="employeeId"
+        id="employeeId"
+        label="Employee ID"
+      ></app-input>
 
-  <app-input
-    [formGroupInstance]="candidateForm"
-    controlName="middleName"
-    id="middle-name"
-    label="Middle Name"
-    class="middle-name"
-  ></app-input>
+      <app-input
+        [formGroupInstance]="candidateForm"
+        [required]="true"
+        maxlength="50"
+        controlName="firstName"
+        id="first-name"
+        label="First Name"
+      ></app-input>
+    </div>
 
-  <app-input
-    [formGroupInstance]="candidateForm"
-    [required]="true"
-    controlName="lastName"
-    id="last-name"
-    label="Last Name"
-    class="last-name"
-  ></app-input>
+    <app-input
+      [formGroupInstance]="candidateForm"
+      maxlength="10"
+      controlName="middleName"
+      id="middle-name"
+      label="Middle Name"
+    ></app-input>
 
-  <app-datepicker
-    [formGroupInstance]="candidateForm"
-    [enableMask]="true"
-    [required]="true"
-    [maskPlaceholder]="datepickerMask"
-    id="dob"
-    controlName="dob"
-    label="DOB"
-    format="MM/dd/yyyy"
-    placeholder="MM/DD/YYYY"
-  ></app-datepicker>
+    <app-input
+      [formGroupInstance]="candidateForm"
+      [required]="true"
+      maxlength="50"
+      controlName="lastName"
+      id="last-name"
+      label="Last Name"
+    ></app-input>
 
-  <app-dropdown
-    [dataSource]="[]"
-    [fields]="fieldsSettings"
-    [formGroupInstance]="candidateForm"
-    [hideBorder]="false"
-    [required]="true"
-    label="Primary Skill"
-    id="primary-skill"
-    class="primary-skill"
-    controlName="primarySkill"
-  ></app-dropdown>
+    <app-datepicker
+      [formGroupInstance]="candidateForm"
+      [max]="today"
+      id="dob"
+      controlName="dob"
+      label="DOB"
+    ></app-datepicker>
+  </div>
+  <div class="row">
+    <app-dropdown
+      [dataSource]="skills$ | async"
+      [fields]="fieldsSettings"
+      [formGroupInstance]="candidateForm"
+      [hideBorder]="false"
+      [required]="true"
+      label="Primary Skill"
+      id="primary-skill"
+      controlName="primarySkillId"
+    ></app-dropdown>
 
-  <app-multiselect-dropdown
-    [dataSource]="[]"
-    [formGroupInstance]="candidateForm"
-    [fields]="skillOptionFields"
-    [required]="true"
-    controlName="skill"
-    id="skill"
-    label="Skill"
-    class="skill"
-  ></app-multiselect-dropdown>
+    <app-multiselect-dropdown
+      [dataSource]="skills$ | async"
+      [formGroupInstance]="candidateForm"
+      [fields]="skillOptionFields"
+      controlName="secondarySkills"
+      id="secondary-skill"
+      label="Secondary Skill"
+    ></app-multiselect-dropdown>
 
-  <app-dropdown
-    [dataSource]="classifications"
-    [fields]="fieldsSettings"
-    [formGroupInstance]="candidateForm"
-    [hideBorder]="false"
-    label="Classification"
-    id="classification"
-    class="classification"
-    controlName="classification"
-  ></app-dropdown>
+    <app-dropdown
+      [dataSource]="classifications"
+      [fields]="fieldsSettings"
+      [formGroupInstance]="candidateForm"
+      [hideBorder]="false"
+      label="Classification"
+      id="classification"
+      controlName="classification"
+    ></app-dropdown>
 
-  <app-datepicker
-    [formGroupInstance]="candidateForm"
-    [enableMask]="true"
-    [required]="true"
-    [maskPlaceholder]="datepickerMask"
-    id="hire-date"
-    controlName="hireDate"
-    label="Hire Date"
-    format="MM/dd/yyyy"
-    placeholder="MM/DD/YYYY"
-  ></app-datepicker>
+    <app-datepicker
+      [formGroupInstance]="candidateForm"
+      [required]="true"
+      id="hire-date"
+      controlName="hireDate"
+      label="Hire Date"
+    ></app-datepicker>
+  </div>
 
-  <app-input
-    [formGroupInstance]="candidateForm"
-    [required]="true"
-    controlName="fte"
-    id="fte"
-    label="FTE"
-    class="fte"
-  ></app-input>
+  <div class="row">
+    <app-numeric-textbox
+      [formGroupInstance]="candidateForm"
+      [required]="true"
+      [strictMode]="true"
+      [decimals]="1"
+      format="#.#"
+      id="fte"
+      label="FTE"
+      controlName="fte"
+    >
+    </app-numeric-textbox>
 
-  <app-dropdown
-    [dataSource]="[]"
-    [fields]="fieldsSettings"
-    [formGroupInstance]="candidateForm"
-    [hideBorder]="false"
-    label="Profile Status"
-    id="profile-status"
-    class="profile-status"
-    controlName="profileStatus"
-  ></app-dropdown>
+    <app-dropdown
+      [dataSource]="profileStatuses"
+      [fields]="fieldsSettings"
+      [formGroupInstance]="candidateForm"
+      [hideBorder]="false"
+      label="Profile Status"
+      id="profile-status"
+      controlName="profileStatus"
+    ></app-dropdown>
+
+    <app-datepicker
+      *ngIf="isOnHoldSelected"
+      [formGroupInstance]="candidateForm"
+      [required]="true"
+      id="hold-start-date"
+      controlName="holdStartDate"
+      label="Hold Start Date"
+    ></app-datepicker>
+
+    <app-datepicker
+      *ngIf="isOnHoldSelected"
+      [formGroupInstance]="candidateForm"
+      id="hold-end-date"
+      controlName="holdEndDate"
+      label="Hold End Date"
+    ></app-datepicker>
+
+    <app-datepicker
+      *ngIf="isTerminatedSelected"
+      [formGroupInstance]="candidateForm"
+      [required]="true"
+      id="termination-date"
+      controlName="terminationDate"
+      label="Termination Date"
+    ></app-datepicker>
+
+    <app-dropdown
+      *ngIf="isTerminatedSelected"
+      [dataSource]="terminationReason"
+      [fields]="fieldsSettings"
+      [formGroupInstance]="candidateForm"
+      [hideBorder]="false"
+      [required]="true"
+      label="Termination Reason"
+      id="terminationReason"
+      controlName="terminationReasonId"
+    ></app-dropdown>
+  </div>
+
 </form>

@@ -78,7 +78,11 @@ export class CredentialsService {
     return this.http.post<CredentialSetupGet>(`/api/CredentialSetups`, credentialSetup);
   }
 
-  public getAllCredentials(): Observable<Credential[]> {
+  public getAllCredentials(includeInIRP: boolean): Observable<Credential[]> {
+    if (includeInIRP) {
+      return this.http.get<Credential[]>(`/api/MasterCredentials/allCreds`, { params: { includeInIRP } });
+    }
+
     return this.http.get<Credential[]>(`/api/MasterCredentials/allCreds`);
   }
 
