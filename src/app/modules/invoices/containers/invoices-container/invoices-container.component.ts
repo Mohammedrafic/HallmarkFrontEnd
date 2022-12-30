@@ -158,7 +158,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public ngOnInit(): void {
-    this.businessUnitId = JSON.parse(localStorage.getItem('BussinessUnitID') || '') as number;
+    this.businessUnitId = JSON.parse((localStorage.getItem('BussinessUnitID') || '0')) as number;
+    (!this.businessUnitId)?this.businessUnitId=0:""
     window.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
     if (this.isAgency) {
       this.checkActionsAllowed();
