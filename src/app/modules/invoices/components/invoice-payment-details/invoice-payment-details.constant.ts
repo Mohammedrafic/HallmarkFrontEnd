@@ -21,6 +21,7 @@ export const PaymentTableDefs: ColDef[] = [
     headerName: '',
     type: 'leftAligned',
     width: 55,
+    minWidth: 45,
     ...commonCol,
     cellRenderer: EditPaymentRendererComponent,
   },

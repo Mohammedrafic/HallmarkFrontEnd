@@ -52,6 +52,7 @@ app-grid {
     }
 
     .ag-root-wrapper {
+      border-top: 1px solid var(--grid-border-color) !important;
       border-top-left-radius: 0;
       border-top-right-radius: 0;
     }
