@@ -81,10 +81,15 @@ export class ScheduleContainerComponent extends Destroyable {
   selectedCells(cells: ScheduleSelectedSlots): void {}
 
   private initScheduleData(isLoadMore = false): void {
-    this.scheduleApiService.getScheduleEmployees(this.scheduleFilters).pipe(
+    const { startDate, endDate, ...restFilters } = this.scheduleFilters;
+
+    this.scheduleApiService.getScheduleEmployees(restFilters).pipe(
       take(1),
       switchMap((candidates: ScheduleCandidatesPage) =>
-        this.scheduleApiService.getSchedulesByEmployeesIds(candidates.items.map(el => el.id)).pipe(
+        this.scheduleApiService.getSchedulesByEmployeesIds(
+          candidates.items.map(el => el.id),
+          { startDate: startDate || '', endDate: endDate || '' }
+        ).pipe(
           take(1),
           map((candidateSchedules: CandidateSchedules[]): ScheduleModelPage =>
             ScheduleGridAdapter.combineCandidateData(candidates, candidateSchedules)
