@@ -91,20 +91,24 @@
           <label>Year</label>
           <div class="input-group dropdown">
             <ejs-dropdownlist appValidateWithMessage
-                              formControlName="years"
-                              [fields]="yearFields"
-                              [dataSource]="filterColumns.years.dataSource"
-                              placeholder=""></ejs-dropdownlist>
+                              formControlName="year"
+                              [fields]="commonFields"
+                              [dataSource]="yearList"
+                              [allowFiltering]="true"
+                              placeholder="Year">
+            </ejs-dropdownlist>
           </div>
         </div>
         <div class="input-container bootstrap">
           <label>Month</label>
           <div class="input-group dropdown">
             <ejs-dropdownlist appValidateWithMessage
-                              formControlName="months"
-                              [fields]="monthFields"
-                              [dataSource]="filterColumns.months.dataSource"
-                              placeholder=""></ejs-dropdownlist>
+                              formControlName="month"
+                              [fields]="commonFields"
+                              [dataSource]="monthList"
+                              [allowFiltering]="true"
+                              placeholder="Month">
+            </ejs-dropdownlist>
           </div>
         </div>
       </div>
@@ -115,16 +119,22 @@
           <label>Status</label>
           <div class="input-group dropdown">
             <ejs-dropdownlist appValidateWithMessage
-                              formControlName="invoiceStatuses"
-                              [fields]="invoiceStatusFields"
-                              [dataSource]="filterColumns.invoiceStatuses.dataSource"
-                              placeholder=""></ejs-dropdownlist>
+                              formControlName="invoiceStatus"
+                              [fields]="commonFields"
+                              [dataSource]="invoiceStatusList"
+                              [allowFiltering]="true"
+                              placeholder="Invoice Status">
+            </ejs-dropdownlist>
           </div>
         </div>
         <div class="input-container bootstrap">
           <label>Invoice ID</label>
           <div class="input-group dropdown">
-            <ejs-autocomplete formControlName="invoiceID"></ejs-autocomplete>
+            <input class="e-input"
+                   type="text"
+                   appValidateWithMessage
+                   maxlength="50"
+                   formControlName="invoiceId" />
           </div>
         </div>
       </div>

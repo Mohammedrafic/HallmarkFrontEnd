@@ -1,16 +1,17 @@
+import { formatDate } from '@angular/common';
+
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { CellClassParams, ColDef, ICellRendererParams } from '@ag-grid-community/core';
+import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
+
 import {
   GridHeaderActionsComponent,
 } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.component';
 import { GridActionsCellComponent, GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
-import { OrderType } from '@shared/enums/order-type';
-import { OrderStatus } from '@shared/enums/order-management';
-import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
-import { formatDate } from '@angular/common';
-import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { DefaultOrderCol, FirstColumnWidth, PrepareMenuItems } from './order-management-irp.const';
 import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
+
+import { DefaultOrderCol, FirstColumnWidth, PrepareMenuItems } from './order-management-irp.const';
 
 export const GridCellsSystemIRPTabLta = (
   threeDotsMenuOptions: Record<string, ItemModel[]> = {},
@@ -180,8 +181,8 @@ export const GridCellsSystemIRPTabLta = (
     minWidth: 80,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) => {
-      const startShiftTime = formatDate(params.data.shiftStartDateTime, 'HH:mm', 'en-US');
-      const endShiftTime = formatDate(params.data.shiftEndDateTime, 'HH:mm', 'en-US');
+      const startShiftTime = formatDate(params.data.shiftStartDateTime, 'HH:mm', 'en-US', 'UTC');
+      const endShiftTime = formatDate(params.data.shiftEndDateTime, 'HH:mm', 'en-US', 'UTC');
 
       return `${startShiftTime}-${endShiftTime}`;
     },

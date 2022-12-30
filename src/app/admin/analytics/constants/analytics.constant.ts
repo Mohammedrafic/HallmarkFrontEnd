@@ -56,6 +56,22 @@ export const ytdSummaryConstants = {
   }
 }
 
+export const vmsInvoiceConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    AgencyIds: 'agencyIds',
+    Year: 'year',
+    Month: 'month',
+    InvoiceStatus: 'invoiceStatus',
+    InvoiceId: 'invoiceId',
+    StartDate: 'startDate',
+    EndDate: 'endDate'
+  }
+}
+
 export const invoiceSummaryConstants = {
   formControlNames: {
     BusinessIds: 'businessIds',
@@ -146,6 +162,11 @@ export type Year = {
   name: string;
 };
 export type Month = {
+  id: number;
+  name: string;
+};
+
+export type InvoiceStatus = {
   id: number;
   name: string;
 };
