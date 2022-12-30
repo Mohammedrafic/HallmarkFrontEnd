@@ -12,7 +12,7 @@ export const findSelectedItems = <T>(source: number[], arr: T[]): T[] => {
     return acc;
   },
   []);
-}
+};
 
 export const createUniqHashObj = <T, U>(
   array: T[],
@@ -36,8 +36,8 @@ export const reduceFiltersState = <T>(oldFilters: T, saveFiltersKeys: string[]):
     }
 
     return acc;
-  }, {})
-}
+  }, {});
+};
 
 export function GetQueryParams<T> (params: T): HttpParams {
   if (params) {
@@ -46,3 +46,11 @@ export function GetQueryParams<T> (params: T): HttpParams {
 
   return new HttpParams();
 }
+
+export const CalcDaysMs = (dayNum: number) => {
+  return dayNum * 24 * 60 * 60 * 1000;
+};
+
+export const GenerateUniqueId = (): string => {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+};

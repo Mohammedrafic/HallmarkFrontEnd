@@ -329,6 +329,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private orderStaus: number;
   private numberArr: number[] = [];
 
+  private previousSelectedSystemId: OrderManagementIRPSystemId | null;
   private isRedirectedFromToast: boolean;
   private quickOrderId: number;
   private dashboardFilterSubscription: Subscription;
@@ -388,6 +389,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   override ngOnInit(): void {
     super.ngOnInit();
 
+    this.setPreviousSelectedSystem();
     this.watchForPermissions();
     this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
@@ -1856,13 +1858,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.isOrgIRPEnabled = !!isIRPEnabled;
       this.isOrgVMSEnabled = !!isVMCEnabled;
 
-      const previousSelectedSystemId = this.orderManagementService.getOrderManagementSystem();
-      this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, previousSelectedSystemId);
-      this.activeSystem = previousSelectedSystemId
+      this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.previousSelectedSystemId);
+      this.activeSystem = this.previousSelectedSystemId
         ?? DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
 
       this.initGridColumns();
       this.getOrders();
+
+      this.previousSelectedSystemId = null;
     });
   }
 
@@ -1889,5 +1892,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     );
 
     this.cd$.next(true);
+  }
+
+  private setPreviousSelectedSystem(): void {
+    this.previousSelectedSystemId = this.orderManagementService.getOrderManagementSystem();
   }
 }

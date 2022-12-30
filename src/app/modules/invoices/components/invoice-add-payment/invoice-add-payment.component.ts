@@ -35,6 +35,8 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
 
   @Input() dialogTitle = PaymentDialogTitle.Add;
 
+  @Input() public container: HTMLElement;
+
   paymentsForm: Record<string, CustomFormGroup<PaymentForm>>;
 
   checkForm: CustomFormGroup<CheckForm>;

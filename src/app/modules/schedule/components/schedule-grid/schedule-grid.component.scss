@@ -1,0 +1,178 @@
+@import "colors";
+
+:host {
+  & * {
+    box-sizing: border-box;
+  }
+}
+
+.grid-wrapper {
+  width: 100%;
+  height: calc(100vh - 194px);
+  border: 1px solid $secondary-dark-blue-45;
+  border-radius: 12px;
+  filter: drop-shadow(0px 2px 20px rgba(0, 0, 0, 0.05));
+  background: $white;
+}
+
+.grid-header {
+  width: 100%;
+  max-height: 63px;
+  padding: 12px 12px 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & .left, & .right {
+    display: flex;
+    align-items: center;
+  }
+
+  & .right {
+    width: 100%;
+    padding-left: 8px;
+    justify-content: space-between;
+  }
+
+  & .search-input {
+    width: 168px;
+    margin-right: 12px;
+
+    &::ng-deep .search-with-icon {
+      box-sizing: border-box;
+    }
+  }
+
+  & .sorting-btn {
+    width: 40px;
+    margin-right: 8px;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  & .date-periods {
+    display: flex;
+    align-items: center;
+    margin-right: 12px;
+
+    & .date-item {
+      padding: 11px 12px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18px;
+      color: $secondary-dark-blue-10;
+      cursor: pointer;
+
+      &.active {
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+.sorting-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 0 !important;
+}
+
+.grid-body {
+  height: calc(100% - 63px);
+  overflow: auto;
+}
+
+.empty-wrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  justify-content: center;
+  background: $secondary-dark-blue-45;
+
+  &__text {
+    margin-top: 10%;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
+  }
+}
+
+table {
+  width: 100%;
+  border-spacing: 0;
+}
+
+tr {
+  position: relative;
+}
+
+th, td {
+  border: 0.5px solid $secondary-dark-blue-45;
+}
+
+.table-title {
+  height: 40px;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  text-align: left;
+  white-space: nowrap;
+  color: $secondary-dark-blue-20;
+
+  &.date {
+    min-width: 112px;
+  }
+
+  &.candidates-head-cell {
+    z-index: 30;
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
+  }
+}
+
+.table-row, .table-cell {
+  height: 90px;
+}
+
+.table-cell {
+  padding: 0;
+  transition: all .2s linear;
+
+  &.selected {
+    border: 0.5px solid $primary-active-blue;
+  }
+
+  &.date-slot {
+    cursor: pointer;
+
+    &:hover {
+      border-color: $primary-active-blue-10;
+      transition: all .2s linear;
+    }
+  }
+
+  &.candidates-cell {
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
+  }
+}
+
+.fixed {
+  position: sticky;
+  z-index: 10;
+  background: $white;
+
+  &--top {
+    top: 0;
+    z-index: 20;
+  }
+
+  &--left {
+    left: 0;
+  }
+}

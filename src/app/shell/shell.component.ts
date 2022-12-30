@@ -660,4 +660,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   contactUs() {
     this.store.dispatch(new ShowCustomSideDialog(true));
   }
+  GetContentDetails(businessUnitId?: number) {
+    if (businessUnitId) {
+        this.alertSideBarCloseClick()
+        window.localStorage.setItem("BussinessUnitID",JSON.stringify(businessUnitId));
+    } 
+  }
 }

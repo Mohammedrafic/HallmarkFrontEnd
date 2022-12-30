@@ -11,11 +11,7 @@
   [isOrderImport]="true"
   [zIndex]="2"
 >
-  <section
-    successful
-    class="records"
-    *ngIf="successGridList"
-  >
+  <section successful class="records" *ngIf="successGridList">
     <ejs-listbox
       id="success-record-list"
       class="records-list"
@@ -24,7 +20,11 @@
       [fields]="recordsListField"
       [selectionSettings]="selectionSettings"
       (created)="selectFirstItemFactory()"
-      (change)="selectItem($event)">
+      (change)="selectItem($event)"
+    >
+      <ng-template #itemTemplate let-data>
+        <ng-container [ngTemplateOutlet]="recordItem" [ngTemplateOutletContext]="{ $implicit: data }"></ng-container>
+      </ng-template>
     </ejs-listbox>
     <div class="records-grids">
       <app-import-grid
@@ -38,11 +38,7 @@
     </div>
   </section>
 
-  <section
-    errors
-    class="records"
-    *ngIf="errorGridList"
-  >
+  <section errors class="records" *ngIf="errorGridList">
     <ejs-listbox
       id="error-record-list"
       class="records-list"
@@ -51,7 +47,11 @@
       [fields]="recordsListField"
       [selectionSettings]="selectionSettings"
       (created)="selectFirstItemFactory()"
-      (change)="selectItem($event)">
+      (change)="selectItem($event)"
+    >
+      <ng-template #itemTemplate let-data>
+        <ng-container [ngTemplateOutlet]="recordItem" [ngTemplateOutletContext]="{ $implicit: data }"></ng-container>
+      </ng-template>
     </ejs-listbox>
     <div class="records-grids">
       <app-import-grid
@@ -65,3 +65,12 @@
     </div>
   </section>
 </app-import-dialog-content>
+
+<ng-template #recordItem let-data>
+  <div class="records-list__item">
+    <app-tooltip-container [message]="data?.name" [showToolTip]="true">
+      <span class="job-title" *ngIf="data?.name">{{ data?.name }}</span>
+    </app-tooltip-container>
+    <i-feather *ngIf="!data?.name" name="alert-circle" class="alert-icon"></i-feather>
+  </div>
+</ng-template>

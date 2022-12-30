@@ -187,7 +187,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public readonly orderStatus = OrderStatus;
 
   private isAlive = true;
-  private isLastExtension: boolean = false;
+  private isLastExtension = false;
+  private ignoreMissingCredentials = false;
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
@@ -407,6 +408,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     const isVMCEnabled = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences.isVMCEnabled;
     const isIrpFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
 
+    this.ignoreMissingCredentials = false;
+
     if (isIrpFlagEnabled && !isVMCEnabled) {
       this.isExtensionSidebarShown = true;
 
@@ -444,7 +447,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   public saveExtension(): void {
-    this.extensionSidebarComponent.saveExtension(this.sideDialog);
+    this.extensionSidebarComponent.saveExtension(this.sideDialog, this.ignoreMissingCredentials);
   }
 
   public getExtensions(): void {
@@ -789,6 +792,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       .pipe(filter(Boolean))
       .subscribe(() => {
         this.isExtensionSidebarShown = true;
+        this.ignoreMissingCredentials = true;
         this.changeDetectorRef.markForCheck();
       });
   }

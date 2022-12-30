@@ -76,7 +76,7 @@ export class ExtensionSidebarComponent implements OnInit {
     this.billRateControl.patchValue(value, { emitEvent: false, onlySelf: true });
   }
 
-  public saveExtension(positionDialog: DialogComponent): void {
+  public saveExtension(positionDialog: DialogComponent, ignoreMissingCredentials: boolean): void {
     if (this.extensionForm.invalid) {
       this.extensionForm.markAllAsTouched();
       return;
@@ -90,6 +90,7 @@ export class ExtensionSidebarComponent implements OnInit {
         jobId: this.orderPosition.jobId,
         orderId: this.candidateJob.orderId,
         comments: this.comments,
+        ignoreMissingCredentials,
       })
       .pipe(
         tap(() => {

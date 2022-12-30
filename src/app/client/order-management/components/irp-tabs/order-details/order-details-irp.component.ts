@@ -69,7 +69,7 @@ import {
   setDataSource,
   setDefaultPrimaryContact,
   showHideFormAction,
-  updateJobDistributionControls,
+  updateJobDistributionForm,
 } from '@client/order-management/components/irp-tabs/order-details/helpers';
 import { Department } from '@shared/models/department.model';
 import { ListOfSkills } from '@shared/models/skill.model';
@@ -484,7 +484,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       } else {
         setDataSource(jobDistributionForm.fields, 'jobDistribution', sourceForJobDistribution);
       }
-      this.jobDistributionForm.reset();
+
       this.changeDetection.markForCheck();
     });
 
@@ -494,7 +494,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     ).subscribe((value: number[]) => {
       const selectedConfig = this.getSelectedFormConfig(JobDistributionForm);
       const agencyFormControl = this.jobDistributionForm.get('agencyId') as AbstractControl;
-      updateJobDistributionControls(value, selectedConfig, this.orderTypeForm, agencyFormControl);
+      updateJobDistributionForm(value, selectedConfig, this.orderTypeForm, agencyFormControl);
       agencyFormControl?.updateValueAndValidity();
       this.showDistributionErrorMessage();
 

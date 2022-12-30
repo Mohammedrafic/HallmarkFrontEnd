@@ -58,6 +58,8 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     isIRPFlag: false,
   };
 
+  private orderManagementSystem: OrderManagementIRPSystemId | null;
+
   @Select(OrderManagementContentState.selectedOrder)
   private selectedOrder$: Observable<Order>;
   @Select(OrganizationManagementState.organization)
@@ -77,6 +79,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setOrderManagementSystem();
     this.watchForOrganizationChnage();
     this.setSelectedOrder();
     this.getInitialData();
@@ -90,6 +93,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   public changeSystem(event: ButtonModel): void {
     this.activeSystem = event.id;
     this.setSubmitButtonConfig();
+    this.getSkillsByActiveSystem();
   }
 
   public save(): void {
@@ -99,6 +103,10 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
 
   public selectTypeSave(saveType: MenuEventArgs): void {
     this.saveEvents.next(saveType);
+  }
+
+  private setOrderManagementSystem(): void {
+    this.orderManagementSystem = this.orderManagementService.getOrderManagementSystem();
   }
 
   private setPageHeader(): void {
@@ -141,7 +149,6 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   private getInitialData(): void {
     this.store.dispatch([
       new GetRegions(),
-      new GetAssignedSkillsByOrganization(),
       new GetOrderRequisitionByPage(),
       new GetAssociateAgencies(),
       new GetOrganizationStatesWithKeyCode(),
@@ -160,7 +167,6 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((organization: Organization) => {
       const isIRPFlag = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
-      const orderManagementSystem = this.orderManagementService.getOrderManagementSystem();
       this.selectedSystem = {...createSystem(organization, isIRPFlag)};
 
       this.showSystemToggle =
@@ -168,14 +174,16 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
         this.selectedSystem.isVMS &&
         this.selectedSystem.isIRPFlag;
 
-      if( orderManagementSystem ) {
-        this.activeSystem = orderManagementSystem === OrderManagementIRPSystemId.IRP ? OrderSystem.IRP : OrderSystem.VMS;
+      if( this.orderManagementSystem ) {
+        this.activeSystem =
+          this.orderManagementSystem === OrderManagementIRPSystemId.IRP ? OrderSystem.IRP : OrderSystem.VMS;
+        this.orderManagementSystem = null;
       } else {
         this.activeSystem = this.selectedSystem.isIRP ? OrderSystem.IRP : OrderSystem.VMS;
       }
 
       this.setSubmitButtonConfig();
-
+      this.getSkillsByActiveSystem();
       updateSystemConfig(this.orderSystemConfig, this.activeSystem);
       this.changeDetection.markForCheck();
     });
@@ -185,5 +193,11 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     this.orderManagementService.setOrderManagementSystem(
       this.activeSystem === OrderSystem.IRP ? OrderManagementIRPSystemId.IRP : OrderManagementIRPSystemId.VMS
     );
+  }
+
+  private getSkillsByActiveSystem(): void {
+    this.store.dispatch(new GetAssignedSkillsByOrganization({
+      params: { SystemType: this.activeSystem === OrderSystem.IRP ? OrderSystem.VMS : OrderSystem.IRP },
+    }));
   }
 }

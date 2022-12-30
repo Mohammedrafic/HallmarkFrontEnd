@@ -6,4 +6,5 @@ export class JobDistributionModel {
   jobDistributionOption: OrderJobDistribution;
   agencyId: number | null;
   agencyName?: string;
+  jobDistributionValue?: number[];
 }

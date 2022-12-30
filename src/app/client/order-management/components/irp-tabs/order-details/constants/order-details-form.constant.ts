@@ -206,7 +206,7 @@ export const JobDistributionConfigLTA = (selectedSystem: SelectSystem): OrderFor
       required: false,
       enabled: true,
       show: false,
-      type: FieldType.Dropdown,
+      type: FieldType.MultiSelectDropdown,
       dataSource: [],
     },
     {
@@ -237,7 +237,7 @@ export const JobDistributionConfigPO = (selectedSystem: SelectSystem): OrderForm
       required: false,
       enabled: true,
       show: false,
-      type: FieldType.Dropdown,
+      type: FieldType.MultiSelectDropdown,
       dataSource: [],
     },
     {
@@ -269,6 +269,7 @@ export const JobDescriptionConfig = (): OrderFormsConfig => ({
       title: 'Classification',
       cssClass: 'itm2',
       required: false,
+      show: true,
       type: FieldType.MultiSelectDropdown,
       dataSource: JobClassifications,
     },
@@ -345,6 +346,7 @@ export const JobDescriptionConfigPO = (): OrderFormsConfig => ({
       title: 'Classification',
       cssClass: 'itm2',
       required: false,
+      show: true,
       type: FieldType.MultiSelectDropdown,
       dataSource: JobClassifications,
     },

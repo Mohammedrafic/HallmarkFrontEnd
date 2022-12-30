@@ -12,6 +12,7 @@ import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { OrganizationSettingFilter, OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { ImportedBillRate } from '@shared/models';
+import { SkillParams } from '@client/order-management/interfaces';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[organizationManagement] Set General States By Country';
@@ -190,7 +191,7 @@ export class GetMasterSkillsByOrganization {
 
 export class GetAssignedSkillsByOrganization {
   static readonly type = '[organizationManagement] Get Assigned Skills by Organization';
-  constructor() {}
+  constructor(public params?: SkillParams) {}
 }
 
 export class GetAllSkillsCategories {

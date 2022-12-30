@@ -1,0 +1,35 @@
+<div class="card-wrapper">
+  <div class="block block--name">
+    <p class="name">{{ candidate.lastName }}, {{ candidate.firstName }}</p>
+
+    <ejs-tooltip
+      *ngIf="candidateIconName"
+      [content]="iconTooltipMessage"
+      position="TopCenter"
+      [showTipPointer]="false"
+    >
+      <i-feather
+        [name]="candidateIconName"
+        class="icon"
+      ></i-feather>
+    </ejs-tooltip>
+  </div>
+  <div class="block">
+    <ejs-tooltip content="ID" position="TopCenter" [showTipPointer]="false">
+      <span>{{ candidate.id }}</span>
+    </ejs-tooltip>
+    <span class="separator">|</span>
+    <ejs-tooltip content="Primary Skill" position="TopCenter" [showTipPointer]="false">
+      <span class="direction">{{ candidate.skill }}</span>
+    </ejs-tooltip>
+  </div>
+  <div class="block">
+    <ejs-tooltip content="Assigned Hours Per Week 1/Week 2" position="TopCenter" [showTipPointer]="false">
+      <span>{{ candidate.workHours.join('/') }}</span>
+    </ejs-tooltip>
+    <span class="separator">|</span>
+    <ejs-tooltip content="Work Commitment" position="TopCenter" [showTipPointer]="false">
+      <span>{{ candidate.workCommitment }}</span>
+    </ejs-tooltip>
+  </div>
+</div>

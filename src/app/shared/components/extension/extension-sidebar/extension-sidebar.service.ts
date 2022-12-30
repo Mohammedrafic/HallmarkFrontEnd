@@ -89,7 +89,9 @@ export class ExtensionSidebarService {
   }
 
   private prepareExtension(extension: any): ExtensionModel {
-    const { orderId, startDate, endDate, billRate, billRates, comments, jobId, durationPrimary } = extension || {};
+    const { orderId, startDate, endDate, billRate, billRates, comments,
+      jobId, durationPrimary, ignoreMissingCredentials } = extension || {};
+
     return {
       jobId,
       orderId,
@@ -99,6 +101,7 @@ export class ExtensionSidebarService {
       actualStartDate: DateTimeHelper.setInitHours(startDate),
       actualEndDate: DateTimeHelper.setInitHours(endDate),
       duration: durationPrimary,
+      ignoreMissingCredentials,
     };
   }
 }
