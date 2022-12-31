@@ -96,7 +96,7 @@ export class GeneralNotesComponent extends DestroyableDirective implements OnIni
   }
 
   private getCategoryById(id: number): CategoryModel | null {
-    return this.categories.find((category: CategoryModel) => category.id === id) ?? null;
+    return this.categories?.find((category: CategoryModel) => category.id === id) ?? null;
   }
 
   private isDialogOpened(): Observable<boolean> {

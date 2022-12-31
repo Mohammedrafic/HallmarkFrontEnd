@@ -71,6 +71,10 @@ export class CandidateProfileService {
     );
   }
 
+  public getCandidatePhotoById(id: number): Observable<Blob> {
+    return this.http.get(`/api/employee/${id}/photo`, { responseType: 'blob' });
+  }
+
   private convertDatesToUTC(candidate: CandidateModel): Partial<CandidateModel> {
     const props = [
       'dob',

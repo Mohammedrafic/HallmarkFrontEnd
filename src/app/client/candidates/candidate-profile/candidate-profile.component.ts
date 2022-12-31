@@ -92,6 +92,14 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
           this.candidateProfileFormService.populateCandidateForm(candidate);
           this.generalNotesService.notes$.next(candidate.generalNotes);
         });
+
+      this.candidateProfileService
+        .getCandidatePhotoById(this.candidateId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((photo: Blob) => {
+          this.photo = photo;
+          this.cdr.markForCheck();
+        });
     }
   }
 }
