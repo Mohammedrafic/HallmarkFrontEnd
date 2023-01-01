@@ -12,11 +12,11 @@ import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
   styleUrls: ['./multiselect-dropdown.component.scss'],
   providers: [
     { provide: NG_VALIDATORS, useExisting: forwardRef(() => MultiselectDropdownComponent), multi: true },
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => MultiselectDropdownComponent), multi: true }
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => MultiselectDropdownComponent), multi: true },
   ],
 })
-export class MultiselectDropdownComponent<T> extends BaseFormControlDirective {
-  @Input() public dataSource: T[] | null | undefined;
+export class MultiselectDropdownComponent extends BaseFormControlDirective {
+  @Input() public dataSource: unknown | null | undefined;
   @Input() public fields: FieldSettingsModel;
   @Input() public selectAllText: string;
   @Input() public showSelectAll: boolean;

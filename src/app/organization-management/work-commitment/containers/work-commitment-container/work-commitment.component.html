@@ -1,0 +1,30 @@
+<section class="work-commitment">
+  <div class="toolbar">
+    <div class="title">
+      <h3>Work Commitment</h3>
+    </div>
+    <div class="btn-container">
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="userPermission[userPermissions.CanManageWorkCommitmentData]"
+      >
+        <app-button
+          text="Add Commitment"
+          [disabled]="userPermission[userPermissions.CanManageWorkCommitmentData]"
+          (clickEmitter)="addCommitment()"
+          [type]="buttonType.PRIMARY"
+        ></app-button>
+      </app-tooltip-container>
+    </div>
+  </div>
+  <div class="grid-container">
+    <app-work-commitment-grid (editCommitment)="handleEditCommitment($event)"></app-work-commitment-grid>
+  </div>
+</section>
+
+<app-work-commitment-dialog
+  [selectedCommitment]="selectedCommitment"
+  [isEditDialog]="isEdit"
+  [permission]="!userPermission[userPermissions.CanManageWorkCommitmentData]"
+  (saveCommitment)="handleSaveCommitment($event)"
+></app-work-commitment-dialog>

@@ -70,7 +70,7 @@ export enum UserPermissions {
   CanViewSkillCategories = 1300,
   CanEditSkillCategories = 1301,
   OrganizationHolidays = 1397,
-  MasterHolidays  = 1398,
+  MasterHolidays = 1398,
   Holidays = 1399,
   CanViewMasterHolidays = 1400,
   CanEditMasterHolidays = 1401,
@@ -121,7 +121,7 @@ export enum UserPermissions {
   CanAgencyAddEditDeleteTimesheetRecords = 2703,
   WidgetApplicantsByPositions = 2704,
   WidgetTrendsOpen = 2705,
-  WidgetTrendsInProgress= 2706,
+  WidgetTrendsInProgress = 2706,
   OrderClosureReasons = 2799,
   CanViewOrderClosureReasons = 2800,
   CanManageOrderClosureReasons = 2801,
@@ -164,6 +164,11 @@ export enum UserPermissions {
   ManageCredentialWithinOrderScope = 4110,
 
   // Manage Work Commitments
+  WorkCommitments = 4150,
   CanViewMasterWorkCommitmentData = 4151,
   CanManageMasterWorkCommitmentData = 4152,
+  CanViewWorkCommitmentData = 4153,
+  CanManageWorkCommitmentData = 4154,
+  MasterWorkCommitments = 4155,
+  OrganizationWorkCommitments = 4156,
 }

@@ -1,0 +1,13 @@
+<app-grid
+  (navigateToPageEmitter)="handleChangePage($event)"
+  (pageSizeChangeEmitter)="handleChangePageSize($event)"
+  (gridReadyEmitter)="gridReady($event)"
+  [columnDefinitions]="columnDefinitions"
+  [rowData]="workCommitmentsGrid"
+  [isLoading]="isLoading"
+  [pageSize]="filters.pageSize"
+  [currentPage]="filters.pageNumber"
+  [totalRecordsCount]="(workCommitmentsPage$ | async)?.totalCount || 0"
+  [rowDragManaged]="false"
+  [suppressMoveWhenRowDragging]="true"
+></app-grid>

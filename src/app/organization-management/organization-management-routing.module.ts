@@ -17,7 +17,8 @@ import { ReasonsComponent } from './reasons/reasons.component';
 import { RegionsComponent } from './regions/regions.component';
 import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
 import { BusinessLinesComponent } from './business-lines/business-lines.component';
-import { TiersComponent } from "@organization-management/tiers/tiers.component";
+import { TiersComponent } from '@organization-management/tiers/tiers.component';
+import { WorkCommitmentComponent } from './work-commitment/containers/work-commitment-container/work-commitment.component';
 
 const routes: Routes = [
   {
@@ -28,28 +29,28 @@ const routes: Routes = [
         path: 'departments',
         component: DepartmentsComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'locations',
         component: LocationsComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'regions',
         component: RegionsComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'credentials',
         component: CredentialsComponent,
         data: {
-          isOrganizationArea: true
+          isOrganizationArea: true,
         },
         children: [
           {
@@ -57,94 +58,101 @@ const routes: Routes = [
             component: CredentialsListComponent,
             data: {
               isOrganizationArea: true,
-              isCredentialSettings: true
-            }
+              isCredentialSettings: true,
+            },
           },
           {
             path: 'setup',
             component: CredentialsSetupComponent,
-            data: { isOrganizationArea: true }
-          }
-        ]
+            data: { isOrganizationArea: true },
+          },
+        ],
       },
       {
         path: 'credentials/groups-setup',
         component: GroupComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'skills',
         component: SkillsComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'shifts',
         component: ShiftsComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'settings',
         component: SettingsComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'holidays',
         component: HolidaysComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'workflow',
         component: JobOrderComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'bill-rates',
         component: BillRatesComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'reasons',
         component: ReasonsComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'specialproject',
         component: SpecialProjectContainerComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'businesslines',
         component: BusinessLinesComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'tiers',
         component: TiersComponent,
         data: {
-          isOrganizationArea: true
-        }
-      }
-    ]
+          isOrganizationArea: true,
+        },
+      },
+      {
+        path: 'workcommitment',
+        component: WorkCommitmentComponent,
+        data: {
+          isOrganizationArea: true,
+        },
+      },
+    ],
   },
 ];
 
