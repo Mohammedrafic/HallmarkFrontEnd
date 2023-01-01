@@ -202,8 +202,8 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
         locationIds: new FormControl([], [Validators.required]),
         departmentIds: new FormControl([], [Validators.required]),
         agencyIds: new FormControl([], [Validators.required]),
-        year: new FormControl([], [Validators.required]),
-        month: new FormControl([], [Validators.required]),
+        year: new FormControl(null),
+        month: new FormControl(null),
         invoiceStatus: new FormControl(null),
         invoiceId: new FormControl(null)
       }
