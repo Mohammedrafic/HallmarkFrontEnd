@@ -12,6 +12,7 @@ import type {
   LegendSettingsModel,
 } from '@syncfusion/ej2-angular-charts';
 
+
 import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulation-widget.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 import { DashboardService } from '../../services/dashboard.service';
@@ -20,6 +21,11 @@ import { LegendPositionEnum } from '../../enums/legend-position.enum';
 import { Store } from '@ngxs/store';
 import { UserState } from '../../../store/user.state';
 import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { CANDIDATE_STATUS } from '@shared/constants';
+import { AlertService } from '@shared/services/alert.service';
 
 @Component({
   selector: 'app-accumulation-chart',
@@ -53,19 +59,73 @@ export class AccumulationChartComponent
 
   private readonly selectedEntries$: BehaviorSubject<string[] | null> = new BehaviorSubject<string[] | null>(null);
 
-  constructor(private readonly dashboardService: DashboardService, private store: Store) {
+  constructor(private readonly dashboardService: DashboardService, private store: Store, private alertService: AlertService
+  ) {
+
     super();
+
   }
 
   public redirectToSourceContent(status: string): void {
     const user = this.store.selectSnapshot(UserState.user);
+    let Enumvalues: number;
     if (this.chartData?.title == "Candidates") {
-      if (this.chartData?.title)
+      //if (this.chartData?.title)
+      if (status.toLowerCase() == CandidatStatus[CandidatStatus['Not Applied']].toLowerCase()) {
+        Enumvalues = CandidatStatus['Not Applied'];
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Applied].toLowerCase()) {
+        Enumvalues = CandidatStatus.Applied;
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Shortlisted].toLowerCase()) {
+        Enumvalues = CandidatStatus.Shortlisted;
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus['Pre Offer Custom']].toLowerCase()) {
+        Enumvalues = CandidatStatus['Pre Offer Custom'];
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Withdraw].toLowerCase()) {
+        Enumvalues = CandidatStatus.Withdraw;
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Offered].toLowerCase()) {
+        Enumvalues = CandidatStatus.Offered;
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.BillRatePending].toLowerCase()) {
+        Enumvalues = CandidatStatus.BillRatePending;
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.OfferedBR].toLowerCase()) {
+        Enumvalues = CandidatStatus.OfferedBR;
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Accepted].toLowerCase()) {
+        Enumvalues = CandidatStatus.Accepted;
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.OnBoard].toLowerCase()) {
+        Enumvalues = CandidatStatus.OnBoard;
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.End].toLowerCase()) {
+        Enumvalues = CandidatStatus.End;
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Offboard].toLowerCase()) {
+        Enumvalues = CandidatStatus.Offboard;
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Rejected].toLowerCase()) {
+        Enumvalues = CandidatStatus.Rejected;
+      }
+      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Cancelled].toLowerCase()) {
+        Enumvalues = CandidatStatus.Cancelled;
+      }
+      else {
+        Enumvalues = 0;
+      }
+      if (Enumvalues > 0) {
         if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
           this.dashboardService.redirectToUrl('agency/candidate-details');
         } else {
-          this.dashboardService.redirectToUrl('client/candidate-details', undefined, status);
+          this.dashboardService.redirectToUrl('client/candidate-details',Enumvalues,undefined);
         }
+      }
+      else {
+        this.store.dispatch(new ShowToast(MessageTypes.Warning, CANDIDATE_STATUS));
+      }
     } else if (this.chartData?.title == "Active Positions") {
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
