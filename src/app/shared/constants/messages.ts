@@ -73,3 +73,4 @@ export const DOCUMENT_DELETE_SUCCESS = 'Documents deleted successfully';
 export const DOCUMENT_UNSHARED_SUCCESS = 'Documents UnShared successfully';
 export const FOLDER_DELETE_SUCCESS = 'Folder deleted successfully';
 export const EMAIL_RESEND_SUCCESS = 'Email was sent successfully';
+export const CANDIDATE_STATUS= 'Selected Candidate status is unavailable';

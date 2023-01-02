@@ -80,7 +80,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   public pageSize = GRID_CONFIG.initialRowsPerPage;
   private selectedTab: number | null;
   private filterApplied = false;
-  public CandidateStatus: string;
+  public CandidateStatus: number;
   constructor(
     private store: Store,
     private router: Router,
@@ -90,7 +90,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   ) {
     super();
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
-    this.CandidateStatus = (routerState?.['status']);
+    this.CandidateStatus = (routerState?.['orderStatus']);
   }
 
   ngOnInit(): void {
