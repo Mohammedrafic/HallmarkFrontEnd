@@ -1,3 +1,5 @@
+import { FilteredItem } from "@shared/models/filter.model";
+import { FilterColumn } from "src/app/dashboard/models/widget-filter.model";
 import { ScheduleOrderType, ScheduleType } from '../enums';
 import { PageOfCollections } from '@shared/models/page.model';
 
@@ -70,8 +72,20 @@ export interface ScheduleFilters {
   endDate?: string;
   regionIds?: number[];
   locationIds?: number[];
-  departmentIds?: number[];
+  departmentsIds?: number[];
   skillIds?: number[];
   pageNumber?: number;
   pageSize?: number;
+}
+
+export interface ScheduleFiltersColumnsDataModel {
+  regionIds: FilterColumn;
+  locationIds: FilterColumn;
+  departmentsIds: FilterColumn
+  skillIds: FilterColumn;
+}
+
+export interface ScheduleFiltersData {
+  filters: ScheduleFilters;
+  filteredItems: FilteredItem[];
 }

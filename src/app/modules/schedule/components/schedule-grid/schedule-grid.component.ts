@@ -123,10 +123,9 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   private startOrgIdWatching(): void {
     this.organizationId$.pipe(
+      filter(Boolean),
       switchMap((businessUnitId: number) => {
-        const id = businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
-
-        return this.store.dispatch(new GetOrganizationById(id));
+        return this.store.dispatch(new GetOrganizationById(businessUnitId));
       }),
       switchMap(() => {
         this.checkOrgPreferences();
