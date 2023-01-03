@@ -7,7 +7,7 @@ export const getCorrectLocationValue = (value: string[] | null) =>
 
 export const getCorrectSkillsValue = (value: ListOfSkills[]) => {
   const skillsName = value.map((item): string => item.name);
-  return getCorrectLongValue(skillsName);
+  return skillsName[0] === null ? 'All' : getCorrectLongValue(skillsName);
 };
 
 export const getCorrectLongValue = (value: string[]) => {

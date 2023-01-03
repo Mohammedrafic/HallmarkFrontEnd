@@ -65,6 +65,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
   public optionFields: FieldSettingsModel = OPTION_FIELDS;
   public buttonType = ButtonTypeEnum;
   public datepickerMask = datepickerMask;
+  public allSkillsLength: number;
 
   @Select(UserState.organizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;
@@ -109,7 +110,9 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
 
   public saveWorkCommitment(): void {
     if (this.commitmentForm?.valid) {
-      this.saveCommitment.emit(WorkCommitmentAdapter.prepareToSave(this.regionsDTO, this.commitmentForm!));
+      this.saveCommitment.emit(
+        WorkCommitmentAdapter.prepareToSave(this.regionsDTO, this.allSkillsLength, this.commitmentForm!)
+      );
     } else {
       this.commitmentForm?.markAllAsTouched();
     }
@@ -229,6 +232,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
       .pipe(filter(Boolean), takeUntil(this.destroy$))
       .subscribe((skills) => {
         setDataSourceValue(this.dialogConfig.fields, 'skills', skills);
+        this.allSkillsLength = skills.length;
         this.changeDetection.markForCheck();
       });
   }

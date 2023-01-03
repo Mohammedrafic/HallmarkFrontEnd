@@ -13,6 +13,7 @@ import { getRegionsArray } from '../helpers';
 export class WorkCommitmentAdapter {
   public static prepareToSave(
     correctRegions: RegionsDTO[],
+    allSkillsLength: number,
     formGroup: CustomFormGroup<WorkCommitmentForm>
   ): WorkCommitmentDTO {
     const {
@@ -29,7 +30,7 @@ export class WorkCommitmentAdapter {
 
     return {
       masterWorkCommitmentId,
-      skills,
+      skills: skills.length === allSkillsLength ? [null] : skills,
       minimumWorkExperience,
       availabilityRequirement,
       schedulePeriod,
