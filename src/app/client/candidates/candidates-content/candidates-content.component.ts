@@ -12,6 +12,7 @@ import { GetOrganizationById } from '@organization-management/store/organization
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { UserPermissions } from '@core/enums';
 import { Permission } from '@core/interface';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-candidates-content',
@@ -97,7 +98,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
     const { isIRPEnabled } =
     this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
 
-    this.isIRP = !!isIRPEnabled;
+    this.isIRP = !!isIRPEnabled && this.store.selectSnapshot(AppState.isIrpFlagEnabled);
     this.preferencesLoaded = true;
   }
 
