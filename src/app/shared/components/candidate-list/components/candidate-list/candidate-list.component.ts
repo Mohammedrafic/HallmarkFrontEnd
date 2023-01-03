@@ -40,7 +40,7 @@ import { ExportColumn, ExportOptions } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { isNil } from 'lodash';
-import { optionFields, regionFields } from '@shared/constants';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, optionFields, regionFields } from '@shared/constants';
 import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
 import { filterColumns, IRPCandidates, VMSCandidates } from './candidate-list.constants';
 import { Permission } from '@core/interface';
@@ -252,10 +252,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public onRemove(id: number): void {
     this.confirmService
-      .confirm('Are you sure you want to inactivate the Candidate?', {
-        okButtonLabel: 'Inactivate',
+      .confirm(
+        this.isIRP ? DELETE_RECORD_TEXT : 'Are you sure you want to inactivate the Candidate?', {
+        okButtonLabel: this.isIRP ? 'Delete' : 'Inactivate',
         okButtonClass: 'delete-button',
-        title: 'Inactivate the Candidate',
+        title: this.isIRP ? DELETE_RECORD_TITLE : 'Inactivate the Candidate',
       })
       .pipe(
         filter((confirm) => !!confirm),
