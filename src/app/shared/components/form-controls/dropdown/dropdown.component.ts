@@ -13,8 +13,8 @@ import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true },
   ],
 })
-export class DropdownComponent<T> extends BaseFormControlDirective {
-  @Input() public dataSource: T[] | null | undefined;
+export class DropdownComponent extends BaseFormControlDirective {
+  @Input() public dataSource: unknown | null | undefined;
   @Input() public fields: FieldSettingsModel;
   @Input() public hideBorder = true;
 }

@@ -1,4 +1,5 @@
 import { GroupMailStatus } from "@admin/alerts/group-email.enum";
+import { StringMap } from "@angular/compiler/src/compiler_facade_interface";
 import { type } from "os";
 import { PageOfCollections } from "./page.model";
 
@@ -33,3 +34,8 @@ export type GroupEmail = {
     businessUnitId: number | null
     selectedFile?: Blob | null
   };
+
+export type GroupEmailRole = {
+  id:number,
+  name:string
+}

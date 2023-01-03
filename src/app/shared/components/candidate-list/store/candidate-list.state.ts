@@ -9,6 +9,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateListService } from '../services/candidate-list.service';
 import {
   ChangeCandidateProfileStatus,
+  DeleteIRPCandidate,
   ExportCandidateList,
   GetAllSkills,
   GetCandidatesByPage,
@@ -17,6 +18,7 @@ import {
 } from './candidate-list.actions';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { RECORD_DELETE } from '@shared/constants';
 
 export interface CandidateListStateModel {
   isCandidateLoading: boolean;
@@ -127,5 +129,13 @@ export class CandidateListState {
         listOfRegions: data
       })
     }))
+  }
+
+  @Action(DeleteIRPCandidate)
+  DeleteIRPCandidate({dispatch}: StateContext<CandidateListStateModel>, { id }: DeleteIRPCandidate): Observable<void> {
+    return this.candidateListService.deleteIRPCandidate(id).pipe(
+      tap(() => dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE))),
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+    );
   }
 }

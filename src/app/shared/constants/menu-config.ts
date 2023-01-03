@@ -615,6 +615,11 @@ export const MENU_CONFIG: any = {
       icon: 'clock',
       route: '/client/associate-list',
     },
+    38: {
+      // Scheduling
+      icon: 'file-text',
+      route: 'client/scheduling',
+    },
     13: {
       // Order Management
       icon: 'file-text',

@@ -202,8 +202,8 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
         locationIds: new FormControl([], [Validators.required]),
         departmentIds: new FormControl([], [Validators.required]),
         agencyIds: new FormControl([], [Validators.required]),
-        year: new FormControl([], [Validators.required]),
-        month: new FormControl([], [Validators.required]),
+        year: new FormControl(null),
+        month: new FormControl(null),
         invoiceStatus: new FormControl(null),
         invoiceId: new FormControl(null)
       }
@@ -243,9 +243,9 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
   private loadInvoiceStatus(): void {
     this.invoiceStatusList = [];
 
-    this.invoiceStatusList.push({ id: 1, name: 'Paid' });
-    this.invoiceStatusList.push({ id: 2, name: 'Submitted pend appr' });
-    this.invoiceStatusList.push({ id: 3, name: 'Pending Payment' });
+    this.invoiceStatusList.push({ id: 1, name: 'Submitted pend appr' });
+    this.invoiceStatusList.push({ id: 2, name: 'Pending Payment' });
+    this.invoiceStatusList.push({ id: 3, name: 'Paid' });
   }
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.BusinessIds) as AbstractControl;

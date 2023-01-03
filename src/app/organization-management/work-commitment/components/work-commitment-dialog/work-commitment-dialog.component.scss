@@ -1,0 +1,75 @@
+.commitment-form-dialog {
+  display: grid;
+  grid-template: auto / 4fr 1fr 1fr 4fr 1fr 1fr;
+
+  //this bad naming was provided for shorter line
+  //"r" means grid-row (+ number), "c" means grid-column (+ number)
+  grid-template-areas:
+    'r1 r1 r1 r1 r1 r1'
+    'r2 r2 r2 r2 r2 r2'
+    'r3 r3 r3 r3 r3 r3'
+    'r4 r4 r4 r4 r4 r4'
+    'r5c1 r5c1 r5c1 r5c2 r5c2 r5c2'
+    'r6c1 r6c1 r6c2 r6c2 r6c3 r6c3'
+    'r7 r7 r7 r7 r7 r7'
+    'r8 r8 r8 r8 r8 r8';
+
+  .input-container {
+    margin-bottom: 12px;
+  }
+
+  .input-container:nth-child(1) {
+    grid-area: r1;
+  }
+
+  .input-container:nth-child(2) {
+    grid-area: r2;
+  }
+
+  .input-container:nth-child(3) {
+    grid-area: r3;
+  }
+
+  .input-container:nth-child(4) {
+    grid-area: r4;
+  }
+
+  .input-container:nth-child(5) {
+    grid-area: r5c1;
+    margin-right: 12px;
+  }
+
+  .input-container:nth-child(6) {
+    grid-area: r5c2;
+  }
+
+  .input-container:nth-child(7) {
+    grid-area: r6c1;
+    margin-right: 12px;
+  }
+
+  .input-container:nth-child(8) {
+    grid-area: r6c2;
+    margin-right: 12px;
+  }
+
+  .input-container:nth-child(9) {
+    grid-area: r6c3;
+  }
+
+  .input-container:nth-child(10) {
+    grid-area: r7;
+  }
+
+  .input-container:nth-child(11) {
+    grid-area: r8;
+  }
+}
+
+.header-container {
+  margin-bottom: 12px;
+
+  .cancel-button {
+    margin-right: 8px;
+  }
+}

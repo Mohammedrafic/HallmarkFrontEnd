@@ -9,12 +9,13 @@ import { ScheduleApiService } from '@shared/services/schedule-api.service';
 import { Destroyable } from '@core/helpers';
 
 import { TabListConfig } from '../../constants';
-import { SetHeaderState } from '../../../../store/app.actions';
+import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import { ActiveTabIndex } from '../../enums';
 import {
   CandidateSchedules,
   ScheduleCandidatesPage,
   ScheduleFilters,
+  ScheduleFiltersData,
   ScheduleModelPage,
   ScheduleSelectedSlots,
 } from '../../interface/schedule.model';
@@ -35,17 +36,11 @@ export class ScheduleContainerComponent extends Destroyable {
 
   scheduleData: ScheduleModelPage;
 
-  scheduleFilters: ScheduleFilters = {
-    firstLastNameOrId: '',
-    startDate: '',
-    endDate: '',
-    regionIds: [0],
-    locationIds: [0],
-    departmentIds: [0],
-    skillIds: [0],
-    pageNumber: 1,
-    pageSize: 30,
-  };// TODO DEN! - REMOVE required fields when they will not be required
+  appliedFiltersAmount = 0;
+
+  totalCount = 0;
+
+  scheduleFilters: ScheduleFilters = {};
 
   constructor(
     private store: Store,
@@ -80,6 +75,15 @@ export class ScheduleContainerComponent extends Destroyable {
 
   selectedCells(cells: ScheduleSelectedSlots): void {}
 
+  showFilters(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
+  }
+
+  updateScheduleFilter(data: ScheduleFiltersData): void {
+    this.changeFilters(data.filters);
+    this.appliedFiltersAmount = data.filteredItems?.length;
+  }
+
   private initScheduleData(isLoadMore = false): void {
     const { startDate, endDate, ...restFilters } = this.scheduleFilters;
 
@@ -106,6 +110,8 @@ export class ScheduleContainerComponent extends Destroyable {
       } else {
         this.scheduleData = scheduleData;
       }
+
+      this.totalCount = scheduleData.totalCount;
 
       this.cdr.detectChanges();
     });

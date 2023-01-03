@@ -9,11 +9,11 @@ import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { MessageTypes } from '@shared/enums/message-types';
-import { Region, regionFilter } from '@shared/models/region.model';
+import { Region, regionFilter, regionsPage } from '@shared/models/region.model';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import {
   ClearLocationList, DeleteRegionById, ExportRegions, GetMasterRegions, GetOrganizationById,
-  GetRegions, SaveRegion, SetGeneralStatesByCountry, SetImportFileDialogState, UpdateRegion
+  GetRegions, GetRegionsPage, SaveRegion, SetGeneralStatesByCountry, SetImportFileDialogState, UpdateRegion
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 
@@ -60,8 +60,12 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
   defaultValue:any;
 
+  @Select(OrganizationManagementState.regionsPage)
+  regionsPageList$: Observable<regionsPage>;
+
   @Select(OrganizationManagementState.regions)
-  regions$: Observable<Region[]>;
+  allRegions$: Observable<Region[]>;
+
 
 
   @Select(OrganizationManagementState.GetMasterRegions)
@@ -160,9 +164,8 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     });
     this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization?.generalInformation?.country));
-      this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
+      this.store.dispatch(new GetRegionsPage(this.filters)).pipe(takeUntil(this.unsubscribe$))
         .subscribe((data) => {
-          this.defaultValue = data.organizationManagement.regions[0]?.id;
         });
     });
 
@@ -190,20 +193,22 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
   public getMasterRegionData() {
     this.store.dispatch(new GetMasterRegions());
+    this.store.dispatch(new GetRegions());
     this.masterRegions$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.masterRegion = data;
-      this.regions$.subscribe((regionsData) => {
-        let filterMasterData: Region[] = [];
-        if (regionsData && regionsData.length > 0) {
-          let regionNameData = regionsData.map(x => x.name);
-          let masterData = data;
-          filterMasterData = masterData.filter((item) => {
-            return !regionNameData.includes(item.name);
-          });
-          this.masterRegion = filterMasterData;
-        }
-        this.changeDetectorRef.detectChanges();
-      });
+      this.allRegions$.pipe(takeUntil(this.unsubscribe$))
+        .subscribe((regionsData) => {
+          let filterMasterData: Region[] = [];
+          if (regionsData && regionsData.length > 0) {
+            let regionNameData = regionsData.map(x => x.name);
+            let masterData = data;
+            filterMasterData = masterData.filter((item) => {
+              return !regionNameData.includes(item.name);
+            });
+            this.masterRegion = filterMasterData;
+          }
+          this.changeDetectorRef.detectChanges();
+        });
     });
   }
 
@@ -288,7 +293,8 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     this.filters.orderBy = this.orderBy;
     this.filters.pageNumber = this.currentPage;
     this.filters.pageSize = this.pageSize;
-    this.store.dispatch([new GetRegions(this.filters)]).pipe(takeUntil(this.unsubscribe$))
+    this.filters.getAll = false;
+    this.store.dispatch([new GetRegionsPage(this.filters)]).pipe(takeUntil(this.unsubscribe$))
       .subscribe((data) => {
       });
   }
@@ -324,6 +330,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   }
 
   onRowsDropDownChanged(): void {
+    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.grid.pageSettings.pageSize = this.pageSize;
   }
 
@@ -352,8 +359,10 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
       })
       .subscribe((confirm) => {
         if (confirm && region.id ) {
-          this.store.dispatch(new DeleteRegionById(region.id));
-          this.getMasterRegionData();
+          this.store.dispatch(new DeleteRegionById(region.id)).subscribe(() => {
+            this.getRegions();
+            this.getMasterRegionData();
+          });
           this.regionFormGroup.reset();
         }
         this.removeActiveCssClass();
@@ -421,8 +430,8 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     }
     this.store.dispatch(new SaveRegion(Region)).subscribe((res) => {
       if (selectedIndex == (selectedRegionsLength - 1)) {
-          this.store.dispatch(new GetRegions());
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
+        this.store.dispatch(new GetRegionsPage(this.filters));
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
       }
     });
     

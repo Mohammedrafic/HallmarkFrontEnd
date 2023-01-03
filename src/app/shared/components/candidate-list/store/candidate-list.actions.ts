@@ -28,3 +28,9 @@ export class ExportCandidateList {
 export class GetRegionList {
   static readonly type = '[candidate list] Get Region List';
 }
+
+export class DeleteIRPCandidate {
+  static readonly type = '[candidate list] Delete IRP Candidate';
+  constructor(public id: number) {}
+
+}

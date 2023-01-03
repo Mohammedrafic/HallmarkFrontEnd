@@ -94,6 +94,11 @@ export class GetRegions {
   constructor(public filter?: regionFilter) {}
 }
 
+export class GetRegionsPage {
+  static readonly type = '[organizationManagement] Get The Regions Page List';
+  constructor(public filter?: regionFilter) { }
+}
+
 export class GetMasterRegions {
   static readonly type = '[organizationManagement] Get The List Of Regions';
   constructor() {}

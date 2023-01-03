@@ -15,7 +15,8 @@ export const ORG_SETTINGS: MenuSettings[] = [
   },
   {
     text: 'Departments',
-    id: 1, route: './departments',
+    id: 1,
+    route: './departments',
     permissionKeys: ['CanViewOrganizationalHierarchy', 'CanCreateOrders'],
   },
   { text: 'Shifts', id: 5, route: './shifts', permissionKeys: ['CanViewShifts'] },
@@ -28,5 +29,12 @@ export const ORG_SETTINGS: MenuSettings[] = [
   { text: 'Reasons', id: 10, route: './reasons', permissionKeys: ['CanOrganizationViewOrders'] },
   { text: 'Special Project', id: 12, route: './specialproject', permissionKeys: ['CanViewSpecialProjects'] },
   { text: 'Business Lines', id: 13, route: './businesslines' },
-  { text: 'Tiers', id: 14, route: './tiers',  permissionKeys: ['CanViewOrganizationTiers']},
+  { text: 'Tiers', id: 14, route: './tiers', permissionKeys: ['CanViewOrganizationTiers'] },
+  {
+    text: 'Work Commitment',
+    id: 15,
+    route: './workcommitment',
+    permissionKeys: ['CanViewWorkCommitmentData'],
+    isIRPOnly: true,
+  },
 ];

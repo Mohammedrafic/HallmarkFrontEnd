@@ -3,4 +3,5 @@ export interface MenuSettings {
   id: number;
   route: string;
   permissionKeys?: string[];
+  isIRPOnly?: boolean;
 }

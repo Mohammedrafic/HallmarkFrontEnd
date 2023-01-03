@@ -11,20 +11,25 @@ import { UserState } from '../store/user.state';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { AppState } from '../store/app.state';
+import { Organization } from '@shared/models/organization.model';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-organization-management',
   templateUrl: './organization-management.component.html',
-  styleUrls: ['./organization-management.component.scss']
+  styleUrls: ['./organization-management.component.scss'],
 })
 export class OrganizationManagementComponent extends AbstractPermission implements OnInit {
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
+  @Select(OrganizationManagementState.organization)
+  private organization$: Observable<Organization>;
 
   public sideMenuConfig: MenuSettings[];
 
   private orgSettings = ORG_SETTINGS;
   private isIRPFlagEnabled = false;
+  private isIRPForOrganizationEnabled = true;
 
   constructor(protected override store: Store) {
     super(store);
@@ -44,42 +49,51 @@ export class OrganizationManagementComponent extends AbstractPermission implemen
   private watchForPermissions(): void {
     const itemsWithoutPermissions = this.orgSettings.filter((item: MenuSettings) => !item.permissionKeys).length;
 
-    this.getPermissionStream().pipe(
-      filter(() => this.sideMenuConfig.length <= itemsWithoutPermissions),
-      takeUntil(this.componentDestroy())
-    ).subscribe((permissions: Permission) => {
+    combineLatest([
+      this.getPermissionStream().pipe(filter(() => this.sideMenuConfig.length <= itemsWithoutPermissions)),
+      this.organization$.pipe(filter(Boolean)),
+    ])
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(([permissions, organization]) => {
+        this.isIRPForOrganizationEnabled = organization.preferences.isIRPEnabled!;
         this.userPermission = permissions;
         this.setMenuConfig();
-    });
+      });
   }
 
   private setMenuConfig(): void {
-    this.sideMenuConfig = this.checkValidPermissions(this.orgSettings);
+    const orgSettingsWithIRP = this.isIRPForOrganizationEnabled
+      ? this.orgSettings
+      : this.orgSettings.filter((item) => !item.isIRPOnly);
+    this.sideMenuConfig = this.checkValidPermissions(orgSettingsWithIRP);
   }
 
   private startOrgIdWatching(): void {
-    this.organizationId$.pipe(
-      switchMap((id) => this.getOrganization(id)),
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.checkOrgPreferences();
-    });
+    this.organizationId$
+      .pipe(
+        switchMap((id) => this.getOrganization(id)),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.checkOrgPreferences();
+      });
   }
 
   private getOrganization(businessUnitId: number): Observable<void> {
-    const id = businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+    const id = businessUnitId || (this.store.selectSnapshot(UserState.user)?.businessUnitId as number);
 
     return this.store.dispatch(new GetOrganizationById(id));
   }
 
   private checkOrgPreferences(): void {
-    const { isIRPEnabled, isVMCEnabled } = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+    const { isIRPEnabled, isVMCEnabled } =
+      this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
     const isIRPOnly = this.isIRPFlagEnabled && !!(isIRPEnabled && !isVMCEnabled);
 
     if (isIRPOnly) {
       const filteredKeys = new Set([8, 9]);
 
-      this.orgSettings = this.orgSettings.filter(el => !filteredKeys.has(el.id));
+      this.orgSettings = this.orgSettings.filter((el) => !filteredKeys.has(el.id));
 
       this.setMenuConfig();
     }

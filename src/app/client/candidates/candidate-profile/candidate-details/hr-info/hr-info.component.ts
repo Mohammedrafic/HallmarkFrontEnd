@@ -11,12 +11,16 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
 @Component({
   selector: 'app-hr-info',
   templateUrl: './hr-info.component.html',
-  styleUrls: ['./hr-info.component.scss']
+  styleUrls: ['./hr-info.component.scss'],
 })
 export class HrInfoComponent extends AbstractContactDetails implements OnInit {
   public readonly hrInternalTransfersRecruitments = HrInternalTransfersRecruitments;
   public readonly orientationConfigurations = OrientationConfigurations;
   public readonly hrCompanyCodes = HrCompanyCodes;
+
+  public get isContractValue(): boolean {
+    return this.candidateForm.get('isContract')?.value;
+  }
 
   constructor(
     protected override cdr: ChangeDetectorRef,
@@ -27,10 +31,24 @@ export class HrInfoComponent extends AbstractContactDetails implements OnInit {
 
   public override ngOnInit(): void {
     super.ngOnInit();
+
+    this.listenContractChanges();
   }
 
-  public listenContractChanges({ checked }: ChangeEventArgs): void {
+  public listenContractChanges(): void {
+    this.candidateForm
+      .get('isContract')
+      ?.valueChanges
+      .subscribe((checked: boolean) => {
+        this.setStateForContractDates(checked);
+      });
+  }
+
+  public onChange({ checked }: ChangeEventArgs): void {
     this.candidateForm.get('isContract')?.setValue(checked);
+  }
+
+  private setStateForContractDates(checked: boolean): void {
     this.candidateForm.get('contractStartDate')?.[checked ? 'enable' : 'disable']();
     this.candidateForm.get('contractEndDate')?.[checked ? 'enable' : 'disable']();
   }

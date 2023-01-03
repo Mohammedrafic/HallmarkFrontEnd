@@ -29,6 +29,14 @@ export class CandidateListService {
   }
 
   /**
+   * Delete IRP candidate by id
+   * @return list of IRP candidates
+   */
+  public deleteIRPCandidate(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/Employee/delete/${id}`);
+  }
+
+  /**
    * Get all skills for active business unit
    * @return list of skills
    */

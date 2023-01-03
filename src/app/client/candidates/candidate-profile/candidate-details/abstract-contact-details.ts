@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Directive, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Directive, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -7,7 +7,7 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
 
 @Directive()
 export abstract class AbstractContactDetails extends DestroyableDirective implements OnInit {
-  @Input() public candidateForm: FormGroup;
+  public candidateForm: FormGroup;
 
   public readonly fieldsSettings: FieldSettingsModel = { text: 'name', value: 'id' };
   public readonly skillOptionFields: FieldSettingsModel = { text: 'name', value: 'masterSkillId' };
@@ -17,6 +17,7 @@ export abstract class AbstractContactDetails extends DestroyableDirective implem
   }
 
   public ngOnInit(): void {
+    this.candidateForm = this.candidateProfileFormService.candidateForm;
     this.candidateProfileFormService.saveEvent$.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
   }
 }

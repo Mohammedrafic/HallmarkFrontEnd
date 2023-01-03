@@ -47,7 +47,7 @@ export class MasterCommitmentState {
   }
 
   @Action(SaveCommitment)
-  SaveRejectMasterReasons(
+  SaveCommitment(
     { patchState, getState, dispatch}: StateContext<CommitmentStateModel>,
     { payload }: SaveCommitment
   ): Observable<MasterCommitment | void> {
@@ -62,7 +62,7 @@ export class MasterCommitmentState {
         } else {
           if(state.commitmentsPage){
             const items = [payload, ...state.commitmentsPage?.items];
-            const commitmentsPage = { ...state.commitmentsPage, items };
+            const commitmentsPage = { ...state.commitmentsPage, items, totalCount: state.commitmentsPage?.totalCount + 1 };
             patchState({ commitmentsPage });
           }
           dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
@@ -79,7 +79,7 @@ export class MasterCommitmentState {
   }
 
   @Action(RemoveCommitment)
-  RemoveRejectMaterReasons(
+  RemoveCommitment(
     { dispatch }: StateContext<CommitmentStateModel>,
     { id }: RemoveCommitment
   ): Observable<void> {
@@ -87,6 +87,10 @@ export class MasterCommitmentState {
       tap(() => {
         dispatch(new UpdateCommitmentSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveCommitmentError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }

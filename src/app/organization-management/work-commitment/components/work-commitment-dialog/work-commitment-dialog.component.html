@@ -1,0 +1,112 @@
+<ejs-dialog
+  #sideDialog
+  cssClass="dialog"
+  [width]="'434px'"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">{{ title }}</h3>
+          </div>
+          <div class="e-card-content">
+            <app-button
+              class="cancel-button"
+              [type]="buttonType.OUTLINED"
+              (clickEmitter)="closeDialog()"
+              text="Cancel"
+            ></app-button>
+            <app-button
+              [disabled]="!permission"
+              (clickEmitter)="saveWorkCommitment()"
+              [type]="buttonType.PRIMARY"
+              text="Save"
+            >
+            </app-button>
+          </div>
+        </div>
+      </section>
+      <div class="form" *ngIf="commitmentForm">
+        <form [formGroup]="commitmentForm" class="commitment-form-dialog bootstrap">
+          <ng-container *ngFor="let field of dialogConfig?.fields; trackBy: trackByIndex">
+            <ng-container [ngSwitch]="field.type">
+              <ng-template [ngSwitchCase]="FieldTypes.Input">
+                <app-input
+                  class="input-container"
+                  [label]="field.title"
+                  [required]="field.required"
+                  [controlName]="field.field"
+                  [formGroupInstance]="commitmentForm"
+                ></app-input>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="FieldTypes.Number">
+                <app-numeric-textbox
+                  class="input-container"
+                  [label]="field.title"
+                  [required]="field.required"
+                  [min]="0"
+                  format="0"
+                  id="numOfHours"
+                  [controlName]="field.field"
+                  [formGroupInstance]="commitmentForm"
+                ></app-numeric-textbox>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="FieldTypes.MultiSelectDropdown">
+                <app-multiselect-dropdown
+                  class="input-container"
+                  [label]="field.title"
+                  [required]="field.required"
+                  selectAllText="Select All"
+                  [dataSource]="field.dataSource"
+                  [showSelectAll]="true"
+                  [controlName]="field.field"
+                  [formGroupInstance]="commitmentForm"
+                  [fields]="optionFields"
+                ></app-multiselect-dropdown>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
+                <app-dropdown
+                  class="input-container"
+                  [label]="field.title"
+                  [required]="field.required"
+                  [controlName]="field.field"
+                  [formGroupInstance]="commitmentForm"
+                  [dataSource]="field.dataSource"
+                  [fields]="optionFields"
+                  [hideBorder]="false"
+                ></app-dropdown>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="FieldTypes.Time">
+                <app-timepicker
+                  class="input-container"
+                  [label]="field.title"
+                  [required]="field.required"
+                  [controlName]="field.field"
+                  [formGroupInstance]="commitmentForm"
+                ></app-timepicker>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="FieldTypes.Calendar">
+                <app-datepicker
+                  class="input-container"
+                  [label]="field.title"
+                  [required]="field.required"
+                  [controlName]="field.field"
+                  [formGroupInstance]="commitmentForm"
+                ></app-datepicker>
+              </ng-template>
+            </ng-container>
+          </ng-container>
+        </form>
+      </div>
+    </section>
+  </ng-template>
+</ejs-dialog>

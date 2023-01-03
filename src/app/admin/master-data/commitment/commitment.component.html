@@ -24,6 +24,7 @@
     [rowData]="(commitmentsPage$ | async)?.items"
     [pageSize]="pageSize"
     [currentPage]="pageNumber"
+    [rowSelection]="rowSelection"
     [totalRecordsCount]="(commitmentsPage$ | async)?.totalCount || 0"
   >
   </app-grid>
@@ -41,7 +42,7 @@
         <input class="e-input"
                type="text"
                appValidateWithMessage
-               maxlength="100"
+               maxlength="50"
                formControlName="name"/>
       </div>
     </div>
