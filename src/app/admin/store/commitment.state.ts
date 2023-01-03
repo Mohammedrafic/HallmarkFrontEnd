@@ -47,7 +47,7 @@ export class MasterCommitmentState {
   }
 
   @Action(SaveCommitment)
-  SaveRejectMasterReasons(
+  SaveCommitment(
     { patchState, getState, dispatch}: StateContext<CommitmentStateModel>,
     { payload }: SaveCommitment
   ): Observable<MasterCommitment | void> {
@@ -79,7 +79,7 @@ export class MasterCommitmentState {
   }
 
   @Action(RemoveCommitment)
-  RemoveRejectMaterReasons(
+  RemoveCommitment(
     { dispatch }: StateContext<CommitmentStateModel>,
     { id }: RemoveCommitment
   ): Observable<void> {
@@ -87,6 +87,10 @@ export class MasterCommitmentState {
       tap(() => {
         dispatch(new UpdateCommitmentSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveCommitmentError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
