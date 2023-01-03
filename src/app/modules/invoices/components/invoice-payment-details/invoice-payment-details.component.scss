@@ -2,6 +2,7 @@
 @import "mixins";
 @import "@ag-grid-community/core/dist/styles/ag-grid.scss";
 @import "@ag-grid-community/core/dist/styles/ag-theme-alpine";
+@import "adaptive-response";
 
 .dialog-container {
   padding: 24px;
@@ -92,6 +93,23 @@
 
     .custom-scroll {
       overflow-y: auto;
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .table-header {
+    .header-block-wrapper {
+      display: flex;
+      flex-direction: column;
+
+      .header-block {
+        padding: 0;
+
+        &:last-of-type {
+          border-left: none;
+        }
+      }
     }
   }
 }
