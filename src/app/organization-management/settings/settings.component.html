@@ -239,11 +239,14 @@
       <div class="input-container bootstrap">
         <label for="attribute">Attribute</label>
         <div class="input-group">
-          <input
-            id="attribute"
-            class="e-input"
-            type="text"
-            formControlName="name"/>
+          <ejs-tooltip [content]="attribute.value" [showTipPointer]="false">
+            <input
+              #attribute
+              id="attribute"
+              class="e-input"
+              type="text"
+              formControlName="name"/>
+          </ejs-tooltip>
         </div>
       </div>
     </div>
