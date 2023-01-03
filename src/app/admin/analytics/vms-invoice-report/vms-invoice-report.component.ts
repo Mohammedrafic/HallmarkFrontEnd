@@ -373,7 +373,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
       "AgencyParamVMSIR": agencyIds.length == 0 ? "null" : agencyIds.join(","),
       "YearParamVMSIR": year == null ? "null" : year,
       "MonthParamVMSIR": month == null ? "null" : month,
-      "InvoiceStatusParamVMSIR": invoiceStatus == null ? "null" : invoiceStatus,
+      "InvoiceStatusParamVMSIR": invoiceStatus == null ? "null" : invoiceStatus.toString(),
       "InvoiceIdParamVMSIR": invoiceId == null ? "null" : invoiceId,
       "BearerParamVMSIR": auth,
       "BusinessUnitIdParamVMSIR": window.localStorage.getItem("lastSelectedOrganizationId") == null
