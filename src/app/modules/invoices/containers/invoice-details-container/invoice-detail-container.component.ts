@@ -309,4 +309,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
         this.cdr.markForCheck();
       });
   }
+
+  public onOpen(args: { preventFocus: boolean }): void {
+    args.preventFocus = true;
+  }
 }

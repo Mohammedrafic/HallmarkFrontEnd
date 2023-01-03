@@ -380,6 +380,13 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
 .menu-mobile {
   margin-right: 12px;
+  width: 40px;
+  border: 1px solid $primary-active-blue-40 !important;
+  padding: 0 !important;
+  
+  i-feather.icon {
+    margin: 0;
+  }
 }
 
 .mobile-change-status-btn {
@@ -396,7 +403,8 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   }
 
   .container,
-  .profile-table-block {
+  .profile-table-block,
+  .profile-details-header {
     padding-bottom: 16px !important;
   }
 
@@ -421,8 +429,9 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
     justify-content: space-evenly !important;
   }
 
-  .e-dropdown-btn,
-  .e-dropdown-btn.e-btn {
-    padding: 0 5px 0 0 !important;
+  .menu-mobile {
+    margin-right: 4px;
+    width: 30px;
+    border: none !important;
   }
 }

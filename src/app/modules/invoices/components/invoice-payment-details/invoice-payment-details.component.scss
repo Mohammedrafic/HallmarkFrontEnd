@@ -1,7 +1,7 @@
-@import 'colors.scss';
-@import 'mixins';
-@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
-@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
+@import "colors.scss";
+@import "mixins";
+@import "@ag-grid-community/core/dist/styles/ag-grid.scss";
+@import "@ag-grid-community/core/dist/styles/ag-theme-alpine";
 
 .dialog-container {
   padding: 24px;
@@ -12,10 +12,10 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 46px;
-}
 
-.title {
-  @include dialog-title;
+  .title {
+    @include dialog-title;
+  }
 }
 
 .table-header {
@@ -47,7 +47,7 @@
 
 .grid-table-container {
   padding-bottom: 0;
-  
+
   ::ng-deep {
     ag-grid-angular {
       height: auto !important;
@@ -59,6 +59,8 @@
 
       .ag-root-wrapper {
         height: auto !important;
+        border-top-left-radius: unset !important;
+        border-top-right-radius: unset !important;
       }
 
       .ag-root-wrapper-body {
@@ -71,23 +73,23 @@
       }
     }
   }
-  
+
   ::ng-deep {
     .ag-cell-focus, .ag-cell {
       border: none !important;
     }
-  
+
     .ag-cell-value {
-      padding-left: 5px!important;
-      padding-right: 5px!important;
+      padding-left: 5px !important;
+      padding-right: 5px !important;
     }
-  
+
     .common-cell {
-      padding-left: 17px!important;
-      padding-right: 17px!important;
+      padding-left: 17px !important;
+      padding-right: 17px !important;
       text-align: right;
     }
-  
+
     .custom-scroll {
       overflow-y: auto;
     }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
@@ -21,6 +21,8 @@ import { InvoiceState } from '../../enums';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnInit {
+  @Input() public container: HTMLElement;
+
   @Output() addPayment: EventEmitter<void> = new EventEmitter();
 
   @Output() editPaymentCheck: EventEmitter<string> = new EventEmitter();
