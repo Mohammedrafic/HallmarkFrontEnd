@@ -1,33 +1,75 @@
-import { Injectable } from "@angular/core";
-import { UserSubscriptionPage, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
-import { Action, Selector, StateContext} from '@ngxs/store';
-import { AlertTrigger, ClearAlertTemplateState, DismissAlert, DismissAllAlerts, GetAlertsTemplatePage, GetGroupEmailById, GetGroupMailByBusinessUnitIdPage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, SendGroupEmail, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
-import { catchError, Observable ,tap} from "rxjs";
-import { AlertsService } from "@shared/services/alerts.service";
-import { BusinessUnitService } from "@shared/services/business-unit.service";
-import { AlertsTemplate, AlertsTemplatePage, AlertTriggerDto, DismissAlertDto, EditAlertsTemplate } from "@shared/models/alerts-template.model";
-import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailRequest } from "@shared/models/group-email.model";
-import { GroupEmailService } from "@shared/services/group-email.service";
-import { HttpErrorResponse } from "@angular/common/http";
-import { ShowToast } from "../../store/app.actions";
-import { MessageTypes } from "../../shared/enums/message-types";
+import {
+  AgencyDto,
+  CandidateStatusAndReasonFilterOptionsDto,
+  MasterSkillDto,
+} from './../analytics/models/common-report.model';
+import { Injectable } from '@angular/core';
+import { UserSubscriptionPage, UserSubscriptionRequest } from '@shared/models/user-subscription.model';
+import { Action, Selector, StateContext } from '@ngxs/store';
+import {
+  AlertTrigger,
+  ClearAlertTemplateState,
+  DismissAlert,
+  DismissAllAlerts,
+  GetAlertsTemplatePage,
+  GetGroupEmailAgencies,
+  GetGroupEmailById,
+  GetGroupEmailCandidates,
+  GetGroupEmailCandidateStatuses,
+  GetGroupEmailInternalUsers,
+  GetGroupEmailRoles,
+  GetGroupEmailSkills,
+  GetGroupMailByBusinessUnitIdPage,
+  GetTemplateByAlertId,
+  GetUserSubscriptionPage,
+  SaveTemplateByAlertId,
+  SendGroupEmail,
+  UpdateTemplateByAlertId,
+  UpdateUserSubscription,
+} from './alerts.actions';
+import { catchError, Observable, tap } from 'rxjs';
+import { AlertsService } from '@shared/services/alerts.service';
+import { BusinessUnitService } from '@shared/services/business-unit.service';
+import {
+  AlertsTemplate,
+  AlertsTemplatePage,
+  AlertTriggerDto,
+  DismissAlertDto,
+  EditAlertsTemplate,
+} from '@shared/models/alerts-template.model';
+import {
+  GroupEmail,
+  GroupEmailByBusinessUnitIdPage,
+  GroupEmailRequest,
+  GroupEmailRole,
+} from '@shared/models/group-email.model';
+import { GroupEmailService } from '@shared/services/group-email.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ShowToast } from '../../store/app.actions';
+import { MessageTypes } from '../../shared/enums/message-types';
+import { User } from '@shared/models/user.model';
 
 interface AlertsStateModel {
   userSubscriptionPage: UserSubscriptionPage | null;
   userSubscriptionSaved: boolean;
-    alertsTemplatePage:AlertsTemplatePage |null;
-    editAlertsTemplate: EditAlertsTemplate | null;
-    saveAlertsTemplate: EditAlertsTemplate | null;
-    updateAlertsTemplate: EditAlertsTemplate | null;
-    alertTriggerDetails:number[];
-    groupEmailByBusinessUnitIdPage: GroupEmailByBusinessUnitIdPage ;
-    sendGroupEmail:GroupEmail;
-    groupEmailData:GroupEmail;
+  alertsTemplatePage: AlertsTemplatePage | null;
+  editAlertsTemplate: EditAlertsTemplate | null;
+  saveAlertsTemplate: EditAlertsTemplate | null;
+  updateAlertsTemplate: EditAlertsTemplate | null;
+  alertTriggerDetails: number[];
+  groupEmailByBusinessUnitIdPage: GroupEmailByBusinessUnitIdPage;
+  sendGroupEmail: GroupEmail;
+  groupEmailData: GroupEmail;
+  groupEmailRoleData: GroupEmailRole;
+  groupEmailUserData: User;
+  groupEmailAgencyData: AgencyDto;
+  groupEmailSkillsData: MasterSkillDto;
+  groupEmailCandidateStatusData: CandidateStatusAndReasonFilterOptionsDto;
+  groupEmailCandidateData: User;
 }
 
 @Injectable()
 export class AlertsState {
-
   @Selector()
   static UserSubscriptionPage(state: AlertsStateModel): UserSubscriptionPage | null {
     return state.userSubscriptionPage;
@@ -39,7 +81,6 @@ export class AlertsState {
   @Selector()
   static AlertsTemplatePage(state: AlertsStateModel): AlertsTemplatePage | null {
     return state.alertsTemplatePage;
-    
   }
   @Selector()
   static TemplateByAlertId(state: AlertsStateModel): EditAlertsTemplate | null {
@@ -58,40 +99,64 @@ export class AlertsState {
     return state.groupEmailByBusinessUnitIdPage;
   }
   @Selector()
-  static SendGroupEmail(state:AlertsStateModel):GroupEmail{
+  static SendGroupEmail(state: AlertsStateModel): GroupEmail {
     return state.sendGroupEmail;
   }
   @Selector()
-  static GetGroupEmailById(state:AlertsStateModel):GroupEmail{
+  static GetGroupEmailById(state: AlertsStateModel): GroupEmail {
     return state.groupEmailData;
   }
+  @Selector()
+  static GetGroupRolesByOrgId(state: AlertsStateModel): GroupEmailRole {
+    return state.groupEmailRoleData;
+  }
+  @Selector()
+  static GetGroupEmailInternalUsers(state: AlertsStateModel): User {
+    return state.groupEmailUserData;
+  }
+  @Selector()
+  static GetGroupEmailAgencies(state: AlertsStateModel): AgencyDto {
+    return state.groupEmailAgencyData;
+  }
+  @Selector()
+  static GetGroupEmailSkills(state: AlertsStateModel): MasterSkillDto {
+    return state.groupEmailSkillsData;
+  }
+  @Selector()
+  static GetGroupEmailCandidateStatuses(state: AlertsStateModel): CandidateStatusAndReasonFilterOptionsDto {
+    return state.groupEmailCandidateStatusData;
+  }
+  @Selector()
+  static GetGroupEmailCandidates(state: AlertsStateModel): User {
+    return state.groupEmailCandidateData;
+  }
 
- 
   constructor(
     private businessUnitService: BusinessUnitService,
     private alertsService: AlertsService,
     private groupEmailService: GroupEmailService
   ) {}
-  
-  
+
   @Action(GetUserSubscriptionPage)
   GetUserSubscriptionPage(
-    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
     { userId, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters }: GetUserSubscriptionPage
   ): Observable<UserSubscriptionPage | void> {
-    return this.alertsService.getUserSubscriptionPage(businessUnitType, userId, pageNumber, pageSize, sortModel, filterModel, filters).pipe(
-      tap((payload) => {
-        patchState({ userSubscriptionPage: payload });
-        return payload;
-      }),
-      catchError((error: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
-      })
-    );
+    return this.alertsService
+      .getUserSubscriptionPage(businessUnitType, userId, pageNumber, pageSize, sortModel, filterModel, filters)
+      .pipe(
+        tap((payload) => {
+          patchState({ userSubscriptionPage: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
   }
   @Action(UpdateUserSubscription)
   UpdateUserSubscription(
-    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
     { userSubscriptionRequest }: UpdateUserSubscription
   ): Observable<void> {
     return this.alertsService.updateUserSubscription(userSubscriptionRequest).pipe(
@@ -103,31 +168,32 @@ export class AlertsState {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
-   
   }
-  
+
   @Action(GetAlertsTemplatePage)
   GetAlertsTemplatePage(
-    { dispatch,patchState }: StateContext<AlertsStateModel>,
-    { businessUnitType,businessUnitId,pageNumber, pageSize, sortModel, filterModel, filters }: GetAlertsTemplatePage
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    { businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters }: GetAlertsTemplatePage
   ): Observable<AlertsTemplatePage | void> {
-    return this.alertsService.getAlertsTemplatePage(businessUnitType,businessUnitId,pageNumber, pageSize, sortModel, filterModel, filters).pipe(
-      tap((payload) => {
-        patchState({ alertsTemplatePage: payload });
-        return payload;
-      }),
-      catchError((error: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
-      })
-    );
+    return this.alertsService
+      .getAlertsTemplatePage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters)
+      .pipe(
+        tap((payload) => {
+          patchState({ alertsTemplatePage: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
   }
 
   @Action(GetTemplateByAlertId)
   GetTemplateByAlertId(
-    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
     { alertId, alertChannel, businessUnitId }: GetTemplateByAlertId
   ): Observable<EditAlertsTemplate | void> {
-    return this.alertsService.getTemplateByAlertId(alertId,alertChannel,businessUnitId).pipe(
+    return this.alertsService.getTemplateByAlertId(alertId, alertChannel, businessUnitId).pipe(
       tap((payload) => {
         patchState({ editAlertsTemplate: payload });
         return payload;
@@ -139,7 +205,7 @@ export class AlertsState {
   }
   @Action(UpdateTemplateByAlertId)
   UpdateTemplateByAlertId(
-    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
     { editAlertsTemplateRequest }: UpdateTemplateByAlertId
   ): Observable<EditAlertsTemplate | void> {
     return this.alertsService.updateTemplateByAlertId(editAlertsTemplateRequest).pipe(
@@ -154,7 +220,7 @@ export class AlertsState {
   }
   @Action(SaveTemplateByAlertId)
   SaveTemplateByAlertId(
-    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
     { addAlertsTemplateRequest }: SaveTemplateByAlertId
   ): Observable<EditAlertsTemplate | void> {
     return this.alertsService.saveTemplateByAlertId(addAlertsTemplateRequest).pipe(
@@ -169,7 +235,7 @@ export class AlertsState {
   }
   @Action(AlertTrigger)
   AlertTrigger(
-    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
     { alertTriggerDto }: AlertTrigger
   ): Observable<number[] | void> {
     return this.alertsService.alertTrigger(alertTriggerDto).pipe(
@@ -184,31 +250,24 @@ export class AlertsState {
   }
 
   @Action(DismissAlert)
-  DismissAlert(    
-    { patchState }: StateContext<AlertsStateModel>,
-    { model }: DismissAlert
-  ): Observable<any> {
+  DismissAlert({ patchState }: StateContext<AlertsStateModel>, { model }: DismissAlert): Observable<any> {
     return this.alertsService.dismissAlert(model);
   }
 
   @Action(DismissAllAlerts)
-  DismissAllAlerts(
-    { patchState }: StateContext<AlertsStateModel>
-  ): Observable<any> {
+  DismissAllAlerts({ patchState }: StateContext<AlertsStateModel>): Observable<any> {
     return this.alertsService.dismissAllAlerts();
   }
   @Action(ClearAlertTemplateState)
-  ClearAlertTemplateState(
-    { patchState }: StateContext<AlertsStateModel>
-  ):void{
-    patchState({ updateAlertsTemplate: null,saveAlertsTemplate:null,sendGroupEmail:undefined });
+  ClearAlertTemplateState({ patchState }: StateContext<AlertsStateModel>): void {
+    patchState({ updateAlertsTemplate: null, saveAlertsTemplate: null, sendGroupEmail: undefined });
   }
   @Action(GetGroupMailByBusinessUnitIdPage)
   GetGroupMailByBusinessUnitIdPage(
-    { dispatch,patchState }: StateContext<AlertsStateModel>,
-    { businessUnitId,getAll}: GetGroupMailByBusinessUnitIdPage
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    { businessUnitId, getAll }: GetGroupMailByBusinessUnitIdPage
   ): Observable<GroupEmailByBusinessUnitIdPage | void> {
-    return this.groupEmailService.getGroupMailByBusinessUnitIdPage(businessUnitId,getAll).pipe(
+    return this.groupEmailService.getGroupMailByBusinessUnitIdPage(businessUnitId, getAll).pipe(
       tap((payload) => {
         patchState({ groupEmailByBusinessUnitIdPage: payload });
         return payload;
@@ -220,7 +279,7 @@ export class AlertsState {
   }
   @Action(SendGroupEmail)
   SendGroupEmail(
-    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
     { sendGroupEmailRequest }: SendGroupEmail
   ): Observable<GroupEmail | void> {
     return this.groupEmailService.SendGroupEmail(sendGroupEmailRequest).pipe(
@@ -235,7 +294,7 @@ export class AlertsState {
   }
   @Action(GetGroupEmailById)
   GetGroupEmailById(
-    { dispatch,patchState }: StateContext<AlertsStateModel>,
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
     { id }: GetGroupEmailById
   ): Observable<GroupEmail | void> {
     return this.groupEmailService.GetGroupEmailById(id).pipe(
@@ -247,5 +306,113 @@ export class AlertsState {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
+  }
+
+  @Action(GetGroupEmailRoles)
+  GetGroupEmailRoles(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    { id }: GetGroupEmailRoles
+  ): Observable<GroupEmailRole | void> {
+    return this.groupEmailService.GetGroupEmailRolesByOrgId(id).pipe(
+      tap((payload) => {
+        patchState({ groupEmailRoleData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailInternalUsers)
+  GetGroupEmailInternalUsers(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    { regionIds, locationIds, roles }: GetGroupEmailInternalUsers
+  ): Observable<User | void> {
+    return this.groupEmailService.GetGroupEmailUsersByRegionLocation(regionIds, locationIds, roles).pipe(
+      tap((payload) => {
+        patchState({ groupEmailUserData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailAgencies)
+  GetGroupEmailAgencies(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    { businessUnitId }: GetGroupEmailAgencies
+  ): Observable<AgencyDto | void> {
+    return this.groupEmailService.GetGroupEmailAgenciesByBusinessUnit(businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ groupEmailAgencyData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailSkills)
+  GetGroupEmailSkills(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    { businessUnitId, isAgency }: GetGroupEmailSkills
+  ): Observable<MasterSkillDto | void> {
+    return this.groupEmailService.GetGroupEmailSkillsByBusinessUnit(businessUnitId, isAgency).pipe(
+      tap((payload) => {
+        patchState({ groupEmailSkillsData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailCandidateStatuses)
+  GetGroupEmailCandidateStatuses(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    { businessUnitId }: GetGroupEmailCandidateStatuses
+  ): Observable<CandidateStatusAndReasonFilterOptionsDto | void> {
+    return this.groupEmailService.GetGroupEmailCandidateStatusesByBusinessUnit(businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ groupEmailCandidateStatusData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailCandidates)
+  GetGroupEmailCandidates(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    {
+      agencies,
+      skills,
+      regions,
+      locations,
+      orderTypes,
+      statuses,
+      jobID,
+      isAgency,
+      businessUnitId,
+    }: GetGroupEmailCandidates
+  ): Observable<User | void> {
+    return this.groupEmailService
+      .GetGroupEmailCandidates(agencies, skills, regions, locations, orderTypes, statuses, jobID, isAgency, businessUnitId)
+      .pipe(
+        tap((payload) => {
+          patchState({ groupEmailCandidateData: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
   }
 }
