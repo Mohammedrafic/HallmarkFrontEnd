@@ -1,6 +1,8 @@
 <div class="card-wrapper">
   <div class="block block--name">
-    <p class="name">{{ candidate.lastName }}, {{ candidate.firstName }}</p>
+    <ejs-tooltip content="Candidate Name" position="TopCenter" [showTipPointer]="false">
+      <p class="name">{{ candidate.lastName }}, {{ candidate.firstName }}</p>
+    </ejs-tooltip>
 
     <ejs-tooltip
       *ngIf="candidateIconName"

@@ -1,4 +1,4 @@
 export enum SystemType {
-  VMS,
-  IRP,
+  VMS = 0,
+  IRP = 1,
 }

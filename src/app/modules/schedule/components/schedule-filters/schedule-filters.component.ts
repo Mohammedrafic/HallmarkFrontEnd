@@ -7,6 +7,7 @@ import { GetAssignedSkillsByOrganization } from "@organization-management/store/
 import { OrganizationManagementState } from "@organization-management/store/organization-management.state";
 import { optionFields } from "@shared/constants";
 import { DestroyableDirective } from "@shared/directives/destroyable.directive";
+import { SystemType } from "@shared/enums/system-type.enum";
 import { sortByField } from "@shared/helpers/sort-by-field.helper";
 import { FilteredItem } from "@shared/models/filter.model";
 import {
@@ -48,6 +49,7 @@ export class ScheduleFiltersComponent extends DestroyableDirective implements On
 
   private filters: ScheduleFilters = {} ;
   private regions: OrganizationRegion[] = [];
+  private activeSystem: SystemType = SystemType.IRP;
 
   get selectedSkillsNumber(): number {
     return this.scheduleFilterFormGroup.get('skillIds')?.value?.length || 0;
@@ -120,7 +122,7 @@ export class ScheduleFiltersComponent extends DestroyableDirective implements On
         takeUntil(this.destroy$),
       )
       .subscribe((structure: OrganizationStructure) => {
-        this.store.dispatch(new GetAssignedSkillsByOrganization());
+        this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: this.activeSystem } }));
         this.regions = structure.regions;
         this.filterColumns.regionIds.dataSource = this.regions;
         this.cdr.markForCheck();

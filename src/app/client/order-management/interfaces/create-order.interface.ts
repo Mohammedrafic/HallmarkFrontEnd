@@ -1,6 +1,7 @@
 import { IrpTabs, OrderSystem } from '@client/order-management/enums';
 import { ButtonType, IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 import { FieldType } from '@core/enums';
+import { SystemType } from "@shared/enums/system-type.enum";
 import { Region } from '@shared/models/region.model';
 import { Location } from '@shared/models/location.model';
 import { Department } from '@shared/models/department.model';
@@ -146,6 +147,6 @@ export interface ContactDetailsUser {
 
 export interface SkillParams {
   params: {
-    SystemType: OrderSystem
+    SystemType: OrderSystem | SystemType;
   }
 }
