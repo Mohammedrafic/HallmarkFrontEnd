@@ -51,6 +51,8 @@ export class YtdSummaryComponent implements OnInit {
     "skillYTDS": "",
     "yearYTDS": "",
     "monthYTDS": "",
+    "organizationNameYTDS": "",
+    "reportPulledMessageYTDS":""
     
   };
 
@@ -381,9 +383,12 @@ export class YtdSummaryComponent implements OnInit {
     }
     let { departmentIds, locationIds,regionIds, skillCategoryIds, skillIds, year, month} = this.ytdSummaryReportForm.getRawValue();
 
+
+    let currentDate = new Date(Date.now());
+    let selectedMonthDate = new Date(year, month, 0);
+
     this.paramsData =
     {
-
       "HostName": this.baseUrl,
       "BearerParamYTDS": auth,
       "BusinessUnitIdParamYTDS": window.localStorage.getItem("lastSelectedOrganizationId") == null
@@ -397,7 +402,10 @@ export class YtdSummaryComponent implements OnInit {
       "skillCategoryYTDS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
       "skillYTDS": skillIds.length == 0 ? "null" : skillIds.join(","),
       "yearYTDS": year,
-      "monthYTDS": month
+      "monthYTDS": month,
+
+      "organizationNameYTDS": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "reportPulledMessageYTDS": "Data for 01/01/" + year.toString() + " - " + String(selectedMonthDate.getMonth() + 1).padStart(2, '0') + "/" + selectedMonthDate.getDate() + "/" + year.toString() + " pulled on " + String(selectedMonthDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + year.toString()
       };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
