@@ -4,6 +4,7 @@
   [width]="888"
   [visible]="false"
   [isModal]="true"
+  [target]="container"
   [animationSettings]="{ effect: 'SlideRight', duration: dialogAnimationTime }">
   <ng-template #content>
     <div class="dialog-container">
@@ -18,7 +19,7 @@
       </div>
       
       <div class="table-header">
-        <div>
+        <div class="header-block-wrapper">
           <span class="header-block">Invoice Number: {{ invoiceData.invoiceNumber || '' }}</span>
           <span class="header-block">
             Invoice Amount: {{ invoiceData.amount || '' | currency: 'USD' }}

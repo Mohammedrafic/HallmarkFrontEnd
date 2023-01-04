@@ -219,7 +219,7 @@ export class YtdSummaryComponent implements OnInit {
     this.yearList = [];
     this.monthList =[]
     let currentYear = (new Date()).getFullYear();
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 3; i >= 1; i--) {
       this.yearList.push({ id: currentYear - i, name: (currentYear - i).toString() });
     }
     this.yearList.push({ id: currentYear, name: currentYear.toString() })

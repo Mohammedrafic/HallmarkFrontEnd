@@ -39,7 +39,7 @@
 
   <ejs-grid class="grid grid-component"
             #grid
-            [dataSource]="(regions$ | async)"
+            [dataSource]="(regionsPageList$ | async)?.items"
             [allowPaging]="allowPaging"
             [pageSettings]="pageSettings"
             [height]="fullScreenGridHeight"
@@ -87,20 +87,20 @@
                                 >
               </ejs-dropdownlist>
               <ejs-numerictextbox
-                                  id="goToPage"
-                                  class="numeric-input-no-border"
-                                  format="#"
-                                  [validateDecimalOnType]="validateDecimalOnType"
-                                  [decimals]="decimals"
-                                  placeholder="Go to:"
-                                  min="1"
-                                  [max]="(regions$ | async)"
-                                  [showSpinButton]="false"
-                                  (change)="onGoToClick($event)"
-                                  >
+                id="goToPage"
+                class="numeric-input-no-border"
+                format="#"
+                [validateDecimalOnType]="validateDecimalOnType"
+                [decimals]="decimals"
+                placeholder="Go to:"
+                min="1"
+                [max]="(regions$ | async)"
+                [showSpinButton]="false"
+                (change)="onGoToClick($event)"
+              >
               </ejs-numerictextbox>
               <div class="total-rows">
-                Total Rows: {{(regions$ | async)?.length}}
+                Total Rows: {{(regionsPageList$ | async)?.totalCount}}
               </div>
             </section>
             <section class="right-side-pager-controls">
@@ -108,7 +108,7 @@
                          id="gridPager"
                          #gridPager
                          [pageSize]="pageSize"
-                         [totalRecordsCount]="(regions$ | async)"
+                         [totalRecordsCount]="(regionsPageList$ | async)?.totalCount"
                          [enablePagerMessage]="false"
                          [currentPage]="currentPage"
                          (click)="onGoToClick($event)"

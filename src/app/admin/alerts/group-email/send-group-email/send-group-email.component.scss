@@ -65,9 +65,11 @@
   .business-dropdowns {
     display: flex;
     width: 100%;
+    flex-wrap: wrap;
 
     .dropdown-container {
-      margin-right: 12px;
+      flex: 1 0 21%;
+      margin: 6px 12px 6px 0;
       width: 100%;
       max-width: 220px;
     }

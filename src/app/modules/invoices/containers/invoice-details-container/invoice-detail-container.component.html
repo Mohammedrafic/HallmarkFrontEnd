@@ -7,6 +7,7 @@
   [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
   [target]="targetElement"
+  (open)="onOpen($event)"
 >
   <ng-template #content>
     <section *ngIf="invoiceDetail" class="container">
@@ -161,6 +162,7 @@
 
 <app-invoice-payment-details
   *ngIf="invoiceDetailsConfig.paymentDetailsOpen"
+  [container]="sideDialog.element"
   (destroyDialog)="closePaymentDetails()"
   (editPaymentCheck)="openEditPayment($event)"
   (addPayment)="openAddPayment()"

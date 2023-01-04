@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { catchError, Observable, tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 
 import { WorkCommitmentDTO, WorkCommitmentsPage } from '../work-commitment/interfaces';
 import { WorkCommitmentStateModel } from '../interfaces';
@@ -45,17 +45,21 @@ export class WorkCommitmentState {
     { dispatch }: StateContext<WorkCommitmentStateModel>,
     { payload, isEdit }: WorkCommitment.SaveCommitment
   ): Observable<WorkCommitmentDTO | void> {
-    return this.workCommitmentApiService.addCommitment(payload).pipe(
-      tap(() => {
-        dispatch([
-          new ShowToast(MessageTypes.Success, isEdit ? RECORD_MODIFIED : RECORD_ADDED),
-          new ShowSideDialog(false),
-          new WorkCommitment.UpdatePageAfterSuccessAction(),
-        ]);
-      }),
-      catchError((error: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
-      })
-    );
+    if (payload) {
+      return this.workCommitmentApiService.addCommitment(payload).pipe(
+        tap(() => {
+          dispatch([
+            new ShowToast(MessageTypes.Success, isEdit ? RECORD_MODIFIED : RECORD_ADDED),
+            new ShowSideDialog(false),
+            new WorkCommitment.UpdatePageAfterSuccessAction(),
+          ]);
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+        })
+      );
+    } else {
+      return of();
+    }
   }
 }

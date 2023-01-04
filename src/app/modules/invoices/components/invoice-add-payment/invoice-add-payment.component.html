@@ -103,16 +103,12 @@
                   </div>
                 </div>
               </ng-template>
-  
             </ng-container>
-  
           </ng-container>
         </form>
       </div>
 
       <div class="table-container">
-        <div class="table-header">Invoices</div>
-
         <div class="grid-table-container">
           <app-grid
             class="ag-theme-alpine app-grid__component"
@@ -121,6 +117,7 @@
             [paginationPanel]="false"
             [adjustColumnsWidth]="true"
             [context]="tableContext"
+            [title]="'Invoices'"
             (gridReadyEmitter)="setGridApi($event)"
           ></app-grid>
         </div>

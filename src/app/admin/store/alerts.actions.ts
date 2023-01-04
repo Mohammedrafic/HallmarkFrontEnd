@@ -94,3 +94,55 @@ export class GetGroupEmailById {
     public id: number
   ) { }
 }
+export class GetGroupEmailRoles {
+  static readonly type = '[groupemail] Get Group Email roles By organization id';
+  constructor(
+    public id: number
+  ) { }
+}
+
+export class GetGroupEmailInternalUsers {
+  static readonly type = '[groupemail] Get Group Email Users By region id, location id and roles';
+  constructor(
+    public regionIds: string,
+    public locationIds: string,
+    public roles: string    
+  ) { }
+}
+
+export class GetGroupEmailAgencies {
+  static readonly type = '[groupemail] Get Group Email Agencies by business unit';
+  constructor(
+    public businessUnitId: number
+  ) { }
+}
+
+export class GetGroupEmailSkills {
+  static readonly type = '[groupemail] Get Group Email skills by business unit';
+  constructor(
+    public businessUnitId: number,
+    public isAgency: number
+  ) { }
+}
+
+export class GetGroupEmailCandidateStatuses {
+  static readonly type = '[groupemail] Get Group Email candidate statuses by business unit';
+  constructor(
+    public businessUnitId: number
+  ) { }
+}
+
+export class GetGroupEmailCandidates {
+  static readonly type = '[groupemail] Get Group Email candidates by criteria';
+  constructor(
+    public agencies: string,
+    public skills: string,
+    public regions: string,
+    public locations: string,
+    public orderTypes: string,
+    public statuses: string,
+    public jobID: string,
+    public isAgency: boolean,
+    public businessUnitId: number
+  ) { }
+}

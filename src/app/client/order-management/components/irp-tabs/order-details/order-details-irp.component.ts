@@ -88,7 +88,6 @@ import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { Document } from '@shared/models/document.model';
 import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
 import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
-import { OrderType } from '@shared/enums/order-type';
 import { UserState } from '../../../../../store/user.state';
 import { Organization, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationStructureService } from '@client/order-management/components/irp-tabs/services';
@@ -101,6 +100,7 @@ import {
 import { SettingsViewService } from '@shared/services';
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -592,14 +592,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.specialProjectForm.patchValue(selectedOrder);
     this.jobDistributionForm.get('jobDistribution')?.patchValue(this.selectedOrder.jobDistributionValue);
 
-    if(selectedOrder.orderType === OrderType.OpenPerDiem) {
+    if(selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
       const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
       changeTypeField(generalInformationConfig.fields, 'jobDates', FieldType.Date);
     }
   }
 
   private setConfigType(selectedOrder: Order): void {
-    if(selectedOrder.orderType === OrderType.OpenPerDiem) {
+    if(selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
       this.orderFormsConfig = perDiemConfig(this.selectedSystem);
     } else {
       this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem);

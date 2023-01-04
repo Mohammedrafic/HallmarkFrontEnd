@@ -163,7 +163,7 @@ button.privilege {
     .spinner-btn {
       width: 100px !important;
     }
-    
+
     .privilege {
       width: 100px;
       margin: 0;
@@ -200,14 +200,13 @@ button.privilege {
 }
 
 @media #{$max-mobile} {
-
   .table-block {
-      .btn-group {
-        .privilege {
-          min-width: 38vw;
-          margin: 0;
-        }
+    .btn-group {
+      .privilege {
+        min-width: 38vw;
+        margin: 0;
       }
+    }
   }
 
   .desktop-tablet-btn-group {

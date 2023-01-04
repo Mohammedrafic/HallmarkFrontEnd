@@ -5,6 +5,7 @@
         <div class="bootstrap business-dropdowns">
           <div class="dropdown-container">
             <div class="input-group dropdown">
+              <label>Business Unit Type</label>
               <ejs-dropdownlist appValidateWithMessage
                                 formControlName="businessUnit"
                                 [fields]="optionFields"
@@ -16,6 +17,7 @@
           </div>
           <div class="dropdown-container">
             <div class="input-group dropdown">
+              <label>Business Unit</label>
               <ejs-dropdownlist appValidateWithMessage
                                 formControlName="business"
                                 [fields]="businessDataFields"
@@ -26,10 +28,139 @@
               </ejs-dropdownlist>
             </div>
           </div>
-
           <div class="dropdown-container">
             <div class="input-group dropdown">
-
+              <label>User Type</label>
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="userType"
+                                [fields]="commonFields"
+                                [dataSource]="filteredUserType"
+                                [value]="defaultUserType"
+                                [allowFiltering]="true"
+                                placeholder="User Type">
+              </ejs-dropdownlist>
+            </div>
+          </div>
+          <div *ngIf="isOrgCandidatesType" class="dropdown-container">
+            <div class="input-group dropdown">
+              <label>Agencies</label>
+              <ejs-multiselect mode="CheckBox" appValidateWithMessage
+                                formControlName="agencies"
+                                [fields]="agencyFields"
+                                [dataSource]="agencyData"                                
+                                [allowFiltering]="true"
+                                placeholder="Agencies"
+                                [showDropDownIcon]="true"
+                                [selectAllText]='allOption'
+                                showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>               
+          <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType" class="dropdown-container">
+            <div class="input-group dropdown">
+              <label>Skills</label>
+              <ejs-multiselect  mode="CheckBox" appValidateWithMessage
+                                formControlName="skills"
+                                [fields]="regionFields"
+                                [dataSource]="skillData"                                
+                                [allowFiltering]="true"
+                                placeholder="Skills"
+                                [showDropDownIcon]="true"
+                                [selectAllText]='allOption'
+                                showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType" class="dropdown-container">
+            <div class="input-group dropdown">
+              <label>Region</label>
+              <ejs-multiselect mode="CheckBox" formControlName="region"
+                               [allowFiltering]="true"
+                               appValidateWithMessage
+                               [fields]="regionFields"
+                               [dataSource]="regionsList"
+                               placeholder="Region"
+                               [showDropDownIcon]="true"
+                               [selectAllText]='allOption'
+                               showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType" class="dropdown-container">
+            <div class="input-group dropdown">
+              <label>Location</label>
+              <ejs-multiselect mode="CheckBox" formControlName="location"
+                               [allowFiltering]="true"
+                               appValidateWithMessage
+                               [fields]="regionFields"
+                               [dataSource]="locationsList"
+                               placeholder="Location"
+                               [showDropDownIcon]="true"
+                               [selectAllText]='allOption'
+                               showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div *ngIf="isOrgCandidatesType" class="dropdown-container">
+            <div class="input-group dropdown">
+              <label>Order Type</label>
+              <ejs-multiselect mode="CheckBox" formControlName="orderTypes"
+                               [allowFiltering]="true"
+                               appValidateWithMessage
+                               [fields]="regionFields"
+                               [dataSource]="orderTypes"
+                               placeholder="Order Type"
+                               [showDropDownIcon]="true"
+                               [selectAllText]='allOption'
+                               showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div *ngIf="isOrgCandidatesType" class="dropdown-container">
+            <div class="input-group dropdown">
+              <label>Candidate Status</label>
+              <ejs-multiselect mode="CheckBox" formControlName="candidateStatus"
+                               [allowFiltering]="true"
+                               appValidateWithMessage
+                               [fields]="candidateStatusFields"
+                               [dataSource]="candidateStatusData"
+                               placeholder="Candiate Status"
+                               [showDropDownIcon]="true"
+                               [selectAllText]='allOption'
+                               showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div *ngIf="isOrgCandidatesType" class="dropdown-container">
+            <div class="input-container bootstrap">
+              <label>Job ID</label>
+              <input class="e-input"
+                   type="text"
+                   appValidateWithMessage
+                   maxlength="50"
+                   formControlName="jobID" 
+                   (keyup.enter)="onJobIdStatusValueChanged()"/>
+            </div>
+          </div>
+          <div *ngIf="isOrgInternalUserType" class="dropdown-container">
+            <div class="input-group dropdown">
+              <label>Role</label>
+              <ejs-multiselect mode="CheckBox"
+                               formControlName="roles"
+                               [placeholder]='placeholderValue'
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               appValidateWithMessage
+                               [fields]="businessDataFields"
+                               [dataSource]="roleData"
+                               [selectAllText]='allOption'
+                               showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>     
+          <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="dropdown-container">
+            <div class="input-group dropdown">
+              <label>User</label>
               <ejs-multiselect mode="CheckBox"
                                formControlName="user"
                                [placeholder]='placeholderValue'
@@ -43,9 +174,25 @@
               </ejs-multiselect>
             </div>
           </div>
+          <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType" class="dropdown-container">
+            <div class="input-group dropdown">
+              <label>Candidate</label>
+              <ejs-multiselect mode="CheckBox"
+                               formControlName="candidate"
+                               [placeholder]='placeholderValue'
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               appValidateWithMessage
+                               [fields]="userDataFields"
+                               [dataSource]="userData"
+                               [selectAllText]='allOption'
+                               showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>     
         </div>
+        
         <div class="input-container bootstrap top-container">
-
           <label>To<span class="required">*</span></label>
           <div class="input-group">
             <input appValidateWithMessage formControlName="emailTo" class="e-input" type="text"

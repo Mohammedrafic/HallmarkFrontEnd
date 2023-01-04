@@ -69,6 +69,10 @@
   .details-action-block {
     justify-content: flex-start;
   }
+
+  .value {
+    white-space: normal;
+  }
 }
 
 @media #{$max-mobile} {

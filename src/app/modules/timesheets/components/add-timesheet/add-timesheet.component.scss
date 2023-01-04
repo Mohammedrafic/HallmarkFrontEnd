@@ -45,22 +45,8 @@
 }
 
 .input-container {
-  width: 100%;
-  padding-top: 20px;
-
-  &.long {
-    grid-column-start: 1;
-    grid-column-end: 3;
-  }
-
-  &.flexed {
-    display: flex;
-    flex-direction: column;
-  }
-
-  label {
-    margin-bottom: 12px;
-  }
+  @include input-form-container;
+  padding-top: 20px
 }
 
 .bootstrap {

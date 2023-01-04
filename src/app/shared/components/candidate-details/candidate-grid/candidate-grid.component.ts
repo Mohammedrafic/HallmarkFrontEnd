@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { CandidateStatus } from '@shared/enums/status';
+import { CandidatesStatusText, CandidateStatus } from '@shared/enums/status';
 import { Store } from '@ngxs/store';
 import { CandidatesColumnsDefinition } from '@shared/components/candidate-details/candidate-grid/candidate-grid.constant';
 import { Router } from '@angular/router';
@@ -8,7 +8,6 @@ import { SetPageNumber, SetPageSize } from '@shared/components/candidate-details
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { CandidateDetailsPage } from '@shared/components/candidate-details/models/candidate.model';
 import { ColDef } from '@ag-grid-community/core';
-import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-candidate-grid',
@@ -16,45 +15,23 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
   styleUrls: ['./candidate-grid.component.scss'],
 })
 export class CandidateGridComponent extends DestroyableDirective implements OnInit {
-  @Input() public CandidateStatus: string;
+  @Input() public CandidateStatus: number;
   @Input() set candidatesPage(page: CandidateDetailsPage) {
-    let Enumvalues: number;
-    switch (this.CandidateStatus) {
-      case "Applied":
-        Enumvalues = CandidatStatus.Applied;
-        break
-      case "Shortlisted":
-        Enumvalues = CandidatStatus.Shortlisted;
-        break;
-      case "Offered":
-        Enumvalues = CandidatStatus.Offered;
-        break;
-      case "Accepted":
-        Enumvalues = CandidatStatus.Accepted;
-        break;
-      case "Onboard":
-        Enumvalues = CandidatStatus.OnBoard;
-        break;
-      default:
-        Enumvalues = 0;
-    }
-
-    if (Enumvalues > 0) {
+    if (page) {
       this.candidatePage = page;
-      this.candidatePage.items = (this.candidatePage.items || []).filter(f => f.status == Enumvalues);
       this.candidatePage.totalCount = this.candidatePage.items.length
-    } else {
-      this.candidatePage = page;
     }
-    // this.CandidateStatus=="Onboard"? 'OnBoard':''
-    // let Enumindex=Object.keys(CandidatStatus).indexOf(this.CandidateStatus=="Onboard"? 'OnBoard':''||"");
-    // let Enumvalues =Object.values(CandidatStatus)[Enumindex]
-    ;
+    if(this.CandidateStatus){
+      if(page){
+        this.candidatePage = page;
+        this.candidatePage.items = (this.candidatePage.items || []).filter(f => f.status == this.CandidateStatus);
+        this.candidatePage.totalCount = this.candidatePage.items.length
+      }
+    }
   }
 
   @Input() public pageNumber: number;
   @Input() public pageSize: number;
-
   @ViewChild('grid') grid: GridComponent;
 
   public candidatePage: CandidateDetailsPage;
