@@ -51,7 +51,7 @@ export class HeadCountComponent implements OnInit {
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/HeadCount/HeadCount.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/HeadCount/HeadCount.cat" };
-  public title: string = "Missing Credentials";
+  public title: string = "Head Count";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
   public allOption: string = "All";
