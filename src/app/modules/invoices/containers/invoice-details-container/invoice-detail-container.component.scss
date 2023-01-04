@@ -395,7 +395,9 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
 @media #{$max-mobile} {
   .menu-mobile {
-    margin: 0;
+    margin: 0 4px 0 0;
+    width: 30px;
+    border: none !important;
   }
 
   .profile-details-header {
@@ -427,11 +429,5 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
   .table-footer {
     justify-content: space-evenly !important;
-  }
-
-  .menu-mobile {
-    margin-right: 4px;
-    width: 30px;
-    border: none !important;
   }
 }

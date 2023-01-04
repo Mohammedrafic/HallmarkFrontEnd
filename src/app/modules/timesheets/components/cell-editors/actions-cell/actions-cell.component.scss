@@ -15,9 +15,14 @@
   }
 }
 
-@media #{$max-mobile} {
+@media #{$max-tablet} {
   .custom-btn {
     padding-left: 0 !important;
+  }
+}
+
+@media #{$max-mobile} {
+  .custom-btn {
     margin: auto auto 5px -5px;
   }
 }
