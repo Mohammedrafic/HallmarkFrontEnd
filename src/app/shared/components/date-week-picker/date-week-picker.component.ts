@@ -108,6 +108,14 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     this.datePicker.hide();
   }
 
+  public navigateTo(): void {
+    const [from] = DateTimeHelper.getWeekStartEnd(this.dateControl.value);
+
+    if (from) {
+      this.datePicker.navigateTo('Month', from);
+    }
+  }
+
   private startDatepickerWatching(): void {
     this.dateControl.valueChanges
     .pipe(
