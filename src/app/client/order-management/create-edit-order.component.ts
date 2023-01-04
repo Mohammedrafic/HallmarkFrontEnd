@@ -117,8 +117,10 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     const selectedOrderId = this.route.snapshot.paramMap.get('orderId');
 
     if(selectedOrderId) {
-      this.store.dispatch(new GetSelectedOrderById(+selectedOrderId))
-        .pipe(
+      this.store.dispatch(new GetSelectedOrderById(
+        +selectedOrderId,
+        this.orderManagementSystem === OrderManagementIRPSystemId.IRP
+      )).pipe(
           switchMap(() => this.selectedOrder$),
           filter(Boolean),
           takeUntil(this.componentDestroy())

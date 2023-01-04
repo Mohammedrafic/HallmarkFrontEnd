@@ -70,7 +70,10 @@ export class GetAgencyOrderCandidatesList {
 
 export class GetSelectedOrderById {
   static readonly type = '[order management] Get Selected Order By Id';
-  constructor(public payload: number) {}
+  constructor(
+    public payload: number,
+    public isIRP?: boolean
+  ) {}
 }
 
 export class GetOrganizationStatesWithKeyCode {

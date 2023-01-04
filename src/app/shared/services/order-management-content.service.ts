@@ -186,12 +186,12 @@ export class OrderManagementContentService {
     ).pipe(map((data) => sortByField(data, 'statusText')));
   }
 
-  /**
-   * Get order by id
-   @param id
-   */
-  public getOrderById(id: number): Observable<Order> {
-    return this.http.get<Order>(`/api/Orders/${id}`);
+  public getOrderById(id: number, isIRP?: boolean): Observable<Order> {
+    if(isIRP) {
+      return this.http.get<Order>(`/api/Orders/${id}`, { params: { isIRPTab: isIRP }});
+    } else {
+      return this.http.get<Order>(`/api/Orders/${id}`);
+    }
   }
 
   /**

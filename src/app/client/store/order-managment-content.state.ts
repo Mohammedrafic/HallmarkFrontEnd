@@ -452,9 +452,9 @@ export class OrderManagementContentState {
   @Action(GetSelectedOrderById)
   GetSelectedOrderById(
     { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
-    { payload }: GetSelectedOrderById
+    { payload, isIRP }: GetSelectedOrderById
   ): Observable<Order> {
-    return this.orderManagementService.getOrderById(payload).pipe(
+    return this.orderManagementService.getOrderById(payload, isIRP).pipe(
       tap((payload) => {
         patchState({ selectedOrder: payload });
         const { orderType, departmentId, skillId, jobStartDate, jobEndDate, isTemplate } = payload;
