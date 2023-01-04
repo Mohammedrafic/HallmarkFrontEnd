@@ -382,7 +382,7 @@ export class SecurityState {
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
