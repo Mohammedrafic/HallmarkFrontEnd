@@ -47,19 +47,21 @@ export class CandidateProfileService {
   }
 
   public saveCandidate(file: Blob, candidateId: number): Observable<void | CandidateModel> {
-    if (file) {
       return this.saveCandidateProfile(candidateId).pipe(
-        mergeMap((candidate) => this.saveCandidatePhoto(file, candidate.id))
+        mergeMap((candidate) => {
+          return file ? this.saveCandidatePhoto(file, candidate.id) : this.removeCandidatePhoto(candidate.id);
+        })
       );
-    } else {
-      return this.saveCandidateProfile(candidateId);
-    }
   }
 
   public saveCandidatePhoto(file: Blob, id: number): Observable<any> {
     const formData = new FormData();
     formData.append('photo', file);
     return this.http.post(`/api/Employee/photo?candidateProfileId=${id}`, formData).pipe(distinctUntilChanged());
+  }
+  
+  public removeCandidatePhoto(id: number): Observable<any> {
+    return this.http.delete(`/api/Employee/${id}/photo`).pipe(distinctUntilChanged());
   }
 
   public getCandidateById(id: number): Observable<CandidateModel> {
