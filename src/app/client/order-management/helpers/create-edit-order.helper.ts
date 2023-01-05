@@ -103,6 +103,7 @@ export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCre
   ...formState.jobDescriptionForm.getRawValue(),
   ...formState.jobDistributionForm.getRawValue(),
   ...formState.specialProjectForm.getRawValue(),
+  ...getBillRateValue(formState),
   jobDistributions: createJobDistributionList(formState.jobDistributionForm),
   contactDetails: [],
   workLocations: [],
@@ -115,6 +116,16 @@ export const getValuesFromList = (formList: FormGroup[]): FormGroup[] => {
   return formList.map((form: FormGroup) => {
     return form.getRawValue();
   });
+};
+
+export const getBillRateValue = (formState: ListOfKeyForms): void | {billRate: number | null} => {
+  const billRateValue = formState.jobDistributionForm.get('billRate')?.value;
+
+  if(typeof billRateValue === 'string') {
+    return {
+      billRate: !!billRateValue.length ? +billRateValue : null,
+    };
+  }
 };
 
 export const createFormData = (order: Order[], documents: Blob[]): FormData => {
