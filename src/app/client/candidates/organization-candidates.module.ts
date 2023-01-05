@@ -8,12 +8,14 @@ import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { TabsModule } from '@shared/components/tabs/tabs.module';
 import { SharedModule } from '@shared/shared.module';
+import { CandidateWorkCommitmentModule } from './candidate-work-commitment/candidate-work-commitment.module';
 
 @NgModule({
   declarations: [CandidateProfileComponent, AddEditCandidateComponent],
   imports: [
     CommonModule,
     CandidateProfileModule,
+    CandidateWorkCommitmentModule,
     OrganizationCandidatesRoutingModule,
     PageToolbarModule,
     ButtonModule,
