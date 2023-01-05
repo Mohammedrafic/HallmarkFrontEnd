@@ -159,8 +159,7 @@ export class HeadCountComponent implements OnInit {
     let startDate = new Date(Date.now());
     this.headCountReportForm = this.formBuilder.group(
       {
-        businessIds: new FormControl([Validators.required]),
-        reportDate: new FormControl(startDate, [Validators.required]),      
+        businessIds: new FormControl([Validators.required]),    
         regionIds: new FormControl([], [Validators.required]),
         locationIds: new FormControl([], [Validators.required])
       }
@@ -192,18 +191,18 @@ export class HeadCountComponent implements OnInit {
           let orgList = this.organizations?.filter((x) => data == x.organizationId);
           this.selectedOrganizations = orgList;
           this.regionsList = [];
-          const locationsList: Location[] = [];
-          const departmentsList: Department[] = [];
+          let regionsList: Region[] = [];
+          let locationsList: Location[] = [];        
           orgList.forEach((value) => {
-            this.regionsList.push(...value.regions);
-            value.regions.forEach((region) => {
-              locationsList.push(...region.locations);
-              region.locations.forEach((location) => {
-                departmentsList.push(...location.departments);
-              });
-            });
+            regionsList.push(...value.regions);
+            locationsList = regionsList.map(obj => {
+              return obj.locations.filter(location => location.regionId === obj.id);
+            }).reduce((a, b) => a.concat(b), []);
+           
           });
+          this.regionsList = sortByField(regionsList, "name");
           this.locationsList = sortByField(locationsList, 'name');
+
 
           if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 ) {
             this.showToastMessage(this.regionsList.length, this.locationsList.length);
@@ -280,9 +279,11 @@ export class HeadCountComponent implements OnInit {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { businessIds, locationIds, regionIds, reportDate} = this.headCountReportForm.getRawValue();
+    
+    let startDate = new Date(Date.now());
+    let { businessIds, locationIds, regionIds} = this.headCountReportForm.getRawValue();
     if (!this.headCountReportForm.dirty) {
-      this.message = "Default filter selected with all regions, locations and departments for 90 days";
+      this.message = "Default filter selected with all regions, locations";
     }
     else {
       this.isResetFilter = false;
@@ -291,7 +292,7 @@ export class HeadCountComponent implements OnInit {
     this.paramsData =
     {
       "OrganizationParamHCR":this.selectedOrganizations?.length==0?this.nullValue: this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
-      "ReportDateParamHCR": formatDate(reportDate, this.dateFormat, this.culture),
+      "ReportDateParamHCR": formatDate(startDate, this.dateFormat, this.culture),
       "RegionParamHCR": regionIds.length==0?this.nullValue : regionIds.join(this.joinString),
       "LocationParamHCR":locationIds.length==0?this.nullValue : locationIds.join(this.joinString),
       "BearerParamHCR": auth,
@@ -328,8 +329,6 @@ export class HeadCountComponent implements OnInit {
         valueId: 'id',
       },
       
-      reportDate: { type: ControlTypes.Date, valueType: ValueType.Text }
-      
     }
   }
  
@@ -354,10 +353,8 @@ export class HeadCountComponent implements OnInit {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    let startDate = new Date(Date.now());
     this.headCountReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.headCountReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-    this.headCountReportForm.get(analyticsConstants.formControlNames.ReportDate)?.setValue(startDate);
     this.filteredItems = [];
   }
   public onFilterApply(): void {
