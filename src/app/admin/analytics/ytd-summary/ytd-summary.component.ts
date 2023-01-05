@@ -405,7 +405,7 @@ export class YtdSummaryComponent implements OnInit {
       "monthYTDS": month,
 
       "organizationNameYTDS": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
-      "reportPulledMessageYTDS": "Data for 01/01/" + year.toString() + " - " + String(selectedMonthDate.getMonth() + 1).padStart(2, '0') + "/" + selectedMonthDate.getDate() + "/" + year.toString() + " pulled on " + String(selectedMonthDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + year.toString()
+      "reportPulledMessageYTDS": "Data for 01/01/" + year.toString() + " - " + String(selectedMonthDate.getMonth() + 1).padStart(2, '0') + "/" + selectedMonthDate.getDate() + "/" + year.toString() + " pulled on " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + year.toString()
       };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
