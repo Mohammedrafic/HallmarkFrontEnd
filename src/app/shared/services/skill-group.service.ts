@@ -14,9 +14,12 @@ export class SkillGroupService {
    * Get all skill group pages
    * @return skill group pages
    */
-  public getSkillGroups(): Observable<CredentialSkillGroupPage> {
+  public getSkillGroups(pageNumber: number, pageSize: number): Observable<CredentialSkillGroupPage> {
     return this.http
-      .get<CredentialSkillGroupPage>(`/api/SkillGroups/organization`)
+      .post<CredentialSkillGroupPage>(`/api/SkillGroups/organization`, {
+        pageNumber,
+        pageSize
+      })
       .pipe(map((data) => ({ ...data, items: sortByField(data.items, 'name') })));
   }
 

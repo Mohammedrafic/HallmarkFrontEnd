@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { GridComponent, SearchService } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, delay, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { combineLatest, delay, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrganizationManagementState } from '../../../store/organization-management.state';
@@ -92,6 +92,14 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.startOrganizationWatching();
     this.organizationChangedHandler();
     this.skillGroupDataLoadedHandler();
+    this.startPageChageWatching();
+  }
+
+  private startPageChageWatching(): void {
+    this.pageSubject.pipe(takeUntil(this.componentDestroy()), throttleTime(100)).subscribe((page) => {
+      this.currentPage = page;
+      this.dispatchNewPage();
+    });
   }
 
   editRow(saveSkillGroup: CredentialSkillGroup, event: any): void {
@@ -153,7 +161,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
             this.reservedMasterSkillIds.delete(skill.id);
           }
         });
-        this.store.dispatch(new RemoveCredentialSkillGroup(skillGroup));
+        this.store.dispatch(new RemoveCredentialSkillGroup(skillGroup, this.currentPage, this.pageSize));
       }
       this.removeActiveCssClass();
     });
@@ -197,7 +205,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
         ...(this.isEdit && { id: this.editedSkillGroupId }),
       };
 
-      this.store.dispatch(new SaveUpdateCredentialSkillGroup(skillGroup));
+      this.store.dispatch(new SaveUpdateCredentialSkillGroup(skillGroup, this.currentPage, this.pageSize));
       this.store.dispatch(new ShowSideDialog(false));
       this.removeActiveCssClass();
       this.clearFormDetails();
@@ -210,6 +218,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   onRowsDropDownChanged(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.grid.pageSettings.pageSize = this.pageSize;
+    this.pageSubject.next(this.currentPage);
   }
 
   onGoToClick(event: any): void {
@@ -268,9 +277,13 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
       this.currentPage = 1;
-      this.store.dispatch(new GetCredentialSkillGroup());
+      this.dispatchNewPage();
       this.store.dispatch(new GetAssignedSkillsByOrganization());
     });
+  }
+
+  private dispatchNewPage(): void {
+    this.store.dispatch(new GetCredentialSkillGroup(this.currentPage, this.pageSize));
   }
 
   private skillGroupDataLoadedHandler(): void {
