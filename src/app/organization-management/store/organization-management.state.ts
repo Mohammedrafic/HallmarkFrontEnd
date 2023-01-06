@@ -1188,9 +1188,9 @@ export class OrganizationManagementState {
   @Action(GetCredentialSkillGroup)
   GetSkillGroups(
     { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: GetCredentialSkillGroup
+    { pageNumber, pageSize }: GetCredentialSkillGroup
   ): Observable<CredentialSkillGroupPage> {
-    return this.skillGroupService.getSkillGroups().pipe(
+    return this.skillGroupService.getSkillGroups(pageNumber, pageSize).pipe(
       tap((payload) => {
         patchState({ skillGroups: payload });
         return payload;
@@ -1201,7 +1201,7 @@ export class OrganizationManagementState {
   @Action(SaveUpdateCredentialSkillGroup)
   SaveUpdateSkillGroup(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
-    { payload }: SaveUpdateCredentialSkillGroup
+    { payload, pageNumber, pageSize }: SaveUpdateCredentialSkillGroup
   ): Observable<CredentialSkillGroup> {
     return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(
       tap((response) => {
@@ -1211,7 +1211,7 @@ export class OrganizationManagementState {
         } else {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
-        dispatch(new GetCredentialSkillGroup());
+        dispatch(new GetCredentialSkillGroup(pageNumber, pageSize));
         return response;
       })
     );
@@ -1220,12 +1220,12 @@ export class OrganizationManagementState {
   @Action(RemoveCredentialSkillGroup)
   RemoveSkillGroup(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
-    { payload }: RemoveCredentialSkillGroup
+    { payload, pageNumber, pageSize }: RemoveCredentialSkillGroup
   ): Observable<void> {
     return this.skillGroupService.removeSkillGroup(payload).pipe(
       tap((payload) => {
         patchState({ isSkillGroupLoading: false });
-        dispatch(new GetCredentialSkillGroup());
+        dispatch(new GetCredentialSkillGroup(pageNumber, pageSize));
         return payload;
       }),
       catchError((error: any) => {

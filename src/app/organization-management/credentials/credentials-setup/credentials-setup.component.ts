@@ -271,7 +271,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
       this.lastSelectedCredential = null;
       this.gridDataSource = [];
       this.store.dispatch(new ClearCredentialSetup());
-      this.store.dispatch(new GetCredentialSkillGroup());
+      this.store.dispatch(new GetCredentialSkillGroup(1, 1000));
     });
   }
 
