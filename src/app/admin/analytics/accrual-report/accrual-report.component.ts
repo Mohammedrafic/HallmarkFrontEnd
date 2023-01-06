@@ -309,20 +309,20 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
         if (!this.isClearAll) {
           let orgList = this.organizations?.filter((x) => data == x.organizationId);
           this.selectedOrganizations = orgList;
-          const regionsList: Region[] = [];
-          const locationsList: Location[] = [];
-          const departmentsList: Department[] = [];
+          this.regionsList = [];
+          let regionsList: Region[] = [];
+          let locationsList: Location[] = [];
+          let departmentsList: Department[] = [];         
           orgList.forEach((value) => {
             regionsList.push(...value.regions);
-            value.regions.forEach((region) => {
-              locationsList.push(...region.locations);
-              region.locations.forEach((location) => {
-                departmentsList.push(...location.departments);
-              });
-            });
+            locationsList = regionsList.map(obj => {
+              return obj.locations.filter(location => location.regionId === obj.id);
+            }).reduce((a, b) => a.concat(b), []);
+            departmentsList = locationsList.map(obj => {
+              return obj.departments.filter(department => department.locationId === obj.id);
+            }).reduce((a, b) => a.concat(b), []);
           });
-
-          this.regionsList = sortByField(regionsList, 'name');
+          this.regionsList = sortByField(regionsList, "name");
           this.locationsList = sortByField(locationsList, 'name');
           this.departmentsList = sortByField(departmentsList, 'name');
 
