@@ -1,3 +1,5 @@
+import { Option } from '../interfaces';
+
 export const setDataSourceValue = <T extends { field: string; dataSource?: any }, U>(
   config: T[],
   key: string,
@@ -8,4 +10,12 @@ export const setDataSourceValue = <T extends { field: string; dataSource?: any }
 
 export const mapperSelectedItems = <T, U>(source: U[], key: string): T[] => {
   return source.flatMap((sourceItem: any) => sourceItem[key].map((item: T) => item));
+};
+
+//TODO remove any
+export const mapDataSource = (items: any, nameField: string, idField: string): Option[] => {
+  return items.map((item: any) => ({
+    name: item[nameField],
+    id: item[idField],
+  }));
 };

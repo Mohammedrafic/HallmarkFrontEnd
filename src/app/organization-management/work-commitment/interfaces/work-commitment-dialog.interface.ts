@@ -44,6 +44,7 @@ export interface CommitmentsInputConfig {
   type: FieldType;
   disabled?: boolean;
   dataSource?: CommitmentDataSource;
+  maxLength?: number;
 }
 
 export interface CommitmentDialogConfig {

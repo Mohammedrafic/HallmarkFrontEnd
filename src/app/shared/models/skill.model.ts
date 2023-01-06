@@ -94,7 +94,7 @@ export class MasterSkillDataSources {
 export interface ListOfSkills {
   id: number;
   name: string;
-  masterSkillId?: number
+  masterSkillId?: number;
 }
 
 export type AssignedSkillTreeItem = {
@@ -112,13 +112,15 @@ export interface AssignedSkillTree {
   assignedSkillIds: string[];
 }
 
-export interface AssignedSkillsByOrganization  {
+export interface AssignedSkillsByOrganization {
   id: number;
   masterSkillId: number;
   categoryName: string;
   skillAbbr: string;
   skillDescription: string;
-  name: string
+  name: string;
+  includeInIRP: boolean;
+  includeInVMS: boolean;
 }
 
 export interface IrpPrimarySkill {
