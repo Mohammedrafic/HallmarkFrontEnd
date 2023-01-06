@@ -68,9 +68,9 @@ export class TierService {
       organizationTierId: tier.id,
       name: tier.name,
       hours: tier.hours,
-      regionIds: tier.regionId ? [tier.regionId] : this.tierConfig.regions,
-      locationIds: tier.locationId ? [tier.locationId] : this.tierConfig.locations,
-      departmentIds:  tier.departmentId ? [tier.departmentId] : this.tierConfig.departments,
+      regionIds: tier.regionId ? [tier.regionId] : null,
+      locationIds: tier.locationId ? [tier.locationId] : null,
+      departmentIds:  tier.departmentId ? [tier.departmentId] : null,
       forceUpsert: false
     };
   }

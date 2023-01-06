@@ -16,6 +16,8 @@ export interface TiersInputConfig {
   required: boolean;
   type: FieldType;
   dataSource?: TierDataSource;
+  showAllToggle?: boolean;
+  customFiltering?: boolean;
 }
 
 export interface TierDialogConfig {

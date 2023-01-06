@@ -300,25 +300,34 @@
     [header]="dialogHeader + ' Workflow'"
     [width]="'569'"
   >
-    <form class="form-container bootstrap" id="addWorkflow" *ngIf="showForm" [formGroup]="workflowMappingFormGroup">
+    <form class="form-container" id="addWorkflow" *ngIf="showForm" [formGroup]="workflowMappingFormGroup">
       <div>
         <div class="input-container dropdown">
           <label for="region">Region <span class="required">*</span></label>
-          <div class="input-group dropdown">
-            <ejs-multiselect
-              id="region"
-              #regionDropdown
-              appValidateWithMessage
-              selectAllText="Select All"
-              mode="CheckBox"
-              [dataSource]="orgRegions"
-              [fields]="fields"
-              [showSelectAll]="true"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              formControlName="regions"
-            >
-            </ejs-multiselect>
+          <div class="dropdown-wrapper">
+            <div class="input-group dropdown bootstrap">
+              <ejs-multiselect
+                id="region"
+                #regionDropdown
+                appValidateWithMessage
+                mode="CheckBox"
+                [dataSource]="orgRegions"
+                [fields]="fields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                formControlName="regions"
+              >
+              </ejs-multiselect>
+            </div>
+            <div class="switch">
+              <ejs-switch
+                name="allRegions"
+                [checked]="allRegionsSelected"
+                (change)="allRegionsChange($event)"
+                label="All"
+              ></ejs-switch>
+              <label for="allRegions" class="switch-text">All</label>
+            </div>
           </div>
         </div>
       </div>
@@ -326,21 +335,30 @@
       <div>
         <div class="input-container dropdown">
           <label for="location">Location <span class="required">*</span></label>
-          <div class="input-group dropdown">
-            <ejs-multiselect
-              id="location"
-              #locationDropdown
-              appValidateWithMessage
-              selectAllText="Select All"
-              mode="CheckBox"
-              [dataSource]="locations"
-              [fields]="fields"
-              [showSelectAll]="true"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              formControlName="locations"
-            >
-            </ejs-multiselect>
+          <div class="dropdown-wrapper">
+            <div class="input-group dropdown bootstrap">
+              <ejs-multiselect
+                id="location"
+                #locationDropdown
+                appValidateWithMessage
+                mode="CheckBox"
+                [dataSource]="locations"
+                [fields]="fields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                formControlName="locations"
+              >
+              </ejs-multiselect>
+            </div>
+            <div class="switch">
+              <ejs-switch
+                name="allLocations"
+                [checked]="allLocationsSelected"
+                (change)="allLocationsChange($event)"
+                label="All"
+              ></ejs-switch>
+              <label for="allLocations" class="switch-text">All</label>
+            </div>
           </div>
         </div>
       </div>
@@ -348,21 +366,35 @@
       <div>
         <div class="input-container dropdown">
           <label for="department">Department <span class="required">*</span></label>
-          <div class="input-group dropdown">
-            <ejs-multiselect
-              id="department"
-              #departmentDropdown
-              appValidateWithMessage
-              selectAllText="Select All"
-              mode="CheckBox"
-              [dataSource]="departments"
-              [fields]="fields"
-              [showSelectAll]="true"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              formControlName="departments"
-            >
-            </ejs-multiselect>
+          <div class="dropdown-wrapper">
+            <div class="input-group dropdown bootstrap">
+              <ejs-multiselect
+                id="department"
+                #departmentDropdown
+                appValidateWithMessage
+                mode="CheckBox"
+                [dataSource]="departments"
+                [fields]="fields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                formControlName="departments"
+                [query]="query"
+                (filtering)="onDepartmentsFiltering($event)"
+              >
+              </ejs-multiselect>
+            </div>
+            <div class="switch">
+              <ejs-switch
+                name="allDepartments"
+                [checked]="allDepartmentsSelected"
+                (change)="allDepartmentsChange($event)"
+                label="All"
+              ></ejs-switch>
+              <label for="allDepartments" class="switch-text">All</label>
+            </div>
+          </div>
+          <div *ngIf="departments && departments.length > maxDepartmentsLength">
+            Narrow down locations/regions or use input search for departments.
           </div>
         </div>
       </div>
@@ -370,7 +402,7 @@
       <div>
         <div class="input-container dropdown">
           <label for="skill">Skill <span class="required">*</span></label>
-          <div class="input-group dropdown">
+          <div class="input-group dropdown bootstrap">
             <ejs-multiselect
               id="skill"
               appValidateWithMessage
@@ -391,7 +423,7 @@
       <div>
         <div class="input-container dropdown">
           <label for="workflowType">Workflow Type <span class="required">*</span></label>
-          <div class="input-group dropdown">
+          <div class="input-group dropdown bootstrap">
             <ejs-dropdownlist
               id="workflowType"
               appValidateWithMessage
@@ -408,7 +440,7 @@
       <div>
         <div class="input-container">
           <label for="workflowName">Workflow Name<span class="required">*</span></label>
-          <div class="input-group dropdown">
+          <div class="input-group dropdown bootstrap">
             <ejs-dropdownlist
               appValidateWithMessage
               id="workflowName"
@@ -422,7 +454,7 @@
         </div>
       </div>
 
-      <div class="groups" *ngIf="isMappingSectionShown">
+      <div class="groups bootstrap" *ngIf="isMappingSectionShown">
         <div class="group-container" formArrayName="orderRoleUserFormArray">
           <div class="group-name"><h3>Order</h3></div>
           <div class="group-details-container">

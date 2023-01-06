@@ -2,9 +2,9 @@ import { SystemType } from "@shared/enums/system-type.enum";
 
 export interface TierDTO {
   organizationTierId: number;
-  regionIds: number[];
-  locationIds: number[];
-  departmentIds: number[];
+  regionIds: number[] | null;
+  locationIds: number[] | null;
+  departmentIds: number[] | null;
   name?: string;
   hours?: number;
   associateOrganizationId?: number;

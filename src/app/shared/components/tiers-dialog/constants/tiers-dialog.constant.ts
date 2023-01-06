@@ -2,6 +2,7 @@ import { Tiers } from '@shared/enums/tiers.enum';
 import { FieldType } from '@core/enums';
 import { TierDialogConfig } from '@shared/components/tiers-dialog/interfaces';
 import { OrganizationRegion } from '@shared/models/organization.model';
+import { FieldNames } from './tiers.constant';
 
 export const TiersDialogConfig = (regions?: OrganizationRegion[]): Record<Tiers, TierDialogConfig> => ({
   [Tiers.tierSettings]: {
@@ -23,28 +24,32 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[]): Record<Tiers,
         type: FieldType.Number,
       },
       {
-        field: 'regionIds',
+        field: FieldNames.regionIds,
         title: 'Region',
         disabled: false,
         required: true,
         type: FieldType.MultiSelectDropdown,
-        dataSource: regions ?? []
+        dataSource: regions ?? [],
+        showAllToggle: true,
       },
       {
-        field: 'locationIds',
+        field: FieldNames.locationIds,
         title: 'Location',
         disabled: false,
         required: true,
         type: FieldType.MultiSelectDropdown,
-        dataSource: []
+        dataSource: [],
+        showAllToggle: true,
       },
       {
-        field: 'departmentIds',
+        field: FieldNames.departmentIds,
         title: 'Department',
         disabled: false,
         required: true,
         type: FieldType.MultiSelectDropdown,
-        dataSource: []
+        dataSource: [],
+        showAllToggle: true,
+        customFiltering: true,
       }
     ]
   },

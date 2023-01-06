@@ -20,6 +20,21 @@
 .form-container {
   padding-top: 24px;
 
+  .switch {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dropdown-wrapper {
+    display: flex;
+
+    .input-group {
+      width: 100%;
+      margin-right: 12px;
+    }
+  }
+
   .input-container {
     margin-bottom: 12px;
 

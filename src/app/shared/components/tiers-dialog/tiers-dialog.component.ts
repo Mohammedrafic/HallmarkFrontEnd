@@ -16,8 +16,8 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { FieldType } from '@core/enums';
-import { OPTION_FIELDS, TIER_DIALOG_TYPE, TiersDialogConfig } from '@shared/components/tiers-dialog/constants';
-import { TierDetails, TierDialogConfig, TiersInputConfig } from '@shared/components/tiers-dialog/interfaces';
+import { OPTION_FIELDS, TIER_DIALOG_TYPE, TiersDialogConfig, FiledNamesSettings, FieldNames } from '@shared/components/tiers-dialog/constants';
+import { TierDataSource, TierDetails, TierDialogConfig, TiersInputConfig } from '@shared/components/tiers-dialog/interfaces';
 import { Tiers } from '@shared/enums/tiers.enum';
 import { CustomFormGroup } from '@core/interface';
 import { TierService } from '@shared/components/tiers-dialog/services';
@@ -35,6 +35,8 @@ import { DepartmentsTierDTO } from '@shared/models/associate-organizations.model
 import { createDepartmentsTier } from '@shared/helpers';
 import { TierList } from '@shared/components/associate-list/interfaces';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { Query } from "@syncfusion/ej2-data";
+import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
 
 @Component({
   selector: 'app-tiers-dialog',
@@ -55,6 +57,14 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   @Input() set selectedTier(tier: TierDetails) {
     if (tier) {
       this.selectedTierDetails = tier;
+      if (this.dialogType === Tiers.tierSettings) {
+        this.allRecords.regionIds = !tier.regionId;
+        this.allRecords.locationIds = !tier.locationId;
+        this.allRecords.departmentIds = !tier.departmentId;
+        this.allRegionsChange({ checked: this.allRecords.regionIds });
+        this.allLocationsChange({ checked: this.allRecords.locationIds });
+        this.allDepartmentsChange({ checked: this.allRecords.departmentIds });
+      }
       this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, tier, this.regions));
     }
   };
@@ -79,6 +89,15 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   private selectedLocations: number[] = [];
   private selectedTierDetails: TierDetails;
 
+  public allRecords: FiledNamesSettings = {
+    'regionIds': false,
+    'locationIds': false,
+    'departmentIds': false
+  };
+  public maxDepartmentsLength = 1000;
+  public query: Query = new Query().take(this.maxDepartmentsLength);
+  public noValue = undefined;
+
   @Select(AssociateListState.getTiersList)
   public tierList$: Observable<TierList[]>;
 
@@ -102,9 +121,76 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     this.watchForDepartments();
   }
 
+  public allRegionsChange(event: { checked: boolean }): void {
+    this.allRecords[FieldNames.regionIds] = event.checked;
+    const regionsControl = this.tierForm?.controls['regionIds'];
+    if (this.allRecords[FieldNames.regionIds]) {
+      regionsControl?.setValue(null);
+      regionsControl?.disable();
+      let locations: Location[] = [];
+      this.regions.forEach((region: OrganizationRegion) => {
+        const filteredLocation = region.locations || [];
+        locations = [...locations, ...filteredLocation] as Location[];
+        setDataSourceValue(this.dialogConfig.fields, 'locationIds', locations);
+      });
+    } else {
+      regionsControl?.enable();
+    }
+  }
+
+  public allLocationsChange(event: { checked: boolean }): void {
+    this.allRecords[FieldNames.locationIds] = event.checked;
+    const locationsControl = this.tierForm?.controls['locationIds'];
+    if (this.allRecords[FieldNames.locationIds]) {
+      locationsControl?.setValue(null);
+      locationsControl?.disable();
+      let departments: OrganizationDepartment[] = [];
+      let locations: TierDataSource | undefined = this.dialogConfig.fields.find((configField: TiersInputConfig) => configField.field === 'locationIds')!.dataSource;
+      locations?.forEach((location: any) => {
+        const filteredDepartments = location.departments || [];
+        departments = [...departments, ...filteredDepartments] as OrganizationDepartment[];
+        setDataSourceValue(this.dialogConfig.fields, 'departmentIds', departments);
+      });
+    } else {
+      locationsControl?.enable();
+    }
+  }
+
+  public allDepartmentsChange(event: { checked: boolean }): void {
+    this.allRecords[FieldNames.departmentIds] = event.checked;
+    const departmentsControl = this.tierForm?.controls['departmentIds'];
+    if (this.allRecords[FieldNames.departmentIds]) {
+      departmentsControl?.setValue(null);
+      departmentsControl?.disable();
+    } else {
+      departmentsControl?.enable();
+    }
+  }
+
+  public allRecordsChange(event: { checked: boolean }, field: string): void {
+    field === 'regionIds' && this.allRegionsChange(event);
+    field === 'locationIds' && this.allLocationsChange(event);
+    field === 'departmentIds' && this.allDepartmentsChange(event);
+  }
+
+  public getToggleValue(field: string): boolean {
+    return this.allRecords[field as FieldNames];
+  }
+
+  public onDepartmentsFiltering(e: FilteringEventArgs): void {
+    const char = e.text.length + 1;
+    let query: Query = new Query();
+    query =
+      e.text !== ''
+        ? query.where('name', 'contains', e.text, true).take(char * 15)
+        : query;
+        let departments: TierDataSource | undefined = this.dialogConfig.fields.find((configField: TiersInputConfig) => configField.field === 'departmentIds')!.dataSource;
+    e.updateData(departments as [], query);
+  };
+
   public saveTiers(): void {
     if (this.tierForm?.valid) {
-      this.saveTier.emit(this.tierForm.value);
+      this.saveTier.emit(this.tierForm.getRawValue());
     } else {
       this.tierForm?.markAllAsTouched();
     }
@@ -191,6 +277,14 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
 
     this.actions$.pipe(ofActionDispatched(ShowSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
+        if (this.isTierSettingsDialog) {
+          this.allRecords.regionIds = false;
+          this.allRecords.locationIds = false;
+          this.allRecords.departmentIds = false;
+          this.allRegionsChange({ checked: false });
+          this.allLocationsChange({ checked: false });
+          this.allDepartmentsChange({ checked: false });
+        }
         this.sideDialog.show();
       } else {
         this.sideDialog.hide();
