@@ -95,13 +95,6 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.startPageChageWatching();
   }
 
-  private startPageChageWatching(): void {
-    this.pageSubject.pipe(takeUntil(this.componentDestroy()), throttleTime(100)).subscribe((page) => {
-      this.currentPage = page;
-      this.dispatchNewPage();
-    });
-  }
-
   editRow(saveSkillGroup: CredentialSkillGroup, event: any): void {
     this.addActiveCssClass(event);
     const currentRowSkillGroupIds = saveSkillGroup.skills?.map(s => s.id);
@@ -257,6 +250,13 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
 
   searchSkill(event: any): void {
     this.searchGrid.search((event.target as HTMLInputElement).value);
+  }
+
+  private startPageChageWatching(): void {
+    this.pageSubject.pipe(takeUntil(this.componentDestroy()), throttleTime(100)).subscribe((page) => {
+      this.currentPage = page;
+      this.dispatchNewPage();
+    });
   }
 
   private clearFormDetails(): void {
