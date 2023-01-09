@@ -143,6 +143,6 @@ export class GetGroupEmailCandidates {
     public statuses: string,
     public jobID: string,
     public isAgency: boolean,
-    public businessUnitId: number
+    public businessUnitIds: string
   ) { }
 }
