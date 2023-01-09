@@ -15,7 +15,7 @@
               </ejs-dropdownlist>
             </div>
           </div>
-          <div class="dropdown-container">
+          <div class="dropdown-container" *ngIf="!isBusinessUnitTypeAgency">
             <div class="input-group dropdown">
               <label>Business Unit</label>
               <ejs-dropdownlist appValidateWithMessage
@@ -26,6 +26,21 @@
                                 [allowFiltering]="true"
                                 placeholder="Business">
               </ejs-dropdownlist>
+            </div>
+          </div>
+          <div class="dropdown-container" *ngIf="isBusinessUnitTypeAgency">
+            <div class="input-group dropdown">
+              <label>Business Unit</label>
+              <ejs-multiselect mode="CheckBox" appValidateWithMessage
+                                formControlName="businesses"
+                                [fields]="businessDataFields"
+                                [dataSource]="businessData$ | async"                                
+                                [allowFiltering]="true"
+                                placeholder="Business"
+                                [showDropDownIcon]="true"
+                                [selectAllText]='allOption'
+                                showSelectAll=true>
+              </ejs-multiselect>
             </div>
           </div>
           <div class="dropdown-container">
