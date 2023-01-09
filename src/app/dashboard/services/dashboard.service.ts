@@ -2,9 +2,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import lodashMap from 'lodash/fp/map';
 import lodashMapPlain from 'lodash/map';
-import { Store } from '@ngxs/store';
-import { UserState } from 'src/app/store/user.state';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { AccumulationChartModel } from '@syncfusion/ej2-angular-charts';
 import type { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
@@ -83,7 +80,7 @@ export class DashboardService {
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
 
-  constructor(private readonly httpClient: HttpClient,private store: Store, private readonly router: Router) {}
+  constructor(private readonly httpClient: HttpClient, private readonly router: Router) {}
 
   public getDashboardsData(): Observable<DashboardDataModel> {
     return forkJoin({ panels: this.getDashboardState(), widgets: this.getWidgetList() }).pipe(
@@ -210,15 +207,7 @@ export class DashboardService {
       ...combinedData.shapeSettings,
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
-    const user = this.store.selectSnapshot(UserState.user);
-    var title : string;
-    if (user?.businessUnitType === BusinessUnitType.Agency) {
-      title= "Candidate’s Home State";
-    }
-    else 
-    {
-       title= "Applicant’s Home State";
-    }
+    const title = "Applicant’s Home State";
     const description = "";
     return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description };
   }
