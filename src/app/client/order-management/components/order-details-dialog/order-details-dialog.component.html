@@ -12,7 +12,8 @@
         <div class="e-card-header">
           <div class="e-card-header-caption">
             <h3 class="e-card-title">
-              {{ isReOrder ? 'Re-Order' : 'Order' }} ID {{ order?.organizationPrefix }}-{{ order?.publicId }}
+              {{ isReOrder && !order?.irpOrderMetadata  ? 'Re-Order' : 'Order' }} ID 
+              {{ order?.organizationPrefix }}-{{ order?.publicId }}
             </h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList>
@@ -23,11 +24,11 @@
               </ejs-chiplist>
               <div class="vertical-divider"></div>
               <div *ngIf="order" class="order-other-statuses">
-                <span class="custom-chip" *ngIf="!isReOrder">{{ order.orderType | orderTypeName: order.isIRPOnly }}</span>
+                <span class="custom-chip" *ngIf="!isReOrder">{{ order.orderType | orderTypeName: !!order.irpOrderMetadata }}</span>
                 <span *ngIf="orderType.ReOrder !== order?.orderType" class="custom-chip">
                   {{ order.isLocked ? 'Locked' : 'Unlocked' }}</span
                 >
-                <span class="custom-chip" *ngIf="order.isIRPOnly">IRP</span>
+                <span class="custom-chip" *ngIf="order.irpOrderMetadata">IRP</span>
               </div>
             </div>
           </div>
@@ -152,7 +153,7 @@
         <ejs-tab #tab *ngIf="orderStatus.Incomplete !== order?.status" (selecting)="onTabSelecting($event)">
           <e-tabitems>
             <e-tabitem>
-              <ng-template #headerText>{{ isReOrder ? 'Re-Order' : 'Order' }} Details</ng-template>
+              <ng-template #headerText>{{ isReOrder && !order?.irpOrderMetadata ? 'Re-Order' : 'Order' }} Details</ng-template>
               <ng-template #content>
                 <app-order-details-container *ngIf="sideDialog.visible" [currentOrder]="order"></app-order-details-container>
               </ng-template>

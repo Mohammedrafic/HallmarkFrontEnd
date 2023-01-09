@@ -12,6 +12,7 @@ import { TableStatusCellComponent } from '@shared/components/table-status-cell/t
 import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
 
 import { DefaultOrderCol, FirstColumnWidth, PrepareMenuItems } from './order-management-irp.const';
+import { GridValuesHelper } from '@core/helpers';
 
 export const GridCellsSystemIRPTabPerDiem = (
   threeDotsMenuOptions: Record<string, ItemModel[]> = {},
@@ -171,8 +172,8 @@ export const GridCellsSystemIRPTabPerDiem = (
     minWidth: 80,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) => {
-      const startShiftTime = formatDate(params.data.shiftStartDateTime, 'HH:mm', 'en-US', 'UTC');
-      const endShiftTime = formatDate(params.data.shiftEndDateTime, 'HH:mm', 'en-US', 'UTC');
+      const startShiftTime = GridValuesHelper.formatDate(params.data.shiftStartDateTime, 'HH:mm');
+      const endShiftTime = GridValuesHelper.formatDate(params.data.shiftEndDateTime, 'HH:mm');
 
       return `${startShiftTime}-${endShiftTime}`;
     },

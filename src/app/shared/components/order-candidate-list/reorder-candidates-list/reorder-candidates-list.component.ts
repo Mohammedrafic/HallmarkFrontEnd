@@ -1,5 +1,5 @@
 import { GetCandidateJob, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
@@ -7,10 +7,13 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
-import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { IrpOrderCandidate, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { PageOfCollections } from '@shared/models/page.model';
 import { distinctUntilChanged, filter, merge, Observable, takeUntil, tap } from 'rxjs';
-import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
+import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
+import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
+import { OrderCandidateApiService } from '../order-candidate-api.service';
 
 enum ReorderCandidateStatuses {
   BillRatePending = 44,
@@ -27,13 +30,16 @@ enum ReorderCandidateStatuses {
   styleUrls: ['./reorder-candidates-list.component.scss'],
 })
 export class ReorderCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit {
+  @Input() selectedOrder: Order;
+
   public candidate: OrderCandidatesList;
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidateStatuses = ReorderCandidateStatuses;
   public candidateJob: OrderCandidateJob;
   public agencyActionsAllowed: boolean;
-
+  public isFeatureIrpEnabled = false;
   public readonly cancelledStatusName = ReorderCandidateStatuses[ReorderCandidateStatuses.Cancelled];
+  public irpCandidates: PageOfCollections<IrpOrderCandidate>;
 
   private selectedIndex: number;
 
@@ -41,9 +47,11 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     protected override store: Store,
     protected override router: Router,
     private orderCandidateListViewService: OrderCandidateListViewService,
+    private candidateApiService: OrderCandidateApiService,
     private actions$: Actions
   ) {
     super(store, router);
+    this.setIrpFeatureFlag();
   }
 
   override ngOnInit(): void {
@@ -53,6 +61,9 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
 
     if (this.isAgency) {
       this.checkForAgencyStatus();
+    }
+    if (this.selectedOrder.irpOrderMetadata) {
+      this.getIrpCandidates();
     }
   }
 
@@ -76,7 +87,8 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
       if (this.isAgency) {
         this.store.dispatch(new GetCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
       } else if (this.isOrganization) {
-        const isGetAvailableSteps = [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard].includes(
+        const isGetAvailableSteps = [CandidatStatus.BillRatePending,
+          CandidatStatus.OfferedBR, CandidatStatus.OnBoard].includes(
           this.candidate.status
         );
 
@@ -127,6 +139,20 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     )
     .subscribe((value) => {
       this.agencyActionsAllowed = value;
+    });
+  }
+
+  private setIrpFeatureFlag(): void {
+    this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+  }
+
+  private getIrpCandidates(): void {
+    this.candidateApiService.getIrpCandidates(this.selectedOrder.irpOrderMetadata?.orderId as number)
+    .pipe(
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((candidates) => {
+      this.irpCandidates = candidates;
     });
   }
 }

@@ -409,7 +409,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public onNextPreviousOrder(isNext: boolean): void {
     this.nextPreviousOrderEvent.emit({
       next: isNext,
-      isIrpOrder: this.order.isIRPOnly as boolean,
+      isIrpOrder: !!this.order.irpOrderMetadata,
     });
   }
 

@@ -81,8 +81,8 @@ export const IRPTabsConfig: TabsListConfig[] = [
 
 export const IRPTabRequestTypeMap: Map<number, number | null> = new Map<number, number | null>()
   .set(0, null)
-  .set(1, 2)
-  .set(2, 1)
+  .set(1, 10)
+  .set(2, 3)
   .set(3, 0);
 
 export const MapSystemWithTabs: Map<OrderManagementIRPSystemId, TabsListConfig[]> =
