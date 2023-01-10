@@ -321,6 +321,7 @@
 <app-filter-dialog
   [items]="filteredItems"
   [count]="ordersPage?.totalCount"
+  [targetElement]="targetElement"
   (deleteFilter)="onFilterDelete($event)"
   (clearAllFiltersClicked)="onFilterClearAll()"
   (applyFilterClicked)="onFilterApply()"

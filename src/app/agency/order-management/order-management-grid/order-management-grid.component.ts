@@ -129,6 +129,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public orderTypes = OrderType;
   public selectedRowRef: any;
   public openDetailsTab = false;
+  public targetElement: HTMLElement | null = document.body.querySelector('#main');
   private orderPerDiemId: number | null;
   private prefix: string | null;
   private orderId: number | null;
