@@ -12,7 +12,8 @@
   <app-reorder-candidates-list *ngSwitchCase="orderType.ReOrder" [candidatesList]="orderCandidatePage$ | async"
                                       (getCandidatesList)="onGetCandidatesList($event)"
                                       [includeDeployedCandidates]="!excludeDeployed"
-                                      [order]="orderCandidates">
+                                      [order]="orderCandidates"
+                                      [selectedOrder]="order">
   </app-reorder-candidates-list>
   <app-order-per-diem-candidates-list *ngSwitchCase="orderType.OpenPerDiem" [candidatesList]="orderCandidatePage$ | async"
                                       (getCandidatesList)="onGetCandidatesList($event)"

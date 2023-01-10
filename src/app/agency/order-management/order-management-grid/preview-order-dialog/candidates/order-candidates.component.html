@@ -30,6 +30,7 @@
     [candidatesList]="orderCandidatePage$ | async"
     (getCandidatesList)="onGetCandidatesList($event)"
     [order]="orderCandidates"
+    [selectedOrder]="currentOrder"
   ></app-reorder-candidates-list>
   <app-order-candidates-list
     *ngSwitchDefault

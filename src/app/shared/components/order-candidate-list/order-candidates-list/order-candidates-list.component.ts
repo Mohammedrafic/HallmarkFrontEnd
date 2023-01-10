@@ -106,7 +106,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.subscribeToDeployedCandidateOrdersInfo();
     }
 
-    if (this.selectedOrder.isIRPOnly) {
+    if (this.selectedOrder.irpOrderMetadata) {
       this.getIrpCandidates();
     }
   }

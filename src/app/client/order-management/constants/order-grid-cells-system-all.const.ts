@@ -14,6 +14,7 @@ import {
 } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.component';
 import { OrderStatus } from '@shared/enums/order-management';
 import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
+import { GridValuesHelper } from '@core/helpers';
 
 export const GridCellsSystemAll = (
   canCreateOrder = false,
@@ -219,8 +220,8 @@ export const GridCellsSystemAll = (
     minWidth: 80,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) => {
-      const startShiftTime = formatDate(params.data.shiftStartTime, 'HH:mm', 'en-US');
-      const endShiftTime = formatDate(params.data.shiftEndTime, 'HH:mm', 'en-US');
+      const startShiftTime = GridValuesHelper.formatDate(params.data.shiftStartTime, 'HH:mm');
+      const endShiftTime = GridValuesHelper.formatDate(params.data.shiftEndTime, 'HH:mm');
 
       return `${startShiftTime}-${endShiftTime}`;
     },
@@ -249,6 +250,6 @@ export const GridCellsSystemAll = (
     minWidth: 135,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) =>
-      formatDate(params.value, 'MM/dd/YYYY HH:mm', 'en-US', 'UTC'),
+      GridValuesHelper.formatDate(params.value, 'MM/dd/YYYY HH:mm'),
   },
 ];
