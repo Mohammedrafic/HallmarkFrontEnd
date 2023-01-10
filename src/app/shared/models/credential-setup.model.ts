@@ -1,4 +1,5 @@
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
+import { PageOfCollections } from './page.model';
 
 export class CredentialSetupGet {
   masterCredentialId: number;
@@ -83,3 +84,5 @@ export class CredentialSetupFilterGet {
   includeInIRP?: boolean;
   includeInVMS?: boolean;
 }
+
+export type CredentialSetupPage = PageOfCollections<CredentialSetupFilterGet>;

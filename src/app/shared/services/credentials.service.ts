@@ -13,9 +13,9 @@ import {
 } from '@shared/models/credential.model';
 import {
   CredentialSetupFilterDto,
-  CredentialSetupFilterGet,
   CredentialSetupGet,
   CredentialSetupMappingPost,
+  CredentialSetupPage,
   CredentialSetupPost,
   SaveUpdatedCredentialSetupDetailIds
 } from '@shared/models/credential-setup.model';
@@ -93,8 +93,8 @@ export class CredentialsService {
     return this.http.post(`/api/CredentialTypes/export`, payload, { responseType: 'blob' });
   }
 
-  public getFilteredCredentialSetupData(filterData: CredentialSetupFilterDto): Observable<CredentialSetupFilterGet[]> {
-    return this.http.get<CredentialSetupFilterGet[]>(
+  public getFilteredCredentialSetupData(filterData: CredentialSetupFilterDto): Observable<CredentialSetupPage> {
+    return this.http.get<CredentialSetupPage>(
       `/api/CredentialSetups/mappings`,
       { params: filterData as HttpParams }
     );

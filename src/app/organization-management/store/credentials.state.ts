@@ -31,8 +31,8 @@ import {
 } from '@shared/constants';
 import { CredentialsService } from '@shared/services/credentials.service';
 import {
-  CredentialSetupFilterGet,
   CredentialSetupGet,
+  CredentialSetupPage,
   SaveUpdatedCredentialSetupDetailIds
 } from '@shared/models/credential-setup.model';
 import { getAllErrors } from '@shared/utils/error.utils';
@@ -46,7 +46,7 @@ export interface CredentialsStateModel {
   activeTab: number;
   setupFilter: CredentialSetupFilter | null;
   groupMappings: SkillGroupMapping[],
-  filteredCredentialSetupData: CredentialSetupFilterGet[],
+  filteredCredentialSetupData: CredentialSetupPage | null,
   credentialSetupList: CredentialSetupGet[],
   assignedCredentialTreeData: AssignedCredentialTreeData | null,
 }
@@ -57,7 +57,7 @@ export interface CredentialsStateModel {
     activeTab: 0,
     setupFilter: null,
     groupMappings: [],
-    filteredCredentialSetupData: [],
+    filteredCredentialSetupData: null,
     credentialSetupList: [],
     assignedCredentialTreeData: null,
   }
@@ -74,7 +74,7 @@ export class CredentialsState {
   static groupMappings(state: CredentialsStateModel): SkillGroupMapping[] { return state.groupMappings; }
 
   @Selector()
-  static filteredCredentialSetupData(state: CredentialsStateModel): CredentialSetupFilterGet[] { return state.filteredCredentialSetupData; }
+  static filteredCredentialSetupData(state: CredentialsStateModel): CredentialSetupPage | null { return state.filteredCredentialSetupData; }
 
   @Selector()
   static credentialSetupList(state: CredentialsStateModel): CredentialSetupGet[] { return state.credentialSetupList; }
@@ -132,7 +132,7 @@ export class CredentialsState {
   }
 
   @Action(GetFilteredCredentialSetupData)
-  GetFilteredCredentialSetupData({ patchState }: StateContext<CredentialsStateModel>, { payload }: GetFilteredCredentialSetupData): Observable<CredentialSetupFilterGet[]> {
+  GetFilteredCredentialSetupData({ patchState }: StateContext<CredentialsStateModel>, { payload }: GetFilteredCredentialSetupData): Observable<CredentialSetupPage> {
     return this.credentialService.getFilteredCredentialSetupData(payload).pipe(tap((responseData) => {
       patchState({ filteredCredentialSetupData: responseData });
       return responseData;
