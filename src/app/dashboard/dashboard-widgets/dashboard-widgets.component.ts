@@ -21,6 +21,7 @@ export class DashboardWidgetsComponent extends AbstractSFComponentDirective<Dash
   @Input() public timeSelection: TimeSelectionEnum;
   @Input() public isDarkTheme: boolean;
   @Input() public description: string;
+  @Input() public UserType:number;
   
   @Output() public dashboardCreatedEmitter: EventEmitter<void> = new EventEmitter();
   @Output() public dragStopEmitter: EventEmitter<void> = new EventEmitter();
