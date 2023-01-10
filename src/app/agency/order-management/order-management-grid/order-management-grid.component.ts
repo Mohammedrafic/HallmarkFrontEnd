@@ -65,6 +65,7 @@ import { PreviewOrderDialogComponent } from '@agency/order-management/order-mana
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { BreakpointObserverService } from '@core/services';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -147,6 +148,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private datePipe: DatePipe,
     private filterService: FilterService,
     private orderManagementAgencyService: OrderManagementAgencyService,
+    private breakpointService: BreakpointObserverService
   ) {
     super();
     this.listenRedirectFromExtension();
@@ -174,6 +176,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
+      this.setGridHeight(data?.items.length);
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
     });
 
@@ -182,7 +185,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onCommentRead();
     this.listenRedirectFromPerDiem();
     this.listenRedirectFromReOrder();
-    
   }
 
   ngOnDestroy(): void {
@@ -277,7 +279,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         const candidate = orderMyAgency.children.find(
           (candidate: OrderManagementChild) => candidate.candidateId === selectedOrderAfterRedirect.candidateId
         );
-        
+
         this.onOpenCandidateDialog(candidate as OrderManagementChild, orderMyAgency);
         this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
         this.gridWithChildRow.detailRowModule.expand(0);
@@ -318,7 +320,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.dispatchNewPage();
       });
   }
-
 
   public onRowsDropDownChanged(): void {
     if (this.pageSize !== parseInt(this.activeRowsPerPageDropDown)) {
@@ -816,7 +817,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private hasOrderMyAgencyId(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     if (selectedOrderAfterRedirect) {
-      this.OrderFilterFormGroup.patchValue({ orderPublicId: selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId.toString() });
+      this.OrderFilterFormGroup.patchValue({
+        orderPublicId: selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId.toString(),
+      });
       this.filters = this.OrderFilterFormGroup.getRawValue();
       this.filters.includeReOrders = false;
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
@@ -843,5 +846,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.pageSize = perPage;
     this.pageSubject.next(1);
     this.isSubrowDisplay = false;
+  }
+
+  private setGridHeight(itemsLength: number | undefined): void {
+    this.breakpointService
+      .getBreakpointMediaRanges()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((screen) => {
+        this.isMobile = screen.isMobile;
+        this.gridHeight = itemsLength && this.isMobile ? String(itemsLength * this.rowHeight) : this.gridHeight;
+        if(screen.isMobile || screen.isTablet) {
+          this.gridWithChildRow.autoFitColumns();
+        }
+      });
   }
 }
