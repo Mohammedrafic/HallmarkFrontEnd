@@ -6,20 +6,18 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_CANNOT_BE_SAVED } from '@shared/constants';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { AssignedCredentialTree } from '@shared/models/credential.model';
-import { AssignedSkillTree, ListOfSkills } from '@shared/models/skill.model';
+import { AssignedSkillTree } from '@shared/models/skill.model';
 import { SkillsService } from '@shared/services/skills.service';
-import { GetAssignedSkillTree, GetFilteredAssignedSkillsByOrganization, SaveAssignedSkillValue } from '@organization-management/store/skills.actions';
+import { GetAssignedSkillTree, SaveAssignedSkillValue } from '@organization-management/store/skills.actions';
 
 export interface SkillsStateModel {
   assignedSkillTreeData: AssignedSkillTree | null,
-  filteredAssignedSkills: ListOfSkills[] | null,
 }
 
 @State<SkillsStateModel>({
   name: 'skills',
   defaults: {
     assignedSkillTreeData: null,
-    filteredAssignedSkills: null,
   }
 })
 @Injectable()
@@ -29,11 +27,6 @@ export class SkillsState {
 
   @Selector()
   static assignedSkillTreeValue(state: SkillsStateModel): string[] { return state.assignedSkillTreeData?.assignedSkillIds || []; }
-
-  @Selector()
-  static filteredAssignedSkills(state: SkillsStateModel): ListOfSkills[] | null {
-    return state.filteredAssignedSkills;
-  }
 
   constructor(private skillsService: SkillsService) {}
 
@@ -46,13 +39,6 @@ export class SkillsState {
         assignedSkillIds: assignedSkillIds
       }
       patchState({ assignedSkillTreeData });
-    }));
-  }
-
-  @Action(GetFilteredAssignedSkillsByOrganization)
-  GetFilteredAssignedSkillsByOrganization({ patchState }: StateContext<SkillsStateModel>): Observable<ListOfSkills[]> {
-    return this.skillsService.getFilteredAssignedOrgSkills().pipe(tap((filteredAssignedSkills) => {
-      patchState({ filteredAssignedSkills });
     }));
   }
 
