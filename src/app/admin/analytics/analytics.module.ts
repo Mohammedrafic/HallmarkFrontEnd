@@ -13,7 +13,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { SecurityState } from 'src/app/security/store/security.state';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
-import { ButtonModule,RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule,CheckBoxAllModule,RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { SharedModule } from '@shared/shared.module';
 import { CandidateJourneyComponent } from './candidate-journey/candidate-journey.component';
 import { JobDetailsComponent } from './job-details/job-details.component';
@@ -105,6 +105,7 @@ import { DailyOrderStatusComponent } from './daily-order-status/daily-order-stat
     AnalyticsRoutingModule,
     MultiSelectAllModule,
     DropDownListModule,
+    CheckBoxAllModule,
     DatePickerModule,
     ButtonModule,
     FeatherModule,
