@@ -2,12 +2,12 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 
 import { Select, Store } from '@ngxs/store';
 import { delay, Observable, Subject, takeUntil } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { debounceTime, filter, throttleTime } from 'rxjs/operators';
 
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CredentialSetupFilterGet, CredentialSetupFilterDto } from '@shared/models/credential-setup.model';
+import { CredentialSetupFilterGet, CredentialSetupFilterDto, CredentialSetupPage } from '@shared/models/credential-setup.model';
 import { Permission } from "@core/interface";
 import { UserPermissions } from "@core/enums";
 import { TakeUntilDestroy } from '@core/decorators';
@@ -35,7 +35,7 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
   private organization$: Observable<Organization>;
 
   @Select(CredentialsState.filteredCredentialSetupData)
-  filteredCredentials$: Observable<CredentialSetupFilterGet[]>;
+  filteredCredentials$: Observable<CredentialSetupPage>;
 
   @Input() credentialSetupFilter$: Subject<CredentialSetupFilterDto>;
   @Input() userPermission: Permission;
@@ -47,8 +47,11 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
 
   protected componentDestroy: () => Observable<unknown>;
 
-  private credentialSetupFilter: CredentialSetupFilterDto;
-  private MAX_PAGE_SIZE = 9999;
+  public credentialSetupFilter: CredentialSetupFilterDto = {
+    pageNumber: this.currentPage,
+    pageSize: this.pageSize
+  };
+  private pageSubject$ = new Subject<number>();
 
   constructor(
     private store: Store,
@@ -59,10 +62,25 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
 
   ngOnInit(): void {
     this.startOrganizationWatching();
-    this.initializeDefaultFilterState();
     this.organizationChangedHandler();
     this.headerFilterChangedHandler();
-    this.mapGridData();
+    this.watchForPageChange();
+  }
+
+  private watchForPageChange(): void {
+    this.pageSubject$
+    .pipe(
+      throttleTime(1),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((page: number) => {
+      this.credentialSetupFilter.pageNumber = page;
+      this.dispatchNewPage();
+    });
+  }
+
+  private dispatchNewPage(): void {
+    this.store.dispatch(new GetFilteredCredentialSetupData(this.credentialSetupFilter));
   }
 
   public onRemoveButtonClick(data: CredentialSetupFilterGet, event: any): void {
@@ -82,18 +100,6 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
     });
   }
 
-  public mapGridData(): void {
-    this.filteredCredentials$.pipe(
-      filter(Boolean),
-      takeUntil(this.componentDestroy()),
-    ).subscribe(data => {
-      this.currentPagerPage = 1;
-      this.lastAvailablePage = this.getLastPage(data);
-      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
-      this.totalDataRecords = data.length;
-    });
-  }
-
   public onRowSelected(event: any): void {
     if (event?.data?.length) {
       this.selectedRow.emit(event.data[0]);
@@ -107,65 +113,43 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
   }
 
   public onGridDataBound(): void {
-    if ((this.grid.dataSource as []).length) {
+    if (this.grid.dataSource && (this.grid.dataSource as []).length) {
       // select first item in the grid by its index
       this.grid.selectRows([0]);
     }
   }
 
   public onRowsDropDownChanged(): void {
-    this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
+    this.credentialSetupFilter.pageSize = parseInt(this.activeRowsPerPageDropDown);
+    this.pageSubject$.next(this.credentialSetupFilter.pageNumber as number);
   }
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.filteredCredentials$.subscribe(data => {
-        this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
-        this.currentPagerPage = event.currentPage || event.value;
-      });
+      this.pageSubject$.next(event.currentPage || event.value);
     }
-  }
-
-  private initializeDefaultFilterState(): void {
-    this.credentialSetupFilter = {
-      pageNumber: this.currentPagerPage,
-      pageSize: this.MAX_PAGE_SIZE
-    };
   }
 
   private organizationChangedHandler(): void {
     this.organizationId$.pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
-      this.currentPagerPage = 1;
-      this.store.dispatch(new GetFilteredCredentialSetupData(this.credentialSetupFilter));
+      this.credentialSetupFilter.pageNumber = 1;
+      this.dispatchNewPage();
     });
   }
 
   private headerFilterChangedHandler(): void {
     this.credentialSetupFilter$.pipe(
       filter(Boolean),
+      debounceTime(300),
       takeUntil(this.componentDestroy())
     ).subscribe(filter => {
-      filter.pageNumber = this.currentPagerPage;
-      filter.pageSize = this.MAX_PAGE_SIZE;
-      this.currentPagerPage = 1;
+      filter.pageSize = this.credentialSetupFilter.pageSize;
+      filter.pageNumber = 1;
       this.credentialSetupFilter = filter;
-      this.store.dispatch(new GetFilteredCredentialSetupData(filter));
+      this.dispatchNewPage();
     });
-  }
-
-  private getActiveRowsPerPage(): number {
-    return parseInt(this.activeRowsPerPageDropDown);
-  }
-
-  private getRowsPerPage(data: object[], currentPage: number): object[] {
-    return data.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
-      (currentPage * this.getActiveRowsPerPage()));
-  }
-
-  private getLastPage(data: object[]): number {
-    return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
   }
 
   private startOrganizationWatching(): void {
