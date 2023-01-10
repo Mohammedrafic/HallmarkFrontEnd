@@ -93,6 +93,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
   public defaultDepartments: (number | undefined)[] = [];
+  public defaultAgingGroups:(number)[] = [];
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
@@ -196,7 +197,9 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           this.defaultRegions = this.regionsList.map((list) => list.id);
+          this.defaultAgingGroups=this.agingGroups.map((list)=>list.id);
           this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+          this.agingReportForm.get(analyticsConstants.formControlNames.AgingGroupIds)?.setValue(this.defaultAgingGroups);
           this.changeDetectorRef.detectChanges();
         }
         else {

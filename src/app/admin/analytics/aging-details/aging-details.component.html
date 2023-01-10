@@ -98,16 +98,19 @@
       <div class="form-elemet">
         <div class="input-container bootstrap">
           <label>Aging Group</label>
-          <div class="input-group dropdown">
-            <ejs-dropdownlist formControlName="agingGroupIds"
-                              [fields]="agingGroupFields"
-                              [dataSource]="filterColumns.agingGroupIds.dataSource"
-                              [allowFiltering]="true"
-                              placeholder="Aging">
-          </ejs-dropdownlist>
+          <div class="input-group dropdown">          
+          <ejs-multiselect mode="CheckBox"
+                             formControlName="agingGroupIds"
+                             placeholder="All"
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.agingGroupIds.dataSource"
+                             [fields]="agingGroupFields"
+                             [selectAllText]='allOption'
+                             showSelectAll=true>
+            </ejs-multiselect>
           </div>
         </div>
       </div>
     </form>
   </app-filter-dialog>
-  
