@@ -3,7 +3,6 @@
   class="e-gridwithchildrow"
   (rowDataBound)="setRowHighlight($event)"
   [dataSource]="ordersPage?.items || []"
-  [allowPaging]="allowPaging"
   [pageSettings]="pageSettings"
   [height]="gridHeight"
   [rowHeight]="rowHeight"
@@ -234,9 +233,7 @@
     </e-column>
     <e-column field="shiftStartTime" headerText="SHIFT" width="160" minWidth="80" maxWidth="200">
       <ng-template #template let-data>
-        <span
-          >{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}-{{ data.shiftEndTime | date: 'HH:mm':'UTC' }}</span
-        >
+        <span>{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}-{{ data.shiftEndTime | date: 'HH:mm':'UTC' }}</span>
       </ng-template>
     </e-column>
     <e-column
@@ -285,53 +282,14 @@
       ></app-grid-subrow-candidate>
     </ng-template>
   </ng-template>
-
-  <ng-template #pagerTemplate let-data>
-    <div class="e-pagertemplate">
-      <div class="control-section">
-        <div class="content-wrapper">
-          <section class="left-side-pager-controls">
-            <ejs-dropdownlist
-              id="rowsPerPage"
-              class="dropdown-no-border"
-              [allowFiltering]="true"
-              [dataSource]="rowsPerPageDropDown"
-              [(value)]="activeRowsPerPageDropDown"
-              (change)="onRowsDropDownChanged()"
-            >
-            </ejs-dropdownlist>
-            <ejs-numerictextbox
-              id="goToPage"
-              class="numeric-input-no-border"
-              format="#"
-              [validateDecimalOnType]="validateDecimalOnType"
-              [decimals]="decimals"
-              placeholder="Go to:"
-              min="1"
-              [max]="ordersPage?.totalPages"
-              [showSpinButton]="false"
-              (change)="onGoToClick($event)"
-            >
-            </ejs-numerictextbox>
-            <div class="total-rows">Total Rows: {{ ordersPage?.totalCount }}</div>
-          </section>
-          <section class="right-side-pager-controls">
-            <ejs-pager
-              id="gridPager"
-              #gridPager
-              [pageSize]="pageSize"
-              [totalRecordsCount]="ordersPage?.totalCount"
-              [enablePagerMessage]="false"
-              [currentPage]="currentPage"
-              (click)="onGoToClick($event)"
-            >
-            </ejs-pager>
-          </section>
-        </div>
-      </div>
-    </div>
-  </ng-template>
 </ejs-grid>
+<app-grid-pagination
+  [currentPage]="currentPage"
+  [pageSize]="pageSize"
+  [totalRecordsCount]="(ordersPage$ | async)?.totalCount || 0"
+  (navigateToPageEmitter)="gridPageChanged($event)"
+  (pageSizeChangeEmitter)="gridPerPageChanged($event)"
+></app-grid-pagination>
 
 <app-export-dialog
   [columns]="columnsToExport"

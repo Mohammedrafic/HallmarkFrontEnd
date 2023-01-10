@@ -318,12 +318,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       });
   }
 
-  public onGoToClick(event: any): void {
-    if ((event.currentPage && event.currentPage !== this.currentPage) || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-      this.isSubrowDisplay = false;
-    }
-  }
 
   public onRowsDropDownChanged(): void {
     if (this.pageSize !== parseInt(this.activeRowsPerPageDropDown)) {
@@ -838,5 +832,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.currentPage = page;
       this.dispatchNewPage();
     });
+  }
+
+  public gridPageChanged(page: number) {
+    this.pageSubject.next(page);
+  }
+
+  public gridPerPageChanged(perPage: number) {
+    this.pageSize = perPage;
+    this.pageSubject.next(1);
+    this.isSubrowDisplay = false;
   }
 }

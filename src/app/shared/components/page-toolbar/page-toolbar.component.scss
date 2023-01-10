@@ -8,6 +8,7 @@ $gap: 12px;
 
   @media #{$max-tablet} {
     flex-direction: column;
+    row-gap: 15px;
   }
 
   .left-content {
@@ -20,7 +21,7 @@ $gap: 12px;
   }
 
   .right-content {
-    width: 50%;
+    max-width: 50%;
     display: flex;
     justify-content: flex-end;
     flex-grow: 1;

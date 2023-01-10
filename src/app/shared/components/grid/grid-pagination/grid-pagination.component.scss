@@ -68,6 +68,7 @@
 
     @media #{$max-mobile} {
       flex-direction: column-reverse !important;
+      padding-right: 16px;
     }
   }
 
