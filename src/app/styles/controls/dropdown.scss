@@ -105,6 +105,17 @@ body.light, body.dark {
       }
     }
   }
+
+  app-dropdown.app-grid-pagination__rows-options {
+    ejs-dropdownlist.e-control {
+      span.e-input-group {
+        &.e-disabled {
+          background-color: inherit !important;
+          border: none !important;
+        }
+      }
+    }
+  }
 }
 
 
@@ -183,7 +194,6 @@ body.dark {
 
         &.e-disabled {
           background-color: $secondary-dark-blue-20 !important;
-
         }
       }
     }
