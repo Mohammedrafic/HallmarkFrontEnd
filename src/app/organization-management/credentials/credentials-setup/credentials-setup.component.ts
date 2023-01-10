@@ -232,7 +232,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
   }
 
   public onMappingFormClosed(): void {
-    this.store.dispatch(new GetFilteredCredentialSetupData({ pageNumber: this.filteredGrid.credentialSetupFilter.pageNumber, pageSize: this.filteredGrid.credentialSetupFilter.pageSize }));
+    this.store.dispatch(new GetFilteredCredentialSetupData(this.filteredGrid.credentialSetupFilter));
   }
 
   public onSelectedCredentialClick(selectedCredential: CredentialSetupFilterGet): void {
