@@ -110,7 +110,7 @@ import {
 } from '@client/order-management/components/order-details-form/interfaces';
 import {
   clearValidatorsToForm,
-  generateControlsConfig,
+  generateControlsConfig, getFilteredJobDistribution,
   setValidatorsToForm, updateValidationToForm, valueMapperForGeneralInformation,
 } from '@client/order-management/components/order-details-form/order-details.helper';
 import {
@@ -636,13 +636,15 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
     const jobDistributionValues = order.jobDistributions
       .map((jobDistribution: JobDistributionModel) => jobDistribution.jobDistributionOption)
       .filter((value, i, array) => array.indexOf(value) === i); // filter duplicates
-
+    
     const agencyValues = order.jobDistributions
       .filter((jobDistribution: JobDistributionModel) =>
         jobDistribution.jobDistributionOption === OrderJobDistribution.Selected)
       .map((jobDistribution: JobDistributionModel) => jobDistribution.agencyId);
 
-    this.jobDistributionForm.controls['jobDistribution'].patchValue(jobDistributionValues[0]);
+    this.jobDistributionForm.controls['jobDistribution'].patchValue(
+      getFilteredJobDistribution(jobDistributionValues)[0]
+    );
 
     this.associateAgencies$
       .pipe(
@@ -890,6 +892,7 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
         takeUntil(this.componentDestroy())
       ).subscribe(({ TieringLogic }) => {
       this.distribution = distributionSource(TieringLogic === TierLogic.Show);
+      this.cd.markForCheck();
     });
   }
 

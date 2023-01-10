@@ -2,6 +2,7 @@ import { FormGroup } from '@angular/forms';
 
 import { ControlsConfig, ValidatorsConfig } from '@client/order-management/components/order-details-form/interfaces';
 import { Order } from '@shared/models/order-management.model';
+import { distributionSource } from '@shared/constants/order-job-distribution-list';
 
 export const generateControlsConfig = (controlNames: string[], form: FormGroup) => {
   return controlNames.reduce((acc: ControlsConfig, controlName: string) => {
@@ -37,3 +38,9 @@ export const valueMapperForGeneralInformation = (order: Order) => ({
     annualSalaryRangeTo: order?.annualSalaryRangeTo
     ? parseFloat(order.annualSalaryRangeTo.toString()).toFixed(2) : '',
 });
+
+export const getFilteredJobDistribution = (jobDistributionValues: number[]): number[] => {
+  return distributionSource(true)
+    .map((distribution: {id: number}) => distribution.id)
+    .filter((id: number) => jobDistributionValues.includes(id));
+};
