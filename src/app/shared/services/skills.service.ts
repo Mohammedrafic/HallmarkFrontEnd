@@ -137,4 +137,8 @@ export class SkillsService {
   public getAllMasterSkillList(): Observable<MasterSkill[]> {
     return this.http.get<MasterSkill[]>('/api/MasterSkills/getAll');
   }
+
+  public getFilteredAssignedOrgSkills(): Observable<ListOfSkills[]> {
+    return this.http.get<ListOfSkills[]>('/api/SkillGroups/unusedSkills');
+  }
 }

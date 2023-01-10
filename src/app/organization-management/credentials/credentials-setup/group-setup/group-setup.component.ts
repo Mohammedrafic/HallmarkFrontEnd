@@ -16,7 +16,6 @@ import {
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialSkillGroup, CredentialSkillGroupPage, CredentialSkillGroupPost } from '@shared/models/skill-group.model';
 import {
-  GetAssignedSkillsByOrganization,
   GetCredentialSkillGroup,
   RemoveCredentialSkillGroup,
   SaveUpdateCredentialSkillGroup
@@ -29,6 +28,8 @@ import { Organization } from '@shared/models/organization.model';
 import { GroupSetupService } from '@organization-management/credentials/services/group-setup.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { GetFilteredAssignedSkillsByOrganization } from '@organization-management/store/skills.actions';
+import { SkillsState } from '@organization-management/store/skills.state';
 
 @TakeUntilDestroy
 @Component({
@@ -48,7 +49,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   @Select(OrganizationManagementState.skillGroups)
   skillGroups$: Observable<CredentialSkillGroupPage>;
 
-  @Select(OrganizationManagementState.assignedSkillsByOrganization)
+  @Select(SkillsState.filteredAssignedSkills)
   allOrganizationSkills$: Observable<Skill[]>;
 
   @Select(OrganizationManagementState.organization)
@@ -278,7 +279,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     ).subscribe(() => {
       this.currentPage = 1;
       this.dispatchNewPage();
-      this.store.dispatch(new GetAssignedSkillsByOrganization());
+      this.store.dispatch(new GetFilteredAssignedSkillsByOrganization());
     });
   }
 
@@ -301,17 +302,9 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
       }
 
       if (allOrganizationSkills) {
-        this.allAssignedSkills = allOrganizationSkills;
-        this.filterSkills();
+        this.searchDataSource = this.allAssignedSkills = allOrganizationSkills;
       }
     });
-  }
-
-  private filterSkills(): void {
-    this.filteredAssignedSkills = this.allAssignedSkills.filter(skill =>
-      !this.reservedMasterSkillIds.has(skill.id)
-    );
-    this.searchDataSource = this.filteredAssignedSkills;
   }
 
   private checkIRPFlag(): void {

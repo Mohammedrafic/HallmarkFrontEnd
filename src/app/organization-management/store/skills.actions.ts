@@ -8,3 +8,8 @@ export class SaveAssignedSkillValue {
   static readonly type = '[skills] Save Assigned Skill Value';
   constructor(public payload: string[]) { }
 }
+
+export class GetFilteredAssignedSkillsByOrganization {
+  static readonly type = '[skills] Get Filtered Assigned Skills by Organization';
+  constructor() {}
+}
