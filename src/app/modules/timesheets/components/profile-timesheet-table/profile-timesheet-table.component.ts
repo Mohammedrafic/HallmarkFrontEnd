@@ -453,13 +453,12 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private watchFormChanges(): void {
     this.timesheetRecordsService.watchFormChanges(this.formControls)
     .pipe(
+      filter(() => this.timesheetRecordsService.checkIfFormTouched(this.formControls)),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
-      if (this.timesheetRecordsService.checkIfFormTouched(this.formControls)) {
-        this.isChangesSaved = false;
-        this.changesSaved.emit(false);
-      }
+      this.isChangesSaved = false;
+      this.changesSaved.emit(false);
     });
   }
 
@@ -587,6 +586,4 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.isMobile = data.breakpoints[BreakpointQuery.MOBILE_MAX];
     });
   }
-
-
 }
