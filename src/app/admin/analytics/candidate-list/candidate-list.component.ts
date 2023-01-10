@@ -285,28 +285,30 @@ export class CandidateListComponent implements OnInit, OnDestroy {
     }
     let { candidateName, skillIds, agencyIds, searchBy, inActiveInComplete } = this.candidateListForm.getRawValue();
 
-    let isExactMatch = null;
+    let isExactMatch = "0";
+
     var candidateNameValue = this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName);
-    if (candidateNameValue.length > 0) {
+    if (candidateNameValue.length > 0 && searchBy==1) {
       isExactMatch = "1";
     }
-    else if(candidateNameValue.length == 0 && candidateName != "null" && candidateName?.length > 0) {
+    else if (candidateNameValue.length == 0 && candidateName != "null" && candidateName?.length > 0 && searchBy == 1) {
       candidateNameValue = [candidateName];
       isExactMatch = "2";
     }
     
     this.paramsData =
     {
+      "BearerParamCL": auth,
+      "BusinessUnitIdParamCL": window.localStorage.getItem("lastSelectedOrganizationId"),
+      "HostNameCL": this.baseUrl,
+
       "OrganizationParamCL": window.localStorage.getItem("lastSelectedOrganizationId"),
       "AgencyCL": agencyIds.length == 0 ? "null" : agencyIds.join(","),
       "SearchByCL": searchBy?.toString(),
       "SkillCL": skillIds.length == 0 ? "null" : skillIds.join(","),
       "CandidateNameCL": candidateNameValue,
-      "BearerParamCL": auth,
-      "BusinessUnitIdParamCL": window.localStorage.getItem("lastSelectedOrganizationId"),
-      "HostNameCL": this.baseUrl,
-      "InActiveInCompleteCL": inActiveInComplete == true ? "1" : "0",
-      "IsExactMatchCL": isExactMatch
+      "IsExactMatchCL": isExactMatch,
+      "InActiveInCompleteCL": inActiveInComplete == true ? "2" : "1"
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
