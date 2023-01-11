@@ -97,7 +97,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType === BusinessUnitType.Agency) {
       this.UserType=BusinessUnitType.Agency
-      alert(this.UserType);
     }
     else{
       this.UserType=0;
