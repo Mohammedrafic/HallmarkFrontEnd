@@ -5,6 +5,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 
 export interface ScheduleCandidate {
   id: number;
+  displayId: string;
   firstName: string;
   lastName: string;
   skill: string;
