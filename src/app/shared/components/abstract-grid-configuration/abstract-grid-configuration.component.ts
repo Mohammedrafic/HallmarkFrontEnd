@@ -83,6 +83,10 @@ export abstract class AbstractGridConfigurationComponent {
 
   public isMobile = false;
 
+  public isSmallDesktop = false;
+
+  public isTablet = false;
+
   public readonly onlyLetters: RegExp = ONLY_LETTERS;
 
   protected constructor() {}
@@ -159,6 +163,8 @@ export abstract class AbstractGridConfigurationComponent {
   }
 
   exportSelected(event: any): void {
+    console.error(event);
+    
     if (event.item.properties.id === ExportType['Excel File']) {
       this.defaultExport(ExportedFileType.excel);
     } else if (event.item.properties.id === ExportType['CSV File']) {

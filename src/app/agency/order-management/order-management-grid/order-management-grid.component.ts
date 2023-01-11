@@ -855,9 +855,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       .subscribe((screen) => {
         this.isMobile = screen.isMobile;
         this.gridHeight = itemsLength && this.isMobile ? String(itemsLength * this.rowHeight) : this.gridHeight;
-        if(screen.isMobile || screen.isTablet) {
-          this.gridWithChildRow.autoFitColumns();
-        }
       });
   }
 }

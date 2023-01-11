@@ -7,62 +7,77 @@
       ></app-button-group>
     </ng-container>
     <ng-template #vmsTabsTemplate>
-      <app-tab-navigation #tabNavigation (selectedTab)="tabSelected($event)"></app-tab-navigation>
+      <app-tab-navigation #tabNavigation (selectedTab)="tabSelected($event)" [tabWidth]="navigationPanelWidth"></app-tab-navigation>
     </ng-template>
   </ng-container>
   <ng-container right>
-    <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
-    <button
-      *ngIf="isIRPFlagEnabled"
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      cssClass="e-outline button-template"
-      [disabled]="isIRPFlagEnabled">
-      <div class="filter-button-content">
-        Templates <i-feather name="clipboard" class="icon"></i-feather>
-      </div>
-    </button>
-    <button
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      cssClass="e-outline button-filter"
-      [disabled]="isActiveSystemIRP"
-      (click)="showFilters()"
-    >
-      <div class="filter-button-content">
-        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{
-          filteredItems.length
-        }}</span>
-        Filters <i-feather name="sliders" class="icon"></i-feather>
-      </div>
-    </button>
-    <app-tooltip-container [message]="toolTipMessage" [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
+    <ng-container  *ngIf="!isContentTabletWidth">
+      <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
       <button
-        [disabled]="isActiveSystemIRP || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+        *ngIf="isIRPFlagEnabled"
         ejs-button
         appHideBeforeSyncfusionLoad
-        (click)="openImportDialog()"
-        class="e-outline"
-      >
-        <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
+        cssClass="e-outline button-template"
+        [disabled]="isIRPFlagEnabled">
+        <div class="filter-button-content">
+          Templates <i-feather name="clipboard" class="icon"></i-feather>
+        </div>
       </button>
-    </app-tooltip-container>
-    <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        cssClass="e-outline button-filter"
+        [disabled]="isActiveSystemIRP"
+        (click)="showFilters()"
+      >
+        <div class="filter-button-content">
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{
+            filteredItems.length
+          }}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
+      <app-tooltip-container [message]="toolTipMessage" [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
+        <button
+          [disabled]="isActiveSystemIRP || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+          ejs-button
+          appHideBeforeSyncfusionLoad
+          (click)="openImportDialog()"
+          class="e-outline"
+        >
+          <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
+        </button>
+      </app-tooltip-container>
+      <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
+      <button
+        *ngIf="
+          activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
+          activeTab !== OrganizationOrderManagementTabs.Incomplete
+        "
+        ejs-dropdownbutton
+        appHideBeforeSyncfusionLoad
+        [items]="exportOptions"
+        (select)="exportSelected($event)"
+        id="importButton"
+        cssClass="e-outline button-export"
+        [disabled]="isActiveSystemIRP"
+      >
+        <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
+      </button>
+  </ng-container>
+  <ng-container *ngIf="isContentTabletWidth">
     <button
-      *ngIf="
-        activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
-        activeTab !== OrganizationOrderManagementTabs.Incomplete
-      "
       ejs-dropdownbutton
       appHideBeforeSyncfusionLoad
-      [items]="exportOptions"
-      (select)="exportSelected($event)"
+      [items]="desktopSmallMenu"
+      (select)="menuSelected($event)"
       id="importButton"
-      cssClass="e-outline button-export"
-      [disabled]="isActiveSystemIRP"
+      cssClass="e-outline menu-mobile"
+      [disabled]="isActiveSystemIRP"  
     >
-      <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
+      <div class="button-export-container"><i-feather name="more-vertical" class="icon"></i-feather></div>
     </button>
+  </ng-container>
     <app-tooltip-container [message]="toolTipMessage" [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
       <button
         [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
@@ -94,6 +109,7 @@
     *ngIf="activeSystem === OrderManagementIRPSystemId.VMS"
     #tabNavigation
     [hideTemplatesTab]="false"
+    [tabWidth]="navigationPanelWidth"
     (selectedTab)="tabSelected($event)"
   >
   </app-tab-navigation>
