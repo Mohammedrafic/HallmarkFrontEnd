@@ -1,14 +1,11 @@
-@import 'adaptive-response';
+@import "adaptive-response";
+@import "colors";
 $gap: 12px;
 
 .controls-container {
   padding: 20px 0;
   display: flex;
   justify-content: space-between;
-
-  @media #{$max-tablet} {
-    flex-direction: column;
-  }
 
   .left-content {
     max-width: 50%;
@@ -20,14 +17,10 @@ $gap: 12px;
   }
 
   .right-content {
-    width: 50%;
+    max-width: 50%;
     display: flex;
     justify-content: flex-end;
     flex-grow: 1;
-
-    @media #{$max-tablet} {
-      justify-content: flex-start;
-    }
 
     & > *:not(:first-child) {
       margin-left: $gap;
@@ -41,6 +34,29 @@ $gap: 12px;
       .e-scroll-nav {
         display: none;
       }
+    }
+  }
+}
+
+@media #{$max-tablet} {
+  .controls-container {
+    flex-direction: column;
+    padding-top: 0;
+    row-gap: 15px;
+
+    .right-content {
+      justify-content: flex-start;
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .controls-container {
+    row-gap: unset;
+
+    .left-content {
+      max-width: unset;
+      padding-top: 1px;
     }
   }
 }

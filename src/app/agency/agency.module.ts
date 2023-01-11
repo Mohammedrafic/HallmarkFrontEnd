@@ -112,6 +112,7 @@ import {
   CandidateGeneralInfoService,
 } from "@agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.service";
 import { AgencyNameComponent } from './agency-list/agency-name/agency-name.component';
+import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
 
 
 const sidebarIcons = {
@@ -224,6 +225,7 @@ const sidebarIcons = {
     CandidateListModule,
     ChildOrderDialogModule,
     BoolValuePipeModule,
+    GridPaginationModule
   ],
   exports: [FileViewerComponent],
   providers: [
