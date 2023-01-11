@@ -4,6 +4,7 @@ import { Order } from '@shared/models/order-management.model';
 import { OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 enum Active {
   No,
@@ -18,7 +19,11 @@ enum Active {
 export class GeneralOrderInfoComponent {
   @Input() orderInformation: Order;
 
+  @Input() system: OrderManagementIRPSystemId;
+
   public orderType: typeof OrderType = OrderType;
+
+  public readonly systemType = OrderManagementIRPSystemId;
 
   get hideEndDate(): boolean {
     return [this.orderType.ReOrder, this.orderType.PermPlacement].includes(this.orderInformation.orderType);

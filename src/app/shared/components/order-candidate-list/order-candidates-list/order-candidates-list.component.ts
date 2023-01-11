@@ -1,7 +1,7 @@
 import { ClearDeployedCandidateOrderInfo, GetCandidateJob,
   GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob,
   GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
@@ -10,7 +10,7 @@ import { Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import { IrpOrderCandidate, Order, OrderCandidatesList } from '@shared/models/order-management.model';
+import { Order, OrderCandidatesList } from '@shared/models/order-management.model';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -25,8 +25,8 @@ import { OfferDeploymentComponent } from './offer-deployment/offer-deployment.co
 import { OnboardedCandidateComponent } from './onboarded-candidate/onboarded-candidate.component';
 import { OrderType } from '@shared/enums/order-type';
 import { OrderCandidateApiService } from '../order-candidate-api.service';
-import { PageOfCollections } from '@shared/models/page.model';
 import { AppState } from 'src/app/store/app.state';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -39,6 +39,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   @ViewChild('apply') apply: ApplyCandidateComponent;
   @ViewChild('onboarded') onboarded: OnboardedCandidateComponent;
   @ViewChild('offerDeployment') offerDeployment: OfferDeploymentComponent;
+
+  @Input() system: OrderManagementIRPSystemId;
 
   @Select(OrderManagementState.selectedOrder)
   public selectedAgOrder$: Observable<Order>;
@@ -67,6 +69,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   ];
   public orderTypes = OrderType;
   public isFeatureIrpEnabled = false;
+  public readonly systemType = OrderManagementIRPSystemId;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;

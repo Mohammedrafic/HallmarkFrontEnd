@@ -11,6 +11,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { OrderManagementService } from '../order-management-content/order-management.service';
 import { OrderStatus } from '@shared/enums/order-management';
 import { PageOfCollections } from '@shared/models/page.model';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-order-candidates-container',
@@ -22,6 +23,8 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
   @Input() set currentOrder(value: Order) {
     this.order = value;
   }
+
+  @Input() activeSystem: OrderManagementIRPSystemId;
 
   public orderCandidatePage: OrderCandidatesListPage;
   public orderCandidates: any;

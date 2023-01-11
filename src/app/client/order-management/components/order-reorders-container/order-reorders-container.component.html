@@ -1,5 +1,5 @@
 <section class="job-details">
-  <app-general-order-per-diem-info [orderInformation]="order"></app-general-order-per-diem-info>
+  <app-general-order-per-diem-info [orderInformation]="order" [system]="activeSystem"></app-general-order-per-diem-info>
 </section>
 <div class="separator"></div>
 <ng-container *ngIf="order?.orderClosureReason">

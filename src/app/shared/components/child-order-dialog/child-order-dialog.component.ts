@@ -51,7 +51,8 @@ import {
   PenaltiesMap,
 } from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 import { ExtensionSidebarComponent } from '@shared/components/extension/extension-sidebar/extension-sidebar.component';
-import { AcceptFormComponent } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
+import { AcceptFormComponent,
+} from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { UnsavedFormDirective } from '@shared/directives/unsaved-form.directive';
@@ -89,6 +90,7 @@ import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 enum Template {
   accept,
@@ -115,6 +117,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
+  @Input() activeSystem: OrderManagementIRPSystemId;
   @Output() saveEmitter = new EventEmitter<void>();
 
   // TODO: Delete it when we will have re-open sidebar
@@ -229,7 +232,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   get isClosedOrderPosition(): boolean {
-    return this.candidate.orderStatus === OrderStatus.Closed || !!this.candidate.positionClosureReason || !!this.selectedOrder?.orderClosureReason;
+    return this.candidate.orderStatus === OrderStatus.Closed || !!this.candidate.positionClosureReason
+    || !!this.selectedOrder?.orderClosureReason;
   }
 
   constructor(
