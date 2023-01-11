@@ -56,7 +56,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   public organizationAgencyControl: FormControl = new FormControl();
   public baseUrl: string;
   public agencyStatuses = AgencyStatus;
-  public businessUnitId:number;
+  public eliteBusinessUnitId:number;
   @Input() public isDarkTheme: boolean | null;
 
   public optionFields = {
@@ -101,8 +101,8 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.businessUnitId = JSON.parse((localStorage.getItem('BussinessUnitID') || '0')) as number;
-    (!this.businessUnitId)?this.businessUnitId=0:""
+    this.eliteBusinessUnitId = JSON.parse((localStorage.getItem('BussinessUnitID') || '0')) as number;
+    (!this.eliteBusinessUnitId)?this.eliteBusinessUnitId=0:""
     window.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
     const user = this.store.selectSnapshot(UserState.user);
     this.subscribeUserChange();
@@ -292,9 +292,9 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         : organizationsAgencies[0]?.id || null;
     }
     
-     if(this.businessUnitId>0){
-      newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === this.businessUnitId)
-        ? this.businessUnitId
+     if(this.eliteBusinessUnitId>0){
+      newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === this.eliteBusinessUnitId)
+        ? this.eliteBusinessUnitId
         : organizationsAgencies[0]?.id || null;
     }
     

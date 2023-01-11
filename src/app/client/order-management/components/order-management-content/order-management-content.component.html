@@ -280,14 +280,14 @@
             >
               <div>
                 <b>
-                  <span #el> {{ data.organizationPrefix }}-{{ data.publicId }} </span>
+                  <span> {{ data.organizationPrefix }}-{{ data.publicId }} </span>
                 </b>
               </div>
             </ng-container>
 
             <ng-template #withToggle>
               <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-                <b #orderId id="orderId">{{ data.organizationPrefix }}-{{ data.publicId }}</b
+                <b>{{ data.organizationPrefix }}-{{ data.publicId }}</b
                 ><i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
               </div>
             </ng-template>

@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ElementRef,
   HostListener,
   OnDestroy,
   OnInit,
@@ -344,8 +343,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private cd$ = new Subject();
   private gridApi: GridApi;
   private SelectedStatus: string[] = [];
-  private id:number;
-  @ViewChild('el',{static:false}) el:ElementRef
+  private eliteOrderId:number;
   
 
     constructor(
@@ -390,8 +388,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   override ngOnInit(): void {
-    this.id = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
-    (!this.id)?this.id=0:""
+    this.eliteOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
+    (!this.eliteOrderId)?this.eliteOrderId=0:""
     window.localStorage.setItem("OrderId", JSON.stringify(""));
     super.ngOnInit();
 
@@ -433,23 +431,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.firstInitGridColumns();
   }
 
-  ngAfterContentInit() {
-    setTimeout(() => {
-      if(this.id>0){
-        if (this.el != undefined) {
-          this.el.nativeElement.click(()=>{ 
-            const el1 = document.getElementById('orderId');
-              if (el1) {
-                el1.onclick = (e) =>{
-                  this.onRowClick(e)
-                }
-              }
-          });
-        } 
-      }
-      
-    }, 8000);
-  }
   ngOnDestroy(): void {
     this.orderManagementService.selectedOrderAfterRedirect = null;
     this.store.dispatch(new ClearSelectedOrder());
@@ -1281,11 +1262,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         });
       }
       if(this.ordersPage?.items){
-        this.id= this.ordersPage.items.find((i) => i.id === this.id)
-        ? this.id
+        this.eliteOrderId= this.ordersPage.items.find((i) => i.id === this.eliteOrderId)
+        ? this.eliteOrderId
         : 0;
-        if(this.id>0 ){
-          this.ordersPage.items= this.ordersPage.items.filter(x=>x.id==this.id);
+        if(this.eliteOrderId>0 ){
+          this.ordersPage.items= this.ordersPage.items.filter(x=>x.id==this.eliteOrderId);
+          const data=this.ordersPage.items;
+          this.gridWithChildRow.dataSource=data;
+          this.onRowClick({data})
         }
       }
     });
