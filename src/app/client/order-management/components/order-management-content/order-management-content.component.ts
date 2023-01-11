@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   HostListener,
   OnDestroy,
   OnInit,
@@ -343,9 +344,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private cd$ = new Subject();
   private gridApi: GridApi;
   private SelectedStatus: string[] = [];
+  private id:number;
+  @ViewChild('el',{static:false}) el:ElementRef
+  
 
-
-  constructor(
+    constructor(
     protected override store: Store,
     private router: Router,
     private route: ActivatedRoute,
@@ -387,6 +390,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   override ngOnInit(): void {
+    this.id = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
+    (!this.id)?this.id=0:""
+    window.localStorage.setItem("OrderId", JSON.stringify(""));
     super.ngOnInit();
 
     this.setPreviousSelectedSystem();
@@ -427,13 +433,30 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.firstInitGridColumns();
   }
 
+  ngAfterContentInit() {
+    setTimeout(() => {
+      if(this.id>0){
+        if (this.el != undefined) {
+          this.el.nativeElement.click(()=>{ 
+            const el1 = document.getElementById('orderId');
+              if (el1) {
+                el1.onclick = (e) =>{
+                  this.onRowClick(e)
+                }
+              }
+          });
+        } 
+      }
+      
+    }, 8000);
+  }
   ngOnDestroy(): void {
     this.orderManagementService.selectedOrderAfterRedirect = null;
     this.store.dispatch(new ClearSelectedOrder());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
-
+  
   private subscribeOnChanges(): void {
     this.cd$.pipe(debounceTime(300), takeUntil(this.unsubscribe$)).subscribe(() => {
       this.cd.detectChanges();
@@ -1256,6 +1279,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
             item.children.sort((a, b) => a.positionId - b.positionId);
           }
         });
+      }
+      if(this.ordersPage?.items){
+        this.id= this.ordersPage.items.find((i) => i.id === this.id)
+        ? this.id
+        : 0;
+        if(this.id>0 ){
+          this.ordersPage.items= this.ordersPage.items.filter(x=>x.id==this.id);
+        }
       }
     });
   }
