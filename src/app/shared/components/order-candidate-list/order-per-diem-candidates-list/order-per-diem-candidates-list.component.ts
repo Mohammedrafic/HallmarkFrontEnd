@@ -26,7 +26,6 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
   public candidate: OrderCandidatesList;
   public candidateJob: OrderCandidateJob | null;
   public agencyActionsAllowed: boolean;
-  public irpCandidates: PageOfCollections<IrpOrderCandidate>;
   public isFeatureIrpEnabled = false;
 
   constructor(
@@ -44,10 +43,6 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
 
     if (this.isAgency) {
       this.checkForAgencyStatus();
-    }
-
-    if (this.selectedOrder.irpOrderMetadata) {
-      this.getIrpCandidates();
     }
   }
 
@@ -108,16 +103,6 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     )
     .subscribe((value) => {
       this.agencyActionsAllowed = value;
-    });
-  }
-
-  private getIrpCandidates(): void {
-    this.candidateApiService.getIrpCandidates(this.selectedOrder.irpOrderMetadata?.orderId as number)
-    .pipe(
-      takeUntil(this.unsubscribe$),
-    )
-    .subscribe((candidates) => {
-      this.irpCandidates = candidates;
     });
   }
 

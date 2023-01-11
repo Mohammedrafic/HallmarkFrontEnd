@@ -56,6 +56,7 @@ export class OrderManagement {
   organizationPrefix: string;
   commentContainerId?: number;
   extensionFromId?: number | null;
+  irpOrderMetadata?: IRPMetaData;
 }
 
 export interface IRPOrderManagement {
@@ -348,6 +349,10 @@ export interface IRPMetaData {
   contact: boolean;
   weekend: boolean;
   holiday: boolean;
+  statusText: string;
+  status: OrderStatus;
+  skillName: string;
+  skillId: number;
 }
 
 export class Order {
@@ -715,3 +720,9 @@ export interface IrpOrderCandidateDto {
 }
 
 export type IrpOrderCandidate = IrpOrderCandidateDto & IrpCandidateShiftTime;
+
+export interface IrpCandidatesParams {
+  PageSize: number;
+  PageNumber: number;
+  isAvaliable: boolean;
+}

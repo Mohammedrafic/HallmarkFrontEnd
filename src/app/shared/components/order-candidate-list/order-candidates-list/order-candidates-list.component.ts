@@ -66,17 +66,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     ApplicantStatus.Withdraw,
   ];
   public orderTypes = OrderType;
-  public irpCandidates: PageOfCollections<IrpOrderCandidate> = {
-    /**
-     * TODO: move to constants
-     */
-    items: [],
-    pageNumber: 1,
-    totalPages: 1,
-    totalCount: 1,
-    hasPreviousPage: false,
-    hasNextPage: false,
-  };
   public isFeatureIrpEnabled = false;
 
   get isShowDropdown(): boolean {

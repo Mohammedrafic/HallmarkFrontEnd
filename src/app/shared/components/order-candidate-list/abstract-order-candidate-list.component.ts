@@ -9,6 +9,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import {
   AgencyOrder,
   CandidateListEvent,
+  IrpOrderCandidate,
   OrderCandidateJob,
   OrderCandidatesListPage,
 } from '@shared/models/order-management.model';
@@ -19,6 +20,7 @@ import { UserState } from 'src/app/store/user.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { PageOfCollections } from '@shared/models/page.model';
 
 @Directive()
 export abstract class AbstractOrderCandidateListComponent
@@ -30,6 +32,7 @@ export abstract class AbstractOrderCandidateListComponent
   @Input() candidatesList: OrderCandidatesListPage | null;
   @Input() order: AgencyOrder;
   @Input() includeDeployedCandidates = true;
+  @Input() irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
 
   @Output() getCandidatesList = new EventEmitter<CandidateListEvent>();
 
