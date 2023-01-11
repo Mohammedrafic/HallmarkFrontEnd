@@ -344,9 +344,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private cd$ = new Subject();
   private gridApi: GridApi;
   private SelectedStatus: string[] = [];
+  private eliteOrderId:number;
+  
 
-
-  constructor(
+    constructor(
     protected override store: Store,
     private router: Router,
     private route: ActivatedRoute,
@@ -388,6 +389,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   override ngOnInit(): void {
+    this.eliteOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
+    (!this.eliteOrderId)?this.eliteOrderId=0:""
+    window.localStorage.setItem("OrderId", JSON.stringify(""));
     super.ngOnInit();
 
     this.setPreviousSelectedSystem();
@@ -434,7 +438,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
-
+  
   private subscribeOnChanges(): void {
     this.cd$.pipe(debounceTime(300), takeUntil(this.unsubscribe$)).subscribe(() => {
       this.cd.detectChanges();
@@ -1258,6 +1262,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
             item.children.sort((a, b) => a.positionId - b.positionId);
           }
         });
+      }
+      if(this.ordersPage?.items){
+        this.eliteOrderId= this.ordersPage.items.find((i) => i.id === this.eliteOrderId)
+        ? this.eliteOrderId
+        : 0;
+        if(this.eliteOrderId>0 ){
+          this.ordersPage.items= this.ordersPage.items.filter(x=>x.id==this.eliteOrderId);
+          const data=this.ordersPage.items;
+          this.gridWithChildRow.dataSource=data;
+          this.onRowClick({data})
+        }
       }
     });
   }
