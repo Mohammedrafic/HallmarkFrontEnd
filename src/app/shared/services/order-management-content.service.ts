@@ -10,6 +10,9 @@ import {
   ApplicantStatus,
   CreateOrderDto,
   EditOrderDto,
+  IrpCandidatesParams,
+  IrpOrderCandidate,
+  IrpOrderCandidateDto,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
@@ -35,6 +38,9 @@ import { orderFieldsConfig } from '@client/order-management/components/add-edit-
 import { Penalty } from '@shared/models/penalty.model';
 import { JobCancellationReason } from '@shared/enums/candidate-cancellation';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { PageOfCollections } from '@shared/models/page.model';
+import { AdaptIrpCandidates } from '@shared/components/order-candidate-list/order-candidate-list.utils';
+import { GetQueryParams } from '@core/helpers/functions.helper';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -163,7 +169,7 @@ export class OrderManagementContentService {
       organizationId: payload.organizationId,
       jobId: payload.jobId,
       locationId: payload.order.locationId,
-      reason: reason
+      reason: reason,
     });
   }
 
@@ -221,6 +227,16 @@ export class OrderManagementContentService {
     });
   }
 
+  public getIrpCandidates(orderId: number,
+    paramsData: IrpCandidatesParams): Observable<PageOfCollections<IrpOrderCandidate>> {
+    return this.http.get<PageOfCollections<IrpOrderCandidateDto>>(`/api/IRPOrders/${orderId}/candidates`, {
+      params: GetQueryParams(paramsData),
+    })
+    .pipe(
+      map((response) => AdaptIrpCandidates(response))
+    );
+  }
+
   /**
    * Get the list of states for organization
    * @return Array of states
@@ -269,7 +285,7 @@ export class OrderManagementContentService {
     let params = new HttpParams()
       .append('orderType', orderType)
       .append('departmentId', departmentId)
-      .append('skillId', skillId)
+      .append('skillId', skillId);
 
     if (jobStartDate && jobEndDate) {
       params = params.append('jobStartDate', jobStartDate).append('jobEndDate', jobEndDate);
@@ -403,8 +419,8 @@ export class OrderManagementContentService {
           poNumbers: 'poNumber',
           projectNames: 'projectName',
           specialProjectCategories: 'projectType',
-        }
-          return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]))
+        };
+          return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]));
       }),
     );
   }

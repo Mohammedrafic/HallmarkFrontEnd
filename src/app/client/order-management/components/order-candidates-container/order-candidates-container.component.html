@@ -8,22 +8,28 @@
   <app-order-close-reason-info [orderInformation]="order"></app-order-close-reason-info>
   <div class="separator"></div>
 </ng-container>
-<div class="candidates-list" *ngIf="orderCandidatePage" [ngSwitch]="order?.orderType">
-  <app-reorder-candidates-list *ngSwitchCase="orderType.ReOrder" [candidatesList]="orderCandidatePage$ | async"
-                                      (getCandidatesList)="onGetCandidatesList($event)"
-                                      [includeDeployedCandidates]="!excludeDeployed"
-                                      [order]="orderCandidates"
-                                      [selectedOrder]="order">
+<div class="candidates-list" *ngIf="orderCandidatePage || order.irpOrderMetadata && irpCandidates$" [ngSwitch]="order?.orderType">
+  <app-reorder-candidates-list *ngSwitchCase="orderType.ReOrder"
+    [candidatesList]="orderCandidatePage$ | async"
+    [irpCandidates]="irpCandidates$ | async"
+    (getCandidatesList)="onGetCandidatesList($event)"
+    [includeDeployedCandidates]="!excludeDeployed"
+    [order]="orderCandidates"
+    [selectedOrder]="order">
   </app-reorder-candidates-list>
-  <app-order-per-diem-candidates-list *ngSwitchCase="orderType.OpenPerDiem" [candidatesList]="orderCandidatePage$ | async"
-                                      (getCandidatesList)="onGetCandidatesList($event)"
-                                      [includeDeployedCandidates]="!excludeDeployed"
-                                      [order]="orderCandidates"
-                                      [selectedOrder]="order">
+  <app-order-per-diem-candidates-list *ngSwitchCase="orderType.OpenPerDiem"
+    [candidatesList]="orderCandidatePage$ | async"
+    [irpCandidates]="irpCandidates$ | async"
+    (getCandidatesList)="onGetCandidatesList($event)"
+    [includeDeployedCandidates]="!excludeDeployed"
+    [order]="orderCandidates"
+    [selectedOrder]="order">
   </app-order-per-diem-candidates-list>
-  <app-order-candidates-list *ngSwitchDefault [candidatesList]="orderCandidatePage$ | async"
-                             [includeDeployedCandidates]="!excludeDeployed"
-                             (getCandidatesList)="onGetCandidatesList($event)"
-                             [order]="orderCandidates">
+  <app-order-candidates-list *ngSwitchDefault
+    [candidatesList]="orderCandidatePage$ | async"
+    [irpCandidates]="irpCandidates$ | async"
+    [includeDeployedCandidates]="!excludeDeployed"
+    (getCandidatesList)="onGetCandidatesList($event)"
+    [order]="orderCandidates">
   </app-order-candidates-list>
 </div>

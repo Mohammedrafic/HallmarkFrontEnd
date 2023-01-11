@@ -23,7 +23,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
+import { IrpOrderCandidate, Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import {
@@ -62,6 +62,7 @@ import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { PermissionService } from '../../../../security/services/permission.service';
 import { UserState } from '../../../../store/user.state';
+import { PageOfCollections } from '@shared/models/page.model';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -104,6 +105,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Select(OrderManagementContentState.orderCandidatesLength)
   public orderCandidatesLength$: Observable<number>;
+
+  @Select(OrderManagementContentState.getIrpCandidatesCount)
+  public irpCandidatesCount$: Observable<number>;
 
   @Select(UserState.currentUserPermissions)
   public currentUserPermissions$: Observable<any[]>;
@@ -237,9 +241,11 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       const order = changes['order']?.currentValue;
       const hasStatus = this.openInProgressFilledStatuses.includes(order.statusText.toLowerCase());
       this.showCloseButton = hasStatus || (!hasStatus && (order?.orderClosureReasonId || order?.orderCloseDate));
+
       if (this.chipList) {
-        this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
-        this.chipList.text = changes['order'].currentValue.statusText.toUpperCase();
+        const status = this.order.irpOrderMetadata ? this.order.irpOrderMetadata.statusText : this.order.statusText;
+        this.chipList.cssClass = this.chipsCssClass.transform(status);
+        this.chipList.text = status.toUpperCase();
       }
     }
   }

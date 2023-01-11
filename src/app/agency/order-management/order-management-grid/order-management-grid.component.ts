@@ -9,7 +9,7 @@ import {
   PagerComponent,
   RowDataBoundEventArgs,
   SelectionSettingsModel,
-  TextWrapSettingsModel
+  TextWrapSettingsModel,
 } from '@syncfusion/ej2-angular-grids';
 import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
 
@@ -27,7 +27,7 @@ import {
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  ROW_HEIGHT
+  ROW_HEIGHT,
 } from './order-management-grid.constants';
 import {
   ClearOrders,
@@ -46,7 +46,7 @@ import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
   Order,
-  OrderManagementChild
+  OrderManagementChild,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -65,6 +65,7 @@ import { PreviewOrderDialogComponent } from '@agency/order-management/order-mana
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { GetIrpOrderCandidates } from '@client/store/order-managment-content.actions';
 import { BreakpointObserverService } from '@core/services';
 
 @Component({
@@ -122,8 +123,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public columnsToExport: ExportColumn[];
   public fileName: string;
   public defaultFileName: string;
-  public isRowScaleUp: boolean = true;
-  public isSubrowDisplay: boolean = false;
+  public isRowScaleUp = true;
+  public isSubrowDisplay = false;
   public ordersPage: AgencyOrderManagementPage;
   public AgencyOrderManagementTabs = AgencyOrderManagementTabs;
   public isLockMenuButtonsShown = true;
@@ -472,8 +473,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const options = this.getDialogNextPreviousOption(event.data);
       this.store.dispatch(new GetOrderById(event.data.orderId, event.data.organizationId, options));
       this.openPreview.next(true);
+      const Action = event.data.irpOrderMetadata ? GetIrpOrderCandidates : GetAgencyOrderCandidatesList;
+
       this.store.dispatch(
-        new GetAgencyOrderCandidatesList(
+        new Action(
           event.data.orderId,
           event.data.organizationId,
           GRID_CONFIG.initialPage,
@@ -625,7 +628,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       candidateName: this.filters.candidateName || null,
       projectTypeIds: this.filters.projectTypeIds || null,
       projectNameIds: this.filters.projectNameIds || null,
-      poNumberIds: this.filters.poNumberIds || null
+      poNumberIds: this.filters.poNumberIds || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.filteredItems$.next(this.filteredItems.length);

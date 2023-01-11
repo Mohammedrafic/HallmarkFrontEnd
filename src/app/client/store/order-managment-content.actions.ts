@@ -68,6 +68,18 @@ export class GetAgencyOrderCandidatesList {
   ) {}
 }
 
+export class GetIrpOrderCandidates {
+  static readonly type = '[order management] Get IRP order Candidates';
+
+  constructor(
+    public orderId: number,
+    public organizationId: number,
+    public pageNumber: number,
+    public pageSize: number,
+    public isAvaliable?: boolean
+  ) {}
+}
+
 export class GetSelectedOrderById {
   static readonly type = '[order management] Get Selected Order By Id';
   constructor(

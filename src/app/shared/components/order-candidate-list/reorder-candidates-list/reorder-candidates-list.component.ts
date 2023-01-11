@@ -39,7 +39,6 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   public agencyActionsAllowed: boolean;
   public isFeatureIrpEnabled = false;
   public readonly cancelledStatusName = ReorderCandidateStatuses[ReorderCandidateStatuses.Cancelled];
-  public irpCandidates: PageOfCollections<IrpOrderCandidate>;
 
   private selectedIndex: number;
 
