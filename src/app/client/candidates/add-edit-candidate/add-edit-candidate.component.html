@@ -3,12 +3,14 @@
     <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
     <h3>Candidates</h3>
   </ng-container>
-  <ng-container right>
+  <ng-container right *ngIf="showButtons">
     <button ejs-button cssClass="e-outline" [disabled]="isCandidateFormPristine" (click)="clearForm()">Clear</button>
     <button ejs-button cssClass="e-primary" (click)="saveCandidate()">Save</button>
   </ng-container>
 </app-page-toolbar>
 
 <app-tabs
+  #tabs
   [tabs]="tabsConfig"
+  (selectEmitter)="onTabChange($event)"
 ></app-tabs>

@@ -69,9 +69,10 @@ export class OrganizationManagementComponent extends AbstractPermission implemen
   }
 
   private setMenuConfig(): void {
-    const orgSettingsWithIRP = this.isIRPForOrganizationEnabled
-      ? this.orgSettings
-      : this.orgSettings.filter((item) => !item.isIRPOnly);
+    const orgSettingsWithIRP =
+      this.isIRPForOrganizationEnabled && this.isIRPFlagEnabled
+        ? this.orgSettings
+        : this.orgSettings.filter((item) => !item.isIRPOnly);
     this.sideMenuConfig = this.checkValidPermissions(orgSettingsWithIRP);
   }
 

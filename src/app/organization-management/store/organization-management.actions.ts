@@ -332,17 +332,17 @@ export class GetAllSkills {
 
 export class GetCredentialSkillGroup {
   static readonly type = '[organizationManagement] Get Credential Skill Group';
-  constructor() {}
+  constructor(public pageNumber: number, public pageSize: number) {}
 }
 
 export class SaveUpdateCredentialSkillGroup {
   static readonly type = '[organizationManagement] Save/Update Credential Skill Group';
-  constructor(public payload: CredentialSkillGroup) {}
+  constructor(public payload: CredentialSkillGroup, public pageNumber: number, public pageSize: number) {}
 }
 
 export class RemoveCredentialSkillGroup {
   static readonly type = '[organizationManagement] Remove Credential Skill Group';
-  constructor(public payload: CredentialSkillGroup) {}
+  constructor(public payload: CredentialSkillGroup, public pageNumber: number, public pageSize: number) {}
 }
 
 export class GetOrganizationSettings {

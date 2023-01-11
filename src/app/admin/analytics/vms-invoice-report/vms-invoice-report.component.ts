@@ -264,17 +264,21 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
         let orgList = this.organizations?.filter((x) => data == x.organizationId);
         this.selectedOrganizations = orgList;
         this.regionsList = [];
-        this.locationsList = [];
-        this.departmentsList = [];
+        let regionsList: Region[] = [];
+        let locationsList: Location[] = [];
+        let departmentsList: Department[] = [];         
         orgList.forEach((value) => {
-          this.regionsList.push(...value.regions);
-          value.regions.forEach((region) => {
-            this.locationsList.push(...region.locations);
-            region.locations.forEach((location) => {
-              this.departmentsList.push(...location.departments);
-            });
-          });
+          regionsList.push(...value.regions);
+          locationsList = regionsList.map(obj => {
+            return obj.locations.filter(location => location.regionId === obj.id);
+          }).reduce((a, b) => a.concat(b), []);
+          departmentsList = locationsList.map(obj => {
+            return obj.departments.filter(department => department.locationId === obj.id);
+          }).reduce((a, b) => a.concat(b), []);
         });
+        this.regionsList = sortByField(regionsList, "name");
+        this.locationsList = sortByField(locationsList, 'name');
+        this.departmentsList = sortByField(departmentsList, 'name');
         if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
           this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
         }

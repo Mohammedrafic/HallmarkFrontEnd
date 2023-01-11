@@ -10,3 +10,10 @@ export const Tier_Config: TierConfig = {
   locations: [],
   departments: [],
 };
+export enum FieldNames {
+  regionIds = 'regionIds',
+  locationIds = 'locationIds',
+  departmentIds = 'departmentIds',
+}
+
+export type FiledNamesSettings = { [K in FieldNames]: boolean; }

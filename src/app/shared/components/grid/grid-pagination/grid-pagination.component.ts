@@ -23,6 +23,8 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
   @Input() public allowBulkButton: boolean = false;
   @Input() public disableBulkButton: boolean = false;
   @Input() public isDarkTheme?: boolean | null;
+  @Input() public customRowsPerPageDropDownObject: { text: string, value: number }[];
+  @Input() public disableRowsPerPageDropdown: boolean = false;
   @Output() public navigateToPageEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output() public pageSizeChangeEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output() public approveEmitter: EventEmitter<void> = new EventEmitter<void>();
@@ -40,6 +42,11 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
   public ngOnInit(): void {
     this.paginationFormGroup = this.getPaginationFormGroup();
     this.initPageSizeControlValueChangesListener();
+    if (this.disableRowsPerPageDropdown) {
+      this.paginationFormGroup.controls['pageSize'].disable();
+    } else {
+      this.paginationFormGroup.controls['pageSize'].enable();
+    }
   }
 
   public handlePagerClickEvent({ currentPage }: PagerChangeEventModel): void {

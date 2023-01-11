@@ -2,7 +2,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import lodashMap from 'lodash/fp/map';
 import lodashMapPlain from 'lodash/map';
-
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { AccumulationChartModel } from '@syncfusion/ej2-angular-charts';
 import type { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
@@ -208,7 +207,6 @@ export class DashboardService {
       ...combinedData.shapeSettings,
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
-
     const title = "Applicant’s Home State";
     const description = "";
     return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description };

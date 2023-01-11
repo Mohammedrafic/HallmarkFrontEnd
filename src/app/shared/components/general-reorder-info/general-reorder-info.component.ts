@@ -61,9 +61,11 @@ export class GeneralReorderInfoComponent extends DestroyableDirective implements
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
 
     if (isAgencyArea) {
-      this.orderManagementAgencyService.orderPerDiemId$.next({id: this.orderInformation.reOrderFrom?.publicId!, prefix: this.orderInformation.organizationPrefix!});
+      this.orderManagementAgencyService.orderPerDiemId$
+      .next({id: this.orderInformation.reOrderFrom?.publicId!, prefix: this.orderInformation.organizationPrefix!});
     } else {
-      this.orderManagementService.orderPerDiemId$.next({id: this.orderInformation.reOrderFrom?.publicId!, prefix: this.orderInformation.organizationPrefix!});
+      this.orderManagementService.orderPerDiemId$
+      .next({id: this.orderInformation.reOrderFrom?.publicId!, prefix: this.orderInformation.organizationPrefix!});
     }
   }
 }

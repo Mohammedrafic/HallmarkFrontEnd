@@ -140,7 +140,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
     let query: Query = new Query();
     query =
       e.text !== ""
-        ? query.where("name", "contains", e.text, true).take(char * 15)
+        ? query.where('name', 'contains', e.text, true).take(char * 15)
         : query;
     e.updateData(this.departments, query);
   };

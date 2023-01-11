@@ -22,7 +22,7 @@
     [gridOptions]="gridOptions"
     [rowDragManaged]="rowDragManaged"
     [suppressMoveWhenRowDragging]="suppressMoveWhenRowDragging"
-    [overlayNoRowsTemplate]="gridEmptyMessage"
+    [overlayNoRowsTemplate]="customGridEmptyMessage || gridEmptyMessage"
     [context]="context"
     class="ag-theme-alpine app-grid__component"
   ></ag-grid-angular>
@@ -39,5 +39,7 @@
     [allowBulkButton]="allowBulkButton"
     [disableBulkButton]="disableBulkButton"
     [isDarkTheme]="isDarkTheme$ | async"
+    [customRowsPerPageDropDownObject]="customRowsPerPageDropDownObject"
+    [disableRowsPerPageDropdown]="disableRowsPerPageDropdown"
   ></app-grid-pagination>
 </div>

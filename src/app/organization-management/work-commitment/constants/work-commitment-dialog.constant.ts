@@ -79,6 +79,7 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       disabled: false,
       required: true,
       type: FieldType.Input,
+      maxLength: 20,
     },
 
     {
@@ -87,6 +88,7 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       disabled: false,
       required: false,
       type: FieldType.Input,
+      maxLength: 200,
     },
   ],
 });

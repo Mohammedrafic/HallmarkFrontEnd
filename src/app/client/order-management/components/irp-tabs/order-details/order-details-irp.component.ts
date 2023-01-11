@@ -148,6 +148,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
   private dataSourceContainer: OrderDataSourceContainer = {};
   private selectedSystem: SelectSystem;
+  private isTieringLogicLoad = true;
 
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   private skills$: Observable<ListOfSkills[]>;
@@ -485,6 +486,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         setDataSource(jobDistributionForm.fields, 'jobDistribution', sourceForJobDistribution);
       }
 
+      this.setJobDistributionValue();
       this.changeDetection.markForCheck();
     });
 
@@ -590,8 +592,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.jobDistributionForm.patchValue(selectedOrder);
     this.jobDescriptionForm.patchValue(selectedOrder);
     this.specialProjectForm.patchValue(selectedOrder);
-    this.jobDistributionForm.get('jobDistribution')?.patchValue(this.selectedOrder.jobDistributionValue);
-
+    
     if(selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
       const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
       changeTypeField(generalInformationConfig.fields, 'jobDates', FieldType.Date);
@@ -704,5 +705,12 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.store.dispatch(new GetContactDetails(id));
     }
     return id;
+  }
+
+  private setJobDistributionValue(): void {
+    if(this.isTieringLogicLoad && this.selectedOrder) {
+      this.jobDistributionForm.get('jobDistribution')?.patchValue(this.selectedOrder.jobDistributionValue);
+      this.isTieringLogicLoad = false;
+    }
   }
 }

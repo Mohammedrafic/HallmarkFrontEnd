@@ -41,6 +41,7 @@
                   [required]="field.required"
                   [controlName]="field.field"
                   [formGroupInstance]="commitmentForm"
+                  [maxlength]="field.maxLength!"
                 ></app-input>
               </ng-template>
 
@@ -52,7 +53,7 @@
                   [min]="0"
                   [maxLength]="10"
                   [decimals]="1"
-                  format="0"
+                  format="#.#"
                   id="numOfHours"
                   [controlName]="field.field"
                   [formGroupInstance]="commitmentForm"

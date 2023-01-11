@@ -115,7 +115,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   
   public readonly maxFileSize: number = FileSize.MB_20;
 
-  public rangeType = DatesRangeType.TwoWeeks;
+  public rangeType = DatesRangeType.OneWeek;
 
   private jobId: number;
 

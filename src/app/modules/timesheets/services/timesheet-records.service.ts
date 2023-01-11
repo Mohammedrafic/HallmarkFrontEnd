@@ -37,6 +37,7 @@ export class TimesheetRecordsService {
     records[currentTab][RecordsMode.Edit].forEach((record) => {
       const config = colDefs.filter((item) => item.cellRendererParams?.editMode);
       const controls: Record<string, string[] | number[] | Validators[]> = {};
+      const formValidator = currentTab === RecordFields.Time ? [AllTimesheetTimeSet] : [];
 
       config.forEach((column) => {
         const field = column.field as keyof RecordValue;
@@ -50,7 +51,8 @@ export class TimesheetRecordsService {
       controls['timeIn'] = [record['timeIn'] || ''];
       controls['isTimeInNull'] = [record['isTimeInNull'] || false];
 
-      formGroups[record.id] = this.fb.group(controls, { validators: [AllTimesheetTimeSet]} as AbstractControlOptions);
+      formGroups[record.id] = this.fb.group(controls, { validators: formValidator } as AbstractControlOptions);
+
     });
 
     return formGroups;

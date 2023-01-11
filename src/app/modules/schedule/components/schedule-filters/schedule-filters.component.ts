@@ -122,6 +122,7 @@ export class ScheduleFiltersComponent extends DestroyableDirective implements On
         takeUntil(this.destroy$),
       )
       .subscribe((structure: OrganizationStructure) => {
+        this.clearAllFilters();
         this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: this.activeSystem } }));
         this.regions = structure.regions;
         this.filterColumns.regionIds.dataSource = this.regions;

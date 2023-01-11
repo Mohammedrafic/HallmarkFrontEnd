@@ -59,6 +59,8 @@ import { UserPermissions } from '@core/enums';
 import { Permission } from '@core/interface';
 import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { Query } from "@syncfusion/ej2-data";
+import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -159,6 +161,11 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public defaultFileName: string;
   public isMileageTitleType: boolean;
   public format = '#';
+  public allRegionsSelected: boolean = false;
+  public allLocationsSelected: boolean = false;
+  public allDepartmentsSelected: boolean = false;
+  public maxDepartmentsLength = 1000;
+  public query: Query = new Query().take(this.maxDepartmentsLength);
 
   constructor(
     private store: Store,
@@ -408,6 +415,61 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.unsubscribe$.complete();
   }
 
+  public allRegionsChange(event: { checked: boolean }): void {
+    this.allRegionsSelected = event.checked;
+    const regionsControl = this.billRatesFormGroup.controls['regionIds'];
+    if (this.allRegionsSelected) {
+      regionsControl.setValue(null);
+      regionsControl.disable();
+      let locations: Location[] = [];
+      this.orgRegions.forEach((region: OrganizationRegion) => {
+        const filteredLocation = region.locations || [];
+        locations = [...locations, ...filteredLocation] as Location[];
+      });
+      this.locations = sortByField(locations, 'name');
+    } else {
+      regionsControl.enable();
+    }
+  }
+
+  public allLocationsChange(event: { checked: boolean }): void {
+    this.allLocationsSelected = event.checked;
+    const locationsControl = this.billRatesFormGroup.controls['locationIds'];
+    if (this.allLocationsSelected) {
+      locationsControl.setValue(null);
+      locationsControl.disable();
+      let departments: OrganizationDepartment[] = [];
+      this.locations?.forEach((location: OrganizationLocation) => {
+        const filteredDepartments = location.departments || [];
+        departments = [...departments, ...filteredDepartments] as OrganizationDepartment[];
+      });
+      this.departments = sortByField(departments, 'name');
+    } else {
+      locationsControl.enable();
+    }
+  }
+
+  public allDepartmentsChange(event: { checked: boolean }): void {
+    this.allDepartmentsSelected = event.checked;
+    const departmentsControl = this.billRatesFormGroup.controls['departmentIds'];
+    if (this.allDepartmentsSelected) {
+      departmentsControl.setValue(null);
+      departmentsControl.disable();
+    } else {
+      departmentsControl.enable();
+    }
+  }
+
+  public onDepartmentsFiltering(e: FilteringEventArgs): void {
+    const char = e.text.length + 1;
+    let query: Query = new Query();
+    query =
+      e.text !== ""
+        ? query.where('name', 'contains', e.text, true).take(char * 15)
+        : query;
+    e.updateData(this.departments as [], query);
+  };
+
   public loadData(): void {
     this.store.dispatch(new GetAssignedSkillsByOrganization());
     this.store.dispatch(new GetBillRates({ pageNumber: this.currentPage, pageSize: this.pageSize }));
@@ -470,19 +532,19 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       if (effectiveDate && !this.isEdit) {
         effectiveDate.setHours(0, 0, 0, 0);
       }
-      const isAllRegions = this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length;
+
       const billRate: BillRateSetupPost = {
         billRateSettingId: this.editRecordId,
         billType: this.billRatesFormGroup.controls['billRatesType'].value,
-        regionIds: isAllRegions ? [] : this.billRatesFormGroup.controls['regionIds'].value, // [] means All on the BE side
+        regionIds: this.allRegionsSelected ? null : this.billRatesFormGroup.controls['regionIds'].value,
         locationIds:
-          isAllRegions && this.billRatesFormGroup.controls['locationIds'].value.length === this.locations.length
-            ? []
-            : this.billRatesFormGroup.controls['locationIds'].value, // [] means All on the BE side
+          this.allLocationsSelected
+            ? null
+            : this.billRatesFormGroup.controls['locationIds'].value,
         departmentIds:
-          isAllRegions && this.billRatesFormGroup.controls['departmentIds'].value.length === this.departments.length
-            ? []
-            : this.billRatesFormGroup.controls['departmentIds'].value, // [] means All on the BE side
+          this.allDepartmentsSelected
+            ? null
+            : this.billRatesFormGroup.controls['departmentIds'].value,
         skillIds:
           this.billRatesFormGroup.controls['skillIds'].value.length === this.allSkills.length
             ? [] // [] means All on the BE side
@@ -709,6 +771,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRateToPost = undefined;
     this.removeActiveCssClass();
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
+    this.allRegionsSelected = this.allLocationsSelected = this.allDepartmentsSelected = false;
+    this.allRegionsChange({ checked: false });
+    this.allLocationsChange({ checked: false });
+    this.allDepartmentsChange({ checked: false });
   }
 
   private regionChangedHandler(): void {
@@ -866,22 +932,22 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   private setupFormValues(data: BillRateSetup): void {
     if (!data.regionId) {
-      const allRegionsIds = this.allRegions.map((region) => region.id);
-      this.billRatesFormGroup.controls['regionIds'].setValue(allRegionsIds);
+      this.allRegionsSelected = true;
+      this.billRatesFormGroup.controls['regionIds'].setValue(null);
     } else {
       this.billRatesFormGroup.controls['regionIds'].setValue([data.regionId]);
     }
 
     if (!data.locationId) {
-      const locationIds = this.locations.map((location) => location.id);
-      this.billRatesFormGroup.controls['locationIds'].setValue(locationIds);
+      this.allLocationsSelected = true;
+      this.billRatesFormGroup.controls['locationIds'].setValue(null);
     } else {
       this.billRatesFormGroup.controls['locationIds'].setValue([data.locationId]);
     }
 
     if (!data.departmentId) {
-      const departmentIds = this.departments.map((department) => department.id);
-      this.billRatesFormGroup.controls['departmentIds'].setValue(departmentIds);
+      this.allDepartmentsSelected = true;
+      this.billRatesFormGroup.controls['departmentIds'].setValue(null);
     } else {
       this.billRatesFormGroup.controls['departmentIds'].setValue([data.departmentId]);
     }
@@ -917,6 +983,9 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesFormGroup.controls['considerFor7thDayOt'].setValue(data.considerFor7thDayOT);
     this.billRatesFormGroup.controls['displayInJob'].setValue(data.displayInJob);
     this.billRatesFormGroup.controls['billRatesType'].setValue(data.billType);
+    this.allRegionsChange({ checked: !data.regionId });
+    this.allLocationsChange({ checked: !data.locationId });
+    this.allDepartmentsChange({ checked: !data.departmentId });
   }
 
   // TODO: temporary solution, until specific service provided

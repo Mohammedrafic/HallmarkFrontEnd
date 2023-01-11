@@ -46,7 +46,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
       this.checkForAgencyStatus();
     }
 
-    if (this.selectedOrder.isIRPOnly) {
+    if (this.selectedOrder.irpOrderMetadata) {
       this.getIrpCandidates();
     }
   }

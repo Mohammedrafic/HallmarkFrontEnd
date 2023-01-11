@@ -30,12 +30,12 @@
         </div>
       </section>
       <div class="form" *ngIf="tierForm">
-        <form [formGroup]="tierForm" class="tier-form-dialog bootstrap">
+        <form [formGroup]="tierForm" class="tier-form-dialog">
           <ng-container *ngFor="let field of dialogConfig?.fields; trackBy:trackByIndex">
             <ng-container [ngSwitch]="field.type">
 
               <ng-template [ngSwitchCase]="FieldTypes.Input">
-                <div class="input-container">
+                <div class="input-container bootstrap">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group">
@@ -50,7 +50,7 @@
               </ng-template>
 
               <ng-template [ngSwitchCase]="FieldTypes.Number">
-                <div class="input-container">
+                <div class="input-container bootstrap">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group">
@@ -72,25 +72,38 @@
                 <div class="input-container">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
-                  <div class="input-group">
-                    <ejs-multiselect
-                      appValidateWithMessage
-                      selectAllText="Select All"
-                      mode="CheckBox"
-                      [dataSource]="field.dataSource"
-                      [fields]="optionFields"
-                      [showSelectAll]="true"
-                      [allowFiltering]="true"
-                      [showDropDownIcon]="true"
-                      [formControlName]="field.field"
-                    >
-                    </ejs-multiselect>
+                  <div class="dropdown-wrapper">
+                    <div class="input-group bootstrap">
+                      <ejs-multiselect
+                        appValidateWithMessage
+                        selectAllText="Select All"
+                        mode="CheckBox"
+                        [dataSource]="field.dataSource"
+                        [fields]="optionFields"
+                        [showSelectAll]="!field.showAllToggle"
+                        [allowFiltering]="true"
+                        [showDropDownIcon]="true"
+                        [formControlName]="field.field"
+                        [query]="field.customFiltering ? query : noValue"
+                        (filtering)="field.customFiltering ? onDepartmentsFiltering($event) : noValue"
+                      >
+                      </ejs-multiselect>
+                    </div>
+                    <div class="switch" *ngIf="field.showAllToggle">
+                      <ejs-switch
+                        [name]="'all' + field.field"
+                        [checked]="getToggleValue(field.field)"
+                        (change)="allRecordsChange($event, field.field)"
+                        label="All"
+                      ></ejs-switch>
+                      <label [for]="'all' + field.field" class="switch-text">All</label>
+                    </div>
                   </div>
                 </div>
               </ng-template>
 
               <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
-                <div class="input-container">
+                <div class="input-container bootstrap">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group dropdown">

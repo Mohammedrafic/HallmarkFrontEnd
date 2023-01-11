@@ -93,6 +93,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
   public defaultDepartments: (number | undefined)[] = [];
+  public defaultAgingGroups:(number)[] = [];
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
@@ -171,17 +172,19 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
           let orgList = this.organizations?.filter((x) => data == x.organizationId);
           this.selectedOrganizations = orgList;
           this.regionsList = [];
-          const locationsList: Location[] = [];
-          const departmentsList: Department[] = [];
+          let regionsList: Region[] = [];
+          let locationsList: Location[] = [];
+          let departmentsList: Department[] = [];         
           orgList.forEach((value) => {
-            this.regionsList.push(...value.regions);
-            value.regions.forEach((region) => {
-              locationsList.push(...region.locations);
-              region.locations.forEach((location) => {
-                departmentsList.push(...location.departments);
-              });
-            });
+            regionsList.push(...value.regions);
+            locationsList = regionsList.map(obj => {
+              return obj.locations.filter(location => location.regionId === obj.id);
+            }).reduce((a, b) => a.concat(b), []);
+            departmentsList = locationsList.map(obj => {
+              return obj.departments.filter(department => department.locationId === obj.id);
+            }).reduce((a, b) => a.concat(b), []);
           });
+          this.regionsList = sortByField(regionsList, "name");
           this.locationsList = sortByField(locationsList, 'name');
           this.departmentsList = sortByField(departmentsList, 'name');
           if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
@@ -194,7 +197,9 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           this.defaultRegions = this.regionsList.map((list) => list.id);
+          this.defaultAgingGroups=this.agingGroups.map((list)=>list.id);
           this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+          this.agingReportForm.get(analyticsConstants.formControlNames.AgingGroupIds)?.setValue(this.defaultAgingGroups);
           this.changeDetectorRef.detectChanges();
         }
         else {

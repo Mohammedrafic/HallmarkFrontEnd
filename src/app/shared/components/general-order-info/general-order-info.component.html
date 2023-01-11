@@ -1,4 +1,4 @@
-<ng-container *ngIf="!orderInformation.isIRPOnly; else irpOrderInfo">
+<ng-container *ngIf="!orderInformation.irpOrderMetadata; else irpOrderInfo">
   <section class="candidates-info" *ngIf="orderInformation">
     <div
       class="container-row"

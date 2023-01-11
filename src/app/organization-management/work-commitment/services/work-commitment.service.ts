@@ -10,6 +10,7 @@ import { WorkCommitmentDialogApiService } from './work-commitment-dialog-api.ser
 
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
+import { mapDataSource } from '../helpers';
 
 @Injectable()
 export class WorkCommitmentService {
@@ -53,7 +54,7 @@ export class WorkCommitmentService {
           name: item.name,
           id: item.id,
         }));
-        this.masterCommitmentNames.set(correctItems);
+        this.masterCommitmentNames.set(mapDataSource(names.items, 'name', 'id'));
       });
   }
 
@@ -62,11 +63,8 @@ export class WorkCommitmentService {
       .getAllSkills()
       .pipe(filter(Boolean), take(1))
       .subscribe((skills: AssignedSkillsByOrganization[]) => {
-        const correctItems = skills.map((item: AssignedSkillsByOrganization) => ({
-          name: item.skillDescription,
-          id: item.masterSkillId,
-        }));
-        this.skills.set(correctItems);
+        const correctItems = skills.filter((skill) => skill.includeInIRP);
+        this.skills.set(mapDataSource(correctItems, 'skillDescription', 'masterSkillId'));
       });
   }
 

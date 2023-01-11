@@ -46,6 +46,8 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { isEmpty } from 'lodash';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { Query } from "@syncfusion/ej2-data";
+import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
 
 type RoleWithUserModel = { [key: number]: { [workflowType: number]: RoleWithUser[] } };
 type WorkflowAsKeyModel = { [key: number]: (UsersByPermission | RolesByPermission)[] };
@@ -140,6 +142,11 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     text: 'name',
     value: 'id',
   };
+  public allRegionsSelected: boolean = false;
+  public allLocationsSelected: boolean = false;
+  public allDepartmentsSelected: boolean = false;
+  public maxDepartmentsLength = 1000;
+  public query: Query = new Query().take(this.maxDepartmentsLength);
 
   constructor(
     protected override store: Store,
@@ -402,6 +409,62 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       this.clearFormDetails();
     });
   }
+
+  public allRegionsChange(event: { checked: boolean }): void {
+    this.allRegionsSelected = event.checked;
+    const regionsControl = this.workflowMappingFormGroup.controls['regions'];
+    if (this.allRegionsSelected) {
+      regionsControl.setValue(null);
+      regionsControl.disable();
+      let locations: OrganizationLocation[] = [];
+      this.allRegions.forEach((region: OrganizationRegion) => {
+        const filteredLocation = region.locations || [];
+        locations = [...locations, ...filteredLocation] as OrganizationLocation[];
+      });
+      this.locations = sortByField(locations, 'name');
+    } else {
+      regionsControl.enable();
+    }
+  }
+
+  public allLocationsChange(event: { checked: boolean }): void {
+    this.allLocationsSelected = event.checked;
+    const locationsControl = this.workflowMappingFormGroup.controls['locations'];
+    if (this.allLocationsSelected) {
+      locationsControl.setValue(null);
+      locationsControl.disable();
+      let departments: OrganizationDepartment[] = [];
+      this.locations?.forEach((location: OrganizationLocation) => {
+        const filteredDepartments = location.departments || [];
+        departments = [...departments, ...filteredDepartments] as OrganizationDepartment[];
+      });
+      this.departments = sortByField(departments, 'name');
+    } else {
+      locationsControl.enable();
+    }
+  }
+
+  public allDepartmentsChange(event: { checked: boolean }): void {
+    this.allDepartmentsSelected = event.checked;
+    const departmentsControl = this.workflowMappingFormGroup.controls['departments'];
+    if (this.allDepartmentsSelected) {
+      departmentsControl.setValue(null);
+      departmentsControl.disable();
+    } else {
+      departmentsControl.enable();
+    }
+  }
+
+  public onDepartmentsFiltering(e: FilteringEventArgs): void {
+    const char = e.text.length + 1;
+    let query: Query = new Query();
+    query =
+      e.text !== ""
+        ? query.where('name', 'contains', e.text, true).take(char * 15)
+        : query;
+    e.updateData(this.departments as [], query);
+  };
+
   mapByWorkflowType(acc: WorkflowAsKeyModel, value: UsersByPermission | RolesByPermission) {
     if (acc?.[value.workflowType]) {
       return { ...acc, [value.workflowType]: [...acc[value.workflowType], value] };
@@ -534,22 +597,22 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       this.workflowMappingFormGroup.controls['workflowName'].setValue(foundWorkflow?.id);
 
       if (!data.regionId) {
-        const allRegionsIds = this.allRegions.map((region) => region.id);
-        this.workflowMappingFormGroup.controls['regions'].setValue(allRegionsIds);
+        this.allRegionsSelected = true;
+        this.workflowMappingFormGroup.controls['regions'].setValue(null);
       } else {
         this.workflowMappingFormGroup.controls['regions'].setValue([data.regionId]);
       }
 
       if (!data.locationId) {
-        const locationIds = this.locations.map((location) => location.id);
-        this.workflowMappingFormGroup.controls['locations'].setValue(locationIds);
+        this.allLocationsSelected = true;
+        this.workflowMappingFormGroup.controls['locations'].setValue(null);
       } else {
         this.workflowMappingFormGroup.controls['locations'].setValue([data.locationId]);
       }
 
       if (!data.departmentId) {
-        const departmentIds = this.departments.map((department) => department.id);
-        this.workflowMappingFormGroup.controls['departments'].setValue(departmentIds);
+        this.allDepartmentsSelected = true;
+        this.workflowMappingFormGroup.controls['departments'].setValue(null);
       } else {
         this.workflowMappingFormGroup.controls['departments'].setValue([data.departmentId]);
       }
@@ -561,6 +624,9 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       }
 
       this.setFormArrayControls(data.stepMappings);
+      this.allRegionsChange({ checked: !data.regionId });
+      this.allLocationsChange({ checked: !data.locationId });
+      this.allDepartmentsChange({ checked: !data.departmentId });
     });
 
     this.store.dispatch(new GetOrganizationStructure());
@@ -608,18 +674,18 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
 
   public onSaveFormClick(): void {
     if (this.workflowMappingFormGroup.valid) {
-      const isAllRegions = this.workflowMappingFormGroup.controls['regions'].value.length === this.allRegions.length;
+      const isAllRegions = this.allRegionsSelected;
       const workflowMapping: WorkflowMappingPost = {
         mappingId: this.editedRecordId,
-        regionIds: isAllRegions ? [] : this.workflowMappingFormGroup.controls['regions'].value, // [] means All on the BE side
+        regionIds: isAllRegions ? null : this.workflowMappingFormGroup.controls['regions'].value,
         locationIds:
-          isAllRegions && this.workflowMappingFormGroup.controls['locations'].value.length === this.locations.length
-            ? []
-            : this.workflowMappingFormGroup.controls['locations'].value, // [] means All on the BE side
+          this.allLocationsSelected
+            ? null
+            : this.workflowMappingFormGroup.controls['locations'].value,
         departmentIds:
-          isAllRegions && this.workflowMappingFormGroup.controls['departments'].value.length === this.departments.length
-            ? []
-            : this.workflowMappingFormGroup.controls['departments'].value, // [] means All on the BE side
+          this.allDepartmentsSelected
+            ? null
+            : this.workflowMappingFormGroup.controls['departments'].value,
         skillIds:
           this.workflowMappingFormGroup.controls['skills'].value.length === this.allSkills.length
             ? []
@@ -816,6 +882,9 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     this.workflowMappingFormGroup.reset();
     this.isEdit = false;
     this.editedRecordId = undefined;
-    this.isMappingSectionShown = false;
+    this.isMappingSectionShown = this.allRegionsSelected = this.allLocationsSelected = this.allDepartmentsSelected = false;
+    this.allRegionsChange({ checked: false });
+    this.allLocationsChange({ checked: false });
+    this.allDepartmentsChange({ checked: false });
   }
 }

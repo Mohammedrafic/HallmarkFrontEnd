@@ -8,7 +8,8 @@ import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { TierService } from '@shared/components/tiers-dialog/services';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
-import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
+
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
     DropDownListModule,
     DialogModule,
     ButtonModule,
+    SwitchModule,
   ],
   providers: [TierService],
   exports: [TiersDialogComponent]
