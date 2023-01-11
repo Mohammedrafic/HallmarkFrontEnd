@@ -66,6 +66,7 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { GetIrpOrderCandidates } from '@client/store/order-managment-content.actions';
+import { BreakpointObserverService } from '@core/services';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -130,6 +131,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public orderTypes = OrderType;
   public selectedRowRef: any;
   public openDetailsTab = false;
+  public targetElement: HTMLElement | null = document.body.querySelector('#main');
   private orderPerDiemId: number | null;
   private prefix: string | null;
   private orderId: number | null;
@@ -147,6 +149,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private datePipe: DatePipe,
     private filterService: FilterService,
     private orderManagementAgencyService: OrderManagementAgencyService,
+    private breakpointService: BreakpointObserverService
   ) {
     super();
     this.listenRedirectFromExtension();
@@ -174,6 +177,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
+      this.setGridHeight(data?.items.length);
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
     });
 
@@ -182,7 +186,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onCommentRead();
     this.listenRedirectFromPerDiem();
     this.listenRedirectFromReOrder();
-    
   }
 
   ngOnDestroy(): void {
@@ -277,7 +280,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         const candidate = orderMyAgency.children.find(
           (candidate: OrderManagementChild) => candidate.candidateId === selectedOrderAfterRedirect.candidateId
         );
-        
+
         this.onOpenCandidateDialog(candidate as OrderManagementChild, orderMyAgency);
         this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
         this.gridWithChildRow.detailRowModule.expand(0);
@@ -317,13 +320,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.filteredItems$.next(this.filteredItems.length);
         this.dispatchNewPage();
       });
-  }
-
-  public onGoToClick(event: any): void {
-    if ((event.currentPage && event.currentPage !== this.currentPage) || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-      this.isSubrowDisplay = false;
-    }
   }
 
   public onRowsDropDownChanged(): void {
@@ -824,7 +820,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private hasOrderMyAgencyId(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     if (selectedOrderAfterRedirect) {
-      this.OrderFilterFormGroup.patchValue({ orderPublicId: selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId.toString() });
+      this.OrderFilterFormGroup.patchValue({
+        orderPublicId: selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId.toString(),
+      });
       this.filters = this.OrderFilterFormGroup.getRawValue();
       this.filters.includeReOrders = false;
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
@@ -841,5 +839,28 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.currentPage = page;
       this.dispatchNewPage();
     });
+  }
+
+  public gridPageChanged(page: number) {
+    this.pageSubject.next(page);
+  }
+
+  public gridPerPageChanged(perPage: number) {
+    this.pageSize = perPage;
+    this.pageSubject.next(1);
+    this.isSubrowDisplay = false;
+  }
+
+  private setGridHeight(itemsLength: number | undefined): void {
+    this.breakpointService
+      .getBreakpointMediaRanges()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((screen) => {
+        this.isMobile = screen.isMobile;
+        this.gridHeight = itemsLength && this.isMobile ? String(itemsLength * this.rowHeight) : this.gridHeight;
+        if(screen.isMobile || screen.isTablet) {
+          this.gridWithChildRow.autoFitColumns();
+        }
+      });
   }
 }

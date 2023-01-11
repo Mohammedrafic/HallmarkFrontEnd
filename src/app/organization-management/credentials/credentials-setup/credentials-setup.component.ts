@@ -47,6 +47,7 @@ import { AppState } from '../../../store/app.state';
 import { systemOptions } from '../constants';
 import { CredentialSetupSystemEnum } from '@organization-management/credentials/enums';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { FilteredCredentialsComponent } from './filtered-credentials/filtered-credentials.component';
 
 @TakeUntilDestroy
 @Component({
@@ -57,6 +58,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 })
 export class CredentialsSetupComponent extends AbstractPermissionGrid implements OnInit {
   @ViewChild('grid') grid: GridComponent;
+  @ViewChild('filteredGrid') filteredGrid: FilteredCredentialsComponent;
 
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
@@ -230,7 +232,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
   }
 
   public onMappingFormClosed(): void {
-    this.store.dispatch(new GetFilteredCredentialSetupData({ pageNumber: 1, pageSize: 9999 }));
+    this.store.dispatch(new GetFilteredCredentialSetupData(this.filteredGrid.credentialSetupFilter));
   }
 
   public onSelectedCredentialClick(selectedCredential: CredentialSetupFilterGet): void {
@@ -271,7 +273,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
       this.lastSelectedCredential = null;
       this.gridDataSource = [];
       this.store.dispatch(new ClearCredentialSetup());
-      this.store.dispatch(new GetCredentialSkillGroup());
+      this.store.dispatch(new GetCredentialSkillGroup(1, 1000));
     });
   }
 

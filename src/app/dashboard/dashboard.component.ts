@@ -76,7 +76,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   public hasOrderCreatePermission: boolean = true;
 
   public widgetsData$: Observable<WidgetsDataModel>;
-
+  public UserType:number;
   constructor(
     private readonly store: Store,
     private readonly dashboardService: DashboardService,
@@ -94,6 +94,15 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     this.setWidgetsData();
     this.store.dispatch(new GetDashboardData());
     this.store.dispatch(new GetAllSkills());
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType === BusinessUnitType.Agency) {
+      this.UserType=BusinessUnitType.Agency
+      alert(this.UserType);
+    }
+    else{
+      this.UserType=0;
+    }
+   
   }
 
   private getAdminOrganizationsStructureAll(): void {

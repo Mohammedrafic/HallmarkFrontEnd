@@ -132,7 +132,7 @@ export class GroupEmailService {
    * @param statuses
    * @param jobID
    * @param isAgency
-   * @param businessUnitId
+   * @param businessUnitIds
    * @return User
    */
   public GetGroupEmailCandidates(
@@ -144,10 +144,10 @@ export class GroupEmailService {
     statuses: string,
     jobID: string,
     isAgency: boolean,
-    businessUnitId: number
+    businessUnitIds: string
   ): Observable<User> {
     return this.http.get<User>(
-      `/api/GroupMail/getcandidates?agencies=${agencies}&skills=${skills}&regions=${regionIds}&locations=${locationIds}&orderTypes=${orderTypes}&statuses=${statuses}&jobID=${jobID}&isAgency=${isAgency}&businessUnitId=${businessUnitId}`
+      `/api/GroupMail/getcandidates?agencies=${agencies}&skills=${skills}&regions=${regionIds}&locations=${locationIds}&orderTypes=${orderTypes}&statuses=${statuses}&jobID=${jobID}&isAgency=${isAgency}&businessUnitIds=${businessUnitIds}`
     );
   }
 }

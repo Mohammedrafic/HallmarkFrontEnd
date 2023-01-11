@@ -1,0 +1,22 @@
+<app-grid
+  title="Work Commitment"
+  [rowData]="[]"
+  [columnDefinitions]="columnDef"
+  [rowSelection]="rowSelection"
+  [totalRecordsCount]="[].length!"
+  customGridEmptyMessage="Add Commitment"
+  [pageSize]="5"
+  [customRowsPerPageDropDownObject]="customRowsPerPageDropDownObject"
+  [disableRowsPerPageDropdown]="true"
+>
+  <button
+    action-button
+    class="add-action"
+    cssClass="e-action-button"
+    ejs-button
+    (click)="addCommitment()"
+  >
+    <i-feather name="plus" class="icon"></i-feather>
+    Add Commitment
+  </button>
+</app-grid>

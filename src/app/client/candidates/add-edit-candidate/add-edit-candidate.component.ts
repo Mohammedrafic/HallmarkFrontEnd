@@ -15,6 +15,7 @@ import { debounceTime, Subject, takeUntil } from 'rxjs';
 export class AddEditCandidateComponent extends DestroyableDirective implements OnInit, AfterViewInit {
   @ViewChild('tabs') public tabsComponent: TabsComponent<unknown>;
   public readonly tabsConfig = tabsConfig;
+  public showButtons = true;
 
   private tabUpdate$: Subject<void> = new Subject();
 
@@ -64,5 +65,9 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
     this.tabsConfig.forEach((tab, index: number) => {
       this.tabsComponent.tabComponent.enableTab(index, true);
     });
+  }
+
+  public onTabChange(tab: { selectedIndex: number }): void {
+    this.showButtons = tab.selectedIndex === 0;
   }
 }

@@ -400,11 +400,11 @@ export class AlertsState {
       statuses,
       jobID,
       isAgency,
-      businessUnitId,
+      businessUnitIds,
     }: GetGroupEmailCandidates
   ): Observable<User | void> {
     return this.groupEmailService
-      .GetGroupEmailCandidates(agencies, skills, regions, locations, orderTypes, statuses, jobID, isAgency, businessUnitId)
+      .GetGroupEmailCandidates(agencies, skills, regions, locations, orderTypes, statuses, jobID, isAgency, businessUnitIds)
       .pipe(
         tap((payload) => {
           patchState({ groupEmailCandidateData: payload });

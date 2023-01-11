@@ -23,7 +23,9 @@ export const analyticsConstants = {
     AgingGroupIds:'agingGroupIds',
     TimesheetStatuses:'timesheetStatuses',
     ReportDate:'reportDate',
-    CredentialName:'credentialName'
+    CredentialName: 'credentialName',
+    SearchBy: 'searchBy',
+    InActiveInComplete:'inActiveInComplete'
   }
 }
 
@@ -170,6 +172,12 @@ export type InvoiceStatus = {
   id: number;
   name: string;
 };
+
+export const searchByList: { name: string; id: number }[] = [
+  { name: 'All', id: 0 },
+  { name: 'By Candidate', id: 1 },
+  { name: 'By Skill', id: 2 }
+];
 
 
 

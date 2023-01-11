@@ -12,10 +12,14 @@ import { FeatherModule } from 'angular-feather';
 import { SharedModule } from '@shared/shared.module';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { CandidateWorkCommitmentComponent } from './candidate-work-commitment.component';
+import { CandidateWorkCommitmentGridComponent } from './candidate-work-commitment-grid/candidate-work-commitment-grid.component';
+import { CandidateCommitmentGridActionRendererComponent } from './candidate-work-commitment-grid/grid-action-renderer/grid-action-renderer.component';
 
 @NgModule({
   declarations: [
-    CandidateWorkCommitmentComponent
+    CandidateWorkCommitmentComponent,
+    CandidateWorkCommitmentGridComponent,
+    CandidateCommitmentGridActionRendererComponent
   ],
   exports: [],
   imports: [

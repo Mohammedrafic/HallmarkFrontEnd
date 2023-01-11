@@ -16,8 +16,8 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 export class FilterDialogComponent extends DestroyableDirective implements OnInit {
   @ViewChild('filterDialog') filterDialog: DialogComponent;
   @ContentChild('groupedChips') public groupedChips:TemplateRef<HTMLElement>;
-  targetElement: HTMLElement = document.body;
 
+  @Input() targetElement: HTMLElement | null = document.body;
   @Input() width: string = '532px';
   @Input() items: FilteredItem[] | null = [];
   @Input() count: number | undefined | null = 0;

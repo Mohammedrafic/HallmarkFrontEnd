@@ -7,7 +7,7 @@
     *ngIf="!allowBulkSelection || !selectedTableRowsAmount; else bulkApproveTemplate"
     class="app-grid-pagination__left-side-controls">
       <app-dropdown
-        [dataSource]="gridConfig.rowsPerPageDropDownObject"
+        [dataSource]="customRowsPerPageDropDownObject || gridConfig.rowsPerPageDropDownObject"
         [fields]="perPageFieldsSettings"
         [formGroupInstance]="paginationFormGroup"
         class="app-grid-pagination__rows-options"
