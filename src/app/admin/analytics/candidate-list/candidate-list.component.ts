@@ -369,6 +369,9 @@ export class CandidateListComponent implements OnInit, OnDestroy {
     this.candidateListForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue([]);
     this.candidateListForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
     this.candidateListForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue([]);
+    this.candidateListForm.get(analyticsConstants.formControlNames.CandidateName)?.setValue(null);
+    this.candidateListForm.get(analyticsConstants.formControlNames.InActiveInComplete)?.setValue(false);
+    this.candidateListForm.get(analyticsConstants.formControlNames.SearchBy)?.setValue(0);
     this.filteredItems = [];
   }
   public onFilterApply(): void {
