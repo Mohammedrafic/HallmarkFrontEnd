@@ -74,5 +74,3 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
     );
   }
 }
-
-// GetAgencyOrderCandidatesList
