@@ -23,7 +23,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { IrpOrderCandidate, Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
+import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import {
@@ -62,7 +62,7 @@ import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { PermissionService } from '../../../../security/services/permission.service';
 import { UserState } from '../../../../store/user.state';
-import { PageOfCollections } from '@shared/models/page.model';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -76,6 +76,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() children: OrderManagementChild[] | undefined;
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   @Input() hasCreateEditOrderPermission: boolean;
+  @Input() activeSystem: OrderManagementIRPSystemId;
 
   @Output() nextPreviousOrderEvent = new EventEmitter<{ next: boolean, isIrpOrder: boolean}>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
@@ -126,6 +127,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public reOrderDialogTitle$ = this.addEditReorderService.reOrderDialogTitle$;
   public canCreateOrder: boolean;
   public canCloseOrderPermission: boolean;
+  public readonly systemType = OrderManagementIRPSystemId;
 
   public disabledCloseButton = true;
   public showCloseButton = false;

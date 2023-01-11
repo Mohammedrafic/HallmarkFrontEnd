@@ -4,6 +4,7 @@ import { Order } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { OrderStatus } from '@shared/enums/order-management';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-order-details-container',
@@ -12,6 +13,8 @@ import { OrderStatus } from '@shared/enums/order-management';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderDetailsContainerComponent {
+  @Input() activeSystem: OrderManagementIRPSystemId;
+
   public orderType = OrderType;
   public isClosedOrder = false;
   public readonly reasonClosure = {

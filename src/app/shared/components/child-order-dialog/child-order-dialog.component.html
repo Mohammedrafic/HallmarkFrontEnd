@@ -69,9 +69,12 @@
               <ng-template #content>
                 <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
                   <section class="job-details" [ngSwitch]="currentOrder?.orderType">
-                    <app-general-order-per-diem-info *ngSwitchCase="orderType.OpenPerDiem" [orderInformation]="currentOrder"></app-general-order-per-diem-info>
-                    <app-general-reorder-info *ngSwitchCase="orderType.ReOrder" [orderInformation]="currentOrder"></app-general-reorder-info>
-                    <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"></app-general-order-info>
+                    <app-general-order-per-diem-info *ngSwitchCase="orderType.OpenPerDiem"
+                      [orderInformation]="currentOrder" [system]="activeSystem"></app-general-order-per-diem-info>
+                    <app-general-reorder-info *ngSwitchCase="orderType.ReOrder"
+                      [orderInformation]="currentOrder" [system]="activeSystem"></app-general-reorder-info>
+                    <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"
+                      [system]="activeSystem"></app-general-order-info>
                   </section>
                   <hr />
                   <ng-container *ngIf="isClosedOrder">
