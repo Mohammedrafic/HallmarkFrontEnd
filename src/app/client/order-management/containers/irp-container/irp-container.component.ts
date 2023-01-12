@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleCha
 import { Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 
-import { Subject, takeUntil } from 'rxjs';
+import { filter, Subject, takeUntil } from 'rxjs';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 
@@ -22,8 +22,13 @@ import {
   showMessageForInvalidCredentials,
 } from '@client/order-management/helpers';
 import { SaveIrpOrder, EditIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
-import { Order } from '@shared/models/order-management.model';
+import { CreateOrderDto, Order } from '@shared/models/order-management.model';
 import { IOrderCredentialItem } from "@order-credentials/types";
+import { ShowToast } from '../../../../store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED } from '@shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 
 @Component({
   selector: 'app-irp-container',
@@ -45,7 +50,8 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     private irpStateService: IrpContainerStateService,
     private store: Store,
     private actions$: Actions,
-    private router: Router
+    private router: Router,
+    private confirmService: ConfirmService,
   ) {
     super();
   }
@@ -125,13 +131,33 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     };
 
    if(this.selectedOrder) {
-      this.store.dispatch(new EditIrpOrder({
-        ...createdOrder,
-        id: this.selectedOrder.id,
-        deleteDocumentsGuids: this.irpStateService.getDeletedDocuments(),
-      },this.irpStateService.getDocuments()));
+     this.showRevokeMessageForEditOrder(createdOrder);
     } else {
       this.store.dispatch(new SaveIrpOrder(createdOrder,this.irpStateService.getDocuments()));
+    }
+  }
+
+  private showRevokeMessageForEditOrder(order: CreateOrderDto): void {
+    const isExternalLogicInclude = this.irpStateService.getIncludedExternalLogic(order);
+
+    if(!isExternalLogicInclude && !this.selectedOrder.canRevoke) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_REVOKED));
+    } else if(!isExternalLogicInclude && this.selectedOrder.canRevoke && !this.selectedOrder.canProceedRevoke) {
+      this.confirmService
+        .confirm(CONFIRM_REVOKE_ORDER, {
+          title: 'Confirm',
+          okButtonLabel: 'Revoke',
+          okButtonClass: '',
+        }).pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
+        this.store.dispatch(new EditIrpOrder({
+          ...order,
+          id: this.selectedOrder.id,
+          deleteDocumentsGuids: this.irpStateService.getDeletedDocuments(),
+        },this.irpStateService.getDocuments()));
+      });
     }
   }
 }

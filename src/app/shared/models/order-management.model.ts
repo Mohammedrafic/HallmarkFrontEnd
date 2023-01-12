@@ -441,6 +441,8 @@ export class Order {
   holiday?: boolean;
   distributedOn?: string;
   creationDate?: string;
+  canRevoke?: boolean;
+  canProceedRevoke?: boolean;
 }
 
 export class ReOrder {
@@ -479,6 +481,7 @@ export class ReOrder {
 
 export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {
   billRates: OrderBillRateDto[];
+  jobDistribution?: number[];
 }
 
 export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'statusText' | 'documents'> {

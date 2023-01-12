@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
 import { ListOfKeyForms} from '@client/order-management/interfaces';
+import { CreateOrderDto } from '@shared/models/order-management.model';
+import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 
 @Injectable()
 export class IrpContainerStateService {
@@ -34,5 +36,13 @@ export class IrpContainerStateService {
 
   public getDeletedDocuments(): string[] {
     return this.deleteDocumentsGuids;
+  }
+
+  public getIncludedExternalLogic(order: CreateOrderDto): boolean {
+    return order.jobDistribution?.some((distribution: number) => [
+      IrpOrderJobDistribution.AllExternal,
+      IrpOrderJobDistribution.SelectedExternal,
+      IrpOrderJobDistribution.TieringLogicExternal,
+    ].includes(distribution)) as boolean;
   }
 }
