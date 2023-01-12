@@ -10,31 +10,33 @@ import { DatePicker, MaskedDateTimeService } from '@syncfusion/ej2-angular-calen
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { Department, DepartmentFilter, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import {
-  SaveDepartment,
-  GetDepartmentsByLocationId,
-  DeleteDepartmentById,
-  GetRegions,
-  UpdateDepartment,
-  GetLocationsByRegionId,
-  ExportDepartments,
-  ClearLocationList,
   ClearDepartmentList,
-  GetDepartmentFilterOptions, GetOrganizationById, SaveDepartmentSucceeded, SaveDepartmentConfirm,
+  ClearLocationList,
+  DeleteDepartmentById,
+  ExportDepartments,
+  GetAssignedSkillsByOrganization,
+  GetDepartmentFilterOptions,
+  GetDepartmentsByLocationId,
+  GetLocationsByRegionId,
+  GetOrganizationById,
+  GetRegions,
+  SaveDepartment,
+  SaveDepartmentConfirm,
+  SaveDepartmentSucceeded,
+  UpdateDepartment
 } from '../store/organization-management.actions';
 import { Region } from '@shared/models/region.model';
 import { Location } from '@shared/models/location.model';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { MessageTypes } from '@shared/enums/message-types';
-import {
-  AbstractGridConfigurationComponent,
-} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
   RECORD_ADDED,
-  RECORD_MODIFIED,
+  RECORD_MODIFIED
 } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
@@ -51,6 +53,8 @@ import { DepartmentsExportCols } from '@organization-management/departments/cons
 import { DepartmentsAdapter } from '@organization-management/departments/adapters/departments.adapter';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { DateTimeHelper } from '@core/helpers';
+import { ListOfSkills } from '@shared/models/skill.model';
+import { difference } from 'lodash';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
@@ -77,6 +81,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   @Select(OrganizationManagementState.sortedLocationsByRegionId)
   public locations$: Observable<Location[]>;
 
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
+  skills$: Observable<ListOfSkills[]>;
+
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
   @ViewChild('reactivationDatepicker') reactivationDatepicker: DatePicker;
@@ -85,6 +92,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   departmentsDetailsFormGroup: FormGroup;
   fieldsSettings: FieldSettingsModel = { text: 'name', value: 'id' };
   irpFieldsSettings: FieldSettingsModel = { text: 'text', value: 'value' };
+  skillFields: FieldSettingsModel = { text: 'name', value: 'masterSkillId' };
+
   defaultValue: number | undefined;
   isLocationsDropDownEnabled = false;
   columnsToExport: ExportColumn[];
@@ -97,6 +106,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   isLocationIRPEnabled = false;
   isOrgUseIRPAndVMS = false;
   isInvoiceDepartmentIdFieldShow = true;
+  primarySkills: ListOfSkills[] = [];
+  secondarySkills: ListOfSkills[] = [];
+  areSkillsAvailable: boolean;
 
   protected componentDestroy: () => Observable<unknown>;
 
@@ -141,6 +153,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.startDepartmentOptionsWatching();
     this.startPageNumberWatching();
     this.startOrgIdWatching();
+    this.getSkills();
+    this.listenPrimarySkill();
+    this.listenIncludeInIRPToggleChanges();
   }
 
   ngOnDestroy(): void {
@@ -441,6 +456,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
     this.grid.getColumnByField('invoiceDepartmentId').visible = this.isInvoiceDepartmentIdFieldShow;
     this.grid.getColumnByField('includeInIRP').visible = this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS;
+    this.grid.getColumnByField('primarySkillNames').visible = this.isIRPFlagEnabled && !!isIRPEnabled;
+    this.grid.getColumnByField('secondarySkillNames').visible = this.isIRPFlagEnabled && !!isIRPEnabled;
 
     this.columnsToExport = DepartmentsExportCols(
       this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS,
@@ -528,5 +545,43 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
+  }
+
+  private getSkills(): void {
+    this.store.dispatch(new GetAssignedSkillsByOrganization());
+    this.skills$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
+      this.primarySkills = skills;
+      this.secondarySkills = skills;
+    });
+  }
+
+  private listenPrimarySkill(): void {
+    this.departmentsDetailsFormGroup.get('primarySkills')?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((formValue) => {
+      const diff = difference(this.primarySkills.map(({ masterSkillId }: ListOfSkills) => masterSkillId), formValue);
+      this.secondarySkills = this.primarySkills.filter(({ masterSkillId }: ListOfSkills) => diff.includes(masterSkillId));
+      this.departmentsDetailsFormGroup.get('secondarySkills')?.reset();
+    })
+  }
+
+  private listenIncludeInIRPToggleChanges(): void {
+    const { preferences } = this.store.selectSnapshot(OrganizationManagementState.organization) || {};
+
+    if (!!preferences?.isVMCEnabled && !!preferences?.isIRPEnabled) {
+      this.departmentsDetailsFormGroup.get('includeInIRP')?.valueChanges
+        .pipe(
+          takeUntil(this.componentDestroy())
+        )
+        .subscribe((state: boolean) => {
+          if (state && this.isIRPFlagEnabled && preferences?.isIRPEnabled) {
+            this.areSkillsAvailable = true;
+          } else {
+            this.areSkillsAvailable = false;
+            this.departmentsDetailsFormGroup.get('primarySkills')?.reset();
+            this.departmentsDetailsFormGroup.get('secondarySkills')?.reset();
+          }
+        });
+    } else {
+      this.areSkillsAvailable = this.isIRPFlagEnabled && !!preferences?.isIRPEnabled;
+    }
   }
 }
