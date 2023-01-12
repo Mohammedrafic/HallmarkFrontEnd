@@ -423,7 +423,14 @@ export class SendGroupEmailComponent
   }
   private onBusinessesValueChanged(): void {
     this.businessesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {      
-      this.getCandidates();
+      this.clearFields();
+      if(this.isAgencyCandidatesType)
+        this.getCandidates();
+      else {
+        let businessUnitIds = value;
+        this.dispatchUserPage(businessUnitIds);
+        this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {});
+      }
     });
   }
 
@@ -547,6 +554,8 @@ export class SendGroupEmailComponent
       } else if (businessUnit == 4) {
         if (value == 1) {
           this.isAgencyUserType = true;
+          let businessUnitIds = this.businessesControl.value;
+          this.dispatchUserPage(businessUnitIds);
           this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
             if (data != undefined) {
               this.userData = data.items;
