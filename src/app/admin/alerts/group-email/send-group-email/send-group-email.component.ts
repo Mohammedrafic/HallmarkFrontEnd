@@ -175,6 +175,7 @@ export class SendGroupEmailComponent
   public isAgencyUserType: boolean = false;
   public isAgencyCandidatesType: boolean = false;
   public isBusinessUnitTypeAgency: boolean = false;
+  public isOrgUser: boolean = false;
 
   constructor(private actions$: Actions, private store: Store, private fb: FormBuilder) {
     super();
@@ -283,10 +284,22 @@ export class SendGroupEmailComponent
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
       // this.isBusinessFormDisabled && this.groupEmailTemplateForm.disable();
     }
+    this.isOrgUser = false;
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
+    } else if (user?.businessUnitType === BusinessUnitType.Organization) {
+      this.isOrgUser = true;
+      this.businessUnits = [
+        { id: BusinessUnitType.Agency, text: 'Agency' },
+        { id: BusinessUnitType.Organization, text: 'Organization' },
+      ];
+    } else if (user?.businessUnitType === BusinessUnitType.Agency) {
+      this.businessUnits = [
+        { id: BusinessUnitType.Agency, text: 'Agency' }
+      ];
     }
+
     this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
 
     this.actions$.pipe(takeWhile(() => this.isAlive));
@@ -399,6 +412,9 @@ export class SendGroupEmailComponent
         if (value == 4) {
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == true);
           this.isBusinessUnitTypeAgency = true;
+          if (this.isOrgUser) {
+             this.filteredUserType.splice(1, 1);
+          }
         }
         if (value == 1) {
           this.dispatchUserPage([]);
