@@ -139,10 +139,9 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
   private showRevokeMessageForEditOrder(order: CreateOrderDto): void {
     const isExternalLogicInclude = this.irpStateService.getIncludedExternalLogic(order);
-
     if(!isExternalLogicInclude && !this.selectedOrder.canRevoke) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_REVOKED));
-    } else if(!isExternalLogicInclude && this.selectedOrder.canRevoke && !this.selectedOrder.canProceedRevoke) {
+    } else if(!isExternalLogicInclude && !this.selectedOrder.canProceedRevoke) {
       this.confirmService
         .confirm(CONFIRM_REVOKE_ORDER, {
           title: 'Confirm',
@@ -152,12 +151,18 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
         filter(Boolean),
         takeUntil(this.componentDestroy())
       ).subscribe(() => {
-        this.store.dispatch(new EditIrpOrder({
-          ...order,
-          id: this.selectedOrder.id,
-          deleteDocumentsGuids: this.irpStateService.getDeletedDocuments(),
-        },this.irpStateService.getDocuments()));
+        this.saveEditedOrder(order);
       });
+    } else {
+      this.saveEditedOrder(order);
     }
+  }
+
+  private saveEditedOrder(order: CreateOrderDto): void {
+    this.store.dispatch(new EditIrpOrder({
+      ...order,
+      id: this.selectedOrder.id,
+      deleteDocumentsGuids: this.irpStateService.getDeletedDocuments(),
+    },this.irpStateService.getDocuments()));
   }
 }

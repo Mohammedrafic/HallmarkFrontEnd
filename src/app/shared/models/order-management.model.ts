@@ -96,12 +96,20 @@ export interface IRPOrderManagement {
   children: OrderManagementChild[];
 }
 
+export interface IRPCandidateForPosition {
+  system: string;
+  rowsSource: IRPOrderPosition[]
+}
+
 export interface IRPOrderPosition {
   orderId: number;
   organizationId: number;
-  candidateStatus: number;
+  candidateStatus: number | string;
+  orderPublicId: number | string;
+  orderStatus: number | string;
   employeeId: number;
   firstName: string;
+  businessUnitName: string;
   middleName: string;
   lastName: string;
   primarySkillId: number;
@@ -114,6 +122,13 @@ export interface IRPOrderPosition {
   nextShiftScheduledEndTime: string;
   scheduledWeeklyHours: number;
   overtime: number;
+  system: number | string;
+  positionId: string;
+  organizationPrefix: string;
+  publicId: number;
+  billRate?: number | string | null;
+  actualStartDate?: Date | string | null;
+  actualEndDate?: Date | string | null;
 }
 
 export interface IRPOrderPositionDisplay {
@@ -139,7 +154,7 @@ export interface IRPOrderPositionDisplay {
 
 export interface IRPOrderPositionMain {
   orderId: number;
-  irpOrderPositionsMainInfoDto: IRPOrderPosition[];
+  candidates: IRPOrderPosition[];
 }
 
 export class OrderManagementFilter {
@@ -195,9 +210,11 @@ export type AgencyOrderManagement = {
   candidates?: CandidateModel[];
 };
 
-export type OrderManagementChild = {
+export interface OrderManagementChild  {
+  organizationPrefix: string;
   actualEndDate?: string;
   actualStartDate?: string;
+  system: string | number;
   orderId: number;
   orderPublicId?: number;
   candidateBillRate: number;

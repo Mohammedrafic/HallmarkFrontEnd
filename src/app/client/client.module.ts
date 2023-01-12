@@ -111,6 +111,9 @@ import { OrganizationCandidatesModule } from '@client/candidates/organization-ca
 import {
   OrderManagementIrpRowPositionModule,
 } from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.module';
+import {
+  OrderManagementSubrowCandidatePositionModule
+} from '@shared/components/order-management-subrow-candidate-position/order-management-subrow-candidate-position.module';
 
 const gridIcons = {
   MessageSquare,
@@ -213,6 +216,7 @@ const gridIcons = {
     SwitchEditorModule,
     BoolValuePipeModule,
     OrganizationCandidatesModule,
+    OrderManagementSubrowCandidatePositionModule,
   ],
   providers: [
     ResizeService,

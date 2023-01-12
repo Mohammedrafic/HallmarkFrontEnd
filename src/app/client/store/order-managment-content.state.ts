@@ -797,7 +797,7 @@ export class OrderManagementContentState {
     return this.orderManagementService.editIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
           new SaveIrpOrderSucceeded(),
         ]);
         if (documents.length) {

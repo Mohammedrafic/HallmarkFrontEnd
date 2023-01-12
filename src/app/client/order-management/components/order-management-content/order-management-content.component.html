@@ -521,17 +521,30 @@
         </div>
 
         <ng-template #defaultSubRow>
-          <app-grid-subrow-candidate
-            *ngFor="let child of data.children; index as i"
-            [candidat]="child"
-            [order]="data"
-            [selected]="
+          <ng-container *ngIf="data.isPushedFromIRP && isIRPFlagEnabled; else vmsSubRow">
+            <app-order-management-subrow-candidate-position
+              *ngFor="let child of data.children; index as i; trackBy:trackById"
+              [candidatePosition]="child"
+              [selected]="
               selectedCandidate?.selected?.order === data.id &&
               selectedCandidate?.selected.positionId === child.positionId
             "
-            [isAgency]="true"
-            (clickEvent)="onOpenCandidateDialog($event, data, i)"
-          ></app-grid-subrow-candidate>
+            ></app-order-management-subrow-candidate-position>
+          </ng-container>
+
+          <ng-template #vmsSubRow>
+            <app-grid-subrow-candidate
+              *ngFor="let child of data.children; index as i"
+              [candidat]="child"
+              [order]="data"
+              [selected]="
+              selectedCandidate?.selected?.order === data.id &&
+              selectedCandidate?.selected.positionId === child.positionId
+            "
+              [isAgency]="true"
+              (clickEvent)="onOpenCandidateDialog($event, data, i)"
+            ></app-grid-subrow-candidate>
+          </ng-template>
         </ng-template>
       </ng-template>
     </ejs-grid>

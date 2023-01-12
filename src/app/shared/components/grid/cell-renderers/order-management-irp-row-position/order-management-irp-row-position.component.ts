@@ -1,19 +1,26 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 
-import { takeUntil } from 'rxjs';
+import { map, takeUntil } from 'rxjs';
 import { take } from 'rxjs/operators';
-
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
+
 import { TakeUntilDestroy } from '@core/decorators';
 import { Destroyable } from '@core/helpers';
-import { IRPOrderPositionDisplay, IRPOrderPositionMain } from '@shared/models/order-management.model';
+import {
+  IRPCandidateForPosition,
+  IRPOrderPosition,
+  IRPOrderPositionDisplay,
+  IRPOrderPositionMain,
+} from '@shared/models/order-management.model';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 import {
-  OrderManagementIrpRowPositionAdapter,
-} from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.adapter';
-import { OrderManagementIRPSubGridCells } from '@client/order-management/constants';
+  OrderManagementSubGridCells,
+} from '@client/order-management/constants';
 import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
+import {
+  OrderManagementIrpRowCandidatesAdapter,
+} from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.adapter';
 
 @TakeUntilDestroy
 @Component({
@@ -24,8 +31,9 @@ import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.const
 })
 export class OrderManagementIrpRowPositionComponent extends Destroyable implements ICellRendererAngularComp {
   public params: ICellRendererParams;
-  public displayRows: IRPOrderPositionDisplay[] | any[] = [];
-  public colDefs: ColDef[] = OrderManagementIRPSubGridCells;
+  //todo: remove any[]
+  public displayRows: IRPCandidateForPosition[] | any[] = [];
+  public colDefs: Record<string, ColDef[]> = OrderManagementSubGridCells;
   public emptyMessage = GRID_EMPTY_MESSAGE;
 
   constructor(
@@ -40,9 +48,10 @@ export class OrderManagementIrpRowPositionComponent extends Destroyable implemen
 
     this.orderManagementIrpApiService.getOrderPositions([params.data.id]).pipe(
       take(1),
+      map((position: IRPOrderPositionMain[]) => OrderManagementIrpRowCandidatesAdapter.prepareTableData(position)),
       takeUntil(this.componentDestroy()),
-    ).subscribe((positions: IRPOrderPositionMain[]) => {
-      this.displayRows = OrderManagementIrpRowPositionAdapter.prepareTableData(positions[0].irpOrderPositionsMainInfoDto);
+    ).subscribe((candidatePositions: IRPCandidateForPosition[]) => {
+      this.displayRows = candidatePositions;
       this.cdr.detectChanges();
     });
   }
@@ -55,5 +64,17 @@ export class OrderManagementIrpRowPositionComponent extends Destroyable implemen
 
   public refresh(): boolean {
     return true;
+  }
+
+  public trackBySystem(index: number, config: IRPCandidateForPosition): string {
+    return config.system;
+  }
+
+  public trackById(index: number, config: IRPOrderPosition): string {
+    return config.positionId;
+  }
+
+  public trackByField(index: number, config: ColDef): string {
+    return config.field as string;
   }
 }

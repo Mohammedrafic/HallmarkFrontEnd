@@ -345,7 +345,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private gridApi: GridApi;
   private SelectedStatus: string[] = [];
   private eliteOrderId:number;
-  
+
 
     constructor(
     protected override store: Store,
@@ -438,7 +438,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
-  
+
   private subscribeOnChanges(): void {
     this.cd$.pipe(debounceTime(300), takeUntil(this.unsubscribe$)).subscribe(() => {
       this.cd.detectChanges();
@@ -1612,6 +1612,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     const statuses = [this.orderStatus.Open, this.orderStatus.InProgress, this.orderStatus.Filled];
 
     return !statuses.includes(status);
+  }
+
+  public trackById(index: number, field: OrderManagementChild): number {
+    return field.orderId;
   }
 
   public updateGrid(): void {
