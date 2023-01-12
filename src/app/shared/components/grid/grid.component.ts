@@ -100,8 +100,10 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   public readonly modules: Module[] = [ClientSideRowModelModule];
   public readonly gridEmptyMessage = GRID_EMPTY_MESSAGE;
   public selectedTableRows: RowNode[] = [];
+  public height = '75vh';
 
   private readonly isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private isMobile: boolean;
 
   private readonly gridInstance$: BehaviorSubject<GridReadyEventModel | null> =
     new BehaviorSubject<GridReadyEventModel | null>(null);
@@ -117,11 +119,15 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
 
   public ngOnChanges(changes: SimpleChanges): void {
     changes['isLoading'] && this.isLoading$.next(!!this.isLoading);
+    if (this.isMobile) {
+      this.setMobileGridHeight();
+    }
   }
 
   public ngOnInit(): void {
     this.initLoadingStateChangesListener();
     this.adjustColumnWidth();
+    this.watchForMobile();
   }
 
   public handleGridReadyEvent(event: GridReadyEventModel): void {
@@ -179,5 +185,23 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
           }
         });
     }
+  }
+
+  private setMobileGridHeight() {
+    if (this.rowData && this.rowData.length) {
+      const gridHeaderHeight = 55;
+      const gridFooterHeight = 120;
+      this.height =
+        this.gridConfig.initialRowHeight * this.rowData.length + (gridHeaderHeight + gridFooterHeight) + 'px';
+    }
+  }
+
+  private watchForMobile(): void {
+    this.breakpointObserver
+      .getBreakpointMediaRanges()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((breackpoints) => {
+        this.isMobile = breackpoints.isMobile;
+      });
   }
 }

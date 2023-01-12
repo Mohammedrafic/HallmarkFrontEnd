@@ -7,6 +7,10 @@ $gap: 12px;
   display: flex;
   justify-content: space-between;
 
+  @media #{$max-desktop-small} {
+    flex-direction: column;
+  }
+
   .left-content {
     max-width: 50%;
     display: flex;
@@ -22,7 +26,21 @@ $gap: 12px;
     justify-content: flex-end;
     flex-grow: 1;
 
-    & > *:not(:first-child) {
+    @media #{$max-mobile} {
+      flex-direction: column;
+      .buttons-group {
+        align-items: flex-start;
+        margin-left: 0;
+      }
+    }
+
+    @media #{$max-desktop-small} {
+      justify-content: flex-start;
+      margin-top: 21px;
+      width: 100%;
+    }
+
+    & > *:not(:first-child, .buttons-group) {
       margin-left: $gap;
     }
   }
