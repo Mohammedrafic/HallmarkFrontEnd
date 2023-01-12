@@ -76,14 +76,13 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     this.onBusinessUnitValueChanged();
     this.businessUnitControl.patchValue(user?.businessUnitType);
 
-    if (user?.businessUnitType !== BusinessUnitType.Hallmark) {
+    if (user?.businessUnitType !== BusinessUnitType.Hallmark && user?.businessUnitType !== BusinessUnitType.MSP) {
       this.isBusinessDisabledForNewRole = true;
       this.businessForm.disable();
     }
 
     if (user?.businessUnitType === BusinessUnitType.MSP) {
-      const [Hallmark, ...rest] = this.businessUnits;
-      this.businessUnits = rest;
+      this.businessUnits = this.businessUnits.filter((item) => item.id !== BusinessUnitType.Hallmark);
     }
 
     this.actions$

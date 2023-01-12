@@ -12,23 +12,23 @@
         <div class="e-card-header">
           <div class="e-card-header-caption">
             <h3 class="e-card-title">
-              {{ isReOrder && !order?.irpOrderMetadata  ? 'Re-Order' : 'Order' }} ID 
+              {{ (isReOrder && activeSystem !==  systemType.IRP) ? 'Re-Order' : 'Order' }} ID 
               {{ order?.organizationPrefix }}-{{ order?.publicId }}
             </h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList>
                 <e-chips>
-                  <e-chip [text]="order?.statusText"></e-chip>
+                  <e-chip [text]="activeSystem !==  systemType.IRP  ? order?.statusText : order?.irpOrderMetadata?.statusText"></e-chip>
                   <e-chip *ngIf="order?.extensionFromId" text="E" cssClass="e-warning ex-chip"></e-chip>
                 </e-chips>
               </ejs-chiplist>
               <div class="vertical-divider"></div>
               <div *ngIf="order" class="order-other-statuses">
-                <span class="custom-chip" *ngIf="!isReOrder">{{ order.orderType | orderTypeName: !!order.irpOrderMetadata }}</span>
+                <span class="custom-chip" *ngIf="!isReOrder">{{ order.orderType | orderTypeName: activeSystem ===  systemType.IRP }}</span>
                 <span *ngIf="orderType.ReOrder !== order?.orderType" class="custom-chip">
                   {{ order.isLocked ? 'Locked' : 'Unlocked' }}</span
                 >
-                <span class="custom-chip" *ngIf="order.irpOrderMetadata">IRP</span>
+                <span class="custom-chip" *ngIf="activeSystem ===  systemType.IRP">IRP</span>
               </div>
             </div>
           </div>
@@ -150,18 +150,23 @@
         </div>
       </section>
       <div class="order-tabs">
-        <ejs-tab #tab *ngIf="orderStatus.Incomplete !== order?.status" (selecting)="onTabSelecting($event)">
+        <ejs-tab #tab *ngIf="activeSystem !==  systemType.IRP ? orderStatus.Incomplete !== order?.status
+          : orderStatus.Incomplete !== order?.irpOrderMetadata?.status" 
+        (selecting)="onTabSelecting($event)">
           <e-tabitems>
             <e-tabitem>
-              <ng-template #headerText>{{ isReOrder && !order?.irpOrderMetadata ? 'Re-Order' : 'Order' }} Details</ng-template>
+              <ng-template #headerText>{{ isReOrder && activeSystem !==  systemType.IRP ? 'Re-Order' : 'Order' }} Details</ng-template>
               <ng-template #content>
-                <app-order-details-container *ngIf="sideDialog.visible" [currentOrder]="order"></app-order-details-container>
+                <app-order-details-container *ngIf="sideDialog.visible" [currentOrder]="order"
+                  [activeSystem]="activeSystem"></app-order-details-container>
               </ng-template>
             </e-tabitem>
             <e-tabitem>
               <ng-template #headerText>
                 {{ order?.extensionFromId ? 'Candidate' : 'Candidates' }}
-                <span class="e-badge e-badge-success e-badge-pill">{{ orderCandidatesLength$ | async }}</span>
+                <span class="e-badge e-badge-success e-badge-pill">{{
+                  activeSystem ===  systemType.IRP? (irpCandidatesCount$ | async) : (orderCandidatesLength$ | async)
+                }}</span>
               </ng-template>
               <ng-template #content>
                 <app-extension-candidate
@@ -172,7 +177,7 @@
                 >
                 </app-extension-candidate>
                 <ng-template #candidateOrder>
-                  <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
+                  <app-order-candidates-container [currentOrder]="order" [activeSystem]="activeSystem"></app-order-candidates-container>
                 </ng-template>
               </ng-template>
             </e-tabitem>
@@ -186,6 +191,7 @@
                   (selectReOrder)="selectReOrder.emit($event)"
                   (editReorder)="editNestedReOrder($event)"
                   [currentOrder]="order"
+                  [activeSystem]="activeSystem"
                 >
                 </app-order-reorders-container>
               </ng-template>
@@ -208,12 +214,14 @@
             </e-tabitem>
           </e-tabitems>
         </ejs-tab>
-        <ejs-tab #tab *ngIf="orderStatus.Incomplete === order?.status" (selecting)="onTabSelecting($event)">
+        <ejs-tab #tab *ngIf="activeSystem !==  systemType.IRP ? orderStatus.Incomplete === order?.status
+        : orderStatus.Incomplete === order?.irpOrderMetadata?.status"
+        (selecting)="onTabSelecting($event)">
           <e-tabitems>
             <e-tabitem>
               <ng-template #headerText>Order Details</ng-template>
               <ng-template #content>
-                <app-order-details-container [currentOrder]="order"></app-order-details-container>
+                <app-order-details-container [currentOrder]="order" [activeSystem]="activeSystem"></app-order-details-container>
               </ng-template>
             </e-tabitem>
           </e-tabitems>
@@ -236,7 +244,7 @@
   <ng-template #footerTemplate>
     <app-dialog-next-previous
       *ngIf="orderDialogOptions$ | async as options"
-      [title]="isReOrder ? 'Re-Order' : 'Order'"
+      [title]="isReOrder && activeSystem !==  systemType.IRP  ? 'Re-Order' : 'Order'"
       [options]="options"
       (nextEvent)="onNextPreviousOrder(true)"
       (previousEvent)="onNextPreviousOrder(false)"

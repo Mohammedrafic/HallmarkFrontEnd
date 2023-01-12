@@ -1,7 +1,7 @@
 import { PageOfCollections } from "@shared/models/page.model";
 
 export type RejectReason = {
-  id: number;
+  id?: number;
   reason: string;
   businessUnitId?: number;
 }
@@ -13,3 +13,18 @@ export type RejectReasonPayload = {
 }
 
 export type RejectReasonPage = PageOfCollections<RejectReason>;
+
+export interface UnavailabilityReasons {
+  id: string;
+  reason: string;
+  calculateTowardsWeeklyHours: boolean;
+  eligibleToBeScheduled: boolean;
+  visibleForIRPCandidates: boolean;
+  organizationId: number;
+  description: string;
+}
+
+export interface UnavailabilityPaging {
+  PageNumber: number;
+  PageSize: number;
+}

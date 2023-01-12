@@ -1,20 +1,22 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RejectReasonPage } from '@shared/models/reject-reason.model';
+
 import { ofActionSuccessful, Select } from '@ngxs/store';
-import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { Observable, takeWhile } from 'rxjs';
+
+import { ReasonsComponent } from '@organization-management/reasons/models/reasons-component.class';
 import {
   GetManualInvoiceRejectReasonsByPage,
   RemoveManualInvoiceRejectReason,
   SaveManualInvoiceRejectReasonError,
-  UpdateManualInvoiceRejectReasonSuccess
+  UpdateManualInvoiceRejectReasonSuccess,
 } from '@organization-management/store/reject-reason.actions';
-import { ReasonsComponent } from '@organization-management/reasons/models/reasons-component.class';
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
+import { RejectReasonPage } from '@shared/models/reject-reason.model';
 
 @Component({
   selector: 'app-manual-invoice-reject-reason',
+  styleUrls: ['./manual-invoice-reject-reason.component.scss'],
   templateUrl: './manual-invoice-reject-reason.component.html',
-  styleUrls: ['./manual-invoice-reject-reason.component.scss']
 })
 export class ManualInvoiceRejectReasonComponent extends ReasonsComponent implements OnInit, OnDestroy {
   @Select(RejectReasonState.manualInvoiceReasonsPage)

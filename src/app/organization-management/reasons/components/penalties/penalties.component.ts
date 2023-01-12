@@ -11,21 +11,23 @@ import { RejectReasonState } from "@organization-management/store/reject-reason.
 import { ReasonsComponent } from '@organization-management/reasons/models/reasons-component.class';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { GridOptions } from '@ag-grid-community/core';
-import { PenaltiesGridActionsRendererComponent } from './penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
+import { PenaltiesGridActionsRendererComponent,
+} from './penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
 import { Penalty, PenaltyPage } from '@shared/models/penalty.model';
-import { CancellationReasonsMap } from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
+import { CancellationReasonsMap,
+} from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 
 @Component({
   selector: 'app-penalties',
   templateUrl: './penalties.component.html',
-  styleUrls: ['./penalties.component.scss']
+  styleUrls: ['./penalties.component.scss'],
 })
 export class PenaltiesComponent extends ReasonsComponent implements OnInit, OnDestroy {
   @Select(RejectReasonState.penalties)
   public reasons$: Observable<PenaltyPage>;
 
   public gridOptions: GridOptions = {
-    onGridReady: (event) => event.api.sizeColumnsToFit()
+    onGridReady: (event) => event.api.sizeColumnsToFit(),
   };
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = [
@@ -34,7 +36,7 @@ export class PenaltiesComponent extends ReasonsComponent implements OnInit, OnDe
       headerName: '',
       cellRenderer: PenaltiesGridActionsRendererComponent,
       maxWidth: 140,
-      valueGetter: (params: { data: Penalty }) => { return params.data },
+      valueGetter: (params: { data: Penalty }) => { return params.data; },
       cellRendererParams: {
         onEdit: (data: Penalty) => {
           this.editReason.emit(data);
@@ -47,32 +49,34 @@ export class PenaltiesComponent extends ReasonsComponent implements OnInit, OnDe
     {
       field: 'reason',
       headerName: 'Reason',
-      valueGetter: (params: { data: Penalty }) => { return CancellationReasonsMap[params.data.reason] },
+      valueGetter: (params: { data: Penalty }) => { return CancellationReasonsMap[params.data.reason]; },
     },
     {
       field: 'regionName',
       headerName: 'Region',
-      valueGetter: (params: { data: Penalty }) => { return params.data.regionId === null ? 'All' : params.data.regionName },
+      valueGetter: (params: { data: Penalty }) => { return params.data.regionId === null ? 'All' : params.data.regionName; },
     },
     {
       field: 'locationName',
       headerName: 'Location',
-      valueGetter: (params: { data: Penalty }) => { return params.data.locationId === null ? 'All' : params.data.locationName },
+      valueGetter: (params: { data: Penalty }) => {
+        return params.data.locationId === null ? 'All' : params.data.locationName; },
     },
     {
       field: 'flatRate',
       headerName: 'Flat Rate',
-      valueGetter: (params: { data: Penalty }) => { return '$' + params.data.flatRate.toFixed(2) },
+      valueGetter: (params: { data: Penalty }) => { return '$' + params.data.flatRate.toFixed(2); },
     },
     {
       field: 'rateOfHours',
       headerName: 'Bill Rate Of X Hours',
-      valueGetter: (params: { data: Penalty }) => { return params.data.rateOfHours + 'hrs' },
+      valueGetter: (params: { data: Penalty }) => { return params.data.rateOfHours + 'hrs'; },
     },
     {
       field: 'flatRateOfHoursPercentage',
       headerName: '% Rate Of X Hours',
-      valueGetter: (params: { data: Penalty }) => { return `${params.data.flatRateOfHoursPercentage.toFixed(2)}% x ${params.data.flatRateOfHours}hrs` },
+      valueGetter: (params: { data: Penalty }) => {
+        return `${params.data.flatRateOfHoursPercentage.toFixed(2)}% x ${params.data.flatRateOfHours}hrs`; },
     },
   ];
 

@@ -1,11 +1,11 @@
 <section class="candidates-list">
   <div class="e-gridcustomheader">
     <div class="title">
-      <h3>{{ selectedOrder.irpOrderMetadata ? 'Candidates': 'Candidates List'}}</h3>
+      <h3>{{ system === systemType.IRP ? 'Candidates': 'Candidates List'}}</h3>
     </div>
   </div>
 
-  <ng-container *ngIf="!selectedOrder.irpOrderMetadata || !isFeatureIrpEnabled || isAgency; else irpCandiadtes">
+  <ng-container *ngIf="system === systemType.VMS || !isFeatureIrpEnabled || isAgency; else irpCandiadtes">
     <ejs-grid
     #orderCandidatesGrid
     id="users-grid"
@@ -25,7 +25,8 @@
       <e-column textAlign="Right" width="80">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <div ejs-button cssClass="e-flat primary-icon-button custom-button" [class.btn-icon__disabled]="order?.isClosed" (click)="onEdit(data, $event)">
+            <div ejs-button cssClass="e-flat primary-icon-button custom-button" [class.btn-icon__disabled]="order?.isClosed"
+            (click)="onEdit(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </div>
           </div>
@@ -83,7 +84,7 @@
       #orderCandidatesGrid
       id="users-grid"
       class="users-grid e-gridwithheader"
-      [dataSource]="irpCandidates.items  || []"
+      [dataSource]="irpCandidates?.items  || []"
       [allowSorting]="false"
       [allowResizing]="true"
       [allowSelection]="false"

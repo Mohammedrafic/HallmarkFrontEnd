@@ -1,4 +1,4 @@
-<ng-container *ngIf="!orderInformation.irpOrderMetadata; else irpOrderInfo">
+<ng-container *ngIf="system === systemType.VMS; else irpOrderInfo">
   <section class="candidates-info">
     <div class="container-row reorders">
       <div class="column">

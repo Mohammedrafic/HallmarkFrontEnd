@@ -62,6 +62,7 @@ import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { PermissionService } from '../../../../security/services/permission.service';
 import { UserState } from '../../../../store/user.state';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -75,6 +76,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() children: OrderManagementChild[] | undefined;
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   @Input() hasCreateEditOrderPermission: boolean;
+  @Input() activeSystem: OrderManagementIRPSystemId;
 
   @Output() nextPreviousOrderEvent = new EventEmitter<{ next: boolean, isIrpOrder: boolean}>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
@@ -105,6 +107,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(OrderManagementContentState.orderCandidatesLength)
   public orderCandidatesLength$: Observable<number>;
 
+  @Select(OrderManagementContentState.getIrpCandidatesCount)
+  public irpCandidatesCount$: Observable<number>;
+
   @Select(UserState.currentUserPermissions)
   public currentUserPermissions$: Observable<any[]>;
 
@@ -122,6 +127,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public reOrderDialogTitle$ = this.addEditReorderService.reOrderDialogTitle$;
   public canCreateOrder: boolean;
   public canCloseOrderPermission: boolean;
+  public readonly systemType = OrderManagementIRPSystemId;
 
   public disabledCloseButton = true;
   public showCloseButton = false;
@@ -237,9 +243,11 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       const order = changes['order']?.currentValue;
       const hasStatus = this.openInProgressFilledStatuses.includes(order.statusText.toLowerCase());
       this.showCloseButton = hasStatus || (!hasStatus && (order?.orderClosureReasonId || order?.orderCloseDate));
+
       if (this.chipList) {
-        this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
-        this.chipList.text = changes['order'].currentValue.statusText.toUpperCase();
+        const status = this.order.irpOrderMetadata ? this.order.irpOrderMetadata.statusText : this.order.statusText;
+        this.chipList.cssClass = this.chipsCssClass.transform(status);
+        this.chipList.text = status.toUpperCase();
       }
     }
   }

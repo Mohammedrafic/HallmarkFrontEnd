@@ -9,6 +9,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { Observable } from 'rxjs';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-general-reorder-info',
@@ -17,12 +18,16 @@ import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organizati
 })
 export class GeneralReorderInfoComponent extends DestroyableDirective implements OnChanges {
   @Input() public orderInformation: Order;
+
+  @Input() system: OrderManagementIRPSystemId;
+  
   @Select(AppState.isOrganizationAgencyArea)
   public isOrganizationOrAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
 
   public orderType = OrderType;
   public agencies: { name: string; tooltip: string };
   public orderPerDiemId: number;
+  public readonly systemType = OrderManagementIRPSystemId;
 
   constructor(
     private store: Store,

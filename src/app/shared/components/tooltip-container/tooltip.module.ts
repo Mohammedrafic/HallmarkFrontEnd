@@ -9,6 +9,6 @@ import { TooltipModule } from "@syncfusion/ej2-angular-popups";
   imports: [
     CommonModule,
     TooltipModule,
-  ]
+  ],
 })
 export class TooltipContainerModule { }

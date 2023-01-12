@@ -81,9 +81,9 @@ export class CredentialsService {
   public getAllCredentials(includeInIRP: boolean): Observable<Credential[]> {
     if (includeInIRP) {
       return this.http.get<Credential[]>(`/api/MasterCredentials/allCreds`, { params: { includeInIRP } });
+    } else {
+      return this.http.get<Credential[]>(`/api/MasterCredentials/allCreds`, { params: { includeInVMS: !includeInIRP} });
     }
-
-    return this.http.get<Credential[]>(`/api/MasterCredentials/allCreds`);
   }
 
   public exportCredentialTypes(payload: ExportPayload): Observable<any> {

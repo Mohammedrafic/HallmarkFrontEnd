@@ -77,3 +77,12 @@
     top: 20px;
   }
 }
+
+
+::ng-deep {
+  .e-input.reason-textbox {
+    .e-input-group.e-control-wrapper.e-multi-line-input {
+      height: 103px;
+    }
+  }
+}

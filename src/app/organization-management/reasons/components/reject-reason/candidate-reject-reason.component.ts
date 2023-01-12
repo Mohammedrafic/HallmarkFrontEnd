@@ -5,7 +5,7 @@ import {
   GetRejectReasonsByPage,
   RemoveRejectReasons,
   SaveRejectReasonsError,
-  UpdateRejectReasonsSuccess
+  UpdateRejectReasonsSuccess,
 } from "@organization-management/store/reject-reason.actions";
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { RejectReasonPage } from "@shared/models/reject-reason.model";
@@ -16,7 +16,7 @@ import { Permission } from "@core/interface";
 @Component({
   selector: 'app-candidate-reject-reason',
   templateUrl: './candidate-reject-reason.component.html',
-  styleUrls: ['./candidate-reject-reason.component.scss']
+  styleUrls: ['./candidate-reject-reason.component.scss'],
 })
 export class CandidateRejectReasonComponent extends ReasonsComponent implements OnInit,OnDestroy {
   @Input() userPermission: Permission;
@@ -43,7 +43,7 @@ export class CandidateRejectReasonComponent extends ReasonsComponent implements 
   protected subscribeOnUpdateReasonSuccess(): void {
     this.actions$.pipe(
       ofActionSuccessful(UpdateRejectReasonsSuccess),
-      takeWhile(() => this.isAlive)
+      takeWhile(() => this.isAlive),
     ).subscribe(() => this.getData());
   }
 }

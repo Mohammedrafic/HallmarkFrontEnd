@@ -1,6 +1,9 @@
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { Injectable } from "@angular/core";
 import { RejectReasonService } from "@shared/services/reject-reason.service";
+/**
+ * TODO: use es6 modules.
+ */
 import {
   GetClosureReasonsByPage, GetManualInvoiceRejectReasonsByPage,
   GetRejectReasonsByPage,
@@ -10,10 +13,13 @@ import {
   SaveClosureReasonsError, CreateManualInvoiceRejectReason, SaveManualInvoiceRejectReasonError,
   SaveRejectReasons, SaveRejectReasonsError, SaveRejectReasonsSuccess,
   UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReason, UpdateManualInvoiceRejectReasonSuccess,
-  UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess, GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty, SavePenaltySuccess, SavePenaltyError, RemovePenalty, ShowOverridePenaltyDialog
+  UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess,
+  GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty,
+  SavePenaltySuccess, SavePenaltyError, RemovePenalty, ShowOverridePenaltyDialog, GetUnavailabilityReasons,
+  SaveUnavailabilityReason, RemoveUnavailabilityReason,
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
-import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
+import { RejectReason, RejectReasonPage, UnavailabilityReasons } from "@shared/models/reject-reason.model";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ShowToast } from "../../store/app.actions";
 import { MessageTypes } from "@shared/enums/message-types";
@@ -21,6 +27,7 @@ import { getAllErrors } from "@shared/utils/error.utils";
 import { RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from "@shared/constants";
 import { Penalty, PenaltyPage } from "@shared/models/penalty.model";
 import { sortByField } from "@shared/helpers/sort-by-field.helper";
+import { PageOfCollections } from '@shared/models/page.model';
 
 export interface RejectReasonStateModel {
   rejectReasonsPage: RejectReasonPage | null;
@@ -28,7 +35,8 @@ export interface RejectReasonStateModel {
   manualInvoicesReasonsPage: RejectReasonPage | null;
   orderRequisition: RejectReasonPage | null;
   penalties: PenaltyPage | null;
-  isReasonLoading: boolean
+  isReasonLoading: boolean;
+  unavailabilityReasons: PageOfCollections<UnavailabilityReasons> | null;
 }
 
 @State<RejectReasonStateModel>({
@@ -40,7 +48,8 @@ export interface RejectReasonStateModel {
     orderRequisition: null,
     penalties: null,
     isReasonLoading: false,
-  }
+    unavailabilityReasons: null,
+  },
 })
 @Injectable()
 export class RejectReasonState {
@@ -74,6 +83,11 @@ export class RejectReasonState {
   @Selector()
   static penalties(state: RejectReasonStateModel): PenaltyPage | null {
     return state.penalties;
+  }
+
+  @Selector()
+  static getUnavailabilityReasons(state: RejectReasonStateModel): PageOfCollections<UnavailabilityReasons> | null {
+    return state.unavailabilityReasons;
   }
 
   constructor(private rejectReasonService:RejectReasonService) {}
@@ -204,7 +218,7 @@ export class RejectReasonState {
     return this.rejectReasonService.updateManualInvoiceReason(payload).pipe(
       tap(() => dispatch([
           new UpdateManualInvoiceRejectReasonSuccess(),
-          new ShowToast(MessageTypes.Success, RECORD_MODIFIED)
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
         ])
       ),
       catchError((error: HttpErrorResponse) => {
@@ -222,7 +236,7 @@ export class RejectReasonState {
     return this.rejectReasonService.removeManualInvoiceReason(id).pipe(
       tap(() => dispatch([
           new UpdateManualInvoiceRejectReasonSuccess(),
-          new ShowToast(MessageTypes.Success, RECORD_DELETE)
+          new ShowToast(MessageTypes.Success, RECORD_DELETE),
         ])
       )
     );
@@ -256,7 +270,7 @@ export class RejectReasonState {
       tap((payload) => {
         dispatch([
           new ShowToast(MessageTypes.Success, RECORD_ADDED),
-          new UpdateManualInvoiceRejectReasonSuccess()
+          new UpdateManualInvoiceRejectReasonSuccess(),
         ]);
 
         return payload;
@@ -291,7 +305,8 @@ export class RejectReasonState {
   ): Observable<RejectReasonPage> {
     patchState({ isReasonLoading: true });
 
-    return this.rejectReasonService.getOrderRequisitionsByPage(pageNumber, pageSize, orderBy, lastSelectedBusinessUnitId).pipe(
+    return this.rejectReasonService.getOrderRequisitionsByPage(pageNumber, pageSize, orderBy, lastSelectedBusinessUnitId)
+    .pipe(
       tap((payload) => {
         patchState({orderRequisition: payload});
         return payload;
@@ -367,6 +382,56 @@ export class RejectReasonState {
         dispatch(new SavePenaltySuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
       })
+    );
+  }
+
+  @Action(GetUnavailabilityReasons)
+  GetUnavailabilityReasons(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    { page, pageSize}: GetUnavailabilityReasons,
+  ): Observable<PageOfCollections<UnavailabilityReasons>> {
+    return this.rejectReasonService.getUnavailabilityReasons({
+      PageNumber: page,
+      PageSize: pageSize,
+    })
+    .pipe(
+      tap((response) => {
+        patchState({
+          unavailabilityReasons: response,
+        });
+      }),
+    );
+  }
+
+  @Action(SaveUnavailabilityReason)
+  SaveUnavailabilityReson(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { payload }: SaveUnavailabilityReason,
+  ): Observable<void> {
+    return this.rejectReasonService.saveUnavailabilityReason(payload)
+    .pipe(
+      tap(() => {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      }),
+    );
+  }
+
+  @Action(RemoveUnavailabilityReason)
+  DeleteUnavailabilityReason(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { id }: RemoveUnavailabilityReason,
+  ): Observable<void> {
+    return this.rejectReasonService.removeUnavailabilityReason(id)
+    .pipe(
+      tap(() => {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      }),
     );
   }
 }

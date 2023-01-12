@@ -6,6 +6,7 @@ import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 import { IrpOrderCandidate, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { PageOfCollections } from '@shared/models/page.model';
@@ -32,6 +33,8 @@ enum ReorderCandidateStatuses {
 export class ReorderCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit {
   @Input() selectedOrder: Order;
 
+  @Input() system: OrderManagementIRPSystemId;
+
   public candidate: OrderCandidatesList;
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidateStatuses = ReorderCandidateStatuses;
@@ -39,7 +42,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   public agencyActionsAllowed: boolean;
   public isFeatureIrpEnabled = false;
   public readonly cancelledStatusName = ReorderCandidateStatuses[ReorderCandidateStatuses.Cancelled];
-  public irpCandidates: PageOfCollections<IrpOrderCandidate>;
+  public readonly systemType = OrderManagementIRPSystemId;
 
   private selectedIndex: number;
 

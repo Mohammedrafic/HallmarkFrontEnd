@@ -3,23 +3,27 @@ import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
 import {
   PurchaseOrderTableColumns, PurchaseOrderHeaderText,
   SpecialProjectTableColumns, SpecialProjectHeaderText,
-  SpecilaProjectCategoryTableColumns, SpecilaProjectCategoryHeaderText, SpecilaProjectMappingTableColumns, SpecilaProjectMappingHeaderText, PurchaseOrderMappingTableColumns, PurchaseOrderMappingHeaderText
+  SpecilaProjectCategoryTableColumns, SpecilaProjectCategoryHeaderText,
+  SpecilaProjectMappingTableColumns, SpecilaProjectMappingHeaderText,
+  PurchaseOrderMappingTableColumns, PurchaseOrderMappingHeaderText,
 } from '../enums/specialproject.enum';
-import { ActionCellRendererComponent } from '../../../shared/components/cell-renderer/action-cellrenderer.component';
+
 import { DatePipe } from '@angular/common';
+import { ActionCellRendererComponent } from '@shared/components/cell-renderers/actions-cell/action-cellrenderer.component';
 
 const commonColumn: ColDef = {
   sortable: true,
   resizable: true,
   filter: true,
-}
+};
 
-export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererParams, datePipe?: DatePipe): ColumnDefinitionModel[] => {
+export const PurchaseOrdderColumnsDefinition = (
+  actionCellParams: ICellRendererParams, datePipe?: DatePipe): ColumnDefinitionModel[] => {
   return [
     {
       field: PurchaseOrderTableColumns.Id,
       headerName: PurchaseOrderHeaderText.Id,
-      hide: true
+      hide: true,
     },
     {
       field: PurchaseOrderTableColumns.POName,
@@ -27,8 +31,8 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
       ...commonColumn,
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: PurchaseOrderTableColumns.PONumber,
@@ -36,8 +40,8 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
       ...commonColumn,
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: PurchaseOrderTableColumns.ProjectBudget,
@@ -46,14 +50,14 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
       ...commonColumn,
       filter: 'agNumberColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: PurchaseOrderTableColumns.StartDate,
       headerName: PurchaseOrderHeaderText.StartDate,
       cellRenderer: (params: ICellRendererParams) => {
-        const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
+        const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string;
         return str?.length > 0 ? str : "";
       },
       ...commonColumn,
@@ -64,7 +68,7 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
           if (cellValue == null) {
             return 0;
           }
-          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string;
           const dateParts = dateAsString.split('/');
           const year = Number(dateParts[2]);
           const month = Number(dateParts[0]) - 1;
@@ -78,14 +82,14 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
           }
           return 0;
         },
-        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
-      }
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY',
+      },
     },
     {
       field: PurchaseOrderTableColumns.EndDate,
       headerName: PurchaseOrderHeaderText.EndDate,
       cellRenderer: (params: ICellRendererParams) => {
-        const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
+        const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string;
         return str?.length > 0 ? str : "";
       },
       ...commonColumn,
@@ -96,7 +100,7 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
           if (cellValue == null) {
             return 0;
           }
-          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string;
           const dateParts = dateAsString.split('/');
           const year = Number(dateParts[2]);
           const month = Number(dateParts[0]) - 1;
@@ -110,15 +114,15 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
           }
           return 0;
         },
-        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
-      }
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY',
+      },
     },
     {
       field: '',
       headerName: 'Action',
       cellRenderer: ActionCellRendererComponent,
-      cellRendererParams: actionCellParams
-    }
+      cellRendererParams: actionCellParams,
+    },
   ];
 };
 
@@ -127,7 +131,7 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
     {
       field: SpecialProjectTableColumns.Id,
       headerName: SpecialProjectHeaderText.Id,
-      hide: true
+      hide: true,
     },
     {
       field: SpecialProjectTableColumns.ProjectTypeName,
@@ -135,8 +139,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       ...commonColumn,
       filter: 'agSetColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: SpecialProjectTableColumns.Name,
@@ -144,8 +148,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       ...commonColumn,
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: SpecialProjectTableColumns.ProjectBudget,
@@ -154,14 +158,14 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       ...commonColumn,
       filter: 'agNumberColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: SpecialProjectTableColumns.StartDate,
       headerName: SpecialProjectHeaderText.StartDate,
       cellRenderer: (params: ICellRendererParams) => {
-        const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
+        const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string;
         return str?.length > 0 ? str : "";
       },
       ...commonColumn,
@@ -172,7 +176,7 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
           if (cellValue == null) {
             return 0;
           }
-          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string;
           const dateParts = dateAsString.split('/');
           const year = Number(dateParts[2]);
           const month = Number(dateParts[0]) - 1;
@@ -186,14 +190,14 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
           }
           return 0;
         },
-        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
-      }
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY',
+      },
     },
     {
       field: SpecialProjectTableColumns.EndDate,
       headerName: SpecialProjectHeaderText.EndDate,
       cellRenderer: (params: ICellRendererParams) => {
-        const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
+        const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string;
         return str?.length > 0 ? str : "";
       },
       ...commonColumn,
@@ -204,7 +208,7 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
           if (cellValue == null) {
             return 0;
           }
-          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string;
           const dateParts = dateAsString.split('/');
           const year = Number(dateParts[2]);
           const month = Number(dateParts[0]) - 1;
@@ -218,15 +222,15 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
           }
           return 0;
         },
-        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY',
       },
     },
     {
       field: '',
       headerName: 'Action',
       cellRenderer: ActionCellRendererComponent,
-      cellRendererParams: actionCellParams
-    }
+      cellRendererParams: actionCellParams,
+    },
   ];
 };
 
@@ -235,7 +239,7 @@ export const SpecialProjectCategoryColumnsDefinition = (actionCellParams: ICellR
     {
       field: SpecilaProjectCategoryTableColumns.Id,
       headerName: SpecilaProjectCategoryHeaderText.Id,
-      hide: true
+      hide: true,
     },
     {
       field: SpecilaProjectCategoryTableColumns.Name,
@@ -243,15 +247,15 @@ export const SpecialProjectCategoryColumnsDefinition = (actionCellParams: ICellR
       ...commonColumn,
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: '',
       headerName: 'Action',
       cellRenderer: ActionCellRendererComponent,
-      cellRendererParams: actionCellParams
-    }
+      cellRendererParams: actionCellParams,
+    },
   ];
 };
 
@@ -260,7 +264,7 @@ export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRe
     {
       field: SpecilaProjectMappingTableColumns.Id,
       headerName: SpecilaProjectMappingHeaderText.Id,
-      hide: true
+      hide: true,
     },
     {
       field: SpecilaProjectMappingTableColumns.OrderSpecialProjectCategoryName,
@@ -268,8 +272,8 @@ export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRe
       ...commonColumn,
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: SpecilaProjectMappingTableColumns.OrderProjectName,
@@ -277,8 +281,8 @@ export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRe
       ...commonColumn,
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: SpecilaProjectMappingTableColumns.RegionName,
@@ -290,8 +294,8 @@ export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRe
       },
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: SpecilaProjectMappingTableColumns.LocationName,
@@ -303,8 +307,8 @@ export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRe
       },
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: SpecilaProjectMappingTableColumns.DepartmentName,
@@ -316,8 +320,8 @@ export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRe
       },
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: SpecilaProjectMappingTableColumns.SkillNames,
@@ -326,23 +330,23 @@ export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRe
       filter: 'agTextColumnFilter',
       filterParams: {
         buttons: ['reset'],
-      }
+      },
     },
     {
       field: '',
       headerName: 'Action',
       cellRenderer: ActionCellRendererComponent,
-      cellRendererParams: actionCellParams
-    }
+      cellRendererParams: actionCellParams,
+    },
   ];
-}
+};
 
 export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRendererParams): ColumnDefinitionModel[] => {
   return [
     {
       field: PurchaseOrderMappingTableColumns.Id,
       headerName: PurchaseOrderMappingHeaderText.Id,
-      hide: true
+      hide: true,
     },
     {
       field: PurchaseOrderMappingTableColumns.OrderPoName,
@@ -350,8 +354,8 @@ export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRen
       ...commonColumn,
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: PurchaseOrderMappingTableColumns.RegionName,
@@ -363,8 +367,8 @@ export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRen
       },
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: PurchaseOrderMappingTableColumns.LocationName,
@@ -376,8 +380,8 @@ export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRen
       },
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: PurchaseOrderMappingTableColumns.DepartmentName,
@@ -389,8 +393,8 @@ export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRen
       },
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
-      }
+        buttons: ['reset'],
+      },
     },
     {
       field: PurchaseOrderMappingTableColumns.SkillNames,
@@ -399,17 +403,17 @@ export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRen
       filter: 'agTextColumnFilter',
       filterParams: {
         buttons: ['reset'],
-      }
+      },
     },
     {
       field: '',
       headerName: 'Action',
       cellRenderer: ActionCellRendererComponent,
-      cellRendererParams: actionCellParams
-    }
+      cellRendererParams: actionCellParams,
+    },
   ];
-}
+};
 
 export const SpecialProjectMessages = {
-  NoRowsMessage: 'No Rows To Show'
-}
+  NoRowsMessage: 'No Rows To Show',
+};

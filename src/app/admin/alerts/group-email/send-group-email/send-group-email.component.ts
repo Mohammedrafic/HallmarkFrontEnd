@@ -1,3 +1,4 @@
+import { ValidatorFn } from '@angular/forms';
 import { OrderTypeOptions } from './../../../../shared/enums/order-type';
 import {
   AgencyDto,
@@ -15,7 +16,7 @@ import {
 import { GroupEmailRole } from '@shared/models/group-email.model';
 import { takeUntil } from 'rxjs';
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import {
   HtmlEditorService,
   ImageService,
@@ -703,7 +704,7 @@ export class SendGroupEmailComponent
       jobID: new FormControl(''),
       user: new FormControl([]),
       candidate: new FormControl([]),
-      emailCc: new FormControl('', [Validators.email, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
+      emailCc: new FormControl('', [emailsValidator()]),
       emailTo: new FormControl('', [
         Validators.required,
         Validators.email,
@@ -713,7 +714,7 @@ export class SendGroupEmailComponent
       emailBody: new FormControl('', [Validators.required]),
       fileUpload: new FormControl(null),
     });
-  }
+  }  
 
   onFormCancelClick(): void {
     this.formCancelClicked.emit();
@@ -733,5 +734,22 @@ export class SendGroupEmailComponent
     setTimeout(() => {
       this.dropElement = document.getElementById('files-droparea') as HTMLElement;
     }, 4000);
+  }
+}
+
+
+export function emailsValidator(): ValidatorFn {
+  function validateEmails(emails: string) {
+    console.log(emails);
+    return (emails.split(',')
+      .map(email => Validators.email(<AbstractControl>{ value: email.trim() }))
+      .find(_ => _ !== null) === undefined);
+  }
+  
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (control.value === '' || !control.value || validateEmails(control.value)) {
+      return null
+    }
+    return { emails: true };
   }
 }

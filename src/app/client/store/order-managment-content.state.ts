@@ -24,7 +24,7 @@ import {
   GetAssociateAgencies,
   GetAvailableSteps,
   GetContactDetails,
-  GetHistoricalData, GetIRPOrders,
+  GetHistoricalData, GetIrpOrderCandidates, GetIRPOrders,
   GetOrderById,
   GetOrderByIdSucceeded,
   GetOrderFilterDataSources,
@@ -65,6 +65,8 @@ import { OrderManagementContentService } from '@shared/services/order-management
 import {
   ApplicantStatus,
   GetPredefinedBillRatesData,
+  IrpCandidatesParams,
+  IrpOrderCandidate,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
@@ -111,6 +113,7 @@ import { OrderImportService } from '@client/order-management/components/order-im
 import { OrderImportResult } from '@shared/models/imported-order.model';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 import { createFormData } from '@client/order-management/helpers';
+import { PageOfCollections } from '@shared/models/page.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -139,6 +142,7 @@ export interface OrderManagementContentStateModel {
   navigationTab: NavigationTabModel;
   contactDetails: Department | null;
   extensions: any;
+  irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -174,6 +178,7 @@ export interface OrderManagementContentStateModel {
     },
     contactDetails: null,
     extensions: null,
+    irpCandidates: null,
   },
 })
 @Injectable()
@@ -331,6 +336,16 @@ export class OrderManagementContentState {
     );
   }
 
+  @Selector()
+  static getIrpCandidates(state: OrderManagementContentStateModel): PageOfCollections<IrpOrderCandidate> | null {
+    return state.irpCandidates;
+  }
+
+  @Selector()
+  static getIrpCandidatesCount(state: OrderManagementContentStateModel): number {
+    return state.irpCandidates?.items.length || 0;
+  }
+
   constructor(
     private orderManagementService: OrderManagementContentService,
     private orderManagementIrpApiService: OrderManagementIrpApiService,
@@ -396,13 +411,13 @@ export class OrderManagementContentState {
         payload.groupedCredentials = groupedCredentials;
         patchState({ selectedOrder: payload });
 
-        const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = payload;
-
+        const { orderType, departmentId, jobStartDate, jobEndDate } = payload;
+        const skill = payload.irpOrderMetadata ? payload.irpOrderMetadata.skillId : payload.skillId;
         dispatch(
           new SetPredefinedBillRatesData(
             orderType,
             departmentId,
-            skillId,
+            skill,
             jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
             jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
           )
@@ -444,6 +459,27 @@ export class OrderManagementContentState {
       );
   }
 
+  @Action(GetIrpOrderCandidates)
+  GetIrpOrderCandidates(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderId, organizationId, pageNumber, pageSize, isAvaliable }: GetIrpOrderCandidates
+  ): Observable<PageOfCollections<IrpOrderCandidate>> {
+    const params: IrpCandidatesParams = {
+      PageSize: pageSize,
+      PageNumber: pageNumber,
+      isAvaliable: !!isAvaliable,
+    };
+
+    return this.orderManagementService.getIrpCandidates(orderId, params)
+    .pipe(
+      tap((response) => {
+        patchState({
+          irpCandidates: response,
+        });
+      }),
+    );
+  }
+
   @Action(ClearOrderCandidatePage)
   ClearOrderCandidatePage({ patchState }: StateContext<OrderManagementContentStateModel>): void {
     patchState({ orderCandidatesListPage: null });
@@ -457,14 +493,15 @@ export class OrderManagementContentState {
     return this.orderManagementService.getOrderById(payload, isIRP).pipe(
       tap((payload) => {
         patchState({ selectedOrder: payload });
-        const { orderType, departmentId, skillId, jobStartDate, jobEndDate, isTemplate } = payload;
+        const { orderType, departmentId, jobStartDate, jobEndDate, isTemplate } = payload;
+        const skill = payload.irpOrderMetadata ? payload.irpOrderMetadata.skillId : payload.skillId;
 
         if (!isTemplate) {
           dispatch(
             new SetPredefinedBillRatesData(
               orderType,
               departmentId,
-              skillId,
+              skill,
               jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
               jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
             )

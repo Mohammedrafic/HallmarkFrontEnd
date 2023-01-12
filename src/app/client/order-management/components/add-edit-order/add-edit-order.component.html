@@ -33,6 +33,7 @@
         <app-order-credentials
           [isActive]="selectedTab === SelectedTab.Credentials"
           [credentials]="orderCredentials"
+          [includeInIRP]="false"
           (credentialChanged)="updateOrderCredentials($event)"
           (credentialDeleted)="deleteOrderCredential($event)"
         ></app-order-credentials>

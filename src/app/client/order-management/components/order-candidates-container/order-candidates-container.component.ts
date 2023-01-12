@@ -1,14 +1,17 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { GetAgencyOrderCandidatesList } from '@client/store/order-managment-content.actions';
+import { GetAgencyOrderCandidatesList, GetIrpOrderCandidates } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 import { Select, Store } from '@ngxs/store';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { CandidateListEvent, OrderCandidatesListPage, Order } from '@shared/models/order-management.model';
+import { CandidateListEvent, OrderCandidatesListPage, Order,
+  IrpOrderCandidate } from '@shared/models/order-management.model';
 import { Observable, takeUntil } from 'rxjs';
 import { OrderType } from '@shared/enums/order-type';
 import { OrderManagementService } from '../order-management-content/order-management.service';
 import { OrderStatus } from '@shared/enums/order-management';
+import { PageOfCollections } from '@shared/models/page.model';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-order-candidates-container',
@@ -21,12 +24,17 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
     this.order = value;
   }
 
+  @Input() activeSystem: OrderManagementIRPSystemId;
+
   public orderCandidatePage: OrderCandidatesListPage;
   public orderCandidates: any;
   public orderType = OrderType;
 
   @Select(OrderManagementContentState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
+
+  @Select(OrderManagementContentState.getIrpCandidates)
+  public irpCandidates$: Observable<PageOfCollections<IrpOrderCandidate>>;
 
   get excludeDeployed(): boolean {
     return this.orderManagementService.excludeDeployed;
@@ -56,8 +64,10 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
 
   public onGetCandidatesList(event: CandidateListEvent): void {
     this.orderManagementService.excludeDeployed = event.excludeDeployed;
+    const Action = this.order.irpOrderMetadata ? GetIrpOrderCandidates : GetAgencyOrderCandidatesList;
+
     this.store.dispatch(
-      new GetAgencyOrderCandidatesList(
+      new Action(
         event.orderId,
         event.organizationId,
         event.currentPage,

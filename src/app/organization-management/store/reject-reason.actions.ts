@@ -1,3 +1,4 @@
+import { UnavailabilityValue } from '@organization-management/reasons/interfaces';
 import { PenaltyPayload } from "@shared/models/penalty.model";
 import { RejectReason } from "@shared/models/reject-reason.model";
 
@@ -8,7 +9,7 @@ export class GetRejectReasonsByPage {
 
 export class SaveRejectReasons {
   static readonly type = '[reject reason] Save Reject Reason';
-  constructor(public payload: { reason: string }){}
+  constructor(public payload: RejectReason){}
 }
 
 export class RemoveRejectReasons {
@@ -103,7 +104,8 @@ export class RemoveOrderRequisition {
 
 export class GetOrderRequisitionByPage {
   static readonly type = '[reject reason] Get Order Requisition by Page';
-  constructor(public pageNumber?: number, public pageSize?: number, public orderBy?: string, public lastSelectedBusinessUnitId?: number) { }
+  constructor(public pageNumber?: number,
+    public pageSize?: number, public orderBy?: string, public lastSelectedBusinessUnitId?: number) { }
 }
 
 export class SaveOrderRequisition {
@@ -140,4 +142,28 @@ export class SavePenaltySuccess {
 
 export class ShowOverridePenaltyDialog {
   static readonly type = '[reject reason] Show Override Penalty Dialog';
+}
+
+export class SaveNewUnavailabilityReason {
+  static readonly type = '[reject reason] Save new unavailability reason';
+
+  constructor(public readonly payload: UnavailabilityValue) {}
+}
+
+export class GetUnavailabilityReasons {
+  static readonly type = '[reject reason] Get Unavailability reasons';
+
+  constructor(public readonly page: number, public pageSize: number) {}
+}
+
+export class SaveUnavailabilityReason {
+  static readonly type = '[reject reason] Save Unavailability reason';
+
+  constructor(public payload: UnavailabilityValue) {}
+}
+
+export class RemoveUnavailabilityReason {
+  static readonly type = '[reject reason] Remove Unavailability reason';
+
+  constructor(public readonly id: number) {}
 }

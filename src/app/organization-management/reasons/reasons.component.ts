@@ -1,324 +1,172 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { SelectEventArgs } from '@syncfusion/ej2-angular-navigations';
+
+import { TakeUntilDestroy } from '@core/decorators';
+import { FieldType } from '@core/enums';
+import * as ReasonActions from '@organization-management/store/reject-reason.actions';
+import { CancellationReasonsMap,
+} from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 import {
-  SaveClosureReasons,
-  SaveClosureReasonsError,
-  CreateManualInvoiceRejectReason, SaveManualInvoiceRejectReasonError,
-  SaveRejectReasons,
-  SaveRejectReasonsError,
-  SaveRejectReasonsSuccess,
-  UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReason, UpdateManualInvoiceRejectReasonSuccess,
-  UpdateRejectReasons,
-  SaveOrderRequisition,
-  UpdateOrderRequisitionSuccess,
-  SaveOrderRequisitionError,
-  SavePenalty,
-  SavePenaltyError,
-  SavePenaltySuccess,
-  ShowOverridePenaltyDialog
-} from '@organization-management/store/reject-reason.actions';
-import {
-  CANCEL_REJECTION_REASON,
-  DELETE_CONFIRM_TITLE,
-  ALPHANUMERICS_AND_SYMBOLS,
-  DATA_OVERRIDE_TEXT,
-  DATA_OVERRIDE_TITLE,
+  CANCEL_REJECTION_REASON, DATA_OVERRIDE_TEXT,
+  DATA_OVERRIDE_TITLE, DELETE_CONFIRM_TITLE,
 } from '@shared/constants';
-import { DialogMode } from '@shared/enums/dialog-mode.enum';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { delay, filter, takeWhile, Observable } from 'rxjs';
-import { ShowSideDialog } from 'src/app/store/app.actions';
-import { RejectReason } from '@shared/models/reject-reason.model';
-import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { CancellationReasonsMap } from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
-import { UserState } from 'src/app/store/user.state';
-import { Penalty } from '@shared/models/penalty.model';
+import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-
-export enum ReasonsNavigationTabs {
-  Rejection,
-  Penalties,
-  Requisition,
-  Closure,
-  ManualInvoice,
-}
+import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { Penalty } from '@shared/models/penalty.model';
+import { RejectReason } from '@shared/models/reject-reason.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { concatMap, delay, filter, Observable, takeUntil } from 'rxjs';
+import { ShowSideDialog } from 'src/app/store/app.actions';
+import { AppState } from 'src/app/store/app.state';
+import { UserState } from 'src/app/store/user.state';
+import { ReasonDialogConfig, ReasonFormsTypeMap } from './constants';
+import { ReasonFormType, ReasonsNavigationTabs } from './enums';
+import { ReasonFormConfig, UnavailabilityValue } from './interfaces';
+import { ReasonsFormsService } from './services/reasons-form.service';
+import { ReasonsService } from './services/reasons.service';
 
 @Component({
   selector: 'app-reasons',
   templateUrl: './reasons.component.html',
-  styleUrls: ['./reasons.component.scss']
+  styleUrls: ['./reasons.component.scss'],
 })
-export class ReasonsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
-  public selectedTab: ReasonsNavigationTabs = ReasonsNavigationTabs.Rejection;
+@TakeUntilDestroy
+export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
+  public selectedTab = ReasonsNavigationTabs.Rejection;
   public reasonsNavigationTabs = ReasonsNavigationTabs;
-  public form: FormGroup;
-  public penaltiesForm: FormGroup;
   public canRejectOrClosure = true;
-
-  private isEdit = false;
-  public title: string = '';
-  private isAlive = true;
-  private isSaving = false;
+  public title = '';
   public cancellationReasons: { id: number; name: string; }[] = [];
   public regions: OrganizationRegion[] = [];
   public orgStructure: OrganizationStructure;
   public selectedRegions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
-  private isAllRegionsSelected = false;
-  private isAllLocationsSelected = false;
-
-  @Select(UserState.organizationStructure)
-  organizationStructure$: Observable<OrganizationStructure>;
-
   public optionFields = {
     text: 'name',
     value: 'id',
   };
 
-  constructor(protected override store: Store, private confirmService: ConfirmService, private actions$: Actions) {
+  public reasonForm: FormGroup;
+  public dialogConfig: ReasonFormConfig[] | null;
+  public readonly inputType = FieldType;
+  public isIRPFlagEnabled = false;
+
+  private isAllRegionsSelected = false;
+  private isAllLocationsSelected = false;
+  private isEdit = false;
+  private formType = ReasonFormType.DefaultReason;
+  protected componentDestroy: () => Observable<unknown>;
+
+  @Select(UserState.organizationStructure)
+  organizationStructure$: Observable<OrganizationStructure>;
+
+  constructor(
+    protected override store: Store,
+    private confirmService: ConfirmService,
+    private actions$: Actions,
+    private reasonFormService: ReasonsFormsService,
+    private reasonsService: ReasonsService,
+    private cd: ChangeDetectorRef,
+  ) {
     super(store);
     const cancellationReasons = Object.entries(CancellationReasonsMap).map(([key, value]) => ({ id: +key, name: value}));
     this.cancellationReasons = sortByField(cancellationReasons, 'name');
+    this.dialogConfig = ReasonDialogConfig[this.formType];
+    this.createForm();
+    this.setIRPFlag();
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.createForm();
     this.subscribeOnSaveReasonSuccess();
-    this.penaltiesSubscriptionHandler();
     this.canRejectOrClosureReason();
   }
 
-  ngOnDestroy(): void {
-    this.isAlive = false;
-  }
-
-  public onTabSelected(selectedTab: any): void {
+  selectTab(selectedTab: SelectEventArgs): void {
     this.selectedTab = selectedTab.selectedIndex;
+    this.formType = ReasonFormsTypeMap[this.selectedTab];
+    this.createForm();
+    this.dialogConfig = ReasonDialogConfig[this.formType];
+
+
+    if (this.selectedTab === ReasonsNavigationTabs.Penalties) {
+      this.createSubsForPenalties();
+    }
+
     this.canRejectOrClosureReason();
   }
 
-  private penaltiesSubscriptionHandler(): void {
-    this.organizationStructure$
-      .pipe(takeWhile(() => this.isAlive), filter(Boolean))
-      .subscribe((structure: OrganizationStructure) => {
-        this.orgStructure = structure;
-        this.regions = structure.regions;
-      });
-    this.penaltiesForm.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
-      this.selectedRegions = [];
-      if (val) {
-        val.forEach((id) =>
-          this.selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
-        );
-        const regionLocations: OrganizationLocation[] = [];
-        this.isAllRegionsSelected = val.length === this.regions.length;
-        this.selectedRegions.forEach((region) => {
-          region.locations?.forEach((location) => (location.regionName = region.name));
-          regionLocations.push(...(region.locations as []));
-        });
-        this.locations = sortByField(regionLocations, 'name');
-      } else {
-        this.locations = [];
-        this.isAllRegionsSelected = false;
-      }
-      this.penaltiesForm.get('locationIds')?.setValue(null);
-    });
-    this.penaltiesForm.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
-      if (val && val.length === this.locations.length) {
-        this.isAllLocationsSelected = true;
-      } else {
-        this.isAllLocationsSelected = false;
-      }
-    });
-    this.actions$.pipe(
-      ofActionDispatched(ShowOverridePenaltyDialog),
-      takeWhile(() => this.isAlive)
-    ).subscribe(() => {
-      this.isSaving = false
-      this.confirmService
-        .confirm(DATA_OVERRIDE_TEXT, {
-          title: DATA_OVERRIDE_TITLE,
-          okButtonLabel: 'Confirm',
-          okButtonClass: '',
-        })
-        .pipe(
-          filter((confirm) => !!confirm),
-          takeWhile(() => this.isAlive)
-        )
-        .subscribe(() => {
-          this.saveReason(true);
-        });
-      });
-  }
-
-  private createForm(): void {
-    this.form = new FormGroup({
-      id: new FormControl(null),
-      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)])
-    });
-    this.penaltiesForm = new FormGroup({
-      candidateCancellationSettingId: new FormControl(null),
-      reason: new FormControl(null, [Validators.required]),
-      regionIds: new FormControl([], [Validators.required]),
-      locationIds: new FormControl([], [Validators.required]),
-      penaltyCriteria: new FormControl(PenaltyCriteria.FlatRateOfHours, [Validators.required]),
-      flatRate: new FormControl(null, [Validators.required]),
-      rateOfHours: new FormControl(null, [Validators.required]),
-      flatRateOfHoursPercentage: new FormControl(null, [Validators.required]),
-      flatRateOfHours: new FormControl(null, [Validators.required]),
+  saveReason(forceUpsert?: boolean): void {
+    this.reasonsService.saveReason({
+      selectedTab: this.selectedTab,
+      editMode: this.isEdit,
+      formValue: this.reasonForm.value,
+      formType: this.formType,
+      allRegionsSelected: this.isAllRegionsSelected,
+      allLocationsSelected: this.isAllLocationsSelected,
+      forceUpsert: forceUpsert,
     });
   }
 
-  private subscribeOnSaveReasonSuccess(): void {
-    this.actions$.pipe(
-      ofActionSuccessful(SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReasonSuccess, UpdateOrderRequisitionSuccess, SavePenaltySuccess),
-      takeWhile(() => this.isAlive)
-    ).subscribe(() =>this.closeSideDialog());
-    this.actions$.pipe(
-      ofActionSuccessful(SaveRejectReasonsError, SaveClosureReasonsError, SaveManualInvoiceRejectReasonError, SaveOrderRequisitionError, SavePenaltyError),
-      takeWhile(() => this.isAlive)
-    ).subscribe(() => this.isSaving = false);
-  }
-
-  public saveReason(forceUpsert?: boolean): void {
-    if (this.selectedTab === ReasonsNavigationTabs.Penalties) {
-      this.penaltiesForm.markAllAsTouched();
-      if(this.penaltiesForm.invalid) {
-        return;
-      }
-    } else {
-      this.form.markAllAsTouched();
-      if(this.form.invalid) {
-        return;
-      }
-    }
-
-    if (!this.isSaving) {
-      this.isSaving = true;
-      switch (this.selectedTab) {
-        case ReasonsNavigationTabs.Rejection:
-          if(!this.isEdit) {
-            this.store.dispatch(new SaveRejectReasons({ reason: this.form.value.reason }));
-          } else if(this.isEdit) {
-            const payload = {
-              id: this.form.value.id,
-              reason: this.form.value.reason
-            }
-
-            this.store.dispatch(new UpdateRejectReasons(payload));
-          }
-          break;
-        case ReasonsNavigationTabs.Requisition:
-          this.store.dispatch(new SaveOrderRequisition({
-            id: this.form.value.id,
-            reason: this.form.value.reason
-          }));
-          break;
-        case ReasonsNavigationTabs.Closure:
-          const payload = {
-            id: this.form.value.id,
-            reason: this.form.value.reason
-          }
-          this.store.dispatch(new SaveClosureReasons(payload));
-          break;
-        case ReasonsNavigationTabs.ManualInvoice:
-          const data: RejectReason = {
-            id: this.form.value.id,
-            reason: this.form.value.reason
-          };
-
-          this.store.dispatch(
-            this.isEdit ? new UpdateManualInvoiceRejectReason(data) : new CreateManualInvoiceRejectReason(data)
-          );
-          break;
-        case ReasonsNavigationTabs.Penalties:
-          const penaltyValue = this.penaltiesForm.getRawValue();
-          if (this.isAllRegionsSelected) {
-            penaltyValue.regionIds = [];
-          }
-          if (this.isAllLocationsSelected) {
-            penaltyValue.locationIds = [];
-          }
-          if (forceUpsert) {
-            penaltyValue.forceUpsert = true;
-          }
-          this.store.dispatch(new SavePenalty(penaltyValue));
-          break;
-      }
-    }
-  }
-
-  public addReason(): void {
+  addReason(): void {
     this.title = DialogMode.Add;
     this.isEdit = false;
     this.store.dispatch(new ShowSideDialog(true));
-    this.isSaving = false;
   }
 
-  public onEdit(data: RejectReason | Penalty): void {
+  editReason(data: RejectReason | Penalty | UnavailabilityValue): void {
     this.isEdit = true;
     this.title = DialogMode.Edit;
-    if (this.selectedTab === ReasonsNavigationTabs.Penalties) {
-      this.isAllLocationsSelected = (data as Penalty).locationId === null;
-      let regions: number[];
-      let locations: number[];
-      if ((data as Penalty).regionId === null) {
-        regions = this.regions.map((region => region.id)) as number[];
-      } else {
-        regions = [(data as Penalty).regionId];
-      }
-      if ((data as Penalty).locationId === null) {
-        locations = [];
-        this.selectedRegions = [];
-        regions.forEach((id) =>
-          this.selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
-        );
-        this.selectedRegions.forEach((region) => region.locations?.forEach((location) => locations.push(location.id)));
-      } else {
-        locations = [(data as Penalty).locationId];
-      }
 
-      this.penaltiesForm.patchValue({
+    if (this.selectedTab === ReasonsNavigationTabs.Penalties) {
+      const regionIds = this.reasonsService.createRegionIds(this.regions, data as Penalty);
+      this.isAllLocationsSelected = (data as Penalty).locationId === null;
+      this.selectedRegions = this.reasonsService.createSelectedRegions(this.regions, data as Penalty, regionIds);
+      const locationIds = this.reasonsService.createLocationIds(this.selectedRegions, data as Penalty);
+
+      this.reasonForm.patchValue({
         candidateCancellationSettingId: (data as Penalty).candidateCancellationSettingId,
         reason: data.reason,
-        regionIds: regions,
-        locationIds: locations,
+        regionIds: regionIds,
+        locationIds: locationIds,
         flatRate: (data as Penalty).flatRate,
         flatRateOfHours: (data as Penalty).flatRateOfHours,
         flatRateOfHoursPercentage: (data as Penalty).flatRateOfHoursPercentage,
         rateOfHours: (data as Penalty).rateOfHours,
-        penaltyCriteria: (data as Penalty).penaltyCriteria
+        penaltyCriteria: (data as Penalty).penaltyCriteria,
+      });
+
+    } else if (this.selectedTab === ReasonsNavigationTabs.Unavailability) {
+      const reason  = data as UnavailabilityValue;
+
+      this.reasonForm.patchValue({
+        id: reason.id,
+        reason: reason.reason,
+        description: reason.description,
+        calculateTowardsWeeklyHours: reason.calculateTowardsWeeklyHours,
+        eligibleToBeScheduled: reason.eligibleToBeScheduled,
+        visibleForIRPCandidates: reason.visibleForIRPCandidates,
       });
     } else {
-      this.form.patchValue({
+      this.reasonForm.patchValue({
         id: (data as RejectReason).id,
-        reason: data.reason
+        reason: data.reason,
       });
     }
 
     this.store.dispatch(new ShowSideDialog(true));
-    this.isSaving = false;
+    this.cd.markForCheck();
   }
 
-  private closeSideDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
-      this.form.reset();
-      this.penaltiesForm.reset();
-      this.penaltiesForm.controls['penaltyCriteria'].setValue(PenaltyCriteria.FlatRateOfHours);
-    });
-  }
+  closeDialog(): void {
+    const isDirty = this.reasonForm.dirty;
 
-  public closeDialog(): void {
-    let isDirty = false;
-    if (this.selectedTab === ReasonsNavigationTabs.Penalties) {
-      isDirty = this.penaltiesForm.dirty;
-    } else {
-      isDirty = this.form.dirty;
-    }
     if (isDirty) {
       this.confirmService
         .confirm(CANCEL_REJECTION_REASON, {
@@ -326,18 +174,125 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit, 
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm:boolean) => !!confirm))
+        .pipe(
+          filter((confirm:boolean) => !!confirm),
+          takeUntil(this.componentDestroy()),
+        )
         .subscribe(() => {
-          this.closeSideDialog()
+          this.closeSideDialog();
         });
     } else {
-      this.closeSideDialog()
+      this.closeSideDialog();
     }
+  }
+
+  trackByField(index: number, item: ReasonFormConfig): string {
+    return item.field;
+  }
+
+  private closeSideDialog(): void {
+    this.store.dispatch(new ShowSideDialog(false))
+    .pipe(
+      delay(500),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      this.reasonForm.reset();
+      if (this.formType === ReasonFormType.PenaltyReason) {
+        this.reasonForm.controls['penaltyCriteria'].patchValue(PenaltyCriteria.FlatRateOfHours);
+      }
+    });
   }
 
   private canRejectOrClosureReason(): void {
     this.canRejectOrClosure = this.selectedTab === 0 ?
       this.userPermission[this.userPermissions.CanRejectCandidate] :
       this.userPermission[this.userPermissions.CanManageOrderClosureReasons];
+  }
+
+  private createSubsForPenalties(): void {
+    this.watchForOrgStructure();
+    this.watchForRegionsControl();
+    this.watchForLocationsControl();
+    this.watchForOverridePenalty();
+  }
+
+  private createForm(): void {
+    this.reasonForm = this.reasonFormService.createReasonsForm(this.formType);
+  }
+
+  private subscribeOnSaveReasonSuccess(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(ReasonActions.SaveRejectReasonsSuccess, ReasonActions.UpdateClosureReasonsSuccess,
+        ReasonActions.UpdateManualInvoiceRejectReasonSuccess, ReasonActions.UpdateOrderRequisitionSuccess,
+        ReasonActions.SavePenaltySuccess, ReasonActions.SaveUnavailabilityReason, ReasonActions.RemoveUnavailabilityReason),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() =>this.closeSideDialog());
+  }
+
+  private watchForOrgStructure(): void {
+    this.organizationStructure$
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe((structure: OrganizationStructure) => {
+        this.orgStructure = structure;
+        this.regions = this.reasonsService.addRegionNameForLocations(structure.regions);
+      });
+  }
+
+  private watchForRegionsControl(): void {
+    this.reasonForm.get('regionIds')?.valueChanges
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((ids: number[]) => {
+      if (ids) {
+        this.isAllRegionsSelected = ids.length === this.regions.length;
+        this.selectedRegions = this.regions.filter((region) => ids.includes(region.id as number));
+        const regionLocations = this.selectedRegions.map((region) => region.locations).flat();
+
+        this.locations = sortByField(regionLocations, 'name');
+      } else {
+        this.locations = [];
+        this.isAllRegionsSelected = false;
+      }
+      this.reasonForm.get('locationIds')?.setValue(null);
+    });
+  }
+
+  private watchForLocationsControl(): void {
+    this.reasonForm.get('locationIds')?.valueChanges
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((val: number[]) => {
+      if (val && val.length === this.locations.length) {
+        this.isAllLocationsSelected = true;
+      } else {
+        this.isAllLocationsSelected = false;
+      }
+    });
+  }
+
+  private watchForOverridePenalty(): void {
+    this.actions$.pipe(
+      ofActionDispatched(ReasonActions.ShowOverridePenaltyDialog),
+      concatMap(() => this.confirmService
+      .confirm(DATA_OVERRIDE_TEXT, {
+        title: DATA_OVERRIDE_TITLE,
+        okButtonLabel: 'Confirm',
+        okButtonClass: '',
+      })),
+      filter((confirm) => !!confirm),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() => {
+      this.saveReason(true);
+    });
+  }
+
+  private setIRPFlag(): void {
+    this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   }
 }
