@@ -3,7 +3,7 @@
     <div class="header-item__sidebar-menu" *ngIf="isMobile$ | async" (click)="toggleMobileSidebar()"></div>
     <ng-container *ngIf="(headerState$ | async) as headerState">
       <i-feather name="{{ headerState?.iconName }}" class="icon"></i-feather>
-      <h1>{{ headerState?.title }}</h1>
+      <h1 class="header-title">{{ headerState?.title }}</h1>
     </ng-container>
   </div>
 
