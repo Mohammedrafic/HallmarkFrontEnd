@@ -103,6 +103,10 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
   }
 
   saveReason(forceUpsert?: boolean): void {
+    if (this.reasonForm.invalid) {
+      return;
+    }
+    
     this.reasonsService.saveReason({
       selectedTab: this.selectedTab,
       editMode: this.isEdit,
@@ -149,9 +153,9 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
         id: reason.id,
         reason: reason.reason,
         description: reason.description,
-        calculateTowardsWeeklyHours: reason.calculateTowardsWeeklyHours,
-        eligibleToBeScheduled: reason.eligibleToBeScheduled,
-        visibleForIRPCandidates: reason.visibleForIRPCandidates,
+        calculateTowardsWeeklyHours: !!reason.calculateTowardsWeeklyHours,
+        eligibleToBeScheduled: !!reason.eligibleToBeScheduled,
+        visibleForIRPCandidates: !!reason.visibleForIRPCandidates,
       });
     } else {
       this.reasonForm.patchValue({

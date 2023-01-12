@@ -38,7 +38,7 @@ export const UnavaliabilityGridConfig: ColDef[] = [
   },
   {
     field: 'calculateTowardsWeeklyHours',
-    headerName: 'Calculate towards weekly hours',
+    headerName: 'Calculate Towards Weekly Hours',
     width: 280,
     type: 'leftAligned',
     cellRenderer: ToggleIconRendererComponent,
@@ -46,7 +46,7 @@ export const UnavaliabilityGridConfig: ColDef[] = [
   },
   {
     field: 'eligibleToBeScheduled',
-    headerName: 'Eligible for scheduling',
+    headerName: 'Eligible For scheduling',
     width: 280,
     type: 'leftAligned',
     cellRenderer: ToggleIconRendererComponent,
@@ -54,7 +54,7 @@ export const UnavaliabilityGridConfig: ColDef[] = [
   },
   {
     field: 'visibleForIRPCandidates',
-    headerName: 'Visible for irp candidate',
+    headerName: 'Visible For irp candidate',
     width: 280,
     type: 'leftAligned',
     cellRenderer: ToggleIconRendererComponent,
@@ -85,7 +85,7 @@ export const UpdateReasonsActionsMap = {
   [ReasonsNavigationTabs.Requisition]: ReasonActions.SaveOrderRequisition,
 };
 
-export const unavailabilityDialogConfig: ReasonFormConfig[] = [
+export const UnavailabilityDialogConfig: ReasonFormConfig[] = [
   {
     field: 'reason',
     title: 'Reason',
@@ -100,13 +100,13 @@ export const unavailabilityDialogConfig: ReasonFormConfig[] = [
   },
   {
     field: 'calculateTowardsWeeklyHours',
-    title: 'Calculate For Weekly Hours',
+    title: 'Calculate Towards Weekly Hours',
     required: false,
     fieldType: FieldType.Toggle,
   },
   {
     field: 'eligibleToBeScheduled',
-    title: 'Eligible for scheduling',
+    title: 'Eligible For scheduling',
     required: false,
     fieldType: FieldType.Toggle,
   },
@@ -129,6 +129,6 @@ export const defaultDialogConfig: ReasonFormConfig[]  = [
 
 export const ReasonDialogConfig: ReasonFormConfigMap = {
   [ReasonFormType.DefaultReason]: defaultDialogConfig,
-  [ReasonFormType.Unavailability]: unavailabilityDialogConfig,
+  [ReasonFormType.Unavailability]: UnavailabilityDialogConfig,
   [ReasonFormType.PenaltyReason]: null,
 };
