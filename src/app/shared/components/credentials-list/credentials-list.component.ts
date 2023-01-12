@@ -193,13 +193,13 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
     }));
   }
 
-  public editCredential(credential: Credential, event: any): void {
+  public editCredential(credential: Credential, event: MouseEvent): void {
     this.addActiveCssClass(event);
-    this.selectedCredential = credential;
+    this.selectedCredential = { ...credential };
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public removeCredential(credential: Credential, event: any): void {
+  public removeCredential(credential: Credential, event: MouseEvent): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm('Are you sure want to delete?', {
