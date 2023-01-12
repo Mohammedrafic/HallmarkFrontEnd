@@ -7,6 +7,18 @@
         placeholder="Name or ID"
         (inputKeyUpEnter)="searchCandidate($event)"
       ></app-search> -->
+      <mat-form-field class="example-full-width" appearance="fill">
+        <input type="text"
+          placeholder="Search"
+          matInput
+          [formControl]="searchControl">
+        <mat-autocomplete>
+          <mat-option *ngFor="let option of candidatesSuggestions" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
 <!--      TODO: uncomment when sorting is implemented-->
 <!--      <button-->
 <!--        ejs-button-->

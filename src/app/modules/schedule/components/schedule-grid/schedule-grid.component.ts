@@ -15,7 +15,7 @@ import {
 import { Select, Store } from '@ngxs/store';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { debounceTime, fromEvent, Observable, switchMap, takeUntil, tap } from 'rxjs';
-import { auditTime, filter, skip } from 'rxjs/operators';
+import { auditTime, concatMap, filter, skip } from 'rxjs/operators';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
@@ -28,6 +28,9 @@ import { DatesPeriods } from '../../constants';
 import * as ScheduleInt from '../../interface';
 import { ScheduleGridAdapter } from '../../adapters';
 import { ScheduleGridService } from '../../services';
+import { FormControl } from '@angular/forms';
+import { ChangeEventArgs } from '@syncfusion/ej2-angular-inputs';
+import { ScheduleApiService } from '@shared/services/schedule-api.service';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -61,12 +64,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   orgFirstDayOfWeek: number;
 
+  searchControl = new FormControl();
+
+  candidatesSuggestions = [];
+
   private itemsPerPage = 30;
 
   constructor(
     private store: Store,
     private weekService: DateWeekService,
     private scheduleGridService: ScheduleGridService,
+    private scheduleApiService: ScheduleApiService,
     private cdr: ChangeDetectorRef,
   ) {
     super();
@@ -76,8 +84,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   trackByDatesRange: TrackByFunction<string> = (_: number, date: string) => date;
 
-  trackByScheduleData: TrackByFunction<ScheduleInt.ScheduleModel>
-  = (_: number, scheduleData: ScheduleInt.ScheduleModel) => scheduleData.id;
+  trackByScheduleData: TrackByFunction<ScheduleInt.ScheduleModel> = (_: number,
+    scheduleData: ScheduleInt.ScheduleModel) => scheduleData.id;
 
   ngOnInit(): void {
     this.startOrgIdWatching();
@@ -114,8 +122,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.detectChanges();
   }
 
-  searchCandidate(event: KeyboardEvent): void {
-    this.scheduleGridService.setSearch((event.target as HTMLInputElement).value);
+  searchCandidate(event: ChangeEventArgs): void {
+    // this.scheduleGridService.setSearch((event.target as HTMLInputElement).value);
   }
 
   private startOrgIdWatching(): void {
@@ -175,15 +183,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private watchForCandidateSearch(): void {
-    this.scheduleGridService.getSearchStream()
+    this.searchControl.valueChanges
     .pipe(
-      auditTime(1500),
-      skip(1),
+      filter((value) => value.length > 2),
+      debounceTime(1000),
+      switchMap((value) => this.scheduleApiService.getScheduleEmployees({
+        firstLastNameOrId: value,
+      })),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe((criteria) => {
-      this.changeFilter.emit({ firstLastNameOrId: criteria });
-      this.scrollArea.nativeElement.scrollTo(0, 0);
+    .subscribe((employees) => {
+      console.log(employees);
     });
   }
 }
