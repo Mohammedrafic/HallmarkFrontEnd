@@ -13,6 +13,7 @@ import { CalendarDateSlotModule } from '../../pipes/calendar-date-slot/calendar-
 import { CandidateCardModule } from '../candidate-card/candidate-card.module';
 import { ScheduleCardModule } from '../schedule-card/schedule-card.module';
 import { ScheduleGridComponent } from './schedule-grid.component';
+import { ScheduleGridService } from '../../services';
 
 const icons = {
   Search,
@@ -33,6 +34,6 @@ const icons = {
     CalendarDateSlotModule,
   ],
   exports: [ScheduleGridComponent],
-  providers: [DateWeekService],
+  providers: [DateWeekService, ScheduleGridService],
 })
 export class ScheduleGridModule { }

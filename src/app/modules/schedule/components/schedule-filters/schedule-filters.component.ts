@@ -1,28 +1,28 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { Select, Store } from "@ngxs/store";
-import { filter, Observable, takeUntil } from "rxjs";
+import { Select, Store } from '@ngxs/store';
+import { filter, Observable, takeUntil } from 'rxjs';
 
-import { GetAssignedSkillsByOrganization } from "@organization-management/store/organization-management.actions";
-import { OrganizationManagementState } from "@organization-management/store/organization-management.state";
-import { optionFields } from "@shared/constants";
-import { DestroyableDirective } from "@shared/directives/destroyable.directive";
-import { SystemType } from "@shared/enums/system-type.enum";
-import { sortByField } from "@shared/helpers/sort-by-field.helper";
-import { FilteredItem } from "@shared/models/filter.model";
+import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { optionFields } from '@shared/constants';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { SystemType } from '@shared/enums/system-type.enum';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { FilteredItem } from '@shared/models/filter.model';
 import {
   OrganizationDepartment,
   OrganizationLocation,
   OrganizationRegion,
   OrganizationStructure,
-} from "@shared/models/organization.model";
-import { Skill } from "@shared/models/skill.model";
-import { FilterService } from "@shared/services/filter.service";
-import { ScheduleFiltersColumns, SkillsFieldsOptions } from "src/app/modules/schedule/constants/schedule-filters.constants";
-import { ScheduleFilters, ScheduleFiltersData } from "src/app/modules/schedule/interface/schedule.model";
-import { ScheduleFiltersService } from "src/app/modules/schedule/services/schedule-filters.service";
-import { ShowFilterDialog } from "src/app/store/app.actions";
-import { UserState } from "src/app/store/user.state";
+} from '@shared/models/organization.model';
+import { Skill } from '@shared/models/skill.model';
+import { FilterService } from '@shared/services/filter.service';
+import { ShowFilterDialog } from 'src/app/store/app.actions';
+import { UserState } from 'src/app/store/user.state';
+import { ScheduleFilters, ScheduleFiltersData } from '../../interface';
+import { ScheduleFiltersColumns, SkillsFieldsOptions } from '../../constants';
+import { ScheduleFiltersService } from '../../services';
 
 @Component({
   selector: 'app-schedule-filters',

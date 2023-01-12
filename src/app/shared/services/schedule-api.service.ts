@@ -7,7 +7,7 @@ import {
   CandidateSchedules,
   ScheduleCandidatesPage,
   ScheduleFilters,
-} from '../../modules/schedule/interface/schedule.model';
+} from '../../modules/schedule/interface/schedule.interface';
 
 @Injectable()
 export class ScheduleApiService {

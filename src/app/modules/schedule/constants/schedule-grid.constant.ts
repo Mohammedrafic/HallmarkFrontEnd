@@ -3,7 +3,7 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 import { DatesRangeType } from '@shared/enums';
 
 import { DatePeriodId, ScheduleType } from '../enums';
-import { ScheduleCandidate, ScheduleCardConfig, ScheduleDateItem } from '../interface/schedule.model';
+import { ScheduleCandidate, ScheduleCardConfig, ScheduleDateItem } from '../interface/schedule.interface';
 
 export const DatesPeriods: ItemModel[] = [
   {

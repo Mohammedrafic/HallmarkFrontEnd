@@ -7,7 +7,7 @@ import {
   ScheduleDateSlot,
   ScheduleModelPage,
   ScheduleSelectedSlots,
-} from '../interface/schedule.model';
+} from '../interface/schedule.interface';
 
 export class ScheduleGridAdapter {
   static combineCandidateData(

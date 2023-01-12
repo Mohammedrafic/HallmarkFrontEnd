@@ -15,7 +15,7 @@ import {
 import { Select, Store } from '@ngxs/store';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { debounceTime, fromEvent, Observable, switchMap, takeUntil, tap } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { auditTime, filter, skip } from 'rxjs/operators';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
@@ -24,17 +24,10 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { DatesRangeType } from '@shared/enums';
 
 import { UserState } from '../../../../store/user.state';
-import { DatesPeriods } from '../../constants/schedule-grid.conts';
-import {
-  ScheduleCandidate,
-  ScheduleDateItem,
-  ScheduleDateSlot,
-  ScheduleFilters,
-  ScheduleModel,
-  ScheduleModelPage,
-  ScheduleSelectedSlots,
-} from '../../interface/schedule.model';
-import { ScheduleGridAdapter } from '../../adapters/shedule-grid.adapter';
+import { DatesPeriods } from '../../constants';
+import * as ScheduleInt from '../../interface';
+import { ScheduleGridAdapter } from '../../adapters';
+import { ScheduleGridService } from '../../services';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -48,11 +41,12 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
 
-  @Input() scheduleData: ScheduleModelPage | null;
+  @Input() scheduleData: ScheduleInt.ScheduleModelPage | null;
 
-  @Output() changeFilter: EventEmitter<ScheduleFilters> = new EventEmitter<ScheduleFilters>();
+  @Output() changeFilter: EventEmitter<ScheduleInt.ScheduleFilters> = new EventEmitter<ScheduleInt.ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
-  @Output() selectedCells: EventEmitter<ScheduleSelectedSlots> = new EventEmitter<ScheduleSelectedSlots>();
+  @Output() selectedCells: EventEmitter<ScheduleInt.ScheduleSelectedSlots>
+  = new EventEmitter<ScheduleInt.ScheduleSelectedSlots>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
@@ -62,7 +56,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   datesRanges: string[] = DateTimeHelper.getDatesBetween();
 
-  selectedCandidatesSlot: Map<number, ScheduleDateSlot> = new Map<number, ScheduleDateSlot>();
+  selectedCandidatesSlot: Map<number, ScheduleInt.ScheduleDateSlot>
+  = new Map<number, ScheduleInt.ScheduleDateSlot>();
 
   orgFirstDayOfWeek: number;
 
@@ -71,6 +66,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   constructor(
     private store: Store,
     private weekService: DateWeekService,
+    private scheduleGridService: ScheduleGridService,
     private cdr: ChangeDetectorRef,
   ) {
     super();
@@ -80,11 +76,13 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   trackByDatesRange: TrackByFunction<string> = (_: number, date: string) => date;
 
-  trackByScheduleData: TrackByFunction<ScheduleModel> = (_: number, scheduleData: ScheduleModel) => scheduleData.id;
+  trackByScheduleData: TrackByFunction<ScheduleInt.ScheduleModel>
+  = (_: number, scheduleData: ScheduleInt.ScheduleModel) => scheduleData.id;
 
   ngOnInit(): void {
     this.startOrgIdWatching();
     this.watchForScroll();
+    this.watchForCandidateSearch();
   }
 
   ngOnChanges(): void {
@@ -96,9 +94,9 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.detectChanges();
   }
 
-  selectScheduleCard(schedule: ScheduleDateItem, candidate: ScheduleCandidate): void {}
+  selectScheduleCard(schedule: ScheduleInt.ScheduleDateItem, candidate: ScheduleInt.ScheduleCandidate): void {}
 
-  selectDateSlot(date: string, candidate: ScheduleCandidate): void {
+  selectDateSlot(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
     const candidateSelectedSlot = this.selectedCandidatesSlot.get(candidate.id);
 
     if (candidateSelectedSlot) {
@@ -117,8 +115,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   searchCandidate(event: KeyboardEvent): void {
-    this.changeFilter.emit({ firstLastNameOrId: (event.target as HTMLInputElement).value });
-    this.scrollArea.nativeElement.scrollTo(0, 0);
+    this.scheduleGridService.setSearch((event.target as HTMLInputElement).value);
   }
 
   private startOrgIdWatching(): void {
@@ -175,5 +172,18 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
           this.loadMoreData.emit(Math.ceil((items?.length || 1) / this.itemsPerPage));
         }
       });
+  }
+
+  private watchForCandidateSearch(): void {
+    this.scheduleGridService.getSearchStream()
+    .pipe(
+      auditTime(1500),
+      skip(1),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((criteria) => {
+      this.changeFilter.emit({ firstLastNameOrId: criteria });
+      this.scrollArea.nativeElement.scrollTo(0, 0);
+    });
   }
 }

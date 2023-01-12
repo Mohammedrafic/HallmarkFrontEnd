@@ -18,7 +18,7 @@ import {
   ScheduleFiltersData,
   ScheduleModelPage,
   ScheduleSelectedSlots,
-} from '../../interface/schedule.model';
+} from '../../interface/schedule.interface';
 import { ScheduleGridAdapter } from '../../adapters/shedule-grid.adapter';
 
 @Component({
@@ -87,7 +87,8 @@ export class ScheduleContainerComponent extends Destroyable {
   private initScheduleData(isLoadMore = false): void {
     const { startDate, endDate, ...restFilters } = this.scheduleFilters;
 
-    this.scheduleApiService.getScheduleEmployees(restFilters).pipe(
+    this.scheduleApiService.getScheduleEmployees(restFilters)
+    .pipe(
       take(1),
       switchMap((candidates: ScheduleCandidatesPage) =>
         this.scheduleApiService.getSchedulesByEmployeesIds(
