@@ -13,6 +13,6 @@ import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 @NgModule({
   declarations: [GridComponent, TitleValueCellRendererComponent, GridCellLinkComponent],
   imports: [CommonModule, AgGridModule, GridPaginationModule, RouterModule, ButtonModule],
-  exports: [GridComponent]
+  exports: [GridComponent],
 })
 export class GridModule {}

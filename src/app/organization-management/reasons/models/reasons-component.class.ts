@@ -1,13 +1,18 @@
 import { Directive, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.model';
+
 import { Actions, Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeWhile, throttleTime } from 'rxjs';
-import { UserState } from '../../../store/user.state';
-import { ConfirmService } from '@shared/services/confirm.service';
+import { filter, Observable, Subject, takeWhile, throttleTime } from 'rxjs';
+
+import { AbstractGridConfigurationComponent,
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { Penalty, PenaltyPage } from '@shared/models/penalty.model';
+import { RejectReason, RejectReasonPage, UnavailabilityReasons } from '@shared/models/reject-reason.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { UserState } from '../../../store/user.state';
+import { PageOfCollections } from '@shared/models/page.model';
+import { UnavailabilityValue } from '../interfaces';
 
 @Directive()
 export abstract class ReasonsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
@@ -15,14 +20,16 @@ export abstract class ReasonsComponent extends AbstractGridConfigurationComponen
   public form: FormGroup;
 
   @Output()
-  public readonly editReason: EventEmitter<RejectReason | Penalty> = new EventEmitter<RejectReason | Penalty>();
+  public readonly editReason: EventEmitter<RejectReason
+  | Penalty | UnavailabilityValue> = new EventEmitter<RejectReason | Penalty | UnavailabilityValue>();
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;
 
   protected isAlive = true;
 
-  protected abstract readonly reasons$: Observable<RejectReasonPage | PenaltyPage>;
+  protected abstract readonly reasons$: Observable<RejectReasonPage | PenaltyPage
+  | PageOfCollections<UnavailabilityReasons>>;
 
   private readonly pageSubject = new Subject<number>();
 
@@ -44,7 +51,7 @@ export abstract class ReasonsComponent extends AbstractGridConfigurationComponen
     this.isAlive = false;
   }
 
-  public onEdit(data: RejectReason) {
+  public onEdit(data: RejectReason | UnavailabilityValue) {
     this.editReason.emit(data);
   }
 
@@ -55,10 +62,12 @@ export abstract class ReasonsComponent extends AbstractGridConfigurationComponen
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })
-      .subscribe((confirm: boolean) => {
-        if (confirm) {
-          this.remove(id);
-        }
+      .pipe(
+        filter((confirm) => !!confirm),
+        takeWhile(() => this.isAlive),
+      )
+      .subscribe(() => {
+        this.remove(id);
       });
   }
 

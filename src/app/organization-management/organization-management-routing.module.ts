@@ -1,25 +1,28 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+
+import { TiersComponent } from '@organization-management/tiers/tiers.component';
+import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
+import { BillRatesComponent } from './bill-rates/bill-rates.component';
+import { BusinessLinesComponent } from './business-lines/business-lines.component';
+import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 import { CredentialsComponent } from './credentials/credentials.component';
 import { DepartmentsComponent } from './departments/departments.component';
 import { HolidaysComponent } from './holidays/holidays.component';
 import { LocationsComponent } from './locations/locations.component';
 import { OrganizationManagementComponent } from './organization-management.component';
+import { RegionsComponent } from './regions/regions.component';
 import { SettingsComponent } from './settings/settings.component';
 import { ShiftsComponent } from './shifts/shifts.component';
 import { SkillsComponent } from './skills/skills.component';
-import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
-import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
-import { JobOrderComponent } from './workflow/job-order/job-order.component';
-import { BillRatesComponent } from './bill-rates/bill-rates.component';
-import { ReasonsComponent } from './reasons/reasons.component';
-import { RegionsComponent } from './regions/regions.component';
 import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
-import { BusinessLinesComponent } from './business-lines/business-lines.component';
-import { TiersComponent } from '@organization-management/tiers/tiers.component';
 import { WorkCommitmentComponent } from './work-commitment/containers/work-commitment-container/work-commitment.component';
+import { JobOrderComponent } from './workflow/job-order/job-order.component';
 
+/**
+ * TODO: refactor component to modules and make them lazy.
+ */
 const routes: Routes = [
   {
     path: '',
@@ -119,7 +122,7 @@ const routes: Routes = [
       },
       {
         path: 'reasons',
-        component: ReasonsComponent,
+        loadChildren: () => import('./reasons/reasons.module').then((m) => m.ReasonsModule),
         data: {
           isOrganizationArea: true,
         },

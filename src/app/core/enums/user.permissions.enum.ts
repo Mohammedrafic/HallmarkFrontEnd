@@ -144,6 +144,8 @@ export enum UserPermissions {
   CanManageNotificationTemplates = 3401,
   CanViewMasterRegions = 3402,
   WidgetLTAOrderEnding = 3403,
+  ViewUnavailabilityReasons = 2811,
+  CanEditUnavailabilityReasons = 2812,
 
   // Organization Invoices
   OrganizationInvoices = 3500,

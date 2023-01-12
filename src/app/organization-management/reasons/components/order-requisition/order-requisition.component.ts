@@ -14,7 +14,7 @@ import { ReasonsComponent } from '@organization-management/reasons/models/reason
 @Component({
   selector: 'app-order-requisition',
   templateUrl: './order-requisition.component.html',
-  styleUrls: ['./order-requisition.component.scss']
+  styleUrls: ['./order-requisition.component.scss'],
 })
 export class OrderRequisitionComponent extends ReasonsComponent implements OnInit,OnDestroy {
   @Select(RejectReasonState.orderRequisition)

@@ -1,0 +1,12 @@
+<div class="row-tool-buttons">
+  <button ejs-button cssClass="e-flat primary-icon-button"
+    [disabled]="!canEdit"
+    (click)="editRecord()">
+    <span><i-feather name="edit" class="icon edit-action"></i-feather></span>
+  </button>
+  <button ejs-button cssClass="e-flat secondary-icon-button"
+    [disabled]="!canEdit"
+    (click)="deleteRecord()">
+    <span><i-feather name="trash-2" class="icon"></i-feather></span>
+  </button>
+</div>

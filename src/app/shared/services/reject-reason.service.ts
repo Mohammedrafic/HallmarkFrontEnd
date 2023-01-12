@@ -1,9 +1,19 @@
-import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
-import { Observable } from "rxjs";
-import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
-import { Penalty, PenaltyPage, PenaltyPayload } from "@shared/models/penalty.model";
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
+import { Observable } from 'rxjs';
+
+import { GetQueryParams } from '@core/helpers/functions.helper';
+import { UnavailabilityValue } from '@organization-management/reasons/interfaces';
+import { PageOfCollections } from '@shared/models/page.model';
+import { Penalty, PenaltyPage, PenaltyPayload } from '@shared/models/penalty.model';
+import {
+  RejectReason, RejectReasonPage, UnavailabilityPaging, UnavailabilityReasons,
+} from '@shared/models/reject-reason.model';
+
+/**
+ * TODO: provide service in modules instead of root.
+ */
 @Injectable({ providedIn: 'root' })
 export class RejectReasonService {
   constructor(private http: HttpClient) { }
@@ -62,7 +72,8 @@ export class RejectReasonService {
    * @param pageSize
    * @param orderBy
    */
-   public getClosureReasonsByPage(pageNumber?: number, pageSize?: number, orderBy?: string, getAll?: boolean): Observable<RejectReasonPage> {
+   public getClosureReasonsByPage(pageNumber?: number, pageSize?: number, orderBy?: string,
+    getAll?: boolean): Observable<RejectReasonPage> {
      const params = this.getCloseReasonsParams(pageNumber, pageSize, orderBy, getAll);
 
     return this.http.get<RejectReasonPage>(`/api/orderclosurereasons`,
@@ -94,7 +105,7 @@ export class RejectReasonService {
     const { reason } = payload;
 
     return this.http.post<RejectReason>('/api/ManualInvoiceReasons', {
-      reason
+      reason,
     });
   }
 
@@ -130,7 +141,8 @@ export class RejectReasonService {
    * @param pageSize
    * @param orderBy
    */
-  public getOrderRequisitionsByPage(pageNumber?: number, pageSize?: number, orderBy?: string, lastSelectedBusinessUnitId?: number): Observable<RejectReasonPage> {
+  public getOrderRequisitionsByPage(pageNumber?: number, pageSize?: number, orderBy?: string,
+    lastSelectedBusinessUnitId?: number): Observable<RejectReasonPage> {
     const params = this.getCloseReasonsParams(pageNumber, pageSize, orderBy);
     let headers = {};
     if (lastSelectedBusinessUnitId) {
@@ -178,5 +190,19 @@ export class RejectReasonService {
    */
   public removePenalty(id: number): Observable<void> {
     return this.http.delete<void>(`/api/CandidateCancellationSettings/setup/${id}`);
+  }
+
+  public getUnavailabilityReasons(params: UnavailabilityPaging): Observable<PageOfCollections<UnavailabilityReasons>> {
+    return this.http.get<PageOfCollections<UnavailabilityReasons>>('/api/UnavailabilityReasons', {
+      params: GetQueryParams(params),
+    });
+  }
+
+  public saveUnavailabilityReason(data: UnavailabilityValue): Observable<void> {
+    return this.http.post<void>('/api/UnavailabilityReasons', data);
+  }
+
+  public removeUnavailabilityReason(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/UnavailabilityReasons/${id}`);
   }
 }

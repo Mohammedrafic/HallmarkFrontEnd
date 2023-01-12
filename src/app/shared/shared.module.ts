@@ -42,7 +42,8 @@ import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
 import { DocumentUploaderComponent } from './components/document-uploader/document-uploader.component';
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
-import { ButtonModule, CheckBoxModule, ChipListAllModule, RadioButtonAllModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule,
+  ChipListAllModule, RadioButtonAllModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
 import { SearchComponent } from './components/search/search.component';
@@ -69,20 +70,25 @@ import {
   SortService,
   ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
-import { OrderCandidatesListComponent } from './components/order-candidate-list/order-candidates-list/order-candidates-list.component';
+import { OrderCandidatesListComponent,
+} from './components/order-candidate-list/order-candidates-list/order-candidates-list.component';
 import { OrderReOrdersListComponent } from './components/order-reorders-list/order-re-orders-list.component';
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
-import { ApplyCandidateComponent } from './components/order-candidate-list/order-candidates-list/apply-candidate/apply-candidate.component';
-import { AcceptCandidateComponent } from './components/order-candidate-list/order-candidates-list/accept-candidate/accept-candidate.component';
+import { ApplyCandidateComponent,
+} from './components/order-candidate-list/order-candidates-list/apply-candidate/apply-candidate.component';
+import { AcceptCandidateComponent,
+} from './components/order-candidate-list/order-candidates-list/accept-candidate/accept-candidate.component';
 import { DatePickerModule, DateRangePickerModule, TimePickerAllModule } from '@syncfusion/ej2-angular-calendars';
-import { OnboardedCandidateComponent } from './components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidate.component';
+import { OnboardedCandidateComponent,
+} from './components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidate.component';
 import { BillRatesViewGridComponent } from './components/bill-rates-view-grid/bill-rates-view-grid.component';
 import { CommentsComponent } from './components/comments/comments.component';
 import { HighlightGridRowDirective } from '@shared/directives/hightlight-grid-row.directive';
 import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-background-for-empty-grid.directive';
 import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
 import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
-import { OfferDeploymentComponent } from './components/order-candidate-list/order-candidates-list/offer-deployment/offer-deployment.component';
+import { OfferDeploymentComponent,
+} from './components/order-candidate-list/order-candidates-list/offer-deployment/offer-deployment.component';
 import { BillRatePipe } from '@shared/pipes/bill-rate.pipe';
 import { HistoricalEventsComponent } from './components/historical-events/historical-events.component';
 import { GridSubrowCandidateComponent } from './components/grid-subrow-candidate/grid-subrow-candidate.component';
@@ -96,7 +102,8 @@ import { ExportButtonComponent } from './components/export-button/export-button.
 import { TabsListComponent } from './components/tabs-list/tabs-list.component';
 import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
 import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dialog.module';
-import { DeployCandidateMessageComponent } from './components/order-candidate-list/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
+import { DeployCandidateMessageComponent,
+} from './components/order-candidate-list/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
 import { ExBillRateNamesPipe } from '@shared/pipes/external-bill-rate-names.pipe';
 import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
@@ -104,14 +111,21 @@ import { SecurityState } from '../security/store/security.state';
 import { NavigationPanelComponent } from './components/navigation-panel/navigation-panel.component';
 import { CandidateAvatarPipe } from './pipes/candidate-avatar.pipe';
 import { GridSubrowReorderComponent } from './components/grid-subrow-reorder/grid-subrow-reorder.component';
-import { GeneralOrderPerDiemInfoComponent } from '@shared/components/general-order-per-diem-info/general-order-per-diem-info.component';
+import { GeneralOrderPerDiemInfoComponent,
+} from '@shared/components/general-order-per-diem-info/general-order-per-diem-info.component';
 import { GeneralReorderInfoComponent } from './components/general-reorder-info/general-reorder-info.component';
-import { OrderReOrdersContainerComponent } from '@client/order-management/components/order-reorders-container/order-reorders-container.component';
-import { OrderPerDiemCandidatesListComponent } from './components/order-candidate-list/order-per-diem-candidates-list/order-per-diem-candidates-list.component';
-import { CandidatesStatusModalComponent } from './components/order-candidate-list/order-per-diem-candidates-list/candidates-status-modal/candidates-status-modal.component';
-import { ReorderCandidatesListComponent } from './components/order-candidate-list/reorder-candidates-list/reorder-candidates-list.component';
-import { ReorderStatusDialogComponent } from './components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/reorder-status-dialog.component';
-import { AcceptFormComponent } from './components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
+import { OrderReOrdersContainerComponent,
+} from '@client/order-management/components/order-reorders-container/order-reorders-container.component';
+import { OrderPerDiemCandidatesListComponent,
+} from './components/order-candidate-list/order-per-diem-candidates-list/order-per-diem-candidates-list.component';
+import { CandidatesStatusModalComponent,
+} from './components/order-candidate-list/order-per-diem-candidates-list/candidates-status-modal/candidates-status-modal.component';
+import { ReorderCandidatesListComponent,
+} from './components/order-candidate-list/reorder-candidates-list/reorder-candidates-list.component';
+import { ReorderStatusDialogComponent,
+} from './components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/reorder-status-dialog.component';
+import { AcceptFormComponent,
+} from './components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
 import { NgxMaskModule } from 'ngx-mask';
 import { CloseOrderSideDialogComponent } from '@shared/components/close-order-side-dialog/close-order-side-dialog.component';
 import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-reason-info/order-close-reason-info.component';
@@ -120,29 +134,34 @@ import { CommentsState } from './components/comments/store/comments.state';
 import { OpenFirstAccordionDirective } from './directives/always-open-first-accordition.directive';
 import { CandidateStatusName } from './pipes/candidate-status-name.pipe';
 import { RouterModule } from '@angular/router';
-import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
-import { ActionCellRendererComponent } from '@shared/components/cell-renderer/action-cellrenderer.component';
+import { ExtensionCandidateComponent,
+} from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
 import { CustomIconComponent } from './components/custom-icon/custom-icon.component';
 import { EmailSideDialogComponent } from '@shared/components/email-side-dialog/email-side-dialog.component';
 import { SmsSideDialogComponent } from '@shared/components/sms-side-dialog/sms-side-dialog.component';
 import { OnScreenSideDialogComponent } from '@shared/components/on-screen-side-dialog/on-screen-side-dialog.component';
-import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
+import { CustomNoRowsOverlayComponent,
+} from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { AlertsState } from '@admin/store/alerts.state';
 import { ImportDialogContentComponent } from './components/import-dialog-content/import-dialog-content.component';
 import { GridErroredCellComponent } from './components/import-dialog-content/grid-errored-cell/grid-errored-cell.component';
 import { HideBeforeSyncfusionLoadDirective } from './directives/hide-before-syncfusion-load.directive';
 import { UnsavedFormDirective } from './directives/unsaved-form.directive';
 import { ClearCacheComponent } from './components/clear-cache/clear-cache.component';
-import { CandidateCancellationDialogComponent } from './components/candidate-cancellation-dialog/candidate-cancellation-dialog.component';
+import { CandidateCancellationDialogComponent,
+} from './components/candidate-cancellation-dialog/candidate-cancellation-dialog.component';
 import { OrderHistoricalEventsComponent } from './components/order-historical-events/order-historical-events.component';
-import { AssignCredentialSideComponent } from './components/credentials-list/assign-credential-side/assign-credential-side.component';
+import { AssignCredentialSideComponent,
+} from './components/credentials-list/assign-credential-side/assign-credential-side.component';
 import { SendEmailSideDialogComponent } from './components/send-email-side-dialog/send-email-side-dialog.component';
-import { DocumentPreviewSideDialogComponent } from './components/document-preview-side-dialog/document-preview-side-dialog.component';
+import { DocumentPreviewSideDialogComponent,
+} from './components/document-preview-side-dialog/document-preview-side-dialog.component';
 import { CustomSideDialogComponent } from './components/custom-side-dialog/custom-side-dialog.component';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { HideByCandidateStatusPipe } from './pipes/hide-by-candidate-status.pipe';
 import { ValidateDirectiveModule } from './directives/validate-directive/validate-directive.module';
 import { BoolValuePipeModule } from './pipes/bool-values/bool-values-pipe.module';
+import { ActionCellRendererComponent } from './components/cell-renderers/actions-cell/action-cellrenderer.component';
 
 const icons = {
   AlertCircle,
