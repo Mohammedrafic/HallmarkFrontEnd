@@ -1,5 +1,7 @@
 @import '../variables/mixins';
 @import '../../styles/variables/colors';
+@import "adaptive-response";
+
 
 $grid-border-radius: 10px;
 $grid-box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
@@ -119,6 +121,11 @@ body.dark {
               color: $secondary-dark-blue-30;
               font-size: 14px;
               padding-top: 25px;
+
+              @media #{$max-mobile} {
+                position: absolute;
+                left: 40px;
+              }
             }
 
             td {

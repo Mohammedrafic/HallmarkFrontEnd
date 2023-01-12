@@ -1,4 +1,5 @@
 @import "colors";
+@import "adaptive-response";
 
 .e-btn-group {
   position: relative;
@@ -39,5 +40,15 @@
   &.disabled {
     color: $secondary-dark-blue-40 !important;
     pointer-events: none !important;
+  }
+}
+@media #{$max-mobile} {
+  .e-btn-group {
+    width: 87vw;
+    display: flex;
+  }
+  .e-btn {
+    flex: 1;
+    min-width: unset;
   }
 }
