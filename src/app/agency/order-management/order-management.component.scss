@@ -31,7 +31,9 @@
   app-tab-navigation {
     position: fixed;
     background-color: $background;
+    padding-top: 10px;
     padding-bottom: 6px;
     z-index: 100;
+    top: 81px;
   }
 }

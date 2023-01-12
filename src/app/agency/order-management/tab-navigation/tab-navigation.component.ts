@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { distinctUntilChanged, filter, map, Observable, takeUntil } from 'rxjs';
+import { takeUntil } from 'rxjs';
 
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 
@@ -11,9 +11,6 @@ import { OrderManagementState } from '../../store/order-management.state';
 import { SetOrdersTab } from '../../store/order-management.actions';
 import { Location } from '@angular/common';
 import { OrderType } from '@shared/enums/order-type';
-import { BreakpointObserverService } from '@core/services';
-import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
-import { MiddleTabletWidth } from '@shared/constants/media-query-breakpoints';
 
 @Component({
   selector: 'app-tab-navigation',
@@ -33,24 +30,18 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
 
   private selectedTabIndex: number;
   private previousSelectedOrderId: number;
-  private resizeObserver: ResizeObserverModel;
-  private isTabletOrMobile = false;
 
   constructor(
     private orderManagementAgencyService: OrderManagementAgencyService,
     private store: Store,
     private location: Location,
-    private breakpointService: BreakpointObserverService
   ) {
     super();
   }
 
   public ngOnInit(): void {
-    this.getDeviceResolution();
     this.selectPerDiemTab();
     this.selectReorderAfterNavigation();
-    this.initResizeObserver();
-    this.listenParentContainerWidth();
 
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
@@ -97,32 +88,5 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
     } else if (selectedOrderAfterRedirect?.orderType !== OrderType.ReOrder) {
       this.store.dispatch(new SetOrdersTab(this.tabsArray[0]));
     }
-  }
-
-  private initResizeObserver(): void {
-    this.resizeObserver = ResizeObserverService.init(this.targetElement!);
-  }
-
-  private listenParentContainerWidth(): void {
-    const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$.pipe(
-      filter(() => this.isTabletOrMobile),
-      map((data) => data[0].contentRect.width),
-      distinctUntilChanged()
-    );
-
-    resizeToolbarObserver$.pipe(takeUntil(this.destroy$)).subscribe((toolbarWidth) => {
-      const isSmallScreen = toolbarWidth <= MiddleTabletWidth;
-      const paddingWidth = 50;
-      this.width = isSmallScreen ? Math.trunc(toolbarWidth - paddingWidth) + 'px' : '100%';
-    });
-  }
-
-  private getDeviceResolution(): void {
-    this.breakpointService
-      .getBreakpointMediaRanges()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(({ isMobile, isTablet }) => {
-        this.isTabletOrMobile = isMobile || isTablet;
-      });
   }
 }

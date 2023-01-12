@@ -87,6 +87,8 @@ export abstract class AbstractGridConfigurationComponent {
 
   public isTablet = false;
 
+  public mobileGridHeight: string = GRID_CONFIG.gridHeight;
+
   public readonly onlyLetters: RegExp = ONLY_LETTERS;
 
   protected constructor() {}
@@ -278,6 +280,16 @@ export abstract class AbstractGridConfigurationComponent {
     } else {
       this.gridWithChildRow.detailRowModule.collapseAll();
       this.subrowsState.clear();
+    }
+  }
+
+  public setHeightForMobileGrid(itemsLength: number | undefined, cd?: ChangeDetectorRef | null): void {
+    const padding = 40;
+    const height = itemsLength ? itemsLength * this.rowHeight + padding : this.gridHeight;
+    this.mobileGridHeight = height < this.gridHeight ? this.gridHeight : String(height);
+
+    if(cd) {
+      cd.detectChanges();
     }
   }
 }

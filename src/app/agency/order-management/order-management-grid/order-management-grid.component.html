@@ -4,7 +4,7 @@
   (rowDataBound)="setRowHighlight($event)"
   [dataSource]="ordersPage?.items || []"
   [pageSettings]="pageSettings"
-  [height]="gridHeight"
+  [height]="isMobile ? mobileGridHeight : gridHeight"
   [rowHeight]="rowHeight"
   [allowSorting]="true"
   [resizeSettings]="resizeSettings"
