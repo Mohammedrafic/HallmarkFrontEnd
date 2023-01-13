@@ -1134,7 +1134,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.editOrder(data);
         break;
       case MoreMenuType['Duplicate']:
-        this.store.dispatch(new DuplicateOrder(data.id));
+        this.store.dispatch(new DuplicateOrder(data.id, this.activeSystem));
         break;
       case MoreMenuType['Close']:
         this.orderManagementContentService.getOrderById(data.id).subscribe((order) => {

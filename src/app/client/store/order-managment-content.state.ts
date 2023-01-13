@@ -932,9 +932,9 @@ export class OrderManagementContentState {
   @Action(DuplicateOrder)
   DuplicateOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { payload }: DuplicateOrder
+    { payload, system }: DuplicateOrder
   ): Observable<number> {
-    return this.orderManagementService.duplicate(payload).pipe(
+    return this.orderManagementService.duplicate(payload, system).pipe(
       tap((id: number) => {
         dispatch(new DuplicateOrderSuccess(id));
       })

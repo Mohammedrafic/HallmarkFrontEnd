@@ -59,7 +59,7 @@ export const GridCellsSystemIRPTabLta = (
             },
             iconName: 'more-vertical',
             buttonClass: 'e-primary',
-            disabled: true,
+            disabled: false,
             menuItems: PrepareMenuItems(params.data, threeDotsMenuOptions),
           },
         ],
