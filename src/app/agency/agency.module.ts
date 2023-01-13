@@ -38,6 +38,7 @@ import {
   Upload,
   X,
   XCircle,
+  Paperclip
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxModule,
@@ -141,6 +142,7 @@ const sidebarIcons = {
   XCircle,
   Slash,
   CheckCircle,
+  Paperclip
 };
 
 @NgModule({
