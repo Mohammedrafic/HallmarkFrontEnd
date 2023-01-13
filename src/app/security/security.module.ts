@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { InputModule } from "@shared/components/form-controls/input/input.module";
-import { MultiselectDropdownModule } from "@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module";
+import { MultiselectDropdownModule,
+} from "@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module";
 import { SharedModule } from '@shared/shared.module';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
-import { Sliders, Edit, Trash2, Plus } from 'angular-feather/icons';
+import { Sliders, Edit, Trash2, Plus, Download } from 'angular-feather/icons';
 import { ButtonAllModule, ChipListModule, SwitchAllModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { TabAllModule, TreeViewAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
@@ -24,7 +25,8 @@ import { UserGridComponent } from './user-list/user-grid/user-grid.component';
 import { AddEditUserComponent } from './user-list/add-edit-user/add-edit-user.component';
 import { UserSettingsComponent } from './user-list/add-edit-user/user-settings/user-settings.component';
 import { VisibilitySettingsComponent } from './user-list/add-edit-user/visibility-settings/visibility-settings.component';
-import { AddEditVisibilityComponent } from './user-list/add-edit-user/visibility-settings/add-edit-visibility/add-edit-visibility.component';
+import { AddEditVisibilityComponent,
+} from './user-list/add-edit-user/visibility-settings/add-edit-visibility/add-edit-visibility.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { RolesFiltersComponent } from './roles-and-permissions/roles-grid/roles-filters/roles-filters.component';
@@ -36,6 +38,7 @@ const securityIcons = {
   Edit,
   Plus,
   Trash2,
+  Download,
 };
 
 @NgModule({

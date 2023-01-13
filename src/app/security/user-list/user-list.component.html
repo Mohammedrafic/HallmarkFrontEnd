@@ -31,7 +31,19 @@
   </ng-container>
   <ng-container right>
     <ng-container>
-
+      <button
+      *ngIf="importAllowed"
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        class="e-outline"
+      >
+        <div class="button-import-container" (click)="uploadUsersRef.click()">
+          Import<i-feather name="download" class="icon"></i-feather>
+          <input hidden type="file" accept=".xlsx" #uploadUsersRef
+            (change)="uploadUsers($event)"
+          />
+        </div>
+      </button>
       <button
         ejs-dropdownbutton
         [items]="exportOptions"

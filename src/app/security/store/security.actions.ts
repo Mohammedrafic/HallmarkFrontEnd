@@ -149,3 +149,9 @@ export class ResendWelcomeEmail {
   static readonly type = '[security] Resend Welcome Email';
   constructor(public userId: string) {}
 }
+
+export class ImportUsers {
+  static readonly type = '[security] Import users file';
+
+  constructor(public readonly file: FormData) {}
+}

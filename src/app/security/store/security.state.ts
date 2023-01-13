@@ -31,6 +31,7 @@ import {
   ExportRoleList,
   GetAllUsersPage,
   ResendWelcomeEmail,
+  ImportUsers,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -517,6 +518,22 @@ export class SecurityState {
       tap(() => { dispatch(new ShowToast(MessageTypes.Success, EMAIL_RESEND_SUCCESS)); }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      }),
+    );
+  }
+
+  @Action(ImportUsers)
+  ImportUsers(
+    { dispatch }: StateContext<SecurityStateModel>,
+    { file }: ImportUsers,
+  ): Observable<void> {
+    return this.userService.importUsers(file)
+    .pipe(
+      tap(() => {
+        dispatch(new ShowToast(MessageTypes.Success, 'Users were imported successfully'));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }),
     );
   }

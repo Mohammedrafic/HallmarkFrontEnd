@@ -11,6 +11,7 @@ import {
   ChangeBusinessUnit,
   GetBusinessByUnitType,
   GetRolePerUser,
+  ImportUsers,
   SaveUser,
   SaveUserSucceeded,
 } from '../store/security.actions';
@@ -37,6 +38,7 @@ const EDIT_DIALOG_TITLE = 'Edit User';
 export class UserListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild(AddEditUserComponent) addEditUserComponent: AddEditUserComponent;
   @ViewChild(UserGridComponent) userGridComponent: UserGridComponent;
+  @ViewChild('uploadUsers') uploadUsersRef: HTMLInputElement;
 
   @Select(SecurityState.businessUserData)
   public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
@@ -54,6 +56,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
   public isBusinessFormDisabled = false;
   public createdUser: User | null;
   public agencyActionsAllowed = false;
+  public importAllowed = false;
 
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
@@ -69,9 +72,14 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
 
   private isAlive = true;
 
-  constructor(protected override store: Store, private confirmService: ConfirmService, private actions$: Actions) {
+  constructor(
+    protected override store: Store,
+    private confirmService: ConfirmService,
+    private actions$: Actions,
+  ) {
     super(store);
     this.store.dispatch(new SetHeaderState({ title: 'Users', iconName: 'lock' }));
+    this.importAllowed = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Hallmark;
   }
 
   override ngOnInit(): void {
@@ -175,6 +183,18 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
       this.disableBussinesUnitForRole();
       this.store.dispatch(new ShowSideDialog(true));
     });
+  }
+
+  public uploadUsers(event: Event): void {
+    const element = event.target as HTMLInputElement;
+    const file: File = element.files?.[0] as File;
+
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      this.store.dispatch(new ImportUsers(formData));
+    }
   }
 
   public override customExport(): void {
