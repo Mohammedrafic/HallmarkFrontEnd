@@ -7,6 +7,7 @@ import { EMPTY, Observable, switchMap, takeUntil } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
+import { CandidateService } from '../services/candidate.service';
 
 @Component({
   selector: 'app-candidate-profile',
@@ -25,6 +26,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   constructor(
     private candidateProfileFormService: CandidateProfileFormService,
     private candidateProfileService: CandidateProfileService,
+    private candidateService: CandidateService,
     private generalNotesService: GeneralNotesService,
     private cdr: ChangeDetectorRef,
     private router: Router,
@@ -32,6 +34,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     private navigationWrapperService: NavigationWrapperService
   ) {
     super();
+    this.employeeIdHandler();
   }
 
   public ngOnInit(): void {
@@ -82,9 +85,16 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     }
   }
 
-  private handleEditingCandidate(): void {
+  private employeeIdHandler(): void {
     if (this.route.snapshot.paramMap.get('id')) {
-      this.candidateId = parseInt(this.route.snapshot.paramMap.get('id') as string);
+      this.candidateId = this.candidateService.employeeId = parseInt(this.route.snapshot.paramMap.get('id') as string);
+    } else {
+      this.candidateService.employeeId = null;
+    }
+  }
+
+  private handleEditingCandidate(): void {
+    if (this.candidateId) {
       this.candidateProfileService
         .getCandidateById(this.candidateId)
         .pipe(takeUntil(this.destroy$))

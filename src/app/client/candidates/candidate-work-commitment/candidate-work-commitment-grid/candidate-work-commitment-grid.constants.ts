@@ -1,23 +1,35 @@
 import { ValueFormatterParams } from "@ag-grid-community/core";
-import { ColumnDefinitionModel } from "@shared/components/grid/models";
+import { formatDate } from "@angular/common";
+import { CandidateWorkCommitment } from "../models/candidate-work-commitment.model";
 import { CandidateCommitmentGridActionRendererComponent } from "./grid-action-renderer/grid-action-renderer.component";
 
-export const CandidateWorkCommitmentColumnDef: ColumnDefinitionModel[] = [
+export const CandidateWorkCommitmentColumnDef = (editCallback: (value: CandidateWorkCommitment) => void, deleteCallback: (value: CandidateWorkCommitment) => void ) => ([
     {
       field: '',
       headerName: '',
       cellRenderer: CandidateCommitmentGridActionRendererComponent,
       maxWidth: 100,
+      cellRendererParams: {
+        edit: (value: CandidateWorkCommitment) => {
+          editCallback(value);
+        },
+        delete: (value: CandidateWorkCommitment) => {
+          deleteCallback(value);
+        }
+      }
     },
     {
       field: 'startDate',
       headerName: 'Start Date',
-      valueFormatter: (params: ValueFormatterParams) => params.value,
+      valueFormatter: (params: ValueFormatterParams) =>
+        formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
       maxWidth: 140,
     },
     {
       field: 'endDate',
       headerName: 'End Date',
+      valueFormatter: (params: ValueFormatterParams) =>
+        params.value && formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
       minWidth: 185,
     },
     {
@@ -47,6 +59,8 @@ export const CandidateWorkCommitmentColumnDef: ColumnDefinitionModel[] = [
     {
       field: 'payRate',
       headerName: 'Pay Rate',
+      valueFormatter: (params: ValueFormatterParams) =>
+        params.value && parseFloat(params.value).toFixed(2),
       flex: 1,
       minWidth: 185,
     },
@@ -69,7 +83,7 @@ export const CandidateWorkCommitmentColumnDef: ColumnDefinitionModel[] = [
       minWidth: 185,
     },
     {
-      field: 'isCriticalOrder',
+      field: 'criticalOrder',
       headerName: 'Critical Order',
       flex: 1,
       minWidth: 185,
@@ -86,4 +100,4 @@ export const CandidateWorkCommitmentColumnDef: ColumnDefinitionModel[] = [
       flex: 1,
       minWidth: 185,
     },
-  ];
+  ]);

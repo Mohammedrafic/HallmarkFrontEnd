@@ -12,6 +12,7 @@ import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { DateTimeHelper } from '@core/helpers';
 import pick from 'lodash/fp/pick';
+import { CandidateService } from '../services/candidate.service';
 
 @Injectable()
 export class CandidateProfileService {
@@ -20,7 +21,7 @@ export class CandidateProfileService {
     private formBuilder: FormBuilder,
     private store: Store,
     private candidateProfileForm: CandidateProfileFormService,
-    private generalNotesService: GeneralNotesService
+    private generalNotesService: GeneralNotesService,
   ) {}
 
   public saveCandidateProfile(candidateId: number): Observable<CandidateModel> {
@@ -49,6 +50,7 @@ export class CandidateProfileService {
   public saveCandidate(file: Blob, candidateId: number): Observable<void | CandidateModel> {
       return this.saveCandidateProfile(candidateId).pipe(
         mergeMap((candidate) => {
+          this.candidateProfileForm.tabUpdate$.next(candidate.id);
           return file ? this.saveCandidatePhoto(file, candidate.id) : this.removeCandidatePhoto(candidate.id);
         })
       );

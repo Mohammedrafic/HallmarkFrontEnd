@@ -1,19 +1,28 @@
 import { PageOfCollections } from "@shared/models/page.model";
 
+export type WorkCommitmentDataSource = {
+  id: number;
+  name: string;
+}
+
 export type CandidateWorkCommitment = {
   id?: number;
-  name: string;
-  regions: string[];
-  locations: string[];
-  startDate: Date;
-  endDate: Date;
+  employeeId?: number;
+  workCommitmentId?: number;
+  name?: string;
+  regions?: string[];
+  locations?: string[];
+  regionIds?: number[];
+  locationIds: number[];
+  startDate: string | Date;
+  endDate: string | Date;
   jobCode: string;
   payRate: number;
   minWorkExperience: number;
   availRequirement: number;
   schedulePeriod: number;
   holiday: number;
-  isCriticalOrder: boolean;
+  criticalOrder: number;
   comment: string;
 }
 

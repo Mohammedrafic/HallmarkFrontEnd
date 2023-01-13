@@ -1,6 +1,16 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_DELETE } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { getAllErrors } from '@shared/utils/error.utils';
+import { catchError, filter, Subject, takeUntil, tap } from 'rxjs';
+import { ShowToast } from 'src/app/store/app.actions';
+import { CandidateWorkCommitment, CandidateWorkCommitmentsPage } from '../models/candidate-work-commitment.model';
+import { CandidateWorkCommitmentService } from '../services/candidate-work-commitment.service';
 import { CandidateWorkCommitmentColumnDef } from './candidate-work-commitment-grid.constants';
 
 @Component({
@@ -10,23 +20,88 @@ import { CandidateWorkCommitmentColumnDef } from './candidate-work-commitment-gr
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CandidateWorkCommitmentGridComponent extends DestroyableDirective implements OnInit {
+  @Input() public dialogSubject$: Subject<{ isOpen: boolean, isEdit: boolean, commitment?: CandidateWorkCommitment }>;
+  @Input() public refreshSubject$: Subject<void>;
+  @Input() set employeeIdVal(value: number | null) {
+    if (value) {
+      this.employeeId = value;
+      this.dispatchNewPage();
+    }
+  }
 
-  public readonly columnDef: ColumnDefinitionModel[] = CandidateWorkCommitmentColumnDef;
+  public employeeId: number;
+  public readonly columnDef: ColumnDefinitionModel[] = CandidateWorkCommitmentColumnDef(this.editCommitment.bind(this), this.deleteCommitment.bind(this));
   public rowSelection = undefined;
   public customRowsPerPageDropDownObject = [ { text: '5 Rows', value: 5 } ];
+  public pageNumber: number = 1;
+  public pageSize: number = 5;
+  public candidateWorkCommitmentsPage: CandidateWorkCommitmentsPage;
 
   constructor(
-    public cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private candidateWorkCommitmentService: CandidateWorkCommitmentService,
+    private store: Store,
+    private confirmService: ConfirmService,
   ) {
     super();
   }
 
   public ngOnInit(): void {
+    this.subscribeOnPageRefreshing();
+  }
 
+  private dispatchNewPage(): void {
+    this.candidateWorkCommitmentService.getCandidateWorkCommitmentByPage(this.pageNumber, this.pageSize, this.employeeId).subscribe((page) => {
+      this.candidateWorkCommitmentsPage = page;
+      this.cd.markForCheck();
+    });
+  }
+
+  private subscribeOnPageRefreshing(): void {
+    this.refreshSubject$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.dispatchNewPage();
+    });
   }
 
   public addCommitment(): void {
-
+    this.dialogSubject$.next({ isOpen: true, isEdit: false });
   }
 
+  public handleChangePage(pageNumber: number): void {
+    if(pageNumber && this.pageNumber !== pageNumber) {
+      this.pageNumber = pageNumber;
+      this.dispatchNewPage();
+    }
+  }
+
+  public editCommitment(commitment: CandidateWorkCommitment): void {
+    this.dialogSubject$.next({ isOpen: true, isEdit: true, commitment: commitment });
+  }
+
+  private deleteCommitmentHandler(commitment: CandidateWorkCommitment): void {
+    this.candidateWorkCommitmentService.deleteCandidateWorkCommitmentById(commitment.id as number).pipe(
+      tap(() => {
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+        this.refreshSubject$.next();
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    ).subscribe();
+  }
+
+  public deleteCommitment(commitment: CandidateWorkCommitment): void {
+    this.confirmService
+    .confirm(DELETE_RECORD_TEXT, {
+      title: DELETE_RECORD_TITLE,
+      okButtonLabel: 'Delete',
+      okButtonClass: 'delete-button',
+    }).pipe(
+      filter(Boolean),
+      takeUntil(this.destroy$),
+    )
+    .subscribe(() => {
+      this.deleteCommitmentHandler(commitment);
+    });
+  }
 }

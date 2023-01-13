@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { InputModule } from '@shared/components/form-controls/input/input.module';
 import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
 import { DropdownModule } from '@shared/components/form-controls/dropdown/dropdown.module';
@@ -14,12 +15,16 @@ import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { CandidateWorkCommitmentComponent } from './candidate-work-commitment.component';
 import { CandidateWorkCommitmentGridComponent } from './candidate-work-commitment-grid/candidate-work-commitment-grid.component';
 import { CandidateCommitmentGridActionRendererComponent } from './candidate-work-commitment-grid/grid-action-renderer/grid-action-renderer.component';
+import { CandidateWorkCommitmentDialogComponent } from './candidate-work-commitment-dialog/candidate-work-commitment-dialog.component';
+import { DialogModule } from '@syncfusion/ej2-angular-popups';
+import { CandidateWorkCommitmentService } from './services/candidate-work-commitment.service';
 
 @NgModule({
   declarations: [
     CandidateWorkCommitmentComponent,
     CandidateWorkCommitmentGridComponent,
-    CandidateCommitmentGridActionRendererComponent
+    CandidateCommitmentGridActionRendererComponent,
+    CandidateWorkCommitmentDialogComponent
   ],
   exports: [],
   imports: [
@@ -36,9 +41,11 @@ import { CandidateCommitmentGridActionRendererComponent } from './candidate-work
     ButtonModule,
     SharedModule,
     DropDownListModule,
+    DialogModule,
+    ReactiveFormsModule
   ],
   providers: [
-
+    CandidateWorkCommitmentService
   ]
 })
 export class CandidateWorkCommitmentModule {}

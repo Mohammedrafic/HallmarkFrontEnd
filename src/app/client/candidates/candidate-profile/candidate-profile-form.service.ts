@@ -10,6 +10,7 @@ import pick from 'lodash/fp/pick';
 export class CandidateProfileFormService {
   public readonly candidateForm: FormGroup = this.createForm();
   public saveEvent$: Subject<void> = new Subject<void>();
+  public tabUpdate$: Subject<number> = new Subject<number>();
 
   constructor(private formBuilder: FormBuilder) {}
 
