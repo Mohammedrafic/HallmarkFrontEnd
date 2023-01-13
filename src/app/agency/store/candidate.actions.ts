@@ -1,6 +1,6 @@
 import { CredentialStatus } from "@shared/enums/status";
 import { CandidateImportRecord, CandidateImportResult } from '@shared/models/candidate-profile-import.model';
-import { CandidateCredential, CredentialRequestParams } from '@shared/models/candidate-credential.model';
+import { BulkVerifyCandidateCredential, CandidateCredential, CredentialRequestParams } from '@shared/models/candidate-credential.model';
 import { Candidate } from 'src/app/shared/models/candidate.model';
 import { Education } from 'src/app/shared/models/education.model';
 import { Experience } from 'src/app/shared/models/experience.model';
@@ -133,6 +133,10 @@ export class SaveCandidatesCredential {
   static readonly type = '[candidate] Save Candidates Credential';
   constructor(public payload: CandidateCredential) {}
 }
+export class VerifyCandidatesCredentials {
+  static readonly type = '[candidate] Verify Candidates Credentials';
+  constructor(public payload: BulkVerifyCandidateCredential) {}
+}
 
 export class SaveCandidatesCredentialSucceeded {
   static readonly type = '[candidate] Save Candidates Credential Succeeded';
@@ -141,6 +145,14 @@ export class SaveCandidatesCredentialSucceeded {
 
 export class SaveCandidatesCredentialFailed {
   static readonly type = '[candidate] Save Candidates Credential Failed';
+}
+export class VerifyCandidatesCredentialsSucceeded {
+  static readonly type = '[candidate] Verify Candidates Credentials Succeeded';
+  constructor(public payload: CandidateCredential[]) {}
+}
+
+export class VerifyCandidatesCredentialsFailed {
+  static readonly type = '[candidate] Verify Candidates Credentials Failed';
 }
 
 export class RemoveCandidatesCredential {

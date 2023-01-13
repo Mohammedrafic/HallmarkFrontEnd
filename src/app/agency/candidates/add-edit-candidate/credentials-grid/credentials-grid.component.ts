@@ -31,6 +31,9 @@ import {
   SaveCandidatesCredentialSucceeded,
   UploadCredentialFiles,
   UploadCredentialFilesSucceeded,
+  VerifyCandidatesCredentials,
+  VerifyCandidatesCredentialsFailed,
+  VerifyCandidatesCredentialsSucceeded,
 } from '@agency/store/candidate.actions';
 import { CandidateState } from '@agency/store/candidate.state';
 import { CredentialGridService } from '@agency/services/credential-grid.service';
@@ -45,7 +48,7 @@ import { optionFields } from '@shared/constants';
 import { FileStatusCode } from '@shared/enums/file.enum';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CredentialStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { CandidateStatus, CredentialStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import {
   CandidateCredential,
   CandidateCredentialGridItem,
@@ -66,6 +69,7 @@ import {
   DisableEditMessage,
 } from './credentials-grid.constants';
 import { AddCredentialForm, SearchCredentialForm } from './credentials-grid.interface';
+import { Verify } from 'crypto';
 
 @Component({
   selector: 'app-credentials-grid',
@@ -284,6 +288,34 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.addCredentialForm.markAsDirty();
     }
   }
+  public verifyCredentials(): void {
+    const rowsWithFiles = this.selectedItems;
+
+    if (rowsWithFiles.length>0) {
+     var list= rowsWithFiles.map((cred)=>this.mapCredential(cred));
+     var request={candidateCredentials:list};
+     this.store.dispatch(
+      new VerifyCandidatesCredentials(request)
+    );
+    
+    }
+    
+  }
+  public mapCredential(cred:CandidateCredential):CandidateCredential
+  {
+    if (cred.masterCredentialId) {
+      cred.status=CredentialStatus.Verified;
+      if (cred.createdOn != null) {
+        cred.createdOn = DateTimeHelper.toUtcFormat(cred.createdOn);
+      }
+
+      if (cred.createdUntil != null) {
+        cred.createdUntil = DateTimeHelper.toUtcFormat(cred.createdUntil);
+      }
+     
+    }
+    return cred;
+  } 
 
   public selectRowsPerPage(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
@@ -603,6 +635,17 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           downloadBlobFile(files.payload, this.file.name);
           this.file = null;
         }
+      });
+      this.actions$
+      .pipe(ofActionSuccessful(VerifyCandidatesCredentialsSucceeded), takeUntil(this.unsubscribe$))
+      .subscribe((credential: { payload: CandidateCredential[] }) => {
+        this.selectedItems = [];
+        this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));      
+      });
+      this.actions$
+      .pipe(ofActionSuccessful(VerifyCandidatesCredentialsFailed), takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        this.disabledCopy = false;
       });
   }
 
