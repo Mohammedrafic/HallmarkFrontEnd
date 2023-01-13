@@ -629,6 +629,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         credentialFile: item.credentialFiles?.length ? item.credentialFiles[0] : null,
         disableCopy: this.disableCopy(item),
         disableEdit: this.disableEdit(item),
+        disableViewDocument:this.disableViewDocument(item),
         showDisableEditTooltip:
           (item.status === this.statusEnum.Reviewed || item.status === this.statusEnum.Verified) &&
           !this.isOrganizationSide,
@@ -636,7 +637,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       };
     });
   }
-
+ private disableViewDocument(item:CandidateCredential):boolean{
+  let length= item.credentialFiles==null?0:item.credentialFiles?.length;
+  return length<=0;
+ }
   private disableCopy(item: CandidateCredential): boolean {
     return (
       !this.areAgencyActionsAllowed ||
