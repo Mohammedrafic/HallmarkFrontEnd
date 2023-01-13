@@ -445,7 +445,11 @@ export class SendGroupEmailComponent
       else {
         let businessUnitIds = value;
         this.dispatchUserPage(businessUnitIds);
-        this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {});
+        this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+          if (data != undefined) {
+            this.userData = data.items.filter(i => i.isDeleted == false);
+          }
+        });
       }
     });
   }
@@ -462,8 +466,7 @@ export class SendGroupEmailComponent
           businessUnitIds.push(this.businessControl.value);
         }
         this.dispatchUserPage(businessUnitIds);
-        let orgList = this.organizations?.filter((x) => value == x.organizationId);
-        console.log(orgList);
+        let orgList = this.organizations?.filter((x) => value == x.organizationId);        
         this.regionsList = [];
         this.locationsList = [];
         orgList.forEach((value) => {
@@ -574,7 +577,7 @@ export class SendGroupEmailComponent
           this.dispatchUserPage(businessUnitIds);
           this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
             if (data != undefined) {
-              this.userData = data.items;
+              this.userData = data.items.filter(i => i.isDeleted == false);
             }
           });
         }
