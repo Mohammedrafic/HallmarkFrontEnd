@@ -1,5 +1,5 @@
-@import "adaptive-response";
-@import "colors";
+@import 'adaptive-response';
+@import 'colors';
 $gap: 12px;
 
 .controls-container {
@@ -21,7 +21,6 @@ $gap: 12px;
   }
 
   .right-content {
-    max-width: 50%;
     display: flex;
     justify-content: flex-end;
     flex-grow: 1;

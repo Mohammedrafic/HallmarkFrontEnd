@@ -1,0 +1,16 @@
+.scroll-to-top {
+  position: fixed;
+  bottom: 16vh;
+  right: 10vw;
+  display: none;
+  transition: all 0.2s ease-in-out;
+  button.e-control.e-btn {
+    padding: 8px 12px !important;
+  }
+}
+.show-scrollTop {
+  display: block;
+}
+.icon {
+  margin-left: 0 !important;
+}

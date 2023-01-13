@@ -4,6 +4,7 @@
       [tabConfig]="(tabsConfig$ | async) || []"
       (changeTab)="handleChangeTab($event)"
       class="tabs"
+      appTabsMobileShadow
     >
     </app-invoices-table-tabs>
   </ng-container>
@@ -204,6 +205,7 @@
     [allowBulkButton]="true"
     [rowSelection]="'multiple'"
     [gridOptions]="gridOptions"
+    [domLayout]="gridDomLayout"
   ></app-grid>
 </ng-template>
 
@@ -239,3 +241,4 @@
   (destroyDialog)="closeAddPayment()"
 >
 </app-invoice-add-payment>
+<app-scroll-to-top *ngIf="isMobile"></app-scroll-to-top>

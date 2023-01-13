@@ -9,6 +9,7 @@ app-grid {
 .app-grid {
   display: flex;
   flex-direction: column;
+  height: 100%;
 
   & .ag-row-selected {
     background-color: $primary-active-blue-70 !important;
