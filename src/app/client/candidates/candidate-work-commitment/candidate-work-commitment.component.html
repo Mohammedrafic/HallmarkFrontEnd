@@ -1,3 +1,4 @@
 <section class="candidate-work-commitment-tab">
-  <app-candidate-work-commitment-grid></app-candidate-work-commitment-grid>
+  <app-candidate-work-commitment-grid [employeeIdVal]="candidateService.employeeId" [refreshSubject$]="refreshSubject$" [dialogSubject$]="dialogSubject$"></app-candidate-work-commitment-grid>
 </section>
+<app-candidate-work-commitment-dialog [employeeIdVal]="candidateService.employeeId" [refreshSubject$]="refreshSubject$" [dialogSubject$]="dialogSubject$"></app-candidate-work-commitment-dialog>

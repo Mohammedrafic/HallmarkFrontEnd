@@ -31,7 +31,7 @@ import { BillRate } from '@shared/models/bill-rate.model';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { HistoricalEvent } from '@shared/models';
 import { ExportPayload } from '@shared/models/export.model';
-import { AgencyOrderManagementTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { AgencyOrderManagementTabs, OrderManagementIRPSystemId, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper } from '@core/helpers';
 import { orderFieldsConfig } from '@client/order-management/components/add-edit-order/order-fields';
@@ -475,8 +475,11 @@ export class OrderManagementContentService {
    * @param payload order id to duplicate
    * @return id of newly created order
    */
-  public duplicate(payload: number): Observable<number> {
-    return this.http.post<number>(`/api/Orders/${payload}/duplicate`, {});
+  public duplicate(payload: number, system: OrderManagementIRPSystemId): Observable<number> {
+    const url = system === OrderManagementIRPSystemId.VMS ? `/api/Orders/${payload}/duplicate`
+    : `/api/IRPOrders/${payload}/duplicate`;
+
+    return this.http.post<number>(url, {});
   }
 
   public getRegularBillRate(

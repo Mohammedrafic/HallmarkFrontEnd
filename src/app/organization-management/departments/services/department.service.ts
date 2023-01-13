@@ -25,6 +25,8 @@ export class DepartmentService {
       ...(isIRPFlagEnabled && {
         includeInIRP: [false],
         unitDescription: ['', [Validators.maxLength(2000)]],
+        primarySkills: [null],
+        secondarySkills: [null]
       })
     });
   }
@@ -69,6 +71,8 @@ export class DepartmentService {
       ...(isIRPFlagEnabled && {
         includeInIRP: !!department.includeInIRP,
         unitDescription: department.unitDescription,
+        primarySkills: department.primarySkills,
+        secondarySkills: department.secondarySkills,
       })
     });
 

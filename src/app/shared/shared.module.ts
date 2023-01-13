@@ -162,6 +162,8 @@ import { HideByCandidateStatusPipe } from './pipes/hide-by-candidate-status.pipe
 import { ValidateDirectiveModule } from './directives/validate-directive/validate-directive.module';
 import { BoolValuePipeModule } from './pipes/bool-values/bool-values-pipe.module';
 import { ActionCellRendererComponent } from './components/cell-renderers/actions-cell/action-cellrenderer.component';
+import { ScrollToTopComponent } from './components/scroll-to-top/scroll-to-top.component';
+import { TabsMobileShadowDirective } from './directives/tabs-mobile-shadow.directive';
 
 const icons = {
   AlertCircle,
@@ -309,6 +311,8 @@ const COMPONENTS = [
     ImportDialogContentComponent,
     MultiSelectModule,
     TooltipModule,
+    ScrollToTopComponent,
+    TabsMobileShadowDirective,
   ],
   declarations: [
     ...COMPONENTS,
@@ -329,6 +333,8 @@ const COMPONENTS = [
     DocumentPreviewSideDialogComponent,
     CustomSideDialogComponent,
     HideByCandidateStatusPipe,
+    ScrollToTopComponent,
+    TabsMobileShadowDirective,
   ],
   providers: [
     DatePipe,

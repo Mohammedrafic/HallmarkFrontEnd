@@ -636,7 +636,7 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
     const jobDistributionValues = order.jobDistributions
       .map((jobDistribution: JobDistributionModel) => jobDistribution.jobDistributionOption)
       .filter((value, i, array) => array.indexOf(value) === i); // filter duplicates
-    
+
     const agencyValues = order.jobDistributions
       .filter((jobDistribution: JobDistributionModel) =>
         jobDistribution.jobDistributionOption === OrderJobDistribution.Selected)
@@ -811,6 +811,8 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
     }
 
     this.updateShifts(shiftStartTimeControl, shiftEndTimeControl);
+
+    this.cd.markForCheck();
   }
 
   setShiftsValidation(shiftStart: AbstractControl, shiftEnd: AbstractControl): void {
@@ -1072,6 +1074,8 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
     ).subscribe((duration: Duration) => {
       this.isJobEndDateControlEnabled = duration === Duration.Other;
       const jobStartDate = this.orderControlsConfig.jobStartDateControl.value as Date | null;
+
+      this.cd.markForCheck();
 
       if (!(jobStartDate instanceof Date) || this.isPermPlacementOrder) {
         return;

@@ -1,3 +1,5 @@
+@import 'adaptive-response';
+
 :host::ng-deep {
   .e-toolbar-items.e-lib.e-hscroll.e-control.e-touch {
     padding: 0 !important;
@@ -5,6 +7,14 @@
   .e-scroll-nav.e-scroll-right-nav.e-lib.e-touch,
   .e-scroll-nav.e-scroll-left-nav.e-lib.e-touch {
     display: none;
+  }
+
+  .tabs {
+    max-width: calc(100vw - 50px) !important;
+    overflow: hidden !important;
+    .e-hscroll-content {
+      padding: 0;
+    }
   }
 }
 

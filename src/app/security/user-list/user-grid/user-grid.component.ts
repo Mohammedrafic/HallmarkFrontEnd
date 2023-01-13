@@ -6,7 +6,7 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
 import { filter, map, Observable, Subject, takeWhile } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
@@ -22,7 +22,7 @@ import { User, UsersPage } from '@shared/models/user-managment-page.model';
 import { ShowExportDialog } from '../../../store/app.actions';
 import { AppState } from '../../../store/app.state';
 import { UserState } from '../../../store/user.state';
-import { ExportUserList, GetRolesPage, GetUsersPage, ResendWelcomeEmail } from '../../store/security.actions';
+import { ExportUserList, GetRolesPage, GetUsersPage, ImportUsers, ResendWelcomeEmail } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
 import { Visibility } from './user-grid.enum';
 import { ColDef } from '@ag-grid-community/core';
@@ -89,18 +89,31 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   filters: RolesFilters;
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
-  constructor(private store: Store, private datePipe: DatePipe, private confirmService: ConfirmService) {
+  /**
+   * TODO: remove datepipe with formatDate function.
+   */
+  constructor(
+    private store: Store,
+    private datePipe: DatePipe,
+    private confirmService: ConfirmService,
+    private actions$: Actions,
+  ) {
     super();
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
     };
+    /**
+     * TODO: this is not needed. var codesmell.
+     */
     var self = this;
     this.rowModelType = 'serverSide';
     this.serverSideStoreType = 'partial';
     (this.serverSideInfiniteScroll = true), (this.serverSideFilterOnServer = true), (this.pagination = true);
     (this.paginationPageSize = this.pageSize), (this.cacheBlockSize = this.pageSize);
     this.maxBlocksInCache = 1;
-
+    /**
+     * TODO: move to constant file.
+     */
     this.columnDefs = [
       {
         headerName: 'Action',
@@ -240,6 +253,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.subscribeOnExportAction();
     this.updateUsers();
     this.loadRoles();
+    this.watchForImport();
   }
 
   ngOnDestroy(): void {
@@ -454,6 +468,16 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.export$.pipe(takeWhile(() => this.isAlive)).subscribe((event: ExportedFileType) => {
       this.defaultFileName = `Security/User List ${this.generateDateTime(this.datePipe)}`;
       this.defaultExport(event);
+    });
+  }
+
+  private watchForImport(): void {
+    this.actions$
+    .pipe(
+      ofActionSuccessful(ImportUsers)
+    )
+    .subscribe(() => {
+      this.dispatchNewPage();
     });
   }
 }

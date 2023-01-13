@@ -1,4 +1,4 @@
-import { PageOfCollections } from "./page.model";
+import { PageOfCollections } from './page.model';
 
 export class Department {
   departmentId?: number;
@@ -17,6 +17,10 @@ export class Department {
   isDeactivated?: boolean;
   ignoreValidationWarning?: boolean;
   id: any;
+  primarySkills?: number[];
+  secondarySkills?: number[];
+  primarySkillNames?: string;
+  secondarySkillNames?: string;
 }
 
 export type DepartmentsPage = PageOfCollections<Department>;

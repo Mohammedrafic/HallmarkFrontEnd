@@ -24,9 +24,11 @@
     [suppressMoveWhenRowDragging]="suppressMoveWhenRowDragging"
     [overlayNoRowsTemplate]="customGridEmptyMessage || gridEmptyMessage"
     [context]="context"
+    [domLayout]="domLayout"
     class="ag-theme-alpine app-grid__component"
   ></ag-grid-angular>
-  <app-grid-pagination *ngIf="paginationPanel"
+  <app-grid-pagination
+    *ngIf="paginationPanel"
     (navigateToPageEmitter)="navigateToPageEmitter.emit($event)"
     (pageSizeChangeEmitter)="pageSizeChangeEmitter.emit($event)"
     (approveEmitter)="approveEmitter.emit(selectedTableRows)"

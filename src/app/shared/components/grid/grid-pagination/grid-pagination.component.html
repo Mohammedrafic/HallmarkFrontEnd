@@ -16,7 +16,7 @@
       <app-numeric-textbox
         (changeValueEmitter)="navigateToPageEmitter.emit($event)"
         [formGroupInstance]="paginationFormGroup"
-        [max]="pagerComponent.totalPages || 1"
+        [max]="10 || 1"
         [min]="1"
         format="#"
         controlName="navigateTo"
@@ -61,7 +61,7 @@
         (click)="handlePagerClickEvent($event)"
         [currentPage]="currentPage"
         [enablePagerMessage]="false"
-        [pageSize]="paginationFormGroup.value.pageSize"
+        [pageSize]="paginationFormGroup.getRawValue().pageSize"
         [totalRecordsCount]="totalRecordsCount"
         class="app-grid-pagination__pager"
       ></ejs-pager>

@@ -12,7 +12,7 @@ import {
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { ExportPayload } from '@shared/models/export.model';
-import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { OrderManagementIRPSystemId, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { ImportedOrder, OrderImportResult } from '@shared/models/imported-order.model';
 
@@ -296,7 +296,7 @@ export class ClearSuggestions {
 
 export class DuplicateOrder {
   static readonly type = '[order management] Duplicate Order';
-  constructor(public payload: number) {}
+  constructor(public readonly payload: number, public readonly system: OrderManagementIRPSystemId) {}
 }
 
 export class DuplicateOrderSuccess {

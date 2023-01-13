@@ -5,6 +5,8 @@
     [rowHeight]="64"
     [modules]="modules"
     [context]="tableContext"
+    [overlayNoRowsTemplate]="gridEmptyMessage"
+    [class.empty-table]="!(reasons$ | async)?.items?.length"
     class="ag-theme-alpine app-grid__component"
   >
   </ag-grid-angular>

@@ -1,13 +1,15 @@
 <app-grid
   title="Work Commitment"
-  [rowData]="[]"
+  [rowData]="candidateWorkCommitmentsPage?.items || []"
   [columnDefinitions]="columnDef"
   [rowSelection]="rowSelection"
-  [totalRecordsCount]="[].length!"
+  [totalRecordsCount]="candidateWorkCommitmentsPage?.totalCount || 0"
   customGridEmptyMessage="Add Commitment"
   [pageSize]="5"
+  [currentPage]="pageNumber"
   [customRowsPerPageDropDownObject]="customRowsPerPageDropDownObject"
   [disableRowsPerPageDropdown]="true"
+  (navigateToPageEmitter)="handleChangePage($event)"
 >
   <button
     action-button

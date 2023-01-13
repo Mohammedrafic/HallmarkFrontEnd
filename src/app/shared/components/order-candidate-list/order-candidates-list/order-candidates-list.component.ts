@@ -98,7 +98,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.subscribeToDeployedCandidateOrdersInfo();
     }
 
-    if (this.selectedOrder.irpOrderMetadata) {
+    if (this.system === OrderManagementIRPSystemId.IRP) {
       this.getIrpCandidates();
     }
   }

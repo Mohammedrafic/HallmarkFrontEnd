@@ -338,7 +338,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public editOrder(data: Order) {
-    if (this.isReOrder && data.orderType !== OrderType.OpenPerDiem && !data.irpOrderMetadata) {
+    if (this.isReOrder && data.orderType !== OrderType.OpenPerDiem && this.activeSystem !== OrderManagementIRPSystemId.IRP) {
       this.order = { ...data };
       this.addEditReorderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.EditReOrder);
       this.store.dispatch(new ShowSideDialog(true));

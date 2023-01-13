@@ -11,6 +11,7 @@ import { WorkCommitmentDialogApiService } from './work-commitment-dialog-api.ser
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { mapDataSource } from '../helpers';
+import { convertHolidaysToDataSource } from '@shared/helpers/dropdown-options.helper';
 
 @Injectable()
 export class WorkCommitmentService {
@@ -78,25 +79,6 @@ export class WorkCommitmentService {
   }
 
   private convertHolidaysToDataSource(holidays: HolidaysPage) {
-    let holidayCounter = 0;
-    holidays.items.forEach((item: Holiday) => {
-      holidayCounter += this.calculateDateDifferent(item.startDateTime, item.endDateTime);
-    });
-
-    const dataSource = [];
-
-    for (let i = 0; i <= holidayCounter; i++) {
-      dataSource.push({ name: i, id: i });
-    }
-
-    return dataSource;
-  }
-
-  private calculateDateDifferent(firstDate: Date | string, secondDate: Date | string): number {
-    firstDate = new Date(firstDate);
-    secondDate = new Date(secondDate);
-
-    const differentInTime = secondDate.getTime() - firstDate.getTime();
-    return Math.ceil(differentInTime / (1000 * 3600 * 24));
+    return convertHolidaysToDataSource(holidays);
   }
 }

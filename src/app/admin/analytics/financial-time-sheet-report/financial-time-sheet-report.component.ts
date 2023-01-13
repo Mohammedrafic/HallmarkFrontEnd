@@ -56,7 +56,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     "BearerParamFTS": "",
     "BusinessUnitIdParamFTS": "",
     "HostName": "",
-    "AccrualReportFilterTypeFTS": ""
+    "AccrualReportFilterTypeFTS": "",
+    "InvoiceIdParamFTS":""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.wls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cat" };
@@ -202,7 +203,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         orderTypes: new FormControl([]),
         jobStatuses: new FormControl([]),
         jobId: new FormControl(''),
-        accrualReportTypes: new FormControl(null, [Validators.required])
+        accrualReportTypes: new FormControl(null, [Validators.required]),
+        invoiceID:new FormControl('')
       }
     );
   }
@@ -360,7 +362,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       }
     }
     let { accrualReportTypes, businessIds, candidateName, candidateStatuses, departmentIds, jobId, jobStatuses, locationIds, orderTypes,
-      regionIds, skillCategoryIds, skillIds, startDate, endDate } = this.financialTimesheetReportForm.getRawValue();
+      regionIds, skillCategoryIds, skillIds, startDate, endDate ,invoiceID} = this.financialTimesheetReportForm.getRawValue();
     if (!this.financialTimesheetReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
     }
@@ -389,7 +391,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "AccrualReportFilterTypeFTS": accrualReportTypes.toString()
+      "AccrualReportFilterTypeFTS": accrualReportTypes.toString(),
+      "InvoiceIdParamFTS":invoiceID==null|| invoiceID == "" ?"null":invoiceID
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -478,6 +481,10 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         dataSource: accrualReportTypesList,
         valueField: 'name',
         valueId: 'id',
+      },
+      invoiceID: {
+        type: ControlTypes.Text,
+        valueType: ValueType.Text
       }
     }
   }
@@ -515,8 +522,9 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.JobStatuses)?.setValue([]);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
-    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue(null);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(0);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.InvoiceID)?.setValue(null);
     this.filteredItems = [];
   }
   public onFilterApply(): void {

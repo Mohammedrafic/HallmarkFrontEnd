@@ -9,10 +9,15 @@ export class TimesheetDateHelper extends Destroyable {
     timeOut: {
       min: new Date(),
       max: new Date(),
-    }
-  }
+    },
+  };
 
-  protected setDateBounds(startDate: string, endDate: string): void {
+  protected setDateBounds(startDate: string, endWeekDate: string): void {
+    const today = DateTimeHelper.setInitHours(new Date().toUTCString());
+    const weekEndDate = DateTimeHelper.setInitHours(endWeekDate);
+
+    const endDate = new Date(weekEndDate) < new Date(today) ? weekEndDate : today;
+
     this.dateSettings.timeIn.min = DateTimeHelper.convertDateToUtc(startDate);
     this.dateSettings.timeIn.max = DateTimeHelper.convertDateToUtc(endDate);
 

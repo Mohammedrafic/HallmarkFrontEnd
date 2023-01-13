@@ -1,9 +1,10 @@
+import { ColDef } from '@ag-grid-community/core';
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+
 import { ButtonModel } from '@shared/models/buttons-group.model';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { OrderManagementIRPSystemId, OrderManagementIRPTabs } from '@shared/enums/order-management-tabs.enum';
-import { ColDef } from '@ag-grid-community/core';
 import { OrderManagement } from '@shared/models/order-management.model';
-import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
 import {
@@ -124,6 +125,12 @@ export const ThreeDotsMenuOptions = (
   ],
 });
 
+export const PositionGridCell = {
+  field: 'positionId',
+  headerName: 'Position ID',
+  width: 140,
+};
+
 export const DefaultOrderCol: ColDef = {
   sortable: true,
   filter: false,
@@ -134,6 +141,12 @@ export const FirstColumnWidth = {
   width: 240,
   minWidth: 240,
   maxWidth: 240,
+};
+
+export const FirstColumnSubRowWidth = {
+  width: 50,
+  minWidth: 50,
+  maxWidth: 50,
 };
 
 export const PrepareMenuItems = (order: OrderManagement, threeDotsMenuOptions: Record<string, ItemModel[]> = {}) => {
@@ -159,29 +172,72 @@ export const PrepareMenuItems = (order: OrderManagement, threeDotsMenuOptions: R
   }
 };
 
-export const OrderManagementIRPSubGridCells: ColDef[] = [
-  FirstColumnWidth,
-  {
-    field: 'name',
-    headerName: 'Employee',
-    width: 200,
-  },
+export const DefaultOrderManagementSubGridCells: ColDef[] = [
   {
     field: 'candidateStatus',
-    width: 215,
+    width: 140,
   },
   {
-    field: 'primarySkillName',
-    headerName: 'Primary skill',
+    field: 'system',
+    headerName: 'System',
+    width: 80,
+  },
+  {
+    field: 'name',
+    headerName: 'Candidate Name',
+    width: 140,
+  },
+];
+
+export const OrderManagementIRPSubGridCells: ColDef[] = [
+  FirstColumnSubRowWidth,
+  PositionGridCell,
+  ...DefaultOrderManagementSubGridCells,
+  {
+    field: 'skill',
+    headerName: 'Primary Skill',
     width: 160,
   },
   {
-    field: 'contract',
-    headerName: 'Contract Employee',
+    field: 'commitment',
+    headerName: 'Work Commitment',
+    width: 140,
+  },
+];
+
+export const OrderManagementVMSSubGridCells: ColDef[] = [
+  FirstColumnSubRowWidth,
+  PositionGridCell,
+  ...DefaultOrderManagementSubGridCells,
+  {
+    field: 'agency',
+    headerName: 'Agency',
     width: 160,
   },
+  {
+    field: 'billRate',
+    headerName: 'Bill Rate $',
+    width: 100,
+  },
+  {
+    field: 'actualStartDate',
+    headerName: 'Actual start date',
+    width: 140,
+  },
+  {
+    field: 'actualEndDate',
+    headerName: 'Actual end date',
+    width: 140,
+  },
+];
+
+export const OrderManagementSubGridCells: Record<string, ColDef[]> = {
+  IRP: OrderManagementIRPSubGridCells,
+  VMS: OrderManagementVMSSubGridCells,
+};
+
 /* TODO future iteration
-  {
+  [{
     field: 'lastShiftScheduledStartTime',
     headerName: 'Last Shift Scheduled',
     width: 160,
@@ -232,5 +288,4 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
     headerName: 'Overtime',
     width: 100,
     cellRendererSelector: titleValueCellRendererSelector,
-  },*/
-];
+  },];*/

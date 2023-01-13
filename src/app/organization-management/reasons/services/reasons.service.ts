@@ -69,9 +69,9 @@ export class ReasonsService {
         id: value.id || null,
         reason: value.reason,
         description: value.description,
-        calculateTowardsWeeklyHours: value.calculateTowardsWeeklyHours,
-        eligibleToBeScheduled: value.eligibleToBeScheduled,
-        visibleForIRPCandidates: value.visibleForIRPCandidates,
+        calculateTowardsWeeklyHours: !!value.calculateTowardsWeeklyHours,
+        eligibleToBeScheduled: !!value.eligibleToBeScheduled,
+        visibleForIRPCandidates: !!value.visibleForIRPCandidates,
       }));
     } else {
       const Action = params.editMode ? UpdateReasonsActionsMap[params.selectedTab]

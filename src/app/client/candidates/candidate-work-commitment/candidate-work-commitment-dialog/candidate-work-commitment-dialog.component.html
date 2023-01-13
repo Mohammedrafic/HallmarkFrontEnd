@@ -1,0 +1,168 @@
+<ejs-dialog
+  #sideDialog
+  cssClass="dialog"
+  [width]="'528px'"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">{{ title }} Commitment</h3>
+          </div>
+          <div  class="e-card-content">
+            <button
+              ejs-button
+              cssClass="e-outline button-cancel"
+              (click)="closeDialog()"
+              >Cancel</button>
+            <button
+              ejs-button
+              type="submit"
+              [isPrimary]="true"
+              (click)="saveCommitment()"
+              >Save</button>
+          </div>
+        </div>
+      </section>
+      <section>
+        <form [formGroup]="candidateWorkCommitmentForm" class="commitment-form bootstrap">
+          <div>
+            <app-dropdown
+              [dataSource]="workCommitments"
+              [fields]="commitmentFields"
+              class="control-field"
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              [hideBorder]="false"
+              label="Work Commitment"
+              id="workCommitmentId"
+              controlName="workCommitmentId"
+            ></app-dropdown>
+          </div>
+          <div>
+            <app-multiselect-dropdown
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              [fields]="commitmentFields"
+              [dataSource]="regions"
+              [showSelectAll]="true"
+              [required]="true"
+              selectAllText="Select All"
+              controlName="regionIds"
+              id="regionIds"
+              class="control-field"
+              label="Region"
+            ></app-multiselect-dropdown>
+          </div>
+          <div>
+            <app-multiselect-dropdown
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              [fields]="commitmentFields"
+              [dataSource]="locations"
+              [showSelectAll]="true"
+              [required]="true"
+              selectAllText="Select All"
+              controlName="locationIds"
+              id="locationIds"
+              class="control-field"
+              label="Location"
+            ></app-multiselect-dropdown>
+          </div>
+
+          <div class="row">
+            <app-input
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              maxlength="100"
+              controlName="jobCode"
+              class="control control-field"
+              id="jobCode"
+              label="Job Code"
+              [required]="true"
+            ></app-input>
+            <app-datepicker
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              id="startDate"
+              controlName="startDate"
+              class="control control-field"
+              label="Start Date"
+              [required]="true"
+              [min]="lastActiveDate"
+            ></app-datepicker>
+            <app-numeric-textbox
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              [htmlAttributes]="numericInputAttributes"
+              id="payRate"
+              class="control-field"
+              controlName="payRate"
+              label="Pay Rate"
+            ></app-numeric-textbox>
+          </div>
+
+          <div class="row">
+            <app-numeric-textbox
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              class="control control-field"
+              id="availRequirement"
+              controlName="availRequirement"
+              label="Avail. Requirement (h)"
+              [format]="format"
+              [decimals]="0"
+            ></app-numeric-textbox>
+            <app-numeric-textbox
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              class="control-field"
+              id="schedulePeriod"
+              controlName="schedulePeriod"
+              label="Schedule Period (weeks)"
+              [format]="format"
+              [decimals]="0"
+            ></app-numeric-textbox>
+          </div>
+
+          <div class="row">
+            <app-numeric-textbox
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              class="control control-field"
+              id="minWorkExperience"
+              controlName="minWorkExperience"
+              label="Min. Work Experience"
+              [format]="format"
+              [decimals]="0"
+            ></app-numeric-textbox>
+            <app-numeric-textbox
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              id="criticalOrder"
+              class="control control-field"
+              controlName="criticalOrder"
+              label="Critical Order"
+              [format]="format"
+              [decimals]="0"
+            ></app-numeric-textbox>
+            <app-dropdown
+              [dataSource]="holidays"
+              [fields]="commitmentFields"
+              class="control-field"
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              [hideBorder]="false"
+              label="Holiday"
+              id="holiday"
+              controlName="holiday"
+          ></app-dropdown>
+          </div>
+
+          <div>
+            <app-input
+              [formGroupInstance]="candidateWorkCommitmentForm"
+              maxlength="100"
+              controlName="comment"
+              id="comment"
+              label="Comment"
+            ></app-input>
+          </div>
+        </form>
+      </section>
+    </section>
+  </ng-template>
+</ejs-dialog>

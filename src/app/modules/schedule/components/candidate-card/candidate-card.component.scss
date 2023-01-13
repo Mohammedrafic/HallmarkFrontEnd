@@ -30,6 +30,16 @@
     justify-content: space-between;
   }
 
+  &-id {
+    flex-grow: 2;
+    flex-shrink: 0;
+  }
+
+  &-skill {
+    flex-grow: 1;
+    flex-shrink: 0;
+  }
+
   & span {
     font-size: 12px;
     font-weight: 400;

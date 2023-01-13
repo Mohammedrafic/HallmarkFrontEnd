@@ -9,6 +9,7 @@ import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { TabsModule } from '@shared/components/tabs/tabs.module';
 import { SharedModule } from '@shared/shared.module';
 import { CandidateWorkCommitmentModule } from './candidate-work-commitment/candidate-work-commitment.module';
+import { CandidateService } from './services/candidate.service';
 
 @NgModule({
   declarations: [CandidateProfileComponent, AddEditCandidateComponent],
@@ -21,6 +22,9 @@ import { CandidateWorkCommitmentModule } from './candidate-work-commitment/candi
     ButtonModule,
     TabsModule,
     SharedModule
+  ],
+  providers: [
+    CandidateService
   ]
 })
 export class OrganizationCandidatesModule {}
