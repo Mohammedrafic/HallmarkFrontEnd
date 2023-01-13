@@ -10,6 +10,7 @@ export class User {
   businessUnitName: string;
   agencyStatus?: number;
   isChatEnabled?: boolean;
+  isDeleted?: boolean;
 }
 
 export class UsersPage {
