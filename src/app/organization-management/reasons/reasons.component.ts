@@ -104,6 +104,8 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
 
   saveReason(forceUpsert?: boolean): void {
     if (this.reasonForm.invalid) {
+      this.reasonForm.markAllAsTouched();
+      this.reasonForm.updateValueAndValidity();
       return;
     }
     
@@ -188,10 +190,6 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
     } else {
       this.closeSideDialog();
     }
-  }
-
-  trackByField(index: number, item: ReasonFormConfig): string {
-    return item.field;
   }
 
   private closeSideDialog(): void {

@@ -26,6 +26,7 @@ import { ReasonsFormsService } from './services/reasons-form.service';
 import { ReasonsService } from './services/reasons.service';
 import { UnavailabilityReasonsModule } from './components/unavailability-reasons';
 import { ToggleIconRendererModule } from '@shared/components/cell-renderers/toggle-icon-renderer';
+import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 
 const icons = {
     Edit,
@@ -53,6 +54,7 @@ const icons = {
         ToggleIconRendererModule,
         SwitchModule,
         TextBoxAllModule,
+        ValidateDirectiveModule,
     ],
     declarations: [
         ReasonsComponent,
