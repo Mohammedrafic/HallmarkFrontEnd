@@ -68,3 +68,6 @@ export interface CredentialParams {
   candidateStatus: ApplicantStatus | null;
   orderId: number | null;
 }
+export interface BulkVerifyCandidateCredential{
+  candidateCredentials:CandidateCredential[];
+}
