@@ -1,7 +1,7 @@
-@import "colors";
-@import "adaptive-response";
-@import "@ag-grid-community/core/dist/styles/ag-grid.scss";
-@import "@ag-grid-community/core/dist/styles/ag-theme-alpine";
+@import 'colors';
+@import 'adaptive-response';
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 
 .e-grid {
   border-radius: 12px;
@@ -15,7 +15,7 @@
   }
 
   &.e-gridhover
-    tr[role="row"]:not(.e-editedrow):hover
+    tr[role='row']:not(.e-editedrow):hover
     .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
     background-color: $primary-active-blue-90;
   }
@@ -316,6 +316,12 @@
         padding-bottom: 12px;
       }
     }
+  }
+}
+
+@media #{$max-desktop-small} {
+  .button-template {
+    margin-left: 0 !important;
   }
 }
 

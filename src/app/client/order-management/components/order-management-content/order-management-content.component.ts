@@ -187,7 +187,7 @@ import {
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { BreakpointObserverService } from '@core/services';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
-import { SmallToolbarWidth, TabletWidth } from '@shared/constants/media-query-breakpoints';
+import { MiddleTabletWidth, TabletWidth } from '@shared/constants/media-query-breakpoints';
 
 @Component({
   selector: 'app-order-management-content',
@@ -256,7 +256,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
   public showFilterForm = false;
   public isLockMenuButtonsShown = true;
-  public isContentTabletWidth = false;
   public resizeObserver: ResizeObserverModel;
   public navigationPanelWidth: string;
 
@@ -340,6 +339,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public isMobile = false;
   public isTablet = false;
   public isSmallDesktop = false;
+  public isDesktop = false;
+  public isContentTabletWidth = false;
+  public isMiddleTabletWidth = false;
   public mobileGridHeight = this.gridHeight;
 
   private isRedirectedFromDashboard: boolean;
@@ -408,9 +410,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   get desktopSmallMenu(): any[] {
     let menu: { text: string }[] = [];
 
-    if (!this.isActiveSystemIRP && !this.isMobile && !this.isTablet) {
-      menu = [...menu, { text: MobileMenuItems.Filters }];
-    }
     if (!this.isActiveSystemIRP || !this.canCreateOrder || !this.userPermission[this.userPermissions.CanCreateOrders]) {
       menu = [...menu, { text: MobileMenuItems.Import }];
     }
@@ -1299,7 +1298,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private onOrdersDataLoadHandler(): void {
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
-      this.setHeightForMobileGrid(data?.items.length);
       if (data?.items) {
         data.items.forEach((item) => {
           item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
@@ -1319,6 +1317,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.onRowClick({data})
         }
       }
+      this.setHeightForMobileGrid(this.ordersPage?.items.length);
     });
   }
 
@@ -1972,7 +1971,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.isMobile = screen.isMobile;
       this.isTablet = screen.isTablet;
       this.isSmallDesktop = screen.isDesktopSmall;
-      this.cd$.next(true);
+      this.isDesktop = screen.isDesktopLarge;
+      this.cd.markForCheck();
      })
   }
 
@@ -1988,11 +1988,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     );
 
     resizeToolbarObserver$.pipe(throttleTime(150), takeUntil(this.unsubscribe$)).subscribe((toolbarWidth) => {
-      this.isContentTabletWidth = toolbarWidth <= TabletWidth;
-      const isSmallScreen = toolbarWidth <= SmallToolbarWidth;
-      const paddingWidth = 50;
-      this.navigationPanelWidth = isSmallScreen ? Math.trunc(toolbarWidth - paddingWidth) + 'px' : '100%';
-      this.cd$.next(true);
+      const isIRP = this.activeSystem === OrderManagementIRPSystemId.IRP;
+      this.isContentTabletWidth = toolbarWidth <= TabletWidth && this.isDesktop && !isIRP;
+      this.isMiddleTabletWidth = toolbarWidth <= MiddleTabletWidth && (this.isTablet || this.isMobile) && !isIRP;
+      this.cd.markForCheck();
     });
   }
 
@@ -2017,11 +2016,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public setHeightForMobileGrid(itemsLength: number | undefined): void {
-    console.error(itemsLength);
-    
     const padding = 40;
     const height = itemsLength ? itemsLength * this.rowHeight + padding : this.gridHeight;
     this.mobileGridHeight = height < this.gridHeight ? this.gridHeight : String(height);
-    // this.cd$.next(true);
   }
 }

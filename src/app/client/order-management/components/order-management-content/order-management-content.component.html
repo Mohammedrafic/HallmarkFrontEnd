@@ -28,10 +28,10 @@
     </ng-container>
   </ng-container>
   <ng-container right>
-    <ng-container *ngIf="!isContentTabletWidth">
+    <ng-container *ngIf="!isMobile">
       <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
       <button
-        *ngIf="isIRPFlagEnabled"
+        *ngIf="isIRPFlagEnabled && !(isContentTabletWidth || isMiddleTabletWidth)"
         ejs-button
         appHideBeforeSyncfusionLoad
         cssClass="e-outline button-template"
@@ -39,8 +39,9 @@
       >
         <div class="filter-button-content">Templates <i-feather name="clipboard" class="icon"></i-feather></div>
       </button>
-      <ng-container [ngTemplateOutlet]="filterButton"></ng-container>
+      <ng-container *ngIf="!isMiddleTabletWidth" [ngTemplateOutlet]="filterButton"></ng-container>
       <app-tooltip-container
+        *ngIf="!(isContentTabletWidth && isMiddleTabletWidth)"
         [message]="toolTipMessage"
         [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
       >
@@ -58,7 +59,8 @@
       <button
         *ngIf="
           activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
-          activeTab !== OrganizationOrderManagementTabs.Incomplete
+          activeTab !== OrganizationOrderManagementTabs.Incomplete &&
+          !(isContentTabletWidth || isMiddleTabletWidth)
         "
         ejs-dropdownbutton
         appHideBeforeSyncfusionLoad
@@ -70,23 +72,26 @@
       >
         <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
       </button>
-    </ng-container>
-    <ng-container *ngIf="isContentTabletWidth && !isMobile" [ngTemplateOutlet]="smallMenuButton"> </ng-container>
-    <app-tooltip-container
-      *ngIf="!isMobile"
-      [message]="toolTipMessage"
-      [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
-    >
-      <button
-        [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
-        ejs-button
-        appHideBeforeSyncfusionLoad
-        [isPrimary]="true"
-        (click)="navigateToOrderForm()"
+
+      <ng-container *ngIf="isContentTabletWidth || isMiddleTabletWidth" [ngTemplateOutlet]="smallMenuButton">
+      </ng-container>
+
+      <app-tooltip-container
+        *ngIf="!isMobile"
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
       >
-        Create Order
-      </button>
-    </app-tooltip-container>
+        <button
+          [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+          ejs-button
+          appHideBeforeSyncfusionLoad
+          [isPrimary]="true"
+          (click)="navigateToOrderForm()"
+        >
+          Create Order
+        </button>
+      </app-tooltip-container>
+    </ng-container>
   </ng-container>
 </app-page-toolbar>
 
@@ -98,7 +103,7 @@
 
 <ng-container *ngIf="isIRPFlagEnabled && activeSystem !== OrderManagementIRPSystemId.VMS; else vmsGridTemplate">
   <div class="grid-table-container table-wrapper">
-    <div class="mobile-group-button" *ngIf="isContentTabletWidth && isMobile">
+    <div class="mobile-group-button" *ngIf="isMobile">
       <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
     </div>
     <ag-grid-angular
@@ -174,7 +179,7 @@
 </ng-template>
 
 <ng-template #vmsGridTemplate>
-  <div class="mobile-group-button" *ngIf="isContentTabletWidth && isMobile">
+  <div class="mobile-group-button" *ngIf="isMobile">
     <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
   </div>
   <section>
@@ -184,7 +189,7 @@
       (rowDataBound)="setRowHighlight($event)"
       [dataSource]="(ordersPage$ | async)?.items"
       [pageSettings]="pageSettings"
-      [height]="mobileGridHeight"
+      [height]="isMobile ? mobileGridHeight : gridHeight"
       [rowHeight]="rowHeight"
       [resizeSettings]="resizeSettings"
       [allowSorting]="allowSorting"
@@ -569,12 +574,12 @@
         <ng-template #defaultSubRow>
           <ng-container *ngIf="data.isPushedFromIRP && isIRPFlagEnabled; else vmsSubRow">
             <app-order-management-subrow-candidate-position
-              *ngFor="let child of data.children; index as i; trackBy:trackById"
+              *ngFor="let child of data.children; index as i; trackBy: trackById"
               [candidatePosition]="child"
               [selected]="
-              selectedCandidate?.selected?.order === data.id &&
-              selectedCandidate?.selected.positionId === child.positionId
-            "
+                selectedCandidate?.selected?.order === data.id &&
+                selectedCandidate?.selected.positionId === child.positionId
+              "
             ></app-order-management-subrow-candidate-position>
           </ng-container>
 
@@ -584,9 +589,9 @@
               [candidat]="child"
               [order]="data"
               [selected]="
-              selectedCandidate?.selected?.order === data.id &&
-              selectedCandidate?.selected.positionId === child.positionId
-            "
+                selectedCandidate?.selected?.order === data.id &&
+                selectedCandidate?.selected.positionId === child.positionId
+              "
               [isAgency]="true"
               (clickEvent)="onOpenCandidateDialog($event, data, i)"
             ></app-grid-subrow-candidate>
