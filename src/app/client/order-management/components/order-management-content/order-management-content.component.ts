@@ -337,6 +337,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private isOrgIRPEnabled = false;
   private isOrgVMSEnabled = false;
 
+  public isMobile = false;
+  public isTablet = false;
+  public isSmallDesktop = false;
+  public mobileGridHeight = this.gridHeight;
+
   private isRedirectedFromDashboard: boolean;
   private orderStaus: number;
   private numberArr: number[] = [];
@@ -403,7 +408,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   get desktopSmallMenu(): any[] {
     let menu: { text: string }[] = [];
 
-    if (!this.isActiveSystemIRP) {
+    if (!this.isActiveSystemIRP && !this.isMobile && !this.isTablet) {
       menu = [...menu, { text: MobileMenuItems.Filters }];
     }
     if (!this.isActiveSystemIRP || !this.canCreateOrder || !this.userPermission[this.userPermissions.CanCreateOrders]) {
@@ -1294,6 +1299,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private onOrdersDataLoadHandler(): void {
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
+      this.setHeightForMobileGrid(data?.items.length);
       if (data?.items) {
         data.items.forEach((item) => {
           item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
@@ -1964,7 +1970,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private getDeviceScreen(): void {
     this.breakpointService.getBreakpointMediaRanges().pipe(takeUntil(this.unsubscribe$)).subscribe((screen) => { 
       this.isMobile = screen.isMobile;
-      this.isSmallDesktop = screen.isDesktopSmall
+      this.isTablet = screen.isTablet;
+      this.isSmallDesktop = screen.isDesktopSmall;
+      this.cd$.next(true);
      })
   }
 
@@ -2006,5 +2014,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.defaultExport(ExportedFileType.excel);
         break;
     }
+  }
+
+  public setHeightForMobileGrid(itemsLength: number | undefined): void {
+    console.error(itemsLength);
+    
+    const padding = 40;
+    const height = itemsLength ? itemsLength * this.rowHeight + padding : this.gridHeight;
+    this.mobileGridHeight = height < this.gridHeight ? this.gridHeight : String(height);
+    // this.cd$.next(true);
   }
 }

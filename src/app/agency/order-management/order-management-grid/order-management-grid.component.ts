@@ -132,6 +132,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public selectedRowRef: any;
   public openDetailsTab = false;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
+  public isMobile = false;
+  public isSmallDesktop = false;
+  public mobileGridHeight = '600';
   private orderPerDiemId: number | null;
   private prefix: string | null;
   private orderId: number | null;
@@ -860,5 +863,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.isMobile = screen.isMobile;
         this.isSmallDesktop = screen.isDesktopSmall;
       });
+  }
+
+  public setHeightForMobileGrid(itemsLength: number | undefined): void {
+    const padding = 40;
+    const height = itemsLength ? itemsLength * this.rowHeight + padding : this.gridHeight;
+    this.mobileGridHeight = height < 600 ? '600' : String(height);
   }
 }
