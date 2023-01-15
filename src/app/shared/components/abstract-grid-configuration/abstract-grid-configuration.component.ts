@@ -157,8 +157,6 @@ export abstract class AbstractGridConfigurationComponent {
   }
 
   exportSelected(event: any): void {
-    console.error(event);
-    
     if (event.item.properties.id === ExportType['Excel File']) {
       this.defaultExport(ExportedFileType.excel);
     } else if (event.item.properties.id === ExportType['CSV File']) {

@@ -239,9 +239,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
 
   private setDialogWidth(): void {
     this.breakpointService.getBreakpointMediaRanges().pipe(takeUntil(this.destroy$)).subscribe(({ isMobile }) => {
-      this.width = isMobile ? '100%' : `${window.innerWidth * 0.6}px`;
-      console.error(this.width);
-      
+      this.width = isMobile ? '100%' : `${window.innerWidth * 0.6}px`; 
     })
   }
 }

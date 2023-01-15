@@ -868,6 +868,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public setHeightForMobileGrid(itemsLength: number | undefined): void {
     const padding = 40;
     const height = itemsLength ? itemsLength * this.rowHeight + padding : this.gridHeight;
-    this.mobileGridHeight = height < 600 ? '600' : String(height);
+    this.mobileGridHeight = height < +this.gridHeight ? this.gridHeight : String(height);
   }
 }

@@ -187,7 +187,7 @@ import {
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { BreakpointObserverService } from '@core/services';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
-import { MiddleTabletWidth, TabletWidth } from '@shared/constants/media-query-breakpoints';
+import { MiddleTabletWidth, SmallDesktopWidth } from '@shared/constants/media-query-breakpoints';
 
 @Component({
   selector: 'app-order-management-content',
@@ -1989,7 +1989,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
     resizeToolbarObserver$.pipe(throttleTime(150), takeUntil(this.unsubscribe$)).subscribe((toolbarWidth) => {
       const isIRP = this.activeSystem === OrderManagementIRPSystemId.IRP;
-      this.isContentTabletWidth = toolbarWidth <= TabletWidth && this.isDesktop && !isIRP;
+      this.isContentTabletWidth = toolbarWidth <= SmallDesktopWidth && this.isDesktop && !isIRP;
       this.isMiddleTabletWidth = toolbarWidth <= MiddleTabletWidth && (this.isTablet || this.isMobile) && !isIRP;
       this.cd.markForCheck();
     });
