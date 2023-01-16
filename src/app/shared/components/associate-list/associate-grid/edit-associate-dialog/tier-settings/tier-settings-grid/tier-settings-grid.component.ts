@@ -85,7 +85,7 @@ export class TierSettingsGridComponent extends DestroyableDirective implements O
   public handleChangePageSize(pageSize: number): void {
     if(pageSize) {
       this.filters.pageSize = pageSize;
-      this.getNewPage();
+      this.selectedOrganizationAgency && this.getNewPage();
     }
   }
 
