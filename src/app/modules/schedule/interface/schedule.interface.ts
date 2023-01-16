@@ -13,6 +13,7 @@ export interface ScheduleCandidate {
   employeeNote: string;
   workHours: number[];
   isOriented: boolean;
+  fullName?: string;
 }
 
 export interface ScheduleItem {

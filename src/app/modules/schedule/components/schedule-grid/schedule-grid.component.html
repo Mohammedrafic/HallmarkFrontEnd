@@ -1,24 +1,24 @@
 <div class="grid-wrapper">
   <div class="grid-header">
     <div class="left">
-      <!-- <app-search
-        #searchComponent
-        class="search-input"
-        placeholder="Name or ID"
-        (inputKeyUpEnter)="searchCandidate($event)"
-      ></app-search> -->
-      <mat-form-field class="example-full-width" appearance="fill">
-        <input type="text"
-          placeholder="Search"
-          matInput
-          [formControl]="searchControl">
-        <mat-autocomplete>
-          <mat-option *ngFor="let option of candidatesSuggestions" [value]="option">
-            {{option}}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
-
+      <div class="candidate-autocomplete">
+        <mat-form-field class="example-full-width" appearance="fill">
+          <input
+            #automcomplete="matAutocompleteTrigger"
+            type="text"
+            placeholder="Search"
+            matInput
+            [matAutocomplete]="autocompleteList"
+            [formControl]="searchControl">
+          <mat-autocomplete
+            #autocompleteList="matAutocomplete"
+            [displayWith]="displayEmployee">
+            <mat-option *ngFor="let option of candidatesSuggestions; trackBy: trackById" [value]="option">
+              {{option.firstName}} {{option.lastName}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
 <!--      TODO: uncomment when sorting is implemented-->
 <!--      <button-->
 <!--        ejs-button-->

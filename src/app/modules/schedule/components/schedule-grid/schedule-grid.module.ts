@@ -15,8 +15,8 @@ import { CalendarDateSlotModule } from '../../pipes/calendar-date-slot/calendar-
 import { CandidateCardModule } from '../candidate-card/candidate-card.module';
 import { ScheduleCardModule } from '../schedule-card/schedule-card.module';
 import { ScheduleGridComponent } from './schedule-grid.component';
-import { ScheduleGridService } from '../../services';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 const icons = {
   Search,
@@ -37,9 +37,10 @@ const icons = {
     CalendarDateSlotModule,
     MatAutocompleteModule,
     MatInputModule,
+    MatFormFieldModule,
     ReactiveFormsModule,
   ],
   exports: [ScheduleGridComponent],
-  providers: [DateWeekService, ScheduleGridService],
+  providers: [DateWeekService],
 })
 export class ScheduleGridModule { }
