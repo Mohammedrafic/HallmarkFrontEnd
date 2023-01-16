@@ -66,6 +66,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   }
 
   private isAlive = true;
+  private firstLoadModal = true;
 
   constructor(private store: Store) {}
 
@@ -105,7 +106,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
         this.countryState$.next(statesValue);
       });
   }
-
+  
   private onBusinessUnitControlChanged(): void {
     this.businessUnitControl?.valueChanges
       .pipe(
@@ -113,6 +114,11 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
         takeWhile(() => this.isAlive)
       )
       .subscribe((value) => {
+        if(!this.firstLoadModal) {
+          this.businessUnitIdControl?.reset();
+        }
+        this.firstLoadModal = false;
+
         this.store.dispatch(new GetNewRoleBusinessByUnitType(value));
       });
   }
