@@ -428,7 +428,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       });
       this.locations = sortByField(locations, 'name');
     } else {
-      regionsControl.enable();
+      regionsControl.enable({emitEvent: false});
     }
   }
 
@@ -445,7 +445,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       });
       this.departments = sortByField(departments, 'name');
     } else {
-      locationsControl.enable();
+      locationsControl.enable({emitEvent: false});
     }
   }
 
@@ -789,14 +789,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
             locations.push(...(selectedRegion?.locations as any));
           });
           this.locations = sortByField(locations, 'name');
-          const departments: OrganizationDepartment[] = [];
-          this.locations.forEach((location) => {
-            departments.push(...location.departments);
-          });
-          this.departments = sortByField(departments, 'name');
-        } else {
-          this.locations = [];
-          this.departments = [];
         }
 
         this.billRatesFormGroup.controls['locationIds'].setValue(null);
@@ -817,8 +809,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
             departments.push(...(selectedLocation?.departments as []));
           });
           this.departments = sortByField(departments, 'name');
-        } else {
-          this.departments = [];
         }
 
         this.billRatesFormGroup.controls['departmentIds'].setValue(null);
@@ -931,18 +921,29 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   }
 
   private setupFormValues(data: BillRateSetup): void {
+    this.allRegionsChange({ checked: !data.regionId });
+    this.allLocationsChange({ checked: !data.locationId });
+    this.allDepartmentsChange({ checked: !data.departmentId });
     if (!data.regionId) {
       this.allRegionsSelected = true;
       this.billRatesFormGroup.controls['regionIds'].setValue(null);
     } else {
-      this.billRatesFormGroup.controls['regionIds'].setValue([data.regionId]);
+      const locations: OrganizationLocation[] = [];
+      const selectedRegion = this.orgRegions.find((region) => region.id === data.regionId);
+      locations.push(...(selectedRegion?.locations as any));
+      this.locations = sortByField(locations, 'name');
+      this.billRatesFormGroup.controls['regionIds'].setValue([data.regionId], {emitEvent: false});
     }
 
     if (!data.locationId) {
       this.allLocationsSelected = true;
       this.billRatesFormGroup.controls['locationIds'].setValue(null);
     } else {
-      this.billRatesFormGroup.controls['locationIds'].setValue([data.locationId]);
+      const departments: OrganizationDepartment[] = [];
+      const selectedLocation = this.locations.find((location) => location.id === data.locationId);
+      departments.push(...(selectedLocation?.departments as []));
+      this.departments = sortByField(departments, 'name');
+      this.billRatesFormGroup.controls['locationIds'].setValue([data.locationId], {emitEvent: false});
     }
 
     if (!data.departmentId) {
@@ -983,9 +984,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesFormGroup.controls['considerFor7thDayOt'].setValue(data.considerFor7thDayOT);
     this.billRatesFormGroup.controls['displayInJob'].setValue(data.displayInJob);
     this.billRatesFormGroup.controls['billRatesType'].setValue(data.billType);
-    this.allRegionsChange({ checked: !data.regionId });
-    this.allLocationsChange({ checked: !data.locationId });
-    this.allDepartmentsChange({ checked: !data.departmentId });
   }
 
   // TODO: temporary solution, until specific service provided
