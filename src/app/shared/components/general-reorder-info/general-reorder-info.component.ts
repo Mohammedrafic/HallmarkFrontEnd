@@ -45,7 +45,7 @@ export class GeneralReorderInfoComponent extends DestroyableDirective implements
       this.agencies = this.getAgencyNames();
     }
   }
-  
+
   public getAgencyNames(): { name: string; tooltip: string } {
     const numberOfAgency = this.orderInformation.jobDistributions?.length;
     const agenciesWithSeparator = this.orderInformation.jobDistributions
