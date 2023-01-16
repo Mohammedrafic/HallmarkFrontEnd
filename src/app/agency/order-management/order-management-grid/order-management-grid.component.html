@@ -4,7 +4,7 @@
   (rowDataBound)="setRowHighlight($event)"
   [dataSource]="ordersPage?.items || []"
   [pageSettings]="pageSettings"
-  [height]="gridHeight"
+  [height]="isMobile ? mobileGridHeight : gridHeight"
   [rowHeight]="rowHeight"
   [allowSorting]="true"
   [resizeSettings]="resizeSettings"
@@ -334,3 +334,5 @@
     (setDefault)="setDefaultFilters($event)"
   ></app-agency-order-filters>
 </app-filter-dialog>
+
+<app-scroll-to-top *ngIf="isMobile"></app-scroll-to-top>

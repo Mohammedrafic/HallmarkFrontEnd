@@ -36,6 +36,7 @@ import {
   Flag,
   Mail,
   Compass,
+  ArrowUp
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -148,6 +149,7 @@ const gridIcons = {
   Flag,
   Mail,
   Compass,
+  ArrowUp
 };
 
 @NgModule({

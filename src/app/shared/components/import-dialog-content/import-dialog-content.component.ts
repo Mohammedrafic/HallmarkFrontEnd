@@ -57,7 +57,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   }
 
   public width = `${window.innerWidth * 0.6}px`;
-  public targetElement: HTMLElement = document.body;
+  public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dropElement: HTMLElement;
   public readonly allowedExtensions: string = '.xlsx';
   public readonly maxFileSize = FileSize.MB_10;

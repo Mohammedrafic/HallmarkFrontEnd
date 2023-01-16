@@ -1,6 +1,6 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tab-navigation #tabNavigation (selectedTab)="onTabChanged($event)"> </app-tab-navigation>
+    <app-tab-navigation #tabNavigation (selectedTab)="onTabChanged($event)" appTabsMobileShadow> </app-tab-navigation>
   </ng-container>
   <ng-container right>
     <div class="toolbar-actions">
@@ -37,4 +37,3 @@
     [search$]="search$"
   ></app-order-management-grid>
 </section>
-

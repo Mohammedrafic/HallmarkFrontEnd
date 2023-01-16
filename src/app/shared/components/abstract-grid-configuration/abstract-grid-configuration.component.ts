@@ -81,8 +81,6 @@ export abstract class AbstractGridConfigurationComponent {
   placeholderDate = placeholderDate;
   datepickerMask = datepickerMask;
 
-  public isMobile = false;
-
   public readonly onlyLetters: RegExp = ONLY_LETTERS;
 
   protected constructor() {}

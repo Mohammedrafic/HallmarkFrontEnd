@@ -27,7 +27,7 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   public constructor(
     private orderManagementService: OrderManagementService,
     private actions: Actions,
-    private store: Store
+    private store: Store,
   ) {
     super();
   }

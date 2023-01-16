@@ -28,6 +28,7 @@ import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angula
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { isArray, isUndefined } from 'lodash';
 import isNil from 'lodash/fp/isNil';
 import {
@@ -44,6 +45,8 @@ import {
   take,
   takeUntil,
   throttleTime,
+  map,
+  distinctUntilChanged,
 } from 'rxjs';
 
 import { ORDERS_GRID_CONFIG } from '@client/client.config';
@@ -181,6 +184,10 @@ import {
   SystemGroupConfig,
   ThreeDotsMenuOptions,
 } from '@client/order-management/constants';
+import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
+import { BreakpointObserverService } from '@core/services';
+import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
+import { MiddleTabletWidth, SmallDesktopWidth } from '@shared/constants/media-query-breakpoints';
 
 @Component({
   selector: 'app-order-management-content',
@@ -241,6 +248,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
+  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
 
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
@@ -248,6 +256,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
   public showFilterForm = false;
   public isLockMenuButtonsShown = true;
+  public resizeObserver: ResizeObserverModel;
+  public navigationPanelWidth: string;
 
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
@@ -326,6 +336,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private isOrgIRPEnabled = false;
   private isOrgVMSEnabled = false;
 
+  public isMobile = false;
+  public isTablet = false;
+  public isSmallDesktop = false;
+  public isDesktop = false;
+  public isContentTabletWidth = false;
+  public isMiddleTabletWidth = false;
+  public mobileGridHeight = this.gridHeight;
+
   private isRedirectedFromDashboard: boolean;
   private orderStaus: number;
   private numberArr: number[] = [];
@@ -364,6 +382,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService,
     private cd: ChangeDetectorRef,
+    private breakpointService: BreakpointObserverService
   ) {
     super(store);
 
@@ -388,12 +407,36 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     return this.isIRPFlagEnabled && this.activeSystem === this.OrderManagementIRPSystemId.IRP;
   }
 
+  get smallMenu(): any[] {
+    let menu: { text: string }[] = [];
+
+    if (!this.isActiveSystemIRP || !this.canCreateOrder || !this.userPermission[this.userPermissions.CanCreateOrders]) {
+      menu = [...menu, { text: MobileMenuItems.Import }];
+    }
+    if (
+      this.activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
+      this.activeTab !== OrganizationOrderManagementTabs.Incomplete &&
+      !this.isActiveSystemIRP
+    ) {
+      menu = [
+        ...menu,
+        { text: MobileMenuItems.ExportExel },
+        { text: MobileMenuItems.ExportCSV },
+        { text: MobileMenuItems.ExportCustom },
+      ];
+    }
+    return menu;
+  }
+
   override ngOnInit(): void {
     this.eliteOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
     (!this.eliteOrderId)?this.eliteOrderId=0:""
     window.localStorage.setItem("OrderId", JSON.stringify(""));
     super.ngOnInit();
 
+    this.getDeviceScreen();
+    this.initResizeObserver();
+    this.listenParentContainerWidth();
     this.setPreviousSelectedSystem();
     this.watchForPermissions();
     this.handleDashboardFilters();
@@ -1274,6 +1317,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.onRowClick({data})
         }
       }
+      this.setHeightForMobileGrid(this.ordersPage?.items.length);
     });
   }
 
@@ -1920,5 +1964,59 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private setPreviousSelectedSystem(): void {
     this.previousSelectedSystemId = this.orderManagementService.getOrderManagementSystem();
+  }
+
+  private getDeviceScreen(): void {
+    this.breakpointService.getBreakpointMediaRanges().pipe(takeUntil(this.unsubscribe$)).subscribe((screen) => { 
+      this.isMobile = screen.isMobile;
+      this.isTablet = screen.isTablet;
+      this.isSmallDesktop = screen.isDesktopSmall;
+      this.isDesktop = screen.isDesktopLarge;
+      this.cd.markForCheck();
+     })
+  }
+
+  private initResizeObserver(): void {
+    this.resizeObserver = ResizeObserverService.init(this.targetElement!);
+  }
+
+  private listenParentContainerWidth(): void {
+    const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$.pipe(
+      map((data) => data[0].contentRect.width),
+      distinctUntilChanged()
+    );
+
+    resizeToolbarObserver$.pipe(throttleTime(150), takeUntil(this.unsubscribe$)).subscribe((toolbarWidth) => {
+      const isIRP = this.activeSystem === OrderManagementIRPSystemId.IRP;
+      this.isContentTabletWidth = toolbarWidth <= SmallDesktopWidth && this.isDesktop && !isIRP;
+      this.isMiddleTabletWidth = toolbarWidth <= MiddleTabletWidth && (this.isTablet || this.isMobile) && !isIRP;
+      this.cd.markForCheck();
+    });
+  }
+
+  public smallMenuSelected({ item: { text } }: MenuEventArgs): void {
+    switch (text) {
+      case MobileMenuItems.Filters:
+        this.showFilters();
+        break;
+      case MobileMenuItems.Import:
+        this.openImportDialog();
+        break;
+      case MobileMenuItems.ExportCSV:
+        this.defaultExport(ExportedFileType.csv);
+        break;
+      case MobileMenuItems.ExportCustom:
+        this.customExport();
+        break;
+      case MobileMenuItems.ExportExel:
+        this.defaultExport(ExportedFileType.excel);
+        break;
+    }
+  }
+
+  public setHeightForMobileGrid(itemsLength: number | undefined): void {
+    const padding = 40;
+    const height = itemsLength ? itemsLength * this.rowHeight + padding : this.gridHeight;
+    this.mobileGridHeight = height < this.gridHeight ? this.gridHeight : String(height);
   }
 }

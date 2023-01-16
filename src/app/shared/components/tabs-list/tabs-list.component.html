@@ -3,6 +3,8 @@
   id="tab_default"
   heightAdjustMode="Auto"
   (selecting)="onSelect($event)"
+  cssClass="tabs"
+  overflowMode="Scrollable"
 >
   <e-tabitems>
     <e-tabitem *ngFor="let tab of tabConfig; trackBy: trackByFn">

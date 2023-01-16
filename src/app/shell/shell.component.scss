@@ -774,3 +774,9 @@
     }
   }
 }
+
+@media #{$max-tablet} {
+  .header-title {
+    display: none;
+  }
+}
