@@ -1,0 +1,17 @@
+.commitment-form {
+  &>div {
+    margin-top: 12px;
+  }
+
+  .row {
+    display: flex;
+
+    .control {
+      margin-right: 12px;
+    }
+
+    .control-field {
+      width: 100%;
+    }
+  }
+}

@@ -797,7 +797,7 @@ export class OrderManagementContentState {
     return this.orderManagementService.editIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
           new SaveIrpOrderSucceeded(),
         ]);
         if (documents.length) {
@@ -932,9 +932,9 @@ export class OrderManagementContentState {
   @Action(DuplicateOrder)
   DuplicateOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { payload }: DuplicateOrder
+    { payload, system }: DuplicateOrder
   ): Observable<number> {
-    return this.orderManagementService.duplicate(payload).pipe(
+    return this.orderManagementService.duplicate(payload, system).pipe(
       tap((id: number) => {
         dispatch(new DuplicateOrderSuccess(id));
       })

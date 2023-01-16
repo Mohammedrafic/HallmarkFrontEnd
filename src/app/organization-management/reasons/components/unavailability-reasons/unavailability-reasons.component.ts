@@ -18,6 +18,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { UnavailabilityReasons } from '@shared/models/reject-reason.model';
 import { UnavailabilityPaging } from './unavailability-reasons.interface';
 import { UserPermissions } from '@core/enums';
+import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 
 @Component({
   selector: 'app-unavailability-reasons',
@@ -36,6 +37,8 @@ export class UnavailabilityReasonsComponent extends ReasonsComponent {
   readonly modules: Module[] = [ClientSideRowModelModule];
 
   readonly userPermissions = UserPermissions;
+
+  readonly gridEmptyMessage = GRID_EMPTY_MESSAGE;
 
   tableContext: { componentParent: UnavailabilityReasonsComponent } = {
     componentParent: this,

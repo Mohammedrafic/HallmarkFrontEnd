@@ -2,9 +2,12 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, O
 import { ActivatedRoute, Router } from '@angular/router';
 import { tabsConfig } from '@client/candidates/add-edit-candidate/tabs-config.constants';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
+import { Store } from '@ngxs/store';
 import { TabsComponent } from '@shared/components/tabs/tabs.component';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
+import { SetHeaderState } from 'src/app/store/app.actions';
+import { CandidateService } from '../services/candidate.service';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -17,15 +20,16 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   public readonly tabsConfig = tabsConfig;
   public showButtons = true;
 
-  private tabUpdate$: Subject<void> = new Subject();
-
   constructor(
     private router: Router,
     public candidateProfileFormService: CandidateProfileFormService,
+    private candidateService: CandidateService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
+    private store: Store,
   ) {
     super();
+    store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
   }
 
   ngOnInit(): void {
@@ -34,7 +38,7 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
 
   ngAfterViewInit(): void {
     if (this.route.snapshot.paramMap.get('id')) {
-      this.tabUpdate$.next();
+      this.candidateProfileFormService.tabUpdate$.next(parseInt(this.route.snapshot.paramMap.get('id') as string));
     }
   }
 
@@ -43,8 +47,10 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   }
 
   private subscribeOnTabUpdate(): void {
-    this.tabUpdate$.pipe(debounceTime(300), takeUntil(this.destroy$)).subscribe(() => {
+    this.candidateProfileFormService.tabUpdate$.pipe(debounceTime(300), takeUntil(this.destroy$)).subscribe((id) => {
+      this.candidateService.employeeId = id;
       this.enableTabs();
+      this.cdr.detectChanges();
     });
   }
 
@@ -53,7 +59,6 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   }
 
   public saveCandidate(): void {
-    this.tabUpdate$.next();
     this.candidateProfileFormService.triggerSaveEvent();
   }
 

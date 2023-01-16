@@ -52,6 +52,9 @@ export const PROCEED_FOR_ALL_AGENCY = 'Order will be distributed to all Agencies
 export const PROCEED_FOR_TIER_LOGIC = 'Order will be distributed based on Tiering logic. Do you want to proceed?';
 export const PLEASE_SELECT_SYSTEM_GROUP_SETUP = 'Please select system for Group setup';
 export const ORDER_DISTRIBUTED_TO_ALL = 'Order was distributed to all associated Agencies';
+export const ERROR_CAN_NOT_REVOKED = 'Order cannot be revoked due to filled position by VMS Candidate';
+export const CONFIRM_REVOKE_ORDER =
+  'Candidates are in application process. If Order is revoked from VMS distribution then all Candidates will be Rejected. Do you want to proceed?';
 
 export const updateCandidateJobMessage = (dates: string[]) =>
   `For this candidate job timesheets will be recalculated for the next start dates: ${dates.join(', ')}`;

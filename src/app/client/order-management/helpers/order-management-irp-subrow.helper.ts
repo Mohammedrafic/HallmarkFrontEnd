@@ -14,12 +14,11 @@ export class OrderManagementIrpSubrowHelper {
       animateRows: true,
       detailCellRenderer: OrderManagementIrpRowPositionComponent,
       context: context,
-      isRowMaster: (dataItem: IRPOrderManagement) => !!dataItem?.acceptedCandidates,
+      isRowMaster: (dataItem: IRPOrderManagement) => !!dataItem.irpCandidatesCount || !!dataItem.vmsCandidatesCount,
       getRowHeight: (params: RowHeightParams) => {
         if (params?.node?.detail) {
           const data = params.data;
-
-          return data.acceptedCandidates * params.api.getSizesForCurrentTheme().rowHeight + 1;
+          return (data.irpCandidatesCount + data.vmsCandidatesCount) * params.api.getSizesForCurrentTheme().rowHeight + 1;
         }
 
         return null;

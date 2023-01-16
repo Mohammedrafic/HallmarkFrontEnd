@@ -1,4 +1,5 @@
 @import 'colors';
+@import 'adaptive-response';
 
 :host {
   height: 100%;
@@ -16,7 +17,8 @@
       }
 
       &.expansion-toggle-icons-order-1 {
-        .ag-group-contracted, .ag-group-expanded {
+        .ag-group-contracted,
+        .ag-group-expanded {
           order: 1;
           margin-left: 25px;
 
@@ -84,15 +86,16 @@
     flex-grow: 1;
   }
 
-  button[type="submit"] {
+  button[type='submit'] {
     margin-left: 8px;
   }
 }
 
-.invoices-actions-container {
+.buttons-group {
   position: relative;
   display: flex;
   align-items: center;
+  margin-left: 12px;
 
   .group-invoices-overlay {
     position: absolute;
@@ -137,8 +140,6 @@
 }
 
 .invoices-split-button {
-  margin-left: 12px;
-
   .main-button {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -191,4 +192,56 @@
 
 .tooltip [disabled] {
   pointer-events: none;
+}
+
+.buttons-group,
+.buttons-container {
+  display: flex;
+  & > *:not(:first-child) {
+    margin-left: 12px;
+  }
+}
+
+@media #{$max-mobile} {
+  .tabs {
+    position: fixed;
+    background: #f6f6f6;
+    z-index: 100;
+    margin-top: -19px;
+    padding: 20px 25px 0;
+    width: 100vw !important;
+    margin-left: -25px;
+  }
+  .bootstrap,
+  .top-margin {
+    margin-top: 42px;
+  }
+  .bootstrap {
+    margin-bottom: 12px;
+  }
+}
+
+.top-margin {
+  margin-left: 0;
+}
+
+@media (max-width: 480px) {
+  .bootstrap,
+  .top-margin {
+    margin-top: 54px;
+  }
+}
+
+.menu-mobile {
+  display: none !important;
+}
+
+@media (max-width: 670px) {
+  .buttons-group {
+    flex-direction: column;
+    .e-tooltip {
+      margin-top: 12px;
+      margin-left: 0;
+    }
+  }
 }

@@ -10,7 +10,6 @@ app-grid {
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-height: 75vh;
 
   & .ag-row-selected {
     background-color: $primary-active-blue-70 !important;
@@ -47,7 +46,7 @@ app-grid {
 
       .action-btn {
         font-size: 16px;
-        color: $primary-active-blue
+        color: $primary-active-blue;
       }
     }
 

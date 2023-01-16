@@ -1,15 +1,18 @@
 import { Injectable } from '@angular/core';
 import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
 import pick from 'lodash/fp/pick';
+import { ListOfSkills } from '@shared/models/skill.model';
+import { difference } from 'lodash';
 
 @Injectable()
 export class CandidateProfileFormService {
   public readonly candidateForm: FormGroup = this.createForm();
   public saveEvent$: Subject<void> = new Subject<void>();
+  public tabUpdate$: Subject<number> = new Subject<number>();
 
   constructor(private formBuilder: FormBuilder) {}
 
@@ -18,6 +21,7 @@ export class CandidateProfileFormService {
   }
 
   public resetCandidateForm(): void {
+    this.candidateForm.controls['secondarySkills'].disable();
     this.candidateForm.reset({
       profileStatus: ProfileStatusesEnum.Active,
       isContract: false,
@@ -37,7 +41,7 @@ export class CandidateProfileFormService {
         lastName: [null, [Validators.required, Validators.maxLength(50)]],
         dob: [null],
         primarySkillId: [null, [Validators.required]],
-        secondarySkills: [null],
+        secondarySkills: [{ value: null, disabled: true }],
         classification: [null],
         hireDate: [null, [Validators.required]],
         fte: [null, [Validators.required, Validators.min(0.0), Validators.max(1)]],
@@ -70,6 +74,16 @@ export class CandidateProfileFormService {
       },
       { validators: greaterThanValidator('contractStartDate', 'contractEndDate') }
     );
+  }
+
+  public getSecondarySkillsDataSource(primarySkills: ListOfSkills[], value: number): ListOfSkills[] {
+    const diff = difference(primarySkills.map(({ masterSkillId }: ListOfSkills) => masterSkillId), [value]);
+    return [...primarySkills.filter(({ masterSkillId }: ListOfSkills) => diff.includes(masterSkillId))];
+  }
+
+  public primarySkillHandler(secondarySkillField: AbstractControl, value: number): void {
+    secondarySkillField[value ? 'enable' : 'disable']();
+    secondarySkillField.reset();
   }
 
   public populateCandidateForm(candidate: CandidateModel): void {

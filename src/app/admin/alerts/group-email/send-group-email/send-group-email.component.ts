@@ -175,6 +175,7 @@ export class SendGroupEmailComponent
   public isAgencyUserType: boolean = false;
   public isAgencyCandidatesType: boolean = false;
   public isBusinessUnitTypeAgency: boolean = false;
+  public isOrgUser: boolean = false;
 
   constructor(private actions$: Actions, private store: Store, private fb: FormBuilder) {
     super();
@@ -283,10 +284,22 @@ export class SendGroupEmailComponent
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
       // this.isBusinessFormDisabled && this.groupEmailTemplateForm.disable();
     }
+    this.isOrgUser = false;
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
+    } else if (user?.businessUnitType === BusinessUnitType.Organization) {
+      this.isOrgUser = true;
+      this.businessUnits = [
+        { id: BusinessUnitType.Agency, text: 'Agency' },
+        { id: BusinessUnitType.Organization, text: 'Organization' },
+      ];
+    } else if (user?.businessUnitType === BusinessUnitType.Agency) {
+      this.businessUnits = [
+        { id: BusinessUnitType.Agency, text: 'Agency' }
+      ];
     }
+
     this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
 
     this.actions$.pipe(takeWhile(() => this.isAlive));
@@ -399,6 +412,9 @@ export class SendGroupEmailComponent
         if (value == 4) {
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == true);
           this.isBusinessUnitTypeAgency = true;
+          if (this.isOrgUser) {
+             this.filteredUserType.splice(1, 1);
+          }
         }
         if (value == 1) {
           this.dispatchUserPage([]);
@@ -423,7 +439,18 @@ export class SendGroupEmailComponent
   }
   private onBusinessesValueChanged(): void {
     this.businessesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {      
-      this.getCandidates();
+      this.clearFields();
+      if(this.isAgencyCandidatesType)
+        this.getCandidates();
+      else {
+        let businessUnitIds = value;
+        this.dispatchUserPage(businessUnitIds);
+        this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+          if (data != undefined) {
+            this.userData = data.items.filter(i => i.isDeleted == false);
+          }
+        });
+      }
     });
   }
 
@@ -439,8 +466,7 @@ export class SendGroupEmailComponent
           businessUnitIds.push(this.businessControl.value);
         }
         this.dispatchUserPage(businessUnitIds);
-        let orgList = this.organizations?.filter((x) => value == x.organizationId);
-        console.log(orgList);
+        let orgList = this.organizations?.filter((x) => value == x.organizationId);        
         this.regionsList = [];
         this.locationsList = [];
         orgList.forEach((value) => {
@@ -547,9 +573,11 @@ export class SendGroupEmailComponent
       } else if (businessUnit == 4) {
         if (value == 1) {
           this.isAgencyUserType = true;
+          let businessUnitIds = this.businessesControl.value;
+          this.dispatchUserPage(businessUnitIds);
           this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
             if (data != undefined) {
-              this.userData = data.items;
+              this.userData = data.items.filter(i => i.isDeleted == false);
             }
           });
         }

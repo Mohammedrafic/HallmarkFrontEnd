@@ -136,6 +136,8 @@ import { WorkCommitmentModule } from './work-commitment/work-commitment.module';
 import { WorkCommitmentApiService } from '@shared/services/work-commitment-api.service';
 import { WorkCommitmentState } from './store/work-commitment.state';
 import { ReasonsModule } from './reasons/reasons.module';
+import { SingleMultipleSkillPipe } from './departments/single-multiple-skill.pipe';
+import { JoinPipeModule } from '@shared/pipes/join.pipe';
 
 const sidebarIcons = {
   Download,
@@ -199,6 +201,7 @@ const sidebarIcons = {
     TiersGridComponent,
     GridActionRendererComponent,
     AssignSkillComponent,
+    SingleMultipleSkillPipe,
   ],
   imports: [
     CommonModule,
@@ -264,6 +267,7 @@ const sidebarIcons = {
     IrpSystemGridTextPipeModule,
     BoolValuePipeModule,
     ReasonsModule,
+    JoinPipeModule
   ],
   exports: [BillRatesComponent],
   providers: [

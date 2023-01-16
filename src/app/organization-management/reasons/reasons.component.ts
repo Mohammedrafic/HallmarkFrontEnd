@@ -103,6 +103,12 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
   }
 
   saveReason(forceUpsert?: boolean): void {
+    if (this.reasonForm.invalid) {
+      this.reasonForm.markAllAsTouched();
+      this.reasonForm.updateValueAndValidity();
+      return;
+    }
+    
     this.reasonsService.saveReason({
       selectedTab: this.selectedTab,
       editMode: this.isEdit,
@@ -149,9 +155,9 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
         id: reason.id,
         reason: reason.reason,
         description: reason.description,
-        calculateTowardsWeeklyHours: reason.calculateTowardsWeeklyHours,
-        eligibleToBeScheduled: reason.eligibleToBeScheduled,
-        visibleForIRPCandidates: reason.visibleForIRPCandidates,
+        calculateTowardsWeeklyHours: !!reason.calculateTowardsWeeklyHours,
+        eligibleToBeScheduled: !!reason.eligibleToBeScheduled,
+        visibleForIRPCandidates: !!reason.visibleForIRPCandidates,
       });
     } else {
       this.reasonForm.patchValue({
@@ -186,10 +192,6 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
     }
   }
 
-  trackByField(index: number, item: ReasonFormConfig): string {
-    return item.field;
-  }
-
   private closeSideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false))
     .pipe(
@@ -205,9 +207,13 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
   }
 
   private canRejectOrClosureReason(): void {
-    this.canRejectOrClosure = this.selectedTab === 0 ?
-      this.userPermission[this.userPermissions.CanRejectCandidate] :
-      this.userPermission[this.userPermissions.CanManageOrderClosureReasons];
+      if (this.selectedTab === ReasonsNavigationTabs.Rejection) {
+        this.canRejectOrClosure = this.userPermission[this.userPermissions.CanRejectCandidate];
+      } else if (this.selectedTab === ReasonsNavigationTabs.Unavailability) {
+        this.canRejectOrClosure = this.userPermission[this.userPermissions.CanEditUnavailabilityReasons];
+      } else {
+        this.canRejectOrClosure = this.userPermission[this.userPermissions.CanManageOrderClosureReasons];
+      }
   }
 
   private createSubsForPenalties(): void {

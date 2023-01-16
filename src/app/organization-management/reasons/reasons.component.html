@@ -250,7 +250,8 @@
   <ng-template #dynamicForm>
 
     <form [formGroup]="reasonForm" class="reason-form">
-      <ng-container *ngFor="let control of dialogConfig; trackBy: trackByField">
+      <!-- trackBy will prevent correct appValidateWithMessage work as it's not reasigning control -->
+      <ng-container *ngFor="let control of dialogConfig">
         <ng-container [ngSwitch]="control.fieldType">
   
           <ng-template [ngSwitchCase]="inputType.Input">

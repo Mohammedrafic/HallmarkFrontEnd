@@ -1,0 +1,55 @@
+@import "colors";
+
+.candidate-row {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding-left: 103px;
+
+  &:hover {
+    background-color: $primary-active-blue-90;
+  }
+
+  .custom-cell {
+    font-size: 12px;
+
+    &__value {
+      font-weight: 700;
+      color: $black;
+      margin: 0;
+      min-height: 20px;
+    }
+
+    &__title {
+      margin: 2px 0 0 0;
+      font-weight: 400;
+      color: $secondary-dark-blue-30;
+      font-size: 12px;
+    }
+  }
+
+  &.selected {
+    background-color: $primary-active-blue-70;
+  }
+
+  .order-status {
+    width: 100%;
+    max-width: 200px;
+    position: relative;
+    padding-right: 70px;
+
+    ejs-chiplist.e-control.e-chip-list .e-chip {
+      width: 100% !important;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 1px;
+      height: 34px;
+      background-color: $secondary-dark-blue-45;
+    }
+  }
+}

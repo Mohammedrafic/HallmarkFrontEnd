@@ -69,8 +69,9 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Input() public adjustColumnsWidth = false;
   @Input() public context: Object;
   @Input() public customGridEmptyMessage: string;
-  @Input() public customRowsPerPageDropDownObject: { text: string, value: number }[];
+  @Input() public customRowsPerPageDropDownObject: { text: string; value: number }[];
   @Input() public disableRowsPerPageDropdown: boolean = false;
+  @Input() public domLayout: 'normal' | 'autoHeight' | 'print' | undefined = 'normal';
 
   @Input() set changeTableSelectedIndex(next: number | null) {
     if (next !== null) {

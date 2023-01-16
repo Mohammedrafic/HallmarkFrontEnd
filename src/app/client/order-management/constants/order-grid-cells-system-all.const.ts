@@ -85,7 +85,9 @@ export const GridCellsSystemAll = (
     cellRenderer: 'agGroupCellRenderer',
     cellClass: (cellClassParams: CellClassParams) => {
       const expansionToggleClass = 'expansion-toggle-icons-order-1';
-      const usePrimaryColor = cellClassParams.data.acceptedCandidates ? 'color-primary-active-blue-10' : '';
+      const usePrimaryColor =
+        cellClassParams.data.irpCandidatesCount || cellClassParams.data.vmsCandidatesCount ?
+          'color-primary-active-blue-10' : '';
       const boldClass = 'font-weight-bold';
 
       return `${expansionToggleClass} ${usePrimaryColor} ${boldClass}`;

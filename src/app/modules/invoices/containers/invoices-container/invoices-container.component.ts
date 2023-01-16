@@ -1,21 +1,32 @@
 import {
-  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef,
-  Component, Inject, OnInit, ViewChild,
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Inject,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
-  combineLatest, combineLatestWith, debounceTime, distinctUntilChanged, filter,
-  map, Observable, switchMap, takeUntil, tap,
+  combineLatest,
+  combineLatestWith,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  Observable,
+  switchMap,
+  takeUntil,
+  tap,
 } from 'rxjs';
 
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
 import { DialogAction } from '@core/enums';
 import { DataSourceItem } from '@core/interface';
-import {
-  RejectReasonInputDialogComponent,
-} from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
+import { RejectReasonInputDialogComponent } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
 import { GRID_CONFIG } from '@shared/constants';
 import { PageOfCollections } from '@shared/models/page.model';
 import { UNIT_ORGANIZATIONS_FIELDS } from 'src/app/modules/timesheets/constants';
@@ -26,13 +37,22 @@ import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions }
 import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
 import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
 import {
-  BaseInvoice, GridContainerTabConfig, InvoiceGridSelections, InvoicePaymentData, InvoicesFilterState, InvoiceUpdateEmmit,
-  ManualInvoice, ManualInvoicesData, PrintingPostDto, SelectedInvoiceRow,
+  BaseInvoice,
+  GridContainerTabConfig,
+  InvoiceGridSelections,
+  InvoicePaymentData,
+  InvoicesFilterState,
+  InvoiceUpdateEmmit,
+  ManualInvoice,
+  ManualInvoicesData,
+  PrintingPostDto,
+  SelectedInvoiceRow,
 } from '../../interfaces';
 import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
 import {
-  PendingInvoice, PendingInvoiceRecord,
-  PendingInvoicesData
+  PendingInvoice,
+  PendingInvoiceRecord,
+  PendingInvoicesData,
 } from '../../interfaces/pending-invoice-record.interface';
 import { InvoicePrintingService, InvoicesService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
@@ -41,6 +61,8 @@ import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { BreakpointObserverService } from '@core/services';
 
 @Component({
   selector: 'app-invoices-container',
@@ -121,6 +143,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public organizationId: number;
   public rejectInvoiceId: number;
   public tabConfig: GridContainerTabConfig | null;
+  public isMobile: boolean;
+  public gridDomLayout: 'normal' | 'autoHeight' | 'print' | undefined;
 
   public gridSelections: InvoiceGridSelections = {
     selectedInvoiceIds: [],
@@ -146,8 +170,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     private actions$: Actions,
     private invoicesContainerService: InvoicesContainerService,
     private printingService: InvoicePrintingService,
+    private breakpointObserver: BreakpointObserverService,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
-    store: Store,
+    store: Store
   ) {
     super(store);
 
@@ -176,6 +201,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchAgencyId();
     this.watchForOpenPayment();
     this.watchForSavePaymentAction();
+    this.watchForMobile();
   }
 
   public ngAfterViewInit(): void {
@@ -522,24 +548,35 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   private watchForSavePaymentAction(): void {
-    this.actions$
-      .pipe(
-        ofActionSuccessful(Invoices.SavePayment),
-        takeUntil(this.componentDestroy()),
-      ).subscribe(() => {
-        this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
-        this.store.dispatch(
-          new Invoices.ToggleInvoiceDialog(
-            DialogAction.Open,
-            this.isAgency,
-            {
-              invoiceIds: this.gridSelections.selectedInvoiceIds,
-              organizationIds: [this.organizationId],
-            },
-            null,
-            null,
-          ));
-        this.cdr.markForCheck();
+    this.actions$.pipe(ofActionSuccessful(Invoices.SavePayment), takeUntil(this.componentDestroy())).subscribe(() => {
+      this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
+      this.store.dispatch(
+        new Invoices.ToggleInvoiceDialog(
+          DialogAction.Open,
+          this.isAgency,
+          {
+            invoiceIds: this.gridSelections.selectedInvoiceIds,
+            organizationIds: [this.organizationId],
+          },
+          null,
+          null
+        )
+      );
+      this.cdr.markForCheck();
+    });
+  }
+
+  private watchForMobile(): void {
+    this.breakpointObserver
+      .getBreakpointMediaRanges()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((breakpoints) => {
+        this.isMobile = breakpoints.isMobile;
+        if (this.isMobile) {
+          this.gridDomLayout = 'autoHeight';
+        } else {
+          this.gridDomLayout = 'normal';
+        }
       });
   }
 }

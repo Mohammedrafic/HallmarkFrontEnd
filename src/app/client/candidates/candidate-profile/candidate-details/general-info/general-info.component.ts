@@ -6,9 +6,10 @@ import { JobClassifications } from '@client/order-management/constants';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Select, Store } from '@ngxs/store';
 import { ListOfSkills } from '@shared/models/skill.model';
-import { Observable } from 'rxjs';
+import { distinctUntilChanged, Observable, takeUntil } from 'rxjs';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 @Component({
   selector: 'app-general-info',
@@ -22,6 +23,8 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
 
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   public skills$: Observable<ListOfSkills[]>;
+  public primarySkillsDataSource: ListOfSkills[] = [];
+  public secondarySkillsDataSource: ListOfSkills[] = [];
 
   public readonly classifications = JobClassifications;
   public readonly profileStatuses = ProfileStatuses;
@@ -41,7 +44,28 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   override ngOnInit(): void {
     super.ngOnInit();
     this.listenProfileStatusChanges();
-    this.store.dispatch(new GetAssignedSkillsByOrganization());
+    this.listenSkillsChanges();
+    this.subscribeOnSkills();
+    this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
+  }
+
+  private subscribeOnSkills(): void {
+    this.skills$.pipe(takeUntil(this.destroy$)).subscribe((skills) => {
+      const primarySkillId = this.candidateForm.controls['primarySkillId'].value;
+      this.primarySkillsDataSource = skills;
+      this.secondarySkillsDataSource = primarySkillId ? this.candidateProfileFormService.getSecondarySkillsDataSource(this.primarySkillsDataSource, primarySkillId) : skills;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private listenSkillsChanges(): void {
+    const secondarySkillsField = this.candidateForm.controls['secondarySkills'];
+    this.candidateForm.controls['primarySkillId'].valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$)).subscribe((value) => {
+      this.candidateProfileFormService.primarySkillHandler(secondarySkillsField, value);
+      this.secondarySkillsDataSource = this.candidateProfileFormService.getSecondarySkillsDataSource(this.primarySkillsDataSource, value);
+      this.cdr.markForCheck();
+    });
+
   }
 
   private listenProfileStatusChanges(): void {

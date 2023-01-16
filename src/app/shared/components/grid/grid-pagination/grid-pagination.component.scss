@@ -46,7 +46,7 @@
 
   &__rows-options,
   &__navigate-to-control {
-    width: 140px;
+    max-width: 140px;
 
     ::ng-deep {
       .e-control-wrapper {
@@ -106,6 +106,7 @@
     .total-rows {
       color: $secondary-dark-blue-15;
       font-size: 14px;
+      min-width: 58px;
     }
   }
 

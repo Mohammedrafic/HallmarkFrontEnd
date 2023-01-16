@@ -109,6 +109,26 @@
           {{ data.reactivateDate | date: 'MM/dd/yyy' : 'UTC' }}
         </ng-template>
       </e-column>
+      <e-column field="primarySkillNames" headerText="PRIMARY SKILL" width=200>
+        <ng-template #template let-data>
+          <app-tooltip-container
+            [showToolTip]="data.primarySkills?.length > 1"
+            [message]="data?.primarySkillNames | join : ', ' "
+          >
+            {{ data | singleMultipleSkill :  'primarySkills' : 'primarySkillNames' }}
+          </app-tooltip-container>
+        </ng-template>
+      </e-column>
+      <e-column field="secondarySkillNames" headerText="SECONDARY SKILL" width=200>
+        <ng-template #template let-data>
+          <app-tooltip-container
+            [showToolTip]="data.secondarySkills?.length > 1"
+            [message]="data?.secondarySkillNames | join : ', '"
+          >
+            {{ data | singleMultipleSkill :  'secondarySkills' : 'secondarySkillNames' }}
+          </app-tooltip-container>
+        </ng-template>
+      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -375,6 +395,7 @@
       </div>
     </div>
 
+
     <div class="dates-message-container" *ngIf="selectedLocation?.isDeactivated && isEdit">
       <span>
         Department is inactivated due to Location inactivation on {{ maxInactivateDate }} <span *ngIf="minReactivateDate">to {{ minReactivateDate }}</span>
@@ -416,6 +437,39 @@
             formControlName="reactivateDate"
           >
           </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="areSkillsAvailable">
+      <div class="input-container">
+        <label>Primary Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="primarySkills"
+            placeholder="All"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [fields]="skillFields"
+            [dataSource]="primarySkills"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Secondary Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="secondarySkills"
+            placeholder="All"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [fields]="skillFields"
+            [dataSource]="secondarySkills"
+          >
+          </ejs-multiselect>
         </div>
       </div>
     </div>

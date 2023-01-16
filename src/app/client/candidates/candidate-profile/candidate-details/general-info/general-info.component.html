@@ -48,7 +48,7 @@
   </div>
   <div class="row">
     <app-dropdown
-      [dataSource]="skills$ | async"
+      [dataSource]="primarySkillsDataSource"
       [fields]="fieldsSettings"
       [formGroupInstance]="candidateForm"
       [hideBorder]="false"
@@ -59,7 +59,7 @@
     ></app-dropdown>
 
     <app-multiselect-dropdown
-      [dataSource]="skills$ | async"
+      [dataSource]="secondarySkillsDataSource"
       [formGroupInstance]="candidateForm"
       [fields]="skillOptionFields"
       controlName="secondarySkills"
