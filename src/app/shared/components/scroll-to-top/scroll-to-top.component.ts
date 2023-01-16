@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, Inject, HostListener } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { ButtonTypeEnum } from '../button/enums/button-type.enum';
 
 @Component({
   selector: 'app-scroll-to-top',
@@ -9,6 +10,7 @@ import { DOCUMENT } from '@angular/common';
 })
 export class ScrollToTopComponent {
   public windowScrolled: boolean;
+  public buttonType = ButtonTypeEnum;
 
   private window: Window;
   constructor(@Inject(DOCUMENT) private readonly document: Document) {

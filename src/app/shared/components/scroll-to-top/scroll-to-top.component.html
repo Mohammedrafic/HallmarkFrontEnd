@@ -1,12 +1,3 @@
 <div class="scroll-to-top" [ngClass]="{ 'show-scrollTop': windowScrolled }">
-  <button
-    ejs-button
-    appHideBeforeSyncfusionLoad
-    cssClass="e-outline"
-    data-toggle="button"
-    aria-pressed="true"
-    (click)="scrollToTop()"
-  >
-    <i-feather name="arrow-up" class="icon"></i-feather>
-  </button>
+  <app-button [type]="buttonType.OUTLINED" (click)="scrollToTop()" iconName="arrow-up"></app-button>
 </div>
