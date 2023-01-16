@@ -491,6 +491,9 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
         this.store.dispatch(new GetCredential());
         this.store.dispatch(new GetCredentialTypes());
         this.clearFormDetails();
+        this.allRegionsChange({checked: false});
+        this.allLocationsChange({checked: false});
+        this.allDepartmentsChange({checked: false});
       } else {
         this.showConfirmationPopup();
       }
