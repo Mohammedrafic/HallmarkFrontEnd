@@ -41,7 +41,7 @@
       </button>
       <ng-container *ngIf="!isMiddleTabletWidth" [ngTemplateOutlet]="filterButton"></ng-container>
       <app-tooltip-container
-        *ngIf="!(isContentTabletWidth && isMiddleTabletWidth)"
+        *ngIf="!(isContentTabletWidth || isMiddleTabletWidth)"
         [message]="toolTipMessage"
         [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
       >
@@ -152,8 +152,8 @@
   <button
     ejs-dropdownbutton
     appHideBeforeSyncfusionLoad
-    [items]="desktopSmallMenu"
-    (select)="menuSelected($event)"
+    [items]="smallMenu"
+    (select)="smallMenuSelected($event)"
     id="importButton"
     cssClass="e-outline menu-mobile"
     [disabled]="isActiveSystemIRP"

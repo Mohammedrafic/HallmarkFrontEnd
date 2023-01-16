@@ -407,7 +407,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     return this.isIRPFlagEnabled && this.activeSystem === this.OrderManagementIRPSystemId.IRP;
   }
 
-  get desktopSmallMenu(): any[] {
+  get smallMenu(): any[] {
     let menu: { text: string }[] = [];
 
     if (!this.isActiveSystemIRP || !this.canCreateOrder || !this.userPermission[this.userPermissions.CanCreateOrders]) {
@@ -1982,7 +1982,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private listenParentContainerWidth(): void {
     const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$.pipe(
-      filter(() => true),
       map((data) => data[0].contentRect.width),
       distinctUntilChanged()
     );
@@ -1995,7 +1994,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
   }
 
-  public menuSelected({ item: { text } }: MenuEventArgs): void {
+  public smallMenuSelected({ item: { text } }: MenuEventArgs): void {
     switch (text) {
       case MobileMenuItems.Filters:
         this.showFilters();

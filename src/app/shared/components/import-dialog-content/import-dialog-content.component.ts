@@ -27,7 +27,6 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { ImportResult } from '@shared/models/import.model';
 import { FileSize, UploaderFileStatus } from '@core/enums';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
-import { BreakpointObserverService } from '@core/services';
 
 @Component({
   selector: 'app-import-dialog-content',
@@ -82,12 +81,11 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
     return this.selectedFile?.statusCode === UploaderFileStatus.ReadyForUpload && !this.activeErrorTab;
   }
 
-  constructor(private confirmService: ConfirmService, private cdr: ChangeDetectorRef, private breakpointService: BreakpointObserverService) {
+  constructor(private confirmService: ConfirmService, private cdr: ChangeDetectorRef) {
     super();
   }
 
   ngOnInit(): void {
-    this.setDialogWidth();
     this.subscribeOnOpenEvent();
     this.subscribeOnSelectErrorsTab();
   }
@@ -235,11 +233,5 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
 
   private subscribeOnSelectErrorsTab(): void {
     this.selectErrorsTab.pipe(takeUntil(this.destroy$)).subscribe(() => this.tab.select(1));
-  }
-
-  private setDialogWidth(): void {
-    this.breakpointService.getBreakpointMediaRanges().pipe(takeUntil(this.destroy$)).subscribe(({ isMobile }) => {
-      this.width = isMobile ? '100%' : `${window.innerWidth * 0.6}px`; 
-    })
   }
 }

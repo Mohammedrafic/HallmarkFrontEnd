@@ -134,7 +134,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public isMobile = false;
   public isSmallDesktop = false;
-  public mobileGridHeight = '600';
+  public mobileGridHeight = this.gridHeight;
   private orderPerDiemId: number | null;
   private prefix: string | null;
   private orderId: number | null;
