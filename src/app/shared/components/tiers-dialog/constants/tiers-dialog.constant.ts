@@ -58,28 +58,31 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[]): Record<Tiers,
     editTitle: 'Edit Tier Exception',
     fields: [
       {
-        field: 'regionIds',
+        field: FieldNames.regionIds,
         title: 'Region',
         disabled: false,
         required: false,
         type: FieldType.MultiSelectDropdown,
-        dataSource: regions ?? []
+        dataSource: regions ?? [],
+        showAllToggle: true,
       },
       {
-        field: 'locationIds',
+        field: FieldNames.locationIds,
         title: 'Location',
         disabled: false,
         required: false,
         type: FieldType.MultiSelectDropdown,
-        dataSource: []
+        dataSource: [],
+        showAllToggle: true,
       },
       {
-        field: 'departmentIds',
+        field: FieldNames.departmentIds,
         title: 'Department',
         disabled: false,
         required: false,
         type: FieldType.MultiSelectDropdown,
-        dataSource: []
+        dataSource: [],
+        showAllToggle: true,
       },
       {
         field: 'organizationTierId',
