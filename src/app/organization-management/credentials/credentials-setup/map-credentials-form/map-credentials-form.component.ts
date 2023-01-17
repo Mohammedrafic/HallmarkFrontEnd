@@ -368,6 +368,9 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
         this.isEdit = true;
         // setup form data
         this.mapCredentialsFormGroup.controls['mappingId'].setValue(credentialSetupMapping.credentionSetupMappingId);
+        this.allRegionsChange({ checked: !credentialSetupMapping.regionIds });
+        this.allLocationsChange({ checked: !credentialSetupMapping.locationIds });
+        this.allDepartmentsChange({ checked: !credentialSetupMapping.departmentIds });
 
         if (!credentialSetupMapping.regionIds) {
           this.allRegions = true;
@@ -450,13 +453,6 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
           const selectedRegion = this.orgRegions.find(region => region.id === id);
           this.locations.push(...sortByField(selectedRegion?.locations ?? [], 'name') as []);
         });
-        this.departments = [];
-        this.locations.forEach(location => {
-          this.departments.push(...location.departments);
-        });
-      } else {
-        this.locations = [];
-        this.departments = [];
       }
 
       this.mapCredentialsFormGroup.controls['locationIds'].setValue(null);
@@ -472,8 +468,6 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
           const selectedLocation = this.locations.find(location => location.id === id);
           this.departments.push(...sortByField(selectedLocation?.departments ?? [], 'name') as []);
         });
-      } else {
-        this.departments = [];
       }
 
       this.mapCredentialsFormGroup.controls['departmentIds'].setValue(null);
@@ -491,9 +485,6 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
         this.store.dispatch(new GetCredential());
         this.store.dispatch(new GetCredentialTypes());
         this.clearFormDetails();
-        this.allRegionsChange({checked: false});
-        this.allLocationsChange({checked: false});
-        this.allDepartmentsChange({checked: false});
       } else {
         this.showConfirmationPopup();
       }
@@ -537,6 +528,9 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
     this.isAllGroupsSelected = undefined;
     this.clearSelection(this.grid);
     this.gridDataSource = [];
+    this.allRegionsChange({checked: false});
+    this.allLocationsChange({checked: false});
+    this.allDepartmentsChange({checked: false});
   }
 
   private cleanUp(): void {
