@@ -1,11 +1,7 @@
 import { FieldType } from "@core/enums";
 
-import {
-  ScheduleFormConfig,
-  ScheduleFormFieldConfig,
-  ScheduleTypeRadioButton,
-} from "../components/create-schedule/create-schedule.interface";
 import { ScheduleType } from "../enums";
+import * as ScheduleInt from '../interface';
 
 
 export enum ScheduleTypeNumber {
@@ -20,7 +16,7 @@ export enum ScheduleFormSourceKeys {
 }
 
 
-export const ScheduleTypes: ScheduleTypeRadioButton[] = [
+export const ScheduleTypes: ScheduleInt.ScheduleTypeRadioButton[] = [
   // TODO: uncomment when Book is implemented
   // {
   //   label: ScheduleType.Book,
@@ -40,7 +36,7 @@ export const ScheduleTypes: ScheduleTypeRadioButton[] = [
 ];
 
 
-const availabilityFormFields:  ScheduleFormFieldConfig[] = [
+const availabilityFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
   {
     field: 'shiftId',
     title: 'Shift',
@@ -73,7 +69,7 @@ const availabilityFormFields:  ScheduleFormFieldConfig[] = [
   },
 ];
 
-const unavailabilityFormFields:  ScheduleFormFieldConfig[] = [
+const unavailabilityFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
   {
     field: 'unavailabilityReasonId',
     title: 'Reason',
@@ -85,12 +81,12 @@ const unavailabilityFormFields:  ScheduleFormFieldConfig[] = [
   ...availabilityFormFields,
 ];
 
-export const AvailabilityFormConfig: ScheduleFormConfig = {
+export const AvailabilityFormConfig: ScheduleInt.ScheduleFormConfig = {
   formClass: 'availability-form',
   formFields: availabilityFormFields,
 };
 
-export const UnavailabilityFormConfig: ScheduleFormConfig = {
+export const UnavailabilityFormConfig: ScheduleInt.ScheduleFormConfig = {
   formClass: 'unavailability-form',
   formFields: unavailabilityFormFields,
 };

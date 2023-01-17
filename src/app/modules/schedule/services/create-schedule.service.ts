@@ -9,46 +9,44 @@ import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { EmployeeScheduledDay, ScheduledDay, ScheduleForm } from "../components/create-schedule/create-schedule.interface";
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
-import { ScheduleModel } from '../interface/schedule.model';
-
+import * as ScheduleInt from '../interface';
 
 @Injectable()
 export class CreateScheduleService {
 
-  set scheduleData(data: ScheduleModel[]) {
+  set scheduleData(data: ScheduleInt.ScheduleModel[]) {
     this.scheduleModels = [...data];
   }
 
-  get scheduleData(): ScheduleModel[] {
+  get scheduleData(): ScheduleInt.ScheduleModel[] {
     return [...this.scheduleModels];
   }
 
-  private scheduleModels: ScheduleModel[] = [];
+  private scheduleModels: ScheduleInt.ScheduleModel[] = [];
 
   constructor(
     private fb: FormBuilder,
     private store: Store,
   ) {}
 
-  createUnavailabilityForm(): CustomFormGroup<ScheduleForm> {
+  createUnavailabilityForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
     return this.fb.group({
       unavailabilityReasonId: [null, Validators.required],
       shiftId: [null, Validators.required],
       startTime: [null, Validators.required],
       endTime: [null, Validators.required],
       hours: [null],
-    }) as CustomFormGroup<ScheduleForm>;
+    }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
   }
 
-  createAvailabilityForm(): CustomFormGroup<ScheduleForm> {
+  createAvailabilityForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
     return this.fb.group({
       shiftId: [null, Validators.required],
       startTime: [null, Validators.required],
       endTime: [null, Validators.required],
       hours: [null],
-    }) as CustomFormGroup<ScheduleForm>;
+    }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
   }
 
   handleError(error: HttpErrorResponse): Observable<never> {
@@ -57,9 +55,9 @@ export class CreateScheduleService {
     return EMPTY;
   }
 
-  getEmployeeScheduledDays(scheduleItems: CreateScheduleItem[]): EmployeeScheduledDay[] {
+  getEmployeeScheduledDays(scheduleItems: CreateScheduleItem[]): ScheduleInt.EmployeeScheduledDay[] {
     return scheduleItems.map((item: CreateScheduleItem) => {
-      const scheduledDays: ScheduledDay[] = item.dateItems.map((dateItem: DateItem) => {
+      const scheduledDays: ScheduleInt.ScheduledDay[] = item.dateItems.map((dateItem: DateItem) => {
         return {
           scheduleToOverrideId: dateItem.scheduleToOverrideId || null,
           date: dateItem.dateString,

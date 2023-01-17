@@ -21,11 +21,11 @@ import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, fromEvent, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
+import { DatesRangeType } from '@shared/enums';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { DatesRangeType } from '@shared/enums';
 import { ScheduleApiService } from '../../services';
 import { UserState } from '../../../../store/user.state';
 import { ScheduleGridAdapter } from '../../adapters';
@@ -48,8 +48,10 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   @Output() changeFilter: EventEmitter<ScheduleInt.ScheduleFilters> = new EventEmitter<ScheduleInt.ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
-  @Output() selectedCells: EventEmitter<ScheduleInt.ScheduleSelectedSlots> = new EventEmitter<ScheduleInt.ScheduleSelectedSlots>();
-  @Output() scheduleCell: EventEmitter<ScheduleInt.ScheduleSelectedSlots> = new EventEmitter<ScheduleInt.ScheduleSelectedSlots>();
+  @Output() selectedCells: EventEmitter<ScheduleInt.ScheduleSelectedSlots>
+    = new EventEmitter<ScheduleInt.ScheduleSelectedSlots>();
+  @Output() scheduleCell: EventEmitter<ScheduleInt.ScheduleSelectedSlots>
+    = new EventEmitter<ScheduleInt.ScheduleSelectedSlots>();
   @Output() selectCandidate: EventEmitter<ScheduleInt.ScheduleCandidate | null>
     = new EventEmitter<ScheduleInt.ScheduleCandidate | null>();
 
@@ -109,7 +111,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.detectChanges();
   }
 
-  handleCellSingleClick(date: string, candidate: ScheduleCandidate): void {
+  handleCellSingleClick(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
     // TODO: refactor, move to directive
     this.preventCellSingleClick = false;
     this.cellClickTimer = setTimeout(() => {
@@ -120,7 +122,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     }, 250);
   }
 
-  handleCellDblClick(date: string, candidate: ScheduleCandidate): void {
+  handleCellDblClick(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
     this.preventCellSingleClick = true;
     clearTimeout(this.cellClickTimer);
     this.selectedCandidatesSlot.clear();
@@ -129,7 +131,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.detectChanges();
   }
 
-  handleScheduleCardDblClick(schedule: ScheduleDateItem, candidate: ScheduleCandidate): void {
+  handleScheduleCardDblClick(schedule: ScheduleInt.ScheduleDateItem, candidate: ScheduleInt.ScheduleCandidate): void {
     this.preventCellSingleClick = true;
     clearTimeout(this.cellClickTimer);
     this.selectedCandidatesSlot.clear();

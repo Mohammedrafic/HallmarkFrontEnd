@@ -25,7 +25,6 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
 import { ConfirmService } from "@shared/services/confirm.service";
 import { MessageTypes } from '@shared/enums/message-types';
-import { ScheduleApiService } from '@shared/services/schedule-api.service';
 import { ShiftsService } from '@shared/services/shift.service';
 import { convertMsToTime, getHoursMinutesSeconds, getTime } from '@shared/utils/date-time.utils';
 import {
@@ -35,17 +34,11 @@ import {
   ScheduleTypes,
   UnavailabilityFormConfig,
 } from "src/app/modules/schedule/constants";
-import { ScheduleModelPage, ScheduleSelectedSlots } from "src/app/modules/schedule/interface/schedule.model";
 import { CreateScheduleService } from "src/app/modules/schedule/services/create-schedule.service";
 import { ShowToast } from 'src/app/store/app.actions';
 import { ScheduleItemsComponent } from '../schedule-items/schedule-items.component';
-import {
-  Schedule,
-  ScheduleForm,
-  ScheduleFormConfig,
-  ScheduleFormSource,
-  ScheduleTypeRadioButton,
-} from "./create-schedule.interface";
+import { ScheduleApiService } from '../../services';
+import * as ScheduleInt from '../../interface';
 
 @Component({
   selector: 'app-create-schedule',
@@ -56,28 +49,28 @@ import {
 export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   @ViewChild(ScheduleItemsComponent) scheduleItemsComponent: ScheduleItemsComponent;
 
-  @Input() scheduleSelectedSlots: ScheduleSelectedSlots;
+  @Input() scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
   @Input() minDate: Date;
   @Input() maxDate: Date;
-  @Input() set scheduleData(page: ScheduleModelPage) {
+  @Input() set scheduleData(page: ScheduleInt.ScheduleModelPage) {
     this.createScheduleService.scheduleData = page.items;
   }
 
   @Output() updateScheduleGrid: EventEmitter<void> = new EventEmitter<void>();
 
   readonly targetElement: HTMLBodyElement = this.globalWindow.document.body as HTMLBodyElement;
-  readonly scheduleTypes: ScheduleTypeRadioButton[] = ScheduleTypes;
+  readonly scheduleTypes: ScheduleInt.ScheduleTypeRadioButton[] = ScheduleTypes;
   readonly scheduleTypeNumberEnum = ScheduleTypeNumber;
   readonly FieldTypes = FieldType;
   readonly scheduleTypesControl: FormControl = new FormControl(this.scheduleTypeNumberEnum.Unavailability); // TODO: change to Book when it is implemented
   readonly dropDownFields = { text: 'text', value: 'value' };
-  readonly scheduleFormSourcesMap: ScheduleFormSource = {
+  readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = {
     [ScheduleFormSourceKeys.Shifts]: [],
     [ScheduleFormSourceKeys.Reasons]: [],
   };
 
-  scheduleForm: CustomFormGroup<ScheduleForm>;
-  scheduleFormConfig: ScheduleFormConfig;
+  scheduleForm: CustomFormGroup<ScheduleInt.ScheduleForm>;
+  scheduleFormConfig: ScheduleInt.ScheduleFormConfig;
   scheduleTypeNumber: ScheduleTypeNumber;
   showScheduleForm = true;
 
@@ -163,7 +156,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
     }
 
     const { shiftId, startTime, endTime, unavailabilityReasonId = null } = this.scheduleForm.getRawValue();
-    const schedule: Schedule = {
+    const schedule: ScheduleInt.Schedule = {
       employeeScheduledDays: this.createScheduleService.getEmployeeScheduledDays(this.scheduleItemsComponent.scheduleItems),
       scheduleType: this.scheduleTypesControl.value,
       startTime: getTime(startTime),

@@ -3,8 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { CandidateSchedules, ScheduleCandidatesPage, ScheduleFilters } from '../interface';
-import { Schedule } from 'src/app/modules/schedule/components/create-schedule/create-schedule.interface';
+import { CandidateSchedules, Schedule, ScheduleCandidatesPage, ScheduleFilters } from '../interface';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
 
 @Injectable()

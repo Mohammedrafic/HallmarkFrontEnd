@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { Observable, switchMap, takeUntil } from 'rxjs';
@@ -85,11 +85,11 @@ export class ScheduleContainerComponent extends Destroyable {
     });
   }
 
-  selectCells(cells: ScheduleSelectedSlots): void {
+  selectCells(cells: ScheduleInt.ScheduleSelectedSlots): void {
     this.scheduleSelectedSlots = cells;
   }
 
-  scheduleCell(cells: ScheduleSelectedSlots): void {
+  scheduleCell(cells: ScheduleInt.ScheduleSelectedSlots): void {
     this.selectCells(cells);
     this.openScheduleDialog();
   }
