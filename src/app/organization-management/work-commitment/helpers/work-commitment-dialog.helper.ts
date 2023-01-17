@@ -9,7 +9,9 @@ export const setDataSourceValue = <T extends { field: string; dataSource?: any }
 };
 
 export const mapperSelectedItems = <T, U>(source: U[], key: string): T[] => {
-  return source.flatMap((sourceItem: any) => sourceItem[key].map((item: T) => item));
+  return source
+    .flatMap((sourceItem: any) => sourceItem[key].map((item: T) => item))
+    .filter((item) => item.includeInIRP);
 };
 
 //TODO remove any

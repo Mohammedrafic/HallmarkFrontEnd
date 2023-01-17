@@ -6,11 +6,11 @@
     <div class="btn-container">
       <app-tooltip-container
         [message]="toolTipMessage"
-        [showToolTip]="userPermission[userPermissions.CanManageWorkCommitmentData]"
+        [showToolTip]="!userPermission[userPermissions.CanManageWorkCommitmentData]"
       >
         <app-button
           text="Add Commitment"
-          [disabled]="userPermission[userPermissions.CanManageWorkCommitmentData]"
+          [disabled]="!userPermission[userPermissions.CanManageWorkCommitmentData]"
           (clickEmitter)="addCommitment()"
           [type]="buttonType.PRIMARY"
         ></app-button>
@@ -25,6 +25,6 @@
 <app-work-commitment-dialog
   [selectedCommitment]="selectedCommitment"
   [isEditDialog]="isEdit"
-  [permission]="!userPermission[userPermissions.CanManageWorkCommitmentData]"
+  [permission]="userPermission[userPermissions.CanManageWorkCommitmentData]"
   (saveCommitment)="handleSaveCommitment($event)"
 ></app-work-commitment-dialog>

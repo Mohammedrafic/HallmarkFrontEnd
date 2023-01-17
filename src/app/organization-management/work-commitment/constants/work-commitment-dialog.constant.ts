@@ -43,6 +43,7 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       disabled: false,
       required: false,
       type: FieldType.Number,
+      decimals: 1,
     },
     {
       field: 'schedulePeriod',
@@ -50,6 +51,7 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       disabled: false,
       required: false,
       type: FieldType.Number,
+      decimals: 0,
     },
     {
       field: 'minimumWorkExperience',
@@ -57,6 +59,7 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       disabled: false,
       required: false,
       type: FieldType.Number,
+      decimals: 1,
     },
     {
       field: 'criticalOrder',
@@ -64,6 +67,7 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       disabled: false,
       required: false,
       type: FieldType.Number,
+      decimals: 0,
     },
     {
       field: 'holiday',

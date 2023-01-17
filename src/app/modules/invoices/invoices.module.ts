@@ -82,6 +82,7 @@ import { InvoicesPermissionHelper } from './helpers/invoices-permission.helper';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { InvoiceAddPaymentModule } from './components/invoice-add-payment/invoice-add-payment.module';
 import { InvoicePaymentDetailsModule } from './components/invoice-payment-details/invoice-payment-details.module';
+import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-top.module';
 
 @NgModule({
   declarations: [
@@ -104,9 +105,23 @@ import { InvoicePaymentDetailsModule } from './components/invoice-payment-detail
     SharedModule,
     DateWeekPickerModule,
     FeatherModule.pick({
-      AlignJustify, Lock, Menu, MessageSquare, MoreVertical, Sliders, ChevronRight,
-      ChevronDown, X, Percent, Package, Trash2, AlertCircle, ChevronsDown, Search,
-      Printer, ArrowUp,
+      AlignJustify,
+      Lock,
+      Menu,
+      MessageSquare,
+      MoreVertical,
+      Sliders,
+      ChevronRight,
+      ChevronDown,
+      X,
+      Percent,
+      Package,
+      Trash2,
+      AlertCircle,
+      ChevronsDown,
+      Search,
+      Printer,
+      ArrowUp,
     }),
     TabModule,
     DropDownButtonModule,
@@ -141,6 +156,7 @@ import { InvoicePaymentDetailsModule } from './components/invoice-payment-detail
     TooltipContainerModule,
     InvoiceAddPaymentModule,
     InvoicePaymentDetailsModule,
+    ScrollToTopModule,
   ],
   providers: [
     InvoicesService,

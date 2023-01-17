@@ -69,6 +69,9 @@ import {
   UploadCandidateProfileFileSucceeded,
   UploadCredentialFiles,
   UploadCredentialFilesSucceeded,
+  VerifyCandidatesCredentials,
+  VerifyCandidatesCredentialsFailed,
+  VerifyCandidatesCredentialsSucceeded,
 } from './candidate.actions';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { CredentialStatus } from "@shared/enums/status";
@@ -383,6 +386,27 @@ export class CandidateState {
       }),
       catchError((error: any) => {
         dispatch(new SaveCandidatesCredentialFailed());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+  @Action(VerifyCandidatesCredentials)
+  VerifyCandidateCredentials(
+    { patchState, dispatch }: StateContext<CandidateStateModel>, //{ patchState, dispatch, getState }
+    { payload }: VerifyCandidatesCredentials
+  ): Observable<CandidateCredential[] | void> {
+    // const isCreating = !payload.id;
+    // payload.candidateProfileId = getState().candidate?.id as number;
+    patchState({ isCandidateLoading: true });
+    return this.candidateService.verifyCandidatesCredentials(payload).pipe(
+      tap((payload) => {
+        patchState({ isCandidateLoading: false });
+        dispatch(new VerifyCandidatesCredentialsSucceeded(payload));
+        dispatch(new ShowToast(MessageTypes.Success,  RECORD_MODIFIED));
+        return payload;
+      }),
+      catchError((error: any) => {
+        dispatch(new VerifyCandidatesCredentialsFailed());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );

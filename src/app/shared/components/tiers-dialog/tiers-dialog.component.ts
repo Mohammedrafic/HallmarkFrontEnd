@@ -57,14 +57,12 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   @Input() set selectedTier(tier: TierDetails) {
     if (tier) {
       this.selectedTierDetails = tier;
-      if (this.dialogType === Tiers.tierSettings) {
-        this.allRecords.regionIds = !tier.regionId;
-        this.allRecords.locationIds = !tier.locationId;
-        this.allRecords.departmentIds = !tier.departmentId;
-        this.allRegionsChange({ checked: this.allRecords.regionIds });
-        this.allLocationsChange({ checked: this.allRecords.locationIds });
-        this.allDepartmentsChange({ checked: this.allRecords.departmentIds });
-      }
+      this.allRecords.regionIds = !tier.regionId;
+      this.allRecords.locationIds = !tier.locationId;
+      this.allRecords.departmentIds = !tier.departmentId;
+      this.allRegionsChange({ checked: this.allRecords.regionIds });
+      this.allLocationsChange({ checked: this.allRecords.locationIds });
+      this.allDepartmentsChange({ checked: this.allRecords.departmentIds });
       this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, tier, this.regions));
     }
   };
@@ -277,14 +275,12 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
 
     this.actions$.pipe(ofActionDispatched(ShowSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
-        if (this.isTierSettingsDialog) {
-          this.allRecords.regionIds = false;
-          this.allRecords.locationIds = false;
-          this.allRecords.departmentIds = false;
-          this.allRegionsChange({ checked: false });
-          this.allLocationsChange({ checked: false });
-          this.allDepartmentsChange({ checked: false });
-        }
+        this.allRecords.regionIds = false;
+        this.allRecords.locationIds = false;
+        this.allRecords.departmentIds = false;
+        this.allRegionsChange({ checked: false });
+        this.allLocationsChange({ checked: false });
+        this.allDepartmentsChange({ checked: false });
         this.sideDialog.show();
       } else {
         this.sideDialog.hide();

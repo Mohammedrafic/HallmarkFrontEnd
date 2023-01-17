@@ -370,6 +370,7 @@ export interface IRPMetaData {
   status: OrderStatus;
   skillName: string;
   skillId: number;
+  orderOpenDate: Date;
 }
 
 export class Order {

@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import {
+  BulkVerifyCandidateCredential,
   CandidateCredential,
   CandidateCredentialResponse,
   CredentialGroupedFiles,
@@ -92,6 +93,9 @@ export class CandidateService {
     return credential.id
       ? this.http.put<CandidateCredential>(`/api/CandidateCredentials`, credential)
       : this.http.post<CandidateCredential>(`/api/CandidateCredentials`, credential);
+  }
+  public verifyCandidatesCredentials(credentials: BulkVerifyCandidateCredential): Observable<CandidateCredential[]> {
+     return this.http.put<CandidateCredential[]>(`/api/CandidateCredentials/verifyCandidatesCredentials`, credentials);
   }
 
   public removeCredential(credential: CandidateCredential): Observable<CandidateCredential> {
