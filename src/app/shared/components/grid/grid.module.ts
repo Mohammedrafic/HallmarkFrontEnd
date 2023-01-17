@@ -9,10 +9,11 @@ import { TitleValueCellRendererComponent } from './components/title-value-cell-r
 import { GridCellLinkComponent } from './components/grid-cell-link/grid-cell-link.component';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { ScrollToTopModule } from '../scroll-to-top/scroll-to-top.module';
 
 @NgModule({
   declarations: [GridComponent, TitleValueCellRendererComponent, GridCellLinkComponent],
-  imports: [CommonModule, AgGridModule, GridPaginationModule, RouterModule, ButtonModule],
+  imports: [CommonModule, AgGridModule, GridPaginationModule, RouterModule, ButtonModule, ScrollToTopModule],
   exports: [GridComponent],
 })
 export class GridModule {}

@@ -4,11 +4,13 @@
       [tabConfig]="tabConfig"
       [isDisabled]="!!(loading$ | async)"
       (changeTab)="handleChangeTab($event)"
+      class="tabs"
+      appTabsMobileShadow
     >
     </app-timesheets-tabs>
   </ng-container>
   <ng-container right>
-    <div class="right-container">
+    <div class="right-container top-margin">
       <div class="dropdown-filter">
         <div *ngIf="isAgency" class="bootstrap">
           <div class="input-container">

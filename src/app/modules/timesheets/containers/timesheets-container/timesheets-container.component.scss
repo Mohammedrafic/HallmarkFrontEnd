@@ -79,4 +79,34 @@
   button.e-control.e-btn i-feather {
     margin-left: 0 !important;
   }
+  .tabs {
+    position: fixed;
+    background: #f6f6f6;
+    z-index: 100;
+    margin-top: -19px;
+    padding: 20px 25px 0;
+    width: 100vw !important;
+    margin-left: -25px;
+  }
+  .bootstrap,
+  .top-margin {
+    margin-top: 42px;
+    .bootstrap {
+      margin-top: 0;
+    }
+  }
+  .bootstrap {
+    margin-bottom: 12px;
+  }
+}
+
+.top-margin {
+  margin-left: 0;
+}
+
+@media (max-width: 480px) {
+  .bootstrap,
+  .top-margin {
+    margin-top: 54px;
+  }
 }

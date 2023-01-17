@@ -24,6 +24,7 @@ import {
   Trash2,
   User,
   Flag,
+  ArrowUp,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -186,6 +187,7 @@ const icons = {
   DollarSign,
   Percent,
   Flag,
+  ArrowUp,
 };
 
 const COMPONENTS = [
