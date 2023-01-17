@@ -11,6 +11,7 @@ import {
   TrackByFunction,
   ViewChild,
 } from '@angular/core';
+import Timeout = NodeJS.Timeout;
 
 import { Select, Store } from '@ngxs/store';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
@@ -53,6 +54,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   @Output() changeFilter: EventEmitter<ScheduleFilters> = new EventEmitter<ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
   @Output() selectedCells: EventEmitter<ScheduleSelectedSlots> = new EventEmitter<ScheduleSelectedSlots>();
+  @Output() scheduleCell: EventEmitter<ScheduleSelectedSlots> = new EventEmitter<ScheduleSelectedSlots>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
@@ -65,6 +67,10 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   selectedCandidatesSlot: Map<number, ScheduleDateSlot> = new Map<number, ScheduleDateSlot>();
 
   orgFirstDayOfWeek: number;
+
+  preventCellSingleClick = false;
+
+  private cellClickTimer: Timeout;
 
   private itemsPerPage = 30;
 
@@ -96,9 +102,39 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.detectChanges();
   }
 
-  selectScheduleCard(schedule: ScheduleDateItem, candidate: ScheduleCandidate): void {}
+  handleCellSingleClick(date: string, candidate: ScheduleCandidate): void {
+    // TODO: refactor, move to directive
+    this.preventCellSingleClick = false;
+    this.cellClickTimer = setTimeout(() => {
+      if (!this.preventCellSingleClick) {
+        this.selectDateSlot(date, candidate);
+        this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
+      }
+    }, 250);
+  }
 
-  selectDateSlot(date: string, candidate: ScheduleCandidate): void {
+  handleCellDblClick(date: string, candidate: ScheduleCandidate): void {
+    this.preventCellSingleClick = true;
+    clearTimeout(this.cellClickTimer);
+    this.selectedCandidatesSlot.clear();
+    this.selectDateSlot(date, candidate);
+    this.scheduleCell.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
+    this.cdr.detectChanges();
+  }
+
+  handleScheduleCardDblClick(schedule: ScheduleDateItem, candidate: ScheduleCandidate): void {
+    this.preventCellSingleClick = true;
+    clearTimeout(this.cellClickTimer);
+    this.selectedCandidatesSlot.clear();
+    // TODO: edit functionality (will be added in the next sprint)
+  }
+
+  searchCandidate(event: KeyboardEvent): void {
+    this.changeFilter.emit({ firstLastNameOrId: (event.target as HTMLInputElement).value });
+    this.scrollArea.nativeElement.scrollTo(0, 0);
+  }
+
+  private selectDateSlot(date: string, candidate: ScheduleCandidate): void {
     const candidateSelectedSlot = this.selectedCandidatesSlot.get(candidate.id);
 
     if (candidateSelectedSlot) {
@@ -110,15 +146,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     } else {
       this.selectedCandidatesSlot.set(candidate.id, { candidate, dates: new Set<string>().add(date) });
     }
-
-    this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
-
-    this.cdr.detectChanges();
-  }
-
-  searchCandidate(event: KeyboardEvent): void {
-    this.changeFilter.emit({ firstLastNameOrId: (event.target as HTMLInputElement).value });
-    this.scrollArea.nativeElement.scrollTo(0, 0);
   }
 
   private startOrgIdWatching(): void {

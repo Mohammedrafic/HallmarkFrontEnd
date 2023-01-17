@@ -25,6 +25,7 @@ export interface ScheduleItem {
   scheduleOrderType: ScheduleOrderType;
   location: string;
   department: string;
+  unavailabilityReason: string
 }
 
 export interface ScheduleModel {

@@ -3,6 +3,9 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
+import { Schedule } from 'src/app/modules/schedule/components/create-schedule/create-schedule.interface';
+import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
+
 import {
   CandidateSchedules,
   ScheduleCandidatesPage,
@@ -23,5 +26,16 @@ export class ScheduleApiService {
     filters: { startDate: string; endDate: string }
   ): Observable<CandidateSchedules[]> {
     return this.http.post<CandidateSchedules[]>('/api/Schedules/byEmployeesIds', { employeeIds, ...filters });
+  }
+
+  getUnavailabilityReasons(visibleForIRPCandidates: boolean): Observable<UnavailabilityReason[]> {
+    return this.http.post<UnavailabilityReason[]>(
+      '/api/UnavailabilityReasons/forCurrentBusinessUnit',
+      { visibleForIRPCandidates }
+    );
+  }
+
+  createSchedule(employeeScheduledDays: Schedule): Observable<void> {
+    return this.http.post<void>('/api/Schedules/create', employeeScheduledDays);
   }
 }

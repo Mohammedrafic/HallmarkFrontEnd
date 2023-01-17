@@ -1,0 +1,19 @@
+<div #inputWrapper class="datepicker-container">
+  <button ejs-button cssClass="e-flat calendar-icon" (click)="openMenu()">
+    <i-feather name="calendar" class="icon"></i-feather>
+  </button>
+
+  <ejs-calendar
+    #ejCalendar
+    *ngIf="isCalendarShown"
+    [min]="minDate"
+    [max]="maxDate"
+    [values]="datesValues"
+    [isMultiSelection]="true"
+    [showTodayButton]="false"
+    (valuesChange)="datesValuesChange($event)"
+    (created)="createCalendarButtons(ejCalendar)"
+    (destroyed)="calendarDestroyed()"
+    class="calendar bootstrap">
+  </ejs-calendar>
+</div>

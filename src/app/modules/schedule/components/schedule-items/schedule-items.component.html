@@ -1,0 +1,47 @@
+<div class="schedule-items-container">
+  <div *ngIf="!scheduleItems.length" class="empty-list-text">At least one Candidate and date is required to Schedule a shift</div>
+  <div class="schedule-item" *ngFor="let item of scheduleItems; trackBy: trackByCandidateId">
+    <button ejs-button cssClass="e-flat" (click)="removeScheduleItem(item.candidateId)">
+      <i-feather name="x" class="icon"></i-feather>
+    </button>
+
+    <span class="candidate-name">{{item.candidateName}}</span>
+
+    <app-icon-multi-date-picker
+      [minDate]="minDate"
+      [maxDate]="maxDate"
+      [datesValues]="item.selectedDates"
+      (appliedDates)="updateDateItems($event, item.candidateId)"
+    ></app-icon-multi-date-picker>
+
+    <ng-container *ngFor="let dateItem of item.dateItems; trackBy: trackByDate">
+      <ng-container *ngIf="!!dateItem.unavailabilityReason">
+        <ejs-tooltip [showTipPointer]="false" [content]="dateItem.unavailabilityReason" position="TopCenter">
+          <ng-container
+            [ngTemplateOutlet]="dateTemplate"
+            [ngTemplateOutletContext]="{ item, dateItem }"
+          ></ng-container>
+        </ejs-tooltip>
+      </ng-container>
+      <ng-container *ngIf="!dateItem.unavailabilityReason">
+        <ng-container
+          [ngTemplateOutlet]="dateTemplate"
+          [ngTemplateOutletContext]="{ item, dateItem }"
+        ></ng-container>
+      </ng-container>
+    </ng-container>
+
+  </div>
+</div>
+
+<ng-template #dateTemplate let-dateItem="dateItem" let-item="item">
+  <div class="date">
+    <i-feather *ngIf="dateItem.scheduleType === scheduleType.Availability" name="clock" class="icon"></i-feather>
+    <i-feather *ngIf="dateItem.scheduleType === scheduleType.Unavailability" name="alert-triangle" class="icon"></i-feather>
+    <i-feather *ngIf="dateItem.scheduleType === scheduleType.Book" name="briefcase" class="icon"></i-feather>
+    <span>{{dateItem.date | date: "MM/dd/yyyy"}}</span>
+    <button ejs-button cssClass="e-flat" (click)="removeDateItem(item.candidateId, dateItem.dateString)">
+      <i-feather name="x" class="icon"></i-feather>
+    </button>
+  </div>
+</ng-template>

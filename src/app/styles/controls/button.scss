@@ -95,6 +95,11 @@ button.e-control.e-btn {
       color: $secondary-dark-blue-30 !important;
     }
   }
+
+  &.e-primary:disabled {
+    background-color: $primary-active-blue-70;
+    color: $white;
+  }
 }
 
 .e-control.e-popup.e-popup-open.e-dropdown-popup.button-export {

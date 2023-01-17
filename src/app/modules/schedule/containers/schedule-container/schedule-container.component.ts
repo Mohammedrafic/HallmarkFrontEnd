@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { switchMap, takeUntil } from 'rxjs';
@@ -42,6 +42,13 @@ export class ScheduleContainerComponent extends Destroyable {
 
   scheduleFilters: ScheduleFilters = {};
 
+  createScheduleDialogOpen = false;
+
+  scheduleSelectedSlots: ScheduleSelectedSlots;
+
+  minDate: Date;
+  maxDate: Date;
+
   constructor(
     private store: Store,
     private cdr: ChangeDetectorRef,
@@ -70,10 +77,34 @@ export class ScheduleContainerComponent extends Destroyable {
       pageSize: 30,
     };
 
-    this.initScheduleData();
+    this.updateScheduleGrid();
   }
 
-  selectedCells(cells: ScheduleSelectedSlots): void {}
+  updateScheduleGrid(): void {
+    this.initScheduleData();
+    this.setDateLimitation();
+    this.selectCells({
+      candidates: [],
+      dates: [],
+    });
+  }
+
+  selectCells(cells: ScheduleSelectedSlots): void {
+    this.scheduleSelectedSlots = cells;
+  }
+
+  scheduleCell(cells: ScheduleSelectedSlots): void {
+    this.selectCells(cells);
+    this.openScheduleDialog();
+  }
+
+  openScheduleDialog(): void {
+    this.createScheduleDialogOpen = true;
+  }
+
+  closeScheduleDialog(): void {
+    this.createScheduleDialogOpen = false;
+  }
 
   showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
@@ -115,5 +146,12 @@ export class ScheduleContainerComponent extends Destroyable {
 
       this.cdr.detectChanges();
     });
+  }
+
+  private setDateLimitation(): void {
+    if (this.scheduleFilters.startDate && this.scheduleFilters.endDate) {
+      this.minDate = new Date(this.scheduleFilters.startDate);
+      this.maxDate = new  Date(this.scheduleFilters.endDate);
+    }
   }
 }

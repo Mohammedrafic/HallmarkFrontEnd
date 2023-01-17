@@ -1,4 +1,4 @@
-@import "../variables/colors.scss";
+@import "colors.scss";
 
 .light {
   ejs-radiobutton {
@@ -15,6 +15,11 @@
         top: 4px;
         width: 9px;
       }
+    }
+
+    .e-label {
+      padding-left: 25px !important;
+      color: $secondary-dark-blue-15 !important;
     }
   }
 }

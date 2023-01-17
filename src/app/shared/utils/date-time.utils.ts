@@ -46,3 +46,14 @@ export const addDays = (date: string | Date, days: number): Date | null => {
   const newDate = new Date(date);
   return new Date(newDate.setDate(newDate.getDate() + days));
 };
+
+export const convertMsToTime = (milliseconds: number): string => {
+  const seconds = Math.floor(milliseconds / 1000);
+  let minutes = Math.floor(seconds / 60);
+  let hours = Math.floor(minutes / 60);
+
+  minutes = minutes % 60;
+  hours = hours % 24;
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+};
