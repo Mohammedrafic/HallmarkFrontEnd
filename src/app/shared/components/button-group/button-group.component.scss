@@ -1,4 +1,5 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
 
 .e-btn-group {
   position: relative;
@@ -18,7 +19,8 @@
   background: $white !important;
   color: $secondary-dark-blue-10 !important;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background: $primary-active-blue-30 !important;
     color: $white !important;
   }
@@ -39,5 +41,16 @@
   &.disabled {
     color: $secondary-dark-blue-40 !important;
     pointer-events: none !important;
+  }
+}
+@media #{$max-mobile} {
+  .e-btn-group {
+    width: 87vw;
+    display: flex;
+  }
+
+  .e-btn {
+    flex: 1;
+    min-width: unset;
   }
 }

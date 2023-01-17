@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
+
 import { Shift, ShiftsPage } from 'src/app/shared/models/shift.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { ScheduleShift } from '@shared/models/schedule-shift.model';
 
 @Injectable({ providedIn: 'root' })
 export class ShiftsService {
@@ -47,5 +49,9 @@ export class ShiftsService {
       return this.http.post(`/api/MasterShifts/export/byIds`, payload, { responseType: 'blob' });
     }
     return this.http.post(`/api/MasterShifts/export`, payload, { responseType: 'blob' });
+  }
+
+  public getAllShifts(): Observable<ScheduleShift[]> {
+    return this.http.get<ScheduleShift[]>(`/api/MasterShifts/all`);
   }
 }

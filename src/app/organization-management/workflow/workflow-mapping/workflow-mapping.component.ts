@@ -269,13 +269,6 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
           locations.push(...(selectedRegion?.locations as any));
         });
         this.locations = sortByField(locations, 'name');
-        this.departments = [];
-        this.locations.forEach((location) => {
-          this.departments.push(...location.departments);
-        });
-      } else {
-        this.locations = [];
-        this.departments = [];
       }
 
       this.workflowMappingFormGroup.controls['locations'].setValue(null);
@@ -346,8 +339,6 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
           departments.push(...(selectedLocation?.departments as []));
         });
         this.departments = sortByField(departments, 'name');
-      } else {
-        this.departments = [];
       }
 
       this.workflowMappingFormGroup.controls['departments'].setValue(null);
@@ -596,6 +587,10 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       this.workflowMappingFormGroup.controls['workflowType'].setValue(WorkflowGroupType.Organization);
       this.workflowMappingFormGroup.controls['workflowName'].setValue(foundWorkflow?.id);
 
+      this.allRegionsChange({ checked: !data.regionId });
+      this.allLocationsChange({ checked: !data.locationId });
+      this.allDepartmentsChange({ checked: !data.departmentId });
+
       if (!data.regionId) {
         this.allRegionsSelected = true;
         this.workflowMappingFormGroup.controls['regions'].setValue(null);
@@ -624,9 +619,6 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       }
 
       this.setFormArrayControls(data.stepMappings);
-      this.allRegionsChange({ checked: !data.regionId });
-      this.allLocationsChange({ checked: !data.locationId });
-      this.allDepartmentsChange({ checked: !data.departmentId });
     });
 
     this.store.dispatch(new GetOrganizationStructure());

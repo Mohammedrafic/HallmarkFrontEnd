@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 
@@ -14,7 +14,7 @@ import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum
   styleUrls: ['./work-commitment.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WorkCommitmentComponent extends AbstractPermission implements OnInit {
+export class WorkCommitmentComponent extends AbstractPermission {
   public isEdit = false;
   public selectedCommitment: WorkCommitmentGrid;
   public buttonType = ButtonTypeEnum;
@@ -24,8 +24,6 @@ export class WorkCommitmentComponent extends AbstractPermission implements OnIni
   constructor(protected override store: Store) {
     super(store);
   }
-
-  override ngOnInit(): void {}
 
   public addCommitment() {
     this.isEdit = false;

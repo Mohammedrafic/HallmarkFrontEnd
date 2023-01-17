@@ -1,0 +1,105 @@
+@import "colors";
+@import "mixins";
+
+.dialog-container {
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: column;
+  padding: 24px;
+  height: calc(100% - 1px);
+}
+
+.dialog-header,
+.schedule-types,
+.separator,
+.form-container {
+  flex: 0 1 auto;
+}
+
+app-schedule-items {
+  flex: 1 1 auto;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+
+  .title {
+    @include dialog-title;
+  }
+}
+
+.button-cancel {
+  margin-right: 8px;
+}
+
+.separator {
+  height: 1px;
+  background-color: $secondary-dark-blue-45;
+  margin: 28px 0;
+}
+
+.form-container {
+  min-height: 135px;
+
+  .validation-icon {
+    display: none !important;
+  }
+}
+
+.schedule-types {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.input-container .input-group.input-readonly {
+  .e-input[readonly] {
+    background-color: $secondary-dark-blue-50;
+    color: $secondary-dark-blue-30;
+    border: 1px solid $secondary-dark-blue-40 !important;
+  }
+}
+
+.availability-form {
+  display: grid;
+  grid-template-columns: 1.6fr 0.9fr 0.9fr 0.6fr;
+  grid-template-rows: 1fr;
+  gap: 16px 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "shift startTime endTime hours";
+}
+
+.unavailability-form {
+  display: grid;
+  grid-template-columns: 1.6fr 0.9fr 0.9fr 0.6fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 16px 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "reason reason reason reason"
+    "shift startTime endTime hours";
+}
+
+.reason {
+  grid-area: reason;
+}
+
+.shift {
+  grid-area: shift;
+}
+
+.startTime {
+  grid-area: startTime;
+}
+
+.endTime {
+  grid-area: endTime;
+}
+
+.hours {
+  grid-area: hours;
+}

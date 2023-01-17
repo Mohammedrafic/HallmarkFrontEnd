@@ -38,7 +38,8 @@ import {
   Upload,
   X,
   XCircle,
-  Paperclip
+  Paperclip,
+  ArrowUp
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxModule,
@@ -104,17 +105,15 @@ import { ManualFormComponent } from './agency-list/add-edit-agency/payment-detai
 import { PaymentDialogComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/payment-dialog.component';
 import { JobDistributionComponent } from './agency-list/add-edit-agency/job-distribution/job-distribution.component';
 import { OrderMatchColumnComponent } from './candidates/add-edit-candidate/credentials-grid/order-match-column/order-match-column.component';
-import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
-import { CredentialStorageFacadeService } from "./services/credential-storage-facade.service";
-import { CredentialStorageService } from "./services/credential-storage.service";
+import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { CredentialStorageFacadeService } from './services/credential-storage-facade.service';
+import { CredentialStorageService } from './services/credential-storage.service';
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
 import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
-import {
-  CandidateGeneralInfoService,
-} from "@agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.service";
+import { CandidateGeneralInfoService } from '@agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.service';
 import { AgencyNameComponent } from './agency-list/agency-name/agency-name.component';
 import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
-
+import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-top.module';
 
 const sidebarIcons = {
   Sliders,
@@ -143,7 +142,8 @@ const sidebarIcons = {
   XCircle,
   Slash,
   CheckCircle,
-  Paperclip
+  Paperclip,
+  ArrowUp,
 };
 
 @NgModule({
@@ -220,6 +220,7 @@ const sidebarIcons = {
     AssociateListModule,
     RadioButtonModule,
     TooltipContainerModule,
+    ScrollToTopModule,
 
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),

@@ -7,13 +7,16 @@
   border-radius: 12px;
 
   .e-row {
-    .e-checkbox-wrapper .e-frame.e-check, body.light .e-css.e-checkbox-wrapper .e-frame.e-check {
+    .e-checkbox-wrapper .e-frame.e-check,
+    body.light .e-css.e-checkbox-wrapper .e-frame.e-check {
       background-color: #fff;
       color: $primary-active-blue-10;
     }
   }
 
-  &.e-gridhover tr[role=row]:not(.e-editedrow):hover .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
+  &.e-gridhover
+    tr[role='row']:not(.e-editedrow):hover
+    .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
     background-color: $primary-active-blue-90;
   }
 
@@ -83,11 +86,13 @@
 }
 
 .radio-container {
-  label, ejs-radiobutton {
+  label,
+  ejs-radiobutton {
     margin-right: 8px;
   }
 
-  label, ejs-radiobutton label .e-label {
+  label,
+  ejs-radiobutton label .e-label {
     font-size: 12px;
     color: $secondary-dark-blue-30;
   }
@@ -104,16 +109,17 @@
   .input-container {
     width: 100%;
 
-    &:nth-child(n+2) {
+    &:nth-child(n + 2) {
       margin-left: 12px;
     }
   }
 }
 
 .subrow-wrapper {
-  app-grid-subrow-candidate:not(:last-child), app-grid-subrow-reorder:not(:last-child) {
+  app-grid-subrow-candidate:not(:last-child),
+  app-grid-subrow-reorder:not(:last-child) {
     display: block;
-    border-bottom: 1px solid  $secondary-dark-blue-45;
+    border-bottom: 1px solid $secondary-dark-blue-45;
   }
 }
 
@@ -148,7 +154,7 @@
   .input-container {
     width: 100%;
 
-    &:nth-child(n+2) {
+    &:nth-child(n + 2) {
       margin-left: 0;
 
       @media #{$min-tablet} {
@@ -160,7 +166,7 @@
 
 :host {
   .table-tabs {
-    margin-bottom: 30px;
+    margin-bottom: 0px;
     display: inline-block;
 
     &.irp {
@@ -214,7 +220,8 @@
       }
 
       &.expansion-toggle-icons-order-1 {
-        .ag-group-contracted, .ag-group-expanded {
+        .ag-group-contracted,
+        .ag-group-expanded {
           order: 1;
           margin-left: 25px;
 
@@ -280,6 +287,79 @@
         font-size: 14px !important;
         color: $secondary-dark-blue-30 !important;
       }
+    }
+  }
+}
+
+.menu-mobile {
+  padding: 8px 11px 8px 6px !important;
+}
+
+.mobile-group-button {
+  display: flex;
+  column-gap: 10px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.navigation-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+::ng-deep {
+  app-page-toolbar {
+    .controls-container {
+      .right-content {
+        align-items: flex-end;
+        padding-bottom: 12px;
+      }
+    }
+  }
+}
+
+@media #{$max-desktop-small} {
+  .button-template {
+    margin-left: 0 !important;
+  }
+}
+
+@media #{$max-mobile} {
+  .app-grid__component {
+    margin-top: 12px;
+  }
+
+  .grid-table-container {
+    margin-top: 90px;
+  }
+
+  :host {
+    .table-tabs {
+      margin-bottom: 8px;
+    }
+
+    .e-grid .e-content {
+      overflow-y: hidden !important;
+    }
+  }
+
+  .mobile-group-button {
+    margin-top: 75px;
+  }
+
+  .navigation-wrapper {
+    position: fixed;
+    top: 81px;
+    z-index: 2;
+    margin: auto -24px;
+    padding: 15px 24px 0 24px;
+    background-color: $background;
+
+    app-tab-navigation {
+      z-index: 2;
+      background-color: $background;
+      margin-bottom: 0;
     }
   }
 }

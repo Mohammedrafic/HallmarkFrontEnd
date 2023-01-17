@@ -1,4 +1,5 @@
 @import "colors.scss";
+@import 'adaptive-response';
 
 .e-dlg-content {
   margin-bottom: 24px;
@@ -210,4 +211,8 @@
   }
 }
 
-
+@media #{$max-mobile} {
+  .import-dialog {
+    width: 100% !important;
+  }
+}

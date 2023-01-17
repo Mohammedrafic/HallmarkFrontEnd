@@ -36,6 +36,7 @@ import {
   Flag,
   Mail,
   Compass,
+  ArrowUp
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -108,12 +109,9 @@ import { OrderManagementIrpApiService } from '@shared/services/order-management-
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
 import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
 import { OrganizationCandidatesModule } from '@client/candidates/organization-candidates.module';
-import {
-  OrderManagementIrpRowPositionModule,
-} from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.module';
-import {
-  OrderManagementSubrowCandidatePositionModule
-} from '@shared/components/order-management-subrow-candidate-position/order-management-subrow-candidate-position.module';
+import { OrderManagementIrpRowPositionModule } from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.module';
+import { OrderManagementSubrowCandidatePositionModule } from '@shared/components/order-management-subrow-candidate-position/order-management-subrow-candidate-position.module';
+import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-top.module';
 
 const gridIcons = {
   MessageSquare,
@@ -148,6 +146,7 @@ const gridIcons = {
   Flag,
   Mail,
   Compass,
+  ArrowUp,
 };
 
 @NgModule({
@@ -217,6 +216,7 @@ const gridIcons = {
     BoolValuePipeModule,
     OrganizationCandidatesModule,
     OrderManagementSubrowCandidatePositionModule,
+    ScrollToTopModule,
   ],
   providers: [
     ResizeService,

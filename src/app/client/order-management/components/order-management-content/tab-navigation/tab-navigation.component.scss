@@ -1,5 +1,16 @@
+@import "adaptive-response";
 .tab-navigation {
   &.e-badge {
     margin-left: 0.3rem;
+  }
+}
+
+.tabs {
+  @media #{$max-tablet} {
+    max-width: calc(90vw - 50px) !important;
+  }
+
+  @media #{$max-mobile} {
+    max-width: calc(100vw - 50px) !important;
   }
 }

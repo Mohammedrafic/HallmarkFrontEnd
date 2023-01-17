@@ -1,0 +1,72 @@
+@import "colors";
+
+.schedule-items-container {
+  padding: 24px;
+  box-sizing: border-box;
+  height: 100%;
+  margin: 25px -24px 0;
+  background-color: $secondary-dark-blue-50;
+
+  .empty-list-text {
+    color: $supportive-red;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .schedule-item {
+    color: $secondary-dark-blue-20;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 22px;
+
+    button {
+      margin: 0;
+      padding: 2px;
+      height: unset;
+      color: inherit;
+
+      i-feather {
+        margin: 0;
+      }
+    }
+
+    .candidate-name {
+      height: 14px;
+      font-size: 12px;
+    }
+
+    .date {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid $secondary-dark-blue-40;
+      border-radius: 16px;
+      padding: 0 4px 0 8px;
+      font-size: 12px;
+      color: $black;
+
+      i-feather {
+        color: $secondary-dark-blue-20;
+      }
+
+      i-feather[name="x"] {
+        color: $black;
+      }
+
+      // TODO: uncomment and adjust for Booking implementation
+      //i-feather[name="clock"] {
+      //  color: $supportive-green-15;
+      //}
+      //
+      //i-feather[name="alert-triangle"] {
+      //  color: $supportive-red;
+      //}
+      //
+      //i-feather[name="briefcase"] {
+      //  color: $primary-active-blue-10;
+      //}
+    }
+  }
+}

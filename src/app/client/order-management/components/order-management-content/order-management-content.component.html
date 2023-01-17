@@ -1,79 +1,97 @@
 <app-page-toolbar>
   <ng-container left>
-    <ng-container *ngIf="isIRPFlagEnabled; else vmsTabsTemplate">
-      <app-button-group
-        [buttonOptions]="systemGroupConfig"
-        (buttonChange)="buttonGroupChange($event)"
-      ></app-button-group>
+    <ng-container *ngIf="isIRPFlagEnabled">
+      <div class="navigation-wrapper" appTabsMobileShadow>
+        <app-button-group
+          [buttonOptions]="systemGroupConfig"
+          (buttonChange)="buttonGroupChange($event)"
+        ></app-button-group>
+        <div>
+          <app-tabs-list
+            class="table-tabs irp"
+            *ngIf="activeSystem === OrderManagementIRPSystemId.IRP"
+            #tabNavigation
+            [tabConfig]="tabsListConfig"
+            (changeTab)="irpTabSelected($event)"
+          >
+          </app-tabs-list>
+          <app-tab-navigation
+            class="table-tabs vms"
+            *ngIf="activeSystem === OrderManagementIRPSystemId.VMS"
+            #tabNavigation
+            [hideTemplatesTab]="false"
+            (selectedTab)="tabSelected($event)"
+          >
+          </app-tab-navigation>
+        </div>
+      </div>
     </ng-container>
-    <ng-template #vmsTabsTemplate>
-      <app-tab-navigation #tabNavigation (selectedTab)="tabSelected($event)"></app-tab-navigation>
-    </ng-template>
   </ng-container>
   <ng-container right>
-    <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
-    <button
-      *ngIf="isIRPFlagEnabled"
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      cssClass="e-outline button-template"
-      [disabled]="isIRPFlagEnabled">
-      <div class="filter-button-content">
-        Templates <i-feather name="clipboard" class="icon"></i-feather>
-      </div>
-    </button>
-    <button
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      cssClass="e-outline button-filter"
-      [disabled]="isActiveSystemIRP"
-      (click)="showFilters()"
-    >
-      <div class="filter-button-content">
-        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{
-          filteredItems.length
-        }}</span>
-        Filters <i-feather name="sliders" class="icon"></i-feather>
-      </div>
-    </button>
-    <app-tooltip-container [message]="toolTipMessage" [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
+    <ng-container *ngIf="!isMobile">
+      <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
       <button
-        [disabled]="isActiveSystemIRP || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+        *ngIf="isIRPFlagEnabled && !(isContentTabletWidth || isMiddleTabletWidth)"
         ejs-button
         appHideBeforeSyncfusionLoad
-        (click)="openImportDialog()"
-        class="e-outline"
+        cssClass="e-outline button-template"
+        [disabled]="isIRPFlagEnabled"
       >
-        <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
+        <div class="filter-button-content">Templates <i-feather name="clipboard" class="icon"></i-feather></div>
       </button>
-    </app-tooltip-container>
-    <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
-    <button
-      *ngIf="
-        activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
-        activeTab !== OrganizationOrderManagementTabs.Incomplete
-      "
-      ejs-dropdownbutton
-      appHideBeforeSyncfusionLoad
-      [items]="exportOptions"
-      (select)="exportSelected($event)"
-      id="importButton"
-      cssClass="e-outline button-export"
-      [disabled]="isActiveSystemIRP"
-    >
-      <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
-    </button>
-    <app-tooltip-container [message]="toolTipMessage" [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
+      <ng-container *ngIf="!isMiddleTabletWidth" [ngTemplateOutlet]="filterButton"></ng-container>
+      <app-tooltip-container
+        *ngIf="!(isContentTabletWidth || isMiddleTabletWidth)"
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
+      >
+        <button
+          [disabled]="isActiveSystemIRP || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+          ejs-button
+          appHideBeforeSyncfusionLoad
+          (click)="openImportDialog()"
+          class="e-outline"
+        >
+          <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
+        </button>
+      </app-tooltip-container>
+      <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
       <button
-        [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
-        ejs-button
+        *ngIf="
+          activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
+          activeTab !== OrganizationOrderManagementTabs.Incomplete &&
+          !(isContentTabletWidth || isMiddleTabletWidth)
+        "
+        ejs-dropdownbutton
         appHideBeforeSyncfusionLoad
-        [isPrimary]="true"
-        (click)="navigateToOrderForm()"
+        [items]="exportOptions"
+        (select)="exportSelected($event)"
+        id="importButton"
+        cssClass="e-outline button-export"
+        [disabled]="isActiveSystemIRP"
       >
-        Create Order
+        <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
       </button>
-    </app-tooltip-container>
+
+      <ng-container *ngIf="isContentTabletWidth || isMiddleTabletWidth" [ngTemplateOutlet]="smallMenuButton">
+      </ng-container>
+
+      <app-tooltip-container
+        *ngIf="!isMobile"
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
+      >
+        <button
+          [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+          ejs-button
+          appHideBeforeSyncfusionLoad
+          [isPrimary]="true"
+          (click)="navigateToOrderForm()"
+        >
+          Create Order
+        </button>
+      </app-tooltip-container>
+    </ng-container>
   </ng-container>
 </app-page-toolbar>
 
@@ -81,26 +99,13 @@
   <ng-container *ngIf="activeSystem === OrderManagementIRPSystemId.All">
     <p class="help-text">Orders for the last 30 days</p>
   </ng-container>
-  <app-tabs-list
-    class="table-tabs irp"
-    *ngIf="activeSystem === OrderManagementIRPSystemId.IRP"
-    #tabNavigation
-    [tabConfig]="tabsListConfig"
-    (changeTab)="irpTabSelected($event)"
-  >
-  </app-tabs-list>
-  <app-tab-navigation
-    class="table-tabs vms"
-    *ngIf="activeSystem === OrderManagementIRPSystemId.VMS"
-    #tabNavigation
-    [hideTemplatesTab]="false"
-    (selectedTab)="tabSelected($event)"
-  >
-  </app-tab-navigation>
 </ng-container>
 
 <ng-container *ngIf="isIRPFlagEnabled && activeSystem !== OrderManagementIRPSystemId.VMS; else vmsGridTemplate">
   <div class="grid-table-container table-wrapper">
+    <div class="mobile-group-button" *ngIf="isMobile">
+      <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
+    </div>
     <ag-grid-angular
       [columnDefs]="columnDefs"
       [rowData]="(ordersPage$ | async)?.items"
@@ -111,6 +116,7 @@
       [class.empty-table]="!(ordersPage$ | async)?.items?.length"
       [overlayNoRowsTemplate]="gridEmptyMessage"
       [rowSelection]="'multiple'"
+      [domLayout]="gridDomLayout"
       class="ag-theme-alpine app-grid__component"
       (gridReady)="setGridApi($event)"
       (sortChanged)="gridSortHandler($event)"
@@ -126,7 +132,57 @@
   (navigateToPageEmitter)="gridPageChanged($event)"
   (pageSizeChangeEmitter)="gridPerPageChanged($event)"
 ></app-grid-pagination>
+
+<ng-template #filterButton>
+  <button
+    ejs-button
+    appHideBeforeSyncfusionLoad
+    cssClass="e-outline button-filter"
+    [disabled]="isActiveSystemIRP"
+    (click)="showFilters()"
+  >
+    <div class="filter-button-content">
+      <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
+      Filters <i-feather name="sliders" class="icon"></i-feather>
+    </div>
+  </button>
+</ng-template>
+
+<ng-template #smallMenuButton>
+  <ng-container *ngIf="isMobile || isTablet" [ngTemplateOutlet]="filterButton"></ng-container>
+  <button
+    ejs-dropdownbutton
+    appHideBeforeSyncfusionLoad
+    [items]="smallMenu"
+    (select)="smallMenuSelected($event)"
+    id="importButton"
+    cssClass="e-outline menu-mobile"
+    [disabled]="isActiveSystemIRP"
+  >
+    <div class="button-export-container"><i-feather name="more-vertical" class="icon"></i-feather></div>
+  </button>
+
+  <app-tooltip-container
+    *ngIf="isMobile"
+    [message]="toolTipMessage"
+    [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
+  >
+    <button
+      [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      [isPrimary]="true"
+      (click)="navigateToOrderForm()"
+    >
+      Create Order
+    </button>
+  </app-tooltip-container>
+</ng-template>
+
 <ng-template #vmsGridTemplate>
+  <div class="mobile-group-button" *ngIf="isMobile">
+    <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
+  </div>
   <section>
     <ejs-grid
       #grid
@@ -134,7 +190,7 @@
       (rowDataBound)="setRowHighlight($event)"
       [dataSource]="(ordersPage$ | async)?.items"
       [pageSettings]="pageSettings"
-      [height]="gridHeight"
+      [height]="isMobile ? mobileGridHeight : gridHeight"
       [rowHeight]="rowHeight"
       [resizeSettings]="resizeSettings"
       [allowSorting]="allowSorting"
@@ -486,11 +542,7 @@
         </e-column>
         <e-column field="shiftStartTime" headerText="SHIFT" width="160" minWidth="80" maxWidth="200">
           <ng-template #template let-data>
-            <span
-              >{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}-{{
-                data.shiftEndTime | date: 'HH:mm':'UTC'
-              }}</span
-            >
+            <span>{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}-{{ data.shiftEndTime | date: 'HH:mm':'UTC' }}</span>
           </ng-template>
         </e-column>
         <e-column field="candidates" headerText="CAND." headerTextAlign="Right" width="90" minWidth="80" maxWidth="160">
@@ -523,12 +575,12 @@
         <ng-template #defaultSubRow>
           <ng-container *ngIf="data.isPushedFromIRP && isIRPFlagEnabled; else vmsSubRow">
             <app-order-management-subrow-candidate-position
-              *ngFor="let child of data.children; index as i; trackBy:trackById"
+              *ngFor="let child of data.children; index as i; trackBy: trackById"
               [candidatePosition]="child"
               [selected]="
-              selectedCandidate?.selected?.order === data.id &&
-              selectedCandidate?.selected.positionId === child.positionId
-            "
+                selectedCandidate?.selected?.order === data.id &&
+                selectedCandidate?.selected.positionId === child.positionId
+              "
             ></app-order-management-subrow-candidate-position>
           </ng-container>
 
@@ -538,9 +590,9 @@
               [candidat]="child"
               [order]="data"
               [selected]="
-              selectedCandidate?.selected?.order === data.id &&
-              selectedCandidate?.selected.positionId === child.positionId
-            "
+                selectedCandidate?.selected?.order === data.id &&
+                selectedCandidate?.selected.positionId === child.positionId
+              "
               [isAgency]="true"
               (clickEvent)="onOpenCandidateDialog($event, data, i)"
             ></app-grid-subrow-candidate>
@@ -562,6 +614,7 @@
   *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
+  [targetElement]="targetElement"
   (deleteFilter)="onFilterDelete($event)"
   (clearAllFiltersClicked)="onFilterClearAll()"
   (applyFilterClicked)="onFilterApply()"
@@ -1084,3 +1137,5 @@
 </mat-menu>
 
 <app-order-import [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-order-import>
+
+<app-scroll-to-top *ngIf="isMobile"></app-scroll-to-top>

@@ -11,4 +11,9 @@ export enum MobileMenuItems {
   Lock = 'Lock',
   Save = 'Save',
   Print = 'Print',
+  Filters = 'Filters',
+  Import = 'Import',
+  ExportExel = 'Export Excel File',
+  ExportCSV = 'Export CSV File',
+  ExportCustom = 'Export Custom',
 }

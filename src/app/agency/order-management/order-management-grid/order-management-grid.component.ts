@@ -132,6 +132,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public selectedRowRef: any;
   public openDetailsTab = false;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
+  public isMobile = false;
+  public isSmallDesktop = false;
+  public mobileGridHeight = this.gridHeight;
   private orderPerDiemId: number | null;
   private prefix: string | null;
   private orderId: number | null;
@@ -156,6 +159,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   ngOnInit(): void {
+    this.getDeviceScreen();
     this.onOrderPreviewChange();
     this.onAgencyChange();
     this.onChildDialogChange();
@@ -177,7 +181,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
-      this.setGridHeight(data?.items.length);
+      this.setHeightForMobileGrid(data?.items.length);
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
     });
 
@@ -851,16 +855,19 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.isSubrowDisplay = false;
   }
 
-  private setGridHeight(itemsLength: number | undefined): void {
+  private getDeviceScreen(): void {
     this.breakpointService
       .getBreakpointMediaRanges()
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((screen) => {
         this.isMobile = screen.isMobile;
-        this.gridHeight = itemsLength && this.isMobile ? String(itemsLength * this.rowHeight) : this.gridHeight;
-        if(screen.isMobile || screen.isTablet) {
-          this.gridWithChildRow.autoFitColumns();
-        }
+        this.isSmallDesktop = screen.isDesktopSmall;
       });
+  }
+
+  public setHeightForMobileGrid(itemsLength: number | undefined): void {
+    const padding = 40;
+    const height = itemsLength ? itemsLength * this.rowHeight + padding : this.gridHeight;
+    this.mobileGridHeight = height < +this.gridHeight ? this.gridHeight : String(height);
   }
 }

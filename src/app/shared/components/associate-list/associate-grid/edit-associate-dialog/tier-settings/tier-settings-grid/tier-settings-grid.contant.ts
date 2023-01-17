@@ -1,3 +1,4 @@
+import { ValueFormatterParams } from '@ag-grid-community/core';
 import {
   ActionRendererComponent
 } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/tier-settings/tier-settings-grid/action-renderer/action-renderer.component';
@@ -22,16 +23,22 @@ export const TiersSettingsColumnsDefinition = ( isAgency: boolean, editCallback:
       field: 'regionName',
       headerName: 'REGION',
       sortable: true,
+      valueFormatter: (params: ValueFormatterParams) =>
+        params.value ? params.value : 'All',
     },
     {
       field: 'locationName',
       headerName: 'LOCATION',
       sortable: true,
+      valueFormatter: (params: ValueFormatterParams) =>
+        params.value ? params.value : 'All',
     },
     {
       field: 'departmentName',
       headerName: 'DEPARTMENT',
       sortable: true,
+      valueFormatter: (params: ValueFormatterParams) =>
+        params.value ? params.value : 'All',
     },
     {
       field: 'tierName',
