@@ -463,7 +463,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.generalInformationForm.get('departmentId')?.valueChanges.pipe(
       filter(Boolean),
       map((id: number) => this.getContactDetailsById(id)),
-      filter((id: number) => !!id && this.selectedSystem.isIRP && this.selectedSystem.isVMS),
+      filter((Boolean)),
       switchMap((id: number) => {
         return this.settingsViewService.getViewSettingKey(
           OrganizationSettingKeys.TieringLogic,
@@ -474,8 +474,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     ).subscribe(({ TieringLogic }) => {
       const jobDistributionForm = this.getSelectedFormConfig(JobDistributionForm);
       const sourceForJobDistribution = getDataSourceForJobDistribution(this.selectedSystem);
-
-      if(TieringLogic) {
+      
+      if(TieringLogic && this.selectedSystem.isIRP && this.selectedSystem.isVMS) {
         setDataSource(jobDistributionForm.fields, 'jobDistribution', [
           sourceForJobDistribution[0],
           sourceForJobDistribution[1],
@@ -592,7 +592,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.jobDistributionForm.patchValue(selectedOrder);
     this.jobDescriptionForm.patchValue(selectedOrder);
     this.specialProjectForm.patchValue(selectedOrder);
-    
+
     if(selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
       const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
       changeTypeField(generalInformationConfig.fields, 'jobDates', FieldType.Date);
