@@ -27,6 +27,7 @@
     [overlayNoRowsTemplate]="gridEmptyMessage"
     [context]="context"
     [domLayout]="domLayout"
+    [class.empty-table]="!rowData || !rowData.length"
     class="ag-theme-alpine app-grid__component"
   ></ag-grid-angular>
   <app-grid-pagination

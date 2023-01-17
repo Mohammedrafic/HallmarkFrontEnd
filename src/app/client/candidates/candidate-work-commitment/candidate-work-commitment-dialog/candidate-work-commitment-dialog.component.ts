@@ -61,6 +61,8 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public todayDate = new Date();
   public lastActiveDate: Date;
 
+  public useMinimumDate: boolean = false;
+
   constructor(
     private cd: ChangeDetectorRef,
     private fb: FormBuilder,
@@ -133,12 +135,15 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         if (activeCommitment) {
           this.lastActiveDate = DateTimeHelper.convertDateToUtc(activeCommitment.startDate as string);
           this.lastActiveDate = addDays(this.lastActiveDate, 1) as Date;
+          this.useMinimumDate = true;
         } else {
           this.lastActiveDate = this.todayDate;
+          this.useMinimumDate = false;
         }
       });
     } else {
       this.lastActiveDate = this.todayDate;
+      this.useMinimumDate = false;
     }
   }
 
