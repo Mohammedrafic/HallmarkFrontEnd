@@ -1,7 +1,8 @@
-import { FilteredItem } from "@shared/models/filter.model";
-import { FilterColumn } from "src/app/dashboard/models/widget-filter.model";
-import { ScheduleOrderType, ScheduleType } from '../enums';
+import { FilteredItem } from '@shared/models/filter.model';
 import { PageOfCollections } from '@shared/models/page.model';
+
+import { FilterColumn } from 'src/app/dashboard/models/widget-filter.model';
+import { ScheduleOrderType, ScheduleType } from '../enums';
 
 export interface ScheduleCandidate {
   id: number;
@@ -13,6 +14,7 @@ export interface ScheduleCandidate {
   employeeNote: string;
   workHours: number[];
   isOriented: boolean;
+  fullName?: string;
 }
 
 export interface ScheduleItem {

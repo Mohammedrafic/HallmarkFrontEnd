@@ -1,25 +1,18 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { switchMap, takeUntil } from 'rxjs';
+import { Observable, switchMap, takeUntil } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
-import { ScheduleApiService } from '@shared/services/schedule-api.service';
 import { Destroyable } from '@core/helpers';
 
 import { TabListConfig } from '../../constants';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import { ActiveTabIndex } from '../../enums';
-import {
-  CandidateSchedules,
-  ScheduleCandidatesPage,
-  ScheduleFilters,
-  ScheduleFiltersData,
-  ScheduleModelPage,
-  ScheduleSelectedSlots,
-} from '../../interface/schedule.model';
-import { ScheduleGridAdapter } from '../../adapters/shedule-grid.adapter';
+import { ScheduleGridAdapter } from '../../adapters';
+import { ScheduleApiService } from '../../services';
+import * as ScheduleInt from '../../interface';
 
 @Component({
   selector: 'app-schedule-container',
@@ -34,20 +27,22 @@ export class ScheduleContainerComponent extends Destroyable {
 
   tabIndex = ActiveTabIndex;
 
-  scheduleData: ScheduleModelPage;
+  scheduleData: ScheduleInt.ScheduleModelPage;
 
   appliedFiltersAmount = 0;
 
   totalCount = 0;
 
-  scheduleFilters: ScheduleFilters = {};
+  scheduleFilters: ScheduleInt.ScheduleFilters = {};
 
   createScheduleDialogOpen = false;
 
-  scheduleSelectedSlots: ScheduleSelectedSlots;
+  scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
 
   minDate: Date;
   maxDate: Date;
+
+  private selectedCandidate: ScheduleInt.ScheduleCandidate | null;
 
   constructor(
     private store: Store,
@@ -69,7 +64,7 @@ export class ScheduleContainerComponent extends Destroyable {
     this.initScheduleData(true);
   }
 
-  changeFilters(filters: ScheduleFilters): void {
+  changeFilters(filters: ScheduleInt.ScheduleFilters): void {
     this.scheduleFilters = {
       ...this.scheduleFilters,
       ...filters,
@@ -81,7 +76,7 @@ export class ScheduleContainerComponent extends Destroyable {
   }
 
   updateScheduleGrid(): void {
-    this.initScheduleData();
+    this.detectWhatDataNeeds();
     this.setDateLimitation();
     this.selectCells({
       candidates: [],
@@ -89,11 +84,11 @@ export class ScheduleContainerComponent extends Destroyable {
     });
   }
 
-  selectCells(cells: ScheduleSelectedSlots): void {
+  selectCells(cells: ScheduleInt.ScheduleSelectedSlots): void {
     this.scheduleSelectedSlots = cells;
   }
 
-  scheduleCell(cells: ScheduleSelectedSlots): void {
+  scheduleCell(cells: ScheduleInt.ScheduleSelectedSlots): void {
     this.selectCells(cells);
     this.openScheduleDialog();
   }
@@ -110,29 +105,30 @@ export class ScheduleContainerComponent extends Destroyable {
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
-  updateScheduleFilter(data: ScheduleFiltersData): void {
+  updateScheduleFilter(data: ScheduleInt.ScheduleFiltersData): void {
     this.changeFilters(data.filters);
     this.appliedFiltersAmount = data.filteredItems?.length;
+  }
+
+  selectCandidate(selectedCandidate: ScheduleInt.ScheduleCandidate | null): void {
+    this.selectedCandidate = selectedCandidate;
+    if (!selectedCandidate) {
+      this.scheduleFilters.firstLastNameOrId = '';
+    }
+    this.detectWhatDataNeeds();
   }
 
   private initScheduleData(isLoadMore = false): void {
     const { startDate, endDate, ...restFilters } = this.scheduleFilters;
 
-    this.scheduleApiService.getScheduleEmployees(restFilters).pipe(
+    this.scheduleApiService.getScheduleEmployees(restFilters)
+    .pipe(
       take(1),
-      switchMap((candidates: ScheduleCandidatesPage) =>
-        this.scheduleApiService.getSchedulesByEmployeesIds(
-          candidates.items.map(el => el.id),
-          { startDate: startDate || '', endDate: endDate || '' }
-        ).pipe(
-          take(1),
-          map((candidateSchedules: CandidateSchedules[]): ScheduleModelPage =>
-            ScheduleGridAdapter.combineCandidateData(candidates, candidateSchedules)
-          )
-        )
+      switchMap((candidates: ScheduleInt.ScheduleCandidatesPage) =>
+        this.getSchedulesByEmployeesIds(candidates)
       ),
       takeUntil(this.componentDestroy()),
-    ).subscribe((scheduleData: ScheduleModelPage) => {
+    ).subscribe((scheduleData: ScheduleInt.ScheduleModelPage) => {
       if (isLoadMore) {
         this.scheduleData = {
           ...scheduleData,
@@ -146,6 +142,46 @@ export class ScheduleContainerComponent extends Destroyable {
 
       this.cdr.detectChanges();
     });
+  }
+
+  private initSelectedCandidateScheduleData(): void {
+    const candidatesPage = {
+      items: [this.selectedCandidate],
+      totalCount: 1,
+    } as ScheduleInt.ScheduleCandidatesPage;
+
+    this.getSchedulesByEmployeesIds(candidatesPage)
+      .subscribe((scheduleData: ScheduleInt.ScheduleModelPage) => {
+        this.scheduleData = scheduleData;
+        this.totalCount = scheduleData.totalCount;
+
+        this.cdr.detectChanges();
+    });
+  }
+
+  private detectWhatDataNeeds(): void {
+    if (this.selectedCandidate) {
+      this.initSelectedCandidateScheduleData();
+    } else {
+      this.initScheduleData();
+    }
+  }
+
+  private getSchedulesByEmployeesIds(
+    candidates: ScheduleInt.ScheduleCandidatesPage,
+  ): Observable<ScheduleInt.ScheduleModelPage> {
+    const { startDate, endDate } = this.scheduleFilters;
+
+    return this.scheduleApiService.getSchedulesByEmployeesIds(
+      candidates.items.map(el => el.id),
+      { startDate: startDate || '', endDate: endDate || '' }
+    ).pipe(
+      take(1),
+      map((candidateSchedules: ScheduleInt.CandidateSchedules[]): ScheduleInt.ScheduleModelPage =>
+        ScheduleGridAdapter.combineCandidateData(candidates, candidateSchedules)
+      ),
+      takeUntil(this.componentDestroy()),
+    );
   }
 
   private setDateLimitation(): void {

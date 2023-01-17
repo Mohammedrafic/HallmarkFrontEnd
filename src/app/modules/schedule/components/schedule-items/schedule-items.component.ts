@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 
 import { DateTimeHelper } from '@core/helpers';
 import { ScheduleItemsService } from 'src/app/modules/schedule/services/schedule-items.service';
-import { DateItem, CreateScheduleItem } from '../schedule-items/schedule-items.interface';
-import { ScheduleSelectedSlots } from '../../interface/schedule.model';
+import { DateItem, CreateScheduleItem } from './schedule-items.interface';
 import { ScheduleType } from '../../enums';
+import { ScheduleSelectedSlots } from '../../interface';
 
 @Component({
   selector: 'app-schedule-items',

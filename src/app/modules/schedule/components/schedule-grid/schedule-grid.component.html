@@ -1,12 +1,23 @@
 <div class="grid-wrapper">
   <div class="grid-header">
     <div class="left">
-      <app-search
-        #searchComponent
-        class="search-input"
-        placeholder="Name or ID"
-        (inputKeyUpEnter)="searchCandidate($event)"
-      ></app-search>
+      <div class="group">
+        <div class="input-container bootstrap">
+          <div class="input-group dropdown candidate-autocomplete">
+            <i-feather name="search" class="search-icon"></i-feather>
+            <ejs-autocomplete
+              [dataSource]="candidatesSuggestions"
+              filterType="StartsWith"
+              [fields]="candidateNameFields"
+              [autofill]="true"
+              placeholder="Name or ID"
+              sortOrder="Ascending"
+              (valueChange)="$event === null ? autoSelectCandidate($event) : null"
+              (select)="autoSelectCandidate($event.itemData)"
+              (filtering)="filteringCandidates($event)"></ejs-autocomplete>
+          </div>
+        </div>
+      </div>
 <!--      TODO: uncomment when sorting is implemented-->
 <!--      <button-->
 <!--        ejs-button-->
@@ -52,6 +63,7 @@
           <td class="table-cell candidates-cell fixed fixed--left">
             <app-candidate-card
               [candidate]="scheduleItem.candidate"
+              (click)="selectCandidate.emit(scheduleItem.candidate)"
             ></app-candidate-card>
           </td>
           <ng-container *ngFor="let dateSlot of datesRanges; trackBy: trackByDatesRange">

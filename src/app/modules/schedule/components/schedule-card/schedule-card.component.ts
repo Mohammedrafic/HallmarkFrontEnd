@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
-import { ScheduleCardConfig, ScheduleDateItem, ScheduleItem } from '../../interface/schedule.model';
-import { GetScheduleCardConfig } from '../../constants/schedule-grid.conts';
+import { ScheduleCardConfig, ScheduleDateItem, ScheduleItem } from '../../interface';
+import { GetScheduleCardConfig } from '../../constants';
 
 @Component({
   selector: 'app-schedule-card',

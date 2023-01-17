@@ -3,27 +3,21 @@ import { Injectable } from '@angular/core';
 import { DateTimeHelper } from '@core/helpers';
 import { CreateScheduleService } from 'src/app/modules/schedule/services/create-schedule.service';
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
-import {
-  ScheduleCandidate,
-  ScheduleDateItem,
-  ScheduleItem,
-  ScheduleModel,
-  ScheduleSelectedSlots,
-} from '../interface/schedule.model';
+import * as ScheduleInt from '../interface';
 
 @Injectable()
 export class ScheduleItemsService {
 
   constructor(private createScheduleService: CreateScheduleService) {}
 
-  getScheduleItems(scheduleSelectedSlots: ScheduleSelectedSlots): CreateScheduleItem[] {
-    return scheduleSelectedSlots.candidates.map((candidate: ScheduleCandidate) => {
+  getScheduleItems(scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots): CreateScheduleItem[] {
+    return scheduleSelectedSlots.candidates.map((candidate: ScheduleInt.ScheduleCandidate) => {
       const scheduleItem: CreateScheduleItem = {
         candidateName: `${candidate.lastName}, ${candidate.firstName}`,
         candidateId: candidate.id,
         selectedDates: [],
         dateItems: scheduleSelectedSlots.dates.map((dateString: string) => {
-          const daySchedule: ScheduleItem = this.getDayScheduleData(candidate.id, dateString);
+          const daySchedule: ScheduleInt.ScheduleItem = this.getDayScheduleData(candidate.id, dateString);
           const date = new Date(dateString);
 
           return {
@@ -42,21 +36,23 @@ export class ScheduleItemsService {
     });
   }
 
-  private getDayScheduleData(candidateId: number, dateString: string): ScheduleItem {
-    const candidateData: ScheduleModel = this.createScheduleService.scheduleData
-      .find((data: ScheduleModel) => data.candidate.id === candidateId) as ScheduleModel;
+  private getDayScheduleData(candidateId: number, dateString: string): ScheduleInt.ScheduleItem {
+    const candidateData: ScheduleInt.ScheduleModel = this.createScheduleService.scheduleData
+      .find((data: ScheduleInt.ScheduleModel) => data.candidate.id === candidateId) as ScheduleInt.ScheduleModel;
     const dateStringLength = 10;
-    let daySchedule: ScheduleItem = {} as ScheduleItem;
+    let daySchedule: ScheduleInt.ScheduleItem = {} as ScheduleInt.ScheduleItem;
 
 
     if (candidateData.schedule.length) {
-      const dateSchedule: ScheduleDateItem | undefined = candidateData.schedule
-        .find((scheduleItem: ScheduleDateItem) => scheduleItem.date.substring(0, dateStringLength) === dateString);
+      const dateSchedule: ScheduleInt.ScheduleDateItem | undefined = candidateData.schedule
+        .find((scheduleItem: ScheduleInt.ScheduleDateItem) =>
+          scheduleItem.date.substring(0, dateStringLength) === dateString
+        );
 
       if (dateSchedule) {
         daySchedule = dateSchedule.daySchedules
-          .find((schedule: ScheduleItem) => schedule.date.substring(0, dateStringLength) === dateString)
-          || {} as ScheduleItem;
+          .find((schedule: ScheduleInt.ScheduleItem) => schedule.date.substring(0, dateStringLength) === dateString)
+          || {} as ScheduleInt.ScheduleItem;
       }
     }
 

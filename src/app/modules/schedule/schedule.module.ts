@@ -12,7 +12,7 @@ import { ScheduleRoutingModule } from './schedule-routing.module';
 import { ScheduleFiltersModule } from './components/schedule-filters/schedule-filters.module';
 import { CreateScheduleModule } from './components/create-schedule/create-schedule.module';
 import { ScheduleGridModule } from './components/schedule-grid/schedule-grid.module';
-import { ScheduleApiService } from '@shared/services/schedule-api.service';
+import { ScheduleApiService } from './services';
 
 const icons = { Sliders };
 

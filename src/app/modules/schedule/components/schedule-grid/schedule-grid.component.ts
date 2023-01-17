@@ -11,31 +11,26 @@ import {
   TrackByFunction,
   ViewChild,
 } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import Timeout = NodeJS.Timeout;
 
 import { Select, Store } from '@ngxs/store';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
+import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, fromEvent, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
+import { DatesRangeType } from '@shared/enums';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { DatesRangeType } from '@shared/enums';
-
+import { ScheduleApiService } from '../../services';
 import { UserState } from '../../../../store/user.state';
-import { DatesPeriods } from '../../constants/schedule-grid.conts';
-import {
-  ScheduleCandidate,
-  ScheduleDateItem,
-  ScheduleDateSlot,
-  ScheduleFilters,
-  ScheduleModel,
-  ScheduleModelPage,
-  ScheduleSelectedSlots,
-} from '../../interface/schedule.model';
-import { ScheduleGridAdapter } from '../../adapters/shedule-grid.adapter';
+import { ScheduleGridAdapter } from '../../adapters';
+import { DatesPeriods } from '../../constants';
+import * as ScheduleInt from '../../interface';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -49,24 +44,35 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
 
-  @Input() scheduleData: ScheduleModelPage | null;
+  @Input() scheduleData: ScheduleInt.ScheduleModelPage | null;
 
-  @Output() changeFilter: EventEmitter<ScheduleFilters> = new EventEmitter<ScheduleFilters>();
+  @Output() changeFilter: EventEmitter<ScheduleInt.ScheduleFilters> = new EventEmitter<ScheduleInt.ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
-  @Output() selectedCells: EventEmitter<ScheduleSelectedSlots> = new EventEmitter<ScheduleSelectedSlots>();
-  @Output() scheduleCell: EventEmitter<ScheduleSelectedSlots> = new EventEmitter<ScheduleSelectedSlots>();
+  @Output() selectedCells: EventEmitter<ScheduleInt.ScheduleSelectedSlots>
+    = new EventEmitter<ScheduleInt.ScheduleSelectedSlots>();
+  @Output() scheduleCell: EventEmitter<ScheduleInt.ScheduleSelectedSlots>
+    = new EventEmitter<ScheduleInt.ScheduleSelectedSlots>();
+  @Output() selectCandidate: EventEmitter<ScheduleInt.ScheduleCandidate | null>
+    = new EventEmitter<ScheduleInt.ScheduleCandidate | null>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
   activePeriod = DatesRangeType.TwoWeeks;
 
-  weekPeriod: [Date, Date] = [new Date(), new Date()];
+  weekPeriod: [Date, Date] = [DateTimeHelper.getCurrentDateWithoutOffset(), DateTimeHelper.getCurrentDateWithoutOffset()];
 
   datesRanges: string[] = DateTimeHelper.getDatesBetween();
 
-  selectedCandidatesSlot: Map<number, ScheduleDateSlot> = new Map<number, ScheduleDateSlot>();
+  selectedCandidatesSlot: Map<number, ScheduleInt.ScheduleDateSlot>
+  = new Map<number, ScheduleInt.ScheduleDateSlot>();
 
   orgFirstDayOfWeek: number;
+
+  searchControl = new FormControl();
+
+  candidatesSuggestions: ScheduleInt.ScheduleCandidate[] = [];
+
+  candidateNameFields: FieldSettingsModel = { text: 'fullName' };
 
   preventCellSingleClick = false;
 
@@ -77,6 +83,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   constructor(
     private store: Store,
     private weekService: DateWeekService,
+    private scheduleApiService: ScheduleApiService,
     private cdr: ChangeDetectorRef,
   ) {
     super();
@@ -86,11 +93,13 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   trackByDatesRange: TrackByFunction<string> = (_: number, date: string) => date;
 
-  trackByScheduleData: TrackByFunction<ScheduleModel> = (_: number, scheduleData: ScheduleModel) => scheduleData.id;
+  trackByScheduleData: TrackByFunction<ScheduleInt.ScheduleModel> = (_: number,
+    scheduleData: ScheduleInt.ScheduleModel) => scheduleData.id;
 
   ngOnInit(): void {
     this.startOrgIdWatching();
     this.watchForScroll();
+    this.watchForCandidateSearch();
   }
 
   ngOnChanges(): void {
@@ -102,7 +111,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.detectChanges();
   }
 
-  handleCellSingleClick(date: string, candidate: ScheduleCandidate): void {
+  handleCellSingleClick(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
     // TODO: refactor, move to directive
     this.preventCellSingleClick = false;
     this.cellClickTimer = setTimeout(() => {
@@ -113,7 +122,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     }, 250);
   }
 
-  handleCellDblClick(date: string, candidate: ScheduleCandidate): void {
+  handleCellDblClick(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
     this.preventCellSingleClick = true;
     clearTimeout(this.cellClickTimer);
     this.selectedCandidatesSlot.clear();
@@ -122,19 +131,14 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.detectChanges();
   }
 
-  handleScheduleCardDblClick(schedule: ScheduleDateItem, candidate: ScheduleCandidate): void {
+  handleScheduleCardDblClick(schedule: ScheduleInt.ScheduleDateItem, candidate: ScheduleInt.ScheduleCandidate): void {
     this.preventCellSingleClick = true;
     clearTimeout(this.cellClickTimer);
     this.selectedCandidatesSlot.clear();
     // TODO: edit functionality (will be added in the next sprint)
   }
 
-  searchCandidate(event: KeyboardEvent): void {
-    this.changeFilter.emit({ firstLastNameOrId: (event.target as HTMLInputElement).value });
-    this.scrollArea.nativeElement.scrollTo(0, 0);
-  }
-
-  private selectDateSlot(date: string, candidate: ScheduleCandidate): void {
+  selectDateSlot(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
     const candidateSelectedSlot = this.selectedCandidatesSlot.get(candidate.id);
 
     if (candidateSelectedSlot) {
@@ -146,6 +150,14 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     } else {
       this.selectedCandidatesSlot.set(candidate.id, { candidate, dates: new Set<string>().add(date) });
     }
+  }
+
+  filteringCandidates(eventArgs: FilteringEventArgs): void {
+    this.searchControl.setValue(eventArgs);
+  }
+
+  autoSelectCandidate(candidate: ScheduleInt.ScheduleCandidate | null): void {
+    this.selectCandidate.emit(candidate);
   }
 
   private startOrgIdWatching(): void {
@@ -202,5 +214,28 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
           this.loadMoreData.emit(Math.ceil((items?.length || 1) / this.itemsPerPage));
         }
       });
+  }
+
+  private watchForCandidateSearch(): void {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(300),
+      tap((filteringEventArgs: FilteringEventArgs) => {
+        if (!filteringEventArgs?.text || !filteringEventArgs?.text.length) {
+          this.candidatesSuggestions = [];
+          filteringEventArgs.updateData([]);
+        }
+      }),
+      switchMap((filteringEventArgs: FilteringEventArgs) => this.scheduleApiService.getScheduleEmployees({
+        firstLastNameOrId: filteringEventArgs.text,
+      }).pipe(
+        tap((employeeDto) => {
+          this.candidatesSuggestions = ScheduleGridAdapter.prepareCandidateFullName(employeeDto.items);
+          filteringEventArgs.updateData(
+            this.candidatesSuggestions as unknown as { [key: string]: ScheduleInt.ScheduleCandidate }[]
+          );
+        }),
+      )),
+      takeUntil(this.componentDestroy()),
+    ).subscribe();
   }
 }

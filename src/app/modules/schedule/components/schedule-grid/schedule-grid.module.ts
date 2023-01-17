@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { AutoCompleteModule } from '@syncfusion/ej2-angular-dropdowns';
 import { FeatherModule } from 'angular-feather';
 import { Search } from 'angular-feather/icons';
 
@@ -31,6 +32,7 @@ const icons = {
     CandidateCardModule,
     ScheduleCardModule,
     CalendarDateSlotModule,
+    AutoCompleteModule,
   ],
   exports: [ScheduleGridComponent],
   providers: [DateWeekService],

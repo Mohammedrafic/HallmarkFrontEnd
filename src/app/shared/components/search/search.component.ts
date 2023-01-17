@@ -3,17 +3,18 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, View
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss']
+  styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent implements AfterViewInit  {
   @ViewChild('inputWithIcon') search: ElementRef;
 
-  @Input() placeholder: string = 'Search';
+  @Input() placeholder = 'Search';
 
   @Output() inputKeyUpEnter = new EventEmitter();
+  /**
+   * TODO: remove any.
+   */
   @Output() public searchFocusOut: EventEmitter<any> = new EventEmitter<any>();
-
-  constructor() { }
 
   ngAfterViewInit(): void {
     if (this.searchFocusOut?.observers.length > 0) {
