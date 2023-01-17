@@ -11,7 +11,7 @@ import { ScheduleContainerComponent } from './containers/schedule-container/sche
 import { ScheduleRoutingModule } from './schedule-routing.module';
 import { ScheduleFiltersModule } from './components/schedule-filters/schedule-filters.module';
 import { ScheduleGridModule } from './components/schedule-grid/schedule-grid.module';
-import { ScheduleApiService } from '@shared/services/schedule-api.service';
+import { ScheduleApiService } from './services';
 
 const icons = { Sliders };
 

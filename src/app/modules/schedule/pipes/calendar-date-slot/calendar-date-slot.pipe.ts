@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { ScheduleDateItem } from '../../interface/schedule.interface';
+import { ScheduleDateItem } from '../../interface';
 
 @Pipe({
   name: 'calendarDateSlot',

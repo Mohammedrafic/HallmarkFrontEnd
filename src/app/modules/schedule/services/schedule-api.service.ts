@@ -3,11 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import {
-  CandidateSchedules,
-  ScheduleCandidatesPage,
-  ScheduleFilters,
-} from '../../modules/schedule/interface/schedule.interface';
+import { CandidateSchedules, ScheduleCandidatesPage, ScheduleFilters } from '../interface';
 
 @Injectable()
 export class ScheduleApiService {

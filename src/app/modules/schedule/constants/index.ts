@@ -1,3 +1,3 @@
-export * from './schedule-container.constant';
+export * from './schedule-container.constants';
 export * from './schedule-filters.constants';
-export * from './schedule-grid.constant';
+export * from './schedule-grid.constants';

@@ -34,12 +34,26 @@
     justify-content: space-between;
   }
 
-  & .search-input {
+  & .candidate-autocomplete {
     width: 168px;
     margin-right: 12px;
 
-    &::ng-deep .search-with-icon {
-      box-sizing: border-box;
+    & .e-input-group.e-control-wrapper {
+      padding: 0;
+    }
+
+    & input.e-input {
+      padding-left: 36px !important;
+    }
+
+    & .search-icon {
+      right: 0;
+      left: 10px;
+      z-index: 1;
+      width: 20px;
+      height: 20px;
+      display: block;
+      color: $secondary-dark-blue-30;
     }
   }
 

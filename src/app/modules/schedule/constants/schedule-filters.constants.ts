@@ -1,4 +1,5 @@
-import { ControlTypes, ValueType } from "@shared/enums/control-types.enum";
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+
 import { ScheduleFiltersColumnsDataModel } from '../interface';
 
 export const SkillsFieldsOptions = {

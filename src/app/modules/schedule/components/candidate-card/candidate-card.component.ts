@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
-import { ScheduleCandidate } from '../../interface/schedule.interface';
-import { CandidateIconName } from '../../constants/schedule-grid.constant';
+import { ScheduleCandidate } from '../../interface';
+import { CandidateIconName } from '../../constants';
 
 @Component({
   selector: 'app-candidate-card',

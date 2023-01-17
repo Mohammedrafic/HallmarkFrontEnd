@@ -13,9 +13,10 @@ import {
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { Select, Store } from '@ngxs/store';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
+import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, fromEvent, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
@@ -24,12 +25,11 @@ import { DateWeekService } from '@core/services';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { DatesRangeType } from '@shared/enums';
-import { ScheduleApiService } from '@shared/services/schedule-api.service';
+import { ScheduleApiService } from '../../services';
 import { UserState } from '../../../../store/user.state';
 import { ScheduleGridAdapter } from '../../adapters';
 import { DatesPeriods } from '../../constants';
 import * as ScheduleInt from '../../interface';
-
 
 @Component({
   selector: 'app-schedule-grid',
@@ -42,7 +42,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   private organizationId$: Observable<number>;
 
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
-  @ViewChild('automcomplete') autocomplete: MatAutocompleteTrigger;
 
   @Input() scheduleData: ScheduleInt.ScheduleModelPage | null;
 
@@ -50,6 +49,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
   @Output() selectedCells: EventEmitter<ScheduleInt.ScheduleSelectedSlots>
   = new EventEmitter<ScheduleInt.ScheduleSelectedSlots>();
+  @Output() selectCandidate: EventEmitter<ScheduleInt.ScheduleCandidate | null>
+    = new EventEmitter<ScheduleInt.ScheduleCandidate | null>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
@@ -67,6 +68,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   searchControl = new FormControl();
 
   candidatesSuggestions: ScheduleInt.ScheduleCandidate[] = [];
+
+  candidateNameFields: FieldSettingsModel = { text: 'fullName' };
 
   private itemsPerPage = 30;
 
@@ -121,12 +124,12 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.detectChanges();
   }
 
-  displayEmployee(item: ScheduleInt.ScheduleCandidate): string {
-    return `${item.firstName} ${item.lastName}`;
+  filteringCandidates(eventArgs: FilteringEventArgs): void {
+    this.searchControl.setValue(eventArgs);
   }
 
-  trackById(index: number, item: ScheduleInt.ScheduleCandidate): number {
-    return item.id;
+  autoSelectCandidate(candidate: ScheduleInt.ScheduleCandidate | null): void {
+    this.selectCandidate.emit(candidate);
   }
 
   private startOrgIdWatching(): void {
@@ -186,25 +189,25 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private watchForCandidateSearch(): void {
-    this.searchControl.valueChanges
-    .pipe(
-      debounceTime(1500),
-      tap((value) => {
-        if (!value || !value.length) {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(300),
+      tap((filteringEventArgs: FilteringEventArgs) => {
+        if (!filteringEventArgs?.text || !filteringEventArgs?.text.length) {
           this.candidatesSuggestions = [];
-          this.cdr.markForCheck();
+          filteringEventArgs.updateData([]);
         }
       }),
-      filter((value) => value.length > 2),
-      switchMap((value) => this.scheduleApiService.getScheduleEmployees({
-        firstLastNameOrId: value,
-      })),
+      switchMap((filteringEventArgs: FilteringEventArgs) => this.scheduleApiService.getScheduleEmployees({
+        firstLastNameOrId: filteringEventArgs.text,
+      }).pipe(
+        tap((employeeDto) => {
+          this.candidatesSuggestions = ScheduleGridAdapter.prepareCandidateFullName(employeeDto.items);
+          filteringEventArgs.updateData(
+            this.candidatesSuggestions as unknown as { [key: string]: ScheduleInt.ScheduleCandidate }[]
+          );
+        }),
+      )),
       takeUntil(this.componentDestroy()),
-    )
-    .subscribe((employeeDto) => {
-      this.candidatesSuggestions = employeeDto.items;
-      this.autocomplete.openPanel();
-      this.cdr.markForCheck();
-    });
+    ).subscribe();
   }
 }

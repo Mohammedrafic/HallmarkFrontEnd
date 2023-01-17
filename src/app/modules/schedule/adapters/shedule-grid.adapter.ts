@@ -7,7 +7,7 @@ import {
   ScheduleDateSlot,
   ScheduleModelPage,
   ScheduleSelectedSlots,
-} from '../interface/schedule.interface';
+} from '../interface';
 
 export class ScheduleGridAdapter {
   static combineCandidateData(
@@ -47,5 +47,12 @@ export class ScheduleGridAdapter {
       candidates,
       dates: [...new Set([...iteratedDates]).values()],
     };
+  }
+
+  static prepareCandidateFullName(candidates: ScheduleCandidate[]): ScheduleCandidate[] {
+    return candidates.map(candidate => ({
+      ...candidate,
+      fullName: `${candidate.lastName} ${candidate.firstName}`,
+    }));
   }
 }
