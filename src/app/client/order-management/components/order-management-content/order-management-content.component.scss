@@ -315,15 +315,29 @@
       .right-content {
         align-items: flex-end;
         justify-content: flex-end;
-        padding-bottom: 2px;
+        padding-bottom: 6px;
       }
     }
   }
 }
 
 @media #{$max-desktop-small} {
-  .button-template {
-    margin-left: 0 !important;
+
+}
+
+@media #{$max-tablet} {
+  ::ng-deep {
+    app-page-toolbar {
+      .controls-container {
+        flex-direction: column;
+
+        .right-content {
+          justify-content: flex-start;
+          margin-top: 12px;
+          margin-left: -10px;
+        }
+      }
+    }
   }
 }
 
