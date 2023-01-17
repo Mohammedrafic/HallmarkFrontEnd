@@ -13,6 +13,7 @@ import { datepickerMask } from '@shared/constants/datepicker-mask';
 import { formatDate } from '@shared/constants/format-date';
 import { placeholderDate } from '@shared/constants/placeholder-date';
 import { ChangeDetectorRef } from '@angular/core';
+import { OrderManagement } from '@shared/models/order-management.model';
 
 enum ExportType {
   'Excel File',
@@ -82,6 +83,8 @@ export abstract class AbstractGridConfigurationComponent {
   datepickerMask = datepickerMask;
 
   public readonly onlyLetters: RegExp = ONLY_LETTERS;
+  private openedChildRows = 0;
+  public mobileGridHeight = this.gridHeight;
 
   protected constructor() {}
 
@@ -229,10 +232,14 @@ export abstract class AbstractGridConfigurationComponent {
       }
     }
     // Syncfusion Support ticket #403476
-    if ( args.requestType == 'paging' || args.requestType == 'filtering' || args.requestType == 'sorting' || args.requestType == 'refresh') {
+    if (
+      args.requestType == 'paging' ||
+      args.requestType == 'filtering' ||
+      args.requestType == 'sorting' ||
+      args.requestType == 'refresh'
+    ) {
       this.isLoaded = false;
     }
-
   }
 
   stopPropagation(event: Event): void {
@@ -249,6 +256,8 @@ export abstract class AbstractGridConfigurationComponent {
       this.gridWithChildRow.detailRowModule.expand(Number(data.index));
       this.subrowsState.add(index);
     }
+
+    this.calculateOpenedSubrow();
   }
 
   public refreshGridColumns(columns: GridColumn[], grid: GridComponent): void {
@@ -271,5 +280,20 @@ export abstract class AbstractGridConfigurationComponent {
       this.gridWithChildRow.detailRowModule.collapseAll();
       this.subrowsState.clear();
     }
+  }
+
+  private calculateOpenedSubrow(): void {
+    this.openedChildRows = 0;
+    this.subrowsState.forEach((item) => {
+      const currentViewData = this.gridWithChildRow.currentViewData[item] as OrderManagement;
+      this.openedChildRows += currentViewData?.children?.length ?? 0;
+    });
+    this.setHeightForMobileGrid(this.gridWithChildRow.currentViewData.length + this.openedChildRows);
+  }
+
+  public setHeightForMobileGrid(itemsLength: number | undefined): void {
+    const padding = 40;
+    const height = itemsLength ? itemsLength * this.rowHeight + padding : this.rowHeight;
+    this.mobileGridHeight = String(height);
   }
 }

@@ -134,7 +134,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public isMobile = false;
   public isSmallDesktop = false;
-  public mobileGridHeight = this.gridHeight;
   private orderPerDiemId: number | null;
   private prefix: string | null;
   private orderId: number | null;
@@ -181,7 +180,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
-      this.setHeightForMobileGrid(data?.items.length);
+      super.setHeightForMobileGrid(data?.items.length);
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
     });
 
@@ -865,9 +864,4 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       });
   }
 
-  public setHeightForMobileGrid(itemsLength: number | undefined): void {
-    const padding = 40;
-    const height = itemsLength ? itemsLength * this.rowHeight + padding : this.gridHeight;
-    this.mobileGridHeight = height < +this.gridHeight ? this.gridHeight : String(height);
-  }
 }
