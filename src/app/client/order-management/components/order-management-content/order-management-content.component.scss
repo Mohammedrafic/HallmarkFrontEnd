@@ -189,7 +189,6 @@
 
   app-page-toolbar {
     margin-bottom: 8px;
-    border-bottom: 1px solid $secondary-dark-blue-40;
     display: block;
   }
 
@@ -311,9 +310,12 @@
 ::ng-deep {
   app-page-toolbar {
     .controls-container {
+      flex-direction: row;
+
       .right-content {
         align-items: flex-end;
-        padding-bottom: 12px;
+        justify-content: flex-end;
+        padding-bottom: 2px;
       }
     }
   }
@@ -331,6 +333,7 @@
   }
 
   .grid-table-container {
+    height: auto;
     margin-top: 90px;
   }
 
@@ -345,7 +348,7 @@
   }
 
   .mobile-group-button {
-    margin-top: 75px;
+    margin-top: 95px;
   }
 
   .navigation-wrapper {
