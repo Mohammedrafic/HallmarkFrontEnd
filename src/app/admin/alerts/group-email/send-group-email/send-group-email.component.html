@@ -1,4 +1,39 @@
 <div [formGroup]="groupEmailTemplateForm" id="groupEmailTemplateForm" class="group-email-template-form">
+    
+    <!-- validation errors-->
+    <div class="alert alert-danger">
+      <div *ngIf="emailToControl.errors?.['required']">
+        - Field Email to is required.
+      </div>
+      <div *ngIf="emailToControl.errors?.['email']">
+        - Field Email to is not a valid email address.
+      </div>
+      <div *ngIf="emailToControl.errors?.['pattern']">
+        - Some of email(s) is not a valid email address.
+      </div>
+    </div>
+
+    <div *ngIf="emailCcControl.invalid && (emailCcControl.dirty || emailCcControl.touched)"
+      class="alert alert-danger">
+      <div *ngIf="emailCcControl.errors?.['emails']">
+        - Some of email(s) in CC not matching valid email address pattern.
+      </div>
+    </div>
+
+    <div *ngIf="subjectControl.invalid && (subjectControl.dirty || subjectControl.touched)"
+      class="alert alert-danger">
+      <div *ngIf="subjectControl.errors?.['required']">
+        - Field Email subject is required.
+      </div>
+    </div>
+
+    <div *ngIf="emailBodyControl.invalid && (emailBodyControl.dirty || emailBodyControl.touched)"
+      class="alert alert-danger">
+      <div *ngIf="emailBodyControl.errors?.['required']">
+        - Field Email body is required.
+      </div>
+    </div>
+
     <div class="section-container">
 
       <div class="left-section">
@@ -43,7 +78,7 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div class="dropdown-container">
+          <div class="dropdown-container" *ngIf="!hideUserTypeControl">
             <div class="input-group dropdown">
               <label>User Type</label>
               <ejs-dropdownlist appValidateWithMessage
@@ -206,7 +241,7 @@
             </div>
           </div>     
         </div>
-        
+
         <div class="input-container bootstrap top-container">
           <label>To<span class="required">*</span></label>
           <div class="input-group">
