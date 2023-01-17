@@ -72,12 +72,11 @@ export class ScheduleContainerComponent extends Destroyable {
       pageSize: 30,
     };
 
-    // this.detectWhatDataNeeds();
     this.updateScheduleGrid();
   }
 
   updateScheduleGrid(): void {
-    this.initScheduleData();
+    this.detectWhatDataNeeds();
     this.setDateLimitation();
     this.selectCells({
       candidates: [],
