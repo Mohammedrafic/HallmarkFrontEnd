@@ -1,0 +1,67 @@
+<form>
+  <ng-container *ngIf="true">
+    <app-multiselect-dropdown
+      [formGroupInstance]="assignDepartmentForm"
+      [fields]="{}"
+      [dataSource]="[]"
+      [showSelectAll]="true"
+      [required]="true"
+      controlName="region"
+      id="region"
+      label="Region"
+      selectAllText="All"
+    ></app-multiselect-dropdown>
+    <app-multiselect-dropdown
+      [formGroupInstance]="assignDepartmentForm"
+      [fields]="{}"
+      [dataSource]="[]"
+      [showSelectAll]="true"
+      [required]="true"
+      controlName="location"
+      id="location"
+      label="Location"
+      selectAllText="All"
+    ></app-multiselect-dropdown>
+    <app-multiselect-dropdown
+      [formGroupInstance]="assignDepartmentForm"
+      [fields]="{}"
+      [dataSource]="[]"
+      [showSelectAll]="true"
+      [required]="true"
+      controlName="department"
+      id="department"
+      label="Department"
+      selectAllText="All"
+    ></app-multiselect-dropdown>
+  </ng-container>
+
+  <div>
+    <app-datepicker
+      [formGroupInstance]="assignDepartmentForm"
+      [required]="true"
+      id="start-date"
+      controlName="startDate"
+      label="Start Date"
+    ></app-datepicker>
+    <app-datepicker
+      [formGroupInstance]="assignDepartmentForm"
+      id="end-date"
+      controlName="endDate"
+      label="End Date"
+    ></app-datepicker>
+  </div>
+  <div class="toggles">
+    <app-toggle
+      [formGroupInstance]="assignDepartmentForm"
+      id="toggle2"
+      controlName="oriented"
+      label="toggle"
+    ></app-toggle>
+    <app-toggle
+      [formGroupInstance]="assignDepartmentForm"
+      id="toggle"
+      controlName="homeCostCenter"
+      label="toggle"
+    ></app-toggle>
+  </div>
+</form>

@@ -1,13 +1,14 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { tabsConfig } from '@client/candidates/add-edit-candidate/tabs-config.constants';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { Store } from '@ngxs/store';
 import { TabsComponent } from '@shared/components/tabs/tabs.component';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { debounceTime, Subject, takeUntil } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs';
 import { SetHeaderState } from 'src/app/store/app.actions';
-import { CandidateService } from '../services/candidate.service';
+import { CandidatesService } from '../services/candidates.service';
+import { CandidateTabsEnum } from '@client/candidates/enums/candidate-tabs.enum';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -15,7 +16,7 @@ import { CandidateService } from '../services/candidate.service';
   styleUrls: ['./add-edit-candidate.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddEditCandidateComponent extends DestroyableDirective implements OnInit, AfterViewInit {
+export class AddEditCandidateComponent extends DestroyableDirective implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('tabs') public tabsComponent: TabsComponent<unknown>;
   public readonly tabsConfig = tabsConfig;
   public showButtons = true;
@@ -23,7 +24,7 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   constructor(
     private router: Router,
     public candidateProfileFormService: CandidateProfileFormService,
-    private candidateService: CandidateService,
+    private candidatesService: CandidatesService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private store: Store,
@@ -32,11 +33,11 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
     store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.subscribeOnTabUpdate();
   }
 
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     if (this.route.snapshot.paramMap.get('id')) {
       this.candidateProfileFormService.tabUpdate$.next(parseInt(this.route.snapshot.paramMap.get('id') as string));
     }
@@ -48,7 +49,7 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
 
   private subscribeOnTabUpdate(): void {
     this.candidateProfileFormService.tabUpdate$.pipe(debounceTime(300), takeUntil(this.destroy$)).subscribe((id) => {
-      this.candidateService.employeeId = id;
+      this.candidatesService.employeeId = id;
       this.enableTabs();
       this.cdr.detectChanges();
     });
@@ -72,7 +73,8 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
     });
   }
 
-  public onTabChange(tab: { selectedIndex: number }): void {
+  public onTabChange(tab: { selectedIndex: CandidateTabsEnum }): void {
     this.showButtons = tab.selectedIndex === 0;
+    this.candidatesService.changeTab(tab.selectedIndex);
   }
 }

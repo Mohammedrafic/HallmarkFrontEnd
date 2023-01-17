@@ -12,7 +12,6 @@ import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { DateTimeHelper } from '@core/helpers';
 import pick from 'lodash/fp/pick';
-import { CandidateService } from '../services/candidate.service';
 
 @Injectable()
 export class CandidateProfileService {
@@ -61,7 +60,7 @@ export class CandidateProfileService {
     formData.append('photo', file);
     return this.http.post(`/api/Employee/photo?candidateProfileId=${id}`, formData).pipe(distinctUntilChanged());
   }
-  
+
   public removeCandidatePhoto(id: number): Observable<any> {
     return this.http.delete(`/api/Employee/${id}/photo`).pipe(distinctUntilChanged());
   }

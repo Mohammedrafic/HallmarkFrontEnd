@@ -44,9 +44,9 @@ app-grid {
         margin: 0;
       }
 
-      .action-btn {
-        font-size: 16px;
-        color: $primary-active-blue;
+      .action-button {
+        position: absolute;
+        right: 8px;
       }
     }
 

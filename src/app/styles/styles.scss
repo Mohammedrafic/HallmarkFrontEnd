@@ -534,6 +534,10 @@ a, a:hover, a:focus, a:active {
       padding-right: 5px;
     }
   }
+
+  &.reverse {
+    flex-direction: row-reverse;
+  }
 }
 
 .button-export-container {

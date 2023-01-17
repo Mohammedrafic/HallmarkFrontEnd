@@ -7,7 +7,8 @@ import { EMPTY, Observable, switchMap, takeUntil } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
-import { CandidateService } from '../services/candidate.service';
+import { CandidatesService } from '../services/candidates.service';
+import { CandidateTabsEnum } from '@client/candidates/enums';
 
 @Component({
   selector: 'app-candidate-profile',
@@ -26,7 +27,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   constructor(
     private candidateProfileFormService: CandidateProfileFormService,
     private candidateProfileService: CandidateProfileService,
-    private candidateService: CandidateService,
+    private candidateService: CandidatesService,
     private generalNotesService: GeneralNotesService,
     private cdr: ChangeDetectorRef,
     private router: Router,
@@ -41,6 +42,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     this.navigationWrapperService.areUnsavedChanges = this.hasUnsavedChanges.bind(this);
     this.listenSaveEvent();
     this.handleEditingCandidate();
+    this.initSelectedTab();
   }
 
   public override ngOnDestroy(): void {
@@ -111,5 +113,9 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
           this.cdr.markForCheck();
         });
     }
+  }
+
+  private initSelectedTab(): void {
+    this.candidateService.changeTab(CandidateTabsEnum.CandidateProfile);
   }
 }

@@ -68,8 +68,8 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Input() public title: string;
   @Input() public adjustColumnsWidth = false;
   @Input() public context: Object;
-  @Input() public customGridEmptyMessage: string;
-  @Input() public customRowsPerPageDropDownObject: { text: string; value: number }[];
+  @Input() public gridEmptyMessage: string = GRID_EMPTY_MESSAGE;
+  @Input() public customRowsPerPageDropDownObject: { text: string, value: number }[];
   @Input() public disableRowsPerPageDropdown: boolean = false;
   @Input() public domLayout: 'normal' | 'autoHeight' | 'print' | undefined = 'normal';
 
@@ -99,7 +99,6 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   public readonly defaultColumnDefinition: ColumnDefinitionModel = { minWidth: 100, resizable: true };
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public readonly modules: Module[] = [ClientSideRowModelModule];
-  public readonly gridEmptyMessage = GRID_EMPTY_MESSAGE;
   public selectedTableRows: RowNode[] = [];
 
   private readonly isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);

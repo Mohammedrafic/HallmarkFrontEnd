@@ -17,4 +17,6 @@ export class ButtonComponent {
   @Input() public disabled: boolean;
 
   @Output() public readonly clickEmitter: EventEmitter<void> = new EventEmitter();
+
+  public readonly buttonTypeEnum: typeof ButtonTypeEnum = ButtonTypeEnum;
 }

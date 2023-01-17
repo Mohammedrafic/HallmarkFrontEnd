@@ -1,7 +1,9 @@
 <div [class.grid-title]="title" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
   <div class="app-grid__header">
     <p *ngIf="title" class="title">{{ title }}</p>
-    <ng-content select="[action-button]"></ng-content>
+    <div class="action-button">
+      <ng-content select="[action-button]"></ng-content>
+    </div>
   </div>
 
   <ag-grid-angular
@@ -22,7 +24,7 @@
     [gridOptions]="gridOptions"
     [rowDragManaged]="rowDragManaged"
     [suppressMoveWhenRowDragging]="suppressMoveWhenRowDragging"
-    [overlayNoRowsTemplate]="customGridEmptyMessage || gridEmptyMessage"
+    [overlayNoRowsTemplate]="gridEmptyMessage"
     [context]="context"
     [domLayout]="domLayout"
     class="ag-theme-alpine app-grid__component"

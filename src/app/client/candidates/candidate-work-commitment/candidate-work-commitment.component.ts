@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Subject } from 'rxjs';
-import { CandidateService } from '../services/candidate.service';
+import { CandidatesService } from '../services/candidates.service';
 import { CandidateWorkCommitment } from './models/candidate-work-commitment.model';
 
 @Component({
@@ -16,7 +16,7 @@ export class CandidateWorkCommitmentComponent extends DestroyableDirective imple
 
   constructor(
     private cdr: ChangeDetectorRef,
-    public candidateService: CandidateService
+    public candidateService: CandidatesService
   ) {
     super();
   }

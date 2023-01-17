@@ -2,15 +2,17 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { GeneralNotesGridActionsRendererComponent } from './general-notes-grid-actions-renderer/general-notes-grid-actions-renderer.component';
-import { Actions, ofActionDispatched, Store } from '@ngxs/store';
+import { Actions, Store } from '@ngxs/store';
 import { ShowSideDialog } from '../../../../store/app.actions';
 import { AddEditNoteComponent } from '@client/candidates/candidate-profile/general-notes/add-edit-note/add-edit-note.component';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
-import { distinctUntilChanged, map, Observable, takeUntil } from 'rxjs';
+import { Observable, takeUntil } from 'rxjs';
 import { ICellRendererParams, ValueFormatterParams } from '@ag-grid-community/core';
 import { CategoryModel } from '@client/candidates/candidate-profile/general-notes/models/category.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { GeneralNotesGridCategoryRendererComponent } from './general-notes-grid-category-renderer/general-notes-grid-category-renderer.component';
+import { CandidatesService } from '@client/candidates/services/candidates.service';
+import { CandidateTabsEnum } from '@client/candidates/enums';
 
 @Component({
   selector: 'app-general-notes',
@@ -52,20 +54,23 @@ export class GeneralNotesComponent extends DestroyableDirective implements OnIni
   public sideDialogTitle$ = this.generalNotesService.sideDialogTitle$;
   public generalNotes$ = this.generalNotesService.notes$;
   public categories: CategoryModel[];
+  public selectedTab$: Observable<CandidateTabsEnum>;
 
-  public readonly isSideDialogOpened$: Observable<boolean> = this.isDialogOpened();
+  public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
 
   public constructor(
     private actions: Actions,
     private datePipe: DatePipe,
     private store: Store,
-    private generalNotesService: GeneralNotesService
+    private generalNotesService: GeneralNotesService,
+    private candidatesService: CandidatesService
   ) {
     super();
   }
 
   public ngOnInit(): void {
     this.getCategories();
+    this.selectedTab$ = this.candidatesService.getSelectedTab$();
   }
 
   public override ngOnDestroy(): void {
@@ -97,13 +102,6 @@ export class GeneralNotesComponent extends DestroyableDirective implements OnIni
 
   private getCategoryById(id: number): CategoryModel | null {
     return this.categories?.find((category: CategoryModel) => category.id === id) ?? null;
-  }
-
-  private isDialogOpened(): Observable<boolean> {
-    return this.actions.pipe(ofActionDispatched(ShowSideDialog)).pipe(
-      map((payload: ShowSideDialog) => payload.isDialogShown),
-      distinctUntilChanged()
-    );
   }
 
   private toggleSideDialog(state: boolean): void {
