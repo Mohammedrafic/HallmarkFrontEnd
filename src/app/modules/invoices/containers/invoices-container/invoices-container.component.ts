@@ -61,7 +61,6 @@ import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
-import { BreakpointObserver } from '@angular/cdk/layout';
 import { BreakpointObserverService } from '@core/services';
 
 @Component({

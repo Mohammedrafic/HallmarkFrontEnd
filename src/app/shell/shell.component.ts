@@ -14,7 +14,7 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { filter, Observable, Subject, takeUntil, distinctUntilChanged, debounceTime, map, interval } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, distinctUntilChanged, debounceTime, map } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
@@ -71,8 +71,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   alertSidebarType = 'auto';
   alertSidebarPosition = 'Right';
   showAlertSidebar = false;
-
-  public isSidebarHidden: boolean = true;
 
   isDarkTheme: boolean;
   isFirstLoad: boolean;
@@ -369,14 +367,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
-    this.isMobile$
-      .pipe(
-        takeUntil(this.unsubscribe$),
-        filter((isMobile: boolean) => isMobile)
-      )
-      .subscribe(() => {
-        this.store.dispatch(new ToggleSidebarState(true));
-      });
 
     this.isSideBarDocked$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDocked) => (this.sidebar.isOpen = isDocked));
     this.isFirstLoad$.pipe(takeUntil(this.unsubscribe$)).subscribe((isFirstLoad) => {
@@ -414,10 +404,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     });
-  }
-
-  public toggleMobileSidebar(): void {
-    this.isSidebarHidden = !this.isSidebarHidden;
   }
 
   toggleTheme(): void {

@@ -343,6 +343,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public isContentTabletWidth = false;
   public isMiddleTabletWidth = false;
   public mobileGridHeight = this.gridHeight;
+  public gridDomLayout: 'normal' | 'autoHeight' | 'print' | undefined;
 
   private isRedirectedFromDashboard: boolean;
   private orderStaus: number;
@@ -1317,7 +1318,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.onRowClick({data})
         }
       }
-      this.setHeightForMobileGrid(this.ordersPage?.items.length);
+      this.setHeightForMobileGrid(this.ordersPage?.items?.length);
     });
   }
 
@@ -1972,6 +1973,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.isTablet = screen.isTablet;
       this.isSmallDesktop = screen.isDesktopSmall;
       this.isDesktop = screen.isDesktopLarge;
+      this.gridDomLayout = this.isMobile ? 'autoHeight' : 'normal';
       this.cd.markForCheck();
      })
   }
@@ -1989,7 +1991,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     resizeToolbarObserver$.pipe(throttleTime(150), takeUntil(this.unsubscribe$)).subscribe((toolbarWidth) => {
       const isIRP = this.activeSystem === OrderManagementIRPSystemId.IRP;
       this.isContentTabletWidth = toolbarWidth <= SmallDesktopWidth && this.isDesktop && !isIRP;
-      this.isMiddleTabletWidth = toolbarWidth <= MiddleTabletWidth && (this.isTablet || this.isMobile) && !isIRP;
+      this.isMiddleTabletWidth = toolbarWidth <= MiddleTabletWidth && (this.isTablet || this.isMobile);
       this.cd.markForCheck();
     });
   }

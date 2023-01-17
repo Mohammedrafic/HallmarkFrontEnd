@@ -116,6 +116,7 @@
       [class.empty-table]="!(ordersPage$ | async)?.items?.length"
       [overlayNoRowsTemplate]="gridEmptyMessage"
       [rowSelection]="'multiple'"
+      [domLayout]="gridDomLayout"
       class="ag-theme-alpine app-grid__component"
       (gridReady)="setGridApi($event)"
       (sortChanged)="gridSortHandler($event)"

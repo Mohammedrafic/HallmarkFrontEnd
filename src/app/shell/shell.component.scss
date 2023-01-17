@@ -349,6 +349,12 @@
     padding: 80px 25px 0 25px;
     height: calc(100% - 80px);
 
+    @media #{$max-mobile} {
+      &:has(app-order-management-content) {
+        height: unset;
+      }
+    }
+
     .last-section {
       margin-bottom: 25px;
     }
@@ -750,7 +756,6 @@
         right: 15px;
         align-items: center;
         margin-bottom: 10px;
-        ;
         color: $primary-active-blue-10;
 
         &__footer_flex-child {
