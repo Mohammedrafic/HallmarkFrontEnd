@@ -144,6 +144,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
+  private alertOrderId:number;
 
   constructor(
     private store: Store,
@@ -159,6 +160,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   ngOnInit(): void {
+    this.alertOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
+    (!this.alertOrderId)?this.alertOrderId=0:""
+    window.localStorage.setItem("OrderId", JSON.stringify(""));
     this.getDeviceScreen();
     this.onOrderPreviewChange();
     this.onAgencyChange();
@@ -183,6 +187,16 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.ordersPage = data;
       this.setHeightForMobileGrid(data?.items.length);
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
+      if(this.ordersPage?.items){
+        this.alertOrderId= this.ordersPage.items.find((i) => i.orderId === this.alertOrderId)
+        ? this.alertOrderId
+        : 0;
+        if(this.alertOrderId>0 ){
+          this.ordersPage.items= this.ordersPage.items.filter(x=>x.orderId===this.alertOrderId);
+          this.gridWithChildRow.dataSource=this.ordersPage.items;
+          this.onRowClick({data:this.ordersPage.items[0],isInteracted:false})
+        }
+      }
     });
 
     this.subscribeOnPageChanges();
