@@ -78,7 +78,7 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div class="dropdown-container">
+          <div class="dropdown-container" *ngIf="!hideUserTypeControl">
             <div class="input-group dropdown">
               <label>User Type</label>
               <ejs-dropdownlist appValidateWithMessage
@@ -241,7 +241,7 @@
             </div>
           </div>     
         </div>
-        
+
         <div class="input-container bootstrap top-container">
           <label>To<span class="required">*</span></label>
           <div class="input-group">

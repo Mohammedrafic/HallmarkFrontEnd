@@ -173,6 +173,7 @@ export class SendGroupEmailComponent
   public isOrgInternalUserType: boolean = false;
   public isOrgCandidatesType: boolean = false;
   public isAgencyUserType: boolean = false;
+  public hideUserTypeControl: boolean = false;
   public isAgencyCandidatesType: boolean = false;
   public isBusinessUnitTypeAgency: boolean = false;
   public isOrgUser: boolean = false;
@@ -711,6 +712,7 @@ export class SendGroupEmailComponent
   }
   disableControls(isSend: boolean): void {
     let ele = document.getElementById('richTextEditorDiv') as HTMLElement;
+    this.hideUserTypeControl = false;
     if (isSend) {
       this.businessControl?.enable();
       this.businessUnitControl?.enable();
@@ -729,6 +731,12 @@ export class SendGroupEmailComponent
       this.groupEmailTemplateForm.controls['user'].disable();
       this.rteObj.enabled = false;
       ele.className = 'rich-text-container-disable';
+      this.clearFields();
+      this.isAgencyCandidatesType = false;
+      this.isOrgCandidatesType = false;
+      this.isOrgInternalUserType = false;
+      this.isAgencyUserType = false;
+      this.hideUserTypeControl = true;
     }
   }
 
