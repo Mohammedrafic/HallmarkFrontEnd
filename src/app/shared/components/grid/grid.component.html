@@ -26,8 +26,8 @@
     [suppressMoveWhenRowDragging]="suppressMoveWhenRowDragging"
     [overlayNoRowsTemplate]="gridEmptyMessage"
     [context]="context"
-    [domLayout]="domLayout"
     [class.empty-table]="!rowData || !rowData.length"
+    [domLayout]="gridDomLayout"
     class="ag-theme-alpine app-grid__component"
   ></ag-grid-angular>
   <app-grid-pagination
@@ -48,3 +48,4 @@
     [disableRowsPerPageDropdown]="disableRowsPerPageDropdown"
   ></app-grid-pagination>
 </div>
+<app-scroll-to-top *ngIf="isMobile"></app-scroll-to-top>

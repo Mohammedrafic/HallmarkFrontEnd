@@ -142,8 +142,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public organizationId: number;
   public rejectInvoiceId: number;
   public tabConfig: GridContainerTabConfig | null;
-  public isMobile: boolean;
-  public gridDomLayout: 'normal' | 'autoHeight' | 'print' | undefined;
 
   public gridSelections: InvoiceGridSelections = {
     selectedInvoiceIds: [],
@@ -169,7 +167,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     private actions$: Actions,
     private invoicesContainerService: InvoicesContainerService,
     private printingService: InvoicePrintingService,
-    private breakpointObserver: BreakpointObserverService,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
     store: Store
   ) {
@@ -189,9 +186,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.checkActionsAllowed();
     }
 
-    this.checkPermissions(this.isAgency).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => this.handleChangeTab(0));
+    this.checkPermissions(this.isAgency)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => this.handleChangeTab(0));
     this.watchDialogVisibility();
     this.startFiltersWatching();
     this.watchForInvoiceStatusChange();
@@ -200,7 +197,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchAgencyId();
     this.watchForOpenPayment();
     this.watchForSavePaymentAction();
-    this.watchForMobile();
   }
 
   public ngAfterViewInit(): void {
@@ -328,10 +324,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public resetFilters(): void {
-    this.store.dispatch(new Invoices.UpdateFiltersState({
-      pageNumber: GRID_CONFIG.initialPage,
-      pageSize: GRID_CONFIG.initialRowsPerPage,
-    }));
+    this.store.dispatch(
+      new Invoices.UpdateFiltersState({
+        pageNumber: GRID_CONFIG.initialPage,
+        pageSize: GRID_CONFIG.initialRowsPerPage,
+      })
+    );
   }
 
   public updateTableByFilters(filters: InvoicesFilterState): void {
@@ -563,19 +561,5 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       );
       this.cdr.markForCheck();
     });
-  }
-
-  private watchForMobile(): void {
-    this.breakpointObserver
-      .getBreakpointMediaRanges()
-      .pipe(takeUntil(this.componentDestroy()))
-      .subscribe((breakpoints) => {
-        this.isMobile = breakpoints.isMobile;
-        if (this.isMobile) {
-          this.gridDomLayout = 'autoHeight';
-        } else {
-          this.gridDomLayout = 'normal';
-        }
-      });
   }
 }

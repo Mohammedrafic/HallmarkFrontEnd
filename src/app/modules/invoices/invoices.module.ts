@@ -82,7 +82,6 @@ import { InvoicesPermissionHelper } from './helpers/invoices-permission.helper';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { InvoiceAddPaymentModule } from './components/invoice-add-payment/invoice-add-payment.module';
 import { InvoicePaymentDetailsModule } from './components/invoice-payment-details/invoice-payment-details.module';
-import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-top.module';
 
 @NgModule({
   declarations: [
@@ -156,7 +155,6 @@ import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-to
     TooltipContainerModule,
     InvoiceAddPaymentModule,
     InvoicePaymentDetailsModule,
-    ScrollToTopModule,
   ],
   providers: [
     InvoicesService,
@@ -208,4 +206,4 @@ import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-to
     },
   ],
 })
-export class InvoicesModule { }
+export class InvoicesModule {}

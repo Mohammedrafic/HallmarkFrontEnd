@@ -71,7 +71,6 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Input() public gridEmptyMessage: string = GRID_EMPTY_MESSAGE;
   @Input() public customRowsPerPageDropDownObject: { text: string, value: number }[];
   @Input() public disableRowsPerPageDropdown: boolean = false;
-  @Input() public domLayout: 'normal' | 'autoHeight' | 'print' | undefined = 'normal';
 
   @Input() set changeTableSelectedIndex(next: number | null) {
     if (next !== null) {
@@ -100,6 +99,8 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public readonly modules: Module[] = [ClientSideRowModelModule];
   public selectedTableRows: RowNode[] = [];
+  public isMobile: boolean;
+  public gridDomLayout: 'normal' | 'autoHeight' | 'print' | undefined;
 
   private readonly isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -122,6 +123,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   public ngOnInit(): void {
     this.initLoadingStateChangesListener();
     this.adjustColumnWidth();
+    this.watchForMobile();
   }
 
   public handleGridReadyEvent(event: GridReadyEventModel): void {
@@ -179,5 +181,19 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
           }
         });
     }
+  }
+
+  private watchForMobile(): void {
+    this.breakpointObserver
+      .getBreakpointMediaRanges()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((breakpoints) => {
+        this.isMobile = breakpoints.isMobile;
+        if (this.isMobile) {
+          this.gridDomLayout = 'autoHeight';
+        } else {
+          this.gridDomLayout = 'normal';
+        }
+      });
   }
 }
