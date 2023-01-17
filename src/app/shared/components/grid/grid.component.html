@@ -26,6 +26,7 @@
     [suppressMoveWhenRowDragging]="suppressMoveWhenRowDragging"
     [overlayNoRowsTemplate]="gridEmptyMessage"
     [context]="context"
+    [class.empty-table]="!rowData || !rowData.length"
     [domLayout]="gridDomLayout"
     class="ag-theme-alpine app-grid__component"
   ></ag-grid-angular>
