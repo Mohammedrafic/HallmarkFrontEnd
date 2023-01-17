@@ -342,7 +342,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public isDesktop = false;
   public isContentTabletWidth = false;
   public isMiddleTabletWidth = false;
-  public mobileGridHeight = this.gridHeight;
   public gridDomLayout: 'normal' | 'autoHeight' | 'print' | undefined;
 
   private isRedirectedFromDashboard: boolean;
@@ -1318,7 +1317,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.onRowClick({data})
         }
       }
-      this.setHeightForMobileGrid(this.ordersPage?.items?.length);
+      super.setHeightForMobileGrid(this.ordersPage?.items?.length);
     });
   }
 
@@ -2014,11 +2013,5 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.defaultExport(ExportedFileType.excel);
         break;
     }
-  }
-
-  public setHeightForMobileGrid(itemsLength: number | undefined): void {
-    const padding = 40;
-    const height = itemsLength ? itemsLength * this.rowHeight + padding : this.gridHeight;
-    this.mobileGridHeight = height < this.gridHeight ? this.gridHeight : String(height);
   }
 }
