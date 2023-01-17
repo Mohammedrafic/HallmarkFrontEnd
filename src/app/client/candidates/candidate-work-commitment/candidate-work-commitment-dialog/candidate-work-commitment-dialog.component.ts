@@ -128,14 +128,18 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private getActiveWorkCommitment(): void {
-    this.candidateWorkCommitmentService.getActiveCandidateWorkCommitment(this.employeeId).subscribe((activeCommitment) => {
-      if (activeCommitment) {
-        this.lastActiveDate = DateTimeHelper.convertDateToUtc(activeCommitment.startDate as string);
-        this.lastActiveDate = addDays(this.lastActiveDate, 1) as Date;
-      } else {
-        this.lastActiveDate = this.todayDate;
-      }
-    });
+    if (this.employeeId) {
+      this.candidateWorkCommitmentService.getActiveCandidateWorkCommitment(this.employeeId).subscribe((activeCommitment) => {
+        if (activeCommitment) {
+          this.lastActiveDate = DateTimeHelper.convertDateToUtc(activeCommitment.startDate as string);
+          this.lastActiveDate = addDays(this.lastActiveDate, 1) as Date;
+        } else {
+          this.lastActiveDate = this.todayDate;
+        }
+      });
+    } else {
+      this.lastActiveDate = this.todayDate;
+    }
   }
 
   private controlsStateHandler(disable: boolean): void {
@@ -216,7 +220,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private setWorkCommitmentDataSource(): void {
-    this.candidateWorkCommitmentService.getAvailableWorkCommitments().subscribe((commitments: WorkCommitmentDataSource[]) => {
+    this.candidateWorkCommitmentService.getAvailableWorkCommitments(this.employeeId).subscribe((commitments: WorkCommitmentDataSource[]) => {
       this.workCommitments = commitments;
       this.cd.detectChanges();
     });

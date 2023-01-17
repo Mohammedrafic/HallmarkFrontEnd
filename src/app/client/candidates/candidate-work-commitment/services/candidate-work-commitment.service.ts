@@ -9,8 +9,8 @@ import { CandidateWorkCommitment, CandidateWorkCommitmentsPage, WorkCommitmentDa
 export class CandidateWorkCommitmentService {
   public constructor(private readonly httpClient: HttpClient) {}
 
-  public getAvailableWorkCommitments(): Observable<WorkCommitmentDataSource[]> {
-    return this.httpClient.get<WorkCommitmentDataSource[]>('/api/WorkCommitment/all');
+  public getAvailableWorkCommitments(employeeId: number): Observable<WorkCommitmentDataSource[]> {
+    return this.httpClient.get<WorkCommitmentDataSource[]>('/api/WorkCommitment/all', { params: { EmployeeId: employeeId }});
   }
 
   public saveCandidateWorkCommitment(workCommitment: CandidateWorkCommitment): Observable<CandidateWorkCommitment> {

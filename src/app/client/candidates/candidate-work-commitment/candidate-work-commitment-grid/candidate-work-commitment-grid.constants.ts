@@ -30,11 +30,11 @@ export const CandidateWorkCommitmentColumnDef = (editCallback: (value: Candidate
       headerName: 'End Date',
       valueFormatter: (params: ValueFormatterParams) =>
         params.value && formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
-      minWidth: 185,
+      minWidth: 140,
     },
     {
       field: 'name',
-      headerName: 'Name',
+      headerName: 'Work Commitment',
       flex: 1,
       minWidth: 185,
     },
@@ -62,37 +62,45 @@ export const CandidateWorkCommitmentColumnDef = (editCallback: (value: Candidate
       valueFormatter: (params: ValueFormatterParams) =>
         params.value && parseFloat(params.value).toFixed(2),
       flex: 1,
-      minWidth: 185,
+      minWidth: 160,
     },
     {
       field: 'minWorkExperience',
       headerName: 'Min. Work Experience',
       flex: 1,
-      minWidth: 185,
+      minWidth: 200,
     },
     {
       field: 'availRequirement',
       headerName: 'Avail. Requirement (hours)',
       flex: 1,
-      minWidth: 185,
+      minWidth: 230,
     },
     {
       field: 'schedulePeriod',
       headerName: 'Schedule Period (weeks)',
       flex: 1,
-      minWidth: 185,
+      minWidth: 220,
     },
     {
       field: 'criticalOrder',
       headerName: 'Critical Order',
       flex: 1,
-      minWidth: 185,
+      minWidth: 160,
     },
     {
       field: 'holiday',
       headerName: 'Holiday',
       flex: 1,
-      minWidth: 185,
+      minWidth: 140,
+    },
+    {
+      field: 'created',
+      headerName: 'Created',
+      valueFormatter: (params: ValueFormatterParams) =>
+        params.value && formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
+      flex: 1,
+      minWidth: 140,
     },
     {
       field: 'comment',
