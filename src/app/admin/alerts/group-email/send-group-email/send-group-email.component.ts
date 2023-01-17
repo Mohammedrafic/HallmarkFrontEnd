@@ -241,6 +241,22 @@ export class SendGroupEmailComponent
     return this.groupEmailTemplateForm.get('candidate') as AbstractControl;
   }
 
+  get subjectControl(): AbstractControl { 
+    return this.groupEmailTemplateForm.get('emailSubject') as AbstractControl; 
+  }
+
+  get emailToControl(): AbstractControl { 
+    return this.groupEmailTemplateForm.get('emailTo') as AbstractControl; 
+  }
+
+  get emailBodyControl(): AbstractControl { 
+    return this.groupEmailTemplateForm.get('emailBody') as AbstractControl; 
+  }
+
+  get emailCcControl(): AbstractControl { 
+    return this.groupEmailTemplateForm.get('emailCc') as AbstractControl; 
+  }
+
   private dispatchNewPage(user: any, sortModel: any = null, filterModel: any = null): void {
     const { businessUnit } = this.groupEmailTemplateForm?.getRawValue();
     if (user != 0 && businessUnit != null) {
