@@ -24,6 +24,7 @@ export type CandidateWorkCommitment = {
   holiday: number;
   criticalOrder: number;
   comment: string;
+  created?: string | Date;
 }
 
 export type CandidateWorkCommitmentsPage = PageOfCollections<CandidateWorkCommitment>;
