@@ -55,6 +55,7 @@ import { endDateValidator, startDateValidator } from '@shared/validators/date.va
 import { DateTimeHelper } from '@core/helpers';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { difference } from 'lodash';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
@@ -548,7 +549,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   private getSkills(): void {
-    this.store.dispatch(new GetAssignedSkillsByOrganization());
+    this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
     this.skills$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
       this.primarySkills = skills;
       this.secondarySkills = skills;
