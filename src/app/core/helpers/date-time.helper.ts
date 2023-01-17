@@ -105,7 +105,7 @@ export class DateTimeHelper {
     if (rangeOption === DatesRangeType.Day) {
       firstDay = curr.getTime();
     }
-  
+
     const lastDay = firstDay + CalcDaysMs((RangeDaysOptions[rangeOption] - 1));
 
     let last = new Date(lastDay).getTime();
@@ -202,5 +202,9 @@ export class DateTimeHelper {
     }
 
     return result;
+  }
+
+  public static getCurrentDateWithoutOffset(): Date {
+    return new Date(new Date().setHours(0, 0, 0, 0));
   }
 }

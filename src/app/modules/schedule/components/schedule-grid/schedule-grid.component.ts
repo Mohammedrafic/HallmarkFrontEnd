@@ -59,7 +59,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   activePeriod = DatesRangeType.TwoWeeks;
 
-  weekPeriod: [Date, Date] = [new Date(), new Date()];
+  weekPeriod: [Date, Date] = [DateTimeHelper.getCurrentDateWithoutOffset(), DateTimeHelper.getCurrentDateWithoutOffset()];
 
   datesRanges: string[] = DateTimeHelper.getDatesBetween();
 
