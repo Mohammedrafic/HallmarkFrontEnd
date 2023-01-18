@@ -607,6 +607,8 @@ export class SendGroupEmailComponent
           });
         }
         if (value == 2) {
+          this.userData = [];
+          this.usersControl.patchValue([]);          
           this.isAgencyCandidatesType = true;          
           this.store.dispatch(new GetGroupEmailSkills(businessId, 1));
           this.skillData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
