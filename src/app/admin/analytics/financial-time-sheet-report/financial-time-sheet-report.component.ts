@@ -299,9 +299,6 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
-        // this.defaultLocations = this.locations.map((list) => list.id);
-        // this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
-        // this.changeDetectorRef.detectChanges();
       }
       else {
         this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
@@ -369,10 +366,13 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       this.isResetFilter = false;
       this.message = ""
     }
+      
+      locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length  > 0 ? this.locations.map(x=> x.id).join(",") : []); 
+      departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length  > 0 ? this.departments.map(x=> x.id).join(",") : []); 
 
       regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
-      locationIds =      locationIds.length > 0 ?locationIds.join(",") : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
-      departmentIds =    departmentIds.length > 0 ?departmentIds.join(",") : this.departmentsList?.length>0?  this.departmentsList.map(x=> x.id).join(",") :"null"; 
+      locationIds =      locationIds.length > 0 ? locationIds  : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
+      departmentIds =    departmentIds.length > 0 ? departmentIds : this.departmentsList?.length>0?  this.departmentsList.map(x=> x.id).join(",") :"null"; 
       skillCategoryIds = skillCategoryIds.length > 0 ?skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; })=> x.id).join(",") : "null"; 
       skillIds =         skillIds.length > 0 ?skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; })=> x.id).join(","):"null"; 
    
@@ -514,6 +514,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public onFilterDelete(event: FilteredItem): void {
     this.filterService.removeValue(event, this.financialTimesheetReportForm, this.filterColumns);
   }
+
   public onFilterClearAll(): void {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
