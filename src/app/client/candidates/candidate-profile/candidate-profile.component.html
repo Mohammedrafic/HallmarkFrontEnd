@@ -7,7 +7,7 @@
       (selectImage)="onImageSelect($event)"
       uploaderTitle="Photo"
       [disabled]="readonlyMode"
-      [logo]="photo">
+      [logo]="photo$ | async">
     </app-image-uploader>
   </div>
   <div class="general-notes">

@@ -17,7 +17,7 @@ import { CandidateTabsEnum } from '@client/candidates/enums';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CandidateProfileComponent extends DestroyableDirective implements OnInit, OnDestroy {
-  public photo: Blob | null = null;
+  public photo$: Observable<Blob>;
   public readonlyMode = false;
 
   private filesDetails: Blob[] = [];
@@ -105,13 +105,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
           this.generalNotesService.notes$.next(candidate.generalNotes);
         });
 
-      this.candidateProfileService
-        .getCandidatePhotoById(this.candidateId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((photo: Blob) => {
-          this.photo = photo;
-          this.cdr.markForCheck();
-        });
+      this.photo$ = this.candidateProfileService.getCandidatePhotoById(this.candidateId);
     }
   }
 

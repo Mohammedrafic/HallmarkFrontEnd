@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
-import { FileSize } from "@core/enums";
-import { FileStatusCode } from "@shared/enums/file.enum";
-import { SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
-import { FileInfo } from "@syncfusion/ej2-inputs/src/uploader/uploader";
+import { FileSize } from '@core/enums';
+import { FileStatusCode } from '@shared/enums/file.enum';
+import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
+import { FileInfo } from '@syncfusion/ej2-inputs/src/uploader/uploader';
 
 @Component({
   selector: 'app-image-uploader',
@@ -19,6 +19,7 @@ export class ImageUploaderComponent implements OnInit {
       reader.readAsDataURL(value as Blob);
       reader.onloadend = () => {
         this.logoSrc = reader.result as string;
+        this.cdr.markForCheck();
       };
     }
   }
@@ -34,6 +35,10 @@ export class ImageUploaderComponent implements OnInit {
   public readonly allowedExtensions: string = '.png, .jpg';
   public readonly maxFileSize = FileSize.MB_20;
   public dropElement: HTMLElement;
+
+  constructor(private cdr: ChangeDetectorRef) {
+  }
+
 
   ngOnInit(): void {
     this.dropElement = document.getElementById('droparea') as HTMLElement;

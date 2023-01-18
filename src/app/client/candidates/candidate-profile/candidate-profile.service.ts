@@ -47,12 +47,12 @@ export class CandidateProfileService {
   }
 
   public saveCandidate(file: Blob, candidateId: number): Observable<void | CandidateModel> {
-      return this.saveCandidateProfile(candidateId).pipe(
-        mergeMap((candidate) => {
-          this.candidateProfileForm.tabUpdate$.next(candidate.id);
-          return file ? this.saveCandidatePhoto(file, candidate.id) : this.removeCandidatePhoto(candidate.id);
-        })
-      );
+    return this.saveCandidateProfile(candidateId).pipe(
+      mergeMap((candidate) => {
+        this.candidateProfileForm.tabUpdate$.next(candidate.id);
+        return file ? this.saveCandidatePhoto(file, candidate.id) : this.removeCandidatePhoto(candidate.id);
+      })
+    );
   }
 
   public saveCandidatePhoto(file: Blob, id: number): Observable<any> {
