@@ -26,8 +26,8 @@ import {
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
-import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { Department, Location, Organisation, Region } from '@shared/models/visibility-settings.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { Organisation } from '@shared/models/visibility-settings.model';
 import { Department as ContactDetails } from '@shared/models/department.model';
 import { currencyValidator } from '@shared/validators/currency.validator';
 import { Duration } from '@shared/enums/durations';
@@ -127,9 +127,9 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public readonly durations = ORDER_DURATION_LIST;
   public readonly masterShiftNames = ORDER_MASTER_SHIFT_NAME_LIST;
   public readonly contactDetailTitles = ORDER_CONTACT_DETAIL_TITLES;
-  public regionDataSource: Region[] | OrganizationRegion[] = [];
-  public locationDataSource: Location[] = [];
-  public departmentDataSource: Department[] = [];
+  public regionDataSource: OrganizationRegion[] = [];
+  public locationDataSource: OrganizationLocation[] = [];
+  public departmentDataSource: OrganizationDepartment[] = [];
   public jobDistributions = ORDER_JOB_DISTRIBUTION;
 
   private selectedOrganizationId: number;
@@ -275,20 +275,20 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public changeRegionDropdown(event: ChangeEventArgs): void {
     this.resetLocation();
     this.resetDepartment();
-    const selectedRegion = event.itemData as Region;
-    this.locationDataSource = selectedRegion.locations;
+    const selectedRegion = event.itemData as OrganizationRegion;
+    this.locationDataSource = this.getActiveLocations(selectedRegion.locations || []);
     this.quickOrderConditions.isLocationsDropDownEnabled = true;
   }
 
   public changeLocationDropdown(event: ChangeEventArgs): void {
     this.resetDepartment();
-    const selectedLocation = event.itemData as Location;
-    this.departmentDataSource = selectedLocation.departments;
+    const selectedLocation = event.itemData as OrganizationLocation;
+    this.departmentDataSource = this.getActiveDepartments(selectedLocation.departments);
     this.quickOrderConditions.isDepartmentsDropDownEnabled = true;
   }
 
   public changeDepartmentDropdown(event: ChangeEventArgs): void {
-    const selectedDepartment = event.itemData as Department;
+    const selectedDepartment = event.itemData as OrganizationDepartment;
     this.store.dispatch(new GetContactDetails(selectedDepartment.id, selectedDepartment.organizationId));
   }
 
@@ -323,16 +323,24 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     }
   }
 
-  private populateRegLocDepFields(region: Region | OrganizationRegion): void {
+  private getActiveLocations(arr: OrganizationLocation[]): OrganizationLocation[] {
+    return arr.filter((location: OrganizationLocation) => !location.isDeactivated);
+  }
+
+  private getActiveDepartments(arr: OrganizationDepartment[]): OrganizationDepartment[] {
+    return arr.filter((department: OrganizationDepartment) => !department.isDeactivated);
+  }
+
+  private populateRegLocDepFields(region: OrganizationRegion): void {
     if (region) {
       this.generalInformationForm.controls['regionId'].patchValue(region.id);
       this.quickOrderConditions.isRegionsDropDownEnabled = true;
-      this.locationDataSource = region.locations as Location[];
+      this.locationDataSource = region.locations ? this.getActiveLocations(region.locations) : [];
     }
     if (this.locationDataSource.length > 0) {
       this.generalInformationForm.controls['locationId'].patchValue(this.locationDataSource[0].id);
       this.quickOrderConditions.isLocationsDropDownEnabled = true;
-      this.departmentDataSource = this.locationDataSource[0].departments;
+      this.departmentDataSource = this.getActiveDepartments(this.locationDataSource[0].departments);
     }
 
     if (this.departmentDataSource.length > 0) {
