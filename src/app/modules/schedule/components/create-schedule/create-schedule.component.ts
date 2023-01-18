@@ -74,7 +74,6 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   scheduleTypeNumber: ScheduleTypeNumber;
   showScheduleForm = true;
 
-  private readonly visibleForIRPCandidates = true; // TODO: refactor when schedule is available for VMS
   private readonly customShiftId = -1;
   private shiftControlSubscription: Subscription | null;
   private scheduleShifts: ScheduleShift[] = [];
@@ -182,7 +181,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   private getUnavailabilityReasons(): void {
-    this.scheduleApiService.getUnavailabilityReasons(this.visibleForIRPCandidates)
+    this.scheduleApiService.getUnavailabilityReasons()
       .pipe(
         catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
         map((reasons: UnavailabilityReason[]) => this.createScheduleService.mapToDropdownOptions(reasons)),

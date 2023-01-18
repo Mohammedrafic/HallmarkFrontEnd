@@ -22,7 +22,7 @@ export class ScheduleApiService {
     return this.http.post<CandidateSchedules[]>('/api/Schedules/byEmployeesIds', { employeeIds, ...filters });
   }
 
-  getUnavailabilityReasons(visibleForIRPCandidates: boolean): Observable<UnavailabilityReason[]> {
+  getUnavailabilityReasons(visibleForIRPCandidates: boolean | null = null): Observable<UnavailabilityReason[]> {
     return this.http.post<UnavailabilityReason[]>(
       '/api/UnavailabilityReasons/forCurrentBusinessUnit',
       { visibleForIRPCandidates }

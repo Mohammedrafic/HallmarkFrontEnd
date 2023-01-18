@@ -17,16 +17,7 @@ export class ScheduleItemsService {
         candidateId: candidate.id,
         selectedDates: [],
         dateItems: scheduleSelectedSlots.dates.map((dateString: string) => {
-          const daySchedule: ScheduleInt.ScheduleItem = this.getDayScheduleData(candidate.id, dateString);
-          const date = new Date(dateString);
-
-          return {
-            dateString: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
-            unavailabilityReason: daySchedule.unavailabilityReason,
-            scheduleType: daySchedule.scheduleType,
-            scheduleToOverrideId: daySchedule.id,
-            date,
-          };
+          return this.getScheduleDateItem(candidate.id, dateString);
         }),
       };
 
@@ -36,22 +27,36 @@ export class ScheduleItemsService {
     });
   }
 
+  getScheduleDateItem(candidateId: number, dateString: string): DateItem {
+    const daySchedule: ScheduleInt.ScheduleItem = this.getDayScheduleData(candidateId, dateString);
+    const date = new Date(dateString);
+
+    return {
+      dateString: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+      unavailabilityReason: daySchedule.unavailabilityReason,
+      scheduleType: daySchedule.scheduleType,
+      scheduleToOverrideId: daySchedule.id,
+      date,
+    };
+  }
+
   private getDayScheduleData(candidateId: number, dateString: string): ScheduleInt.ScheduleItem {
     const candidateData: ScheduleInt.ScheduleModel = this.createScheduleService.scheduleData
       .find((data: ScheduleInt.ScheduleModel) => data.candidate.id === candidateId) as ScheduleInt.ScheduleModel;
     const dateStringLength = 10;
+    const formattedDateSting = dateString.substring(0, dateStringLength);
     let daySchedule: ScheduleInt.ScheduleItem = {} as ScheduleInt.ScheduleItem;
 
 
     if (candidateData.schedule.length) {
       const dateSchedule: ScheduleInt.ScheduleDateItem | undefined = candidateData.schedule
         .find((scheduleItem: ScheduleInt.ScheduleDateItem) =>
-          scheduleItem.date.substring(0, dateStringLength) === dateString
+          scheduleItem.date.substring(0, dateStringLength) === formattedDateSting
         );
 
       if (dateSchedule) {
         daySchedule = dateSchedule.daySchedules
-          .find((schedule: ScheduleInt.ScheduleItem) => schedule.date.substring(0, dateStringLength) === dateString)
+          .find((schedule: ScheduleInt.ScheduleItem) => schedule.date.substring(0, dateStringLength) === formattedDateSting)
           || {} as ScheduleInt.ScheduleItem;
       }
     }

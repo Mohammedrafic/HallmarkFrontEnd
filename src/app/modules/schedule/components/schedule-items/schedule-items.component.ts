@@ -62,7 +62,6 @@ export class ScheduleItemsComponent {
 
   updateDateItems(dates: Date[], candidateId: number): void {
     const scheduleItem = this.scheduleItems.find((item: CreateScheduleItem) => item.candidateId === candidateId);
-    const dateItems: DateItem[] = [];
 
     if (!scheduleItem) {
       return;
@@ -73,18 +72,12 @@ export class ScheduleItemsComponent {
       return;
     }
 
-    dates.forEach((date: Date) => {
+    scheduleItem.selectedDates = dates;
+    scheduleItem.dateItems = dates.map((date: Date) => {
       const dateString = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date));
       const dateItem = scheduleItem.dateItems.find((item: DateItem) => item.dateString === dateString);
 
-      if (dateItem) {
-        dateItems.push(dateItem);
-      } else {
-        dateItems.push({ dateString, date });
-      }
+      return dateItem ? dateItem : this.scheduleItemsService.getScheduleDateItem(candidateId, dateString);
     });
-
-    scheduleItem.selectedDates = dates;
-    scheduleItem.dateItems = dateItems;
   }
 }
