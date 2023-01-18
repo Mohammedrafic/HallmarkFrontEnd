@@ -35,6 +35,8 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   @Input() isAbleToChange = true;
 
+  @Input() overrideInitDates = false;
+
   @Input() rangeType = DatesRangeType.TwoWeeks;
 
   @Input() firstDayOfWeek: number;
@@ -188,14 +190,8 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     const dateRange = DateTimeHelper.getRange(value, this.startDate, this.rangeType, this.firstDayOfWeek, !!this.maxDate);
 
     this.startDateValue = value;
-    this.dateControl.patchValue(dateRange, { emitEvent: false });
+    this.setRangeToService(dateRange, value);
 
-    this.weekService.setRange([
-      DateTimeHelper.toUtcFormat(DateTimeHelper.getDynamicWeekDate(value, true, this.startDate, this.rangeType,
-        this.firstDayOfWeek, !!this.maxDate)),
-      DateTimeHelper.toUtcFormat(DateTimeHelper.getDynamicWeekDate(value, false, this.startDate, this.rangeType,
-        this.firstDayOfWeek, !!this.maxDate)),
-    ]);
     this.compareDates();
   }
 
@@ -224,16 +220,29 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     : value.toDateString();
 
 
+    this.setRangeToService(range, value);
+
+    this.compareDates();
+  }
+
+  private setRangeToService(range: string, value: Date | string): void {
     this.dateControl.setValue(range, { emitEvent: false });
 
+    const startRangeDate = DateTimeHelper.getDynamicWeekDate(value, true, this.startDate, this.rangeType,
+      this.firstDayOfWeek, !!this.maxDate);
+
     this.weekService.setRange([
-      DateTimeHelper.toUtcFormat(DateTimeHelper.getDynamicWeekDate(value, true, this.startDate, this.rangeType,
-        this.firstDayOfWeek, !!this.maxDate)),
+      DateTimeHelper.toUtcFormat(startRangeDate),
       DateTimeHelper.toUtcFormat(DateTimeHelper.getDynamicWeekDate(value, false, this.startDate, this.rangeType,
         this.firstDayOfWeek, !!this.maxDate)),
     ]);
 
-    this.compareDates();
+    if (this.overrideInitDates && this.initDates) {
+      this.initDates = [
+        startRangeDate,
+        startRangeDate,
+      ];
+    }
   }
 
   private compareDates(): void {
