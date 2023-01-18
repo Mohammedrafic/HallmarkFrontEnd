@@ -159,9 +159,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   ngOnInit(): void {
-    this.alertOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
-    (!this.alertOrderId)?this.alertOrderId=0:""
-    window.localStorage.setItem("OrderId", JSON.stringify(""));
+    this.getAlertOrderId();
     this.getDeviceScreen();
     this.onOrderPreviewChange();
     this.onAgencyChange();
@@ -227,6 +225,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onExportClicked$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((event: any) => this.exportSelected(event));
+  }
+  public getAlertOrderId():void{
+    this.alertOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
+    (!this.alertOrderId)?this.alertOrderId=0:""
+    window.localStorage.setItem("OrderId", JSON.stringify(""));
   }
 
   public override customExport(): void {
