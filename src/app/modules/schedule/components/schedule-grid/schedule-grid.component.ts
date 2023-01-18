@@ -218,7 +218,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   private watchForCandidateSearch(): void {
     this.searchControl.valueChanges.pipe(
-      debounceTime(300),
+      debounceTime(1000),
       tap((filteringEventArgs: FilteringEventArgs) => {
         if (!filteringEventArgs?.text || !filteringEventArgs?.text.length) {
           this.candidatesSuggestions = [];
