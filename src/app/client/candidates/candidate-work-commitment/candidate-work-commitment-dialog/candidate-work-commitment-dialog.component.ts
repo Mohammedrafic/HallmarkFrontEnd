@@ -176,9 +176,14 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private subscribeOnDialog(): void {
     this.dialogSubject$.pipe(takeUntil(this.destroy$)).subscribe((value: { isOpen: boolean, isEdit: boolean, commitment?: CandidateWorkCommitment }) => {
-      value.isOpen ? this.sideDialog.show() : this.sideDialog.hide();
+      if (value.isOpen) {
+        this.setWorkCommitmentDataSource();
+        this.getActiveWorkCommitment();
+        this.sideDialog.show();
+      } else {
+        this.sideDialog.hide();
+      }
       this.title = value.isEdit ? 'Edit' : 'Add';
-      this.getActiveWorkCommitment();
       if (value.isEdit) {
         this.enableControls();
         this.getCandidateWorkCommitmentById(value.commitment as CandidateWorkCommitment);
