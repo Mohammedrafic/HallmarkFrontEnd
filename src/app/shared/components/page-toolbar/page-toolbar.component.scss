@@ -60,6 +60,13 @@ $gap: 12px;
     flex-direction: column;
     padding-top: 15px;
 
+    .left-content {
+      max-width: unset;
+      width: auto;
+      overflow: hidden;
+      padding-top: 1px;
+    }
+
     .right-content {
       justify-content: flex-start;
     }

@@ -31,7 +31,7 @@
     <ng-container *ngIf="!isMobile">
       <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
       <button
-        *ngIf="!isIRPFlagEnabled && !(isContentSmallDesktop)"
+        *ngIf="!isIRPFlagEnabled && !isContentSmallDesktop"
         ejs-button
         appHideBeforeSyncfusionLoad
         cssClass="e-outline button-template"
