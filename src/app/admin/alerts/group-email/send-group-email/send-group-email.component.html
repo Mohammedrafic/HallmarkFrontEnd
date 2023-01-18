@@ -2,14 +2,8 @@
     
     <!-- validation errors-->
     <div class="alert alert-danger">
-      <div *ngIf="emailToControl.errors?.['required']">
+      <div *ngIf="emailToControl.value == ''">
         - Field Email to is required.
-      </div>
-      <div *ngIf="emailToControl.errors?.['email']">
-        - Field Email to is not a valid email address.
-      </div>
-      <div *ngIf="emailToControl.errors?.['pattern']">
-        - Some of email(s) is not a valid email address.
       </div>
     </div>
 
