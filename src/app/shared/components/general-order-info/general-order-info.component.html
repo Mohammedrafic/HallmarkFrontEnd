@@ -154,7 +154,7 @@
       </div>
 
       <div class="column">
-        <div class="title">{{ (orderInformation.distributedOn | date: 'MM/dd/yyy':'UTC') || '-' }}</div>
+        <div class="title">{{ (orderInformation?.irpOrderMetadata?.orderOpenDate | date: 'MM/dd/yyy':'UTC') || '-' }}</div>
         <div class="sup-title">Distributed On</div>
       </div>
     </div>
