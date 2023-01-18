@@ -27,7 +27,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { Department, Location, Organisation, Region } from '@shared/models/visibility-settings.model';
+import { Organisation } from '@shared/models/visibility-settings.model';
 import { Department as ContactDetails } from '@shared/models/department.model';
 import { currencyValidator } from '@shared/validators/currency.validator';
 import { Duration } from '@shared/enums/durations';
@@ -275,20 +275,20 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public changeRegionDropdown(event: ChangeEventArgs): void {
     this.resetLocation();
     this.resetDepartment();
-    const selectedRegion = event.itemData as Region;
-    this.locationDataSource = this.getActiveLocations(selectedRegion.locations);
+    const selectedRegion = event.itemData as OrganizationRegion;
+    this.locationDataSource = this.getActiveLocations(selectedRegion.locations || []);
     this.quickOrderConditions.isLocationsDropDownEnabled = true;
   }
 
   public changeLocationDropdown(event: ChangeEventArgs): void {
     this.resetDepartment();
-    const selectedLocation = event.itemData as Location;
+    const selectedLocation = event.itemData as OrganizationLocation;
     this.departmentDataSource = this.getActiveDepartments(selectedLocation.departments);
     this.quickOrderConditions.isDepartmentsDropDownEnabled = true;
   }
 
   public changeDepartmentDropdown(event: ChangeEventArgs): void {
-    const selectedDepartment = event.itemData as Department;
+    const selectedDepartment = event.itemData as OrganizationDepartment;
     this.store.dispatch(new GetContactDetails(selectedDepartment.id, selectedDepartment.organizationId));
   }
 
