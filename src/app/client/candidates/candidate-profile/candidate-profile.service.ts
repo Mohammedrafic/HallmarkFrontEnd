@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, distinctUntilChanged, EMPTY, mergeMap, Observable, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, EMPTY, mergeMap, Observable, of, tap } from 'rxjs';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
 import { FormBuilder } from '@angular/forms';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
@@ -20,7 +20,7 @@ export class CandidateProfileService {
     private formBuilder: FormBuilder,
     private store: Store,
     private candidateProfileForm: CandidateProfileFormService,
-    private generalNotesService: GeneralNotesService,
+    private generalNotesService: GeneralNotesService
   ) {}
 
   public saveCandidateProfile(candidateId: number): Observable<CandidateModel> {
@@ -46,11 +46,14 @@ export class CandidateProfileService {
     );
   }
 
-  public saveCandidate(file: Blob, candidateId: number): Observable<void | CandidateModel> {
+  public saveCandidate(file: Blob | null, candidateId: number): Observable<void | CandidateModel> {
     return this.saveCandidateProfile(candidateId).pipe(
       mergeMap((candidate) => {
         this.candidateProfileForm.tabUpdate$.next(candidate.id);
-        return file ? this.saveCandidatePhoto(file, candidate.id) : this.removeCandidatePhoto(candidate.id);
+        if (file) {
+          return this.saveCandidatePhoto(file, candidate.id);
+        }
+        return file === null ? this.removeCandidatePhoto(candidate.id) : of(null);
       })
     );
   }
@@ -58,11 +61,17 @@ export class CandidateProfileService {
   public saveCandidatePhoto(file: Blob, id: number): Observable<any> {
     const formData = new FormData();
     formData.append('photo', file);
-    return this.http.post(`/api/Employee/photo?candidateProfileId=${id}`, formData).pipe(distinctUntilChanged());
+    return this.http.post(`/api/Employee/photo?candidateProfileId=${id}`, formData).pipe(
+      distinctUntilChanged(),
+      catchError(() => EMPTY)
+    );
   }
 
   public removeCandidatePhoto(id: number): Observable<any> {
-    return this.http.delete(`/api/Employee/${id}/photo`).pipe(distinctUntilChanged());
+    return this.http.delete(`/api/Employee/${id}/photo`).pipe(
+      distinctUntilChanged(),
+      catchError(() => EMPTY)
+    );
   }
 
   public getCandidateById(id: number): Observable<CandidateModel> {
@@ -75,7 +84,9 @@ export class CandidateProfileService {
   }
 
   public getCandidatePhotoById(id: number): Observable<Blob> {
-    return this.http.get(`/api/employee/${id}/photo`, { responseType: 'blob' });
+    return this.http.get(`/api/employee/${id}/photo`, { responseType: 'blob' }).pipe(
+      catchError(() => EMPTY)
+    );
   }
 
   private convertDatesToUTC(candidate: CandidateModel): Partial<CandidateModel> {

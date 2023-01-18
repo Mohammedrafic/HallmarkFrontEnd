@@ -20,7 +20,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   public photo$: Observable<Blob>;
   public readonlyMode = false;
 
-  private filesDetails: Blob[] = [];
+  private filesDetails: Blob | null;
   private isRemoveLogo: boolean;
   private candidateId: number;
 
@@ -56,7 +56,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
       return EMPTY;
     } else {
       return this.candidateProfileService
-        .saveCandidate(this.filesDetails[0], this.candidateId)
+        .saveCandidate(this.filesDetails, this.candidateId)
         .pipe(takeUntil(this.destroy$));
     }
   }
@@ -79,10 +79,10 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
 
   public onImageSelect(event: Blob | null) {
     if (event) {
-      this.filesDetails = [event as Blob];
+      this.filesDetails = event as Blob;
       this.isRemoveLogo = false;
     } else {
-      this.filesDetails = [];
+      this.filesDetails = null;
       this.isRemoveLogo = true;
     }
   }

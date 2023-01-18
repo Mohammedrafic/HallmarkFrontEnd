@@ -41,7 +41,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     super(cdr, candidateProfileFormService);
   }
 
-  override ngOnInit(): void {
+  public override ngOnInit(): void {
     super.ngOnInit();
     this.listenProfileStatusChanges();
     this.listenSkillsChanges();
@@ -99,10 +99,6 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   private removeValidators(): void {
     this.isTerminatedSelected = false;
     this.isOnHoldSelected = false;
-    const controls = ['holdStartDate', 'terminationDate', 'terminationReasonId'];
-
-    controls.forEach(() => {
-      this.candidateForm.removeValidators(Validators.required);
-    });
+    this.candidateProfileFormService.removeValidators();
   }
 }

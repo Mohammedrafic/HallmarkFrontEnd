@@ -26,6 +26,7 @@ export class CandidateProfileFormService {
       profileStatus: ProfileStatusesEnum.Active,
       isContract: false,
     });
+    this.removeValidators();
   }
 
   public markCandidateFormAsTouched(): void {
@@ -88,6 +89,16 @@ export class CandidateProfileFormService {
 
   public populateCandidateForm(candidate: CandidateModel): void {
     this.candidateForm.patchValue(this.getPartialFormValueByControls(candidate));
+  }
+
+  public removeValidators(): void {
+    const controls = ['holdStartDate', 'terminationDate', 'terminationReasonId'];
+
+    controls.forEach(() => {
+      this.candidateForm.removeValidators(Validators.required);
+    });
+
+    this.candidateForm.updateValueAndValidity();
   }
 
   private getPartialFormValueByControls(value: CandidateModel): any {
