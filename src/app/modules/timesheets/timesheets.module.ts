@@ -3,19 +3,47 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AgGridModule } from '@ag-grid-community/angular';
-import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
+import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
 import { NgxsModule } from '@ngxs/store';
 import { FeatherModule } from 'angular-feather';
 import { DialogAllModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ButtonModule, CheckBoxModule, ChipListModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
-import { DateTimePickerModule, TimePickerModule,
-  DatePickerModule, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import {
+  DateTimePickerModule,
+  TimePickerModule,
+  DatePickerModule,
+  MaskedDateTimeService,
+} from '@syncfusion/ej2-angular-calendars';
 import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { FileText, ChevronRight, AlignJustify, Briefcase, Calendar, CheckCircle, ChevronDown,
-  Copy, Download, Edit, Edit3, Folder, Lock, MapPin, Menu, MessageSquare, MoreVertical, Plus, Search, Sliders, Trash2,
-  Upload, User, X, XCircle, AlertTriangle,
+import {
+  FileText,
+  ChevronRight,
+  AlignJustify,
+  Briefcase,
+  Calendar,
+  CheckCircle,
+  ChevronDown,
+  Copy,
+  Download,
+  Edit,
+  Edit3,
+  Folder,
+  Lock,
+  MapPin,
+  Menu,
+  MessageSquare,
+  MoreVertical,
+  Plus,
+  Search,
+  Sliders,
+  Trash2,
+  Upload,
+  User,
+  X,
+  XCircle,
+  AlertTriangle,
 } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
@@ -31,9 +59,7 @@ import { TimesheetsContainerComponent } from './containers/timesheets-container/
 import { TimesheetsTableComponent } from './components/timesheets-table/timesheets-table.component';
 import { TimesheetsState } from './store/state/timesheets.state';
 import { TimesheetsApiService } from './services/timesheets-api.service';
-import {
-  ProfileDetailsContainerComponent,
-} from './containers/profile-details-container/profile-details-container.component';
+import { ProfileDetailsContainerComponent } from './containers/profile-details-container/profile-details-container.component';
 import { ProfileTimesheetTableComponent } from './components/profile-timesheet-table/profile-timesheet-table.component';
 import { AddTimesheetComponent } from './components/add-timesheet/add-timesheet.component';
 import { AddRecordService } from './services/add-record.service';
@@ -50,12 +76,8 @@ import { GridModule } from '@shared/components/grid/grid.module';
 import { ProfileMilesComponent } from './components/profile-cumulative-hours/profile-miles/profile-miles.component';
 import { InputEditorComponent } from './components/cell-editors/input-editor/input-editor.component';
 import { GridDateEditorComponent } from './components/cell-editors/grid-date-editor/grid-date-editor.component';
-import {
-  TimesheetTableApproveCellComponent,
-} from './components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
-import {
-  TimesheetTableLinkComponent,
-} from './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
+import { TimesheetTableApproveCellComponent } from './components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
+import { TimesheetTableLinkComponent } from './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { TimesheetDetailsService } from './services/timesheet-details.service';
 import { FileViewerModule } from '@shared/modules/file-viewer/file-viewer.module';
 import { DateRangeWeekPickerModule } from '@shared/components/date-range-week-picker/date-range-week-picker.module';
@@ -68,9 +90,7 @@ import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
 import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
 import { TimesheetsTableFiltersColumns } from './enums';
 import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
-import {
-  RejectReasonInputDialogModule,
-} from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.module';
+import { RejectReasonInputDialogModule } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.module';
 import { RecordStatusCellComponent } from './components/cell-editors/record-status-cell/record-status-cell.component';
 import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
 import { UploadDocumentsComponent } from './components/upload-documents/upload-documents.component';

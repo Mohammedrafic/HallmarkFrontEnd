@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { Store } from "@ngxs/store";
+import { Store } from '@ngxs/store';
 
 import { BehaviorSubject, distinctUntilChanged, Observable, takeUntil, throttleTime } from 'rxjs';
 
 import { RowNode } from '@ag-grid-community/core';
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-event.model';
-import { AbstractPermission } from "@shared/helpers/permissions";
+import { AbstractPermission } from '@shared/helpers/permissions';
 import { BaseObservable } from '@core/helpers';
 
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
@@ -15,6 +15,7 @@ import { TimesheetsSelectedRowEvent } from '../../interface';
 import { TimesheetsColumnsDefinition } from '../../constants';
 import { TimesheetsTableColumns } from '../../enums';
 import { GRID_CONFIG } from '@shared/constants';
+import { BreakpointObserverService } from '@core/services';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -35,15 +36,16 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
 
   @Output() readonly sortHandler: EventEmitter<string> = new EventEmitter<string>();
 
-  @Output() readonly timesheetRowSelected: EventEmitter<TimesheetsSelectedRowEvent>
-  = new EventEmitter<TimesheetsSelectedRowEvent>();
+  @Output() readonly timesheetRowSelected: EventEmitter<TimesheetsSelectedRowEvent> =
+    new EventEmitter<TimesheetsSelectedRowEvent>();
 
   @Output() readonly bulkApproveEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
 
   @Output() readonly bulkExportEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
 
-  public readonly columnDefinitions: ColumnDefinitionModel[] =
-    TimesheetsColumnsDefinition(this.router.url.includes('agency'));
+  public readonly columnDefinitions: ColumnDefinitionModel[] = TimesheetsColumnsDefinition(
+    this.router.url.includes('agency')
+  );
   public currentPageSubj: BaseObservable<number> = new BaseObservable<number>(1);
   public currentPage$: Observable<number> = this.currentPageSubj.getStream();
   public pageSize = GRID_CONFIG.initialRowsPerPage;
@@ -54,10 +56,7 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
   private readonly gridInstance$: BehaviorSubject<GridReadyEventModel | null> =
     new BehaviorSubject<GridReadyEventModel | null>(null);
 
-  constructor(
-    private router: Router,
-    protected override store: Store,
-  ) {
+  constructor(private router: Router, protected override store: Store) {
     super(store);
 
     this.isAgency = this.router.url.includes('agency');
@@ -97,20 +96,16 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
   }
 
   private columnVisibility(): void {
-    this.gridInstance$.getValue()?.columnApi
-      .setColumnVisible(
-        TimesheetsTableColumns.Approve,
-        !this.isAgency && this.activeTabIdx === 1
-      );
+    this.gridInstance$
+      .getValue()
+      ?.columnApi.setColumnVisible(TimesheetsTableColumns.Approve, !this.isAgency && this.activeTabIdx === 1);
   }
 
   private startCurrentPageWatching(): void {
-    this.currentPage$.pipe(
-      distinctUntilChanged(),
-      throttleTime(100),
-      takeUntil(this.componentDestroy())
-    ).subscribe((pageNumber) => {
-      this.changePage.emit(pageNumber);
-    });
+    this.currentPage$
+      .pipe(distinctUntilChanged(), throttleTime(100), takeUntil(this.componentDestroy()))
+      .subscribe((pageNumber) => {
+        this.changePage.emit(pageNumber);
+      });
   }
 }

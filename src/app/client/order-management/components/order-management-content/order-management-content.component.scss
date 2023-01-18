@@ -245,7 +245,7 @@
 }
 
 .grid-table-container {
-  height: 100%;
+  height: calc(98vh - 254px);
 
   &::ng-deep {
     & .e-checkbox-wrapper .e-frame.e-check {

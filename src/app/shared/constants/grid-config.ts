@@ -14,7 +14,7 @@ export const GRID_CONFIG = {
   isResizingEnabled: true,
   isWordWrappingEnabled: true,
   wordWrapSettings: { wrapMode: 'Content' } as TextWrapSettingsModel,
-  gridHeight: '660',
+  gridHeight: '640',
   fullScreenGridHeight: '100%',
   initialRowHeight: 64,
   resizeSettings: { mode: 'Auto' } as ResizeSettingsModel,

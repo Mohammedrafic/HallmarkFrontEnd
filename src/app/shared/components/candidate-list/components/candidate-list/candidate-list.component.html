@@ -78,7 +78,7 @@
       </ng-template>
     </e-column>
     <e-column headerText="Primary Skill" field="primarySkillName" [visible]="false" width=200></e-column>
-    <e-column headerText="Skill" field="candidateProfileSkills" width=200>
+    <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200>
       <ng-template #template let-data>
         <div *ngFor="let skill of (data.candidateProfileSkills || data.employeeSkills)">{{skill.skillDescription || skill}}</div>
       </ng-template>

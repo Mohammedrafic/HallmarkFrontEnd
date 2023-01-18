@@ -20,11 +20,11 @@
       padding: 0;
     }
   }
-}
 
-.e-tab_default_tab_header_items_nav.e-scroll-nav.e-scroll-left-nav.e-lib.e-touch,
-.e-tab_default_tab_header_items_nav.e-scroll-nav.e-scroll-right-nav.e-lib.e-touch {
-  display: none !important;
+  .e-tab_default_tab_header_items_nav.e-scroll-nav.e-scroll-left-nav.e-lib.e-touch,
+  .e-tab_default_tab_header_items_nav.e-scroll-nav.e-scroll-right-nav.e-lib.e-touch {
+    display: none !important;
+  }
 }
 
 .tab-item {

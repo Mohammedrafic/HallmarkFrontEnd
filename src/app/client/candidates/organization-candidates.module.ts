@@ -9,7 +9,8 @@ import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { TabsModule } from '@shared/components/tabs/tabs.module';
 import { SharedModule } from '@shared/shared.module';
 import { CandidateWorkCommitmentModule } from './candidate-work-commitment/candidate-work-commitment.module';
-import { CandidateService } from './services/candidate.service';
+import { CandidatesService } from './services/candidates.service';
+import { DepartmentsModule } from '@client/candidates/departments/departments.module';
 
 @NgModule({
   declarations: [CandidateProfileComponent, AddEditCandidateComponent],
@@ -21,10 +22,9 @@ import { CandidateService } from './services/candidate.service';
     PageToolbarModule,
     ButtonModule,
     TabsModule,
-    SharedModule
+    SharedModule,
+    DepartmentsModule,
   ],
-  providers: [
-    CandidateService
-  ]
+  providers: [CandidatesService],
 })
 export class OrganizationCandidatesModule {}

@@ -1,0 +1,27 @@
+<app-grid
+  class="department-assigned-grid"
+  *ngIf="(departmentsAssigned$ | async) as departmentsAssigned"
+  title="Department Assigned"
+  [rowSelection]="undefined"
+  [rowData]="departmentsAssigned?.items"
+  [columnDefinitions]="columnDef"
+  [totalRecordsCount]="departmentsAssigned?.items?.length!"
+>
+<!--  TODO: https://hallmarkhcs.atlassian.net/browse/EIN-8904 -->
+<!--  <app-button-->
+<!--    action-button-->
+<!--    iconName="plus"-->
+<!--    text="Assign Department"-->
+<!--    [type]="buttonType.ACTION"-->
+<!--    (clickEmitter)="showAssignDepartmentDialog()"-->
+<!--  ></app-button>-->
+</app-grid>
+
+<app-side-dialog
+  *ngIf="(selectedTab$ | async) === candidateTabsEnum.Departments"
+  [header]="sideDialogTitle$ | async"
+  (formCancelClicked)="onCancel()"
+  (formSaveClicked)="onSave()"
+>
+  <app-assign-department *ngIf="(sideDialogTitle$ | async) !== sideDialogTitleEnum.Filter"></app-assign-department>
+</app-side-dialog>

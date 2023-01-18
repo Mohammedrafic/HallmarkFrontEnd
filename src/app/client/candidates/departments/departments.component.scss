@@ -1,0 +1,11 @@
+:host {
+  height: 400px;
+}
+
+.department-assigned-grid {
+  ::ng-deep {
+    .ag-header-cell-text {
+      white-space: normal;
+    }
+  }
+}

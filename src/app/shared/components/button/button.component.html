@@ -6,7 +6,7 @@
   [tabindex]="tabindex"
   [disabled]="disabled"
 >
-  <div class="filter-button-content">
+  <div class="filter-button-content" [class.reverse]="type === buttonTypeEnum.ACTION">
     <span *ngIf="badgeText" class="e-badge e-badge-success e-badge-circle">{{ badgeText }}</span>
     <span>{{ text }}</span>
     <i-feather *ngIf="iconName" [name]="iconName" class="icon"></i-feather>

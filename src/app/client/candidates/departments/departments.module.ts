@@ -1,0 +1,43 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DepartmentsComponent } from '@client/candidates/departments/departments.component';
+import { AssignDepartmentComponent } from '@client/candidates/departments/assign-department/assign-department.component';
+import { GridModule } from '@shared/components/grid/grid.module';
+import { FeatherModule } from 'angular-feather';
+import { ButtonModule } from '@shared/components/button/button.module';
+import { SharedModule } from '@shared/shared.module';
+import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
+import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
+import { ToggleModule } from '@shared/components/form-controls/toggle/toggle.module';
+import { DepartmentsService } from '@client/candidates/departments/departments.service';
+import { SkillMatchComponent } from './grid/cell-renderers/skill-match/skill-match.component';
+import { SkillNameComponent } from './grid/cell-renderers/skill-name/skill-name.component';
+import { OrientationCompletedComponent } from './grid/cell-renderers/orientation-completed/orientation-completed.component';
+import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { MultiplePipeModule } from '@shared/pipes/multiple.pipe';
+import { JoinPipeModule } from '@shared/pipes/join.pipe';
+
+@NgModule({
+  declarations: [
+    DepartmentsComponent,
+    AssignDepartmentComponent,
+    SkillMatchComponent,
+    SkillNameComponent,
+    OrientationCompletedComponent,
+  ],
+  imports: [
+    CommonModule,
+    GridModule,
+    FeatherModule,
+    ButtonModule,
+    SharedModule,
+    MultiselectDropdownModule,
+    DatepickerModule,
+    ToggleModule,
+    TooltipContainerModule,
+    MultiplePipeModule,
+    JoinPipeModule,
+  ],
+  providers: [DepartmentsService],
+})
+export class DepartmentsModule {}

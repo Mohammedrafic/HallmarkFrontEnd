@@ -7,7 +7,6 @@
 >
   <button
     action-button
-    class="add-action"
     cssClass="e-action-button"
     ejs-button
     (click)="addNote()"
@@ -18,9 +17,10 @@
 </app-grid>
 
 <app-side-dialog
+  *ngIf="(selectedTab$ | async) === candidateTabsEnum.CandidateProfile"
   [header]="sideDialogTitle$ | async"
   (formCancelClicked)="onCancel()"
   (formSaveClicked)="onSave()"
 >
-  <app-add-edit-note *ngIf="isSideDialogOpened$ | async" #addEditNoteComponent></app-add-edit-note>
+  <app-add-edit-note #addEditNoteComponent></app-add-edit-note>
 </app-side-dialog>
