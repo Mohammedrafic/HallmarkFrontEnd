@@ -183,15 +183,18 @@ export class JobFillRatioComponent implements OnInit {
           this.filterOptionsData = data;
           this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
           this.filterColumns.skillIds.dataSource = [];
-          this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
- 
+
+          let masterSkills = this.filterOptionsData.masterSkills;
+          this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
+          let skills = masterSkills.filter((i) => i.skillCategoryId);
+          this.filterColumns.skillIds.dataSource = skills;
+         
           if (this.isInitialLoad) {
                   //ToDo: To add a spinner & may need to check if in 3seconds, skills and departments also get loaded
                   setTimeout(()=>{this.SearchReport();},3000)
                   this.isInitialLoad = false;
               }
 
-          this.fillRatioReportForm.get(accrualConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
         }
       });
       this.SetReportData();
@@ -203,6 +206,9 @@ export class JobFillRatioComponent implements OnInit {
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
       this.onFilterControlValueChangedHandler();
+      this.onFilterRegionChangedHandler();
+      this.onFilterLocationChangedHandler();
+      this.onFilterSkillCategoryChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.fillRatioReportForm.get(accrualConstants.formControlNames.BusinessIds)?.enable() : this.fillRatioReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
@@ -241,7 +247,6 @@ export class JobFillRatioComponent implements OnInit {
         this.changeDetectorRef.detectChanges();
       }
     });
-
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.isAlive = true;
@@ -279,9 +284,7 @@ export class JobFillRatioComponent implements OnInit {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          this.defaultRegions = this.regionsList.map((list) => list.id);
-          this.fillRatioReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
-          this.changeDetectorRef.detectChanges();
+          setTimeout(()=>{ this.SearchReport()},3000);
         }
         else {
           this.isClearAll = false;
@@ -289,8 +292,9 @@ export class JobFillRatioComponent implements OnInit {
         }
       }
     });
+  }
     
-
+  public onFilterRegionChangedHandler(): void {
     this.regionIdControl = this.fillRatioReportForm.get(accrualConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.regionIdControl.value.length > 0) {
@@ -298,24 +302,21 @@ export class JobFillRatioComponent implements OnInit {
         this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
-        this.defaultLocations = this.locations.map((list) => list.id);
-        this.fillRatioReportForm.get(accrualConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
-        this.changeDetectorRef.detectChanges();
       }
       else {
         this.fillRatioReportForm.get(accrualConstants.formControlNames.LocationIds)?.setValue([]);
       }
     });
+  }
+    
+  public onFilterLocationChangedHandler(): void {
     this.locationIdControl = this.fillRatioReportForm.get(accrualConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.locationIdControl.value.length > 0) {
         this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
-        this.defaultDepartments = this.departments.map((list) => list.id);
-        this.fillRatioReportForm.get(accrualConstants.formControlNames.DepartmentIds)?.setValue(this.defaultDepartments);
-        this.changeDetectorRef.detectChanges();
-      }
+       }
       else {
         this.fillRatioReportForm.get(accrualConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
@@ -324,6 +325,9 @@ export class JobFillRatioComponent implements OnInit {
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
     });
+  }
+
+  public onFilterSkillCategoryChangedHandler(): void {
     this.skillCategoryIdControl = this.fillRatioReportForm.get(accrualConstants.formControlNames.SkillCategoryIds) as AbstractControl;
     this.skillCategoryIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.skillCategoryIdControl.value.length > 0) {
@@ -331,9 +335,6 @@ export class JobFillRatioComponent implements OnInit {
         this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
         let skills = masterSkills.filter((i) => data?.includes(i.skillCategoryId));
         this.filterColumns.skillIds.dataSource = skills;
-        this.defaultSkills = skills.map((list) => list.id);
-        this.fillRatioReportForm.get(accrualConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
-        this.changeDetectorRef.detectChanges();
       }
       else {
         this.fillRatioReportForm.get(accrualConstants.formControlNames.SkillIds)?.setValue([]);
@@ -346,16 +347,6 @@ export class JobFillRatioComponent implements OnInit {
         this.selectedSkills = masterSkills?.filter((object) => data?.includes(object.id));
       }
     });
-
-    this.skillIdControl = this.fillRatioReportForm.get(accrualConstants.formControlNames.SkillIds) as AbstractControl;
-    this.skillIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (this.skillIdControl.value.length > 0) {
-        let masterSkills = this.filterOptionsData.masterSkills;
-        this.selectedSkills = masterSkills?.filter((object) => data?.includes(object.id));
-      }
-
-    });
-    
   }
 
   public SearchReport(): void {   
@@ -369,6 +360,16 @@ export class JobFillRatioComponent implements OnInit {
     let {departmentIds,locationIds,
       regionIds,skillCategoryIds,skillIds,startDate, endDate } = this.fillRatioReportForm.getRawValue();
     
+      locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length  > 0 ? this.locations.map(x=> x.id).join(",") : []); 
+      departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length  > 0 ? this.departments.map(x=> x.id).join(",") : []); 
+
+      regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
+      locationIds =      locationIds.length > 0 ? locationIds  : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
+      departmentIds =    departmentIds.length > 0 ? departmentIds : this.departmentsList?.length>0?  this.departmentsList.map(x=> x.id).join(",") :"null"; 
+      skillCategoryIds = skillCategoryIds.length > 0 ?skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; })=> x.id).join(",") : "null"; 
+      skillIds =         skillIds.length > 0 ?skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; })=> x.id).join(","):"null"; 
+
+      
     this.paramsData =
     {
 
@@ -379,11 +380,11 @@ export class JobFillRatioComponent implements OnInit {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "OrganizationsFRL":    this.selectedOrganizations.length == 0? "null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "regionFRL":            regionIds.length == 0 ? "null" :regionIds.join(","),
-      "locationFRL":          locationIds.length == 0 ? "null" :locationIds.join(","),
-      "departmentFRL":        departmentIds.length == 0 ? "null" :departmentIds.join(","),
-      "skillCategoryFRL":     skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
-      "skillFRL":             skillIds.length==0?"null":skillIds.join(","),
+      "regionFRL":            regionIds.length==0? "null" : regionIds,
+      "locationFRL":          locationIds.length==0?"null" : locationIds,
+      "departmentFRL":        departmentIds.length==0?"null" :  departmentIds,
+      "skillCategoryFRL":     skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
+      "skillFRL":             skillIds.length == 0 ? "null" : skillIds,
       "startDateFRL":   formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "endDateFRL": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
 
@@ -394,11 +395,11 @@ export class JobFillRatioComponent implements OnInit {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "OrganizationsFRLS": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "regionFRLS": regionIds.length == 0 ? "null" : regionIds.join(","),
-      "locationFRLS": locationIds.length == 0 ? "null" : locationIds.join(","),
-      "departmentFRLS": departmentIds.length == 0 ? "null" : departmentIds.join(","),
-      "skillCategoryFRLS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
-      "skillFRLS": skillIds.length == 0 ? "null" : skillIds.join(","),
+      "regionFRLS": regionIds.length==0? "null" : regionIds,
+      "locationFRLS": locationIds.length==0?"null" : locationIds,
+      "departmentFRLS": departmentIds.length==0?"null" :  departmentIds,
+      "skillCategoryFRLS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
+      "skillFRLS": skillIds.length == 0 ? "null" : skillIds,
       "startDateFRLS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "endDateFRLS": formatDate(endDate, 'MM/dd/yyyy', 'en-US')
     };
@@ -476,7 +477,7 @@ export class JobFillRatioComponent implements OnInit {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.fillRatioReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+    this.fillRatioReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue([]);
     this.fillRatioReportForm.get(accrualConstants.formControlNames.LocationIds)?.setValue([]);
     this.fillRatioReportForm.get(accrualConstants.formControlNames.DepartmentIds)?.setValue([]);
     this.fillRatioReportForm.get(accrualConstants.formControlNames.SkillCategoryIds)?.setValue([]);
@@ -484,11 +485,24 @@ export class JobFillRatioComponent implements OnInit {
     this.fillRatioReportForm.get(accrualConstants.formControlNames.StartDate)?.setValue(startDate);
     this.fillRatioReportForm.get(accrualConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.filteredItems = [];
+    this.locations =[];
+    this.departments =[];
+    this.filterColumns.locationIds.dataSource =[];
+    this.filterColumns.departmentIds.dataSource =[];
   }
+
   public onFilterApply(): void {
+    let { departmentIds, locationIds,      regionIds} = this.fillRatioReportForm.getRawValue();
+    regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
+    locationIds =      locationIds.length > 0 ?locationIds.join(",") : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
+    departmentIds =    departmentIds.length > 0 ?departmentIds.join(",") : this.departmentsList?.length>0?  this.departmentsList.map(x=> x.id).join(",") :"null"; 
+ 
+    if(!(regionIds.length >0 && locationIds.length >0 && departmentIds.length >0 ))
+    {
     this.fillRatioReportForm.markAllAsTouched();
     if (this.fillRatioReportForm?.invalid) {
       return;
+    }
     }
     this.filteredItems = [];
     this.SearchReport();

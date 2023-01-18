@@ -534,6 +534,10 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(0);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.InvoiceID)?.setValue(null);
     this.filteredItems = [];
+    this.locations =[];
+    this.departments =[];
+    this.filterColumns.locationIds.dataSource =[];
+    this.filterColumns.departmentIds.dataSource =[];
   }
 
 
