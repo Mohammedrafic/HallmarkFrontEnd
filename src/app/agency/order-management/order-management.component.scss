@@ -1,6 +1,10 @@
 @import "adaptive-response";
 @import "colors";
 
+:host{
+  height: 100%;
+}
+
 .toolbar-actions {
   display: flex;
   justify-content: flex-end;
@@ -14,6 +18,28 @@
     display: none; //TODO: temporary solution to hide the search field
     flex-grow: 1;
     max-width: 400px;
+  }
+}
+
+.grid-component {
+  height: calc(100% - 145px);
+
+  @media #{$max-tablet} {
+    height: calc(100% - 208px);
+  }
+}
+
+@media #{$min-desktop-small} {
+  ::ng-deep {
+    app-page-toolbar {
+      .controls-container {
+        flex-direction: row;
+
+        .right-content {
+          margin-top: 0;
+        }
+      }
+    }
   }
 }
 

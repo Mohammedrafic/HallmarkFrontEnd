@@ -350,7 +350,7 @@
     height: calc(100% - 80px);
 
     @media #{$max-mobile} {
-      &:has(app-order-management-content) {
+      &:has(app-order-management-content, app-order-management) {
         height: unset;
       }
     }

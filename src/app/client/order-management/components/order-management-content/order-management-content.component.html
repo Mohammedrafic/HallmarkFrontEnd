@@ -103,6 +103,9 @@
 
 <ng-container *ngIf="isIRPFlagEnabled && activeSystem !== OrderManagementIRPSystemId.VMS; else vmsGridTemplate">
   <div class="grid-table-container table-wrapper">
+    <div class="mobile-group-button" *ngIf="isMobile">
+      <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
+    </div>
     <ag-grid-angular
       [columnDefs]="columnDefs"
       [rowData]="(ordersPage$ | async)?.items"
@@ -148,6 +151,7 @@
 <ng-template #smallMenuButton>
   <ng-container *ngIf="!isActiveSystemIRP && (isMobile || isTablet)" [ngTemplateOutlet]="filterButton"></ng-container>
   <button
+    *ngIf="!isActiveSystemIRP"
     ejs-dropdownbutton
     appHideBeforeSyncfusionLoad
     [items]="smallMenu"
@@ -180,14 +184,14 @@
   <div class="mobile-group-button" *ngIf="isMobile">
     <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
   </div>
-  <section>
+  <section class="grid-component">
     <ejs-grid
       #grid
       class="e-gridwithchildrow"
       (rowDataBound)="setRowHighlight($event)"
       [dataSource]="(ordersPage$ | async)?.items"
       [pageSettings]="pageSettings"
-      [height]="isMobile ? mobileGridHeight : gridHeight"
+      [height]="isMobile ? mobileGridHeight : fullScreenGridHeight"
       [rowHeight]="rowHeight"
       [resizeSettings]="resizeSettings"
       [allowSorting]="allowSorting"

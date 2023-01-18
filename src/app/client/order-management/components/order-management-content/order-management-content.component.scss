@@ -246,6 +246,10 @@
 .grid-table-container {
   height: calc(98vh - 254px);
 
+  @media #{$max-tablet} {
+    height: calc(98vh - 330px);
+  }
+
   &::ng-deep {
     & .e-checkbox-wrapper .e-frame.e-check {
       background: $primary-active-blue-70 !important;
@@ -294,6 +298,15 @@
   padding: 8px 11px 8px 6px !important;
 }
 
+.grid-component {
+  height: calc(100% - 190px);
+  overflow-y: auto;
+
+  @media #{$max-tablet} {
+    height: calc(100% - 260px);
+  }
+}
+
 .mobile-group-button {
   display: flex;
   column-gap: 10px;
@@ -319,10 +332,6 @@
       }
     }
   }
-}
-
-@media #{$max-desktop-small} {
-
 }
 
 @media #{$max-tablet} {
