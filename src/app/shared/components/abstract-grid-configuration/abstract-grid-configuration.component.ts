@@ -286,13 +286,13 @@ export abstract class AbstractGridConfigurationComponent {
     this.openedChildRows = 0;
     this.subrowsState.forEach((item) => {
       const currentViewData = this.gridWithChildRow.currentViewData[item] as OrderManagement;
-      this.openedChildRows += currentViewData?.children?.length ?? 0;
+      this.openedChildRows += currentViewData?.reOrderCount || (currentViewData?.children?.length ?? 0);
     });
     this.setHeightForMobileGrid(this.gridWithChildRow.currentViewData.length + this.openedChildRows);
   }
 
   public setHeightForMobileGrid(itemsLength: number | undefined): void {
-    const padding = 40;
+    const padding = 60;
     const height = itemsLength ? itemsLength * this.rowHeight + padding : this.rowHeight;
     this.mobileGridHeight = String(height);
   }

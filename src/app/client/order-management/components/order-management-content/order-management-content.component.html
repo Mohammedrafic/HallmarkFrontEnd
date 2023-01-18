@@ -31,7 +31,7 @@
     <ng-container *ngIf="!isMobile">
       <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
       <button
-        *ngIf="isIRPFlagEnabled && !(isContentTabletWidth || isMiddleTabletWidth)"
+        *ngIf="!isIRPFlagEnabled && !(isContentSmallDesktop)"
         ejs-button
         appHideBeforeSyncfusionLoad
         cssClass="e-outline button-template"
@@ -39,9 +39,9 @@
       >
         <div class="filter-button-content">Templates <i-feather name="clipboard" class="icon"></i-feather></div>
       </button>
-      <ng-container *ngIf="!isMiddleTabletWidth" [ngTemplateOutlet]="filterButton"></ng-container>
+      <ng-container *ngIf="!isActiveSystemIRP && !(isContentTabletWidth || isMiddleTabletWidth)" [ngTemplateOutlet]="filterButton"></ng-container>
       <app-tooltip-container
-        *ngIf="!(isContentTabletWidth || isMiddleTabletWidth)"
+        *ngIf="!isActiveSystemIRP && !(isContentSmallDesktop || isMiddleTabletWidth)"
         [message]="toolTipMessage"
         [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
       >
@@ -60,7 +60,7 @@
         *ngIf="
           activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
           activeTab !== OrganizationOrderManagementTabs.Incomplete &&
-          !(isContentTabletWidth || isMiddleTabletWidth)
+          !isActiveSystemIRP && !(isContentSmallDesktop || isMiddleTabletWidth)
         "
         ejs-dropdownbutton
         appHideBeforeSyncfusionLoad
@@ -73,7 +73,7 @@
         <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
       </button>
 
-      <ng-container *ngIf="isContentTabletWidth || isMiddleTabletWidth" [ngTemplateOutlet]="smallMenuButton">
+      <ng-container *ngIf="!isActiveSystemIRP && (isContentSmallDesktop || isMiddleTabletWidth)" [ngTemplateOutlet]="smallMenuButton">
       </ng-container>
 
       <app-tooltip-container
@@ -149,8 +149,9 @@
 </ng-template>
 
 <ng-template #smallMenuButton>
-  <ng-container *ngIf="isMobile || isTablet" [ngTemplateOutlet]="filterButton"></ng-container>
+  <ng-container *ngIf="!isActiveSystemIRP && (isMobile || isTablet)" [ngTemplateOutlet]="filterButton"></ng-container>
   <button
+    *ngIf="!isActiveSystemIRP"
     ejs-dropdownbutton
     appHideBeforeSyncfusionLoad
     [items]="smallMenu"
@@ -183,14 +184,14 @@
   <div class="mobile-group-button" *ngIf="isMobile">
     <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
   </div>
-  <section>
+  <section class="grid-component">
     <ejs-grid
       #grid
       class="e-gridwithchildrow"
       (rowDataBound)="setRowHighlight($event)"
       [dataSource]="(ordersPage$ | async)?.items"
       [pageSettings]="pageSettings"
-      [height]="isMobile ? mobileGridHeight : gridHeight"
+      [height]="isMobile ? mobileGridHeight : fullScreenGridHeight"
       [rowHeight]="rowHeight"
       [resizeSettings]="resizeSettings"
       [allowSorting]="allowSorting"

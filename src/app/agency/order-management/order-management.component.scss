@@ -1,6 +1,10 @@
 @import "adaptive-response";
 @import "colors";
 
+:host{
+  height: 100%;
+}
+
 .toolbar-actions {
   display: flex;
   justify-content: flex-end;
@@ -14,6 +18,28 @@
     display: none; //TODO: temporary solution to hide the search field
     flex-grow: 1;
     max-width: 400px;
+  }
+}
+
+.grid-component {
+  height: calc(100% - 145px);
+
+  @media #{$max-tablet} {
+    height: calc(100% - 208px);
+  }
+}
+
+@media #{$min-desktop-small} {
+  ::ng-deep {
+    app-page-toolbar {
+      .controls-container {
+        flex-direction: row;
+
+        .right-content {
+          margin-top: 0;
+        }
+      }
+    }
   }
 }
 
@@ -31,8 +57,8 @@
   app-tab-navigation {
     position: fixed;
     background-color: $background;
-    padding-top: 10px;
-    padding-bottom: 6px;
+    margin: auto -24px;
+    padding: 10px 24px 6px 24px;
     z-index: 100;
     top: 81px;
   }

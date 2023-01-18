@@ -187,7 +187,7 @@ import {
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { BreakpointObserverService } from '@core/services';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
-import { MiddleTabletWidth, SmallDesktopWidth } from '@shared/constants/media-query-breakpoints';
+import { MiddleTabletWidth, SmallDesktopWidth, TabletWidth } from '@shared/constants/media-query-breakpoints';
 
 @Component({
   selector: 'app-order-management-content',
@@ -342,6 +342,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public isDesktop = false;
   public isContentTabletWidth = false;
   public isMiddleTabletWidth = false;
+  public isContentSmallDesktop = false;
   public gridDomLayout: 'normal' | 'autoHeight' | 'print' | undefined;
 
   private isRedirectedFromDashboard: boolean;
@@ -409,6 +410,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   get smallMenu(): any[] {
     let menu: { text: string }[] = [];
+    if(!this.isActiveSystemIRP && !this.isMobile && this.isContentTabletWidth) {
+      menu = [...menu, { text: MobileMenuItems.Filters }];
+    }
 
     if (!this.isActiveSystemIRP || !this.canCreateOrder || !this.userPermission[this.userPermissions.CanCreateOrders]) {
       menu = [...menu, { text: MobileMenuItems.Import }];
@@ -1988,8 +1992,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     );
 
     resizeToolbarObserver$.pipe(throttleTime(150), takeUntil(this.unsubscribe$)).subscribe((toolbarWidth) => {
-      const isIRP = this.activeSystem === OrderManagementIRPSystemId.IRP;
-      this.isContentTabletWidth = toolbarWidth <= SmallDesktopWidth && this.isDesktop && !isIRP;
+      this.isContentSmallDesktop = toolbarWidth <= SmallDesktopWidth && (this.isDesktop || this.isSmallDesktop);
+      this.isContentTabletWidth = toolbarWidth <= TabletWidth && !this.isTablet;
       this.isMiddleTabletWidth = toolbarWidth <= MiddleTabletWidth && (this.isTablet || this.isMobile);
       this.cd.markForCheck();
     });

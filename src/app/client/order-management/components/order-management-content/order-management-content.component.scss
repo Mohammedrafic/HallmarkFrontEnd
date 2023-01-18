@@ -189,7 +189,6 @@
 
   app-page-toolbar {
     margin-bottom: 8px;
-    border-bottom: 1px solid $secondary-dark-blue-40;
     display: block;
   }
 
@@ -247,6 +246,10 @@
 .grid-table-container {
   height: calc(98vh - 254px);
 
+  @media #{$max-tablet} {
+    height: calc(98vh - 330px);
+  }
+
   &::ng-deep {
     & .e-checkbox-wrapper .e-frame.e-check {
       background: $primary-active-blue-70 !important;
@@ -295,6 +298,15 @@
   padding: 8px 11px 8px 6px !important;
 }
 
+.grid-component {
+  height: calc(100% - 190px);
+  overflow-y: auto;
+
+  @media #{$max-tablet} {
+    height: calc(100% - 260px);
+  }
+}
+
 .mobile-group-button {
   display: flex;
   column-gap: 10px;
@@ -311,17 +323,30 @@
 ::ng-deep {
   app-page-toolbar {
     .controls-container {
+      flex-direction: row;
+
       .right-content {
         align-items: flex-end;
-        padding-bottom: 12px;
+        justify-content: flex-end;
+        padding-bottom: 6px;
       }
     }
   }
 }
 
-@media #{$max-desktop-small} {
-  .button-template {
-    margin-left: 0 !important;
+@media #{$max-tablet} {
+  ::ng-deep {
+    app-page-toolbar {
+      .controls-container {
+        flex-direction: column;
+
+        .right-content {
+          justify-content: flex-start;
+          margin-top: 12px;
+          margin-left: -10px;
+        }
+      }
+    }
   }
 }
 
@@ -331,6 +356,7 @@
   }
 
   .grid-table-container {
+    height: auto;
     margin-top: 90px;
   }
 
@@ -345,7 +371,7 @@
   }
 
   .mobile-group-button {
-    margin-top: 75px;
+    margin-top: 95px;
   }
 
   .navigation-wrapper {
