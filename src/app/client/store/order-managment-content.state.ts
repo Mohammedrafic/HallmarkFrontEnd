@@ -653,7 +653,7 @@ export class OrderManagementContentState {
   ): Observable<AssociateAgency[]> {
     return this.orderManagementService.getAssociateAgencies(lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
-        patchState({ associateAgencies: payload });
+        patchState({ associateAgencies: sortByField(payload, 'agencyName') });
       })
     );
   }
