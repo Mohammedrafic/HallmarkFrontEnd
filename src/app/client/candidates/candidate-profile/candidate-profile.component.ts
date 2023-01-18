@@ -56,7 +56,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
       return EMPTY;
     } else {
       return this.candidateProfileService
-        .saveCandidate(this.filesDetails, this.candidateId)
+        .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId)
         .pipe(takeUntil(this.destroy$));
     }
   }
