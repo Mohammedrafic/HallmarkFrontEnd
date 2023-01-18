@@ -353,6 +353,14 @@ export class SendGroupEmailComponent
     });
 
     this.store.dispatch(new GetOrganizationsStructureAll(user?.id!));
+    if(this.isBusinessFormDisabled) {
+      this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+        this.organizations = [];
+        if (data != null && data.length > 0) {
+          this.organizations = uniqBy(data, 'organizationId');
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -599,6 +607,8 @@ export class SendGroupEmailComponent
           });
         }
         if (value == 2) {
+          this.userData = [];
+          this.usersControl.patchValue([]);          
           this.isAgencyCandidatesType = true;          
           this.store.dispatch(new GetGroupEmailSkills(businessId, 1));
           this.skillData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -716,6 +726,8 @@ export class SendGroupEmailComponent
     if (isSend) {
       this.businessControl?.enable();
       this.businessUnitControl?.enable();
+      const user = this.store.selectSnapshot(UserState.user);
+      this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
       this.groupEmailTemplateForm.controls['emailTo'].disable();
       this.groupEmailTemplateForm.controls['emailCc'].enable();
       this.groupEmailTemplateForm.controls['emailSubject'].enable();
