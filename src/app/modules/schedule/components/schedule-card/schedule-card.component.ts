@@ -34,7 +34,9 @@ export class ScheduleCardComponent implements OnInit {
   }
 
   private prepareCardTitle(scheduleItem: ScheduleItem): string {
-    return this.cardConfig?.title || `${scheduleItem.location.slice(0, 3)}-${scheduleItem.department.slice(0, 3)}`;
+    return this.cardConfig?.title
+      || scheduleItem.unavailabilityReason
+      || `${scheduleItem.location.slice(0, 3)}-${scheduleItem.department.slice(0, 3)}`;
   }
 
   private prepareCardIconName(): string {

@@ -8,22 +8,21 @@
     <span class="candidate-name">{{item.candidateName}}</span>
 
     <app-icon-multi-date-picker
-      [minDate]="minDate"
-      [maxDate]="maxDate"
+      [datePickerLimitations]="datePickerLimitations"
       [datesValues]="item.selectedDates"
       (appliedDates)="updateDateItems($event, item.candidateId)"
     ></app-icon-multi-date-picker>
 
     <ng-container *ngFor="let dateItem of item.dateItems; trackBy: trackByDate">
-      <ng-container *ngIf="!!dateItem.unavailabilityReason">
-        <ejs-tooltip [showTipPointer]="false" [content]="dateItem.unavailabilityReason" position="TopCenter">
+      <ng-container *ngIf="dateItem.tooltipContent">
+        <ejs-tooltip [showTipPointer]="false" [content]="dateItem.tooltipContent" position="TopCenter">
           <ng-container
             [ngTemplateOutlet]="dateTemplate"
             [ngTemplateOutletContext]="{ item, dateItem }"
           ></ng-container>
         </ejs-tooltip>
       </ng-container>
-      <ng-container *ngIf="!dateItem.unavailabilityReason">
+      <ng-container *ngIf="!dateItem.tooltipContent">
         <ng-container
           [ngTemplateOutlet]="dateTemplate"
           [ngTemplateOutletContext]="{ item, dateItem }"

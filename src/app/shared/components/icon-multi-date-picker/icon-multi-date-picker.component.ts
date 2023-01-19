@@ -11,6 +11,7 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
+import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { CalendarComponent } from '@syncfusion/ej2-angular-calendars';
 
 import { Destroyable } from '@core/helpers';
@@ -25,8 +26,7 @@ export class IconMultiDatePickerComponent extends Destroyable implements AfterVi
   @ViewChild('inputWrapper') inputWrapper: ElementRef;
 
   @Input() datesValues: Date[] = [];
-  @Input() minDate: Date;
-  @Input() maxDate: Date;
+  @Input() datePickerLimitations: DatePickerLimitations;
 
   @Output() appliedDates: EventEmitter<Date[]> = new EventEmitter<Date[]>();
 
@@ -108,7 +108,7 @@ export class IconMultiDatePickerComponent extends Destroyable implements AfterVi
       return acc;
     }, {});
 
-    this.datesValues = this.datesValues.filter(el => appliedDatesHash[el.toISOString()]);
+    this.datesValues = this.datesValues.filter((el: Date) => appliedDatesHash[el.toISOString()]);
 
     this.isCalendarShown = false;
     this.cdr.detectChanges();

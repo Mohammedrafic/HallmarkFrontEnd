@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 
 import { DateTimeHelper } from '@core/helpers';
-import { CreateScheduleService } from 'src/app/modules/schedule/services/create-schedule.service';
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
+import { CreateScheduleService } from './create-schedule.service';
 
 @Injectable()
 export class ScheduleItemsService {
@@ -33,7 +33,7 @@ export class ScheduleItemsService {
 
     return {
       dateString: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
-      unavailabilityReason: daySchedule.unavailabilityReason,
+      tooltipContent: this.getTooltipContent(daySchedule),
       scheduleType: daySchedule.scheduleType,
       scheduleToOverrideId: daySchedule.id,
       date,
@@ -62,5 +62,27 @@ export class ScheduleItemsService {
     }
 
     return daySchedule;
+  }
+
+  private getTooltipContent(daySchedule: ScheduleInt.ScheduleItem): string {
+    const timeRange = this.getTimeRange(daySchedule.startDate, daySchedule.endDate);
+
+    if (timeRange && daySchedule.unavailabilityReason) {
+      return `${timeRange} ${daySchedule.unavailabilityReason}`;
+    }
+
+    if (timeRange) {
+      return `${timeRange}`;
+    }
+
+    return '';
+  }
+
+  private getTimeRange(startDate: string, endDate: string): string {
+    if (startDate && endDate) {
+      return `${DateTimeHelper.formatDateUTC(startDate, 'HH:mm')} - ${DateTimeHelper.formatDateUTC(endDate, 'HH:mm')}`;
+    }
+
+    return '';
   }
 }

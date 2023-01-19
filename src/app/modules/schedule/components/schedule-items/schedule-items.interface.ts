@@ -5,7 +5,7 @@ export interface DateItem {
   dateString: string;
   scheduleToOverrideId?: number;
   scheduleType?: ScheduleType;
-  unavailabilityReason?: string
+  tooltipContent?: string;
 }
 
 export interface CreateScheduleItem {

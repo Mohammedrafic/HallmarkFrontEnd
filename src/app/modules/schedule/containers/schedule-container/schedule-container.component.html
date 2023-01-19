@@ -59,8 +59,7 @@
 
 <app-create-schedule
   *ngIf="createScheduleDialogOpen"
-  [minDate]="minDate"
-  [maxDate]="maxDate"
+  [datePickerLimitations]="datePickerLimitations"
   [scheduleSelectedSlots]="scheduleSelectedSlots"
   [scheduleData]="scheduleData"
   (destroyDialog)="closeScheduleDialog()"
