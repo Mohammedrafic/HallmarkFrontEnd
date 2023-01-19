@@ -27,6 +27,7 @@ export class OrderManagementService extends DestroyableDirective {
 
   private _selectedOrderAfterRedirect: OrderTab | null;
   private orderManagementSystem: OrderManagementIRPSystemId | null;
+  private previousSelectedOrganizationId: number;
 
   constructor(
     private fb: FormBuilder
@@ -87,5 +88,11 @@ export class OrderManagementService extends DestroyableDirective {
     return this.orderManagementSystem;
   }
 
+  public setPreviousOrganizationId(id: number): void {
+    if (this.previousSelectedOrganizationId !== id) {
+      this.orderManagementSystem = null;
+    }
 
+    this.previousSelectedOrganizationId = id;
+  }
 }

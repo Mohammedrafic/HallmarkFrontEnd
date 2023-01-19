@@ -434,14 +434,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   override ngOnInit(): void {
     this.eliteOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
-    (!this.eliteOrderId)?this.eliteOrderId=0:""
+    (!this.eliteOrderId)?this.eliteOrderId=0:"";
     window.localStorage.setItem("OrderId", JSON.stringify(""));
     super.ngOnInit();
 
     this.getDeviceScreen();
     this.initResizeObserver();
     this.listenParentContainerWidth();
-    this.setPreviousSelectedSystem();
     this.watchForPermissions();
     this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
@@ -600,6 +599,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters.pageNumber = this.currentPage;
       this.filters.pageSize = this.pageSize;
       this.filters.orderType = IRPTabRequestTypeMap.get(this.activeIRPTabIndex) ?? null;
+
+      this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.IRP);
 
       this.store.dispatch(new GetIRPOrders(this.filters));
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
@@ -1295,6 +1296,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
       this.store.dispatch(new GetAssignedSkillsByOrganization());
 
+      this.orderManagementService.setPreviousOrganizationId(id);
       this.getOrganization(id);
     });
   }
@@ -1931,6 +1933,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.isOrgVMSEnabled = !!isVMCEnabled;
 
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.previousSelectedSystemId);
+
+      this.setPreviousSelectedSystem();
       this.activeSystem = this.previousSelectedSystemId
         ?? DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
 
@@ -1971,14 +1975,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private getDeviceScreen(): void {
-    this.breakpointService.getBreakpointMediaRanges().pipe(takeUntil(this.unsubscribe$)).subscribe((screen) => { 
+    this.breakpointService.getBreakpointMediaRanges().pipe(takeUntil(this.unsubscribe$)).subscribe((screen) => {
       this.isMobile = screen.isMobile;
       this.isTablet = screen.isTablet;
       this.isSmallDesktop = screen.isDesktopSmall;
       this.isDesktop = screen.isDesktopLarge;
       this.gridDomLayout = this.isMobile ? 'autoHeight' : 'normal';
       this.cd.markForCheck();
-     })
+     });
   }
 
   private initResizeObserver(): void {
