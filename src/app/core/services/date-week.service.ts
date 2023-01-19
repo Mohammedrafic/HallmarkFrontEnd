@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BaseObservable } from '@core/helpers';
-import { Observable } from 'rxjs';
+import { distinctUntilChanged, Observable } from 'rxjs';
 
 /**
  * This service used for DateWeekPickerComponent, stores selected range.
@@ -14,6 +14,9 @@ export class DateWeekService {
   }
 
   getRangeStream(): Observable<[string, string]> {
-    return this.rangeStore.getStream();
+    return this.rangeStore.getStream()
+    .pipe(
+      distinctUntilChanged((prev, next) => prev[0] === next[0] && prev[1] === next[1]),
+    );
   }
 }

@@ -27,7 +27,7 @@ import {
 } from '../../enums';
 import {
   AddSuccessMessage, BulkApproveSuccessMessage, DefaultFiltersState, DefaultTimesheetCollection, DefaultTimesheetState,
-  filteringOptionsMapping, GetBydateErrMessage, PutSuccess, SavedFiltersParams, TimesheetConfirmMessages
+  filteringOptionsMapping, GetBydateErrMessage, PutSuccess, SavedFiltersParams, TimesheetConfirmMessages,
 } from '../../constants';
 import {
   AddMileageDto,
@@ -45,7 +45,7 @@ import {
   TimesheetsFilteringOptions,
   TimesheetsFilterState,
   TimesheetStatistics,
-  UploadDialogState
+  UploadDialogState,
 } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
@@ -143,7 +143,7 @@ export class TimesheetsState {
       weekMiles,
       cumulativeMiles,
       weekCharge,
-      cumulativeCharge
+      cumulativeCharge,
     } : null;
   }
 
@@ -203,7 +203,7 @@ export class TimesheetsState {
           dispatch(new Timesheets.GetTabsCounts());
         }),
         catchError((err: HttpErrorResponse) => {
-          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
         }),
       );
   }
@@ -222,7 +222,7 @@ export class TimesheetsState {
           });
         }),
         catchError((err: HttpErrorResponse) => {
-          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
         }),
       );
   }
@@ -268,7 +268,7 @@ export class TimesheetsState {
   ): Observable<null> {
     return of(null).pipe(
       tap(() => setState(patch<TimesheetsModel>({
-        timesheetsFilters: null
+        timesheetsFilters: null,
       })))
     );
   }
@@ -286,9 +286,9 @@ export class TimesheetsState {
         });
       }),
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
-    )
+    );
   }
 
   @Action(TimesheetDetails.PutTimesheetRecords)
@@ -309,9 +309,9 @@ export class TimesheetsState {
         return ctx.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
       }),
       catchError((err: HttpErrorResponse) => {
-        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
-    )
+    );
   }
 
   @Action(Timesheets.DeleteProfileTimesheet)
@@ -322,9 +322,9 @@ export class TimesheetsState {
     return this.timesheetsApiService.deleteProfileTimesheets(profileId, profileTimesheetId)
     .pipe(
       catchError((err: HttpErrorResponse) => {
-        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
-    )
+    );
   }
 
   @Action(Timesheets.ToggleCandidateDialog)
@@ -408,14 +408,14 @@ export class TimesheetsState {
             timesheetDetails: null,
           });
 
-          return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+          return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
         }),
-      )
+      );
   }
 
   @Action(TimesheetDetails.AgencySubmitTimesheet)
   SubmitTimesheet(
-    {  dispatch }: StateContext<TimesheetsModel>,
+    ctx: StateContext<TimesheetsModel>,
     { id, orgId }: TimesheetDetails.AgencySubmitTimesheet
   ): Observable<void> {
     return this.timesheetDetailsApiService.changeTimesheetStatus({
@@ -439,7 +439,7 @@ export class TimesheetsState {
     })
     .pipe(
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
     );
   }
@@ -452,7 +452,7 @@ export class TimesheetsState {
     return this.timesheetDetailsApiService.changeTimesheetStatus(payload)
     .pipe(
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
     );
   }
@@ -466,14 +466,14 @@ export class TimesheetsState {
           downloadBlobFile(file, `empty.${payload.exportFileType === ExportedFileType.csv ? 'csv' : 'xlsx'}`);
         }),
         catchError((err: HttpErrorResponse) => {
-          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
         }),
       );
   }
 
   @Action(Timesheets.PreviewAttachment)
   PreviewAttachment(
-    { patchState, dispatch }: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { timesheetRecordId, organizationId, payload: { id, fileName } }: Timesheets.PreviewAttachment
   ): Observable<void> {
     return dispatch(
@@ -487,19 +487,19 @@ export class TimesheetsState {
         getOriginal: () => this.timesheetDetailsApiService.downloadRecordAttachment({
           timesheetRecordId,
           fileId: id,
-          organizationId
-        })
+          organizationId,
+        }),
       })
     );
   }
 
   @Action(Timesheets.DownloadRecordAttachment)
   DownloadRecordAttachment(
-    { patchState, dispatch }: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { timesheetRecordId, organizationId, payload: { id, fileName } }: Timesheets.DownloadRecordAttachment
   ): Observable<void | Blob> {
     return this.timesheetDetailsApiService.downloadRecordAttachment({
-      timesheetRecordId, fileId: id, organizationId
+      timesheetRecordId, fileId: id, organizationId,
     }).pipe(
       tap((file: Blob) => downloadBlobFile(file, fileName)),
       catchError(() => dispatch(
@@ -510,13 +510,13 @@ export class TimesheetsState {
 
   @Action(Timesheets.DeleteRecordAttachment)
   DeleteRecordAttachment(
-    { patchState, dispatch }: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { timesheetRecordId, organizationId, payload: { id } }: Timesheets.DeleteRecordAttachment
   ): Observable<void | Blob> {
     return this.timesheetDetailsApiService.deleteRecordAttachment({
       timesheetId: timesheetRecordId,
       fileId: id,
-      organizationId
+      organizationId,
     }).pipe(
       catchError(() => dispatch(
         new ShowToast(MessageTypes.Error, 'File not found')
@@ -586,8 +586,8 @@ export class TimesheetsState {
             timesheetsFiltersColumns: patch({
               [columnKey]: patch({
                 dataSource: dataSource,
-              })
-            })
+              }),
+            }),
           }))
         )
       );
@@ -633,7 +633,7 @@ export class TimesheetsState {
         catchError((err: HttpErrorResponse) => dispatch(
           new ShowToast(MessageTypes.Error, getAllErrors(err.error))
         )),
-      )
+      );
   }
 
   @Action(TimesheetDetails.NoWorkPerformed)
@@ -689,7 +689,7 @@ export class TimesheetsState {
     const stream = showWarning ? this.confirmService.confirm(TimesheetConfirmMessages.confirmBulkApprove, {
       title: 'Timesheets Approval',
       okButtonLabel: 'Yes',
-      okButtonClass: ''
+      okButtonClass: '',
     }) : of(true);
 
     return stream.pipe(
@@ -698,7 +698,7 @@ export class TimesheetsState {
       tap(() => {
         dispatch([
           new ShowToast(MessageTypes.Success, BulkApproveSuccessMessage.successMessage),
-          new Timesheets.GetAll()
+          new Timesheets.GetAll(),
         ]);
       }),
       catchError((err: HttpErrorResponse) => dispatch(
@@ -738,7 +738,7 @@ export class TimesheetsState {
           const { id, organizationId } = state.timesheetDetails as TimesheetDetailsModel;
 
           if (body.type === 2 && !timesheetDetails.mileageTimesheetId) {
-            ctx.dispatch(new Timesheets.GetAll())
+            ctx.dispatch(new Timesheets.GetAll());
           }
 
           ctx.dispatch([
@@ -750,7 +750,7 @@ export class TimesheetsState {
       catchError((err: HttpErrorResponse) => {
         return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       })
-    )
+    );
   }
 
   @Action(TimesheetDetails.GetDetailsByDate)
@@ -777,6 +777,11 @@ export class TimesheetsState {
                 statusText: '',
                 rejectionReason: undefined,
                 noWorkPerformed: false,
+                canEditMileage: false,
+                canEditTimesheet: false,
+                canApproveMileage: false,
+                canApproveTimesheet: false,
+                canUploadFiles: false,
                 isNotExist: true,
                 timesheetStatistic: {
                   cumulativeCharge: 0,
@@ -786,7 +791,7 @@ export class TimesheetsState {
                   weekHours: 0,
                   weekMiles: 0,
                   timesheetStatisticDetails: [],
-                }
+                },
               },
               timeSheetRecords: {
                 timesheets: {
@@ -801,8 +806,8 @@ export class TimesheetsState {
                   editMode: [],
                   viewMode: [],
                 },
-              }
-            })
+              },
+            });
           }
           return ctx.dispatch(new ShowToast(MessageTypes.Error, GetBydateErrMessage));
         })

@@ -154,7 +154,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
       this.minDate = null;
       this.maxDate = null;
     }
-
+    
     if (this.initDates) {
       this.startDateValue = this.initDates[0].toDateString();
       this.startDate = this.initDates[0];
@@ -166,21 +166,26 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
         DateTimeHelper.getRange(this.initDates[0], this.startDate, this.rangeType, this.firstDayOfWeek, !!this.maxDate),
         { emitEvent: false });
 
+      const firstDay = DateTimeHelper.getWeekDate(
+        this.initDates[0],
+        true,
+        this.rangeType,
+        this.firstDayOfWeek,
+        !!this.maxDate,
+      ).setHours(0, 0, 0);
+      const lastDay = DateTimeHelper.getWeekDate(
+        this.initDates[0],
+        false,
+        this.rangeType,
+        this.firstDayOfWeek,
+        !!this.maxDate,
+      ).setHours(0, 0, 0);
+      const utcStartDate = DateTimeHelper.toUtcFormat(new Date(firstDay));
+      const utcLastDate = DateTimeHelper.toUtcFormat(new Date(lastDay));
+
       this.weekService.setRange([
-        DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(
-          this.initDates[0],
-          true,
-          this.rangeType,
-          this.firstDayOfWeek,
-          !!this.maxDate,
-        )),
-        DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(
-          this.initDates[0],
-          false,
-          this.rangeType,
-          this.firstDayOfWeek,
-          !!this.maxDate,
-        )),
+        utcStartDate,
+        utcLastDate,
       ]);
     }
     this.compareDates();
@@ -219,9 +224,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     this.startDateValue = typeof value === 'string' ? DateTimeHelper.getWeekStartEnd(value)[0].toDateString()
     : value.toDateString();
 
-
     this.setRangeToService(range, value);
-
     this.compareDates();
   }
 

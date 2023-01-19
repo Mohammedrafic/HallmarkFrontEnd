@@ -9,7 +9,7 @@ import { DateWeekService } from '@core/services';
 import {
   approveTimesheetDialogData,
   orgSubmitEmptyTimesheetDialogData,
-  submitTimesheetDialogData
+  submitTimesheetDialogData,
 } from '../constants';
 import { TimesheetDetails } from '../store/actions/timesheet-details.actions';
 import { ShowToast } from '../../../store/app.actions';
@@ -35,12 +35,13 @@ export class TimesheetDetailsService {
   }
 
   public approveTimesheet(timesheetId: number, isTimesheetOrMileagesUpdate: boolean): Observable<void> {
-    const { title, submitButtonText, confirmMessage, successMessage } = approveTimesheetDialogData(isTimesheetOrMileagesUpdate);
+    const { title, submitButtonText,
+      confirmMessage, successMessage } = approveTimesheetDialogData(isTimesheetOrMileagesUpdate);
 
     return this.confirmService.confirm(confirmMessage, {
       title,
       okButtonLabel: submitButtonText,
-      okButtonClass: 'delete-button'
+      okButtonClass: 'delete-button',
     })
       .pipe(
         filter((submitted: boolean) => submitted),
@@ -57,12 +58,13 @@ export class TimesheetDetailsService {
   }
 
   public submitTimesheet(timesheetId: number, orgId: number, isTimesheetOrMileagesUpdate: boolean): Observable<void> {
-    const { title, submitButtonText, confirmMessage, successMessage } = submitTimesheetDialogData(isTimesheetOrMileagesUpdate);
+    const { title, submitButtonText, confirmMessage,
+      successMessage } = submitTimesheetDialogData(isTimesheetOrMileagesUpdate);
 
     return this.confirmService.confirm(confirmMessage, {
       title,
       okButtonLabel: submitButtonText,
-      okButtonClass: 'delete-button'
+      okButtonClass: 'delete-button',
     })
       .pipe(
         filter((submitted: boolean) => submitted),
@@ -87,7 +89,7 @@ export class TimesheetDetailsService {
     return this.confirmService.confirm(confirmMessage, {
       title,
       okButtonLabel: submitButtonText,
-      okButtonClass: ''
+      okButtonClass: '',
     });
   }
 
@@ -131,11 +133,11 @@ export class TimesheetDetailsService {
           }),
           getOriginal: () => this.timesheetDetailsApiService.downloadAttachment({
             fileId,
-            organizationId: organizationId
-          })
+            organizationId: organizationId,
+          }),
         })
-      )
-    }
+      ),
+    };
   }
 
   public watchRangeStream(): Observable<[string, string]> {
@@ -145,7 +147,7 @@ export class TimesheetDetailsService {
       distinctUntilChanged((prev, next) => {
         return (prev[0] === next[0]) || (prev[1] === next[1]);
       }),
-    )
+    );
   }
 
   public confirmTimesheetLeave(message: string): Observable<boolean> {
@@ -157,7 +159,7 @@ export class TimesheetDetailsService {
     .pipe(
       take(1),
       filter((submitted) => submitted)
-    )
+    );
   }
 
   public createChartItems(statistic: TimesheetStatisticsDetails[] | null): TimesheetStatisticsDetails[] {
@@ -178,7 +180,7 @@ export class TimesheetDetailsService {
     } else if (!statistic || !statistic.length || !chartItems || !chartItems.length) {
       chartItems = Object.keys(HourOccupationType).map((rate) => {
         return getEmptyHoursOccupationData(rate);
-      })
+      });
 
       const ItemsNumToshow = 6;
       chartItems.splice(ItemsNumToshow, chartItems.length);
