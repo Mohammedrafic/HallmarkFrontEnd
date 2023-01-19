@@ -85,7 +85,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   };
   public unsubscribe$: Subject<void> = new Subject();
   get templateEmailTitle(): string {
-    return "Send Bulk Email";
+    return "Send Group Email";
   }
 
   private gridApi: GridApi;
