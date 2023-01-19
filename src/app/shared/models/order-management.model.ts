@@ -449,6 +449,7 @@ export class Order {
   extensionPublicId?: number | null;
   hasParentExtension?: boolean;
   hasExtensions?: boolean;
+  allAgencies?: boolean;
   extensionInitialOrderPublicId?: number;
   regionName?: string;
   /**
