@@ -389,7 +389,7 @@ export class Order {
   projectNameId: number | null;
   hourlyRate: number | null;
   openPositions: number | null;
-  minYrsRequired: number | null;
+  minYrsRequired: string | null;
   joiningBonus: number | null;
   compBonus: number | null;
   duration: Duration;
