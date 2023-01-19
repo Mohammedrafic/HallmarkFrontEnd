@@ -218,12 +218,16 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     return index + config.field;
   }
 
-  private hideDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false));
-    setDataSourceValue(this.dialogConfig.fields, 'organizationTierId', []);
+  private resetToggles(): void {
     this.allRegionsChange({ checked: false });
     this.allLocationsChange({ checked: false });
     this.allDepartmentsChange({ checked: false });
+  }
+
+  private hideDialog(): void {
+    this.store.dispatch(new ShowSideDialog(false));
+    this.isTierSettingsDialog || setDataSourceValue(this.dialogConfig.fields, 'organizationTierId', []);
+    this.resetToggles();
     this.tierForm?.reset({}, {emitEvent: false});
   }
 
@@ -272,6 +276,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
       takeUntil(this.destroy$)
     ).subscribe(() => {
       this.tierForm?.reset({}, {emitEvent: false});
+      this.resetToggles();
     });
   }
 
