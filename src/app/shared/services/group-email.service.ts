@@ -53,8 +53,9 @@ export class GroupEmailService {
     const formData = new FormData();
     formData.append('file', groupEmailRequest?.selectedFile != null ? groupEmailRequest?.selectedFile : '');
     delete groupEmailRequest.selectedFile;
-    const params = new HttpParams().append('content', JSON.stringify(groupEmailRequest));
-    return this.http.post<GroupEmail>(`/api/GroupMail/creategroupmail`, formData, { params: params });
+    formData.append('content', JSON.stringify(groupEmailRequest))
+    // const params = new HttpParams().append('content', JSON.stringify(groupEmailRequest));
+    return this.http.post<GroupEmail>(`/api/GroupMail/creategroupmail`, formData);
   }
   /**
    * Get Group Email By Id
