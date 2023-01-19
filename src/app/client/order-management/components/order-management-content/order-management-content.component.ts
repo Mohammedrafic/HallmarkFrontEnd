@@ -547,8 +547,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
   }
 
-  public override updatePage(): void {
-    this.getOrders();
+  public override updatePage(clearedFilters?: boolean): void {
+    this.getOrders(clearedFilters);
   }
 
   public onAddReorderClose(): void {

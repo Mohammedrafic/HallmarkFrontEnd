@@ -416,8 +416,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       .subscribe();
   }
 
+  public override updatePage(): void {
+    this.dispatchNewPage();
+  }
+
   private dispatchNewPage(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
+    this.filters.orderBy = this.orderBy;
 
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
