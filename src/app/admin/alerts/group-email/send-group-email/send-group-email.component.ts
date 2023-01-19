@@ -296,8 +296,10 @@ export class SendGroupEmailComponent
     if (user?.businessUnitType === BusinessUnitType.MSP || 
       user?.businessUnitType === BusinessUnitType.Hallmark) {
       this.businessUnitControl.patchValue(BusinessUnitType.Organization);
+      this.businessUnitType = BusinessUnitType.Organization;
     } else {    
       this.businessUnitControl.patchValue(user?.businessUnitType);
+      this.businessUnitType = user?.businessUnitType as BusinessUnitType;
     }
     this.isBusinessUnitTypeAgency = user?.businessUnitType === BusinessUnitType.Agency;
     if (user?.businessUnitType) {
@@ -329,6 +331,10 @@ export class SendGroupEmailComponent
         this.defaultBusinessValue = data[0]?.id;
         if (!this.isBusinessFormDisabled) {
           this.defaultValue = data[0]?.id;
+        }
+        if (user?.businessUnitType === BusinessUnitType.Agency){
+          var defaultAgencies = data.map((list) => list.id);
+          this.businessesControl.setValue(defaultAgencies);
         }
       }
     });
