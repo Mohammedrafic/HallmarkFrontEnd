@@ -151,7 +151,7 @@ export class AssociateService {
   }
 
   public getTiers(payload: Partial<DepartmentsTierDTO>): Observable<TierList[]> {
-    return this.http.get<TierList[]>('/api/OrganizationTiers/byHierarchy', {params: payload});
+    return this.http.post<TierList[]>('/api/OrganizationTiers/byHierarchy', payload);
   }
 
   public saveTierException(payload: TierDTO): Observable<TierDTO> {
