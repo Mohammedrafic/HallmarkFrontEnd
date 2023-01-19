@@ -36,7 +36,7 @@ export class CredentialListService {
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       credentialTypeId: ['', Validators.required],
       expireDateApplicable: [false],
-      comment: ['', Validators.maxLength(500)],
+      comment: ['', Validators.maxLength(4000)],
     });
 
     if(isIncludeIrp && isCredentialSettings) {
