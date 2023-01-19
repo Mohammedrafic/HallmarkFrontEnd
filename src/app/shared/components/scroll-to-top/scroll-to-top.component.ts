@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, Inject, HostListener } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ButtonTypeEnum } from '../button/enums/button-type.enum';
+import { windowScrollTop } from '@shared/utils/styles.utils';
 
 @Component({
   selector: 'app-scroll-to-top',
@@ -36,13 +37,6 @@ export class ScrollToTopComponent {
   }
 
   public scrollToTop(): void {
-    const that = this;
-    (function smoothscroll() {
-      let currentScroll = that.document.documentElement.scrollTop || that.document.body.scrollTop;
-      if (currentScroll > 0) {
-        that.window.requestAnimationFrame(smoothscroll);
-        that.window.scrollTo(0, currentScroll - currentScroll / 8);
-      }
-    })();
+    windowScrollTop();
   }
 }
