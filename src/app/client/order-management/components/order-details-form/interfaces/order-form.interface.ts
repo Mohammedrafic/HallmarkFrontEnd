@@ -26,7 +26,7 @@ export interface GeneralInformationDTO {
   skillId: string;
   hourlyRate: string;
   openPositions: number;
-  minYrsRequired: number;
+  minYrsRequired: string;
   joiningBonus: number;
   compBonus: number;
   duration: string;
