@@ -388,4 +388,10 @@
       margin-bottom: 0;
     }
   }
+
+  ::ng-deep {
+    .e-ddl.e-popup.e-control.e-popup-open {
+      z-index: 1100;
+    }
+  }
 }
