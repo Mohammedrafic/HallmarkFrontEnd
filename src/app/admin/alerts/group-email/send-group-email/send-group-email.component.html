@@ -1,15 +1,9 @@
 <div [formGroup]="groupEmailTemplateForm" id="groupEmailTemplateForm" class="group-email-template-form">
     
     <!-- validation errors-->
-    <div class="alert alert-danger">
-      <div *ngIf="emailToControl.errors?.['required']">
+    <div *ngIf="isSend" class="alert alert-danger">
+      <div *ngIf="emailToControl.value == ''">
         - Field Email to is required.
-      </div>
-      <div *ngIf="emailToControl.errors?.['email']">
-        - Field Email to is not a valid email address.
-      </div>
-      <div *ngIf="emailToControl.errors?.['pattern']">
-        - Some of email(s) is not a valid email address.
       </div>
     </div>
 
@@ -46,6 +40,7 @@
                                 [fields]="optionFields"
                                 [dataSource]="businessUnits"
                                 [allowFiltering]="true"
+                                [(ngModel)]="businessUnitType"
                                 placeholder="Business Unit">
               </ejs-dropdownlist>
             </div>
@@ -59,6 +54,7 @@
                                 [dataSource]="businessData$ | async"
                                 [value]="defaultBusinessValue"
                                 [allowFiltering]="true"
+                                [(ngModel)]="businessUnit"
                                 placeholder="Business">
               </ejs-dropdownlist>
             </div>
@@ -87,6 +83,7 @@
                                 [dataSource]="filteredUserType"
                                 [value]="defaultUserType"
                                 [allowFiltering]="true"
+                                [(ngModel)]="userTypeInput"
                                 placeholder="User Type">
               </ejs-dropdownlist>
             </div>

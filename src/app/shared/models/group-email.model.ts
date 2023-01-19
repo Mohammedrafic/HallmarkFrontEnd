@@ -32,7 +32,9 @@ export type GroupEmail = {
     status:GroupMailStatus |null,
     fromMail:string | null,
     businessUnitId: number | null
-    selectedFile?: Blob | null
+    selectedFile?: Blob | null,
+    businessUnitType: number | null,
+    userType: number | null
   };
 
 export type GroupEmailRole = {

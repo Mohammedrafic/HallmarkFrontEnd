@@ -85,7 +85,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   };
   public unsubscribe$: Subject<void> = new Subject();
   get templateEmailTitle(): string {
-    return "Send Bulk Email";
+    return "Send Group Email";
   }
 
   private gridApi: GridApi;
@@ -250,7 +250,9 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         bCCList: "",
         status: GroupMailStatus.Pending,
         fromMail: this.userObj?.email == undefined ? "" : this.userObj?.email,
-        selectedFile: formValues.fileUpload
+        selectedFile: formValues.fileUpload,
+        businessUnitType: formValues.businessUnit==0?null:formValues.businessUnit,
+        userType: formValues.userType
       };
       this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));
 
@@ -351,7 +353,10 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.emailSubject = data.subjectMail;
     this.groupEmailTemplateForm.emailTo=data.toList==null?"":data.toList;
     this.groupEmailTemplateForm.emailCc=data.ccList==null?"":data.ccList;
-
+    this.groupEmailTemplateForm.businessUnitType = data.businessUnitType;
+    this.groupEmailTemplateForm.businessUnit = data.businessUnitId;    
+    this.groupEmailTemplateForm.userTypeInput = data.userType;
+    this.groupEmailTemplateForm.populateUserType();    
   }
   private ResetForm(): void {
     this.groupEmailTemplateForm.emailBody = "";
