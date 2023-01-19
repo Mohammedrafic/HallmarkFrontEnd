@@ -154,6 +154,12 @@ export class JobFillRatioComponent implements OnInit {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
+
+  public masterRegionsList: Region[] = [];
+  public masterLocationsList: Location[] = [];
+  public masterDepartmentsList: Department[] = [];
+
+
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -190,7 +196,6 @@ export class JobFillRatioComponent implements OnInit {
           this.filterColumns.skillIds.dataSource = skills;
          
           if (this.isInitialLoad) {
-                  //ToDo: To add a spinner & may need to check if in 3seconds, skills and departments also get loaded
                   setTimeout(()=>{this.SearchReport();},3000)
                   this.isInitialLoad = false;
               }
@@ -270,6 +275,11 @@ export class JobFillRatioComponent implements OnInit {
           this.regionsList = sortByField(regionsList, "name");
           this.locationsList = sortByField(locationsList, 'name');
           this.departmentsList = sortByField(departmentsList, 'name');
+
+          this.masterRegionsList = this.regionsList;
+          this.masterLocationsList = this.locationsList;
+          this.masterDepartmentsList = this.departmentsList;
+
           if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
             this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
           }
@@ -297,6 +307,10 @@ export class JobFillRatioComponent implements OnInit {
   public onFilterRegionChangedHandler(): void {
     this.regionIdControl = this.fillRatioReportForm.get(accrualConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.fillRatioReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+      this.fillRatioReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.locations = [];
+      this.departments = [];
       if (this.regionIdControl.value.length > 0) {
         let regionList = this.regions?.filter((object) => data?.includes(object.id));
         this.selectedRegions = regionList;
@@ -312,6 +326,8 @@ export class JobFillRatioComponent implements OnInit {
   public onFilterLocationChangedHandler(): void {
     this.locationIdControl = this.fillRatioReportForm.get(accrualConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.fillRatioReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.departments = [];
       if (this.locationIdControl.value.length > 0) {
         this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
@@ -487,8 +503,9 @@ export class JobFillRatioComponent implements OnInit {
     this.filteredItems = [];
     this.locations =[];
     this.departments =[];
-    this.filterColumns.locationIds.dataSource =[];
-    this.filterColumns.departmentIds.dataSource =[];
+    this.regionsList = this.masterRegionsList;
+    this.locationsList = this.masterLocationsList;
+    this.departmentsList = this.masterDepartmentsList;
   }
 
   public onFilterApply(): void {
