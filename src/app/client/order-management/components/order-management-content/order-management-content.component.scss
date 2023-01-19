@@ -307,13 +307,6 @@
   }
 }
 
-.mobile-group-button {
-  display: flex;
-  column-gap: 10px;
-  width: 100%;
-  margin-bottom: 12px;
-}
-
 .navigation-wrapper {
   display: flex;
   flex-direction: column;
@@ -371,7 +364,18 @@
   }
 
   .mobile-group-button {
-    margin-top: 95px;
+    display: flex;
+    column-gap: 10px;
+    width: 100%;
+    margin-bottom: 12px;
+
+    &.irp {
+      margin-top: 95px;
+    }
+
+    &.vms {
+      margin-top: 60px;
+    }
   }
 
   .navigation-wrapper {
