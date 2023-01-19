@@ -179,7 +179,7 @@ export abstract class AbstractGridConfigurationComponent {
     console.warn('public override defaultExport(fileType): void { }');
   }
 
-  updatePage(): void {
+  updatePage(clearedFilters?: boolean): void {
     console.warn('Override updatePage() method in child component:');
     console.warn('public override updatePage(): void { }');
   }
@@ -191,7 +191,7 @@ export abstract class AbstractGridConfigurationComponent {
     } else {
       this.orderBy = '';
     }
-    this.updatePage();
+    this.updatePage(true);
   }
 
   contentLoadedHandler(cd?: ChangeDetectorRef | null) {
