@@ -81,11 +81,12 @@ export class GroupEmailService {
    * @param regionIds
    * @param locationIds
    * @param roles
+   * @param businessUnitIds
    * @return User
    */
-  public GetGroupEmailUsersByRegionLocation(regionIds: string, locationIds: string, roles: string): Observable<User> {
+  public GetGroupEmailUsersByRegionLocation(regionIds: string, locationIds: string, roles: string, businessUnitIds: string): Observable<User> {
     return this.http.get<User>(
-      `/api/GroupMail/getinternalusers?regionIds=${regionIds}&locationIds=${locationIds}&roles=${roles}`
+      `/api/GroupMail/getinternalusers?regionIds=${regionIds}&locationIds=${locationIds}&roles=${roles}&BusinessUnitIds=${businessUnitIds == '' ? 'null' : businessUnitIds}`
     );
   }
 

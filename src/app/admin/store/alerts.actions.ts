@@ -106,7 +106,8 @@ export class GetGroupEmailInternalUsers {
   constructor(
     public regionIds: string,
     public locationIds: string,
-    public roles: string    
+    public roles: string,
+    public businessUnitIds: string
   ) { }
 }
 
