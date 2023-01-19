@@ -107,7 +107,7 @@ export type PartnershipSettings = {
 
 export interface DepartmentsTierDTO {
   organizationId: number;
-  regionIds: number[],
-  locationIds: number[],
-  departmentIds: number[],
+  regionIds: number[] | null,
+  locationIds: number[] | null,
+  departmentIds: number[] | null,
 }

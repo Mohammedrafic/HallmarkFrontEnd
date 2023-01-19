@@ -93,9 +93,9 @@ export class TierService {
   private getStructureForTierException(tier: TierDetails): TierDTO {
     return {
       tierExceptionId: tier.id,
-      regionIds: [tier.regionId],
-      locationIds: [tier.locationId],
-      departmentIds: [tier.departmentId],
+      regionIds: tier.regionId ? [tier.regionId] : null,
+      locationIds: tier.locationId ? [tier.locationId] : null,
+      departmentIds: tier.departmentId ? [tier.departmentId] : null,
       organizationTierId: tier.organizationTierId,
     }
   }
