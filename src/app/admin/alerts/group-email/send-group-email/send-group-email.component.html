@@ -1,7 +1,7 @@
 <div [formGroup]="groupEmailTemplateForm" id="groupEmailTemplateForm" class="group-email-template-form">
     
     <!-- validation errors-->
-    <div class="alert alert-danger">
+    <div *ngIf="isSend" class="alert alert-danger">
       <div *ngIf="emailToControl.value == ''">
         - Field Email to is required.
       </div>
@@ -40,6 +40,7 @@
                                 [fields]="optionFields"
                                 [dataSource]="businessUnits"
                                 [allowFiltering]="true"
+                                [(ngModel)]="businessUnitType"
                                 placeholder="Business Unit">
               </ejs-dropdownlist>
             </div>
@@ -53,6 +54,7 @@
                                 [dataSource]="businessData$ | async"
                                 [value]="defaultBusinessValue"
                                 [allowFiltering]="true"
+                                [(ngModel)]="businessUnit"
                                 placeholder="Business">
               </ejs-dropdownlist>
             </div>
@@ -81,6 +83,7 @@
                                 [dataSource]="filteredUserType"
                                 [value]="defaultUserType"
                                 [allowFiltering]="true"
+                                [(ngModel)]="userTypeInput"
                                 placeholder="User Type">
               </ejs-dropdownlist>
             </div>
