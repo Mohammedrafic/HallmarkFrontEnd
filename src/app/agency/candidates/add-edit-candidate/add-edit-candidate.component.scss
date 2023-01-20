@@ -1,6 +1,18 @@
 @import "../../../styles/variables/colors.scss";
 @import "../../../styles/variables/mixins.scss";
 
+:host {
+  height: calc(100% - 240px);
+
+  ::ng-deep {
+    ejs-tab {
+      .e-content.e-lib.e-touch {
+        height: 100% !important;
+      }
+    }
+  }
+}
+
 .candidate-message {
   display: flex;
   align-items: center;
