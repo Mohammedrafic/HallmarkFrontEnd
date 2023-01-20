@@ -23,13 +23,13 @@ import {
 } from "@agency/store/candidate.actions";
 
 import { FormControl, Validators } from '@angular/forms';
+import { DEFAULT_ZOOM } from './file-viewer.constant';
 
 interface ListBoxItem {
   name: string;
   id: number;
   category: string;
 }
-const DEFAULT_ZOOM: number = 1;
 
 @Component({
   selector: 'app-file-viewer',
@@ -149,8 +149,6 @@ export class FileViewerComponent implements OnInit, OnDestroy {
       ofActionSuccessful(GetCredentialPdfFilesSucceeded)
     ).subscribe((file: { payload: Blob }) => {
       const reader = new FileReader();
-
-      console.log(file.payload);
       //  file.payload.
       reader.readAsDataURL(file.payload);
       // Convert blob to url
@@ -210,10 +208,9 @@ export class FileViewerComponent implements OnInit, OnDestroy {
     this.zoom = zoom;   
   }
 
-  public resetZoom()
-	{
-		this.zoom = DEFAULT_ZOOM;
-	}
+  resetZoom() {
+    this.zoom = DEFAULT_ZOOM;
+  }
 
   nextPage() {
     if(this.page == this.totalPages) return;

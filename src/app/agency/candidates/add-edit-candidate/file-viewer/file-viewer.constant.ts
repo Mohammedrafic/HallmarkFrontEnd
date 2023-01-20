@@ -1,0 +1,1 @@
+export const DEFAULT_ZOOM: number = 1;
