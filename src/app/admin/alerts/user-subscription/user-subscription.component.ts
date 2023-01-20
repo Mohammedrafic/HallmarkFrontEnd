@@ -242,10 +242,15 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if (data != undefined) {
           this.userData = data.items;
-          this.defaultUserValue = data.items[0]?.id;
-        let value = this.businessForm.controls['user'].value;
-        if (value != this.userData.find(x => x.id == user?.id)?.id) {
-          this.businessForm.controls['user'].setValue(this.userData.find(x => x.id == user?.id)?.id);
+         let userValue = data.items[0]?.id;
+        if (userValue != this.userData.find(x => x.id == user?.id)?.id) {
+          if (this.userData.find(x => x.id == user?.id) != null) {
+            this.businessForm.controls['user'].setValue(this.userData.find(x => x.id == user?.id)?.id);
+          } else {
+            this.businessForm.controls['user'].setValue(userValue);
+          }
+        } else {
+          this.businessForm.controls['user'].setValue(userValue);
         }
       }
     });
@@ -282,22 +287,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       if (value == 1) {
         this.dispatchUserPage([]);
       }
-      else {
-        this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-          if (!this.isBusinessFormDisabled && data.length > 0) {
-            if (this.businessForm.controls['business'].value != data[0].id) {
-              this.businessForm.controls['business'].setValue(data[0].id);
-            }
-          }
-        });
-
-        this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-          if (data != undefined && this.userData.length > 0) {
-            if (this.businessForm.controls['user'].value != this.userData[0].id)
-              this.businessForm.controls['user'].setValue(this.userData[0].id);
-          }
-        });
-      }
+     
     });
   }
   private onBusinessValueChanged(): void {
