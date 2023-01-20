@@ -83,7 +83,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     this.confirmMessages = InvoiceConfirmMessages;
   }
 
-  public override closeDialog(): void {
+  override closeDialog(): void {
     super.closeDialog();
     this.clearDialog();
     this.dropDownOptions.reasons = [];
@@ -92,7 +92,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     this.cd.markForCheck();
   }
 
-  public saveManualInvoice(): void {
+  saveManualInvoice(): void {
     if (!this.form?.valid) {
       this.form?.updateValueAndValidity();
       this.cd.markForCheck();
@@ -121,11 +121,69 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         }
 
         this.closeDialog();
-      })
+      });
   }
 
-  public setFilesForUpload(files: FileForUpload[]): void {
+  setFilesForUpload(files: FileForUpload[]): void {
     this.filesForUpload = files;
+  }
+
+  setOrderIdOnEdit(): void {
+    if (this.invoiceToEdit) {
+      const { formattedOrderIdFull } = this.invoiceToEdit;
+
+      this.handleOrderIdChange(formattedOrderIdFull);
+    }
+  }
+
+  populateLocations(id: number): void {
+    const regions = this.store.snapshot().invoices.regions as OrganizationRegion[];
+    const [, orderId] = ManualInvoiceAdapter.parseOrderId(this.form?.get('orderId')?.value);
+
+    const candidateLocationId = this.searchOptions.find((item) => {
+      return (item.orderPublicId === orderId
+      && item.candidateId === Number(id));
+    })?.locationId;
+
+    const candidateRegion = regions.find((item) => {
+      return !!item.locations?.find((location) => location.id === candidateLocationId);
+    }) as OrganizationRegion;
+
+    const locations = InvoiceMetaAdapter.createLocationsOptions(candidateRegion?.locations || [] as OrganizationLocation[]);
+    this.dropDownOptions.invoiceLocations = sortByField(locations, 'text');
+    this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
+    if (this.postionSearch) {
+      this.form?.get('locationId')?.patchValue(this.postionSearch.locationId);
+    } else {
+      this.form?.get('locationId')?.patchValue(this.dropDownOptions.invoiceLocations[0].value);
+    }
+    this.cd.markForCheck();
+  }
+
+  deleteFile({ id }: CustomFilesPropModel): void {
+    const file = this.invoiceToEdit?.attachments.find((attachment: Attachment) => attachment.id === id);
+
+    if (file) {
+      this.filesForDelete = [...this.filesForDelete, file];
+    }
+  }
+
+  clearDialogData(): void {
+    this.invoiceToEdit = null;
+    this.filesForDelete = [];
+    this.filesForUpload = [];
+    this.dialogShown = false;
+  }
+
+  private watchForCandidate(): void {
+    this.form?.get('nameId')?.valueChanges
+    .pipe(
+      filter((value) => !!value),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((id) => {
+      this.populateLocations(id);
+    });
   }
 
   private getDialogState(): void {
@@ -236,49 +294,6 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     }
   }
 
-  public setOrderIdOnEdit(): void {
-    if (this.invoiceToEdit) {
-      const { formattedOrderIdFull } = this.invoiceToEdit;
-
-      this.handleOrderIdChange(formattedOrderIdFull);
-    }
-  }
-
-  private watchForCandidate(): void {
-    this.form?.get('nameId')?.valueChanges
-    .pipe(
-      filter((value) => !!value),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe((id) => {
-      this.populateLocations(id);
-    });
-  }
-
-  public populateLocations(id: number): void {
-    const regions = this.store.snapshot().invoices.regions as OrganizationRegion[];
-    const [, orderId] = ManualInvoiceAdapter.parseOrderId(this.form?.get('orderId')?.value);
-
-    const candidateLocationId = this.searchOptions.find((item) => {
-      return (item.orderPublicId === orderId
-      && item.candidateId === Number(id));
-    })?.locationId;
-
-    const candidateRegion = regions.find((item) => {
-      return !!item.locations?.find((location) => location.id === candidateLocationId)
-    }) as OrganizationRegion;
-
-    const locations = InvoiceMetaAdapter.createLocationsOptions(candidateRegion?.locations || [] as OrganizationLocation[]);
-    this.dropDownOptions.invoiceLocations = sortByField(locations, 'text');
-    this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
-    if (this.postionSearch) {
-      this.form?.get('locationId')?.patchValue(this.postionSearch.locationId);
-    } else {
-      this.form?.get('locationId')?.patchValue(this.dropDownOptions.invoiceLocations[0].value);
-    }
-    this.cd.markForCheck();
-  }
-
   private watchForLocation(): void {
     this.form?.controls['locationId'].valueChanges
     .pipe(
@@ -331,20 +346,5 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       this.form?.get('departmentId')?.patchValue(this.dropDownOptions.invoiceDepartments[0].value);
     }
     this.cd.markForCheck();
-  }
-
-  public deleteFile({ id }: CustomFilesPropModel): void {
-    const file = this.invoiceToEdit?.attachments.find((attachment: Attachment) => attachment.id === id);
-
-    if (file) {
-      this.filesForDelete = [...this.filesForDelete, file];
-    }
-  }
-
-  public clearDialogData(): void {
-    this.invoiceToEdit = null;
-    this.filesForDelete = [];
-    this.filesForUpload = [];
-    this.dialogShown = false;
   }
 }

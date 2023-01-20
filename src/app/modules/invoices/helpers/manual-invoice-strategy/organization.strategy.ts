@@ -82,7 +82,7 @@ export class OrganizationStrategy implements ManualInvoiceStrategy {
       )
       .pipe(
         map(() => null),
-      )
+      );
   }
 
   public connectConfigOptions(config: AddManInvoiceDialogConfig, options: ManualInvoiceInputOptions): void {

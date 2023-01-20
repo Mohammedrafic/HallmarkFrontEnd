@@ -5,22 +5,22 @@ import { InvoicesTableFiltersColumns } from '../enums';
 
 export const AGENCY_INVOICE_TABS: InvoicesTabItem[] = [
   {
-    title: 'Manual Invoice Pending'
+    title: 'Manual Invoice Pending',
   },
   {
     title: 'All Invoices',
-  }
+  },
 ];
 
 export const ORGANIZATION_INVOICE_TABS: InvoicesTabItem[] = [
   {
-    title: 'Manual Invoice Pending'
+    title: 'Pending Invoice Records',
   },
   {
-    title: 'Pending Invoice Records'
+    title: 'Manual Invoice Pending',
   },
   {
-    title: 'Pending Approval'
+    title: 'Pending Approval',
   },
   {
     title: 'Pending Payment',
@@ -29,7 +29,7 @@ export const ORGANIZATION_INVOICE_TABS: InvoicesTabItem[] = [
     title: 'Paid',
   },
   {
-    title: 'All Invoices'
+    title: 'All Invoices',
   },
 ];
 
@@ -86,3 +86,10 @@ export const InvoicesFilteringOptionsMapping: Map<FilteringInvoicesOptionsFields
   .set(FilteringInvoicesOptionsFields.Orders, InvoicesTableFiltersColumns.OrderIds)
   .set(FilteringInvoicesOptionsFields.Regions, InvoicesTableFiltersColumns.RegionsIds)
   .set(FilteringInvoicesOptionsFields.Skills, InvoicesTableFiltersColumns.SkillIds);
+
+
+export const ApproveInvoiceConfirmDialogConfig = {
+  title: 'Approve Invoice',
+  submitButtonText: 'Approve',
+  getMessage: (invoiceId: number) => `Are you sure you want to approve invoice ${invoiceId}?`,
+};

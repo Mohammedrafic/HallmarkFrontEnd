@@ -48,7 +48,6 @@ export enum INVOICES_ACTIONS {
   SetIsAgency = '[invoices] Set is agency state',
   SetPermissions = '[invoices] Set permissions',
   SetTabIndex = '[invoices] set tab index',
-  CheckManualInvoicesExist = '[invoices] check manual invoices existing',
   GetPaymentDetails = '[invoices] get payment details',
   SavePayment = '[invoices] save payment',
   OpenAddPaymentDialog = '[invoices] open add payment dialog',

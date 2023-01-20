@@ -2,10 +2,9 @@
   <ng-container left>
     <app-invoices-table-tabs
       [tabConfig]="(tabsConfig$ | async) || []"
-      (changeTab)="handleChangeTab($event)"
+      (changeTab)="selectTab($event)"
       class="tabs"
-      appTabsMobileShadow
-    >
+      appTabsMobileShadow>
     </app-invoices-table-tabs>
   </ng-container>
 
@@ -92,7 +91,7 @@
           <ejs-listbox
             [dataSource]="groupInvoicesOptions"
             [itemTemplate]="itemTemplate"
-            (change)="onInvoiceGrouping($event)"
+            (change)="selectGroupOption($event)"
           ></ejs-listbox>
 
           <ng-template #itemTemplate let-data>
@@ -139,11 +138,20 @@
 
 <section class="invoices-table-container">
   <ng-container [ngSwitch]="selectedTabIdx">
-    <ng-container
-      *ngSwitchCase="0"
-      [ngTemplateOutlet]="invoicesTable"
-      [ngTemplateOutletContext]="{ itemsData: manualInvoicesData$ | async }"
-    ></ng-container>
+
+    <ng-container *ngSwitchCase="0">
+      <ng-container
+        *ngIf="isAgency; else pendingInvoiceRecords"
+        [ngTemplateOutlet]="invoicesTable"
+        [ngTemplateOutletContext]="{ itemsData: manualInvoicesData$ | async }"
+      ></ng-container>
+      <ng-template #pendingInvoiceRecords>
+        <ng-container
+          [ngTemplateOutlet]="invoicesTable"
+          [ngTemplateOutletContext]="{ itemsData: pendingInvoicesData$ | async}"
+        ></ng-container>
+      </ng-template>
+    </ng-container>
 
     <ng-container *ngSwitchCase="1">
       <ng-container
@@ -154,7 +162,7 @@
       <ng-template #pendingInvoice>
         <ng-container
           [ngTemplateOutlet]="invoicesTable"
-          [ngTemplateOutletContext]="{ itemsData: pendingInvoicesData$ | async }"
+          [ngTemplateOutletContext]="{ itemsData: manualInvoicesData$ | async }"
         ></ng-container>
       </ng-template>
     </ng-container>
@@ -187,24 +195,24 @@
 
 <ng-template #invoicesTable let-itemsData="itemsData">
   <app-grid
-    [class.inactive]="!itemsData?.items?.length"
-    (navigateToPageEmitter)="handlePageChange($event)"
-    (pageSizeChangeEmitter)="handlePageSizeChange($event)"
-    (approveEmitter)="bulkApprove($event)"
-    (exportEmitter)="bulkExport($event)"
-    (sortChanged)="handleSortingChange($event)"
-    (multiSelectionChanged)="handleMultiSelectionChanged($event)"
-    (gridSelectedRow)="handleRowSelected($event)"
-    [suppressRowClickSelection]="false"
-    [columnDefinitions]="colDefs"
-    [isLoading]="isLoading"
-    [rowData]="itemsData?.items"
-    [totalRecordsCount]="itemsData?.totalCount || 0"
-    [changeTableSelectedIndex]="currentSelectedTableRowIndex | async"
-    [allowBulkSelection]="false"
-    [allowBulkButton]="true"
-    [rowSelection]="'multiple'"
-    [gridOptions]="gridOptions"
+          [class.inactive]="!itemsData?.items?.length"
+          (navigateToPageEmitter)="changePage($event)"
+          (pageSizeChangeEmitter)="changePageSize($event)"
+          (approveEmitter)="bulkApprove($event)"
+          (exportEmitter)="bulkExport($event)"
+          (sortChanged)="changeSorting($event)"
+          (multiSelectionChanged)="changeMultiSelection($event)"
+          (gridSelectedRow)="selectRow($event)"
+          [suppressRowClickSelection]="false"
+          [columnDefinitions]="colDefs"
+          [isLoading]="isLoading"
+          [rowData]="itemsData?.items"
+          [totalRecordsCount]="itemsData?.totalCount || 0"
+          [changeTableSelectedIndex]="currentSelectedTableRowIndex | async"
+          [allowBulkSelection]="false"
+          [allowBulkButton]="true"
+          [rowSelection]="'multiple'"
+          [gridOptions]="gridOptions"
   ></app-grid>
 </ng-template>
 
@@ -217,7 +225,7 @@
   [approveAllowed]="approveInvoiceEnabled"
   [payAllowed]="payInvoiceEnabled"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
-  (updateTable)="handleUpdateTable($event)"
+  (updateTable)="updateTable($event)"
 ></app-invoice-detail-container>
 
 <app-manual-invoice-dialog></app-manual-invoice-dialog>

@@ -1,6 +1,6 @@
 export enum OrganizationInvoicesGridTab {
-  Manual,
   PendingRecords,
+  Manual,
   PendingApproval,
   PendingPayment,
   Paid,

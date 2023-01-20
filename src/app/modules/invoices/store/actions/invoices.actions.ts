@@ -3,19 +3,9 @@ import { DataSourceItem, FileForUpload } from '@core/interface';
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { Attachment } from '@shared/components/attachments';
 import { ExportPayload } from '@shared/models/export.model';
-
-import {
-  GetPendingApprovalParams,
-  GroupInvoicesParams,
-  InvoicePaymentData,
-  InvoicePaymentGetParams,
-  InvoicePermissions,
-  InvoicesFilterState,
-  ManualInvoice,
-  ManualInvoicePostDto,ManualInvoicePutDto,
-  PaymentCreationDto,
-  PrintingPostDto,
-} from '../../interfaces';
+import { GetPendingApprovalParams, GroupInvoicesParams, InvoicePaymentData, InvoicePermissions,
+  InvoicesFilterState, ManualInvoice, ManualInvoicePostDto, ManualInvoicePutDto, PaymentCreationDto,
+  PrintingPostDto } from '../../interfaces';
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -316,14 +306,6 @@ export namespace Invoices {
 
     constructor(
       public readonly index: number) {}
-  }
-
-  export class CheckManualInvoicesExist {
-    static readonly type = INVOICES_ACTIONS.CheckManualInvoicesExist;
-
-    constructor(
-      public readonly organizationId: number,
-    ) {}
   }
 
   export class SavePayment {

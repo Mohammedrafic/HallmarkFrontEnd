@@ -8,3 +8,4 @@ export * from './add-dialog.helper';
 export * from './date.helper';
 export * from './grid-values.helper';
 export * from './destroy-dialog.helper';
+export * from './functions.helper';
