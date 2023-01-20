@@ -22,12 +22,11 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   public readonly tabsConfig = tabsConfig;
   public showButtons = true;
   public title: DialogMode;
-  public candidateName: string | null;
 
   constructor(
     private router: Router,
     public candidateProfileFormService: CandidateProfileFormService,
-    private candidatesService: CandidatesService,
+    public candidatesService: CandidatesService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private store: Store,
@@ -38,7 +37,6 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
 
   public ngOnInit(): void {
     this.subscribeOnTabUpdate();
-    this.subscribeOnCandidateNameChange();
   }
 
   public ngAfterViewInit(): void {
@@ -52,12 +50,6 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
 
   public get isCandidateFormPristine(): boolean {
     return this.candidateProfileFormService.candidateForm.pristine;
-  }
-
-  private subscribeOnCandidateNameChange(): void {
-    this.candidatesService.getCandidateName().pipe(takeUntil(this.destroy$)).subscribe(name => {
-      this.candidateName = name;
-    });
   }
 
   private subscribeOnTabUpdate(): void {
