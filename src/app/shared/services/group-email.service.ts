@@ -53,8 +53,9 @@ export class GroupEmailService {
     const formData = new FormData();
     formData.append('file', groupEmailRequest?.selectedFile != null ? groupEmailRequest?.selectedFile : '');
     delete groupEmailRequest.selectedFile;
-    const params = new HttpParams().append('content', JSON.stringify(groupEmailRequest));
-    return this.http.post<GroupEmail>(`/api/GroupMail/creategroupmail`, formData, { params: params });
+    formData.append('content', JSON.stringify(groupEmailRequest))
+    // const params = new HttpParams().append('content', JSON.stringify(groupEmailRequest));
+    return this.http.post<GroupEmail>(`/api/GroupMail/creategroupmail`, formData);
   }
   /**
    * Get Group Email By Id
@@ -81,11 +82,12 @@ export class GroupEmailService {
    * @param regionIds
    * @param locationIds
    * @param roles
+   * @param businessUnitIds
    * @return User
    */
-  public GetGroupEmailUsersByRegionLocation(regionIds: string, locationIds: string, roles: string): Observable<User> {
+  public GetGroupEmailUsersByRegionLocation(regionIds: string, locationIds: string, roles: string, businessUnitIds: string): Observable<User> {
     return this.http.get<User>(
-      `/api/GroupMail/getinternalusers?regionIds=${regionIds}&locationIds=${locationIds}&roles=${roles}`
+      `/api/GroupMail/getinternalusers?regionIds=${regionIds}&locationIds=${locationIds}&roles=${roles}&BusinessUnitIds=${businessUnitIds == '' ? 'null' : businessUnitIds}`
     );
   }
 
