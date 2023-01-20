@@ -2,6 +2,7 @@
 
 .container {
   padding-top: 24px;
+  height: calc(100% - 20px);
 
   .toolbar-buttons {
     float: right;
@@ -19,7 +20,8 @@
   margin-top: 12px;
 }
 
-.reason-form, .penalties-form {
+.reason-form,
+.penalties-form {
   margin-top: 24px;
 }
 
@@ -29,7 +31,7 @@
   .rate {
     width: 85%;
 
-    &>div {
+    & > div {
       display: flex;
 
       .left {
@@ -78,11 +80,16 @@
   }
 }
 
-
 ::ng-deep {
   .e-input.reason-textbox {
     .e-input-group.e-control-wrapper.e-multi-line-input {
       height: 103px;
+    }
+  }
+
+  ejs-tab {
+    .e-content.e-lib.e-touch {
+      height: 94% !important;
     }
   }
 }

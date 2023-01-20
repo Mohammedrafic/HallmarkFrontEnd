@@ -2,6 +2,7 @@
 
 .container {
   padding-top: 24px;
+  height: 100%;
 
   .toolbar-buttons {
     float: right;
@@ -17,6 +18,14 @@
 
     .search {
       margin-right: 12px;
+    }
+  }
+
+  ::ng-deep {
+    ejs-tab {
+      .e-content.e-lib.e-touch {
+        height: 94% !important;
+      }
     }
   }
 }

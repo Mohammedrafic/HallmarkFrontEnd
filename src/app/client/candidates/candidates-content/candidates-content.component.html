@@ -52,7 +52,7 @@
   (changeTab)="handleChangeTab($event)"
 ></app-tabs-list>
 </section>
-<section>
+<section class="grid-component">
   <app-candidate-list
     *ngIf="preferencesLoaded"
     [filteredItems$]="filteredItems$"

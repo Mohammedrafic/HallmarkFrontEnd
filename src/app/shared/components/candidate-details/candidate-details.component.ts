@@ -30,7 +30,6 @@ import { toCorrectTimezoneFormat } from '../../utils/date-time.utils';
 import { GRID_CONFIG } from '@shared/constants';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { PreservedFilters } from '@shared/models/preserved-filters.model';
-import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { Router } from '@angular/router';
 
 @Component({
