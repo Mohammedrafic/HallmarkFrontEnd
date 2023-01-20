@@ -22,10 +22,11 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   public readonly tabsConfig = tabsConfig;
   public showButtons = true;
   public title: DialogMode;
+  public candidateName$ = this.candidatesService.getCandidateName();
 
   constructor(
     private router: Router,
-    public candidateProfileFormService: CandidateProfileFormService,
+    private candidateProfileFormService: CandidateProfileFormService,
     public candidatesService: CandidatesService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
