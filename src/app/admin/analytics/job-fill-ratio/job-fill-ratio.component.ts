@@ -251,7 +251,6 @@ export class JobFillRatioComponent implements OnInit {
       }
     });
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      debugger;
       this.fillRatioReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.isAlive = true;
