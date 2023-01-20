@@ -222,9 +222,9 @@ export class JobFillRatioComponent implements OnInit {
     this.fillRatioReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        regionIds: new FormControl([], [Validators.required]),
-        locationIds: new FormControl([], [Validators.required]),
-        departmentIds: new FormControl([], [Validators.required]),
+        regionIds: new FormControl([]),
+        locationIds: new FormControl([]),
+        departmentIds: new FormControl([]),
         skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
         startDate: new FormControl(startDate, [Validators.required]),
@@ -520,17 +520,9 @@ export class JobFillRatioComponent implements OnInit {
   }
 
   public onFilterApply(): void {
-    let { departmentIds, locationIds,      regionIds} = this.fillRatioReportForm.getRawValue();
-    regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
-    locationIds =      locationIds.length > 0 ?locationIds.join(",") : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
-    departmentIds =    departmentIds.length > 0 ?departmentIds.join(",") : this.departmentsList?.length>0?  this.departmentsList.map(x=> x.id).join(",") :"null"; 
- 
-    if(!(regionIds.length >0 && locationIds.length >0 && departmentIds.length >0 ))
-    {
     this.fillRatioReportForm.markAllAsTouched();
     if (this.fillRatioReportForm?.invalid) {
       return;
-    }
     }
     this.filteredItems = [];
     this.SearchReport();
