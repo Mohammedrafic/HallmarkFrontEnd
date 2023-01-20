@@ -50,16 +50,13 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
   public regionFields = REGION_DATA_FIELDS;
-  selectedRegions: Region[]=[];
-
+  
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedLocations: Location[]=[];
-
+  
   isDepartmentsDropDownEnabled: boolean = false;
   departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedDepartments: Department[]=[];
-  agingGroupFields: FieldSettingsModel = { text: 'name', value: 'id' };
+    agingGroupFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
@@ -228,14 +225,18 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       this.locations = [];
       this.departments = [];
+
       if (this.regionIdControl.value.length > 0) {
-        let regionList = this.regions?.filter((object) => data?.includes(object.id));
-        this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
+        this.departments = this.locations.map(obj => {
+          return obj.departments.filter(department => department.locationId === obj.id);
+        }).reduce((a, b) => a.concat(b), []);
       }
       else {
+        this.filterColumns.locationIds.dataSource = [];
         this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+        this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
@@ -244,19 +245,19 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     this.locationIdControl = this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-      this.departments = [];
+     
       if (this.locationIdControl.value.length > 0) {
-        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
       }
       else {
+        this.filterColumns.departmentIds.dataSource = [];
         this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
    this.departmentIdControl = this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
+      this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
   }
 
