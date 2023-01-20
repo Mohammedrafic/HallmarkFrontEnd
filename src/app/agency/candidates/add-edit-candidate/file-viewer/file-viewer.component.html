@@ -44,25 +44,25 @@
         <div class="right">
           <div class="file-viewer">
             <div *ngIf="!imageMode" class="zoom">
-              <button class="navigation" ion-button (click)="incrementZoom(-0.1)">
+              <button class="navigation" (click)="incrementZoom(-0.1)">
                 <i-feather name="zoom-out" class="icon"></i-feather>
               </button>
-              <button class="navigation" ion-button (click)="incrementZoom(0.1)">
+              <button class="navigation" (click)="incrementZoom(0.1)">
                 <i-feather name="zoom-in" class="icon"></i-feather>
               </button>
               <button class="navigation" ion-fab mini (click)="resetZoom()">
                 <i-feather name="refresh-cw" class="icon"></i-feather>
               </button>
-              <button class="navigation" ion-button (click)="firstPage()">
+              <button class="navigation" (click)="firstPage()">
                 <i-feather name="chevrons-left" class="icon"></i-feather>
               </button>
-              <button class="navigation" ion-button (click)="prevPage()">
+              <button class="navigation" (click)="prevPage()">
                 <i-feather name="chevron-left" class="icon"></i-feather>
               </button>
-              <button class="navigation" ion-button (click)="nextPage()">
+              <button class="navigation" (click)="nextPage()">
                 <i-feather name="chevron-right" class="icon"></i-feather>
               </button>
-              <button class="navigation" ion-button (click)="lastPage()">
+              <button class="navigation" (click)="lastPage()">
                 <i-feather name="chevrons-right" class="icon"></i-feather>
               </button>
               <input class="smallimput" id="name" type="number" [formControl]="pageSelection">
