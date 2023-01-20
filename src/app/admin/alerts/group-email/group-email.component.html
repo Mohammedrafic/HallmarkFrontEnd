@@ -1,7 +1,7 @@
 <app-page-toolbar>
     <ng-container right>
       <div class="bootstrap business-dropdowns">
-        <div class="dropdown-container">
+        <div class="dropdown-container" *ngIf="userPermission[userPermissions.CanSendGroupEmail]">
           <button
           ejs-button
           id="sendGroupEmailButton"
