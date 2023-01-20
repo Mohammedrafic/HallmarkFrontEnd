@@ -40,6 +40,7 @@ import { YtdSummaryComponent } from './ytd-summary/ytd-summary.component';
 import { AccrualReportComponent } from './accrual-report/accrual-report.component';
 import { DailyOrderStatusComponent } from './daily-order-status/daily-order-status.component';
 import { CandidateStatusComponent } from './candidate-status/candidate-status.component';
+import { VendorActivityComponent } from './vendor-activity/vendor-activity.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '', pathMatch: 'full' },
@@ -309,6 +310,13 @@ const routes: Routes = [
       {
         path: 'candidate-status',
         component: CandidateStatusComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'vendor-activity',
+        component: VendorActivityComponent,
         data: {
           isOrganizationArea: true,
         }
