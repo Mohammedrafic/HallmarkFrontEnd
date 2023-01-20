@@ -145,7 +145,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   }
 
   private getCandidateName(candidate: Candidate): string {
-    return `${candidate.firstName} ${candidate.lastName}`;
+    return `${candidate.lastName}, ${candidate.firstName}`;
   }
 
   public clearForm(): void {

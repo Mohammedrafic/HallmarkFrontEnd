@@ -102,7 +102,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
         .pipe(takeUntil(this.destroy$))
         .subscribe((candidate) => {
           this.candidateProfileFormService.populateCandidateForm(candidate);
-          this.candidateService.setCandidateName(`${candidate.firstName} ${candidate.lastName}`);
+          this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
           this.generalNotesService.notes$.next(candidate.generalNotes);
         });
 
