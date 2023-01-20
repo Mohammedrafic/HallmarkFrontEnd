@@ -5,20 +5,10 @@ import type {
   Module,
   RowDragEvent,
   SelectionChangedEvent,
-  SortChangedEvent,
+  SortChangedEvent
 } from '@ag-grid-community/core';
 import { RowNode } from '@ag-grid-community/core';
-import {
-  BehaviorSubject,
-  combineLatest,
-  delay,
-  filter,
-  Observable,
-  takeUntil,
-  debounceTime,
-  Subject,
-  throttleTime,
-} from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, delay, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 
 import {
   ChangeDetectionStrategy,
@@ -29,7 +19,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
-  ViewEncapsulation,
+  ViewEncapsulation
 } from '@angular/core';
 
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
@@ -65,7 +55,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Input() public totalRecordsCount: number = 1;
   @Input() public gridOptions: GridOptions;
   @Input() public paginationPanel = true;
-  @Input() public title: string;
+  @Input() public gridTitle: string;
   @Input() public adjustColumnsWidth = false;
   @Input() public context: Object;
   @Input() public gridEmptyMessage: string = GRID_EMPTY_MESSAGE;
