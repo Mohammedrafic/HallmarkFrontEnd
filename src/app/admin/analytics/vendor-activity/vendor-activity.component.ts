@@ -4,6 +4,7 @@ import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
+import { EmitType } from '@syncfusion/ej2-base';
 import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
@@ -13,14 +14,16 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { 
-  GetCommonReportFilterOptions, GetLogiReportData, ClearLogiReportState   } from '@organization-management/store/logi-report.action';
+import {
+  GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData,
+  GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState
+} from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { analyticsConstants } from '../constants/analytics.constant';
+import { accrualConstants, analyticsConstants } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
@@ -28,8 +31,10 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
-import { AgencyDto, CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto } from '../models/common-report.model';
+import { CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SearchCandidate, SkillCategoryDto } from '../models/common-report.model';
+import { OutsideZone } from "@core/decorators";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
 
 @Component({
   selector: 'app-vendor-activity',
@@ -38,7 +43,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 })
 export class VendorActivityComponent implements OnInit {
 
-  public title: string = "Candidate Status";
+  public title: string = "Vendor Activity";
 
   public paramsData: any = {
 
@@ -46,20 +51,20 @@ export class VendorActivityComponent implements OnInit {
     "BearerParamVA": "",
     "BusinessUnitIdParamVA": "",
     "OrganizationsVA": "",
-    "regionVA":   "",
-    "locationVA":  "",
+    "regionVA": "",
+    "locationVA": "",
     "departmentVA": "",
     "agencyVA": "",
-    "skillCategoryVA":    "",
-    "skillVA":   "",
-    "startDateVA":   "",
-    "endDateVA": "",
+    "skillCategoryVA": "",
+    "skillVA": "",
+    "startDateVA": "",
+    "endDateVA": ""
   };
 
 
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/VendorActivity/VendorActivity.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/VendorActivity/VendorActivity.cat" };
-  
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateStatus/CandidateStatus.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateStatus/CandidateStatus.cat" };
+
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
 
@@ -68,8 +73,8 @@ export class VendorActivityComponent implements OnInit {
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedRegions: Region[];  
-  
+  selectedRegions: Region[];
+
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
@@ -86,17 +91,21 @@ export class VendorActivityComponent implements OnInit {
 
   @Select(LogiReportState.commonReportFilterData)
   public financialTimeSheetFilterData$: Observable<CommonReportFilterOptions>;
-  
+
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
   selectedOrganizations: Organisation[];
 
+  public agencyFields = {
+    text: 'agencyName',
+    value: 'agencyId',
+  };
+  selectedAgencies: AssociateAgencyDto[];
+  public defaultAgencyIds: (number | undefined)[] = [];
 
 
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedDepartments: Department[];
-  selectedAgencies: AgencyDto[];
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
 
@@ -116,7 +125,8 @@ export class VendorActivityComponent implements OnInit {
   public agencyIdControl: AbstractControl;
   public skillCategoryIdControl: AbstractControl;
   public skillIdControl: AbstractControl;
- 
+
+  public agencyData: AssociateAgencyDto[] = [];
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
@@ -128,7 +138,6 @@ export class VendorActivityComponent implements OnInit {
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
   public defaultDepartments: (number | undefined)[] = [];
-  public defaultAgencyIds: (number | undefined)[] = [];
   public defaultSkillCategories: (number | undefined)[] = [];
   public defaultOrderTypes: (number | undefined)[] = [];
   public defaultSkills: (number | undefined)[] = [];
@@ -142,8 +151,6 @@ export class VendorActivityComponent implements OnInit {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
-  VendorActivityesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  private fixedVendorActivityesIncluded: number[] = [1, 2, 3, 4, 5, 7, 10, 11, 12];
 
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
@@ -165,7 +172,6 @@ export class VendorActivityComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
@@ -175,21 +181,26 @@ export class VendorActivityComponent implements OnInit {
           this.filterOptionsData = data;
           this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
           this.filterColumns.skillIds.dataSource = [];
-          this.filterColumns.agencyIds.dataSource = data.agencies;
-          this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
-          this.VendorActivityReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+
           let masterSkills = this.filterOptionsData.masterSkills;
           this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
           let skills = masterSkills.filter((i) => i.skillCategoryId);
           this.filterColumns.skillIds.dataSource = skills;
 
+          this.filterColumns.agencyIds.dataSource = [];
+          this.filterColumns.agencyIds.dataSource = data?.agencies;
 
+          this.agencyIdControl = this.VendorActivityReportForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
+          let agencyIds = data?.agencies;
+          this.selectedAgencies = agencyIds;
+          this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
+          this.VendorActivityReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
 
           if (this.isInitialLoad) {
-                  //ToDo: To add a spinner & may need to check if in 3seconds, skills and departments also get loaded
-                  setTimeout(()=>{this.SearchReport();},3000)
-                  this.isInitialLoad = false;
-              }
+            //ToDo: To add a spinner & may need to check if in 3seconds, skills and departments also get loaded
+            setTimeout(() => { this.SearchReport(); }, 3000)
+            this.isInitialLoad = false;
+          }
 
         }
       });
@@ -254,7 +265,7 @@ export class VendorActivityComponent implements OnInit {
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
-          let departmentsList: Department[] = [];         
+          let departmentsList: Department[] = [];
           orgList.forEach((value) => {
             regionsList.push(...value.regions);
             locationsList = regionsList.map(obj => {
@@ -281,7 +292,7 @@ export class VendorActivityComponent implements OnInit {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          setTimeout(()=>{ this.SearchReport()},3000);
+          setTimeout(() => { this.SearchReport() }, 3000);
         }
         else {
           this.isClearAll = false;
@@ -290,7 +301,7 @@ export class VendorActivityComponent implements OnInit {
       }
     });
   }
-    
+
   public onFilterRegionChangedHandler(): void {
     this.regionIdControl = this.VendorActivityReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -305,7 +316,7 @@ export class VendorActivityComponent implements OnInit {
       }
     });
   }
-    
+
   public onFilterLocationChangedHandler(): void {
     this.locationIdControl = this.VendorActivityReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -313,7 +324,7 @@ export class VendorActivityComponent implements OnInit {
         this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
-       }
+      }
       else {
         this.VendorActivityReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
@@ -321,13 +332,6 @@ export class VendorActivityComponent implements OnInit {
     this.departmentIdControl = this.VendorActivityReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
-    });
-    this.agencyIdControl = this.VendorActivityReportForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
-    this.agencyIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (this.agencyIdControl.value.length > 0) {
-        let agencyData = this.filterOptionsData.agencies;
-        this.selectedAgencies = agencyData?.filter((object) => data?.includes(object.agencyId));
-      }
     });
   }
 
@@ -351,9 +355,18 @@ export class VendorActivityComponent implements OnInit {
         this.selectedSkills = masterSkills?.filter((object) => data?.includes(object.id));
       }
     });
+
+    this.agencyIdControl = this.VendorActivityReportForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
+    this.agencyIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.agencyIdControl.value.length > 0) {
+        let agencyIds = this.agencyData;
+        this.selectedAgencies = agencyIds?.filter((object) => data?.includes(object.agencyId));
+      }
+    });
+
   }
 
-  public SearchReport(): void {   
+  public SearchReport(): void {
     this.filteredItems = [];
     let auth = "Bearer ";
     for (let x = 0; x < window.localStorage.length; x++) {
@@ -362,17 +375,18 @@ export class VendorActivityComponent implements OnInit {
       }
     }
     let { departmentIds, locationIds, 
-      regionIds,agencyIds,skillCategoryIds,skillIds,startDate, endDate } = this.VendorActivityReportForm.getRawValue();
-    
-      locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length  > 0 ? this.locations.map(x=> x.id).join(",") : []); 
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
-      regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
-      locationIds =      locationIds.length > 0 ? locationIds  : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
-    departmentIds = departmentIds.length > 0 ? departmentIds : this.defaultAgencyIds?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
-      skillCategoryIds = skillCategoryIds.length > 0 ?skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; })=> x.id).join(",") : "null"; 
-      skillIds =         skillIds.length > 0 ?skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; })=> x.id).join(","):"null"; 
+      regionIds, skillCategoryIds, skillIds, startDate, endDate, agencyIds } = this.VendorActivityReportForm.getRawValue();
 
-      
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
+
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+    skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
+    skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
+
+
     this.paramsData =
     {
 
@@ -382,15 +396,15 @@ export class VendorActivityComponent implements OnInit {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "OrganizationsVA":    this.selectedOrganizations.length == 0? "null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "regionVA":            regionIds.length==0? "null" : regionIds,
-      "locationVA":          locationIds.length==0?"null" : locationIds,
+      "OrganizationsVA": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "regionVA": regionIds.length == 0 ? "null" : regionIds,
+      "locationVA": locationIds.length == 0 ? "null" : locationIds,
       "departmentVA": departmentIds.length == 0 ? "null" : departmentIds,
       "agencyVA": agencyIds.length == 0 ? "null" : agencyIds.join(","),
-      "skillCategoryVA":     skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
-      "skillVA":             skillIds.length == 0 ? "null" : skillIds,
-      "startDateVA":   formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "endDateVA": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "skillCategoryVA": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
+      "skillVA": skillIds.length == 0 ? "null" : skillIds,
+      "startDateVA": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "endDateVA": formatDate(endDate, 'MM/dd/yyyy', 'en-US')
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -426,6 +440,13 @@ export class VendorActivityComponent implements OnInit {
         valueField: 'name',
         valueId: 'id',
       },
+      agencyIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'agencyName',
+        valueId: 'agencyId',
+      },
       skillCategoryIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
@@ -442,20 +463,6 @@ export class VendorActivityComponent implements OnInit {
       },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      VendorActivityes: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Text,
-        dataSource: [],
-        valueField: 'statusText',
-        valueId: 'status',
-      },
-      VendorActivityFilterType: {
-        type: ControlTypes.Dropdown,
-        valueType: ValueType.Text,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
     }
   }
 
@@ -471,7 +478,7 @@ export class VendorActivityComponent implements OnInit {
 
   public showFilters(): void {
     if (this.isResetFilter) {
-    this.onFilterControlValueChangedHandler();
+      this.onFilterControlValueChangedHandler();
     }
     this.store.dispatch(new ShowFilterDialog(true));
   }
@@ -491,24 +498,23 @@ export class VendorActivityComponent implements OnInit {
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.filteredItems = [];
-    this.locations =[];
-    this.departments =[];
-    this.filterColumns.locationIds.dataSource =[];
-    this.filterColumns.departmentIds.dataSource =[];
-  } 
+    this.locations = [];
+    this.departments = [];
+    this.filterColumns.locationIds.dataSource = [];
+    this.filterColumns.departmentIds.dataSource = [];
+  }
 
   public onFilterApply(): void {
-    let { departmentIds, locationIds,      regionIds} = this.VendorActivityReportForm.getRawValue();
-    regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
-    locationIds =      locationIds.length > 0 ?locationIds.join(",") : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
-    departmentIds =    departmentIds.length > 0 ?departmentIds.join(",") : this.departmentsList?.length>0?  this.departmentsList.map(x=> x.id).join(",") :"null"; 
- 
-    if(!(regionIds.length >0 && locationIds.length >0 && departmentIds.length >0 ))
-    {
-    this.VendorActivityReportForm.markAllAsTouched();
-    if (this.VendorActivityReportForm?.invalid) {
-      return;
-    }
+    let { departmentIds, locationIds, regionIds } = this.VendorActivityReportForm.getRawValue();
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+
+    if (!(regionIds.length > 0 && locationIds.length > 0 && departmentIds.length > 0)) {
+      this.VendorActivityReportForm.markAllAsTouched();
+      if (this.VendorActivityReportForm?.invalid) {
+        return;
+      }
     }
     this.filteredItems = [];
     this.SearchReport();
