@@ -24,6 +24,23 @@
     }
   }
 
+  .zoom {
+    text-align: center;
+  }
+
+  .navigation {
+    margin: 2px;
+  }
+
+  .pdf-container {
+    display: block;
+    height: 500px;
+  }
+
+  .smallimput {
+    width: 50px !important;
+  }
+  
   .file-viewer-container {
     display: flex;
     height: 100%;

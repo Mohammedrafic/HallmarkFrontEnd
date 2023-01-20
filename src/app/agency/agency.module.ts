@@ -39,7 +39,13 @@ import {
   X,
   XCircle,
   Paperclip,
-  ArrowUp
+  ArrowUp,
+  ZoomIn,
+  ZoomOut,
+  RefreshCw,
+  ChevronLeft,
+  ChevronsLeft,
+  ChevronsRight
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxModule,
@@ -47,7 +53,6 @@ import {
   TextBoxModule,
   UploaderModule,
 } from '@syncfusion/ej2-angular-inputs';
-import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
 import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { AgencyComponent } from './agency.component';
 import { AgencyRoutingModule } from './agency-routing.module';
@@ -115,6 +120,8 @@ import { AgencyNameComponent } from './agency-list/agency-name/agency-name.compo
 import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
 import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-top.module';
 
+import { PdfViewerModule } from 'ng2-pdf-viewer';
+
 const sidebarIcons = {
   Sliders,
   Plus,
@@ -144,6 +151,12 @@ const sidebarIcons = {
   CheckCircle,
   Paperclip,
   ArrowUp,
+  ZoomIn,
+  ZoomOut,
+  RefreshCw,
+  ChevronLeft,
+  ChevronsLeft,
+  ChevronsRight,
 };
 
 @NgModule({
