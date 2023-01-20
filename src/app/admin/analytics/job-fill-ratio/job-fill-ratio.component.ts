@@ -378,7 +378,15 @@ export class JobFillRatioComponent implements OnInit {
     }
     let {departmentIds,locationIds,
       regionIds,skillCategoryIds,skillIds,startDate, endDate } = this.fillRatioReportForm.getRawValue();
-    
+
+    if (!this.fillRatioReportForm.dirty) {
+      this.message = "Default filter selected with all regions, locations and departments for 90 days";
+    }
+    else {
+      this.isResetFilter = false;
+      this.message = ""
+    }
+
       locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length  > 0 ? this.locations.map(x=> x.id).join(",") : []); 
       departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length  > 0 ? this.departments.map(x=> x.id).join(",") : []); 
 
