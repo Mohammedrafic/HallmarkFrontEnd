@@ -1,11 +1,12 @@
+<app-button-group
+  class="button-group"
+  *ngIf="isIRPFlagEnabled"
+  [buttonOptions]="systemGroupConfig"
+  (buttonChange)="buttonGroupChange($event)"
+></app-button-group>
 <app-page-toolbar>
   <ng-container left>
     <div class="navigation-wrapper" appTabsMobileShadow>
-      <app-button-group
-        *ngIf="isIRPFlagEnabled"
-        [buttonOptions]="systemGroupConfig"
-        (buttonChange)="buttonGroupChange($event)"
-      ></app-button-group>
       <div>
         <app-tabs-list
           class="table-tabs irp"
