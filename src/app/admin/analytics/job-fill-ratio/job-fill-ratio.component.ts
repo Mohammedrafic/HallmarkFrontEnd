@@ -84,14 +84,12 @@ export class JobFillRatioComponent implements OnInit {
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedRegions: Region[];  
   
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedLocations: Location[];
-
+  
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
   isDepartmentsDropDownEnabled: boolean = false;
@@ -110,7 +108,7 @@ export class JobFillRatioComponent implements OnInit {
 
 
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedDepartments: Department[];
+  
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
 
@@ -253,6 +251,7 @@ export class JobFillRatioComponent implements OnInit {
       }
     });
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.fillRatioReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.isAlive = true;
         this.previousOrgId = data;
@@ -305,41 +304,45 @@ export class JobFillRatioComponent implements OnInit {
   }
     
   public onFilterRegionChangedHandler(): void {
-    this.regionIdControl = this.fillRatioReportForm.get(accrualConstants.formControlNames.RegionIds) as AbstractControl;
+    this.regionIdControl = this.fillRatioReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.fillRatioReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
       this.fillRatioReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       this.locations = [];
       this.departments = [];
+
       if (this.regionIdControl.value.length > 0) {
-        let regionList = this.regions?.filter((object) => data?.includes(object.id));
-        this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
+        this.departments = this.locations.map(obj => {
+          return obj.departments.filter(department => department.locationId === obj.id);
+        }).reduce((a, b) => a.concat(b), []);
       }
       else {
-        this.fillRatioReportForm.get(accrualConstants.formControlNames.LocationIds)?.setValue([]);
+        this.filterColumns.locationIds.dataSource = [];
+        this.fillRatioReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+        this.fillRatioReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
     
   public onFilterLocationChangedHandler(): void {
-    this.locationIdControl = this.fillRatioReportForm.get(accrualConstants.formControlNames.LocationIds) as AbstractControl;
+    this.locationIdControl = this.fillRatioReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.fillRatioReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-      this.departments = [];
+     
       if (this.locationIdControl.value.length > 0) {
-        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
-       }
+      }
       else {
-        this.fillRatioReportForm.get(accrualConstants.formControlNames.DepartmentIds)?.setValue([]);
+        this.filterColumns.departmentIds.dataSource = [];
+        this.fillRatioReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
-    this.departmentIdControl = this.fillRatioReportForm.get(accrualConstants.formControlNames.DepartmentIds) as AbstractControl;
+   this.departmentIdControl = this.fillRatioReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
+      this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
   }
 

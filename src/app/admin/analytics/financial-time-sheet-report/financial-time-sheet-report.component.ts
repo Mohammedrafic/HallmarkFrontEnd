@@ -70,13 +70,13 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedRegions: Region[] = [];
+  
 
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedLocations: Location[] = [];
+  
 
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
@@ -104,7 +104,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  selectedDepartments: Department[] = [];
+  
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
   @Select(UserState.lastSelectedOrganizationId)
@@ -235,6 +235,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.isAlive = true;
         this.previousOrgId = data;
@@ -306,18 +307,21 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
 
     this.regionIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.departments = [];
+      this.locations = [];
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-      this.locations = [];
-      this.departments = [];
       if (this.regionIdControl.value.length > 0) {
-        let regionList = this.regions?.filter((object) => data?.includes(object.id));
-        this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
+        this.departments = this.locations.map(obj => {
+          return obj.departments.filter(department => department.locationId === obj.id);
+        }).reduce((a, b) => a.concat(b), []);
       }
       else {
+        this.filterColumns.locationIds.dataSource = [];
         this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
@@ -326,19 +330,18 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.locationIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-      this.departments = [];
       if (this.locationIdControl.value.length > 0) {
-        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
       }
       else {
+        this.filterColumns.departmentIds.dataSource = [];
         this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
     this.departmentIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
+      this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
   }
 
