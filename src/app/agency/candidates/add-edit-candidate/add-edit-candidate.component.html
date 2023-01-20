@@ -1,7 +1,7 @@
 <app-page-toolbar>
   <ng-container left>
     <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
-    <h3>{{title}} Candidate</h3>
+    <h3>{{title}} Candidate <span class="candidate-name-title">{{candidateName}}</span></h3>
     <div class="candidate-message" *ngIf="isCandidateAssigned">
       <div class="candidate-message__itm" *ngIf="candidateJob"><span>Job title:</span> {{candidateJob}}</div>
       <div class="candidate-message__itm" *ngIf="orderOrPositionId"><span>{{orderOrPositionTitle}} ID:</span> {{orderOrPositionId}}</div>

@@ -9,6 +9,7 @@ import { debounceTime, takeUntil } from 'rxjs';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { CandidatesService } from '../services/candidates.service';
 import { CandidateTabsEnum } from '@client/candidates/enums/candidate-tabs.enum';
+import { DialogMode } from '@shared/enums/dialog-mode.enum';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -20,6 +21,8 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   @ViewChild('tabs') public tabsComponent: TabsComponent<unknown>;
   public readonly tabsConfig = tabsConfig;
   public showButtons = true;
+  public title: DialogMode;
+  public candidateName: string | null;
 
   constructor(
     private router: Router,
@@ -35,16 +38,26 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
 
   public ngOnInit(): void {
     this.subscribeOnTabUpdate();
+    this.subscribeOnCandidateNameChange();
   }
 
   public ngAfterViewInit(): void {
     if (this.route.snapshot.paramMap.get('id')) {
       this.candidateProfileFormService.tabUpdate$.next(parseInt(this.route.snapshot.paramMap.get('id') as string));
+      this.title = DialogMode.Edit;
+    } else {
+      this.title = DialogMode.Add;
     }
   }
 
   public get isCandidateFormPristine(): boolean {
     return this.candidateProfileFormService.candidateForm.pristine;
+  }
+
+  private subscribeOnCandidateNameChange(): void {
+    this.candidatesService.getCandidateName().pipe(takeUntil(this.destroy$)).subscribe(name => {
+      this.candidateName = name;
+    });
   }
 
   private subscribeOnTabUpdate(): void {

@@ -65,9 +65,9 @@ export class CandidateProfileFormService {
         zipCode: [null],
         personalEmail: [
           null,
-          [Validators.required, Validators.email, Validators.maxLength(200), Validators.pattern(/\S+@\S+\.com/)],
+          [Validators.required, Validators.email, Validators.maxLength(200)],
         ],
-        workEmail: [null, [Validators.email, Validators.maxLength(200), Validators.pattern(/\S+@\S+\.com/)]],
+        workEmail: [null, [Validators.email, Validators.maxLength(200)]],
         phone1: [null, [Validators.required]],
         phone2: [null],
         professionalSummary: [null],
