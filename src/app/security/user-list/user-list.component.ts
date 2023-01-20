@@ -176,7 +176,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
         this.userSettingForm.patchValue({
           ...editedUser,
           roles: user.roles?.map((role: any) => role.id),
-        });
+        }, {emitEvent: false});
       }
 
       this.subscribeOnFieldsChanges(user);
@@ -235,8 +235,8 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
 
   private disableBussinesUnitForRole(): void {
     if (this.isBusinessFormDisabled) {
-      this.userSettingForm.get('businessUnitType')?.disable();
-      this.userSettingForm.get('businessUnitId')?.disable();
+      this.userSettingForm.get('businessUnitType')?.disable({emitEvent: false});
+      this.userSettingForm.get('businessUnitId')?.disable({emitEvent: false});
     }
   }
 
@@ -267,7 +267,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
   private subscribeOnFieldsChanges(user: User) {
     if (user.businessUnitType !== BusinessUnitType.Hallmark) {
       this.newBusinessDataPerUser$.pipe(take(2)).subscribe(() => {
-        this.userSettingForm.get('businessUnitId')?.setValue(user.businessUnitId);
+        this.userSettingForm.get('businessUnitId')?.setValue(user.businessUnitId, {emitEvent: false});
       });
     }
 
