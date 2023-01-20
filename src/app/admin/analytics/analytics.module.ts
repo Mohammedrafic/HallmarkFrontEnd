@@ -52,6 +52,8 @@ import { OvertimeComponent } from './overtime/overtime.component';
 import { FeatherModule } from 'angular-feather';
 import { AccrualReportComponent } from './accrual-report/accrual-report.component';
 import { DailyOrderStatusComponent } from './daily-order-status/daily-order-status.component';
+import { CandidateStatusComponent } from './candidate-status/candidate-status.component';
+import { VendorActivityComponent } from './vendor-activity/vendor-activity.component';
 
 
 
@@ -96,7 +98,9 @@ import { DailyOrderStatusComponent } from './daily-order-status/daily-order-stat
     OverallStatusComponent,
     OvertimeComponent,
     AccrualReportComponent,
-    DailyOrderStatusComponent  ],
+    DailyOrderStatusComponent,
+    CandidateStatusComponent,
+    VendorActivityComponent  ],
   imports: [
     CommonModule,
     SharedModule,
