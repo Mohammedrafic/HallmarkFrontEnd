@@ -18,13 +18,13 @@ export const SystemGroupConfig = (
 ): ButtonModel[] => {
   const buttons = [];
 
-  if (isIRPIncluded && isVMSIncluded) {
-    buttons.push({
-      id: OrderManagementIRPSystemId.All,
-      title: 'All',
-      disabled: true,
-    });
-  }
+  // if (isIRPIncluded && isVMSIncluded) { // TODO hide before future iterations
+  //   buttons.push({
+  //     id: OrderManagementIRPSystemId.All,
+  //     title: 'All',
+  //     disabled: true,
+  //   });
+  // }
 
   if (isIRPIncluded) {
     buttons.push({
@@ -42,13 +42,13 @@ export const SystemGroupConfig = (
     });
   }
 
-  if (isIRPIncluded && isVMSIncluded) {
-    buttons.push({
-      id: OrderManagementIRPSystemId.OrderJourney,
-      title: 'Order Journey',
-      disabled: true,
-    });
-  }
+  // if (isIRPIncluded && isVMSIncluded) { // TODO hide before future iterations
+  //   buttons.push({
+  //     id: OrderManagementIRPSystemId.OrderJourney,
+  //     title: 'Order Journey',
+  //     disabled: true,
+  //   });
+  // }
 
   return buttons;
 };
