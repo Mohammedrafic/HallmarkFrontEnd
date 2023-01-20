@@ -1,6 +1,10 @@
 @import "colors";
 @import "adaptive-response";
 
+:host {
+  height: 100%;
+}
+
 .tab-legend {
   display: flex;
   gap: 17px;
