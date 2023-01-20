@@ -31,7 +31,7 @@
     <ng-container *ngIf="!isMobile">
       <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
       <button
-        *ngIf="!isIRPFlagEnabled && !(isContentSmallDesktop)"
+        *ngIf="!isIRPFlagEnabled && !isContentSmallDesktop"
         ejs-button
         appHideBeforeSyncfusionLoad
         cssClass="e-outline button-template"
@@ -644,6 +644,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.regionIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -659,6 +660,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.locationIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -676,6 +678,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.departmentsIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -693,6 +696,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.agencyIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -710,6 +714,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.skillIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -732,6 +737,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.orderTypes.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -750,6 +756,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.orderStatuses.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -765,6 +772,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.candidateStatuses.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -782,6 +790,7 @@
             [dataSource]="filterColumns.projectTypeIds.dataSource"
             [fields]="specialProjectCategoriesFields"
             [showDropDownIcon]="true"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -799,6 +808,7 @@
             [dataSource]="filterColumns.projectNameIds.dataSource"
             [fields]="projectNameFields"
             [showDropDownIcon]="true"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -814,6 +824,7 @@
             [dataSource]="filterColumns.poNumberIds.dataSource"
             [fields]="poNumberFields"
             [showDropDownIcon]="true"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -1032,6 +1043,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.regionIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -1047,6 +1059,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.locationIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -1064,6 +1077,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.departmentsIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>
@@ -1081,6 +1095,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.skillIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
         </div>

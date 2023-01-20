@@ -10,6 +10,8 @@
         [dataSource]="customRowsPerPageDropDownObject || gridConfig.rowsPerPageDropDownObject"
         [fields]="perPageFieldsSettings"
         [formGroupInstance]="paginationFormGroup"
+        [allowFiltering]="!(isMobile || isTablet)"
+        (openDropdown)="openDropdownPopup($event)"
         class="app-grid-pagination__rows-options"
         controlName="pageSize"
       ></app-dropdown>

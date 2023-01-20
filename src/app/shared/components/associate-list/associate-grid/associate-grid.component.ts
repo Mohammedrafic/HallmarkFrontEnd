@@ -1,12 +1,14 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import {
+  AbstractGridConfigurationComponent,
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import PriceUtils from '@shared/utils/price.utils';
 import { JOB_DISTRIBUTION_COLUMNS } from '@shared/components/associate-list/associate-grid/associated-org-grid.constant';
 import {
   AssociateOrganizationsAgency,
   AssociateOrganizationsAgencyPage,
 } from '@shared/models/associate-organizations.model';
-import { DistributionLevels, PartnershipStatus } from '@shared/enums/partnership-settings';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
 import { combineLatest, debounceTime, filter, Observable, Subject, takeWhile } from 'rxjs';
@@ -48,9 +50,6 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   public readonly agencyStatus = AgencyStatus;
   public jobDistributionColumns = JOB_DISTRIBUTION_COLUMNS;
   public openAssociateOrgAgencyDialog = new EventEmitter<boolean>();
-  public tierValueAccess = (_: string, { tier }: AssociateOrganizationsAgency) => {
-    return DistributionLevels[tier];
-  };
   public partnershipStatusValueAccess = (_: string, { partnershipStatus }: AssociateOrganizationsAgency) => {
     return PartnershipStatus[partnershipStatus];
   };

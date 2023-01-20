@@ -10,7 +10,7 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { Observable } from 'rxjs';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
-import { JobDistributionModel } from '@shared/models/job-distribution.model';
+import { getAgencyNameList } from '@shared/components/general-reorder-info/general-reoder-info.helper';
 
 @Component({
   selector: 'app-general-reorder-info',
@@ -47,22 +47,7 @@ export class GeneralReorderInfoComponent extends DestroyableDirective implements
   }
 
   public getAgencyNames(): { name: string; tooltip: string } {
-    const numberOfAgency = this.orderInformation.jobDistributions?.length;
-    const agenciesWithSeparator = this.orderInformation.jobDistributions
-      ?.map(({ agencyName }: any) => agencyName)
-      .join(', ');
-    const hasAgency = this.isJobDistributionHasAgency(this.orderInformation.jobDistributions);
-
-    switch (true) {
-      case numberOfAgency === 1 && hasAgency:
-        return { name: this.orderInformation.jobDistributions[0].agencyName!, tooltip: '' };
-      case numberOfAgency === 2 && hasAgency:
-        return { name: agenciesWithSeparator, tooltip: '' };
-      case numberOfAgency >= 3 && hasAgency:
-        return { name: `Multiple Agencies ${numberOfAgency}`, tooltip: agenciesWithSeparator };
-      default:
-        return { name: 'All', tooltip: '' };
-    }
+    return getAgencyNameList(this.orderInformation);
   }
 
   public moveToPerDiem(): void {
@@ -75,11 +60,5 @@ export class GeneralReorderInfoComponent extends DestroyableDirective implements
       this.orderManagementService.orderPerDiemId$
       .next({id: this.orderInformation.reOrderFrom?.publicId!, prefix: this.orderInformation.organizationPrefix!});
     }
-  }
-
-  private isJobDistributionHasAgency(jobDistributions: JobDistributionModel[]): boolean {
-    return jobDistributions.every((distribution: JobDistributionModel) => {
-      return distribution.agencyName !== null;
-    });
   }
 }

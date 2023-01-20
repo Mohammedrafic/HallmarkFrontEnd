@@ -6,8 +6,8 @@
   <ejs-calendar
     #ejCalendar
     *ngIf="isCalendarShown"
-    [min]="minDate"
-    [max]="maxDate"
+    [min]="datePickerLimitations.minDate"
+    [max]="datePickerLimitations.maxDate"
     [values]="datesValues"
     [isMultiSelection]="true"
     [showTodayButton]="false"

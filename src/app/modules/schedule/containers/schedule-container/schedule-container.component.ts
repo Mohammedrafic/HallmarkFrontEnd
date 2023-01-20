@@ -4,6 +4,7 @@ import { Store } from '@ngxs/store';
 import { Observable, switchMap, takeUntil } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
+import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { Destroyable } from '@core/helpers';
 
@@ -39,8 +40,7 @@ export class ScheduleContainerComponent extends Destroyable {
 
   scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
 
-  minDate: Date;
-  maxDate: Date;
+  datePickerLimitations: DatePickerLimitations;
 
   private selectedCandidate: ScheduleInt.ScheduleCandidate | null;
 
@@ -186,8 +186,10 @@ export class ScheduleContainerComponent extends Destroyable {
 
   private setDateLimitation(): void {
     if (this.scheduleFilters.startDate && this.scheduleFilters.endDate) {
-      this.minDate = new Date(this.scheduleFilters.startDate);
-      this.maxDate = new  Date(this.scheduleFilters.endDate);
+      this.datePickerLimitations = {
+        minDate: new Date(this.scheduleFilters.startDate),
+        maxDate: new  Date(this.scheduleFilters.endDate),
+      };
     }
   }
 }

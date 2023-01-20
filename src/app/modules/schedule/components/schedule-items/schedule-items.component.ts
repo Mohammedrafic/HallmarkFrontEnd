@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { DateTimeHelper } from '@core/helpers';
-import { ScheduleItemsService } from 'src/app/modules/schedule/services/schedule-items.service';
+import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
+import { ScheduleItemsService } from '../../services/schedule-items.service';
 import { DateItem, CreateScheduleItem } from './schedule-items.interface';
 import { ScheduleType } from '../../enums';
 import { ScheduleSelectedSlots } from '../../interface';
@@ -13,8 +14,7 @@ import { ScheduleSelectedSlots } from '../../interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleItemsComponent {
-  @Input() minDate: Date;
-  @Input() maxDate: Date;
+  @Input() datePickerLimitations: DatePickerLimitations;
   @Input() set scheduleSelectedSlots(scheduleSelectedSlots: ScheduleSelectedSlots) {
     if (scheduleSelectedSlots.candidates.length) {
       this.scheduleItems = this.scheduleItemsService.getScheduleItems(scheduleSelectedSlots);

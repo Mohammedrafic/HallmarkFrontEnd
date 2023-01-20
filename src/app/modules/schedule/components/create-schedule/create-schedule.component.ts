@@ -10,20 +10,21 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { FormControl } from "@angular/forms";
+import { FormControl } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { ChangeArgs } from "@syncfusion/ej2-angular-buttons";
-import { catchError, filter, map, Subscription, take, takeUntil, tap } from "rxjs";
+import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
+import { catchError, filter, map, Subscription, take, takeUntil, tap } from 'rxjs';
 
-import { FieldType } from "@core/enums";
-import { DestroyDialog } from "@core/helpers";
-import { CustomFormGroup, DropdownOption } from "@core/interface";
-import { GlobalWindow } from "@core/tokens";
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED, RECORDS_ADDED } from "@shared/constants";
+import { FieldType } from '@core/enums';
+import { DestroyDialog } from '@core/helpers';
+import { CustomFormGroup, DropdownOption } from '@core/interface';
+import { GlobalWindow } from '@core/tokens';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED, RECORDS_ADDED } from '@shared/constants';
+import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
-import { ConfirmService } from "@shared/services/confirm.service";
+import { ConfirmService } from '@shared/services/confirm.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShiftsService } from '@shared/services/shift.service';
 import { convertMsToTime, getHoursMinutesSeconds, getTime } from '@shared/utils/date-time.utils';
@@ -33,9 +34,9 @@ import {
   ScheduleTypeNumber,
   ScheduleTypes,
   UnavailabilityFormConfig,
-} from "src/app/modules/schedule/constants";
-import { CreateScheduleService } from "src/app/modules/schedule/services/create-schedule.service";
-import { ShowToast } from 'src/app/store/app.actions';
+} from '../../constants';
+import { CreateScheduleService } from '../../services/create-schedule.service';
+import { ShowToast } from '../../../../store/app.actions';
 import { ScheduleItemsComponent } from '../schedule-items/schedule-items.component';
 import { ScheduleApiService } from '../../services';
 import * as ScheduleInt from '../../interface';
@@ -50,8 +51,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   @ViewChild(ScheduleItemsComponent) scheduleItemsComponent: ScheduleItemsComponent;
 
   @Input() scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
-  @Input() minDate: Date;
-  @Input() maxDate: Date;
+  @Input() datePickerLimitations: DatePickerLimitations;
   @Input() set scheduleData(page: ScheduleInt.ScheduleModelPage) {
     this.createScheduleService.scheduleData = page.items;
   }

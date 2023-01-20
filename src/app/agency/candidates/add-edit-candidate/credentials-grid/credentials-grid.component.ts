@@ -576,8 +576,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.actions$
       .pipe(ofActionSuccessful(DownloadCredentialFilesSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((payload: { file: Blob; candidateName: string }) => {
-        const dateTime = DateTimeHelper.formatDateUTC(DateTimeHelper.toUtcFormat(new Date()), 'MM/dd/YYYY HH:mm');
-        downloadBlobFile(payload.file, `${payload.candidateName} Credentials ${dateTime}.zip`);
+        let dateTime = DateTimeHelper.formatDateUTC(DateTimeHelper.toUtcFormat(new Date()), 'MM/dd/YYYY HH:mm');
+        dateTime=dateTime.replace(/[/: ]/g, '_');
+        downloadBlobFile(payload.file, `${payload.candidateName} Credentials ${dateTime}.pdf`);
       });
   }
 

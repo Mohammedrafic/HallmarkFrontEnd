@@ -1,8 +1,9 @@
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
 
 import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
 import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { PopupEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-dropdown',
@@ -17,4 +18,7 @@ export class DropdownComponent extends BaseFormControlDirective {
   @Input() public dataSource: unknown | null | undefined;
   @Input() public fields: FieldSettingsModel;
   @Input() public hideBorder = true;
+  @Input() public allowFiltering = true;
+
+  @Output() public openDropdown: EventEmitter<PopupEventArgs> = new EventEmitter();
 }

@@ -1,38 +1,33 @@
-import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { formatDate } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
   Input, OnInit, Output, ViewChild } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { BreakpointObserver } from '@angular/cdk/layout';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 
+import { FileExtensionsString } from '@core/constants';
+import { DialogAction, FileSize } from '@core/enums';
+import { DateTimeHelper } from '@core/helpers';
+import { FileForUpload, Permission } from '@core/interface';
+import { Select, Store } from '@ngxs/store';
+import { Attachment, AttachmentsListConfig } from '@shared/components/attachments';
+import { UploadFileAreaComponent } from '@shared/components/upload-file-area/upload-file-area.component';
+import { GRID_CONFIG } from '@shared/constants';
+import { DatesRangeType } from '@shared/enums';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
+import { MessageTypes } from '@shared/enums/message-types';
+import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
+import { AgencyStatus } from '@shared/enums/status';
+import { AbstractPermission } from "@shared/helpers/permissions";
+import { ExportColumn, ExportPayload } from '@shared/models/export.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
+import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
+import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { combineLatest, distinctUntilChanged, filter, map, Observable,
   switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
-import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
-import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
-import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
-
-import { DateTimeHelper } from '@core/helpers';
-import { DialogAction, FileSize } from '@core/enums';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { MessageTypes } from '@shared/enums/message-types';
-import { ExportColumn, ExportPayload } from '@shared/models/export.model';
-import { Attachment, AttachmentsListConfig } from '@shared/components/attachments';
-import { TimesheetTargetStatus, TIMETHEETS_STATUSES } from '../../enums';
-import { Timesheets } from '../../store/actions/timesheets.actions';
-import { TimesheetsState } from '../../store/state/timesheets.state';
-import {
-  CandidateMilesData,
-  ChangeStatusData,
-  CustomExport,
-  DialogActionPayload,
-  OpenAddDialogMeta,
-  Timesheet,
-  TimesheetAttachments,
-  TimesheetDetailsModel,
-  UploadDocumentsModel,
-  WorkWeek,
-} from '../../interface';
+import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import {
   ConfirmApprovedTimesheetDeleteDialogContent,
   ConfirmDeleteTimesheetDialogContent,
@@ -40,21 +35,14 @@ import {
   TimesheetConfirmMessages,
   TimesheetDetailsExportOptions,
 } from '../../constants';
-import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
-import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
-import { TimesheetDetailsService } from '../../services';
+import { TimesheetTargetStatus, TIMETHEETS_STATUSES } from '../../enums';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
-import { FileForUpload, Permission } from '@core/interface';
-import { AgencyStatus } from '@shared/enums/status';
-import { GRID_CONFIG } from '@shared/constants';
+import * as TimesheetInt from '../../interface';
+import { TimesheetDetailsService } from '../../services';
+import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
+import { Timesheets } from '../../store/actions/timesheets.actions';
+import { TimesheetsState } from '../../store/state/timesheets.state';
 import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
-import { AbstractPermission } from "@shared/helpers/permissions";
-import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
-import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
-import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
-import { FileExtensionsString } from '@core/constants';
-import { UploadFileAreaComponent } from '@shared/components/upload-file-area/upload-file-area.component';
-import { DatesRangeType } from '@shared/enums';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -105,7 +93,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public weekPeriod: [Date, Date] = [new Date(), new Date()];
 
-  public workWeeks: WorkWeek<Date>[];
+  public workWeeks: TimesheetInt.WorkWeek<Date>[];
 
   public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
 
@@ -120,16 +108,16 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   private jobId: number;
 
   @Select(TimesheetsState.isTimesheetOpen)
-  public readonly isTimesheetOpen$: Observable<DialogActionPayload>;
+  public readonly isTimesheetOpen$: Observable<TimesheetInt.DialogActionPayload>;
 
   @Select(TimesheetsState.selectedTimeSheet)
-  public readonly selectedTimeSheet$: Observable<Timesheet>;
+  public readonly selectedTimeSheet$: Observable<TimesheetInt.Timesheet>;
 
   @Select(TimesheetsState.timesheetDetails)
-  public readonly timesheetDetails$: Observable<TimesheetDetailsModel>;
+  public readonly timesheetDetails$: Observable<TimesheetInt.TimesheetDetailsModel>;
 
   @Select(TimesheetsState.timesheetDetailsMilesStatistics)
-  public readonly milesData$: Observable<CandidateMilesData>;
+  public readonly milesData$: Observable<TimesheetInt.CandidateMilesData>;
 
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
 
@@ -137,6 +125,9 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public attachmentsListConfig$: Observable<AttachmentsListConfig>;
 
+  /**
+   * TODO: combine falgs with object.
+   */
   public isDNWEnabled = false;
 
   public isNavigationAvaliable = true;
@@ -166,7 +157,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     protected override store: Store,
     private route: ActivatedRoute,
     private confirmService: ConfirmService,
-    private datePipe: DatePipe,
     private router: Router,
     private timesheetDetailsService: TimesheetDetailsService,
     private breakpointObserver: BreakpointObserver,
@@ -225,12 +215,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.isChangesSaved = event;
   }
 
-  public openAddDialog(meta: OpenAddDialogMeta): void {
+  public openAddDialog(meta: TimesheetInt.OpenAddDialogMeta): void {
     this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open,
       meta.currentTab, meta.startDate, meta.endDate));
   }
 
-  public openUploadSideDialog(timesheetAttachments: TimesheetAttachments): void {
+  public openUploadSideDialog(timesheetAttachments: TimesheetInt.TimesheetAttachments): void {
     this.store.dispatch(new Timesheets.ToggleTimesheetUploadAttachmentsDialog(
       DialogAction.Open,
       timesheetAttachments,
@@ -262,7 +252,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
     checked ? this.timesheetDetails$
       .pipe(
-        map(({ status }: TimesheetDetailsModel) => status === TimesheetStatus.Approved),
+        map(({ status }: TimesheetInt.TimesheetDetailsModel) => status === TimesheetStatus.Approved),
         switchMap((approved: boolean) => this.confirmService.confirm(
           approved ? ConfirmApprovedTimesheetDeleteDialogContent : ConfirmDeleteTimesheetDialogContent, {
             title: 'Delete Timesheet',
@@ -304,7 +294,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       });
   }
 
-  public updateTimesheetStatus(status: TimesheetTargetStatus, data?: Partial<ChangeStatusData>): Observable<void> {
+  public updateTimesheetStatus(status: TimesheetTargetStatus,
+    data?: Partial<TimesheetInt.ChangeStatusData>): Observable<void> {
     return this.store.dispatch(
       new TimesheetDetails.ChangeTimesheetStatus({
         timesheetId: this.isTimesheetOrMileagesUpdate ? this.timesheetId : this.mileageTimesheetId,
@@ -343,11 +334,96 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     }
   }
 
+  public closeExport(): void {
+    this.fileName = '';
+    this.store.dispatch(
+      new ShowExportDialog(false)
+    );
+  }
+
+  public exportProfileDetails(fileType: ExportedFileType): void {
+    this.store.dispatch(
+      new TimesheetDetails.Export(
+        new ExportPayload(fileType),
+      )
+    );
+  }
+
+  public customExport(event: TimesheetInt.CustomExport): void {
+    this.closeExport();
+    this.exportProfileDetails(event.fileType);
+  }
+
+  public showCustomExportDialog(): void {
+    this.fileName = `Timesheet ${formatDate(Date.now(), 'MM/dd/yyyy hh:mm a', 'en-US')}`;
+
+    this.store.dispatch(
+      new ShowExportDialog(true)
+    );
+  }
+
+  public onFilesSelected(files: FileForUpload[]): void {
+    this.store.dispatch(new TimesheetDetails.UploadFiles({
+      timesheetId: this.timesheetId,
+      organizationId: this.organizationId,
+      files,
+    }))
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.store.dispatch(
+          new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
+        );
+      });
+  }
+
+  public saveFilesOnRecord(uploadData: TimesheetInt.UploadDocumentsModel): void {
+    this.store.dispatch([
+      new Timesheets.UploadMilesAttachments(uploadData.fileForUpload, this.organizationId),
+      ...this.prepareFilesForDelete(uploadData.filesForDelete, this.timesheetId, this.organizationId),
+    ]).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.store.dispatch(
+        new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
+      );
+    });
+  }
+
+  public listenResizeToolbar(): void {
+    const tabletBreakPoint$: Observable<boolean> = this.breakpointObserver
+    .observe([BreakpointQuery.TABLET_MAX]).pipe(map((data) => data.matches));
+    const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$
+    .pipe(map((data) => data[0].contentRect.width), distinctUntilChanged());
+    
+    const smallTabletScreenWidth = 760;
+    const mobileScreenWidth = +BreakpointQuery.MOBILE_MAX.replace(/\D/g, ""); 
+  
+      combineLatest([tabletBreakPoint$, resizeToolbarObserver$])
+        .pipe(filter(([isLessMaxTablet, resize]) => Boolean(isLessMaxTablet)), takeUntil(this.componentDestroy()))
+        .subscribe(([isLessMaxTablet, toolbarWidth]) => {
+          this.isMobile = toolbarWidth <= mobileScreenWidth;
+          this.isSmallTabletScreen = toolbarWidth <= smallTabletScreenWidth;
+          this.cd.markForCheck();
+        });
+  }
+
+  public openFileUploadArea(): void {
+    this.uploadFileArea.open();
+  }
+
+  public onMobileMenuSelect({ item: { text }}: MenuEventArgs): void {
+    if(text === MobileMenuItems.Upload) {
+      setTimeout(() => this.openFileUploadArea());
+    }
+  }
+
   private orgSubmitEmptyTimesheetWarning(): void {
     this.timesheetDetailsService.orgSubmitEmptyTimesheet().pipe(take(1), takeUntil(this.componentDestroy())).subscribe();
   }
 
-  private orgSubmitTimesheet(timesheetDetails: TimesheetDetailsModel | null): void {
+  private orgSubmitTimesheet(timesheetDetails: TimesheetInt.TimesheetDetailsModel | null): void {
     this.timesheetDetailsService.submitTimesheet(
       this.timesheetId,
       timesheetDetails?.organizationId as number,
@@ -364,7 +440,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.selectedTimeSheet$.pipe(
       throttleTime(100),
       filter(Boolean),
-      switchMap((timesheet: Timesheet) => {
+      switchMap((timesheet: TimesheetInt.Timesheet) => {
         this.countOfTimesheetUpdates = 0;
         return this.store.dispatch(new Timesheets.GetTimesheetDetails(
           timesheet.id, timesheet.organizationId, this.isAgency));
@@ -390,6 +466,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       }),
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
+      // eslint-disable-next-line no-plusplus
       this.countOfTimesheetUpdates++;
       this.chipList?.refresh();
       this.cd.detectChanges();
@@ -408,63 +485,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     });
   }
 
-  public closeExport(): void {
-    this.fileName = '';
-    this.store.dispatch(
-      new ShowExportDialog(false)
-    );
-  }
-
-  public exportProfileDetails(fileType: ExportedFileType): void {
-    this.store.dispatch(
-      new TimesheetDetails.Export(
-        new ExportPayload(fileType),
-      )
-    );
-  }
-
-  public customExport(event: CustomExport): void {
-    this.closeExport();
-    this.exportProfileDetails(event.fileType);
-  }
-
-  public showCustomExportDialog(): void {
-    this.fileName = `Timesheet ${this.generateDateTime(this.datePipe)}`;
-
-    this.store.dispatch(
-      new ShowExportDialog(true)
-    );
-  }
-
-  public onFilesSelected(files: FileForUpload[]): void {
-    this.store.dispatch(new TimesheetDetails.UploadFiles({
-      timesheetId: this.timesheetId,
-      organizationId: this.organizationId,
-      files,
-    }))
-      .pipe(
-        takeUntil(this.componentDestroy())
-      )
-      .subscribe(() => {
-        this.store.dispatch(
-          new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
-        );
-      });
-  }
-
-  public saveFilesOnRecord(uploadData: UploadDocumentsModel): void {
-    this.store.dispatch([
-      new Timesheets.UploadMilesAttachments(uploadData.fileForUpload, this.organizationId),
-      ...this.prepareFilesForDelete(uploadData.filesForDelete, this.timesheetId, this.organizationId),
-    ]).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.store.dispatch(
-        new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
-      );
-    });
-  }
-
   private prepareFilesForDelete(
     arr: Attachment[],
     timesheetId: number,
@@ -473,17 +493,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     return arr.map(file => new Timesheets.DeleteRecordAttachment(timesheetId, organizationId, file));
   }
 
-  private refreshData(): Observable<TimesheetDetailsModel> {
+  private refreshData(): Observable<TimesheetInt.TimesheetDetailsModel> {
     return this.store.dispatch(
       new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
     );
-  }
-
-  /**
-   * TODO: date pipe is always defined, needs check
-   */
-  private generateDateTime(datePipe: DatePipe): string {
-    return datePipe ? datePipe.transform(Date.now(), 'MM/dd/yyyy hh:mm a') as string : '';
   }
 
   private closeDialog(): void {
@@ -509,10 +522,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       this.organizationId = this.isAgency ? organizationId : null;
       this.jobId = jobId;
       this.weekPeriod = [
-        new Date(DateTimeHelper.convertDateToUtc(weekStartDate)),
-        new Date(DateTimeHelper.convertDateToUtc(weekEndDate)),
+        DateTimeHelper.convertDateToUtc(weekStartDate),
+        DateTimeHelper.convertDateToUtc(weekEndDate),
       ];
-      this.workWeeks = candidateWorkPeriods.map((el: WorkWeek<string>): WorkWeek<Date> => ({
+      this.workWeeks = candidateWorkPeriods.map((el: TimesheetInt.WorkWeek<string>): TimesheetInt.WorkWeek<Date> => ({
         weekStartDate: new Date(DateTimeHelper.convertDateToUtc(el.weekStartDate)),
         weekEndDate: new Date(DateTimeHelper.convertDateToUtc(el.weekEndDate)),
       }));
@@ -555,36 +568,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
           : permissions[this.userPermissions.CanOrganizationAddEditDeleteTimesheetRecords];
       });
   }
-
-  public openFileUploadArea(): void {
-    this.uploadFileArea.open();
-  }
-
-  public onMobileMenuSelect({ item: { text }}: MenuEventArgs): void {
-    if(text === MobileMenuItems.Upload) {
-      setTimeout(() => this.openFileUploadArea());
-    }
-  }
   
   private initResizeObserver(): void {
     this.resizeObserver = ResizeObserverService.init(this.targetElement!);
   }
-
-  public listenResizeToolbar(): void {
-    const tabletBreakPoint$: Observable<boolean> = this.breakpointObserver
-    .observe([BreakpointQuery.TABLET_MAX]).pipe(map((data) => data.matches));
-    const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$
-    .pipe(map((data) => data[0].contentRect.width), distinctUntilChanged());
-    
-    const smallTabletScreenWidth = 760;
-    const mobileScreenWidth = +BreakpointQuery.MOBILE_MAX.replace(/\D/g, ""); 
-  
-      combineLatest([tabletBreakPoint$, resizeToolbarObserver$])
-        .pipe(filter(([isLessMaxTablet, resize]) => Boolean(isLessMaxTablet)), takeUntil(this.componentDestroy()))
-        .subscribe(([isLessMaxTablet, toolbarWidth]) => {
-          this.isMobile = toolbarWidth <= mobileScreenWidth;
-          this.isSmallTabletScreen = toolbarWidth <= smallTabletScreenWidth;
-          this.cd.markForCheck();
-        });
-    }
-  }
+}

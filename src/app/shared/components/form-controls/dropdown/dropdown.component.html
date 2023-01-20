@@ -4,11 +4,12 @@
                           [class.app-dropdown]="hideBorder">
   <div class="input-group dropdown">
     <ejs-dropdownlist
-      [allowFiltering]="true"
+      [allowFiltering]="allowFiltering"
       [dataSource]="dataSource"
       [formControlName]="controlName"
       [fields]="fields"
       [placeholder]="placeholder"
+      (open)="openDropdown.emit($event)"
       (blur)="onBlur()"
     ></ejs-dropdownlist>
     <app-error-message [control]="getControl()"></app-error-message>

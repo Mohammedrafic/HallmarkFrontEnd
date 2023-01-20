@@ -37,7 +37,7 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
 
   static createFormGroup(): FormGroup {
     return new FormGroup({
-      email: new FormControl(null, [Validators.required, Validators.email, Validators.maxLength(200), Validators.pattern(/\S+@\S+\.com/)]),
+      email: new FormControl(null, [Validators.required, Validators.email, Validators.maxLength(200)]),
       country: new FormControl(null),
       state: new FormControl(null),
       city: new FormControl(null, [Validators.maxLength(20)]),

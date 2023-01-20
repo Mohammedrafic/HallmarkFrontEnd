@@ -60,10 +60,10 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
       this.allRecords.regionIds = !tier.regionId;
       this.allRecords.locationIds = !tier.locationId;
       this.allRecords.departmentIds = !tier.departmentId;
+      this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, tier, this.regions));
       this.allRegionsChange({ checked: this.allRecords.regionIds });
       this.allLocationsChange({ checked: this.allRecords.locationIds });
-      this.allDepartmentsChange({ checked: this.allRecords.departmentIds });
-      this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, tier, this.regions));
+      this.allDepartmentsChange({ checked: this.allRecords.departmentIds }, false);
     }
   };
 
@@ -129,8 +129,9 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
       this.regions.forEach((region: OrganizationRegion) => {
         const filteredLocation = region.locations || [];
         locations = [...locations, ...filteredLocation] as Location[];
-        setDataSourceValue(this.dialogConfig.fields, 'locationIds', locations);
       });
+      this.locations = sortByField(locations, 'name');
+      setDataSourceValue(this.dialogConfig.fields, 'locationIds', locations);
     } else {
       regionsControl?.enable();
     }
@@ -147,21 +148,21 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
       locations?.forEach((location: any) => {
         const filteredDepartments = location.departments || [];
         departments = [...departments, ...filteredDepartments] as OrganizationDepartment[];
-        setDataSourceValue(this.dialogConfig.fields, 'departmentIds', departments);
       });
+      setDataSourceValue(this.dialogConfig.fields, 'departmentIds', departments);
     } else {
       locationsControl?.enable();
     }
   }
 
-  public allDepartmentsChange(event: { checked: boolean }): void {
+  public allDepartmentsChange(event: { checked: boolean }, emitEvent: boolean = true): void {
     this.allRecords[FieldNames.departmentIds] = event.checked;
     const departmentsControl = this.tierForm?.controls['departmentIds'];
     if (this.allRecords[FieldNames.departmentIds]) {
-      departmentsControl?.setValue(null);
-      departmentsControl?.disable();
+      departmentsControl?.setValue(null, {emitEvent: emitEvent});
+      departmentsControl?.disable({emitEvent: false});
     } else {
-      departmentsControl?.enable();
+      departmentsControl?.enable({emitEvent: false});
     }
   }
 
@@ -217,9 +218,17 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     return index + config.field;
   }
 
+  private resetToggles(): void {
+    this.allRegionsChange({ checked: false });
+    this.allLocationsChange({ checked: false });
+    this.allDepartmentsChange({ checked: false });
+  }
+
   private hideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false));
-    this.tierForm?.reset();
+    this.isTierSettingsDialog || setDataSourceValue(this.dialogConfig.fields, 'organizationTierId', []);
+    this.resetToggles();
+    this.tierForm?.reset({}, {emitEvent: false});
   }
 
   private createForm(): void {
@@ -235,7 +244,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
       .subscribe((value: number[]) => {
         this.selectedRegions = value;
         const selectedRegions: OrganizationRegion[] = findSelectedItems(value, this.regions);
-        const selectedLocation: OrganizationLocation[] = mapperSelectedItems(selectedRegions,'locations');
+        const selectedLocation: OrganizationLocation[] = mapperSelectedItems(selectedRegions, 'locations');
         this.locations = sortByField(selectedLocation, 'name');
         setDataSourceValue(this.dialogConfig.fields, 'locationIds', selectedLocation);
         this.changeDetection.markForCheck();
@@ -266,7 +275,8 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
       filter(({ isDialogShown }) => !isDialogShown),
       takeUntil(this.destroy$)
     ).subscribe(() => {
-      this.tierForm?.reset();
+      this.tierForm?.reset({}, {emitEvent: false});
+      this.resetToggles();
     });
   }
 
@@ -291,10 +301,8 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   private watchForDepartments(): void {
     if (this.dialogType === Tiers.tierException) {
       this.tierForm?.get('departmentIds')?.valueChanges.pipe(
-        filter((departments: number[]) => !!departments?.length),
         switchMap((departments: number[]) => this.getTiers(departments)),
         switchMap(() => this.tierList$),
-        filter((tiers: TierList[]) => !!tiers.length),
         takeUntil(this.destroy$)
       ).subscribe((tiers: TierList[]) => {
         setDataSourceValue(this.dialogConfig.fields, 'organizationTierId', tiers);
@@ -311,7 +319,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   }
 
   private getTiers(departments: number[]): Observable<TierList> {
-    const departmentTierDTO: DepartmentsTierDTO = createDepartmentsTier(this.organizationId, this.selectedRegions, this.selectedLocations, departments);
+    const departmentTierDTO: DepartmentsTierDTO = createDepartmentsTier(this.organizationId, this.selectedRegions, this.selectedLocations, departments, this.allRecords);
     return this.store.dispatch(new TiersException.GetTiers(departmentTierDTO));
   }
 }

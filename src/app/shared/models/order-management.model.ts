@@ -389,7 +389,7 @@ export class Order {
   projectNameId: number | null;
   hourlyRate: number | null;
   openPositions: number | null;
-  minYrsRequired: number | null;
+  minYrsRequired: string | null;
   joiningBonus: number | null;
   compBonus: number | null;
   duration: Duration;
@@ -449,6 +449,7 @@ export class Order {
   extensionPublicId?: number | null;
   hasParentExtension?: boolean;
   hasExtensions?: boolean;
+  allAgencies?: boolean;
   extensionInitialOrderPublicId?: number;
   regionName?: string;
   /**

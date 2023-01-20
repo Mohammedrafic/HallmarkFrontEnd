@@ -40,7 +40,7 @@ export const ScheduleCardTypeMap: Map<ScheduleType, ScheduleCardConfig> = new Ma
     iconColor: '#3E7FFF',
     showTitleToolTip: true,
   })
-  .set(ScheduleType.Unavailability, { bgColor: '#EAECF2', title: 'PTO', iconName: 'alert-triangle', iconColor: '#FF5858' })
+  .set(ScheduleType.Unavailability, { bgColor: '#EAECF2', title: '', iconName: 'alert-triangle', iconColor: '#FF5858' })
   .set(ScheduleType.Availability, { bgColor: '#D1EACE', title: 'Available', iconName: 'clock', iconColor: '#70B16E' });
 
 export const GetScheduleCardConfig = (scheduleItem: ScheduleDateItem): ScheduleCardConfig | undefined => {

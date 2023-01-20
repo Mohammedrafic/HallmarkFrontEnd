@@ -7,7 +7,7 @@ export const ValidatorsListForNumberWithDots = [
 ];
 export const ValidatorsListForNumber = [
   Validators.maxLength(10),
-  Validators.pattern(ONLY_NUMBER),
+  Validators.pattern(ONLY_NUMBER_AND_DOT),
 ];
 export const GeneralInformationControlsConfigForPerDiem = [
   {

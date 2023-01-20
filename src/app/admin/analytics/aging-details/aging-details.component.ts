@@ -50,16 +50,13 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
   public regionFields = REGION_DATA_FIELDS;
-  selectedRegions: Region[]=[];
-
+  
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedLocations: Location[]=[];
-
+  
   isDepartmentsDropDownEnabled: boolean = false;
   departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedDepartments: Department[]=[];
-  agingGroupFields: FieldSettingsModel = { text: 'name', value: 'id' };
+    agingGroupFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
@@ -102,6 +99,11 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public user: User | null;
   public isResetFilter: boolean = false;
   private previousOrgId: number = 0;
+
+  public masterRegionsList: Region[] = [];
+  public masterLocationsList: Location[] = [];
+  public masterDepartmentsList: Department[] = [];
+
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -164,7 +166,8 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
           this.changeDetectorRef.detectChanges();
         }
       });
-      this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (typeof data === 'number' && data != this.previousOrgId) {
         this.previousOrgId = data;
         if (!this.isClearAll) {
@@ -186,6 +189,11 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
           this.regionsList = sortByField(regionsList, "name");
           this.locationsList = sortByField(locationsList, 'name');
           this.departmentsList = sortByField(departmentsList, 'name');
+
+          this.masterRegionsList = this.regionsList;
+          this.masterLocationsList = this.locationsList;
+          this.masterDepartmentsList = this.departmentsList;
+
           if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
             this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
           }
@@ -195,9 +203,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
 
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          // this.defaultRegions = this.regionsList.map((list) => list.id);
           this.defaultAgingGroups=this.agingGroups.map((list)=>list.id);
-          // this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
           this.agingReportForm.get(analyticsConstants.formControlNames.AgingGroupIds)?.setValue(this.defaultAgingGroups);
           if (this.isInitialLoad) {
             setTimeout(()=>{ this.SearchReport()},3000);
@@ -216,17 +222,22 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public onFilterRegionChangedHandler(): void {
     this.regionIdControl = this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+      this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.locations = [];
+      this.departments = [];
+
       if (this.regionIdControl.value.length > 0) {
-        let regionList = this.regions?.filter((object) => data?.includes(object.id));
-        this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
-        // this.defaultLocations = this.locations.map((list) => list.id);
-        // this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
-        // this.changeDetectorRef.detectChanges();
+        this.departments = this.locations.map(obj => {
+          return obj.departments.filter(department => department.locationId === obj.id);
+        }).reduce((a, b) => a.concat(b), []);
       }
       else {
+        this.filterColumns.locationIds.dataSource = [];
         this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+        this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
@@ -234,21 +245,20 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
  public onFilterLocationChangedHandler(): void {
     this.locationIdControl = this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+     
       if (this.locationIdControl.value.length > 0) {
-        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
-        // this.defaultDepartments = this.departments.map((list) => list.id);
-        // this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue(this.defaultDepartments);
-        // this.changeDetectorRef.detectChanges();
       }
       else {
+        this.filterColumns.departmentIds.dataSource = [];
         this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
    this.departmentIdControl = this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
+      this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
   }
 
@@ -367,8 +377,9 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     this.filteredItems = [];
     this.locations =[];
     this.departments =[];
-    this.filterColumns.locationIds.dataSource =[];
-    this.filterColumns.departmentIds.dataSource =[];
+    this.regionsList = this.masterRegionsList;
+    this.locationsList = this.masterLocationsList;
+    this.departmentsList = this.masterDepartmentsList;
   }
   public onFilterApply(): void {
     let { regionIds,locationIds,departmentIds,agingGroupIds } = this.agingReportForm.getRawValue();

@@ -144,6 +144,10 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     if (candidateSelectedSlot) {
       if (candidateSelectedSlot.dates.has(date)) {
         candidateSelectedSlot.dates.delete(date);
+
+        if (!candidateSelectedSlot.dates.size) {
+          this.selectedCandidatesSlot.delete(candidate.id);
+        }
       } else {
         candidateSelectedSlot.dates.add(date);
       }

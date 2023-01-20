@@ -474,7 +474,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     ).subscribe(({ TieringLogic }) => {
       const jobDistributionForm = this.getSelectedFormConfig(JobDistributionForm);
       const sourceForJobDistribution = getDataSourceForJobDistribution(this.selectedSystem);
-      
+
       if(TieringLogic && this.selectedSystem.isIRP && this.selectedSystem.isVMS) {
         setDataSource(jobDistributionForm.fields, 'jobDistribution', [
           sourceForJobDistribution[0],

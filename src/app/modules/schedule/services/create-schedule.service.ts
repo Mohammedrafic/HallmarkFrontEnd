@@ -15,6 +15,8 @@ import * as ScheduleInt from '../interface';
 @Injectable()
 export class CreateScheduleService {
 
+  private scheduleModels: ScheduleInt.ScheduleModel[] = [];
+
   set scheduleData(data: ScheduleInt.ScheduleModel[]) {
     this.scheduleModels = [...data];
   }
@@ -22,8 +24,6 @@ export class CreateScheduleService {
   get scheduleData(): ScheduleInt.ScheduleModel[] {
     return [...this.scheduleModels];
   }
-
-  private scheduleModels: ScheduleInt.ScheduleModel[] = [];
 
   constructor(
     private fb: FormBuilder,

@@ -28,7 +28,6 @@ import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 
 @Component({
   selector: 'app-irp-container',

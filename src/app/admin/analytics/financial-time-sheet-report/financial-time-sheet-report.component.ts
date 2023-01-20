@@ -28,8 +28,10 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
-import { CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, 
-  MasterSkillDto, SearchCandidate, SkillCategoryDto ,OrderTypeOptionsForReport} from '../models/common-report.model';
+import {
+  CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions,
+  MasterSkillDto, SearchCandidate, SkillCategoryDto, OrderTypeOptionsForReport
+} from '../models/common-report.model';
 import { OutsideZone } from "@core/decorators";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
@@ -57,7 +59,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     "BusinessUnitIdParamFTS": "",
     "HostName": "",
     "AccrualReportFilterTypeFTS": "",
-    "InvoiceIdParamFTS":""
+    "InvoiceIdParamFTS": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.wls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cat" };
@@ -68,13 +70,13 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedRegions: Region[]=[];
+  
 
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedLocations: Location[]=[];
+  
 
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
@@ -94,7 +96,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
-  selectedOrganizations: Organisation[]=[];
+  selectedOrganizations: Organisation[] = [];
 
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -102,7 +104,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  selectedDepartments: Department[]=[];
+  
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
   @Select(UserState.lastSelectedOrganizationId)
@@ -146,6 +148,11 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
+
+  public masterRegionsList: Region[] = [];
+  public masterLocationsList: Location[] = [];
+  public masterDepartmentsList: Department[] = [];
+
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -161,20 +168,20 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     if (this.user?.id != null) {
       this.store.dispatch(new GetOrganizationsStructureAll(this.user?.id));
     }
- }
+  }
 
   ngOnInit(): void {
 
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
-      this.orderFilterColumnsSetup();      
+      this.orderFilterColumnsSetup();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
           this.logiReportComponent.SetReportData(data);
         }
       });
       this.agencyOrganizationId = data;
-   
+
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
@@ -203,7 +210,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         jobStatuses: new FormControl([]),
         jobId: new FormControl(''),
         accrualReportTypes: new FormControl(null, [Validators.required]),
-        invoiceID:new FormControl('')
+        invoiceID: new FormControl('')
       }
     );
   }
@@ -228,6 +235,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.isAlive = true;
         this.previousOrgId = data;
@@ -237,7 +245,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
-          let departmentsList: Department[] = [];    
+          let departmentsList: Department[] = [];
 
           orgList.forEach((value) => {
             regionsList.push(...value.regions);
@@ -253,6 +261,10 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
           this.locationsList = sortByField(locationsList, 'name');
           this.departmentsList = sortByField(departmentsList, 'name');
 
+          this.masterRegionsList = this.regionsList;
+          this.masterLocationsList = this.locationsList;
+          this.masterDepartmentsList = this.departmentsList;
+
           if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
             this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
           }
@@ -264,7 +276,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
           let filter: CommonReportFilter = {
             businessUnitIds: businessIdData
           };
-          
+
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             if (data != null) {
@@ -276,7 +288,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
               this.filterColumns.candidateStatuses.dataSource = data.candidateStatusesAndReasons;
 
               this.isDefaultLoad = true;
-              setTimeout(()=>{ this.SearchReport()},3000);
+              setTimeout(() => { this.SearchReport() }, 3000);
             }
           });
           this.regions = this.regionsList;
@@ -292,35 +304,44 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
 
 
   public onFilterRegionChangedHandler(): void {
+
     this.regionIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.departments = [];
+      this.locations = [];
+      this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+      this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.regionIdControl.value.length > 0) {
-        let regionList = this.regions?.filter((object) => data?.includes(object.id));
-        this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
+        this.departments = this.locations.map(obj => {
+          return obj.departments.filter(department => department.locationId === obj.id);
+        }).reduce((a, b) => a.concat(b), []);
       }
       else {
+        this.filterColumns.locationIds.dataSource = [];
         this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
-    
-    public onFilterLocationChangedHandler(): void {
+
+  public onFilterLocationChangedHandler(): void {
     this.locationIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.locationIdControl.value.length > 0) {
-        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
       }
       else {
+        this.filterColumns.departmentIds.dataSource = [];
         this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
     this.departmentIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
+      this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
   }
 
@@ -356,9 +377,9 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    
+
     let { accrualReportTypes, businessIds, candidateName, candidateStatuses, departmentIds, jobId, jobStatuses, locationIds, orderTypes,
-      regionIds, skillCategoryIds, skillIds, startDate, endDate ,invoiceID} = this.financialTimesheetReportForm.getRawValue();
+      regionIds, skillCategoryIds, skillIds, startDate, endDate, invoiceID } = this.financialTimesheetReportForm.getRawValue();
     if (!this.financialTimesheetReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
     }
@@ -366,26 +387,25 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       this.isResetFilter = false;
       this.message = ""
     }
-      
-      locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length  > 0 ? this.locations.map(x=> x.id).join(",") : []); 
-      departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length  > 0 ? this.departments.map(x=> x.id).join(",") : []); 
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
 
-      regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
-      locationIds =      locationIds.length > 0 ? locationIds  : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
-      departmentIds =    departmentIds.length > 0 ? departmentIds : this.departmentsList?.length>0?  this.departmentsList.map(x=> x.id).join(",") :"null"; 
-      skillCategoryIds = skillCategoryIds.length > 0 ?skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; })=> x.id).join(",") : "null"; 
-      skillIds =         skillIds.length > 0 ?skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; })=> x.id).join(","):"null"; 
-   
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+    skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
+    skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
+
     this.paramsData =
     {
-      "OrganizationParamFTS":this.selectedOrganizations?.length==0?"null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "OrganizationParamFTS": this.selectedOrganizations?.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       "StartDateParamFTS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamFTS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamFTS":  regionIds.length==0? "null" : regionIds,
-      "LocationParamFTS":locationIds.length==0?"null" : locationIds,
-      "DepartmentParamFTS": departmentIds.length==0?"null" :  departmentIds,
+      "RegionParamFTS": regionIds.length == 0 ? "null" : regionIds,
+      "LocationParamFTS": locationIds.length == 0 ? "null" : locationIds,
+      "DepartmentParamFTS": departmentIds.length == 0 ? "null" : departmentIds,
       "SkillCategoriesParamFTS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
-      "SkillsParamFTS":  skillIds.length == 0 ? "null" : skillIds,
+      "SkillsParamFTS": skillIds.length == 0 ? "null" : skillIds,
       "CandidateNameParamFTS": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
       "CandidateStatusesParamFTS": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
       "OrderTypesParamFTS": orderTypes.length == 0 ? "null" : orderTypes.join(","),
@@ -398,7 +418,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
       "AccrualReportFilterTypeFTS": accrualReportTypes.toString(),
-      "InvoiceIdParamFTS":invoiceID==null|| invoiceID == "" ?"null":invoiceID
+      "InvoiceIdParamFTS": invoiceID == null || invoiceID == "" ? "null" : invoiceID
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -534,22 +554,23 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(0);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.InvoiceID)?.setValue(null);
     this.filteredItems = [];
-    this.locations =[];
-    this.departments =[];
-    this.filterColumns.locationIds.dataSource =[];
-    this.filterColumns.departmentIds.dataSource =[];
+    this.locations = [];
+    this.departments = [];
+
+    this.regionsList = this.masterRegionsList;
+    this.locationsList = this.masterLocationsList;
+    this.departmentsList = this.masterDepartmentsList;
   }
 
 
   public onFilterApply(): void {
 
-    let { departmentIds, locationIds,      regionIds} = this.financialTimesheetReportForm.getRawValue();
-      regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
-      locationIds =      locationIds.length > 0 ?locationIds.join(",") : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
-      departmentIds =    departmentIds.length > 0 ?departmentIds.join(",") : this.departmentsList?.length>0?  this.departmentsList.map(x=> x.id).join(",") :"null"; 
-   
-      if(!(regionIds.length >0 && locationIds.length >0 && departmentIds.length >0 ))
-      {
+    let { departmentIds, locationIds, regionIds } = this.financialTimesheetReportForm.getRawValue();
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+
+    if (!(regionIds.length > 0 && locationIds.length > 0 && departmentIds.length > 0)) {
       this.financialTimesheetReportForm.markAllAsTouched();
       if (this.financialTimesheetReportForm?.invalid) {
         return;
@@ -570,7 +591,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   }
 
   public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
-    this.onFilterChild(e);
+    this.onFilterChild(e); 
   }
   @OutsideZone
   private onFilterChild(e: FilteringEventArgs) {
