@@ -9,6 +9,7 @@ import { debounceTime, takeUntil } from 'rxjs';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { CandidatesService } from '../services/candidates.service';
 import { CandidateTabsEnum } from '@client/candidates/enums/candidate-tabs.enum';
+import { DialogMode } from '@shared/enums/dialog-mode.enum';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -20,11 +21,13 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   @ViewChild('tabs') public tabsComponent: TabsComponent<unknown>;
   public readonly tabsConfig = tabsConfig;
   public showButtons = true;
+  public title: DialogMode;
+  public candidateName$ = this.candidatesService.getCandidateName();
 
   constructor(
     private router: Router,
-    public candidateProfileFormService: CandidateProfileFormService,
-    private candidatesService: CandidatesService,
+    private candidateProfileFormService: CandidateProfileFormService,
+    public candidatesService: CandidatesService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private store: Store,
@@ -40,6 +43,9 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   public ngAfterViewInit(): void {
     if (this.route.snapshot.paramMap.get('id')) {
       this.candidateProfileFormService.tabUpdate$.next(parseInt(this.route.snapshot.paramMap.get('id') as string));
+      this.title = DialogMode.Edit;
+    } else {
+      this.title = DialogMode.Add;
     }
   }
 
