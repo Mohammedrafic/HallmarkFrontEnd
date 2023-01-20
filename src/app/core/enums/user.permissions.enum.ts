@@ -173,4 +173,8 @@ export enum UserPermissions {
   CanManageWorkCommitmentData = 4154,
   MasterWorkCommitments = 4155,
   OrganizationWorkCommitments = 4156,
+
+  //Group email permission
+  CanViewGroupEmail = 5101,
+  CanSendGroupEmail = 5102,
 }

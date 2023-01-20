@@ -292,6 +292,7 @@ export class SendGroupEmailComponent
     this.onRolesValueChanged();
     this.onUserTypeValueChanged();
     this.onRegionValueChanged();
+    this.onLocationValueChanged();
     this.onSkillsValueChanged();
     this.onCandidateValueChanged();
     this.onCandidateStatusValueChanged();
@@ -607,19 +608,35 @@ export class SendGroupEmailComponent
     });
   }
 
+  private onLocationValueChanged(): void {
+    this.locationControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      if (value != undefined && value.length > 0) {
+        if(this.isOrgInternalUserType){
+          this.getUsersByRole();
+        }
+      }
+    });
+  }
+
   private onRolesValueChanged(): void {
     this.rolesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (value != undefined && value.length > 0) {
-        this.userData = [];
-        var regionId = this.regionControl.value.join();
-        var locationId = this.locationControl.value.join();
-        var roles = value.join();
-        this.store.dispatch(new GetGroupEmailInternalUsers(regionId, locationId, roles, 'null'));
-        this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-          this.userData = data;
-        });
+        this.getUsersByRole();
       }
     });
+  }
+
+  private getUsersByRole(): void{
+    this.userData = [];
+    var regionId = this.regionControl.value.join();
+    var locationId = this.locationControl.value.join();
+    var roles = this.rolesControl.value.join();
+    if(regionId !='' && locationId !='' && roles !=''){
+      this.store.dispatch(new GetGroupEmailInternalUsers(regionId, locationId, roles, 'null'));
+      this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+        this.userData = data;
+      });
+    }
   }
 
   private onUserTypeValueChanged(): void {
