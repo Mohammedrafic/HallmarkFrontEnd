@@ -4,6 +4,7 @@ import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
+import { EmitType } from '@syncfusion/ej2-base';
 import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
@@ -13,14 +14,16 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { 
-  GetCommonReportFilterOptions, GetLogiReportData, ClearLogiReportState   } from '@organization-management/store/logi-report.action';
+import {
+  GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData,
+  GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState
+} from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { analyticsConstants } from '../constants/analytics.constant';
+import { accrualConstants, analyticsConstants } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
@@ -28,8 +31,10 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
-import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto } from '../models/common-report.model';
+import { CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SearchCandidate, SkillCategoryDto } from '../models/common-report.model';
+import { OutsideZone } from "@core/decorators";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
 
 @Component({
   selector: 'app-candidate-status',
@@ -162,7 +167,6 @@ export class CandidateStatusComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
