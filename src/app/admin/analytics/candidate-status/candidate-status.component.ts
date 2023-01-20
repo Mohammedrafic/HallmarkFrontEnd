@@ -31,7 +31,7 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
-import { CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SearchCandidate, SkillCategoryDto } from '../models/common-report.model';
+import { CandidateStatusAndReasonFilterOptionsDto, CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SearchCandidate, SkillCategoryDto } from '../models/common-report.model';
 import { OutsideZone } from "@core/decorators";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
@@ -54,12 +54,14 @@ export class CandidateStatusComponent implements OnInit {
     "regionCS":   "",
     "locationCS":  "",
     "departmentCS":  "",
-    "skillCategoryCS":    "",
-    "skillCS":   "",
-    "startDateCS":   "",
-    "endDateCS": "",
-    "CandidateStatusesParamCS":"",
-    "candidateStatusFilterTypeCS":""
+    "orderStartDateBegin":    "",
+    "orderStartDateEnd":   "",
+    "orderEndDateBegin":   "",
+    "orderEndDateEnd": "",
+    "actualStartDateBegin":"",
+    "actualStartDateEnd": "",
+    "candidateStatusesParamCS": "",
+    "skillCS": ""
   };
 
 
@@ -74,14 +76,13 @@ export class CandidateStatusComponent implements OnInit {
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedRegions: Region[];  
+  
   
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedLocations: Location[];
-
+  
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
   isDepartmentsDropDownEnabled: boolean = false;
@@ -100,7 +101,7 @@ export class CandidateStatusComponent implements OnInit {
 
 
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedDepartments: Department[];
+  
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
 
@@ -119,7 +120,7 @@ export class CandidateStatusComponent implements OnInit {
   public departmentIdControl: AbstractControl;
   public skillCategoryIdControl: AbstractControl;
   public skillIdControl: AbstractControl;
- 
+  public canidateStatusControl: AbstractControl;
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
@@ -146,6 +147,12 @@ export class CandidateStatusComponent implements OnInit {
   private previousOrgId: number = 0;
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5, 7, 10, 11, 12];
+
+  public masterRegionsList: Region[] = [];
+  public masterLocationsList: Location[] = [];
+  public masterDepartmentsList: Department[] = [];
+
+  public candidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
 
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
@@ -183,15 +190,7 @@ export class CandidateStatusComponent implements OnInit {
           this.filterColumns.skillIds.dataSource = skills;
 
           this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
-
-
-          if (this.isInitialLoad) {
-                  //ToDo: To add a spinner & may need to check if in 3seconds, skills and departments also get loaded
-                  setTimeout(()=>{this.SearchReport();},3000)
-                  this.isInitialLoad = false;
-              }
-
-        }
+         }
       });
       this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
@@ -205,6 +204,7 @@ export class CandidateStatusComponent implements OnInit {
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
       this.onFilterSkillCategoryChangedHandler();
+      this.onFilterCandidateStatusChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.candidateStatusReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.candidateStatusReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
@@ -212,16 +212,27 @@ export class CandidateStatusComponent implements OnInit {
   private initForm(): void {
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
+
+    let endDate = new Date(Date.now());
+    endDate.setDate(endDate.getDate());
+
     this.candidateStatusReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        regionIds: new FormControl([], [Validators.required]),
-        locationIds: new FormControl([], [Validators.required]),
-        departmentIds: new FormControl([], [Validators.required]),
+        regionIds: new FormControl([]),
+        locationIds: new FormControl([]),
+        departmentIds: new FormControl([]),
         skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
-        startDate: new FormControl(startDate, [Validators.required]),
-        endDate: new FormControl(new Date(Date.now()), [Validators.required]),
+        orderStartDateBegin: new FormControl(startDate),
+        orderStartDateEnd: new FormControl(endDate),
+
+        orderEndDateBegin: new FormControl(startDate),
+        orderEndDateEnd: new FormControl(endDate),
+
+        actualStartDateBegin: new FormControl(startDate),
+        actualStartDateEnd: new FormControl(endDate),
+
         candidateStatuses : new FormControl([])
       }
     );
@@ -245,6 +256,7 @@ export class CandidateStatusComponent implements OnInit {
       }
     });
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.candidateStatusReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.isAlive = true;
         this.previousOrgId = data;
@@ -267,6 +279,11 @@ export class CandidateStatusComponent implements OnInit {
           this.regionsList = sortByField(regionsList, "name");
           this.locationsList = sortByField(locationsList, 'name');
           this.departmentsList = sortByField(departmentsList, 'name');
+
+          this.masterRegionsList = this.regionsList;
+          this.masterLocationsList = this.locationsList;
+          this.masterDepartmentsList = this.departmentsList;
+
           if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
             this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
           }
@@ -294,14 +311,24 @@ export class CandidateStatusComponent implements OnInit {
   public onFilterRegionChangedHandler(): void {
     this.regionIdControl = this.candidateStatusReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.candidateStatusReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+      this.candidateStatusReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.locations = [];
+      this.departments = [];
+
       if (this.regionIdControl.value.length > 0) {
-        let regionList = this.regions?.filter((object) => data?.includes(object.id));
-        this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
+
+        this.departments = this.locations.map(obj => {
+          return obj.departments.filter(department => department.locationId === obj.id);
+        }).reduce((a, b) => a.concat(b), []);
+
       }
       else {
+        this.filterColumns.locationIds.dataSource = [];
         this.candidateStatusReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+        this.candidateStatusReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
@@ -309,20 +336,23 @@ export class CandidateStatusComponent implements OnInit {
   public onFilterLocationChangedHandler(): void {
     this.locationIdControl = this.candidateStatusReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.candidateStatusReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+
       if (this.locationIdControl.value.length > 0) {
-        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
-       }
+      }
       else {
+        this.filterColumns.departmentIds.dataSource = [];
         this.candidateStatusReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
     this.departmentIdControl = this.candidateStatusReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
+      this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
   }
+
 
   public onFilterSkillCategoryChangedHandler(): void {
     this.skillCategoryIdControl = this.candidateStatusReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds) as AbstractControl;
@@ -345,6 +375,14 @@ export class CandidateStatusComponent implements OnInit {
       }
     });
   }
+  public onFilterCandidateStatusChangedHandler(): void {
+    this.canidateStatusControl = this.candidateStatusReportForm.get(analyticsConstants.formControlNames.CandidateStatuses) as AbstractControl;
+    this.canidateStatusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.canidateStatusControl.value.length > 0) {
+        this.candidateStatuses = this.filterColumns.candidateStatuses.dataSource?.filter((object: { status: any; }) => data?.includes(object.status));
+      }
+    });
+  }
 
   public SearchReport(): void {   
     this.filteredItems = [];
@@ -355,10 +393,19 @@ export class CandidateStatusComponent implements OnInit {
       }
     }
     let { departmentIds, locationIds, candidateStatuses,
-      regionIds,skillCategoryIds,skillIds,startDate, endDate } = this.candidateStatusReportForm.getRawValue();
-    
+      regionIds, skillCategoryIds, skillIds, orderStartDateBegin, orderStartDateEnd,
+      orderEndDateBegin, orderEndDateEnd, actualStartDateBegin, actualStartDateEnd   } = this.candidateStatusReportForm.getRawValue();
+
+    if (!this.candidateStatusReportForm.dirty) {
+      this.message = "Default filter selected with all regions, locations and departments for 90 days";
+    }
+    else {
+      this.isResetFilter = false;
+      this.message = ""
+    }
       locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length  > 0 ? this.locations.map(x=> x.id).join(",") : []); 
-      departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length  > 0 ? this.departments.map(x=> x.id).join(",") : []); 
+      departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
+      candidateStatuses = candidateStatuses.length > 0 ? this.candidateStatuses?.map(x => x.statusText) : this.filterColumns.candidateStatuses.dataSource.map((x: { statusText: any; }) => x.statusText).join(",");
 
       regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
       locationIds =      locationIds.length > 0 ? locationIds  : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
@@ -372,20 +419,23 @@ export class CandidateStatusComponent implements OnInit {
 
       "HostName": this.baseUrl,
       "BearerParamCS": auth,
-      "BusinessUnitIdCS": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "BusinessUnitIdParamCS": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "OrganizationsCS":    this.selectedOrganizations.length == 0? "null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+
+      "OrganizationsCS": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       "regionCS":            regionIds.length==0? "null" : regionIds,
       "locationCS":          locationIds.length==0?"null" : locationIds,
       "departmentCS":        departmentIds.length==0?"null" :  departmentIds,
-      "skillCategoryCS":     skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
-      "skillCS":             skillIds.length == 0 ? "null" : skillIds,
-      "startDateCS":   formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "endDateCS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "CandidateStatusesParamCS": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
-      "candidateStatusFilterTypeCS" : "1"
+      "orderStartDateBegin": formatDate(orderStartDateBegin, 'MM/dd/yyyy', 'en-US'),
+      "orderStartDateEnd":   formatDate(orderStartDateEnd, 'MM/dd/yyyy', 'en-US'),
+      "orderEndDateBegin":   formatDate(orderEndDateBegin, 'MM/dd/yyyy', 'en-US'),
+      "orderEndDateEnd":     formatDate(orderEndDateEnd, 'MM/dd/yyyy', 'en-US'),
+      "actualStartDateBegin":formatDate(actualStartDateBegin, 'MM/dd/yyyy', 'en-US'),
+      "actualStartDateEnd":  formatDate(actualStartDateEnd, 'MM/dd/yyyy', 'en-US'),
+      "candidateStatusesParamCS": candidateStatuses.length == 0 ? "null" : candidateStatuses,
+      "skillCS": skillIds.length == 0 ? "null" : skillIds,
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -435,8 +485,16 @@ export class CandidateStatusComponent implements OnInit {
         valueField: 'name',
         valueId: 'id',
       },
-      startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      endDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+
+      orderStartDateBegin: { type: ControlTypes.Date, valueType: ValueType.Text },
+      orderStartDateEnd: { type: ControlTypes.Date, valueType: ValueType.Text },
+
+      orderEndDateBegin: { type: ControlTypes.Date, valueType: ValueType.Text },
+      orderEndDateEnd: { type: ControlTypes.Date, valueType: ValueType.Text },
+
+      actualStartDateBegin: { type: ControlTypes.Date, valueType: ValueType.Text },
+      actualStartDateEnd: { type: ControlTypes.Date, valueType: ValueType.Text },
+
       candidateStatuses: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Text,
@@ -444,14 +502,7 @@ export class CandidateStatusComponent implements OnInit {
         valueField: 'statusText',
         valueId: 'status',
       },
-      candidateStatusFilterType: {
-        type: ControlTypes.Dropdown,
-        valueType: ValueType.Text,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-    }
+     }
   }
 
   private SetReportData() {
@@ -482,28 +533,29 @@ export class CandidateStatusComponent implements OnInit {
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue([]);
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
+
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderStartDateBegin)?.setValue(startDate);
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderStartDateEnd)?.setValue(new Date(Date.now()));
+
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderEndDateBegin)?.setValue(startDate);
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderEndDateEnd)?.setValue(new Date(Date.now()));
+
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualStartDateBegin)?.setValue(startDate);
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualStartDateEnd)?.setValue(new Date(Date.now()));
+
     this.filteredItems = [];
     this.locations =[];
     this.departments =[];
-    this.filterColumns.locationIds.dataSource =[];
-    this.filterColumns.departmentIds.dataSource =[];
+    this.regionsList = this.masterRegionsList;
+    this.locationsList = this.masterLocationsList;
+    this.departmentsList = this.masterDepartmentsList;
   } 
 
   public onFilterApply(): void {
-    let { departmentIds, locationIds,      regionIds} = this.candidateStatusReportForm.getRawValue();
-    regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
-    locationIds =      locationIds.length > 0 ?locationIds.join(",") : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
-    departmentIds =    departmentIds.length > 0 ?departmentIds.join(",") : this.departmentsList?.length>0?  this.departmentsList.map(x=> x.id).join(",") :"null"; 
- 
-    if(!(regionIds.length >0 && locationIds.length >0 && departmentIds.length >0 ))
-    {
     this.candidateStatusReportForm.markAllAsTouched();
     if (this.candidateStatusReportForm?.invalid) {
       return;
-    }
     }
     this.filteredItems = [];
     this.SearchReport();

@@ -25,7 +25,14 @@ export const analyticsConstants = {
     ReportDate:'reportDate',
     CredentialName: 'credentialName',
     SearchBy: 'searchBy',
-    InActiveInComplete:'inActiveInComplete'
+    InActiveInComplete: 'inActiveInComplete',
+
+    OrderStartDateBegin: 'orderStartDateBegin',
+    OrderStartDateEnd: 'orderStartDateEnd',
+    OrderEndDateBegin: 'orderEndDateBegin',
+    OrderEndDateEnd: 'orderEndDateEnd',
+    ActualStartDateBegin: 'actualStartDateBegin',
+    ActualStartDateEnd: 'actualStartDateEnd'
   }
 }
 
