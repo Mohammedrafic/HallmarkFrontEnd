@@ -1,17 +1,20 @@
 import { Injectable } from '@angular/core';
-import { InvoicesContainerService } from './invoices-container.service';
+
 import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { Observable } from 'rxjs';
-import { GridContainerTabConfig, InvoiceAttachment, InvoiceDetail,
-  InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
-import { ManualInvoicesGridHelper, PendingInvoiceRowDetailsGridHelper, PendingInvoicesGridHelper } from '../../helpers';
-import { Invoices } from '../../store/actions/invoices.actions';
-import { InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
+
 import { Attachment } from '@shared/components/attachments';
+import {
+  invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs,
+} from '../../constants/invoice-detail.constant';
+import { InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
+import { ManualInvoicesGridHelper, PendingInvoiceRowDetailsGridHelper, PendingInvoicesGridHelper } from '../../helpers';
 import { PendingApprovalGridHelper } from '../../helpers/grid/pending-approval-grid.helper';
-import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
-import { invoiceDetailsColumnDefs, invoiceInfoItems,
-  invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
+import {
+  GridContainerTabConfig, InvoiceAttachment, InvoiceDetail, InvoiceInfoUIItem, ManualInvoice, PendingApprovalInvoice,
+} from '../../interfaces';
+import { Invoices } from '../../store/actions/invoices.actions';
+import { InvoicesContainerService } from './invoices-container.service';
 
 @Injectable()
 export class OrganizationInvoicesContainerService extends InvoicesContainerService {
@@ -23,15 +26,9 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
       case OrganizationInvoicesGridTab.Manual:
         return ManualInvoicesGridHelper.getOrganizationColDefs({
           approve: ({ id }: ManualInvoice) =>
-            this.store.dispatch(new Invoices.ApproveInvoice(id))
-              .subscribe(
-                () => this.store.dispatch(new Invoices.CheckManualInvoicesExist(organizationId))
-              ),
+            this.store.dispatch(new Invoices.ApproveInvoice(id)),
           reject: ({ id }: ManualInvoice) =>
-            this.store.dispatch(new Invoices.ShowRejectInvoiceDialog(id))
-              .subscribe(
-                () => this.store.dispatch(new Invoices.CheckManualInvoicesExist(organizationId))
-              ),
+            this.store.dispatch(new Invoices.ShowRejectInvoiceDialog(id)),
           previewAttachment: (attachment) => this.store.dispatch(
             new Invoices.PreviewAttachment(organizationId, attachment)
           ),
@@ -92,11 +89,11 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
     let action;
 
     switch (tabIndex) {
-      case OrganizationInvoicesGridTab.Manual:
-        action = new Invoices.GetManualInvoices(organizationId);
-        break;
       case OrganizationInvoicesGridTab.PendingRecords:
         action = new Invoices.GetPendingInvoices(organizationId);
+        break;
+      case OrganizationInvoicesGridTab.Manual:
+        action = new Invoices.GetManualInvoices(organizationId);
         break;
       case OrganizationInvoicesGridTab.PendingApproval:
         action = new Invoices.GetPendingApproval({
@@ -167,7 +164,7 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
       case OrganizationInvoicesGridTab.PendingRecords:
         return this.createTabConfig({
           groupingEnabled: true,
-          manualInvoiceCreationEnabled: true,
+          manualInvoiceCreationEnabled: false,
         });
       default:
         return defaultConfig;

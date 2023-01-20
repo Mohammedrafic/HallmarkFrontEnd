@@ -1,27 +1,26 @@
-import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
-import { catchError, filter, Observable, take } from 'rxjs';
+import { RowNode } from '@ag-grid-community/core';
 import { Store } from '@ngxs/store';
+import { catchError, filter, Observable, take } from 'rxjs';
+import { tap } from 'rxjs/internal/operators/tap';
 
 import { BaseObservable } from '@core/helpers';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
-import { OrganizationRegion } from '@shared/models/organization.model';
-
-import { InvoiceFilterForm, InvoicePaymentData } from '../interfaces';
-import { InvoicesTableFiltersColumns } from '../enums';
-import { Invoices } from '../store/actions/invoices.actions';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { approveInvoiceConfirmDialogConfig } from '../constants/approve-invoice-confirm-dialog-config.const';
-import { TimesheetTargetStatus } from '../../timesheets/enums';
-import { tap } from 'rxjs/internal/operators/tap';
-import { ShowToast } from '../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
+import { OrganizationRegion } from '@shared/models/organization.model';
+import { ConfirmService } from '@shared/services/confirm.service';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { InvoicesApiService } from './invoices-api.service';
-import { RowNode } from '@ag-grid-community/core';
+import { ShowToast } from '../../../store/app.actions';
+import { TimesheetTargetStatus } from '../../timesheets/enums';
+import { ApproveInvoiceConfirmDialogConfig } from '../constants';
+import { InvoicesTableFiltersColumns } from '../enums';
+import { InvoiceFilterForm, InvoicePaymentData } from '../interfaces';
 import { PendingApprovalInvoice } from '../interfaces/pending-approval-invoice.interface';
+import { Invoices } from '../store/actions/invoices.actions';
+import { InvoicesApiService } from './invoices-api.service';
 
 @Injectable()
 export class InvoicesService {
@@ -73,7 +72,7 @@ export class InvoicesService {
   }
 
   public confirmInvoiceApprove(invoiceId: number): Observable<boolean> {
-    const { title, submitButtonText, getMessage } = approveInvoiceConfirmDialogConfig;
+    const { title, submitButtonText, getMessage } = ApproveInvoiceConfirmDialogConfig;
 
     return this.confirmService.confirm(getMessage(invoiceId), {
       title,

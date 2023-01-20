@@ -45,15 +45,20 @@ export class ScheduleItemsComponent {
     }
   }
 
-  removeDateItem(candidateId: number, dateString: string): void {
+  removeDateItem(candidateId: number, dateString: string, id: number | null): void {
     const scheduleItem = this.scheduleItems.find((item: CreateScheduleItem) => item.candidateId === candidateId);
 
     if (!scheduleItem) {
       return;
     }
 
-    scheduleItem.dateItems = scheduleItem.dateItems.filter((item: DateItem) => item.dateString !== dateString);
-    scheduleItem.selectedDates = scheduleItem.dateItems.map((item: DateItem) => item.date);
+    if (id) {
+      scheduleItem.dateItems = scheduleItem.dateItems.filter((item: DateItem) => item.id !== id);
+    } else {
+      scheduleItem.dateItems = scheduleItem.dateItems.filter((item: DateItem) => item.dateString !== dateString);
+    }
+
+    scheduleItem.selectedDates = this.scheduleItemsService.getSelectedDates(scheduleItem);
 
     if (!scheduleItem.dateItems.length) {
       this.removeScheduleItem(candidateId);
@@ -73,11 +78,9 @@ export class ScheduleItemsComponent {
     }
 
     scheduleItem.selectedDates = dates;
-    scheduleItem.dateItems = dates.map((date: Date) => {
-      const dateString = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date));
-      const dateItem = scheduleItem.dateItems.find((item: DateItem) => item.dateString === dateString);
-
-      return dateItem ? dateItem : this.scheduleItemsService.getScheduleDateItem(candidateId, dateString);
-    });
+    scheduleItem.dateItems = this.scheduleItemsService.getScheduleDateItems(
+      dates.map((date: Date) => DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date))),
+      candidateId
+    );
   }
 }

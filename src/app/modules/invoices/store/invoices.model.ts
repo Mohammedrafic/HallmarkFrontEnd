@@ -20,7 +20,6 @@ import { PendingApprovalInvoicesData } from '../interfaces/pending-approval-invo
 export interface InvoicesModel {
   invoicesData: PageOfCollections<InvoiceRecord> | null;
   manualInvoicesData: ManualInvoicesData | null;
-  manualInvoicesExist: boolean;
   pendingInvoicesData: PendingInvoicesData | null;
   pendingApprovalInvoicesData: PendingApprovalInvoicesData | null;
   pendingPaymentInvoicesData: PendingApprovalInvoicesData | null;

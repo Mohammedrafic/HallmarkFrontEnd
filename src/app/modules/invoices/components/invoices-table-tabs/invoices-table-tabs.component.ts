@@ -5,7 +5,7 @@ import {
   EventEmitter,
   Input, NgZone,
   Output,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -20,7 +20,7 @@ import { OutsideZone } from '@core/decorators';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoicesTableTabsComponent extends Destroyable implements AfterViewInit {
-  private readonly tabsComponentCreated$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
+  private readonly tabsComponentCreated$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   @Input()
   public tabConfig: TabsListConfig[];

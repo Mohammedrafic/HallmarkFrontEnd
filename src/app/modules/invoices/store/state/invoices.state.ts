@@ -134,11 +134,6 @@ export class InvoicesState {
   }
 
   @Selector([InvoicesState])
-  static manualInvoicesExist(state: InvoicesModel): boolean {
-    return state.manualInvoicesExist;
-  }
-
-  @Selector([InvoicesState])
   static paymentDetails(state: InvoicesModel): InvoicePayment[] {
     return state.paymentDetails;
   }
@@ -339,14 +334,14 @@ export class InvoicesState {
       switchMap((res) => this.invoicesAPIService.saveManualInvoiceAttachments(
         files, isAgency ? res.organizationId : null,  res.timesheetId,)),
       tap(() => {
+        ctx.dispatch(new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successAdd));
         const tabIdx = ctx.getState().selectedTabIdx;
 
-        ctx.dispatch([
-          new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successAdd),
-          tabIdx === 0 ? new Invoices.GetManualInvoices(payload.organizationId) :
-          new Invoices.GetPendingInvoices(payload.organizationId),
-        ]);
-
+        if (isAgency && tabIdx === 0) {
+          ctx.dispatch(new Invoices.GetManualInvoices(payload.organizationId));
+        } else {
+          ctx.dispatch(new Invoices.GetPendingInvoices(payload.organizationId));
+        }
       }),
       catchError((err: HttpErrorResponse) => {
         return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
@@ -465,7 +460,7 @@ export class InvoicesState {
     { organizationId }: Invoices.GetManualInvoices
   ): Observable<ManualInvoicesData | void> {
     const state = getState();
-
+    
     return this.invoicesAPIService.getManualInvoices({
       ...state.invoicesFilters,
       organizationId,
@@ -476,22 +471,6 @@ export class InvoicesState {
       catchError((err: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
-    );
-  }
-
-  @Action(Invoices.CheckManualInvoicesExist)
-  CheckManualInvoicesExist(
-    { patchState }: StateContext<InvoicesModel>,
-    { organizationId }: Invoices.CheckManualInvoicesExist
-  ): Observable<ManualInvoicesData | void> {
-    return this.invoicesAPIService.getManualInvoices({
-      pageNumber: 1,
-      pageSize: 1,
-      organizationId,
-    }).pipe(
-      tap(({ totalCount }: ManualInvoicesData) => patchState({
-        manualInvoicesExist: !!totalCount,
-      })),
     );
   }
 

@@ -1,34 +1,22 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  Inject,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef,
+  Component, Inject, NgZone, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
-  combineLatest,
-  combineLatestWith,
-  debounceTime,
-  distinctUntilChanged,
-  filter,
-  map,
-  Observable,
-  switchMap,
-  takeUntil,
-  tap,
+  combineLatest, distinctUntilChanged, filter,
+  map, Observable, skip, switchMap, takeUntil, tap,
 } from 'rxjs';
 
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
+import { OutsideZone } from '@core/decorators';
 import { DialogAction } from '@core/enums';
 import { DataSourceItem } from '@core/interface';
-import { RejectReasonInputDialogComponent } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
+import { RejectReasonInputDialogComponent,
+} from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
 import { GRID_CONFIG } from '@shared/constants';
 import { PageOfCollections } from '@shared/models/page.model';
+// TODO: move this constant to shared.
 import { UNIT_ORGANIZATIONS_FIELDS } from 'src/app/modules/timesheets/constants';
 import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
@@ -37,23 +25,10 @@ import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions }
 import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
 import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
 import {
-  BaseInvoice,
-  GridContainerTabConfig,
-  InvoiceGridSelections,
-  InvoicePaymentData,
-  InvoicesFilterState,
-  InvoiceUpdateEmmit,
-  ManualInvoice,
-  ManualInvoicesData,
-  PrintingPostDto,
-  SelectedInvoiceRow,
+  BaseInvoice, GridContainerTabConfig, InvoiceGridSelections, InvoicePaymentData, InvoicesFilterState, InvoiceUpdateEmmit,
+  ManualInvoice, ManualInvoicesData, PendingInvoice, PendingInvoiceRecord,
+  PendingInvoicesData, PrintingPostDto, SelectedInvoiceRow, PendingApprovalInvoicesData,
 } from '../../interfaces';
-import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
-import {
-  PendingInvoice,
-  PendingInvoiceRecord,
-  PendingInvoicesData,
-} from '../../interfaces/pending-invoice-record.interface';
 import { InvoicePrintingService, InvoicesService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
@@ -61,7 +36,6 @@ import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
-import { BreakpointObserverService } from '@core/services';
 
 @Component({
   selector: 'app-invoices-container',
@@ -69,7 +43,7 @@ import { BreakpointObserverService } from '@core/services';
   styleUrls: ['./invoices-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoicesContainerComponent extends InvoicesPermissionHelper implements OnInit, AfterViewInit {
+export class InvoicesContainerComponent extends InvoicesPermissionHelper implements OnInit {
   @ViewChild(InvoicesTableTabsComponent)
   public invoicesTableTabsComponent: InvoicesTableTabsComponent;
 
@@ -99,9 +73,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   @Select(UserState.lastSelectedAgencyId)
   public readonly agencyId$: Observable<number>;
-
-  @Select(InvoicesState.manualInvoicesExist)
-  public readonly manualInvoicesExist$: Observable<boolean>;
 
   public selectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab = 0;
 
@@ -160,56 +131,65 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public paymentRecords: InvoicePaymentData[] = [];
 
   public businessUnitId?: number;
+  /**
+   * TODO: incorrect naming.
+   */
   public Org: DataSourceItem[];
+
   constructor(
     private cdr: ChangeDetectorRef,
     private invoicesService: InvoicesService,
     private actions$: Actions,
     private invoicesContainerService: InvoicesContainerService,
     private printingService: InvoicePrintingService,
+    private ngZone: NgZone,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
     store: Store
   ) {
     super(store);
 
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
-
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
     this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
+    this.selectTab(0);
+    this.tabConfig = this.invoicesContainerService.getTabConfig(this.selectedTabIdx);
   }
 
   public ngOnInit(): void {
+    /**
+     * TODO: refactoring needed.
+     */
     this.businessUnitId = JSON.parse((localStorage.getItem('BussinessUnitID') || '0')) as number;
-    (!this.businessUnitId)?this.businessUnitId=0:""
+    (!this.businessUnitId)?this.businessUnitId=0:"";
+    /**
+     * TODO: remove window object with angular document token injection.
+     */
     window.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
+
+    
     if (this.isAgency) {
       this.checkActionsAllowed();
     }
-
-    this.checkPermissions(this.isAgency)
-      .pipe(takeUntil(this.componentDestroy()))
-      .subscribe(() => this.handleChangeTab(0));
+    this.setGridConfig();
     this.watchDialogVisibility();
     this.startFiltersWatching();
     this.watchForInvoiceStatusChange();
-
-    this.watchOrganizationId();
+    this.setPermissions();
     this.watchAgencyId();
     this.watchForOpenPayment();
     this.watchForSavePaymentAction();
   }
 
-  public ngAfterViewInit(): void {
-    this.setManualInvoicesTabVisibility();
-  }
-
   public watchAgencyId(): void {
+    /**
+     * TODO: refactoring needed.
+     */
     if (this.isAgency) {
       this.agencyId$
         .pipe(
           distinctUntilChanged(),
           switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
-        switchMap(() => this.organizations$),
+          switchMap(() => this.organizations$),
           filter((organizations: DataSourceItem[]) => !!organizations.length),
           tap((organizations: DataSourceItem[]) => this.Org = organizations,
           ),
@@ -217,30 +197,14 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         )
         .subscribe((orgId: number) => {
           if (this.businessUnitId) {
-            this.organizationControl.setValue((this.Org || []).filter(f => f.id == this.businessUnitId)[0].id, { emitEvent: true, onlySelf: false });
+            this.organizationControl
+            .setValue((this.Org || []).filter(f => f.id === this.businessUnitId)[0].id,
+            { emitEvent: true, onlySelf: false });
           } else {
             this.organizationControl.setValue(orgId, { emitEvent: true, onlySelf: false });
           }
         });
     }
-  }
-
-  public watchOrganizationId(): void {
-    this.organizationId$
-      .pipe(
-        tap((id: number) => {
-          const orgIdSet = !!this.organizationId;
-          this.organizationId = id;
-
-          if (!orgIdSet) {
-            this.handleChangeTab(0);
-          }
-        }),
-        takeUntil(this.componentDestroy())
-      )
-      .subscribe((id: number) => {
-        this.store.dispatch(new Invoices.SelectOrganization(id));
-      });
   }
 
   public watchDialogVisibility(): void {
@@ -253,28 +217,29 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     });
   }
 
-  public setManualInvoicesTabVisibility(): void {
-    if (!this.isAgency) {
-      this.organizationId$
-        .pipe(
-          switchMap((orgId: number) => this.store.dispatch(new Invoices.CheckManualInvoicesExist(orgId))),
-          switchMap(() => this.manualInvoicesExist$),
-          takeUntil(this.componentDestroy()),
-        )
-        .subscribe((invoicesExist: boolean) =>
-          this.invoicesTableTabsComponent.setTabVisibility(0, invoicesExist)
-        );
-    }
-  }
-
   public startFiltersWatching(): void {
-    this.organizationId$.pipe(
-      combineLatestWith(this.invoicesFilters$),
-      debounceTime(200),
+    const organizationStream = this.organizationId$
+    .pipe(
+      distinctUntilChanged(),
+      filter((id) => !!id),
+      tap((id: number) => {
+        this.organizationId = id;
+        this.store.dispatch(new Invoices.SelectOrganization(id));
+      }),
+    );
+
+    combineLatest([
+      organizationStream,
+      this.invoicesFilters$.pipe(skip(1)),
+    ])
+    .pipe(
+      tap(([orgId]) => {
+        this.organizationId = orgId;
+      }),
       takeUntil(this.componentDestroy()),
-    ).subscribe(([orgId]) => {
-      this.organizationId = orgId;
-      this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? orgId : null);
+    ).subscribe(() => {
+      this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
+      this.setGridConfig();
       this.cdr.markForCheck();
     });
   }
@@ -283,35 +248,21 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
-  public handleChangeTab(tabIdx: number): void {
+  public selectTab(tabIdx: number): void {
+    if (this.selectedTabIdx  === tabIdx) {
+      return;
+    }
     this.selectedTabIdx = tabIdx;
     this.store.dispatch([
       new Invoices.SetTabIndex(tabIdx),
-      new Invoices.CheckManualInvoicesExist(this.organizationId),
     ]);
 
     this.clearSelections();
-    this.clearTab();
-
-    this.gridOptions = {
-      ...this.defaultGridOptions,
-      ...this.invoicesContainerService.getGridOptions(tabIdx, this.organizationId),
-    };
-
-    this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
-      {
-        organizationId: this.organizationId,
-        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay
-          || this.invoiceContainerConfig.invoicePayAllowed && this.payInvoiceEnabled,
-        canEdit: this.invoiceContainerConfig.agencyActionsAllowed && this.approveInvoiceEnabled,
-      });
-
+    this.clearGroupedInvoices();
+    this.setGridConfig();
 
     this.tabConfig = this.invoicesContainerService.getTabConfig(tabIdx);
-
     this.cdr.markForCheck();
-
-    this.resetFilters();
   }
 
   public openAddDialog(): void {
@@ -337,7 +288,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public handleRowSelected(selectedRowData: SelectedInvoiceRow): void {
+  public selectRow(selectedRowData: SelectedInvoiceRow): void {
     const enableSelectionIndex = this.isAgency ? 1 : 2;
 
     if (this.selectedTabIdx >= enableSelectionIndex) {
@@ -369,7 +320,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.cdr.markForCheck();
   }
 
-  public handleUpdateTable({ invoiceId, status, organizationId }: InvoiceUpdateEmmit): void {
+  public updateTable({ invoiceId, status, organizationId }: InvoiceUpdateEmmit): void {
     this.store.dispatch(new Invoices.ChangeInvoiceState(invoiceId, status, organizationId))
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
@@ -377,25 +328,19 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       });
   }
 
-  public handlePageChange(pageNumber: number): void {
+  public changePage(pageNumber: number): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({
       pageNumber,
-    }, true))
-      .pipe(
-        takeUntil(this.componentDestroy()),
-      );
+    }, true));
   }
 
-  public handlePageSizeChange(pageSize: number): void {
+  public changePageSize(pageSize: number): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({
       pageSize,
-    }, true))
-      .pipe(
-        takeUntil(this.componentDestroy()),
-      );
+    }, true));
   }
 
-  public handleSortingChange(event: string): void {
+  public changeSorting(event: string): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({ orderBy: event }, true));
   }
 
@@ -431,11 +376,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       });
   }
 
-  public onInvoiceGrouping({ items }: { items: GroupInvoicesOption[] }): void {
+  public selectGroupOption({ items }: { items: GroupInvoicesOption[] }): void {
     this.groupInvoicesBy = items[0];
     this.hideGroupingOverlay();
   }
 
+  @OutsideZone
   public showGroupingOverlay(): void {
     setTimeout(() => {
       this.invoiceContainerConfig.groupInvoicesOverlayVisible = true;
@@ -447,7 +393,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.invoiceContainerConfig.groupInvoicesOverlayVisible = false;
   }
 
-  public handleMultiSelectionChanged(nodes: RowNode[]): void {
+  public changeMultiSelection(nodes: RowNode[]): void {
     if (nodes.length) {
       this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
       this.gridSelections.rowNodes = nodes;
@@ -494,7 +440,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.invoiceContainerConfig.addPaymentOpen = false;
   }
 
-  private clearTab(): void {
+  private clearGroupedInvoices(): void {
     this.groupingInvoiceRecordsIds = [];
   }
 
@@ -561,5 +507,26 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       );
       this.cdr.markForCheck();
     });
+  }
+
+  private setPermissions(): void {
+    this.checkPermissions(this.isAgency).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe();
+  }
+
+  private setGridConfig(): void {
+    this.gridOptions = {
+      ...this.defaultGridOptions,
+      ...this.invoicesContainerService.getGridOptions(this.selectedTabIdx, this.organizationId),
+    };
+
+    this.colDefs = this.invoicesContainerService.getColDefsByTab(this.selectedTabIdx,
+      {
+        organizationId: this.organizationId,
+        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay
+          || this.invoiceContainerConfig.invoicePayAllowed && this.payInvoiceEnabled,
+        canEdit: this.invoiceContainerConfig.agencyActionsAllowed && this.approveInvoiceEnabled,
+      });
   }
 }

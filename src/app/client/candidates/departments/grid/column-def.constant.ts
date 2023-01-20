@@ -36,11 +36,6 @@ export const columnDef = (columnParams: ColumnDefParams) => [
     },
   },
   {
-    field: 'departmentName',
-    headerName: 'Department',
-    flex: 1,
-  },
-  {
     field: 'regionName',
     headerName: 'Region',
     flex: 1,
@@ -50,6 +45,12 @@ export const columnDef = (columnParams: ColumnDefParams) => [
     headerName: 'Location',
     flex: 1,
   },
+  {
+    field: 'departmentName',
+    headerName: 'Department',
+    flex: 1,
+  },
+
   {
     field: 'skillMatch',
     headerName: 'Skill Match',
