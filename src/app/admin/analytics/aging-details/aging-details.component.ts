@@ -166,7 +166,8 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
           this.changeDetectorRef.detectChanges();
         }
       });
-      this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (typeof data === 'number' && data != this.previousOrgId) {
         this.previousOrgId = data;
         if (!this.isClearAll) {
