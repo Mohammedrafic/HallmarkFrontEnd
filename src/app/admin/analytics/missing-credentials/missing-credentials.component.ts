@@ -291,6 +291,7 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
         this.changeDetectorRef.detectChanges();
       }
       else {
+        this.filterColumns.locationIds.dataSource = [];
         this.missingCredentialReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
       }
     });
@@ -305,6 +306,7 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
         this.changeDetectorRef.detectChanges();
       }
       else {
+        this.filterColumns.departmentIds.dataSource = [];
         this.missingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
