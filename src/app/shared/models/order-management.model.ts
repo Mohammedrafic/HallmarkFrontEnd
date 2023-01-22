@@ -536,7 +536,7 @@ export type CandidateProfile = {
   classification: number;
   createdAt: string;
   createdBy: string;
-  dob: number;
+  dob: string;
   email: string;
   firstName: string;
   id: number;
@@ -591,6 +591,8 @@ export type OrderCandidateJob = {
   commentContainerId?: number;
   reOrderDate?: string;
   jobCancellation?: JobCancellation;
+  candidateSSNRequired:boolean;
+  candidateDOBRequired:boolean;
 };
 
 export type CandidatesBasicInfo = {

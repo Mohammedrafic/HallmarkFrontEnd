@@ -66,6 +66,9 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { CandidateDOBRequired, CandidateSSNRequired } from '@shared/constants';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> {}
 
@@ -130,7 +133,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public hasEditOrderBillRatesPermission: boolean;
 
   public applicantStatusEnum = ApplicantStatusEnum;
-
+  public candidateSSNRequired :boolean;
+  public candidateDOBRequired :boolean;
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
     Rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
@@ -281,6 +285,18 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   public onAccept(): void {
+    if(this.candidateDOBRequired){
+      if(!this.form.controls["dob"].value){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateDOBRequired));
+        return;
+      }
+    }
+    if(this.candidateSSNRequired){
+      if(!this.form.controls["ssn"].value){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
+        return;
+      }
+    }
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
   }
 
@@ -484,6 +500,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       penaltyCriteria: new FormControl(''),
       rate: new FormControl(''),
       hours: new FormControl(''),
+      dob:new FormControl(''),
+      ssn:new FormControl('')
     });
   }
 
@@ -503,6 +521,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   private patchForm(value: OrderCandidateJob): void {
     this.candidateJob = value;
+    this.candidateSSNRequired =value.candidateSSNRequired;
+    this.candidateDOBRequired=value.candidateDOBRequired;
     if (this.candidateJob) {
       this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
       this.getComments();
@@ -529,6 +549,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         penaltyCriteria: PenaltiesMap[this.candidateJob.jobCancellation?.penaltyCriteria || 0],
         rate: this.candidateJob.jobCancellation?.rate,
         hours: this.candidateJob.jobCancellation?.hours,
+        dob:value.candidateProfile.dob,
+        ssn:value.candidateProfile.ssn
       });
 
       if (!this.isRejected) {
