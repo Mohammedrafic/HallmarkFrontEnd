@@ -10,9 +10,9 @@ export interface Option {
 
 export interface WorkCommitmentForm {
   masterWorkCommitmentId: number;
-  regions: OrganizationRegion[];
-  locations: OrganizationLocation[];
-  skills: ListOfSkills[] | null[];
+  regions: OrganizationRegion[] | string[];
+  locations: OrganizationLocation[] | number[];
+  skillIds: (ListOfSkills | null | string | number)[];
   minimumWorkExperience: number | null;
   availabilityRequirement: number | null;
   schedulePeriod: number | null;
@@ -20,11 +20,12 @@ export interface WorkCommitmentForm {
   holiday: number | null;
   jobCode: string;
   comments: string | null;
+  workCommitmentId: number | null;
 }
 
 export interface WorkCommitmentDTO {
   masterWorkCommitmentId: number;
-  skills: number[] | null[];
+  skillIds: number[] | null[];
   minimumWorkExperience: number;
   availabilityRequirement: number;
   schedulePeriod: number;
@@ -33,6 +34,7 @@ export interface WorkCommitmentDTO {
   jobCode: string;
   comments: string;
   regions: RegionsDTO[];
+  workCommitmentId?: number | null;
 }
 
 export type CommitmentDataSource = OrganizationRegion[] | OrganizationLocation[] | OrganizationDepartment[] | Option[];
@@ -42,6 +44,7 @@ export interface CommitmentsInputConfig {
   title: string;
   required: boolean;
   type: FieldType;
+  disableOnEdit: boolean;
   disabled?: boolean;
   dataSource?: CommitmentDataSource;
   maxLength?: number;

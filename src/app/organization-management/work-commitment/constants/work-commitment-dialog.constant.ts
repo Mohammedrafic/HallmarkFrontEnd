@@ -12,6 +12,7 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       disabled: false,
       required: true,
       type: FieldType.Dropdown,
+      disableOnEdit: true,
     },
     {
       field: 'regions',
@@ -20,6 +21,7 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       required: true,
       type: FieldType.MultiSelectDropdown,
       dataSource: [],
+      disableOnEdit: false,
     },
     {
       field: 'locations',
@@ -28,14 +30,16 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       required: true,
       type: FieldType.MultiSelectDropdown,
       dataSource: [],
+      disableOnEdit: false,
     },
     {
-      field: 'skills',
+      field: 'skillIds',
       title: 'Skill',
       disabled: false,
       required: true,
       type: FieldType.MultiSelectDropdown,
       dataSource: [],
+      disableOnEdit: false,
     },
     {
       field: 'availabilityRequirement',
@@ -44,30 +48,34 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       required: false,
       type: FieldType.Number,
       decimals: 1,
+      disableOnEdit: false,
     },
     {
       field: 'schedulePeriod',
-      title: 'Schedule Period (weeks)',
+      title: 'Schedule Period (Weeks)',
       disabled: false,
       required: false,
       type: FieldType.Number,
       decimals: 0,
+      disableOnEdit: false,
     },
     {
       field: 'minimumWorkExperience',
-      title: 'Min. work experience',
+      title: 'Min. Work Experience',
       disabled: false,
       required: false,
       type: FieldType.Number,
       decimals: 1,
+      disableOnEdit: false,
     },
     {
       field: 'criticalOrder',
-      title: 'Min.Critical Order',
+      title: 'Critical Order',
       disabled: false,
       required: false,
       type: FieldType.Number,
       decimals: 0,
+      disableOnEdit: false,
     },
     {
       field: 'holiday',
@@ -76,6 +84,7 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       required: false,
       type: FieldType.Dropdown,
       dataSource: [],
+      disableOnEdit: false,
     },
     {
       field: 'jobCode',
@@ -84,6 +93,7 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       required: true,
       type: FieldType.Input,
       maxLength: 20,
+      disableOnEdit: false,
     },
 
     {
@@ -93,6 +103,7 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       required: false,
       type: FieldType.Input,
       maxLength: 200,
+      disableOnEdit: false,
     },
   ],
 });

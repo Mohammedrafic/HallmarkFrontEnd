@@ -5,7 +5,14 @@ import { filter, Observable, take } from 'rxjs';
 
 import { CustomFormGroup } from '@core/interface';
 import { BaseObservable } from '@core/helpers';
-import { Holiday, HolidaysPage, MasterCommitmentNames, Option, WorkCommitmentForm } from '../interfaces';
+import {
+  Holiday,
+  HolidaysPage,
+  MasterCommitmentNames,
+  Option,
+  WorkCommitmentForm,
+  WorkCommitmentGrid,
+} from '../interfaces';
 import { WorkCommitmentDialogApiService } from './work-commitment-dialog-api.service';
 
 import { OrganizationRegion } from '@shared/models/organization.model';
@@ -29,7 +36,7 @@ export class WorkCommitmentService {
       masterWorkCommitmentId: [null, Validators.required],
       regions: [null, Validators.required],
       locations: [null, Validators.required],
-      skills: [null, Validators.required],
+      skillIds: [null, Validators.required],
       availabilityRequirement: [null],
       schedulePeriod: [null],
       minimumWorkExperience: [null],
@@ -37,6 +44,7 @@ export class WorkCommitmentService {
       holiday: [null],
       jobCode: [null, Validators.required],
       comments: [null],
+      workCommitmentId: null,
     }) as CustomFormGroup<WorkCommitmentForm>;
   }
 
@@ -44,6 +52,20 @@ export class WorkCommitmentService {
     this.getNamesDropdown();
     this.getHolidaysDropdown();
     this.getSkillsDropdown();
+  }
+
+  public mapStructureForForms(commitment: WorkCommitmentGrid): WorkCommitmentForm {
+    let allSkills = null;
+
+    if (commitment.skillIds[0] === 0) {
+      allSkills = this.skills.get().map((item) => item.id);
+    }
+    return {
+      ...commitment,
+      regions: commitment.regionIds,
+      locations: commitment.locationIds,
+      skillIds: allSkills ?? commitment.skillIds,
+    };
   }
 
   private getNamesDropdown(): void {

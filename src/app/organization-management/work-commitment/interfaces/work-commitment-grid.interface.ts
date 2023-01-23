@@ -42,17 +42,20 @@ export interface WorkCommitmentGrid {
   holiday: number;
   jobCode: string;
   locationName: string[];
+  locationIds: number[];
   masterWorkCommitmentId: number;
   masterWorkCommitmentName: string;
   minimumWorkExperience: number;
   regionName: string[];
+  regionIds: string[];
   schedulePeriod: number;
-  skills: ListOfSkills[];
+  skillNames: string[];
+  skillIds: number[];
   workCommitmentId: number;
 }
 
 export type WorkCommitmentsPage = PageOfCollections<WorkCommitmentDetails>;
 
 export interface WorkCommitmentGridColumns extends ICellRendererParams {
-  edit?: (commitment: WorkCommitmentDetails) => WorkCommitmentDetails;
+  edit?: (commitment: WorkCommitmentGrid) => WorkCommitmentGrid;
 }

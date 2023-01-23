@@ -15,7 +15,6 @@ export namespace WorkCommitment {
   export class DeleteCommitment {
     static readonly type = WORK_COMMITMENT_ACTIONS.DELETE_COMMITMENT;
     constructor(public id: number) {}
-    //TODO provide logic
   }
 
   export class UpdatePageAfterSuccessAction {

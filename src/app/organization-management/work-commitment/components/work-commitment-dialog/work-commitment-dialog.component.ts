@@ -49,11 +49,15 @@ import { WorkCommitmentAdapter } from '../../adapters/work-commitment.adapter';
 export class WorkCommitmentDialogComponent extends DestroyableDirective implements OnInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
-  @Input() selectedCommitment: WorkCommitmentGrid;
+  @Input() set selectedCommitment(commitment: WorkCommitmentGrid) {
+    if (commitment) {
+      this.commitmentForm?.patchValue(this.commitmentService.mapStructureForForms(commitment));
+    }
+  }
   @Input() permission: boolean;
   @Input() set isEditDialog(value: boolean) {
-    this.dialogConfig = CommitmentsDialogConfig();
     this.setDialogTitle(value);
+    this.isEdit = value;
   }
 
   @Output() saveCommitment = new EventEmitter<WorkCommitmentDTO>();
@@ -66,11 +70,12 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
   public buttonType = ButtonTypeEnum;
   public datepickerMask = datepickerMask;
   public allSkillsLength: number;
+  public isEdit: boolean = false;
 
   @Select(UserState.organizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;
 
-  private selectedRegions: OrganizationRegion[] = []; //TODO use when edit functionality will be provided
+  private selectedRegions: OrganizationRegion[] = [];
   private regions: OrganizationRegion[];
   private regionsDTO: RegionsDTO[];
 
@@ -82,6 +87,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
     private changeDetection: ChangeDetectorRef
   ) {
     super();
+    this.dialogConfig = CommitmentsDialogConfig();
   }
 
   ngOnInit(): void {
@@ -231,7 +237,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
       .getStream()
       .pipe(filter(Boolean), takeUntil(this.destroy$))
       .subscribe((skills) => {
-        setDataSourceValue(this.dialogConfig.fields, 'skills', skills);
+        setDataSourceValue(this.dialogConfig.fields, 'skillIds', skills);
         this.allSkillsLength = skills.length;
         this.changeDetection.markForCheck();
       });

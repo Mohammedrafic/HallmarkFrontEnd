@@ -16,7 +16,16 @@ export class WorkCommitmentApiService {
     return this.http.post<WorkCommitmentsPage>('/api/WorkCommitment/GetAll', { pageNumber, pageSize });
   }
 
-  public addCommitment(payload: WorkCommitmentDTO): Observable<WorkCommitmentDTO> {
-    return this.http.post<WorkCommitmentDTO>('/api/WorkCommitment', payload);
+  public saveCommitment(payload: WorkCommitmentDTO): Observable<WorkCommitmentDTO> {
+    const url = '/api/WorkCommitment';
+    if (payload.workCommitmentId) {
+      return this.http.put<WorkCommitmentDTO>(url, payload);
+    } else {
+      return this.http.post<WorkCommitmentDTO>(url, payload);
+    }
+  }
+
+  public deleteCommitment(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/WorkCommitment/${id}`);
   }
 }

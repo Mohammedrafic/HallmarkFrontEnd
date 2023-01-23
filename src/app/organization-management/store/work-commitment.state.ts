@@ -10,8 +10,9 @@ import { WorkCommitmentApiService } from '@shared/services/work-commitment-api.s
 import { WorkCommitment } from './work-commitment.actions';
 import { ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { Tiers } from './tiers.actions';
 
 @State<WorkCommitmentStateModel>({
   name: 'workCommitment',
@@ -46,7 +47,7 @@ export class WorkCommitmentState {
     { payload, isEdit }: WorkCommitment.SaveCommitment
   ): Observable<WorkCommitmentDTO | void> {
     if (payload) {
-      return this.workCommitmentApiService.addCommitment(payload).pipe(
+      return this.workCommitmentApiService.saveCommitment(payload).pipe(
         tap(() => {
           dispatch([
             new ShowToast(MessageTypes.Success, isEdit ? RECORD_MODIFIED : RECORD_ADDED),
@@ -61,5 +62,23 @@ export class WorkCommitmentState {
     } else {
       return of();
     }
+  }
+
+  @Action(WorkCommitment.DeleteCommitment)
+  deleteCommitment(
+    { dispatch }: StateContext<WorkCommitmentStateModel>,
+    { id }: WorkCommitment.DeleteCommitment
+  ): Observable<void> {
+    return this.workCommitmentApiService.deleteCommitment(id).pipe(
+      tap(() => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_DELETE),
+          new WorkCommitment.UpdatePageAfterSuccessAction(),
+        ]);
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
   }
 }

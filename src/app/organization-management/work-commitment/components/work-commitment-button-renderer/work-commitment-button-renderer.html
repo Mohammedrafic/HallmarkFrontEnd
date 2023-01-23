@@ -1,23 +1,21 @@
 <div class="row-tool-buttons action-renderer ag-grid-cell-renderer">
   <button
     ejs-button
-    cssClass="e-flat primary-icon-button"
+    appHideBeforeSyncfusionLoad
+    cssClass="e-flat primary-icon-button edit-button"
     (click)="editCommitment()"
     [disabled]="!userPermission[userPermissions.CanManageWorkCommitmentData]"
-    disabled
   >
-    <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+    <span><i-feather name="edit" class="icon"></i-feather></span>
   </button>
   <button
     ejs-button
+    appHideBeforeSyncfusionLoad
     cssClass="e-flat secondary-icon-button"
     [disabled]="!userPermission[userPermissions.CanManageWorkCommitmentData]"
     class="remove-button"
     (click)="deleteCommitment()"
-    disabled
   >
     <span><i-feather name="trash-2" class="icon"></i-feather></span>
   </button>
 </div>
-
-<!--TODO undisable when add/delete functionality will be provide-->
