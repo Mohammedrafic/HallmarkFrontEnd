@@ -218,17 +218,19 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
       )
       .subscribe((value) => {
         this.regionsDTO = [];
+        const regionsUnique = new Set<RegionsDTO>();
         this.selectedRegions.map((item) => {
-          const locationArr: number[] = [];
+          const locationArr = new Set<number>();
           value.forEach((locationId) => {
             item.locations!.filter((location: any) => {
               if (location.id === locationId) {
-                locationArr.push(location.id);
+                locationArr.add(location.id);
               }
             });
           });
-          this.regionsDTO.push({ id: item.id!, locations: locationArr });
+          regionsUnique.add({ id: item.id!, locations: [...locationArr] });
         });
+        this.regionsDTO = [...regionsUnique];
       });
   }
 
