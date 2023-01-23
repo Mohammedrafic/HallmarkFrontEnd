@@ -326,10 +326,6 @@
     .controls-container {
       flex-direction: row;
 
-      @media #{$max-desktop-small} {
-        padding-top: 0;
-      }
-
       .right-content {
         align-items: flex-end;
         justify-content: flex-end;
