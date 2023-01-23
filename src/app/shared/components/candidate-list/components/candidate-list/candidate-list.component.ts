@@ -252,8 +252,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public onRemove(id: number): void {
     this.confirmService
-      .confirm(
-        'Are you sure you want to inactivate the Candidate?', {
+      .confirm('Are you sure you want to inactivate the Candidate?', {
         okButtonLabel: 'Inactivate',
         okButtonClass: 'delete-button',
         title: 'Inactivate the Candidate',
@@ -388,17 +387,16 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private inactivateCandidate(id: number) {
-    if (this.isIRP) {
-       this.store.dispatch(new DeleteIRPCandidate(id));
-       this.dispatchNewPage();
-    } else {
-      this.store
-      .dispatch(new ChangeCandidateProfileStatus(id, CandidateStatus.Inactive))
+    const ChangeCandidateStatusAction = this.isIRP
+      ? new DeleteIRPCandidate(id)
+      : new ChangeCandidateProfileStatus(id, CandidateStatus.Inactive);
+
+    this.store
+      .dispatch(ChangeCandidateStatusAction)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.dispatchNewPage();
       });
-    }
   }
 
   private clearFilters(): void {
