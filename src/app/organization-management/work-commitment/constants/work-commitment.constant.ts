@@ -36,11 +36,11 @@ export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkC
     valueGetter: (params: { data: WorkCommitmentGrid }) => getCorrectLocationValue(params.data.locationName),
   },
   {
-    field: 'skills',
+    field: 'skillNames',
     headerName: 'SKILL',
     minWidth: 140,
     sortable: true,
-    valueGetter: (params: { data: WorkCommitmentDetails }) => getCorrectSkillsValue(params.data.skills),
+    valueGetter: (params: { data: WorkCommitmentGrid }) => getCorrectSkillsValue(params.data.skillNames),
   },
   {
     field: 'minimumWorkExperience',

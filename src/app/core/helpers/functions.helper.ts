@@ -54,3 +54,51 @@ export const CalcDaysMs = (dayNum: number) => {
 export const GenerateUniqueId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 };
+
+export const isObjectsEqual = (obj1: Record<string, unknown>, obj2: Record<string, unknown>): boolean => {
+  if (obj1 === null && obj2 === null) {
+    return true;
+  }
+
+  if (!obj1 || typeof obj1 !== 'object' || !obj2 || typeof obj2 !== 'object') {
+    return false;
+  }
+
+  const firstKeys: string[] = Object.keys(obj1);
+  const secondKeys: string[] = Object.keys(obj2);
+
+  if (firstKeys.length !== secondKeys.length) {
+    return false;
+  }
+
+  return Object.keys(obj1).every((p) => {
+    if (Object.prototype.hasOwnProperty.call(obj1, p) !== Object.prototype.hasOwnProperty.call(obj2, p)) {
+      return false;
+    }
+
+    switch (typeof (obj1[p])) {
+      case 'object':
+        if (!isObjectsEqual(obj1[p] as Record<string, unknown>, obj2[p] as Record<string, unknown>)) {
+          return false;
+        }
+        break;
+      case 'function':
+        if (typeof (obj2[p]) === 'undefined' || (p !== 'compare'
+        && (obj1[p] as () => unknown).toString() !== (obj2[p] as () => unknown).toString())) {
+          return false;
+        }
+        break;
+      default:
+        if (obj1[p] !== obj2[p]) {
+          return false;
+        }
+    }
+
+    return true;
+  }) && Object.keys(obj2).every((p) => {
+    if (typeof (obj1[p]) === 'undefined' && typeof (obj2[p]) !== 'undefined') {
+      return false;
+    }
+    return true;
+  });
+};

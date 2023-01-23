@@ -45,7 +45,7 @@ export class WorkCommitmentButtonRenderer extends AbstractPermission {
       })
       .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
       .subscribe(() => {
-        this.store.dispatch(new WorkCommitment.DeleteCommitment(this.cellValue.data.id));
+        this.store.dispatch(new WorkCommitment.DeleteCommitment(this.cellValue.data.workCommitmentId));
       });
   }
 }

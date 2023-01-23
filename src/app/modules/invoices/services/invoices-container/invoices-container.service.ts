@@ -29,7 +29,8 @@ export abstract class InvoicesContainerService {
     organizationId: number | null
   ): Observable<void>;
 
-  public getGridOptions(tab: AgencyInvoicesGridTab | OrganizationInvoicesGridTab, organizationId: number | null): GridOptions {
+  public getGridOptions(tab: AgencyInvoicesGridTab | OrganizationInvoicesGridTab,
+    organizationId: number | null): GridOptions {
     return {};
   }
 
@@ -42,6 +43,6 @@ export abstract class InvoicesContainerService {
       groupingEnabled: false,
       manualInvoiceCreationEnabled: false,
       ...config,
-    }
+    };
   }
 }

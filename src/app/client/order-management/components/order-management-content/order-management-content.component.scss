@@ -165,8 +165,15 @@
 }
 
 :host {
+  .button-group {
+    margin-top: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid $secondary-dark-blue-40;
+    display: block;
+  }
+
   .table-tabs {
-    margin-bottom: 0px;
+    margin-bottom: 0;
     display: inline-block;
 
     &.irp {
@@ -244,10 +251,10 @@
 }
 
 .grid-table-container {
-  height: calc(98vh - 254px);
+  height: calc(98vh - 320px);
 
   @media #{$max-tablet} {
-    height: calc(98vh - 305px);
+    height: calc(98vh - 350px);
   }
 
   &::ng-deep {
@@ -299,31 +306,29 @@
 }
 
 .grid-component {
-  height: calc(100% - 190px);
+  height: calc(100% - 250px);
   overflow-y: auto;
 
   @media #{$max-tablet} {
-    height: calc(100% - 245px);
+    height: calc(100% - 290px);
   }
-}
-
-.mobile-group-button {
-  display: flex;
-  column-gap: 10px;
-  width: 100%;
-  margin-bottom: 12px;
 }
 
 .navigation-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-self: flex-end;
 }
 
 ::ng-deep {
   app-page-toolbar {
     .controls-container {
       flex-direction: row;
+
+      @media #{$max-desktop-small} {
+        padding-top: 0;
+      }
 
       .right-content {
         align-items: flex-end;
@@ -371,12 +376,23 @@
   }
 
   .mobile-group-button {
-    margin-top: 95px;
+    display: flex;
+    column-gap: 10px;
+    width: 100%;
+    margin-bottom: 12px;
+
+    &.irp {
+      margin-top: 95px;
+    }
+
+    &.vms {
+      margin-top: 60px;
+    }
   }
 
   .navigation-wrapper {
     position: fixed;
-    top: 81px;
+    top: 180px;
     z-index: 2;
     margin: auto -24px;
     padding: 15px 24px 0 24px;

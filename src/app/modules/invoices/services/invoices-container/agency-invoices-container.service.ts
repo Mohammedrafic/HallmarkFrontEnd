@@ -21,7 +21,7 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
     { organizationId, canPay, canEdit }: { organizationId: number, canPay: boolean, canEdit: boolean },
     ): ColDef[] {
     switch (tab) {
-      case 0:
+      case AgencyInvoicesGridTab.Manual:
         return ManualInvoicesGridHelper.getAgencyColDefs({
           edit: (invoice: ManualInvoice) => this.store.dispatch([
             new Invoices.ToggleManualInvoiceDialog(DialogAction.Open, invoice),
@@ -38,7 +38,7 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
           ),
           canEdit,
         });
-      case 1:
+      case AgencyInvoicesGridTab.All:
         return AllInvoicesGridHelper.getColDefs(
           canPay,
           {

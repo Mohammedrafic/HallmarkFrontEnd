@@ -433,7 +433,11 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onMenuItemClick(menuItem: MenuItem): void {
     this.setSideBarForFirstLoad(menuItem.route as string);
-    this.router.navigate([menuItem.route]);
+    if (menuItem.id == AnalyticsMenuId) {
+      this.router.navigate([menuItem.route]);
+    } else {
+      !menuItem.children?.length && this.router.navigate([menuItem.route]);
+    }
   }
 
   onSubMenuItemClick(event: any): void {

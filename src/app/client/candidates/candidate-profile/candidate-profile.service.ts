@@ -12,6 +12,7 @@ import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { DateTimeHelper } from '@core/helpers';
 import pick from 'lodash/fp/pick';
+import { CandidatesService } from '../services/candidates.service';
 
 @Injectable()
 export class CandidateProfileService {
@@ -20,6 +21,7 @@ export class CandidateProfileService {
     private formBuilder: FormBuilder,
     private store: Store,
     private candidateProfileForm: CandidateProfileFormService,
+    private candidateService: CandidatesService,
     private generalNotesService: GeneralNotesService
   ) {}
 
@@ -38,6 +40,7 @@ export class CandidateProfileService {
         } else {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
+        this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
       }),
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));

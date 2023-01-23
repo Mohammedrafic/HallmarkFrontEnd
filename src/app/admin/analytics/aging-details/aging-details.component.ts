@@ -142,9 +142,9 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     this.agingReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        regionIds: new FormControl([], [Validators.required]),
-        locationIds: new FormControl([], [Validators.required]),
-        departmentIds: new FormControl([], [Validators.required]),
+        regionIds: new FormControl([]),
+        locationIds: new FormControl([]),
+        departmentIds: new FormControl([]),
         agingGroupIds:new FormControl(null)
       }
     );
@@ -382,18 +382,9 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     this.departmentsList = this.masterDepartmentsList;
   }
   public onFilterApply(): void {
-    let { regionIds,locationIds,departmentIds,agingGroupIds } = this.agingReportForm.getRawValue();
-
-    regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
-    locationIds =      locationIds.length > 0 ?locationIds.join(",") : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
-    departmentIds =    departmentIds.length > 0 ?departmentIds.join(",") : this.departmentsList?.length>0?  this.departmentsList.map(x=> x.id).join(",") :"null"; 
- 
-    if(!(regionIds.length >0 && locationIds.length >0 && departmentIds.length >0 ))
-    {
         this.agingReportForm.markAllAsTouched();
         if (this.agingReportForm.invalid) {
           return;
-        }
     }
     this.SearchReport();
     this.store.dispatch(new ShowFilterDialog(false));

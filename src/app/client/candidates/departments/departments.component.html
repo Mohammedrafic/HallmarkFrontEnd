@@ -1,7 +1,7 @@
 <app-grid
   class="department-assigned-grid"
   *ngIf="(departmentsAssigned$ | async) as departmentsAssigned"
-  title="Department Assigned"
+  gridTitle="Department Assigned"
   [rowSelection]="undefined"
   [rowData]="departmentsAssigned?.items"
   [columnDefinitions]="columnDef"

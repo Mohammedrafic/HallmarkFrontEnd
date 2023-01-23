@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 
-import { map, Observable, zip } from 'rxjs';
 import { Actions, ofActionCompleted, Store } from '@ngxs/store';
+import { map, Observable, zip } from 'rxjs';
 
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { ShowToast } from 'src/app/store/app.actions';
 import {
   AddManInvoiceDialogConfig, AddManInvoiceForm, ManInvoiceInputConfig, ManualInvoiceInputOptions,
-  ManualInvoiceMeta
+  ManualInvoiceMeta,
 } from '../../interfaces';
+import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoiceMetaAdapter } from '../invoice-meta.adapter';
 import { ManualInvoiceStrategy } from './strategy.interface';
-import { Invoices } from '../../store/actions/invoices.actions';
-import { ShowToast } from 'src/app/store/app.actions';
-import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable({ providedIn: 'any'})
 export class AgencyStrategy implements ManualInvoiceStrategy {
@@ -50,6 +50,7 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
       form.get('departmentId')?.patchValue(meta[0].departmentId);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getMeta(form: CustomFormGroup<AddManInvoiceForm>): Observable<null> {
     const id = this.store.snapshot().invoices.selectedOrganizationId;
     this.store.dispatch(new Invoices.GetManInvoiceMeta(id));

@@ -156,7 +156,8 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
 
     const { shiftId, startTime, endTime, unavailabilityReasonId = null } = this.scheduleForm.getRawValue();
     const schedule: ScheduleInt.Schedule = {
-      employeeScheduledDays: this.createScheduleService.getEmployeeScheduledDays(this.scheduleItemsComponent.scheduleItems),
+      employeeScheduledDays: this.createScheduleService
+        .getEmployeeScheduledDays(this.scheduleItemsComponent.scheduleItems, startTime, endTime),
       scheduleType: this.scheduleTypesControl.value,
       startTime: getTime(startTime),
       endTime: getTime(endTime),

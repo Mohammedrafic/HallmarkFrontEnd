@@ -7,21 +7,21 @@
       </div>
     </div>
 
-    <div *ngIf="emailCcControl.invalid && (emailCcControl.dirty || emailCcControl.touched)"
+    <div *ngIf="emailCcControl.invalid && emailCcControl.touched"
       class="alert alert-danger">
       <div *ngIf="emailCcControl.errors?.['emails']">
         - Some of email(s) in CC not matching valid email address pattern.
       </div>
     </div>
 
-    <div *ngIf="subjectControl.invalid && (subjectControl.dirty || subjectControl.touched)"
+    <div *ngIf="subjectControl.invalid && subjectControl.touched"
       class="alert alert-danger">
       <div *ngIf="subjectControl.errors?.['required']">
         - Field Email subject is required.
       </div>
     </div>
 
-    <div *ngIf="emailBodyControl.invalid && (emailBodyControl.dirty || emailBodyControl.touched)"
+    <div *ngIf="emailBodyControl.invalid && emailBodyControl.touched"
       class="alert alert-danger">
       <div *ngIf="emailBodyControl.errors?.['required']">
         - Field Email body is required.
@@ -65,7 +65,7 @@
               <ejs-multiselect mode="CheckBox" appValidateWithMessage
                                 formControlName="businesses"
                                 [fields]="businessDataFields"
-                                [dataSource]="businessData$ | async"                                
+                                [dataSource]="businessData"                                
                                 [allowFiltering]="true"
                                 placeholder="Business"
                                 [showDropDownIcon]="true"

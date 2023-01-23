@@ -1,7 +1,7 @@
 import { positionIdStatuses } from "@agency/candidates/add-edit-candidate/add-edit-candidate.constants";
 import { CandidateAgencyComponent } from '@agency/candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
 import { Location } from '@angular/common';
-import { AfterViewInit, Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
@@ -64,6 +64,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   public candidateJob: string;
   public orderOrPositionTitle: string;
   public orderOrPositionId: string;
+  public candidateName: string | null;
 
   private filesDetails: Blob[] = [];
   private unsubscribe$: Subject<void> = new Subject();
@@ -88,7 +89,6 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     private confirmService: ConfirmService,
     private credentialStorage: CredentialStorageFacadeService,
     private location: Location,
-    private readonly ngZone: NgZone,
   ) {
     super(store);
     store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
@@ -103,6 +103,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCandidateSucceeded))
       .subscribe((candidate: { payload: Candidate }) => {
         this.fetchedCandidate = candidate.payload;
+        this.candidateName = this.getCandidateName(this.fetchedCandidate);
         this.uploadImages(this.fetchedCandidate.id as number);
         this.candidateForm.markAsPristine();
       });
@@ -110,6 +111,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetCandidateByIdSucceeded))
       .subscribe((candidate: { payload: Candidate }) => {
         this.fetchedCandidate = candidate.payload;
+        this.candidateName = this.getCandidateName(this.fetchedCandidate);
         this.patchAgencyFormValue(this.fetchedCandidate);
       });
     this.actions$
@@ -140,6 +142,10 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.isRemoveLogo = false;
+  }
+
+  private getCandidateName(candidate: Candidate): string {
+    return `${candidate.lastName}, ${candidate.firstName}`;
   }
 
   public clearForm(): void {

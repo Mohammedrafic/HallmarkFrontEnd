@@ -6,7 +6,6 @@ import { GRID_CONFIG } from '@shared/constants';
 export const DefaultInvoicesState: InvoicesModel = {
   invoicesData: null,
   manualInvoicesData: null,
-  manualInvoicesExist: false,
   pendingInvoicesData: null,
   pendingApprovalInvoicesData: null,
   pendingPaymentInvoicesData: null,

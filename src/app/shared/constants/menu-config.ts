@@ -383,6 +383,16 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/daily-order',
     },
+    84: {
+      // Candidate Status Report
+      icon: '',
+      route: '/analytics/candidate-status',
+    },
+    85: {
+      // Vendor Activity Report
+      icon: '',
+      route: '/analytics/vendor-activity',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -564,6 +574,16 @@ export const MENU_CONFIG: any = {
       // New Accrual Report
       icon: '',
       route: '/analytics/accrual-report',
+    },
+    84: {
+      // Candidate Status Report
+      icon: '',
+      route: '/analytics/candidate-status',
+    },
+    85: {
+      // Vendor Activity Report
+      icon: '',
+      route: '/analytics/vendor-activity',
     },
   },
 
@@ -912,6 +932,16 @@ export const MENU_CONFIG: any = {
       // New Accrual Report
       icon: '',
       route: '/analytics/accrual-report',
+    },
+    84: {
+      // Candidate Status Report
+      icon: '',
+      route: '/analytics/candidate-status',
+    },
+    85: {
+      // Vendor Activity Report
+      icon: '',
+      route: '/analytics/vendor-activity',
     },
   },
 

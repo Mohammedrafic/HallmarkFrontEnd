@@ -1,31 +1,31 @@
+<app-button-group
+  class="button-group"
+  *ngIf="isIRPFlagEnabled"
+  [buttonOptions]="systemGroupConfig"
+  (buttonChange)="buttonGroupChange($event)"
+></app-button-group>
 <app-page-toolbar>
   <ng-container left>
-    <ng-container *ngIf="isIRPFlagEnabled">
-      <div class="navigation-wrapper" appTabsMobileShadow>
-        <app-button-group
-          [buttonOptions]="systemGroupConfig"
-          (buttonChange)="buttonGroupChange($event)"
-        ></app-button-group>
-        <div>
-          <app-tabs-list
-            class="table-tabs irp"
-            *ngIf="activeSystem === OrderManagementIRPSystemId.IRP"
-            #tabNavigation
-            [tabConfig]="tabsListConfig"
-            (changeTab)="irpTabSelected($event)"
-          >
-          </app-tabs-list>
-          <app-tab-navigation
-            class="table-tabs vms"
-            *ngIf="activeSystem === OrderManagementIRPSystemId.VMS"
-            #tabNavigation
-            [hideTemplatesTab]="false"
-            (selectedTab)="tabSelected($event)"
-          >
-          </app-tab-navigation>
-        </div>
+    <div class="navigation-wrapper" appTabsMobileShadow>
+      <div>
+        <app-tabs-list
+          class="table-tabs irp"
+          *ngIf="activeSystem === OrderManagementIRPSystemId.IRP"
+          #tabNavigation
+          [tabConfig]="tabsListConfig"
+          (changeTab)="irpTabSelected($event)"
+        >
+        </app-tabs-list>
+        <app-tab-navigation
+          class="table-tabs vms"
+          *ngIf="activeSystem === OrderManagementIRPSystemId.VMS"
+          #tabNavigation
+          [hideTemplatesTab]="false"
+          (selectedTab)="tabSelected($event)"
+        >
+        </app-tab-navigation>
       </div>
-    </ng-container>
+    </div>
   </ng-container>
   <ng-container right>
     <ng-container *ngIf="!isMobile">
@@ -181,7 +181,7 @@
 </ng-template>
 
 <ng-template #vmsGridTemplate>
-  <div class="mobile-group-button" *ngIf="isMobile">
+  <div class="mobile-group-button" [ngClass]="isIRPFlagEnabled ? 'irp': 'vms'" *ngIf="isMobile">
     <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
   </div>
   <section class="grid-component">

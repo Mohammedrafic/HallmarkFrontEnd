@@ -45,3 +45,14 @@
     width: 30%;
   }
 }
+
+.stepper-title {
+  &>span {
+    color: $supportive-red;
+  }
+}
+
+.candidate-name-title {
+  margin-left: 10px;
+  font-weight: 700;
+}

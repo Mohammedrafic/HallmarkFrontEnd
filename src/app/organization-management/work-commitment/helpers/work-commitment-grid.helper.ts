@@ -5,10 +5,7 @@ import { WorkCommitmentOrgHierarchies } from '../interfaces';
 export const getCorrectLocationValue = (value: string[] | null) =>
   value === null ? 'All' : getCorrectLongValue(value);
 
-export const getCorrectSkillsValue = (value: ListOfSkills[]) => {
-  const skillsName = value.map((item): string => item.name);
-  return skillsName[0] === null ? 'All' : getCorrectLongValue(skillsName);
-};
+export const getCorrectSkillsValue = (value: string[]) => (value[0] === null ? 'All' : getCorrectLongValue(value));
 
 export const getCorrectLongValue = (value: string[]) => {
   if (value.length <= 3) {
@@ -22,11 +19,11 @@ export const getCorrectLongValue = (value: string[]) => {
 
 export const getCorrectDateValue = (value: string) => formatDate(value, 'EEEE, h:mm', 'en-US');
 
-export const getRegionsArray = (orgStructure: WorkCommitmentOrgHierarchies[]): string[] => {
+export const getRegionsArray = (orgStructure: WorkCommitmentOrgHierarchies[], key: string): string[] => {
   const regions = new Set();
 
-  orgStructure.forEach((location: WorkCommitmentOrgHierarchies) => {
-    regions.add(location.regionName);
+  orgStructure.forEach((location: any) => {
+    regions.add(location[key]);
   });
 
   return Array.from(regions) as string[];

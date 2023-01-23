@@ -12,56 +12,56 @@ export class ScheduleItemsService {
 
   getScheduleItems(scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots): CreateScheduleItem[] {
     return scheduleSelectedSlots.candidates.map((candidate: ScheduleInt.ScheduleCandidate) => {
-      const scheduleItem: CreateScheduleItem = {
+      return  {
         candidateName: `${candidate.lastName}, ${candidate.firstName}`,
         candidateId: candidate.id,
-        selectedDates: [],
-        dateItems: scheduleSelectedSlots.dates.map((dateString: string) => {
-          return this.getScheduleDateItem(candidate.id, dateString);
-        }),
+        selectedDates: scheduleSelectedSlots.dates.map((date: string) => new Date(date)),
+        dateItems: this.getScheduleDateItems(scheduleSelectedSlots.dates, candidate.id),
       };
-
-      scheduleItem.selectedDates = scheduleItem.dateItems.map((item: DateItem) => item.date);
-
-      return scheduleItem;
     });
   }
 
-  getScheduleDateItem(candidateId: number, dateString: string): DateItem {
-    const daySchedule: ScheduleInt.ScheduleItem = this.getDayScheduleData(candidateId, dateString);
+  getScheduleDateItems(dates: string[], candidateId: number): DateItem[] {
+    const scheduleDateItems: DateItem[] = [];
+
+    dates.forEach((dateString: string) => {
+      const daySchedules: ScheduleInt.ScheduleItem[] = this.createScheduleService.getDaySchedules(candidateId, dateString);
+
+      if (daySchedules.length) {
+        daySchedules.forEach((scheduleItem: ScheduleInt.ScheduleItem) => {
+          scheduleDateItems.push(this.getScheduleDateItem(scheduleItem, dateString));
+        });
+      } else {
+        const date = new Date(dateString);
+
+        scheduleDateItems.push({
+          dateString: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+          id: null,
+          date,
+        });
+      }
+    });
+
+    return scheduleDateItems;
+  }
+
+  getSelectedDates(scheduleItem: CreateScheduleItem): Date[] {
+    const dates = scheduleItem.dateItems.map((item: DateItem) => item.dateString);
+    const uniqueDates = [...new Set(dates)];
+
+    return uniqueDates.map((date: string) => new Date(date));
+  }
+
+  private getScheduleDateItem(daySchedule: ScheduleInt.ScheduleItem, dateString: string): DateItem {
     const date = new Date(dateString);
 
     return {
       dateString: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
       tooltipContent: this.getTooltipContent(daySchedule),
       scheduleType: daySchedule.scheduleType,
-      scheduleToOverrideId: daySchedule.id,
+      id: daySchedule.id,
       date,
     };
-  }
-
-  private getDayScheduleData(candidateId: number, dateString: string): ScheduleInt.ScheduleItem {
-    const candidateData: ScheduleInt.ScheduleModel = this.createScheduleService.scheduleData
-      .find((data: ScheduleInt.ScheduleModel) => data.candidate.id === candidateId) as ScheduleInt.ScheduleModel;
-    const dateStringLength = 10;
-    const formattedDateSting = dateString.substring(0, dateStringLength);
-    let daySchedule: ScheduleInt.ScheduleItem = {} as ScheduleInt.ScheduleItem;
-
-
-    if (candidateData.schedule.length) {
-      const dateSchedule: ScheduleInt.ScheduleDateItem | undefined = candidateData.schedule
-        .find((scheduleItem: ScheduleInt.ScheduleDateItem) =>
-          scheduleItem.date.substring(0, dateStringLength) === formattedDateSting
-        );
-
-      if (dateSchedule) {
-        daySchedule = dateSchedule.daySchedules
-          .find((schedule: ScheduleInt.ScheduleItem) => schedule.date.substring(0, dateStringLength) === formattedDateSting)
-          || {} as ScheduleInt.ScheduleItem;
-      }
-    }
-
-    return daySchedule;
   }
 
   private getTooltipContent(daySchedule: ScheduleInt.ScheduleItem): string {

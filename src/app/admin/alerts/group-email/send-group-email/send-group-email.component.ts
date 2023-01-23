@@ -1,3 +1,4 @@
+import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { ValidatorFn } from '@angular/forms';
 import { OrderTypeOptions } from './../../../../shared/enums/order-type';
 import {
@@ -143,6 +144,7 @@ export class SendGroupEmailComponent
   private editArea: HTMLElement;
   public userData: User[];
   public agencyData: AgencyDto[];
+  public businessData: BusinessUnit[];
   public roleData: GroupEmailRole[];
   public skillData: MasterSkillDto[];
   public range: Range = new Range();
@@ -180,8 +182,10 @@ export class SendGroupEmailComponent
   public isAgencyCandidatesType: boolean = false;
   public isBusinessUnitTypeAgency: boolean = false;
   public isOrgUser: boolean = false;
+  public userBusinessUnitType: BusinessUnitType | undefined;
 
-  constructor(private actions$: Actions, private store: Store, private fb: FormBuilder) {
+  constructor(private actions$: Actions, private store: Store, private fb: FormBuilder,
+    private orderManagementContentService: OrderManagementContentService) {
     super();
   }
   get businessUnitControl(): AbstractControl {
@@ -288,11 +292,13 @@ export class SendGroupEmailComponent
     this.onRolesValueChanged();
     this.onUserTypeValueChanged();
     this.onRegionValueChanged();
+    this.onLocationValueChanged();
     this.onSkillsValueChanged();
     this.onCandidateValueChanged();
     this.onCandidateStatusValueChanged();
     this.onOrderTypeValueChanged();
     const user = this.store.selectSnapshot(UserState.user);
+    this.userBusinessUnitType = user?.businessUnitType;
     if (user?.businessUnitType === BusinessUnitType.MSP || 
       user?.businessUnitType === BusinessUnitType.Hallmark) {
       this.businessUnitControl.patchValue(BusinessUnitType.Organization);
@@ -328,14 +334,11 @@ export class SendGroupEmailComponent
 
     this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if (data != undefined) {
+        this.businessData = data;
         this.defaultBusinessValue = data[0]?.id;
         if (!this.isBusinessFormDisabled) {
           this.defaultValue = data[0]?.id;
-        }
-        if (user?.businessUnitType === BusinessUnitType.Agency){
-          var defaultAgencies = data.map((list) => list.id);
-          this.businessesControl.setValue(defaultAgencies);
-        }
+        }        
       }
     });
 
@@ -436,8 +439,7 @@ export class SendGroupEmailComponent
         this.isAgencyCandidatesType = false;
         this.isAgencyUserType = false;
         this.isOrgCandidatesType = false;
-        this.isOrgInternalUserType = false;
-        this.store.dispatch(new GetBusinessByUnitType(value));
+        this.isOrgInternalUserType = false;        
         this.filteredUserType = [];
         if (value == 3) {
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == false);
@@ -451,21 +453,47 @@ export class SendGroupEmailComponent
         }
         if (value == 1) {
           this.dispatchUserPage([]);
-        } else {
-          this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-            if (!this.isBusinessFormDisabled && data.length > 0) {
-              if (this.groupEmailTemplateForm.controls['business'].value != data[0].id) {
-                this.groupEmailTemplateForm.controls['business'].setValue(data[0].id);
+        } else {          
+          this.businessData = [];
+          if (this.isOrgUser && value == 4) {            
+            this.orderManagementContentService.getAssociateAgencies().subscribe((data) => {
+              if(data != undefined && data.length > 0){
+                let businessUnits:BusinessUnit[] = [];
+                data.forEach((item) => {
+                  businessUnits.push({ 
+                    id:item.agencyId, 
+                    name:item.agencyName, 
+                    businessUnitType: 0,
+                    parentUnitId:0,
+                    agencyStatus:0
+                  });
+                });
+                this.businessData = businessUnits;                
               }
-            }
-          });
+            });
+          } else {
+            this.store.dispatch(new GetBusinessByUnitType(value));
+            this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+              if (!this.isBusinessFormDisabled && data.length > 0) {                
+                this.businessData = data;
+                if (this.groupEmailTemplateForm.controls['business'].value != data[0].id) {
+                  this.groupEmailTemplateForm.controls['business'].setValue(data[0].id);
+                }                
+              }
+              if (this.userBusinessUnitType === BusinessUnitType.Agency){
+                var defaultAgencies = data.map((list) => list.id);
+                console.log(defaultAgencies);
+                this.businessesControl.setValue(defaultAgencies);
+              }
+            });
+          }
           this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
             this.organizations = [];
             if (data != null && data.length > 0) {
               this.organizations = uniqBy(data, 'organizationId');
             }
           });
-          this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {});
+          //this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {});
         }
       }
       if(!this.isSend){
@@ -493,13 +521,22 @@ export class SendGroupEmailComponent
         if(this.isAgencyCandidatesType)
           this.getCandidates();
         else {
-          let businessUnitIds = value;
-          this.dispatchUserPage(businessUnitIds);
-          this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-            if (data != undefined) {
-              this.userData = data.items.filter(i => i.isDeleted == false);
-            }
-          });
+          this.userData = [];            
+          if(this.isOrgUser){
+            let businessUnitIds = value.join();
+            this.store.dispatch(new GetGroupEmailInternalUsers('null', 'null', 'null', businessUnitIds));
+            this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+              if(data != undefined) this.userData = data;
+            });
+          } else {
+            let businessUnitIds = value;
+            this.dispatchUserPage(businessUnitIds);
+            this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+              if (data != undefined) {
+                this.userData = data.items.filter(i => i.isDeleted == false);
+              }
+            });
+          }
         }
       }
     });
@@ -571,19 +608,35 @@ export class SendGroupEmailComponent
     });
   }
 
+  private onLocationValueChanged(): void {
+    this.locationControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      if (value != undefined && value.length > 0) {
+        if(this.isOrgInternalUserType){
+          this.getUsersByRole();
+        }
+      }
+    });
+  }
+
   private onRolesValueChanged(): void {
     this.rolesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (value != undefined && value.length > 0) {
-        this.userData = [];
-        var regionId = this.regionControl.value.join();
-        var locationId = this.locationControl.value.join();
-        var roles = value.join();
-        this.store.dispatch(new GetGroupEmailInternalUsers(regionId, locationId, roles));
-        this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-          this.userData = data;
-        });
+        this.getUsersByRole();
       }
     });
+  }
+
+  private getUsersByRole(): void{
+    this.userData = [];
+    var regionId = this.regionControl.value.join();
+    var locationId = this.locationControl.value.join();
+    var roles = this.rolesControl.value.join();
+    if(regionId !='' && locationId !='' && roles !=''){
+      this.store.dispatch(new GetGroupEmailInternalUsers(regionId, locationId, roles, 'null'));
+      this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+        this.userData = data;
+      });
+    }
   }
 
   private onUserTypeValueChanged(): void {
@@ -625,13 +678,22 @@ export class SendGroupEmailComponent
         } else if (businessUnit == 4) {
           if (value == 1) {
             this.isAgencyUserType = true;
-            let businessUnitIds = this.businessesControl.value;
-            this.dispatchUserPage(businessUnitIds);
-            this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-              if (data != undefined) {
-                this.userData = data.items.filter(i => i.isDeleted == false);
-              }
-            });
+            this.userData = [];            
+            if(this.isOrgUser){
+              let businessUnitIds = this.businessesControl.value.join();
+              this.store.dispatch(new GetGroupEmailInternalUsers('null', 'null', 'null', businessUnitIds));
+              this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+                if(data != undefined) this.userData = data;
+              });
+            } else {
+              let businessUnitIds = this.businessesControl.value;
+              this.dispatchUserPage(businessUnitIds);
+              this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+                if (data != undefined) {
+                  this.userData = data.items.filter(i => i.isDeleted == false);
+                }
+              });
+            }
           }
           if (value == 2) {
             this.userData = [];

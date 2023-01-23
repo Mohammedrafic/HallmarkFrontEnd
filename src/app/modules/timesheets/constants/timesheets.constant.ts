@@ -1,7 +1,7 @@
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
-import { ExportType, HourOccupationType, TIMETHEETS_STATUSES } from '../enums';
-import { CandidateHoursAndMilesData, TabConfig, TabCountConfig } from '../interface';
+import { ExportType, TIMETHEETS_STATUSES } from '../enums';
+import { TabConfig } from '../interface';
 
 
 export const TAB_ADMIN_TIMESHEETS: TabConfig[] = [
@@ -34,7 +34,7 @@ export const MapTimesheetsStatuses: Map<TIMETHEETS_STATUSES, number> = new Map()
 export const TimesheetExportOptions: ItemModel[] = [
   { text: ExportType.Excel_file, id: '0' },
   { text: ExportType.CSV_file, id: '1' },
-  { text: ExportType.Custom, id: '2' }
+  { text: ExportType.Custom, id: '2' },
 ];
 
 export const UNIT_ORGANIZATIONS_FIELDS = {
@@ -44,5 +44,5 @@ export const UNIT_ORGANIZATIONS_FIELDS = {
 
 export const ColorsWidgetMap: string[] = [
   '#79B392', '#E48192', '#9B85C6', '#8CB3FF', '#8190B2', '#E0BD82', '#518CFF', '#D1D6E2',
-  '#70B16E', '#FFBBBB', '#6499FF', '#677089', '#D1EACE', '#C2A7F9', '#FCC769'
+  '#70B16E', '#FFBBBB', '#6499FF', '#677089', '#D1EACE', '#C2A7F9', '#FCC769',
 ];

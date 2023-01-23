@@ -288,6 +288,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
         this.changeDetectorRef.detectChanges();
       }
       else {
+        this.filterColumns.locationIds.dataSource = [];
         this.candidateJourneyForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
       }
     });
@@ -302,6 +303,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
         this.changeDetectorRef.detectChanges();
       }
       else {
+        this.filterColumns.departmentIds.dataSource = [];
         this.candidateJourneyForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });

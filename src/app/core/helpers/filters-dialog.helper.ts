@@ -105,6 +105,9 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
     this.formGroup = this.filtersHelperService.createForm() as CustomFormGroup<T>;
   }
 
+  /**
+   * TODO: refactoring needed.
+   */
   protected initFiltersColumns(stateKey: (state: S) => T): void {
     this.store.select(stateKey)
       .pipe(

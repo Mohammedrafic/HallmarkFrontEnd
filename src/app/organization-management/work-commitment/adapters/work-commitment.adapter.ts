@@ -18,7 +18,7 @@ export class WorkCommitmentAdapter {
   ): WorkCommitmentDTO {
     const {
       masterWorkCommitmentId,
-      skills,
+      skillIds,
       minimumWorkExperience,
       availabilityRequirement,
       schedulePeriod,
@@ -26,11 +26,18 @@ export class WorkCommitmentAdapter {
       holiday,
       jobCode,
       comments,
+      workCommitmentId,
     } = formGroup.getRawValue();
 
+    const commitmentId: { workCommitmentId?: number } = {};
+    if (workCommitmentId) {
+      commitmentId.workCommitmentId = workCommitmentId;
+    }
+
     return {
+      ...commitmentId,
       masterWorkCommitmentId,
-      skills: skills.length === allSkillsLength ? [null] : skills,
+      skillIds: skillIds.length === allSkillsLength ? [null] : skillIds,
       minimumWorkExperience,
       availabilityRequirement,
       schedulePeriod,
@@ -71,12 +78,15 @@ export class WorkCommitmentAdapter {
         holiday,
         jobCode,
         locationName: workCommitmentOrgHierarchies.map((item) => item.locationName),
+        locationIds: workCommitmentOrgHierarchies.map((item) => item.locationId),
         masterWorkCommitmentId,
         masterWorkCommitmentName,
         minimumWorkExperience,
-        regionName: getRegionsArray(workCommitmentOrgHierarchies),
+        regionName: getRegionsArray(workCommitmentOrgHierarchies, 'regionName'),
+        regionIds: getRegionsArray(workCommitmentOrgHierarchies, 'regionId'),
         schedulePeriod,
-        skills,
+        skillNames: skills.map((item) => item.name),
+        skillIds: skills.map((item) => item.id),
         workCommitmentId,
       });
     });

@@ -9,7 +9,7 @@
 >
   <ng-template #content>
     <div class="dialog-container">
-      
+
       <div class="dialog-header">
         <h3 class="title">{{dialogTitle}} Payment</h3>
         <div class="controls">
@@ -21,9 +21,9 @@
       <div class="form-container">
         <form [formGroup]="checkForm" autocomplete="off" class="bootstrap grid">
           <ng-container *ngFor="let field of addPaymentFormConfig; trackBy: trackByField">
-  
+
             <ng-container [ngSwitch]="field.type">
-  
+
               <ng-template [ngSwitchCase]="fieldTypes.Date">
                 <div class="input-container">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
@@ -40,7 +40,7 @@
                   </div>
                 </div>
               </ng-template>
-  
+
               <ng-template [ngSwitchCase]="fieldTypes.Input">
                 <div class="input-container">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
@@ -71,7 +71,7 @@
                   </div>
                 </div>
               </ng-template>
-  
+
               <ng-template [ngSwitchCase]="fieldTypes.Dropdown">
                 <div class="input-container">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
@@ -87,7 +87,7 @@
                   </div>
                 </div>
               </ng-template>
-  
+
               <ng-template [ngSwitchCase]="fieldTypes.Toggle">
                 <div class="input-container row-flexed">
                   <div class="input-group wide">
@@ -117,7 +117,7 @@
             [paginationPanel]="false"
             [adjustColumnsWidth]="true"
             [context]="tableContext"
-            [title]="'Invoices'"
+            [gridTitle]="'Invoices'"
             (gridReadyEmitter)="setGridApi($event)"
           ></app-grid>
         </div>

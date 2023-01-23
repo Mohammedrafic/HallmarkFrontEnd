@@ -5,7 +5,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { filter, take, Observable, Subject, takeUntil } from 'rxjs';
 import { FilterChangedEvent, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { ClearAlertTemplateState, GetGroupEmailById, SendGroupEmail} from '@admin/store/alerts.actions';
 import { AlertsState } from '@admin/store/alerts.state';
@@ -33,6 +33,8 @@ import { GroupMailStatus } from '../group-email.enum';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { GroupEmailColumnsDefinition } from './group-email.constant';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
+import { Permission } from '@core/interface';
+import { UserPermissions } from '@core/enums';
 @Component({
   selector: 'app-group-email',
   templateUrl: './group-email.component.html',
@@ -68,7 +70,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
   public isSend:boolean=true;
-
+  public userPermission: Permission = {};
+  public readonly userPermissions = UserPermissions;
   public viewGroupEmailData: GroupEmail = {
     id: 0,
     subjectMail: "",
@@ -180,6 +183,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       }
     });
     this.getGroupEmails();
+    this.getPermission();
+    console.log(this.userPermission);
   }
   public onViewGroupEmail(data: any): void {
     this.onView(data.rowData);
@@ -366,5 +371,13 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.groupEmailTemplateForm.controls['user'].setValue([]);
 
   }
-
+  private getPermission(): void {
+    this.store.select(UserState.userPermission).pipe(
+      filter((permissions: Permission) => !!Object.keys(permissions).length),
+      take(1)
+    ).subscribe((permissions: Permission) => {
+      console.log(permissions);
+      this.userPermission = permissions;
+    });
+  }
 }

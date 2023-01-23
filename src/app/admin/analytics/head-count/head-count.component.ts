@@ -249,6 +249,7 @@ export class HeadCountComponent implements OnInit {
         this.changeDetectorRef.detectChanges();
       }
       else {
+        this.filterColumns.locationIds.dataSource = [];
         this.headCountReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
       }
     });

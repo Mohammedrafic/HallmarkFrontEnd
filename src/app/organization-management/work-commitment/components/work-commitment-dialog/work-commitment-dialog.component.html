@@ -84,6 +84,7 @@
                   [dataSource]="field.dataSource"
                   [fields]="optionFields"
                   [hideBorder]="false"
+                  [disabled]="isEdit && field.disableOnEdit"
                 ></app-dropdown>
               </ng-template>
 

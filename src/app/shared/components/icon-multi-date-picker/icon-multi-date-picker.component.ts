@@ -6,14 +6,17 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   Output,
   Renderer2,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
+
 import { CalendarComponent } from '@syncfusion/ej2-angular-calendars';
 
+import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { Destroyable } from '@core/helpers';
 
 @Component({
@@ -22,23 +25,29 @@ import { Destroyable } from '@core/helpers';
   styleUrls: ['./icon-multi-date-picker.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IconMultiDatePickerComponent extends Destroyable implements AfterViewInit, OnDestroy {
+export class IconMultiDatePickerComponent extends Destroyable implements OnChanges, AfterViewInit, OnDestroy {
   @ViewChild('inputWrapper') inputWrapper: ElementRef;
 
-  @Input() datesValues: Date[] = [];
+  @Input() dates: Date[] = [];
   @Input() datePickerLimitations: DatePickerLimitations;
 
   @Output() appliedDates: EventEmitter<Date[]> = new EventEmitter<Date[]>();
 
   isCalendarShown = false;
+  datesValues: Date[] = [];
 
-  private appliedDatesValues: Date[] = [];
   private outerClickRemover: () => void;
   private applyListenerRemover: () => void;
   private cancelListenerRemover: () => void;
 
   constructor(private renderer2: Renderer2, private cdr: ChangeDetectorRef) {
     super();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['dates']?.currentValue) {
+      this.datesValues = [...changes['dates'].currentValue];
+    }
   }
 
   ngAfterViewInit(): void {
@@ -79,8 +88,8 @@ export class IconMultiDatePickerComponent extends Destroyable implements AfterVi
 
     ejCalendar.element.appendChild(calendarFooterElement);
 
-    this.applyListenerRemover = this.renderer2.listen(applyBtn, 'click', this.applyListener.bind(this));
-    this.cancelListenerRemover = this.renderer2.listen(cancelBtn, 'click', this.cancelListener.bind(this));
+    this.applyListenerRemover = this.renderer2.listen(applyBtn, 'click', this.applyDates.bind(this));
+    this.cancelListenerRemover = this.renderer2.listen(cancelBtn, 'click', this.cancelChanges.bind(this));
 
     this.cdr.detectChanges();
   }
@@ -89,27 +98,18 @@ export class IconMultiDatePickerComponent extends Destroyable implements AfterVi
     const clickedInside = this.inputWrapper.nativeElement.contains(event.target);
 
     if (!clickedInside) {
-      this.isCalendarShown = false;
-      this.cdr.detectChanges();
+      this.cancelChanges();
     }
   }
 
-  private applyListener(): void {
-    this.appliedDatesValues = this.datesValues;
+  private applyDates(): void {
     this.appliedDates.emit(this.datesValues);
     this.isCalendarShown = false;
     this.cdr.detectChanges();
   }
 
-  private cancelListener(): void {
-    const appliedDatesHash = this.appliedDatesValues.reduce((acc: Record<string, Date>, date: Date) => {
-      acc[date.toISOString()] = date;
-
-      return acc;
-    }, {});
-
-    this.datesValues = this.datesValues.filter((el: Date) => appliedDatesHash[el.toISOString()]);
-
+  private cancelChanges(): void {
+    this.datesValues = [...this.dates];
     this.isCalendarShown = false;
     this.cdr.detectChanges();
   }
