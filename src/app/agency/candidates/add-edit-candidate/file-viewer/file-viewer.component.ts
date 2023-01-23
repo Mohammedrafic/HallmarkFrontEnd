@@ -8,7 +8,6 @@ import { ListBox, SelectionSettingsModel } from "@syncfusion/ej2-angular-dropdow
 import {
   MagnificationService,
   NavigationService,
-  PdfViewerComponent,
   TextSelectionService,
   ToolbarService
 } from "@syncfusion/ej2-angular-pdfviewer";
@@ -23,6 +22,9 @@ import {
   GetCredentialPdfFilesSucceeded,
 } from "@agency/store/candidate.actions";
 
+import { FormControl, Validators } from '@angular/forms';
+import { DEFAULT_ZOOM } from './file-viewer.constant';
+
 interface ListBoxItem {
   name: string;
   id: number;
@@ -36,7 +38,6 @@ interface ListBoxItem {
   providers: [ToolbarService, NavigationService, TextSelectionService, MagnificationService]
 })
 export class FileViewerComponent implements OnInit, OnDestroy {
-  @ViewChild('pdfViewer') pdfViewerControl: PdfViewerComponent;
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
   @Input() openEvent: Subject<number>;
@@ -54,6 +55,12 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   public previewFile: ListBoxItem | null;
   public imageSrs = '';
   public imageMode = false;
+  public loadedFileUrl = '';
+  public zoom: number = 1.0;
+  public originalSize: boolean = true;
+  public page: number = 1;
+  public totalPages: number = 0;
+  public pageSelection: FormControl = new FormControl('');
 
   public service = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
 
@@ -70,6 +77,10 @@ export class FileViewerComponent implements OnInit, OnDestroy {
     this.subscribeOnPdfFileLoaded();
     this.subscribeOnFileLoaded();
     this.subscribeOnGroupedCandidateCredentialsFiles();
+   
+    this.pageSelection.valueChanges.subscribe(x => {
+      this.page = x;
+    });
   }
 
   ngOnDestroy(): void {
@@ -80,12 +91,12 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   public onCancel(): void {
     this.sideDialog.hide();
     this.isFullScreen = false;
-    this.pdfViewerControl?.unload();
     this.previewFile = null;
     this.data = [];
   }
 
   public resizeDialog(): void {
+    this.zoom = DEFAULT_ZOOM;
     this.isFullScreen = !this.isFullScreen;
     this.sideDialog.show(this.isFullScreen);
   }
@@ -93,7 +104,6 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   public selectFile(event: any): void {
     this.previewFile = event.items[0];
     this.setMode();
-    this.pdfViewerControl?.unload();
     if (this.imageMode) {
       this.getOriginalFileById((this.previewFile as ListBoxItem).id);
     } else {
@@ -139,11 +149,10 @@ export class FileViewerComponent implements OnInit, OnDestroy {
       ofActionSuccessful(GetCredentialPdfFilesSucceeded)
     ).subscribe((file: { payload: Blob }) => {
       const reader = new FileReader();
-
+      //  file.payload.
       reader.readAsDataURL(file.payload);
-      reader.onloadend = () => {
-        this.pdfViewerControl?.load(reader.result as string, '');
-      }
+      // Convert blob to url
+      this.loadedFileUrl = URL.createObjectURL(file.payload);
     });
   }
 
@@ -153,6 +162,8 @@ export class FileViewerComponent implements OnInit, OnDestroy {
         if (this.isDownloading) {
           this.isDownloading = false;
           downloadBlobFile(file.payload, (this.previewFile as ListBoxItem).name);
+          // Convert blob to url
+          this.loadedFileUrl = URL.createObjectURL(file.payload);
         } else {
           this.setImage(file.payload);
         }
@@ -189,5 +200,45 @@ export class FileViewerComponent implements OnInit, OnDestroy {
     reader.onloadend = () => {
       this.imageSrs = reader.result as string;
     }
+  }
+
+  incrementZoom(amount: number) {
+    var zoom = this.zoom + amount;
+    if(zoom < 0.1) return;
+    this.zoom = zoom;   
+  }
+
+  resetZoom() {
+    this.zoom = DEFAULT_ZOOM;
+  }
+
+  nextPage() {
+    if(this.page == this.totalPages) return;
+    this.page++;
+  }
+  
+  prevPage() {
+    if(this.page == 1) return;
+    this.page--;
+  }
+
+  firstPage() {
+    this.page = 1;
+  }
+  
+  lastPage() {
+    this.page = this.totalPages;
+  }
+
+  pagechanging(e: any){
+    this.page = e.pageNumber;
+    this.pageSelection.setValue(e.pageNumber);
+  }
+
+  afterLoadComplete(pdfData: any) {
+    this.totalPages = pdfData.numPages;
+    this.pageSelection.setValidators([Validators.min(1), Validators.max(this.totalPages)]);
+    this.page = 1;
+    this.pageSelection.setValue(1);
   }
 }

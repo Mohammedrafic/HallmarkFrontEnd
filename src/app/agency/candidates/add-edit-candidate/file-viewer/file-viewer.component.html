@@ -43,8 +43,44 @@
         </div>
         <div class="right">
           <div class="file-viewer">
-            <ejs-pdfviewer *ngIf="!imageMode" id="pdfViewer" #pdfViewer [serviceUrl]="service" [enableTextSelection]="false"></ejs-pdfviewer>
-            <div *ngIf="imageMode" class="image-container"><img class="image" [src]="imageSrs"/></div>
+            <div *ngIf="!imageMode" >
+              <div class="zoom">
+                <button class="navigation" (click)="incrementZoom(-0.1)">
+                  <i-feather name="zoom-out" class="icon"></i-feather>
+                </button>
+                <button class="navigation" (click)="incrementZoom(0.1)">
+                  <i-feather name="zoom-in" class="icon"></i-feather>
+                </button>
+                <button class="navigation" ion-fab mini (click)="resetZoom()">
+                  <i-feather name="refresh-cw" class="icon"></i-feather>
+                </button>
+                <button class="navigation" (click)="firstPage()">
+                  <i-feather name="chevrons-left" class="icon"></i-feather>
+                </button>
+                <button class="navigation" (click)="prevPage()">
+                  <i-feather name="chevron-left" class="icon"></i-feather>
+                </button>
+                <button class="navigation" (click)="nextPage()">
+                  <i-feather name="chevron-right" class="icon"></i-feather>
+                </button>
+                <button class="navigation" (click)="lastPage()">
+                  <i-feather name="chevrons-right" class="icon"></i-feather>
+                </button>
+                <input class="smallimput" id="name" type="number" [formControl]="pageSelection">
+                <span> of {{ totalPages }} </span>
+              </div>
+              <pdf-viewer class="pdf-container" 
+                [src]="loadedFileUrl"
+                [render-text]="true"
+                [fit-to-page]="true"
+                [original-size]="false"
+                [page]="page"
+                [zoom]="zoom" 
+                (pagechanging)="pagechanging($event)"
+                (after-load-complete)="afterLoadComplete($event)"
+              ></pdf-viewer>
+            </div>
+            <div *ngIf="imageMode" class="image-container"><img class="image" [src]="imageSrs"/></div>  
           </div>
         </div>
       </section>
