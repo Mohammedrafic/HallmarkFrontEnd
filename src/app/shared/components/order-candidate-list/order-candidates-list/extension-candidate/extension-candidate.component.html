@@ -21,10 +21,13 @@
             [formControl]="statusesFormControl"
             [disabled]="!actionsAllowed"
             placeholder="Select Status"
-            (select)="onDropDownChanged($event)"
+            (select)="onStatusChange($event)"
           >
           </ejs-dropdownlist>
         </div>
+        <button ejs-button cssClass="e-primary save-button" (click)="onSave()">
+          Save
+        </button>
         <app-tooltip-container [showToolTip]="!actionsAllowed">
           <button
             ejs-button
@@ -306,9 +309,12 @@
           [dataSource]="applicantStatuses"
           [formControl]="statusesFormControl"
           placeholder="Select Status"
-          (select)="onDropDownChanged($event)"
+          (select)="onStatusChange($event)"
         ></ejs-dropdownlist>
       </div>
+      <button ejs-button cssClass="e-primary save-button" (click)="onSave()">
+        Save
+      </button>
       <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="canAccept" (click)="onReject()">Reject</button>
       <button ejs-button [isPrimary]="true" *ngIf="canAccept" (click)="onAccept()">Accept</button>
     </div>

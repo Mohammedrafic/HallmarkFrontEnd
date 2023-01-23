@@ -12,7 +12,7 @@
         <div class="e-card-header">
           <div class="e-card-header-caption candidat-status">
             <h3 class="e-card-title candidate-title">
-              {{orderCandidate?.lastName}}, {{orderCandidate?.firstName}}
+              111{{orderCandidate?.lastName}}, {{orderCandidate?.firstName}}
             </h3>
           </div>
           <div class="e-card-content button-container">
@@ -23,9 +23,12 @@
                 [formControl]="statusesFormControl"
                 [dataSource]="nextApplicantStatuses"
                 placeholder="Select Status"
-                (select)="onDropDownChanged($event)"
+                (select)="onStatusChange($event)"
               ></ejs-dropdownlist>
             </div>
+            <button ejs-button cssClass="e-primary" (click)="onSave()" *ngIf="showDropdown">
+              Save
+            </button>
             <!--TODO: create and use ReadOnly Mode for it-->
             <app-tooltip-container [showToolTip]="!actionsAllowed">
               <button ejs-button cssClass="e-outline"
@@ -133,9 +136,12 @@
             [fields]="optionFields"
             [formControl]="statusesFormControl"
             [dataSource]="nextApplicantStatuses"
-            (select)="onDropDownChanged($event)"
+            (select)="onStatusChange($event)"
           ></ejs-dropdownlist>
         </div>
+        <button ejs-button cssClass="e-primary" (click)="onSave()" *ngIf="showDropdown">
+          Save
+        </button>
         <!--TODO: create and use ReadOnly Mode for it-->
         <button ejs-button cssClass="e-outline" [disabled]="!actionsAllowed"
           (click)="onReject()" *ngIf="showRejectButton">Reject</button>

@@ -43,7 +43,6 @@ import { RejectReason } from '@shared/models/reject-reason.model';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { ShowToast } from 'src/app/store/app.actions';
 import PriceUtils from '@shared/utils/price.utils';
-import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
@@ -153,6 +152,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
+  public selectedApplicantStatus: ApplicantStatus | null = null;
 
   get candidateStatus(): ApplicantStatusEnum {
     return this.candidate.status || (this.candidate.candidateStatus as any);
@@ -227,21 +227,30 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   public cancelRejectCandidate(): void {
     this.statusesFormControl.reset();
+    this.selectedApplicantStatus = null;
   }
 
-  public updateCandidateJob(event: { itemData: ApplicantStatus }, reloadJob = false): void {
+  public onSave(): void {
+    this.updateCandidateJob({itemData: this.selectedApplicantStatus});
+  }
+
+  public onStatusChange(event: { itemData: ApplicantStatus }): void {
     if (event.itemData?.isEnabled) {
-      if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
-        this.onReject();
-      } else {
-        this.offerCandidate(event.itemData, reloadJob);
-      }
+      this.selectedApplicantStatus = event.itemData;
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, SET_READONLY_STATUS));
     }
   }
 
-  private offerCandidate(applicantStatus: ApplicantStatus, reloadJob: boolean): void {
+  public updateCandidateJob(event: { itemData: ApplicantStatus | null }, reloadJob = false): void {
+    if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
+      this.onReject();
+    } else {
+      this.offerCandidate(event.itemData, reloadJob);
+    }
+  }
+
+  private offerCandidate(applicantStatus: ApplicantStatus | null, reloadJob: boolean): void {
     if (!this.formGroup.errors && this.candidateJob) {
       this.shouldChangeCandidateStatus()
         .pipe(take(1))
@@ -254,7 +263,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                   orderId: this.candidateJob.orderId,
                   organizationId: this.candidateJob.organizationId,
                   jobId: this.candidateJob.jobId,
-                  nextApplicantStatus: applicantStatus,
+                  nextApplicantStatus: this.selectedApplicantStatus || this.candidateJob.applicantStatus,
                   candidateBillRate: this.candidateJob.candidateBillRate,
                   offeredBillRate: value.offeredBillRate,
                   requestComment: this.candidateJob.requestComment,
@@ -283,6 +292,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
             }
           } else {
             this.statusesFormControl.reset();
+            this.selectedApplicantStatus = null;
           }
         });
     }
