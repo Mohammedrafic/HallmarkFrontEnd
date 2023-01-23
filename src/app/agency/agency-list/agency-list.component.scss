@@ -1,12 +1,12 @@
 @import 'adaptive-response';
 :host {
-  height: calc(100% - 80px);
+  height: calc(100% - 95px);
 
   .grid-component {
     height: 100%;
 
     @media #{$max-desktop-small} {
-      height: 92%;
+      height: calc(100% - 60px);
     }
   }
 }

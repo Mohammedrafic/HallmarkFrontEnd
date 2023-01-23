@@ -30,10 +30,10 @@
     color: $secondary-dark-blue-30;
   }
   .grid-component {
-    height: 100%;
+    height: calc(100% - 10px);
 
     @media #{$max-desktop-small} {
-      height: 93%;
+      height: calc(100% - 65px);
     }
   }
 }
