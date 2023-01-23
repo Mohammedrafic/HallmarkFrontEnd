@@ -517,7 +517,7 @@ export type AcceptJobDTO = {
   guaranteedWorkWeek?: string;
   jobId: number;
   orderId: number;
-  nextApplicantStatus: ApplicantStatus;
+  nextApplicantStatus: ApplicantStatus | null;
   offeredBillRate?: number;
   organizationId: number;
   requestComment?: string;

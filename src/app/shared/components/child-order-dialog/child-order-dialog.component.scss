@@ -20,6 +20,14 @@
   margin-left: 0 !important;
 }
 
+.button-container {
+  display: flex;
+
+  .save-button {
+    margin-left: 12px;
+  }
+}
+
 .preview-dialog {
   .preview-header {
     align-items: start !important;

@@ -128,6 +128,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public canOnboard = false;
   public canClose = false;
   public hasEditOrderBillRatesPermission: boolean;
+  public selectedApplicantStatus: ApplicantStatus | null = null;
 
   public applicantStatusEnum = ApplicantStatusEnum;
 
@@ -278,14 +279,23 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   public resetStatusesFormControl(): void {
     this.statusesFormControl.reset();
+    this.selectedApplicantStatus = null;
   }
 
   public onAccept(): void {
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
   }
 
-  public onDropDownChanged(event: { itemData: ApplicantStatus }): void {
-    switch (event.itemData.applicantStatus) {
+  public onSave(): void {
+    this.saveHandler({itemData: this.selectedApplicantStatus});
+  }
+
+  public onStatusChange(event: { itemData: ApplicantStatus }): void {
+    this.selectedApplicantStatus = event.itemData;
+  }
+
+  public saveHandler(event: { itemData: ApplicantStatus | null }): void {
+    switch (event.itemData?.applicantStatus) {
       case ApplicantStatusEnum.Accepted:
         this.onAccept();
         break;
@@ -300,12 +310,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         break;
 
       default:
-        if (this.form.dirty) {
-          this.updateAgencyCandidateJob({
-            applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
-            statusText: this.candidateJob.applicantStatus.statusText,
-          });
-        }
+        this.updateAgencyCandidateJob(this.selectedApplicantStatus || this.candidateJob.applicantStatus);
         break;
     }
   }

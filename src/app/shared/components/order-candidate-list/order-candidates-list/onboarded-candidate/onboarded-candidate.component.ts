@@ -19,24 +19,22 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, merge, Observable, Subject, switchMap, takeUntil, of, take } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { DatePipe, formatDate } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
-  GetPredefinedBillRates,
   GetRejectReasonsForOrganisation,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   SetIsDirtyOrderForm,
-  SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
@@ -123,6 +121,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canOnboard = false;
   public canClose = false;
   public hasEditOrderBillRatesPermission: boolean;
+  public selectedApplicantStatus: ApplicantStatus | null = null;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -218,9 +217,13 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       });
   }
 
+  public onSave(): void {
+    this.handleOnboardedCandidate({itemData: this.selectedApplicantStatus});
+  }
+
   public onDropDownChanged(event: { itemData: ApplicantStatus }): void {
     if (event.itemData?.isEnabled) {
-      this.handleOnboardedCandidate(event);
+      this.selectedApplicantStatus = event.itemData;
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, SET_READONLY_STATUS));
     }
@@ -259,6 +262,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   public resetStatusesFormControl(): void {
     this.jobStatusControl.reset();
+    this.selectedApplicantStatus = null;
   }
 
   public onClose(): void {
@@ -349,10 +353,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   organizationId: this.candidateJob.organizationId,
                   jobId: this.candidateJob.jobId,
                   orderId: this.candidateJob.orderId,
-                  nextApplicantStatus: {
-                    applicantStatus: 60,
-                    statusText: 'Onboard',
-                  },
+                  nextApplicantStatus: this.selectedApplicantStatus || this.candidateJob.applicantStatus,
                   candidateBillRate: value.candidateBillRate,
                   offeredBillRate: value.offeredBillRate,
                   requestComment: value.comments,
@@ -371,6 +372,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             this.closeDialog();
           } else {
             this.jobStatusControl.reset();
+            this.selectedApplicantStatus = null;
           }
         });
     }
@@ -462,7 +464,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         filter((error) => error.type === MessageTypes.Error),
         takeUntil(this.unsubscribe$)
       )
-      .subscribe(() => this.jobStatusControl.reset());
+      .subscribe(() => (this.jobStatusControl.reset(), this.selectedApplicantStatus = null));
   }
 
   private subscribeOnCancelOrganizationCandidateJobSuccess(): void {
@@ -547,8 +549,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     }
   }
 
-  private handleOnboardedCandidate(event: { itemData: ApplicantStatus }): void {
-    if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded) {
+  private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {
+    if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded || event.itemData === null) {
       this.onAccept();
     } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
       this.openCandidateCancellationDialog.next();
@@ -590,6 +592,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.closeModalEvent.emit();
     this.candidateJob = null;
     this.jobStatusControl.reset();
+    this.selectedApplicantStatus = null;
     this.billRatesData = [];
     this.isRejected = false;
     this.nextApplicantStatuses = [];

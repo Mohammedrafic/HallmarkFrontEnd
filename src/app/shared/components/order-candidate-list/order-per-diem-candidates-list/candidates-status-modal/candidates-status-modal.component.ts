@@ -128,6 +128,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   public nextApplicantStatuses: ApplicantStatus[];
   public orderCandidateJob: OrderCandidateJob | null;
   public comments: Comment[] = [];
+  public selectedApplicantStatus: ApplicantStatus | null = null;
 
   private unsubscribe$: Subject<void> = new Subject();
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
@@ -171,7 +172,15 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     this.openRejectDialog.next(true);
   }
 
-  public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatusEnum; statusText: string } }): void {
+  public onSave(): void {
+    this.saveHandler({itemData: this.selectedApplicantStatus});
+  }
+
+  public onStatusChange(event: { itemData: ApplicantStatus }): void {
+    this.selectedApplicantStatus = event.itemData;
+  }
+
+  public saveHandler(event: { itemData: { applicantStatus: ApplicantStatusEnum; statusText: string } | null }): void {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
       this.onReject();
     } else {
@@ -196,6 +205,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
 
   public cancelRejectCandidate(): void {
     this.statusesFormControl.reset();
+    this.selectedApplicantStatus = null;
   }
 
   public onApply(): void {
@@ -223,7 +233,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Withdraw, statusText: 'Withdraw' });
   }
 
-  private updateOrganizationCandidateJob(status: { applicantStatus: ApplicantStatusEnum; statusText: string }): void {
+  private updateOrganizationCandidateJob(status: { applicantStatus: ApplicantStatusEnum; statusText: string } | null): void {
     if (this.form.valid && this.orderCandidateJob) {
       const value = this.form.getRawValue();
 
@@ -235,10 +245,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
             jobId: this.orderCandidateJob.jobId,
             clockId: value.clockId,
             allowDeployWoCredentials: value.allow,
-            nextApplicantStatus: {
-              applicantStatus: status.applicantStatus,
-              statusText: status.statusText,
-            },
+            nextApplicantStatus: this.selectedApplicantStatus || this.orderCandidateJob.applicantStatus,
           })
         )
         .subscribe({

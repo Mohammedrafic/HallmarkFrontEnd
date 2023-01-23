@@ -23,12 +23,15 @@
                             [itemTemplate]="itemTemplate"
                             [allowFiltering]="true"
                             placeholder="Select Status"
-                            (select)="updateCandidateJob($event)">
+                            (select)="onStatusChange($event)">
             <ng-template #itemTemplate let-data>
               <span [ngClass]="{'disabled-item': !data.isEnabled}">{{data.statusText}}</span>
             </ng-template>
           </ejs-dropdownlist>
         </div>
+        <button ejs-button cssClass="e-primary" (click)="onSave()" *ngIf="!isRejected && !isReadOnly && !isClosedPosition">
+          Save
+        </button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
