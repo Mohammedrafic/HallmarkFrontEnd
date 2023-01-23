@@ -42,7 +42,7 @@ import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
 })
 export class JobFillRatioComponent implements OnInit {
 
-  public title: string = "Job Fill Ratio";
+  public title: string = "Job Fill Ratio By Location";
 
   public paramsData: any = {
 
