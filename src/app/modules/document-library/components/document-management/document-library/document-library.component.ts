@@ -754,6 +754,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           `data:image/jpg;base64,${file.fileAsBase64}`
         );
         break;
+      case '.jpeg':
+        this.isImage = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `data:image/jpg;base64,${file.fileAsBase64}`
+        );
+        break;
       case '.png':
         this.isImage = true;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
@@ -764,7 +770,15 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.isWordDoc = true;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
         break;
+      case '.doc':
+        this.isWordDoc = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
+        break;
       case '.xlsx':
+        this.isWordDoc = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
+        break;
+      case '.xls':
         this.isWordDoc = true;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
         break;
@@ -1105,7 +1119,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
   }
 
-  public saveShareDocument(shareWhileUpload:boolean=false) {
+  public saveShareDocument(shareWhileUpload: boolean = false) {
     let unitType: number = 0;
     let unitIds: number[] = [];
     if (this.agencySwitch) {
@@ -1123,7 +1137,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         businessUnitType: unitType,
         businessUnitIds: unitIds,
         regionLocationMappings: mapping,
-        isShareWhileUpload:shareWhileUpload
+        isShareWhileUpload: shareWhileUpload
       }
       this.store.dispatch(new ShareDocuments(shareDocumentsFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
         this.documentLibraryform.reset();
@@ -1220,9 +1234,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       });
   }
 
-  doCognitiveSearch(event: any){    
+  doCognitiveSearch(event: any) {
     const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
-    const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value    
+    const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
     const keyword = event.target.value;
     if (keyword.trim() != '' && event.code == 'Enter' && keyword.length >= 3) {
       this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId));
