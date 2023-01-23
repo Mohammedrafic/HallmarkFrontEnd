@@ -91,6 +91,7 @@ import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { ApplicantStatus as ApplicantStatusModel } from '@shared/models/order-management.model';
 
 enum Template {
   accept,
@@ -178,6 +179,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public canCreateOrder: boolean;
   public canCloseOrder: boolean;
   public isClosedOrder = false;
+  public selectedApplicantStatus: ApplicantStatusModel | null = null;
 
   public readonly nextApplicantStatuses = [
     {
@@ -476,13 +478,22 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     this.saveEmitter.emit();
   }
 
-  public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatus; isEnabled: boolean } }): void {
+  
+  public onSave(): void {
+    this.saveHandler({itemData: this.selectedApplicantStatus});
+  }
+
+  public onStatusChange(event: { itemData: ApplicantStatusModel | null }): void {
     if (event.itemData?.isEnabled) {
-      if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
-        this.openCandidateCancellationDialog.next();
-      }
+      this.selectedApplicantStatus = event.itemData;
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, SET_READONLY_STATUS));
+    }
+  }
+
+  public saveHandler(event: { itemData: ApplicantStatusModel | null }): void {
+    if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
+      this.openCandidateCancellationDialog.next();
     }
   }
 
@@ -501,6 +512,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   public resetStatusesFormControl(): void {
     this.jobStatusControl.reset();
+    this.selectedApplicantStatus = null;
   }
 
   private closeSideDialog(): void {
@@ -509,6 +521,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     this.openEvent.next(null);
     this.selectedTemplate = null;
     this.jobStatusControl.reset();
+    this.selectedApplicantStatus = null;
     this.orderCandidateListViewService.setIsCandidateOpened(false);
   }
 

@@ -255,13 +255,16 @@
               [dataSource]="nextApplicantStatuses"
               [itemTemplate]="itemTemplate"
               placeholder="Select Status"
-              (select)="onDropDownChanged($event)"
+              (select)="onStatusChange($event)"
             >
               <ng-template #itemTemplate let-data>
                 <span [ngClass]="{ 'disabled-item': !data.isEnabled }">{{ data.statusText }}</span>
               </ng-template>
             </ejs-dropdownlist>
           </div>
+          <button ejs-button cssClass="e-primary save-button" (click)="onSave()">
+            Save
+          </button>
         </div>
       </div>
     </section>
