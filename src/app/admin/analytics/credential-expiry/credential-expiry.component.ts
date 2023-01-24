@@ -1,14 +1,13 @@
-import { Component, Inject, OnInit, ViewChild,OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
-import { Location, LocationsByRegionsFilter } from '@shared/models/location.model';
-import { Region, regionFilter } from '@shared/models/region.model';
-import { Department, DepartmentsByLocationsFilter } from '@shared/models/department.model';
+import { Region, Location, Department } from '@shared/models/visibility-settings.model';
+
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable, Subject, takeUntil } from 'rxjs';
-import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
+import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
 import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
@@ -16,7 +15,10 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetCommonReportFilterOptions, GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData,  GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import {
+  GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData,
+  GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState
+} from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -27,6 +29,11 @@ import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { AgencyDto, CandidateStatusDto, CommonReportFilter, CommonReportFilterOptions } from '../models/common-report.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { Organisation } from '@shared/models/visibility-settings.model';
+import { uniqBy } from 'lodash';
+import { MessageTypes } from '../../../shared/enums/message-types';
+import { User } from '../../../shared/models/user.model';
+import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 
 @Component({
   selector: 'app-credential-expiry',
@@ -67,7 +74,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
   isDepartmentsDropDownEnabled: boolean = false;
-  departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
+  departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedDepartments: Department[];
 
   @Select(LogiReportState.logiReportData)
@@ -80,9 +87,9 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   private organizationId$: Observable<number>;
   private agencyOrganizationId:number;
 
-  @Select(SecurityState.bussinesData)
-  public businessData$: Observable<BusinessUnit[]>;
-  selectedOrganizations: BusinessUnit[];
+  @Select(SecurityState.organisations)
+  public organizationData$: Observable<Organisation[]>;
+  selectedOrganizations: Organisation[];
 
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
@@ -94,10 +101,12 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public departmentIdControl: AbstractControl;
   public agencyIdControl: AbstractControl;
   public candidateStatusesIdControl: AbstractControl;
+ 
+
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
-  public organizations: BusinessUnit[] = [];
+  public organizations: Organisation[];
   public defaultOrganizations:number[] =[];
   public defaultRegions:(number|undefined)[] =[];
   public defaultLocations:(number|undefined)[]=[];
@@ -110,12 +119,25 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public isInitialLoad: boolean = false;
   public baseUrl: string;
   public filterOptionsData: CommonReportFilterOptions;
+  public organizationFields = ORGANIZATION_DATA_FIELDS;
+  private previousOrgId: number = 0;
+  public isResetFilter: boolean = false;
+  private isAlive = true;
+  public user: User | null;
+  public regionsList: Region[] = [];
+  public locationsList: Location[] = [];
+  public departmentsList: Department[] = [];
+
+  public masterRegionsList: Region[] = [];
+  public masterLocationsList: Location[] = [];
+  public masterDepartmentsList: Department[] = [];
 
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   selectedCandidateStatuses: CandidateStatusDto[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
+    message: string;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
     private filterService: FilterService  ,@Inject(APP_SETTINGS) private appSettings: AppSettings) {
@@ -130,38 +152,42 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   }
 
   ngOnInit(): void {
-    
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
-   
-     // this.SetReportData();
-      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:ConfigurationDto[])=>{
-        if(data.length>0)
-        {
-        this.logiReportComponent.SetReportData(data);
-        }
-     });   
-      this.agencyOrganizationId=data;   
-      this.isInitialLoad = true;
-      this.orderFilterColumnsSetup();
-      let businessIdData = [];
-      businessIdData.push(data);
-      let filter: CommonReportFilter = {
-        businessUnitIds: businessIdData
-      };
 
-      this.store.dispatch(new GetCommonReportFilterOptions(filter));
-      this.CommonReportFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.store.dispatch(new ClearLogiReportState());
+      this.orderFilterColumnsSetup();
+      this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
+          this.isAlive = false;
           this.filterOptionsData = data;
           this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
           this.filterColumns.agencyIds.dataSource = data.agencies;
           this.defaultCandidateStatuses = data.candidateStatuses.map((list) => list.status);
           this.defaultAgencys = data.agencies.map((list) => list.agencyId);
+
+          if (this.isInitialLoad) {
+            setTimeout(() => { this.SearchReport(); }, 3000)
+            this.isInitialLoad = false;
+          }
+
         }
       });
+      this.SetReportData();
+      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
+        if (data.length > 0) {
+          this.logiReportComponent.SetReportData(data);
+        }
+      });
+      this.agencyOrganizationId = data;
+      this.isInitialLoad = true;
       this.onFilterControlValueChangedHandler();
+      this.onFilterRegionChangedHandler();
+      this.onFilterLocationChangedHandler();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
+
+
   private initForm(): void {
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
@@ -170,9 +196,9 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         businessIds: new FormControl({value:[],disabled:true}, [Validators.required]),
         startDate: new FormControl(startDate, [Validators.required]),
         endDate: new FormControl(new Date(Date.now()), [Validators.required]),
-        regionIds: new FormControl([], [Validators.required]),
-        locationIds: new FormControl([], [Validators.required]),
-        departmentIds: new FormControl([], [Validators.required]),
+        regionIds: new FormControl([]),
+        locationIds: new FormControl([]),
+        departmentIds: new FormControl([]),
         agencyIds: new FormControl([]),
         jobId: new FormControl(''),
         candidateStatuses: new FormControl([]),
@@ -183,59 +209,69 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
+
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
-    this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.organizations = data;
-      this.filterColumns.businessIds.dataSource = data;
-      this.defaultOrganizations = data.map((list) => list.id).filter(i=>i==this.agencyOrganizationId);
+
+    this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (data != null && data.length > 0) {
+        this.organizations = uniqBy(data, 'organizationId');
+        this.filterColumns.businessIds.dataSource = this.organizations;
+        this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+      }
     });
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (!this.isClearAll) {
-        this.selectedOrganizations = this.organizations?.filter((x) => data?.includes(x.id));
-        let regionFilter: regionFilter = {
-          ids: data,
-          getAll: true
-        };
-        this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
-        
-      }
-      else {
-        this.isClearAll = false;
+      this.credentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+        /*this.isAlive = true;*/
+        this.previousOrgId = data;
+        if (!this.isClearAll) {
+          let orgList = this.organizations?.filter((x) => data == x.organizationId);
+          this.selectedOrganizations = orgList;
+          this.regionsList = [];
+          let regionsList: Region[] = [];
+          let locationsList: Location[] = [];
+          let departmentsList: Department[] = [];
+          orgList.forEach((value) => {
+            regionsList.push(...value.regions);
+            locationsList = regionsList.map(obj => {
+              return obj.locations.filter(location => location.regionId === obj.id);
+            }).reduce((a, b) => a.concat(b), []);
+            departmentsList = locationsList.map(obj => {
+              return obj.departments.filter(department => department.locationId === obj.id);
+            }).reduce((a, b) => a.concat(b), []);
+          });
+          this.regionsList = sortByField(regionsList, "name");
+          this.locationsList = sortByField(locationsList, 'name');
+          this.departmentsList = sortByField(departmentsList, 'name');
+
+          this.masterRegionsList = this.regionsList;
+          this.masterLocationsList = this.locationsList;
+          this.masterDepartmentsList = this.departmentsList;
+
+          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          }
+          else {
+            this.isResetFilter = true;
+          }
+          let businessIdData = [];
+          businessIdData.push(data);
+          let filter: CommonReportFilter = {
+            businessUnitIds: businessIdData
+          };
+          this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          setTimeout(() => { this.SearchReport() }, 3000);
+        }
+        else {
+          this.isClearAll = false;
+          this.credentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+        }
       }
     });
-    this.regionIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
-    this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (this.regionIdControl.value.length > 0) {
-        this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
-        let locationFilter: LocationsByRegionsFilter = {
-          ids: data,
-          businessUnitIds:this.selectedOrganizations?.map((list) => list.id),
-          getAll: true
-        };
-        this.store.dispatch(new GetLocationsByRegions(locationFilter));
-      }
-    });
-    this.locationIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
-    this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (this.locationIdControl.value.length > 0) {
-        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
-        let departmentFilter: DepartmentsByLocationsFilter = {
-          ids: data,
-          businessUnitIds:this.selectedOrganizations?.map((list) => list.id),
-          getAll: true
-        };
-        this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
-      }
-    });
-    this.departmentIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
-    this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));
-      if (this.isInitialLoad) {
-        this.isInitialLoad = false;
-        setTimeout(()=>{ this.SearchReport()},3000);
-      }
-    });
+
 
     this.agencyIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
     this.agencyIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -253,11 +289,52 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       }
     });
 
-    this.onOrganizationsChange();
-    this.onRegionsChange();
-    this.onLocationsChange();
   }
- 
+
+  public onFilterRegionChangedHandler(): void {
+    this.regionIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
+    this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.credentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+      this.credentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.locations = [];
+      this.departments = [];
+
+      if (this.regionIdControl.value.length > 0) {
+        this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
+        this.filterColumns.locationIds.dataSource = this.locations;
+        this.departments = this.locations.map(obj => {
+          return obj.departments.filter(department => department.locationId === obj.id);
+        }).reduce((a, b) => a.concat(b), []);
+      }
+      else {
+        this.filterColumns.locationIds.dataSource = [];
+        this.credentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+        this.credentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      }
+    });
+  }
+
+  public onFilterLocationChangedHandler(): void {
+    this.locationIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
+    this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.credentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+
+      if (this.locationIdControl.value.length > 0) {
+        this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
+        this.filterColumns.departmentIds.dataSource = this.departments;
+      }
+      else {
+        this.filterColumns.departmentIds.dataSource = [];
+        this.credentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      }
+    });
+    this.departmentIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
+    this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.departments = this.departments?.filter((object) => data?.includes(object.id));
+    });
+  }
+
+
   public SearchReport(): void {
     let auth = "Bearer ";
     for(let x=0;x<window.localStorage.length;x++)
@@ -267,16 +344,32 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { startDate, endDate, candidateStatuses, jobId } = this.credentialExpiryForm.getRawValue();
-    
+    let { departmentIds, locationIds,  regionIds, startDate, endDate, jobId } = this.credentialExpiryForm.getRawValue();
+
+    if (!this.credentialExpiryForm.dirty) {
+      this.message = "Default filter selected with all regions, locations and departments for 90 days";
+    }
+    else {
+      this.isResetFilter = false;
+      this.message = ""
+    }
+
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
+
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+  
+
       this.paramsData =
       {
-       "OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.id).join(","),
+      "OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       "StartDateParamCREXP": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamCREXP": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamCREXP": this.selectedRegions?.map((list) => list.id).join(","),
-      "LocationParamCREXP": this.selectedLocations?.map((list) => list.id).join(","),
-      "DepartmentParamCREXP": this.selectedDepartments?.map((list) => list.departmentId).join(","),
+      "RegionParamCREXP": regionIds.length == 0 ? "null" : regionIds,
+      "LocationParamCREXP": locationIds.length == 0 ? "null" : locationIds,
+      "DepartmentParamCREXP": departmentIds.length == 0 ? "null" : departmentIds,
       "AgencyParamCREXP": this.selectedAgencies.length ==0?"null":this.selectedAgencies?.map((list) => list.agencyId).join(","),
       "CandidateStatusCREXP": this.selectedCandidateStatuses.length == 0 ? "null" : this.selectedCandidateStatuses?.map((list) => list.status).join(","),
       "JobIdCREXP": jobId.trim() == "" ? "null" : jobId.trim(),
@@ -342,7 +435,8 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       },
     }
   }
-  private SetReportData(){
+
+  private SetReportData() {
     const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
       if(logiReportData!=null&&logiReportData.length==0)
       {
@@ -352,47 +446,14 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         this.logiReportComponent?.SetReportData(logiReportData);
       }
   }
-  private onOrganizationsChange(): void {
-    this.regions$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: Region[]) => {
-        if (data != undefined) {
-          this.regions = data;
-          this.filterColumns.regionIds.dataSource = this.regions;
-          this.defaultRegions=data.map((list) => list.id);
-          this.defaultLocations=[];
-          this.defaultDepartments=[];
-        }
-      });
-  }
-  private onRegionsChange(): void {
-    this.locations$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: Location[]) => {
-        if (data != undefined) {
-          this.locations = data;
-          this.filterColumns.locationIds.dataSource = sortByField(this.locations, 'name');
-          this.defaultLocations=data.map((list) => list.id);
-          this.defaultDepartments=[];
-        }
-      });
-  }
-  private onLocationsChange(): void {
-    this.departments$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: Department[]) => {
-        if (data != undefined) {
-          this.departments = data;
-          this.filterColumns.departmentIds.dataSource = sortByField(this.departments, 'departmentName');
-          this.defaultDepartments=data.map((list) => list.departmentId);
-        }
-      });
-  }
 
   public showFilters(): void {
-    this.onFilterControlValueChangedHandler();
+    if (this.isResetFilter) {
+      this.onFilterControlValueChangedHandler();
+    }
     this.store.dispatch(new ShowFilterDialog(true));
   }
+
   public onFilterDelete(event: FilteredItem): void {
     this.filterService.removeValue(event, this.credentialExpiryForm, this.filterColumns);
   }
@@ -409,6 +470,11 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.JobId)?.setValue('');
     this.filteredItems = [];
+    this.locations = [];
+    this.departments = [];
+    this.regionsList = this.masterRegionsList;
+    this.locationsList = this.masterLocationsList;
+    this.departmentsList = this.masterDepartmentsList;
   }
   public onFilterApply(): void {
     this.credentialExpiryForm.markAllAsTouched();
@@ -419,4 +485,13 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     this.SearchReport();
     this.store.dispatch(new ShowFilterDialog(false));
   }
+
+  public showToastMessage(regionsLength: number, locationsLength: number, departmentsLength: number) {
+    this.message = "";
+    let error: any = regionsLength == 0 ? "Regions/Locations/Departments are required" : locationsLength == 0 ? "Locations/Departments are required" : departmentsLength == 0 ? "Departments are required" : "";
+
+    this.store.dispatch([new ShowToast(MessageTypes.Error, error)]);
+    return;
+  }
 }
+
