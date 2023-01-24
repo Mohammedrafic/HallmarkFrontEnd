@@ -246,8 +246,14 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     }
     if (this.groupEmailTemplateForm.emailBody!=''&&this.groupEmailTemplateForm.emailTo!=''&&this.groupEmailTemplateForm.emailSubject!='') {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
+      console.log(formValues)
+      let businessUnitId: number | null = null;
+      if(formValues.businessUnit == 4)
+        businessUnitId = formValues.businesses[0]
+      if(formValues.businessUnit == 3)
+        businessUnitId = formValues.business == 0 ? null : formValues.business
       const sendGroupEmailDto: SendGroupEmailRequest = {
-        businessUnitId: formValues.business==0?null:formValues.business,
+        businessUnitId: businessUnitId,
         bodyMail: formValues.emailBody,
         subjectMail: formValues.emailSubject,
         toList: formValues.emailTo == undefined ? "" : formValues.emailTo,
@@ -362,6 +368,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.businessUnit = data.businessUnitId;    
     this.groupEmailTemplateForm.userTypeInput = data.userType;
     this.groupEmailTemplateForm.populateUserType();    
+    console.log(data);
   }
   private ResetForm(): void {
     this.groupEmailTemplateForm.emailBody = "";
