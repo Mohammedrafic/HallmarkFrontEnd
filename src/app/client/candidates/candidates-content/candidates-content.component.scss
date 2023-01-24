@@ -32,7 +32,13 @@
 }
 
 .grid-component {
-  height: calc(100% - 110px);
+  &__irp {
+    height: calc(100% - 110px);
+  }
+
+  &__vms {
+    height: calc(100% - 152px);
+  }
 }
 
 @media #{$max-desktop-small} {

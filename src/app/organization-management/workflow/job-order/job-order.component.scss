@@ -1,8 +1,7 @@
 @import 'colors.scss';
 
 .container {
-  height: 100%;
-  overflow: auto;
+  height: calc(100% - 80px);
   padding-top: 23px;
   padding-right: 25px;
   margin-right: -25px;
