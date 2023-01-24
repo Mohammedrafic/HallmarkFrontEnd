@@ -11,8 +11,9 @@
     'r4 r4 r4 r4 r4 r4'
     'r5c1 r5c1 r5c1 r5c2 r5c2 r5c2'
     'r6c1 r6c1 r6c2 r6c2 r6c3 r6c3'
-    'r7 r7 r7 r7 r7 r7'
-    'r8 r8 r8 r8 r8 r8';
+    'r7c1 r7c1 r7c1 r7c2 r7c2 r7c2'
+    'r8 r8 r8 r8 r8 r8'
+    'r9 r9 r9 r9 r9 r9';
 
   .input-container {
     margin-bottom: 12px;
@@ -58,11 +59,20 @@
   }
 
   .input-container:nth-child(10) {
-    grid-area: r7;
+    grid-area: r7c1;
+    margin-right: 12px;
   }
 
   .input-container:nth-child(11) {
+    grid-area: r7c2;
+  }
+
+  .input-container:nth-child(12) {
     grid-area: r8;
+  }
+
+  .input-container:nth-child(13) {
+    grid-area: r9;
   }
 }
 

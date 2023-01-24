@@ -87,6 +87,22 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       disableOnEdit: false,
     },
     {
+      field: 'startDate',
+      title: 'Start Date',
+      disabled: false,
+      required: true,
+      type: FieldType.Calendar,
+      disableOnEdit: false,
+    },
+    {
+      field: 'endDate',
+      title: 'End Date',
+      disabled: false,
+      required: false,
+      type: FieldType.Calendar,
+      disableOnEdit: false,
+    },
+    {
       field: 'jobCode',
       title: 'Job Code',
       disabled: false,
@@ -95,7 +111,6 @@ export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
       maxLength: 20,
       disableOnEdit: false,
     },
-
     {
       field: 'comments',
       title: 'Comment',

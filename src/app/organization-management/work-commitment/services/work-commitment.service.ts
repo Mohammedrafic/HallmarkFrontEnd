@@ -4,7 +4,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { filter, Observable, take } from 'rxjs';
 
 import { CustomFormGroup } from '@core/interface';
-import { BaseObservable } from '@core/helpers';
+import { BaseObservable, DateTimeHelper } from '@core/helpers';
 import {
   Holiday,
   HolidaysPage,
@@ -42,6 +42,8 @@ export class WorkCommitmentService {
       minimumWorkExperience: [null],
       criticalOrder: [null],
       holiday: [null],
+      startDate: [null, Validators.required],
+      endDate: [null],
       jobCode: [null, Validators.required],
       comments: [null],
       workCommitmentId: null,
@@ -65,6 +67,8 @@ export class WorkCommitmentService {
       regions: commitment.regionIds,
       locations: commitment.locationIds,
       skillIds: allSkills ?? commitment.skillIds,
+      startDate: commitment.startDate ? DateTimeHelper.formatDateUTC(commitment.startDate, 'MM/dd/YYYY') : null,
+      endDate: commitment.endDate ? DateTimeHelper.formatDateUTC(commitment.endDate, 'MM/dd/YYYY') : null,
     };
   }
 
