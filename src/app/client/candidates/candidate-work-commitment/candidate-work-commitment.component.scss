@@ -1,5 +1,8 @@
-@import "colors";
+@import 'colors';
+:host {
+  height: calc(100vh - 340px);
+}
 
 .candidate-work-commitment-tab {
-  
+  height: 100%;
 }
