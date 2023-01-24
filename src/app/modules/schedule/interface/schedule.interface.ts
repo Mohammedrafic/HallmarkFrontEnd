@@ -21,8 +21,6 @@ export interface ScheduleItem {
   id: number;
   date: string;
   startDate: string;
-  startTime: string;
-  endTime: string;
   endDate: string;
   scheduleType: ScheduleType;
   orderId: number;

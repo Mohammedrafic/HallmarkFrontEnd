@@ -67,7 +67,7 @@ export class CreateScheduleService {
         const dateString: string =  DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date));
 
         return {
-          scheduleToOverrideId: this.getScheduleToOverrideId(item.candidateId, dateString, startTime, endTime),
+          schedulesToOverrideIds: this.getScheduleToOverrideIds(item.candidateId, dateString, startTime, endTime),
           date: dateString,
         };
       });
@@ -108,13 +108,17 @@ export class CreateScheduleService {
     });
   }
 
-  private getScheduleToOverrideId(candidateId: number, dateString: string, startTime: Date, endTime: Date): number | null {
-    const overlappingSchedule: ScheduleInt.ScheduleItem =
-      this.getDaySchedules(candidateId, dateString).find((daySchedule: ScheduleInt.ScheduleItem) => {
-        return this.isTimeRangeOverlapping(daySchedule, startTime, endTime);
-      }) as ScheduleInt.ScheduleItem;
+  private getScheduleToOverrideIds(
+    candidateId: number,
+    dateString: string,
+    startTime: Date,
+    endTime: Date
+  ): number[] | null {
+    const overlappingScheduleIds: number[] = this.getDaySchedules(candidateId, dateString)
+      .filter((daySchedule: ScheduleInt.ScheduleItem) => this.isTimeRangeOverlapping(daySchedule, startTime, endTime))
+      .map((daySchedule: ScheduleInt.ScheduleItem) => daySchedule.id);
 
-    return overlappingSchedule ? overlappingSchedule.id : null;
+    return overlappingScheduleIds.length ? overlappingScheduleIds : null;
   }
 
   private isTimeRangeOverlapping(daySchedule: ScheduleInt.ScheduleItem, startTime: Date, endTime: Date): boolean {
@@ -124,7 +128,7 @@ export class CreateScheduleService {
     const shiftEndTimeMs = endTime.getTime();
 
     return (shiftStartTimeMs >= dayScheduleStartTimeMs && shiftEndTimeMs <= dayScheduleEndTimeMs)
-      || (shiftEndTimeMs >= dayScheduleStartTimeMs && shiftStartTimeMs < dayScheduleStartTimeMs)
-      || (shiftStartTimeMs <= dayScheduleEndTimeMs && shiftEndTimeMs > dayScheduleEndTimeMs);
+      || (shiftEndTimeMs > dayScheduleStartTimeMs && shiftStartTimeMs < dayScheduleStartTimeMs)
+      || (shiftStartTimeMs < dayScheduleEndTimeMs && shiftEndTimeMs > dayScheduleEndTimeMs);
   }
 }

@@ -40,7 +40,7 @@ export interface ScheduleFormSource {
 
 export interface ScheduledDay {
   date: string;
-  scheduleToOverrideId: number | null;
+  schedulesToOverrideIds: number[] | null;
 }
 
 export interface EmployeeScheduledDay {
