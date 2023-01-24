@@ -1,27 +1,39 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
 
-.e-switch-wrapper {
-  height: 14px !important;
-  width: 34px !important;
-}
+:host {
+  height: calc(100% - 80px);
 
-.e-switch-handle{
-  height: 20px !important;
-  width: 20px !important;
-}
-
-.button-group {
-  width: auto;
-  display: flex;
-  align-items: center;
-  button {
-    margin-right: 12px;
+  .e-switch-wrapper {
+    height: 14px !important;
+    width: 34px !important;
   }
-  label {
-    margin-right: 24px;
-  }
-}
 
-.switch-text {
-  color: $secondary-dark-blue-30;
+  .e-switch-handle {
+    height: 20px !important;
+    width: 20px !important;
+  }
+
+  .button-group {
+    width: auto;
+    display: flex;
+    align-items: center;
+    button {
+      margin-right: 12px;
+    }
+    label {
+      margin-right: 24px;
+    }
+  }
+
+  .switch-text {
+    color: $secondary-dark-blue-30;
+  }
+  .grid-component {
+    height: calc(100% - 10px);
+
+    @media #{$max-desktop-small} {
+      height: calc(100% - 65px);
+    }
+  }
 }

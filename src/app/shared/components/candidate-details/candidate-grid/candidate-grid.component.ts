@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { CandidatesStatusText, CandidateStatus } from '@shared/enums/status';
+import { CandidateStatus } from '@shared/enums/status';
 import { Store } from '@ngxs/store';
 import { CandidatesColumnsDefinition } from '@shared/components/candidate-details/candidate-grid/candidate-grid.constant';
 import { Router } from '@angular/router';

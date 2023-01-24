@@ -254,7 +254,7 @@
   height: calc(98vh - 320px);
 
   @media #{$max-tablet} {
-    height: calc(98vh - 370px);
+    height: calc(98vh - 350px);
   }
 
   &::ng-deep {
@@ -310,7 +310,7 @@
   overflow-y: auto;
 
   @media #{$max-tablet} {
-    height: calc(100% - 310px);
+    height: calc(100% - 290px);
   }
 }
 

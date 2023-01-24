@@ -1,11 +1,12 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
 
 .e-switch-wrapper {
   height: 14px !important;
   width: 34px !important;
 }
 
-.e-switch-handle{
+.e-switch-handle {
   height: 20px !important;
   width: 20px !important;
 }
@@ -28,4 +29,23 @@
 
 .switch-text {
   color: $secondary-dark-blue-30;
+}
+
+.grid-component {
+  height: calc(100% - 110px);
+}
+
+@media #{$max-desktop-small} {
+  ::ng-deep {
+    app-page-toolbar {
+      .controls-container {
+        flex-direction: row;
+
+        .right-content {
+          margin-top: 0;
+          justify-content: flex-end;
+        }
+      }
+    }
+  }
 }

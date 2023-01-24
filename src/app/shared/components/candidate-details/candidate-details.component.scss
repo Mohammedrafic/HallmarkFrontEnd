@@ -1,4 +1,9 @@
 @import "colors";
+@import "adaptive-response";
+
+:host {
+  height: 100%;
+}
 
 .tab-legend {
   display: flex;
@@ -18,5 +23,13 @@
 
 .candidates-grid {
   margin-top: 24px;
-  height: 800px;
+  height: calc(100% - 135px);
+
+  @media #{$max-desktop-small} {
+    height: calc(100% - 195px);
+  }
+
+  @media #{$max-tablet} {
+    height: calc(100% - 210px);
+  }
 }

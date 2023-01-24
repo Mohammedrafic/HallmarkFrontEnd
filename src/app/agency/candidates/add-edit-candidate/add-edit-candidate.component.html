@@ -19,7 +19,7 @@
   </ng-container>
 </app-page-toolbar>
 <!-- Candidate Profile step -->
-<ejs-tab class="stepper" #stepper (created)="onStepperCreated()">
+<ejs-tab class="stepper" #stepper (created)="onStepperCreated()" [heightAdjustMode]="'Fill'">
   <e-tabitems>
     <e-tabitem>
       <ng-template #headerText>
