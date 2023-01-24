@@ -25,7 +25,7 @@
           >
           </ejs-dropdownlist>
         </div>
-        <button ejs-button cssClass="e-primary save-button" (click)="onSave()">
+        <button ejs-button cssClass="e-primary save-button" (click)="onSave()" *ngIf="!isAgency">
           Save
         </button>
         <app-tooltip-container [showToolTip]="!actionsAllowed">
@@ -36,6 +36,7 @@
             *ngIf="canAccept"
             [disabled]="!actionsAllowed"
             (click)="onReject()"
+            class="reject-button"
           >
             Reject
           </button>
@@ -312,7 +313,7 @@
           (select)="onStatusChange($event)"
         ></ejs-dropdownlist>
       </div>
-      <button ejs-button cssClass="e-primary save-button" (click)="onSave()">
+      <button ejs-button cssClass="e-primary save-button" (click)="onSave()" *ngIf="!isAgency">
         Save
       </button>
       <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="canAccept" (click)="onReject()">Reject</button>

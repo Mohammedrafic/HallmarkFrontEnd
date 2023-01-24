@@ -5,7 +5,11 @@
   .header-container {
     .button-container {
       display: flex;
-      gap: 12px;
+      justify-content: end;
+
+      &>button {
+        margin-left: 12px;
+      }
 
       @media (max-width: $tablet-min) {
         button:not(.close-button),
