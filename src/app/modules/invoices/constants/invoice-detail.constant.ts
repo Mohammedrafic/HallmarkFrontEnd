@@ -1,11 +1,12 @@
 import { formatDate } from '@angular/common';
 
-import { DateTimeHelper, GridValuesHelper } from '@core/helpers';
-import { ColDef } from '@ag-grid-enterprise/all-modules';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
+import { ColDef } from '@ag-grid-enterprise/all-modules';
+import { DateTimeHelper, GridValuesHelper } from '@core/helpers';
 
-import { InvoiceDetail, InvoiceInfoUIItem } from '../interfaces';
-import { INVOICES_STATUSES, InvoicesActionBtn, InvoiceState } from '../enums';
+import { TypedValueGetterParams } from '@core/interface';
+import { InvoicesActionBtn, InvoiceState, INVOICES_STATUSES } from '../enums';
+import { InvoiceDetail, InvoiceInfoUIItem, InvoiceSummaryItem } from '../interfaces';
 
 const hallmarkName = 'Hallmark';
 
@@ -115,7 +116,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       autoHeight: true,
       wrapText: true,
       cellClass: 'custom-line-height',
-      headerClass: 'custom-wrap'
+      headerClass: 'custom-wrap',
     },
     {
       field: 'formattedJobId',
@@ -125,7 +126,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       autoHeight: true,
       wrapText: true,
       cellClass: 'custom-line-height',
-      headerClass: 'custom-wrap'
+      headerClass: 'custom-wrap',
     },
     {
       field: '',
@@ -262,6 +263,12 @@ export const invoiceSummaryColumnDefs = (location: string): ColDef[] => [
     type: 'rightAligned',
     cellClass: 'font-weight-bold align-right',
     headerClass: 'custom-wrap align-right',
+    valueGetter: (params: TypedValueGetterParams<InvoiceSummaryItem>) => {
+      const loactionIdText = params.data.locationInvoiceId  ? `${params.data.locationInvoiceId}-` : '';
+      const skillGlText = params.data.skillGLNumber ? `-${params.data.skillGLNumber}` : '';
+      
+      return `${loactionIdText}${params.data.departmentName}-${params.data.costCenterFormattedName}${skillGlText}`;
+    },
   },
 ];
 

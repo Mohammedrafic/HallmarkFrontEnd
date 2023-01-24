@@ -17,7 +17,7 @@ export class InvoicePrintingService {
     data.forEach((invoice, index: number) => {
       if (index !== 0) {
         doc.addPage();
-      };
+      }
 
       this.addInvoiceHeader(doc, invoice.meta);
       this.addInvoiceBody(doc, invoice, logo);
@@ -35,7 +35,7 @@ export class InvoicePrintingService {
     data.forEach((invoice, index: number) => {
       if (index !== 0) {
         doc.addPage();
-      };
+      }
 
       this.addAgencyInvoiceHeader(doc, invoice.meta);
       this.addAgencyInvoiceBody(doc, invoice, logo);
@@ -70,10 +70,10 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
               fontSize: 10,
               halign: 'right',
               fontStyle: 'bold',
-              cellWidth: 'auto'
+              cellWidth: 'auto',
             },
-          }
-        ]
+          },
+        ],
       ],
       theme: 'plain',
     });
@@ -88,9 +88,9 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
               fontSize: 10,
               halign: 'left',
               fontStyle: 'bold',
-              overflow: 'linebreak'
+              overflow: 'linebreak',
             },
-          }
+          },
         ],
         [
           {
@@ -102,7 +102,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
               overflow: 'linebreak',
               cellPadding: { left: 10 },
             },
-          }
+          },
         ],
         [
           {
@@ -115,8 +115,8 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
               overflow: 'linebreak',
               cellPadding: { left: 10, top: 5, right: 15 },
             }, 
-          }
-        ]
+          },
+        ],
       ],
       theme: 'plain',
     });
@@ -146,10 +146,10 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
               fontSize: 10,
               halign: 'right',
               fontStyle: 'bold',
-              cellWidth: 'auto'
+              cellWidth: 'auto',
             },
-          }
-        ]
+          },
+        ],
       ],
       theme: 'plain',
     });
@@ -164,9 +164,9 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
               fontSize: 10,
               halign: 'left',
               fontStyle: 'bold',
-              overflow: 'linebreak'
+              overflow: 'linebreak',
             },
-          }
+          },
         ],
         [
           {
@@ -178,7 +178,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
               overflow: 'linebreak',
               cellPadding: { left: 10 },
             },
-          }
+          },
         ],
         [
           {
@@ -192,8 +192,8 @@ Hauppauge, NY 11788`,
               overflow: 'linebreak',
               cellPadding: { left: 10, top: 5, right: 15 },
             }, 
-          }
-        ]
+          },
+        ],
       ],
       theme: 'plain',
     });
@@ -205,7 +205,7 @@ Hauppauge, NY 11788`,
         {
           content: '',
           colSpan: 12,
-        }
+        },
       ],
       [
         {
@@ -216,7 +216,7 @@ Hauppauge, NY 11788`,
         {
           content: GridValuesHelper.formatAbsCurrency(data.totals.amount),
           styles: { halign: 'right', fontStyle: 'normal' },
-        }
+        },
       ],
       [
         {
@@ -226,8 +226,8 @@ Hauppauge, NY 11788`,
             fillColor: '#CFCFCF',
             fontStyle: 'bold',
             halign: 'center',
-          }
-        }
+          },
+        },
       ],
       [
         {
@@ -280,13 +280,18 @@ Hauppauge, NY 11788`,
             lineColor: '#181919',
             halign: 'left',
           },
-        }
+        },
       ],
     ];
 
     data.summary.forEach((summary) => {
       summary.items.forEach((detail, idx: number) => {
-        
+        const loactionIdText = detail.locationInvoiceId  ? `${detail.locationInvoiceId}-` : '';
+        const skillGlText =detail.skillGLNumber ? `-${detail.skillGLNumber}` : '';
+        // eslint-disable-next-line max-len
+        const additionalDetails = `${loactionIdText}${detail.departmentName}-${detail.costCenterFormattedName}${skillGlText}`;
+
+
         const sum: CellDef[] = [
           idx === 0 ? {
             content: summary.locationName, 
@@ -332,7 +337,7 @@ Hauppauge, NY 11788`,
             },
           },
           {
-            content: detail.details || '',
+            content: additionalDetails,
             colSpan: 3,
             styles: {
               halign: 'left',
@@ -347,7 +352,7 @@ Hauppauge, NY 11788`,
         }
 
         footer.push(sum);
-      })
+      });
     });
 
     footer.push([
@@ -379,7 +384,7 @@ Hauppauge, NY 11788`,
           fontStyle: 'bold',
           halign: 'right',
           lineColor: '#181919',
-        }
+        },
       },
       {
         content: GridValuesHelper.formatAbsCurrency(data.totals.amount),
@@ -387,7 +392,7 @@ Hauppauge, NY 11788`,
           fontStyle: 'bold',
           halign: 'right',
           lineColor: '#181919',
-        }
+        },
       },
       {
         content: '',
@@ -396,7 +401,7 @@ Hauppauge, NY 11788`,
           lineColor: '#181919',
         },
       },
-    ])
+    ]);
 
     footer.push([
       {
@@ -506,14 +511,14 @@ Hauppauge, NY 11788`,
         styles: {
           halign: 'left',
           fillColor: '#F5F5F5',
-        }
+        },
       },
       {
         content: '',
         styles: {
           halign: 'left',
           fillColor: '#F5F5F5',
-        }
+        },
       }, 
       {
         content: '',
@@ -565,13 +570,13 @@ Hauppauge, NY 11788`,
             content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
             styles: {
               halign: 'left',
-            }
+            },
           },
           {
             content: DateTimeHelper.formatDateUTC(record.timeIn, 'MM/dd/YYYY HH:mm'),
             styles: {
               halign: 'left',
-            }
+            },
           },
           DateTimeHelper.formatDateUTC(record.timeOut, 'MM/dd/YYYY HH:mm'),
           record.billRateConfigName,
@@ -627,7 +632,7 @@ Hauppauge, NY 11788`,
         {
           content: '',
           colSpan: 13,
-        }
+        },
       ],
       [
         {
@@ -638,7 +643,7 @@ Hauppauge, NY 11788`,
         {
           content: GridValuesHelper.formatAbsCurrency(data.totals.amount),
           styles: { halign: 'right', fontStyle: 'normal' },
-        }
+        },
       ],
       [
         {
@@ -649,7 +654,7 @@ Hauppauge, NY 11788`,
         {
           content: GridValuesHelper.formatAbsCurrency(data.totals.feeTotal),
           styles: { halign: 'right', fontStyle: 'normal' },
-        }
+        },
       ],
       [
         {
@@ -659,8 +664,8 @@ Hauppauge, NY 11788`,
             fillColor: '#CFCFCF',
             fontStyle: 'bold',
             halign: 'center',
-          }
-        }
+          },
+        },
       ],
       [
         {
@@ -721,12 +726,16 @@ Hauppauge, NY 11788`,
             lineColor: '#181919',
             halign: 'left',
           },
-        }
+        },
       ],
     ];
 
     data.summary.forEach((summary) => {
       summary.items.forEach((detail, idx: number) => {
+        const loactionIdText = detail.locationInvoiceId  ? `${detail.locationInvoiceId}-` : '';
+        const skillGlText =detail.skillGLNumber ? `-${detail.skillGLNumber}` : '';
+        // eslint-disable-next-line max-len
+        const additionalDetails = `${loactionIdText}${detail.departmentName}-${detail.costCenterFormattedName}${skillGlText}`;
         
         const sum: CellDef[] = [
           idx === 0 ? {
@@ -781,7 +790,7 @@ Hauppauge, NY 11788`,
             },
           },
           {
-            content: detail.details || '',
+            content: additionalDetails,
             colSpan: 4,
             styles: {
               halign: 'left',
@@ -796,7 +805,7 @@ Hauppauge, NY 11788`,
         }
 
         footer.push(sum);
-      })
+      });
     });
 
     footer.push([
@@ -828,7 +837,7 @@ Hauppauge, NY 11788`,
           fontStyle: 'bold',
           halign: 'right',
           lineColor: '#181919',
-        }
+        },
       },
       {
         content: GridValuesHelper.formatAbsCurrency(data.totals.feeTotal),
@@ -836,7 +845,7 @@ Hauppauge, NY 11788`,
           fontStyle: 'bold',
           halign: 'right',
           lineColor: '#181919',
-        }
+        },
       },
       {
         content: GridValuesHelper.formatAbsCurrency(data.totals.calculatedTotal),
@@ -844,7 +853,7 @@ Hauppauge, NY 11788`,
           fontStyle: 'bold',
           halign: 'right',
           lineColor: '#181919',
-        }
+        },
       },
       {
         content: '',
@@ -853,7 +862,7 @@ Hauppauge, NY 11788`,
           lineColor: '#181919',
         },
       },
-    ])
+    ]);
 
     footer.push([
       {
@@ -969,14 +978,14 @@ Hauppauge, NY 11788`,
         styles: {
           halign: 'left',
           fillColor: '#F5F5F5',
-        }
+        },
       },
       {
         content: '',
         styles: {
           halign: 'left',
           fillColor: '#F5F5F5',
-        }
+        },
       }, 
       {
         content: '',
@@ -1034,13 +1043,13 @@ Hauppauge, NY 11788`,
             content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
             styles: {
               halign: 'left',
-            }
+            },
           },
           {
             content: formatDate(DateTimeHelper.toUtcFormat(record.timeIn), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
             styles: {
               halign: 'left',
-            }
+            },
           },
           formatDate(DateTimeHelper.toUtcFormat(record.timeOut), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
           record.billRateConfigName,
