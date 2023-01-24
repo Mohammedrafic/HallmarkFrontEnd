@@ -31,6 +31,7 @@ import { UserState } from '../../../../store/user.state';
 import { ScheduleGridAdapter } from '../../adapters';
 import { DatesPeriods } from '../../constants';
 import * as ScheduleInt from '../../interface';
+import { ScheduleDateItem } from '../../interface';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -45,6 +46,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
 
   @Input() scheduleData: ScheduleInt.ScheduleModelPage | null;
+  @Input() selectedFilters: ScheduleInt.ScheduleFilters;
 
   @Output() changeFilter: EventEmitter<ScheduleInt.ScheduleFilters> = new EventEmitter<ScheduleInt.ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
@@ -111,31 +113,41 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.detectChanges();
   }
 
-  handleCellSingleClick(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
+  handleCellSingleClick(date: string, candidate: ScheduleInt.ScheduleCandidate, cellDate?: ScheduleDateItem): void {
     // TODO: refactor, move to directive
-    this.preventCellSingleClick = false;
-    this.cellClickTimer = setTimeout(() => {
-      if (!this.preventCellSingleClick) {
-        this.selectDateSlot(date, candidate);
-        this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
-      }
-    }, 250);
+    if(!cellDate?.isDisabled && this.getSelectionAvailable()) {
+      this.preventCellSingleClick = false;
+      this.cellClickTimer = setTimeout(() => {
+        if (!this.preventCellSingleClick) {
+          this.selectDateSlot(date, candidate);
+          this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
+        }
+      }, 250);
+    }
   }
 
   handleCellDblClick(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
-    this.preventCellSingleClick = true;
-    clearTimeout(this.cellClickTimer);
-    this.selectedCandidatesSlot.clear();
-    this.selectDateSlot(date, candidate);
-    this.scheduleCell.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
-    this.cdr.detectChanges();
+    if(this.getSelectionAvailable()) {
+      this.preventCellSingleClick = true;
+      clearTimeout(this.cellClickTimer);
+      this.selectedCandidatesSlot.clear();
+      this.selectDateSlot(date, candidate);
+      this.scheduleCell.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
+      this.cdr.detectChanges();
+    }
   }
 
-  handleScheduleCardDblClick(schedule: ScheduleInt.ScheduleDateItem, candidate: ScheduleInt.ScheduleCandidate): void {
-    this.preventCellSingleClick = true;
-    clearTimeout(this.cellClickTimer);
-    this.selectedCandidatesSlot.clear();
-    // TODO: edit functionality (will be added in the next sprint)
+  handleScheduleCardDblClick(
+    schedule: ScheduleInt.ScheduleDateItem,
+    candidate: ScheduleInt.ScheduleCandidate,
+    cellDate?: ScheduleDateItem
+  ): void {
+    if(!cellDate?.isDisabled && this.getSelectionAvailable()) {
+      this.preventCellSingleClick = true;
+      clearTimeout(this.cellClickTimer);
+      this.selectedCandidatesSlot.clear();
+      // TODO: edit functionality (will be added in the next sprint)
+    }
   }
 
   selectDateSlot(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
@@ -231,6 +243,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       }),
       switchMap((filteringEventArgs: FilteringEventArgs) => this.scheduleApiService.getScheduleEmployees({
         firstLastNameOrId: filteringEventArgs.text,
+        startDate: this.selectedFilters.startDate,
+        endDate: this.selectedFilters.endDate,
       }).pipe(
         tap((employeeDto) => {
           this.candidatesSuggestions = ScheduleGridAdapter.prepareCandidateFullName(employeeDto.items);
@@ -241,5 +255,16 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       )),
       takeUntil(this.componentDestroy()),
     ).subscribe();
+  }
+
+  private getSelectionAvailable(): boolean {
+    if(this.scheduleData &&
+      this.scheduleData?.items.length === 1) {
+      return true;
+    } else {
+      return !!(this.scheduleData &&
+        this.scheduleData?.items.length > 1 &&
+        this.selectedFilters.departmentsIds?.length === 1);
+    }
   }
 }

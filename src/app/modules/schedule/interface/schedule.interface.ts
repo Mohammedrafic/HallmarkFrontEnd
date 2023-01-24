@@ -49,6 +49,10 @@ export interface ScheduleDateItem {
   extendedDays: number;
   daySchedules: ScheduleItem[];
   isInDifferentDepartments: boolean;
+  employeeStatus: number;
+  departmentStartDate: string;
+  departmentEndDate: string;
+  isDisabled?: boolean;
 }
 
 export interface ScheduleDateSlot {
@@ -74,8 +78,8 @@ export interface ScheduleCardConfig {
 
 export interface ScheduleFilters {
   firstLastNameOrId?: string;
-  startDate?: string;
-  endDate?: string;
+  startDate?: string | Date;
+  endDate?: string | Date;
   regionIds?: number[];
   locationIds?: number[];
   departmentsIds?: number[];
