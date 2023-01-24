@@ -853,6 +853,8 @@ export class SendGroupEmailComponent
       this.groupEmailTemplateForm.controls['userType'].enable();
       this.rteObj.enabled = true;
       ele.className = 'rich-text-container-edit';
+      this.uploadObj.clearAll();
+      this.groupEmailTemplateForm.controls['fileUpload'].patchValue('');
     } else {
       this.businessControl?.disable();
       this.businessesControl?.disable();
