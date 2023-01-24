@@ -1,4 +1,5 @@
 @import 'src/app/styles/variables/colors';
+@import 'adaptive-response';
 
 .order-type-status-container {
   display: flex;
@@ -24,7 +25,8 @@
     display: flex;
   }
 
-  .input-container, .dropdown-container {
+  .input-container,
+  .dropdown-container {
     margin-bottom: 15px;
     margin-right: 10px;
   }
@@ -189,7 +191,22 @@ ejs-textbox.e-control {
 }
 
 .e-wrapper {
-  label{
+  label {
     margin-right: 15px;
+  }
+}
+
+@media #{$max-desktop-small} {
+  .order-form-container {
+    flex-direction: column;
+
+    .left-section {
+      width: 100%;
+      padding-bottom: 20px;
+    }
+
+    .right-section {
+      width: 100%;
+    }
   }
 }
