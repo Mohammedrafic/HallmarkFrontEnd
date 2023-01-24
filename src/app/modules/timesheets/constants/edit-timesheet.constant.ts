@@ -129,7 +129,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         widthStyle: FieldWidthStyle.Short,
       },
     ],
-  }
+  },
 };
 
 export const ProfileTimesheetTableConfig: DetailsTableConfig = {
@@ -155,11 +155,11 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
     dataSource: [
       {
         id: 1,
-        text: 'Regular'
+        text: 'Regular',
       },
       {
         id: 2,
-        text: 'Fixed'
+        text: 'Fixed',
       },
     ],
   },
@@ -170,11 +170,11 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
     dataSource: [
       {
         id: 1,
-        text: 'FAV-87100'
+        text: 'FAV-87100',
       },
       {
         id: 2,
-        text: 'FAV-90'
+        text: 'FAV-90',
       },
     ],
   },
@@ -193,20 +193,20 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
     width: 100,
     header: 'Total',
   },
-}
+};
 
 export const MapedRecordsType = {
   [RecordFields.Time]: 1,
   [RecordFields.Miles]: 2,
   [RecordFields.Expenses]: 3,
-}
+};
 
 export const AddSuccessMessage = {
   successMessage: 'Record was added successfully',
-}
+};
 
 export const PutSuccess = {
-  successMessage: 'Records were updated successfully'
-}
+  successMessage: 'Records were updated successfully',
+};
 
 export const GetBydateErrMessage = 'Timesheet for selected week does not exist';

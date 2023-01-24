@@ -75,6 +75,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   @Output() readonly nextPreviousOrderEvent = new EventEmitter<boolean>();
 
+  /**
+   * TODO: save timesheetDetails instead of separate params from it.
+   */
+
   public rejectReasonDialogVisible = false;
 
   public isAgency: boolean;
@@ -90,6 +94,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public mileageTimesheetId: number;
 
   public organizationId: number | null = null;
+
+  public costCenterId: number | null = null;
 
   public weekPeriod: [Date, Date] = [new Date(), new Date()];
 
@@ -217,7 +223,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public openAddDialog(meta: TimesheetInt.OpenAddDialogMeta): void {
     this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open,
-      meta.currentTab, meta.startDate, meta.endDate));
+      meta.currentTab, meta.startDate, meta.endDate, this.costCenterId));
   }
 
   public openUploadSideDialog(timesheetAttachments: TimesheetInt.TimesheetAttachments): void {
@@ -460,6 +466,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         this.mileageTimesheetId = details.mileageTimesheetId;
         this.isMileageStatusAvailable = details.mileageStatusText
         .toLocaleLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST;
+        this.costCenterId = details.departmentId;
 
         return this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
           details.id, details.organizationId, this.isAgency));

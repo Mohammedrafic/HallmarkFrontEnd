@@ -6,7 +6,7 @@ import {
   Attachment,
   CandidateHoursAndMilesData, CandidateInfo, FilterColumns,
   TabCountConfig, Timesheet, TimesheetAttachments, TimesheetDetailsModel, TimesheetInvoice,
-  TimesheetRecordsDto, TimesheetsFilterState
+  TimesheetRecordsDto, TimesheetsFilterState,
 } from '../../interface';
 
 
@@ -30,6 +30,7 @@ export interface TimesheetsModel {
     dialogType: RecordFields;
     startDate: string;
     endDate: string;
+    orderConstCenterId: number | null;
   };
   isUploadDialogOpen: {
     action: boolean;

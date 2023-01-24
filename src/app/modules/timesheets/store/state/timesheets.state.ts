@@ -154,6 +154,7 @@ export class TimesheetsState {
       type: state.isAddDialogOpen.dialogType,
       startDate: state.isAddDialogOpen.startDate,
       endDate: state.isAddDialogOpen.endDate,
+      orderCostCenterId: state.isAddDialogOpen.orderConstCenterId,
     };
   }
 
@@ -338,13 +339,14 @@ export class TimesheetsState {
 
   @Action(Timesheets.ToggleTimesheetAddDialog)
   ToggleAddDialog({ patchState }: StateContext<TimesheetsModel>,
-    { action, type, startDate, endDate }: Timesheets.ToggleTimesheetAddDialog): void {
+    { action, type, startDate, endDate, orderConstCenterId }: Timesheets.ToggleTimesheetAddDialog): void {
     patchState({
       isAddDialogOpen: {
         action: action === DialogAction.Open,
         dialogType: type,
         startDate: startDate,
         endDate: endDate,
+        orderConstCenterId: orderConstCenterId,
       },
     });
   }
