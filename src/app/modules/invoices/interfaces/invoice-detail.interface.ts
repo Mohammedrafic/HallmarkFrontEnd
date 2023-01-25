@@ -71,8 +71,13 @@ export interface InvoiceSummaryItem {
   total: number;
   details: string;
   costCenterFormattedName: string;
+  invoiceDepartmentId: string;
+  locationIExternalId: string;
+  locationInvoiceId: string;
+  skillGLNumber: string;
   extDepartmentId: string;
-  totalFee: number;
+  feeTotal: number; 
+  calculatedTotal: number;
 }
 
 export interface InvoiceInfoUIItem {

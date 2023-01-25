@@ -45,4 +45,8 @@ export class SpinnerInterceptorHelperService {
     this.spinnerService.hide();
     this.loadQueue.clear();
   }
+
+  checkQueueForUrl(url: string): boolean {
+    return this.loadQueue.has(url);
+  }
 }

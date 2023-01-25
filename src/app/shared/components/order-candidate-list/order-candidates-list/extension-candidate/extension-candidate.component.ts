@@ -66,6 +66,9 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { CandidateDOBRequired, CandidateSSNRequired } from '@shared/constants';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> {}
 
@@ -128,9 +131,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public canOnboard = false;
   public canClose = false;
   public hasEditOrderBillRatesPermission: boolean;
+  public selectedApplicantStatus: ApplicantStatus | null = null;
 
   public applicantStatusEnum = ApplicantStatusEnum;
-
+  public candidateSSNRequired :boolean;
+  public candidateDOBRequired :boolean;
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
     Rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
@@ -278,14 +283,35 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   public resetStatusesFormControl(): void {
     this.statusesFormControl.reset();
+    this.selectedApplicantStatus = null;
   }
 
   public onAccept(): void {
+    if(this.candidateDOBRequired){
+      if(!this.form.controls["dob"].value){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateDOBRequired));
+        return;
+      }
+    }
+    if(this.candidateSSNRequired){
+      if(!this.form.controls["ssn"].value){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
+        return;
+      }
+    }
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
   }
 
-  public onDropDownChanged(event: { itemData: ApplicantStatus }): void {
-    switch (event.itemData.applicantStatus) {
+  public onSave(): void {
+    this.saveHandler({itemData: this.selectedApplicantStatus});
+  }
+
+  public onStatusChange(event: { itemData: ApplicantStatus }): void {
+    this.selectedApplicantStatus = event.itemData;
+  }
+
+  public saveHandler(event: { itemData: ApplicantStatus | null }): void {
+    switch (event.itemData?.applicantStatus) {
       case ApplicantStatusEnum.Accepted:
         this.onAccept();
         break;
@@ -300,12 +326,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         break;
 
       default:
-        if (this.form.dirty) {
-          this.updateAgencyCandidateJob({
-            applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
-            statusText: this.candidateJob.applicantStatus.statusText,
-          });
-        }
+        this.updateAgencyCandidateJob(this.selectedApplicantStatus || this.candidateJob.applicantStatus);
         break;
     }
   }
@@ -484,6 +505,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       penaltyCriteria: new FormControl(''),
       rate: new FormControl(''),
       hours: new FormControl(''),
+      dob:new FormControl(''),
+      ssn:new FormControl('')
     });
   }
 
@@ -503,6 +526,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   private patchForm(value: OrderCandidateJob): void {
     this.candidateJob = value;
+    this.candidateSSNRequired =value.candidateSSNRequired;
+    this.candidateDOBRequired=value.candidateDOBRequired;
     if (this.candidateJob) {
       this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
       this.getComments();
@@ -529,6 +554,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         penaltyCriteria: PenaltiesMap[this.candidateJob.jobCancellation?.penaltyCriteria || 0],
         rate: this.candidateJob.jobCancellation?.rate,
         hours: this.candidateJob.jobCancellation?.hours,
+        dob:value.candidateProfile.dob,
+        ssn:value.candidateProfile.ssn
       });
 
       if (!this.isRejected) {

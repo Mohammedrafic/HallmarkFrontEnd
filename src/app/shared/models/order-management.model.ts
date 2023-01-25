@@ -517,7 +517,7 @@ export type AcceptJobDTO = {
   guaranteedWorkWeek?: string;
   jobId: number;
   orderId: number;
-  nextApplicantStatus: ApplicantStatus;
+  nextApplicantStatus: ApplicantStatus | null;
   offeredBillRate?: number;
   organizationId: number;
   requestComment?: string;
@@ -536,7 +536,7 @@ export type CandidateProfile = {
   classification: number;
   createdAt: string;
   createdBy: string;
-  dob: number;
+  dob: string;
   email: string;
   firstName: string;
   id: number;
@@ -591,6 +591,8 @@ export type OrderCandidateJob = {
   commentContainerId?: number;
   reOrderDate?: string;
   jobCancellation?: JobCancellation;
+  candidateSSNRequired:boolean;
+  candidateDOBRequired:boolean;
 };
 
 export type CandidatesBasicInfo = {

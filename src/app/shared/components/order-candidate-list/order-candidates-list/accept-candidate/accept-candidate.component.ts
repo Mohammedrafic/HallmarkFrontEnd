@@ -16,6 +16,8 @@ import {
 } from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 
 import {
+  CandidateDOBRequired,
+  CandidateSSNRequired,
   DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   deployedCandidateMessage,
@@ -45,6 +47,8 @@ import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -83,6 +87,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public priceUtils = PriceUtils;
   public showHoursControl: boolean = false;
   public showPercentage: boolean = false;
+  public candidateSSNRequired :boolean;
+  public candidateDOBRequired :boolean;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
@@ -189,6 +195,18 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public onAccept(): void {
+    if(this.candidateDOBRequired){
+      if(!this.form.controls["dob"].value){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateDOBRequired));
+        return;
+      }
+    }
+    if(this.candidateSSNRequired){
+      if(!this.form.controls["ssn"].value){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
+        return;
+      }
+    }
     this.shouldChangeCandidateStatus()
       .pipe(take(1))
       .subscribe((isConfirm) => {
@@ -306,6 +324,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       penaltyCriteria: new FormControl(''),
       rate: new FormControl(''),
       hours: new FormControl(''),
+      dob:new FormControl(''),
+      ssn: new FormControl('')
     });
   }
 
@@ -324,6 +344,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       this.candidateJob = value;
 
       if (value) {
+        this.candidateSSNRequired =value.candidateSSNRequired;
+        this.candidateDOBRequired=value.candidateDOBRequired;
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
         this.billRatesData = [...value.billRates];
@@ -353,6 +375,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
           rate: value.jobCancellation?.rate,
           hours: value.jobCancellation?.hours,
+          dob:value.candidateProfile.dob,
+          ssn:value.candidateProfile.ssn
         });
       }
       this.changeDetectionRef.markForCheck();

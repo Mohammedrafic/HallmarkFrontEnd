@@ -3,8 +3,8 @@
     <ejs-tooltip content="Candidate Name" position="TopCenter" [showTipPointer]="false">
       <p class="name">{{ candidate.lastName }}, {{ candidate.firstName }}</p>
     </ejs-tooltip>
-
-    <ejs-tooltip
+    <!-- TODO: uncomment for feature implementation -->
+    <!--<ejs-tooltip
       *ngIf="candidateIconName"
       [content]="iconTooltipMessage"
       position="TopCenter"
@@ -14,7 +14,7 @@
         [name]="candidateIconName"
         class="icon"
       ></i-feather>
-    </ejs-tooltip>
+    </ejs-tooltip> -->
   </div>
   <div class="block">
     <ejs-tooltip content="ID" position="TopCenter" [showTipPointer]="false" class="block-id">

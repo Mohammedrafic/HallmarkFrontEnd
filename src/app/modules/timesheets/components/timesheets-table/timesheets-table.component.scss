@@ -1,4 +1,5 @@
 @import '../../../../styles/variables/colors';
+@import 'adaptive-response';
 
 :host::ng-deep {
   .app-grid {
@@ -17,4 +18,14 @@
 
 .e-btn-icon.e-icons.e-icon-right.e-caret {
   display: none;
+}
+
+@media #{$max-desktop-small} {
+  :host {
+    ::ng-deep {
+      app-grid .app-grid {
+        height: calc(100% - 60px);
+      }
+    }
+  }
 }

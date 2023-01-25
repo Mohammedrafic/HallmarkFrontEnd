@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, takeUntil } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -23,6 +24,7 @@ import { UserState } from 'src/app/store/user.state';
 import { ScheduleFilters, ScheduleFiltersData } from '../../interface';
 import { ScheduleFiltersColumns, SkillsFieldsOptions } from '../../constants';
 import { ScheduleFiltersService } from '../../services';
+import { OrganizationStructureService } from '@shared/services';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -72,6 +74,7 @@ export class ScheduleFiltersComponent extends DestroyableDirective implements On
     private filterService: FilterService,
     private cdr: ChangeDetectorRef,
     private scheduleFiltersService: ScheduleFiltersService,
+    private organizationStructureService: OrganizationStructureService
   ) {
     super();
   }
@@ -119,15 +122,18 @@ export class ScheduleFiltersComponent extends DestroyableDirective implements On
     this.organizationStructure$
       .pipe(
         filter(Boolean),
+        map((structure: OrganizationStructure) =>
+          this.organizationStructureService.getOrgStructureForIrp(structure.regions)
+        ),
         takeUntil(this.destroy$),
       )
-      .subscribe((structure: OrganizationStructure) => {
+      .subscribe((structure: OrganizationRegion[]) => {
         if (this.filteredItems.length) {
           this.clearAllFilters();
         }
 
         this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: this.activeSystem } }));
-        this.regions = structure.regions;
+        this.regions = structure;
         this.filterColumns.regionIds.dataSource = this.regions;
         this.cdr.markForCheck();
       });

@@ -35,6 +35,8 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   public onCallId: number;
 
+  private initialCostCenterId: number | null = null;
+
   @Select(TimesheetsState.addDialogOpen)
   public readonly dialogState$: Observable<TimesheetDetailsAddDialogState>;
 
@@ -72,6 +74,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
         this.form = this.addService.createForm(value.type) as CustomFormGroup<AddTimsheetForm>;
         this.formType = value.type;
         this.setDateBounds(value.startDate, value.endDate);
+        this.initialCostCenterId = value.orderCostCenterId;
         this.populateOptions();
         this.sideAddDialog.show();
         this.cd.detectChanges();
@@ -88,7 +91,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   public override closeDialog(): void {
     super.closeDialog();
-    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Close, this.formType, '', ''));
+    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Close, this.formType, '', '', null));
   }
 
   private populateOptions(): void {
@@ -113,6 +116,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
         item.options = Object.values(uniqBillRatesHashObj);
 
         this.onCallId = item.options?.find((rate) => rate.text.toLowerCase() === 'oncall')?.value as number;
+        this.form?.get('departmentId')?.patchValue(this.initialCostCenterId, { emitEvent: false, onlySelf: true });
       }
     });
   }

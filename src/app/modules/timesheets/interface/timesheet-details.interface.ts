@@ -80,6 +80,7 @@ export interface TimesheetDetailsModel {
   orderLocationName: string | null;
   orderDepartmentName: string | null;
   orderSkillAbbreviation: string | null;
+  orderCostCenterId: number;
   jobStartDate: string;
   jobEndDate: string;
   unitName: string;
@@ -119,6 +120,7 @@ export interface TimesheetDetailsAddDialogState {
   type: RecordFields;
   startDate: string;
   endDate: string;
+  orderCostCenterId: number | null;
 }
 
 export interface RecordsPutDto {

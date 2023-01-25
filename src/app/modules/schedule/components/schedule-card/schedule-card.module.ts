@@ -6,6 +6,7 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
 import { AlertTriangle, Briefcase, Calendar, Clock } from 'angular-feather/icons';
 import { FeatherModule } from 'angular-feather';
 
+import { ScheduleCardService } from '../../services/schedule-card.service';
 import { ScheduleCardComponent } from './schedule-card.component';
 
 const icons = {
@@ -28,5 +29,6 @@ const icons = {
     TooltipModule,
     TooltipContainerModule,
   ],
+  providers: [ScheduleCardService],
 })
 export class ScheduleCardModule { }

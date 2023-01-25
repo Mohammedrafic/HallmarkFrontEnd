@@ -36,13 +36,15 @@ import { customEmailValidator } from '@shared/validators/email.validator';
 import { UserState } from '../../store/user.state';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion,
+  OrganizationStructure } from '@shared/models/organization.model';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { Days } from '@shared/enums/days';
-import { groupInvoicesOptions } from 'src/app/modules/invoices/constants';
-import { AssociatedLink, DisabledSettingsByDefault, SettingsAppliedToPermissions, SettingsFilterCols, tierSettingsKey } from './settings.constant';
+import { GroupInvoicesOptions } from 'src/app/modules/invoices/constants';
+import { AssociatedLink, DisabledSettingsByDefault, SettingsAppliedToPermissions,
+  SettingsFilterCols, tierSettingsKey } from './settings.constant';
 import { SettingsDataAdapter } from './helpers/settings-data.adapter';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { SideMenuService } from '@shared/components/side-menu/services';
@@ -81,7 +83,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     value: 'id',
   };
 
-  public readonly groupInvoicesOptions = groupInvoicesOptions;
+  public readonly groupInvoicesOptions = GroupInvoicesOptions;
   public readonly groupInvoicesFields = {
     text: 'text',
     value: 'id',

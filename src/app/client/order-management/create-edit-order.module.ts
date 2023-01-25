@@ -30,7 +30,7 @@ import { MultiDatePickerModule } from '@shared/components/multi-date-picker/mult
 import { GridIcons } from '@client/order-management/constants';
 import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
 import { OrderCredentialsService } from "@client/order-management/services";
-import { OrganizationStructureService } from '@client/order-management/components/irp-tabs/services';
+import { OrganizationStructureService } from '@shared/services';
 
 @NgModule({
   declarations: [

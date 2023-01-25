@@ -23,6 +23,8 @@ export interface WorkCommitmentDetails {
   departmentId: number;
   departmentName: string;
   holiday: number;
+  startDate: string | null;
+  endDate: string | null;
   jobCode: string;
   masterWorkCommitmentId: number;
   masterWorkCommitmentName: string;
@@ -40,6 +42,8 @@ export interface WorkCommitmentGrid {
   departmentId: number;
   departmentName: string;
   holiday: number;
+  startDate: string | null;
+  endDate: string | null;
   jobCode: string;
   locationName: string[];
   locationIds: number[];

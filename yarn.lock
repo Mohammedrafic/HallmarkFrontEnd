@@ -4536,6 +4536,11 @@ domhandler@^4.2.0, domhandler@^4.3.1:
   dependencies:
     domelementtype "^2.2.0"
 
+dommatrix@^1.0.1:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/dommatrix/-/dommatrix-1.0.3.tgz#e7c18e8d6f3abdd1fef3dd4aa74c4d2e620a0525"
+  integrity sha512-l32Xp/TLgWb8ReqbVJAFIvXmY7go4nTxxlWiAFyhoQw9RKEOHBZNnyGvJWqDVSPmq3Y9HlM4npqF/T6VMOXhww==
+
 dompurify@^2.2.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.4.0.tgz#c9c88390f024c2823332615c9e20a453cf3825dd"
@@ -6603,6 +6608,14 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
+ng2-pdf-viewer@^9.1.3:
+  version "9.1.3"
+  resolved "https://registry.yarnpkg.com/ng2-pdf-viewer/-/ng2-pdf-viewer-9.1.3.tgz#54648e485abc6ed50b25ddc6068538b3f0ea86bb"
+  integrity sha512-t2Gez92xPWPfY3qzzs+iLey5NUCYwJXIzv+dU4prY96aYdacsxuOpFjORW1+a330ryMkxYEJvEQ+mgbBJr77xw==
+  dependencies:
+    pdfjs-dist "~2.14.305"
+    tslib "^2.3.1"
+
 ngx-mask@13.1.15:
   version "13.1.15"
   resolved "https://registry.yarnpkg.com/ngx-mask/-/ngx-mask-13.1.15.tgz#1bfd96772f72eabd70ae186335b5e6804789ee23"
@@ -7070,6 +7083,14 @@ path-type@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-4.0.0.tgz#84ed01c0a7ba380afe09d90a8c180dcd9d03043b"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
+
+pdfjs-dist@~2.14.305:
+  version "2.14.305"
+  resolved "https://registry.yarnpkg.com/pdfjs-dist/-/pdfjs-dist-2.14.305.tgz#ed2ecb439ff8af5446c90a310ebd30bc1a91df62"
+  integrity sha512-5f7i25J1dKIBczhgfxEgNxfYNIxXEdxqo6Qb4ehY7Ja+p6AI4uUmk/OcVGXfRGm2ys5iaJJhJUwBFwv6Jl/Qww==
+  dependencies:
+    dommatrix "^1.0.1"
+    web-streams-polyfill "^3.2.1"
 
 performance-now@^2.1.0:
   version "2.1.0"
@@ -8428,6 +8449,11 @@ tslib@^2.0.0, tslib@^2.1.0, tslib@^2.2.0, tslib@^2.3.0, tslib@^2.4.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
   integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
 
+tslib@^2.3.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
+  integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==
+
 tsutils@^3.21.0:
   version "3.21.0"
   resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-3.21.0.tgz#b48717d394cea6c1e096983eed58e9d61715b623"
@@ -8612,6 +8638,11 @@ wcwidth@^1.0.1:
   integrity sha1-8LDc+RW8X/FSivrbLA4XtTLaL+g=
   dependencies:
     defaults "^1.0.3"
+
+web-streams-polyfill@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.2.1.tgz#71c2718c52b45fd49dbeee88634b3a60ceab42a6"
+  integrity sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==
 
 webidl-conversions@^3.0.0:
   version "3.0.1"

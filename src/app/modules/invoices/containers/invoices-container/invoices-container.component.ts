@@ -19,7 +19,7 @@ import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fiel
 import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import { InvoicesTableTabsComponent } from '../../components/invoices-table-tabs/invoices-table-tabs.component';
-import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions } from '../../constants';
+import { defaultGroupInvoicesOption, GroupInvoicesOption, GroupInvoicesOptions } from '../../constants';
 import { AgencyInvoicesGridTab, InvoicesAgencyTabId, OrganizationInvoicesGridTab } from '../../enums';
 import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
 import { InvoicePrintingService, InvoicesService } from '../../services';
@@ -97,7 +97,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public gridOptions: GridOptions = {};
 
-  public readonly groupInvoicesOptions = groupInvoicesOptions;
+  public readonly groupInvoicesOptions = GroupInvoicesOptions;
 
   public readonly defaultGroupInvoicesOption: GroupInvoicesOption = defaultGroupInvoicesOption;
 

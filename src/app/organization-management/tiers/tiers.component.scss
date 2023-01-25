@@ -1,21 +1,25 @@
-@import "colors";
+@import 'colors';
 
-.toolbar {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+.tiers {
+  height: calc(100% - 80px);
 
-  h3{
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    h3 {
       color: $title-black;
       margin: 8px;
+    }
+
+    button {
+      margin-left: 18px;
+    }
   }
 
-  button {
-    margin-left: 18px;
+  .grid-container {
+    margin-top: 24px;
+    height: 100%;
   }
-}
-
-.grid-container {
-  margin-top: 24px;
-  height: 800px;
 }

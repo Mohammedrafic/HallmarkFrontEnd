@@ -4,4 +4,5 @@ export enum InvoicesAggregationType {
   CostCenter = 3,
   Candidate = 4,
   Agency = 5,
+  Organization = 6,
 }

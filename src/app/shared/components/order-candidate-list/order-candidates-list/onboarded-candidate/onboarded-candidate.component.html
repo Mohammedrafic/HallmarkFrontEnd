@@ -28,6 +28,9 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
+        <button ejs-button class="save-button" cssClass="e-primary" (click)="onSave()" *ngIf="!isRejected && !isCancelled">
+          Save
+        </button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>

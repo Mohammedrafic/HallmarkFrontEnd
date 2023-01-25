@@ -1,3 +1,5 @@
+import { InvoiceSummaryItem } from './invoice-detail.interface';
+
 export interface InvoicePrintRecord {
   weekDate: string;
   timeIn: string;
@@ -18,18 +20,6 @@ export interface InvoicePrintRecord {
   fee: number;
   rate: number;
   total: number;
-};
-
-export interface InvoicePrintSummaryRecord {
-  departmentName: string;
-  costCenterFormattedName: string;
-  skillName: string;
-  value: number;
-  total: number;
-  details: string;
-  calculatedTotal: number;
-  fee: number;
-  feeTotal: number;
 }
 
 export interface PrintInvoiceMeta {
@@ -45,7 +35,7 @@ export interface PrintInvoiceMeta {
 
 export interface GroupedPrintSummary {
   locationName: string;
-  items: InvoicePrintSummaryRecord[];
+  items: InvoiceSummaryItem[];
 }
 
 export interface PrintInvoiceData {

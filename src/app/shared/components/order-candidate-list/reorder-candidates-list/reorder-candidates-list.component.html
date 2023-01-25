@@ -3,6 +3,19 @@
     <div class="title">
       <h3>Candidates List</h3>
     </div>
+    <ng-container *ngIf="system === systemType.IRP && isFeatureIrpEnabled">
+      <div class="input-container">
+        <div class="input-group switch">
+          <ejs-switch
+            id="switcher"
+            class="switch"
+            (change)="onSwitcher($event)"
+            [checked]="includeDeployedCandidates"
+          ></ejs-switch>
+          <label class="switch-label" for="switcher">is Avaliable</label>
+        </div>
+      </div>
+    </ng-container>
   </div>
 
   <ng-container *ngIf="system !== systemType.IRP || !isFeatureIrpEnabled || isAgency; else irpCandiadtes">
@@ -220,7 +233,7 @@
             <div class="status-cell">
               <ejs-chiplist>
                 <e-chips>
-                  <e-chip [text]="data.orderStatusText" [cssClass]="data.orderStatusText | chipsCssClass"></e-chip>
+                  <e-chip [text]="data.statusName" [cssClass]="data.statusName | chipsCssClass"></e-chip>
                 </e-chips>
               </ejs-chiplist>
             </div>

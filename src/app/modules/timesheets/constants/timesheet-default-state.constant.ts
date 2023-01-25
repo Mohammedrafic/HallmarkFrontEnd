@@ -36,6 +36,7 @@ export const DefaultTimesheetState: TimesheetsModel = {
     dialogType: RecordFields.Time,
     startDate: '',
     endDate: '',
+    orderConstCenterId: null,
   },
   isUploadDialogOpen: {
     action: false,
@@ -46,4 +47,4 @@ export const DefaultTimesheetState: TimesheetsModel = {
   timesheetDetails: null,
   organizations: [],
   selectedOrganizationId: 0,
-}
+};

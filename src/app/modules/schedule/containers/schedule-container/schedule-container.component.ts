@@ -119,9 +119,7 @@ export class ScheduleContainerComponent extends Destroyable {
   }
 
   private initScheduleData(isLoadMore = false): void {
-    const { startDate, endDate, ...restFilters } = this.scheduleFilters;
-
-    this.scheduleApiService.getScheduleEmployees(restFilters)
+    this.scheduleApiService.getScheduleEmployees(this.scheduleFilters)
     .pipe(
       take(1),
       switchMap((candidates: ScheduleInt.ScheduleCandidatesPage) =>
@@ -174,7 +172,7 @@ export class ScheduleContainerComponent extends Destroyable {
 
     return this.scheduleApiService.getSchedulesByEmployeesIds(
       candidates.items.map(el => el.id),
-      { startDate: startDate || '', endDate: endDate || '' }
+      { startDate: startDate || '', endDate: endDate || '',  departmentsIds: this.scheduleFilters.departmentsIds ?? [] }
     ).pipe(
       take(1),
       map((candidateSchedules: ScheduleInt.CandidateSchedules[]): ScheduleInt.ScheduleModelPage =>

@@ -40,7 +40,7 @@ import { ExportColumn, ExportOptions } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { isNil } from 'lodash';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, optionFields, regionFields } from '@shared/constants';
+import { optionFields, regionFields } from '@shared/constants';
 import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
 import { filterColumns, IRPCandidates, VMSCandidates } from './candidate-list.constants';
 import { Permission } from '@core/interface';
@@ -252,11 +252,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public onRemove(id: number): void {
     this.confirmService
-      .confirm(
-        this.isIRP ? DELETE_RECORD_TEXT : 'Are you sure you want to inactivate the Candidate?', {
-        okButtonLabel: this.isIRP ? 'Delete' : 'Inactivate',
+      .confirm('Are you sure you want to inactivate the Candidate?', {
+        okButtonLabel: 'Inactivate',
         okButtonClass: 'delete-button',
-        title: this.isIRP ? DELETE_RECORD_TITLE : 'Inactivate the Candidate',
+        title: 'Inactivate the Candidate',
       })
       .pipe(
         filter((confirm) => !!confirm),
@@ -388,17 +387,16 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private inactivateCandidate(id: number) {
-    if (this.isIRP) {
-       this.store.dispatch(new DeleteIRPCandidate(id));
-       this.dispatchNewPage();
-    } else {
-      this.store
-      .dispatch(new ChangeCandidateProfileStatus(id, CandidateStatus.Inactive))
+    const ChangeCandidateStatusAction = this.isIRP
+      ? new DeleteIRPCandidate(id)
+      : new ChangeCandidateProfileStatus(id, CandidateStatus.Inactive);
+
+    this.store
+      .dispatch(ChangeCandidateStatusAction)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.dispatchNewPage();
       });
-    }
   }
 
   private clearFilters(): void {

@@ -100,63 +100,40 @@
       <div class="form-elemet">
         <div class="group">
           <div class="input-container calendar">
-            <label>Order Start Date Between</label>
+            <label>Order Start Date<span class="required">*</span></label>
             <div class="input-group datepicker">
-              <ejs-datepicker id="orderStartDateBegin" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                              appValidateWithMessage formControlName="orderStartDateBegin">
+              <ejs-datepicker id="orderStartDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+                              appValidateWithMessage formControlName="orderStartDate">
               </ejs-datepicker>
             </div>
           </div>
           <div class="input-container calendar">
-            <label> &nbsp;</label>
+            <label>Order End Date<span class="required">*</span></label>
             <div class="input-group datepicker">
-              <ejs-datepicker id="orderStartDateEnd" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                              appValidateWithMessage formControlName="orderStartDateEnd"
-                              [min]="candidateStatusReportForm.controls['orderStartDateEnd'].value">
-              </ejs-datepicker>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-elemet">
-        <div class="group">
-          <div class="input-container calendar">
-            <label>Order End Date Between</label>
-            <div class="input-group datepicker">
-              <ejs-datepicker id="orderEndDateBegin" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                              appValidateWithMessage formControlName="orderEndDateBegin">
-              </ejs-datepicker>
-            </div>
-          </div>
-          <div class="input-container calendar">
-            <label> &nbsp;</label>
-            <div class="input-group datepicker">
-              <ejs-datepicker id="orderEndDateEnd" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                              appValidateWithMessage formControlName="orderEndDateEnd"
-                              [min]="candidateStatusReportForm.controls['orderEndDateEnd'].value">
+              <ejs-datepicker id="orderEndDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+                              appValidateWithMessage formControlName="orderEndDate"
+                              [min]="candidateStatusReportForm.controls['orderStartDate'].value">
               </ejs-datepicker>
             </div>
           </div>
         </div>
       </div>
-
       <div class="form-elemet">
         <div class="group">
           <div class="input-container calendar">
-            <label>Actual Start Date Between</label>
+            <label>Actual Start Date</label>
             <div class="input-group datepicker">
-              <ejs-datepicker id="actualStartDateBegin" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                              appValidateWithMessage formControlName="actualStartDateBegin">
+              <ejs-datepicker id="actualStartDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+                              appValidateWithMessage formControlName="actualStartDate">
               </ejs-datepicker>
             </div>
           </div>
           <div class="input-container calendar">
-            <label> &nbsp;</label>
+            <label>Actual End Date</label>
             <div class="input-group datepicker">
-              <ejs-datepicker id="actualStartDateEnd" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                              appValidateWithMessage formControlName="actualStartDateEnd"
-                              [min]="candidateStatusReportForm.controls['actualStartDateEnd'].value">
+              <ejs-datepicker id="actualEndDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+                              appValidateWithMessage formControlName="actualEndDate"
+                              [min]="candidateStatusReportForm.controls['actualStartDate'].value">
               </ejs-datepicker>
             </div>
           </div>

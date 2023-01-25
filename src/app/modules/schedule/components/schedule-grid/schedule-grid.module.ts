@@ -14,6 +14,7 @@ import { CalendarDateSlotModule } from '../../pipes/calendar-date-slot/calendar-
 import { CandidateCardModule } from '../candidate-card/candidate-card.module';
 import { ScheduleCardModule } from '../schedule-card/schedule-card.module';
 import { ScheduleGridComponent } from './schedule-grid.component';
+import { CalendarTooltipSlotModule } from '../../pipes/calendar-tooltip-slot/calendar-tooltip-slot.module';
 
 const icons = {
   Search,
@@ -33,6 +34,7 @@ const icons = {
     ScheduleCardModule,
     CalendarDateSlotModule,
     AutoCompleteModule,
+    CalendarTooltipSlotModule,
   ],
   exports: [ScheduleGridComponent],
   providers: [DateWeekService],

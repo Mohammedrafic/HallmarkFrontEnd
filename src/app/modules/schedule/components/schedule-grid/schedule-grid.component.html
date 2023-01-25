@@ -73,10 +73,20 @@
               class="table-cell date-slot"
               [attr.colspan]="dateSchedule.extendedDays"
               [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
-              (click)="handleCellSingleClick(dateSlot, scheduleItem.candidate)"
+              (click)="handleCellSingleClick(dateSlot, scheduleItem.candidate, dateSchedule)"
               (dblclick)="handleScheduleCardDblClick(dateSchedule, scheduleItem.candidate)"
             >
-              <app-schedule-card [dateSchedule]="dateSchedule"></app-schedule-card>
+
+              <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
+                <app-schedule-card [dateSchedule]="dateSchedule"></app-schedule-card>
+              </ng-container>
+
+              <ng-template #disabledCell>
+                <ejs-tooltip
+                  [content]="dateSchedule | calendarTooltipSlot">
+                  <div class="table-cell disabled-cell"></div>
+                </ejs-tooltip>
+              </ng-template>
             </td>
 
             <ng-template #emptyCell>

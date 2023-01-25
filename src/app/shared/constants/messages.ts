@@ -78,3 +78,5 @@ export const DOCUMENT_UNSHARED_SUCCESS = 'Documents UnShared successfully';
 export const FOLDER_DELETE_SUCCESS = 'Folder deleted successfully';
 export const EMAIL_RESEND_SUCCESS = 'Email was sent successfully';
 export const CANDIDATE_STATUS= 'Selected Candidate status is unavailable';
+export const CandidateSSNRequired= 'SSN of Candidate is mandatory to accept the offer. Please update SSN of candidate on Candidate Profile screen and come back here to accept offer.';
+export const CandidateDOBRequired= 'DOB of Candidate is mandatory to accept the offer. Please update DOB of candidate on Candidate Profile screen and come back here to accept offer.';
