@@ -119,7 +119,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.cdr.detectChanges();
   }
 
-  public initFiltersDataSources(): void {
+  initFiltersDataSources(): void {
     this.store.dispatch(new Invoices.GetFiltersDataSource());
   }
 

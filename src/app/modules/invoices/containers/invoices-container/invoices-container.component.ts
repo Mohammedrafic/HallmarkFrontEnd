@@ -22,24 +22,6 @@ import { InvoicesTableTabsComponent } from '../../components/invoices-table-tabs
 import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions } from '../../constants';
 import { AgencyInvoicesGridTab, InvoicesAgencyTabId, OrganizationInvoicesGridTab } from '../../enums';
 import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
-import {
-  BaseInvoice,
-  GridContainerTabConfig,
-  InvoiceGridSelections,
-  InvoicePaymentData,
-  InvoicesFilterState,
-  InvoicesTabItem,
-  InvoiceTabId,
-  InvoiceUpdateEmmit,
-  ManualInvoice,
-  ManualInvoicesData,
-  PendingApprovalInvoicesData,
-  PendingInvoice,
-  PendingInvoiceRecord,
-  PendingInvoicesData,
-  PrintingPostDto,
-  SelectedInvoiceRow,
-} from '../../interfaces';
 import { InvoicePrintingService, InvoicesService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
@@ -47,6 +29,7 @@ import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
 import { InvoicesFiltersDialogComponent } from '../../components/invoices-filters-dialog/invoices-filters-dialog.component';
+import * as Interfaces from '../../interfaces';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 
 @Component({
@@ -69,19 +52,19 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public readonly organizations$: Observable<DataSourceItem[]>;
 
   @Select(InvoicesState.pendingInvoicesData)
-  public readonly pendingInvoicesData$: Observable<PendingInvoicesData>;
+  public readonly pendingInvoicesData$: Observable<Interfaces.PendingInvoicesData>;
 
   @Select(InvoicesState.invoicesContainerData)
-  public readonly invoicesContainerData$: Observable<PageOfCollections<BaseInvoice>>;
+  public readonly invoicesContainerData$: Observable<PageOfCollections<Interfaces.BaseInvoice>>;
 
   @Select(InvoicesState.manualInvoicesData)
-  public readonly manualInvoicesData$: Observable<ManualInvoicesData>;
+  public readonly manualInvoicesData$: Observable<Interfaces.ManualInvoicesData>;
 
   @Select(InvoicesState.pendingApprovalInvoicesData)
-  public readonly pendingApprovalInvoicesData$: Observable<PendingApprovalInvoicesData>;
+  public readonly pendingApprovalInvoicesData$: Observable<Interfaces.PendingApprovalInvoicesData>;
 
   @Select(InvoicesState.invoicesFilters)
-  public readonly invoicesFilters$: Observable<PendingInvoicesData>;
+  public readonly invoicesFilters$: Observable<Interfaces.PendingInvoicesData>;
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationChangeId$: Observable<number>;
@@ -91,7 +74,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public selectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab = 0;
 
-  public selectedTabId: InvoiceTabId = 0;
+  public selectedTabId: Interfaces.InvoiceTabId = 0;
 
   public appliedFiltersAmount = 0;
 
@@ -106,8 +89,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public readonly defaultGridOptions: GridOptions = {
     onRowSelected: (event: RowSelectedEvent): void => {
       this.groupingInvoiceRecordsIds = event.api.getSelectedRows()
-        .map(({ invoiceRecords }: PendingInvoice) => invoiceRecords?.map((record: PendingInvoiceRecord) => record.id))
-        .flat();
+        .map(({ invoiceRecords }: Interfaces.PendingInvoice) =>
+          invoiceRecords?.map((record: Interfaces.PendingInvoiceRecord) => record.id)
+        ).flat();
     },
   };
 
@@ -126,9 +110,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public isLoading: boolean;
   public organizationId: number;
   public rejectInvoiceId: number;
-  public tabConfig: GridContainerTabConfig | null;
+  public tabConfig: Interfaces.GridContainerTabConfig | null;
 
-  public gridSelections: InvoiceGridSelections = {
+  public gridSelections: Interfaces.InvoiceGridSelections = {
     selectedInvoiceIds: [],
     rowNodes: [],
   };
@@ -142,7 +126,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     addPaymentOpen: false,
   };
 
-  public paymentRecords: InvoicePaymentData[] = [];
+  public paymentRecords: Interfaces.InvoicePaymentData[] = [];
 
   public businessUnitId?: number;
 
@@ -262,7 +246,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.selectedTabIdx = tabIdx;
 
     if (tabsConfig.length) {
-      this.selectedTabId = (tabsConfig[tabIdx] as InvoicesTabItem).tabId;
+      this.selectedTabId = (tabsConfig[tabIdx] as Interfaces.InvoicesTabItem).tabId;
     } else {
       this.selectedTabId = 0;
     }
@@ -297,12 +281,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     );
   }
 
-  public updateTableByFilters(filters: InvoicesFilterState): void {
+  public updateTableByFilters(filters: Interfaces.InvoicesFilterState): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({ ...filters }));
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public selectRow(selectedRowData: SelectedInvoiceRow): void {
+  public selectRow(selectedRowData: Interfaces.SelectedInvoiceRow): void {
     const enableSelectionIndex = this.isAgency ? 1 : 2;
 
     if (this.selectedTabIdx >= enableSelectionIndex) {
@@ -334,7 +318,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.cdr.markForCheck();
   }
 
-  public updateTable({ invoiceId, status, organizationId }: InvoiceUpdateEmmit): void {
+  public updateTable({ invoiceId, status, organizationId }: Interfaces.InvoiceUpdateEmmit): void {
     this.store.dispatch(new Invoices.ChangeInvoiceState(invoiceId, status, organizationId))
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
@@ -368,7 +352,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public bulkApprove(nodes: RowNode[]): void {
     this.store.dispatch(
-      new Invoices.ApproveInvoices(nodes.map((node: RowNode) => (node.data as ManualInvoice).id))
+      new Invoices.ApproveInvoices(nodes.map((node: RowNode) => (node.data as Interfaces.ManualInvoice).id))
     );
   }
 
@@ -417,7 +401,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public printInvoices(): void {
-    const dto: PrintingPostDto = {
+    const dto: Interfaces.PrintingPostDto = {
       invoiceIds: this.gridSelections.selectedInvoiceIds,
       ...(this.isAgency ? {
         organizationIds: [this.organizationId] as number[],
@@ -496,7 +480,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         takeUntil(this.componentDestroy()),
       )
       .subscribe(() => {
-        const paymentData = this.store.selectSnapshot(InvoicesState.selectedPayment) as InvoicePaymentData;
+        const paymentData = this.store.selectSnapshot(InvoicesState.selectedPayment) as Interfaces.InvoicePaymentData;
         this.paymentRecords = [paymentData];
         this.openAddPayment();
       });
