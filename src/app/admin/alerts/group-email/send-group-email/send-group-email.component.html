@@ -34,7 +34,7 @@
         <div class="bootstrap business-dropdowns">
           <div class="dropdown-container">
             <div class="input-group dropdown">
-              <label>Business Unit Type</label>
+              <label>Business Unit Type<span class="required">*</span></label>
               <ejs-dropdownlist appValidateWithMessage
                                 formControlName="businessUnit"
                                 [fields]="optionFields"
@@ -47,7 +47,7 @@
           </div>
           <div class="dropdown-container" *ngIf="!isBusinessUnitTypeAgency">
             <div class="input-group dropdown">
-              <label>Business Unit</label>
+              <label>Business Unit<span class="required">*</span></label>
               <ejs-dropdownlist appValidateWithMessage
                                 formControlName="business"
                                 [fields]="businessDataFields"
@@ -60,7 +60,7 @@
           </div>
           <div class="dropdown-container" *ngIf="isBusinessUnitTypeAgency">
             <div class="input-group dropdown">
-              <label>Business Unit</label>
+              <label>Business Unit<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox" appValidateWithMessage
                                 formControlName="businesses"
                                 [fields]="businessDataFields"
@@ -75,7 +75,7 @@
           </div>
           <div class="dropdown-container" *ngIf="!hideUserTypeControl">
             <div class="input-group dropdown">
-              <label>User Type</label>
+              <label>User Type<span class="required">*</span></label>
               <ejs-dropdownlist appValidateWithMessage
                                 formControlName="userType"
                                 [fields]="commonFields"
@@ -89,7 +89,7 @@
           </div>
           <div *ngIf="isOrgCandidatesType" class="dropdown-container">
             <div class="input-group dropdown">
-              <label>Agencies</label>
+              <label>Agencies<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox" appValidateWithMessage
                                 formControlName="agencies"
                                 [fields]="agencyFields"
@@ -104,7 +104,7 @@
           </div>               
           <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType" class="dropdown-container">
             <div class="input-group dropdown">
-              <label>Skills</label>
+              <label>Skills<span class="required">*</span></label>
               <ejs-multiselect  mode="CheckBox" appValidateWithMessage
                                 formControlName="skills"
                                 [fields]="regionFields"
@@ -119,7 +119,7 @@
           </div>
           <div *ngIf="isOrgInternalUserType || isOrgCandidatesType" class="dropdown-container">
             <div class="input-group dropdown">
-              <label>Region</label>
+              <label>Region<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox" formControlName="region"
                                [allowFiltering]="true"
                                appValidateWithMessage
@@ -134,7 +134,7 @@
           </div>
           <div *ngIf="isOrgInternalUserType || isOrgCandidatesType" class="dropdown-container">
             <div class="input-group dropdown">
-              <label>Location</label>
+              <label>Location<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox" formControlName="location"
                                [allowFiltering]="true"
                                appValidateWithMessage
@@ -190,7 +190,7 @@
           </div>
           <div *ngIf="isOrgInternalUserType" class="dropdown-container">
             <div class="input-group dropdown">
-              <label>Role</label>
+              <label>Role<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox"
                                formControlName="roles"
                                [placeholder]='placeholderValue'
@@ -206,7 +206,7 @@
           </div>     
           <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="dropdown-container">
             <div class="input-group dropdown">
-              <label>User</label>
+              <label>User<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox"
                                formControlName="user"
                                [placeholder]='placeholderValue'
@@ -222,7 +222,7 @@
           </div>
           <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType" class="dropdown-container">
             <div class="input-group dropdown">
-              <label>Candidate</label>
+              <label>Candidate<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox"
                                formControlName="candidate"
                                [placeholder]='placeholderValue'
