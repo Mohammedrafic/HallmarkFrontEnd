@@ -1,4 +1,4 @@
-import {  CommonReportFilterOptions, SearchCandidate, SearchCredential} from "@admin/analytics/models/common-report.model";
+import {  CandidateStatusAndReasonFilterOptionsDto, CommonReportFilterOptions, SearchCandidate, SearchCredential} from "@admin/analytics/models/common-report.model";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { sortByField } from "@shared/helpers/sort-by-field.helper";
@@ -80,6 +80,13 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
    */
  public getCommonCredentialSearch(filter:any): Observable<SearchCredential[]> {
   return this.http.post<SearchCredential[]>(`/api/LogiReport/common/credentialsearch`,filter);
-}
+  }
+
+
+  public getCommonReportCandidateStatusOptions(filter: any): Observable<CandidateStatusAndReasonFilterOptionsDto[]> {
+    return this.http.post<CandidateStatusAndReasonFilterOptionsDto[]>(`/api/LogiReport/common/candidatestatus`, filter).pipe(map((data) => {
+      return data;
+    }));
+  }
 
 }
