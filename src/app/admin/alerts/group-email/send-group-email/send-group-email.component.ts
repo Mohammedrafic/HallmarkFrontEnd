@@ -571,7 +571,7 @@ export class SendGroupEmailComponent
 
   private onBusinessValueChanged(): void {    
     this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      if (this.isSend == true) {
+      if (this.isSend == true) {        
         this.clearFields();
         this.userData = [];
         this.ResetForm();
@@ -580,7 +580,6 @@ export class SendGroupEmailComponent
         if (value != 0 && value != null) {
           businessUnitIds.push(this.businessControl.value);
         }
-        this.dispatchUserPage(businessUnitIds);
         let orgList = this.organizations?.filter((x) => value == x.organizationId);        
         this.regionsList = [];
         this.locationsList = [];
@@ -599,8 +598,6 @@ export class SendGroupEmailComponent
             this.roleData = data;
           });
         }
-
-
       }
     });
   }
@@ -631,6 +628,9 @@ export class SendGroupEmailComponent
     this.regionControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (value != undefined && value.length > 0) {
         this.locationsList = this.locationsData.filter((i) => value.indexOf(i.regionId) !== -1);
+      } else {
+        this.locationsList = this.locationsData;
+        this.locationControl.patchValue([]);        
       }
     });
   }
@@ -639,7 +639,14 @@ export class SendGroupEmailComponent
     this.locationControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {      
       if(this.isOrgInternalUserType){
         this.getUsersByRole();
-      }      
+      }
+      if(this.isOrgCandidatesType){
+        this.userData = [];
+        this.candidateControl.patchValue([]);
+        if (value != undefined && value.length > 0) {
+          this.getCandidates()
+        }
+      }     
     });
   }
 
@@ -671,18 +678,17 @@ export class SendGroupEmailComponent
         this.isOrgInternalUserType = false;
         this.clearFields();
         var businessUnit = this.businessUnitControl.value;
-        var businessId = this.businessControl.value;
-
-        this.skillsControl.patchValue([]);
-        this.candidateControl.patchValue([]);
+        var businessId = this.businessControl.value;        
         if (businessUnit == 3) {
           if (value == 1) {
             this.isOrgInternalUserType = true;
             this.userData = [];
           }
-          if (value == 2) {
+          if (value == 2) {            
             this.userData = [];
             this.isOrgCandidatesType = true;
+            this.skillsControl.patchValue([]);
+            this.candidateControl.patchValue([]);
             this.store.dispatch(new GetGroupEmailAgencies(businessId));
             this.agencyData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
               this.agencyData = data;
@@ -718,10 +724,12 @@ export class SendGroupEmailComponent
               });
             }
           }
-          if (value == 2) {
+          if (value == 2) {            
             this.userData = [];
             this.usersControl.patchValue([]);          
             this.isAgencyCandidatesType = true;          
+            this.skillsControl.patchValue([]);
+            this.candidateControl.patchValue([]);
             this.store.dispatch(new GetGroupEmailSkills(businessId, 1));
             this.skillData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
               this.skillData = data;
@@ -733,29 +741,25 @@ export class SendGroupEmailComponent
   }
 
   private onSkillsValueChanged(): void {
-    this.skillsControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {      
-      if (value != undefined && value.length > 0) {
-        this.getCandidates();
-      } else if(this.isAgencyCandidatesType){
-        this.candidateControl.patchValue([]);
-        this.userData = [];
-      }
+    this.skillsControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {                        
+      this.userData = [];
+      this.candidateControl.patchValue([]);
+      if (value != undefined && value.length > 0) 
+        this.getCandidates();      
     });
   }
 
   private onOrderTypeValueChanged(): void {
     this.orderTypesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      if (value != undefined && value.length > 0) {
-        this.getCandidates();
-      }
+      if (value != undefined && value.length > 0) 
+        this.getCandidates();      
     });
   }
 
   private onCandidateStatusValueChanged(): void {
     this.candidateStatusControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      if (value != undefined && value.length > 0) {
-        this.getCandidates();
-      }
+      if (value != undefined && value.length > 0) 
+        this.getCandidates();      
     });
   }
 
@@ -840,6 +844,8 @@ export class SendGroupEmailComponent
   disableControls(isSend: boolean): void {
     let ele = document.getElementById('richTextEditorDiv') as HTMLElement;
     this.hideUserTypeControl = false;
+    this.uploadObj.clearAll();
+    this.groupEmailTemplateForm.controls['fileUpload'].patchValue('');
     if (isSend) {
       this.businessControl?.enable();
       this.businessesControl?.enable();
@@ -852,9 +858,7 @@ export class SendGroupEmailComponent
       this.groupEmailTemplateForm.controls['user'].enable();
       this.groupEmailTemplateForm.controls['userType'].enable();
       this.rteObj.enabled = true;
-      ele.className = 'rich-text-container-edit';
-      this.uploadObj.clearAll();
-      this.groupEmailTemplateForm.controls['fileUpload'].patchValue('');
+      ele.className = 'rich-text-container-edit';      
     } else {
       this.businessControl?.disable();
       this.businessesControl?.disable();
