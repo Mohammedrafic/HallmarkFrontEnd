@@ -181,6 +181,7 @@
           [actionsDisabled]="timesheetDetails.noWorkPerformed"
           [disableAnyAction]="disableAnyAction"
           [hasEditTimesheetRecordsPermission]="hasEditTimesheetRecordsPermission"
+          [hasApproveRejectRecordsPermission]="hasApproveRejectTimesheetRecordsPermission"
           [hasApproveRejectMileagesPermission]="
             isAgency ? true : userPermission[userPermissions.CanOrganizationApproveRejectMileages]
           "
