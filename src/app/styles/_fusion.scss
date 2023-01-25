@@ -13,6 +13,16 @@
   }
 }
 
+.e-highlightselectedrange:nth-last-of-type(1) {
+  border-top-right-radius: 50%;
+  border-bottom-right-radius: 50%;
+}
+
+.e-highlightselectedrange:nth-of-type(1) {
+  border-top-left-radius: 50%;
+  border-bottom-left-radius: 50%;
+}
+
 .e-highlightselectedrange {
   background: $primary-active-blue-10 !important;
 

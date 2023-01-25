@@ -1,6 +1,6 @@
 import { LoadingInterceptor } from './core/interceptors/spinner.interceptor';
 import { Spinnermodule } from './core/components/spinner/spinner.module';
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgxsModule } from '@ngxs/store';
@@ -25,6 +25,7 @@ import { Overlay } from '@angular/cdk/overlay';
 import { ContactusState } from './store/contact-us.state';
 import { PreservedFiltersState } from './store/preserved-filters.state';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CustomErrorHandler } from '@core/interceptors';
 
 @NgModule({
   declarations: [AppComponent],
@@ -65,6 +66,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
       multi: true,
     },
     Overlay,
+    {
+      provide: ErrorHandler,
+      useClass: CustomErrorHandler,
+    },
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })
