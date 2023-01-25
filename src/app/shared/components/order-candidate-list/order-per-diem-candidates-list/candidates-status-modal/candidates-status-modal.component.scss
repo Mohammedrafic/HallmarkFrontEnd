@@ -7,7 +7,11 @@
       display: flex;
       justify-content: end;
 
-      &>button {
+      button {
+        margin-left: 12px;
+      }
+
+      .close-button {
         margin-left: 12px;
       }
 
