@@ -40,3 +40,8 @@ export class GetCommonReportCredentialSearch{
   constructor(public filter: CommonCredentialSearchFilter) { }
 }
 
+export class GetCommonReportCandidateStatusOptions {
+  static readonly type = '[LogiReport] Get Common Candidate Status';
+  constructor(public filter: CommonReportFilter) { }
+}
+
