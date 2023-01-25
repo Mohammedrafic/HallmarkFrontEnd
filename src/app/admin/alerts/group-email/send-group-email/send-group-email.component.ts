@@ -636,20 +636,16 @@ export class SendGroupEmailComponent
   }
 
   private onLocationValueChanged(): void {
-    this.locationControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      if (value != undefined && value.length > 0) {
-        if(this.isOrgInternalUserType){
-          this.getUsersByRole();
-        }
-      }
+    this.locationControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {      
+      if(this.isOrgInternalUserType){
+        this.getUsersByRole();
+      }      
     });
   }
 
   private onRolesValueChanged(): void {
     this.rolesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      if (value != undefined && value.length > 0) {
-        this.getUsersByRole();
-      }
+      this.getUsersByRole();      
     });
   }
 
@@ -737,9 +733,12 @@ export class SendGroupEmailComponent
   }
 
   private onSkillsValueChanged(): void {
-    this.skillsControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+    this.skillsControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {      
       if (value != undefined && value.length > 0) {
         this.getCandidates();
+      } else if(this.isAgencyCandidatesType){
+        this.candidateControl.patchValue([]);
+        this.userData = [];
       }
     });
   }
@@ -779,6 +778,7 @@ export class SendGroupEmailComponent
 
   private getCandidates(): void {
     this.candidateControl.patchValue([]);
+    this.userData = [];
     var agencies =
       this.agenciesControl.value != null && this.agenciesControl.value != undefined
         ? this.agenciesControl.value.join()
@@ -853,6 +853,8 @@ export class SendGroupEmailComponent
       this.groupEmailTemplateForm.controls['userType'].enable();
       this.rteObj.enabled = true;
       ele.className = 'rich-text-container-edit';
+      this.uploadObj.clearAll();
+      this.groupEmailTemplateForm.controls['fileUpload'].patchValue('');
     } else {
       this.businessControl?.disable();
       this.businessesControl?.disable();
