@@ -1,4 +1,5 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
 
 .create-order-header {
   padding: 20px 0;
@@ -41,4 +42,51 @@
   width: 100%;
   background-color: $secondary-dark-blue-40;
   margin: 10px 0;
+}
+
+.mobile-btn {
+  display: none;
+}
+
+@media #{$max-mobile} {
+  .desktop-btn {
+    display: none;
+  }
+
+  .create-order-header {
+    flex-direction: column-reverse;
+    row-gap: 16px;
+  }
+
+  .mobile-btn {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    .controls-form {
+      background-color: $background;
+      box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+      padding: 12px 24px;
+
+      ejs-splitbutton {
+        width: 100%;
+
+        button {
+          width: 100%;
+
+          &.e-dropdown-btn {
+            width: 40px;
+            background-color: $primary-active-blue;
+            margin-left: 1px;
+          }
+        }
+      }
+    }
+  }
+
+  .e-popup.e-popup-open {
+    width: 88%;
+  }
 }

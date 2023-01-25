@@ -172,7 +172,13 @@ ejs-textbox.e-control {
   }
 }
 
+.contact-btn {
+  display: flex;
+}
+
 .remove-button-container {
+  display: flex;
+  justify-content: flex-end;
   width: 52px;
   margin-top: 22px;
 }
@@ -207,6 +213,62 @@ ejs-textbox.e-control {
 
     .right-section {
       width: 100%;
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .form-line-item-20,
+  .form-line-item-25,
+  .form-line-item-30,
+  .form-line-item-40 {
+    width: 100%;
+  }
+
+  .form-line {
+    flex-direction: column;
+    row-gap: 12px;
+
+    .contact-btn,
+    .input-container,
+    .datepicker-container,
+    .job-description-checkboxes-container {
+      padding-left: 0;
+    }
+  }
+
+  .job-description-checkboxes-container {
+    flex-direction: column;
+    align-items: unset;
+    row-gap: 10px;
+    width: 100%;
+    padding: 0;
+
+    ejs-checkbox:not(:first-child) {
+      margin-left: 0;
+    }
+  }
+
+  .contact-btn {
+    width: 100%;
+  }
+
+  .order-type-container {
+    max-width: 50%;
+  }
+
+  .order-status-container {
+    flex: 1;
+  }
+
+  .order-type-status-container {
+    .left-section {
+      width: 100%;
+      padding: 0;
+    }
+
+    .right-section {
+      display: none;
     }
   }
 }
