@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
-import { filter, Observable, take } from 'rxjs';
+import { filter, take } from 'rxjs';
 
 import { CustomFormGroup } from '@core/interface';
 import { BaseObservable, DateTimeHelper } from '@core/helpers';
 import {
-  Holiday,
   HolidaysPage,
   MasterCommitmentNames,
   Option,
@@ -19,6 +18,7 @@ import { OrganizationRegion } from '@shared/models/organization.model';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { mapDataSource } from '../helpers';
 import { convertHolidaysToDataSource } from '@shared/helpers/dropdown-options.helper';
+import { formatDate as formatDateString } from '@shared/constants/format-date';
 
 @Injectable()
 export class WorkCommitmentService {
@@ -67,8 +67,8 @@ export class WorkCommitmentService {
       regions: commitment.regionIds,
       locations: commitment.locationIds,
       skillIds: allSkills ?? commitment.skillIds,
-      startDate: commitment.startDate ? DateTimeHelper.formatDateUTC(commitment.startDate, 'MM/dd/YYYY') : null,
-      endDate: commitment.endDate ? DateTimeHelper.formatDateUTC(commitment.endDate, 'MM/dd/YYYY') : null,
+      startDate: commitment.startDate ? DateTimeHelper.formatDateUTC(commitment.startDate, formatDateString) : null,
+      endDate: commitment.endDate ? DateTimeHelper.formatDateUTC(commitment.endDate, formatDateString) : null,
     };
   }
 

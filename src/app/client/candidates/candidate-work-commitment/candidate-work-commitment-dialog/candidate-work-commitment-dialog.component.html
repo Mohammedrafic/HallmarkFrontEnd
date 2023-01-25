@@ -88,7 +88,8 @@
               class="control control-field"
               label="Start Date"
               [required]="true"
-              [min]="useMinimumDate ? lastActiveDate : null"
+              [min]="useMinimumDate ? minimumDate : null"
+              [max]="todayDate"
             ></app-datepicker>
             <app-numeric-textbox
               [formGroupInstance]="candidateWorkCommitmentForm"

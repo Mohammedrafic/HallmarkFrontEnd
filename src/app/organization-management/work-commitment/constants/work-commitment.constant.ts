@@ -3,6 +3,7 @@ import { getCorrectLocationValue, getCorrectSkillsValue } from '../helpers';
 import { WorkCommitmentButtonRenderer } from '../components/work-commitment-button-renderer/work-commitment-button-renderer';
 import { ValueFormatterParams } from '@ag-grid-community/core';
 import { formatDate } from '@angular/common';
+import { formatDate as formatDateString } from '@shared/constants/format-date';
 
 export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkCommitmentGrid) => void) => [
   {
@@ -80,7 +81,7 @@ export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkC
     minWidth: 120,
     sortable: true,
     valueFormatter: (params: ValueFormatterParams) =>
-        params.value && formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
+        params.value && formatDate(params.value, formatDateString, 'en-US', 'UTC'),
   },
   {
     field: 'endDate',
@@ -88,7 +89,7 @@ export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkC
     minWidth: 120,
     sortable: true,
     valueFormatter: (params: ValueFormatterParams) =>
-        params.value && formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
+        params.value && formatDate(params.value, formatDateString, 'en-US', 'UTC'),
   },
   {
     field: 'jobCode',
