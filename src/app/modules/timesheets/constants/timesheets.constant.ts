@@ -37,11 +37,6 @@ export const TimesheetExportOptions: ItemModel[] = [
   { text: ExportType.Custom, id: '2' },
 ];
 
-export const UNIT_ORGANIZATIONS_FIELDS = {
-  text: 'name',
-  value: 'id',
-};
-
 export const ColorsWidgetMap: string[] = [
   '#79B392', '#E48192', '#9B85C6', '#8CB3FF', '#8190B2', '#E0BD82', '#518CFF', '#D1D6E2',
   '#70B16E', '#FFBBBB', '#6499FF', '#677089', '#D1EACE', '#C2A7F9', '#FCC769',

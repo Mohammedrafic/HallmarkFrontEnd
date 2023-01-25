@@ -1,6 +1,7 @@
 import { InjectionToken } from '@angular/core';
-import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { Observable } from 'rxjs';
+
+import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 
 export type InvoiceTabsProvider = Observable<TabsListConfig[]>;
 
