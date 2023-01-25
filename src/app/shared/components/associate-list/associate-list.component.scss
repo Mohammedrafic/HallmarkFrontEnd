@@ -1,13 +1,18 @@
-.associate {
-  margin-top: 24px;
+:host {
+  height: 100%;
 
-  .actions {
-    button {
-      background-color: transparent;
+  .associate {
+    margin-top: 24px;
+    height: calc(100% - 115px);
+
+    .actions {
+      button {
+        background-color: transparent;
+      }
     }
-  }
 
-  .e-gridcustomheader {
-    width: unset;
+    .e-gridcustomheader {
+      width: unset;
+    }
   }
 }

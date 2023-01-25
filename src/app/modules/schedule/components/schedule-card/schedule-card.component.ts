@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
+import { ScheduleCardService } from '../../services/schedule-card.service';
 import { ScheduleCardConfig, ScheduleDateItem, ScheduleItem } from '../../interface';
 import { GetScheduleCardConfig } from '../../constants';
 
@@ -24,6 +25,10 @@ export class ScheduleCardComponent implements OnInit {
 
   additionalTooltipMessage: string;
 
+  overlappingTooltipMessage: string;
+
+  constructor(private scheduleCardService: ScheduleCardService) {}
+
   ngOnInit(): void {
     this.firstDaySchedule = this.dateSchedule.daySchedules[0];
     this.cardConfig = GetScheduleCardConfig(this.dateSchedule);
@@ -44,6 +49,8 @@ export class ScheduleCardComponent implements OnInit {
   }
 
   private createTooltips(): void {
+    this.overlappingTooltipMessage = this.scheduleCardService.getOverlappingTooltipMessage(this.dateSchedule);
+
     this.tooltipMessage =
       `OrderID-${this.firstDaySchedule.orderId} ${this.firstDaySchedule.location} ${this.firstDaySchedule.department}`;
 

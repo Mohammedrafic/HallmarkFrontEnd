@@ -14,3 +14,13 @@
 .tabs {
   margin-top: 15px;
 }
+
+:host {
+  ::ng-deep {
+    ejs-tab {
+      .e-content.e-lib.e-touch {
+        height: calc(100% - 80px) !important;
+      }
+    }
+  }
+}

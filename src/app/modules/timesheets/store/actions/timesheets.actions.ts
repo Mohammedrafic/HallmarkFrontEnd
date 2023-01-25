@@ -29,7 +29,8 @@ export namespace Timesheets {
       public readonly action: DialogAction,
       public readonly type: RecordFields,
       public readonly startDate: string,
-      public readonly endDate: string
+      public readonly endDate: string,
+      public readonly orderConstCenterId: number | null,
     ) {}
   }
 

@@ -44,6 +44,7 @@
   <ng-container *ngIf="activeTabIndex === tabIndex.Scheduling">
     <app-schedule-grid
       [scheduleData]="scheduleData"
+      [selectedFilters]="scheduleFilters"
       (changeFilter)="changeFilters($event)"
       (loadMoreData)="loadMoreData($event)"
       (selectedCells)="selectCells($event)"

@@ -45,7 +45,7 @@
     </app-tooltip-container>
   </div>
 
-  <ejs-tab id="navigationTabs" (selected)="onTabSelected($event)">
+  <ejs-tab id="navigationTabs" (selected)="onTabSelected($event)" [heightAdjustMode]="'Fill'">
     <e-tabitems>
       <e-tabitem>
         <ng-template #headerText><div>Bill Rate Setup</div></ng-template>

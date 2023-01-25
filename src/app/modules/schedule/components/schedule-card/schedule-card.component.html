@@ -47,4 +47,15 @@
       +{{ dateSchedule.daySchedules.length - 1 }}
     </div>
   </ejs-tooltip>
+
+  <ejs-tooltip
+    *ngIf="dateSchedule.daySchedules.length > 1"
+    [content]="overlappingTooltipMessage"
+    position="TopCenter"
+    [showTipPointer]="false"
+  >
+    <div class="badge">
+      +{{ dateSchedule.daySchedules.length - 1 }}
+    </div>
+  </ejs-tooltip>
 </div>

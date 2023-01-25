@@ -28,12 +28,12 @@
   </ng-container>
 </app-page-toolbar>
 
-<section>
+<section class="grid-component">
   <ejs-grid #grid
             [dataSource]="(agencies$ | async)?.items"
             [allowPaging]="allowPaging"
             [pageSettings]="pageSettings"
-            [height]="gridHeight"
+            [height]="fullScreenGridHeight"
             [rowHeight]="rowHeight"
             [enableVirtualization]="true"
             [resizeSettings]="resizeSettings"

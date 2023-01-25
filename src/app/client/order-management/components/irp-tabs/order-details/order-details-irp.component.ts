@@ -90,14 +90,13 @@ import { IrpContainerStateService } from '@client/order-management/containers/ir
 import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
 import { UserState } from '../../../../../store/user.state';
 import { Organization, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { OrganizationStructureService } from '@client/order-management/components/irp-tabs/services';
 import {
   GetContactDetails,
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
   GetSuggestedDetails,
 } from '@client/store/order-managment-content.actions';
-import { SettingsViewService } from '@shared/services';
+import { OrganizationStructureService, SettingsViewService } from '@shared/services';
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderType } from '@shared/enums/order-type';

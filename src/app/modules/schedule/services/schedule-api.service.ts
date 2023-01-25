@@ -17,7 +17,7 @@ export class ScheduleApiService {
 
   getSchedulesByEmployeesIds(
     employeeIds: number[],
-    filters: { startDate: string; endDate: string }
+    filters: { startDate: string | Date; endDate: string | Date, departmentsIds: number[] }
   ): Observable<CandidateSchedules[]> {
     return this.http.post<CandidateSchedules[]>('/api/Schedules/byEmployeesIds', { employeeIds, ...filters });
   }
