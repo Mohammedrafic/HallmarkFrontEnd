@@ -397,7 +397,7 @@ export class VendorActivityComponent implements OnInit {
       regionIds, skillCategoryIds, skillIds, startDate, endDate, agencyIds } = this.VendorActivityReportForm.getRawValue();
 
     if (!this.VendorActivityReportForm.dirty) {
-      this.message = "Default filter selected with all regions, locations and departments for 90 days";
+      //this.message = "Default filter selected with all regions, locations and departments for 90 days";
     }
     else {
       this.isResetFilter = false;
