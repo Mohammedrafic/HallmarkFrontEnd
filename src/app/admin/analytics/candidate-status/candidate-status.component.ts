@@ -54,10 +54,10 @@ export class CandidateStatusComponent implements OnInit {
     "regionCS":   "",
     "locationCS":  "",
     "departmentCS":  "",
-    "orderStartDate":    "",
-    "orderEndDate": "",
-    "actualStartDate":"",
-    "actualEndDate": "",
+    "orderStartDateCS":    "",
+    "orderEndDateCS": "",
+    "actualStartDateCS":"",
+    "actualEndDateCS": "",
     "candidateStatusesParamCS": "",
     "skillCS": ""
   };
@@ -225,8 +225,8 @@ export class CandidateStatusComponent implements OnInit {
 
         orderStartDate: new FormControl(startDate, [Validators.required]),
         orderEndDate: new FormControl(endDate, [Validators.required]),
-        actualStartDate: new FormControl(startDate),
-        actualEndDate: new FormControl(endDate),
+        actualStartDate: new FormControl(null),
+        actualEndDate: new FormControl(null),
         candidateStatuses : new FormControl([])
       }
     );
@@ -430,10 +430,10 @@ export class CandidateStatusComponent implements OnInit {
       "regionCS":            regionIds.length==0? "null" : regionIds,
       "locationCS":          locationIds.length==0?"null" : locationIds,
       "departmentCS":        departmentIds.length==0?"null" :  departmentIds,
-      "orderStartDate":       formatDate(orderStartDate, 'MM/dd/yyyy', 'en-US'),
-      "orderEndDate":         formatDate(orderEndDate, 'MM/dd/yyyy', 'en-US'),
-      "actualStartDateBegin": formatDate(actualStartDate, 'MM/dd/yyyy', 'en-US'),
-      "actualStartDateEnd":   formatDate(actualEndDate, 'MM/dd/yyyy', 'en-US'),
+      "orderStartDateCS":       formatDate(orderStartDate, 'MM/dd/yyyy', 'en-US'),
+      "orderEndDateCS":         formatDate(orderEndDate, 'MM/dd/yyyy', 'en-US'),
+      "actualStartDateCS": formatDate(actualStartDate, 'MM/dd/yyyy', 'en-US'),
+      "actualEndDateCS":   formatDate(actualEndDate, 'MM/dd/yyyy', 'en-US'),
       "candidateStatusesParamCS": candidateStatuses.length == 0 ? "null" : candidateStatuses,
       "skillCS": skillIds.length == 0 ? "null" : skillIds,
     };
@@ -538,8 +538,8 @@ export class CandidateStatusComponent implements OnInit {
 
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderStartDate)?.setValue(startDate);
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderEndDate)?.setValue(endDate);
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualStartDate)?.setValue(startDate);
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualEndDate)?.setValue(endDate);
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualStartDate)?.setValue(null);
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualEndDate)?.setValue(null);
 
     this.filteredItems = [];
     this.locations =[];
