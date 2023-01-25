@@ -18,6 +18,8 @@ export interface WorkCommitmentForm {
   schedulePeriod: number | null;
   criticalOrder: number | null;
   holiday: number | null;
+  startDate: string | null;
+  endDate: string | null;
   jobCode: string;
   comments: string | null;
   workCommitmentId: number | null;
@@ -31,6 +33,8 @@ export interface WorkCommitmentDTO {
   schedulePeriod: number;
   criticalOrder: number;
   holiday: number;
+  startDate: string | null;
+  endDate: string | null;
   jobCode: string;
   comments: string;
   regions: RegionsDTO[];

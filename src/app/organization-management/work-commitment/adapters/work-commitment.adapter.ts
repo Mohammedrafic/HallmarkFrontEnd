@@ -6,9 +6,9 @@ import {
   RegionsDTO,
   WorkCommitmentDetails,
   WorkCommitmentGrid,
-  WorkCommitmentOrgHierarchies,
 } from '../interfaces';
 import { getRegionsArray } from '../helpers';
+import { DateTimeHelper } from '@core/helpers';
 
 export class WorkCommitmentAdapter {
   public static prepareToSave(
@@ -24,6 +24,8 @@ export class WorkCommitmentAdapter {
       schedulePeriod,
       criticalOrder,
       holiday,
+      startDate,
+      endDate,
       jobCode,
       comments,
       workCommitmentId,
@@ -43,6 +45,8 @@ export class WorkCommitmentAdapter {
       schedulePeriod,
       criticalOrder,
       holiday,
+      startDate: startDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(startDate)) : null,
+      endDate: endDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(endDate)) : null,
       jobCode,
       comments,
       regions: correctRegions,
@@ -60,6 +64,8 @@ export class WorkCommitmentAdapter {
         departmentId,
         departmentName,
         holiday,
+        startDate,
+        endDate,
         jobCode,
         masterWorkCommitmentId,
         masterWorkCommitmentName,
@@ -76,6 +82,8 @@ export class WorkCommitmentAdapter {
         departmentId,
         departmentName,
         holiday,
+        startDate,
+        endDate,
         jobCode,
         locationName: workCommitmentOrgHierarchies.map((item) => item.locationName),
         locationIds: workCommitmentOrgHierarchies.map((item) => item.locationId),
