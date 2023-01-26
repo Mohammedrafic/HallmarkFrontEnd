@@ -27,10 +27,8 @@ export const analyticsConstants = {
     SearchBy: 'searchBy',
     InActiveInComplete: 'inActiveInComplete',
 
-    OrderStartDate: 'orderStartDate',
-    OrderEndDate: 'orderEndDate',
-    ActualStartDate: 'actualStartDate',
-    ActualEndDate: 'actualEndDate'
+    BeginStartDate: 'beginStartDate',
+    EndStartDate: 'endStartDate',
   }
 }
 
