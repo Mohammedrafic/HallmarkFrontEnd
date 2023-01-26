@@ -28,7 +28,7 @@ export class ScheduleContainerComponent extends Destroyable {
 
   tabIndex = ActiveTabIndex;
 
-  scheduleData: ScheduleInt.ScheduleModelPage;
+  scheduleData: ScheduleInt.ScheduleModelPage | null;
 
   appliedFiltersAmount = 0;
 
@@ -130,7 +130,7 @@ export class ScheduleContainerComponent extends Destroyable {
       if (isLoadMore) {
         this.scheduleData = {
           ...scheduleData,
-          items: [...this.scheduleData.items, ...scheduleData.items],
+          items: [...(this.scheduleData?.items || []), ...scheduleData.items],
         };
       } else {
         this.scheduleData = scheduleData;
@@ -158,6 +158,12 @@ export class ScheduleContainerComponent extends Destroyable {
   }
 
   private detectWhatDataNeeds(): void {
+    if (!this.detectIsRequiredFiltersExist()) {
+      this.scheduleData = null;
+
+      return;
+    }
+
     if (this.selectedCandidate) {
       this.initSelectedCandidateScheduleData();
     } else {
@@ -189,5 +195,12 @@ export class ScheduleContainerComponent extends Destroyable {
         maxDate: new  Date(this.scheduleFilters.endDate),
       };
     }
+  }
+
+  private detectIsRequiredFiltersExist(): boolean {
+    return !!this.selectedCandidate
+      || !!this.scheduleFilters.firstLastNameOrId
+      || !!this.scheduleFilters.regionIds?.length
+      || !!this.scheduleFilters.locationIds?.length;
   }
 }
