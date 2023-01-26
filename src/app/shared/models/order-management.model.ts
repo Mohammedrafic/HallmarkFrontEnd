@@ -417,7 +417,7 @@ export class Order {
   departmentName?: string;
   jobDistributionValue?: number[];
   isIRPOnly?: boolean;
-  jobDates?: Date;
+  jobDates?: Date | string;
   orderOpenDate?: Date;
   irpOrderMetadata?: IRPMetaData;
   isLocked?: boolean;
