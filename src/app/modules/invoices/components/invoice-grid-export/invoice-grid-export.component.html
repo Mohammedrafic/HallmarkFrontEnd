@@ -1,0 +1,13 @@
+<button
+  *ngIf="showExport"
+  ejs-dropdownbutton
+  id="exportButton"
+  [items]="exportOptions"
+  (select)="exportSelected($event)"
+  cssClass="e-outline button-export">
+  <div class="button-export-container">
+    Export <i-feather name="upload" class="icon"></i-feather>
+  </div>
+</button>
+
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>

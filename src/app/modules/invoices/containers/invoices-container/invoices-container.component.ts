@@ -292,7 +292,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     if (this.selectedTabIdx >= enableSelectionIndex) {
       this.invoicesService.setCurrentSelectedIndexValue(selectedRowData.rowIndex);
 
-
       const invoices = this.store.selectSnapshot(InvoicesState.pendingApprovalInvoicesData);
       const prevId: number | null = invoices?.items[selectedRowData.rowIndex - 1]?.invoiceId || null;
       const nextId: number | null = invoices?.items[selectedRowData.rowIndex + 1]?.invoiceId || null;
@@ -434,6 +433,15 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public closeAddPayment(): void {
     this.invoiceContainerConfig.addPaymentOpen = false;
+  }
+
+  public resetTableSelection(): void {
+    this.gridSelections.rowNodes.forEach((node: RowNode) => {
+      node.setSelected(false);
+    });
+
+    this.clearSelections();
+    this.gridSelections.rowNodes = [];
   }
 
   private clearGroupedInvoices(): void {

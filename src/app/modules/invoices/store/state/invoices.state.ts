@@ -39,7 +39,7 @@ import { OrganizationStructure } from '@shared/models/organization.model';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
-import { downloadBlobFile } from '@shared/utils/file.utils';
+import { downloadBlobFile, saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Attachment } from '@shared/components/attachments';
 import { reduceFiltersState } from '@core/helpers/functions.helper';
@@ -750,5 +750,21 @@ export class InvoicesState {
     patchState({
       selectedPayment: payload,
     });
+  }
+
+  @Action(Invoices.ExportInvoices)
+  ExportInvoices(
+    { dispatch }: StateContext<InvoicesModel>,
+    { payload, isAgency}: Invoices.ExportInvoices
+  ): Observable<void | Blob> {
+    return this.invoicesAPIService.exportInvoices(payload, isAgency).pipe(
+      tap((file: Blob) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+      }),
+    );
   }
 }

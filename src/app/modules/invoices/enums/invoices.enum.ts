@@ -51,6 +51,7 @@ export enum INVOICES_ACTIONS {
   GetPaymentDetails = '[invoices] get payment details',
   SavePayment = '[invoices] save payment',
   OpenAddPaymentDialog = '[invoices] open add payment dialog',
+  ExportInvoices = '[invoices] export invoices',
 }
 
 export enum InvoicesTableFiltersColumns {

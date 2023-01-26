@@ -142,6 +142,18 @@ export class PendingApprovalGridHelper {
   public static getOrganizationPaidColDefs(): TypedColDef<PendingApprovalInvoice>[] {
     const colDef = [
       {
+        headerName: '',
+        headerCheckboxSelection: true,
+        headerCheckboxSelectionFilteredOnly: true,
+        checkboxSelection: true,
+        width: 100,
+        headerComponent: ToggleRowExpansionHeaderCellComponent,
+        sortable: false,
+        suppressMenu: false,
+        filter: false,
+        resizable: false,
+      },
+      {
         field: 'formattedInvoiceId',
         minWidth: 160,
         headerName: 'Invoice Id',
@@ -238,7 +250,7 @@ export class PendingApprovalGridHelper {
                                   candidateFirstName,
                                   candidateLastName,
                                 },
-                              }: TypedValueGetterParams<PendingApprovalInvoiceRecord>) => 
+                              }: TypedValueGetterParams<PendingApprovalInvoiceRecord>) =>
                               `${candidateLastName}, ${candidateFirstName}`,
                 cellRendererSelector: titleValueCellRendererSelector,
                 cellRendererParams: (params: ICellRendererParams): TitleValueCellRendererParams => {
