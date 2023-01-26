@@ -145,7 +145,7 @@ export class AccumulationChartComponent
   }
 
   public ngOnInit(): void {
-    this.datalabel = { visible: true };
+    this.datalabel = { visible: true, position: 'Outside' };
     this.filteredChartData$ = this.getFilteredChartData();
   }
 
