@@ -355,6 +355,7 @@
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
+      [order]="selectedOrder"
     ></app-onboarded-candidate>
   </ng-template>
 
@@ -367,6 +368,7 @@
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
+      [order]="selectedOrder"
     ></app-accept-candidate>
   </ng-template>
 
@@ -382,6 +384,7 @@
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
+      [order]="selectedOrder"
     >
     </app-apply-candidate>
   </ng-template>
@@ -395,6 +398,7 @@
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
+      [order]="selectedOrder"
     ></app-offer-deployment>
   </ng-template>
   <ng-template #footerTemplate>

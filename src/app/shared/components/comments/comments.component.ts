@@ -35,6 +35,17 @@ export class CommentsComponent {
   get comments(): Comment[] {
     return this.commentsList;
   }
+  @Input() set externalCommentConfiguration(value: boolean | null | undefined) {
+    this.CommentConfiguration = value;
+    if (this.isAgencyUser||this.CommentConfiguration==true) {
+      this.isExternal = true;
+    }
+  }
+  get externalCommentConfiguration(): boolean | null | undefined {
+    return this.CommentConfiguration;
+  }
+
+  public CommentConfiguration:boolean|null|undefined;
   public commentsList: Comment[] = [];
   @Input() commentContainerId: number;
   @Input() isCreating: boolean = false;
@@ -93,7 +104,7 @@ export class CommentsComponent {
     });
     const user = this.store.selectSnapshot(UserState).user;
     this.isAgencyUser = user.businessUnitType === BusinessUnitType.Agency;
-    if (this.isAgencyUser) {
+    if (this.isAgencyUser||this.CommentConfiguration==true) {
       this.isExternal = true;
     }
   }

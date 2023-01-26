@@ -31,7 +31,7 @@ import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
   GetRejectReasonsForAgency,
@@ -69,7 +69,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
   @Input() isOrderOverlapped: boolean;
-
+  @Input() order:Order;
+  
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
 

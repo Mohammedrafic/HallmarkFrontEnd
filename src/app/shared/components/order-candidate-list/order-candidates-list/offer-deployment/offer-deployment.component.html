@@ -185,7 +185,7 @@
       </ejs-accordion>
     </div>
     <div class="comments">
-      <app-comments *ngIf="candidateJob" [comments]="comments" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
+      <app-comments *ngIf="candidateJob" [comments]="comments" [externalCommentConfiguration]="order.externalCommentsConfiguration" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
     </div>
   </section>
   <section class="bill-rates">
