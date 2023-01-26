@@ -234,6 +234,34 @@ ejs-textbox.e-control {
     width: 100%;
   }
 
+  .work-location-item,
+  .contact-details-item {
+    &:not(:last-child) {
+      border-bottom: 1px solid $secondary-dark-blue-45;
+      padding-bottom: 20px;
+    }
+  }
+
+  .contact-btn {
+    justify-content: space-between;
+
+    .radio-button {
+      height: unset;
+      flex-direction: row-reverse;
+      align-items: flex-end;
+      column-gap: 20px;
+      margin-bottom: 0;
+
+      ejs-radiobutton {
+        margin-bottom: 16px;
+      }
+    }
+
+    .remove-button-container {
+      margin-top: 0;
+    }
+  }
+
   .form-line {
     flex-direction: column;
     row-gap: 12px;

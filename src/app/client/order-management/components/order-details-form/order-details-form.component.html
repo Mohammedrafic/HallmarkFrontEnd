@@ -543,7 +543,7 @@
             <form [formGroup]="contactDetailsForm">
               <ng-container formArrayName="contactDetails">
                 <div
-                  class="form-line"
+                  class="form-line contact-details-item"
                   [formGroupName]="i"
                   *ngFor="let contact of contactDetailsFormArray.controls; let i = index"
                 >
@@ -661,7 +661,7 @@
           <form [formGroup]="workLocationForm">
             <ng-container formArrayName="workLocations">
               <div
-                class="form-line"
+                class="form-line work-location-item"
                 [formGroupName]="i"
                 *ngFor="let workLocation of workLocationsFormArray.controls; let i = index"
               >
