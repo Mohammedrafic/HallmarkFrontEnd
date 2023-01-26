@@ -154,6 +154,15 @@ ejs-textbox.e-control {
       border-color: transparent;
     }
 
+    &.disable {
+      color: $primary-active-blue-60;
+
+      &:hover,
+      &:focus {
+        background-color: $primary-active-blue-90;
+      }
+    }
+
     i-feather {
       vertical-align: bottom;
     }
