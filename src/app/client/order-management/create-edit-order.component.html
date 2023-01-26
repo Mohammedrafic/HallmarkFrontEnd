@@ -14,12 +14,9 @@
     </div>
   </div>
   <div *ngIf="showSystemToggle && !selectedOrder">
-    <app-button-group
-      [buttonOptions]="orderSystemConfig"
-      (buttonChange)="changeSystem($event)"
-    ></app-button-group>
+    <app-button-group [buttonOptions]="orderSystemConfig" (buttonChange)="changeSystem($event)"></app-button-group>
   </div>
-  <div class="controls-form">
+  <div class="controls-form desktop-btn">
     <ejs-splitbutton
       content="Submit"
       cssClass="e-primary"
@@ -33,12 +30,26 @@
 <div class="split-line"></div>
 <div class="content-wrapper">
   <ng-container [ngSwitch]="activeSystem">
-      <app-irp-container
-        *ngSwitchCase="orderSystem.IRP"
-        [handleSaveEvents]="saveEvents"
-        [selectedOrder]="selectedOrder"
-        [selectedSystem]="selectedSystem"
-      ></app-irp-container>
-      <app-add-edit-order *ngSwitchCase="orderSystem.VMS" [handleSaveEvents]="saveEvents"></app-add-edit-order>
+    <app-irp-container
+      *ngSwitchCase="orderSystem.IRP"
+      [handleSaveEvents]="saveEvents"
+      [selectedOrder]="selectedOrder"
+      [selectedSystem]="selectedSystem"
+    ></app-irp-container>
+    <app-add-edit-order *ngSwitchCase="orderSystem.VMS" [handleSaveEvents]="saveEvents"></app-add-edit-order>
   </ng-container>
+
+  <div class="mobile-btn">
+    <div class="controls-form">
+      <ejs-splitbutton
+        content="Submit"
+        cssClass="e-primary"
+        [items]="submitButtonConfig"
+        (click)="save()"
+        (select)="selectTypeSave($event)"
+        width="200"
+      >
+      </ejs-splitbutton>
+    </div>
+  </div>
 </div>
