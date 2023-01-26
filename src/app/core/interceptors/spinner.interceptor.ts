@@ -1,12 +1,10 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import {
-  HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse,
+  HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse, HttpErrorResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { includes } from 'lodash/fp';
 
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, finalize, tap } from 'rxjs/operators';
 import { ExcludeSpinnerUrls } from '../constants/filters-helper.constant';
 
 import { SpinnerInterceptorHelperService } from '../services/spinner';
@@ -36,11 +34,15 @@ export class LoadingInterceptor implements HttpInterceptor {
         }
         this.spinnerService.checkQueueState();
       }),
+      finalize(() => {
+        if (this.spinnerService.checkQueueForUrl(request.url)) {
+          this.spinnerService.deleteUrlFromQueue(request.url);
+        }
+      }),
     ) as Observable<HttpEvent<unknown>>;
   }
 
   checkExcludeSpinnerUrls(url:string): boolean {
     return ExcludeSpinnerUrls.some(item => url.includes(item));
   }
-
 }

@@ -1,4 +1,4 @@
-import { CommonReportFilterOptions, SearchCandidate, SearchCredential } from "@admin/analytics/models/common-report.model";
+import { CandidateStatusAndReasonFilterOptionsDto, CommonReportFilterOptions, SearchCandidate, SearchCredential } from "@admin/analytics/models/common-report.model";
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { ConfigurationDto, LogiReportDto } from "@shared/models/analytics.model";
@@ -9,7 +9,7 @@ import { LogiReportService } from "@shared/services/logi-report.service";
 import { filter, Observable, tap } from "rxjs";
 import { JobDetailSummaryReportFilterOptions } from "../../admin/analytics/models/jobdetail-summary.model";
 import { AssociateAgencyDto } from "../../shared/models/logi-report-file";
-import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions, GetCommonReportCredentialSearch} from "./logi-report.action";
+import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions, GetCommonReportCredentialSearch, GetCommonReportCandidateStatusOptions} from "./logi-report.action";
 
 export interface LogiReportStateModel {
 
@@ -21,6 +21,8 @@ export interface LogiReportStateModel {
     searchCandidates: SearchCandidate[];
     searchCredentials:SearchCredential[];
     jobDetailSummaryReportFilterOptions: JobDetailSummaryReportFilterOptions | null;
+    getCommonReportCandidateStatusOptions: CandidateStatusAndReasonFilterOptionsDto[] | [];
+
 }
 @State<LogiReportStateModel>({
     name: 'LogiReport',
@@ -33,7 +35,8 @@ export interface LogiReportStateModel {
         commonReportFilterOptions:null,
         searchCandidates: [],
         searchCredentials:[],
-        jobDetailSummaryReportFilterOptions:null
+        jobDetailSummaryReportFilterOptions: null,
+        getCommonReportCandidateStatusOptions :[]
     },
 })
 @Injectable()
@@ -64,7 +67,10 @@ export class LogiReportState {
 
     @Selector()
     static jobDetailSummaryReportFilterData(state: LogiReportStateModel): JobDetailSummaryReportFilterOptions | null { return state.jobDetailSummaryReportFilterOptions; }
- 
+
+    @Selector()
+    static getCommonReportCandidateStatusData(state: LogiReportStateModel): CandidateStatusAndReasonFilterOptionsDto[] | null { return state.getCommonReportCandidateStatusOptions; }
+
 
     @Action(GetRegionsByOrganizations)
     GetRegionsByOrganizations({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<Region[]> {
@@ -150,6 +156,15 @@ export class LogiReportState {
                 return payload
            
         }));
+  }
+
+
+  @Action(GetCommonReportCandidateStatusOptions)
+  GetCommonReportCandidateStatusOptions({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<CandidateStatusAndReasonFilterOptionsDto[]> {
+    return this.logiReportService.getCommonReportCandidateStatusOptions(filter).pipe(tap((payload: any) => {
+      patchState({ getCommonReportCandidateStatusOptions: payload });
+      return payload
+    }));
   }
 }
 

@@ -60,6 +60,8 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   public todayDate = new Date();
   public lastActiveDate: Date;
+  public selectWorkCommitmentStartDate: Date;
+  public minimumDate: Date;
 
   public useMinimumDate: boolean = false;
 
@@ -103,6 +105,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private getWorkCommitmentById(id: number): void {
     this.candidateWorkCommitmentService.getWorkCommitmentById(id).subscribe((commitment: WorkCommitmentDetails) => {
+      this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
+      this.minimumDate = this.lastActiveDate < this.selectWorkCommitmentStartDate ? this.selectWorkCommitmentStartDate : this.lastActiveDate;
+
       let regions = commitment.workCommitmentOrgHierarchies.map((val) => val.regionId);
       regions = uniq(regions);
       let locations = commitment.workCommitmentOrgHierarchies.map((val) => val.locationId);
@@ -116,7 +121,8 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       this.candidateWorkCommitmentForm.controls['criticalOrder'].setValue(commitment.criticalOrder);
       this.candidateWorkCommitmentForm.controls['holiday'].setValue(commitment.holiday);
       this.candidateWorkCommitmentForm.controls['comment'].setValue(commitment.comments);
-      this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.lastActiveDate);
+      this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.minimumDate);
+      this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity();
     });
   }
 

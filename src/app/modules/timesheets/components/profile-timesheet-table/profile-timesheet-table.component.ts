@@ -62,6 +62,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() hasEditTimesheetRecordsPermission: boolean;
 
+  @Input() hasApproveRejectRecordsPermission: boolean;
+
   @Input() hasApproveRejectMileagesPermission: boolean;
 
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
@@ -124,7 +126,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public actionButtonDisabled = false;
 
-  public hasPermissions: boolean;
+  public hasEditPermissions: boolean;
+
+  public hasApproveRejectPermissions: boolean;
 
   public submitText: string;
 
@@ -201,7 +205,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   ngAfterViewInit(): void {
     this.getRecords();
     this.watchForDialogState();
-    this.adjustColumnWidth(); 
+    this.adjustColumnWidth();
     this.initResizeObserver();
     this.listenResizeContent();
   }
@@ -347,7 +351,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public listenResizeContent(): void {
-    if (this.isTablet) { 
+    if (this.isTablet) {
       this.resizeObserver.resize$
         .pipe(
           map((data) => data[0].contentRect.width),
@@ -470,8 +474,14 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.isApproveBtnEnabled = !!currentTabMapping.get(this.currentTab);
     this.isRejectBtnEnabled = !this.isAgency && !!currentTabMapping.get(this.currentTab);
     this.isOrgSubmitBtnEnabled = this.orgCanSubmitTimesheet();
-    this.hasPermissions = this.currentTab === this.tableTypes.Miles
-      ? this.hasApproveRejectMileagesPermission : this.hasEditTimesheetRecordsPermission;
+
+    if (this.currentTab === this.tableTypes.Miles) {
+      this.hasEditPermissions = this.hasApproveRejectMileagesPermission;
+      this.hasApproveRejectPermissions = this.hasApproveRejectMileagesPermission;
+    } else {
+      this.hasEditPermissions = this.hasEditTimesheetRecordsPermission;
+      this.hasApproveRejectPermissions = this.hasApproveRejectRecordsPermission;
+    }
   }
 
   private setActionBtnState(): void {
@@ -568,10 +578,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX])])
     .pipe(debounceTime(200), takeUntil(this.componentDestroy())).subscribe(([event, data]) => {
         if(data.matches) {
-            event.api.sizeColumnsToFit();   
+            event.api.sizeColumnsToFit();
         } else {
           event.columnApi.autoSizeAllColumns();
-        }  
+        }
     });
   }
 

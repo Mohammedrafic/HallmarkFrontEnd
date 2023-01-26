@@ -5,107 +5,54 @@
   (clearAllFiltersClicked)="clearAllFilters()"
   (applyFilterClicked)="applyFilters()">
   <form class="bootstrap" [formGroup]="formGroup">
-    <div class="input-container">
-      <label for="searchTerm">Candidate name</label>
-      <div class="input-group">
-        <input
-          id="searchTerm"
-          class="e-input"
-          type="text"
-          maxlength="50"
-          formControlName="searchTerm"
-        />
-      </div>
-    </div>
-<!--    <div class="input-container">-->
-<!--      <label for="orderId">Order ID</label>-->
-<!--      <div class="input-group dropdown">-->
-<!--        <ejs-multiselect-->
-<!--          id="orderId"-->
-<!--          mode="CheckBox"-->
-<!--          [allowFiltering]="true"-->
-<!--          [fields]="filterOptionFields"-->
-<!--          [dataSource]="filterColumns.orderIds?.dataSource"-->
-<!--          [showDropDownIcon]="true"-->
-<!--          formControlName="orderIds"-->
-<!--          placeholder=""></ejs-multiselect>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="row">-->
-<!--      <div class="input-container">-->
-<!--        <label for="region">Region</label>-->
-<!--        <div class="input-group dropdown">-->
-<!--          <ejs-multiselect-->
-<!--            id="region"-->
-<!--            mode="CheckBox"-->
-<!--            [allowFiltering]="true"-->
-<!--            [fields]="filterOptionFields"-->
-<!--            [dataSource]="filterColumns.regionsIds?.dataSource"-->
-<!--            [showDropDownIcon]="true"-->
-<!--            formControlName="regionsIds"-->
-<!--            placeholder=""></ejs-multiselect>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="input-container">-->
-<!--        <label for="location">Location</label>-->
-<!--        <div class="input-group dropdown">-->
-<!--          <ejs-multiselect-->
-<!--            id="location"-->
-<!--            mode="CheckBox"-->
-<!--            [allowFiltering]="true"-->
-<!--            [fields]="filterOptionFields"-->
-<!--            [dataSource]="filterColumns.locationIds?.dataSource"-->
-<!--            [showDropDownIcon]="true"-->
-<!--            [noRecordsTemplate]="'Please select the Region'"-->
-<!--            formControlName="locationIds"-->
-<!--            placeholder=""></ejs-multiselect>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="row">-->
-<!--      <div class="input-container">-->
-<!--        <label for="department">Department</label>-->
-<!--        <div class="input-group dropdown">-->
-<!--          <ejs-multiselect-->
-<!--            id="department"-->
-<!--            mode="CheckBox"-->
-<!--            [allowFiltering]="true"-->
-<!--            [fields]="filterOptionFields"-->
-<!--            [dataSource]="filterColumns.departmentIds?.dataSource"-->
-<!--            [showDropDownIcon]="true"-->
-<!--            formControlName="departmentIds"-->
-<!--            [noRecordsTemplate]="'Please select the Region and Location'"-->
-<!--            placeholder=""></ejs-multiselect>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="input-container">-->
-<!--        <label for="agencyName">Select Agency</label>-->
-<!--        <div class="input-group dropdown">-->
-<!--          <ejs-multiselect-->
-<!--            id="agencyName"-->
-<!--            mode="CheckBox"-->
-<!--            [allowFiltering]="true"-->
-<!--            [fields]="filterOptionFields"-->
-<!--            [dataSource]="filterColumns.agencyIds?.dataSource"-->
-<!--            [showDropDownIcon]="true"-->
-<!--            formControlName="agencyIds"-->
-<!--            placeholder=""></ejs-multiselect>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="input-container">-->
-<!--      <label for="skill">Skill</label>-->
-<!--      <div class="input-group dropdown">-->
-<!--        <ejs-multiselect-->
-<!--          id="skill"-->
-<!--          mode="CheckBox"-->
-<!--          [allowFiltering]="true"-->
-<!--          [fields]="filterOptionFields"-->
-<!--          [dataSource]="filterColumns.skillIds?.dataSource"-->
-<!--          [showDropDownIcon]="true"-->
-<!--          formControlName="skillIds"-->
-<!--          placeholder=""></ejs-multiselect>-->
-<!--      </div>-->
-<!--    </div>-->
+    <ng-container *ngFor="let fieldConfig of filtersFormConfig; trackBy: trackByFn">
+      <ng-container [ngSwitch]="fieldConfig.type">
+        <ng-container *ngSwitchCase="controlTypes.Text">
+          <div class="input-container" [class.short]="fieldConfig.isShort">
+            <label [for]="fieldConfig.field">{{ fieldConfig.title }}</label>
+            <div class="input-group">
+              <input
+                [id]="fieldConfig.field"
+                class="e-input"
+                type="text"
+                maxlength="50"
+                [formControlName]="fieldConfig.field"
+              />
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="controlTypes.Dropdown">
+          <div class="input-container" [class.short]="fieldConfig.isShort">
+            <label [for]="fieldConfig.field">{{ fieldConfig.title }}</label>
+            <div class="input-group dropdown">
+              <ejs-multiselect
+                [id]="fieldConfig.field"
+                mode="CheckBox"
+                [allowFiltering]="true"
+                [fields]="filterOptionFields"
+                [dataSource]="filterColumns[fieldConfig.field]?.dataSource"
+                [showDropDownIcon]="true"
+                [formControlName]="fieldConfig.field"
+                placeholder=""></ejs-multiselect>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="controlTypes.Date">
+          <div class="input-container calendar" [class.short]="fieldConfig.isShort">
+            <label [for]="fieldConfig.field">{{ fieldConfig.title }}</label>
+            <div class="input-group datepicker">
+              <ejs-datepicker
+                [id]="fieldConfig.field"
+                class="datepicker"
+                appValidateWithMessage
+                format="MM/dd/yyyy"
+                placeholder="MM/DD/YYYY"
+                [formControlName]="fieldConfig.field"
+              ></ejs-datepicker>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </ng-container>
   </form>
 </app-filter-dialog>

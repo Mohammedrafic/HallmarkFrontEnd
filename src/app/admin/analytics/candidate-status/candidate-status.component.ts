@@ -16,7 +16,7 @@ import { GetOrganizationsStructureAll } from 'src/app/security/store/security.ac
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import {
   GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData,
-  GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState
+  GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState, GetCommonReportCandidateStatusOptions
 } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
@@ -54,12 +54,10 @@ export class CandidateStatusComponent implements OnInit {
     "regionCS":   "",
     "locationCS":  "",
     "departmentCS":  "",
-    "orderStartDateBegin":    "",
-    "orderStartDateEnd":   "",
-    "orderEndDateBegin":   "",
-    "orderEndDateEnd": "",
-    "actualStartDateBegin":"",
-    "actualStartDateEnd": "",
+    "orderStartDateCS":    "",
+    "orderEndDateCS": "",
+    "actualStartDateCS":"",
+    "actualEndDateCS": "",
     "candidateStatusesParamCS": "",
     "skillCS": ""
   };
@@ -98,7 +96,8 @@ export class CandidateStatusComponent implements OnInit {
   public organizationData$: Observable<Organisation[]>;
   selectedOrganizations: Organisation[];
 
-
+  @Select(LogiReportState.getCommonReportCandidateStatusData)
+  public getCommonReportCandidateStatusData$: Observable<CandidateStatusAndReasonFilterOptionsDto[]>;
 
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   
@@ -146,7 +145,7 @@ export class CandidateStatusComponent implements OnInit {
   private isAlive = true;
   private previousOrgId: number = 0;
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5, 7, 10, 11, 12];
+  private fixedCandidateStatusesIncluded: number[] = [6,7,11];
 
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
@@ -188,10 +187,9 @@ export class CandidateStatusComponent implements OnInit {
           this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
           let skills = masterSkills.filter((i) => i.skillCategoryId);
           this.filterColumns.skillIds.dataSource = skills;
-
-          this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
          }
       });
+    
       this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
@@ -224,15 +222,11 @@ export class CandidateStatusComponent implements OnInit {
         departmentIds: new FormControl([]),
         skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
-        orderStartDateBegin: new FormControl(startDate),
-        orderStartDateEnd: new FormControl(endDate),
 
-        orderEndDateBegin: new FormControl(startDate),
-        orderEndDateEnd: new FormControl(endDate),
-
-        actualStartDateBegin: new FormControl(startDate),
-        actualStartDateEnd: new FormControl(endDate),
-
+        orderStartDate: new FormControl(startDate, [Validators.required]),
+        orderEndDate: new FormControl(endDate, [Validators.required]),
+        actualStartDate: new FormControl(null),
+        actualEndDate: new FormControl(null),
         candidateStatuses : new FormControl([])
       }
     );
@@ -298,6 +292,14 @@ export class CandidateStatusComponent implements OnInit {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
+
+          this.store.dispatch(new GetCommonReportCandidateStatusOptions(filter));
+          this.getCommonReportCandidateStatusData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: any) => {
+            if (data != null) {
+              this.filterColumns.candidateStatuses.dataSource = data;
+            }
+          });
+
           setTimeout(()=>{ this.SearchReport()},3000);
         }
         else {
@@ -393,8 +395,8 @@ export class CandidateStatusComponent implements OnInit {
       }
     }
     let { departmentIds, locationIds, candidateStatuses,
-      regionIds, skillCategoryIds, skillIds, orderStartDateBegin, orderStartDateEnd,
-      orderEndDateBegin, orderEndDateEnd, actualStartDateBegin, actualStartDateEnd   } = this.candidateStatusReportForm.getRawValue();
+      regionIds, skillCategoryIds, skillIds, orderStartDate,
+      orderEndDate, actualStartDate, actualEndDate  } = this.candidateStatusReportForm.getRawValue();
 
     if (!this.candidateStatusReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
@@ -428,12 +430,10 @@ export class CandidateStatusComponent implements OnInit {
       "regionCS":            regionIds.length==0? "null" : regionIds,
       "locationCS":          locationIds.length==0?"null" : locationIds,
       "departmentCS":        departmentIds.length==0?"null" :  departmentIds,
-      "orderStartDateBegin": formatDate(orderStartDateBegin, 'MM/dd/yyyy', 'en-US'),
-      "orderStartDateEnd":   formatDate(orderStartDateEnd, 'MM/dd/yyyy', 'en-US'),
-      "orderEndDateBegin":   formatDate(orderEndDateBegin, 'MM/dd/yyyy', 'en-US'),
-      "orderEndDateEnd":     formatDate(orderEndDateEnd, 'MM/dd/yyyy', 'en-US'),
-      "actualStartDateBegin":formatDate(actualStartDateBegin, 'MM/dd/yyyy', 'en-US'),
-      "actualStartDateEnd":  formatDate(actualStartDateEnd, 'MM/dd/yyyy', 'en-US'),
+      "orderStartDateCS":       formatDate(orderStartDate, 'MM/dd/yyyy', 'en-US'),
+      "orderEndDateCS":         formatDate(orderEndDate, 'MM/dd/yyyy', 'en-US'),
+      "actualStartDateCS": formatDate(actualStartDate, 'MM/dd/yyyy', 'en-US'),
+      "actualEndDateCS":   formatDate(actualEndDate, 'MM/dd/yyyy', 'en-US'),
       "candidateStatusesParamCS": candidateStatuses.length == 0 ? "null" : candidateStatuses,
       "skillCS": skillIds.length == 0 ? "null" : skillIds,
     };
@@ -486,14 +486,11 @@ export class CandidateStatusComponent implements OnInit {
         valueId: 'id',
       },
 
-      orderStartDateBegin: { type: ControlTypes.Date, valueType: ValueType.Text },
-      orderStartDateEnd: { type: ControlTypes.Date, valueType: ValueType.Text },
+      orderStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      orderEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
 
-      orderEndDateBegin: { type: ControlTypes.Date, valueType: ValueType.Text },
-      orderEndDateEnd: { type: ControlTypes.Date, valueType: ValueType.Text },
-
-      actualStartDateBegin: { type: ControlTypes.Date, valueType: ValueType.Text },
-      actualStartDateEnd: { type: ControlTypes.Date, valueType: ValueType.Text },
+      actualStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      actualEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
 
       candidateStatuses: {
         type: ControlTypes.Multiselect,
@@ -528,6 +525,10 @@ export class CandidateStatusComponent implements OnInit {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
+
+    let endDate = new Date(Date.now());
+    endDate.setDate(endDate.getDate());
+
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
@@ -535,14 +536,10 @@ export class CandidateStatusComponent implements OnInit {
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
 
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderStartDateBegin)?.setValue(startDate);
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderStartDateEnd)?.setValue(new Date(Date.now()));
-
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderEndDateBegin)?.setValue(startDate);
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderEndDateEnd)?.setValue(new Date(Date.now()));
-
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualStartDateBegin)?.setValue(startDate);
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualStartDateEnd)?.setValue(new Date(Date.now()));
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderStartDate)?.setValue(startDate);
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderEndDate)?.setValue(endDate);
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualStartDate)?.setValue(null);
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualEndDate)?.setValue(null);
 
     this.filteredItems = [];
     this.locations =[];

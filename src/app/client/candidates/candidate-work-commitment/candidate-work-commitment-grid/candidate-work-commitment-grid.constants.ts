@@ -1,7 +1,8 @@
-import { ValueFormatterParams } from "@ag-grid-community/core";
-import { formatDate } from "@angular/common";
-import { CandidateWorkCommitment } from "../models/candidate-work-commitment.model";
-import { CandidateCommitmentGridActionRendererComponent } from "./grid-action-renderer/grid-action-renderer.component";
+import { ValueFormatterParams } from '@ag-grid-community/core';
+import { formatDate } from '@angular/common';
+import { CandidateWorkCommitment } from '../models/candidate-work-commitment.model';
+import { CandidateCommitmentGridActionRendererComponent } from './grid-action-renderer/grid-action-renderer.component';
+import { formatDate as formatDateString } from '@shared/constants/format-date';
 
 export const CandidateWorkCommitmentColumnDef = (editCallback: (value: CandidateWorkCommitment) => void, deleteCallback: (value: CandidateWorkCommitment) => void ) => ([
     {
@@ -22,14 +23,14 @@ export const CandidateWorkCommitmentColumnDef = (editCallback: (value: Candidate
       field: 'startDate',
       headerName: 'Start Date',
       valueFormatter: (params: ValueFormatterParams) =>
-        formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
+        formatDate(params.value, formatDateString, 'en-US', 'UTC'),
       maxWidth: 140,
     },
     {
       field: 'endDate',
       headerName: 'End Date',
       valueFormatter: (params: ValueFormatterParams) =>
-        params.value && formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
+        params.value && formatDate(params.value, formatDateString, 'en-US', 'UTC'),
       minWidth: 140,
     },
     {
@@ -98,7 +99,7 @@ export const CandidateWorkCommitmentColumnDef = (editCallback: (value: Candidate
       field: 'created',
       headerName: 'Created',
       valueFormatter: (params: ValueFormatterParams) =>
-        params.value && formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
+        params.value && formatDate(params.value, formatDateString, 'en-US', 'UTC'),
       flex: 1,
       minWidth: 140,
     },

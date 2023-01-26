@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Subject } from 'rxjs';
 import { CandidatesService } from '../services/candidates.service';
 import { CandidateWorkCommitment } from './models/candidate-work-commitment.model';
@@ -10,18 +9,11 @@ import { CandidateWorkCommitment } from './models/candidate-work-commitment.mode
   styleUrls: ['./candidate-work-commitment.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CandidateWorkCommitmentComponent extends DestroyableDirective implements OnInit, OnDestroy {
+export class CandidateWorkCommitmentComponent {
   public dialogSubject$ = new Subject<{ isOpen: boolean, isEdit: boolean, commitment?: CandidateWorkCommitment }>();
   public refreshSubject$ = new Subject<void>();
 
   constructor(
-    private cdr: ChangeDetectorRef,
     public candidateService: CandidatesService
-  ) {
-    super();
-  }
-
-  public ngOnInit(): void {
-
-  }
+  ) { }
 }

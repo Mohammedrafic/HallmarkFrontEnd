@@ -39,6 +39,8 @@ import { UserState } from '../../../../store/user.state';
 import { findSelectedItems } from '@core/helpers/functions.helper';
 import { GetOrganizationStructure } from '../../../../store/user.actions';
 import { WorkCommitmentAdapter } from '../../adapters/work-commitment.adapter';
+import { AbstractControl } from '@angular/forms';
+import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 
 @Component({
   selector: 'app-work-commitment-dialog',
@@ -145,6 +147,20 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
 
   private createForm(): void {
     this.commitmentForm = this.commitmentService.createCommitmentForm();
+    this.addDateFieldsValidators(this.commitmentForm);
+  }
+
+  private addDateFieldsValidators(commitmentForm: CustomFormGroup<WorkCommitmentForm>): void {
+    const startTimeField = commitmentForm.get('startDate') as AbstractControl;
+    const endTimeField = commitmentForm.get('endDate') as AbstractControl;
+    startTimeField.addValidators(startDateValidator(commitmentForm, 'endDate'));
+    startTimeField.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() =>
+      endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
+    );
+    endTimeField.addValidators(endDateValidator(commitmentForm, 'startDate'));
+    endTimeField.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() =>
+      endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
+    );
   }
 
   private setDialogTitle(value: boolean): void {

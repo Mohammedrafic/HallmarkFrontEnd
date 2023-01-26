@@ -467,7 +467,7 @@ export class OrderManagementContentState {
     const params: IrpCandidatesParams = {
       PageSize: pageSize,
       PageNumber: pageNumber,
-      isAvaliable: !!isAvaliable,
+      isAvaliable: !isAvaliable,
     };
 
     return this.orderManagementService.getIrpCandidates(orderId, params)

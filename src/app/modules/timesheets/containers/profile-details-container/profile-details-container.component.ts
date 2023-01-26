@@ -106,7 +106,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
 
   public readonly allowedFileExtensions: string = FileExtensionsString;
-  
+
   public readonly maxFileSize: number = FileSize.MB_20;
 
   public rangeType = DatesRangeType.OneWeek;
@@ -146,8 +146,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public hasEditTimesheetRecordsPermission: boolean;
 
+  public hasApproveRejectTimesheetRecordsPermission: boolean;
+
   public mobileMenu = [{ text: MobileMenuItems.Upload }];
-  
+
   public isMobile = false;
 
   public isSmallTabletScreen = false;
@@ -402,10 +404,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     .observe([BreakpointQuery.TABLET_MAX]).pipe(map((data) => data.matches));
     const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$
     .pipe(map((data) => data[0].contentRect.width), distinctUntilChanged());
-    
+
     const smallTabletScreenWidth = 760;
-    const mobileScreenWidth = +BreakpointQuery.MOBILE_MAX.replace(/\D/g, ""); 
-  
+    const mobileScreenWidth = +BreakpointQuery.MOBILE_MAX.replace(/\D/g, "");
+
       combineLatest([tabletBreakPoint$, resizeToolbarObserver$])
         .pipe(filter(([isLessMaxTablet, resize]) => Boolean(isLessMaxTablet)), takeUntil(this.componentDestroy()))
         .subscribe(([isLessMaxTablet, toolbarWidth]) => {
@@ -570,12 +572,20 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         takeUntil(this.componentDestroy())
       )
       .subscribe((permissions: Permission) => {
-        this.hasEditTimesheetRecordsPermission = this.isAgency
-          ? permissions[this.userPermissions.CanAgencyAddEditDeleteTimesheetRecords]
-          : permissions[this.userPermissions.CanOrganizationAddEditDeleteTimesheetRecords];
+        if (this.isAgency) {
+          this.hasEditTimesheetRecordsPermission =
+            permissions[this.userPermissions.CanAgencyAddEditDeleteTimesheetRecords];
+          this.hasApproveRejectTimesheetRecordsPermission =
+            permissions[this.userPermissions.CanAgencyAddEditDeleteTimesheetRecords];
+        } else {
+          this.hasEditTimesheetRecordsPermission =
+            permissions[this.userPermissions.CanOrganizationAddEditDeleteTimesheetRecords];
+          this.hasApproveRejectTimesheetRecordsPermission =
+            permissions[this.userPermissions.CanOrganizationApproveRejectTimesheets];
+        }
       });
   }
-  
+
   private initResizeObserver(): void {
     this.resizeObserver = ResizeObserverService.init(this.targetElement!);
   }

@@ -217,8 +217,14 @@ export class VendorActivityComponent implements OnInit {
   }
 
   private initForm(): void {
-    let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
+    let today = new Date(Date.now());
+
+    today.setDate(1); 
+    let year = today.getMonth() == 0 ? today.getFullYear() - 1 : today.getFullYear();
+    let month = today.getMonth() == 0 ? 11 : today.getMonth();
+    let startDate = new Date(year, month , 1);
+    let endDate = new Date(year, month+1, 0);
+
     this.VendorActivityReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
@@ -229,7 +235,7 @@ export class VendorActivityComponent implements OnInit {
         skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
         startDate: new FormControl(startDate, [Validators.required]),
-        endDate: new FormControl(new Date(Date.now()), [Validators.required])
+        endDate: new FormControl(endDate, [Validators.required])
       }
     );
   }
@@ -391,7 +397,7 @@ export class VendorActivityComponent implements OnInit {
       regionIds, skillCategoryIds, skillIds, startDate, endDate, agencyIds } = this.VendorActivityReportForm.getRawValue();
 
     if (!this.VendorActivityReportForm.dirty) {
-      this.message = "Default filter selected with all regions, locations and departments for 90 days";
+      //this.message = "Default filter selected with all regions, locations and departments for 90 days";
     }
     else {
       this.isResetFilter = false;
@@ -508,8 +514,14 @@ export class VendorActivityComponent implements OnInit {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
+    let today = new Date(Date.now());
+
+    today.setDate(1);
+    let year = today.getMonth() == 0 ? today.getFullYear() - 1 : today.getFullYear();
+    let month = today.getMonth() == 0 ? 11 : today.getMonth();
+    let startDate = new Date(year, month, 1);
+    let endDate = new Date(year, month + 1, 0);
+
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
@@ -517,7 +529,7 @@ export class VendorActivityComponent implements OnInit {
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue([]);
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
-    this.VendorActivityReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.VendorActivityReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(endDate);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
@@ -527,7 +539,6 @@ export class VendorActivityComponent implements OnInit {
   }
 
   public onFilterApply(): void {
-  
       this.VendorActivityReportForm.markAllAsTouched();
       if (this.VendorActivityReportForm?.invalid) {
         return;

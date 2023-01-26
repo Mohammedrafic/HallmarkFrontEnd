@@ -18,14 +18,14 @@
         <ng-container *ngIf="isEditEnabled">
           <app-tooltip-container
             [ngClass]="{ 'middle-tablet': isMiddleContentWidth }"
-            [showToolTip]="!hasPermissions"
+            [showToolTip]="!hasEditPermissions"
             *ngIf="!actionsDisabled && currentTab !== tableTypes.Expenses"
           >
             <button
               class="add-action spaced"
               cssClass="e-action-button"
               ejs-button
-              [disabled]="disableAnyAction || !hasPermissions"
+              [disabled]="disableAnyAction || !hasEditPermissions"
               (click)="openAddDialog()"
             >
               <i-feather name="plus" class="icon"></i-feather> <span class="action-text">Add Record</span>
@@ -35,12 +35,12 @@
           <ng-container *ngIf="!actionsDisabled && (recordsToShow?.[currentTab]?.[modeValues.Edit]?.length || isEditOn)">
             <app-tooltip-container
               [ngClass]="{ 'middle-tablet': isMiddleContentWidth }"
-              [showToolTip]="!hasPermissions"
+              [showToolTip]="!hasEditPermissions"
               *ngIf="!isEditOn; else isMobile ? editMobileBtnHandlers : editHandlers"
             >
               <button
                 (click)="editTimesheets()"
-                [disabled]="disableAnyAction || !hasPermissions"
+                [disabled]="disableAnyAction || !hasEditPermissions"
                 ejs-button
                 cssClass="e-action-button"
                 class="add-action"
@@ -111,21 +111,21 @@
 
 <ng-template #btnGroup>
   <div class="btn-group" *ngIf="currentTab !== tableTypes.Expenses && !isEditOn">
-    <app-tooltip-container [showToolTip]="!hasPermissions" *ngIf="isRejectBtnEnabled && !actionsDisabled">
+    <app-tooltip-container [showToolTip]="!hasApproveRejectPermissions" *ngIf="isRejectBtnEnabled && !actionsDisabled">
       <button
         ejs-button
-        [disabled]="disableAnyAction || actionButtonDisabled || !hasPermissions"
+        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions"
         cssClass="e-outline privilege"
         (click)="onRejectButtonClick()"
       >
         Reject
       </button>
     </app-tooltip-container>
-    <app-tooltip-container [showToolTip]="!hasPermissions" *ngIf="isApproveBtnEnabled">
+    <app-tooltip-container [showToolTip]="!hasApproveRejectPermissions" *ngIf="isApproveBtnEnabled">
       <button
         ejs-button
         [isPrimary]="true"
-        [disabled]="disableAnyAction || actionButtonDisabled || !hasPermissions"
+        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions"
         cssClass="spinner-btn privilege"
         (click)="handleApprove()"
       >
@@ -135,11 +135,11 @@
         </ng-template>
       </button>
     </app-tooltip-container>
-    <app-tooltip-container [showToolTip]="!hasPermissions" *ngIf="!isApproveBtnEnabled && isOrgSubmitBtnEnabled">
+    <app-tooltip-container [showToolTip]="!hasEditPermissions" *ngIf="!isApproveBtnEnabled && isOrgSubmitBtnEnabled">
       <button
         ejs-button
         [isPrimary]="true"
-        [disabled]="disableAnyAction || actionButtonDisabled || !hasPermissions"
+        [disabled]="disableAnyAction || actionButtonDisabled || !hasEditPermissions"
         cssClass="spinner-btn privilege"
         (click)="orgSubmit()"
       >
