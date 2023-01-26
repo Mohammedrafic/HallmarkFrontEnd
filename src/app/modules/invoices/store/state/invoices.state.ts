@@ -24,28 +24,26 @@ import {
   InvoiceStateDto,
   ManualInvoiceMeta,
   ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData,
+  PendingApprovalInvoice, PendingApprovalInvoicesData, PendingInvoicesData,
 } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import {
   DefaultFiltersState,
   DefaultInvoicesState,
-  FilteringInvoicesOptionsFields,
   InvoicesFilteringOptionsMapping,
   ManualInvoiceMessages,
   SavedInvoicesFiltersParams,
 } from '../../constants';
-import { InvoicesTableFiltersColumns } from '../../enums';
 import { InvoiceMessageHelper, InvoiceMetaAdapter } from '../../helpers';
 import { OrganizationStructure } from '@shared/models/organization.model';
-import { PendingInvoicesData } from '../../interfaces/pending-invoice-record.interface';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
 import { Attachment } from '@shared/components/attachments';
 import { reduceFiltersState } from '@core/helpers/functions.helper';
+import { FilteringInvoicesOptionsFields } from '../../enums';
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -234,22 +232,28 @@ export class InvoicesState {
 
   @Action(Invoices.GetFiltersDataSource)
   GetFiltersDataSource(
-    { setState, dispatch }: StateContext<InvoicesModel>,
+    { setState, dispatch, getState }: StateContext<InvoicesModel>,
   ): Observable<InvoicesFilteringOptions | void> {
     return this.invoicesAPIService.getFiltersDataSource().pipe(
       tap((res) => {
+        const { invoiceFiltersColumns } = getState();
+
         setState(patch({
-          invoiceFiltersColumns: patch(Object.keys(res).reduce((acc: any, key) => {
-            if (key === FilteringInvoicesOptionsFields.Statuses) { // TODO remove when would be correct api call
+          invoiceFiltersColumns: patch(Object.keys(res).reduce((acc: InvoiceFilterColumns, key: string) => {
+            const typedKey = key as FilteringInvoicesOptionsFields;
+            const optionsKey = InvoicesFilteringOptionsMapping.get(typedKey);
+
+            if (!optionsKey) {
               return acc;
             }
 
-            acc[InvoicesFilteringOptionsMapping.get(
-              (key as FilteringInvoicesOptionsFields))as InvoicesTableFiltersColumns] = patch({
-              dataSource: res[key as FilteringInvoicesOptionsFields],
-            });
+            acc[optionsKey] = {
+              ...invoiceFiltersColumns[optionsKey],
+              dataSource: res[typedKey],
+            };
+
             return acc;
-          }, {})),
+          }, {} as InvoiceFilterColumns)),
         }));
       }),
       catchError((err: HttpErrorResponse) => {
@@ -460,7 +464,7 @@ export class InvoicesState {
     { organizationId }: Invoices.GetManualInvoices
   ): Observable<ManualInvoicesData | void> {
     const state = getState();
-    
+
     return this.invoicesAPIService.getManualInvoices({
       ...state.invoicesFilters,
       organizationId,

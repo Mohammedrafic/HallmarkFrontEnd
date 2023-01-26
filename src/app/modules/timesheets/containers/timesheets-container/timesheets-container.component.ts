@@ -27,7 +27,7 @@ import { DataSourceItem } from '@core/interface';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { TabConfig, TabCountConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
-import { TimesheetExportOptions, TAB_ADMIN_TIMESHEETS, UNIT_ORGANIZATIONS_FIELDS } from '../../constants';
+import { TimesheetExportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { TimesheetsService } from '../../services';
@@ -38,6 +38,7 @@ import { TimesheetsTabsComponent } from '../../components/timesheets-tabs/timesh
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { FilterService } from '@shared/services/filter.service';
 import { PreservedFilters } from '@shared/models/preserved-filters.model';
+import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fields-settings';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -90,7 +91,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public orgId: number | null = null;
   public appliedFiltersAmount = 0;
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
-  public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
+  public readonly unitOrganizationsFields = baseDropdownFieldsSettings;
   public filters: TimesheetsFilterState | undefined;
   public readonly organizationControl: FormControl = new FormControl(null);
   public readonly currentSelectedTableRowIndex: Observable<number> = this.timesheetsService.getStream();
