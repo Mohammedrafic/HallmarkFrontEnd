@@ -141,7 +141,7 @@
       </ejs-accordion>
     </div>
     <div class="comments">
-      <app-comments [disabled]="!showComments"  [comments]="comments" [commentContainerId]="candidateJob?.commentContainerId || 0"></app-comments>
+      <app-comments [disabled]="!showComments"  [comments]="comments" [externalCommentConfiguration]="order.externalCommentsConfiguration" [commentContainerId]="candidateJob?.commentContainerId || 0"></app-comments>
     </div>
   </section>
   <section class="bill-rates">

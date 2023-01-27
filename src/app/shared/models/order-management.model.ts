@@ -462,6 +462,7 @@ export class Order {
   creationDate?: string;
   canRevoke?: boolean;
   canProceedRevoke?: boolean;
+  externalCommentsConfiguration?:boolean | null;
 }
 
 export class ReOrder {

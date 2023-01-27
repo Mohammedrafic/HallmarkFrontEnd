@@ -355,6 +355,7 @@
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
+      [order]="selectedOrder"
       [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
     ></app-onboarded-candidate>
   </ng-template>
@@ -368,6 +369,7 @@
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
+      [order]="selectedOrder"
     ></app-accept-candidate>
   </ng-template>
 
@@ -383,6 +385,7 @@
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
+      [order]="selectedOrder"
     >
     </app-apply-candidate>
   </ng-template>
@@ -396,6 +399,7 @@
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
+      [order]="selectedOrder"
       [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
     ></app-offer-deployment>
   </ng-template>

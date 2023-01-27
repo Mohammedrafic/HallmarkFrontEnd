@@ -137,6 +137,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
   @Output() orderTypeChanged = new EventEmitter<OrderType>();
   @Output() hourlyRateSync = new EventEmitter<string>();
+  @Input() public externalCommentConfiguration ?: boolean | null; 
 
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;

@@ -30,13 +30,13 @@
 <div class="split-line"></div>
 <div class="content-wrapper">
   <ng-container [ngSwitch]="activeSystem">
-    <app-irp-container
-      *ngSwitchCase="orderSystem.IRP"
-      [handleSaveEvents]="saveEvents"
-      [selectedOrder]="selectedOrder"
-      [selectedSystem]="selectedSystem"
-    ></app-irp-container>
-    <app-add-edit-order *ngSwitchCase="orderSystem.VMS" [handleSaveEvents]="saveEvents"></app-add-edit-order>
+      <app-irp-container
+        *ngSwitchCase="orderSystem.IRP"
+        [handleSaveEvents]="saveEvents"
+        [selectedOrder]="selectedOrder"
+        [selectedSystem]="selectedSystem"
+      ></app-irp-container>
+      <app-add-edit-order *ngSwitchCase="orderSystem.VMS" [externalCommentConfiguration]="externalCommentConfiguration" [handleSaveEvents]="saveEvents"></app-add-edit-order>
   </ng-container>
 
   <div class="mobile-btn">

@@ -72,7 +72,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   @ViewChild('billRates') billRatesComponent: BillRatesComponent;
 
   @Input('handleSaveEvents') public handleSaveEvents$: Subject<void | MenuEventArgs>;
-
+  @Input() public externalCommentConfiguration ?: boolean | null; 
+  
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order>;
 
