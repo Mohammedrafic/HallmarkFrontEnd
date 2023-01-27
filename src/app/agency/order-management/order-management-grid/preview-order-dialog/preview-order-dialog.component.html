@@ -61,6 +61,7 @@
                 <ng-container *ngIf="currentOrder">
                   <app-extension-candidate
                     [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
+                    [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
                     *ngIf="currentOrder.extensionFromId; else candidateOrder"
                     [currentOrder]="currentOrder"
                     [dialogEvent]="openEvent"

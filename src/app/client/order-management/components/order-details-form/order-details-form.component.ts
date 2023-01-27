@@ -41,7 +41,7 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
 import { Document } from '@shared/models/document.model';
-
+import { AbstractPermission } from '@shared/helpers/permissions';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
 import { OrderJobDistribution } from '@shared/enums/job-distibution';
@@ -76,7 +76,7 @@ import { distributionSource, ORDER_JOB_DISTRIBUTION } from '@shared/constants/or
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { DurationService } from '@shared/services/duration.service';
 import { UserState } from 'src/app/store/user.state';
-import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { DateTimeHelper } from '@core/helpers';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { OrderDetailsService } from '@client/order-management/components/order-details-form/services';
 import {
@@ -126,7 +126,7 @@ import { JobClassifications, OptionFields } from '@client/order-management/const
   styleUrls: ['./order-details-form.component.scss'],
   providers: [MaskedDateTimeService],
 })
-export class OrderDetailsFormComponent extends Destroyable implements OnInit {
+export class OrderDetailsFormComponent extends AbstractPermission implements OnInit {
   @Input() isActive = false;
 
   @Input() set disableOrderType(value: boolean) {
@@ -225,7 +225,7 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
   private selectedOrder$: Observable<Order | null>;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private route: ActivatedRoute,
     private alertService: AlertService,
     private orderManagementService: OrderManagementContentService,
@@ -235,7 +235,7 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
     private orderDetailsService: OrderDetailsService,
     private cd: ChangeDetectorRef,
   ) {
-    super();
+    super(store);
     this.initOrderForms();
     this.getSettings();
     this.watchForOrderFormsChanges();
@@ -246,7 +246,8 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
     this.setShiftsValidation(this.orderControlsConfig.shiftStartTimeControl, this.orderControlsConfig.shiftEndTimeControl);
   }
 
-  public ngOnInit(): void {
+  public override ngOnInit(): void {
+    super.ngOnInit();
     this.getFormData();
     this.setOrderId();
     this.resetFormAfterSwichingOrganization();

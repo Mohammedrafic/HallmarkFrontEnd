@@ -92,9 +92,9 @@
                   </div>
                   <div class="input-container">
                     <label>Offered Bill Rate ($)<span *ngIf="!isRejected && !isReadOnly" class="required">*</span></label>
-                    <div class="input-group" [ngClass]="{'input-readonly': isRejected || isReadOnly}">
+                    <div class="input-group" [ngClass]="{'input-readonly': isRejected || isReadOnly || (!hasCanEditOrderBillRatePermission && !isAgency) }">
                       <input appValidateWithMessage
-                             [readonly]="isRejected || isReadOnly"
+                             [readonly]="isRejected || isReadOnly || (!hasCanEditOrderBillRatePermission && !isAgency)"
                              formControlName="offeredBillRate"
                              class="e-input"
                              (focus)="priceUtils.setPriceMask(formGroup, 'offeredBillRate', $event)"

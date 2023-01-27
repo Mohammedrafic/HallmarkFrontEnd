@@ -78,6 +78,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
   @Input() isOrderOverlapped: boolean;
+  @Input() hasCanEditOrderBillRatePermission: boolean;
 
   public statusesFormControl = new FormControl();
   public openRejectDialog = new Subject<boolean>();

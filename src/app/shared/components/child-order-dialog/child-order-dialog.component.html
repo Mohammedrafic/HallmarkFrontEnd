@@ -110,6 +110,7 @@
                         [orderDuration]="(selectedOrder$ | async)?.duration!"
                         [actionsAllowed]="agencyActionsAllowed"
                         [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
+                        [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
                       ></app-onboarded-candidate>
                       <section *ngIf="isReorderType">
                         <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>
@@ -149,6 +150,7 @@
                         [isTab]="true"
                         [actionsAllowed]="agencyActionsAllowed"
                         [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
+                        [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
                       ></app-offer-deployment>
                     </ng-container>
 
@@ -162,6 +164,7 @@
                         appUnsavedForm
                         [dialogEvent]="$any(openEvent)"
                         [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
+                        [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
                         [currentOrder]="order"
                       >
                       </app-extension-candidate>

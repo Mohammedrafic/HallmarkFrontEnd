@@ -157,7 +157,9 @@
                   </div>
 
                   <!-- Joining Bonus -->
-                  <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+                  <div
+                    *ngIf="!isPermPlacementOrder && userPermission[userPermissions.CanEnterJoiningCompletionBonus]"
+                    class="input-container bootstrap form-line-item-20">
                     <label>Joining Bonus</label>
                     <div class="input-group">
                       <input
@@ -224,7 +226,9 @@
                   </div>
 
                   <!-- Comp. Bonus -->
-                  <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+                  <div
+                    *ngIf="!isPermPlacementOrder && userPermission[userPermissions.CanEnterJoiningCompletionBonus]"
+                    class="input-container bootstrap form-line-item-20">
                     <label>Comp. Bonus</label>
                     <div class="input-group">
                       <input

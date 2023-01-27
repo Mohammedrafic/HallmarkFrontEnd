@@ -96,6 +96,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
   @Input() isOrderOverlapped: boolean;
+  @Input() hasCanEditOrderBillRatePermission: boolean;
 
   public override form: FormGroup;
   public jobStatusControl: FormControl;
