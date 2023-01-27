@@ -4,7 +4,14 @@ import { BUSSINES_DATA_FIELDS, UNIT_FIELDS } from '../../user-list.constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Select, Store } from '@ngxs/store';
 import { SecurityState } from '../../../store/security.state';
-import { filter, map, merge, Observable, Subject, takeWhile } from 'rxjs';
+import {
+  combineLatest,
+  filter,
+  map,
+  Observable,
+  Subject,
+  takeWhile,
+} from 'rxjs';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import {
   ChangeBusinessUnit,
@@ -106,7 +113,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
         this.countryState$.next(statesValue);
       });
   }
-  
+
   private onBusinessUnitControlChanged(): void {
     this.businessUnitControl?.valueChanges
       .pipe(
@@ -124,12 +131,13 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   }
 
   private subscribeOnBusinessUnits(): void {
-    merge(
+    combineLatest([
       (this.businessUnitControl as AbstractControl).valueChanges,
-      (this.businessUnitIdControl as AbstractControl).valueChanges
-    )
-      .pipe(
-        filter((value) => !!value),
+      (this.businessUnitIdControl as AbstractControl).valueChanges,
+    ]).pipe(
+        filter((valueList: number[]) => {
+          return valueList.every((value: number) => value !== null);
+        }),
         takeWhile(() => this.isAlive)
       )
       .subscribe(() => {
