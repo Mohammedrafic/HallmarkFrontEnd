@@ -416,7 +416,7 @@ export class CandidateStatusComponent implements OnInit {
     }
       locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length  > 0 ? this.locations.map(x=> x.id).join(",") : []); 
       departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
-      candidateStatuses = candidateStatuses.length > 0 ? this.candidateStatuses?.map(x => x.statusText) : this.filterColumns.candidateStatuses.dataSource.map((x: { statusText: any; }) => x.statusText).join(",");
+    candidateStatuses = candidateStatuses.length > 0 ? this.candidateStatuses?.map(x => x.statusText).join(",") : this.filterColumns.candidateStatuses.dataSource.map((x: { statusText: any; }) => x.statusText).join(",");
 
       regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
       locationIds =      locationIds.length > 0 ? locationIds  : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
