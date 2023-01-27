@@ -38,6 +38,9 @@ export const SettingsAppliedToPermissions: string[] = [
   'AllowAgencyToBidOnCandidateBillRateBeyondOrderBillRate',
   'AutoLockOrder',
   'IsReOrder',
+  'SSNRequiredToAcceptPosition',
+  'DateOfBirthRequiredToAcceptPosition',
+  'SetDefaultCommentsScopeToExternal'
 ];
 
 export const DisabledSettingsByDefault = [
