@@ -10,6 +10,7 @@
     [enableVirtualization]="true"
     [pageSettings]="pageSettings"
     [height]="fullScreenGridHeight"
+    (actionBegin)="actionBegin($event)"
     class="e-gridwithheader e-gridsubheader"
   >
     <e-columns>
