@@ -10,7 +10,7 @@ import { PrintInvoiceData, PrintInvoiceMeta } from '../interfaces';
 
 @Injectable()
 export class InvoicePrintingService {
-  public printInvoice(data: PrintInvoiceData[]): void {
+  printInvoice(data: PrintInvoiceData[]): void {
     const doc = this.createDoc();
     const logo = this.createImage();
 
@@ -27,7 +27,7 @@ export class InvoicePrintingService {
     doc.save();
   }
 
-  public printAgencyInvoice(data: PrintInvoiceData[]): void {
+  printAgencyInvoice(data: PrintInvoiceData[]): void {
     const doc = this.createDoc();
     const logo = this.createImage();
 
@@ -286,11 +286,10 @@ Hauppauge, NY 11788`,
 
     data.summary.forEach((summary) => {
       summary.items.forEach((detail, idx: number) => {
-        const loactionIdText = detail.locationInvoiceId  ? `${detail.locationInvoiceId}-` : '';
+        const loactionIdText = detail.locationIExternalId  ? `${detail.locationIExternalId}-` : '';
+        const departmentIdText = detail.invoiceDepartmentId ? `-${detail.invoiceDepartmentId}` : '';
         const skillGlText =detail.skillGLNumber ? `-${detail.skillGLNumber}` : '';
-        // eslint-disable-next-line max-len
-        const additionalDetails = `${loactionIdText}${detail.departmentName}-${detail.costCenterFormattedName}${skillGlText}`;
-
+        const additionalDetails = `${loactionIdText}${detail.departmentName}${departmentIdText}${skillGlText}`;
 
         const sum: CellDef[] = [
           idx === 0 ? {
@@ -732,10 +731,10 @@ Hauppauge, NY 11788`,
 
     data.summary.forEach((summary) => {
       summary.items.forEach((detail, idx: number) => {
-        const loactionIdText = detail.locationInvoiceId  ? `${detail.locationInvoiceId}-` : '';
+        const loactionIdText = detail.locationIExternalId  ? `${detail.locationIExternalId}-` : '';
+        const departmentIdText = detail.invoiceDepartmentId ? `-${detail.invoiceDepartmentId}` : '';
         const skillGlText =detail.skillGLNumber ? `-${detail.skillGLNumber}` : '';
-        // eslint-disable-next-line max-len
-        const additionalDetails = `${loactionIdText}${detail.departmentName}-${detail.costCenterFormattedName}${skillGlText}`;
+        const additionalDetails = `${loactionIdText}${detail.departmentName}${departmentIdText}${skillGlText}`;
         
         const sum: CellDef[] = [
           idx === 0 ? {
