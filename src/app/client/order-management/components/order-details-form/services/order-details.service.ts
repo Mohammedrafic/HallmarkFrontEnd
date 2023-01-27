@@ -7,7 +7,7 @@ import {
   JobDistributionDTO,
   OrderTypeDTO, SpecialProjectDTO,
 } from '@client/order-management/components/order-details-form/interfaces';
-import { ONLY_NUMBER, ONLY_NUMBER_AND_DOT } from '@shared/constants';
+import { NUMBER_AND_ONE_DECIMAL,ONLY_NUMBER, ONLY_NUMBER_AND_DOT } from '@shared/constants';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 import { OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
 import { ValidatorsListForNumberWithDots } from '@client/order-management/components/order-details-form/constants';
@@ -41,7 +41,7 @@ export class OrderDetailsService {
         skillId: [null, Validators.required],
         hourlyRate: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(ONLY_NUMBER_AND_DOT)]],
         openPositions: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(ONLY_NUMBER)]],
-        minYrsRequired: [null, [Validators.maxLength(10), Validators.pattern(ONLY_NUMBER_AND_DOT)]],
+        minYrsRequired: [null, [Validators.maxLength(10), Validators.pattern(NUMBER_AND_ONE_DECIMAL)]],
         joiningBonus: [null, [Validators.maxLength(10), Validators.pattern(ONLY_NUMBER_AND_DOT)]],
         compBonus: [null, [Validators.maxLength(10), Validators.pattern(ONLY_NUMBER_AND_DOT)]],
         duration: [null, Validators.required],
