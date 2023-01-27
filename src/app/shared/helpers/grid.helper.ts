@@ -11,6 +11,6 @@ export class GridHelper {
     if (!value) {
       return '';
     }
-    return formatDate(value, pattern, 'en-US');
+    return formatDate(value, pattern, 'en-US', 'UTC');
   }
 }
