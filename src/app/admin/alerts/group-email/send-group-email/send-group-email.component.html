@@ -263,7 +263,9 @@
           <div class="id-container">
             <div class="input-container bootstrap">
               <label>Attachment</label>
-              <div id="group-attachment-files">
+              <input *ngIf="!isSend" class="e-input" type="text" disabled [(ngModel)]="fileNameInput" 
+                     [ngModelOptions]="{standalone: true}" />
+              <div id="group-attachment-files" *ngIf="isSend">
                 <div id="files-droparea" class="droparea" (click)="browseGroupEmail()">
                   <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
                 </div>
@@ -276,7 +278,7 @@
                               (selected)="onFileSelectedGroup($event)">
                 </ejs-uploader>
               </div>
-              <label>Attached file size should not exceed 2MB<span class="e-input"></span></label>
+              <label *ngIf="isSend">Attached file size should not exceed 2MB<span class="e-input"></span></label>
             </div>
           </div>
         </div>
