@@ -229,7 +229,6 @@ export abstract class AbstractGridConfigurationComponent {
     if (args.requestType === 'refresh') {
       // prevent double re-render on sorting
       if (this.refreshing) {
-        args.cancel = true;
         this.refreshing = false;
         return;
       }
