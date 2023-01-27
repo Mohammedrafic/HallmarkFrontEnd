@@ -82,6 +82,9 @@ import { InvoicesPermissionHelper } from './helpers/invoices-permission.helper';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { InvoiceAddPaymentModule } from './components/invoice-add-payment/invoice-add-payment.module';
 import { InvoicePaymentDetailsModule } from './components/invoice-payment-details/invoice-payment-details.module';
+import { InvoicesFiltersService } from './services/invoices-filters.service';
+import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
+import { InvoiceGridExportComponent } from './components/invoice-grid-export/invoice-grid-export.component';
 
 @NgModule({
   declarations: [
@@ -97,6 +100,7 @@ import { InvoicePaymentDetailsModule } from './components/invoice-payment-detail
     InvoicesTableTabsComponent,
     AllInvoicesActionCellComponent,
     GridOrderIdCellComponent,
+    InvoiceGridExportComponent,
 
   ],
   imports: [
@@ -120,7 +124,7 @@ import { InvoicePaymentDetailsModule } from './components/invoice-payment-detail
       ChevronsDown,
       Search,
       Printer,
-      ArrowUp,
+      ArrowUp
     }),
     TabModule,
     DropDownButtonModule,
@@ -155,6 +159,7 @@ import { InvoicePaymentDetailsModule } from './components/invoice-payment-detail
     TooltipContainerModule,
     InvoiceAddPaymentModule,
     InvoicePaymentDetailsModule,
+    ValidateDirectiveModule
   ],
   providers: [
     InvoicesService,
@@ -166,6 +171,7 @@ import { InvoicePaymentDetailsModule } from './components/invoice-payment-detail
     InvoicePrintingService,
     InvoiceAgencyResolver,
     InvoicesPermissionHelper,
+    InvoicesFiltersService,
     {
       provide: AddDialogHelperService,
       useClass: AddInvoiceService,

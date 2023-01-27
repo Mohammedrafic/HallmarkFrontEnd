@@ -423,23 +423,23 @@
                     </ejs-dropdownlist>
                   </div>
                 </div>
-              <div class="input-container bootstrap form-line-item-40">
-                <label> Agency <span *ngIf="agencyControlEnabled" class="required">*</span></label>
-                <div class="input-group dropdown">
-                  <ejs-multiselect
-                    mode="CheckBox"
-                    formControlName="agency"
-                    appValidateWithMessage
-                    [enabled]="agencyControlEnabled"
-                    [dataSource]="associateAgencies$ | async"
-                    [fields]="associateAgencyFields"
-                    [showSelectAll]="true"
-                    [allowFiltering]="true"
-                    [showDropDownIcon]="true"
-                  >
-                  </ejs-multiselect>
+                <div class="input-container bootstrap form-line-item-40">
+                  <label> Agency <span *ngIf="agencyControlEnabled" class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-multiselect
+                      mode="CheckBox"
+                      formControlName="agency"
+                      appValidateWithMessage
+                      [enabled]="agencyControlEnabled"
+                      [dataSource]="associateAgencies$ | async"
+                      [fields]="associateAgencyFields"
+                      [showSelectAll]="true"
+                      [allowFiltering]="true"
+                      [showDropDownIcon]="true"
+                    >
+                    </ejs-multiselect>
+                  </div>
                 </div>
-              </div>
               </div>
             </form>
           </div>
@@ -530,7 +530,11 @@
         <div class="contact-details">
           <div class="contact-header">
             <div class="title">Contact Details</div>
-            <div class="stick-right add-contact-link" (click)="addContact()">
+            <div
+              class="stick-right add-contact-link"
+              [class.disable]="contactDetailsFormArray.invalid"
+              (click)="addContact()"
+            >
               <i-feather name="plus" class="icon"></i-feather>
               Add Contact
             </div>
@@ -539,7 +543,7 @@
             <form [formGroup]="contactDetailsForm">
               <ng-container formArrayName="contactDetails">
                 <div
-                  class="form-line"
+                  class="form-line contact-details-item"
                   [formGroupName]="i"
                   *ngFor="let contact of contactDetailsFormArray.controls; let i = index"
                 >
@@ -610,29 +614,31 @@
                     </div>
                   </div>
 
-                  <!--Primary contact-->
-                  <div *ngIf="contactDetailsFormArray.controls.length > 1" class="radio-button">
-                    <label>Primary</label>
-                    <ejs-radiobutton
-                      name="primaryContact"
-                      [value]="i"
-                      [checked]="contact.get('isPrimaryContact')?.value"
-                      (change)="selectPrimaryContact($event)"
-                    ></ejs-radiobutton>
-                  </div>
+                  <div class="contact-btn">
+                    <!--Primary contact-->
+                    <div *ngIf="contactDetailsFormArray.controls.length > 1" class="radio-button">
+                      <label>Primary</label>
+                      <ejs-radiobutton
+                        name="primaryContact"
+                        [value]="i"
+                        [checked]="contact.get('isPrimaryContact')?.value"
+                        (change)="selectPrimaryContact($event)"
+                      ></ejs-radiobutton>
+                    </div>
 
-                  <!-- Remove button -->
-                  <div class="input-container remove-button-container">
-                    <button
-                      *ngIf="contactDetailsFormArray.controls.length > 1"
-                      ejs-button
-                      type="button"
-                      cssClass="e-outline"
-                      class="icon-button"
-                      (click)="removeContact(i)"
-                    >
-                      <i-feather name="trash2" class="icon"></i-feather>
-                    </button>
+                    <!-- Remove button -->
+                    <div class="input-container remove-button-container">
+                      <button
+                        *ngIf="contactDetailsFormArray.controls.length > 1"
+                        ejs-button
+                        type="button"
+                        cssClass="e-outline"
+                        class="icon-button"
+                        (click)="removeContact(i)"
+                      >
+                        <i-feather name="trash2" class="icon"></i-feather>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </ng-container>
@@ -642,7 +648,11 @@
         <div class="work-location">
           <div class="work-location-header">
             <div class="title">Work Location</div>
-            <div class="stick-right add-contact-link" (click)="addWorkLocation()">
+            <div
+              class="stick-right add-contact-link"
+              [class.disable]="workLocationsFormArray.invalid"
+              (click)="addWorkLocation()"
+            >
               <i-feather name="plus" class="icon"></i-feather>
               Add More
             </div>
@@ -651,7 +661,7 @@
           <form [formGroup]="workLocationForm">
             <ng-container formArrayName="workLocations">
               <div
-                class="form-line"
+                class="form-line work-location-item"
                 [formGroupName]="i"
                 *ngFor="let workLocation of workLocationsFormArray.controls; let i = index"
               >

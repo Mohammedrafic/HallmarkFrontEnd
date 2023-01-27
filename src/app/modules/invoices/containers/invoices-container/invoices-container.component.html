@@ -1,8 +1,9 @@
 <app-page-toolbar>
   <ng-container left>
     <app-invoices-table-tabs
-      [tabConfig]="(tabsConfig$ | async) || []"
-      (changeTab)="selectTab($event)"
+      *ngIf="tabsConfig$ | async as tabsConfig"
+      [tabConfig]="tabsConfig"
+      (changeTab)="selectTab($event, tabsConfig)"
       class="tabs"
       appTabsMobileShadow>
     </app-invoices-table-tabs>
@@ -37,6 +38,13 @@
             Filters <i-feather name="sliders" class="icon"></i-feather>
           </div>
         </button>
+
+        <app-invoice-grid-export
+          [selectedTab]="selectedTabIdx"
+          [selectedRows]="gridSelections"
+          [isAgency]="isAgency"
+          (resetTableSelection)="resetTableSelection()"
+        ></app-invoice-grid-export>
 
         <button
           ejs-button
@@ -231,7 +239,7 @@
 <app-manual-invoice-dialog></app-manual-invoice-dialog>
 
 <app-invoices-filters-dialog
-  [activeTabIdx]="selectedTabIdx"
+  [selectedTabId]="selectedTabId"
   (appliedFiltersAmount)="changeFiltersAmount($event)"
   (resetFilters)="resetFilters()"
   (updateTableByFilters)="updateTableByFilters($event)"

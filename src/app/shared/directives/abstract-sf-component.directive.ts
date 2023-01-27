@@ -1,5 +1,5 @@
 import { Component as SFComponent } from '@syncfusion/ej2-base';
-import { takeUntil, filter } from 'rxjs';
+import { takeUntil, filter, debounceTime } from 'rxjs';
 
 import { Directive, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 
@@ -30,6 +30,7 @@ export class AbstractSFComponentDirective<ComponentType extends SFComponent<HTML
     this.componentResizeObserver = ResizeObserverService.init(this.sfComponent.getRootElement());
     this.componentResizeObserver.resize$
       .pipe(
+        debounceTime(300),
         filter(() => !this.skipResizeObserverHandlerPredicate),
         takeUntil(this.destroy$)
       )

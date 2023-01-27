@@ -52,8 +52,10 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
 
   @Input() scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
   @Input() datePickerLimitations: DatePickerLimitations;
-  @Input() set scheduleData(page: ScheduleInt.ScheduleModelPage) {
-    this.createScheduleService.scheduleData = page.items;
+  @Input() set scheduleData(page: ScheduleInt.ScheduleModelPage | null) {
+    if (page) {
+      this.createScheduleService.scheduleData = page.items;
+    }
   }
 
   @Output() updateScheduleGrid: EventEmitter<void> = new EventEmitter<void>();

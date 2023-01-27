@@ -1,13 +1,17 @@
 @import '../../styles/variables/colors';
 
-.bootstrap .row {
+.bootstrap {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-gap: 12px;
+  grid-column-gap: 12px;
 }
 
 .input-container {
   margin-bottom: 12px;
+
+  &:not(.short) {
+    grid-column: 1/3;
+  }
 
   :last-child {
     margin-bottom: 0;

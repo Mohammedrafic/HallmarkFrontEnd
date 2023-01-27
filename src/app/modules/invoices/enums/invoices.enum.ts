@@ -51,20 +51,51 @@ export enum INVOICES_ACTIONS {
   GetPaymentDetails = '[invoices] get payment details',
   SavePayment = '[invoices] save payment',
   OpenAddPaymentDialog = '[invoices] open add payment dialog',
+  ExportInvoices = '[invoices] export invoices',
 }
 
 export enum InvoicesTableFiltersColumns {
-  SearchTerm = 'searchTerm',
-  StatusIds = 'statusIds',
   OrderBy = 'orderBy',
+  SearchTerm = 'searchTerm',
   PageNumber = 'pageNumber',
   PageSize = 'pageSize',
-  OrderIds = 'orderIds',
-  LocationIds = 'locationIds',
-  RegionsIds = 'regionsIds',
-  DepartmentIds = 'departmentIds',
+  OrganizationId = 'organizationId',
+  InvoiceState = 'invoiceState',
+  AmountFrom = 'amountFrom',
+  AmountTo = 'amountTo',
+  StatusIds = 'statusIds',
+  ApDelivery = 'apDelivery',
+  AggregateByType = 'aggregateByType',
+  InvoiceIds = 'invoiceIds',
+  FormattedInvoiceIds = 'formattedInvoiceIds',
   AgencyIds = 'agencyIds',
-  SkillIds = 'skillIds',
+  IssueDateFrom = 'issueDateFrom',
+  IssueDateTo = 'issueDateTo',
+  DueDateFrom = 'dueDateFrom',
+  DueDateTo = 'dueDateTo',
+  PaidDateFrom = 'paidDateFrom',
+  PaidDateTo = 'paidDateTo',
+}
+
+export enum FilteringInvoicesOptionsFields {
+  Agency = 'agency',
+  ApDelivery = 'apDelivery',
+  AggregateByType = 'aggregateByType',
+  InvoiceStates = 'invoiceStates',
+}
+
+export enum InvoicesOrgTabId {
+  PendingInvoiceRecords,
+  ManualInvoicePending,
+  PendingApproval,
+  PendingPayment,
+  Paid,
+  AllInvoices,
+}
+
+export enum InvoicesAgencyTabId {
+  ManualInvoicePending = 6,
+  AllInvoices,
 }
 
 export enum PermissionCodes {

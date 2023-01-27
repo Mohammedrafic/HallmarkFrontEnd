@@ -460,6 +460,10 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
   }
 
   public addContact(): void {
+    if(this.contactDetailsFormArray.invalid) {
+      return;
+    }
+    
     this.createContactForm();
   }
 
@@ -482,6 +486,10 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
   }
 
   public addWorkLocation(): void {
+    if(this.workLocationsFormArray.invalid) {
+      return;
+    }
+
     this.createWorkLocationForm();
   }
 

@@ -264,10 +264,11 @@ export const invoiceSummaryColumnDefs = (location: string): ColDef[] => [
     cellClass: 'font-weight-bold align-right',
     headerClass: 'custom-wrap align-right',
     valueGetter: (params: TypedValueGetterParams<InvoiceSummaryItem>) => {
-      const loactionIdText = params.data.locationInvoiceId  ? `${params.data.locationInvoiceId}-` : '';
+      const loactionIdText = params.data.locationIExternalId  ? `${params.data.locationIExternalId}-` : '';
+      const departmentIdText = params.data.invoiceDepartmentId ? `-${params.data.invoiceDepartmentId}` : '';
       const skillGlText = params.data.skillGLNumber ? `-${params.data.skillGLNumber}` : '';
       
-      return `${loactionIdText}${params.data.departmentName}-${params.data.costCenterFormattedName}${skillGlText}`;
+      return `${loactionIdText}${params.data.departmentName}${departmentIdText}${skillGlText}`;
     },
   },
 ];

@@ -6,17 +6,17 @@ import { map } from 'rxjs/operators';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
-import { GetPendingApprovalParams, GroupInvoicesParams, InvoicesFilteringOptions,
+import { GroupInvoicesParams, InvoicesFilteringOptions,
   InvoicesFilterState, InvoiceStateDto, ManualInvoiceMeta,
   ManualInvoicePostDto, ManualInvoiceReason, ManualInvoicesData,
   ManualInvoiceTimesheetResponse, InvoiceDetail, PrintingPostDto,
-  PrintInvoiceData, ManualInvoicePutDto, InvoicePayment, InvoicePaymentGetParams, PaymentCreationDto } from '../interfaces';
+  PrintInvoiceData, ManualInvoicePutDto, InvoicePayment, InvoicePaymentGetParams, PaymentCreationDto,
+  PendingApprovalInvoice, PendingApprovalInvoicesData, PendingInvoicesData,
+} from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
 
-import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
 import { ChangeStatusData } from '../../timesheets/interface';
-import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../interfaces/pending-approval-invoice.interface';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { GetQueryParams } from '@core/helpers/functions.helper';
@@ -27,11 +27,8 @@ export class InvoicesApiService {
     private http: HttpClient,
   ) {}
 
-  public getFiltersDataSource(
-    organizationId: number | null = null
-  ): Observable<InvoicesFilteringOptions> {
-    return this.http.get<InvoicesFilteringOptions>
-    (`/api/Timesheets/filteringOptions${organizationId ? `/${organizationId}` : ''}`);
+  public getFiltersDataSource(): Observable<InvoicesFilteringOptions> {
+    return this.http.get<InvoicesFilteringOptions>(`/api/Invoices/filteroptions`);
   }
 
   public getInvoiceReasons(): Observable<ManualInvoiceReason[]> {
@@ -106,7 +103,7 @@ export class InvoicesApiService {
     return this.http.post<PendingInvoicesData>('/api/PendingInvoices', data);
   }
 
-  public getPendingApproval(data: GetPendingApprovalParams, isAgency = false): Observable<PendingApprovalInvoicesData> {
+  public getPendingApproval(data: InvoicesFilterState, isAgency = false): Observable<PendingApprovalInvoicesData> {
     return this.http.post<PendingApprovalInvoicesData>(`/api/Invoices${isAgency ? '/agency' : ''}/filtered`, data);
   }
 
@@ -167,6 +164,11 @@ export class InvoicesApiService {
 
   public deletePayment(id: number): Observable<void> {
     return this.http.delete<void>(`/api/Invoices/payments/${id}`);
+  }
+
+  public exportInvoices(payload: ExportPayload, isAgency: boolean): Observable<Blob> {
+    const url = isAgency ? '/api/Invoices/agency/export' : '/api/Invoices/export';
+    return this.http.post(url, payload, { responseType: 'blob' });
   }
 
   private organizationDeleteManualInvoice(id: number): Observable<void> {

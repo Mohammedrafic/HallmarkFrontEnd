@@ -1,40 +1,35 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef,
-  Component, Inject, NgZone, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, NgZone, OnInit, ViewChild } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { FormControl } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import {
-  combineLatest, distinctUntilChanged, filter,
-  map, Observable, skip, switchMap, takeUntil, tap,
-} from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, Observable, skip, switchMap, takeUntil, tap } from 'rxjs';
 
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
 import { OutsideZone } from '@core/decorators';
 import { DialogAction } from '@core/enums';
 import { DataSourceItem } from '@core/interface';
-import { RejectReasonInputDialogComponent,
+import {
+  RejectReasonInputDialogComponent,
 } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
 import { GRID_CONFIG } from '@shared/constants';
 import { PageOfCollections } from '@shared/models/page.model';
-// TODO: move this constant to shared.
-import { UNIT_ORGANIZATIONS_FIELDS } from 'src/app/modules/timesheets/constants';
+import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fields-settings';
+
 import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import { InvoicesTableTabsComponent } from '../../components/invoices-table-tabs/invoices-table-tabs.component';
 import { defaultGroupInvoicesOption, GroupInvoicesOption, GroupInvoicesOptions } from '../../constants';
-import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
+import { AgencyInvoicesGridTab, InvoicesAgencyTabId, OrganizationInvoicesGridTab } from '../../enums';
 import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
-import {
-  BaseInvoice, GridContainerTabConfig, InvoiceGridSelections, InvoicePaymentData, InvoicesFilterState, InvoiceUpdateEmmit,
-  ManualInvoice, ManualInvoicesData, PendingInvoice, PendingInvoiceRecord,
-  PendingInvoicesData, PrintingPostDto, SelectedInvoiceRow, PendingApprovalInvoicesData,
-} from '../../interfaces';
 import { InvoicePrintingService, InvoicesService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
+import { InvoicesFiltersDialogComponent } from '../../components/invoices-filters-dialog/invoices-filters-dialog.component';
+import * as Interfaces from '../../interfaces';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 
 @Component({
@@ -47,6 +42,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   @ViewChild(InvoicesTableTabsComponent)
   public invoicesTableTabsComponent: InvoicesTableTabsComponent;
 
+  @ViewChild(InvoicesFiltersDialogComponent)
+  public invoicesFiltersDialogComponent: InvoicesFiltersDialogComponent;
+
   @ViewChild(RejectReasonInputDialogComponent)
   public rejectReasonInputDialogComponent: RejectReasonInputDialogComponent;
 
@@ -54,19 +52,19 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public readonly organizations$: Observable<DataSourceItem[]>;
 
   @Select(InvoicesState.pendingInvoicesData)
-  public readonly pendingInvoicesData$: Observable<PendingInvoicesData>;
+  public readonly pendingInvoicesData$: Observable<Interfaces.PendingInvoicesData>;
 
   @Select(InvoicesState.invoicesContainerData)
-  public readonly invoicesContainerData$: Observable<PageOfCollections<BaseInvoice>>;
+  public readonly invoicesContainerData$: Observable<PageOfCollections<Interfaces.BaseInvoice>>;
 
   @Select(InvoicesState.manualInvoicesData)
-  public readonly manualInvoicesData$: Observable<ManualInvoicesData>;
+  public readonly manualInvoicesData$: Observable<Interfaces.ManualInvoicesData>;
 
   @Select(InvoicesState.pendingApprovalInvoicesData)
-  public readonly pendingApprovalInvoicesData$: Observable<PendingApprovalInvoicesData>;
+  public readonly pendingApprovalInvoicesData$: Observable<Interfaces.PendingApprovalInvoicesData>;
 
   @Select(InvoicesState.invoicesFilters)
-  public readonly invoicesFilters$: Observable<PendingInvoicesData>;
+  public readonly invoicesFilters$: Observable<Interfaces.PendingInvoicesData>;
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationChangeId$: Observable<number>;
@@ -75,6 +73,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public readonly agencyId$: Observable<number>;
 
   public selectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab = 0;
+
+  public selectedTabId: Interfaces.InvoiceTabId = 0;
 
   public appliedFiltersAmount = 0;
 
@@ -86,14 +86,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public groupingInvoiceRecordsIds: number[] = [];
 
-  /**
-   * TODO: move to const file
-   */
   public readonly defaultGridOptions: GridOptions = {
     onRowSelected: (event: RowSelectedEvent): void => {
       this.groupingInvoiceRecordsIds = event.api.getSelectedRows()
-        .map(({ invoiceRecords }: PendingInvoice) => invoiceRecords?.map((record: PendingInvoiceRecord) => record.id))
-        .flat();
+        .map(({ invoiceRecords }: Interfaces.PendingInvoice) =>
+          invoiceRecords?.map((record: Interfaces.PendingInvoiceRecord) => record.id)
+        ).flat();
     },
   };
 
@@ -103,7 +101,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public readonly defaultGroupInvoicesOption: GroupInvoicesOption = defaultGroupInvoicesOption;
 
-  public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
+  public readonly unitOrganizationsFields = baseDropdownFieldsSettings;
 
   public groupInvoicesBy: GroupInvoicesOption = defaultGroupInvoicesOption;
 
@@ -112,9 +110,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public isLoading: boolean;
   public organizationId: number;
   public rejectInvoiceId: number;
-  public tabConfig: GridContainerTabConfig | null;
+  public tabConfig: Interfaces.GridContainerTabConfig | null;
 
-  public gridSelections: InvoiceGridSelections = {
+  public gridSelections: Interfaces.InvoiceGridSelections = {
     selectedInvoiceIds: [],
     rowNodes: [],
   };
@@ -128,13 +126,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     addPaymentOpen: false,
   };
 
-  public paymentRecords: InvoicePaymentData[] = [];
+  public paymentRecords: Interfaces.InvoicePaymentData[] = [];
 
   public businessUnitId?: number;
-  /**
-   * TODO: incorrect naming.
-   */
-  public Org: DataSourceItem[];
+
+  public organizationsList: DataSourceItem[];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -144,6 +140,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     private printingService: InvoicePrintingService,
     private ngZone: NgZone,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
+    @Inject(DOCUMENT) private document: Document,
     store: Store
   ) {
     super(store);
@@ -151,22 +148,20 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
     this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
+    this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.ManualInvoicePending : 0;
     this.selectTab(0);
     this.tabConfig = this.invoicesContainerService.getTabConfig(this.selectedTabIdx);
   }
 
   public ngOnInit(): void {
-    /**
-     * TODO: refactoring needed.
-     */
     this.businessUnitId = JSON.parse((localStorage.getItem('BussinessUnitID') || '0')) as number;
-    (!this.businessUnitId)?this.businessUnitId=0:"";
-    /**
-     * TODO: remove window object with angular document token injection.
-     */
-    window.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
+    if (!this.businessUnitId) {
+      this.businessUnitId = 0;
+    }
 
-    
+    this.document.defaultView?.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
+
+
     if (this.isAgency) {
       this.checkActionsAllowed();
     }
@@ -181,9 +176,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public watchAgencyId(): void {
-    /**
-     * TODO: refactoring needed.
-     */
     if (this.isAgency) {
       this.agencyId$
         .pipe(
@@ -191,18 +183,15 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
           switchMap(() => this.organizations$),
           filter((organizations: DataSourceItem[]) => !!organizations.length),
-          tap((organizations: DataSourceItem[]) => this.Org = organizations,
-          ),
+          tap((organizations: DataSourceItem[]) => this.organizationsList = organizations),
           map(([firstOrganization]: DataSourceItem[]) => firstOrganization.id),
         )
         .subscribe((orgId: number) => {
-          if (this.businessUnitId) {
-            this.organizationControl
-            .setValue((this.Org || []).filter(f => f.id === this.businessUnitId)[0].id,
-            { emitEvent: true, onlySelf: false });
-          } else {
-            this.organizationControl.setValue(orgId, { emitEvent: true, onlySelf: false });
-          }
+          const value = this.businessUnitId
+            ? (this.organizationsList || []).filter(org => org.id === this.businessUnitId)[0].id
+            : orgId;
+
+          this.organizationControl.setValue(value, { emitEvent: true, onlySelf: false });
         });
     }
   }
@@ -240,6 +229,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     ).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
       this.setGridConfig();
+      this.invoicesFiltersDialogComponent?.initFiltersDataSources();
       this.cdr.markForCheck();
     });
   }
@@ -248,11 +238,19 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
-  public selectTab(tabIdx: number): void {
-    if (this.selectedTabIdx  === tabIdx) {
+  public selectTab(tabIdx: number, tabsConfig: unknown[] = []): void {
+    if (this.selectedTabIdx === tabIdx) {
       return;
     }
+
     this.selectedTabIdx = tabIdx;
+
+    if (tabsConfig.length) {
+      this.selectedTabId = (tabsConfig[tabIdx] as Interfaces.InvoicesTabItem).tabId;
+    } else {
+      this.selectedTabId = 0;
+    }
+
     this.store.dispatch([
       new Invoices.SetTabIndex(tabIdx),
     ]);
@@ -283,17 +281,16 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     );
   }
 
-  public updateTableByFilters(filters: InvoicesFilterState): void {
+  public updateTableByFilters(filters: Interfaces.InvoicesFilterState): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({ ...filters }));
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public selectRow(selectedRowData: SelectedInvoiceRow): void {
+  public selectRow(selectedRowData: Interfaces.SelectedInvoiceRow): void {
     const enableSelectionIndex = this.isAgency ? 1 : 2;
 
     if (this.selectedTabIdx >= enableSelectionIndex) {
       this.invoicesService.setCurrentSelectedIndexValue(selectedRowData.rowIndex);
-
 
       const invoices = this.store.selectSnapshot(InvoicesState.pendingApprovalInvoicesData);
       const prevId: number | null = invoices?.items[selectedRowData.rowIndex - 1]?.invoiceId || null;
@@ -320,7 +317,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.cdr.markForCheck();
   }
 
-  public updateTable({ invoiceId, status, organizationId }: InvoiceUpdateEmmit): void {
+  public updateTable({ invoiceId, status, organizationId }: Interfaces.InvoiceUpdateEmmit): void {
     this.store.dispatch(new Invoices.ChangeInvoiceState(invoiceId, status, organizationId))
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
@@ -354,13 +351,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public bulkApprove(nodes: RowNode[]): void {
     this.store.dispatch(
-      new Invoices.ApproveInvoices(nodes.map((node: RowNode) => (node.data as ManualInvoice).id))
+      new Invoices.ApproveInvoices(nodes.map((node: RowNode) => (node.data as Interfaces.ManualInvoice).id))
     );
   }
 
-  public bulkExport(event: RowNode[]): void {
-
-  }
+  public bulkExport(event: RowNode[]): void {}
 
   public groupInvoices(): void {
     this.store.dispatch(new Invoices.GroupInvoices({
@@ -405,7 +400,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public printInvoices(): void {
-    const dto: PrintingPostDto = {
+    const dto: Interfaces.PrintingPostDto = {
       invoiceIds: this.gridSelections.selectedInvoiceIds,
       ...(this.isAgency ? {
         organizationIds: [this.organizationId] as number[],
@@ -438,6 +433,15 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public closeAddPayment(): void {
     this.invoiceContainerConfig.addPaymentOpen = false;
+  }
+
+  public resetTableSelection(): void {
+    this.gridSelections.rowNodes.forEach((node: RowNode) => {
+      node.setSelected(false);
+    });
+
+    this.clearSelections();
+    this.gridSelections.rowNodes = [];
   }
 
   private clearGroupedInvoices(): void {
@@ -484,7 +488,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         takeUntil(this.componentDestroy()),
       )
       .subscribe(() => {
-        const paymentData = this.store.selectSnapshot(InvoicesState.selectedPayment) as InvoicePaymentData;
+        const paymentData = this.store.selectSnapshot(InvoicesState.selectedPayment) as Interfaces.InvoicePaymentData;
         this.paymentRecords = [paymentData];
         this.openAddPayment();
       });

@@ -1,5 +1,4 @@
 import { ColDef, RowNode } from '@ag-grid-community/core';
-import { AggregateType } from '@syncfusion/ej2-angular-grids';
 import { ItemModel, SelectEventArgs, TabItemModel } from '@syncfusion/ej2-angular-navigations';
 
 import { DataSourceItem, TypedValueGetterParams } from '@core/interface';
@@ -9,9 +8,10 @@ import { AttachmentAction } from '@shared/components/attachments';
 import { AgencyStatus } from '@shared/enums/status';
 import { BillRateType } from '@shared/models';
 import { Attachment, DetailsColumnConfig } from '../../timesheets/interface';
-import { FilteringInvoicesOptionsFields } from '../constants';
-import { DeliveryType, InvoiceAttachmentFileType, InvoiceRecordType, InvoicesAggregationType,
-  InvoicesTableFiltersColumns, InvoiceState, INVOICES_STATUSES } from '../enums';
+import {
+  InvoiceAttachmentFileType, InvoiceRecordType, InvoicesAggregationType,
+  InvoicesTableFiltersColumns, INVOICES_STATUSES, FilteringInvoicesOptionsFields, InvoicesOrgTabId, InvoicesAgencyTabId,
+} from '../enums';
 import { PendingInvoiceStatus } from '../enums/invoice-status.enum';
 import { InvoiceDetail } from './invoice-detail.interface';
 import { PendingApprovalInvoice, PendingApprovalInvoicesData } from './pending-approval-invoice.interface';
@@ -56,16 +56,25 @@ export interface InvoiceItem {
 
 export interface InvoicesFilterState {
   orderBy?: string;
+  searchTerm?: string;
   pageNumber?: number;
   pageSize?: number;
-  searchTerm?: string;
-  orderIds?: string[];
-  locationIds?: string[];
-  regionsIds?: string[];
-  departmentIds?: string[];
-  agencyIds?: string[];
-  skillIds?: string[];
   organizationId?: number | null;
+  invoiceState?: number;
+  amountFrom?: number;
+  amountTo?: number;
+  formattedInvoiceIds?: string[];
+  statusIds?: number[];
+  apDelivery?: number[];
+  aggregateByType?: number[];
+  invoiceIds?: number[];
+  agencyIds?: number[];
+  issueDateFrom?: string;
+  issueDateTo?: string;
+  dueDateFrom?: string;
+  dueDateTo?: string;
+  paidDateFrom?: string;
+  paidDateTo?: string;
 }
 
 export type InvoiceFilterColumns = {
@@ -155,10 +164,13 @@ export interface BaseInvoice {
   skillAbbr: string;
 }
 
+export type InvoiceTabId = InvoicesOrgTabId | InvoicesAgencyTabId;
+
 export interface InvoicesTabItem extends TabItemModel {
   amount?: number;
   title?: string;
   hidden?: boolean;
+  tabId: InvoiceTabId;
 }
 
 export interface DropdownSelectArgs<T = unknown> extends Omit<SelectEventArgs, 'itemData'> {
@@ -173,17 +185,6 @@ export interface InvoiceFilterForm {
   departmentIds: string[];
   agencyIds: string[];
   skillIds: string[];
-}
-
-export interface GetPendingApprovalParams {
-  orderBy?: string;
-  pageNumber?: number;
-  pageSize?: number;
-  organizationId?: number | null,
-  invoiceState?: InvoiceState;
-  apDelivery?: DeliveryType;
-  aggregateByType?: AggregateType;
-  invoiceIds?: number[];
 }
 
 export interface GridContainerTabConfig {
@@ -295,4 +296,11 @@ export interface ExportOption extends ItemModel {
 export interface InvoiceGridSelections {
   selectedInvoiceIds: number[];
   rowNodes: RowNode[];
+}
+
+export interface InvoiceFilterFieldConfig {
+  type: ControlTypes;
+  title: string;
+  field: InvoicesTableFiltersColumns;
+  isShort?: boolean;
 }

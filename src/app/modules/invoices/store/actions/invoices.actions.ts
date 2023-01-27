@@ -3,7 +3,7 @@ import { DataSourceItem, FileForUpload } from '@core/interface';
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { Attachment } from '@shared/components/attachments';
 import { ExportPayload } from '@shared/models/export.model';
-import { GetPendingApprovalParams, GroupInvoicesParams, InvoicePaymentData, InvoicePermissions,
+import { GroupInvoicesParams, InvoicePaymentData, InvoicePermissions,
   InvoicesFilterState, ManualInvoice, ManualInvoicePostDto, ManualInvoicePutDto, PaymentCreationDto,
   PrintingPostDto } from '../../interfaces';
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums';
@@ -36,7 +36,7 @@ export namespace Invoices {
     static readonly type = INVOICES_ACTIONS.GET_PENDING_APPROVAL;
 
     constructor(
-      public readonly payload: GetPendingApprovalParams,
+      public readonly payload: InvoicesFilterState,
     ) {
     }
   }
@@ -318,5 +318,15 @@ export namespace Invoices {
     static readonly type = INVOICES_ACTIONS.OpenAddPaymentDialog;
 
     constructor(public readonly payload: InvoicePaymentData) {}
+  }
+
+  export class ExportInvoices {
+    static readonly type = INVOICES_ACTIONS.ExportInvoices;
+
+    constructor(
+      public readonly payload: ExportPayload,
+      public readonly isAgency: boolean,
+    ) {
+    }
   }
 }
