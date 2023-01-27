@@ -16,7 +16,6 @@ import {
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
 import { Tier, TierExceptionPage, TierList } from '@shared/components/associate-list/interfaces';
-import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 
 @Injectable()
 export class AssociateService {
@@ -27,9 +26,9 @@ export class AssociateService {
    * @param pageSize
    * @return associate list
    */
-  public getAssociateListByPage(pageNumber: number, pageSize: number): Observable<AssociateOrganizationsAgencyPage> {
+  public getAssociateListByPage(pageNumber: number, pageSize: number, orderBy: string): Observable<AssociateOrganizationsAgencyPage> {
     return this.http.get<any>(
-      `/api/AssociateOrganizations/associateBusinessUnits?PageNumber=${pageNumber}&PageSize=${pageSize}`
+      `/api/AssociateOrganizations/associateBusinessUnits`, { params: { pageNumber, pageSize, orderBy } }
     );
   }
 
