@@ -9,9 +9,10 @@ import { ShowExportDialog } from '../../../../store/app.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { InvoiceGridSelections } from '../../interfaces';
-import { GetExportFileName, GetTabsToExport, InvoiceExportCols } from './invoice-export.constant';
-import { Invoices } from '../../store/actions/invoices.actions';
+import { GetExportFileName, GetInvoiceState, GetTabsToExport, InvoiceExportCols } from './invoice-export.constant';
 import { InvoicesState } from '../../store/state/invoices.state';
+import { InvoiceState } from '../../enums';
+import { Invoices } from '../../store/actions/invoices.actions';
 
 @Component({
   selector: 'app-invoice-grid-export',
@@ -33,6 +34,7 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
   public columnsToExport: ExportColumn[] = InvoiceExportCols;
 
   private selectedTabIndex = 0;
+  private invoiceState: InvoiceState | null;
 
   constructor(
     private store: Store,
@@ -63,11 +65,12 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
     const ids = this.selectedRows.selectedInvoiceIds.length ? this.selectedRows.selectedInvoiceIds : null;
     this.getDefaultFileName();
 
-    this.store.dispatch(new Invoices.ExportInvoices(new ExportPayload(
+   this.store.dispatch(new Invoices.ExportInvoices(new ExportPayload(
       fileType,
       {
         ...filters,
         offset: Math.abs(new Date().getTimezoneOffset()),
+        invoiceState: this.invoiceState,
         ids,
       },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
@@ -82,6 +85,7 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
     const tabsToExport = GetTabsToExport(this.isAgency);
     this.selectedTabIndex = selectedTabIdx;
     this.showExport = tabsToExport.includes(selectedTabIdx);
+    this.invoiceState = GetInvoiceState(this.isAgency, selectedTabIdx);
     this.cdr.markForCheck();
   }
 
