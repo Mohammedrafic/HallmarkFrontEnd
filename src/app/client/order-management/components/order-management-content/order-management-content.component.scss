@@ -358,7 +358,7 @@
 
   .grid-table-container {
     height: auto;
-    margin-top: 90px;
+    margin-top: 130px;
   }
 
   :host {
@@ -378,21 +378,39 @@
     margin-bottom: 12px;
 
     &.irp {
-      margin-top: 95px;
+      margin-top: 130px;
     }
 
     &.vms {
-      margin-top: 60px;
+      margin-top: 130px;
     }
+  }
+
+  .system-buttons {
+    position: fixed;
+    top: 81px;
+    left: 50%;
+    z-index: 3;
+    margin-top: 0 !important;
+    padding: 24px;
+    transform: translateX(-50%);
+    background-color: $background;
+    display: flex !important;
+    justify-content: center;
   }
 
   .navigation-wrapper {
     position: fixed;
-    top: 180px;
+    top: 160px;
     z-index: 2;
+    width: 100%;
     margin: auto -24px;
     padding: 15px 24px 0 24px;
     background-color: $background;
+
+    .table-tabs.irp {
+      max-width: none !important;
+    }
 
     app-tab-navigation {
       z-index: 2;
