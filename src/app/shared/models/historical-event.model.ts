@@ -2,6 +2,7 @@ export interface HistoricalEvent {
   dateTime: string;
   content: string;
   userName?: string;
+  localDateTime: string;
 }
 
 export interface OrderHistoricalEvent {
