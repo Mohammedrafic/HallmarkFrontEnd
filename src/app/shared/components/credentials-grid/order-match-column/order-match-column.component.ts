@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { OrderMatch } from "@shared/enums/order-management";
-import { orderMatchColorClasses, orderMatchIcons } from "./order-match-column.constants";
+import { OrderMatch } from '@shared/enums/order-management';
+import { orderMatchColorClasses, orderMatchIcons } from './order-match-column.constants';
 
 
 @Component({

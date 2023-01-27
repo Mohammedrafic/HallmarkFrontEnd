@@ -1,5 +1,5 @@
-import { FieldSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
-import { SelectionSettingsModel } from "@syncfusion/ej2-grids/src/grid/base/grid-model";
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { SelectionSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
 export const AllowedCredentialFileExtensions: string = '.pdf, .jpg, .jpeg, .png';
 

@@ -1,28 +1,30 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 
 import {
   BulkVerifyCandidateCredential,
   CandidateCredential,
   CandidateCredentialResponse,
   CredentialGroupedFiles,
-  CredentialRequestParams,
-} from "@shared/models/candidate-credential.model";
-import { CandidateImportRecord, CandidateImportResult } from "@shared/models/candidate-profile-import.model";
-import { CredentialStatus } from "@shared/enums/status";
-import { CredentialType } from "@shared/models/credential-type.model";
-import { Credential } from "@shared/models/credential.model";
+  CredentialRequestParams
+} from '@shared/models/candidate-credential.model';
+import { CandidateImportRecord, CandidateImportResult } from '@shared/models/candidate-profile-import.model';
+import { CredentialStatus } from '@shared/enums/status';
+import { CredentialType } from '@shared/models/credential-type.model';
+import { Credential } from '@shared/models/credential.model';
 import { Candidate } from 'src/app/shared/models/candidate.model';
 import { Education } from 'src/app/shared/models/education.model';
 import { Experience } from 'src/app/shared/models/experience.model';
+import { AppState } from '../../store/app.state';
+import { Store } from '@ngxs/store';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CandidateService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private store: Store) {}
 
   public getCandidateById(id: number): Observable<Candidate> {
     return this.http.get<Candidate>(`/api/CandidateProfile/${id}`);
@@ -77,29 +79,68 @@ export class CandidateService {
   }
 
   public getCredentialByCandidateId(params: CredentialRequestParams, id: number): Observable<CandidateCredentialResponse> {
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const endpoint = new Map<boolean, string>([
+      [true, `/api/CandidateCredentials/candidateProfileId/${id}`],
+      [false, `/api/EmployeeCredentials/all`],
+    ]);
+
     return this.http.get<CandidateCredentialResponse>(
-      `/api/CandidateCredentials/candidateProfileId/${id}`,
+      endpoint.get(isAgencyArea) as string,
       { params: { ... params } }
-    );
+    ).pipe(map((res: any) => {
+      if (isAgencyArea) {
+        return res;
+      } else {
+        return {
+          credentials: {
+          ...res,
+            items: res.items.map((item: any) => {
+              return {
+                ...item,
+                credentialFiles: item.files,
+                createdUntil: item.certifiedUntil,
+                createdOn: item.certifiedOn,
+                masterName: item.credential,
+                number: item.credentialNumber
+              };
+            }),
+          }};
+      }
+    }));
   }
 
   public getMasterCredentials(searchTerm: string, credentialTypeId: number | string): Observable<Credential[]> {
-    return this.http.get<Credential[]>(`/api/MasterCredentials/forAgency`, {
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const endpoint = new Map<boolean, string>([
+      [true, '/api/MasterCredentials/forAgency'],
+      [false, '/api/MasterCredentials'],
+    ]);
+    return this.http.get<Credential[]>(endpoint.get(isAgencyArea) as string, {
       params: { SearchTerm: searchTerm, CredentialTypeId: credentialTypeId },
     });
   }
 
   public saveCredential(credential: CandidateCredential): Observable<CandidateCredential> {
-    return credential.id
-      ? this.http.put<CandidateCredential>(`/api/CandidateCredentials`, credential)
-      : this.http.post<CandidateCredential>(`/api/CandidateCredentials`, credential);
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const endpoint = new Map<boolean, string>([
+      [true, '/api/CandidateCredentials'],
+      [false, '/api/EmployeeCredentials'],
+    ]);
+    return this.http[credential.id ? 'put' : 'post']<CandidateCredential>(endpoint.get(isAgencyArea) as string, credential);
   }
+
   public verifyCandidatesCredentials(credentials: BulkVerifyCandidateCredential): Observable<CandidateCredential[]> {
      return this.http.put<CandidateCredential[]>(`/api/CandidateCredentials/verifyCandidatesCredentials`, credentials);
   }
 
   public removeCredential(credential: CandidateCredential): Observable<CandidateCredential> {
-    return this.http.delete<CandidateCredential>(`/api/CandidateCredentials/${credential.id}`);
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const endpoint = new Map<boolean, string>([
+      [true, `/api/CandidateCredentials/${credential.id}`],
+      [false, `/api/EmployeeCredentials/${credential.id}`],
+    ]);
+    return this.http.delete<CandidateCredential>(endpoint.get(isAgencyArea) as string);
   }
 
   public getCredentialTypes(): Observable<CredentialType[]> {
@@ -107,23 +148,45 @@ export class CandidateService {
   }
 
   public saveCredentialFiles(files: Blob[], candidateCredentialId: number): Observable<any> {
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const endpoint = new Map<boolean, string>([
+      [true, `/api/CandidateCredentials/${candidateCredentialId}/credentialFile`],
+      [false, `/api/EmployeeCredentials/${candidateCredentialId}/credentialFile`],
+    ]);
+
     const formData = new FormData();
     files.forEach((file) => formData.append('credentialFiles', file));
-    return this.http.post(`/api/CandidateCredentials/${candidateCredentialId}/credentialFile`, formData);
+    return this.http.post(endpoint.get(isAgencyArea) as string, formData);
   }
 
   public getCredentialFile(credentialFileId: number): Observable<any> {
-    return this.http.get(`/api/CandidateCredentials/credentialFile/${credentialFileId}`, { responseType: 'blob' });
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const endpoint = new Map<boolean, string>([
+      [true, `/api/CandidateCredentials/credentialFile/${credentialFileId}`],
+      [false, `/api/EmployeeCredentials/credentialFile/${credentialFileId}`],
+    ]);
+
+    return this.http.get(endpoint.get(isAgencyArea) as string, { responseType: 'blob' });
   }
 
   public getCredentialPdfFile(credentialFileId: number): Observable<any> {
-    return this.http.get(`/api/CandidateCredentials/credentialPdfFile/${credentialFileId}`, { responseType: 'blob' });
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const endpoint = new Map<boolean, string>([
+      [true, `/api/CandidateCredentials/credentialPdfFile/${credentialFileId}`],
+      [false, `/api/EmployeeCredentials/credentialPdfFile/${credentialFileId}`],
+    ]);
+
+    return this.http.get(endpoint.get(isAgencyArea) as string, { responseType: 'blob' });
   }
 
   public getCredentialGroupedFiles(candidateId: number): Observable<CredentialGroupedFiles[]> {
-    return this.http.get<CredentialGroupedFiles[]>(
-      `/api/CandidateCredentials/groupedCandidateCredentialsFiles/${candidateId}`
-    );
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const endpoint = new Map<boolean, string>([
+      [true, `/api/CandidateCredentials/groupedCandidateCredentialsFiles/${candidateId}`],
+      [false, `/api/EmployeeCredentials/groupedCandidateCredentialsFiles/${candidateId}`],
+    ]);
+
+    return this.http.get<CredentialGroupedFiles[]>(endpoint.get(isAgencyArea) as string);
   }
 
   public getCredentialStatuses(
@@ -132,10 +195,17 @@ export class CandidateService {
     credentialStatus: CredentialStatus | null,
     credentialId: number | null
   ): Observable<CredentialStatus[]> {
-    return this.http.post<CredentialStatus[]>(
-      '/api/CandidateCredentials/credentialStatuses',
-      { isOrganization, orderId, credentialStatus, credentialId}
-    );
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    if (isAgencyArea) {
+      return this.http.post<CredentialStatus[]>(
+        '/api/CandidateCredentials/credentialStatuses',
+        { isOrganization, orderId, credentialStatus, credentialId}
+      );
+    } else {
+      const statuses = Object.values(CredentialStatus).filter((v) => !isNaN(Number(v)));
+      return of(statuses) as Observable<CredentialStatus[]>;
+    }
+
   }
 
   public getCandidateProfileTemplate(): Observable<any> {
@@ -157,8 +227,14 @@ export class CandidateService {
   }
 
   public downloadCredentialFiles(candidateProfileId: number, candidateCredentialFileIds: number[]): Observable<Blob> {
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const endpoint = new Map<boolean, string>([
+      [true, '/api/CandidateCredentials/bulkDownload'],
+      [false, '/api/EmployeeCredentials/bulkDownload'],
+    ]);
+
     return this.http.post(
-      '/api/CandidateCredentials/bulkDownload',
+      endpoint.get(isAgencyArea) as string,
       { candidateProfileId, candidateCredentialFileIds },
       { responseType: 'blob' }
     );

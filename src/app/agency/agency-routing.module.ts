@@ -4,7 +4,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { AgencyComponent } from './agency.component';
 import { AgencyListComponent } from './agency-list/agency-list.component';
 import { AddEditAgencyComponent } from './agency-list/add-edit-agency/add-edit-agency.component';
-import { CandidatesComponent } from './candidates/candidates.component';
 import { AddEditCandidateComponent } from './candidates/add-edit-candidate/add-edit-candidate.component';
 import { ClearAgencyGuard } from './guards/clear-agency.guard';
 import { ProfileComponent } from '@agency/profile/profile.component';
@@ -61,7 +60,10 @@ const routes: Routes = [
       },
       {
         path: 'candidates',
-        component: CandidatesComponent,
+        loadChildren: () =>
+          import('../agency/candidates/candidates.module').then(
+            (m: typeof import('../agency/candidates/candidates.module')) => m.CandidatesModule
+          ),
         data: {
           isAgencyArea: true,
         },

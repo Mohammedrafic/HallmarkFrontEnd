@@ -2,8 +2,13 @@ import { TabsModel } from '@shared/components/tabs/tabs.model';
 import { CandidateProfileComponent } from '@client/candidates/candidate-profile/candidate-profile.component';
 import { CandidateWorkCommitmentComponent } from '../candidate-work-commitment/candidate-work-commitment.component';
 import { DepartmentsComponent } from '@client/candidates/departments/departments.component';
+import { CredentialsComponent } from '@client/candidates/credentials/credentials.component';
 
-type TabComponents = CandidateProfileComponent | CandidateWorkCommitmentComponent | DepartmentsComponent;
+type TabComponents =
+  | CandidateProfileComponent
+  | CandidateWorkCommitmentComponent
+  | DepartmentsComponent
+  | CredentialsComponent;
 
 export const tabsConfig: TabsModel<TabComponents>[] = [
   {
@@ -32,6 +37,6 @@ export const tabsConfig: TabsModel<TabComponents>[] = [
     subtitle: '',
     isRequired: false,
     disabled: true,
-    component: null,
+    component: CredentialsComponent,
   },
 ];

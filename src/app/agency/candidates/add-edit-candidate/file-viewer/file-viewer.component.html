@@ -69,18 +69,18 @@
                 <input class="smallimput" id="name" type="number" [formControl]="pageSelection">
                 <span> of {{ totalPages }} </span>
               </div>
-              <pdf-viewer class="pdf-container" 
+              <pdf-viewer class="pdf-container"
                 [src]="loadedFileUrl"
                 [render-text]="true"
                 [fit-to-page]="true"
                 [original-size]="false"
                 [page]="page"
-                [zoom]="zoom" 
+                [zoom]="zoom"
                 (pagechanging)="pagechanging($event)"
                 (after-load-complete)="afterLoadComplete($event)"
               ></pdf-viewer>
             </div>
-            <div *ngIf="imageMode" class="image-container"><img class="image" [src]="imageSrs"/></div>  
+            <div *ngIf="imageMode" class="image-container"><img class="image" [src]="imageSrs"/></div>
           </div>
         </div>
       </section>
