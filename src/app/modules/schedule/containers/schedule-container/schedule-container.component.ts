@@ -4,16 +4,16 @@ import { Store } from '@ngxs/store';
 import { Observable, switchMap, takeUntil } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
-import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
-import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { Destroyable } from '@core/helpers';
-
-import { TabListConfig } from '../../constants';
+import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
+import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
+import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
-import { ActiveTabIndex } from '../../enums';
 import { ScheduleGridAdapter } from '../../adapters';
-import { ScheduleApiService } from '../../services';
+import { TabListConfig } from '../../constants';
+import { ActiveTabIndex } from '../../enums';
 import * as ScheduleInt from '../../interface';
+import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 
 @Component({
   selector: 'app-schedule-container',
@@ -42,12 +42,15 @@ export class ScheduleContainerComponent extends Destroyable {
 
   datePickerLimitations: DatePickerLimitations;
 
+  chipsData: ChipItem[];
+
   private selectedCandidate: ScheduleInt.ScheduleCandidate | null;
 
   constructor(
     private store: Store,
     private cdr: ChangeDetectorRef,
     private scheduleApiService: ScheduleApiService,
+    private filterService: ScheduleFiltersService,
   ) {
     super();
 
@@ -65,6 +68,7 @@ export class ScheduleContainerComponent extends Destroyable {
   }
 
   changeFilters(filters: ScheduleInt.ScheduleFilters): void {
+    //TODO: make filters as plain arrays number;
     this.scheduleFilters = {
       ...this.scheduleFilters,
       ...filters,
@@ -106,6 +110,7 @@ export class ScheduleContainerComponent extends Destroyable {
   }
 
   updateScheduleFilter(data: ScheduleInt.ScheduleFiltersData): void {
+    this.chipsData = data.chipsData;
     this.changeFilters(data.filters);
     this.appliedFiltersAmount = data.filteredItems?.length;
   }
@@ -116,6 +121,10 @@ export class ScheduleContainerComponent extends Destroyable {
       this.scheduleFilters.firstLastNameOrId = '';
     }
     this.detectWhatDataNeeds();
+  }
+
+  deleteFilterItem(event: ChipDeleteEventType): void {
+    this.filterService.deleteInlineChip(event);
   }
 
   private initScheduleData(isLoadMore = false): void {

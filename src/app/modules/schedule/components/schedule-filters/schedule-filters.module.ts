@@ -6,7 +6,6 @@ import { MultiSelectAllModule } from "@syncfusion/ej2-angular-dropdowns";
 
 import { FilterDialogModule } from "@shared/components/filter-dialog/filter-dialog.module";
 import { ScheduleFiltersComponent } from './schedule-filters.component';
-import { ScheduleFiltersService } from '../../services/schedule-filters.service';
 
 @NgModule({
   declarations: [
@@ -19,6 +18,5 @@ import { ScheduleFiltersService } from '../../services/schedule-filters.service'
     ReactiveFormsModule,
   ],
   exports: [ScheduleFiltersComponent],
-  providers: [ScheduleFiltersService],
 })
 export class ScheduleFiltersModule {}

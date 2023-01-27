@@ -1,7 +1,10 @@
+import { DropdownOption } from '@core/interface';
+import { ControlTypes } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { PageOfCollections } from '@shared/models/page.model';
-
-import { FilterColumn } from 'src/app/dashboard/models/widget-filter.model';
+import { ValueType } from '@syncfusion/ej2-angular-grids';
+import { ChipItem } from '../../../shared/components/inline-chips';
 import { ScheduleOrderType, ScheduleType } from '../enums';
 
 export interface ScheduleCandidate {
@@ -74,6 +77,15 @@ export interface ScheduleCardConfig {
   showTitleToolTip?: boolean;
 }
 
+export interface ScheduleFilterItem {
+  type: ControlTypes,
+  dataSource: DropdownOption[],
+  valueField: string;
+  valueId: string;
+  valueType: ValueType;
+  filterTitle: string;
+}
+
 export interface ScheduleFilters {
   firstLastNameOrId?: string;
   startDate?: string | Date;
@@ -86,14 +98,21 @@ export interface ScheduleFilters {
   pageSize?: number;
 }
 
-export interface ScheduleFiltersColumnsDataModel {
-  regionIds: FilterColumn;
-  locationIds: FilterColumn;
-  departmentsIds: FilterColumn
-  skillIds: FilterColumn;
+export interface ScheduleFiltersConfig {
+  regionIds: ScheduleFilterItem;
+  locationIds: ScheduleFilterItem;
+  departmentsIds: ScheduleFilterItem;
+  skillIds: ScheduleFilterItem;
 }
 
 export interface ScheduleFiltersData {
   filters: ScheduleFilters;
   filteredItems: FilteredItem[];
+  chipsData: ChipItem[],
+}
+
+export interface ScheduleFilterStructure {
+  regions: OrganizationRegion[];
+  locations: OrganizationLocation[];
+  departments: OrganizationDepartment[];
 }
