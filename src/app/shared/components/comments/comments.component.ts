@@ -37,7 +37,7 @@ export class CommentsComponent {
   }
   @Input() set externalCommentConfiguration(value: boolean | null | undefined) {
     this.CommentConfiguration = value;
-    if (this.isAgencyUser||this.CommentConfiguration==true) {
+    if (this.isAgencyUser || this.CommentConfiguration === true) {
       this.isExternal = true;
     }
   }
@@ -45,7 +45,7 @@ export class CommentsComponent {
     return this.CommentConfiguration;
   }
 
-  public CommentConfiguration:boolean|null|undefined;
+  public CommentConfiguration: boolean | null | undefined;
   public commentsList: Comment[] = [];
   @Input() commentContainerId: number;
   @Input() isCreating: boolean = false;
@@ -63,7 +63,7 @@ export class CommentsComponent {
 
   public selectedFilter = CommentsFilter.All;
   public showExternal = false;
-  public commentsFilterItems = [ CommentsFilter.All, CommentsFilter.External, CommentsFilter.Internal ];
+  public commentsFilterItems = [CommentsFilter.All, CommentsFilter.External, CommentsFilter.Internal];
   public commentsFilter = CommentsFilter;
   public isExternal = false;
   public isAgencyUser = false;
@@ -104,7 +104,7 @@ export class CommentsComponent {
     });
     const user = this.store.selectSnapshot(UserState).user;
     this.isAgencyUser = user.businessUnitType === BusinessUnitType.Agency;
-    if (this.isAgencyUser||this.CommentConfiguration==true) {
+    if (this.isAgencyUser || this.CommentConfiguration === true) {
       this.isExternal = true;
     }
   }
@@ -115,11 +115,11 @@ export class CommentsComponent {
   }
 
   private scrollToLastMessage(): void {
-    this.body?.nativeElement.lastElementChild?.scrollIntoView({ block: 'nearest'});
+    this.body?.nativeElement.lastElementChild?.scrollIntoView({ block: 'nearest' });
   }
 
   private scrollToSpecificMessage(messageEl: HTMLElement): void {
-    messageEl.scrollIntoView({ block: 'nearest'});
+    messageEl.scrollIntoView({ block: 'nearest' });
   }
 
   private hasUnread(): boolean {

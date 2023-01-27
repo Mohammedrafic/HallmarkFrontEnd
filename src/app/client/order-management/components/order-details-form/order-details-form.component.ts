@@ -137,8 +137,8 @@ export class OrderDetailsFormComponent extends Destroyable implements OnInit {
 
   @Output() orderTypeChanged = new EventEmitter<OrderType>();
   @Output() hourlyRateSync = new EventEmitter<string>();
-  @Input() externalCommentConfiguration?:boolean|null;
-  
+  @Input() public externalCommentConfiguration ?: boolean | null; 
+
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
