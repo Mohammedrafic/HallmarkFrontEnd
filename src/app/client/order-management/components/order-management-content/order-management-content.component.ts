@@ -1932,11 +1932,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.isOrgIRPEnabled = !!isIRPEnabled;
       this.isOrgVMSEnabled = !!isVMCEnabled;
 
-      this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.previousSelectedSystemId);
-
       this.setPreviousSelectedSystem();
       this.activeSystem = this.previousSelectedSystemId
         ?? DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+      this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem);
 
       this.initGridColumns();
       this.getOrders();

@@ -503,10 +503,10 @@ export class InvoicesState {
     { patchState, getState, dispatch }: StateContext<InvoicesModel>,
     { payload }: Invoices.GetPendingApproval
   ): Observable<PendingApprovalInvoicesData | void> {
-    const state = getState();
+    const { invoicesFilters } = getState();
 
     return this.invoicesAPIService.getPendingApproval({
-      ...state.invoicesFilters,
+      ...invoicesFilters,
       ...payload,
     },
       getState().isAgencyArea,
