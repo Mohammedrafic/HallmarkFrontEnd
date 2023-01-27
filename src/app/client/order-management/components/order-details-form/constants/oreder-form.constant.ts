@@ -1,5 +1,5 @@
 import { Validators } from '@angular/forms';
-import { ONLY_NUMBER, ONLY_NUMBER_AND_DOT } from '@shared/constants';
+import {  NUMBER_AND_ONE_DECIMAL, ONLY_NUMBER_AND_DOT } from '@shared/constants';
 
 export const ValidatorsListForNumberWithDots = [
   Validators.maxLength(10),
@@ -7,7 +7,7 @@ export const ValidatorsListForNumberWithDots = [
 ];
 export const ValidatorsListForNumber = [
   Validators.maxLength(10),
-  Validators.pattern(ONLY_NUMBER_AND_DOT),
+  Validators.pattern(NUMBER_AND_ONE_DECIMAL),
 ];
 export const GeneralInformationControlsConfigForPerDiem = [
   {

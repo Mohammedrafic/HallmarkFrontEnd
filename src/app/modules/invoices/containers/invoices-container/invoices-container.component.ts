@@ -132,6 +132,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public organizationsList: DataSourceItem[];
 
+  private previousSelectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private invoicesService: InvoicesService,
@@ -148,7 +150,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
     this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
-    this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.ManualInvoicePending : 0;
+    this.initDefaultSelectedTabId();
     this.selectTab(0);
     this.tabConfig = this.invoicesContainerService.getTabConfig(this.selectedTabIdx);
   }
@@ -239,6 +241,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public selectTab(tabIdx: number, tabsConfig: unknown[] = []): void {
+    this.previousSelectedTabIdx = this.selectedTabIdx;
     if (this.selectedTabIdx === tabIdx) {
       return;
     }
@@ -248,7 +251,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     if (tabsConfig.length) {
       this.selectedTabId = (tabsConfig[tabIdx] as Interfaces.InvoicesTabItem).tabId;
     } else {
-      this.selectedTabId = 0;
+      this.initDefaultSelectedTabId();
     }
 
     this.store.dispatch([
@@ -334,7 +337,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public changePageSize(pageSize: number): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({
       pageSize,
-    }, true));
+    }, this.previousSelectedTabIdx === this.selectedTabIdx));
+    this.previousSelectedTabIdx = this.selectedTabIdx;
   }
 
   public changeSorting(event: string): void {
@@ -532,5 +536,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           || this.invoiceContainerConfig.invoicePayAllowed && this.payInvoiceEnabled,
         canEdit: this.invoiceContainerConfig.agencyActionsAllowed && this.approveInvoiceEnabled,
       });
+  }
+
+  private initDefaultSelectedTabId(): void {
+    this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.ManualInvoicePending : 0;
   }
 }

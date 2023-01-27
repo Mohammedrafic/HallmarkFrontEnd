@@ -356,6 +356,7 @@
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
       [order]="selectedOrder"
+      [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
     ></app-onboarded-candidate>
   </ng-template>
 
@@ -399,6 +400,7 @@
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
       [order]="selectedOrder"
+      [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
     ></app-offer-deployment>
   </ng-template>
   <ng-template #footerTemplate>

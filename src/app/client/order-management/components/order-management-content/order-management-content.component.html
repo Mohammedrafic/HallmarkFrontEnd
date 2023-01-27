@@ -1,5 +1,5 @@
 <app-button-group
-  class="button-group"
+  class="button-group system-buttons"
   *ngIf="isIRPFlagEnabled"
   [buttonOptions]="systemGroupConfig"
   (buttonChange)="buttonGroupChange($event)"
@@ -1113,6 +1113,7 @@
   [activeSystem]="activeSystem"
   [orderPositionSelected$]="orderPositionSelected$"
   [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"
+  [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"
   (closeReOrderEmitter)="onAddReorderClose()"

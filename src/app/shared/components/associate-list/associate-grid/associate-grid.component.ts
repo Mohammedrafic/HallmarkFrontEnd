@@ -73,6 +73,10 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
     this.isAlive = false;
   }
 
+  public override updatePage(): void {
+    this.dispatchNewPage();
+  }
+
   public onEdit({ index, ...row }: { index: string } & AssociateOrganizationsAgency): void {
     this.grid.selectRow(Number(index) + 1);
     this.openEditDialog.emit(row);
@@ -112,7 +116,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   }
 
   private dispatchNewPage(): void {
-    this.store.dispatch(new TiersException.GetAssociateListPage(this.currentPage, this.pageSize));
+    this.store.dispatch(new TiersException.GetAssociateListPage(this.currentPage, this.pageSize, this.orderBy));
   }
 
   private subscribeOnAssociateOrgAgencyDialogEvent(): void {

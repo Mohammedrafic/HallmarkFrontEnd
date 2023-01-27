@@ -12,7 +12,7 @@ import { Tier } from '@shared/components/associate-list/interfaces';
 export namespace TiersException {
   export class GetAssociateListPage {
     static readonly type = TIERS_EXCEPTION_ACTION.GET_ASSOCIATE_LIST;
-    constructor(public pageNumber: number, public pageSize: number) {}
+    constructor(public pageNumber: number, public pageSize: number, public orderBy: string) {}
   }
 
   export class DeleteAssociateOrganizationsAgencyById {

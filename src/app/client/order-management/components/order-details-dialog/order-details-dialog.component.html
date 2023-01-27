@@ -12,7 +12,7 @@
         <div class="e-card-header">
           <div class="e-card-header-caption">
             <h3 class="e-card-title">
-              {{ (isReOrder && activeSystem !==  systemType.IRP) ? 'Re-Order' : 'Order' }} ID 
+              {{ (isReOrder && activeSystem !==  systemType.IRP) ? 'Re-Order' : 'Order' }} ID
               {{ order?.organizationPrefix }}-{{ order?.publicId }}
             </h3>
             <div class="order-statuses">
@@ -151,7 +151,7 @@
       </section>
       <div class="order-tabs">
         <ejs-tab #tab *ngIf="activeSystem !==  systemType.IRP ? orderStatus.Incomplete !== order?.status
-          : orderStatus.Incomplete !== order?.irpOrderMetadata?.status" 
+          : orderStatus.Incomplete !== order?.irpOrderMetadata?.status"
         (selecting)="onTabSelecting($event)">
           <e-tabitems>
             <e-tabitem>
@@ -170,6 +170,7 @@
               </ng-template>
               <ng-template #content>
                 <app-extension-candidate
+                  [hasCanEditOrderBillRatePermission]="hasCanEditOrderBillRatePermission"
                   [currentOrder]="order"
                   [candidateOrder]="candidateOrderPage"
                   [dialogEvent]="openEvent"

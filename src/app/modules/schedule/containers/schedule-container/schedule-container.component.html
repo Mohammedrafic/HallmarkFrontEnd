@@ -1,44 +1,47 @@
-<app-page-toolbar>
-  <ng-container left>
+<div class="control-container">
+  <div class="control-group ">
     <app-tabs-list
-      class="table-tabs irp"
-      [tabConfig]="tabsListConfig"
-      (changeTab)="changeTab($event)"
-    >
-    </app-tabs-list>
-  </ng-container>
-  <ng-container right>
-    <button
-      *ngIf="activeTabIndex === tabIndex.Scheduling"
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      cssClass="e-outline button-filter"
-      (click)="showFilters()"
-    >
-      <div class="filter-button-content">
-        <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-pill align-text">
-          {{ appliedFiltersAmount }}
-        </span>
-        <span class="filter-button-text">Filters</span> <i-feather name="sliders" class="icon"></i-feather>
-      </div>
-    </button>
-    <app-tooltip-container
-      *ngIf="activeTabIndex === tabIndex.Scheduling"
-      [showToolTip]="!scheduleSelectedSlots?.dates?.length"
-      message="Select at least one date to Schedule"
-    >
-      <button
-        ejs-button
-        appHideBeforeSyncfusionLoad
-        cssClass="e-primary"
-        [disabled]="!scheduleSelectedSlots?.dates?.length"
-        (click)="openScheduleDialog()"
+        class="table-tabs irp"
+        [tabConfig]="tabsListConfig"
+        (changeTab)="changeTab($event)"
       >
-        Schedule
-      </button>
-    </app-tooltip-container>
-  </ng-container>
-</app-page-toolbar>
+      </app-tabs-list>
+      <div>
+        <button
+          *ngIf="activeTabIndex === tabIndex.Scheduling"
+          ejs-button
+          appHideBeforeSyncfusionLoad
+          cssClass="e-outline button-filter"
+          (click)="showFilters()"
+        >
+          <div class="filter-button-content">
+            <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-pill align-text">
+              {{ appliedFiltersAmount }}
+            </span>
+            <span class="filter-button-text">Filters</span> <i-feather name="sliders" class="icon"></i-feather>
+          </div>
+        </button>
+        <app-tooltip-container
+          *ngIf="activeTabIndex === tabIndex.Scheduling"
+          [showToolTip]="!scheduleSelectedSlots?.dates?.length"
+          message="Select at least one date to Schedule"
+        >
+          <button
+            ejs-button
+            appHideBeforeSyncfusionLoad
+            cssClass="e-primary"
+            [disabled]="!scheduleSelectedSlots?.dates?.length"
+            (click)="openScheduleDialog()"
+          >
+            Schedule
+          </button>
+        </app-tooltip-container>
+      </div>
+  </div>
+  <div class="control-group block">
+    <app-inline-chips [setChips]="chipsData" (filterChipDelted)="deleteFilterItem($event)"></app-inline-chips>
+  </div>
+</div>
 
 <div class="content">
   <ng-container *ngIf="activeTabIndex === tabIndex.Scheduling">

@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
+
 import { Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
+import { filter, Observable, take, takeUntil } from 'rxjs';
 
 import { ConfirmService } from '@shared/services/confirm.service';
-
+import { AbstractPermission } from '@shared/helpers/permissions';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-form.component';
 import { ADD_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, EDIT_CONFIRM_TEXT } from '@shared/constants';
@@ -21,7 +22,7 @@ import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
   templateUrl: './bill-rates.component.html',
   styleUrls: ['./bill-rates.component.scss'],
 })
-export class BillRatesComponent implements OnInit, OnDestroy {
+export class BillRatesComponent extends AbstractPermission implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.predefinedBillRatesOptions)
   billRatesOptions$: Observable<BillRateOption[]>;
 
@@ -51,13 +52,15 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
 
   private editBillRateIndex: string | null;
-  private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private confirmService: ConfirmService, private store: Store) {
+  constructor(private confirmService: ConfirmService, protected override store: Store) {
+    super(store);
     this.billRatesControl = new FormArray([]);
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
+
     this.billRatesChanges();
 
     this.billRateForm = BillRateFormComponent.createForm();
@@ -73,11 +76,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.intervalMaxField.valueChanges.subscribe(() =>
       this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
   }
 
   public onAddBillRate(): void {
@@ -235,7 +233,10 @@ export class BillRatesComponent implements OnInit, OnDestroy {
             okButtonLabel: 'Yes',
             okButtonClass: 'ok-button',
           })
-          .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
+          .pipe(
+            filter(Boolean),
+            takeUntil(this.componentDestroy())
+          )
           .subscribe(() => {
             if (!this.editBillRateIndex) {
               this.billRatesControl.push(this.fromValueToBillRate(value));
@@ -275,7 +276,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   private billRatesChanges(): void {
     this.billRatesOptions$.pipe(
       filter((data) => !!data.length),
-      takeUntil(this.unsubscribe$),
+      takeUntil(this.componentDestroy()),
     ).subscribe((options: BillRateOption[]) => {
       this.billRatesOptions = options;
     });

@@ -103,7 +103,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.eliteBusinessUnitId = JSON.parse((localStorage.getItem('BussinessUnitID') || '0')) as number;
     (!this.eliteBusinessUnitId)?this.eliteBusinessUnitId=0:""
-    window.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
     const user = this.store.selectSnapshot(UserState.user);
     this.subscribeUserChange();
     this.isOrganizationAgencyAreaChange();

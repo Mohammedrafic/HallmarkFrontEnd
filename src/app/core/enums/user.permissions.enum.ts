@@ -92,6 +92,8 @@ export enum UserPermissions {
   CanOnboardCandidate = 1860,
   CanRejectCandidate = 1865,
   CanCloseOrders = 1870,
+  CanEditOrderBillRate = 1875,
+  CanEnterJoiningCompletionBonus = 1880,
   SettingsBillRates = 1899,
   CanViewSettingsBillRates = 1900,
   CanEditSettingsBillRates = 1901,

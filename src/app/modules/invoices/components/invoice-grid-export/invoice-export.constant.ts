@@ -1,6 +1,6 @@
 import { formatDate } from '@angular/common';
 
-import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
+import { AgencyInvoicesGridTab, InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
 import { ExportColumn } from '@shared/models/export.model';
 import { AGENCY_INVOICE_TABS, ORGANIZATION_INVOICE_TABS } from '../../constants';
 import { InvoicesTabItem } from '../../interfaces';
@@ -42,4 +42,23 @@ export const GetTabsToExport = (isAgency: boolean): number[] => {
 export const GetExportFileName = (isAgency: boolean, tabIndex: number): string => {
   const tabLists = GetTabLists(isAgency);
   return `${tabLists[tabIndex].title} ${formatDate(Date.now(), 'MM/dd/yyyy hh:mm a', 'en-US')}`;
+};
+
+export const GetInvoiceState = (isAgency: boolean, tab: OrganizationInvoicesGridTab) => {
+  return isAgency ? null : getOrgInvoiceState(tab);
+};
+
+export const getOrgInvoiceState = (tab: OrganizationInvoicesGridTab): InvoiceState | null  => {
+  switch (tab) {
+    case OrganizationInvoicesGridTab.PendingApproval:
+      return InvoiceState.SubmittedPendingApproval;
+    case OrganizationInvoicesGridTab.PendingPayment:
+      return InvoiceState.PendingPayment;
+    case OrganizationInvoicesGridTab.Paid:
+      return InvoiceState.Paid;
+    case OrganizationInvoicesGridTab.All:
+      return null;
+    default:
+      return null;
+  }
 };

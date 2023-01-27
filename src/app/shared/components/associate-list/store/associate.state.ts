@@ -100,9 +100,9 @@ export class AssociateListState {
   @Action(TiersException.GetAssociateListPage)
   GetAssociateListPage(
     { patchState }: StateContext<AssociateStateModel>,
-    { pageNumber, pageSize }: TiersException.GetAssociateListPage
+    { pageNumber, pageSize, orderBy }: TiersException.GetAssociateListPage
   ): Observable<AssociateOrganizationsAgencyPage> {
-    return this.associateService.getAssociateListByPage(pageNumber, pageSize).pipe(
+    return this.associateService.getAssociateListByPage(pageNumber, pageSize, orderBy).pipe(
       tap((payload) => {
         patchState({ associateListPage: payload });
         return payload;

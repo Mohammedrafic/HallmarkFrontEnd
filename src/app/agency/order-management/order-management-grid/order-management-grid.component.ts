@@ -780,6 +780,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.openDetailsTab = false;
         this.openChildDialog.next(false);
         this.selectedCandidate = null;
+        if(this.alertOrderId>0)
+          this.openDetailsTab = true;
         if (this.selectedReOrder?.selected.reOrder !== this.selectedOrder.orderId) {
           this.selectedReOrder = null;
         }
