@@ -48,7 +48,7 @@ import { optionFields } from '@shared/constants';
 import { FileStatusCode } from '@shared/enums/file.enum';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateStatus, CredentialStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { CredentialStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import {
   CandidateCredential,
   CandidateCredentialGridItem,
@@ -69,7 +69,6 @@ import {
   DisableEditMessage,
 } from './credentials-grid.constants';
 import { AddCredentialForm, SearchCredentialForm } from './credentials-grid.interface';
-import { Verify } from 'crypto';
 
 @Component({
   selector: 'app-credentials-grid',
@@ -205,7 +204,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     private actions$: Actions,
     private credentialGridService: CredentialGridService,
     private confirmService: ConfirmService,
-    private readonly ngZone: NgZone
+    private readonly ngZone: NgZone,
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
@@ -286,6 +285,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.saveCredential(this.addCredentialForm.getRawValue());
     } else {
       this.addCredentialForm.markAsDirty();
+      this.addCredentialForm.markAllAsTouched();
     }
   }
   public verifyCredentials(): void {
@@ -297,9 +297,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
      this.store.dispatch(
       new VerifyCandidatesCredentials(request)
     );
-    
+
     }
-    
+
   }
   public mapCredential(cred:CandidateCredential):CandidateCredential
   {
@@ -312,12 +312,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       if (cred.createdUntil != null) {
         cred.createdUntil = DateTimeHelper.toUtcFormat(cred.createdUntil);
       }
-     
+
       cred.orderId= this.orderId;
-     
+
     }
     return cred;
-  } 
+  }
 
   public selectRowsPerPage(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
@@ -643,7 +643,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       .pipe(ofActionSuccessful(VerifyCandidatesCredentialsSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((credential: { payload: CandidateCredential[] }) => {
         this.selectedItems = [];
-        this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));      
+        this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
       });
       this.actions$
       .pipe(ofActionSuccessful(VerifyCandidatesCredentialsFailed), takeUntil(this.unsubscribe$))
