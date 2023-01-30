@@ -90,6 +90,11 @@ export namespace TiersException {
     constructor( public payload: DepartmentsTierDTO ) {}
   }
 
+  export class GetGeneralTiers {
+    static readonly type = TIERS_EXCEPTION_ACTION.GET_GENERAL_TIERS;
+    constructor( public payload: DepartmentsTierDTO ) {}
+  }
+
   export class SaveTierException {
     static readonly type = TIERS_EXCEPTION_ACTION.SAVE_TIER_EXCEPTION;
     constructor(

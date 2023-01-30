@@ -229,6 +229,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     this.isTierSettingsDialog || setDataSourceValue(this.dialogConfig.fields, 'organizationTierId', []);
     this.resetToggles();
     this.tierForm?.reset({}, {emitEvent: false});
+    this.changeDetection.markForCheck();
   }
 
   private createForm(): void {

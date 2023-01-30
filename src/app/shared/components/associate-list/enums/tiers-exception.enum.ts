@@ -20,5 +20,6 @@ export enum TIERS_EXCEPTION_ACTION {
   DELETE_TIER_EXCEPTION = '[associate] Delete Tier Exception',
   SELECTED_ORG_AGENCY = '[associate] Get Selected Org/Agency',
   UPDATE_PAGE_AFTER_SUCCESS_ACTION = '[associate] update page after success action',
-  SAVE_TIER = '[associate] Save Tier'
+  SAVE_TIER = '[associate] Save Tier',
+  GET_GENERAL_TIERS = '[associate] Get General Tiers',
 }

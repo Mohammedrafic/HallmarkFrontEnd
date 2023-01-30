@@ -33,7 +33,7 @@ export class TierSettingsComponent extends DestroyableDirective implements OnIni
   public tierControl: FormControl = new FormControl();
   public tiersList: TierList[];
 
-  @Select(AssociateListState.getTiersList)
+  @Select(AssociateListState.getGeneralTiersList)
   public tierList$: Observable<TierList[]>;
 
   ngOnInit(): void {
@@ -49,7 +49,7 @@ export class TierSettingsComponent extends DestroyableDirective implements OnIni
     ).subscribe((tiers: TierList[]) => {
       this.tiersList = [
         NotAssignedListOption,
-        ...tiers
+        ...tiers,
       ] as TierList[];
     });
   }

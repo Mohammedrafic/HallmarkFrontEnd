@@ -223,7 +223,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
       new TiersException.GetFeeExceptionsInitialData(associateOrganizationsAgency.organizationId!),
       new TiersException.GetJobDistributionInitialData(),
       new TiersException.GetPartnershipSettings(associateOrganizationsAgency.id!),
-      new TiersException.GetTiers(
+      new TiersException.GetGeneralTiers(
         createDepartmentsTier(associateOrganizationsAgency.organizationId!)
       ),
       new TiersException.GetSelectedOrgAgency(associateOrganizationsAgency),

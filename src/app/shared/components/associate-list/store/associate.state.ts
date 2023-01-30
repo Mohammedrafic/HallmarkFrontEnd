@@ -36,6 +36,7 @@ import { AssociateStateModel, TierExceptionPage, TierList } from '@shared/compon
     jobDistributionInitialData: null,
     partnershipSettings: null,
     tierList: null,
+    generalTierList: null,
     selectedOrganizationAgency: null,
     tiersExceptionByPage: null,
     associateAgencyOrg: [],
@@ -75,6 +76,11 @@ export class AssociateListState {
   @Selector()
   static associateAgencyOrg(state: AssociateStateModel): { id: number, name: string }[] {
     return state.associateAgencyOrg;
+  }
+
+  @Selector()
+  static getGeneralTiersList(state: AssociateStateModel): TierList[] | null {
+    return state.generalTierList;
   }
 
   @Selector()
@@ -252,6 +258,21 @@ export class AssociateListState {
       tap((payload) => {
         patchState({ feeSettings: payload });
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(TiersException.GetGeneralTiers)
+  GetGeneralTiers(
+    { patchState, dispatch }: StateContext<AssociateStateModel>,
+    { payload }: TiersException.GetGeneralTiers
+  ): Observable<TierList[] | void> {
+    return this.associateService.getTiers(payload).pipe(
+      tap((generalTierList: TierList[]) => {
+        patchState({generalTierList});
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));

@@ -19,6 +19,7 @@ export interface AssociateStateModel {
   tierList: TierList[] | null;
   selectedOrganizationAgency: AssociateOrganizationsAgency | null;
   tiersExceptionByPage: TierExceptionPage | null;
+  generalTierList: TierList[] | null;
 }
 
 export interface TierExceptionColumn extends ICellRendererParams {
