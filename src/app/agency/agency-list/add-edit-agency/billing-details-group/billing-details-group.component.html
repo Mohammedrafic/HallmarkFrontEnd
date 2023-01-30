@@ -47,13 +47,15 @@
           <div class="input-container">
             <label>Zipcode</label>
             <div class="input-group">
-              <input
+              <ejs-maskedtextbox
+                class="e-input"
+                promptChar="_"
+                mask="00000"
                 appValidateWithMessage
                 formControlName="zipCode"
-                mask="00000||000000"
-                class="e-input"
-                type="text"
-              />
+                placeholder=" "
+                maxlength="6"
+              ></ejs-maskedtextbox>
             </div>
           </div>
         </div>
@@ -61,13 +63,29 @@
           <div class="input-container">
             <label>Phone 1</label>
             <div class="input-group">
-              <input appValidateWithMessage formControlName="phone1" mask="000-000-0000" class="e-input" type="text" />
+              <ejs-maskedtextbox
+                class="e-input"
+                promptChar="_"
+                mask="000-000-0000"
+                appValidateWithMessage
+                formControlName="phone1"
+                placeholder=" "
+                maxlength="10"
+              ></ejs-maskedtextbox>
             </div>
           </div>
           <div class="input-container">
             <label>Phone 2</label>
             <div class="input-group">
-              <input appValidateWithMessage formControlName="phone2" mask="000-000-0000" class="e-input" type="text" />
+              <ejs-maskedtextbox
+                class="e-input"
+                promptChar="_"
+                mask="000-000-0000"
+                appValidateWithMessage
+                formControlName="phone2"
+                placeholder=" "
+                maxlength="10"
+              ></ejs-maskedtextbox>
             </div>
           </div>
           <div class="input-container">

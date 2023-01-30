@@ -36,12 +36,15 @@
         <div class="input-container">
           <label for="bankZipCode">Zipcode</label>
           <div class="input-group">
-            <input appValidateWithMessage
-                   id="bankZipCode"
-                   formControlName="bankZipCode"
-                   mask="{{zipCodeMask}}"
-                   class="e-input"
-                   type="text"/>
+            <ejs-maskedtextbox
+              class="e-input"
+              promptChar="_"
+              mask="00000"
+              appValidateWithMessage
+              formControlName="bankZipCode"
+              placeholder=" "
+              maxlength="6"
+            ></ejs-maskedtextbox>
           </div>
         </div>
       </div>

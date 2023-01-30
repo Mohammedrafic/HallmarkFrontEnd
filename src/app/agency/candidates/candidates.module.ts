@@ -18,7 +18,7 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
 import { ButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { GridModule as SyncfusionGrid } from '@syncfusion/ej2-angular-grids';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
-import { TextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
+import { MaskedTextBoxModule, TextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
 import { NgxMaskModule } from 'ngx-mask';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { CandidateListModule } from '@shared/components/candidate-list/candidate-list.module';
@@ -77,7 +77,8 @@ import { CredentialsGridModule } from '@shared/components/credentials-grid/crede
     FeatherModule,
     ListBoxModule,
     GridModule,
-    CandidatesRoutingModule
+    CandidatesRoutingModule,
+    MaskedTextBoxModule,
   ],
 })
 export class CandidatesModule {}
