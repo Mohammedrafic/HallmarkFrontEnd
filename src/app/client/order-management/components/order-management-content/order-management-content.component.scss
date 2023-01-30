@@ -306,7 +306,7 @@
 }
 
 .grid-component {
-  height: calc(100% - 250px);
+  height: calc(100% - 285px);
   overflow-y: auto;
 
   @media #{$max-tablet} {
@@ -404,6 +404,15 @@
   ::ng-deep {
     .e-ddl.e-popup.e-control.e-popup-open {
       z-index: 1100;
+    }
+  }
+}
+.e-gridwithchildrow{
+  height: 100% !important;
+  .e-gridcontent{
+    height: calc(100% - 106px);
+    .e-content{
+      height : 100% !important;
     }
   }
 }

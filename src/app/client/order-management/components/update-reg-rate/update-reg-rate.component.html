@@ -1,0 +1,24 @@
+<div class="app-updatereg-rate" *ngIf="showcontent">
+    <section class="app-updatereg-rate-section">
+      <form class="general-info__form">
+          <app-numeric-textbox
+            [formGroupInstance]="updateform"
+            [required]="true"
+            [strictMode]="true"
+            (input)="checkvalue()"
+            id="regrate"
+            controlName="updaterate"
+            format="#"
+            class="app-update-reg-rate-textbox"
+            placeholder="-Update Reg Rate-"
+          ></app-numeric-textbox>
+          <div (click)="$event.stopImmediatePropagation()" class="approve">
+            <p
+            [class.disabled]="disabledbtn"
+              (click)="updateformvalue()">
+              Update Reg Rate
+            </p>
+          </div>
+      </form>
+    </section>
+</div>

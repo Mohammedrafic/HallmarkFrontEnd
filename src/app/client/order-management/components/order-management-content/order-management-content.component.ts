@@ -85,6 +85,7 @@ import {
   ReloadOrganisationOrderCandidatesLists,
   SelectNavigationTab,
   SetLock,
+  UpdateRegRateSucceeded
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -188,6 +189,7 @@ import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { BreakpointObserverService } from '@core/services';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { MiddleTabletWidth, SmallDesktopWidth, TabletWidth } from '@shared/constants/media-query-breakpoints';
+import { UpdateRegRateComponent } from '../update-reg-rate/update-reg-rate.component';
 
 @Component({
   selector: 'app-order-management-content',
@@ -202,6 +204,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @ViewChild('detailsDialog') detailsDialog: OrderDetailsDialogComponent;
   @ViewChild('tabNavigation') tabNavigation: TabNavigationComponent;
   @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
+  @ViewChild('updaterateRow') updaterateRow: UpdateRegRateComponent;
 
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
 
@@ -344,6 +347,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public isMiddleTabletWidth = false;
   public isContentSmallDesktop = false;
   public gridDomLayout: 'normal' | 'autoHeight' | 'print' | undefined;
+  public openregrateupdate:boolean = false;
+  public CurrentOrderDatas:any = [];
+
 
   private isRedirectedFromDashboard: boolean;
   private orderStaus: number;
@@ -476,6 +482,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.subscribeOnPermissions();
     this.subscribeOnChanges();
     this.firstInitGridColumns();
+    this.OnUpdateRegrateSucceededHandler();
   }
 
   ngOnDestroy(): void {
@@ -716,6 +723,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private checkSelectedChildrenItem(): void {
     const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children?.length !== 0);
     const hasSelectedChildReorders = this.selectedItems.some((itm) => itm.reOrders?.length !== 0);
+    this.selectedItems.length > 0 ? this.openregrateupdate = true : this.openregrateupdate = false;
 
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
@@ -750,6 +758,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           ? [...permPlacementColumnsToExport, ...allOrdersChildColumnsToExport]
           : permPlacementColumnsToExport;
     }
+    this.CurrentOrderDatas = [];
+    for(let i=0;i<this.selectedItems.length;i++){
+      if((this.selectedItems[i].statusText === "Open") || (this.selectedItems[i].statusText === "In progress")){
+        this.CurrentOrderDatas.push(this.selectedItems[i].id);
+      }
+    }
+
     this.cd$.next(true);
   }
 
@@ -1626,6 +1641,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ApproveOrder)).subscribe(() => {
       const [index] = this.gridWithChildRow.getSelectedRowIndexes();
       this.selectedIndex = index;
+      this.getOrders();
+    });
+  }
+
+  private OnUpdateRegrateSucceededHandler(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(UpdateRegRateSucceeded)).subscribe(() => {
+      this.gridWithChildRow.clearRowSelection();
       this.getOrders();
     });
   }
