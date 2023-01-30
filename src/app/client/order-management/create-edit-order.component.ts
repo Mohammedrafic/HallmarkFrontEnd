@@ -66,6 +66,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   private readonly organization$: Observable<Organization>;
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
+  public externalCommentConfiguration?:boolean|null;
 
   constructor(
     private router: Router,
@@ -170,7 +171,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     ).subscribe((organization: Organization) => {
       const isIRPFlag = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
       this.selectedSystem = {...createSystem(organization, isIRPFlag)};
-
+      this.externalCommentConfiguration=organization.externalCommentsConfiguration;
       this.showSystemToggle =
         this.selectedSystem.isIRP &&
         this.selectedSystem.isVMS &&

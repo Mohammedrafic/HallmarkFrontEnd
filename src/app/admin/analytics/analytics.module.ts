@@ -5,7 +5,7 @@ import { CandidateListComponent } from './candidate-list/candidate-list.componen
 import { AnalyticsRoutingModule } from './analytics-routing.module';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { LogiWebReportComponent } from '@shared/components/logi-web-report/logi-web-report.component';
-import { DropDownListModule, MultiSelectAllModule,AutoCompleteAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import { AutoCompleteAllModule, DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxsModule } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
@@ -13,7 +13,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { SecurityState } from 'src/app/security/store/security.state';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
-import { ButtonModule,CheckBoxAllModule,RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxAllModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { SharedModule } from '@shared/shared.module';
 import { CandidateJourneyComponent } from './candidate-journey/candidate-journey.component';
 import { JobDetailsComponent } from './job-details/job-details.component';
@@ -54,7 +54,6 @@ import { AccrualReportComponent } from './accrual-report/accrual-report.componen
 import { DailyOrderStatusComponent } from './daily-order-status/daily-order-status.component';
 import { CandidateStatusComponent } from './candidate-status/candidate-status.component';
 import { VendorActivityComponent } from './vendor-activity/vendor-activity.component';
-
 
 
 @NgModule({
@@ -100,11 +99,14 @@ import { VendorActivityComponent } from './vendor-activity/vendor-activity.compo
     AccrualReportComponent,
     DailyOrderStatusComponent,
     CandidateStatusComponent,
-    VendorActivityComponent  ],
+    VendorActivityComponent],
+  exports: [
+    CandidateListComponent
+  ],
   imports: [
     CommonModule,
     SharedModule,
-    FormsModule,    
+    FormsModule,
     ReactiveFormsModule,
     AnalyticsRoutingModule,
     MultiSelectAllModule,
@@ -115,7 +117,7 @@ import { VendorActivityComponent } from './vendor-activity/vendor-activity.compo
     FeatherModule,
     AutoCompleteAllModule,
     RadioButtonModule,
-    NgxsModule.forFeature([OrganizationManagementState,UserState,SecurityState,LogiReportState])
+    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState])
   ]
 })
 export class AnalyticsModule { }

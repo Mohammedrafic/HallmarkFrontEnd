@@ -166,6 +166,11 @@ export class InvoicesApiService {
     return this.http.delete<void>(`/api/Invoices/payments/${id}`);
   }
 
+  public exportInvoices(payload: ExportPayload, isAgency: boolean): Observable<Blob> {
+    const url = isAgency ? '/api/Invoices/agency/export' : '/api/Invoices/export';
+    return this.http.post(url, payload, { responseType: 'blob' });
+  }
+
   private organizationDeleteManualInvoice(id: number): Observable<void> {
     return this.http.delete<void>(`/api/ManualInvoiceRecords/${id}`);
   }

@@ -1,4 +1,4 @@
-import { CredentialStatus } from "@shared/enums/status";
+import { CredentialStatus } from '@shared/enums/status';
 import { CandidateImportRecord, CandidateImportResult } from '@shared/models/candidate-profile-import.model';
 import { BulkVerifyCandidateCredential, CandidateCredential, CredentialRequestParams } from '@shared/models/candidate-credential.model';
 import { Candidate } from 'src/app/shared/models/candidate.model';
@@ -195,6 +195,8 @@ export class GetCredentialPdfFilesSucceeded {
 
 export class GetGroupedCredentialsFiles {
   static readonly type = '[candidate] Get Grouped Credentials Files';
+  constructor(public candidateId: number) {}
+
 }
 
 export class UploadCredentialFilesSucceeded {
@@ -242,7 +244,7 @@ export class SaveCandidateImportResultSucceeded {
 
 export class DownloadCredentialFiles {
   static readonly type = '[candidate] Download Credential Files';
-  constructor(public candidateProfileId: number, public candidateCredentialFileIds: number[]) {}
+  constructor(public candidateProfileId: number, public candidateCredentialFileIds: number[], public candidateName?: string) {}
 }
 
 export class DownloadCredentialFilesSucceeded {

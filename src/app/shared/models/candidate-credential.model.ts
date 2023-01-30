@@ -5,17 +5,17 @@ export interface CandidateCredential {
   id?: number;
   candidateProfileId?: number;
   status?: number;
-  completedDate: string | null;
+  completedDate?: string | null;
   masterName?: string;
   masterCredentialId: number;
-  number: string;
-  insitute: string;
-  experience: string;
-  createdOn: string;
-  createdUntil: string;
+  number?: string;
+  insitute?: string;
+  experience?: string;
+  createdOn?: string;
+  createdUntil?: string;
   credentialFiles?: CredentialFile[];
   expireDateApplicable?: boolean;
-  orderId: number | null;
+  orderId?: number | null;
   orderMatch?: string;
   reqForOnboard?: boolean;
   reqForSubmission?: boolean;
@@ -24,6 +24,9 @@ export interface CandidateCredential {
   credentialTypeName?: string;
   rejectReason?: string;
   organizationId?: number | null;
+  credentialNumber?: string;
+  certifiedOn?: string;
+  certifiedUntil?: string;
 }
 
 export interface CandidateCredentialGridItem extends CandidateCredential {
@@ -61,6 +64,7 @@ export interface CredentialRequestParams {
   pageSize: number;
   orderId?: number;
   organizationId?: number;
+  candidateProfileId?: number;
 }
 
 export interface CredentialParams {

@@ -26,7 +26,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
 
 import { BillRate } from '@shared/models/bill-rate.model';
-import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
   GetOrganisationCandidateJob,
@@ -78,7 +78,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
   @Input() isOrderOverlapped: boolean;
+  @Input() hasCanEditOrderBillRatePermission: boolean;
 
+  @Input() order: Order;
+  
   public statusesFormControl = new FormControl();
   public openRejectDialog = new Subject<boolean>();
   public billRatesData: BillRate[] = [];

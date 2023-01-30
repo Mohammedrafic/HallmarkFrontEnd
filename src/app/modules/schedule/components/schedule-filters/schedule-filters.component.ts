@@ -4,27 +4,21 @@ import { Select, Store } from '@ngxs/store';
 import { filter, Observable, takeUntil } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { Destroyable } from '@core/helpers';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { optionFields } from '@shared/constants';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { SystemType } from '@shared/enums/system-type.enum';
-import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { FilteredItem } from '@shared/models/filter.model';
-import {
-  OrganizationDepartment,
-  OrganizationLocation,
-  OrganizationRegion,
-  OrganizationStructure,
-} from '@shared/models/organization.model';
+import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
+import { OrganizationStructureService } from '@shared/services';
 import { FilterService } from '@shared/services/filter.service';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { ScheduleFilters, ScheduleFiltersData } from '../../interface';
-import { ScheduleFiltersColumns, SkillsFieldsOptions } from '../../constants';
+import { ScheduleFiltersColumns } from '../../constants';
+import { ScheduleFilterHelper } from '../../helpers';
+import { ScheduleFilters, ScheduleFiltersData, ScheduleFilterStructure } from '../../interface';
 import { ScheduleFiltersService } from '../../services';
-import { OrganizationStructureService } from '@shared/services';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -32,7 +26,7 @@ import { OrganizationStructureService } from '@shared/services';
   styleUrls: ['./schedule-filters.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ScheduleFiltersComponent extends DestroyableDirective implements OnInit {
+export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   @Input() public count: number;
 
   @Output() public updateScheduleFilter: EventEmitter<ScheduleFiltersData> = new EventEmitter<ScheduleFiltersData>();
@@ -44,13 +38,21 @@ export class ScheduleFiltersComponent extends DestroyableDirective implements On
   private readonly skills$: Observable<Skill[]>;
 
   public filteredItems: FilteredItem[] = [];
+
   public readonly scheduleFilterFormGroup = this.scheduleFiltersService.createScheduleFilterForm();
+
   public readonly filterColumns = ScheduleFiltersColumns;
-  public readonly optionFields = optionFields;
-  public readonly skillsFields = SkillsFieldsOptions;
+
+  public readonly optionFields = { text: 'text', value: 'value' };
 
   private filters: ScheduleFilters = {} ;
-  private regions: OrganizationRegion[] = [];
+
+  private filterStructure: ScheduleFilterStructure = {
+    regions: [],
+    locations: [],
+    departments: [],
+  };
+
   private activeSystem: SystemType = SystemType.IRP;
 
   get selectedSkillsNumber(): number {
@@ -74,15 +76,16 @@ export class ScheduleFiltersComponent extends DestroyableDirective implements On
     private filterService: FilterService,
     private cdr: ChangeDetectorRef,
     private scheduleFiltersService: ScheduleFiltersService,
-    private organizationStructureService: OrganizationStructureService
+    private organizationStructureService: OrganizationStructureService,
   ) {
     super();
   }
 
   public ngOnInit(): void {
-    this.watchForOrganizationStructure();
-    this.watchForSkills();
-    this.watchForControlsValueChanges();
+    this.getOrganizationStructure();
+    this.getSkills();
+    this.watchForControls();
+    this.observeInlineChipDeleteEvent();
   }
 
   public deleteFilter(event: FilteredItem): void {
@@ -94,14 +97,12 @@ export class ScheduleFiltersComponent extends DestroyableDirective implements On
     this.scheduleFilterFormGroup.reset();
     this.filters = this.scheduleFilterFormGroup.getRawValue();
     this.filteredItems = [];
-    this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems });
+    this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems, chipsData: [] });
   }
 
   public applyFilter(): void {
     if (this.scheduleFilterFormGroup.valid) {
-      this.filters = this.scheduleFilterFormGroup.getRawValue();
-      this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
-      this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems });
+      this.setFilters();
       this.store.dispatch(new ShowFilterDialog(false));
     } else {
       this.scheduleFilterFormGroup.markAllAsTouched();
@@ -118,61 +119,51 @@ export class ScheduleFiltersComponent extends DestroyableDirective implements On
     this.scheduleFilterFormGroup.markAsUntouched();
   }
 
-  private watchForOrganizationStructure(): void {
+  private getOrganizationStructure(): void {
     this.organizationStructure$
       .pipe(
         filter(Boolean),
         map((structure: OrganizationStructure) =>
           this.organizationStructureService.getOrgStructureForIrp(structure.regions)
         ),
-        takeUntil(this.destroy$),
+        takeUntil(this.componentDestroy()),
       )
-      .subscribe((structure: OrganizationRegion[]) => {
+      .subscribe((regions: OrganizationRegion[]) => {
         if (this.filteredItems.length) {
           this.clearAllFilters();
         }
 
         this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: this.activeSystem } }));
-        this.regions = structure;
-        this.filterColumns.regionIds.dataSource = this.regions;
+        this.filterStructure = this.scheduleFiltersService.createFilterStructure(regions);
+        this.filterColumns.regionIds.dataSource = ScheduleFilterHelper.adaptRegionToOption(this.filterStructure.regions);
         this.cdr.markForCheck();
       });
   }
 
-  private watchForSkills(): void {
+  private getSkills(): void {
     this.skills$
       .pipe(
         filter(Boolean),
-        takeUntil(this.destroy$),
+        map((skills) => ScheduleFilterHelper.adaptSkillToOption(skills)),
+        takeUntil(this.componentDestroy()),
       )
-      .subscribe((skills: Skill[]) => {
+      .subscribe((skills) => {
         this.filterColumns.skillIds.dataSource = skills;
         this.cdr.markForCheck();
       });
   }
 
-  private watchForControlsValueChanges(): void {
+  private watchForControls(): void {
     this.scheduleFilterFormGroup.get('regionIds')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((val: number[]) => {
-        this.filterColumns.locationIds.dataSource = [];
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((selectedRegionIds: number[]) => {
+        this.scheduleFilterFormGroup.get('locationIds')?.patchValue([], { emitEvent: false, onlySelf: true});
 
-        if (val?.length) {
-          const regionLocations: OrganizationLocation[] = [];
-          const selectedRegions: OrganizationRegion[] = val.map((id) => {
-            return this.regions.find((region) => region.id === id) as OrganizationRegion;
-          });
-
-          this.filterColumns.locationIds.dataSource = [];
-          selectedRegions.forEach((region: OrganizationRegion) => {
-            region?.locations?.forEach((location: OrganizationLocation) => {
-              location.regionName = region.name;
-            });
-            regionLocations.push(...(region?.locations as []));
-          });
-          this.filterColumns.locationIds.dataSource.push(...sortByField(regionLocations, 'name'));
+        if (selectedRegionIds?.length) {
+          this.filterColumns.locationIds.dataSource = this.scheduleFiltersService
+          .getSelectedLocatinOptions(this.filterStructure, selectedRegionIds);
         } else {
-          this.scheduleFilterFormGroup.get('locationIds')?.setValue([]);
+          this.filterColumns.locationIds.dataSource = [];
           this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
         }
 
@@ -180,36 +171,67 @@ export class ScheduleFiltersComponent extends DestroyableDirective implements On
       });
 
     this.scheduleFilterFormGroup.get('locationIds')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((val: number[]) => {
-        this.filterColumns.departmentsIds.dataSource = [];
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((slectedLocationIds: number[]) => {
+        this.scheduleFilterFormGroup.get('departmentsIds')?.patchValue([], { emitEvent: false, onlySelf: true});
 
-        if (val?.length) {
-          const locationDepartments: OrganizationDepartment[] = [];
-          const selectedLocations: OrganizationLocation[] = val.map((id) => {
-            return (this.filterColumns.locationIds.dataSource as OrganizationLocation[])
-              .find((location: OrganizationLocation) => location.id === id) as OrganizationLocation;
-          });
-
-          selectedLocations.forEach((location: OrganizationLocation) => {
-            locationDepartments.push(...(location?.departments as []));
-          });
-
-          this.filterColumns.departmentsIds.dataSource.push(...sortByField(locationDepartments, 'name'));
+        if (slectedLocationIds?.length) {
+          this.filterColumns.departmentsIds.dataSource = this.scheduleFiltersService
+          .getSelectedDepartmentOptions(this.filterStructure, slectedLocationIds);
         } else {
-          this.scheduleFilterFormGroup.get('departmentsIds')?.setValue([]);
+          this.filterColumns.departmentsIds.dataSource = [];
           this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
         }
 
         this.cdr.markForCheck();
       });
 
-    this.scheduleFilterFormGroup.get('departmentsIds')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.cdr.markForCheck());
+    this.scheduleFilterFormGroup.valueChanges
+    .pipe(takeUntil(this.componentDestroy()))
+    .subscribe(() => {
+      this.cdr.markForCheck();
+    });
+  }
 
-    this.scheduleFilterFormGroup.get('skillIds')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.cdr.markForCheck());
+  private observeInlineChipDeleteEvent(): void {
+    this.scheduleFiltersService.getDeleteInlineChipStream()
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((event) => {
+      if (event === null) {
+        this.clearAllFilters();
+        return;
+      } 
+
+      const itemToDelete = this.filteredItems.find((item) => item.column === event.field && item.text === event.value);
+      const controlValue = this.scheduleFilterFormGroup.get(event.field)?.value;
+      let updatedValue: string | number | number[] | boolean;
+
+      if (controlValue && itemToDelete) {
+        if (Array.isArray(controlValue)) {
+          updatedValue = controlValue.filter((value) => value !== itemToDelete.value) as number[];
+        } else {
+          updatedValue = '';
+        }
+        
+        this.scheduleFilterFormGroup.get(event.field)?.patchValue(updatedValue);
+        this.setFilters();
+      }
+    });
+  }
+
+  private setFilters(): void {
+    this.filters = this.scheduleFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
+    const chips = this.scheduleFiltersService.createChipsData(this.scheduleFilterFormGroup.getRawValue(),
+
+    this.filterColumns);
+
+    this.updateScheduleFilter.emit({
+      filters: this.filters,
+      filteredItems: this.filteredItems,
+      chipsData: chips,
+    });
   }
 }

@@ -1,16 +1,98 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+import { DropdownOption } from '@core/interface';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { Observable, Subject } from 'rxjs';
+import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
+import { ScheduleFilterHelper } from '../helpers';
+import { ScheduleFilterItem, ScheduleFiltersConfig, ScheduleFilterStructure } from '../interface';
+
 @Injectable()
 export class ScheduleFiltersService {
+  deletedInlineChip: Subject<ChipDeleteEventType> = new Subject();
+
   constructor(private readonly fb: FormBuilder) {}
 
-  public createScheduleFilterForm(): FormGroup {
+  createScheduleFilterForm(): FormGroup {
     return this.fb.group({
       regionIds: ['', Validators.required],
       locationIds: ['', Validators.required],
       departmentsIds: [],
       skillIds: [],
     });
+  }
+
+  createFilterStructure(orgRegions: OrganizationRegion[]): ScheduleFilterStructure {
+    const structure: ScheduleFilterStructure = {
+      regions: orgRegions,
+      locations: [],
+      departments: [],
+    };
+
+    structure.locations = orgRegions.flatMap((region) => region.locations as OrganizationLocation[]);
+    structure.departments = structure.locations.flatMap((location) => location.departments as OrganizationDepartment[]);
+
+    return structure;
+  }
+
+  getSelectedLocatinOptions(structure: ScheduleFilterStructure, selectedIds: number[]): DropdownOption[] {
+    const selectedRegions: OrganizationRegion[] = structure.regions
+    .filter((region) => selectedIds.includes(region.id as number));
+    const locations = selectedRegions.flatMap((region) => region.locations as OrganizationLocation[]);
+
+    return ScheduleFilterHelper.adaptLocationToOption(sortByField(locations, 'name'));
+  }
+
+  getSelectedDepartmentOptions(structure: ScheduleFilterStructure, selectedIds: number[]): DropdownOption[] {
+    const selectedLocations = structure.locations
+    .filter((location) => selectedIds.includes(location.id));
+    const departments = selectedLocations.flatMap((location) => location.departments as OrganizationDepartment[]);
+
+    return ScheduleFilterHelper.adaptDepartmentToOption(sortByField(departments, 'name'));
+  }
+
+  createChipsData(
+    formValue: Record<string, number[] | number | string | boolean>, filterConfig: ScheduleFiltersConfig): ChipItem[] {
+    return Object.keys(filterConfig).filter((key) => {
+      if (Array.isArray(formValue[key])) {
+        return !!(formValue[key] as number[]).length;
+      }
+
+      return !!formValue[key];
+    })
+    .map((key) => {
+      const configItem = filterConfig[key as keyof ScheduleFiltersConfig];
+      return ({
+        groupField: key,
+        groupTitle: configItem.filterTitle,
+        data: this.createChipValue(formValue[key], configItem),
+      });
+    });
+  }
+
+  deleteInlineChip(event: ChipDeleteEventType): void {
+    this.deletedInlineChip.next(event);
+  }
+
+  getDeleteInlineChipStream(): Observable<ChipDeleteEventType> {
+    return this.deletedInlineChip.asObservable();
+  }
+
+  private createChipValue(formValue: number[] | number | string | boolean, configIem: ScheduleFilterItem): string[] {
+    if (Array.isArray(formValue)) {
+      return configIem.dataSource.filter((source) => formValue.includes(source.value as number)).map((data) => data.text);
+    }
+
+    if (typeof formValue === 'boolean') {
+      return [formValue ? 'Yes' : 'No'];
+    }
+
+    if (typeof formValue === 'number') {
+      return [formValue.toString()];
+    }
+
+    return [formValue];
   }
 }

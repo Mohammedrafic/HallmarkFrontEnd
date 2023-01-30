@@ -159,7 +159,7 @@
                   </div>
                   <div class="input-container bootstrap">
                     <label class="input-group">Offered Bill Rate ($)</label>
-                    <div class="input-group" [class.input-readonly]="isOnBoarded && !isAgency">
+                    <div class="input-group" [class.input-readonly]="(isOnBoarded || !hasCanEditOrderBillRatePermission) && !isAgency">
                       <input
                         appValidateWithMessage
                         formControlName="offeredBillRate"
@@ -167,7 +167,7 @@
                         type="text"
                         (focus)="priceUtils.setPriceMask(form, 'offeredBillRate', $event)"
                         (blur)="priceUtils.setTwoDecimals(form, 'offeredBillRate', $event)"
-                        [readonly]="isOnBoarded && !isAgency"
+                        [readonly]="(isOnBoarded || !hasCanEditOrderBillRatePermission) && !isAgency"
                       />
                     </div>
                   </div>
@@ -268,7 +268,7 @@
       </ejs-accordion>
     </div>
     <div class="comments">
-      <app-comments *ngIf="candidateJob" [comments]="comments" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
+      <app-comments *ngIf="candidateJob" [comments]="comments" [externalCommentConfiguration]="order.externalCommentsConfiguration" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
     </div>
   </section>
   <section>

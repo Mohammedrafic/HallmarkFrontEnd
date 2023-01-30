@@ -76,6 +76,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() children: OrderManagementChild[] | undefined;
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   @Input() hasCreateEditOrderPermission: boolean;
+  @Input() hasCanEditOrderBillRatePermission: boolean;
   @Input() activeSystem: OrderManagementIRPSystemId;
 
   @Output() nextPreviousOrderEvent = new EventEmitter<{ next: boolean, isIrpOrder: boolean}>();

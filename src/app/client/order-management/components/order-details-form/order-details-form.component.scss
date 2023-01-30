@@ -1,4 +1,5 @@
 @import 'src/app/styles/variables/colors';
+@import 'adaptive-response';
 
 .order-type-status-container {
   display: flex;
@@ -24,7 +25,8 @@
     display: flex;
   }
 
-  .input-container, .dropdown-container {
+  .input-container,
+  .dropdown-container {
     margin-bottom: 15px;
     margin-right: 10px;
   }
@@ -152,6 +154,15 @@ ejs-textbox.e-control {
       border-color: transparent;
     }
 
+    &.disable {
+      color: $primary-active-blue-60;
+
+      &:hover,
+      &:focus {
+        background-color: $primary-active-blue-90;
+      }
+    }
+
     i-feather {
       vertical-align: bottom;
     }
@@ -170,7 +181,13 @@ ejs-textbox.e-control {
   }
 }
 
+.contact-btn {
+  display: flex;
+}
+
 .remove-button-container {
+  display: flex;
+  justify-content: flex-end;
   width: 52px;
   margin-top: 22px;
 }
@@ -189,7 +206,106 @@ ejs-textbox.e-control {
 }
 
 .e-wrapper {
-  label{
+  label {
     margin-right: 15px;
+  }
+}
+
+@media #{$max-desktop-small} {
+  .order-form-container {
+    flex-direction: column;
+
+    .left-section {
+      width: 100%;
+      padding-bottom: 20px;
+    }
+
+    .right-section {
+      width: 100%;
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .form-line-item-20,
+  .form-line-item-25,
+  .form-line-item-30,
+  .form-line-item-40 {
+    width: 100%;
+  }
+
+  .work-location-item,
+  .contact-details-item {
+    &:not(:last-child) {
+      border-bottom: 1px solid $secondary-dark-blue-45;
+      padding-bottom: 20px;
+    }
+  }
+
+  .contact-btn {
+    justify-content: space-between;
+
+    .radio-button {
+      height: unset;
+      flex-direction: row-reverse;
+      align-items: flex-end;
+      column-gap: 20px;
+      margin-bottom: 0;
+
+      ejs-radiobutton {
+        margin-bottom: 16px;
+      }
+    }
+
+    .remove-button-container {
+      margin-top: 0;
+    }
+  }
+
+  .form-line {
+    flex-direction: column;
+    row-gap: 12px;
+
+    .contact-btn,
+    .input-container,
+    .datepicker-container,
+    .job-description-checkboxes-container {
+      padding-left: 0;
+    }
+  }
+
+  .job-description-checkboxes-container {
+    flex-direction: column;
+    align-items: unset;
+    row-gap: 10px;
+    width: 100%;
+    padding: 0;
+
+    ejs-checkbox:not(:first-child) {
+      margin-left: 0;
+    }
+  }
+
+  .contact-btn {
+    width: 100%;
+  }
+
+  .order-type-container {
+    max-width: 50%;
+  }
+
+  .order-status-container {
+    flex: 1;
+  }
+
+  .order-type-status-container {
+    .left-section {
+      width: 100%;
+      padding: 0;
+    }
+
+    .right-section {
+      display: none;
+    }
   }
 }

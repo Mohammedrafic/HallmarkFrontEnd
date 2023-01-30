@@ -1,0 +1,17 @@
+<div class="chips-list">
+  <div class="chips-container" [ngClass]="{ 'full-height': chipsExpanded}">
+    <div class="chips-block" overflowElement (elementOverflowed)="toggleShowButton($event)">
+      <span class="chips-title">Applied Filters: {{ chipsData && chipsData.length ? ' ' : 'None' }}</span>
+      <ng-container *ngFor="let group of chipsData; trackBy: trackByField">
+        <span class="chips-group-text">{{group.groupTitle}}</span>
+        <ng-container *ngFor="let chipText of group.data; trackBy: trackByText">
+          <ejs-chiplist [chips]="[chipText]" enableDelete="true" (delete)="deleteFilterChip($event, group.groupField)"></ejs-chiplist>
+        </ng-container>
+      </ng-container>
+    </div>
+    <div class="chips-controls">
+      <button class="chips-control-btn" *ngIf="contentOverflowed" (click)="toggleExpandMode()">{{expandBtnText}}</button>
+      <button class="chips-control-btn" *ngIf="showClearAllBtn" (click)="clearAllChips()">Clear All</button>
+    </div>
+  </div>
+</div>

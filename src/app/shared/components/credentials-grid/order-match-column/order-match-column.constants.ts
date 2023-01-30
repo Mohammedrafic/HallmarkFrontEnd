@@ -1,4 +1,4 @@
-import { OrderMatch } from "@shared/enums/order-management";
+import { OrderMatch } from '@shared/enums/order-management';
 
 export const orderMatchIcons = {
   [OrderMatch.Unassigned]: 'alert-triangle',

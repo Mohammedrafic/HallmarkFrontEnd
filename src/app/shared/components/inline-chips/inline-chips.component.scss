@@ -1,0 +1,91 @@
+@import 'colors';
+
+.chips-container {
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+  height: 42px;
+  overflow: hidden;
+
+  &.full-height {
+    height: auto;
+  }
+}
+
+.chip-group {
+  display: flex;
+  align-items: center;
+}
+
+.chips-title {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: $secondary-dark-blue-30;
+  white-space: nowrap;
+}
+
+.chips-group-text {
+  font-size: 12px;
+  color: $secondary-dark-blue-30;
+  margin: 0 5px;
+  display: flex;
+  align-items: center;
+}
+
+.e-chip-list {
+  padding: 4px 2px;
+  flex-wrap: nowrap;
+
+  .e-chip {
+    margin: 5px 0px 5px 0;
+    width: auto;
+    text-transform: initial;
+    font-variant: common-ligatures;
+    font-weight: normal;
+    font-size: 12px;
+    height: 24px;
+    background-color: $secondary-dark-blue-50;
+    color: $black;
+    border: 1px solid $secondary-dark-blue-40;
+    line-height: 14px;
+
+    .e-chip-delete.e-dlt-btn {
+      color: $black;
+      font-weight: 600;
+
+      &::before {
+        content: "\e7e7";
+      }
+    }
+  }
+}
+
+.chips-list {
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+}
+
+.chips-block {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.chips-control-btn {
+  border: none;
+  background: none;
+  color: $primary-active-blue-10;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-left: 30px;
+  padding: 0;
+}
+
+.chips-controls {
+  display: flex;
+  align-items: baseline;
+  margin-top: 13px;
+}

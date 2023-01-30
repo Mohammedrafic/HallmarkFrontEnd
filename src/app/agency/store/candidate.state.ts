@@ -4,11 +4,7 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { catchError, Observable, of, tap } from 'rxjs';
 
-import {
-  CandidateCredential,
-  CandidateCredentialResponse,
-  CredentialGroupedFiles,
-} from '@shared/models/candidate-credential.model';
+import { CandidateCredential, CandidateCredentialResponse, CredentialGroupedFiles } from '@shared/models/candidate-credential.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { CandidateImportResult } from '@shared/models/candidate-profile-import.model';
@@ -71,10 +67,10 @@ import {
   UploadCredentialFilesSucceeded,
   VerifyCandidatesCredentials,
   VerifyCandidatesCredentialsFailed,
-  VerifyCandidatesCredentialsSucceeded,
+  VerifyCandidatesCredentialsSucceeded
 } from './candidate.actions';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { CredentialStatus } from "@shared/enums/status";
+import { CredentialStatus } from '@shared/enums/status';
 
 @State<CandidateStateModel>({
   name: 'candidate',
@@ -375,7 +371,7 @@ export class CandidateState {
     { payload }: SaveCandidatesCredential
   ): Observable<CandidateCredential | void> {
     const isCreating = !payload.id;
-    payload.candidateProfileId = getState().candidate?.id as number;
+    payload.candidateProfileId = payload.candidateProfileId ? payload.candidateProfileId : getState().candidate?.id as number;
     patchState({ isCandidateLoading: true });
     return this.candidateService.saveCredential(payload).pipe(
       tap((payload) => {
@@ -489,9 +485,9 @@ export class CandidateState {
   @Action(GetGroupedCredentialsFiles)
   GetGroupedCredentialsFiles(
     { patchState, getState }: StateContext<CandidateStateModel>,
-    {}: GetGroupedCredentialsFiles
+    {candidateId}: GetGroupedCredentialsFiles
   ): Observable<CredentialGroupedFiles[]> {
-    const id = getState().candidate?.id as number;
+    const id = getState().candidate?.id ? getState().candidate?.id as number : candidateId;
     return this.candidateService.getCredentialGroupedFiles(id).pipe(
       tap((payload) => {
         patchState({ groupedCandidateCredentialsFiles: payload });
@@ -565,7 +561,7 @@ export class CandidateState {
   @Action(DownloadCredentialFiles)
   DownloadCredentialFiles(
     { dispatch, getState }: StateContext<CandidateStateModel>,
-    { candidateProfileId, candidateCredentialFileIds }: DownloadCredentialFiles
+    { candidateProfileId, candidateCredentialFileIds, candidateName }: DownloadCredentialFiles
   ): Observable<Observable<void> | Blob> {
     const candidate = getState().candidate;
     return this.candidateService.downloadCredentialFiles(
@@ -574,8 +570,11 @@ export class CandidateState {
     )
       .pipe(
         tap((payload: Blob) => {
-          dispatch(new DownloadCredentialFilesSucceeded(payload, `${candidate?.firstName} ${candidate?.lastName}`));
-          return payload;
+          if (candidateName) {
+            dispatch(new DownloadCredentialFilesSucceeded(payload, candidateName.split(',').join('')));
+          } else {
+            dispatch(new DownloadCredentialFilesSucceeded(payload, `${candidate?.firstName} ${candidate?.lastName}`));
+          }
         }),
         catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download files'))))
       );

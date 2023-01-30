@@ -23,7 +23,7 @@ import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -96,7 +96,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
   @Input() isOrderOverlapped: boolean;
+  @Input() hasCanEditOrderBillRatePermission: boolean;
 
+  @Input() order:Order;
+  
   public override form: FormGroup;
   public jobStatusControl: FormControl;
   public optionFields = OPTION_FIELDS;

@@ -39,6 +39,13 @@
           </div>
         </button>
 
+        <app-invoice-grid-export
+          [selectedTab]="selectedTabIdx"
+          [selectedRows]="gridSelections"
+          [isAgency]="isAgency"
+          (resetTableSelection)="resetTableSelection()"
+        ></app-invoice-grid-export>
+
         <button
           ejs-button
           *ngIf="(!isAgency && selectedTabIdx !== 0 && selectedTabIdx !== 1) || (isAgency && selectedTabIdx !== 0)"

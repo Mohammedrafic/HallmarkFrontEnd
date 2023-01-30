@@ -54,10 +54,8 @@ export class CandidateStatusComponent implements OnInit {
     "regionCS":   "",
     "locationCS":  "",
     "departmentCS":  "",
-    "orderStartDateCS":    "",
-    "orderEndDateCS": "",
-    "actualStartDateCS":"",
-    "actualEndDateCS": "",
+    "BeginStartDateCS":    "",
+    "EndStartDateCS": "",
     "candidateStatusesParamCS": "",
     "skillCS": ""
   };
@@ -209,10 +207,24 @@ export class CandidateStatusComponent implements OnInit {
 
   private initForm(): void {
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
 
-    let endDate = new Date(Date.now());
-    endDate.setDate(endDate.getDate());
+    if (startDate.getDay() == 0)
+      startDate.setDate(startDate.getDate() +7);
+    if (startDate.getDay() == 1)
+      startDate.setDate(startDate.getDate() + 6);
+    if (startDate.getDay() == 2)
+      startDate.setDate(startDate.getDate() + 5);
+    if (startDate.getDay() == 3)
+      startDate.setDate(startDate.getDate() + 4);
+    if (startDate.getDay() == 4)
+      startDate.setDate(startDate.getDate() + 3);
+    if (startDate.getDay() == 5)
+      startDate.setDate(startDate.getDate() + 2);
+    if (startDate.getDay() == 6)
+      startDate.setDate(startDate.getDate() + 1);
+
+    let endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 6);
 
     this.candidateStatusReportForm = this.formBuilder.group(
       {
@@ -223,10 +235,8 @@ export class CandidateStatusComponent implements OnInit {
         skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
 
-        orderStartDate: new FormControl(startDate, [Validators.required]),
-        orderEndDate: new FormControl(endDate, [Validators.required]),
-        actualStartDate: new FormControl(null),
-        actualEndDate: new FormControl(null),
+        beginStartDate: new FormControl(startDate, [Validators.required]),
+        endStartDate: new FormControl(endDate, [Validators.required]),
         candidateStatuses : new FormControl([])
       }
     );
@@ -395,11 +405,10 @@ export class CandidateStatusComponent implements OnInit {
       }
     }
     let { departmentIds, locationIds, candidateStatuses,
-      regionIds, skillCategoryIds, skillIds, orderStartDate,
-      orderEndDate, actualStartDate, actualEndDate  } = this.candidateStatusReportForm.getRawValue();
+      regionIds, skillCategoryIds, skillIds, beginStartDate,endStartDate } = this.candidateStatusReportForm.getRawValue();
 
     if (!this.candidateStatusReportForm.dirty) {
-      this.message = "Default filter selected with all regions, locations and departments for 90 days";
+      this.message = "Default filter selected with all regions, locations and departments for next week";
     }
     else {
       this.isResetFilter = false;
@@ -407,7 +416,7 @@ export class CandidateStatusComponent implements OnInit {
     }
       locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length  > 0 ? this.locations.map(x=> x.id).join(",") : []); 
       departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
-      candidateStatuses = candidateStatuses.length > 0 ? this.candidateStatuses?.map(x => x.statusText) : this.filterColumns.candidateStatuses.dataSource.map((x: { statusText: any; }) => x.statusText).join(",");
+    candidateStatuses = candidateStatuses.length > 0 ? this.candidateStatuses?.map(x => x.statusText).join(",") : this.filterColumns.candidateStatuses.dataSource.map((x: { statusText: any; }) => x.statusText).join(",");
 
       regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
       locationIds =      locationIds.length > 0 ? locationIds  : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
@@ -430,10 +439,8 @@ export class CandidateStatusComponent implements OnInit {
       "regionCS":            regionIds.length==0? "null" : regionIds,
       "locationCS":          locationIds.length==0?"null" : locationIds,
       "departmentCS":        departmentIds.length==0?"null" :  departmentIds,
-      "orderStartDateCS":       formatDate(orderStartDate, 'MM/dd/yyyy', 'en-US'),
-      "orderEndDateCS":         formatDate(orderEndDate, 'MM/dd/yyyy', 'en-US'),
-      "actualStartDateCS": formatDate(actualStartDate, 'MM/dd/yyyy', 'en-US'),
-      "actualEndDateCS":   formatDate(actualEndDate, 'MM/dd/yyyy', 'en-US'),
+      "BeginStartDateCS": formatDate(beginStartDate, 'MM/dd/yyyy', 'en-US'),
+      "EndStartDateCS": formatDate(endStartDate, 'MM/dd/yyyy', 'en-US'),
       "candidateStatusesParamCS": candidateStatuses.length == 0 ? "null" : candidateStatuses,
       "skillCS": skillIds.length == 0 ? "null" : skillIds,
     };
@@ -486,12 +493,9 @@ export class CandidateStatusComponent implements OnInit {
         valueId: 'id',
       },
 
-      orderStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      orderEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-
-      actualStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      actualEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-
+      beginStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      endStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+   
       candidateStatuses: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Text,
@@ -521,13 +525,34 @@ export class CandidateStatusComponent implements OnInit {
   public onFilterDelete(event: FilteredItem): void {
     this.filterService.removeValue(event, this.candidateStatusReportForm, this.filterColumns);
   }
+
+  private getNextDayOfWeek(date:any, dayOfWeek:any):any {
+    // Code to check that date and dayOfWeek are valid left as an exercise ;)
+    var resultDate = new Date(date.getTime());
+    resultDate.setDate(date.getDate() + (7 + dayOfWeek - date.getDay()) % 7);
+    return resultDate;
+  }
+
   public onFilterClearAll(): void {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
+    if (startDate.getDay() == 0)
+      startDate.setDate(startDate.getDate() +7);
+    if (startDate.getDay() == 1)
+      startDate.setDate(startDate.getDate() + 6);
+    if (startDate.getDay() == 2)
+      startDate.setDate(startDate.getDate() + 5);
+    if (startDate.getDay() == 3)
+      startDate.setDate(startDate.getDate() + 4);
+    if (startDate.getDay() == 4)
+      startDate.setDate(startDate.getDate() + 3);
+    if (startDate.getDay() == 5)
+      startDate.setDate(startDate.getDate() + 2);
+    if (startDate.getDay() == 6)
+      startDate.setDate(startDate.getDate() + 1);
 
-    let endDate = new Date(Date.now());
-    endDate.setDate(endDate.getDate());
+    let endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate()+6);
 
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
@@ -536,11 +561,9 @@ export class CandidateStatusComponent implements OnInit {
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
 
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderStartDate)?.setValue(startDate);
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.OrderEndDate)?.setValue(endDate);
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualStartDate)?.setValue(null);
-    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.ActualEndDate)?.setValue(null);
-
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.BeginStartDate)?.setValue(startDate);
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.EndStartDate)?.setValue(endDate);
+  
     this.filteredItems = [];
     this.locations =[];
     this.departments =[];

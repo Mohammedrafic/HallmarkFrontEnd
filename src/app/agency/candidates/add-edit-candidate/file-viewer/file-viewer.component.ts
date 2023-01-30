@@ -1,26 +1,21 @@
-import { CandidateState } from "@agency/store/candidate.state";
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { downloadBlobFile } from "@shared/utils/file.utils";
-import { Observable, Subject, takeUntil } from "rxjs";
+import { CandidateState } from '@agency/store/candidate.state';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { downloadBlobFile } from '@shared/utils/file.utils';
+import { Observable, Subject, takeUntil } from 'rxjs';
 
-import { ListBox, SelectionSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
-import {
-  MagnificationService,
-  NavigationService,
-  TextSelectionService,
-  ToolbarService
-} from "@syncfusion/ej2-angular-pdfviewer";
-import { DialogComponent } from "@syncfusion/ej2-angular-popups";
+import { ListBox, SelectionSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { MagnificationService, NavigationService, TextSelectionService, ToolbarService } from '@syncfusion/ej2-angular-pdfviewer';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { getInstance } from '@syncfusion/ej2-base';
 
-import { CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
+import { CredentialGroupedFiles } from '@shared/models/candidate-credential.model';
 import {
   GetCredentialFiles,
   GetCredentialFilesSucceeded,
   GetCredentialPdfFiles,
-  GetCredentialPdfFilesSucceeded,
-} from "@agency/store/candidate.actions";
+  GetCredentialPdfFilesSucceeded
+} from '@agency/store/candidate.actions';
 
 import { FormControl, Validators } from '@angular/forms';
 import { DEFAULT_ZOOM } from './file-viewer.constant';
@@ -70,14 +65,14 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   @Select(CandidateState.groupedCandidateCredentialsFiles)
   public groupedCandidateCredentialsFiles$: Observable<CredentialGroupedFiles[]>;
 
-  constructor(private store: Store, private actions$: Actions) {}
+  constructor(private store: Store, private actions$: Actions, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.subscribeOnOpenEvent();
     this.subscribeOnPdfFileLoaded();
     this.subscribeOnFileLoaded();
     this.subscribeOnGroupedCandidateCredentialsFiles();
-   
+
     this.pageSelection.valueChanges.subscribe(x => {
       this.page = x;
     });
@@ -153,6 +148,7 @@ export class FileViewerComponent implements OnInit, OnDestroy {
       reader.readAsDataURL(file.payload);
       // Convert blob to url
       this.loadedFileUrl = URL.createObjectURL(file.payload);
+      this.cdr.markForCheck();
     });
   }
 
@@ -164,6 +160,7 @@ export class FileViewerComponent implements OnInit, OnDestroy {
           downloadBlobFile(file.payload, (this.previewFile as ListBoxItem).name);
           // Convert blob to url
           this.loadedFileUrl = URL.createObjectURL(file.payload);
+          this.cdr.markForCheck();
         } else {
           this.setImage(file.payload);
         }
@@ -180,7 +177,7 @@ export class FileViewerComponent implements OnInit, OnDestroy {
           });
 
           this.data = this.data.concat(dataItems as unknown  as ListBoxItem);
-        })
+        });
       });
   }
 
@@ -199,13 +196,14 @@ export class FileViewerComponent implements OnInit, OnDestroy {
     reader.readAsDataURL(file);
     reader.onloadend = () => {
       this.imageSrs = reader.result as string;
+      this.cdr.markForCheck();
     }
   }
 
   incrementZoom(amount: number) {
     var zoom = this.zoom + amount;
     if(zoom < 0.1) return;
-    this.zoom = zoom;   
+    this.zoom = zoom;
   }
 
   resetZoom() {
@@ -216,7 +214,7 @@ export class FileViewerComponent implements OnInit, OnDestroy {
     if(this.page == this.totalPages) return;
     this.page++;
   }
-  
+
   prevPage() {
     if(this.page == 1) return;
     this.page--;
@@ -225,7 +223,7 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   firstPage() {
     this.page = 1;
   }
-  
+
   lastPage() {
     this.page = this.totalPages;
   }

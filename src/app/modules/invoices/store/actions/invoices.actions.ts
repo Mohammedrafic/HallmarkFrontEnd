@@ -319,4 +319,14 @@ export namespace Invoices {
 
     constructor(public readonly payload: InvoicePaymentData) {}
   }
+
+  export class ExportInvoices {
+    static readonly type = INVOICES_ACTIONS.ExportInvoices;
+
+    constructor(
+      public readonly payload: ExportPayload,
+      public readonly isAgency: boolean,
+    ) {
+    }
+  }
 }

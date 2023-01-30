@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormControl, Validators } from "@angular/forms";
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 
-import { FieldSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
-import { FilesPropModel } from "@syncfusion/ej2-angular-inputs";
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { FilesPropModel } from '@syncfusion/ej2-angular-inputs';
 
-import { AddCredentialForm, SearchCredentialForm }
-  from "@agency/candidates/add-edit-candidate/credentials-grid/credentials-grid.interface";
-import { CustomFormGroup } from "@core/interface";
-import { CredentialStatus } from "@shared/enums/status";
-import { CandidateCredential, CredentialFile, CredentialRequestParams } from "@shared/models/candidate-credential.model";
+import { AddCredentialForm, SearchCredentialForm } from '@shared/components/credentials-grid/credentials-grid.interface';
+import { CustomFormGroup } from '@core/interface';
+import { CredentialStatus } from '@shared/enums/status';
+import { CandidateCredential, CredentialFile, CredentialRequestParams } from '@shared/models/candidate-credential.model';
 
 @Injectable()
 export class CredentialGridService {
@@ -47,8 +46,9 @@ export class CredentialGridService {
     pageSize: number,
     orderId: number | null,
     organizationId: number | null,
+    candidateProfileId: number | undefined,
   ): CredentialRequestParams {
-    const params: CredentialRequestParams = { pageNumber, pageSize };
+    const params: CredentialRequestParams = { pageNumber, pageSize, candidateProfileId };
 
     if (orderId) {
       params.orderId = orderId;

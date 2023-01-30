@@ -417,7 +417,7 @@ export class Order {
   departmentName?: string;
   jobDistributionValue?: number[];
   isIRPOnly?: boolean;
-  jobDates?: Date;
+  jobDates?: Date | string;
   orderOpenDate?: Date;
   irpOrderMetadata?: IRPMetaData;
   isLocked?: boolean;
@@ -462,6 +462,7 @@ export class Order {
   creationDate?: string;
   canRevoke?: boolean;
   canProceedRevoke?: boolean;
+  externalCommentsConfiguration?:boolean | null;
 }
 
 export class ReOrder {

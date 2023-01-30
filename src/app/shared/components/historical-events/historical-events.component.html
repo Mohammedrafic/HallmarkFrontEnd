@@ -1,7 +1,7 @@
  <div class="historical-events__wrapper" *ngIf="historicalEvents$ | async as historicalEvents">
   <ng-container *ngIf="historicalEvents?.length; else noData">
     <ng-container *ngFor="let event of historicalEvents">
-      <p><span class="historical-events__span">{{event.dateTime | date : 'MM/dd/yyyy, h:mm:ss'}} - </span>{{event.content}} <span class="hyperlink" *ngIf="event.userName">{{event.userName}}</span></p>
+      <p><span class="historical-events__span">{{event.localDateTime | date : 'MM/dd/yyyy, h:mm:ss'}} - </span>{{event.content}} <span class="hyperlink" *ngIf="event.userName">{{event.userName}}</span></p>
     </ng-container>
   </ng-container>
   <ng-template #noData>

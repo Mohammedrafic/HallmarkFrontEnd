@@ -2,7 +2,7 @@
   [billRatesData]="billRatesControl.value"
   [billRateOptions]="billRatesOptions"
   [readOnlyMode]="readOnlyMode"
-  [disabledActionMode]="disabledActionMode"
+  [disabledActionMode]="disabledActionMode || !userPermission[userPermissions.CanEditOrderBillRate]"
   (add)="onAddBillRate()"
   (edit)="onEditBillRate($event)"
   (remove)="onRemoveBillRate($event)">

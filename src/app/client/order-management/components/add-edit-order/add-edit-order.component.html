@@ -16,6 +16,7 @@
               [disableOrderType]="disableOrderType"
               [isActive]="selectedTab === SelectedTab.OrderDetails"
               (hourlyRateSync)="hourlyRateToBillRateSync($event)"
+              [externalCommentConfiguration]="externalCommentConfiguration"
             ></app-order-details-form>
           </section>
         </ng-container>

@@ -17,7 +17,8 @@ export class Organization {
   dbConnectionStringName: string;
   isOrganizationUsed?: boolean;
   organizationPrefix: string;
-
+  externalCommentsConfiguration?:boolean | null;
+  
   constructor(
     organizationId: number,
     businessUnitId: number,

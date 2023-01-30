@@ -92,9 +92,9 @@
                   </div>
                   <div class="input-container">
                     <label>Offered Bill Rate ($)<span *ngIf="!isRejected && !isReadOnly" class="required">*</span></label>
-                    <div class="input-group" [ngClass]="{'input-readonly': isRejected || isReadOnly}">
+                    <div class="input-group" [ngClass]="{'input-readonly': isRejected || isReadOnly || (!hasCanEditOrderBillRatePermission && !isAgency) }">
                       <input appValidateWithMessage
-                             [readonly]="isRejected || isReadOnly"
+                             [readonly]="isRejected || isReadOnly || (!hasCanEditOrderBillRatePermission && !isAgency)"
                              formControlName="offeredBillRate"
                              class="e-input"
                              (focus)="priceUtils.setPriceMask(formGroup, 'offeredBillRate', $event)"
@@ -199,7 +199,7 @@
       </ejs-accordion>
     </div>
     <div class="comments">
-      <app-comments *ngIf="candidateJob" [comments]="comments" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
+      <app-comments *ngIf="candidateJob" [comments]="comments" [externalCommentConfiguration]="order.externalCommentsConfiguration" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
     </div>
   </section>
   <section class="bill-rates">
