@@ -14,6 +14,7 @@ import { TrendChartModule } from '../widgets/trend-chart/trend-chart.module';
 import { ChatModule } from '../widgets/chat/chat.module';
 import { InvoicesChartModule } from '../widgets/invoices-chart/invoices-chart.module';
 import { UserState } from '../../store/user.state';
+import { CandidateChartModule } from '../widgets/candidate-chart/candidate-chart.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -30,6 +31,7 @@ import { UserState } from '../../store/user.state';
     TrendChartModule,
     ChatModule,
     InvoicesChartModule,
+    CandidateChartModule,
     NgxsModule.forFeature([ UserState])
   ]
 })

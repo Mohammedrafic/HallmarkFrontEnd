@@ -12,6 +12,7 @@ export enum OrderStatus {
 export enum CandidateJobStatus {
   Onboard = 1,
   Rejected = 2,
+  Applied=3
 }
 
 export enum OrderMatch {

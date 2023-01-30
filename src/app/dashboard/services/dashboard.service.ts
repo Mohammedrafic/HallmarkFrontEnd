@@ -53,6 +53,9 @@ import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 import { DateTimeHelper } from '@core/helpers';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
+import { CandidateStatusDataModel } from '../models/canidate-status-dto.model';
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { CandidateStatusDto } from '@admin/analytics/models/common-report.model';
 
 @Injectable()
 export class DashboardService {
@@ -76,6 +79,7 @@ export class DashboardService {
     [WidgetTypeEnum.OPEN_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getOpenPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getInProgressPositionTrendWidgetData(filters),
       [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
+      [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -422,4 +426,23 @@ export class DashboardService {
       .get<AssignedSkillsByOrganization[]>('/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit', { headers })
       .pipe(map((data) => sortByField(data, 'skillDescription')));
   }
+  private getCandidateAppliedInLastNDays(filter: DashboartFilterDto, orderStatus: ApplicantStatus): Observable<CandidateStatusDataModel> {
+    return this.httpClient
+      .post<CandidateStatusDataModel>(`${this.baseUrl}/CandidateAppliedInLastNDays`, { orderStatuses: [orderStatus], ...filter })
+      .pipe(map(data=>data
+      //{
+        // const title = "Candidate Applied in last N Days";
+        // const description = "Candidate Applied in last N Days";
+        // return {
+        //   id: WidgetTypeEnum.Candidate_Applied_In_Last_N_Days,         
+        //   total: data.total,
+        //   chartData: data.values.map((item: number, index: number) => ({ x: index, y: item })),
+        //   title: title,
+        //   description: description
+        // };
+      //}
+      )
+      );
+  }
+
 }
