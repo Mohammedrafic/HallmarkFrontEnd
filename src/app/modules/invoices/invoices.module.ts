@@ -5,7 +5,7 @@ import { A11yModule } from '@angular/cdk/a11y';
 
 import {
   AlignJustify, ChevronDown, ChevronRight, Lock, Menu, MessageSquare, MoreVertical, Package,
-  Percent, Sliders, Trash2, X, AlertCircle, ChevronsDown, Search, Printer, ArrowUp,
+  Percent, Sliders, Trash2, X, AlertCircle, ChevronsDown, Search, Printer, ArrowUp, Upload,
 } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import {
@@ -124,7 +124,8 @@ import { InvoiceGridExportComponent } from './components/invoice-grid-export/inv
       ChevronsDown,
       Search,
       Printer,
-      ArrowUp
+      ArrowUp,
+      Upload,
     }),
     TabModule,
     DropDownButtonModule,
