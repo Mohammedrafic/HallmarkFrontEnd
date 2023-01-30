@@ -18,7 +18,7 @@ export const InvoiceExportCols : ExportColumn[] = [
   { text:'Invoice ID', column: 'invoiceId' },
   { text:'Location Name', column: 'locationName' },
   { text:'Week', column: 'week' },
-  { text:'Time in', column: 'timeIn' },
+  { text:'Time In', column: 'timeIn' },
   { text:'Time Out', column: 'timeOut' },
   { text:'Bill Rate Type / Expenses Code Reason', column: 'billRateTypeCodeReason' },
   { text:'Cost Centre', column: 'costCenter' },
