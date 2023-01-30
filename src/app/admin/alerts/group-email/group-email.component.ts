@@ -242,6 +242,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   public onGroupEmailSend(): void {
     this.sendGroupEmailFormGroup.markAllAsTouched();
     if (this.sendGroupEmailFormGroup.invalid) {
+      this.groupEmailTemplateForm.isFormInvalid = true;
       return;
     }
     if (this.groupEmailTemplateForm.emailBody!=''&&this.groupEmailTemplateForm.emailTo!=''&&this.groupEmailTemplateForm.emailSubject!='') {
@@ -275,6 +276,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       if(this.groupEmailTemplateForm.emailTo=='')
       {
         controlNames="Email To";
+        this.groupEmailTemplateForm.isFormInvalid = true;
       }
       if(this.groupEmailTemplateForm.emailSubject=='')
       {
@@ -289,7 +291,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         isAre=" are "
         field="Fields "
       }
-      this.store.dispatch(new ShowToast(MessageTypes.Error,field+controlNames+isAre+ SEND_EMAIL_REQUIRED));
+      //this.store.dispatch(new ShowToast(MessageTypes.Error,field+controlNames+isAre+ SEND_EMAIL_REQUIRED));
     }
   }
   public sideBar = {
