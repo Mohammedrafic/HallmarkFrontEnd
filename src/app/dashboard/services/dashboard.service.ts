@@ -53,7 +53,7 @@ import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 import { DateTimeHelper } from '@core/helpers';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
-import { CandidateStatusDataModel } from '../models/canidate-status-dto.model';
+import { CandidateStatusDataModel } from '../models/candidate-status-dto.model';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { CandidateStatusDto } from '@admin/analytics/models/common-report.model';
 

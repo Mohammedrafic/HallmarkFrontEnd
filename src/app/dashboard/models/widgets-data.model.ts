@@ -4,7 +4,7 @@ import type { ChartAccumulation } from './chart-accumulation-widget.model';
 import type { PositionsByTypeAggregatedModel } from './positions-by-type-aggregated.model';
 import { CandidatesPositionDataModel } from './candidates-positions.model';
 import { PositionTrend } from './position-trend.model';
-import { CandidateStatusDataModel } from './canidate-status-dto.model';
+import { CandidateStatusDataModel } from './candidate-status-dto.model';
 
 export interface WidgetsDataModel {
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: CandidatesByStateWidgetAggregatedDataModel;

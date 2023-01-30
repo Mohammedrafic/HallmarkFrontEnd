@@ -3,7 +3,7 @@ import { Store } from '@ngxs/store';
 import { OrderStatus } from '@shared/enums/order-management';
 import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
 import { UserState } from '../../../store/user.state';
-import { CandidateStatusDataModel } from '../../models/canidate-status-dto.model';
+import { CandidateStatusDataModel } from '../../models/candidate-status-dto.model';
 import { DashboardService } from '../../services/dashboard.service';
 
 
@@ -38,8 +38,8 @@ export class CandidateChartComponent  {
   public toSourceContent(event: MouseEvent): void {
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
       const user = this.store.selectSnapshot(UserState.user);
-      if (user?.businessUnitType != null && (user?.businessUnitType == BusinessUnitType.Hallmark || user?.businessUnitType == BusinessUnitType.Organization)) {
-        this.dashboardService.redirectToUrl('agency/order-management/',this.chartData === undefined ? 0 : OrderStatus.InProgress, this.chartData === undefined ? '' : this.chartData.statusName);
+      if (user?.businessUnitType != null && (user?.businessUnitType != BusinessUnitType.Agency)) {
+        this.dashboardService.redirectToUrl('client/order-management/',this.chartData === undefined ? 0 : OrderStatus.InProgress, this.chartData === undefined ? '' : this.chartData.statusName);
 
       } 
     }

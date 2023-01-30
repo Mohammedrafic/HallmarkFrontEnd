@@ -15,9 +15,9 @@
         <span class="widget__title">{{ chartData?.count }}</span>
         <span class="widget__type" *ngIf="!isLTAOrderEnding"
               (mousedown)="defineMousePosition($event)"
-              (click)="toSourceContent($event)">{{ chartData?.statusName | titlecase }} Positions</span>
+              (click)="toSourceContent($event)">Candidates applied in last {{chartData?.days||0}} days</span>
         <span class="widget__type" *ngIf="isLTAOrderEnding"
-              (mousedown)="defineMousePosition($event)">Candidates Applied in last N Days</span>
+              (mousedown)="defineMousePosition($event)">Candidates applied in last {{chartData?.days||0}} days</span>
       </div>
     </ng-template>
   </app-widget-wrapper>
