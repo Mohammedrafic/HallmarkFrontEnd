@@ -749,5 +749,5 @@ export type IrpOrderCandidate = IrpOrderCandidateDto & IrpCandidateShiftTime;
 export interface IrpCandidatesParams {
   PageSize: number;
   PageNumber: number;
-  isAvaliable: boolean;
+  isAvailable: boolean;
 }
