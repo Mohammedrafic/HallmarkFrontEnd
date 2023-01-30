@@ -11,6 +11,7 @@ import { Order } from '@shared/models/order-management.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
 import { ButtonModel } from '@shared/models/buttons-group.model';
 import { Organization } from '@shared/models/organization.model';
+import { DateTimeHelper } from '@core/helpers';
 
 export const collectInvalidFieldsFromForm = (controls: { [key: string]: AbstractControl }, fields: string[]): void => {
   for (const name in controls) {
@@ -24,7 +25,7 @@ export const createJobDistributionList = (distributionForm: FormGroup): JobDistr
   const jobDistributionList: JobDistributionList[] = [];
 
   distributionForm.value.jobDistribution.forEach((value: number) => {
-    if(value === IrpOrderJobDistribution.SelectedExternal) {
+    if (value === IrpOrderJobDistribution.SelectedExternal) {
       distributionForm.value.agencyId.forEach((agencyId: number) => {
         jobDistributionList.push(createDistribution(value, agencyId));
       });
@@ -85,7 +86,7 @@ export const isFormsValid = (forms: FormGroup[]): boolean => {
 export const getFormsList = (list: ListOfKeyForms): FormGroup[] => {
   const formList = [];
   for (const form in list) {
-    if(FormArrayList.includes(form)) {
+    if (FormArrayList.includes(form)) {
       (list[form as keyof ListOfKeyForms]! as FormGroup[]).forEach((item: FormGroup) => {
         formList.push(item);
       });
@@ -97,20 +98,33 @@ export const getFormsList = (list: ListOfKeyForms): FormGroup[] => {
   return formList as FormGroup[];
 };
 
-export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCredentialItem[]) => ({
-  ...formState.orderType.getRawValue(),
-  ...formState.generalInformationForm.getRawValue(),
-  ...formState.jobDescriptionForm.getRawValue(),
-  ...formState.jobDistributionForm.getRawValue(),
-  ...formState.specialProjectForm.getRawValue(),
-  ...getBillRateValue(formState),
-  jobDistributions: createJobDistributionList(formState.jobDistributionForm),
-  contactDetails: [],
-  workLocations: [],
-  credentials: [...credentials],
-  isSubmit: true,
-  isTemplate: false,
-});
+export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCredentialItem[]) => {
+  const jobEndDate = formState.generalInformationForm.get('jobEndDate')?.value;
+  const jobStartDate = formState.generalInformationForm.get('jobStartDate')?.value;
+  const jobDates = formState.generalInformationForm.get('jobDates')?.value;
+
+  return {
+    ...formState.orderType.getRawValue(),
+    ...formState.generalInformationForm.getRawValue(),
+    ...formState.jobDescriptionForm.getRawValue(),
+    ...formState.jobDistributionForm.getRawValue(),
+    ...formState.specialProjectForm.getRawValue(),
+    ...getBillRateValue(formState),
+    jobEndDate: jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : null,
+    jobStartDate: jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : null,
+    jobDistributions: createJobDistributionList(formState.jobDistributionForm),
+    jobDates: jobDates ? formatJobDates(jobDates) : [],
+    contactDetails: [],
+    workLocations: [],
+    credentials: [...credentials],
+    isSubmit: true,
+    isTemplate: false,
+  };
+};
+
+export const formatJobDates = (dates: Date[]): string[] => {
+  return dates.map((date: Date) => DateTimeHelper.toUtcFormat(date));
+};
 
 export const getValuesFromList = (formList: FormGroup[]): FormGroup[] => {
   return formList.map((form: FormGroup) => {
@@ -118,10 +132,10 @@ export const getValuesFromList = (formList: FormGroup[]): FormGroup[] => {
   });
 };
 
-export const getBillRateValue = (formState: ListOfKeyForms): void | {billRate: number | null} => {
+export const getBillRateValue = (formState: ListOfKeyForms): void | { billRate: number | null } => {
   const billRateValue = formState.jobDistributionForm.get('billRate')?.value;
 
-  if(typeof billRateValue === 'string') {
+  if (typeof billRateValue === 'string') {
     return {
       billRate: !!billRateValue.length ? +billRateValue : null,
     };
