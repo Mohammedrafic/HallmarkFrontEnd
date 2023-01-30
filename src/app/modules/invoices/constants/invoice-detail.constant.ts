@@ -167,7 +167,15 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       type: 'rightAligned',
       cellClass: 'font-weight-bold align-right',
       headerClass: 'custom-wrap align-right',
-      valueFormatter: (params: ValueFormatterParams) => GridValuesHelper.formatAbsNumber(params.value, '1.2-2'),
+      valueFormatter: (params: ValueFormatterParams) => {
+        const formatedValue = GridValuesHelper.formatAbsNumber(params.value, '1.2-2');
+
+        if (params.data.total > 0) {
+          return formatedValue;
+        }
+
+        return `(${formatedValue})`;
+      },
     },
     {
       field: 'rate',

@@ -7,7 +7,7 @@ export class InvoicesAdapter {
       return {
         text: item.reason,
         value: item.id,
-      }
+      };
     });
   }
 }

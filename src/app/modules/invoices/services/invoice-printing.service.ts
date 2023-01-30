@@ -288,8 +288,10 @@ Hauppauge, NY 11788`,
       summary.items.forEach((detail, idx: number) => {
         const loactionIdText = detail.locationIExternalId  ? `${detail.locationIExternalId}-` : '';
         const departmentIdText = detail.invoiceDepartmentId ? `-${detail.invoiceDepartmentId}` : '';
-        const skillGlText =detail.skillGLNumber ? `-${detail.skillGLNumber}` : '';
+        const skillGlText = detail.skillGLNumber ? `-${detail.skillGLNumber}` : '';
         const additionalDetails = `${loactionIdText}${detail.departmentName}${departmentIdText}${skillGlText}`;
+        const formatedValue = detail.total > 0 ? GridValuesHelper.formatAbsNumber(detail.value, '1.2-2')
+        : `(${GridValuesHelper.formatAbsNumber(detail.value, '1.2-2')})`;
 
         const sum: CellDef[] = [
           idx === 0 ? {
@@ -320,7 +322,7 @@ Hauppauge, NY 11788`,
             },
           },
           {
-            content: GridValuesHelper.formatAbsNumber(detail.value, '1.2-2'),
+            content: formatedValue,
             styles: {
               halign: 'right',
               fontStyle: 'normal',
@@ -564,6 +566,9 @@ Hauppauge, NY 11788`,
         cellPadding: 2,
       },
       body: data.invoiceRecords.map((record) => {
+        const formatedValue = record.total > 0 ? GridValuesHelper.formatAbsNumber(record.value, '1.2-2')
+        : `(${GridValuesHelper.formatAbsNumber(record.value, '1.2-2')})`;
+
         return [
           {
             content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
@@ -585,7 +590,7 @@ Hauppauge, NY 11788`,
           record.agencyName,
           record.skillName,
           {
-            content: GridValuesHelper.formatAbsNumber(record.value, '1.2-2'),
+            content: formatedValue,
             styles: {
               halign: 'right',
             },
@@ -735,6 +740,9 @@ Hauppauge, NY 11788`,
         const departmentIdText = detail.invoiceDepartmentId ? `-${detail.invoiceDepartmentId}` : '';
         const skillGlText =detail.skillGLNumber ? `-${detail.skillGLNumber}` : '';
         const additionalDetails = `${loactionIdText}${detail.departmentName}${departmentIdText}${skillGlText}`;
+        const formatedValue = detail.total > 0 ? GridValuesHelper.formatAbsNumber(detail.value, '1.2-2')
+        : `(${GridValuesHelper.formatAbsNumber(detail.value, '1.2-2')})`;
+
         
         const sum: CellDef[] = [
           idx === 0 ? {
@@ -765,7 +773,7 @@ Hauppauge, NY 11788`,
             },
           },
           {
-            content: GridValuesHelper.formatAbsNumber(detail.value, '1.2-2'),
+            content: formatedValue,
             styles: {
               halign: 'right',
               fontStyle: 'normal',
@@ -1037,6 +1045,9 @@ Hauppauge, NY 11788`,
         cellPadding: 2,
       },
       body: data.invoiceRecords.map((record) => {
+        const formatedValue = record.total > 0 ? GridValuesHelper.formatAbsNumber(record.value, '1.2-2')
+        : `(${GridValuesHelper.formatAbsNumber(record.value, '1.2-2')})`;
+
         return [
           {
             content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
@@ -1058,7 +1069,7 @@ Hauppauge, NY 11788`,
           record.organizationName,
           record.skillName,
           {
-            content:  GridValuesHelper.formatAbsNumber(record.value, '1.2-2'),
+            content: formatedValue,
             styles: {
               halign: 'right',
             },
