@@ -107,7 +107,8 @@ export class GetGroupEmailInternalUsers {
     public regionIds: string,
     public locationIds: string,
     public roles: string,
-    public businessUnitIds: string
+    public businessUnitIds: string,
+    public forAgency: boolean
   ) { }
 }
 

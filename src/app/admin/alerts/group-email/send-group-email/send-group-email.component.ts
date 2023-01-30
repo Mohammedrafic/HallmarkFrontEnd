@@ -83,6 +83,7 @@ export class SendGroupEmailComponent
   @Input() businessUnitType: number | null;
   @Input() businessUnit: number | null;  
   @Input() userTypeInput: number | null;
+  @Input() fileNameInput: string | undefined;
   override selectedItems: any;
 
   public selectedBusinessUnit: number | null;
@@ -551,7 +552,7 @@ export class SendGroupEmailComponent
           this.userData = [];            
           if(this.isOrgUser){
             let businessUnitIds = value.join();
-            this.store.dispatch(new GetGroupEmailInternalUsers('null', 'null', 'null', businessUnitIds));
+            this.store.dispatch(new GetGroupEmailInternalUsers('null', 'null', 'null', businessUnitIds, true));
             this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
               if(data != undefined) this.userData = data;
             });
@@ -661,8 +662,9 @@ export class SendGroupEmailComponent
     var regionId = this.regionControl.value.join();
     var locationId = this.locationControl.value.join();
     var roles = this.rolesControl.value.join();
+    var businessUnitId = this.businessControl.value;
     if(regionId !='' && locationId !='' && roles !=''){
-      this.store.dispatch(new GetGroupEmailInternalUsers(regionId, locationId, roles, 'null'));
+      this.store.dispatch(new GetGroupEmailInternalUsers(regionId, locationId, roles, businessUnitId, false));
       this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
         this.userData = data;
       });
@@ -702,6 +704,13 @@ export class SendGroupEmailComponent
             this.store.dispatch(new GetGroupEmailCandidateStatuses(businessId));
             this.candidateStatusData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
               this.candidateStatusData = data;
+              let billRatePending = this.candidateStatusData.filter((item)=>item.statusText=="Bill Rate Pending")[0];
+              let billRatePendingIndex = this.candidateStatusData.indexOf(billRatePending, 0);
+              this.candidateStatusData.splice(billRatePendingIndex, 1);
+
+              let offeredBillRate = this.candidateStatusData.filter((item)=>item.statusText=="Offered Bill Rate")[0];
+              let offeredBillRateIndex = this.candidateStatusData.indexOf(offeredBillRate, 0);
+              this.candidateStatusData.splice(offeredBillRateIndex, 1);
             });
           }
         } else if (businessUnit == 4) {
@@ -710,7 +719,7 @@ export class SendGroupEmailComponent
             this.userData = [];            
             if(this.isOrgUser){
               let businessUnitIds = this.businessesControl.value.join();
-              this.store.dispatch(new GetGroupEmailInternalUsers('null', 'null', 'null', businessUnitIds));
+              this.store.dispatch(new GetGroupEmailInternalUsers('null', 'null', 'null', businessUnitIds, true));
               this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
                 if(data != undefined) this.userData = data;
               });
@@ -874,7 +883,7 @@ export class SendGroupEmailComponent
       this.isAgencyCandidatesType = false;
       this.isOrgCandidatesType = false;
       this.isOrgInternalUserType = false;
-      this.isAgencyUserType = false;               
+      this.isAgencyUserType = false;     
     }
   }
 

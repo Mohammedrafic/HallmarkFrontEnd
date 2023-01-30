@@ -327,9 +327,9 @@ export class AlertsState {
   @Action(GetGroupEmailInternalUsers)
   GetGroupEmailInternalUsers(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { regionIds, locationIds, roles, businessUnitIds }: GetGroupEmailInternalUsers
+    { regionIds, locationIds, roles, businessUnitIds, forAgency }: GetGroupEmailInternalUsers
   ): Observable<User | void> {
-    return this.groupEmailService.GetGroupEmailUsersByRegionLocation(regionIds, locationIds, roles,businessUnitIds).pipe(
+    return this.groupEmailService.GetGroupEmailUsersByRegionLocation(regionIds, locationIds, roles,businessUnitIds, forAgency).pipe(
       tap((payload) => {
         patchState({ groupEmailUserData: payload });
         return payload;

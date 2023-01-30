@@ -367,8 +367,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.businessUnitType = data.businessUnitType;
     this.groupEmailTemplateForm.businessUnit = data.businessUnitId;    
     this.groupEmailTemplateForm.userTypeInput = data.userType;
+    this.groupEmailTemplateForm.fileNameInput = data.fileName;
     this.groupEmailTemplateForm.populateUserType();    
-    console.log(data);
   }
   private ResetForm(): void {
     this.groupEmailTemplateForm.emailBody = "";
