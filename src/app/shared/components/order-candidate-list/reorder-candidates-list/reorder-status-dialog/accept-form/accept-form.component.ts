@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { PenaltiesMap } from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
@@ -17,12 +17,18 @@ const showHourlyRateForStatuses: CandidatStatus[] = [
   templateUrl: './accept-form.component.html',
   styleUrls: ['./accept-form.component.scss'],
 })
-export class AcceptFormComponent {
+export class AcceptFormComponent implements OnChanges{
   @Input() formGroup: FormGroup;
   
   @Input() status: CandidatStatus;
 
+  @Input() isAgency: boolean;
+
   public priceUtils = PriceUtils;
+
+  public isBlankStatus: boolean;
+
+  public isCandidatePayRateVisible: boolean;
 
   get penaltyCriteriaControlValue(): string {
     return this.formGroup.get('penaltyCriteria')?.value;
@@ -49,6 +55,21 @@ export class AcceptFormComponent {
     return this.status === CandidatStatus.Cancelled;
   }
 
+  public ngOnChanges(): void {
+      this.getCandidatePayRateSetting();
+      this.configureCandidatePayRateField();
+  }
+
+  private getCandidatePayRateSetting(): void {
+    this.isCandidatePayRateVisible = this.isAgency && true || !this.isAgency; //TODO get CandidatePayRate setting when BE will be implemented
+    this.isBlankStatus = this.status === CandidatStatus.Offered;
+    
+  }
+
+  private configureCandidatePayRateField(): void {
+    this.formGroup.get('candidatePayRate')?.setValidators(this.isBlankStatus ? [Validators.required] : []);
+  }
+
   static generateFormGroup(): FormGroup {
     return new FormGroup({
       reOrderFromId: new FormControl({ value: '', disabled: true }),
@@ -67,6 +88,7 @@ export class AcceptFormComponent {
       penaltyCriteria: new FormControl({ value: '', disabled: true }),
       rate: new FormControl({ value: '', disabled: true }),
       hours: new FormControl({ value: '', disabled: true }),
+      candidatePayRate: new FormControl({ value: '', disabled: true }),
     });
   }
 }

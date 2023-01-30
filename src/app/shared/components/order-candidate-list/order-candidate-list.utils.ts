@@ -18,11 +18,11 @@ export const getOrderPublicId = (organizationPrefix: string, publicId: number): 
 
 export const hasEditOrderBillRatesPermission = (applicantStatus: ApplicantStatus, statuses: AvailableStatus[]): boolean => {
   if (applicantStatus === ApplicantStatus.Shortlisted || applicantStatus === ApplicantStatus.PreOfferCustom) {
-    return !!statuses.find(status => status.applicantStatus === ApplicantStatus.Shortlisted);
+    return !!statuses?.find(status => status.applicantStatus === ApplicantStatus.Shortlisted);
   }
 
   if (applicantStatus === ApplicantStatus.Offered) {
-    return !!statuses.find(status => status.applicantStatus === ApplicantStatus.Offered);
+    return !!statuses?.find(status => status.applicantStatus === ApplicantStatus.Offered);
   }
 
   if (
@@ -30,7 +30,7 @@ export const hasEditOrderBillRatesPermission = (applicantStatus: ApplicantStatus
     || applicantStatus === ApplicantStatus.BillRatePending
     || applicantStatus === ApplicantStatus.OfferedBR
   ) {
-    return !!statuses.find(status => status.applicantStatus === ApplicantStatus.OnBoarded);
+    return !!statuses?.find(status => status.applicantStatus === ApplicantStatus.OnBoarded);
   }
 
   return true;

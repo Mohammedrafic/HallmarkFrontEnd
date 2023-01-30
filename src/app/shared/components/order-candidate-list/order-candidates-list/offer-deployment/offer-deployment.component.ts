@@ -94,6 +94,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public today = new Date();
   public priceUtils = PriceUtils;
   public hasEditOrderBillRatesPermission: boolean;
+  public isCandidatePayRateVisible: boolean;
 
   get showYearsOfExperience(): boolean {
     return (
@@ -171,6 +172,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       this.readOnlyMode =
         this.candidateStatus === ApplicantStatusEnum.Withdraw || this.candidateStatus === ApplicantStatusEnum.Rejected;
       this.isClosedPosition = this.candidateStatus === ApplicantStatusEnum.Offboard;
+      this.getCandidatePayRateSetting();
     }
 
     this.checkRejectReason();
@@ -329,6 +331,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       expAsTravelers: new FormControl(''),
       guaranteedWorkWeek: new FormControl('', [Validators.maxLength(200)]),
       offeredStartDate: new FormControl(''),
+      candidatePayRate: new FormControl('')
     });
   }
 
@@ -463,5 +466,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
+  }
+
+  private getCandidatePayRateSetting(): void {
+    this.isCandidatePayRateVisible = !this.showYearsOfExperience; //TODO get CandidatePayRate setting when BE will be implemented
   }
 }

@@ -99,7 +99,21 @@
         </div>
       </div>
     </div>
-    <div></div>
+    <div>
+      <div class="input-container bootstrap" *ngIf="isCandidatePayRateVisible">
+        <label>Candidate Pay Rate ($) <span *ngIf="isBlankStatus" class="required">*</span> </label>
+        <div class="input-group">
+          <input
+            appValidateWithMessage
+            formControlName="candidatePayRate"
+            class="e-input"
+            type="text"
+            (focus)="priceUtils.setPriceMask(formGroup, 'candidatePayRate', $event)"
+            (blur)="priceUtils.setTwoDecimals(formGroup, 'candidatePayRate', $event)"
+          />
+        </div>
+      </div>
+    </div>
   </div>
   <div class="wrapper cl-3">
     <div class="input-container bootstrap">

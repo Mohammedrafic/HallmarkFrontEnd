@@ -136,7 +136,7 @@
                   </div>
                 </div>
                 <div class="d-flex">
-                  <div class="input-container bootstrap">
+                  <div class="input-container bootstrap f-grow-2"> 
                     <label>Available Start Date <span *ngIf="isApplied" class="required">*</span></label>
                     <div class="input-group datepicker">
                       <ejs-datepicker appValidateWithMessage
@@ -147,6 +147,19 @@
                                       [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                                       formControlName="availableStartDate">
                       </ejs-datepicker>
+                    </div>
+                  </div>
+                  <div class="input-container bootstrap" *ngIf="isCandidatePayRateVisible &&  !isApplied">
+                    <label>Candidate Pay Rate ($) <span *ngIf="candidatePayRateRequired" class="required">*</span></label>
+                    <div class="input-group">
+                      <input
+                        appValidateWithMessage
+                        formControlName="candidatePayRate"
+                        class="e-input"
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(form, 'candidatePayRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(form, 'candidatePayRate', $event)"
+                      />
                     </div>
                   </div>
                 </div>

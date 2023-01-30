@@ -122,6 +122,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canClose = false;
   public hasEditOrderBillRatesPermission: boolean;
   public selectedApplicantStatus: ApplicantStatus | null = null;
+  public isCandidatePayRateVisible: boolean;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -200,6 +201,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     if (candidate?.currentValue && !candidate?.isFirstChange()) {
       this.getComments();
     }
+    this.getCandidatePayRateSetting();
   }
 
   ngOnDestroy(): void {
@@ -582,6 +584,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       penaltyCriteria: new FormControl(''),
       rate: new FormControl(''),
       hours: new FormControl(''),
+      candidatePayRate: new FormControl('')
     });
 
     this.jobStatusControl = new FormControl('');
@@ -616,5 +619,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
+  }
+
+  private getCandidatePayRateSetting(): void {
+    this.isCandidatePayRateVisible = true; //TODO get CandidatePayRate setting when BE will be implemented
   }
 }

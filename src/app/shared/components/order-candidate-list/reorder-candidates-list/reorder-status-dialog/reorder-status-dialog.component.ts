@@ -192,7 +192,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
         this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(this.currentCandidateApplicantStatus, data);
-        if (!data.length) {
+        if (!data?.length) {
           this.jobStatusControl.disable();
         } else {
           this.jobStatusControl.enable();
@@ -363,6 +363,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       penaltyCriteria: PenaltiesMap[jobCancellation?.penaltyCriteria || 0],
       rate: jobCancellation?.rate,
       hours: jobCancellation?.hours,
+      candidatePayRate: ''
     });
     this.enableFields();
   }
@@ -531,6 +532,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   private enableFields(): void {
     if (!this.isCancelled) {
       this.acceptForm.get('candidateBillRate')?.enable();
+    }
+    if(this.currentCandidateApplicantStatus === CandidatStatus.Offered) {
+      //TODO add to condition the check of the setting
+      this.acceptForm.get('candidatePayRate')?.enable();
     }
     switch (this.currentCandidateApplicantStatus) {
       case !this.isAgency && CandidatStatus.BillRatePending:
