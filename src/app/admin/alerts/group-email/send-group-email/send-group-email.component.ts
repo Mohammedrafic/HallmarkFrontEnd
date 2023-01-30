@@ -934,8 +934,12 @@ export class SendGroupEmailComponent
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this.dropElement = document.getElementById('files-droparea') as HTMLElement;
+      this.dropElement = document.getElementById('droparea') as HTMLElement;    
     }, 4000);
+  }
+
+  onFileRemoving(){
+    this.uploadObj.clearAll();
   }
 
   onCCFieldKeyup() {

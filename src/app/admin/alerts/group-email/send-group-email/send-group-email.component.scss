@@ -102,6 +102,11 @@
     color: #3e7fff;
     font-size: 12px;
     cursor: pointer;
+
+    .browse-link {
+      text-decoration: underline;
+      font-weight: 700;
+    }
   }
 
   .e-file-select-wrap {
