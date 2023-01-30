@@ -60,6 +60,8 @@ import {
   UpdateOrganisationCandidateJobSucceed,
   UploadOrderImportFile,
   UploadOrderImportFileSucceeded,
+  UpdateRegRateorder,
+  UpdateRegRateSucceeded
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -114,6 +116,8 @@ import { OrderImportResult } from '@shared/models/imported-order.model';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 import { createFormData } from '@client/order-management/helpers';
 import { PageOfCollections } from '@shared/models/page.model';
+import { UpdateRegRateService } from '@client/order-management/components/update-reg-rate/update-reg-rate.service';
+import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -353,7 +357,8 @@ export class OrderManagementContentState {
     private departmentService: DepartmentsService,
     private rejectReasonService: RejectReasonService,
     private extensionSidebarService: ExtensionSidebarService,
-    private orderImportService: OrderImportService
+    private orderImportService: OrderImportService,
+    private UpdateRegRateService : UpdateRegRateService
   ) {}
 
   @Action(GetOrders, { cancelUncompleted: true })
@@ -1036,4 +1041,18 @@ export class OrderManagementContentState {
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Orders were not imported'))))
     );
   }
+
+  @Action(UpdateRegRateorder)
+  UpdateRegRateorder(
+    { dispatch } : StateContext<OrderManagementContentStateModel>,
+    { payload } : UpdateRegRateorder
+  ) : Observable<UpdateRegrateModel | Observable<void>>{
+    return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
+      tap((payload) => {
+        dispatch(new UpdateRegRateSucceeded(payload));
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Reg rate is not updated'))))
+    );
+  }
+
 }

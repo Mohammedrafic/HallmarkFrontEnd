@@ -1,0 +1,31 @@
+.app-updatereg-rate{
+    border: 1px solid #e0e0e0;
+    padding: 5px 0 5px 16px;
+    border-bottom-left-radius: var(--grid-border-radius);
+    border-bottom-right-radius: var(--grid-border-radius);
+    background: #3e7fff;
+    .app-updatereg-rate-section{
+        display: flex;
+    }
+}
+app-numeric-textbox.app-update-reg-rate-textbox {
+    width: 200px;
+    margin-right : 20px;
+}
+.general-info__form{
+    display: flex;
+}
+.disabled {
+    pointer-events: none;
+    cursor: initial;
+    color: gainsboro !important;
+}
+p{
+    font-size: 14px;
+    background: cornflowerblue;
+    padding: 13px 20px;
+    margin: 0px;
+    color: white;
+    cursor: pointer;
+    border-radius: 7px;
+}

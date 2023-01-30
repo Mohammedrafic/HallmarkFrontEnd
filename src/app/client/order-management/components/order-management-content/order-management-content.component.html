@@ -1122,6 +1122,13 @@
   (reOpenOrderSuccess)="updateOrderDetails($event)"
 ></app-order-details-dialog>
 
+<app-update-reg-rate
+  #updaterateRow
+  *ngIf="openregrateupdate"
+  [orderdatas]="CurrentOrderDatas"
+></app-update-reg-rate>
+
+
 <app-child-order-dialog
   [order]="$any(selectedOrder)"
   [candidate]="selectedCandidate"

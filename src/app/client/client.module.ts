@@ -104,6 +104,9 @@ import { OrderManagementIrpRowPositionModule } from '@shared/components/grid/cel
 import { OrderManagementSubrowCandidatePositionModule } from '@shared/components/order-management-subrow-candidate-position/order-management-subrow-candidate-position.module';
 import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-top.module';
 import { CandidateState } from '@agency/store/candidate.state';
+import { UpdateRegRateComponent
+} from './order-management/components/update-reg-rate/update-reg-rate.component';
+import { NumericTextboxModule } from '@shared/components/form-controls/numeric-textbox/numeric-textbox.module';
 
 const gridIcons = {
   MessageSquare,
@@ -154,6 +157,7 @@ const gridIcons = {
     OrderDetailsContainerComponent,
     OrderCandidatesContainerComponent,
     OrderImportComponent,
+    UpdateRegRateComponent
   ],
   imports: [
     CommonModule,
@@ -209,6 +213,7 @@ const gridIcons = {
     OrganizationCandidatesModule,
     OrderManagementSubrowCandidatePositionModule,
     ScrollToTopModule,
+    NumericTextboxModule
   ],
   providers: [
     ResizeService,

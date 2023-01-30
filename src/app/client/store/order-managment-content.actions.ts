@@ -15,6 +15,7 @@ import { ExportPayload } from '@shared/models/export.model';
 import { OrderManagementIRPSystemId, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { ImportedOrder, OrderImportResult } from '@shared/models/imported-order.model';
+import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
 
 export class GetOrders {
   static readonly type = '[order management] Get Orders';
@@ -368,4 +369,14 @@ export class GetOrderImportErrorsSucceeded {
 export class SaveOrderImportResultSucceeded {
   static readonly type = '[order management] Save Order Import Result Succeeded';
   constructor(public payload: OrderImportResult) {}
+}
+
+export class UpdateRegRateorder {
+  static readonly type = '[order management] Update Reg Rate Order';
+  constructor(public payload: UpdateRegrateModel) {}
+}
+
+export class UpdateRegRateSucceeded {
+  static readonly type = '[order management] Update Reg Rate Succeeded';
+  constructor(public payload: UpdateRegrateModel) {}
 }
