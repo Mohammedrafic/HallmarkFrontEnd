@@ -5,7 +5,12 @@ import { CustomFormGroup } from '@core/interface';
 import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 
-import { InvoiceFilterColumns } from '../interfaces';
+import {
+  InvoiceFilterColumns, InvoicesFilteringOptions,
+  InvoicesPendingInvoiceRecordsFilteringOptions,
+} from '../interfaces';
+import { FilteringInvoicesOptionsFields, FilteringPendingInvoiceRecordsOptionsFields } from '../enums';
+import { InvoicesFilteringOptionsMapping, PendingInvoiceRecordsFilteringOptionsMapping } from '../constants';
 
 @Injectable()
 export class InvoicesFiltersService {
@@ -55,5 +60,47 @@ export class InvoicesFiltersService {
     formGroup.get('paidDateTo')?.setValidators([endDateValidator(formGroup, 'paidDateFrom')]);
     formGroup.get('weekPeriodFrom')?.setValidators([startDateValidator(formGroup, 'weekPeriodTo')]);
     formGroup.get('weekPeriodTo')?.setValidators([endDateValidator(formGroup, 'weekPeriodFrom')]);
+  }
+
+  prepareAllFiltersDataSources(
+    stateCols: InvoicesFilteringOptions,
+    invoiceFiltersColumns: InvoiceFilterColumns,
+  ): InvoiceFilterColumns {
+    return Object.keys(stateCols).reduce((acc: InvoiceFilterColumns, key: string) => {
+      const typedKey = key as FilteringInvoicesOptionsFields;
+      const optionsKey = InvoicesFilteringOptionsMapping.get(typedKey);
+
+      if (!optionsKey) {
+        return acc;
+      }
+
+      acc[optionsKey] = {
+        ...invoiceFiltersColumns[optionsKey],
+        dataSource: stateCols[typedKey],
+      };
+
+      return acc;
+    }, {} as InvoiceFilterColumns);
+  }
+
+  preparePendingFiltersDataSources(
+    stateCols: InvoicesPendingInvoiceRecordsFilteringOptions,
+    invoiceFiltersColumns: InvoiceFilterColumns,
+  ): InvoiceFilterColumns {
+    return Object.keys(stateCols).reduce((acc: InvoiceFilterColumns, key: string) => {
+      const typedKey = key as FilteringPendingInvoiceRecordsOptionsFields;
+      const optionsKey = PendingInvoiceRecordsFilteringOptionsMapping.get(typedKey);
+
+      if (!optionsKey) {
+        return acc;
+      }
+
+      acc[optionsKey] = {
+        ...invoiceFiltersColumns[optionsKey],
+        dataSource: stateCols[typedKey],
+      };
+
+      return acc;
+    }, {} as InvoiceFilterColumns);
   }
 }
