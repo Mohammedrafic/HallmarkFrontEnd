@@ -165,6 +165,7 @@ import { ValidateDirectiveModule } from './directives/validate-directive/validat
 import { BoolValuePipeModule } from './pipes/bool-values/bool-values-pipe.module';
 import { ActionCellRendererComponent } from './components/cell-renderers/actions-cell/action-cellrenderer.component';
 import { TabsMobileShadowDirective } from './directives/tabs-mobile-shadow.directive';
+import { LocalDateTimePipe } from './pipes/local-date-time.pipe';
 
 const icons = {
   AlertCircle,
@@ -336,6 +337,7 @@ const COMPONENTS = [
     CustomSideDialogComponent,
     HideByCandidateStatusPipe,
     TabsMobileShadowDirective,
+    LocalDateTimePipe,
   ],
   providers: [
     DatePipe,
