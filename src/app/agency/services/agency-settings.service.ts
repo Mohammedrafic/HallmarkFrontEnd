@@ -15,4 +15,13 @@ export class AgencySettingsService {
   public getAgencySettingByKey(key: AgencySettingKeys): Observable<boolean> {
     return this.http.get<boolean>(`/api/AgencySettings`, { params: { key }});
   }
+
+  /**
+   * Check if candidate profile can be edited
+   * @param id - candidate profile id
+   * @return flag
+   */
+  public isCandidateUserCreated(CandidateProfileId: number): Observable<boolean> {
+    return this.http.get<boolean>(`/api/CandidateProfile/canProfileBeEdited`, { params: { CandidateProfileId }});
+  }
 }

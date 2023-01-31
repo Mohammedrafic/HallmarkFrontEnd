@@ -1,14 +1,17 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { Store } from '@ngxs/store';
+import { UserPermissions } from '@core/enums';
+import { Permission } from '@core/interface';
+import { Select, Store } from '@ngxs/store';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_DELETE } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { catchError, filter, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
+import { UserState } from 'src/app/store/user.state';
 import { CandidateWorkCommitment, CandidateWorkCommitmentsPage } from '../models/candidate-work-commitment.model';
 import { CandidateWorkCommitmentService } from '../services/candidate-work-commitment.service';
 import { CandidateWorkCommitmentColumnDef } from './candidate-work-commitment-grid.constants';
@@ -28,6 +31,9 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
       this.dispatchNewPage();
     }
   }
+  
+  @Select(UserState.userPermission)
+  currentUserPermissions$: Observable<Permission>;
 
   public employeeId: number;
   public readonly columnDef: ColumnDefinitionModel[] = CandidateWorkCommitmentColumnDef(this.editCommitment.bind(this), this.deleteCommitment.bind(this));
@@ -36,6 +42,8 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
   public pageNumber: number = 1;
   public pageSize: number = 5;
   public candidateWorkCommitmentsPage: CandidateWorkCommitmentsPage;
+
+  public readonly userPermissions = UserPermissions;
 
   constructor(
     private cd: ChangeDetectorRef,
