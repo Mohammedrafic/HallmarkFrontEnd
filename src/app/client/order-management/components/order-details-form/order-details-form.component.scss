@@ -308,4 +308,10 @@ ejs-textbox.e-control {
       display: none;
     }
   }
+
+  ::ng-deep {
+    .e-popup-full-page .e-popup-open {
+      height: fit-content !important;
+    }
+  }
 }
