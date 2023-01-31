@@ -21,6 +21,7 @@ export enum INVOICES_ACTIONS {
   UPDATE_FILTERS_STATE = '[invoices] UPDATE FILTERS STATE',
   RESET_FILTERS_STATE = '[invoices] RESET FILTERS STATE',
   GET_FILTERS_DATA_SOURCE = '[invoices] GET FILTERS DATA SOURCE',
+  GET_PENDING_RECORDS_FILTERS_DATA_SOURCE = '[invoices] GET PENDING RECORDS FILTERS DATA SOURCE',
   SET_FILTERS_DATA_SOURCE = '[invoices] SET FILTERS DATA SOURCE',
   GetReasons = '[invoices] Get reasons for manual invoices',
   GetMeta = '[invoices] Get manual invoice metadata',
@@ -75,6 +76,16 @@ export enum InvoicesTableFiltersColumns {
   DueDateTo = 'dueDateTo',
   PaidDateFrom = 'paidDateFrom',
   PaidDateTo = 'paidDateTo',
+
+  // Keys for Pending Invoices Records
+  OrderIds = 'orderIds',
+  TimesheetType = 'timesheetType',
+  RegionIds = 'regionIds',
+  LocationIds = 'locationIds',
+  DepartmentIds = 'departmentIds',
+  SkillIds = 'skillIds',
+  WeekPeriodFrom = 'weekPeriodFrom',
+  WeekPeriodTo = 'weekPeriodTo',
 }
 
 export enum FilteringInvoicesOptionsFields {
@@ -82,6 +93,15 @@ export enum FilteringInvoicesOptionsFields {
   ApDelivery = 'apDelivery',
   AggregateByType = 'aggregateByType',
   InvoiceStates = 'invoiceStates',
+}
+
+export enum FilteringPendingInvoiceRecordsOptionsFields {
+  Types = 'types',
+  Skills = 'skills',
+  Agency = 'agency',
+  Regions = 'regions',
+  Locations = 'locations',
+  Departments = 'departments',
 }
 
 export enum InvoicesOrgTabId {

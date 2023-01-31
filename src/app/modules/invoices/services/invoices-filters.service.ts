@@ -31,6 +31,15 @@ export class InvoicesFiltersService {
       dueDateTo: [null],
       paidDateFrom: [null],
       paidDateTo: [null],
+
+      orderIds: [null],
+      timesheetType: [null],
+      regionIds: [null],
+      locationIds: [null],
+      departmentIds: [null],
+      skillIds: [null],
+      weekPeriodFrom: [null],
+      weekPeriodTo: [null],
     }) as CustomFormGroup<InvoiceFilterColumns>;
   }
 
@@ -44,5 +53,7 @@ export class InvoicesFiltersService {
     formGroup.get('dueDateTo')?.setValidators([endDateValidator(formGroup, 'dueDateFrom')]);
     formGroup.get('paidDateFrom')?.setValidators([startDateValidator(formGroup, 'paidDateTo')]);
     formGroup.get('paidDateTo')?.setValidators([endDateValidator(formGroup, 'paidDateFrom')]);
+    formGroup.get('weekPeriodFrom')?.setValidators([startDateValidator(formGroup, 'weekPeriodTo')]);
+    formGroup.get('weekPeriodTo')?.setValidators([endDateValidator(formGroup, 'weekPeriodFrom')]);
   }
 }
