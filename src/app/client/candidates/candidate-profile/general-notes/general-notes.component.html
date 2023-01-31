@@ -9,6 +9,7 @@
     action-button
     cssClass="e-action-button"
     ejs-button
+    [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageIrpCandidateProfile]"
     (click)="addNote()"
   >
     <i-feather name="plus" class="icon"></i-feather>

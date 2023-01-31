@@ -55,6 +55,7 @@
 <section [ngClass]="isIRP ? 'grid-component__irp' : 'grid-component__vms'">
   <app-candidate-list
     *ngIf="preferencesLoaded"
+    [userPermission]="(currentUserPermissions$ | async) ?? {}"
     [filteredItems$]="filteredItems$"
     [export$]="exportUsers$"
     [search$]="search$"

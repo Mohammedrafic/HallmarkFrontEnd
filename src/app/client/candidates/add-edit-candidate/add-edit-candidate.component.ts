@@ -2,14 +2,17 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, O
 import { ActivatedRoute, Router } from '@angular/router';
 import { tabsConfig } from '@client/candidates/add-edit-candidate/tabs-config.constants';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { TabsComponent } from '@shared/components/tabs/tabs.component';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { debounceTime, takeUntil } from 'rxjs';
+import { Observable, debounceTime, takeUntil } from 'rxjs';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { CandidatesService } from '../services/candidates.service';
 import { CandidateTabsEnum } from '@client/candidates/enums/candidate-tabs.enum';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
+import { UserState } from 'src/app/store/user.state';
+import { Permission } from '@core/interface';
+import { UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -19,7 +22,12 @@ import { DialogMode } from '@shared/enums/dialog-mode.enum';
 })
 export class AddEditCandidateComponent extends DestroyableDirective implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('tabs') public tabsComponent: TabsComponent<unknown>;
+
+  @Select(UserState.userPermission)
+  public readonly userPermissions$: Observable<Permission>;
+
   public readonly tabsConfig = tabsConfig;
+  public readonly userPermissions = UserPermissions;
   public showButtons = true;
   public title: DialogMode;
   public candidateName$ = this.candidatesService.getCandidateName();
