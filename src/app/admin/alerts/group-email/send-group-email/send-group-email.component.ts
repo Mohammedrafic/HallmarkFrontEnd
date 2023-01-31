@@ -80,6 +80,7 @@ export class SendGroupEmailComponent
   @Input() emailTo: string | null;
   @Input() emailCc: string | null;
   @Input() isSend: boolean = true;
+  @Input() isFormInvalid: boolean = false;
   @Input() businessUnitType: number | null;
   @Input() businessUnit: number | null;  
   @Input() userTypeInput: number | null;
@@ -868,6 +869,8 @@ export class SendGroupEmailComponent
       this.groupEmailTemplateForm.controls['userType'].enable();
       this.rteObj.enabled = true;
       ele.className = 'rich-text-container-edit';      
+      this.isFormInvalid = false;
+      this.groupEmailTemplateForm.markAsUntouched();
     } else {
       this.businessControl?.disable();
       this.businessesControl?.disable();
@@ -931,8 +934,16 @@ export class SendGroupEmailComponent
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this.dropElement = document.getElementById('files-droparea') as HTMLElement;
+      this.dropElement = document.getElementById('droparea') as HTMLElement;    
     }, 4000);
+  }
+
+  onFileRemoving(){
+    this.uploadObj.clearAll();
+  }
+
+  onCCFieldKeyup() {
+    this.isFormInvalid = false;
   }
 }
 

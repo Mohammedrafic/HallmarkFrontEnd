@@ -1,27 +1,27 @@
 <div [formGroup]="groupEmailTemplateForm" id="groupEmailTemplateForm" class="group-email-template-form">
     
     <!-- validation errors-->
-    <div *ngIf="isSend" class="alert alert-danger">
+    <div *ngIf="isSend && isFormInvalid" class="alert alert-danger">
       <div *ngIf="emailToControl.value == ''">
         - Field Email to is required.
       </div>
     </div>
 
-    <div *ngIf="emailCcControl.invalid && emailCcControl.touched"
+    <div *ngIf="emailCcControl.invalid && isFormInvalid"
       class="alert alert-danger">
       <div *ngIf="emailCcControl.errors?.['emails']">
         - Some of email(s) in CC not matching valid email address pattern.
       </div>
     </div>
 
-    <div *ngIf="subjectControl.invalid && subjectControl.touched"
+    <div *ngIf="subjectControl.invalid && isFormInvalid"
       class="alert alert-danger">
       <div *ngIf="subjectControl.errors?.['required']">
         - Field Email subject is required.
       </div>
     </div>
 
-    <div *ngIf="emailBodyControl.invalid && emailBodyControl.touched"
+    <div *ngIf="emailBodyControl.invalid && isFormInvalid"
       class="alert alert-danger">
       <div *ngIf="emailBodyControl.errors?.['required']">
         - Field Email body is required.
@@ -249,7 +249,7 @@
           <label>CC</label>
           <div class="input-group">
             <input formControlName="emailCc" class="e-input" type="text"
-                   [(ngModel)]="emailCc" />
+                   [(ngModel)]="emailCc" (keyup)="onCCFieldKeyup()" />
           </div>
         </div>
         <div class="input-container bootstrap top-container">
@@ -266,7 +266,7 @@
               <input *ngIf="!isSend" class="e-input" type="text" disabled [(ngModel)]="fileNameInput" 
                      [ngModelOptions]="{standalone: true}" />
               <div id="group-attachment-files" *ngIf="isSend">
-                <div id="files-droparea" class="droparea" (click)="browseGroupEmail()">
+                <div id="droparea" class="droparea" (click)="browseGroupEmail()">
                   <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
                 </div>
                 <ejs-uploader #filesUploaderGroupEmail formControlName="fileUpload"
@@ -275,7 +275,8 @@
                               [multiple]="false"
                               [maxFileSize]="maxFileSize"
                               [autoUpload]="false"
-                              (selected)="onFileSelectedGroup($event)">
+                              (selected)="onFileSelectedGroup($event)"
+                              (removing)="onFileRemoving()">
                 </ejs-uploader>
               </div>
               <label *ngIf="isSend">Attached file size should not exceed 2MB<span class="e-input"></span></label>
