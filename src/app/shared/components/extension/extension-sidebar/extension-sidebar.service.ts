@@ -16,7 +16,7 @@ export class ExtensionSidebarService {
 
   public saveExtension(extension: ExtensionModel): Observable<void> {
     const payload = this.prepareExtension(extension);
-    return this.http.put<void>('/api/candidatejobs/extensions', payload);
+    return this.http.post<void>('/api/candidatejobs/extensions', payload);
   }
 
   public getExtensions(id: number, orderId: number, organizationId?: number): Observable<ExtensionGridModel[]> {
