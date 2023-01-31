@@ -60,7 +60,6 @@ import { UserState } from 'src/app/store/user.state';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
-import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
 
@@ -100,7 +99,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() isCandidatePayRateVisible: boolean;
 
   @Input() order:Order;
-  
+
   public override form: FormGroup;
   public jobStatusControl: FormControl;
   public optionFields = OPTION_FIELDS;
@@ -124,7 +123,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
-  public hasEditOrderBillRatesPermission: boolean;
   public selectedApplicantStatus: ApplicantStatus | null = null;
 
   get startDateControl(): AbstractControl | null {
@@ -483,10 +481,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private subscribeOnGetStatus(): void {
     this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
       this.nextApplicantStatuses = data;
-      this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(
-        this.candidateJob?.applicantStatus?.applicantStatus || this.candidate?.status as number,
-        data
-      );
+
       if (!data.length) {
         this.jobStatusControl.disable();
       } else {

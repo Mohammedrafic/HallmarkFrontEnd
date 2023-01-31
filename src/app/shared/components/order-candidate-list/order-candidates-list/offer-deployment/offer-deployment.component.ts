@@ -49,7 +49,6 @@ import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
-import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
 
@@ -82,7 +81,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isCandidatePayRateVisible: boolean;
 
   @Input() order: Order;
-  
+
   public statusesFormControl = new FormControl();
   public openRejectDialog = new Subject<boolean>();
   public billRatesData: BillRate[] = [];
@@ -384,7 +383,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     });
     this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
       this.nextApplicantStatuses = data;
-      this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(this.applicationStatus || this.candidate.status, data);
+
       if (!data.length) {
         this.statusesFormControl.disable();
       } else {

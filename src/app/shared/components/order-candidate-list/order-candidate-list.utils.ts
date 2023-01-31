@@ -1,7 +1,5 @@
 import { DateTimeHelper } from '@core/helpers';
-import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import { ApplicantStatus as AvailableStatus, IrpOrderCandidate, IrpOrderCandidateDto,
-} from '@shared/models/order-management.model';
+import { IrpOrderCandidate, IrpOrderCandidateDto } from '@shared/models/order-management.model';
 import { PageOfCollections } from '@shared/models/page.model';
 
 export const getCandidatePositionId = (organizationPrefix: string, publicId: number, positionId: number): string => {
@@ -16,26 +14,6 @@ export const getOrderPublicId = (organizationPrefix: string, publicId: number): 
   return `${organizationPrefix}-${publicId}`;
 };
 
-export const hasEditOrderBillRatesPermission = (applicantStatus: ApplicantStatus, statuses: AvailableStatus[]): boolean => {
-  if (applicantStatus === ApplicantStatus.Shortlisted || applicantStatus === ApplicantStatus.PreOfferCustom) {
-    return !!statuses?.find(status => status.applicantStatus === ApplicantStatus.Shortlisted);
-  }
-
-  if (applicantStatus === ApplicantStatus.Offered) {
-    return !!statuses?.find(status => status.applicantStatus === ApplicantStatus.Offered);
-  }
-
-  if (
-    applicantStatus === ApplicantStatus.OnBoarded
-    || applicantStatus === ApplicantStatus.BillRatePending
-    || applicantStatus === ApplicantStatus.OfferedBR
-  ) {
-    return !!statuses?.find(status => status.applicantStatus === ApplicantStatus.OnBoarded);
-  }
-
-  return true;
-};
-
 export const AdaptIrpCandidates = (
   response: PageOfCollections<IrpOrderCandidateDto>): PageOfCollections<IrpOrderCandidate> => {
   const candidatesData: PageOfCollections<IrpOrderCandidate> = {
@@ -46,14 +24,12 @@ export const AdaptIrpCandidates = (
       const lastTimeTo = DateTimeHelper.formatDateUTC(candidate.lastShiftTo, timeFormat);
       const nextTimeFrom = DateTimeHelper.formatDateUTC(candidate.nextShiftFrom, timeFormat);
       const nextTimeTo = DateTimeHelper.formatDateUTC(candidate.nextShiftTo, timeFormat);
-  
-  
       const irpCandidate: IrpOrderCandidate = {
         ...candidate,
         lastShiftTime: `${lastTimeFrom} - ${lastTimeTo}`,
         nextShiftTime: `${nextTimeFrom} - ${nextTimeTo}`,
       };
-  
+
       return irpCandidate;
     }),
   };

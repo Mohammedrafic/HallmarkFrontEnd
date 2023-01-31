@@ -282,7 +282,6 @@
         [isActive]="isActiveCandidateDialog$ | async"
         [readOnlyMode]="isReadOnlyBillRates"
         (billRatesChanged)="onBillRatesChanged($event)"
-        [disabledActionMode]="!hasEditOrderBillRatesPermission"
       ></app-bill-rates>
     </ng-template>
   </section>

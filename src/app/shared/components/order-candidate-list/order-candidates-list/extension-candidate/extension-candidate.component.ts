@@ -65,7 +65,6 @@ import { UserState } from 'src/app/store/user.state';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
-import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateDOBRequired, CandidateSSNRequired } from '@shared/constants';
@@ -131,7 +130,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
-  public hasEditOrderBillRatesPermission: boolean;
   public selectedApplicantStatus: ApplicantStatus | null = null;
 
   public applicantStatusEnum = ApplicantStatusEnum;
@@ -361,10 +359,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
 
     this.applicantStatuses = statuses;
-    this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(
-      this.candidateJob?.applicantStatus?.applicantStatus || (this.candidate?.status as number),
-      this.applicantStatuses
-    );
     this.changeDetectorRef.markForCheck();
 
     if (!this.applicantStatuses.length) {
