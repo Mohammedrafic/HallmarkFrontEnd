@@ -34,7 +34,7 @@
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
             <span><i-feather name="edit" class="icon"></i-feather></span>
           </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button enabled-button" (click)="onRemove(data.id)">
+          <button ejs-button cssClass="e-flat secondary-icon-button enabled-button" [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id)">
             <span><i-feather name="trash-2" class="icon"></i-feather></span>
           </button>
           <ejs-tooltip *ngIf="data.hasRedFlag" [content]="data.redFlagDescription" position="TopCenter">
