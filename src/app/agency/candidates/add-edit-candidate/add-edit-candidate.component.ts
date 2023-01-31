@@ -39,6 +39,8 @@ import {
 } from '../../store/candidate.actions';
 import { CandidateContactDetailsComponent } from './candidate-contact-details/candidate-contact-details.component';
 import { AbstractPermission } from '@shared/helpers/permissions';
+import { AgencySettingsService } from "@agency/services/agency-settings.service";
+import { AgencySettingKeys } from "@shared/constants/agency-settings";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -65,6 +67,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   public orderOrPositionTitle: string;
   public orderOrPositionId: string;
   public candidateName: string | null;
+  public isMobileLoginOn: boolean;
 
   private filesDetails: Blob[] = [];
   private unsubscribe$: Subject<void> = new Subject();
@@ -89,9 +92,11 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     private confirmService: ConfirmService,
     private credentialStorage: CredentialStorageFacadeService,
     private location: Location,
+    private agencySettingsService: AgencySettingsService,
   ) {
     super(store);
     store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
+    this.getCandidateLoginSetting();
   }
 
   override ngOnInit(): void {
@@ -113,6 +118,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         this.fetchedCandidate = candidate.payload;
         this.candidateName = this.getCandidateName(this.fetchedCandidate);
         this.patchAgencyFormValue(this.fetchedCandidate);
+        this.handleMobileLoginRestriction();
       });
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetCandidatePhotoSucceeded))
@@ -144,8 +150,25 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     this.isRemoveLogo = false;
   }
 
+  private getCandidateLoginSetting(): void {
+    this.agencySettingsService.getAgencySettingByKey(AgencySettingKeys.AllowCandidateLogin).subscribe(setting => {
+      this.isMobileLoginOn = setting;
+    });
+  }
+
   private getCandidateName(candidate: Candidate): string {
     return `${candidate.lastName}, ${candidate.firstName}`;
+  }
+
+  private handleMobileLoginRestriction(): void {
+    const generalInfoControl = this.candidateForm.get('generalInfo') as FormGroup;
+    for (const control in generalInfoControl.controls) {
+      if (control !== 'profileStatus') {
+        generalInfoControl.get(control)?.disable();
+      }
+    }
+    this.candidateForm.get('contactDetails')?.disable();
+    this.candidateForm.get('profSummary')?.disable();
   }
 
   public clearForm(): void {

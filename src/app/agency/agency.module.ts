@@ -94,6 +94,7 @@ import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-to
 
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { CandidatesModule } from '@agency/candidates/candidates.module';
+import { AgencySettingsService } from './services/agency-settings.service';
 
 
 const sidebarIcons = {
@@ -206,7 +207,8 @@ const sidebarIcons = {
   ],
   providers: [
     OrderCandidateApiService,
-    CandidateGeneralInfoService
+    CandidateGeneralInfoService,
+    AgencySettingsService
   ]
 })
 export class AgencyModule {}

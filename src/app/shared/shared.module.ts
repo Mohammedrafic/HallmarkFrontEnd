@@ -26,6 +26,7 @@ import {
   User,
   Flag,
   ArrowUp,
+  Info,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -190,6 +191,7 @@ const icons = {
   Percent,
   Flag,
   ArrowUp,
+  Info
 };
 
 const COMPONENTS = [
