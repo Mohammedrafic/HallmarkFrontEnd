@@ -346,7 +346,9 @@ export class DashboardService {
   public redirectToUrl(url: string,orderStatus? :number,status? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: status} });
   }
-
+  public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :number,candidateStatus?:string): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus} });
+  }
   private getTasksWidgetData(): Observable<string> {
     return of('temporary-collapsed-widget-tasks');
   }
@@ -430,17 +432,7 @@ export class DashboardService {
     return this.httpClient
       .post<CandidateStatusDataModel>(`${this.baseUrl}/CandidateAppliedInLastNDays`, { orderStatuses: [orderStatus], ...filter })
       .pipe(map(data=>data
-      //{
-        // const title = "Candidate Applied in last N Days";
-        // const description = "Candidate Applied in last N Days";
-        // return {
-        //   id: WidgetTypeEnum.Candidate_Applied_In_Last_N_Days,         
-        //   total: data.total,
-        //   chartData: data.values.map((item: number, index: number) => ({ x: index, y: item })),
-        //   title: title,
-        //   description: description
-        // };
-      //}
+     
       )
       );
   }
