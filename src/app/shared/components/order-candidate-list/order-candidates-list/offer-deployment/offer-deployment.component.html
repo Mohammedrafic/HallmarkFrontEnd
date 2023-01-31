@@ -124,15 +124,29 @@
                       <input formControlName="expAsTravelers" class="e-input" type="number" readonly/>
                     </div>
                   </div>
-                  <div class="input-container">
-                    <label>Available Start Date</label>
-                    <div class="input-group input-readonly">
-                      <ejs-datepicker appValidateWithMessage
-                                      class="datepicker"
-                                      format="MM/dd/yyyy"
-                                      readonly="true"
-                                      formControlName="availableStartDate">
-                      </ejs-datepicker>
+                  <div class="d-flex bootstrap">
+                    <div class="input-container">
+                      <label>Available Start Date</label>
+                      <div class="input-group input-readonly">
+                        <ejs-datepicker appValidateWithMessage
+                                        class="datepicker"
+                                        format="MM/dd/yyyy"
+                                        readonly="true"
+                                        formControlName="availableStartDate">
+                        </ejs-datepicker>
+                      </div>
+                    </div>
+
+                    <div class="input-container" *ngIf="isCandidatePayRateVisible && showCandidatePayRate">
+                      <label>Candidate Pay Rate ($)</label>
+                      <div class="input-group input-readonly">
+                        <input
+                          appValidateWithMessage
+                          formControlName="candidatePayRate"
+                          class="e-input"
+                          readonly
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

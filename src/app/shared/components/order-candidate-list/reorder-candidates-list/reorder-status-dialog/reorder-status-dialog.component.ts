@@ -82,6 +82,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     }
   }
   @Input() actionsAllowed: boolean;
+  @Input() isCandidatePayRateVisible: boolean;
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
 
@@ -192,7 +193,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
         this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(this.currentCandidateApplicantStatus, data);
-        if (!data.length) {
+        if (!data?.length) {
           this.jobStatusControl.disable();
         } else {
           this.jobStatusControl.enable();
@@ -237,6 +238,11 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   public onAccept(): void {
+    if(this.isCandidatePayRateVisible && this.acceptForm.invalid) {
+      this.acceptForm.markAllAsTouched();
+      return;
+    }
+  
     const value = this.acceptForm.getRawValue();
     const applicantStatus: ApplicantStatus = this.getNewApplicantStatus();
 
@@ -266,6 +272,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         allowDeployWoCredentials: false,
         billRates: this.orderCandidateJob.billRates,
         offeredStartDate: this.orderCandidateJob.offeredStartDate,
+        candidatePayRate: value.candidatePayRate,
       })
     );
   }
@@ -334,6 +341,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     organizationPrefix,
     jobCancellation,
     orderPublicId,
+    candidatePayRate,
   }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     let isBillRatePending: number;
@@ -363,6 +371,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       penaltyCriteria: PenaltiesMap[jobCancellation?.penaltyCriteria || 0],
       rate: jobCancellation?.rate,
       hours: jobCancellation?.hours,
+      candidatePayRate: candidatePayRate,
     });
     this.enableFields();
   }
@@ -532,6 +541,11 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     if (!this.isCancelled) {
       this.acceptForm.get('candidateBillRate')?.enable();
     }
+
+    if(this.isCandidatePayRateVisible && this.currentCandidateApplicantStatus === CandidatStatus.Offered) {
+      this.acceptForm.get('candidatePayRate')?.enable();
+    }
+
     switch (this.currentCandidateApplicantStatus) {
       case !this.isAgency && CandidatStatus.BillRatePending:
         this.canReject && this.canOffer && this.canOnboard && this.acceptForm.get('hourlyRate')?.enable();

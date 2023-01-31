@@ -97,6 +97,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() candidateOrderIds: string[];
   @Input() isOrderOverlapped: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
+  @Input() isCandidatePayRateVisible: boolean;
 
   @Input() order:Order;
   
@@ -435,6 +436,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
             rate: value.jobCancellation?.rate,
             hours: value.jobCancellation?.hours,
+            candidatePayRate: value.candidatePayRate,
           });
           this.switchFormState();
         }
@@ -585,6 +587,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       penaltyCriteria: new FormControl(''),
       rate: new FormControl(''),
       hours: new FormControl(''),
+      candidatePayRate: new FormControl('')
     });
 
     this.jobStatusControl = new FormControl('');

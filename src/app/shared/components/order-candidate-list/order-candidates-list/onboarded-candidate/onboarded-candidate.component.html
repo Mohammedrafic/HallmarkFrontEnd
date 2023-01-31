@@ -79,6 +79,12 @@
                         <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" maxlength="50" [readOnly]="isOnBoarded"/>
                       </div>
                     </div>
+                    <div class="input-container bootstrap">
+                      <label class="input-group">Available Start Date</label>
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" readonly/>
+                      </div>
+                    </div>
                   </div>
                   <div class="right-column">
                     <div class="input-container bootstrap">
@@ -119,12 +125,17 @@
                         <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" maxlength="50"/>
                       </div>
                     </div>
-                  </div>
-                </div>
-                <div class="input-container bootstrap">
-                  <label class="input-group">Available Start Date</label>
-                  <div class="input-group input-readonly">
-                    <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" readonly/>
+                    <div class="input-container bootstrap" *ngIf="isCandidatePayRateVisible">
+                      <label>Candidate Pay Rate ($)</label>
+                      <div class="input-group input-readonly">
+                        <input
+                          appValidateWithMessage
+                          formControlName="candidatePayRate"
+                          class="e-input"
+                          readonly
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div *ngIf="isAccepted" class="input-container bootstrap offered-start-date">

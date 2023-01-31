@@ -1,15 +1,16 @@
 import { GetCandidateJob, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
+import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
-import { IrpOrderCandidate, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
-import { PageOfCollections } from '@shared/models/page.model';
+import { Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { SettingsViewService } from '@shared/services';
 import { distinctUntilChanged, filter, merge, Observable, takeUntil, tap } from 'rxjs';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
@@ -41,6 +42,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   public candidateJob: OrderCandidateJob;
   public agencyActionsAllowed: boolean;
   public isFeatureIrpEnabled = false;
+  public isCandidatePayRateVisible: boolean;
   public readonly cancelledStatusName = ReorderCandidateStatuses[ReorderCandidateStatuses.Cancelled];
   public readonly systemType = OrderManagementIRPSystemId;
 
@@ -51,7 +53,9 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     protected override router: Router,
     private orderCandidateListViewService: OrderCandidateListViewService,
     private candidateApiService: OrderCandidateApiService,
-    private actions$: Actions
+    private actions$: Actions,
+    private settingService: SettingsViewService,
+    private cdr: ChangeDetectorRef,
   ) {
     super(store, router);
     this.setIrpFeatureFlag();
@@ -79,7 +83,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     this.selectedIndex = Number(data.index);
 
     this.getCandidateJobData();
-
+    this.getCandidatePayRateSetting();
     this.dialogNextPreviousOption = this.getDialogNextPreviousOption(this.candidate);
     this.orderCandidateListViewService.setIsCandidateOpened(true);
     this.openDetails.next(true);
@@ -157,5 +161,24 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     .subscribe((candidates) => {
       this.irpCandidates = candidates;
     });
+  }
+
+  
+  private getCandidatePayRateSetting(): void {
+    const organizationId = this.candidate.organizationId;
+
+    if(organizationId) {
+    this.settingService
+      .getViewSettingKey(
+        OrganizationSettingKeys.CandidatePayRate,
+        OrganizationalHierarchy.Organization,
+        organizationId,
+        organizationId
+      ).pipe(takeUntil(this.unsubscribe$))
+      .subscribe(({ CandidatePayRate }) => {
+        this.isCandidatePayRateVisible = JSON.parse(CandidatePayRate);
+        this.cdr.markForCheck();
+      });
+    }
   }
 }

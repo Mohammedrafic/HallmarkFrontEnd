@@ -27,12 +27,18 @@ export enum OrganizationSettingKeys {
   EnableChat,
   PayHigherBillRates,
   TieringLogic,
-  InvoiceAutoGeneration
+  InvoiceAutoGeneration,
+  SubmissionRequiredMinimum,
+  CandidateEditTimesheets,
+  AllowCandidateLogin,
+  SSNRequiredToAcceptPosition,
+  DateOfBirthRequiredToAcceptPosition,
+  CandidatePayRate,
 }
 
 export enum OrganizationalHierarchy {
   Organization = 1,
   Region = 2,
   Location = 3,
-  Department = 4
+  Department = 4,
 }

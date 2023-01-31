@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { merge, Observable, Subject, takeUntil } from 'rxjs';
@@ -31,6 +31,7 @@ import {
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import PriceUtils from '@shared/utils/price.utils';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -38,7 +39,7 @@ import { Comment } from '@shared/models/comment.model';
   styleUrls: ['./candidates-status-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
+export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChanges {
   @Select(OrderManagementContentState.rejectionReasonsList)
   rejectionReasonsList$: Observable<RejectReason[]>;
 
@@ -56,10 +57,12 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     this.comments = [];
   };
   public orderCandidate: OrderCandidatesList;
+  public priceUtils = PriceUtils;
   @Input() openEvent: Subject<boolean>;
   @Input() isAgency: boolean = false;
   @Input() isLocked: boolean | undefined = false;
   @Input() actionsAllowed: boolean;
+  @Input() isCandidatePayRateVisible: boolean;
 
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob | null) {
     this.orderCandidateJob = orderCandidateJob;
@@ -97,6 +100,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
 
   get showAcceptButton(): boolean {
     return this.isAgency && [ApplicantStatusEnum.Offered].includes(this.orderCandidate?.status);
+  }
+
+  get showCandidatePayRateField(): boolean {
+    return ![ApplicantStatusEnum.NotApplied, ApplicantStatusEnum.Applied].includes(this.orderCandidate?.status);
   }
 
   get showApplyButton(): boolean {
@@ -148,6 +155,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public ngOnChanges(): void {
+    this.adjustCandidatePayRateControl();
   }
 
   public closeDialog(): void {
@@ -246,6 +257,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
             clockId: value.clockId,
             allowDeployWoCredentials: value.allow,
             nextApplicantStatus: this.selectedApplicantStatus || this.orderCandidateJob.applicantStatus,
+            candidatePayRate: value.candidatePayRate,
           })
         )
         .subscribe({
@@ -258,6 +270,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
 
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     if (this.orderCandidateJob) {
+      const value = this.form.getRawValue();
       this.store
         .dispatch(
           new UpdateAgencyCandidateJob({
@@ -265,6 +278,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
             jobId: this.orderCandidateJob.jobId,
             orderId: this.orderCandidateJob.orderId,
             nextApplicantStatus: applicantStatus,
+            candidatePayRate: value.candidatePayRate,
           })
         )
         .subscribe(() => {
@@ -293,6 +307,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
       clockId: ['', [Validators.maxLength(50)]],
       allow: [false],
       rejectReason: [''],
+      candidatePayRate: [{ value: null, disabled: true }],
     });
   }
 
@@ -328,6 +343,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
       clockId: orderCandidateJob.clockId,
       allow: orderCandidateJob.allowDeployCredentials,
       rejectReason: orderCandidateJob.rejectReason,
+      candidatePayRate: orderCandidateJob.candidatePayRate
     });
     this.cd.detectChanges();
   }
@@ -367,5 +383,16 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
         }
         this.cd.detectChanges();
       });
+  }
+
+  
+  private adjustCandidatePayRateControl(): void {
+    const candidatePayRateControl = this.form?.get('candidatePayRate');
+
+    if(this.isCandidatePayRateVisible && this.showAcceptButton) {
+      candidatePayRateControl?.enable();
+    } else {
+      candidatePayRateControl?.disable();
+    }
   }
 }

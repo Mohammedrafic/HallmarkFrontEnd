@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { PenaltiesMap } from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
@@ -17,12 +17,18 @@ const showHourlyRateForStatuses: CandidatStatus[] = [
   templateUrl: './accept-form.component.html',
   styleUrls: ['./accept-form.component.scss'],
 })
-export class AcceptFormComponent {
+export class AcceptFormComponent implements OnChanges{
   @Input() formGroup: FormGroup;
   
   @Input() status: CandidatStatus;
 
+  @Input() isAgency: boolean;
+
+  @Input() isCandidatePayRateVisible: boolean;
+
   public priceUtils = PriceUtils;
+
+  public isBlankStatus: boolean;
 
   get penaltyCriteriaControlValue(): string {
     return this.formGroup.get('penaltyCriteria')?.value;
@@ -49,6 +55,22 @@ export class AcceptFormComponent {
     return this.status === CandidatStatus.Cancelled;
   }
 
+  public ngOnChanges(): void {
+      this.configureCandidatePayRateField();
+  }
+
+  private configureCandidatePayRateField(): void {
+    this.isBlankStatus = this.status === CandidatStatus.Offered;
+
+    const candidatePayRateControl = this.formGroup.get('candidatePayRate');
+    
+    if(this.isCandidatePayRateVisible && this.isBlankStatus) {
+      candidatePayRateControl?.enable();
+    } else {
+      candidatePayRateControl?.disable();
+    }
+  }
+
   static generateFormGroup(): FormGroup {
     return new FormGroup({
       reOrderFromId: new FormControl({ value: '', disabled: true }),
@@ -67,6 +89,7 @@ export class AcceptFormComponent {
       penaltyCriteria: new FormControl({ value: '', disabled: true }),
       rate: new FormControl({ value: '', disabled: true }),
       hours: new FormControl({ value: '', disabled: true }),
+      candidatePayRate: new FormControl({ value: '', disabled: true }, [Validators.required]),
     });
   }
 }

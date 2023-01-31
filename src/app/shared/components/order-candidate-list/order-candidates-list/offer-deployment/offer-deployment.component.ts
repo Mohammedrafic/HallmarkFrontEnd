@@ -79,6 +79,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() candidateOrderIds: string[];
   @Input() isOrderOverlapped: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
+  @Input() isCandidatePayRateVisible: boolean;
 
   @Input() order: Order;
   
@@ -97,6 +98,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public today = new Date();
   public priceUtils = PriceUtils;
   public hasEditOrderBillRatesPermission: boolean;
+  public showCandidatePayRate: boolean;
 
   get showYearsOfExperience(): boolean {
     return (
@@ -174,6 +176,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       this.readOnlyMode =
         this.candidateStatus === ApplicantStatusEnum.Withdraw || this.candidateStatus === ApplicantStatusEnum.Rejected;
       this.isClosedPosition = this.candidateStatus === ApplicantStatusEnum.Offboard;
+      this.showCandidatePayRate = this.candidateStatus !== ApplicantStatusEnum.Applied && this.candidateStatus !== ApplicantStatusEnum.NotApplied;
     }
 
     this.checkRejectReason();
@@ -332,6 +335,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       expAsTravelers: new FormControl(''),
       guaranteedWorkWeek: new FormControl('', [Validators.maxLength(200)]),
       offeredStartDate: new FormControl(''),
+      candidatePayRate: new FormControl('')
     });
   }
 
@@ -350,6 +354,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       expAsTravelers: data.expAsTravelers,
       guaranteedWorkWeek: data.guaranteedWorkWeek,
       offeredStartDate: DateTimeHelper.formatDateUTC(data.offeredStartDate || data.order.jobStartDate.toString(), 'MM/dd/yyyy'),
+      candidatePayRate: data.candidatePayRate,
     });
   }
 

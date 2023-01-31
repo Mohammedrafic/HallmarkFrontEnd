@@ -27,6 +27,8 @@ import { OrderType } from '@shared/enums/order-type';
 import { OrderCandidateApiService } from '../order-candidate-api.service';
 import { AppState } from 'src/app/store/app.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { SettingsViewService } from '@shared/services';
+import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -70,6 +72,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public orderTypes = OrderType;
   public isFeatureIrpEnabled = false;
   public readonly systemType = OrderManagementIRPSystemId;
+  public isCandidatePayRateVisible: boolean;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -80,6 +83,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     protected override router: Router,
     private orderCandidateListViewService: OrderCandidateListViewService,
     private candidateApiService: OrderCandidateApiService,
+    private settingService: SettingsViewService
   ) {
     super(store, router);
     this.setIrpFeatureFlag();
@@ -110,6 +114,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
 
     this.candidate = { ...data };
     this.getDeployedCandidateOrders();
+    this.getCandidatePayRateSetting();
 
     this.orderCandidateListViewService.setIsCandidateOpened(true);
     if (this.order && this.candidate) {
@@ -268,5 +273,22 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
 
   private setIrpFeatureFlag(): void {
     this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+  }
+
+  private getCandidatePayRateSetting(): void {
+    const organizationId = this.candidate.organizationId;
+
+    if(organizationId) {
+    this.settingService
+      .getViewSettingKey(
+        OrganizationSettingKeys.CandidatePayRate,
+        OrganizationalHierarchy.Organization,
+        organizationId,
+        organizationId
+      ).pipe(takeUntil(this.unsubscribe$))
+      .subscribe(({ CandidatePayRate }) => {
+        this.isCandidatePayRateVisible = JSON.parse(CandidatePayRate);
+      });
+    }
   }
 }
