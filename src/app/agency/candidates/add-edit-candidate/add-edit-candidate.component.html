@@ -1,10 +1,18 @@
-<app-page-toolbar>
+<app-page-toolbar [rightPanelButtonsOnly]="true">
   <ng-container left>
-    <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
-    <h3>{{title}} Candidate <span class="candidate-name-title">{{candidateName}}</span></h3>
-    <div class="candidate-message" *ngIf="isCandidateAssigned">
-      <div class="candidate-message__itm" *ngIf="candidateJob"><span>Job title:</span> {{candidateJob}}</div>
-      <div class="candidate-message__itm" *ngIf="orderOrPositionId"><span>{{orderOrPositionTitle}} ID:</span> {{orderOrPositionId}}</div>
+    <div class="candidate-left-container">
+      <button ejs-button cssClass="e-outline" class="back-button" (click)="navigateBack()">Back</button>
+      <h3>{{title}} Candidate <span class="candidate-name-title">{{candidateName}}</span></h3>
+      <div class="candidate-message" *ngIf="isCandidateAssigned">
+        <div class="candidate-message__itm" *ngIf="candidateJob"><span>Job title:</span> {{candidateJob}}</div>
+        <div class="candidate-message__itm" *ngIf="orderOrPositionId"><span>{{orderOrPositionTitle}} ID:</span> {{orderOrPositionId}}</div>
+      </div>
+    </div>
+    <div class="restriction-message" *ngIf="!isNavigatedFromOrganizationArea && isMobileLoginOn">
+      <div class="tooltip-icon">
+        <i-feather name="info" class="icon"></i-feather>
+      </div>
+      <div class="message">This profile is managed by a Candidate via the EII Plus mobile application. The Candidate will receive updates on jobs, schedule, and timesheets from your Agency. You can manage the partnership by changing the profile status.</div>
     </div>
   </ng-container>
   <ng-container right>
@@ -44,7 +52,7 @@
           <div class="right">
             <app-image-uploader (selectImage)="onImageSelect($event)"
                                 uploaderTitle="Photo"
-                                [disabled]="readonlyMode"
+                                [disabled]="readonlyMode || isMobileLoginOn"
                                 [logo]="photo">
             </app-image-uploader>
           </div>
@@ -58,7 +66,7 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-experience-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission"></app-experience-grid>
+        <app-experience-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed" [userPermission]="userPermission"></app-experience-grid>
       </ng-template>
     </e-tabitem >
     <e-tabitem *ngIf="userPermission[userPermissions.CanViewEducation]">
@@ -68,7 +76,7 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-education-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission"></app-education-grid>
+        <app-education-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed" [userPermission]="userPermission"></app-education-grid>
       </ng-template>
     </e-tabitem>
     <e-tabitem *ngIf="userPermission[userPermissions.CanViewCandidateCredentials]">
@@ -79,7 +87,7 @@
       </ng-template>
       <ng-template #content>
         <app-credentials-grid
-          [isNavigatedFromOrganizationArea]="isNavigatedFromOrganizationArea"
+          [isNavigatedFromOrganizationArea]="isNavigatedFromOrganizationArea || isMobileLoginOn"
           [areAgencyActionsAllowed]="agencyActionsAllowed"
           [isCandidateAssigned]="isCandidateAssigned"
           [orderId]="orderId"

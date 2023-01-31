@@ -1,5 +1,6 @@
 @import "../../../styles/variables/colors.scss";
 @import "../../../styles/variables/mixins.scss";
+@import 'adaptive-response';
 
 :host {
   height: calc(100% - 240px);
@@ -11,6 +12,33 @@
       }
     }
   }
+}
+
+.restriction-message {
+  border-radius: 8px;
+  background-color: $primary-active-blue-90;
+  color: $primary-active-blue;
+  font-size: 14px;
+  line-height: 21px;
+  padding: 8px;
+  display: flex;
+  margin: 0 20px;
+  max-width: 65%;
+
+  .tooltip-icon {
+    padding: 4px 15px 0 5px;
+  }
+}
+
+@media #{$max-tablet} {
+  .restriction-message {
+    margin: 21px 0 0 0;
+    max-width: 100%;
+  }
+}
+
+.candidate-left-container {
+  display: flex;
 }
 
 .candidate-message {
@@ -55,4 +83,8 @@
 .candidate-name-title {
   margin-left: 10px;
   font-weight: 700;
+}
+
+.back-button {
+  margin-right: 28px;
 }

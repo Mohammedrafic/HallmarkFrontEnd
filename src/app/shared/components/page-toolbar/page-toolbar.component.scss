@@ -15,6 +15,10 @@ $gap: 12px;
     max-width: 50%;
     display: flex;
 
+    &.buttons {
+      max-width: 100%;
+    }
+
     & > *:not(:last-child) {
       margin-right: $gap;
     }
@@ -65,6 +69,10 @@ $gap: 12px;
       width: auto;
       overflow: hidden;
       padding-top: 1px;
+
+      &.buttons {
+        flex-direction: column;
+      }
     }
 
     .right-content {

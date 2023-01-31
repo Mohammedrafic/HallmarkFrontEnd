@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-page-toolbar',
@@ -6,4 +6,6 @@ import { Component, ViewEncapsulation } from '@angular/core';
   styleUrls: ['./page-toolbar.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class PageToolbarComponent {}
+export class PageToolbarComponent {
+  @Input() rightPanelButtonsOnly = false;
+}
