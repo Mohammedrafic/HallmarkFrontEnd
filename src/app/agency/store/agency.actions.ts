@@ -14,7 +14,12 @@ export class SaveAgencySucceeded {
 
 export class GetAgencyByPage {
   static readonly type = '[agency] Get Agency by Page';
-  constructor(public pageNumber: number, public pageSize: number, public filters: AgencyListFilters) {}
+  constructor(
+    public pageNumber: number,
+    public pageSize: number,
+    public orderBy: string,
+    public filters: AgencyListFilters
+  ) {}
 }
 
 export class GetAgencyById {

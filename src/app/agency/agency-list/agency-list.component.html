@@ -37,7 +37,6 @@
             [rowHeight]="rowHeight"
             [enableVirtualization]="true"
             [resizeSettings]="resizeSettings"
-            [sortSettings]="initialSort"
             [allowSorting]="allowSorting"
             [allowResizing]="allowResizing"
             (dataBound)="dataBound()"
@@ -60,7 +59,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column headerText="AGENCY NAME" width="430">
+      <e-column field="AgencyName" headerText="AGENCY NAME" width="430">
         <ng-template #template let-data>
           <app-agency-name
             [agencyName]="data.agencyDetails.name"
@@ -68,7 +67,7 @@
           ></app-agency-name>
         </ng-template>
       </e-column>
-      <e-column field="agencyDetails.status" headerText="AGENCY STATUS" width=200>
+      <e-column field="AgencyStatus" headerText="AGENCY STATUS" width=200>
         <ng-template #template let-data>
           <div>
             <ejs-chiplist class="events-off">
@@ -81,7 +80,11 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="agencyContactDetails.0.contactPerson" headerText="CONTACT PERSON" width="220"></e-column>
+      <e-column field="ContactPerson" headerText="CONTACT PERSON" width="220">
+        <ng-template #template let-data>
+          {{ data.agencyContactDetails[0].contactPerson }}
+        </ng-template>
+      </e-column>
       <e-column field="agencyContactDetails.0.phone1" headerText="PHONE" width="220" [allowSorting]="false"></e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>

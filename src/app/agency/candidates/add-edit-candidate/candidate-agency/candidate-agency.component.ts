@@ -24,7 +24,12 @@ export class CandidateAgencyComponent implements AfterViewInit {
   agencies$: Observable<any>;
 
   constructor(private store: Store) {
-    store.dispatch(new GetAgencyByPage(GRID_CONFIG.initialPage, GRID_CONFIG.initialRowsPerPage, {})); // TODO: needed until we dont have agency switcher in the header
+    store.dispatch(new GetAgencyByPage(
+      GRID_CONFIG.initialPage,
+      GRID_CONFIG.initialRowsPerPage,
+      '',
+      {}
+    )); // TODO: needed until we dont have agency switcher in the header
   }
 
   ngAfterViewInit(): void {

@@ -18,15 +18,13 @@ import { sortBy } from '@shared/helpers/sort-array.helper';
 export class AgencyService {
   constructor(private http: HttpClient) {}
 
-  /**
-   * Get agencies by page number
-   * @param PageNumber
-   * @param PageSize
-   * @param Filters
-   * @return list of agencies
-   */
-  public getAgencies(PageNumber: number, PageSize: number, Filters: AgencyListFilters): Observable<AgencyPage> {
-    return this.http.post<AgencyPage>(`/api/Agency/filtered`, { PageNumber, PageSize, ...Filters });
+  public getAgencies(
+    PageNumber: number,
+    PageSize: number,
+    OrderBy: string,
+    Filters: AgencyListFilters
+  ): Observable<AgencyPage> {
+    return this.http.post<AgencyPage>(`/api/Agency/filtered`, { PageNumber, PageSize, OrderBy, ...Filters });
   }
 
   /**

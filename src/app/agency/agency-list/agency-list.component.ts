@@ -35,9 +35,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
 
   public readonly statusEnum = AgencyStatus;
   public readonly statusMapper = agencyStatusMapper;
-  public initialSort = {
-    columns: [{ field: 'agencyDetails.name', direction: 'Ascending' }],
-  };
+
   public columnsToExport: ExportColumn[] = [
     { text: 'Agency Name', column: 'AgencyName' },
     { text: 'Agency Status', column: 'AgencyStatus' },
@@ -76,7 +74,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   override ngOnInit(): void {
     super.ngOnInit();
     this.initAgencyListFilterFormGroup();
-    this.dispatchNewPage();
+    this.updatePage();
     this.subscribeOnPageChanges();
     this.subscribeOnAgencyFilteringOptions();
     this.subscribeOnSuccessAgencyByPage();
@@ -176,7 +174,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
 
   public onFilterClearAll(): void {
     this.clearFilters();
-    this.dispatchNewPage();
+    this.updatePage();
   }
 
   private clearFilters(): void {
@@ -190,7 +188,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public onFilterApply(): void {
     this.filters = this.agencyListFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.agencyListFilterFormGroup, this.filterColumns);
-    this.dispatchNewPage();
+    this.updatePage();
     this.store.dispatch(new ShowFilterDialog(false));
     this.filteredItems$.next(this.filteredItems.length);
   }
@@ -207,8 +205,8 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     this.filteredItems$.next(this.filteredItems.length);
   }
 
-  private dispatchNewPage(): void {
-    this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize, this.filters));
+  public override updatePage(): void {
+    this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
   }
 
   private getDefaultFileName(): string {
@@ -241,14 +239,14 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAgencySucceeded))
       .subscribe((agency: { payload: Agency }) => {
-        this.dispatchNewPage();
+        this.updatePage();
       });
   }
 
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
       this.currentPage = page;
-      this.dispatchNewPage();
+      this.updatePage();
     });
   }
 
