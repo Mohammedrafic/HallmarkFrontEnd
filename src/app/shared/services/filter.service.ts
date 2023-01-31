@@ -105,6 +105,7 @@ export class FilterService {
 
           case ControlTypes.Date:
             if (datePipe) {
+              // TODO use formatDate instead of date Pipe
               chips.push({ text: datePipe.transform(val, 'MM/dd/yyyy'), column: key, value: val });
             }
             break;

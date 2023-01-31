@@ -6,12 +6,13 @@ import { map } from 'rxjs/operators';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
-import { GroupInvoicesParams, InvoicesFilteringOptions,
+import {
+  GroupInvoicesParams, InvoicesFilteringOptions,
   InvoicesFilterState, InvoiceStateDto, ManualInvoiceMeta,
   ManualInvoicePostDto, ManualInvoiceReason, ManualInvoicesData,
   ManualInvoiceTimesheetResponse, InvoiceDetail, PrintingPostDto,
   PrintInvoiceData, ManualInvoicePutDto, InvoicePayment, InvoicePaymentGetParams, PaymentCreationDto,
-  PendingApprovalInvoice, PendingApprovalInvoicesData, PendingInvoicesData,
+  PendingApprovalInvoice, PendingApprovalInvoicesData, PendingInvoicesData, InvoicesPendingInvoiceRecordsFilteringOptions
 } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
@@ -29,6 +30,10 @@ export class InvoicesApiService {
 
   public getFiltersDataSource(): Observable<InvoicesFilteringOptions> {
     return this.http.get<InvoicesFilteringOptions>(`/api/Invoices/filteroptions`);
+  }
+
+  public getPendingInvoicesFiltersDataSource(): Observable<InvoicesPendingInvoiceRecordsFilteringOptions> {
+    return this.http.get<InvoicesPendingInvoiceRecordsFilteringOptions>(`/api/PendingInvoices/filteroptions`);
   }
 
   public getInvoiceReasons(): Observable<ManualInvoiceReason[]> {

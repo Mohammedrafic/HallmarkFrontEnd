@@ -1,13 +1,9 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
-import {
-  InvoiceFilterColumns,
-  InvoiceFilterFieldConfig,
-  InvoicesTabItem,
-  InvoiceTabId,
-} from '../interfaces';
+import { InvoiceFilterColumns, InvoiceFilterFieldConfig, InvoicesTabItem, InvoiceTabId } from '../interfaces';
 import {
   FilteringInvoicesOptionsFields,
+  FilteringPendingInvoiceRecordsOptionsFields,
   InvoicesAgencyTabId,
   InvoicesOrgTabId,
   InvoicesTableFiltersColumns,
@@ -81,6 +77,11 @@ const defaultColumnMapping = {
   valueId: 'id',
 };
 
+const defaultDateMapping = {
+  type: ControlTypes.Date,
+  valueType: ValueType.Text,
+};
+
 export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
   [InvoicesTableFiltersColumns.FormattedInvoiceIds]: defaultInputMapping,
   [InvoicesTableFiltersColumns.SearchTerm]: defaultInputMapping,
@@ -90,12 +91,21 @@ export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
   [InvoicesTableFiltersColumns.ApDelivery]: defaultInputMapping,
   [InvoicesTableFiltersColumns.AggregateByType]: defaultInputMapping,
   [InvoicesTableFiltersColumns.AgencyIds]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.IssueDateFrom]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.IssueDateTo]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.DueDateFrom]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.DueDateTo]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.PaidDateFrom]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.PaidDateTo]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.IssueDateFrom]: defaultDateMapping,
+  [InvoicesTableFiltersColumns.IssueDateTo]: defaultDateMapping,
+  [InvoicesTableFiltersColumns.DueDateFrom]: defaultDateMapping,
+  [InvoicesTableFiltersColumns.DueDateTo]: defaultDateMapping,
+  [InvoicesTableFiltersColumns.PaidDateFrom]: defaultDateMapping,
+  [InvoicesTableFiltersColumns.PaidDateTo]: defaultDateMapping,
+
+  [InvoicesTableFiltersColumns.OrderIds]: defaultInputMapping,
+  [InvoicesTableFiltersColumns.TimesheetType]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.RegionIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.LocationIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.DepartmentIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.SkillIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.WeekPeriodFrom]: defaultDateMapping,
+  [InvoicesTableFiltersColumns.WeekPeriodTo]: defaultDateMapping,
 } as InvoiceFilterColumns;
 
 export const InvoicesFilteringOptionsMapping: Map<FilteringInvoicesOptionsFields, InvoicesTableFiltersColumns> = new Map()
@@ -103,6 +113,14 @@ export const InvoicesFilteringOptionsMapping: Map<FilteringInvoicesOptionsFields
   .set(FilteringInvoicesOptionsFields.AggregateByType, InvoicesTableFiltersColumns.AggregateByType)
   .set(FilteringInvoicesOptionsFields.ApDelivery, InvoicesTableFiltersColumns.ApDelivery)
   .set(FilteringInvoicesOptionsFields.InvoiceStates, InvoicesTableFiltersColumns.StatusIds);
+
+export const PendingInvoiceRecordsFilteringOptionsMapping: Map<FilteringPendingInvoiceRecordsOptionsFields, InvoicesTableFiltersColumns> = new Map()
+  .set(FilteringPendingInvoiceRecordsOptionsFields.Types, InvoicesTableFiltersColumns.TimesheetType)
+  .set(FilteringPendingInvoiceRecordsOptionsFields.Skills, InvoicesTableFiltersColumns.SkillIds)
+  .set(FilteringPendingInvoiceRecordsOptionsFields.Agency, InvoicesTableFiltersColumns.AgencyIds)
+  .set(FilteringPendingInvoiceRecordsOptionsFields.Regions, InvoicesTableFiltersColumns.RegionIds)
+  .set(FilteringPendingInvoiceRecordsOptionsFields.Locations, InvoicesTableFiltersColumns.LocationIds)
+  .set(FilteringPendingInvoiceRecordsOptionsFields.Departments, InvoicesTableFiltersColumns.DepartmentIds);
 
 export const ApproveInvoiceConfirmDialogConfig = {
   title: 'Approve Invoice',
@@ -199,6 +217,81 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
   },
 ];
 
+export const PendingInvoicesFiltersFormConfig = (): InvoiceFilterFieldConfig[] => [
+  {
+    type: ControlTypes.Dropdown,
+    title: 'Type',
+    field: InvoicesTableFiltersColumns.TimesheetType,
+  },
+  {
+    type: ControlTypes.Text,
+    title: 'Order ID/Position ID',
+    field: InvoicesTableFiltersColumns.OrderIds,
+  },
+  {
+    type: ControlTypes.Dropdown,
+    title: 'Agency',
+    field: InvoicesTableFiltersColumns.AgencyIds,
+  },
+  {
+    type: ControlTypes.Text,
+    title: 'Candidate',
+    field: InvoicesTableFiltersColumns.SearchTerm,
+  },
+  {
+    type: ControlTypes.Dropdown,
+    title: 'Region',
+    field: InvoicesTableFiltersColumns.RegionIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Dropdown,
+    title: 'Location',
+    field: InvoicesTableFiltersColumns.LocationIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Dropdown,
+    title: 'Department',
+    field: InvoicesTableFiltersColumns.DepartmentIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Dropdown,
+    title: 'Skill',
+    field: InvoicesTableFiltersColumns.SkillIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Date,
+    title: 'Week Period From',
+    field: InvoicesTableFiltersColumns.WeekPeriodFrom,
+    isShort: true,
+  },
+  {
+    type: ControlTypes.Date,
+    title: 'Week Period To',
+    field: InvoicesTableFiltersColumns.WeekPeriodTo,
+    isShort: true,
+  },
+  {
+    type: ControlTypes.Text,
+    title: 'Amount From',
+    field: InvoicesTableFiltersColumns.AmountFrom,
+    isShort: true,
+  },
+  {
+    type: ControlTypes.Text,
+    title: 'Amount To',
+    field: InvoicesTableFiltersColumns.AmountTo,
+    isShort: true,
+  },
+];
+
 export const DetectFormConfigBySelectedType = (selectedTabId: InvoiceTabId, isAgency: boolean): InvoiceFilterFieldConfig[] => {
   if (
     selectedTabId !== InvoicesAgencyTabId.ManualInvoicePending
@@ -206,6 +299,10 @@ export const DetectFormConfigBySelectedType = (selectedTabId: InvoiceTabId, isAg
     && selectedTabId !== InvoicesOrgTabId.ManualInvoicePending
   ) {
     return AllInvoicesFiltersFormConfig(isAgency, selectedTabId);
+  }
+
+  if (selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
+    return PendingInvoicesFiltersFormConfig();
   }
 
   return ManualInvoicesFiltersFormConfig();

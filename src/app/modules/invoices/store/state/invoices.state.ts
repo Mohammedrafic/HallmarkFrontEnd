@@ -25,12 +25,12 @@ import {
   ManualInvoiceMeta,
   ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData,
   PendingApprovalInvoice, PendingApprovalInvoicesData, PendingInvoicesData,
+  InvoicesPendingInvoiceRecordsFilteringOptions,
 } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import {
   DefaultFiltersState,
   DefaultInvoicesState,
-  InvoicesFilteringOptionsMapping,
   ManualInvoiceMessages,
   SavedInvoicesFiltersParams,
 } from '../../constants';
@@ -43,7 +43,7 @@ import { downloadBlobFile, saveSpreadSheetDocument } from '@shared/utils/file.ut
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Attachment } from '@shared/components/attachments';
 import { reduceFiltersState } from '@core/helpers/functions.helper';
-import { FilteringInvoicesOptionsFields } from '../../enums';
+import { InvoicesFiltersService } from '../../services/invoices-filters.service';
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -55,6 +55,7 @@ export class InvoicesState {
     private invoicesService: InvoicesService,
     private invoicesAPIService: InvoicesApiService,
     private manualInvoiceAttachmentsApiService: ManualInvoiceAttachmentsApiService,
+    private invoicesFiltersService: InvoicesFiltersService
   ) {
   }
 
@@ -239,21 +240,37 @@ export class InvoicesState {
         const { invoiceFiltersColumns } = getState();
 
         setState(patch({
-          invoiceFiltersColumns: patch(Object.keys(res).reduce((acc: InvoiceFilterColumns, key: string) => {
-            const typedKey = key as FilteringInvoicesOptionsFields;
-            const optionsKey = InvoicesFilteringOptionsMapping.get(typedKey);
+          invoiceFiltersColumns: patch(this.invoicesFiltersService.prepareAllFiltersDataSources(
+            res,
+            invoiceFiltersColumns,
+          )),
+        }));
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+      }),
+    );
+  }
 
-            if (!optionsKey) {
-              return acc;
-            }
+  @Action(Invoices.GetPendingRecordsFiltersDataSource)
+  GetPendingRecordsFiltersDataSource(
+    { setState, dispatch, getState }: StateContext<InvoicesModel>,
+  ): Observable<InvoicesPendingInvoiceRecordsFilteringOptions | void> {
+    return this.invoicesAPIService.getPendingInvoicesFiltersDataSource().pipe(
+      map(res => ({
+        ...res,
+        regions: [],
+        locations: [],
+        departments: [],
+      })),
+      tap((res) => {
+        const { invoiceFiltersColumns } = getState();
 
-            acc[optionsKey] = {
-              ...invoiceFiltersColumns[optionsKey],
-              dataSource: res[typedKey],
-            };
-
-            return acc;
-          }, {} as InvoiceFilterColumns)),
+        setState(patch({
+          invoiceFiltersColumns: patch(this.invoicesFiltersService.preparePendingFiltersDataSources(
+            res,
+            invoiceFiltersColumns,
+          )),
         }));
       }),
       catchError((err: HttpErrorResponse) => {

@@ -11,31 +11,30 @@ import {
   TrackByFunction,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
 import { debounceTime, Observable, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
-import { Destroyable, LeftOnlyValidValues } from '@core/helpers';
+import { Destroyable } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 import { filterOptionFields } from '@core/constants/filters-helper.constant';
 import { PageOfCollections } from '@shared/models/page.model';
 import { FilterService } from '@shared/services/filter.service';
 import { FilteredItem } from '@shared/models/filter.model';
 import { ControlTypes } from '@shared/enums/control-types.enum';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
+import { UserState } from '../../../../store/user.state';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesFiltersService } from '../../services/invoices-filters.service';
-import {
-  InvoiceFilterColumns,
-  InvoiceFilterFieldConfig,
-  InvoiceRecord,
-  InvoicesFilterState,
-  InvoiceTabId,
-} from '../../interfaces';
+import { InvoiceFilterColumns, InvoiceFilterFieldConfig, InvoiceRecord, InvoicesFilterState, InvoiceTabId } from '../../interfaces';
 import { DetectFormConfigBySelectedType } from '../../constants';
-import { InvoicesTableFiltersColumns } from '../../enums';
+import { InvoicesAgencyTabId, InvoicesOrgTabId, InvoicesTableFiltersColumns } from '../../enums';
+import { InvoiceFiltersAdapter } from '../../adapters';
 
 @Component({
   selector: 'app-invoices-filters-dialog',
@@ -44,6 +43,9 @@ import { InvoicesTableFiltersColumns } from '../../enums';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoicesFiltersDialogComponent extends Destroyable implements OnInit, OnChanges {
+  @Select(UserState.organizationStructure)
+  private readonly organizationStructure$: Observable<OrganizationStructure>;
+
   @Select(InvoicesState.invoicesData)
   public invoicesData$: Observable<PageOfCollections<InvoiceRecord> | null>;
 
@@ -61,12 +63,15 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   public filterOptionFields = filterOptionFields;
   public isAgency = false;
 
+  private regions: OrganizationRegion[] = [];
+
   constructor(
     private filterService: FilterService,
     private cdr: ChangeDetectorRef,
     private invoicesFiltersService: InvoicesFiltersService,
     private store: Store,
     private router: Router,
+    private datePipe: DatePipe
   ) {
     super();
 
@@ -79,6 +84,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   ngOnInit(): void {
     this.initFiltersDataSources();
     this.initFormGroup();
+    this.watchForControlsValueChanges();
     this.setFormGroupValidators();
     this.startFormGroupWatching();
     this.initFiltersColumns();
@@ -107,20 +113,21 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   applyFilters(): void {
-    const filters: InvoicesFilterState = LeftOnlyValidValues(this.formGroup);
-
-    if (filters.formattedInvoiceIds) {
-      filters.formattedInvoiceIds = [this.formGroup.getRawValue().formattedInvoiceIds];
-    }
-
-    this.updateTableByFilters.emit(filters);
-    this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
+    this.updateTableByFilters.emit(InvoiceFiltersAdapter.prepareFilters(this.formGroup));
+    this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
     this.cdr.detectChanges();
   }
 
   initFiltersDataSources(): void {
-    this.store.dispatch(new Invoices.GetFiltersDataSource());
+    if (this.selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
+      this.store.dispatch(new Invoices.GetPendingRecordsFiltersDataSource());
+    } else if (
+      this.selectedTabId !== InvoicesOrgTabId.ManualInvoicePending
+      && this.selectedTabId !== InvoicesAgencyTabId.ManualInvoicePending
+    ) {
+      this.store.dispatch(new Invoices.GetFiltersDataSource());
+    }
   }
 
   private initFormGroup(): void {
@@ -155,6 +162,76 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
 
   private initFormConfig(): void {
     this.filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency);
+
+    if (this.selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
+      this.watchForOrganizationStructure();
+    }
+
     this.cdr.detectChanges();
+  }
+
+  private watchForOrganizationStructure(): void {
+    this.organizationStructure$.pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy()),
+    ).subscribe((structure: OrganizationStructure) => {
+      this.regions = structure.regions;
+      this.filterColumns.regionIds.dataSource = this.regions;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private watchForControlsValueChanges(): void {
+    this.formGroup.get('regionIds')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((val: number[]) => {
+        this.filterColumns.locationIds.dataSource = [];
+
+        if (val?.length) {
+          const regionLocations: OrganizationLocation[] = [];
+          const selectedRegions: OrganizationRegion[] = val.map((id) => {
+            return this.regions.find((region) => region.id === id) as OrganizationRegion;
+          });
+
+          this.filterColumns.locationIds.dataSource = [];
+          selectedRegions.forEach((region: OrganizationRegion) => {
+            region?.locations?.forEach((location: OrganizationLocation) => {
+              location.regionName = region.name;
+            });
+            regionLocations.push(...(region?.locations as []));
+          });
+          this.filterColumns.locationIds.dataSource.push(...sortByField(regionLocations, 'name'));
+        } else {
+          this.formGroup.get('locationIds')?.setValue([]);
+          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+        }
+
+        this.cdr.markForCheck();
+      });
+
+    this.formGroup.get('locationIds')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((val: number[]) => {
+        this.filterColumns.departmentIds.dataSource = [];
+
+        if (val?.length) {
+          const locationDepartments: OrganizationDepartment[] = [];
+          const selectedLocations: OrganizationLocation[] = val.map((id) => {
+            return (this.filterColumns.locationIds.dataSource as OrganizationLocation[])
+              .find((location: OrganizationLocation) => location.id === id) as OrganizationLocation;
+          });
+
+          selectedLocations.forEach((location: OrganizationLocation) => {
+            locationDepartments.push(...(location?.departments as []));
+          });
+
+          this.filterColumns.departmentIds.dataSource.push(...sortByField(locationDepartments, 'name'));
+        } else {
+          this.formGroup.get('departmentIds')?.setValue([]);
+          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+        }
+
+        this.cdr.markForCheck();
+      });
   }
 }

@@ -9,8 +9,15 @@ import { AgencyStatus } from '@shared/enums/status';
 import { BillRateType } from '@shared/models';
 import { Attachment, DetailsColumnConfig } from '../../timesheets/interface';
 import {
-  InvoiceAttachmentFileType, InvoiceRecordType, InvoicesAggregationType,
-  InvoicesTableFiltersColumns, INVOICES_STATUSES, FilteringInvoicesOptionsFields, InvoicesOrgTabId, InvoicesAgencyTabId,
+  InvoiceAttachmentFileType,
+  InvoiceRecordType,
+  InvoicesAggregationType,
+  InvoicesTableFiltersColumns,
+  INVOICES_STATUSES,
+  FilteringInvoicesOptionsFields,
+  InvoicesOrgTabId,
+  InvoicesAgencyTabId,
+  FilteringPendingInvoiceRecordsOptionsFields
 } from '../enums';
 import { PendingInvoiceStatus } from '../enums/invoice-status.enum';
 import { InvoiceDetail } from './invoice-detail.interface';
@@ -75,6 +82,15 @@ export interface InvoicesFilterState {
   dueDateTo?: string;
   paidDateFrom?: string;
   paidDateTo?: string;
+
+  orderIds?: string[];
+  timesheetType?: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentIds?: number[];
+  skillIds?: number[];
+  weekPeriodFrom?: string;
+  weekPeriodTo?: string;
 }
 
 export type InvoiceFilterColumns = {
@@ -89,6 +105,10 @@ export type InvoiceFilterColumns = {
 
 export type InvoicesFilteringOptions = {
   [key in FilteringInvoicesOptionsFields]: DataSourceItem[];
+}
+
+export type InvoicesPendingInvoiceRecordsFilteringOptions = {
+  [key in FilteringPendingInvoiceRecordsOptionsFields]: DataSourceItem[];
 }
 
 export interface ManualInvoiceTimesheetResponse {
@@ -303,4 +323,5 @@ export interface InvoiceFilterFieldConfig {
   title: string;
   field: InvoicesTableFiltersColumns;
   isShort?: boolean;
+  showSelectAll?: boolean;
 }
