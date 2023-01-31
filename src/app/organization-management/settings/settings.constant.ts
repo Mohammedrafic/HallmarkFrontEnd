@@ -49,4 +49,5 @@ export const DisabledSettingsByDefault = [
   'NetPaymentTerms',
   'NoOfDaysAllowedForTimesheetEdit',
   'EnableChat',
+  'CandidateAppliedInLastNDays',
 ];

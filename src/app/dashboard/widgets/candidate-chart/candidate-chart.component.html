@@ -1,0 +1,24 @@
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+    <ng-template #header>
+        <div class="app-widget-wrapper__tooltip" *ngIf="description.length>0">
+          <ejs-tooltip [content]="description" position='TopCenter'>
+            <span class="mytooltip">
+              <i-feather name="info" id="info"
+                         [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+            </span>
+          </ejs-tooltip>
+        </div>
+      
+    </ng-template>
+    <ng-template #positionChat>
+      <div class="widget">
+        <span class="widget__title">{{ chartData?.count }}</span>
+        <span class="widget__type" *ngIf="!isLTAOrderEnding"
+              (mousedown)="defineMousePosition($event)"
+              (click)="toSourceContent($event)">Candidates applied in last {{chartData?.days||0}} days</span>
+        <span class="widget__type" *ngIf="isLTAOrderEnding"
+              (mousedown)="defineMousePosition($event)">Candidates applied in last {{chartData?.days||0}} days</span>
+      </div>
+    </ng-template>
+  </app-widget-wrapper>
+  
