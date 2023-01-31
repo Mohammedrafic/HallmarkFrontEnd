@@ -407,7 +407,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           let locationFilter: LocationsByRegionsFilter = {
             ids: data,
             getAll: true,
-            businessUnitId: selectedBusinessUnitId
+            businessUnitId: selectedBusinessUnitId,
+            orderBy:'Name'
           };
           this.store.dispatch(new GetLocationsByRegions(locationFilter));
           this.changeDetectorRef.markForCheck();
