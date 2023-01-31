@@ -18,14 +18,14 @@
   <div class="section">
     <div class="title">
       <i-feather name="calendar" class="icon"></i-feather>
-      <span class="title-text">{{ candidateJob?.actualStartDate | date: 'MM/dd/yyyy' }}</span>
+      <span class="title-text">{{ candidateJob?.actualStartDate | date: 'MM/dd/yyyy': 'UTC' }}</span>
     </div>
     <div class="sub-title">Initial Start Date</div>
   </div>
   <div class="section">
     <div class="title">
       <i-feather name="calendar" class="icon"></i-feather>
-      <span class="title-text">{{ candidateJob?.actualEndDate | date: 'MM/dd/yyyy' }}</span>
+      <span class="title-text">{{ candidateJob?.actualEndDate | date: 'MM/dd/yyyy': 'UTC' }}</span>
     </div>
     <div class="sub-title">Initial End Date</div>
   </div>

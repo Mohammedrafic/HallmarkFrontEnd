@@ -5,6 +5,7 @@ import { catchError, Observable, of } from 'rxjs';
 import { ExtensionGridModel, ExtensionModel } from './models/extension.model';
 import { AppState } from '../../../../store/app.state';
 import { Store } from '@ngxs/store';
+import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 
 @Injectable({
@@ -98,8 +99,8 @@ export class ExtensionSidebarService {
       billRate,
       billRates,
       comments,
-      actualStartDate: DateTimeHelper.setInitHours(startDate),
-      actualEndDate: DateTimeHelper.setInitHours(endDate),
+      actualStartDate: toCorrectTimezoneFormat(startDate),
+      actualEndDate: DateTimeHelper.setInitHours(toCorrectTimezoneFormat(endDate)),
       duration: durationPrimary,
       ignoreMissingCredentials,
     };

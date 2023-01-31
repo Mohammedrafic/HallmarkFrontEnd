@@ -18,6 +18,7 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { BillRate } from '@shared/models';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -54,7 +55,8 @@ export class ExtensionSidebarComponent implements OnInit {
   ) {}
 
   public ngOnInit(): void {
-    this.minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
+    const minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
+    this.minDate = DateTimeHelper.convertDateToUtc(minDate.toString());
     this.initExtensionForm();
     this.listenPrimaryDuration();
     this.listenDurationChanges();
@@ -129,11 +131,12 @@ export class ExtensionSidebarComponent implements OnInit {
 
   private initExtensionForm(): void {
     const { actualEndDate, candidateBillRate } = this.candidateJob || {};
+    const startDate = addDays(actualEndDate, 1);
     this.extensionForm = this.formBuilder.group({
       durationPrimary: [Duration.Other],
       durationSecondary: [],
       durationTertiary: [],
-      startDate: [addDays(actualEndDate, 1), [Validators.required]],
+      startDate: [startDate ? DateTimeHelper.convertDateToUtc(startDate.toString()) : null, [Validators.required]],
       endDate: ['', [Validators.required]],
       billRate: [candidateBillRate, [Validators.required]],
       comments: [null],
