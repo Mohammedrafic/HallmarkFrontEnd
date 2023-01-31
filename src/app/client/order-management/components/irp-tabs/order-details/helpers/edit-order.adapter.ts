@@ -1,5 +1,3 @@
-import { formatDate } from '@angular/common';
-
 import { Order } from '@shared/models/order-management.model';
 import { DateTimeHelper } from '@core/helpers';
 import {
@@ -11,7 +9,7 @@ export const adaptOrder = (selectedOrder: Order): Order => {
     ...selectedOrder,
     ...modifyJobDistribution(selectedOrder),
     ...selectedOrder.irpOrderMetadata,
-    jobDates: formatDate(selectedOrder.jobStartDate, 'MM/dd/yyy', 'en-US', 'UTC'),
+    jobDates: DateTimeHelper.convertDateToUtc(selectedOrder.jobStartDate.toString()),
     shiftStartTime: DateTimeHelper.convertDateToUtc(selectedOrder.shiftStartTime.toString()),
     shiftEndTime: DateTimeHelper.convertDateToUtc(selectedOrder.shiftEndTime.toString()),
   };

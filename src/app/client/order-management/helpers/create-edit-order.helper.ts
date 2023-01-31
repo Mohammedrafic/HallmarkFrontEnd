@@ -122,8 +122,12 @@ export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCre
   };
 };
 
-export const formatJobDates = (dates: Date[]): string[] => {
-  return dates.map((date: Date) => DateTimeHelper.toUtcFormat(date));
+export const formatJobDates = (dates: Date[] | Date): string[] | string => {
+  if (Array.isArray(dates)) {
+    return dates.map((date: Date) => DateTimeHelper.toUtcFormat(date));
+  }
+
+  return DateTimeHelper.toUtcFormat(dates);
 };
 
 export const getValuesFromList = (formList: FormGroup[]): FormGroup[] => {
