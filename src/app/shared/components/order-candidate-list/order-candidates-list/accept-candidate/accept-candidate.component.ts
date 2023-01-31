@@ -8,7 +8,6 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import {
@@ -71,6 +70,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() candidateOrderIds: string[];
   @Input() isOrderOverlapped: boolean;
   @Input() order:Order;
+  @Input() isCandidatePayRateVisible: boolean;
   
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -89,7 +89,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public priceUtils = PriceUtils;
   public showHoursControl: boolean = false;
   public showPercentage: boolean = false;
-  public isCandidatePayRateVisible: boolean;
   public candidatePayRateRequired: boolean;
   public candidateSSNRequired :boolean;
   public candidateDOBRequired :boolean;
@@ -100,6 +99,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   get isApplied(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Applied;
+  }
+
+  get showCandidatePayRate(): boolean {
+    return ![ApplicantStatusEnum.NotApplied, ApplicantStatusEnum.Applied].includes(this.candidateStatus);
   }
 
   get isOffered(): boolean {
@@ -164,21 +167,18 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private actions$: Actions,
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
-    private changeDetectionRef: ChangeDetectorRef
-  ) {}
+    private changeDetectionRef: ChangeDetectorRef,
+  ) {
+    this.createForm();
+  }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(): void {
     this.switchFormState();
     this.checkReadOnlyStatuses();
-
-    if (changes['candidate']?.currentValue) {
-      this.getCandidatePayRateSetting();
-    }
+    this.adjustCandidatePayRateField();
   }
 
   ngOnInit(): void {
-    this.createForm();
-    this.switchFormState();
     this.patchForm();
     this.subscribeOnReasonsList();
     this.subscribeOnSuccessRejection();
@@ -306,6 +306,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           allowDeployWoCredentials: false,
           billRates: this.billRatesData,
           offeredStartDate: this.candidateJob.offeredStartDate,
+          candidatePayRate: value.candidatePayRate
         })
       )
       .subscribe(() => {
@@ -319,7 +320,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       jobId: new FormControl(''),
       date: new FormControl(''),
       billRates: new FormControl(''),
-      candidatePayRate: new FormControl(''),
+      candidatePayRate: new FormControl('', [Validators.required]),
       availableStartDate: new FormControl('', [Validators.required]),
       candidateBillRate: new FormControl('', [Validators.required]),
       locationName: new FormControl(''),
@@ -389,7 +390,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           rate: value.jobCancellation?.rate,
           hours: value.jobCancellation?.hours,
           dob:value.candidateProfile.dob,
-          ssn:value.candidateProfile.ssn
+          ssn:value.candidateProfile.ssn,
+          candidatePayRate: this.candidateJob.candidatePayRate
         });
       }
       this.changeDetectionRef.markForCheck();
@@ -431,20 +433,16 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       this.form?.enable();
     } else {
       this.form?.disable();
-      this.adjustCandidatePayRateField();
     }
   }
 
   private adjustCandidatePayRateField(): void {
-    const candidatePayRateControl = this.form?.get('candidatePayRate');
-
-    if(!candidatePayRateControl) { return };
-
+    const candidatePayRateControl = this.form.get('candidatePayRate');
     if(this.isCandidatePayRateVisible && this.isOffered) {
-      candidatePayRateControl.enable();
+      candidatePayRateControl?.enable();
+    } else {
+      candidatePayRateControl?.disable();
     }
-
-    candidatePayRateControl.setValidators(this.isCandidatePayRateVisible ? [Validators.required] : []);
 
     this.candidatePayRateRequired = this.isOffered;
   }
@@ -460,10 +458,5 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
-  }
-
-
-  private getCandidatePayRateSetting(): void {
-    this.isCandidatePayRateVisible = true; //TODO get CandidatePayRate setting when BE will be implemented
   }
 }

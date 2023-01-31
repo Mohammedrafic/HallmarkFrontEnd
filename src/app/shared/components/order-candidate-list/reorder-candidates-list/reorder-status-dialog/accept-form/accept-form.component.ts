@@ -24,11 +24,11 @@ export class AcceptFormComponent implements OnChanges{
 
   @Input() isAgency: boolean;
 
+  @Input() isCandidatePayRateVisible: boolean;
+
   public priceUtils = PriceUtils;
 
   public isBlankStatus: boolean;
-
-  public isCandidatePayRateVisible: boolean;
 
   get penaltyCriteriaControlValue(): string {
     return this.formGroup.get('penaltyCriteria')?.value;
@@ -56,18 +56,19 @@ export class AcceptFormComponent implements OnChanges{
   }
 
   public ngOnChanges(): void {
-      this.getCandidatePayRateSetting();
       this.configureCandidatePayRateField();
   }
 
-  private getCandidatePayRateSetting(): void {
-    this.isCandidatePayRateVisible = this.isAgency && true || !this.isAgency; //TODO get CandidatePayRate setting when BE will be implemented
-    this.isBlankStatus = this.status === CandidatStatus.Offered;
-    
-  }
-
   private configureCandidatePayRateField(): void {
-    this.formGroup.get('candidatePayRate')?.setValidators(this.isBlankStatus ? [Validators.required] : []);
+    this.isBlankStatus = this.status === CandidatStatus.Offered;
+
+    const candidatePayRateControl = this.formGroup.get('candidatePayRate');
+    
+    if(this.isCandidatePayRateVisible && this.isBlankStatus) {
+      candidatePayRateControl?.enable();
+    } else {
+      candidatePayRateControl?.disable();
+    }
   }
 
   static generateFormGroup(): FormGroup {
@@ -88,7 +89,7 @@ export class AcceptFormComponent implements OnChanges{
       penaltyCriteria: new FormControl({ value: '', disabled: true }),
       rate: new FormControl({ value: '', disabled: true }),
       hours: new FormControl({ value: '', disabled: true }),
-      candidatePayRate: new FormControl({ value: '', disabled: true }),
+      candidatePayRate: new FormControl({ value: '', disabled: true }, [Validators.required]),
     });
   }
 }

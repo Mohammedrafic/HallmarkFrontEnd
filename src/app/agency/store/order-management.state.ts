@@ -328,7 +328,7 @@ export class OrderManagementState {
     return this.orderManagementContentService.updateCandidateJob(payload).pipe(
       tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'))),
       catchError((error) => {
-        const errorMessage = error?.error?.errors?.CandidateBillRate[0] ?? 'Candidate cannot be updated';
+        const errorMessage = error?.error?.errors?.CandidateBillRate?.[0] ?? getAllErrors(error.error);
         return of(dispatch(new ShowToast(MessageTypes.Error, errorMessage)));
       })
     );

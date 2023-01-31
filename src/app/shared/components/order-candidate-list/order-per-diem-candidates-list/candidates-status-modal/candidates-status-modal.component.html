@@ -88,6 +88,19 @@
                         <input appValidateWithMessage formControlName="skill" class="e-input" type="text" readonly/>
                       </div>
                     </div>
+                    <div class="input-container bootstrap" *ngIf="isCandidatePayRateVisible && showCandidatePayRateField">
+                      <label>Candidate Pay Rate ($) <span *ngIf="showAcceptButton" class="required">*</span></label>
+                      <div class="input-group">
+                        <input
+                          appValidateWithMessage
+                          formControlName="candidatePayRate"
+                          class="e-input"
+                          type="text"
+                          (focus)="priceUtils.setPriceMask(form, 'candidatePayRate', $event)"
+                          (blur)="priceUtils.setTwoDecimals(form, 'candidatePayRate', $event)"
+                        />
+                      </div>
+                    </div>
                     <div *ngIf="showClockId" class="input-container bootstrap">
                       <label class="input-group">Clock ID</label>
                       <div class="input-group input-readonly">

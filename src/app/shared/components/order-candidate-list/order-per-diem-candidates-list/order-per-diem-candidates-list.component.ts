@@ -10,9 +10,10 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { UserState } from 'src/app/store/user.state';
-import { OrderCandidateApiService } from '../order-candidate-api.service';
 import { AppState } from 'src/app/store/app.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { SettingsViewService } from '@shared/services';
+import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 
 @Component({
   selector: 'app-order-per-diem-candidates-list',
@@ -29,12 +30,13 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
   public candidateJob: OrderCandidateJob | null;
   public agencyActionsAllowed: boolean;
   public isFeatureIrpEnabled = false;
+  public isCandidatePayRateVisible: boolean;
   public readonly systemType = OrderManagementIRPSystemId;
 
   constructor(
     protected override store: Store,
     protected override router: Router,
-    private candidateApiService: OrderCandidateApiService,
+    private settingService: SettingsViewService,
     ) {
     super(store, router);
     this.setIrpFeatureFlag();
@@ -55,6 +57,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     }
 
     this.candidate = { ...data };
+    this.getCandidatePayRateSetting();
     if (this.order && this.candidate) {
       if (this.isAgency) {
         if ([ApplicantStatus.NotApplied, ApplicantStatus.Withdraw].includes(this.candidate.status)) {
@@ -111,5 +114,22 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
 
   private setIrpFeatureFlag(): void {
     this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+  }
+
+  private getCandidatePayRateSetting(): void {
+    const organizationId = this.candidate.organizationId;
+
+    if(organizationId) {
+    this.settingService
+      .getViewSettingKey(
+        OrganizationSettingKeys.CandidatePayRate,
+        OrganizationalHierarchy.Organization,
+        organizationId,
+        organizationId
+      ).pipe(takeUntil(this.unsubscribe$))
+      .subscribe(({ CandidatePayRate }) => {
+        this.isCandidatePayRateVisible = JSON.parse(CandidatePayRate);
+      });
+    }
   }
 }

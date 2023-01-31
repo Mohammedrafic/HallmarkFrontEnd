@@ -357,6 +357,7 @@
       [isOrderOverlapped]="isOrderOverlapped"
       [order]="selectedOrder"
       [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
+      [isCandidatePayRateVisible]="isCandidatePayRateVisible"
     ></app-onboarded-candidate>
   </ng-template>
 
@@ -370,6 +371,7 @@
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
       [order]="selectedOrder"
+      [isCandidatePayRateVisible]="isCandidatePayRateVisible"
     ></app-accept-candidate>
   </ng-template>
 
@@ -401,6 +403,7 @@
       [isOrderOverlapped]="isOrderOverlapped"
       [order]="selectedOrder"
       [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
+      [isCandidatePayRateVisible]="isCandidatePayRateVisible"
     ></app-offer-deployment>
   </ng-template>
   <ng-template #footerTemplate>
