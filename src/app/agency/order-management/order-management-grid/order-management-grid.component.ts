@@ -189,6 +189,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         ? this.alertOrderId
         : 0;
         if(this.alertOrderId>0 ){
+          this.openDetailsTab = true;
           this.ordersPage.items= this.ordersPage.items.filter(x=>x.orderId===this.alertOrderId);
           this.gridWithChildRow.dataSource=this.ordersPage.items;
           this.onRowClick({data:this.ordersPage.items[0],isInteracted:false})
@@ -780,8 +781,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.openDetailsTab = false;
         this.openChildDialog.next(false);
         this.selectedCandidate = null;
-        if(this.alertOrderId>0)
-          this.openDetailsTab = true;
         if (this.selectedReOrder?.selected.reOrder !== this.selectedOrder.orderId) {
           this.selectedReOrder = null;
         }
