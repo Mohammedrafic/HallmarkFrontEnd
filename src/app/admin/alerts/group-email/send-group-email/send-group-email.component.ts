@@ -854,7 +854,7 @@ export class SendGroupEmailComponent
   disableControls(isSend: boolean): void {
     let ele = document.getElementById('richTextEditorDiv') as HTMLElement;
     this.hideUserTypeControl = false;
-    this.uploadObj.clearAll();
+    this.uploadObj?.clearAll();
     this.groupEmailTemplateForm.controls['fileUpload'].patchValue('');
     if (isSend) {
       this.businessControl?.enable();
