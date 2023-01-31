@@ -39,8 +39,7 @@ import {
 } from '../../store/candidate.actions';
 import { CandidateContactDetailsComponent } from './candidate-contact-details/candidate-contact-details.component';
 import { AbstractPermission } from '@shared/helpers/permissions';
-import { AgencySettingsService } from "@agency/services/agency-settings.service";
-import { AgencySettingKeys } from "@shared/constants/agency-settings";
+import { AgencySettingsService } from '@agency/services/agency-settings.service';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -96,7 +95,6 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   ) {
     super(store);
     store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
-    this.getCandidateLoginSetting();
   }
 
   override ngOnInit(): void {
@@ -127,6 +125,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       });
 
     if (this.route.snapshot.paramMap.get('id')) {
+      this.getCandidateLoginSetting(parseInt(this.route.snapshot.paramMap.get('id') as string));
       this.title = 'Edit';
       this.store.dispatch(new GetCandidateById(parseInt(this.route.snapshot.paramMap.get('id') as string)));
       this.store.dispatch(new GetCandidatePhoto(parseInt(this.route.snapshot.paramMap.get('id') as string)));
@@ -150,8 +149,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     this.isRemoveLogo = false;
   }
 
-  private getCandidateLoginSetting(): void {
-    this.agencySettingsService.getAgencySettingByKey(AgencySettingKeys.AllowCandidateLogin).subscribe(setting => {
+  private getCandidateLoginSetting(id: number): void {
+    this.agencySettingsService.isCandidateUserCreated(id).subscribe(setting => {
       this.isMobileLoginOn = setting;
     });
   }

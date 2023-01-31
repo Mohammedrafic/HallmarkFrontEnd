@@ -1,11 +1,11 @@
 <div class="row-tool-buttons action-renderer ag-grid-cell-renderer">
-  <button ejs-button class="edit-button" cssClass="e-flat primary-icon-button" (click)="editCommitment()" [disabled]="cellValue.data.endDate">
+  <button ejs-button class="edit-button" cssClass="e-flat primary-icon-button" (click)="editCommitment()" [disabled]="cellValue.data.endDate || !userPermission[userPermissions.ManageIrpCandidateProfile]">
     <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
   </button>
   <button
     ejs-button
     cssClass="e-flat secondary-icon-button"
-    [disabled]="!cellValue.data.endDate"
+    [disabled]="!cellValue.data.endDate || !userPermission[userPermissions.ManageIrpCandidateProfile]"
     class="remove-button"
     (click)="deleteCommitment()">
     <span><i-feather name="trash-2" class="icon"></i-feather></span>

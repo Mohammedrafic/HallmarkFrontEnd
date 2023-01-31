@@ -11,11 +11,13 @@
   (navigateToPageEmitter)="handleChangePage($event)"
 >
   <button
+    *ngIf="(currentUserPermissions$ | async) as userPermission"
     action-button
     class="add-action"
     cssClass="e-action-button"
     ejs-button
     (click)="addCommitment()"
+    [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
   >
     <i-feather name="plus" class="icon"></i-feather>
     Add Commitment
