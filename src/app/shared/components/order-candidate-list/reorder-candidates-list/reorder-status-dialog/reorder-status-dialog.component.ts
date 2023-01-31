@@ -541,10 +541,11 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     if (!this.isCancelled) {
       this.acceptForm.get('candidateBillRate')?.enable();
     }
-    if(this.currentCandidateApplicantStatus === CandidatStatus.Offered) {
-      //TODO add to condition the check of the setting
+
+    if(this.isCandidatePayRateVisible && this.currentCandidateApplicantStatus === CandidatStatus.Offered) {
       this.acceptForm.get('candidatePayRate')?.enable();
     }
+
     switch (this.currentCandidateApplicantStatus) {
       case !this.isAgency && CandidatStatus.BillRatePending:
         this.canReject && this.canOffer && this.canOnboard && this.acceptForm.get('hourlyRate')?.enable();

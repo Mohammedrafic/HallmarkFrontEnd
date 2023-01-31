@@ -438,6 +438,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   private adjustCandidatePayRateField(): void {
     const candidatePayRateControl = this.form.get('candidatePayRate');
+
     if(this.isCandidatePayRateVisible && this.isOffered) {
       candidatePayRateControl?.enable();
     } else {
