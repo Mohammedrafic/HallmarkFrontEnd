@@ -5,7 +5,7 @@
   </ng-container>
   <ng-container right *ngIf="showButtons">
     <button ejs-button cssClass="e-outline" [disabled]="isCandidateFormPristine" (click)="clearForm()">Clear</button>
-    <button ejs-button cssClass="e-primary" (click)="saveCandidate()">Save</button>
+    <button ejs-button cssClass="e-primary" (click)="saveCandidate()" [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageIrpCandidateProfile]">Save</button>
   </ng-container>
 </app-page-toolbar>
 
