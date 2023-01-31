@@ -203,7 +203,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
           this.filterColumns.locationIds.dataSource.push(...sortByField(regionLocations, 'name'));
         } else {
           this.formGroup.get('locationIds')?.setValue([]);
-          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
+          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
         }
 
         this.cdr.markForCheck();
@@ -228,7 +228,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
           this.filterColumns.departmentIds.dataSource.push(...sortByField(locationDepartments, 'name'));
         } else {
           this.formGroup.get('departmentIds')?.setValue([]);
-          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
+          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
         }
 
         this.cdr.markForCheck();
