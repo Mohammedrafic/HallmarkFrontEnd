@@ -151,7 +151,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   private getCandidateLoginSetting(id: number): void {
     this.agencySettingsService.isCandidateUserCreated(id).subscribe(setting => {
-      this.isMobileLoginOn = setting;
+      this.isMobileLoginOn = !setting;
     });
   }
 
