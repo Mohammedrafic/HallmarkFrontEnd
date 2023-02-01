@@ -85,6 +85,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Input() isTab = false;
   @Input() actionsAllowed = true;
   @Input() hasCanEditOrderBillRatePermission: boolean;
+  @Input() isCandidatePayRateVisible: boolean;
 
   candidate$: Observable<OrderCandidatesList>;
 
@@ -130,6 +131,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
+  public format = '###.00';
+  public decimals = 2;
   public selectedApplicantStatus: ApplicantStatus | null = null;
 
   public applicantStatusEnum = ApplicantStatusEnum;
@@ -168,6 +171,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   get isReadOnlyBillRates(): boolean {
     return !this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard;
+  }
+
+  get isOffered(): boolean {
+    console.error(this.candidate?.status === ApplicantStatusEnum.Offered);
+    
+    return this.candidate?.status === ApplicantStatusEnum.Offered;
   }
 
   constructor(
@@ -500,8 +509,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       penaltyCriteria: new FormControl(''),
       rate: new FormControl(''),
       hours: new FormControl(''),
-      dob:new FormControl(''),
-      ssn:new FormControl('')
+      dob: new FormControl(''),
+      ssn: new FormControl(''),
+      candidatePayRate: new FormControl(''),
     });
   }
 
@@ -549,12 +559,17 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         penaltyCriteria: PenaltiesMap[this.candidateJob.jobCancellation?.penaltyCriteria || 0],
         rate: this.candidateJob.jobCancellation?.rate,
         hours: this.candidateJob.jobCancellation?.hours,
-        dob:value.candidateProfile.dob,
-        ssn:value.candidateProfile.ssn
+        dob: value.candidateProfile.dob,
+        ssn: value.candidateProfile.ssn,
+        candidatePayRate: this.candidateJob.candidatePayRate,
       });
 
       if (!this.isRejected) {
         this.fieldsEnableHandlear();
+      }
+
+      if(this.isAgency && this.isOffered) {
+        this.form.get('candidatePayRate')?.enable();
       }
     }
     this.changeDetectorRef.markForCheck();

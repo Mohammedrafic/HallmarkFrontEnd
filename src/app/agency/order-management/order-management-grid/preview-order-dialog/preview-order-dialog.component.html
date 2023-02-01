@@ -65,6 +65,7 @@
                     *ngIf="currentOrder.extensionFromId; else candidateOrder"
                     [currentOrder]="currentOrder"
                     [dialogEvent]="openEvent"
+                    [isCandidatePayRateVisible]="true"
                   ></app-extension-candidate>
                 </ng-container>
                 <ng-template #candidateOrder>
