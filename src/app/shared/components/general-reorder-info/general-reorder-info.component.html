@@ -93,8 +93,8 @@
       <div class="column">
         <div>
           <div class="title">
-            {{ orderInformation?.shiftStartTime | date: 'HH:mm' }} -
-            {{ orderInformation?.shiftEndTime | date: 'HH:mm' }}
+            {{ orderInformation?.shiftStartTime | date: 'HH:mm':'UTC' }} -
+            {{ orderInformation?.shiftEndTime | date: 'HH:mm':'UTC' }}
           </div>
           <div class="sup-title">Shift</div>
         </div>
@@ -194,8 +194,8 @@
             </div>
             <div>
               <div class="title">
-                {{ orderInformation.shiftStartTime | date: 'HH:mm' }} -
-                {{ orderInformation.shiftEndTime | date: 'HH:mm' }}
+                {{ orderInformation?.shiftStartTime | date: 'HH:mm':'UTC' }} -
+                {{ orderInformation?.shiftEndTime | date: 'HH:mm':'UTC' }}
               </div>
               <div class="sup-title">Shift</div>
             </div>

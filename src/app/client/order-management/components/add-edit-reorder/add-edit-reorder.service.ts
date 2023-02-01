@@ -7,7 +7,6 @@ import { HttpClient } from '@angular/common/http';
 import { AppState } from '../../../../store/app.state';
 import { AgencyModel, CandidateModel } from '@client/order-management/components/add-edit-reorder/models/candidate.model';
 import { ReorderRequestModel } from '@client/order-management/components/add-edit-reorder/models/reorder.model';
-import { getTimeFromDate, setTimeToDate } from '@shared/utils/date-time.utils';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models';
@@ -72,8 +71,8 @@ export class AddEditReorderService {
       agencyIds,
       candidateProfileIds: reorder.candidates,
       reorderDate: DateTimeHelper.toUtcFormat(reorder.reorderDate),
-      shiftEndTime: DateTimeHelper.toUtcFormat(setTimeToDate(getTimeFromDate(reorder.shiftEndTime))!),
-      shiftStartTime: DateTimeHelper.toUtcFormat(setTimeToDate(getTimeFromDate(reorder.shiftStartTime))!),
+      shiftEndTime: new Date(DateTimeHelper.toUtcFormat(reorder.shiftEndTime)),
+      shiftStartTime: new Date(DateTimeHelper.toUtcFormat(reorder.shiftStartTime)),
       billRate: reorder.billRate,
       openPositions: reorder.openPosition,
     };

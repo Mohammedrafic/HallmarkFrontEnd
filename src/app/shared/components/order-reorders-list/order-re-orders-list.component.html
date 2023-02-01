@@ -70,7 +70,7 @@
       </e-column>
       <e-column field="shift" textAlign="Right" headerText="SHIFT" width="150">
         <ng-template #template let-data>
-          <span>{{ data.shiftStartTime | date: 'HH:mm' }}-{{ data.shiftEndTime | date: 'H:mm' }}</span>
+          <span>{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}-{{ data.shiftEndTime | date: 'H:mm':'UTC' }}</span>
         </ng-template>
       </e-column>
       <e-column field="openPositions" headerText="# POSITIONS" width="120">

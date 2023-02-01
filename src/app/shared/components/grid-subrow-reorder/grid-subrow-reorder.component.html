@@ -34,7 +34,7 @@
     <div class="title">Re-Order Date</div>
   </div>
   <div class="info general-info">
-    <div class="data">{{reOrder.shiftStartTime | date: 'HH:mm'}}-{{reOrder.shiftEndTime | date: 'HH:mm'}}</div>
+    <div class="data">{{reOrder.shiftStartTime | date: 'HH:mm': 'UTC'}}-{{reOrder.shiftEndTime | date: 'HH:mm': 'UTC'}}</div>
     <div class="title">Re-Order Shift</div>
   </div>
   <div class="info">
