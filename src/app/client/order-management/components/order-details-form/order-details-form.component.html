@@ -159,7 +159,8 @@
                   <!-- Joining Bonus -->
                   <div
                     *ngIf="!isPermPlacementOrder && userPermission[userPermissions.CanEnterJoiningCompletionBonus]"
-                    class="input-container bootstrap form-line-item-20">
+                    class="input-container bootstrap form-line-item-20"
+                  >
                     <label>Joining Bonus</label>
                     <div class="input-group">
                       <input
@@ -228,7 +229,8 @@
                   <!-- Comp. Bonus -->
                   <div
                     *ngIf="!isPermPlacementOrder && userPermission[userPermissions.CanEnterJoiningCompletionBonus]"
-                    class="input-container bootstrap form-line-item-20">
+                    class="input-container bootstrap form-line-item-20"
+                  >
                     <label>Comp. Bonus</label>
                     <div class="input-group">
                       <input
@@ -618,9 +620,9 @@
                     </div>
                   </div>
 
-                  <div class="contact-btn">
+                  <div *ngIf="contactDetailsFormArray.controls.length > 1" class="contact-btn">
                     <!--Primary contact-->
-                    <div *ngIf="contactDetailsFormArray.controls.length > 1" class="radio-button">
+                    <div class="radio-button">
                       <label>Primary</label>
                       <ejs-radiobutton
                         name="primaryContact"
@@ -633,7 +635,6 @@
                     <!-- Remove button -->
                     <div class="input-container remove-button-container">
                       <button
-                        *ngIf="contactDetailsFormArray.controls.length > 1"
                         ejs-button
                         type="button"
                         cssClass="e-outline"
@@ -715,9 +716,8 @@
                 </div>
 
                 <!-- Remove button -->
-                <div class="input-container remove-button-container">
+                <div *ngIf="workLocationsFormArray.controls.length > 1" class="input-container remove-button-container">
                   <button
-                    *ngIf="workLocationsFormArray.controls.length > 1"
                     ejs-button
                     type="button"
                     cssClass="e-outline"
@@ -736,7 +736,7 @@
           <form [formGroup]="specialProject">
             <div class="form-line">
               <!-- Special Project Category -->
-              <div class="input-container bootstrap form-line-item-30">
+              <div class="input-container bootstrap form-line-item-35">
                 <label
                   >Special Project Category<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label
                 >
@@ -752,7 +752,7 @@
                 </div>
               </div>
               <!-- Project Name -->
-              <div class="input-container bootstrap form-line-item-30">
+              <div class="input-container bootstrap form-line-item-35">
                 <label>Project Name<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
@@ -766,7 +766,7 @@
                 </div>
               </div>
               <!-- PO# -->
-              <div class="input-container bootstrap form-line-item-30">
+              <div class="input-container bootstrap form-line-item-35">
                 <label>PO#<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
