@@ -101,6 +101,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     super.ngOnInit();
     this.generateCandidateForm();
     this.checkForAgencyStatus();
+    this.setCredentialParams();
 
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCandidateSucceeded))
@@ -114,7 +115,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetCandidateByIdSucceeded))
       .subscribe((candidate: { payload: Candidate }) => {
         this.fetchedCandidate = candidate.payload;
-        this.getCandidateLoginSetting(candidate.payload.id as number);
+        !this.isNavigatedFromOrganizationArea && this.getCandidateLoginSetting(candidate.payload.id as number);
         this.candidateName = this.getCandidateName(this.fetchedCandidate);
         this.patchAgencyFormValue(this.fetchedCandidate);
       });
@@ -130,7 +131,6 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       this.store.dispatch(new GetCandidatePhoto(parseInt(this.route.snapshot.paramMap.get('id') as string)));
     }
     this.pagePermissions();
-    this.setCredentialParams();
     this.subscribeOnCandidateCredentialResponse();
   }
 
