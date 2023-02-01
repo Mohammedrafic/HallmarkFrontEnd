@@ -43,6 +43,7 @@ label {
 
 .order-form-container {
   display: flex;
+
   .left-section {
     width: 70%;
     padding-right: 20px;
@@ -90,8 +91,13 @@ label {
 .form-line-item-25 {
   width: 25%;
 }
+
 .form-line-item-30 {
   width: 30%;
+}
+
+.form-line-item-35 {
+  width: 35%;
 }
 
 .form-line-item-40 {
@@ -173,23 +179,25 @@ ejs-textbox.e-control {
 .project-type-container,
 .project-name-container {
   display: flex;
+  align-items: flex-end;
+
   .input-container:first-child {
     width: 100%;
   }
   .edit-button-container {
-    margin: 22px 0 0 8px;
+    margin-left: 16px;
   }
 }
 
 .contact-btn {
   display: flex;
+  align-items: flex-end;
+  column-gap: 14px;
 }
 
 .remove-button-container {
   display: flex;
   justify-content: flex-end;
-  width: 52px;
-  margin-top: 22px;
 }
 
 .radio-button {
@@ -224,12 +232,24 @@ ejs-textbox.e-control {
       width: 100%;
     }
   }
+
+  .order-type-status-container {
+    .left-section {
+      width: 100%;
+      padding-right: 0;
+    }
+
+    .right-section {
+      width: 0;
+    }
+  }
 }
 
 @media #{$max-mobile} {
   .form-line-item-20,
   .form-line-item-25,
   .form-line-item-30,
+  .form-line-item-35,
   .form-line-item-40 {
     width: 100%;
   }
@@ -244,6 +264,7 @@ ejs-textbox.e-control {
 
   .contact-btn {
     justify-content: space-between;
+    width: 100%;
 
     .radio-button {
       height: unset;
@@ -284,10 +305,6 @@ ejs-textbox.e-control {
     ejs-checkbox:not(:first-child) {
       margin-left: 0;
     }
-  }
-
-  .contact-btn {
-    width: 100%;
   }
 
   .order-type-container {

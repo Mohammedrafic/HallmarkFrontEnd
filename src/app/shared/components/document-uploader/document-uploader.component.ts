@@ -32,6 +32,10 @@ export class DocumentUploaderComponent implements OnInit {
   }
 
   public browse(): void {
+    if(this.disabled) {
+      return;
+    }
+
     document
       .getElementById('documents-uploader')
       ?.getElementsByClassName('e-file-select-wrap')[0]

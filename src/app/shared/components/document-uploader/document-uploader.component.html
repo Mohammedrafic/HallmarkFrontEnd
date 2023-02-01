@@ -1,7 +1,11 @@
 <div tabindex="0" class="e-card">
-  <div class="e-card-header">
+  <div class="e-card-header tablet">
     <div class="e-card-header-caption">
       <div class="e-card-title">{{uploaderTitle}}</div>
+    </div>
+    <div class="upload-btn" [class.disable]="disabled" (click)="browse()">
+      <i-feather name="upload" class="icon"></i-feather>
+      <div class="add-contact-link" >Upload</div>
     </div>
   </div>
   <div id="documents-uploader" class="e-card-content">
