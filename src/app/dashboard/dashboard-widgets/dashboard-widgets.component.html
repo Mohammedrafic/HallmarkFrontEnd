@@ -63,6 +63,11 @@
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.LTA_ORDER_ENDING"
                               [isDarkTheme]="isDarkTheme"></app-position-chart>
+          <app-org-widget *ngSwitchCase="widgetTypeEnum.ORG"    
+                              [chartData]="widgetsData?.[widgetTypeEnum.ORG]"
+                              [isLoading]="isLoading"
+                              [description]="widgetDescriptionEnum.ORG"
+                              [isDarkTheme]="isDarkTheme"></app-org-widget>
         </ng-template>
       </e-panel>
     </e-panels>

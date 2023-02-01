@@ -13,6 +13,7 @@ import { TasksModule } from '../widgets/tasks/tasks.module';
 import { TrendChartModule } from '../widgets/trend-chart/trend-chart.module';
 import { ChatModule } from '../widgets/chat/chat.module';
 import { InvoicesChartModule } from '../widgets/invoices-chart/invoices-chart.module';
+import { OrgWidgetModule } from '../widgets/org-widget/org-widget.module';
 import { UserState } from '../../store/user.state';
 
 @NgModule({
@@ -30,6 +31,7 @@ import { UserState } from '../../store/user.state';
     TrendChartModule,
     ChatModule,
     InvoicesChartModule,
+    OrgWidgetModule,
     NgxsModule.forFeature([ UserState])
   ]
 })

@@ -4,6 +4,7 @@ import type { ChartAccumulation } from './chart-accumulation-widget.model';
 import type { PositionsByTypeAggregatedModel } from './positions-by-type-aggregated.model';
 import { CandidatesPositionDataModel } from './candidates-positions.model';
 import { PositionTrend } from './position-trend.model';
+import { OrgDetailsInfoModel } from './org-details-info.model';
 
 export interface WidgetsDataModel {
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: CandidatesByStateWidgetAggregatedDataModel;
@@ -21,4 +22,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.OPEN_POSITIONS_TREND]: PositionTrend;
   [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: PositionTrend;
   [WidgetTypeEnum.LTA_ORDER_ENDING]: CandidatesPositionDataModel;
+  [WidgetTypeEnum.ORG]: OrgDetailsInfoModel;
 }
