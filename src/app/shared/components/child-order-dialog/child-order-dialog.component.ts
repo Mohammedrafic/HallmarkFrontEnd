@@ -53,7 +53,7 @@ import {
 import { ExtensionSidebarComponent } from '@shared/components/extension/extension-sidebar/extension-sidebar.component';
 import { AcceptFormComponent,
 } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, OrganizationalHierarchy, OrganizationSettingKeys, SET_READONLY_STATUS } from '@shared/constants';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { UnsavedFormDirective } from '@shared/directives/unsaved-form.directive';
 import {
@@ -92,6 +92,7 @@ import { PermissionService } from '../../../security/services/permission.service
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { ApplicantStatus as ApplicantStatusModel } from '@shared/models/order-management.model';
+import { SettingsViewService } from '@shared/services';
 
 enum Template {
   accept,
@@ -180,6 +181,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public canCloseOrder: boolean;
   public isClosedOrder = false;
   public selectedApplicantStatus: ApplicantStatusModel | null = null;
+  public isCandidatePayRateVisible: boolean;
 
   public readonly nextApplicantStatuses = [
     {
@@ -250,6 +252,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     private permissionService: PermissionService,
     private changeDetectorRef: ChangeDetectorRef,
     private childOrderDialogService: ChildOrderDialogService,
+    private settingService: SettingsViewService,
   ) {
     super(store);
   }
@@ -287,6 +290,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       this.setCloseOrderButtonState();
       this.setAddExtensionBtnState(candidate);
       this.getDeployedCandidateOrders();
+       this.getCandidatePayRateSetting();
 
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(
@@ -822,5 +826,22 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         DateTimeHelper.toUtcFormat(addDays(this.candidateJob?.actualEndDate as string, 1) as Date)
       ),
     };
+  }
+
+  private getCandidatePayRateSetting(): void {
+    const organizationId = this.candidate.organizationId;
+
+    if(organizationId) {
+    this.settingService
+      .getViewSettingKey(
+        OrganizationSettingKeys.CandidatePayRate,
+        OrganizationalHierarchy.Organization,
+        organizationId,
+        organizationId
+      ).pipe(takeUntil(this.componentDestroy()))
+      .subscribe(({ CandidatePayRate }) => {
+        this.isCandidatePayRateVisible = JSON.parse(CandidatePayRate);
+      });
+    }
   }
 }
