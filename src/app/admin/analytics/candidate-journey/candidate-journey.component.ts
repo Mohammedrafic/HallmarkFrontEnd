@@ -277,7 +277,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
               this.filterColumns.jobStatuses.dataSource = data.jobStatusesAndReasons;
-              this.filterColumns.candidateStatuses.dataSource = data.candidateStatusesAndReasons;
+              this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
               this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons.filter(i => this.fixedJobStatusesIncluded.includes(i.status));
               this.defaultOrderTypes = this.orderTypesList.map((list) => list.id);
               setTimeout(() => { this.SearchReport() }, 3000);
