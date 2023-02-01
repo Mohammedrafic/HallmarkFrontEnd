@@ -116,7 +116,6 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         this.fetchedCandidate = candidate.payload;
         this.candidateName = this.getCandidateName(this.fetchedCandidate);
         this.patchAgencyFormValue(this.fetchedCandidate);
-        this.handleMobileLoginRestriction();
       });
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetCandidatePhotoSucceeded))
@@ -152,6 +151,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   private getCandidateLoginSetting(id: number): void {
     this.agencySettingsService.isCandidateUserCreated(id).subscribe(setting => {
       this.isMobileLoginOn = !setting;
+      this.isMobileLoginOn && this.handleMobileLoginRestriction();
     });
   }
 
