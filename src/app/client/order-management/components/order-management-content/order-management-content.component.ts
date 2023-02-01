@@ -369,6 +369,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private cd$ = new Subject();
   private gridApi: GridApi;
   private SelectedStatus: string[] = [];
+  private candidateStatusId:number;
+  private candidateStatusIds: number[] = [];
+  private SelectedCandiateStatuses: any[] = [];
   private eliteOrderId:number;
 
 
@@ -404,8 +407,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderStaus = routerState?.['orderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
     this.quickOrderId = routerState?.['publicId'];
-    this.prefix = routerState?.['prefix'];
+    this.prefix = routerState?.['prefix'];    
     (routerState?.['status'] =="In Progress (Pending)" ||   routerState?.['status'] =="In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] =="In Progress" ? this.SelectedStatus.push("InProgress"): routerState?.['status']?this.SelectedStatus.push(routerState?.['status']):"";
+    this.candidateStatusId = routerState?.['candidateStatusId'] || 0;
+    routerState?.['candidateStatus']!=undefined&&routerState?.['candidateStatus']!=''?this.SelectedCandiateStatuses.push(routerState?.['candidateStatus']):"";
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.orderManagementService.createFilterForm();
   }
@@ -1542,6 +1547,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         .map((status: FilterStatus) => status.status);
       this.OrderFilterFormGroup.get('orderStatuses')?.setValue((this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses);
       this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
+      this.OrderFilterFormGroup.get('candidateStatuses')?.setValue((this.candidateStatusIds.length > 0) ? this.candidateStatusIds : []);
+      this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
     }
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
@@ -1758,6 +1765,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private applyDashboardFilters(): void {
     this.orderStaus > 0 ? this.numberArr.push(this.orderStaus) : [];
     this.filters.orderStatuses = this.numberArr;
+    this.candidateStatusId > 0 ? this.candidateStatusIds.push(this.candidateStatusId) : [];
+    this.filters.candidateStatuses = this.candidateStatusIds;
 
     combineLatest([this.organizationId$, this.filteredItems$])
       .pipe(takeUntil(this.unsubscribe$))
