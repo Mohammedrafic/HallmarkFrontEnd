@@ -17,7 +17,7 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { UserState } from 'src/app/store/user.state';
-import { Duration } from '../../../enums/durations';
+import { Duration } from '@shared/enums/durations';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.component';
 import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.component';
@@ -100,10 +100,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     if (this.isAgency) {
       this.checkForAgencyStatus();
       this.subscribeToDeployedCandidateOrdersInfo();
-    }
-
-    if (this.system === OrderManagementIRPSystemId.IRP) {
-      this.getIrpCandidates();
     }
   }
 
@@ -257,18 +253,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     if (this.deployedCandidateOrderIds.length) {
       this.store.dispatch(new ClearDeployedCandidateOrderInfo());
     }
-  }
-
-  private getIrpCandidates(): void {
-    this.candidateApiService.getIrpCandidates(this.selectedOrder.irpOrderMetadata?.orderId as number)
-    .pipe(
-      takeUntil(this.unsubscribe$),
-    )
-    .subscribe((candidates) => {
-      this.irpCandidates = candidates;
-      this.grid.refresh();
-      this.grid.dataSource = this.irpCandidates.items;
-    });
   }
 
   private setIrpFeatureFlag(): void {

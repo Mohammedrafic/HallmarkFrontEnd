@@ -69,9 +69,6 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     if (this.isAgency) {
       this.checkForAgencyStatus();
     }
-    if (this.selectedOrder.irpOrderMetadata) {
-      this.getIrpCandidates();
-    }
   }
 
   public onEdit(data: OrderCandidatesList & { index: string }, event: MouseEvent): void {
@@ -153,17 +150,6 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   }
 
-  private getIrpCandidates(): void {
-    this.candidateApiService.getIrpCandidates(this.selectedOrder.irpOrderMetadata?.orderId as number)
-    .pipe(
-      takeUntil(this.unsubscribe$),
-    )
-    .subscribe((candidates) => {
-      this.irpCandidates = candidates;
-    });
-  }
-
-  
   private getCandidatePayRateSetting(): void {
     const organizationId = this.candidate.organizationId;
 
