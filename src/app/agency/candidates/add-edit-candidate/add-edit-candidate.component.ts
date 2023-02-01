@@ -114,6 +114,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetCandidateByIdSucceeded))
       .subscribe((candidate: { payload: Candidate }) => {
         this.fetchedCandidate = candidate.payload;
+        this.getCandidateLoginSetting(candidate.payload.id as number);
         this.candidateName = this.getCandidateName(this.fetchedCandidate);
         this.patchAgencyFormValue(this.fetchedCandidate);
       });
@@ -124,7 +125,6 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       });
 
     if (this.route.snapshot.paramMap.get('id')) {
-      this.getCandidateLoginSetting(parseInt(this.route.snapshot.paramMap.get('id') as string));
       this.title = 'Edit';
       this.store.dispatch(new GetCandidateById(parseInt(this.route.snapshot.paramMap.get('id') as string)));
       this.store.dispatch(new GetCandidatePhoto(parseInt(this.route.snapshot.paramMap.get('id') as string)));
