@@ -87,8 +87,8 @@
       </ng-template>
       <ng-template #content>
         <app-credentials-grid
-          [isNavigatedFromOrganizationArea]="isNavigatedFromOrganizationArea || isMobileLoginOn"
-          [areAgencyActionsAllowed]="agencyActionsAllowed"
+          [isNavigatedFromOrganizationArea]="isNavigatedFromOrganizationArea"
+          [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed"
           [isCandidateAssigned]="isCandidateAssigned"
           [orderId]="orderId"
           [userPermission]="userPermission"
