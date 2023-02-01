@@ -104,7 +104,7 @@ body.light, body.dark {
 }
 
 body.dark {
-  .e-card-title {
+  .e-card-title, .user-name {
     color: $white !important;
   }
 }

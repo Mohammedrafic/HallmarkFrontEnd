@@ -96,6 +96,10 @@
   }
 }
 
+body.dark .title{
+  color : $white !important;
+}
+
 .organization-agency-title-container {
   display: flex;
   max-width: 231px;
