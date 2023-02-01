@@ -125,7 +125,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   private onChangeCandidateJob(): Observable<OrderCandidateJob> {
     return merge(this.candidateJobOrganisationState$, this.candidateJobAgencyState$).pipe(
       filter((candidateJob) => !!candidateJob),
-      tap((candidateJob: OrderCandidateJob) => (this.candidateJob = candidateJob))
+      tap((candidateJob: OrderCandidateJob) => (this.candidateJob = candidateJob, this.cdr.detectChanges()))
     );
   }
 
