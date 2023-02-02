@@ -31,7 +31,7 @@ import {
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
-import PriceUtils from '@shared/utils/price.utils';
+import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -57,7 +57,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
     this.comments = [];
   };
   public orderCandidate: OrderCandidatesList;
-  public priceUtils = PriceUtils;
+  public payRateSetting = CandidatePayRateSettings;
+
   @Input() openEvent: Subject<boolean>;
   @Input() isAgency: boolean = false;
   @Input() isLocked: boolean | undefined = false;

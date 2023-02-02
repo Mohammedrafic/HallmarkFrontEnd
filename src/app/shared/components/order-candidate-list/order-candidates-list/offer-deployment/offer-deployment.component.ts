@@ -51,6 +51,7 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
+import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -98,6 +99,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public priceUtils = PriceUtils;
   public hasEditOrderBillRatesPermission: boolean;
   public showCandidatePayRate: boolean;
+  public payRateSetting = CandidatePayRateSettings;
 
   get showYearsOfExperience(): boolean {
     return (

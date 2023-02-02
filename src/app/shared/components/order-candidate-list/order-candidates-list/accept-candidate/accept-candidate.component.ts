@@ -49,6 +49,7 @@ import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-or
 import { DateTimeHelper } from '@core/helpers';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
+import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -92,6 +93,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public candidatePayRateRequired: boolean;
   public candidateSSNRequired :boolean;
   public candidateDOBRequired :boolean;
+  public payRateSetting = CandidatePayRateSettings;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;

@@ -140,12 +140,14 @@
                     <div class="input-container" *ngIf="isCandidatePayRateVisible && showCandidatePayRate">
                       <label>Candidate Pay Rate ($)</label>
                       <div class="input-group input-readonly">
-                        <input
-                          appValidateWithMessage
-                          formControlName="candidatePayRate"
-                          class="e-input"
-                          readonly
-                        />
+                        <app-numeric-textbox
+                          [formGroupInstance]="formGroup"
+                          [decimals]="payRateSetting.decimals"
+                          [maxLength]="payRateSetting.maxLength"
+                          [min]="payRateSetting.min"
+                          [format]="payRateSetting.format"
+                          controlName="candidatePayRate"
+                        ></app-numeric-textbox>
                       </div>
                     </div>
                   </div>

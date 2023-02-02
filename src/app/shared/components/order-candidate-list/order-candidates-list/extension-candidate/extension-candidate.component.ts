@@ -69,6 +69,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateDOBRequired, CandidateSSNRequired, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { SettingsViewService } from '@shared/services';
+import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -131,8 +132,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
-  public format = '###.00';
-  public decimals = 2;
+  public payRateSetting = CandidatePayRateSettings;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public isCandidatePayRateVisible: boolean;
 

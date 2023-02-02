@@ -73,7 +73,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob) {
     if (orderCandidateJob) {
       this.orderCandidateJob = orderCandidateJob;
-      this.currentCandidateApplicantStatus = orderCandidateJob.applicantStatus.applicantStatus;
+      this.currentCandidateApplicantStatus = orderCandidateJob.applicantStatus.applicantStatus;  
       this.setValueForm(orderCandidateJob);
       this.getOrderPermissions(orderCandidateJob.orderId);
     } else {
@@ -438,6 +438,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
             billRates: this.orderCandidateJob.billRates,
             actualStartDate: value.shiftStartTime,
             actualEndDate: value.shiftEndTime,
+            candidatePayRate: value.candidatePayRate,
             nextApplicantStatus: {
               applicantStatus: status.applicantStatus,
               statusText: status.statusText,
