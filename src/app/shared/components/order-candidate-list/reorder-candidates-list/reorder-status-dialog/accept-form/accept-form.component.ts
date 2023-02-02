@@ -2,6 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { PenaltiesMap } from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
+import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { PenaltyCriteria } from "@shared/enums/candidate-cancellation";
 import PriceUtils from '@shared/utils/price.utils';
@@ -30,9 +31,7 @@ export class AcceptFormComponent implements OnChanges{
 
   public isBlankStatus: boolean;
 
-  public format = '###.00';
-
-  public decimals = 2;
+  public payRateSetting = CandidatePayRateSettings;
 
   get penaltyCriteriaControlValue(): string {
     return this.formGroup.get('penaltyCriteria')?.value;

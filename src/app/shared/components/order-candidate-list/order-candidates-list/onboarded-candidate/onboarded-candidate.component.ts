@@ -62,6 +62,7 @@ import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
+import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -124,8 +125,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canOnboard = false;
   public canClose = false;
   public selectedApplicantStatus: ApplicantStatus | null = null;
-  public format = '###.00';
-  public decimals = 2;
+  public payRateSetting = CandidatePayRateSettings;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');

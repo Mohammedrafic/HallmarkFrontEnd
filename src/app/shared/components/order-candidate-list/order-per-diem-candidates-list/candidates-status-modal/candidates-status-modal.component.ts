@@ -31,6 +31,7 @@ import {
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -56,8 +57,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
     this.comments = [];
   };
   public orderCandidate: OrderCandidatesList;
-  public format = '###.00';
-  public decimals = 2;
+  public payRateSetting = CandidatePayRateSettings;
 
   @Input() openEvent: Subject<boolean>;
   @Input() isAgency: boolean = false;
