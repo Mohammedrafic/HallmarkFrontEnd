@@ -527,7 +527,7 @@ export type AcceptJobDTO = {
   skillName?: string;
   expAsTravelers?: number;
   availableStartDate?: string | null;
-  candidatePayRate?: string | null;
+  candidatePayRate: string;
 };
 
 export type CandidateProfile = {
@@ -595,7 +595,7 @@ export type OrderCandidateJob = {
   jobCancellation?: JobCancellation;
   candidateSSNRequired:boolean;
   candidateDOBRequired:boolean;
-  candidatePayRate?: string | null;
+  candidatePayRate: string;
 };
 
 export type CandidatesBasicInfo = {

@@ -281,6 +281,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                   offeredStartDate: DateTimeHelper.toUtcFormat(new Date(value.offeredStartDate)),
                   allowDeployWoCredentials: true,
                   billRates: this.billRatesComponent.billRatesControl.value,
+                  candidatePayRate: value.candidatePayRate,
                 })
               )
               .subscribe(() => {
@@ -417,6 +418,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
     });
     this.disableControlsBasedOnPermissions();
+    this.configureCandidatePayRateField();
   }
 
   private disableControlsBasedOnPermissions(): void {
@@ -472,5 +474,15 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
+  }
+
+  private configureCandidatePayRateField(): void {
+    const candidatePayRateField = this.formGroup.get('candidatePayRate');
+    if (this.isAgency && this.candidateStatus === ApplicantStatusEnum.Offered) {
+      candidatePayRateField?.enable();
+    } else {
+      candidatePayRateField?.disable();
+    }
+    this.changeDetectorRef.markForCheck();
   }
 }

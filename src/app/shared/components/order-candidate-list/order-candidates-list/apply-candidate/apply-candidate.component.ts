@@ -134,6 +134,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
                   expAsTravelers: value.expAsTravelers,
                   availableStartDate: availableStartDate,
                   requestComment: value.requestComment,
+                  candidatePayRate: value.candidatePayRate,
                 })
               )
               .subscribe(() => {
