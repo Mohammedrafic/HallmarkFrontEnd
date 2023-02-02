@@ -67,9 +67,10 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateDOBRequired, CandidateSSNRequired } from '@shared/constants';
+import { CandidateDOBRequired, CandidateSSNRequired, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import { SettingsViewService } from '@shared/services';
 
-interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> {}
+interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
 @Component({
   selector: 'app-extension-candidate',
@@ -85,7 +86,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Input() isTab = false;
   @Input() actionsAllowed = true;
   @Input() hasCanEditOrderBillRatePermission: boolean;
-  @Input() isCandidatePayRateVisible: boolean;
 
   candidate$: Observable<OrderCandidatesList>;
 
@@ -131,13 +131,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
-  public format = '###.00';
-  public decimals = 2;
   public selectedApplicantStatus: ApplicantStatus | null = null;
+  public isCandidatePayRateVisible: boolean;
 
   public applicantStatusEnum = ApplicantStatusEnum;
-  public candidateSSNRequired :boolean;
-  public candidateDOBRequired :boolean;
+  public candidateSSNRequired: boolean;
+  public candidateDOBRequired: boolean;
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
     Rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
@@ -174,8 +173,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   get isOffered(): boolean {
-    console.error(this.candidate?.status === ApplicantStatusEnum.Offered);
-    
     return this.candidate?.status === ApplicantStatusEnum.Offered;
   }
 
@@ -186,7 +183,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     private commentsService: CommentsService,
     private router: Router,
     private durationService: DurationService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private settingService: SettingsViewService,
   ) {
     super();
     this.isAgency = this.router.url.includes('agency');
@@ -295,23 +293,29 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   public onAccept(): void {
-    if(this.candidateDOBRequired){
-      if(!this.form.controls["dob"].value){
+    if (this.candidateDOBRequired) {
+      if (!this.form.controls["dob"].value) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateDOBRequired));
         return;
       }
     }
-    if(this.candidateSSNRequired){
-      if(!this.form.controls["ssn"].value){
+    if (this.candidateSSNRequired) {
+      if (!this.form.controls["ssn"].value) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
         return;
       }
     }
+
+    if (this.isAgency && this.isCandidatePayRateVisible && this.isOffered && this.form.get('candidatePayRate')?.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
   }
 
   public onSave(): void {
-    this.saveHandler({itemData: this.selectedApplicantStatus});
+    this.saveHandler({ itemData: this.selectedApplicantStatus });
   }
 
   public onStatusChange(event: { itemData: ApplicantStatus }): void {
@@ -399,7 +403,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       .subscribe(([permissions, candidate]: [CurrentUserPermission[], OrderCandidatesList]) => {
         this.orderPermissions = permissions;
         this.mapPermissions();
-
+        this.getCandidatePayRateSetting();
         const { organizationId, candidateJobId } = candidate;
         const GetCandidateJobAction = this.isAgency ? GetCandidateJob : GetOrganisationCandidateJob;
         this.store.dispatch(new GetCandidateJobAction(organizationId as number, candidateJobId));
@@ -470,6 +474,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         billRates: this.billRatesData,
         guaranteedWorkWeek: value.guaranteedWorkWeek,
         clockId: value.clockId,
+        candidatePayRate: value.candidatePayRate,
       };
       const statusChanged = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
       this.store
@@ -484,6 +489,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             this.dialogEvent.next(false);
           } else {
             this.resetStatusesFormControl();
+            this.adjustCandidatePayRateField();
           }
         });
     } else {
@@ -511,7 +517,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       hours: new FormControl(''),
       dob: new FormControl(''),
       ssn: new FormControl(''),
-      candidatePayRate: new FormControl(''),
+      candidatePayRate: new FormControl('', Validators.required),
     });
   }
 
@@ -531,8 +537,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   private patchForm(value: OrderCandidateJob): void {
     this.candidateJob = value;
-    this.candidateSSNRequired =value.candidateSSNRequired;
-    this.candidateDOBRequired=value.candidateDOBRequired;
+    this.candidateSSNRequired = value.candidateSSNRequired;
+    this.candidateDOBRequired = value.candidateDOBRequired;
     if (this.candidateJob) {
       this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
       this.getComments();
@@ -566,10 +572,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
       if (!this.isRejected) {
         this.fieldsEnableHandlear();
-      }
-
-      if(this.isAgency && this.isOffered) {
-        this.form.get('candidatePayRate')?.enable();
       }
     }
     this.changeDetectorRef.markForCheck();
@@ -635,11 +637,42 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     (this.isAgency ? this.candidateJobState$ : this.candidatesJob$)
       .pipe(filter(Boolean), takeUntil(this.destroy$))
       .subscribe((data) => {
-        if(data.jobId === this.candidate?.candidateJobId) {
+        if (data.jobId === this.candidate?.candidateJobId) {
           this.resetStatusesFormControl();
           this.createForm();
           this.patchForm(data);
+          this.adjustCandidatePayRateField();
         }
       });
   }
+
+  private getCandidatePayRateSetting(): void {
+    const organizationId = this.candidate?.organizationId;
+
+    if (organizationId) {
+      this.settingService
+        .getViewSettingKey(
+          OrganizationSettingKeys.CandidatePayRate,
+          OrganizationalHierarchy.Organization,
+          organizationId,
+          organizationId
+        ).pipe(takeUntil(this.destroy$))
+        .subscribe(({ CandidatePayRate }) => {
+          this.isCandidatePayRateVisible = JSON.parse(CandidatePayRate);
+        });
+    }
+  }
+
+  private adjustCandidatePayRateField(): void {
+    const candidatePayRateControl = this.form.get('candidatePayRate');
+    setTimeout(() => {
+      if (this.isCandidatePayRateVisible && this.isAgency && this.isOffered) {
+        candidatePayRateControl?.enable();
+      } else {
+        candidatePayRateControl?.disable();
+      }
+      this.changeDetectorRef.markForCheck();
+    })
+  }
+
 }
