@@ -89,6 +89,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.setFormGroupValidators();
     this.startFormGroupWatching();
     this.initFiltersColumns();
+    this.watchForOrganizationStructure();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -96,6 +97,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       this.clearAllFilters(false);
       this.initFormConfig();
     }
+    this.initFiltersDataSources();
   }
 
   deleteFilter(event: FilteredItem): void {
@@ -117,7 +119,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.updateTableByFilters.emit(InvoiceFiltersAdapter.prepareFilters(this.formGroup));
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   initFiltersDataSources(): void {
@@ -150,12 +152,13 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   private initFiltersColumns(): void {
-    this.store.select(InvoicesState.invoiceFiltersColumns).pipe(
+    this.store.select(InvoicesState.invoiceFiltersColumns)
+    .pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy()),
     ).subscribe((filters: InvoiceFilterColumns) => {
       this.filterColumns = filters;
-
+      this.filterColumns.regionIds.dataSource = this.regions;
       this.initFormConfig();
       this.cdr.detectChanges();
     });
@@ -163,16 +166,12 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
 
   private initFormConfig(): void {
     this.filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency);
-
-    if (this.selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
-      this.watchForOrganizationStructure();
-    }
-
     this.cdr.detectChanges();
   }
 
   private watchForOrganizationStructure(): void {
-    this.organizationStructure$.pipe(
+    this.organizationStructure$
+    .pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy()),
     ).subscribe((structure: OrganizationStructure) => {

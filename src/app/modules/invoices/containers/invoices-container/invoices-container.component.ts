@@ -232,7 +232,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     ).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
       this.setGridConfig();
-      this.invoicesFiltersDialogComponent?.initFiltersDataSources();
       this.cdr.markForCheck();
     });
   }
