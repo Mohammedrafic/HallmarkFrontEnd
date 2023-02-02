@@ -214,6 +214,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       distinctUntilChanged(),
       filter((id) => !!id),
       tap((id: number) => {
+        this.resetFilters();
         this.organizationId = id;
         this.store.dispatch(new Invoices.SelectOrganization(id));
       }),

@@ -176,6 +176,9 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       filter(Boolean),
       takeUntil(this.componentDestroy()),
     ).subscribe((structure: OrganizationStructure) => {
+      this.formGroup.reset();
+      this.filteredItems = [];
+      this.appliedFiltersAmount.emit(this.filteredItems.length);
       this.regions = structure.regions;
       this.filterColumns.regionIds.dataSource = this.regions;
       this.cdr.markForCheck();
