@@ -56,6 +56,7 @@ import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { CandidateStatusDataModel } from '../models/candidate-status-dto.model';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { CandidateStatusDto } from '@admin/analytics/models/common-report.model';
+import { OrgDetailsInfoModel } from '../models/org-details-info.model';
 
 @Injectable()
 export class DashboardService {
