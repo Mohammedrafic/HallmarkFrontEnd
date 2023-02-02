@@ -1,5 +1,5 @@
 import { DropdownOption } from '@core/interface';
-import { CostCenter, CostCentersDto } from './../interface/common.interface';
+import { CostCentersDto } from '../interface';
 
 export const CostCenterAdapter = (res: CostCentersDto) => {
   const options: DropdownOption[] = [];
@@ -14,14 +14,13 @@ export const CostCenterAdapter = (res: CostCentersDto) => {
           value: center.id,
         });
       });
-    } else {
-      const item = res[key] as CostCenter;
-
+    } else if (data) {
       options.push({
-        text: item.formattedName,
-        value: item.id,
+        text: data.formattedName,
+        value: data.id,
       });
     }
   });
+
   return options;
-}
+};

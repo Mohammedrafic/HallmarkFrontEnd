@@ -1,0 +1,36 @@
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+    <ng-template #header>
+      <div class="app-accumulation-chart__title">
+        <h3 class="widget-header__title">My Tasks</h3>
+      </div>
+      <div class="app-widget-wrapper__tooltip" *ngIf="description.length>0">
+        <ejs-tooltip [content]="description" position='TopCenter'>
+          <span class="mytooltip">
+            <i-feather name="info" id="info"
+                       [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+          </span>
+        </ejs-tooltip>
+      </div>
+    
+  </ng-template>
+  <ng-template #OrgChart>
+    <div class="widget">
+      <span class="widget__type"
+            (mousedown)="defineMousePosition($event)" (click)="toSourceContent('Order')">
+            <p class="orgname">Pending Order(s) Approval</p><p class="orgcount">{{chartData?.pendingOrders}}</p>
+      </span>
+      <span class="widget__type"
+            (mousedown)="defineMousePosition($event)" (click)="toSourceContent('ManualInvoice')">
+            <p class="orgname">Pending Manual Invoice(s) Approval</p><p class="orgcount">{{chartData?.pendingManualInvoices}}</p>
+      </span>
+      <span class="widget__type"
+            (mousedown)="defineMousePosition($event)" (click)="toSourceContent('pendingInvoice')">
+            <p class="orgname">Pending Invoice(s) Approval</p><p class="orgcount">{{chartData?.pendingOrganizationInvoices}}</p>
+      </span>
+      <span class="widget__type"
+            (mousedown)="defineMousePosition($event)" (click)="toSourceContent('Timesheet')">
+            <p class="orgname">Pending Timesheet(s) Approval</p><p class="orgcount">{{chartData?.pendingTimeSheets}}</p>
+      </span>
+    </div>
+  </ng-template>
+  </app-widget-wrapper>

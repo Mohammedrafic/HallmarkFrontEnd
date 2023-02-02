@@ -1,5 +1,5 @@
-import { GetDocumentsByCognitiveSearch } from './../../../store/actions/document-library.actions';
-import { CellClickedEvent, FilterChangedEvent, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
+import { GetDocumentsByCognitiveSearch, GetSharedDocumentInformation } from './../../../store/actions/document-library.actions';
+import { CellClickedEvent, ColDef, FilterChangedEvent, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -30,6 +30,7 @@ import {
   NodeItem,
   PreviewDocumentDetailFilter,
   regionFilter,
+  SharedDocumentInformation,
   ShareDocumentDto,
   ShareDocumentInfoFilter,
   ShareDocumentInfoPage,
@@ -72,7 +73,7 @@ import { Region } from '@shared/models/region.model';
 import { datesValidator } from '@shared/validators/date.validator';
 import { GetBusinessByUnitType } from '../../../../../security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -83,7 +84,7 @@ import {
   TextSelectionService,
   ToolbarService
 } from '@syncfusion/ej2-angular-pdfviewer';
-import { DocumentEditorComponent, EditorHistoryService, EditorService, SearchService } from '@syncfusion/ej2-angular-documenteditor';
+import { DocumentEditorComponent, EditorHistoryService, EditorService, SearchService, TableHistoryInfo } from '@syncfusion/ej2-angular-documenteditor';
 import { User } from '../../../../../shared/models/user-managment-page.model';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 
@@ -104,6 +105,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   get filterBbusinessControl(): AbstractControl {
     return this.businessFilterForm.get('filterBusiness') as AbstractControl;
   }
+  public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public unitFields = UNIT_FIELDS;
   public businessUnits = BUSINESS_UNITS_VALUES;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
@@ -188,6 +190,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.downloadDocument(params);
     }
   }
+  public sharedDocumentInformation:BusinessUnit[];
   public allOption: string = "All";
   public optionFields = {
     text: 'name',
@@ -207,7 +210,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     value: 'agencyId',
   };
 
-  @ViewChild('pdfViewer', { static: true })
+  public columnDefs:ColDef[] = [
+    { field: 'name', headerName:"Shared With",width:400},
+  ];
+ @ViewChild('pdfViewer', { static: true })
   public pdfViewer: PdfViewerComponent;
 
   @ViewChild('wordDocPreview', { static: true })
@@ -241,6 +247,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public shareAssociateAgencies$: Observable<AssociateAgencyDto[]>;
   @Select(DocumentLibraryState.getShareOrganizationsData)
   public shareOrganizationsData$: Observable<ShareOrganizationsData[]>;
+  @Select(DocumentLibraryState.getSharedDocumentInformation)
+  public sharedDocumentInformation$: Observable<BusinessUnit[]>;
 
 
   constructor(private store: Store, private datePipe: DatePipe,
@@ -287,7 +295,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         }
       }
     });
-
+    
 
     this.action$.pipe(ofActionDispatched(GetDocumentsSelectedNode), takeUntil(this.unsubscribe$)).subscribe((payload) => {
       this.selectedNodeText = '';
@@ -450,6 +458,18 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
   private getFolderTree(selectedBusinessUnitId: number | null) {
     this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: selectedBusinessUnitId }));
+  }
+  private getSharedDocumentInformation(documentId:number){
+    let sharedDocumentInformation: SharedDocumentInformation = {
+      businessUnitType: this.businessFilterForm.get('filterBusinessUnit')?.value,
+      documentId: documentId
+    }
+    
+    this.store.dispatch(new GetSharedDocumentInformation(sharedDocumentInformation));
+    this.sharedDocumentInformation$.pipe(takeUntil(this.unsubscribe$))
+    .subscribe((data: BusinessUnit[]) => {
+      this.sharedDocumentInformation=data;
+    });
   }
 
   public createForm(): void {
@@ -691,8 +711,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     selectedRows = this.gridApi.getSelectedRows();
     if (selectedRows.length > 0) {
       let selectedIds = selectedRows.map((item: any) => {
-        return item.id;
-      })
+      return item.id;
+    })
       this.isAddNewFolder = false;
       this.isUpload = false;
       this.isEditDocument = false;
@@ -1156,6 +1176,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   private ShareDocument(data: DocumentLibraryDto) {
     if (data) {
+      this.getSharedDocumentInformation(data.id)
       this.formDailogTitle = "";
       this.isAddNewFolder = false;
       this.isUpload = false;

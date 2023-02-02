@@ -372,6 +372,17 @@
         </div>
       </div>
     </section>
-
+    <section>
+      <div class="shared-with-grid">
+        <ag-grid-angular
+        [rowHeight]="gridConfig.initialRowHeight" 
+        domLayout="autoHeight" 
+        [headerHeight]="50"
+        [columnDefs]="columnDefs"
+        [rowData]="sharedDocumentInformation"
+        class="ag-theme-alpine">
+        </ag-grid-angular>
+      </div>
+    </section>
   </form>
 </app-side-dialog>

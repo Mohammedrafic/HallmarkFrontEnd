@@ -14,5 +14,6 @@ export enum WidgetTypeEnum {
   OPEN_POSITIONS_TREND = 'Open_Positions_Trend',
   IN_PROGRESS_POSITIONS_TREND = 'In_Progress_Positions_Trend',
   LTA_ORDER_ENDING ='LTA_Order_Ending',
-  Candidate_Applied_In_Last_N_Days='Candidate_Applied_In_Last_N_Days'
+  Candidate_Applied_In_Last_N_Days='Candidate_Applied_In_Last_N_Days',
+  ORG = 'Organization_Widget'
 }

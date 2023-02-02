@@ -78,8 +78,9 @@ export class DashboardService {
     [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
     [WidgetTypeEnum.OPEN_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getOpenPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getInProgressPositionTrendWidgetData(filters),
-      [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
+    [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
       [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
+    [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters)
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -322,6 +323,11 @@ export class DashboardService {
     return this.httpClient
       .post<CandidatesPositionsDto>(`${this.baseUrl}/ltaorderending`, { orderStatuses: [orderStatus], ...filter })
       .pipe(map((data) => data.orderStatusesDetails[0]));
+  }
+  private getOrganizationWidgetdata(filter: DashboartFilterDto) : Observable<OrgDetailsInfoModel> {
+    return this.httpClient.post<OrgDetailsInfoModel>(`${this.baseUrl}/organizationpendingcounts`, { ...filter }).pipe(
+      map((data)=> data)
+    )
   }
 
   private getActivePositionWidgetData(filter: DashboartFilterDto): Observable<AccumulationChartModel> {

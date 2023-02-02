@@ -32,6 +32,9 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { CandidateDOBRequired, CandidateSSNRequired } from '@shared/constants';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -140,6 +143,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
 
   private unsubscribe$: Subject<void> = new Subject();
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
+  public candidateSSNRequired :boolean;
+  public candidateDOBRequired :boolean;
 
   constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService, private cd: ChangeDetectorRef) {}
 
@@ -238,6 +243,19 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   }
 
   public onAccept(): void {
+    if(this.candidateDOBRequired){
+      if(!this.form.controls["dob"].value){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateDOBRequired));
+        return;
+      }
+    }
+    if(this.candidateSSNRequired){
+      if(!this.form.controls["ssn"].value){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
+        return;
+      }
+    }
+
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
   }
 
@@ -309,6 +327,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       allow: [false],
       rejectReason: [''],
       candidatePayRate: [{ value: null, disabled: true }],
+      dob:[''],
+      ssn: [''],
     });
   }
 
@@ -344,8 +364,12 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       clockId: orderCandidateJob.clockId,
       allow: orderCandidateJob.allowDeployCredentials,
       rejectReason: orderCandidateJob.rejectReason,
-      candidatePayRate: orderCandidateJob.candidatePayRate
+      candidatePayRate: orderCandidateJob.candidatePayRate,
+      dob:orderCandidateJob.candidateProfile.dob,
+      ssn:orderCandidateJob.candidateProfile.ssn,
     });
+    this.candidateDOBRequired=orderCandidateJob.candidateDOBRequired;
+    this.candidateSSNRequired=orderCandidateJob.candidateSSNRequired; 
     this.cd.detectChanges();
   }
 

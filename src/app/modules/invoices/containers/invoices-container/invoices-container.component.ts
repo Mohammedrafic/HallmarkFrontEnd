@@ -214,6 +214,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       distinctUntilChanged(),
       filter((id) => !!id),
       tap((id: number) => {
+        this.resetFilters();
         this.organizationId = id;
         this.store.dispatch(new Invoices.SelectOrganization(id));
       }),
@@ -231,7 +232,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     ).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
       this.setGridConfig();
-      this.invoicesFiltersDialogComponent?.initFiltersDataSources();
       this.cdr.markForCheck();
     });
   }

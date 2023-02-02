@@ -6,11 +6,13 @@ import {
   DocumentsLibraryPage, DocumentTagFilter, DocumentTags, DocumentTypeFilter, DocumentTypes,
   FolderTreeFilter, DownloadDocumentDetail, DownloadDocumentDetailFilter, DeleteDocumentsFilter, ShareDocumentsFilter, SharedDocumentPostDto,
   ShareDocumentInfoPage, ShareDocumentInfoFilter, UnShareDocumentsFilter, AssociateAgencyDto, ShareOrganizationsData, DeleteDocumentFolderFilter,
-  PreviewDocumentDetailFilter
+  PreviewDocumentDetailFilter,
+  SharedDocumentInformation
 } from "../store/model/document-library.model";
 
 import { Region } from '@shared/models/region.model';
 import { Location } from '@shared/models/location.model';
+import { BusinessUnit } from "@shared/models/business-unit.model";
 
 @Injectable({ providedIn: 'root' })
 export class DocumentLibraryService {
@@ -207,6 +209,18 @@ export class DocumentLibraryService {
   public getShareOrganizationsData(): Observable<ShareOrganizationsData[]> {
     return this.http.get<ShareOrganizationsData[]>(`/api/DocumentLibrary/share/getOrganizations`);
   }
+
+ /**
+ * Get the list of shared document information
+ * @return Array of share document information
+ */
+ public getSharedDocumentInformation(filter:SharedDocumentInformation): Observable<BusinessUnit[]> {
+  let params = new HttpParams();
+    params = params.append("DocumentId", filter.documentId);
+    params = params.append("BusinessUnitType", filter.businessUnitType);
+
+  return this.http.get<BusinessUnit[]>(`/api/DocumentLibrary/GetSharedDocumentInformation`,{params:params});
+}
 
   /**
   * Remove document folder
