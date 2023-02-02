@@ -18,4 +18,5 @@ export const widgetTypeToConfigurationMapper: Record<WidgetTypeEnum, PanelModel>
   [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: { sizeX: 3, sizeY: 1, maxSizeX: 3, maxSizeY: 1, minSizeX: 3, minSizeY: 1 },
   [WidgetTypeEnum.LTA_ORDER_ENDING]: { sizeX: 3, sizeY: 1, maxSizeX: 3, maxSizeY: 1, minSizeX: 3, minSizeY: 1 },
   [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: { sizeX: 3, sizeY: 1, maxSizeX: 3, maxSizeY: 1, minSizeX: 3, minSizeY: 1 },
+  [WidgetTypeEnum.ORG]: { sizeX: 3, sizeY: 1, maxSizeX: 3, maxSizeY: 1, minSizeX: 3, minSizeY: 1 },
 };

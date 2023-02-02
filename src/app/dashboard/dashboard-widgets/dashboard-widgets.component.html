@@ -68,6 +68,11 @@
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.Candidate_Applied_In_Last_N_Days"
                               [isDarkTheme]="isDarkTheme"></app-candidate-chart>
+          <app-org-widget *ngSwitchCase="widgetTypeEnum.ORG"    
+                              [chartData]="widgetsData?.[widgetTypeEnum.ORG]"
+                              [isLoading]="isLoading"
+                              [description]="widgetDescriptionEnum.ORG"
+                              [isDarkTheme]="isDarkTheme"></app-org-widget>
         </ng-template>
       </e-panel>
     </e-panels>
