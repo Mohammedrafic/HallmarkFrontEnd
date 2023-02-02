@@ -130,10 +130,10 @@
                       <div class="input-group input-readonly">
                         <app-numeric-textbox
                           [formGroupInstance]="form"
-                          [decimals]="2"
+                          [decimals]="decimals"
                           [maxLength]="10"
                           [min]="0"
-                          format="###.00"
+                          [format]="format"
                           controlName="candidatePayRate"
                         ></app-numeric-textbox>
                       </div>

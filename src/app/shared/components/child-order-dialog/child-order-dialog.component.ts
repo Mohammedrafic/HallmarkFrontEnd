@@ -51,7 +51,8 @@ import {
   PenaltiesMap,
 } from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 import { ExtensionSidebarComponent } from '@shared/components/extension/extension-sidebar/extension-sidebar.component';
-import { AcceptFormComponent,
+import {
+  AcceptFormComponent,
 } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, OrganizationalHierarchy, OrganizationSettingKeys, SET_READONLY_STATUS } from '@shared/constants';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
@@ -237,7 +238,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   get isClosedOrderPosition(): boolean {
     return this.candidate.orderStatus === OrderStatus.Closed || !!this.candidate.positionClosureReason
-    || !!this.selectedOrder?.orderClosureReason;
+      || !!this.selectedOrder?.orderClosureReason;
   }
 
   constructor(
@@ -290,7 +291,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       this.setCloseOrderButtonState();
       this.setAddExtensionBtnState(candidate);
       this.getDeployedCandidateOrders();
-       this.getCandidatePayRateSetting();
+      this.getCandidatePayRateSetting();
 
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(
@@ -482,9 +483,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     this.saveEmitter.emit();
   }
 
-  
+
   public onSave(): void {
-    this.saveHandler({itemData: this.selectedApplicantStatus});
+    this.saveHandler({ itemData: this.selectedApplicantStatus });
   }
 
   public onStatusChange(event: { itemData: ApplicantStatusModel | null }): void {
@@ -747,9 +748,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   private subscribeOnSelectedOrder() {
     this.selectedOrder$.pipe(takeUntil(this.componentDestroy()))
-    .subscribe((data) => {
-      this.selectedOrder = data;
-    });
+      .subscribe((data) => {
+        this.selectedOrder = data;
+      });
   }
 
   private subscribeOnCancelOrganizationCandidateJobSuccess(): void {
@@ -777,11 +778,11 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions()
-    .pipe(takeUntil(this.componentDestroy()))
-    .subscribe(({ canCloseOrder, canCreateOrder }) => {
-      this.canCreateOrder = canCreateOrder;
-      this.canCloseOrder = canCloseOrder;
-    });
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(({ canCloseOrder, canCreateOrder }) => {
+        this.canCreateOrder = canCreateOrder;
+        this.canCloseOrder = canCloseOrder;
+      });
   }
 
   private getDeployedCandidateOrders(): void {
@@ -831,17 +832,17 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private getCandidatePayRateSetting(): void {
     const organizationId = this.candidate.organizationId;
 
-    if(organizationId) {
-    this.settingService
-      .getViewSettingKey(
-        OrganizationSettingKeys.CandidatePayRate,
-        OrganizationalHierarchy.Organization,
-        organizationId,
-        organizationId
-      ).pipe(takeUntil(this.componentDestroy()))
-      .subscribe(({ CandidatePayRate }) => {
-        this.isCandidatePayRateVisible = JSON.parse(CandidatePayRate);
-      });
+    if (organizationId) {
+      this.settingService
+        .getViewSettingKey(
+          OrganizationSettingKeys.CandidatePayRate,
+          OrganizationalHierarchy.Organization,
+          organizationId,
+          organizationId
+        ).pipe(takeUntil(this.componentDestroy()))
+        .subscribe(({ CandidatePayRate }) => {
+          this.isCandidatePayRateVisible = JSON.parse(CandidatePayRate);
+        });
     }
   }
 }

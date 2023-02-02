@@ -131,6 +131,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
+  public format = '###.00';
+  public decimals = 2;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public isCandidatePayRateVisible: boolean;
 
