@@ -98,6 +98,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public priceUtils = PriceUtils;
   public hasEditOrderBillRatesPermission: boolean;
   public showCandidatePayRate: boolean;
+  public format = '###.00';
+  public decimals = 2;
 
   get showYearsOfExperience(): boolean {
     return (

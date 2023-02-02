@@ -124,6 +124,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canOnboard = false;
   public canClose = false;
   public selectedApplicantStatus: ApplicantStatus | null = null;
+  public format = '###.00';
+  public decimals = 2;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');

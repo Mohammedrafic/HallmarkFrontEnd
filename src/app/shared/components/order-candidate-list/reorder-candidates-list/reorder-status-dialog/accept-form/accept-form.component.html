@@ -103,14 +103,14 @@
       <div class="input-container bootstrap" *ngIf="isCandidatePayRateVisible">
         <label>Candidate Pay Rate ($) <span *ngIf="isBlankStatus" class="required">*</span> </label>
         <div class="input-group">
-          <input
-            appValidateWithMessage
-            formControlName="candidatePayRate"
-            class="e-input"
-            type="text"
-            (focus)="priceUtils.setPriceMask(formGroup, 'candidatePayRate', $event)"
-            (blur)="priceUtils.setTwoDecimals(formGroup, 'candidatePayRate', $event)"
-          />
+          <app-numeric-textbox
+            [formGroupInstance]="formGroup"
+            [decimals]="decimals"
+            [maxLength]="10"
+            [min]="0"
+            [format]="format"
+            controlName="candidatePayRate"
+          ></app-numeric-textbox>
         </div>
       </div>
     </div>

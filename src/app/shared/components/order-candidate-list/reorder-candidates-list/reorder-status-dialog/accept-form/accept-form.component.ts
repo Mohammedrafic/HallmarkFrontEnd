@@ -30,6 +30,10 @@ export class AcceptFormComponent implements OnChanges{
 
   public isBlankStatus: boolean;
 
+  public format = '###.00';
+
+  public decimals = 2;
+
   get penaltyCriteriaControlValue(): string {
     return this.formGroup.get('penaltyCriteria')?.value;
   }
@@ -65,7 +69,7 @@ export class AcceptFormComponent implements OnChanges{
     const candidatePayRateControl = this.formGroup.get('candidatePayRate');
     
     if(this.isCandidatePayRateVisible && this.isBlankStatus) {
-      candidatePayRateControl?.enable();
+      candidatePayRateControl?.enable();   
     } else {
       candidatePayRateControl?.disable();
     }

@@ -92,6 +92,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public candidatePayRateRequired: boolean;
   public candidateSSNRequired :boolean;
   public candidateDOBRequired :boolean;
+  public format = '###.00';
+  public decimals = 2;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
