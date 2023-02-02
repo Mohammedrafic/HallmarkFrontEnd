@@ -374,7 +374,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   private getNewApplicantStatus(): ApplicantStatus {
-    return this.acceptForm.dirty
+    return this.acceptForm.get('candidateBillRate')?.dirty
       ? { applicantStatus: CandidatStatus.BillRatePending, statusText: 'Bill Rate Pending' }
       : { applicantStatus: CandidatStatus.OnBoard, statusText: 'Onboard' };
   }
