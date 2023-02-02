@@ -16,6 +16,6 @@ export const widgetTypes: Record<string, WidgetTypeEnum> = {
   15: WidgetTypeEnum.OPEN_POSITIONS_TREND,
   16: WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND,
   17: WidgetTypeEnum.LTA_ORDER_ENDING,
-  18: WidgetTypeEnum.Candidate_Applied_In_Last_N_Days
+  18: WidgetTypeEnum.Candidate_Applied_In_Last_N_Days,
   19: WidgetTypeEnum.ORG
 };
