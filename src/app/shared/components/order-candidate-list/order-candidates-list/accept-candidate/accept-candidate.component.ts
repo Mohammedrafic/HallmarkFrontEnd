@@ -70,9 +70,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
   @Input() isOrderOverlapped: boolean;
-  @Input() order:Order;
+  @Input() order: Order;
   @Input() isCandidatePayRateVisible: boolean;
-  
+
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
 
@@ -91,8 +91,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public showHoursControl: boolean = false;
   public showPercentage: boolean = false;
   public candidatePayRateRequired: boolean;
-  public candidateSSNRequired :boolean;
-  public candidateDOBRequired :boolean;
+  public candidateSSNRequired: boolean;
+  public candidateDOBRequired: boolean;
   public payRateSetting = CandidatePayRateSettings;
 
   get isRejected(): boolean {
@@ -104,7 +104,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get showCandidatePayRate(): boolean {
-    return ![ApplicantStatusEnum.NotApplied, ApplicantStatusEnum.Applied].includes(this.candidateStatus);
+    return ![ApplicantStatusEnum.NotApplied, ApplicantStatusEnum.Applied, ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom].includes(this.candidateStatus);
   }
 
   get isOffered(): boolean {
@@ -209,14 +209,14 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public onAccept(): void {
-    if(this.candidateDOBRequired){
-      if(!this.form.controls["dob"].value){
+    if (this.candidateDOBRequired) {
+      if (!this.form.controls["dob"].value) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateDOBRequired));
         return;
       }
     }
-    if(this.candidateSSNRequired){
-      if(!this.form.controls["ssn"].value){
+    if (this.candidateSSNRequired) {
+      if (!this.form.controls["ssn"].value) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
         return;
       }
@@ -250,7 +250,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       okButtonClass: 'ok-button',
     };
 
-    return this.isDeployedCandidate  && this.isAgency && this.isOrderOverlapped
+    return this.isDeployedCandidate && this.isAgency && this.isOrderOverlapped
       ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds), options)
       : of(true);
   }
@@ -340,7 +340,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       penaltyCriteria: new FormControl(''),
       rate: new FormControl(''),
       hours: new FormControl(''),
-      dob:new FormControl(''),
+      dob: new FormControl(''),
       ssn: new FormControl('')
     });
   }
@@ -360,18 +360,18 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       this.candidateJob = value;
 
       if (value) {
-        this.candidateSSNRequired =value.candidateSSNRequired;
-        this.candidateDOBRequired=value.candidateDOBRequired;
+        this.candidateSSNRequired = value.candidateSSNRequired;
+        this.candidateDOBRequired = value.candidateDOBRequired;
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()), 
-            DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString())],
+          date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
+          DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString())],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
           availableStartDate: value.availableStartDate ?
-          DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
+            DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
           candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
           locationName: value.order.locationName,
           yearExp: value.yearsOfExperience,
@@ -391,8 +391,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
           rate: value.jobCancellation?.rate,
           hours: value.jobCancellation?.hours,
-          dob:value.candidateProfile.dob,
-          ssn:value.candidateProfile.ssn,
+          dob: value.candidateProfile.dob,
+          ssn: value.candidateProfile.ssn,
           candidatePayRate: this.candidateJob.candidatePayRate
         });
       }
@@ -441,7 +441,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private adjustCandidatePayRateField(): void {
     const candidatePayRateControl = this.form.get('candidatePayRate');
 
-    if(this.isCandidatePayRateVisible && this.isOffered) {
+    if (this.isCandidatePayRateVisible && this.isOffered) {
       candidatePayRateControl?.enable();
     } else {
       candidatePayRateControl?.disable();

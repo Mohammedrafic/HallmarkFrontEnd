@@ -170,14 +170,14 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private changeDetectorRef: ChangeDetectorRef
-  ) {}
+  ) { }
 
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['candidate']?.currentValue) {
       this.readOnlyMode =
         this.candidateStatus === ApplicantStatusEnum.Withdraw || this.candidateStatus === ApplicantStatusEnum.Rejected;
       this.isClosedPosition = this.candidateStatus === ApplicantStatusEnum.Offboard;
-      this.showCandidatePayRate = this.candidateStatus !== ApplicantStatusEnum.Applied && this.candidateStatus !== ApplicantStatusEnum.NotApplied;
+      this.showCandidatePayRate = ![ApplicantStatusEnum.NotApplied, ApplicantStatusEnum.Applied, ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom, ApplicantStatusEnum.Withdraw].includes(this.candidateStatus);
     }
 
     this.checkRejectReason();
@@ -238,7 +238,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public onSave(): void {
-    this.updateCandidateJob({itemData: this.selectedApplicantStatus});
+    this.updateCandidateJob({ itemData: this.selectedApplicantStatus });
   }
 
   public onStatusChange(event: { itemData: ApplicantStatus }): void {
