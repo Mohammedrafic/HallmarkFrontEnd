@@ -64,7 +64,8 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   readonly scheduleTypes: ScheduleInt.ScheduleTypeRadioButton[] = ScheduleTypes;
   readonly scheduleTypeNumberEnum = ScheduleTypeNumber;
   readonly FieldTypes = FieldType;
-  readonly scheduleTypesControl: FormControl = new FormControl(this.scheduleTypeNumberEnum.Unavailability); // TODO: change to Book when it is implemented
+  // TODO: change to Book when it is implemented
+  readonly scheduleTypesControl: FormControl = new FormControl(this.scheduleTypeNumberEnum.Unavailability);
   readonly dropDownFields = { text: 'text', value: 'value' };
   readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = {
     [ScheduleFormSourceKeys.Shifts]: [],

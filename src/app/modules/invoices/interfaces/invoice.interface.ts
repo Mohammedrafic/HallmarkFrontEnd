@@ -82,7 +82,6 @@ export interface InvoicesFilterState {
   dueDateTo?: string;
   paidDateFrom?: string;
   paidDateTo?: string;
-
   orderIds?: string[];
   timesheetType?: number;
   regionIds?: number[];
@@ -325,3 +324,5 @@ export interface InvoiceFilterFieldConfig {
   isShort?: boolean;
   showSelectAll?: boolean;
 }
+
+export type InvoiceFilterValue = string | string[] | number | number[];

@@ -61,7 +61,6 @@ export const SavedInvoicesFiltersParams: InvoicesTableFiltersColumns[] = [
   InvoicesTableFiltersColumns.PageNumber,
   InvoicesTableFiltersColumns.PageSize,
   InvoicesTableFiltersColumns.OrderBy,
-  InvoicesTableFiltersColumns.StatusIds,
 ];
 
 
@@ -85,11 +84,11 @@ const defaultDateMapping = {
 export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
   [InvoicesTableFiltersColumns.FormattedInvoiceIds]: defaultInputMapping,
   [InvoicesTableFiltersColumns.SearchTerm]: defaultInputMapping,
-  [InvoicesTableFiltersColumns.StatusIds]: defaultInputMapping,
+  [InvoicesTableFiltersColumns.StatusIds]: defaultColumnMapping,
   [InvoicesTableFiltersColumns.AmountFrom]: defaultInputMapping,
   [InvoicesTableFiltersColumns.AmountTo]: defaultInputMapping,
-  [InvoicesTableFiltersColumns.ApDelivery]: defaultInputMapping,
-  [InvoicesTableFiltersColumns.AggregateByType]: defaultInputMapping,
+  [InvoicesTableFiltersColumns.ApDelivery]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.AggregateByType]: defaultColumnMapping,
   [InvoicesTableFiltersColumns.AgencyIds]: defaultColumnMapping,
   [InvoicesTableFiltersColumns.IssueDateFrom]: defaultDateMapping,
   [InvoicesTableFiltersColumns.IssueDateTo]: defaultDateMapping,
@@ -114,7 +113,8 @@ export const InvoicesFilteringOptionsMapping: Map<FilteringInvoicesOptionsFields
   .set(FilteringInvoicesOptionsFields.ApDelivery, InvoicesTableFiltersColumns.ApDelivery)
   .set(FilteringInvoicesOptionsFields.InvoiceStates, InvoicesTableFiltersColumns.StatusIds);
 
-export const PendingInvoiceRecordsFilteringOptionsMapping: Map<FilteringPendingInvoiceRecordsOptionsFields, InvoicesTableFiltersColumns> = new Map()
+export const PendingInvoiceRecordsFilteringOptionsMapping: Map<FilteringPendingInvoiceRecordsOptionsFields,
+InvoicesTableFiltersColumns> = new Map()
   .set(FilteringPendingInvoiceRecordsOptionsFields.Types, InvoicesTableFiltersColumns.TimesheetType)
   .set(FilteringPendingInvoiceRecordsOptionsFields.Skills, InvoicesTableFiltersColumns.SkillIds)
   .set(FilteringPendingInvoiceRecordsOptionsFields.Agency, InvoicesTableFiltersColumns.AgencyIds)
@@ -144,10 +144,10 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
   },
   {
     type: ControlTypes.Text,
-    title: 'Candidate name',
+    title: 'Candidate Name',
     field: InvoicesTableFiltersColumns.SearchTerm,
   },
-  ...(selectedTabId === InvoicesOrgTabId.AllInvoices ? [{
+  ...(selectedTabId === InvoicesOrgTabId.AllInvoices || isAgency && InvoicesAgencyTabId.AllInvoices ? [{
     type: ControlTypes.Dropdown,
     title: 'Status',
     field: InvoicesTableFiltersColumns.StatusIds,
@@ -168,10 +168,11 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
     type: ControlTypes.Dropdown,
     title: 'AP Delivery',
     field: InvoicesTableFiltersColumns.ApDelivery,
+    showSelectAll: true,
   },
   {
     type: ControlTypes.Dropdown,
-    title: 'Group by Type',
+    title: 'Group By Type',
     field: InvoicesTableFiltersColumns.AggregateByType,
   },
   ...(!isAgency ? [{
@@ -292,7 +293,8 @@ export const PendingInvoicesFiltersFormConfig = (): InvoiceFilterFieldConfig[] =
   },
 ];
 
-export const DetectFormConfigBySelectedType = (selectedTabId: InvoiceTabId, isAgency: boolean): InvoiceFilterFieldConfig[] => {
+export const DetectFormConfigBySelectedType = (selectedTabId: InvoiceTabId,
+  isAgency: boolean): InvoiceFilterFieldConfig[] => {
   if (
     selectedTabId !== InvoicesAgencyTabId.ManualInvoicePending
     && selectedTabId !== InvoicesOrgTabId.PendingInvoiceRecords

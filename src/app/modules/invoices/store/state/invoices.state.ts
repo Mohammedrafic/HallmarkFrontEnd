@@ -199,7 +199,6 @@ export class InvoicesState {
     { payload, usePrevFiltersState }: Invoices.UpdateFiltersState,
   ): Observable<null> {
     const oldFilters: InvoicesFilterState = getState().invoicesFilters || DefaultFiltersState;
-
     let filters: InvoicesFilterState;
 
     if (!usePrevFiltersState) {
@@ -213,9 +212,11 @@ export class InvoicesState {
 
     return of(null).pipe(
       throttleTime(100),
-      tap(() => setState(patch<InvoicesModel>({
-        invoicesFilters,
-      })))
+      tap(() => {
+        setState(patch<InvoicesModel>({
+          invoicesFilters,
+        }));
+      })
     );
   }
 

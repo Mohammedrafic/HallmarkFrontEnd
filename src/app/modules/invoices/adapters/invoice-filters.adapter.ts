@@ -8,7 +8,8 @@ type TypedKey = keyof InvoicesFilterState;
 
 export class InvoiceFiltersAdapter {
   static prepareFilters(formGroup: FormGroup): InvoicesFilterState {
-    const filters: InvoicesFilterState | any = LeftOnlyValidValues(formGroup);
+    const filters: InvoicesFilterState = LeftOnlyValidValues(formGroup);
+
     const dateFieldsKeys: TypedKey[] = [
       'issueDateFrom',
       'issueDateTo',
@@ -20,9 +21,10 @@ export class InvoiceFiltersAdapter {
       'weekPeriodTo',
     ];
 
+
     dateFieldsKeys.forEach((key: TypedKey) => {
       if (filters[key]) {
-        filters[key] = DateTimeHelper.toUtcFormat(filters[key]);
+        (filters[key] as string) = DateTimeHelper.toUtcFormat(filters[key] as string);
       }
     });
 

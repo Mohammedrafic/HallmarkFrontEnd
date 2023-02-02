@@ -44,6 +44,7 @@ export class FilterService {
    */
   public removeValue(event: FilteredItem, form: FormGroup, filterColumns: any): void {
     let val = form.controls[event.column].value;
+
     if (Array.isArray(val)) {
       val = val.filter((item) => {
         return item !== event.value;

@@ -26,13 +26,12 @@ export const createUniqHashObj = <T, U>(
   }, {});
 };
 
-/**
- * TODO: change to correct type
- */
-export const reduceFiltersState = <T>(oldFilters: T, saveFiltersKeys: string[]): T => {
-  return Object.keys(oldFilters).reduce((acc: any, key: string) => {
+export const reduceFiltersState = <T>(oldFilters: T,
+  saveFiltersKeys: string[]): Partial<T> => {
+  return Object.keys(oldFilters as Record<string, unknown>)
+  .reduce((acc: Partial<T>, key: string) => {
     if (saveFiltersKeys.includes(key)) {
-      acc[key] = (oldFilters as any)[key];
+     (acc[key as keyof T]) = oldFilters[key as keyof T];
     }
 
     return acc;

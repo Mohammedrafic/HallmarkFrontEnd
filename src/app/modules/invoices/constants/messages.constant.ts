@@ -8,10 +8,10 @@ export const InvoiceConfirmMessages: CommonDialogConformMessages = {
   confirmOrderChange: 'Are you sure you want to change invoice without saving changes?',
   confirmEdit: 'Are you sure you want to change the timesheet? This will lead to recalculating values and generating new invoice records.',
   confirmBulkApprove: '',
-}
+};
 
 export const ManualInvoiceMessages = {
   successAdd: 'Manual invoice was created successfully',
   successEdit: 'Manual invoice was edited successfully',
   successDelete: 'Manual invoice was deleted successfully',
-}
+};

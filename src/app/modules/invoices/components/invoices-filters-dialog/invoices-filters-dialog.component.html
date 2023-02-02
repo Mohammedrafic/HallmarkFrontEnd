@@ -7,6 +7,7 @@
   <form class="bootstrap" [formGroup]="formGroup">
     <ng-container *ngFor="let fieldConfig of filtersFormConfig; trackBy: trackByFn">
       <ng-container [ngSwitch]="fieldConfig.type">
+
         <ng-container *ngSwitchCase="controlTypes.Text">
           <div class="input-container" [class.short]="fieldConfig.isShort">
             <label [for]="fieldConfig.field">{{ fieldConfig.title }}</label>
@@ -21,6 +22,7 @@
             </div>
           </div>
         </ng-container>
+
         <ng-container *ngSwitchCase="controlTypes.Dropdown">
           <div class="input-container" [class.short]="fieldConfig.isShort">
             <label [for]="fieldConfig.field">{{ fieldConfig.title }}</label>
@@ -38,6 +40,7 @@
             </div>
           </div>
         </ng-container>
+
         <ng-container *ngSwitchCase="controlTypes.Date">
           <div class="input-container calendar" [class.short]="fieldConfig.isShort">
             <label [for]="fieldConfig.field">{{ fieldConfig.title }}</label>
@@ -53,6 +56,7 @@
             </div>
           </div>
         </ng-container>
+        
       </ng-container>
     </ng-container>
   </form>

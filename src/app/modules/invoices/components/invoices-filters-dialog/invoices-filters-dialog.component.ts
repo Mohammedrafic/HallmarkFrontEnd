@@ -24,14 +24,15 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { FilterService } from '@shared/services/filter.service';
 import { FilteredItem } from '@shared/models/filter.model';
 import { ControlTypes } from '@shared/enums/control-types.enum';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion,
+  OrganizationStructure } from '@shared/models/organization.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-
 import { UserState } from '../../../../store/user.state';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { Invoices } from '../../store/actions/invoices.actions';
-import { InvoicesFiltersService } from '../../services/invoices-filters.service';
-import { InvoiceFilterColumns, InvoiceFilterFieldConfig, InvoiceRecord, InvoicesFilterState, InvoiceTabId } from '../../interfaces';
+import { InvoicesFiltersService } from '../../services';
+import { InvoiceFilterColumns, InvoiceFilterFieldConfig, InvoiceRecord, InvoicesFilterState,
+  InvoiceTabId } from '../../interfaces';
 import { DetectFormConfigBySelectedType } from '../../constants';
 import { InvoicesAgencyTabId, InvoicesOrgTabId, InvoicesTableFiltersColumns } from '../../enums';
 import { InvoiceFiltersAdapter } from '../../adapters';
@@ -71,7 +72,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     private invoicesFiltersService: InvoicesFiltersService,
     private store: Store,
     private router: Router,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
   ) {
     super();
 
