@@ -1,7 +1,7 @@
 import {
   DocumentFolder, NodeItem, Documents, DocumentTypeFilter, DocumentsFilter,
   DocumentTagFilter, FolderTreeFilter, DownloadDocumentDetailFilter, DownloadDocumentDetail, DeleteDocumentsFilter,
-  ShareDocumentsFilter, ShareDocumentInfoFilter, UnShareDocumentsFilter, DeleteDocumentFolderFilter, PreviewDocumentDetailFilter, DownloadPreviewDetail
+  ShareDocumentsFilter, ShareDocumentInfoFilter, UnShareDocumentsFilter, DeleteDocumentFolderFilter, PreviewDocumentDetailFilter, DownloadPreviewDetail, SharedDocumentInformation
 } from "../model/document-library.model";
 import { regionFilter } from '../model/document-library.model';
 import { LocationsByRegionsFilter } from "../model/document-library.model";
@@ -89,6 +89,11 @@ export class ShareDocumentsSucceeded {
 export class GetDocumentById {
   static readonly type = '[documentsLibrary] Get document by id';
   constructor(public documentId: number) { }
+}
+
+export class GetSharedDocumentInformation {
+  static readonly type = '[documentsLibrary] Get document information by Id';
+  constructor(public sharedDocumentInformation: SharedDocumentInformation) { }
 }
 
 export class GetSharedDocuments {

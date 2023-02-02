@@ -1,4 +1,4 @@
-import { GetDocumentsByCognitiveSearch } from './../actions/document-library.actions';
+import { GetDocumentsByCognitiveSearch, GetSharedDocumentInformation } from './../actions/document-library.actions';
 import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
@@ -16,10 +16,11 @@ import {
 } from "../actions/document-library.actions";
 import {
   DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, FolderTreeItem,
-  DownloadDocumentDetail, SharedDocumentPostDto, ShareDocumentInfoPage, UnShareDocumentsFilter, AssociateAgencyDto, ShareOrganizationsData
+  DownloadDocumentDetail, SharedDocumentPostDto, ShareDocumentInfoPage, UnShareDocumentsFilter, AssociateAgencyDto, ShareOrganizationsData, SharedDocumentInformation
 } from "../model/document-library.model";
 import { Region } from "@shared/models/region.model";
 import { Location } from "@shared/models/location.model";
+import { BusinessUnit } from '@shared/models/business-unit.model';
 
 
 
@@ -41,6 +42,7 @@ export interface DocumentLibraryStateModel {
   associateAgencies: AssociateAgencyDto[] | null,
   shareOrganizationsData: ShareOrganizationsData[] | null,
   documentPreviewDetail: DownloadDocumentDetail | null,
+  businessUnits: BusinessUnit[] | null
 }
 
 @State<DocumentLibraryStateModel>({
@@ -61,7 +63,8 @@ export interface DocumentLibraryStateModel {
     saveDocumentFolder: null,
     associateAgencies: null,
     shareOrganizationsData: null,
-    documentPreviewDetail: null
+    documentPreviewDetail: null,
+    businessUnits:null,
   }
 })
 @Injectable()
@@ -137,6 +140,11 @@ export class DocumentLibraryState {
   @Selector()
   static getShareOrganizationsData(state: DocumentLibraryStateModel): ShareOrganizationsData[] | null {
     return state.shareOrganizationsData;
+  }
+
+  @Selector()
+  static getSharedDocumentInformation(state: DocumentLibraryStateModel):BusinessUnit[] | null{
+    return state.businessUnits;
   }
 
   @Action(GetFoldersTree)
@@ -371,6 +379,16 @@ export class DocumentLibraryState {
       patchState({ shareOrganizationsData: payload });
       return payload
     }));
+  }
+
+  @Action(GetSharedDocumentInformation)
+  GetSharedDocumentInformation({ patchState }: StateContext<DocumentLibraryStateModel>, { sharedDocumentInformation }: GetSharedDocumentInformation): Observable<BusinessUnit[]> {
+    return this.documentLibraryService.getSharedDocumentInformation(sharedDocumentInformation).pipe(
+      tap((payload) => {
+        patchState({ businessUnits: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(DeleteEmptyDocumentsFolder)
