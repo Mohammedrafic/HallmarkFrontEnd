@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core';
+import { DateTimeHelper } from '@core/helpers';
 import { Duration } from '@shared/enums/durations';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DurationService {
-  public getEndDate(duration: Duration, jobStartDate: Date): Date {
+  private otherDurationHandler(jobStartDateValue: Date, orderDates: { jobStartDate: Date, jobEndDate: Date }): Date {
+    const durationInDays = DateTimeHelper.getDateDiffInDays(new Date(orderDates.jobStartDate), new Date(orderDates.jobEndDate));
+
+    return new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + durationInDays));
+  }
+
+  public getEndDate(duration: Duration, jobStartDate: Date, orderDates?: { jobStartDate: Date, jobEndDate: Date }): Date {
     const jobStartDateValue = new Date(jobStartDate.getTime());
 
     switch (duration) {
@@ -26,6 +33,9 @@ export class DurationService {
 
       case Duration.NinetyDays:
         return new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + 89));
+
+      case Duration.Other:
+        return orderDates ? this.otherDurationHandler(jobStartDateValue, orderDates) : jobStartDate;
 
       default:
         return jobStartDate;
