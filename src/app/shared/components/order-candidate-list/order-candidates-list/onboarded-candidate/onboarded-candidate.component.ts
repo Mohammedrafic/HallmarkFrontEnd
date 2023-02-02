@@ -98,7 +98,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Input() isCandidatePayRateVisible: boolean;
 
-  @Input() order:Order;
+  @Input() order: Order;
 
   public override form: FormGroup;
   public jobStatusControl: FormControl;
@@ -315,7 +315,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   public onStartDateChange(event: ChangedEventArgs): void {
     const actualStartDate = new Date(event.value!);
-    const actualEndDate = this.durationService.getEndDate(this.orderDuration, actualStartDate);
+    const actualEndDate = this.durationService.getEndDate(this.orderDuration, actualStartDate, { jobStartDate: this.order.jobStartDate, jobEndDate: this.order.jobEndDate });
 
     this.form.patchValue({
       endDate: actualEndDate,
