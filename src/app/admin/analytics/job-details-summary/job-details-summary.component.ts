@@ -268,7 +268,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
                 if (item.statusText !== 'Incomplete'
                   && item.statusText !== 'PreOpen'
                   && item.statusText !== 'Open'
-                  && item.statusText !== 'In progress'
+                   && item.statusText !== 'Accepted' 
                   && item.statusText !== 'Pending') {
                   return item;
                 }
