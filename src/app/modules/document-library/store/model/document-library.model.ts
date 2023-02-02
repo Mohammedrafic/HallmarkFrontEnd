@@ -157,6 +157,11 @@ export class DeleteDocumentsFilter {
   businessUnitId: number | null;
 }
 
+export class SharedDocumentInformation{
+  businessUnitType: number;
+  documentId: number;
+}
+
 export class SharedDocumentPostDto {
   documentId: number;
   sharedDocumentIds: number[];
