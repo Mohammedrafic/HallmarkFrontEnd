@@ -112,6 +112,7 @@
                         [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
                         [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
                         [order]="order"
+                        [isCandidatePayRateVisible]="isCandidatePayRateVisible"
                       ></app-onboarded-candidate>
                       <section *ngIf="isReorderType">
                         <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>

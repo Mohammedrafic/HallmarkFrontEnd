@@ -40,7 +40,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'IsReOrder',
   'SSNRequiredToAcceptPosition',
   'DateOfBirthRequiredToAcceptPosition',
-  'SetDefaultCommentsScopeToExternal'
+  'SetDefaultCommentsScopeToExternal',
+  'CandidatePayRate',
 ];
 
 export const DisabledSettingsByDefault = [

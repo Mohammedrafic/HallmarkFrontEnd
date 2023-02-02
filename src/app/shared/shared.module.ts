@@ -37,8 +37,6 @@ import {
 } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 
-import { ErrorMessageComponent } from './components/error-message/error-message.component';
-import { ValidationErrorPipe } from './pipes/validation-error.pipe';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MessageToastComponent } from './components/message-toast/message-toast.component';
 import { ToastModule } from '@syncfusion/ej2-angular-notifications';
@@ -167,6 +165,8 @@ import { BoolValuePipeModule } from './pipes/bool-values/bool-values-pipe.module
 import { ActionCellRendererComponent } from './components/cell-renderers/actions-cell/action-cellrenderer.component';
 import { TabsMobileShadowDirective } from './directives/tabs-mobile-shadow.directive';
 import { LocalDateTimePipe } from './pipes/local-date-time.pipe';
+import { NumericTextboxModule as CustomNumericTextboxModule} from './components/form-controls/numeric-textbox/numeric-textbox.module';
+import { ValidationErrorModule } from './pipes/validation-error/validation.error.module';
 
 const icons = {
   AlertCircle,
@@ -196,7 +196,6 @@ const icons = {
 };
 
 const COMPONENTS = [
-  ValidationErrorPipe,
   ChipsCssClass,
   OrderTypeName,
   CandidateStatusName,
@@ -302,6 +301,8 @@ const COMPONENTS = [
     SplitButtonModule,
     ValidateDirectiveModule,
     BoolValuePipeModule,
+    CustomNumericTextboxModule,
+    ValidationErrorModule
   ],
   exports: [
     ...COMPONENTS,
@@ -310,7 +311,6 @@ const COMPONENTS = [
     FilterDialogModule,
     SideMenuModule,
     NavigationPanelComponent,
-    ErrorMessageComponent,
     CandidateAvatarPipe,
     AcceptFormComponent,
 
@@ -318,10 +318,11 @@ const COMPONENTS = [
     MultiSelectModule,
     TooltipModule,
     TabsMobileShadowDirective,
+    CustomNumericTextboxModule,
+    ValidationErrorModule
   ],
   declarations: [
     ...COMPONENTS,
-    ErrorMessageComponent,
     BillRateFormComponent,
     BillRatesGridComponent,
     TabsListComponent,
