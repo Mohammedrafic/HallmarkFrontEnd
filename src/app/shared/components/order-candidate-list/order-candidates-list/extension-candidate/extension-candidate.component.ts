@@ -347,7 +347,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   public onStartDateChange(event: ChangedEventArgs): void {
     const actualStartDate = new Date(event.value!);
-    const actualEndDate = this.durationService.getEndDate(this.currentOrder.duration, actualStartDate);
+    const actualEndDate = this.durationService.getEndDate(this.currentOrder.duration, actualStartDate, { jobStartDate: this.currentOrder.jobStartDate, jobEndDate: this.currentOrder.jobEndDate });
     this.form.patchValue({
       actualEndDate,
     });
