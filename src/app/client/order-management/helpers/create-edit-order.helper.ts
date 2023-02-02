@@ -113,7 +113,7 @@ export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCre
     jobEndDate: jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : null,
     jobStartDate: jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : null,
     jobDistributions: createJobDistributionList(formState.jobDistributionForm),
-    jobDates: jobDates ? formatJobDates(jobDates) : [],
+    jobDates: jobDates ? formatJobDates(jobDates) : null,
     contactDetails: [],
     workLocations: [],
     credentials: [...credentials],
