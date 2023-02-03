@@ -628,7 +628,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           takeUntil(this.componentDestroy())
         ).subscribe((data) => {
           this.selectedDepartment = data.organizationManagement.departments?.find((department: Department) => department.departmentId === order.departmentId);
-          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
+          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId, { emitEvent: false });
         });
     }
 
@@ -727,7 +727,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   /** During editing order (in progress or filled), some fields have to be disabled */
   private disableFormControls(order: Order): void {
     if (order.status === OrderStatus.Incomplete || order.status === OrderStatus.Open) {
-      ControlsForDisable.forEach((control) => this.generalInformationForm.controls[control].enable());
+      ControlsForDisable.forEach((control) => this.generalInformationForm.controls[control].enable({ emitEvent: false }));
     }
 
     if (order.status === OrderStatus.InProgress || order.status === OrderStatus.Filled) {
