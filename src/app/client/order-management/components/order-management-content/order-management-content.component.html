@@ -778,7 +778,20 @@
         </div>
       </div>
     </div>
-    <div class="bootstrap">
+    <div class="filter-row bootstrap">
+      <div class="input-container">
+        <label>Contact Person</label>
+        <div class="input-group multiselect">
+          <ejs-autocomplete
+            mode="CheckBox"
+            formControlName="projectTypeIds"
+            [allowFiltering]="true"
+            [dataSource]="filterColumns.projectTypeIds.dataSource"
+            [fields]="specialProjectCategoriesFields"
+          >
+          </ejs-autocomplete>
+        </div>
+      </div>
       <div class="input-container">
         <label>Special Project Category</label>
         <div class="input-group multiselect">
