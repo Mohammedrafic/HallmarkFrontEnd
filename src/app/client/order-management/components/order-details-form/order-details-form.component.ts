@@ -1031,14 +1031,15 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       debounceTime(50),
       takeUntil(this.componentDestroy())
     ).subscribe(([orderType, departmentId, skillId, jobStartDate]) => {
-      if (this.isPermPlacementOrder || isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate) {
+      const departmentIdValue = departmentId || this.generalInformationForm.controls['departmentId'].value;
+      if (this.isPermPlacementOrder || isNaN(parseInt(orderType)) || !departmentIdValue || !skillId || !jobStartDate) {
         return;
       }
 
       this.store.dispatch(
         new SetPredefinedBillRatesData(
           orderType,
-          departmentId,
+          departmentIdValue,
           skillId,
           DateTimeHelper.toUtcFormat(jobStartDate),
           DateTimeHelper.toUtcFormat(this.orderControlsConfig.jobEndDateControl.value)
