@@ -315,6 +315,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         organizationId: this.orderCandidateJob.organizationId,
         jobId: this.orderCandidateJob.jobId,
         jobCancellationDto,
+        candidatePayRate: this.orderCandidateJob.candidatePayRate ?? '',
       }));
       this.onCloseDialog();
     }
@@ -374,7 +375,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   private getNewApplicantStatus(): ApplicantStatus {
-    return this.acceptForm.dirty
+    return this.acceptForm.get('candidateBillRate')?.dirty
       ? { applicantStatus: CandidatStatus.BillRatePending, statusText: 'Bill Rate Pending' }
       : { applicantStatus: CandidatStatus.OnBoard, statusText: 'Onboard' };
   }
@@ -467,6 +468,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
               statusText: this.orderCandidateJob.applicantStatus.statusText,
             },
             billRates: this.getBillRateForUpdate(bill),
+            candidatePayRate: this.candidateJob.candidatePayRate ?? '',
           })
         )
         .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));

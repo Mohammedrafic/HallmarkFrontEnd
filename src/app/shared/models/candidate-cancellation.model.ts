@@ -4,6 +4,7 @@ export type CandidateCancellation = {
   jobId: number;
   organizationId: number;
   jobCancellationDto: JobCancellation;
+  candidatePayRate: string;
 }
 
 export type JobCancellation = {

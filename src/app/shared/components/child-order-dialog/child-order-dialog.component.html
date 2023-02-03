@@ -129,6 +129,7 @@
                         [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
                         [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
                         [order]="order"
+                        [isCandidatePayRateVisible]="isCandidatePayRateVisible"
                       ></app-accept-candidate>
                       <section *ngIf="isReorderType">
                         <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>

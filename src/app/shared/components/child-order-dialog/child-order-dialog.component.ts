@@ -387,6 +387,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
             clockId: this.candidateJob?.clockId,
             guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
             billRates: this.getBillRateForUpdate(bill),
+            candidatePayRate: this.candidateJob.candidatePayRate ?? '',
           })
         )
         .subscribe(() => {
@@ -509,6 +510,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           organizationId: this.candidateJob.organizationId,
           jobId: this.candidateJob.jobId,
           jobCancellationDto,
+          candidatePayRate: this.candidateJob.candidatePayRate ?? '',
         })
       );
       this.closeSideDialog();

@@ -228,6 +228,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
           statusText: this.candidateJob.applicantStatus.statusText,
         },
         billRates: this.getBillRateForUpdate(bill),
+        candidatePayRate: this.candidateJob.candidatePayRate ?? '',
       };
 
       this.store.dispatch(new UpdateOrganisationCandidateJob(valueForUpdate));
@@ -283,6 +284,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
           organizationId: this.candidateJob.organizationId,
           jobId: this.candidateJob.jobId,
           jobCancellationDto,
+          candidatePayRate: this.candidateJob.candidatePayRate ?? '',
         })
       );
       this.dialogEvent.next(false);

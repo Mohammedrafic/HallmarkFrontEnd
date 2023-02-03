@@ -233,6 +233,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
             orderId: this.orderApplicantsInitialData.orderId,
             organizationId: this.orderApplicantsInitialData.organizationId,
             candidateId: this.orderApplicantsInitialData.candidateId,
+            candidatePayRate: this.orderApplicantsInitialData.candidatePayRate ?? '',
           })
         )
         .subscribe(() => {

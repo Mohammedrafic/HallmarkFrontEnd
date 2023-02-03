@@ -241,6 +241,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
         rejectReasonId: event.rejectReason,
+        candidatePayRate: this.candidateJob.candidatePayRate,
       };
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
@@ -259,6 +260,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
         jobCancellationDto,
+        candidatePayRate: this.candidateJob.candidatePayRate ?? '',
       }));
       this.closeDialog();
     }
@@ -305,6 +307,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             clockId: this.candidateJob?.clockId,
             guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
             billRates: this.getBillRateForUpdate(bill),
+            candidatePayRate: this.candidateJob.candidatePayRate ?? '',
           })
         )
         .subscribe(() => {
@@ -368,6 +371,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   allowDeployWoCredentials: value.allow,
                   billRates: this.billRatesData,
                   offeredStartDate: this.candidateJob.offeredStartDate,
+                  candidatePayRate: this.candidateJob.candidatePayRate ?? '',
                 })
               )
               .subscribe(() => {
@@ -436,16 +440,23 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
             rate: value.jobCancellation?.rate,
             hours: value.jobCancellation?.hours,
-            candidatePayRate: value.candidatePayRate,
+            candidatePayRate: value.candidatePayRate ?? '',
           });
           this.switchFormState();
+          this.configureCandidatePayRateField();
         }
         this.changeDetectorRef.markForCheck();
     });
   }
 
-  private getDateString(date: string): string | null {
-    return this.datePipe.transform(date, 'MM/dd/yyyy');
+  private configureCandidatePayRateField(): void {
+    const candidatePayRateField = this.form.get('candidatePayRate');
+    if(this.isAgency && this.candidateStatus === ApplicantStatusEnum.Offered) {
+      candidatePayRateField?.enable();
+    } else {
+      candidatePayRateField?.disable();
+    }
+    this.changeDetectorRef.markForCheck();
   }
 
   private subscribeOnReasonsList(): void {

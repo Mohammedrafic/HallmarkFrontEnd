@@ -221,6 +221,12 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         return;
       }
     }
+
+    if (this.candidatePayRateRequired && this.form.get('candidatePayRate')?.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.shouldChangeCandidateStatus()
       .pipe(take(1))
       .subscribe((isConfirm) => {
@@ -367,8 +373,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [value.order.jobStartDate ?DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()):"", 
-           value.order.jobEndDate? DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()):""],
+          date: [value.order.jobStartDate ? DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()) : "",
+          value.order.jobEndDate ? DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()) : ""],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
           availableStartDate: value.availableStartDate ?
             DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
@@ -447,7 +453,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       candidatePayRateControl?.disable();
     }
 
-    this.candidatePayRateRequired = this.isOffered;
+    this.candidatePayRateRequired = this.isCandidatePayRateVisible && this.isOffered && this.isAgency;
   }
 
   private closeDialog(): void {
