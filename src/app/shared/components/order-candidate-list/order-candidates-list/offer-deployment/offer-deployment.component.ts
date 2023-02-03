@@ -337,7 +337,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       expAsTravelers: new FormControl(''),
       guaranteedWorkWeek: new FormControl('', [Validators.maxLength(200)]),
       offeredStartDate: new FormControl(''),
-      candidatePayRate: new FormControl('')
+      candidatePayRate: new FormControl(null)
     });
   }
 

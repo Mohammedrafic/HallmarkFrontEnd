@@ -387,7 +387,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
             clockId: this.candidateJob?.clockId,
             guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
             billRates: this.getBillRateForUpdate(bill),
-            candidatePayRate: this.candidateJob.candidatePayRate ?? '',
+            candidatePayRate: this.candidateJob.candidatePayRate,
           })
         )
         .subscribe(() => {
@@ -510,7 +510,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           organizationId: this.candidateJob.organizationId,
           jobId: this.candidateJob.jobId,
           jobCancellationDto,
-          candidatePayRate: this.candidateJob.candidatePayRate ?? '',
+          candidatePayRate: this.candidateJob.candidatePayRate,
         })
       );
       this.closeSideDialog();
@@ -699,6 +699,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     orderPublicId,
     jobCancellation,
     reOrderDate,
+    candidatePayRate,
   }: OrderCandidateJob) {
 
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
@@ -723,15 +724,23 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       penaltyCriteria: PenaltiesMap[jobCancellation?.penaltyCriteria || 0],
       rate: jobCancellation?.rate,
       hours: jobCancellation?.hours,
+      candidatePayRate: candidatePayRate
     });
     this.enableFields();
   }
 
   private enableFields(): void {
+    const applicantStatus = this.candidateJob?.applicantStatus.applicantStatus;
+    if (this.isAgency && applicantStatus === CandidatStatus.Offered) {
+      this.acceptForm.get('candidatePayRate')?.enable();
+    } else {
+      this.acceptForm.get('candidatePayRate')?.disable();
+    }
+
     if (!this.isCancelled) {
       this.acceptForm.get('candidateBillRate')?.enable();
     }
-    switch (this.candidateJob?.applicantStatus.applicantStatus) {
+    switch (applicantStatus) {
       case !this.isAgency && CandidatStatus.BillRatePending:
         this.acceptForm.get('hourlyRate')?.enable();
         this.acceptForm.get('candidateBillRate')?.disable();
