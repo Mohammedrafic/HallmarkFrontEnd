@@ -67,7 +67,7 @@ export class AcceptFormComponent implements OnChanges{
 
     const candidatePayRateControl = this.formGroup.get('candidatePayRate');
     
-    if(this.isCandidatePayRateVisible && this.isBlankStatus) {
+    if(this.isCandidatePayRateVisible && this.isBlankStatus && this.isAgency) {
       candidatePayRateControl?.enable();   
     } else {
       candidatePayRateControl?.disable();
@@ -92,7 +92,7 @@ export class AcceptFormComponent implements OnChanges{
       penaltyCriteria: new FormControl({ value: '', disabled: true }),
       rate: new FormControl({ value: '', disabled: true }),
       hours: new FormControl({ value: '', disabled: true }),
-      candidatePayRate: new FormControl({ value: '', disabled: true }, [Validators.required]),
+      candidatePayRate: new FormControl({ value: null, disabled: true }, [Validators.required]),
     });
   }
 }

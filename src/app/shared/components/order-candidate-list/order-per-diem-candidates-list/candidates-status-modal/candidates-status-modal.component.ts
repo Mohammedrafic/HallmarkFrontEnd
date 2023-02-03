@@ -126,6 +126,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
     return [ApplicantStatusEnum.OnBoarded].includes(this.orderCandidate?.status);
   }
 
+  get candidatePayRateRequired(): boolean {
+    return this.showAcceptButton && this.isAgency && this.isCandidatePayRateVisible;
+  }
+
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
 
@@ -233,7 +237,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
             orderId: this.orderApplicantsInitialData.orderId,
             organizationId: this.orderApplicantsInitialData.organizationId,
             candidateId: this.orderApplicantsInitialData.candidateId,
-            candidatePayRate: this.orderApplicantsInitialData.candidatePayRate ?? '',
+            candidatePayRate: this.orderApplicantsInitialData.candidatePayRate,
           })
         )
         .subscribe(() => {
@@ -255,6 +259,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
         this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
         return;
       }
+    }
+    
+    if (this.candidatePayRateRequired && this.form.get('candidatePayRate')?.invalid) {
+      this.form.markAllAsTouched();
+      return;
     }
 
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
@@ -327,7 +336,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       clockId: ['', [Validators.maxLength(50)]],
       allow: [false],
       rejectReason: [''],
-      candidatePayRate: [{ value: null, disabled: true }],
+      candidatePayRate: [{ value: null, disabled: true }, [Validators.required]],
       dob:[''],
       ssn: [''],
     });

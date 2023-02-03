@@ -328,7 +328,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       jobId: new FormControl(''),
       date: new FormControl(''),
       billRates: new FormControl(''),
-      candidatePayRate: new FormControl('', [Validators.required]),
+      candidatePayRate: new FormControl(null, [Validators.required]),
       availableStartDate: new FormControl('', [Validators.required]),
       candidateBillRate: new FormControl('', [Validators.required]),
       locationName: new FormControl(''),

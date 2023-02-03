@@ -14,7 +14,7 @@ export type OrderApplicantsInitialData = {
   expAsTravelers?: number;
   requestComment?: string;
   skill?: string;
-  candidatePayRate: string;
+  candidatePayRate: string | null;
 }
 
 export type OrderApplicantsApplyData = {
@@ -25,5 +25,5 @@ export type OrderApplicantsApplyData = {
   expAsTravelers?: number;
   availableStartDate?: string;
   requestComment?: string;
-  candidatePayRate: string;
+  candidatePayRate: string | null;
 }
