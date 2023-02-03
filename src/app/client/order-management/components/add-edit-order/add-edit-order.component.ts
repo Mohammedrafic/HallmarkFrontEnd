@@ -11,7 +11,6 @@ import {
   ClearPredefinedBillRates,
   EditOrder,
   GetPredefinedBillRates,
-  GetSelectedOrderById,
   SaveOrder,
   SaveOrderSucceeded,
   SelectNavigationTab,
