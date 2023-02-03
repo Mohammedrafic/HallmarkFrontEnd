@@ -149,7 +149,18 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
-    this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
+
+    if (this.isAgency) {
+      this.organizationId$ = this.organizationControl.valueChanges
+      .pipe(
+        tap((id) => {
+          this.store.dispatch(new Invoices.GetOrganizationStructure(id, true));
+        }),
+      );
+    } else {
+      this.organizationId$ = this.organizationChangeId$;
+    }
+
     this.initDefaultSelectedTabId();
     this.selectTab(0);
     this.tabConfig = this.invoicesContainerService.getTabConfig(this.selectedTabIdx);
@@ -185,7 +196,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
           switchMap(() => this.organizations$),
           filter((organizations: DataSourceItem[]) => !!organizations.length),
-          tap((organizations: DataSourceItem[]) => this.organizationsList = organizations),
+          tap((organizations: DataSourceItem[]) => {
+            this.organizationsList = organizations;
+          }),
           map(([firstOrganization]: DataSourceItem[]) => firstOrganization.id),
         )
         .subscribe((orgId: number) => {

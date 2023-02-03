@@ -50,6 +50,9 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   @Select(InvoicesState.invoicesData)
   public invoicesData$: Observable<PageOfCollections<InvoiceRecord> | null>;
 
+  @Select(InvoicesState.organizationStructure)
+  public selectedOrgStructure$: Observable<OrganizationStructure | null>;
+
   @Input() selectedTabId: InvoiceTabId;
 
   @Output() readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();
@@ -170,7 +173,9 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   private watchForOrganizationStructure(): void {
-    this.organizationStructure$
+    const structureStream = this.isAgency ? this.selectedOrgStructure$ : this.organizationStructure$;
+
+    structureStream
     .pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy()),

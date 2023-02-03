@@ -160,7 +160,7 @@ import { InvoiceGridExportComponent } from './components/invoice-grid-export/inv
     TooltipContainerModule,
     InvoiceAddPaymentModule,
     InvoicePaymentDetailsModule,
-    ValidateDirectiveModule
+    ValidateDirectiveModule,
   ],
   providers: [
     InvoicesService,

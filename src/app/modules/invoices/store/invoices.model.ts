@@ -13,7 +13,7 @@ import {
   ManualInvoicesData,
   PrintInvoiceData,
 } from '../interfaces';
-import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
 import { PendingApprovalInvoicesData } from '../interfaces/pending-approval-invoice.interface';
 
@@ -42,4 +42,5 @@ export interface InvoicesModel {
   selectedTabIdx: number;
   paymentDetails: InvoicePayment[];
   selectedPayment: InvoicePaymentData | null;
+  organizationStructure: OrganizationStructure | null;
 }
