@@ -1206,9 +1206,12 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
   }
 
-  public onFiltering(event: FilteringEventArgs, dataSource: unknown[], options: FieldSettingsModel) {
-    this.partialSearchService.search(dataSource, event.text, options).pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
-      event.updateData(data as []);
-    });
+  public findItemsBySubSting(event: FilteringEventArgs, dataSource: unknown[], options: FieldSettingsModel) {
+    this.partialSearchService
+      .search(dataSource, event.text, options)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((data) => {
+        event.updateData(data as Array<{ [key: string]: string }>);
+      });
   }
 }
