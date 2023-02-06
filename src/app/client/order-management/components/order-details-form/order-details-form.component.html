@@ -57,7 +57,7 @@
                       [dataSource]="regionDataSource"
                       [fields]="optionFields"
                       (select)="onRegionDropDownChanged($event)"
-                      (filtering)="findItemsBySubSting($event, regionDataSource, optionFields)"
+                      (filtering)="filterItemsBySubString($event, regionDataSource, optionFields)"
                     >
                     </ejs-dropdownlist>
                   </div>
@@ -75,7 +75,7 @@
                       [dataSource]="locationDataSource"
                       [fields]="optionFields"
                       (select)="onLocationDropDownChanged($event)"
-                      (filtering)="findItemsBySubSting($event, locationDataSource, optionFields)"
+                      (filtering)="filterItemsBySubString($event, locationDataSource, optionFields)"
                     >
                     </ejs-dropdownlist>
                   </div>
@@ -93,7 +93,7 @@
                       [dataSource]="departmentDataSource"
                       [fields]="departmentFields"
                       (select)="onDepartmentDropDownChanged($event)"
-                      (filtering)="findItemsBySubSting($event, departmentDataSource, departmentFields)"
+                      (filtering)="filterItemsBySubString($event, departmentDataSource, departmentFields)"
                     >
                     </ejs-dropdownlist>
                   </div>
@@ -111,7 +111,7 @@
                       [dataSource]="skillDataSource"
                       [fields]="skillFields"
                       (select)="onSkillsDropDownChanged($event)"
-                      (filtering)="findItemsBySubSting($event, skillDataSource, skillFields)"
+                      (filtering)="filterItemsBySubString($event, skillDataSource, skillFields)"
                     >
                     </ejs-dropdownlist>
                   </div>
