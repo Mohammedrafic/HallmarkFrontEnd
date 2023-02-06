@@ -147,6 +147,11 @@ export class InvoicesState {
     return state.selectedPayment;
   }
 
+  @Selector([InvoicesState])
+  static organizationStructure(state: InvoicesModel): OrganizationStructure | null {
+    return state.organizationStructure;
+  }
+
 
   @Action(Invoices.ToggleInvoiceDialog)
   ToggleInvoiceDialog(
@@ -453,6 +458,7 @@ export class InvoicesState {
     .pipe(
       tap((res) => {
         patchState({
+          organizationStructure: res,
           organizationLocations: InvoiceMetaAdapter.createLocationsStructure(res.regions),
           regions: res.regions,
         });

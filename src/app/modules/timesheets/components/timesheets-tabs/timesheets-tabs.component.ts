@@ -8,6 +8,7 @@ import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.mo
 import { Destroyable } from '@core/helpers';
 import { OutsideZone } from '@core/decorators';
 import { TabConfig } from '../../interface';
+import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -27,6 +28,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
 
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
+  public alertTitle:string;
 
   constructor(
     private readonly ngZone: NgZone,
@@ -37,6 +39,13 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
   public ngOnChanges(changes: SimpleChanges): void {
     if (this.tabConfig) {
       this.asyncRefresh();
+    }
+    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '') as string;
+    //Pending Approval Tab navigation
+    if(AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase()==this.alertTitle.toLowerCase()) {
+      this.tabComponent.selectedItem=1;
+      this.changeTab.emit(1);
+      window.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
   }
 

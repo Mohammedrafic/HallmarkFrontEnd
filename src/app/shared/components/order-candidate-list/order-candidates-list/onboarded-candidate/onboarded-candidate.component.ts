@@ -260,7 +260,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
         jobCancellationDto,
-        candidatePayRate: this.candidateJob.candidatePayRate ?? '',
+        candidatePayRate: this.candidateJob.candidatePayRate,
       }));
       this.closeDialog();
     }
@@ -307,7 +307,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             clockId: this.candidateJob?.clockId,
             guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
             billRates: this.getBillRateForUpdate(bill),
-            candidatePayRate: this.candidateJob.candidatePayRate ?? '',
+            candidatePayRate: this.candidateJob.candidatePayRate,
           })
         )
         .subscribe(() => {
@@ -371,7 +371,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   allowDeployWoCredentials: value.allow,
                   billRates: this.billRatesData,
                   offeredStartDate: this.candidateJob.offeredStartDate,
-                  candidatePayRate: this.candidateJob.candidatePayRate ?? '',
+                  candidatePayRate: this.candidateJob.candidatePayRate,
                 })
               )
               .subscribe(() => {
@@ -440,7 +440,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
             rate: value.jobCancellation?.rate,
             hours: value.jobCancellation?.hours,
-            candidatePayRate: value.candidatePayRate ?? '',
+            candidatePayRate: value.candidatePayRate,
           });
           this.switchFormState();
           this.configureCandidatePayRateField();
@@ -595,7 +595,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       penaltyCriteria: new FormControl(''),
       rate: new FormControl(''),
       hours: new FormControl(''),
-      candidatePayRate: new FormControl('')
+      candidatePayRate: new FormControl(null)
     });
 
     this.jobStatusControl = new FormControl('');

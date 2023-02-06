@@ -30,6 +30,7 @@ export const DefaultInvoicesState: InvoicesModel = {
   selectedTabIdx: 0,
   paymentDetails: [],
   selectedPayment: null,
+  organizationStructure: null,
 };
 
 export const DefaultFiltersState: InvoicesFilterState = {

@@ -3,7 +3,7 @@ import { DOCUMENT } from '@angular/common';
 import { FormControl } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { combineLatest, distinctUntilChanged, filter, map, Observable, skip, switchMap, takeUntil, tap } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
 
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
 import { OutsideZone } from '@core/decorators';
@@ -149,7 +149,18 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
-    this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
+
+    if (this.isAgency) {
+      this.organizationId$ = this.organizationControl.valueChanges
+      .pipe(
+        tap((id) => {
+          this.store.dispatch(new Invoices.GetOrganizationStructure(id, true));
+        }),
+      );
+    } else {
+      this.organizationId$ = this.organizationChangeId$;
+    }
+
     this.initDefaultSelectedTabId();
     this.selectTab(0);
     this.tabConfig = this.invoicesContainerService.getTabConfig(this.selectedTabIdx);
@@ -185,7 +196,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
           switchMap(() => this.organizations$),
           filter((organizations: DataSourceItem[]) => !!organizations.length),
-          tap((organizations: DataSourceItem[]) => this.organizationsList = organizations),
+          tap((organizations: DataSourceItem[]) => {
+            this.organizationsList = organizations;
+          }),
           map(([firstOrganization]: DataSourceItem[]) => firstOrganization.id),
         )
         .subscribe((orgId: number) => {
@@ -209,26 +222,25 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public startFiltersWatching(): void {
-    const organizationStream = this.organizationId$
+    this.organizationId$
     .pipe(
       distinctUntilChanged(),
       filter((id) => !!id),
-      tap((id: number) => {
-        this.resetFilters();
-        this.organizationId = id;
-        this.store.dispatch(new Invoices.SelectOrganization(id));
-      }),
-    );
+    )
+    .subscribe((id) => {
+      this.organizationId = id;
+      this.store.dispatch(new Invoices.SelectOrganization(id));
+      this.resetFilters();
+    });
 
-    combineLatest([
-      organizationStream,
-      this.invoicesFilters$.pipe(skip(1)),
-    ])
+    this.invoicesFilters$
     .pipe(
-      tap(([orgId]) => {
-        this.organizationId = orgId;
+      filter(() => {
+        if (this.isAgency) {
+          return !!this.organizationId;
+        }
+        return true;
       }),
-      takeUntil(this.componentDestroy()),
     ).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
       this.setGridConfig();

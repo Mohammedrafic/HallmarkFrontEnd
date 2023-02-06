@@ -89,7 +89,7 @@
                       </div>
                     </div>
                     <div class="input-container bootstrap" *ngIf="isCandidatePayRateVisible && showCandidatePayRateField">
-                      <label>Candidate Pay Rate ($) <span *ngIf="showAcceptButton" class="required">*</span></label>
+                      <label>Candidate Pay Rate ($) <span *ngIf="candidatePayRateRequired" class="required">*</span></label>
                       <div class="input-group">
                         <app-numeric-textbox
                           [formGroupInstance]="form"

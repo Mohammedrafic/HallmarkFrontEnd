@@ -315,7 +315,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         organizationId: this.orderCandidateJob.organizationId,
         jobId: this.orderCandidateJob.jobId,
         jobCancellationDto,
-        candidatePayRate: this.orderCandidateJob.candidatePayRate ?? '',
+        candidatePayRate: this.orderCandidateJob.candidatePayRate,
       }));
       this.onCloseDialog();
     }
@@ -468,7 +468,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
               statusText: this.orderCandidateJob.applicantStatus.statusText,
             },
             billRates: this.getBillRateForUpdate(bill),
-            candidatePayRate: this.candidateJob.candidatePayRate ?? '',
+            candidatePayRate: this.candidateJob.candidatePayRate,
           })
         )
         .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));

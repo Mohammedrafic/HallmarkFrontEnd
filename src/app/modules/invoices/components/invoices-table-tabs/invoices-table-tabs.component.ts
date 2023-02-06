@@ -12,6 +12,10 @@ import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-naviga
 import { BehaviorSubject, filter, takeUntil } from 'rxjs';
 import { Destroyable } from '@core/helpers';
 import { OutsideZone } from '@core/decorators';
+import { AlertIdEnum } from '@admin/alerts/alerts.enum';
+import { Store } from '@ngxs/store';
+import { UserState } from 'src/app/store/user.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-invoices-table-tabs',
@@ -30,14 +34,47 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
 
   @ViewChild(TabComponent)
   public tabComponent: TabComponent;
+  public alertTitle: string
 
   constructor(
     private readonly ngZone: NgZone,
+    private store: Store
   ) {
     super();
   }
 
   public ngAfterViewInit(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '') as string;
+    //Paid Tab navigation
+    if ((AlertIdEnum[AlertIdEnum['Invoice: Organization Paid']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
+      if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {
+        this.changeTab.emit(4);
+        this.tabComponent.selectedItem = 4
+        window.localStorage.setItem("alertTitle", JSON.stringify(""));
+      }
+    }
+    if ((AlertIdEnum[AlertIdEnum['Invoice: Approved']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
+      //Pending payment tab navigation for organization
+      if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {
+        this.changeTab.emit(3);
+        this.tabComponent.selectedItem = 3;
+      }
+      //All invoices tab navigation for agency
+      if (user?.businessUnitType === BusinessUnitType.Agency) {
+        this.changeTab.emit(1);
+        this.tabComponent.selectedItem = 1;
+      }
+      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
+    if ((AlertIdEnum[AlertIdEnum['Time Sheet: Org. Approved']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
+      //Pending invoice record tab navigation for organization
+      if (user?.businessUnitType === BusinessUnitType.Organization) {
+        this.changeTab.emit(0);
+        this.tabComponent.selectedItem = 0;
+      }
+      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
     this.asyncRefresh();
   }
 
