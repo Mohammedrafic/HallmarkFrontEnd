@@ -14,7 +14,7 @@ import {
   takeUntil,
   throttleTime,
 } from 'rxjs';
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { ChangeEventArgs, FieldSettingsModel, FilteringEventArgs, highlightSearch } from '@syncfusion/ej2-angular-dropdowns';
 
 import {
   GetDepartmentsByLocationId,
@@ -119,6 +119,7 @@ import {
   SpecialProjectControlsConfig,
 } from '@client/order-management/components/order-details-form/constants';
 import { JobClassifications, OptionFields } from '@client/order-management/constants';
+import { PartilSearchService } from '@shared/services/partial-search.service';
 
 @Component({
   selector: 'app-order-details-form',
@@ -235,6 +236,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     private settingsViewService: SettingsViewService,
     private orderDetailsService: OrderDetailsService,
     private cd: ChangeDetectorRef,
+    private partialSearchService: PartilSearchService,
   ) {
     super(store);
     this.initOrderForms();
@@ -1202,5 +1204,11 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
   private setOrderId(): void {
     this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
+  }
+
+  public onFiltering(event: FilteringEventArgs, dataSource: unknown[], options: FieldSettingsModel) {
+    this.partialSearchService.search(dataSource, event.text, options).pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
+      event.updateData(data as []);
+    });
   }
 }
