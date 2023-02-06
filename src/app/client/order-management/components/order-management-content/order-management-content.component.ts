@@ -375,7 +375,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private eliteOrderId:number;
 
 
-    constructor(
+  constructor(
     protected override store: Store,
     private router: Router,
     private route: ActivatedRoute,
@@ -1419,6 +1419,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         dataSource: [],
         valueField: 'statusText',
         valueId: 'status',
+      },
+      contactEmails: {
+        type: ControlTypes.Autocomplete,
+        valueType: ValueType.Text,
+        dataSource: [],
+        valueField: 'fullName',
+        valueId: 'email',
       },
       candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },
