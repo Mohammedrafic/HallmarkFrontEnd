@@ -13,10 +13,12 @@ import {
   GetGroupEmailSkills,
   GetGroupEmailCandidateStatuses,
   GetGroupEmailCandidates,
+  GetDocumentPreviewDeatils,
+  GetDocumentDownloadDeatils
 } from './../../../store/alerts.actions';
-import { GroupEmailRole } from '@shared/models/group-email.model';
+import { DownloadDocumentDetail, GroupEmailRole } from '@shared/models/group-email.model';
 import { takeUntil } from 'rxjs';
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import {
   HtmlEditorService,
@@ -60,6 +62,23 @@ import { uniqBy } from 'lodash';
 import { CommonReportFilter, CommonReportFilterOptions } from '@admin/analytics/models/common-report.model';
 import { GetCommonReportFilterOptions } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
+import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { ShowDocPreviewSideDialog } from 'src/app/store/app.actions';
+import {
+  PdfViewerComponent, 
+  LinkAnnotationService, 
+  BookmarkViewService, 
+  MagnificationService, 
+  ThumbnailViewService,
+  NavigationService, 
+  TextSearchService, 
+  TextSelectionService, 
+  PrintService, 
+  AnnotationService, 
+  FormFieldsService
+} from '@syncfusion/ej2-angular-pdfviewer';
 
 @Component({
   selector: 'app-send-group-email',
@@ -80,11 +99,13 @@ export class SendGroupEmailComponent
   @Input() emailTo: string | null;
   @Input() emailCc: string | null;
   @Input() isSend: boolean = true;
+  @Input() fileName : string | null;
   @Input() isFormInvalid: boolean = false;
   @Input() businessUnitType: number | null;
   @Input() businessUnit: number | null;  
   @Input() userTypeInput: number | null;
   @Input() fileNameInput: string | undefined;
+  @Input() id:any;
   override selectedItems: any;
 
   public selectedBusinessUnit: number | null;
@@ -131,6 +152,9 @@ export class SendGroupEmailComponent
   @Select(AlertsState.GetGroupEmailCandidateStatuses)
   public candidateStatusData$: Observable<CandidateStatusAndReasonFilterOptionsDto[]>;
 
+  @Select(AlertsState.documentDownloadDetail)
+  documentDownloadDetail$: Observable<DownloadDocumentDetail>;
+
   public organizations: Organisation[] = [];
   public agencies: AgencyDto[] = [];
   public regionsList: Region[] = [];
@@ -142,7 +166,8 @@ export class SendGroupEmailComponent
   public regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   public candidateStatusFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-
+  @ViewChild('pdfViewer', { static: true })
+  public pdfViewer: PdfViewerComponent;
   @ViewChild('RTEGroupEmail') public rteObj: RichTextEditorComponent;
   private listboxEle: HTMLElement;
   private editArea: HTMLElement;
@@ -187,9 +212,27 @@ export class SendGroupEmailComponent
   public isBusinessUnitTypeAgency: boolean = false;
   public isOrgUser: boolean = false;
   public userBusinessUnitType: BusinessUnitType | undefined;
+  public uploaderstatus:boolean = true;
+  public service: string = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
+  public downloadedFileName: string = '';
+  public dialogWidth: string = '434px';
+  public previewUrl: SafeResourceUrl | null;
+  public isImage: boolean = false;
+  public isWordDoc: boolean = false;
+  public isPdf: boolean = false;
+  public pdfDocumentPath:string = "";
+  public previewTitle: string = "Document Preview";
+  public isExcel: boolean = false;
+  fileAsBase64: string;
+  faDownload = faDownload as IconProp;
 
-  constructor(private actions$: Actions, private store: Store, private fb: FormBuilder,
-    private orderManagementContentService: OrderManagementContentService) {
+
+  constructor(private actions$: Actions, 
+              private store: Store, 
+              private fb: FormBuilder,
+              private changeDetectorRef: ChangeDetectorRef,
+              private sanitizer: DomSanitizer,
+              private orderManagementContentService: OrderManagementContentService) {
     super();
   }
   get businessUnitControl(): AbstractControl {
@@ -930,6 +973,137 @@ export class SendGroupEmailComponent
     this.groupEmailTemplateForm.controls['emailSubject'].setValue('');
     this.groupEmailTemplateForm.controls['emailBody'].setValue('');
     this.groupEmailTemplateForm.controls['user'].setValue([]);
+  }
+
+  public openpdf(id: any) {
+    this.downloadedFileName = '';
+    const downloadFilter = {
+      Id: id,
+    }
+
+    this.store.dispatch(new GetDocumentPreviewDeatils(downloadFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
+      if (val) {
+        var data = val?.null?.documentPreviewDetail;
+        if (data != null) {
+          if (this.downloadedFileName != data.fileName) {
+            this.downloadedFileName = data.fileName;
+            if (data.fileAsBase64 && data.fileAsBase64 != '') {
+              this.getPreviewUrl(data);
+              this.dialogWidth = "1000px";
+              this.store.dispatch(new ShowDocPreviewSideDialog(true));
+            }
+            this.changeDetectorRef.markForCheck();
+          }
+        }
+      }
+    });
+  }
+
+
+  load(url: string) {
+    this.pdfViewer?.load(url, '');
+  }
+
+  getPreviewUrl(file: any) {
+    let extension = (file != null) ? file.extension : null;
+    switch (extension) {
+      case '.pdf':
+        this.previewUrl = '';
+        this.isPdf = true;
+        this.load(`data:application/pdf;base64,${file.fileAsBase64}`);
+        break;
+      case '.jpg':
+        this.isImage = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `data:image/jpg;base64,${file.fileAsBase64}`
+        );
+        break;
+      case '.jpeg':
+        this.isImage = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `data:image/jpg;base64,${file.fileAsBase64}`
+        );
+        break;
+      case '.png':
+        this.isImage = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `data:image/png;base64,${file.fileAsBase64}`
+        );
+        break;
+      case '.docx':
+        this.isWordDoc = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
+        break;
+      case '.doc':
+        this.isWordDoc = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
+        break;
+      case '.xlsx':
+        this.isWordDoc = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
+        break;
+      case '.xls':
+        this.isWordDoc = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
+        break;
+      default:
+
+    }
+    this.changeDetectorRef.markForCheck();
+  }
+
+  setDocumentMimeTypeDefaults() {
+    this.isPdf = false;
+    this.isWordDoc = false;
+    this.isImage = false;
+    this.isExcel = false;
+    this.previewUrl = '';
+    this.fileAsBase64 = '';
+  }
+
+  public onClosePreview(): void {
+    this.setDocumentMimeTypeDefaults();
+    this.previewUrl = null;
+    this.downloadedFileName = '';
+    this.changeDetectorRef.markForCheck();
+    this.store.dispatch(new ShowDocPreviewSideDialog(false));
+  }
+
+
+  public downloadfile(docId: any) {
+    this.setDocumentMimeTypeDefaults();
+    const downloadFilter = {
+      Id: docId,
+    }
+    this.store.dispatch(new GetDocumentDownloadDeatils(downloadFilter));
+    this.documentDownloadDetail$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data: DownloadDocumentDetail) => {
+        if (data) {
+          if (this.downloadedFileName != data.fileName) {
+            this.downloadedFileName = data.fileName;
+            this.createLinkToDownload(data.fileAsBase64, data.fileName, data.contentType);
+          }
+        }
+      });
+    this.changeDetectorRef.markForCheck();
+  }
+  createLinkToDownload(base64String: string, fileName: string, contentType: string) {
+    if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
+      const byteChar = atob(base64String);
+      const byteArray = new Array(byteChar.length);
+      for (let i = 0; i < byteChar.length; i++) {
+        byteArray[i] = byteChar.charCodeAt(i);
+      }
+      const uIntArray = new Uint8Array(byteArray);
+      const blob = new Blob([uIntArray], { type: contentType });
+      (window.navigator as any).msSaveOrOpenBlob(blob, `${fileName}`);
+    } else {
+      const source = `data:${contentType};base64,${base64String}`;
+      const link = document.createElement('a');
+      link.href = source;
+      link.download = `${fileName}`;
+      link.click();
+    }
   }
 
   ngAfterViewInit() {

@@ -81,6 +81,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     bCCList: "",
     status: null,
     fromMail: "",
+    fileName: "",
     businessUnitId: null,
     sentBy: "",
     sentOn: "",
@@ -370,6 +371,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.businessUnit = data.businessUnitId;    
     this.groupEmailTemplateForm.userTypeInput = data.userType;
     this.groupEmailTemplateForm.fileNameInput = data.fileName;
+    this.groupEmailTemplateForm.fileName = data.fileName == null?"":data.fileName;
+    this.groupEmailTemplateForm.id = data.id;
     this.groupEmailTemplateForm.populateUserType();    
   }
   private ResetForm(): void {
@@ -377,6 +380,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.emailSubject = "";
     this.groupEmailTemplateForm.emailTo="";
     this.groupEmailTemplateForm.emailCc="";
+    this.groupEmailTemplateForm.fileName = "";
     this.groupEmailTemplateForm.groupEmailTemplateForm.controls['user'].setValue([]);
 
   }

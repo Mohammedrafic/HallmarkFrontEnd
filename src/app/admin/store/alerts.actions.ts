@@ -134,6 +134,28 @@ export class GetGroupEmailCandidateStatuses {
   ) { }
 }
 
+
+export class GetDocumentPreviewDeatils {
+  static readonly type = '[groupemail] Get document preview details';
+  constructor(public id: any) { }
+}
+
+export class GetDocumentPreviewDeatilsSucceeded {
+  static readonly type = '[groupemail] Get document preview details Succeeded';
+  constructor(public documentPreviewDetail: any) { }
+}
+
+export class GetDocumentDownloadDeatils {
+  static readonly type = '[groupemail] Get document download details';
+  constructor(public id: any) { }
+}
+
+export class GetDocumentDownloadDeatilsSucceeded {
+  static readonly type = '[groupemail] Get document download details Succeeded';
+  constructor(public documentDownloadDetail: any) { }
+}
+
+
 export class GetGroupEmailCandidates {
   static readonly type = '[groupemail] Get Group Email candidates by criteria';
   constructor(

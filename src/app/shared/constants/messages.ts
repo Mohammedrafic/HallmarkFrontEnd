@@ -84,3 +84,4 @@ export const REGULAR_RATE_UPDATE_SUCCESS = 'Regular Rate on Open and In-Progress
 export const UpdateRegularRatesucceedcount = (count: number) =>
   ` ${count} Order(s) affected , ` + REGULAR_RATE_UPDATE_SUCCESS;
 
+export const DOCUMENT_DOWNLOAD_SUCCESS = 'Document downloaded successfully';

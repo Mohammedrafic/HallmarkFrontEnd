@@ -25,8 +25,8 @@ import { ToggleSwitchComponent } from './toggle-switch/toggle-switch.component';
 import { GroupEmailComponent } from './group-email/group-email.component';
 import { SendGroupEmailComponent } from './group-email/send-group-email/send-group-email.component';
 import { GroupEmailTableComponent } from './group-email/group-email-table/group-email-table.component';
-
-
+import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 
 @NgModule({
@@ -60,6 +60,8 @@ import { GroupEmailTableComponent } from './group-email/group-email-table/group-
     DialogModule,
     TextBoxModule,
     UploaderModule,
+    PdfViewerModule,
+    FontAwesomeModule,
     NgxsModule.forFeature([AlertsState]),
   ]
 })
