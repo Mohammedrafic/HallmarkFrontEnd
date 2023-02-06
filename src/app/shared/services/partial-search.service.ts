@@ -14,7 +14,7 @@ export class PartilSearchService {
     this.filter$
       .pipe(
         debounceTime(400),
-        distinctUntilChanged((prev, curr) => prev.searchString === curr.searchString)
+        distinctUntilChanged((prev, curr) => prev.searchString === curr.searchString && prev.dataSource === curr.dataSource)
       )
       .subscribe((data) => {
         const result = this.filterItemsBySubString(data);

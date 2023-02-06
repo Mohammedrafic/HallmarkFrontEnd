@@ -134,6 +134,7 @@
                 [fields]="optionFields"
                 (select)="changeRegionDropdown($event)"
                 (filtering)="filterItemsBySubString($event, regionDataSource, optionFields)"
+                (close)="closeDropdown()"
               >
               </ejs-dropdownlist>
             </div>
@@ -153,6 +154,7 @@
                 [fields]="optionFields"
                 (select)="changeLocationDropdown($event)"
                 (filtering)="filterItemsBySubString($event, locationDataSource, optionFields)"
+                (close)="closeDropdown()"
               >
               </ejs-dropdownlist>
             </div>
@@ -172,6 +174,7 @@
                 [fields]="optionFields"
                 (select)="changeDepartmentDropdown($event)"
                 (filtering)="filterItemsBySubString($event, departmentDataSource, optionFields)"
+                (close)="closeDropdown()"
               >
               </ejs-dropdownlist>
             </div>
@@ -189,6 +192,7 @@
                 [dataSource]="skillsDataSource"
                 [fields]="skillFields"
                 (filtering)="filterItemsBySubString($event, skillsDataSource, skillFields)"
+                (close)="closeDropdown()"
               >
               </ejs-dropdownlist>
             </div>

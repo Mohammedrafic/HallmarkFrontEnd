@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { ChangeEventArgs, FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { ChangeEventArgs, FieldSettingsModel, FilteringEventArgs, highlightSearch } from '@syncfusion/ej2-angular-dropdowns';
 import {
   combineLatest,
   debounceTime,
@@ -110,10 +110,14 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public shiftNameField: AbstractControl;
   public shiftStartTimeField: AbstractControl;
   public shiftEndTimeField: AbstractControl;
+  private filterQueryString: string;
+  private readonly hightlightDropdownSearchString  = { itemCreated: (e: { item: HTMLElement; }) => {
+    highlightSearch(e.item, this.filterQueryString, true, 'Contains') }
+  }
 
   public readonly quickOrderConditions: QuickOrderConditions = { ...QuickOrderCondition };
-  public readonly optionFields: FieldSettingsModel = optionFields;
-  public readonly skillFields: FieldSettingsModel = skillsFields;
+  public readonly optionFields: FieldSettingsModel = { ...optionFields, ...this.hightlightDropdownSearchString };
+  public readonly skillFields: FieldSettingsModel = { ...skillsFields, ...this.hightlightDropdownSearchString };
   public readonly organizationTypeFields: FieldSettingsModel = organizationFields;
   public readonly associateAgencyFields: FieldSettingsModel = associateAgencyFields;
   public readonly specialProjectCategoriesFields: FieldSettingsModel = specialProjectCategoriesFields;
@@ -793,13 +797,18 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public filterItemsBySubString< T extends object>(
     event: FilteringEventArgs,
     dataSource: T[],
-    options: FieldSettingsModel
+    options: FieldSettingsModel,
   ): void {
     this.partialSearchService
       .searchDropdownItems(dataSource, event.text, options)
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
+        this.filterQueryString = event.text;
         event.updateData(data as Array<{ [key: string]: string }>);
       });
+  }
+
+  public closeDropdown(): void {
+    this.filterQueryString = '';
   }
 }

@@ -176,15 +176,19 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public orderId: string | null;
   public comments: Comment[] = [];
   public isShiftTimeRequired = true;
-  public optionFields: FieldSettingsModel = OptionFields;
-  public departmentFields: FieldSettingsModel = DepartmentFields;
+  private filterQueryString: string;
+  private readonly hightlightDropdownSearchString  = { itemCreated: (e: { item: HTMLElement; }) => {
+    highlightSearch(e.item, this.filterQueryString, true, 'Contains') }
+  }
+  public optionFields: FieldSettingsModel = { ...OptionFields, ...this.hightlightDropdownSearchString };
+  public departmentFields: FieldSettingsModel = { ...DepartmentFields, ...this.hightlightDropdownSearchString };
   public reasonForRequisitionFields: FieldSettingsModel = ReasonRequisitionFields;
   public associateAgencyFields: FieldSettingsModel = AssociateAgencyFields;
   public organizationStateWithKeyCodeFields: FieldSettingsModel = OrganizationStateWithKeyCodeFields;
   public specialProjectCategoriesFields: FieldSettingsModel = SpecialProjectCategoriesFields;
   public projectNameFields: FieldSettingsModel = ProjectNameFields;
   public poNumberFields: FieldSettingsModel = PoNumberFields;
-  public skillFields: FieldSettingsModel = SkillFields;
+  public skillFields: FieldSettingsModel = { ...SkillFields, ...this.hightlightDropdownSearchString };
   public isSpecialProjectFieldsRequired: boolean;
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
@@ -1215,7 +1219,12 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       .searchDropdownItems(dataSource, event.text, options)
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((data) => {
+        this.filterQueryString = event.text;
         event.updateData(data as Array<{ [key: string]: string }>);
       });
+  }
+
+  public closeDropdown(): void {
+    this.filterQueryString = '';
   }
 }
