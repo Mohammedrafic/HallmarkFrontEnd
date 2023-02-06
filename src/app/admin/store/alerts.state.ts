@@ -12,6 +12,10 @@ import {
   DismissAlert,
   DismissAllAlerts,
   GetAlertsTemplatePage,
+  GetDocumentDownloadDeatils,
+  GetDocumentDownloadDeatilsSucceeded,
+  GetDocumentPreviewDeatils,
+  GetDocumentPreviewDeatilsSucceeded,
   GetGroupEmailAgencies,
   GetGroupEmailById,
   GetGroupEmailCandidates,
@@ -38,6 +42,7 @@ import {
   EditAlertsTemplate,
 } from '@shared/models/alerts-template.model';
 import {
+  DownloadDocumentDetail,
   GroupEmail,
   GroupEmailByBusinessUnitIdPage,
   GroupEmailRequest,
@@ -48,6 +53,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '../../shared/enums/message-types';
 import { User } from '@shared/models/user.model';
+import { DOCUMENT_DOWNLOAD_SUCCESS } from '@shared/constants/messages';
 
 interface AlertsStateModel {
   userSubscriptionPage: UserSubscriptionPage | null;
@@ -66,6 +72,8 @@ interface AlertsStateModel {
   groupEmailSkillsData: MasterSkillDto;
   groupEmailCandidateStatusData: CandidateStatusAndReasonFilterOptionsDto;
   groupEmailCandidateData: User;
+  documentPreviewDetail : DownloadDocumentDetail;
+  documentDownloadDetail : DownloadDocumentDetail;
 }
 
 @Injectable()
@@ -130,6 +138,11 @@ export class AlertsState {
   static GetGroupEmailCandidates(state: AlertsStateModel): User {
     return state.groupEmailCandidateData;
   }
+  @Selector()
+  static documentDownloadDetail(state: AlertsStateModel): DownloadDocumentDetail | null {
+    return state.documentDownloadDetail;
+  }
+
 
   constructor(
     private businessUnitService: BusinessUnitService,
@@ -415,4 +428,33 @@ export class AlertsState {
         })
       );
   }
+
+  @Action(GetDocumentPreviewDeatils)
+  GetDocumentPreviewDeatils({ patchState, dispatch }: StateContext<AlertsStateModel>, { id }: GetDocumentPreviewDeatils): Observable<DownloadDocumentDetail | void> {
+    return this.groupEmailService.GetDocumentPreviewDetails(id).pipe(
+      tap((payload) => {
+        patchState({ documentPreviewDetail: payload });
+        dispatch(new GetDocumentPreviewDeatilsSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetDocumentDownloadDeatils)
+  GetDocumentDownloadDeatils({ patchState, dispatch }: StateContext<AlertsStateModel>, { id }: GetDocumentDownloadDeatils): Observable<DownloadDocumentDetail | void> {
+    return this.groupEmailService.GetDocumentDownloadDetails(id).pipe(
+      tap((payload) => {
+        patchState({ documentDownloadDetail: payload });
+        dispatch(new ShowToast(MessageTypes.Success, DOCUMENT_DOWNLOAD_SUCCESS));
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
 }

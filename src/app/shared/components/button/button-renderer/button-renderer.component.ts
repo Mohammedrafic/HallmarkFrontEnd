@@ -1,4 +1,4 @@
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrash, faEye } from '@fortawesome/free-solid-svg-icons';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { Component } from '@angular/core';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
@@ -20,6 +20,7 @@ export class ButtonRendererComponent extends AbstractPermission implements ICell
   }
   faEdit = faEdit as IconProp;
   faTrash = faTrash as IconProp;
+  faView = faEye as IconProp;
   params: any;
   label: string;
 
