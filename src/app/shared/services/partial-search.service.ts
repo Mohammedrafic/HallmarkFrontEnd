@@ -2,9 +2,9 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, Subject, distinctUntilChanged } from 'rxjs';
 
 export class PartilSearchService {
-  private filter$: Subject<{ dataSource: unknown[]; searchString: string; options: FieldSettingsModel }> =
+  private filter$: Subject<{ dataSource: object[]; searchString: string; options: FieldSettingsModel }> =
     new Subject();
-  private result$: Subject<unknown[]> = new Subject();
+  private result$: Subject<object[]> = new Subject();
 
   constructor() {
     this.subscribeToFilter();
@@ -22,7 +22,7 @@ export class PartilSearchService {
       });
   }
 
-  public search(dataSource: unknown[], searchString: string, options: FieldSettingsModel): Subject<unknown[]> {
+  public searchDropdownItems(dataSource: object[], searchString: string, options: FieldSettingsModel): Subject<object[]> {
     this.filter$.next({ dataSource, searchString, options });
     return this.result$;
   }
@@ -32,12 +32,12 @@ export class PartilSearchService {
     searchString,
     options,
   }: {
-    dataSource: unknown[];
+    dataSource: object[];
     searchString: string;
     options: FieldSettingsModel;
-  }): unknown[] {
-    return dataSource.filter((data: unknown) => {
-      const itemValue = (data as Record<string, string>)[options.text!]?.trim()?.toLowerCase();
+  }): object[] {
+    return dataSource.filter((data: object) => {
+      const itemValue = (data[options.text as keyof object] as string)?.trim()?.toLowerCase();
       const searchValue = searchString.trim().toLowerCase();
       return itemValue.includes(searchValue);
     });

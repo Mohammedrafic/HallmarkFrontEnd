@@ -790,9 +790,13 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       });
   }
 
-  public filterItemsBySubString(event: FilteringEventArgs, dataSource: unknown[], options: FieldSettingsModel): void {
+  public filterItemsBySubString< T extends object>(
+    event: FilteringEventArgs,
+    dataSource: T[],
+    options: FieldSettingsModel
+  ): void {
     this.partialSearchService
-      .search(dataSource, event.text, options)
+      .searchDropdownItems(dataSource, event.text, options)
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
         event.updateData(data as Array<{ [key: string]: string }>);
