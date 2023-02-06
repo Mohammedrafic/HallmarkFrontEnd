@@ -70,6 +70,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateDOBRequired, CandidateSSNRequired, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { SettingsViewService } from '@shared/services';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
+import { DateTimeHelper } from '@core/helpers';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -471,8 +472,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         candidateBillRate: this.candidateJob.candidateBillRate,
         offeredBillRate: value.offeredBillRate,
         requestComment: value.comments,
-        actualStartDate: toCorrectTimezoneFormat(new Date(value.actualStartDate).toISOString()),
-        actualEndDate: toCorrectTimezoneFormat(new Date(value.actualEndDate).toISOString()),
+        actualStartDate: DateTimeHelper.toUtcFormat(value.actualStartDate),
+        actualEndDate: DateTimeHelper.toUtcFormat(value.actualEndDate),
         offeredStartDate: this.candidateJob?.offeredStartDate,
         allowDeployWoCredentials: value.allowDeployCredentials,
         billRates: this.billRatesData,

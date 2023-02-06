@@ -99,7 +99,7 @@ export class ExtensionSidebarService {
       billRate,
       billRates,
       comments,
-      actualStartDate: toCorrectTimezoneFormat(startDate),
+      actualStartDate: DateTimeHelper.setInitHours(toCorrectTimezoneFormat(startDate)),
       actualEndDate: DateTimeHelper.setInitHours(toCorrectTimezoneFormat(endDate)),
       duration: durationPrimary,
       ignoreMissingCredentials,
