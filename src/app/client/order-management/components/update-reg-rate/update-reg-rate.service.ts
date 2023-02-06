@@ -10,8 +10,7 @@ export class UpdateRegRateService {
   constructor(private http: HttpClient) {}
 
   public UpdateRegRate(getregrate : UpdateRegrateModel): Observable<any> {
-    console.log(getregrate);
-    return this.http.put('/api/Orders/updateBulkHourlyRate', getregrate, { responseType: 'blob' });
+    return this.http.put('/api/Orders/updateBulkHourlyRate', getregrate);
   }
 
 }
