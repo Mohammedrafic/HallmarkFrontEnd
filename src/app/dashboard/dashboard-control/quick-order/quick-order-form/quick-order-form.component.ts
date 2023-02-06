@@ -111,13 +111,13 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public shiftStartTimeField: AbstractControl;
   public shiftEndTimeField: AbstractControl;
   private filterQueryString: string;
-  private readonly hightlightDropdownSearchString  = { itemCreated: (e: { item: HTMLElement; }) => {
+  private readonly highlightDropdownSearchString  = { itemCreated: (e: { item: HTMLElement; }) => {
     highlightSearch(e.item, this.filterQueryString, true, 'Contains') }
   }
 
   public readonly quickOrderConditions: QuickOrderConditions = { ...QuickOrderCondition };
-  public readonly optionFields: FieldSettingsModel = { ...optionFields, ...this.hightlightDropdownSearchString };
-  public readonly skillFields: FieldSettingsModel = { ...skillsFields, ...this.hightlightDropdownSearchString };
+  public readonly optionFields: FieldSettingsModel = { ...optionFields, ...this.highlightDropdownSearchString };
+  public readonly skillFields: FieldSettingsModel = { ...skillsFields, ...this.highlightDropdownSearchString };
   public readonly organizationTypeFields: FieldSettingsModel = organizationFields;
   public readonly associateAgencyFields: FieldSettingsModel = associateAgencyFields;
   public readonly specialProjectCategoriesFields: FieldSettingsModel = specialProjectCategoriesFields;
