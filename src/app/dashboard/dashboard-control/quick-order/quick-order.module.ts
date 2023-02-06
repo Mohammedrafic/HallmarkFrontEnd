@@ -15,6 +15,7 @@ import { SettingsViewService } from '@shared/services';
 import { QuickOrderService } from './services';
 import { AccordionModule } from '@syncfusion/ej2-angular-navigations';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
+import { PartilSearchService } from '@shared/services/partial-search.service';
 
 @NgModule({
   imports: [
@@ -35,6 +36,6 @@ import { ValidateDirectiveModule } from '@shared/directives/validate-directive/v
   ],
   declarations: [QuickOrderComponent, QuickOrderFormComponent],
   exports: [QuickOrderComponent],
-  providers: [SettingsViewService, QuickOrderService]
+  providers: [SettingsViewService, QuickOrderService, PartilSearchService]
 })
 export class QuickOrderModule {}

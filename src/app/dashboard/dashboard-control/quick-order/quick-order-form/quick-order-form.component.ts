@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { ChangeEventArgs, FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import {
   combineLatest,
   debounceTime,
@@ -85,6 +85,7 @@ import { QuickOrderService } from '../services';
 import { GetOrganizationSkills, ToggleQuickOrderDialog } from 'src/app/dashboard/store/dashboard.actions';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
+import { PartilSearchService } from '@shared/services/partial-search.service';
 
 @Component({
   selector: 'app-quick-order-form',
@@ -185,7 +186,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     private readonly actions$: Actions,
     private readonly durationService: DurationService,
     private readonly settingsViewService: SettingsViewService,
-    private readonly quickOrderService: QuickOrderService
+    private readonly quickOrderService: QuickOrderService,
+    private readonly partialSearchService: PartilSearchService
   ) {
     super();
     this.initOrderForms();
@@ -499,7 +501,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   private removePermPlacementControls(controls: string[]): void {
     controls.forEach((control: string) => {
       this.generalInformationForm.contains(control) &&
-      this.generalInformationForm.removeControl(control, { emitEvent: false });
+        this.generalInformationForm.removeControl(control, { emitEvent: false });
     });
   }
 
@@ -715,7 +717,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       takeUntil(this.destroy$))
       .subscribe(() => {
         this.submitQuickOrderForm();
-    });
+      });
   }
 
   private detectFormValueChanges(): void {
@@ -783,8 +785,15 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         }),
         takeUntil(this.destroy$)
       ).subscribe(({ TieringLogic }) => {
-      this.jobDistributions = distributionSource(TieringLogic === TierLogic.Show);
-      this.cdr.markForCheck();
+        this.jobDistributions = distributionSource(TieringLogic === TierLogic.Show);
+        this.cdr.markForCheck();
+      });
+  }
+
+  public onFiltering(event: FilteringEventArgs, dataSource: unknown[], options: FieldSettingsModel) {
+    this.partialSearchService.search(dataSource, event.text, options).pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      event.updateData(data as []);
     });
   }
+
 }

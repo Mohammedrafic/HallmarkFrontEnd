@@ -133,6 +133,7 @@
                 [dataSource]="regionDataSource"
                 [fields]="optionFields"
                 (select)="changeRegionDropdown($event)"
+                (filtering)="onFiltering($event, regionDataSource, optionFields)"
               >
               </ejs-dropdownlist>
             </div>
@@ -151,6 +152,7 @@
                 [dataSource]="locationDataSource"
                 [fields]="optionFields"
                 (select)="changeLocationDropdown($event)"
+                (filtering)="onFiltering($event, locationDataSource, optionFields)"
               >
               </ejs-dropdownlist>
             </div>
@@ -169,13 +171,14 @@
                 [dataSource]="departmentDataSource"
                 [fields]="optionFields"
                 (select)="changeDepartmentDropdown($event)"
+                (filtering)="onFiltering($event, departmentDataSource, optionFields)"
               >
               </ejs-dropdownlist>
             </div>
           </div>
 
           <!-- Skill -->
-          <div class="input-container bootstrap form-line-item-20">
+          <div class="input-container bootstrap form-line-item-20" *ngIf="organizationSkills$ | async as skillsDataSource">
             <label>Skill<span class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist
@@ -183,8 +186,9 @@
                 formControlName="skillId"
                 appValidateWithMessage
                 [allowFiltering]="true"
-                [dataSource]="organizationSkills$ | async"
+                [dataSource]="skillsDataSource"
                 [fields]="skillFields"
+                (filtering)="onFiltering($event, skillsDataSource, skillFields)"
               >
               </ejs-dropdownlist>
             </div>
