@@ -92,6 +92,7 @@ import {
   RECORD_ADDED,
   RECORD_MODIFIED,
   updateCandidateJobMessage,
+  UpdateRegularRatesucceedcount
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -1048,8 +1049,9 @@ export class OrderManagementContentState {
     { payload } : UpdateRegRateorder
   ) : Observable<UpdateRegrateModel | Observable<void>>{
     return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
-      tap((payload) => {
-        dispatch(new UpdateRegRateSucceeded(payload));
+      tap((payload) => {  
+        const count = payload.length;
+        dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Reg rate is not updated'))))
     );
