@@ -172,17 +172,17 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     }
   }
 
+  public onCloseDialog(): void {
+    this.clearDeployedCandidateOrderInfo();
+    this.sideDialog.hide();
+  }
+
   private getDeployedCandidateOrders(): void {
     if (!!this.candidate.deployedCandidateInfo) {
       const candidateId = this.candidate.candidateId;
       const organizationId = this.candidate.organizationId || this.candidate.deployedCandidateInfo.organizationId;
       this.store.dispatch(new GetDeployedCandidateOrderInfo(this.order.orderId, candidateId, organizationId));
     }
-  }
-
-  public onCloseDialog(): void {
-    this.clearDeployedCandidateOrderInfo();
-    this.sideDialog.hide();
   }
 
   private openDialog(template: any): void {

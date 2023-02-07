@@ -3,19 +3,28 @@
     <div class="title">
       <h3>Candidates List</h3>
     </div>
-    <ng-container *ngIf="system === systemType.IRP && isFeatureIrpEnabled">
-      <div class="input-container">
-        <div class="input-group switch">
-          <ejs-switch
-            id="switcher"
-            class="switch"
-            (change)="onSwitcher($event)"
-            [checked]="includeDeployedCandidates"
-          ></ejs-switch>
-          <label class="switch-label" for="switcher">is Available</label>
+    <div class="grid-toolbar">
+      <app-search
+        class="search"
+        [placeholder]="candidateSearchPlaceholder"
+        [showClearButton]="true"
+        (inputKeyUpEnter)="searchByCandidateName($event)"
+        (clearInput)="clearInputField()"
+      ></app-search>
+      <ng-container *ngIf="system === systemType.IRP && isFeatureIrpEnabled">
+        <div class="input-container">
+          <div class="input-group switch">
+            <ejs-switch
+              id="switcher"
+              class="switch"
+              (change)="onSwitcher($event)"
+              [checked]="includeDeployedCandidates"
+            ></ejs-switch>
+            <label class="switch-label" for="switcher">is Available</label>
+          </div>
         </div>
-      </div>
-    </ng-container>
+      </ng-container>
+    </div>
   </div>
 
   <ng-container *ngIf="system !== systemType.IRP || !isFeatureIrpEnabled || isAgency; else irpCandiadtes">

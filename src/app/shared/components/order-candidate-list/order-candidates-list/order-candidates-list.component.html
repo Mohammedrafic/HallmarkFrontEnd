@@ -4,15 +4,24 @@
       <div class="title">
         <h3>Candidates List</h3>
       </div>
-      <div class="input-container">
-        <div class="input-group switch">
-          <ejs-switch
-            id="switcher"
-            class="switch"
-            (change)="onSwitcher($event)"
-            [checked]="includeDeployedCandidates"
-          ></ejs-switch>
-          <label class="switch-label" for="switcher">Include <br />Deployed</label>
+      <div class="grid-toolbar">
+        <app-search
+          class="search"
+          [placeholder]="candidateSearchPlaceholder"
+          [showClearButton]="true"
+          (inputKeyUpEnter)="searchByCandidateName($event)"
+          (clearInput)="clearInputField()"
+        ></app-search>
+        <div class="input-container">
+          <div class="input-group switch">
+            <ejs-switch
+              id="switcher"
+              class="switch"
+              (change)="onSwitcher($event)"
+              [checked]="includeDeployedCandidates"
+            ></ejs-switch>
+            <label class="switch-label" for="switcher">Include <br />Deployed</label>
+          </div>
         </div>
       </div>
     </div>
