@@ -21,6 +21,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { PageOfCollections } from '@shared/models/page.model';
+import { CandidateSearchPlaceholder } from '@shared/constants/candidate-search-placeholder';
 
 @Directive()
 export abstract class AbstractOrderCandidateListComponent
@@ -46,6 +47,7 @@ export abstract class AbstractOrderCandidateListComponent
   public isAgency: boolean;
   public isOrganization: boolean;
   public readonly searchByCandidateName$: Subject<string> = new Subject();
+  public readonly candidateSearchPlaceholder = CandidateSearchPlaceholder;
 
   protected pageSubject = new Subject<number>();
   protected unsubscribe$: Subject<void> = new Subject();

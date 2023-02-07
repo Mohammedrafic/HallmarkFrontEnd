@@ -7,6 +7,7 @@
       <div class="grid-toolbar">
         <app-search
           class="search"
+          [placeholder]="candidateSearchPlaceholder"
           [showClearButton]="true"
           (inputKeyUpEnter)="searchByCandidateName($event)"
           (clearInput)="clearInputField()"
