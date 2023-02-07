@@ -5,41 +5,44 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, View
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
 })
-export class SearchComponent implements AfterViewInit  {
+export class SearchComponent implements AfterViewInit {
   @ViewChild('inputWithIcon') search: ElementRef;
 
-  @Input() placeholder = 'Search';
+  @Input() public placeholder = 'Search';
+  @Input() public showClearButton = false;
 
-  @Output() inputKeyUpEnter = new EventEmitter();
-  /**
-   * TODO: remove any.
-   */
-  @Output() public searchFocusOut: EventEmitter<any> = new EventEmitter<any>();
+  @Output() public inputKeyUpEnter: EventEmitter<KeyboardEvent> = new EventEmitter();
+  @Output() public searchFocusOut: EventEmitter<FocusEvent> = new EventEmitter();
+  @Output() public clearInput: EventEmitter<void> = new EventEmitter();
 
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     if (this.searchFocusOut?.observers.length > 0) {
       this.search.nativeElement.getElementsByTagName('input')[0].focus();
     }
   }
 
-  onSearchClick(): void {
+  public onSearchClick(): void {
     this.search.nativeElement.classList.add('e-search-input-active');
   }
 
-  onSearchBlur(): void {
+  public onSearchBlur(): void {
     this.search.nativeElement.classList.remove('e-search-input-active');
   }
 
-  onKeyUp($event: any): void {
+  public onKeyUp($event: KeyboardEvent): void {
     this.inputKeyUpEnter.emit($event);
   }
 
-  clear(): void {
+  public clear(): void {
     this.search.nativeElement.getElementsByTagName('input')[0].value = '';
   }
 
-  public onSearchFocusOut($event: any): void {
-    if (this.searchFocusOut?.observers.length > 0)
-      this.searchFocusOut.emit($event);
+  public onSearchFocusOut($event: FocusEvent): void {
+    if (this.searchFocusOut?.observers.length > 0) this.searchFocusOut.emit($event);
+  }
+
+  public clearInputByButton(): void {
+    this.clear();
+    this.clearInput.emit();
   }
 }
