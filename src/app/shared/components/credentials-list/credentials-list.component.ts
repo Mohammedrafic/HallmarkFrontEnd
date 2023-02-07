@@ -188,8 +188,8 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
       credentialTypeId: data.credentialTypeId,
       expireDateApplicable: data.expireDateApplicable,
       comment: data.comment,
-      includeInVMS: this.selectedSystem.isVMS,
-      includeInIRP: this.selectedSystem.isIRP,
+      includeInVMS: data.includeInVMS,
+      includeInIRP: data.includeInIRP,
     }));
   }
 
