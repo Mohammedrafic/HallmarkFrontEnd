@@ -4,12 +4,17 @@
   </span>
   <div class="e-input-in-wrap">
     <input
-      class="e-input" type="text"
+      #input
+      class="e-input"
+      type="text"
       [placeholder]="placeholder"
-      (click)='onSearchClick()'
-      (blur)='onSearchBlur()'
+      (click)="onSearchClick()"
+      (blur)="onSearchBlur()"
       (keyup)="onKeyUp($event)"
       (focusout)="onSearchFocusOut($event)"
-    >
+    />
   </div>
+  <span *ngIf="showClearButton && input.value" class="e-input-group-icon" (click)="clearInputByButton()">
+    <i-feather name="X" class="icon"></i-feather>
+  </span>
 </div>

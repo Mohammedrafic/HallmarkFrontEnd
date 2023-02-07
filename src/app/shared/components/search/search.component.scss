@@ -1,4 +1,4 @@
-@import '../../styles/variables/colors';
+@import 'colors';
 
 .e-input-group.e-float-icon-left.search-with-icon {
   height: 40px;
@@ -32,6 +32,10 @@
 
 .e-input-group.e-float-icon-left:hover {
   border-color: $primary-active-blue-10;
+}
+
+.e-input-group.e-float-icon-left > .e-input-group-icon {
+  width: 30px;
 }
 
 .e-search-input-active {
