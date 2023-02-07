@@ -111,7 +111,16 @@ export abstract class AbstractOrderCandidateListComponent
     }
   }
 
-  public searchCandidateByName(value: string): void {
+  public searchByCandidateName(event: KeyboardEvent): void {
+    const queryString = (event.target as HTMLInputElement).value;
+    this.searchByCandidateName$.next(queryString.toLowerCase());
+  }
+
+  public clearInputField(): void {
+    this.searchByCandidateName$.next('');
+  }
+
+  private searchCandidateByName(value: string): void {
     this.getCandidatesList.emit({
       orderId: this.order.orderId,
       organizationId: this.order.organizationId,
@@ -120,15 +129,6 @@ export abstract class AbstractOrderCandidateListComponent
       excludeDeployed: !this.includeDeployedCandidates,
       searchTerm: value,
     });
-  }
-
-  public searchByCandidateName(event: KeyboardEvent): void {
-    const queryString = (event.target as HTMLInputElement).value;
-    this.searchByCandidateName$.next(queryString.toLowerCase());
-  }
-
-  public clearInputField(): void {
-    this.searchByCandidateName$.next('');
   }
 
   private searchCandidatesByName(): void {
