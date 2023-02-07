@@ -50,3 +50,8 @@ export interface OrginazationModuleSettings {
   isFeatureIrpEnabled: boolean;
   isIrpDisplayed: boolean;
 }
+
+export interface DatePeriod {
+  from: string;
+  to: string;
+}

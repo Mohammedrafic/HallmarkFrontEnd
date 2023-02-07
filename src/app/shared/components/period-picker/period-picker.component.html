@@ -1,0 +1,25 @@
+<div class="custom-date-picker">
+  <button
+    ejs-button cssClass="e-outline"
+    (click)="selectPreviousPeriod()">
+    <i-feather name="chevron-left" class="icon"></i-feather>
+  </button>
+  <ejs-datepicker
+    class="datepicker custom"
+    [start]="periodType"
+    [depth]="periodType"
+    [format]="headerFormat"
+    [showTodayButton]="false"
+    [showClearButton]="false"
+    [allowEdit]="false"
+    [firstDayOfWeek]="firstWeekDay"
+    [formControl]="dateControl"
+    (change)="selectPeriod($event)"
+  ></ejs-datepicker>
+  <button
+    ejs-button
+    cssClass="e-outline"
+    (click)="slectNextPeriod()">
+    <i-feather name="chevron-right" class="icon"></i-feather>
+  </button>
+</div>
