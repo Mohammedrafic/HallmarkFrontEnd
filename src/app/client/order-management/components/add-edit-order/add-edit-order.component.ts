@@ -4,7 +4,7 @@ import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angula
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
@@ -116,7 +116,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     private saveTemplateDialogService: SaveTemplateDialogService,
     private confirmService: ConfirmService,
     private billRatesSyncService: BillRatesSyncService,
-    private cd: ChangeDetectorRef,
   ) {
     this.orderId = Number(this.route.snapshot.paramMap.get('orderId'));
     this.isTemplate = !!this.route.snapshot.paramMap.get('fromTemplate');
@@ -695,7 +694,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           .filter((billrate) => !billrate.isPredefined);
       }
       this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
-      this.cd.detectChanges();
     });
   }
 
