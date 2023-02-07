@@ -115,7 +115,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     private actions$: Actions,
     private saveTemplateDialogService: SaveTemplateDialogService,
     private confirmService: ConfirmService,
-    private billRatesSyncService: BillRatesSyncService
+    private billRatesSyncService: BillRatesSyncService,
   ) {
     this.orderId = Number(this.route.snapshot.paramMap.get('orderId'));
     this.isTemplate = !!this.route.snapshot.paramMap.get('fromTemplate');
@@ -684,7 +684,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private subscribeOnPredefinedBillRates(): void {
     this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe((predefinedBillRates) => {
-      if (!this.billRatesComponent?.billRatesControl && this.order) return;
+      if (!this.billRatesComponent?.billRatesControl && this.order) {
+        this.orderBillRates = predefinedBillRates;
+        return;
+      };
       if (this.billRatesComponent?.billRatesControl) {
         this.manuallyAddedBillRates = this.billRatesComponent.billRatesControl
           .getRawValue()

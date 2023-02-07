@@ -502,7 +502,7 @@ export class OrderManagementContentState {
         const { orderType, departmentId, jobStartDate, jobEndDate, isTemplate } = payload;
         const skill = payload.irpOrderMetadata ? payload.irpOrderMetadata.skillId : payload.skillId;
 
-        if (!isTemplate) {
+        if (!isTemplate && orderType && departmentId && jobStartDate && jobEndDate) {
           dispatch(
             new SetPredefinedBillRatesData(
               orderType,
