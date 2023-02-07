@@ -18,7 +18,7 @@ import { debounceTime, Observable, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
-import { CustomFormGroup } from '@core/interface';
+import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { filterOptionFields } from '@core/constants/filters-helper.constant';
 import { PageOfCollections } from '@shared/models/page.model';
 import { FilterService } from '@shared/services/filter.service';
@@ -36,6 +36,7 @@ import { InvoiceFilterColumns, InvoiceFilterFieldConfig, InvoiceRecord, Invoices
 import { DetectFormConfigBySelectedType } from '../../constants';
 import { InvoicesAgencyTabId, InvoicesOrgTabId, InvoicesTableFiltersColumns } from '../../enums';
 import { InvoiceFiltersAdapter } from '../../adapters';
+import { InvoicesModel } from '../../store/invoices.model';
 
 @Component({
   selector: 'app-invoices-filters-dialog',
@@ -52,6 +53,9 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
 
   @Select(InvoicesState.organizationStructure)
   public selectedOrgStructure$: Observable<OrganizationStructure | null>;
+
+  @Select(InvoicesState.invoicesOrganizations)
+  public readonly organizations$: Observable<DataSourceItem[]>;
 
   @Input() selectedTabId: InvoiceTabId;
 
@@ -129,10 +133,29 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     if (this.selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
       this.store.dispatch(new Invoices.GetPendingRecordsFiltersDataSource());
     } else if (
-      this.selectedTabId !== InvoicesOrgTabId.ManualInvoicePending
-      && this.selectedTabId !== InvoicesAgencyTabId.ManualInvoicePending
+      this.selectedTabId === InvoicesOrgTabId.ManualInvoicePending
+      || this.selectedTabId === InvoicesAgencyTabId.ManualInvoicePending
     ) {
+      this.initManualPendingFiltersDataSources();
+    } else {
       this.store.dispatch(new Invoices.GetFiltersDataSource());
+    }
+  }
+
+  private initManualPendingFiltersDataSources(): void {
+    if(this.isAgency) {
+      const currentOrgId = (this.store.snapshot().invoices as InvoicesModel).selectedOrganizationId;
+
+      this.organizations$.pipe(
+        filter((organizations: DataSourceItem[]) => !!organizations.length),
+        takeUntil(this.componentDestroy()),
+      ).subscribe((organizations: DataSourceItem[]) => {
+        const id = currentOrgId ? currentOrgId : organizations[0].id;
+        this.store.dispatch(new Invoices.GetManualInvoiceRecordFiltersDataSource(id));
+      });
+
+    } else {
+      this.store.dispatch(new Invoices.GetManualInvoiceRecordFiltersDataSource(null));
     }
   }
 

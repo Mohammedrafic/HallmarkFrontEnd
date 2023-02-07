@@ -53,6 +53,7 @@ export enum INVOICES_ACTIONS {
   SavePayment = '[invoices] save payment',
   OpenAddPaymentDialog = '[invoices] open add payment dialog',
   ExportInvoices = '[invoices] export invoices',
+  GetManualInvoiceRecordsFilterDataSource = '[invoices] Get manual invoice records filters data source',
 }
 
 export enum InvoicesTableFiltersColumns {
@@ -86,6 +87,13 @@ export enum InvoicesTableFiltersColumns {
   SkillIds = 'skillIds',
   WeekPeriodFrom = 'weekPeriodFrom',
   WeekPeriodTo = 'weekPeriodTo',
+
+  // Keys for Manual Invoice Pending
+  OrderId = 'orderId',
+  ServiceDateFrom = 'serviceDateFrom',
+  ServiceDateTo = 'serviceDateTo',
+  VendorFee = 'vendorFee',
+  ReasonCodeIds = 'reasonCodeIds',
 }
 
 export enum FilteringInvoicesOptionsFields {
@@ -99,6 +107,17 @@ export enum FilteringPendingInvoiceRecordsOptionsFields {
   Types = 'types',
   Skills = 'skills',
   Agency = 'agency',
+  Regions = 'regions',
+  Locations = 'locations',
+  Departments = 'departments',
+}
+
+export enum FilteringManualPendingInvoiceRecordsOptionsFields {
+  Agency = 'agency',
+  InvoiceStates = 'invoiceStates',
+  Reasons = 'reasons',
+  VendorFee = 'vendorFee',
+  Skills = 'skills',
   Regions = 'regions',
   Locations = 'locations',
   Departments = 'departments',
@@ -130,4 +149,10 @@ export enum PaymentMode {
 export enum PaymentDialogTitle {
   Add = 'Add',
   Edit = 'Edit',
+}
+
+export enum VendorFee {
+  No = 1,
+  Yes = 2,
+  All = 3,
 }

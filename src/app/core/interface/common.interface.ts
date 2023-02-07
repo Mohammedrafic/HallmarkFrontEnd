@@ -15,7 +15,9 @@ export interface DataSourceItem {
   id: number;
   name: string;
   organizationId?: number;
+  reason?: string;
 }
+
 export interface CommonDialogConformMessages {
   confirmUnsavedChages: string;
   confirmTabChange: string;

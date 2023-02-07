@@ -2,9 +2,8 @@ import { FormGroup } from '@angular/forms';
 
 import { DateTimeHelper, LeftOnlyValidValues } from '@core/helpers';
 
-import { InvoicesFilterState } from '../interfaces';
-
-type TypedKey = keyof InvoicesFilterState;
+import { InvoiceManualPendingRecordsFilteringOptions, InvoicesFilterState, TypedKey } from '../interfaces';
+import { CreateInvoiceReasonList, CreateVendorFeeList } from '../helpers';
 
 export class InvoiceFiltersAdapter {
   static prepareFilters(formGroup: FormGroup): InvoicesFilterState {
@@ -37,5 +36,18 @@ export class InvoiceFiltersAdapter {
     }
 
     return filters;
+  }
+
+  static prepareDateToManualPendingInvoice(
+    data: InvoiceManualPendingRecordsFilteringOptions
+  ): InvoiceManualPendingRecordsFilteringOptions {
+    return {
+      ...data,
+      regions: [],
+      locations: [],
+      departments: [],
+      reasons: CreateInvoiceReasonList(data.reasons),
+      vendorFee: CreateVendorFeeList(),
+    } as InvoiceManualPendingRecordsFilteringOptions;
   }
 }

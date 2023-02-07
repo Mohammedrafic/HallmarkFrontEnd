@@ -6,3 +6,4 @@ export * from './grid/invoices-container-grid.helper';
 export * from './invoices-adapter.helper';
 export * from './manual-invoice.adapter';
 export * from './message-helper';
+export * from './invoice.helper';

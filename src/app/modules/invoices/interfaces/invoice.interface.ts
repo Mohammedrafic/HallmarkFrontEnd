@@ -17,7 +17,7 @@ import {
   FilteringInvoicesOptionsFields,
   InvoicesOrgTabId,
   InvoicesAgencyTabId,
-  FilteringPendingInvoiceRecordsOptionsFields
+  FilteringPendingInvoiceRecordsOptionsFields, FilteringManualPendingInvoiceRecordsOptionsFields
 } from '../enums';
 import { PendingInvoiceStatus } from '../enums/invoice-status.enum';
 import { InvoiceDetail } from './invoice-detail.interface';
@@ -108,6 +108,10 @@ export type InvoicesFilteringOptions = {
 
 export type InvoicesPendingInvoiceRecordsFilteringOptions = {
   [key in FilteringPendingInvoiceRecordsOptionsFields]: DataSourceItem[];
+}
+
+export type InvoiceManualPendingRecordsFilteringOptions = {
+  [key in FilteringManualPendingInvoiceRecordsOptionsFields]: DataSourceItem[];
 }
 
 export interface ManualInvoiceTimesheetResponse {
@@ -326,3 +330,5 @@ export interface InvoiceFilterFieldConfig {
 }
 
 export type InvoiceFilterValue = string | string[] | number | number[];
+
+export type TypedKey = keyof InvoicesFilterState;

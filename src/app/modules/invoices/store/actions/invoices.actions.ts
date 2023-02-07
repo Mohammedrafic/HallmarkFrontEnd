@@ -333,4 +333,13 @@ export namespace Invoices {
     ) {
     }
   }
+
+  export class GetManualInvoiceRecordFiltersDataSource {
+    static readonly type = INVOICES_ACTIONS.GetManualInvoiceRecordsFilterDataSource;
+
+    constructor(
+      public readonly organizationId: number | null,
+    ) {
+    }
+  }
 }
