@@ -209,8 +209,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       let additionalValues = {};
       if (this.isOnBoard) {
         additionalValues = {
-          actualStartDate: toCorrectTimezoneFormat(this.candidateJob.actualStartDate),
-          actualEndDate: toCorrectTimezoneFormat(this.candidateJob.actualEndDate),
+          actualStartDate: DateTimeHelper.toUtcFormat(this.candidateJob.actualStartDate),
+          actualEndDate: DateTimeHelper.toUtcFormat(this.candidateJob.actualEndDate),
           guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
           clockId: this.candidateJob.clockId,
         };
@@ -463,6 +463,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
+    if (typeof value.actualStartDate === 'string') {
+      value.actualStartDate = new Date(value.actualStartDate);
+    }
+    if (typeof value.actualEndDate === 'string') {
+      value.actualEndDate = new Date(value.actualEndDate);
+    }
     if (this.form.valid) {
       const updatedValue = {
         organizationId: this.candidateJob.organizationId,
