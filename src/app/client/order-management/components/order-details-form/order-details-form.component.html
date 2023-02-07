@@ -46,7 +46,7 @@
                 </div>
 
                 <!-- Region -->
-                <div class="input-container bootstrap form-line-item-20">
+                <div class="input-container bootstrap form-line-item-20" *ngIf="(regions$ | async) as regionDataSource">
                   <label>Region<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -54,16 +54,18 @@
                       formControlName="regionId"
                       appValidateWithMessage
                       [allowFiltering]="true"
-                      [dataSource]="regions$ | async"
+                      [dataSource]="regionDataSource"
                       [fields]="optionFields"
                       (select)="onRegionDropDownChanged($event)"
+                      (filtering)="filterItemsBySubString($event, regionDataSource, optionFields)"
+                      (close)="closeDropdown()"
                     >
                     </ejs-dropdownlist>
                   </div>
                 </div>
 
                 <!-- Location -->
-                <div class="input-container bootstrap form-line-item-20">
+                <div class="input-container bootstrap form-line-item-20" *ngIf="(locations$ | async) as locationDataSource">
                   <label>Location<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -71,16 +73,18 @@
                       formControlName="locationId"
                       appValidateWithMessage
                       [allowFiltering]="true"
-                      [dataSource]="locations$ | async"
+                      [dataSource]="locationDataSource"
                       [fields]="optionFields"
                       (select)="onLocationDropDownChanged($event)"
+                      (filtering)="filterItemsBySubString($event, locationDataSource, optionFields)"
+                      (close)="closeDropdown()"
                     >
                     </ejs-dropdownlist>
                   </div>
                 </div>
 
                 <!-- Department -->
-                <div class="input-container bootstrap form-line-item-20">
+                <div class="input-container bootstrap form-line-item-20" *ngIf="(departments$ | async) as departmentDataSource">
                   <label>Department<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -88,16 +92,18 @@
                       formControlName="departmentId"
                       appValidateWithMessage
                       [allowFiltering]="true"
-                      [dataSource]="departments$ | async"
+                      [dataSource]="departmentDataSource"
                       [fields]="departmentFields"
                       (select)="onDepartmentDropDownChanged($event)"
+                      (filtering)="filterItemsBySubString($event, departmentDataSource, departmentFields)"
+                      (close)="closeDropdown()"
                     >
                     </ejs-dropdownlist>
                   </div>
                 </div>
 
                 <!-- Skill -->
-                <div class="input-container bootstrap form-line-item-20">
+                <div class="input-container bootstrap form-line-item-20" *ngIf="skills$ | async as skillDataSource">
                   <label>Skill<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -105,9 +111,11 @@
                       formControlName="skillId"
                       appValidateWithMessage
                       [allowFiltering]="true"
-                      [dataSource]="skills$ | async"
+                      [dataSource]="skillDataSource"
                       [fields]="skillFields"
                       (select)="onSkillsDropDownChanged($event)"
+                      (filtering)="filterItemsBySubString($event, skillDataSource, skillFields)"
+                      (close)="closeDropdown()"
                     >
                     </ejs-dropdownlist>
                   </div>

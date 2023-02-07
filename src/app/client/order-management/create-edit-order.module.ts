@@ -31,6 +31,7 @@ import { GridIcons } from '@client/order-management/constants';
 import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
 import { OrderCredentialsService } from "@client/order-management/services";
 import { OrganizationStructureService } from '@shared/services';
+import { PartilSearchService } from '@shared/services/partial-search.service';
 
 @NgModule({
   declarations: [
@@ -66,7 +67,8 @@ import { OrganizationStructureService } from '@shared/services';
     OrderDetailsIrpService,
     IrpContainerStateService,
     OrderCredentialsService,
-    OrganizationStructureService
+    OrganizationStructureService,
+    PartilSearchService,
   ],
 })
 export class CreateEditOrderModule { }
