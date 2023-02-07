@@ -116,7 +116,8 @@ export class OrderManagementContentService {
     organizationId: number,
     pageNumber: number,
     pageSize: number,
-    excludeDeployed?: boolean
+    excludeDeployed?: boolean,
+    searchTerm?: string,
   ): Observable<OrderCandidatesListPage> {
     let params: any = {
       PageNumber: pageNumber,
@@ -125,6 +126,10 @@ export class OrderManagementContentService {
 
     if (excludeDeployed) {
       params = { ...params, excludeDeployed };
+    }
+
+    if(searchTerm) {
+      params = { ...params, searchTerm }
     }
     return this.http.get<OrderCandidatesListPage>(
       `/api/CandidateProfile/order/${orderId}/organization/${organizationId}`,
@@ -212,7 +217,8 @@ export class OrderManagementContentService {
     organizationId: number,
     pageNumber: number,
     pageSize: number,
-    excludeDeployed?: boolean
+    excludeDeployed?: boolean,
+    searchTerm?: string,
   ): Observable<OrderCandidatesListPage> {
     let params: any = {
       PageNumber: pageNumber,
@@ -221,6 +227,10 @@ export class OrderManagementContentService {
 
     if (excludeDeployed) {
       params = { ...params, excludeDeployed };
+    }
+
+    if(searchTerm) {
+      params = { ...params, searchTerm };
     }
     return this.http.get<OrderCandidatesListPage>(`/api/CandidateProfile/order/${orderId}`, {
       params,

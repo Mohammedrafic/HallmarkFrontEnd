@@ -72,7 +72,8 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
         event.organizationId,
         event.currentPage,
         event.pageSize,
-        event.excludeDeployed
+        event.excludeDeployed,
+        event.searchTerm,
       )
     );
   }

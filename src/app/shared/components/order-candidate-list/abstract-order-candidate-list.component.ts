@@ -109,6 +109,17 @@ export abstract class AbstractOrderCandidateListComponent
     }
   }
 
+  public searchCandidateByName(value: string): void {
+    this.getCandidatesList.emit({
+      orderId: this.order.orderId,
+      organizationId: this.order.organizationId,
+      currentPage: this.currentPage,
+      pageSize: this.pageSize,
+      excludeDeployed: !this.includeDeployedCandidates,
+      searchTerm: value,
+    });
+  }
+
   protected onCloseDetails(): Observable<boolean> {
     return this.openDetails.pipe(
       filter((isOpen) => !isOpen),

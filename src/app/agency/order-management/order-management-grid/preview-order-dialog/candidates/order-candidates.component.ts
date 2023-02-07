@@ -59,7 +59,8 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
         event.organizationId,
         event.currentPage,
         event.pageSize,
-        event.excludeDeployed
+        event.excludeDeployed,
+        event.searchTerm,
       )
     );
   }
