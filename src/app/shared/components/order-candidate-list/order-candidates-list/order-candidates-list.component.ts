@@ -15,7 +15,7 @@ import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-or
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { combineLatest, Observable, Subject } from 'rxjs';
-import { distinctUntilChanged, takeUntil, debounceTime } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { UserState } from 'src/app/store/user.state';
 import { Duration } from '@shared/enums/durations';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
@@ -74,8 +74,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public readonly systemType = OrderManagementIRPSystemId;
   public isCandidatePayRateVisible: boolean;
 
-  private searchByCandidateName$: Subject<string> = new Subject();
-
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
   }
@@ -103,7 +101,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.checkForAgencyStatus();
       this.subscribeToDeployedCandidateOrdersInfo();
     }
-    this.searchCandidatesByName();
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
@@ -178,23 +175,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public onCloseDialog(): void {
     this.clearDeployedCandidateOrderInfo();
     this.sideDialog.hide();
-  }
-
-  public searchByCandidateName(event: KeyboardEvent): void {
-    const queryString = (event.target as HTMLInputElement).value;
-    this.searchByCandidateName$.next(queryString.toLowerCase());
-  }
-
-  public clearInputField(): void {
-    this.searchByCandidateName$.next('');
-  }
-
-  private searchCandidatesByName(): void {
-    this.searchByCandidateName$
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.unsubscribe$))
-      .subscribe((queryString) => {
-        this.searchCandidateByName(queryString);
-      });
   }
 
   private getDeployedCandidateOrders(): void {

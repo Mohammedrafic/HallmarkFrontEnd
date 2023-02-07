@@ -1,6 +1,6 @@
 import { Directive, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { combineLatest, debounceTime, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -45,6 +45,7 @@ export abstract class AbstractOrderCandidateListComponent
   public openDetails = new Subject<boolean>();
   public isAgency: boolean;
   public isOrganization: boolean;
+  public readonly searchByCandidateName$: Subject<string> = new Subject();
 
   protected pageSubject = new Subject<number>();
   protected unsubscribe$: Subject<void> = new Subject();
@@ -59,6 +60,7 @@ export abstract class AbstractOrderCandidateListComponent
     this.isOrganization = this.router.url.includes('client');
 
     combineLatest([this.onPageChanges(), this.onCloseDetails()]).pipe(takeUntil(this.unsubscribe$)).subscribe();
+    this.searchCandidatesByName();
   }
 
   ngOnDestroy(): void {
@@ -118,6 +120,23 @@ export abstract class AbstractOrderCandidateListComponent
       excludeDeployed: !this.includeDeployedCandidates,
       searchTerm: value,
     });
+  }
+
+  public searchByCandidateName(event: KeyboardEvent): void {
+    const queryString = (event.target as HTMLInputElement).value;
+    this.searchByCandidateName$.next(queryString.toLowerCase());
+  }
+
+  public clearInputField(): void {
+    this.searchByCandidateName$.next('');
+  }
+
+  private searchCandidatesByName(): void {
+    this.searchByCandidateName$
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.unsubscribe$))
+      .subscribe((queryString) => {
+        this.searchCandidateByName(queryString);
+      });
   }
 
   protected onCloseDetails(): Observable<boolean> {
