@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ONLY_LETTERS, ONLY_NUMBER, ONLY_NUMBER_AND_DOT, ALPHANUMERICS_AND_SYMBOLS, ALPHANUMERIC } from '@shared/constants';
+import { ONLY_LETTERS, ONLY_NUMBER, ONLY_NUMBER_AND_DOT, ALPHANUMERICS_AND_SYMBOLS, ALPHANUMERIC,  MIN_DIGITS_LENGTH_ONLY_NINE } from '@shared/constants';
 
 @Pipe({
   name: 'validationError',
@@ -35,6 +35,9 @@ export class ValidationErrorPipe implements PipeTransform {
         }
         if(this.isWrongValue(ALPHANUMERIC, value)) {
           return 'Only alphanumeric symbols are allowed';
+        }
+        if(this.isWrongValue(MIN_DIGITS_LENGTH_ONLY_NINE, value)){
+          return `Min digits entered should be 9`;
         }
         return '';
       default:
