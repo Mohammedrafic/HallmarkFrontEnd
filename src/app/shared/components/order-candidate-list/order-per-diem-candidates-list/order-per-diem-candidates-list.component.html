@@ -1,7 +1,15 @@
 <section class="candidates-list">
   <div class="e-gridcustomheader">
     <div class="title">
-      <h3>{{ system === systemType.IRP ? 'Candidates': 'Candidates List'}}</h3>
+      <h3>{{ system === systemType.IRP ? 'Candidates' : 'Candidates List' }}</h3>
+    </div>
+    <div class="grid-toolbar">
+      <app-search
+        class="search"
+        [showClearButton]="true"
+        (inputKeyUpEnter)="searchByCandidateName($event)"
+        (clearInput)="clearInputField()"
+      ></app-search>
     </div>
   </div>
 

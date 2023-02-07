@@ -33,6 +33,15 @@
       color: $primary-active-blue;
     }
   }
+
+  .grid-toolbar {
+    display: flex;
+    column-gap: 50px;
+    
+    .search {
+      width: 280px;
+    }
+  }
 }
 
 .e-tooltip-wrap .e-arrow-tip .e-tip-bottom {
