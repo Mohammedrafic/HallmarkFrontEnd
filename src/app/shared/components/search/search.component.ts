@@ -38,7 +38,9 @@ export class SearchComponent implements AfterViewInit {
   }
 
   public onSearchFocusOut($event: FocusEvent): void {
-    if (this.searchFocusOut?.observers.length > 0) this.searchFocusOut.emit($event);
+    if (this.searchFocusOut?.observers.length > 0) { 
+      this.searchFocusOut.emit($event);
+    }
   }
 
   public clearInputByButton(): void {

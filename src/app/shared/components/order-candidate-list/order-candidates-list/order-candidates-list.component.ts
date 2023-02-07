@@ -103,6 +103,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.checkForAgencyStatus();
       this.subscribeToDeployedCandidateOrdersInfo();
     }
+    this.searchCandidatesByName();
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
@@ -181,7 +182,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
 
   public searchByCandidateName(event: KeyboardEvent): void {
     const queryString = (event.target as HTMLInputElement).value;
-    this.searchByCandidateName$.next(queryString);
+    this.searchByCandidateName$.next(queryString.toLowerCase());
   }
 
   public clearInputField(): void {
@@ -191,8 +192,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   private searchCandidatesByName(): void {
     this.searchByCandidateName$
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.unsubscribe$))
-      .subscribe((data) => {
-    this.searchCandidateByName(data);
+      .subscribe((queryString) => {
+        this.searchCandidateByName(queryString);
       });
   }
 
