@@ -436,7 +436,18 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     if (menuItem.id == AnalyticsMenuId) {
       this.router.navigate([menuItem.route]);
     } else {
-      !menuItem.children?.length && this.router.navigate([menuItem.route]);
+      if (!menuItem.children?.length) {
+        this.router.navigate([menuItem.route]).then(() => {
+          this.closeSidebarInMobileMode();
+        });
+      }
+    }
+  }
+
+  private closeSidebarInMobileMode(): void {
+    const isMobile = this.store.selectSnapshot(AppState.isMobileScreen);
+    if (isMobile) {
+      this.store.dispatch(new ToggleSidebarState(false));
     }
   }
 
