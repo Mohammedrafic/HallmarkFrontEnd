@@ -242,6 +242,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         return true;
       }),
     ).subscribe(() => {
+      this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
       this.setGridConfig();
       this.cdr.markForCheck();
