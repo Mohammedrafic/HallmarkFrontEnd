@@ -45,7 +45,7 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
 
   public ngAfterViewInit(): void {
     const user = this.store.selectSnapshot(UserState.user);
-    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '') as string;
+    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
     //Paid Tab navigation
     if ((AlertIdEnum[AlertIdEnum['Invoice: Organization Paid']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
       if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {

@@ -40,7 +40,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
     if (this.tabConfig) {
       this.asyncRefresh();
     }
-    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '') as string;
+    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
     //Pending Approval Tab navigation
     if(AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase()==this.alertTitle.toLowerCase()) {
       this.tabComponent.selectedItem=1;
