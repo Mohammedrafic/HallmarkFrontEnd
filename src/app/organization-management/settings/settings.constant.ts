@@ -3,6 +3,8 @@ import { SettingsFilterColsConfig } from './settings.interface';
 
 export const AssociatedLink: string = '/client/associate-list';
 export const tierSettingsKey: string = 'TieringLogic';
+export const billingSettingsKey: string = 'BillingContactEmails';
+export const invoiceGeneratingSettingsKey: string = 'InvoiceAutoGeneration';
 
 export const SettingsFilterCols: SettingsFilterColsConfig = {
   regionIds: {

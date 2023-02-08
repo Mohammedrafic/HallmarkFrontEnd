@@ -6,4 +6,5 @@ export enum OrganizationSettingControlType {
   DateTime = 5,
   FixedKeyDictionary = 6,
   InvoiceAutoGeneration = 7,
+  EmailAria = 8,
 }

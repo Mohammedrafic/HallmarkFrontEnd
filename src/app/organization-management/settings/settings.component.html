@@ -520,6 +520,27 @@
           </ejs-multiselect>
         </div>
       </div>
+
+      <div class="input-container bootstrap" *ngSwitchCase="organizationSettingControlType.EmailAria">
+        <div class="input-container">
+          <label for="email">Emails</label>
+          <div class="input-group">
+            <ejs-textbox
+              name="email"
+              appValidateWithMessage
+              formControlName="value"
+              placeholder="Comma separated email"
+              [multiline]="true">
+            </ejs-textbox>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngIf="showBillingMessage">
+        <div class="toggle-message">
+          Please make sure to align Billing contact e-mail recipients configuration with group by set in Auto-generation of invoices.
+        </div>
+      </ng-container>
     </div>
   </form>
 </app-side-dialog>

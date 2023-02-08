@@ -36,20 +36,32 @@ import { customEmailValidator } from '@shared/validators/email.validator';
 import { UserState } from '../../store/user.state';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion,
-  OrganizationStructure } from '@shared/models/organization.model';
+import {
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { Days } from '@shared/enums/days';
 import { GroupInvoicesOptions } from 'src/app/modules/invoices/constants';
-import { AssociatedLink, DisabledSettingsByDefault, SettingsAppliedToPermissions,
-  SettingsFilterCols, tierSettingsKey } from './settings.constant';
+import {
+  AssociatedLink,
+  billingSettingsKey,
+  DisabledSettingsByDefault,
+  invoiceGeneratingSettingsKey,
+  SettingsAppliedToPermissions,
+  SettingsFilterCols,
+  tierSettingsKey,
+} from './settings.constant';
 import { SettingsDataAdapter } from './helpers/settings-data.adapter';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { SideMenuService } from '@shared/components/side-menu/services';
 import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
 import { OrganizationSettingKeys } from '@shared/constants';
+import { MultiEmailValidator } from '@core/helpers';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -128,6 +140,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public organizationHierarchy: number;
   public organizationHierarchyId: number;
   public showToggleMessage = false;
+  public showBillingMessage = false;
   public readonly associateLink: string = AssociatedLink;
 
   public textFieldType: number;
@@ -481,7 +494,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         };
         dynamicValue = JSON.stringify(invoiceAutoGeneration);
         break;
-
+      case OrganizationSettingControlType.EmailAria:
+        dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
+        break;
       default:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
         break;
@@ -521,6 +536,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           break;
         case OrganizationSettingValidationType.DigitsOnly:
           this.textFieldType = TextFieldTypeControl.Numeric;
+          break;
+        case OrganizationSettingValidationType.MultipleEmails:
+          validators.push(MultiEmailValidator);
           break;
       }
     });
@@ -589,6 +607,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.formControlType === OrganizationSettingControlType.InvoiceAutoGeneration) {
       const valueOptions = this.isParentEdit ? parentData.value : childData.value;
       dynamicValue = { ...JSON.parse(valueOptions), isInvoice: true };
+    }
+
+    if(this.formControlType === OrganizationSettingControlType.EmailAria) {
+      dynamicValue = this.isParentEdit ? parentData.value : childData.value;
     }
 
     // TODO: run outside zone
@@ -814,6 +836,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     private handleShowToggleMessage(key: string): void {
       this.showToggleMessage = key === tierSettingsKey;
+      this.showBillingMessage = key === billingSettingsKey || key === invoiceGeneratingSettingsKey;
     }
 
   private disableDepForInvoiceGeneration(): void {

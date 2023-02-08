@@ -23,6 +23,8 @@ export class ValidationErrorPipe implements PipeTransform {
         return `The minimum value should be ${value.min.min}`;
       case 'duplicateDate' in value:
         return 'Payee with such date already exists';
+      case 'invalidEmails' in value:
+        return `Please correct e-mail format: ${value.invalidEmails.join()}`;
       case 'pattern' in value:
         if (this.isWrongValue(ONLY_LETTERS, value)) {
           return 'Only letters are allowed';
