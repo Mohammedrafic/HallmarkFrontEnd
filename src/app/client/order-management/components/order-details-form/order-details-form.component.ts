@@ -1079,7 +1079,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       ]).pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(([departmentId, skillId]) => {
-      if (!departmentId || !skillId || this.isEditMode) {
+      if (!departmentId || !skillId || (this.isEditMode && this.order?.status !== OrderStatus.Incomplete)) { 
         return;
       }
 
