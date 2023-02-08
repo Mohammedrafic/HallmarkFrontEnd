@@ -87,6 +87,7 @@ import {
 import { DocumentEditorComponent, EditorHistoryService, EditorService, SearchService, TableHistoryInfo } from '@syncfusion/ej2-angular-documenteditor';
 import { User } from '../../../../../shared/models/user-managment-page.model';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
+import { AgGridAngular } from '@ag-grid-community/angular';
 
 @Component({
   selector: 'app-document-library',
@@ -159,6 +160,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
   public isSharedFolderClick: boolean = false;
   public totalRecordsCount: number;
+  @ViewChild('sharedWith') sharedWith:AgGridAngular
 
   public gridApi!: GridApi;
   public rowData: DocumentLibraryDto[] = [];
@@ -459,9 +461,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   private getFolderTree(selectedBusinessUnitId: number | null) {
     this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: selectedBusinessUnitId }));
   }
-  private getSharedDocumentInformation(documentId:number){
+  private getSharedDocumentInformation(documentId:number,busniessUnitType:number){
     let sharedDocumentInformation: SharedDocumentInformation = {
-      businessUnitType: this.businessFilterForm.get('filterBusinessUnit')?.value,
+      businessUnitType: busniessUnitType,
       documentId: documentId
     }
     
@@ -737,7 +739,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       businessUnitType: this.filterSelecetdBusinesType,
       businessUnitId: this.filterSelectedBusinesUnitId
     }
-
+    
     this.store.dispatch(new GetDocumentPreviewDeatils(downloadFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
       if (val) {
         var data = val?.documentLibrary?.documentPreviewDetail;
@@ -1176,7 +1178,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   private ShareDocument(data: DocumentLibraryDto) {
     if (data) {
-      this.getSharedDocumentInformation(data.id)
+      this.documentId=data.id;
       this.formDailogTitle = "";
       this.isAddNewFolder = false;
       this.isUpload = false;
@@ -1185,6 +1187,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.dialogWidth = '600px'
       this.createForm();
       this.shareDocumentIds = [data.id];
+      this.sharedWith.gridOptions.api?.setRowData([]);
       this.store.dispatch(new ShowSideDialog(true));
     }
   }
@@ -1212,6 +1215,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.agencySwitch = !this.agencySwitch;
     if (this.agencySwitch) {
       this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
+      this.getSharedDocumentInformation(this.documentId,BusinessUnitType.Agency)
       this.getAssociateAgencyData();
       this.isShare = true;
       this.halmarkSwitch = false;
@@ -1236,6 +1240,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.organizationSwitch = !this.organizationSwitch;
     if (this.organizationSwitch) {
       this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
+      this.getSharedDocumentInformation(this.documentId,BusinessUnitType.Organization)
       this.getShareOrganizationsData();
       this.isShare = true;
       this.halmarkSwitch = false;

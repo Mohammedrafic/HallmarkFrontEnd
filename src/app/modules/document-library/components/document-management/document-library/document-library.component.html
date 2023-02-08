@@ -374,13 +374,13 @@
     </section>
     <section>
       <div class="shared-with-grid">
-        <ag-grid-angular
-        [rowHeight]="gridConfig.initialRowHeight" 
-        domLayout="autoHeight" 
+        <ag-grid-angular #sharedWith
+        [rowHeight]="50" 
+        domLayout="autoHeight"
         [headerHeight]="50"
         [columnDefs]="columnDefs"
-        [rowData]="sharedDocumentInformation"
-        class="ag-theme-alpine">
+        [rowData]="sharedDocumentInformation$ | async"
+        class="ag-theme-alpine grid app-grid__component">
         </ag-grid-angular>
       </div>
     </section>
