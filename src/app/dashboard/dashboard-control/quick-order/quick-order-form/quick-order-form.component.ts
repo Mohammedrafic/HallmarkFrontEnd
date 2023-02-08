@@ -85,7 +85,8 @@ import { QuickOrderService } from '../services';
 import { GetOrganizationSkills, ToggleQuickOrderDialog } from 'src/app/dashboard/store/dashboard.actions';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
-import { PartilSearchService } from '@shared/services/partial-search.service';
+import { PartialSearchService } from '@shared/services/partial-search.service';
+import { PartialSearchDataType } from '@shared/models/partial-search-data-source.model';
 
 @Component({
   selector: 'app-quick-order-form',
@@ -191,7 +192,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     private readonly durationService: DurationService,
     private readonly settingsViewService: SettingsViewService,
     private readonly quickOrderService: QuickOrderService,
-    private readonly partialSearchService: PartilSearchService
+    private readonly partialSearchService: PartialSearchService
   ) {
     super();
     this.initOrderForms();
@@ -794,17 +795,18 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       });
   }
 
-  public filterItemsBySubString< T extends object>(
+  public filterItemsBySubString<T>(
     event: FilteringEventArgs,
     dataSource: T[],
     options: FieldSettingsModel,
   ): void {
+    const queryString = event.text.trim();
     this.partialSearchService
-      .searchDropdownItems(dataSource, event.text, options)
+      .searchDropdownItems(dataSource, queryString, options)
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
-        this.filterQueryString = event.text;
-        event.updateData(data as Array<{ [key: string]: string }>);
+        this.filterQueryString = queryString;
+        event.updateData(data as PartialSearchDataType[]);
       });
   }
 

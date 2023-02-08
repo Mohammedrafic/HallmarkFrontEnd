@@ -1,13 +1,23 @@
+import { PartialSearchDataType } from '@shared/models/partial-search-data-source.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, Subject, distinctUntilChanged } from 'rxjs';
 
-export class PartilSearchService {
-  private filter$: Subject<{ dataSource: object[]; searchString: string; options: FieldSettingsModel }> =
+export class PartialSearchService {
+  private filter$: Subject<{ dataSource: PartialSearchDataType[]; searchString: string; options: FieldSettingsModel }> =
     new Subject();
-  private result$: Subject<object[]> = new Subject();
+  private result$: Subject<PartialSearchDataType[]> = new Subject();
 
   constructor() {
     this.subscribeToFilter();
+  }
+
+  public searchDropdownItems<T extends unknown>(
+    dataSource: T[],
+    searchString: string,
+    options: FieldSettingsModel
+  ): Subject<PartialSearchDataType[]> {
+    this.filter$.next({ dataSource: dataSource as PartialSearchDataType[], searchString, options });
+    return this.result$;
   }
 
   private subscribeToFilter(): void {
@@ -22,24 +32,19 @@ export class PartilSearchService {
       });
   }
 
-  public searchDropdownItems(dataSource: object[], searchString: string, options: FieldSettingsModel): Subject<object[]> {
-    this.filter$.next({ dataSource, searchString, options });
-    return this.result$;
-  }
-
   private filterItemsBySubString({
     dataSource,
     searchString,
     options,
   }: {
-    dataSource: object[];
+    dataSource: PartialSearchDataType[];
     searchString: string;
     options: FieldSettingsModel;
-  }): object[] {
-    return dataSource.filter((data: object) => {
-      const itemValue = (data[options.text as keyof object] as string)?.trim()?.toLowerCase();
-      const searchValue = searchString.trim().toLowerCase();
-      return itemValue.includes(searchValue);
+  }): PartialSearchDataType[] {
+    return dataSource.filter((data: PartialSearchDataType) => {
+      const itemValue = data[options.text as string]?.toLowerCase();
+      const searchValue = searchString.toLowerCase();
+      return itemValue?.includes(searchValue);
     });
   }
 }
