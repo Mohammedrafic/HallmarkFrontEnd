@@ -20,16 +20,6 @@ export interface GroupInvoicesOption {
 
 export const GroupInvoicesOptions: GroupInvoicesOption[] = [
   {
-    id: InvoicesAggregationType.Agency,
-    text: 'Agency (Location - Agency)',
-    tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Agency],
-  },
-  {
-    id: InvoicesAggregationType.Candidate,
-    text: 'Candidate (Location - Candidate)',
-    tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Candidate],
-  },
-  {
     id: InvoicesAggregationType.CostCenter,
     text: 'Cost Center (Location-Department)',
     tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.CostCenter],
