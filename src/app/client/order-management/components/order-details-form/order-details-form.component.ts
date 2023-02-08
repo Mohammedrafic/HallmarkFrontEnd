@@ -119,7 +119,8 @@ import {
   SpecialProjectControlsConfig,
 } from '@client/order-management/components/order-details-form/constants';
 import { JobClassifications, OptionFields } from '@client/order-management/constants';
-import { PartilSearchService } from '@shared/services/partial-search.service';
+import { PartialSearchService } from '@shared/services/partial-search.service';
+import { PartialSearchDataType } from '@shared/models/partial-search-data-source.model';
 
 @Component({
   selector: 'app-order-details-form',
@@ -240,7 +241,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     private settingsViewService: SettingsViewService,
     private orderDetailsService: OrderDetailsService,
     private cd: ChangeDetectorRef,
-    private partialSearchService: PartilSearchService,
+    private partialSearchService: PartialSearchService,
   ) {
     super(store);
     this.initOrderForms();
@@ -1210,17 +1211,18 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
   }
 
-  public filterItemsBySubString<T extends object>(
+  public filterItemsBySubString<T>(
     event: FilteringEventArgs,
     dataSource: T[],
     options: FieldSettingsModel
   ) {
+    const queryString = event.text.trim();
     this.partialSearchService
-      .searchDropdownItems(dataSource, event.text, options)
+      .searchDropdownItems(dataSource, queryString, options)
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((data) => {
-        this.filterQueryString = event.text;
-        event.updateData(data as Array<{ [key: string]: string }>);
+        this.filterQueryString = queryString;
+        event.updateData(data as PartialSearchDataType[]);
       });
   }
 
