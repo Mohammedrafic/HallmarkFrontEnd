@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
 import { Subject, takeUntil, throttleTime } from 'rxjs';
 import { OrderType } from '@shared/enums/order-type';
@@ -9,7 +9,7 @@ import { SetIsDirtyOrderForm } from '@client/store/order-managment-content.actio
 import { HistoricalEventsService } from '@shared/services/historical-events.service';
 import { OrderHistoricalEvent } from '@shared/models';
 import { AppState } from '../../../store/app.state';
-import { ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { AccordionComponent, ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
 
 type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
 @Component({
@@ -18,6 +18,9 @@ type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
   styleUrls: ['./order-details.component.scss'],
 })
 export class OrderDetailsComponent implements OnChanges, OnDestroy {
+  @ViewChild('accrdDescription') private readonly accrdDescription: AccordionComponent;
+  @ViewChild('accrdHistorical') private readonly accrdHistorical: AccordionComponent;
+
   @Input() isPosition: boolean = false;
   @Input() jobId: number;
   @Input() set currentOrder(value: Order) {
@@ -29,7 +32,6 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   public orderType = OrderType;
   public contactDetails: ContactDetails;
   public comments: Comment[] = [];
-  public isJobDescriptionExpended = true;
   public events: OrderHistoricalEvent[];
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -56,7 +58,8 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
     const { currentOrder } = changes;
 
     if (currentOrder?.currentValue) {
-      this.isJobDescriptionExpended = true;
+      this.accrdDescription?.expandItem(true, 1);
+      this.accrdHistorical?.expandItem(false);
       this.getComments();
     }
   }
