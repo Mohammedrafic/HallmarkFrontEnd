@@ -596,3 +596,8 @@ html, body {
 div#Organization_Widget {
   height: 160px !important;
 }
+.comments-container {
+  white-space: normal;
+  line-height: 20px;
+  word-break: break-word;
+}
