@@ -283,6 +283,27 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
     field: InvoicesTableFiltersColumns.AgencyIds,
   }] : []),
   {
+    type: ControlTypes.Multiselect,
+    title: 'Region',
+    field: InvoicesTableFiltersColumns.RegionIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Multiselect,
+    title: 'Location',
+    field: InvoicesTableFiltersColumns.LocationIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Multiselect,
+    title: 'Department',
+    field: InvoicesTableFiltersColumns.DepartmentIds,
+    isShort: false,
+    showSelectAll: true,
+  },
+  {
     type: ControlTypes.Date,
     title: 'Issued Date From',
     field: InvoicesTableFiltersColumns.IssueDateFrom,

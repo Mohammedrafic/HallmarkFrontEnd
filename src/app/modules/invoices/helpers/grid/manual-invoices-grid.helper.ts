@@ -63,12 +63,12 @@ export class ManualInvoicesGridHelper {
     const {
       attachments,
       candidateName,
+      regionName,
       locationName,
       departmentName,
       skillName,
       weekPeriod,
       statusText,
-      unitName,
       orderId,
     } = InvoicesContainerGridHelper.getColDefsMap(true);
     return [
@@ -106,9 +106,9 @@ export class ManualInvoicesGridHelper {
       },
       invoiceRecordTypeColDef,
       statusText,
-      unitName,
       candidateName,
       orderId,
+      regionName,
       locationName,
       departmentName,
       skillName,
@@ -145,6 +145,7 @@ export class ManualInvoicesGridHelper {
     const {
       attachments,
       candidateName,
+      regionName,
       locationName,
       departmentName,
       skillName,
@@ -196,6 +197,7 @@ export class ManualInvoicesGridHelper {
       unitName,
       candidateName,
       orderId,
+      regionName,
       locationName,
       departmentName,
       skillName,

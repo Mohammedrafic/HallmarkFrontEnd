@@ -26,6 +26,7 @@ export class PendingInvoicesGridHelper {
     const {
       attachments,
       candidateName,
+      regionName,
       locationName,
       departmentName,
       skillName,
@@ -51,6 +52,7 @@ export class PendingInvoicesGridHelper {
       unitName,
       candidateName,
       orderId,
+      regionName,
       locationName,
       {
         ...attachments,
