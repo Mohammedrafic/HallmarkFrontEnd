@@ -109,18 +109,10 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   public saveCredential(): void {
-    if (this.credentialForm.valid && this.isSystemSelected()) {
-      const credential: Credential = {
-        ...this.credentialForm.getRawValue(),
-        includeInVMS: this.credentialForm.get('includeInVMS')?.value ?? this.selectedSystem.isVMS,
-        includeInIRP: this.credentialForm.get('includeInIRP')?.value ?? this.selectedSystem.isIRP,
-      };
-
-      this.store.dispatch(new SaveCredential(credential));
-      this.credentialForm.reset();
+    if(this.isCredentialSettings) {
+      this.saveCredentialForSettings();
     } else {
-      this.store.dispatch(new ShowToast(MessageTypes.Error, ErrorMessageForSystem));
-      this.credentialForm.markAllAsTouched();
+      this.saveCredentialForMasterData();
     }
   }
 
@@ -168,7 +160,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   private initDialogConfig(): void {
-    this.dialogConfig = CredentialsDialogConfig(this.showIrpFields(), this.isCredentialSettings);
+      this.dialogConfig = CredentialsDialogConfig(this.showIrpFields(), this.isCredentialSettings);
   }
 
   private initCredentialForm(): void {
@@ -243,12 +235,44 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   private showIrpFields(): boolean {
-    return this.selectedSystem.isIRP && this.selectedSystem.isVMS && this.isIrpFlagEnabled && !this.isMspUser;
+    return this.selectedSystem.isIRP &&
+      this.selectedSystem.isVMS &&
+      this.isIrpFlagEnabled &&
+      !this.isMspUser;
   }
 
   private isCurrentMspUser(): void {
     const user = this.store.selectSnapshot(UserState.user);
     this.isMspUser = user?.businessUnitType === BusinessUnitType.MSP;
     this.isIrpFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+  }
+
+  private saveCredentialForSettings(): void {
+    if (this.credentialForm.valid && this.isSystemSelected()) {
+      const credential: Credential = {
+        ...this.credentialForm.getRawValue(),
+        includeInVMS: this.credentialForm.get('includeInVMS')?.value ?? this.selectedSystem.isVMS,
+        includeInIRP: this.credentialForm.get('includeInIRP')?.value ?? this.selectedSystem.isIRP,
+      };
+
+      this.store.dispatch(new SaveCredential(credential));
+      this.credentialForm.reset();
+    } else {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, ErrorMessageForSystem));
+      this.credentialForm.markAllAsTouched();
+    }
+  }
+
+  private saveCredentialForMasterData(): void {
+    if (this.credentialForm.valid) {
+      const credential: Credential = {
+        ...this.credentialForm.getRawValue(),
+      };
+
+      this.store.dispatch(new SaveCredential(credential));
+      this.credentialForm.reset();
+    } else {
+      this.credentialForm.markAllAsTouched();
+    }
   }
 }

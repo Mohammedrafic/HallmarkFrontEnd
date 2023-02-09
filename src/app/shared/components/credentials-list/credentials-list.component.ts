@@ -275,7 +275,7 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
         this.showHideGridColumns();
       }
       const { isCredentialSettings } = this.route.snapshot.data;
-      this.isCredentialSettings = isCredentialSettings;
+      this.isCredentialSettings = !!isCredentialSettings;
 
       this.getCredentials();
     });
