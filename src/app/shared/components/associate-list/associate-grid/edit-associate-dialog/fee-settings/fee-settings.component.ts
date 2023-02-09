@@ -61,15 +61,16 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   ngAfterViewInit(): void {
     this.grid.rowHeight = GRID_CONFIG.initialRowHeight;
   }
-
-  public addNew(): void {
-    this.openAddNewFeeDialog.next(this.organizationAgencyId);
+  
+  public addNew(Id:number): void {
+    this.openAddNewFeeDialog.next(Id);
   }
 
-  public onEdit(data: { index: string } & FeeExceptions): void {
-    this.openAddNewFeeDialog.next(this.organizationAgencyId);
+  public onEdit(data: { index: string } & FeeExceptions, Id : number): void {
+    this.openAddNewFeeDialog.next(Id);
     this.editFeeData.next(data);
   }
+
 
   public onRemove(data: { index: string } & FeeExceptions): void {
     this.confirmService
