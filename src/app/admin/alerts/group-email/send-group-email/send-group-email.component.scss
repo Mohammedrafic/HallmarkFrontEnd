@@ -123,3 +123,16 @@
     font-weight: bold;
   }
 }
+.disabled .droparea {
+  cursor: not-allowed !important;
+  opacity: 0.5;
+}
+h5{
+  color: rgb(62, 127, 255);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: normal
+}
+.attachmentdiv{
+  display: inline-flex;
+}

@@ -15,6 +15,7 @@ import { GetRegionList } from '@shared/components/candidate-list/store/candidate
 import { CandidateListState } from '@shared/components/candidate-list/store/candidate-list.state';
 import { Classifications, DefaultOptionFields, SkillFields } from "./candidate-general-info.constants";
 import { CandidateGeneralInfoService } from "./candidate-general-info.service";
+import { MIN_DIGITS_LENGTH_ONLY_NINE } from '@shared/constants/regex-patterns';
 
 @Component({
   selector: 'app-candidate-general-info',
@@ -67,7 +68,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
       profileStatus: new FormControl(2, [Validators.required]),
       candidateAgencyStatus: new FormControl(2, [Validators.required]),
       candidateProfileRegions: new FormControl(null, [Validators.required]),
-      ssn: new FormControl(null, [Validators.minLength(9)]),
+      ssn: new FormControl(null,  [Validators.pattern(MIN_DIGITS_LENGTH_ONLY_NINE)]),
     });
   }
 

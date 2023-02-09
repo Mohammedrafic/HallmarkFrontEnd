@@ -1,13 +1,21 @@
 <section class="order-content" *ngIf="order">
   <div class="job-description-accordion">
-    <ejs-accordion (expanding)="isJobDescriptionExpended = true">
+    <ejs-accordion #accrdDescription (clicked)="accrdHistorical.expandItem(false)" expandMode="Single">
       <e-accordionitems>
-        <e-accordionitem [expanded]="isJobDescriptionExpended">
+        <e-accordionitem expanded="true">
           <ng-template #header>
             <div>Job Description</div>
           </ng-template>
           <ng-template #content>
             <div class="description">{{ order.jobDescription }}</div>
+          </ng-template>
+        </e-accordionitem>
+        <e-accordionitem>
+          <ng-template #header>
+            <div>Unit Description</div>
+          </ng-template>
+          <ng-template #content>
+            <div class="description">{{ order.unitDescription }}</div>
           </ng-template>
         </e-accordionitem>
       </e-accordionitems>
@@ -34,7 +42,12 @@
         </div>
       </div>
     </div>
-    <ejs-accordion class="historical-events" (expanded)="onExpanded($event)">
+    <ejs-accordion
+      #accrdHistorical
+      class="historical-events"
+      (expanded)="onExpanded($event)"
+      (clicked)="accrdDescription.expandItem(false)"
+    >
       <e-accordionitems>
         <e-accordionitem>
           <ng-template #header>

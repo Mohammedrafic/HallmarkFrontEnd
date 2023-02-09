@@ -2,7 +2,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
 import { InvoiceFilterColumns, InvoiceFilterFieldConfig, InvoicesTabItem, InvoiceTabId } from '../interfaces';
 import {
-  FilteringInvoicesOptionsFields,
+  FilteringInvoicesOptionsFields, FilteringManualPendingInvoiceRecordsOptionsFields,
   FilteringPendingInvoiceRecordsOptionsFields,
   InvoicesAgencyTabId,
   InvoicesOrgTabId,
@@ -76,6 +76,13 @@ const defaultColumnMapping = {
   valueId: 'id',
 };
 
+const defaultDropdownColumnMapping = {
+  type: ControlTypes.Dropdown,
+  valueType: ValueType.Id,
+  valueField: 'name',
+  valueId: 'id',
+};
+
 const defaultDateMapping = {
   type: ControlTypes.Date,
   valueType: ValueType.Text,
@@ -105,6 +112,12 @@ export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
   [InvoicesTableFiltersColumns.SkillIds]: defaultColumnMapping,
   [InvoicesTableFiltersColumns.WeekPeriodFrom]: defaultDateMapping,
   [InvoicesTableFiltersColumns.WeekPeriodTo]: defaultDateMapping,
+
+  [InvoicesTableFiltersColumns.OrderId]: defaultInputMapping,
+  [InvoicesTableFiltersColumns.ServiceDateFrom]: defaultDateMapping,
+  [InvoicesTableFiltersColumns.ServiceDateTo]: defaultDateMapping,
+  [InvoicesTableFiltersColumns.VendorFee]: defaultDropdownColumnMapping,
+  [InvoicesTableFiltersColumns.ReasonCodeIds]: defaultColumnMapping,
 } as InvoiceFilterColumns;
 
 export const InvoicesFilteringOptionsMapping: Map<FilteringInvoicesOptionsFields, InvoicesTableFiltersColumns> = new Map()
@@ -120,7 +133,19 @@ InvoicesTableFiltersColumns> = new Map()
   .set(FilteringPendingInvoiceRecordsOptionsFields.Agency, InvoicesTableFiltersColumns.AgencyIds)
   .set(FilteringPendingInvoiceRecordsOptionsFields.Regions, InvoicesTableFiltersColumns.RegionIds)
   .set(FilteringPendingInvoiceRecordsOptionsFields.Locations, InvoicesTableFiltersColumns.LocationIds)
-  .set(FilteringPendingInvoiceRecordsOptionsFields.Departments, InvoicesTableFiltersColumns.DepartmentIds);
+  .set(FilteringPendingInvoiceRecordsOptionsFields.Departments, InvoicesTableFiltersColumns.DepartmentIds)
+  .set(FilteringInvoicesOptionsFields.InvoiceStates, InvoicesTableFiltersColumns.StatusIds);
+
+export const ManualPendingInvoiceRecordsFilteringOptionsMapping: Map<FilteringManualPendingInvoiceRecordsOptionsFields,
+  InvoicesTableFiltersColumns> = new Map()
+  .set(FilteringManualPendingInvoiceRecordsOptionsFields.InvoiceStates, InvoicesTableFiltersColumns.StatusIds)
+  .set(FilteringManualPendingInvoiceRecordsOptionsFields.Agency, InvoicesTableFiltersColumns.AgencyIds)
+  .set(FilteringManualPendingInvoiceRecordsOptionsFields.Reasons, InvoicesTableFiltersColumns.ReasonCodeIds)
+  .set(FilteringManualPendingInvoiceRecordsOptionsFields.VendorFee, InvoicesTableFiltersColumns.VendorFee)
+  .set(FilteringManualPendingInvoiceRecordsOptionsFields.Regions, InvoicesTableFiltersColumns.RegionIds)
+  .set(FilteringManualPendingInvoiceRecordsOptionsFields.Locations, InvoicesTableFiltersColumns.LocationIds)
+  .set(FilteringManualPendingInvoiceRecordsOptionsFields.Departments, InvoicesTableFiltersColumns.DepartmentIds)
+  .set(FilteringManualPendingInvoiceRecordsOptionsFields.Skills, InvoicesTableFiltersColumns.SkillIds)
 
 export const ApproveInvoiceConfirmDialogConfig = {
   title: 'Approve Invoice',
@@ -128,11 +153,88 @@ export const ApproveInvoiceConfirmDialogConfig = {
   getMessage: (invoiceId: number) => `Are you sure you want to approve invoice ${invoiceId}?`,
 };
 
-export const ManualInvoicesFiltersFormConfig = (): InvoiceFilterFieldConfig[] => [
+export const ManualInvoicesFiltersFormConfig = (isAgency: boolean): InvoiceFilterFieldConfig[] => [
+  {
+    type: ControlTypes.Multiselect,
+    title: 'Status',
+    field: InvoicesTableFiltersColumns.StatusIds,
+  },
+  ...(!isAgency ? [{
+    type: ControlTypes.Multiselect,
+    title: 'Agency',
+    field: InvoicesTableFiltersColumns.AgencyIds,
+  }] : []),
   {
     type: ControlTypes.Text,
-    title: 'Candidate name',
+    title: 'Candidate Name',
     field: InvoicesTableFiltersColumns.SearchTerm,
+  },
+  {
+    type: ControlTypes.Text,
+    title: 'Order ID',
+    field: InvoicesTableFiltersColumns.OrderId,
+  },
+  {
+    type: ControlTypes.Multiselect,
+    title: 'Region',
+    field: InvoicesTableFiltersColumns.RegionIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Multiselect,
+    title: 'Location',
+    field: InvoicesTableFiltersColumns.LocationIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Multiselect,
+    title: 'Department',
+    field: InvoicesTableFiltersColumns.DepartmentIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Multiselect,
+    title: 'Skill',
+    field: InvoicesTableFiltersColumns.SkillIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Date,
+    title: 'Service Date From',
+    field: InvoicesTableFiltersColumns.ServiceDateFrom,
+    isShort: true,
+  },
+  {
+    type: ControlTypes.Date,
+    title: 'Service Date To',
+    field: InvoicesTableFiltersColumns.ServiceDateTo,
+    isShort: true,
+  },
+  {
+    type: ControlTypes.Dropdown,
+    title: 'Vendor Fee',
+    field: InvoicesTableFiltersColumns.VendorFee,
+  },
+  {
+    type: ControlTypes.Multiselect,
+    title: 'Reason Code',
+    field: InvoicesTableFiltersColumns.ReasonCodeIds,
+  },
+  {
+    type: ControlTypes.Text,
+    title: 'Amount From',
+    field: InvoicesTableFiltersColumns.AmountFrom,
+    isShort: true,
+  },
+  {
+    type: ControlTypes.Text,
+    title: 'Amount To',
+    field: InvoicesTableFiltersColumns.AmountTo,
+    isShort: true,
   },
 ];
 
@@ -148,7 +250,7 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
     field: InvoicesTableFiltersColumns.SearchTerm,
   },
   ...(selectedTabId === InvoicesOrgTabId.AllInvoices || isAgency && InvoicesAgencyTabId.AllInvoices ? [{
-    type: ControlTypes.Dropdown,
+    type: ControlTypes.Multiselect,
     title: 'Status',
     field: InvoicesTableFiltersColumns.StatusIds,
   }]: []),
@@ -165,21 +267,42 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
     isShort: true,
   },
   {
-    type: ControlTypes.Dropdown,
+    type: ControlTypes.Multiselect,
     title: 'AP Delivery',
     field: InvoicesTableFiltersColumns.ApDelivery,
     showSelectAll: true,
   },
   {
-    type: ControlTypes.Dropdown,
+    type: ControlTypes.Multiselect,
     title: 'Group By Type',
     field: InvoicesTableFiltersColumns.AggregateByType,
   },
   ...(!isAgency ? [{
-    type: ControlTypes.Dropdown,
+    type: ControlTypes.Multiselect,
     title: 'Agency',
     field: InvoicesTableFiltersColumns.AgencyIds,
   }] : []),
+  {
+    type: ControlTypes.Multiselect,
+    title: 'Region',
+    field: InvoicesTableFiltersColumns.RegionIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Multiselect,
+    title: 'Location',
+    field: InvoicesTableFiltersColumns.LocationIds,
+    isShort: true,
+    showSelectAll: true,
+  },
+  {
+    type: ControlTypes.Multiselect,
+    title: 'Department',
+    field: InvoicesTableFiltersColumns.DepartmentIds,
+    isShort: false,
+    showSelectAll: true,
+  },
   {
     type: ControlTypes.Date,
     title: 'Issued Date From',
@@ -220,7 +343,7 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
 
 export const PendingInvoicesFiltersFormConfig = (): InvoiceFilterFieldConfig[] => [
   {
-    type: ControlTypes.Dropdown,
+    type: ControlTypes.Multiselect,
     title: 'Type',
     field: InvoicesTableFiltersColumns.TimesheetType,
   },
@@ -230,7 +353,7 @@ export const PendingInvoicesFiltersFormConfig = (): InvoiceFilterFieldConfig[] =
     field: InvoicesTableFiltersColumns.OrderIds,
   },
   {
-    type: ControlTypes.Dropdown,
+    type: ControlTypes.Multiselect,
     title: 'Agency',
     field: InvoicesTableFiltersColumns.AgencyIds,
   },
@@ -240,28 +363,28 @@ export const PendingInvoicesFiltersFormConfig = (): InvoiceFilterFieldConfig[] =
     field: InvoicesTableFiltersColumns.SearchTerm,
   },
   {
-    type: ControlTypes.Dropdown,
+    type: ControlTypes.Multiselect,
     title: 'Region',
     field: InvoicesTableFiltersColumns.RegionIds,
     isShort: true,
     showSelectAll: true,
   },
   {
-    type: ControlTypes.Dropdown,
+    type: ControlTypes.Multiselect,
     title: 'Location',
     field: InvoicesTableFiltersColumns.LocationIds,
     isShort: true,
     showSelectAll: true,
   },
   {
-    type: ControlTypes.Dropdown,
+    type: ControlTypes.Multiselect,
     title: 'Department',
     field: InvoicesTableFiltersColumns.DepartmentIds,
     isShort: true,
     showSelectAll: true,
   },
   {
-    type: ControlTypes.Dropdown,
+    type: ControlTypes.Multiselect,
     title: 'Skill',
     field: InvoicesTableFiltersColumns.SkillIds,
     isShort: true,
@@ -306,6 +429,5 @@ export const DetectFormConfigBySelectedType = (selectedTabId: InvoiceTabId,
   if (selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
     return PendingInvoicesFiltersFormConfig();
   }
-
-  return ManualInvoicesFiltersFormConfig();
+  return ManualInvoicesFiltersFormConfig(isAgency);
 };

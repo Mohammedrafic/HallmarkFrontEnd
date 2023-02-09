@@ -14,7 +14,7 @@ import {
   takeUntil,
   throttleTime,
 } from 'rxjs';
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { ChangeEventArgs, FieldSettingsModel, FilteringEventArgs, highlightSearch } from '@syncfusion/ej2-angular-dropdowns';
 
 import {
   GetDepartmentsByLocationId,
@@ -119,6 +119,8 @@ import {
   SpecialProjectControlsConfig,
 } from '@client/order-management/components/order-details-form/constants';
 import { JobClassifications, OptionFields } from '@client/order-management/constants';
+import { PartialSearchService } from '@shared/services/partial-search.service';
+import { PartialSearchDataType } from '@shared/models/partial-search-data-source.model';
 
 @Component({
   selector: 'app-order-details-form',
@@ -175,15 +177,19 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public orderId: string | null;
   public comments: Comment[] = [];
   public isShiftTimeRequired = true;
-  public optionFields: FieldSettingsModel = OptionFields;
-  public departmentFields: FieldSettingsModel = DepartmentFields;
+  private filterQueryString: string;
+  private readonly highlightDropdownSearchString  = { itemCreated: (e: { item: HTMLElement; }) => {
+    highlightSearch(e.item, this.filterQueryString, true, 'Contains') }
+  }
+  public optionFields: FieldSettingsModel = { ...OptionFields, ...this.highlightDropdownSearchString };
+  public departmentFields: FieldSettingsModel = { ...DepartmentFields, ...this.highlightDropdownSearchString };
   public reasonForRequisitionFields: FieldSettingsModel = ReasonRequisitionFields;
   public associateAgencyFields: FieldSettingsModel = AssociateAgencyFields;
   public organizationStateWithKeyCodeFields: FieldSettingsModel = OrganizationStateWithKeyCodeFields;
   public specialProjectCategoriesFields: FieldSettingsModel = SpecialProjectCategoriesFields;
   public projectNameFields: FieldSettingsModel = ProjectNameFields;
   public poNumberFields: FieldSettingsModel = PoNumberFields;
-  public skillFields: FieldSettingsModel = SkillFields;
+  public skillFields: FieldSettingsModel = { ...SkillFields, ...this.highlightDropdownSearchString };
   public isSpecialProjectFieldsRequired: boolean;
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
@@ -235,6 +241,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     private settingsViewService: SettingsViewService,
     private orderDetailsService: OrderDetailsService,
     private cd: ChangeDetectorRef,
+    private partialSearchService: PartialSearchService,
   ) {
     super(store);
     this.initOrderForms();
@@ -1073,7 +1080,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       ]).pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(([departmentId, skillId]) => {
-      if (!departmentId || !skillId || this.isEditMode) {
+      if (!departmentId || !skillId || (this.isEditMode && this.order?.status !== OrderStatus.Incomplete)) { 
         return;
       }
 
@@ -1202,5 +1209,24 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
   private setOrderId(): void {
     this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
+  }
+
+  public filterItemsBySubString<T>(
+    event: FilteringEventArgs,
+    dataSource: T[],
+    options: FieldSettingsModel
+  ) {
+    const queryString = event.text.trim();
+    this.partialSearchService
+      .searchDropdownItems(dataSource, queryString, options)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((data) => {
+        this.filterQueryString = queryString;
+        event.updateData(data as PartialSearchDataType[]);
+      });
+  }
+
+  public closeDropdown(): void {
+    this.filterQueryString = '';
   }
 }

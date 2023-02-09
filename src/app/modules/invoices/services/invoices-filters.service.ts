@@ -6,11 +6,21 @@ import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/i
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 
 import {
-  InvoiceFilterColumns, InvoicesFilteringOptions,
+  InvoiceFilterColumns,
+  InvoiceManualPendingRecordsFilteringOptions,
+  InvoicesFilteringOptions,
   InvoicesPendingInvoiceRecordsFilteringOptions,
 } from '../interfaces';
-import { FilteringInvoicesOptionsFields, FilteringPendingInvoiceRecordsOptionsFields } from '../enums';
-import { InvoicesFilteringOptionsMapping, PendingInvoiceRecordsFilteringOptionsMapping } from '../constants';
+import {
+  FilteringInvoicesOptionsFields,
+  FilteringManualPendingInvoiceRecordsOptionsFields,
+  FilteringPendingInvoiceRecordsOptionsFields,
+} from '../enums';
+import {
+  InvoicesFilteringOptionsMapping,
+  ManualPendingInvoiceRecordsFilteringOptionsMapping,
+  PendingInvoiceRecordsFilteringOptionsMapping,
+} from '../constants';
 
 @Injectable()
 export class InvoicesFiltersService {
@@ -45,6 +55,12 @@ export class InvoicesFiltersService {
       skillIds: [null],
       weekPeriodFrom: [null],
       weekPeriodTo: [null],
+
+      orderId: [null],
+      serviceDateFrom: [null],
+      serviceDateTo: [null],
+      vendorFee: [null],
+      reasonCodeIds: [null],
     }) as CustomFormGroup<InvoiceFilterColumns>;
   }
 
@@ -90,6 +106,27 @@ export class InvoicesFiltersService {
     return Object.keys(stateCols).reduce((acc: InvoiceFilterColumns, key: string) => {
       const typedKey = key as FilteringPendingInvoiceRecordsOptionsFields;
       const optionsKey = PendingInvoiceRecordsFilteringOptionsMapping.get(typedKey);
+
+      if (!optionsKey) {
+        return acc;
+      }
+
+      acc[optionsKey] = {
+        ...invoiceFiltersColumns[optionsKey],
+        dataSource: stateCols[typedKey],
+      };
+
+      return acc;
+    }, {} as InvoiceFilterColumns);
+  }
+
+  prepareManualPendingInvoiceFiltersDataSources(
+    stateCols: InvoiceManualPendingRecordsFilteringOptions,
+    invoiceFiltersColumns: InvoiceFilterColumns,
+  ): InvoiceFilterColumns {
+    return Object.keys(stateCols).reduce((acc: InvoiceFilterColumns, key: string) => {
+      const typedKey = key as FilteringManualPendingInvoiceRecordsOptionsFields;
+      const optionsKey = ManualPendingInvoiceRecordsFilteringOptionsMapping.get(typedKey);
 
       if (!optionsKey) {
         return acc;

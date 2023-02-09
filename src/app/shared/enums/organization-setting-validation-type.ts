@@ -3,5 +3,6 @@ export enum OrganizationSettingValidationType {
   MaxLength = 2,
   DateTime = 3,
   DigitsOnly = 4,
-  Email = 5
+  Email = 5,
+  MultipleEmails = 6,
 }

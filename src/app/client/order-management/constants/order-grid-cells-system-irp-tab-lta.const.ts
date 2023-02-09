@@ -9,10 +9,12 @@ import {
 } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.component';
 import { GridActionsCellComponent, GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
-import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
 
 import { DefaultOrderCol, FirstColumnWidth, PrepareMenuItems } from './order-management-irp.const';
 import { GridValuesHelper } from '@core/helpers';
+import {
+  CriticalCellComponent,
+} from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell/critical-cell.component';
 
 export const GridCellsSystemIRPTabLta = (
   threeDotsMenuOptions: Record<string, ItemModel[]> = {},
@@ -105,7 +107,7 @@ export const GridCellsSystemIRPTabLta = (
     field: 'criticalOrder',
     headerName: 'CRITICAL',
     width: 125,
-    cellRenderer: SwitchEditorComponent,
+    cellRenderer: CriticalCellComponent,
     cellRendererParams: {
       disabled: true,
       showCheckbox: true,

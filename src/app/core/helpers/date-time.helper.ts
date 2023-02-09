@@ -1,4 +1,5 @@
 import { formatDate } from '@angular/common';
+import { DatePeriod } from '@core/interface';
 
 import { RangeDaysOptions } from '@shared/components/date-week-picker/date-week.constant';
 import { DatesRangeType } from '@shared/enums';
@@ -44,7 +45,7 @@ export class DateTimeHelper {
         Date.UTC(gmt.getFullYear(), gmt.getMonth(), gmt.getDate(), gmt.getHours(), gmt.getMinutes())
       ).toISOString();
     }
-
+    
     return new Date(
       Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes())
     ).toISOString();
@@ -214,5 +215,56 @@ export class DateTimeHelper {
     const utc2 = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
   
     return Math.floor((utc2 - utc1) / msPerDay);
+  }
+
+  /**
+   * This method is for getting period (month) range based on the first day of week set for organization.
+   * It creates range to be used in calendar (first day could be in previous month and last in next).
+   */
+  public static calculateMonthBoundDays(selectedDate: Date, firstWeekDay: number): DatePeriod {
+    const year = selectedDate.getFullYear();
+    const month = selectedDate.getMonth();
+    const firstDayOfMonth = new Date(year, month, 1, 0, 0, 0);
+    const lastDayOfMonth = new Date(year, month + 1, 0, 0, 0, 0);
+    const calendarFirstDay = firstDayOfMonth.getDay();
+    const calendarLastDay = lastDayOfMonth.getDay();
+
+    // Temporary variable.
+    const dateRange = {
+      from: new Date(),
+      to: new Date(),
+    };
+
+    const range: DatePeriod = {
+      from: '',
+      to: '',
+    };
+
+    if (calendarFirstDay >= firstWeekDay) {
+
+      const dayDiff = calendarFirstDay - firstWeekDay;
+      dateRange.from = new Date(firstDayOfMonth.setDate(firstDayOfMonth.getDate() - dayDiff));
+
+    } else if (calendarFirstDay < firstWeekDay) {
+
+      const dayDiff = calendarFirstDay + 7 - firstWeekDay;
+      dateRange.from = new Date(firstDayOfMonth.setDate(firstDayOfMonth.getDate() - dayDiff));
+    }
+
+    if (calendarLastDay >= firstWeekDay && firstWeekDay !== 0) {
+
+      const dayDiff = 6 - calendarLastDay + firstWeekDay;
+      dateRange.to = new Date(lastDayOfMonth.setDate(lastDayOfMonth.getDate() + dayDiff));
+
+    } else if (calendarLastDay < firstWeekDay || firstWeekDay === 0) {
+
+      const dayDiff = 6 - calendarLastDay;
+      dateRange.to = new Date(lastDayOfMonth.setDate(lastDayOfMonth.getDate() + dayDiff));
+    }
+
+    range.from = DateTimeHelper.toUtcFormat(dateRange.from);
+    range.to = DateTimeHelper.toUtcFormat(dateRange.to);
+
+    return range;
   }
 }

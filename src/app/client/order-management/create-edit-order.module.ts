@@ -31,6 +31,14 @@ import { GridIcons } from '@client/order-management/constants';
 import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
 import { OrderCredentialsService } from "@client/order-management/services";
 import { OrganizationStructureService } from '@shared/services';
+import { PartialSearchService } from '@shared/services/partial-search.service';
+import {
+  TableTypeCellComponent,
+} from '@client/order-management/components/order-management-content/sub-grid-components/table-type-cell';
+import {
+  CriticalCellComponent,
+} from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
+
 
 @NgModule({
   declarations: [
@@ -39,6 +47,8 @@ import { OrganizationStructureService } from '@shared/services';
     OrderDetailsIrpComponent,
     AddEditOrderComponent,
     OrderDetailsFormComponent,
+    TableTypeCellComponent,
+    CriticalCellComponent,
   ],
   imports: [
     FeatherModule.pick(GridIcons),
@@ -66,7 +76,8 @@ import { OrganizationStructureService } from '@shared/services';
     OrderDetailsIrpService,
     IrpContainerStateService,
     OrderCredentialsService,
-    OrganizationStructureService
+    OrganizationStructureService,
+    PartialSearchService,
   ],
 })
 export class CreateEditOrderModule { }

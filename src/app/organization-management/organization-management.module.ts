@@ -138,6 +138,7 @@ import { WorkCommitmentState } from './store/work-commitment.state';
 import { ReasonsModule } from './reasons/reasons.module';
 import { SingleMultipleSkillPipe } from './departments/single-multiple-skill.pipe';
 import { JoinPipeModule } from '@shared/pipes/join.pipe';
+import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 
 const sidebarIcons = {
   Download,
@@ -241,6 +242,7 @@ const sidebarIcons = {
     CredentialListModule,
     ButtonGroupModule,
     WorkCommitmentModule,
+    ValidateDirectiveModule,
 
     FeatherModule.pick(sidebarIcons),
 

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ONLY_LETTERS, ONLY_NUMBER, ONLY_NUMBER_AND_DOT, ALPHANUMERICS_AND_SYMBOLS, ALPHANUMERIC } from '@shared/constants';
+import { ONLY_LETTERS, ONLY_NUMBER, ONLY_NUMBER_AND_DOT, ALPHANUMERICS_AND_SYMBOLS, ALPHANUMERIC,  MIN_DIGITS_LENGTH_ONLY_NINE } from '@shared/constants';
 
 @Pipe({
   name: 'validationError',
@@ -23,6 +23,8 @@ export class ValidationErrorPipe implements PipeTransform {
         return `The minimum value should be ${value.min.min}`;
       case 'duplicateDate' in value:
         return 'Payee with such date already exists';
+      case 'invalidEmails' in value:
+        return `Please correct e-mail format: ${value.invalidEmails.join()}`;
       case 'pattern' in value:
         if (this.isWrongValue(ONLY_LETTERS, value)) {
           return 'Only letters are allowed';
@@ -35,6 +37,9 @@ export class ValidationErrorPipe implements PipeTransform {
         }
         if(this.isWrongValue(ALPHANUMERIC, value)) {
           return 'Only alphanumeric symbols are allowed';
+        }
+        if(this.isWrongValue(MIN_DIGITS_LENGTH_ONLY_NINE, value)){
+          return `Min digits entered should be 9`;
         }
         return '';
       default:

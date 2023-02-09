@@ -46,3 +46,9 @@ export enum InputAttrType {
   Mail = 'email',
   Number = 'number',
 }
+
+export enum PeriodType {
+  Year = 'Year',
+  Decade = 'Decade',
+  Month = 'Month',
+}

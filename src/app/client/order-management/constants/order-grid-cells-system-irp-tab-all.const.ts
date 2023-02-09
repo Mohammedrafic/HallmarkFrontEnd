@@ -9,10 +9,15 @@ import {
 } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.component';
 import { GridActionsCellComponent, GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
-import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
 
 import { DefaultOrderCol, FirstColumnWidth, PrepareMenuItems } from './order-management-irp.const';
 import { GridValuesHelper } from '@core/helpers';
+import {
+  TableTypeCellComponent,
+} from '@client/order-management/components/order-management-content/sub-grid-components/table-type-cell';
+import {
+  CriticalCellComponent,
+} from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
 
 export const GridCellsSystemIRPTabAll = (
   threeDotsMenuOptions: Record<string, ItemModel[]> = {},
@@ -106,7 +111,7 @@ export const GridCellsSystemIRPTabAll = (
     field: 'criticalOrder',
     headerName: 'CRITICAL',
     width: 125,
-    cellRenderer: SwitchEditorComponent,
+    cellRenderer: CriticalCellComponent,
     cellRendererParams: {
       disabled: true,
       showCheckbox: true,
@@ -117,6 +122,7 @@ export const GridCellsSystemIRPTabAll = (
     ...DefaultOrderCol,
     field: 'orderTypeText',
     headerName: 'TYPE',
+    cellRenderer: TableTypeCellComponent,
     width: 85,
     minWidth: 70,
     maxWidth: 110,
@@ -196,7 +202,7 @@ export const GridCellsSystemIRPTabAll = (
     valueFormatter: (params: ValueFormatterParams) => {
       const startShiftTime = GridValuesHelper.formatDate(params.data?.shiftStartDateTime, 'HH:mm');
       const endShiftTime = GridValuesHelper.formatDate(params.data?.shiftEndDateTime, 'HH:mm');
-      
+
       return `${startShiftTime}-${endShiftTime}`;
     },
   },

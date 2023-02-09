@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { ChangeEventArgs, FieldSettingsModel, FilteringEventArgs, highlightSearch } from '@syncfusion/ej2-angular-dropdowns';
 import {
   combineLatest,
   debounceTime,
@@ -85,6 +85,8 @@ import { QuickOrderService } from '../services';
 import { GetOrganizationSkills, ToggleQuickOrderDialog } from 'src/app/dashboard/store/dashboard.actions';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
+import { PartialSearchService } from '@shared/services/partial-search.service';
+import { PartialSearchDataType } from '@shared/models/partial-search-data-source.model';
 
 @Component({
   selector: 'app-quick-order-form',
@@ -109,10 +111,14 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public shiftNameField: AbstractControl;
   public shiftStartTimeField: AbstractControl;
   public shiftEndTimeField: AbstractControl;
+  private filterQueryString: string;
+  private readonly highlightDropdownSearchString  = { itemCreated: (e: { item: HTMLElement; }) => {
+    highlightSearch(e.item, this.filterQueryString, true, 'Contains') }
+  }
 
   public readonly quickOrderConditions: QuickOrderConditions = { ...QuickOrderCondition };
-  public readonly optionFields: FieldSettingsModel = optionFields;
-  public readonly skillFields: FieldSettingsModel = skillsFields;
+  public readonly optionFields: FieldSettingsModel = { ...optionFields, ...this.highlightDropdownSearchString };
+  public readonly skillFields: FieldSettingsModel = { ...skillsFields, ...this.highlightDropdownSearchString };
   public readonly organizationTypeFields: FieldSettingsModel = organizationFields;
   public readonly associateAgencyFields: FieldSettingsModel = associateAgencyFields;
   public readonly specialProjectCategoriesFields: FieldSettingsModel = specialProjectCategoriesFields;
@@ -185,7 +191,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     private readonly actions$: Actions,
     private readonly durationService: DurationService,
     private readonly settingsViewService: SettingsViewService,
-    private readonly quickOrderService: QuickOrderService
+    private readonly quickOrderService: QuickOrderService,
+    private readonly partialSearchService: PartialSearchService
   ) {
     super();
     this.initOrderForms();
@@ -499,7 +506,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   private removePermPlacementControls(controls: string[]): void {
     controls.forEach((control: string) => {
       this.generalInformationForm.contains(control) &&
-      this.generalInformationForm.removeControl(control, { emitEvent: false });
+        this.generalInformationForm.removeControl(control, { emitEvent: false });
     });
   }
 
@@ -715,7 +722,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       takeUntil(this.destroy$))
       .subscribe(() => {
         this.submitQuickOrderForm();
-    });
+      });
   }
 
   private detectFormValueChanges(): void {
@@ -783,8 +790,27 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         }),
         takeUntil(this.destroy$)
       ).subscribe(({ TieringLogic }) => {
-      this.jobDistributions = distributionSource(TieringLogic === TierLogic.Show);
-      this.cdr.markForCheck();
-    });
+        this.jobDistributions = distributionSource(TieringLogic === TierLogic.Show);
+        this.cdr.markForCheck();
+      });
+  }
+
+  public filterItemsBySubString<T>(
+    event: FilteringEventArgs,
+    dataSource: T[],
+    options: FieldSettingsModel,
+  ): void {
+    const queryString = event.text.trim();
+    this.partialSearchService
+      .searchDropdownItems(dataSource, queryString, options)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data) => {
+        this.filterQueryString = queryString;
+        event.updateData(data as PartialSearchDataType[]);
+      });
+  }
+
+  public closeDropdown(): void {
+    this.filterQueryString = '';
   }
 }

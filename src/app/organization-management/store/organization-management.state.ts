@@ -131,7 +131,7 @@ import {
   LocationFilterOptions,
   LocationsPage,
   LocationType,
-  TimeZoneModel
+  TimeZoneModel,
 } from '@shared/models/location.model';
 import { CandidateStateModel } from "@shared/models/candidate.model";
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
@@ -142,7 +142,7 @@ import {
   MasterSkillByOrganization,
   Skill,
   SkillDataSource,
-  SkillsPage
+  SkillsPage,
 } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ShowToast } from 'src/app/store/app.actions';
@@ -155,8 +155,7 @@ import {
   RECORD_CANNOT_BE_DELETED,
   RECORD_DELETE,
   RECORD_MODIFIED,
-  RECORD_SAVED,
-  usedByOrderErrorMessage
+  usedByOrderErrorMessage,
 } from 'src/app/shared/constants/messages';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
@@ -1236,6 +1235,7 @@ export class OrganizationManagementState {
       })
     );
   }
+
 
   @Action(GetOrganizationSettings)
   GetOrganizationSettingsByOrganizationId(

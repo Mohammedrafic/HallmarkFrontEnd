@@ -4,7 +4,7 @@ import {
   MasterSkillDto,
 } from './../../admin/analytics/models/common-report.model';
 import { User } from './../models/user.model';
-import { GroupEmailRole } from './../models/group-email.model';
+import { DownloadDocumentDetail, GroupEmailRole } from './../models/group-email.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
@@ -124,6 +124,19 @@ export class GroupEmailService {
       `/api/GroupMail/getcandidatestatuses?businessUnitId=${businessUnitId}`
     );
   }
+
+  public GetDocumentPreviewDetails(DocId: any): Observable<DownloadDocumentDetail> {
+    let params = new HttpParams();
+    params = params.append("Id", DocId.Id);   
+    return this.http.get<DownloadDocumentDetail>(`/api/GroupMail/getgroupmailbyid`, { params: params });
+  }
+
+  public GetDocumentDownloadDetails(DocId: any): Observable<DownloadDocumentDetail> {
+    let params = new HttpParams();
+    params = params.append("Id", DocId.Id);   
+    return this.http.get<DownloadDocumentDetail>(`/api/GroupMail/getgroupmailbyid`, { params: params });
+  }
+
 
   /**
    * Get Group Email candidates

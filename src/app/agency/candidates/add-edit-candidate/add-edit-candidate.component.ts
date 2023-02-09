@@ -1,7 +1,7 @@
 import { positionIdStatuses } from "@agency/candidates/add-edit-candidate/add-edit-candidate.constants";
 import { CandidateAgencyComponent } from '@agency/candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
 import { Location } from '@angular/common';
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
@@ -69,7 +69,6 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   public isMobileLoginOn: boolean;
 
   private filesDetails: Blob[] = [];
-  private unsubscribe$: Subject<void> = new Subject();
   private isRemoveLogo: boolean = false;
 
   public get isCandidateAssigned(): boolean {
@@ -92,6 +91,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     private credentialStorage: CredentialStorageFacadeService,
     private location: Location,
     private agencySettingsService: AgencySettingsService,
+    private ngZone: NgZone,
   ) {
     super(store);
     store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
@@ -104,7 +104,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     this.setCredentialParams();
 
     this.actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCandidateSucceeded))
+      .pipe(takeUntil(this.componentDestroy()), ofActionSuccessful(SaveCandidateSucceeded))
       .subscribe((candidate: { payload: Candidate }) => {
         this.fetchedCandidate = candidate.payload;
         this.candidateName = this.getCandidateName(this.fetchedCandidate);
@@ -112,7 +112,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         this.candidateForm.markAsPristine();
       });
     this.actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetCandidateByIdSucceeded))
+      .pipe(takeUntil(this.componentDestroy()), ofActionSuccessful(GetCandidateByIdSucceeded))
       .subscribe((candidate: { payload: Candidate }) => {
         this.fetchedCandidate = candidate.payload;
         !this.isNavigatedFromOrganizationArea && this.getCandidateLoginSetting(candidate.payload.id as number);
@@ -120,7 +120,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         this.patchAgencyFormValue(this.fetchedCandidate);
       });
     this.actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetCandidatePhotoSucceeded))
+      .pipe(takeUntil(this.componentDestroy()), ofActionSuccessful(GetCandidatePhotoSucceeded))
       .subscribe((photo: { payload: Blob }) => {
         this.photo = photo.payload;
       });
@@ -141,15 +141,18 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   }
 
   override ngOnDestroy(): void {
+    super.ngOnDestroy();
     this.store.dispatch(new RemoveCandidateFromStore());
     this.credentialStorage.removeCredentialParams();
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
     this.isRemoveLogo = false;
   }
 
   private getCandidateLoginSetting(id: number): void {
-    this.agencySettingsService.isCandidateUserCreated(id).subscribe(setting => {
+    this.agencySettingsService.isCandidateUserCreated(id)
+    .pipe(
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe(setting => {
       this.isMobileLoginOn = !setting;
       this.isMobileLoginOn && this.handleMobileLoginRestriction();
     });
@@ -239,19 +242,21 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     this.tab.enableTab(educationTabIndex, false);
     this.tab.enableTab(credentialTabIndex, false);
 
-    this.isCandidateCreated$.pipe(takeUntil(this.unsubscribe$)).subscribe((res) => {
-      if (res) {
-        this.tab.enableTab(experienceTabIndex, true);
-        this.tab.enableTab(educationTabIndex, true);
-        this.tab.enableTab(credentialTabIndex, true);
-      } else {
-        this.tab.enableTab(experienceTabIndex, false);
-        this.tab.enableTab(educationTabIndex, false);
-        this.tab.enableTab(credentialTabIndex, false);
-      }
+    this.isCandidateCreated$
+    .pipe(
+      takeUntil(this.componentDestroy())
+      )
+    .subscribe((res) => {
+      this.tab.enableTab(experienceTabIndex, !!res);
+      this.tab.enableTab(educationTabIndex, !!res);
+      this.tab.enableTab(credentialTabIndex, !!res);
     });
 
-    this.tab.selected.pipe(takeUntil(this.unsubscribe$)).subscribe((event: SelectEventArgs) => {
+    this.tab.selected
+    .pipe(
+      takeUntil(this.componentDestroy())
+      )
+    .subscribe((event: SelectEventArgs) => {
       this.showSaveProfileButtons = event.selectedIndex === profileTabIndex;
 
       if (
@@ -280,6 +285,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     }
   }
 
+  //TODO: refactoring needed
   private patchAgencyFormValue({
     agencyId,
     firstName,
@@ -323,6 +329,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     this.candidateForm.get('agency')?.patchValue({ agencyId });
   }
 
+  //TODO: remove any
   private getCandidateRequestObj(formValue: any): Candidate {
     const agencyId = this.store.selectSnapshot(UserState.lastSelectedAgencyId);
 
@@ -351,12 +358,15 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   private pagePermissions(): void {
     const location = this.location.getState() as { readonly: boolean; isRedirectFromOrder: boolean };
 
-    this.route.data.subscribe((data) => {
-      if (data['readonly']) {
-        this.readonlyMode = true;
-        this.isCredentialStep = true;
-        this.candidateForm.disable();
-      }
+    this.route.data
+    .pipe(
+      filter((data) => data['readonly']),
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe(() => {
+      this.readonlyMode = true;
+      this.isCredentialStep = true;
+      this.candidateForm.disable();
     });
 
     if (location.readonly) {
@@ -409,7 +419,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   private checkForAgencyStatus(): void {
     this.store
       .select(UserState.agencyActionsAllowed)
-      .pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$))
+      .pipe(distinctUntilChanged(), takeUntil(this.componentDestroy()))
       .subscribe((value) => {
         this.agencyActionsAllowed = value;
       });
@@ -425,7 +435,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     this.candidateCredentialResponse$
       .pipe(
         filter(response => !!response && this.isCandidateAssigned),
-        takeUntil(this.unsubscribe$)
+        takeUntil(this.componentDestroy())
       )
       .subscribe((response: CandidateCredentialResponse) => {
         this.candidateJob = response.jobTitle;

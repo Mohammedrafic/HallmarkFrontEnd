@@ -7,12 +7,27 @@ import { map } from 'rxjs/operators';
 import { PageOfCollections } from '@shared/models/page.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
 import {
-  GroupInvoicesParams, InvoicesFilteringOptions,
-  InvoicesFilterState, InvoiceStateDto, ManualInvoiceMeta,
-  ManualInvoicePostDto, ManualInvoiceReason, ManualInvoicesData,
-  ManualInvoiceTimesheetResponse, InvoiceDetail, PrintingPostDto,
-  PrintInvoiceData, ManualInvoicePutDto, InvoicePayment, InvoicePaymentGetParams, PaymentCreationDto,
-  PendingApprovalInvoice, PendingApprovalInvoicesData, PendingInvoicesData, InvoicesPendingInvoiceRecordsFilteringOptions
+  GroupInvoicesParams,
+  InvoicesFilteringOptions,
+  InvoicesFilterState,
+  InvoiceStateDto,
+  ManualInvoiceMeta,
+  ManualInvoicePostDto,
+  ManualInvoiceReason,
+  ManualInvoicesData,
+  ManualInvoiceTimesheetResponse,
+  InvoiceDetail,
+  PrintingPostDto,
+  PrintInvoiceData,
+  ManualInvoicePutDto,
+  InvoicePayment,
+  InvoicePaymentGetParams,
+  PaymentCreationDto,
+  PendingApprovalInvoice,
+  PendingApprovalInvoicesData,
+  PendingInvoicesData,
+  InvoicesPendingInvoiceRecordsFilteringOptions,
+  InvoiceManualPendingRecordsFilteringOptions,
 } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
@@ -34,6 +49,18 @@ export class InvoicesApiService {
 
   public getPendingInvoicesFiltersDataSource(): Observable<InvoicesPendingInvoiceRecordsFilteringOptions> {
     return this.http.get<InvoicesPendingInvoiceRecordsFilteringOptions>(`/api/PendingInvoices/filteroptions`);
+  }
+
+  public getManualInvoicePendingFiltersDataSource(
+    id: number | null
+  ): Observable<InvoiceManualPendingRecordsFilteringOptions> {
+    if(id) {
+      return this.http.get<InvoiceManualPendingRecordsFilteringOptions>('/api/manualInvoiceRecords/filterOptions', {
+        params: { organizationid: id },
+      });
+    } else {
+      return this.http.get<InvoiceManualPendingRecordsFilteringOptions>('/api/manualInvoiceRecords/filterOptions');
+    }
   }
 
   public getInvoiceReasons(): Observable<ManualInvoiceReason[]> {

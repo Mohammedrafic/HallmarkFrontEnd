@@ -719,6 +719,7 @@ export type CandidateListEvent = {
   currentPage: number;
   pageSize: number;
   excludeDeployed: boolean;
+  searchTerm?: string;
 };
 
 interface IrpCandidateShiftTime {

@@ -133,6 +133,8 @@
                 [dataSource]="regionDataSource"
                 [fields]="optionFields"
                 (select)="changeRegionDropdown($event)"
+                (filtering)="filterItemsBySubString($event, regionDataSource, optionFields)"
+                (close)="closeDropdown()"
               >
               </ejs-dropdownlist>
             </div>
@@ -151,6 +153,8 @@
                 [dataSource]="locationDataSource"
                 [fields]="optionFields"
                 (select)="changeLocationDropdown($event)"
+                (filtering)="filterItemsBySubString($event, locationDataSource, optionFields)"
+                (close)="closeDropdown()"
               >
               </ejs-dropdownlist>
             </div>
@@ -169,13 +173,15 @@
                 [dataSource]="departmentDataSource"
                 [fields]="optionFields"
                 (select)="changeDepartmentDropdown($event)"
+                (filtering)="filterItemsBySubString($event, departmentDataSource, optionFields)"
+                (close)="closeDropdown()"
               >
               </ejs-dropdownlist>
             </div>
           </div>
 
           <!-- Skill -->
-          <div class="input-container bootstrap form-line-item-20">
+          <div class="input-container bootstrap form-line-item-20" *ngIf="organizationSkills$ | async as skillsDataSource">
             <label>Skill<span class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist
@@ -183,8 +189,10 @@
                 formControlName="skillId"
                 appValidateWithMessage
                 [allowFiltering]="true"
-                [dataSource]="organizationSkills$ | async"
+                [dataSource]="skillsDataSource"
                 [fields]="skillFields"
+                (filtering)="filterItemsBySubString($event, skillsDataSource, skillFields)"
+                (close)="closeDropdown()"
               >
               </ejs-dropdownlist>
             </div>
@@ -192,51 +200,11 @@
         </div>
 
         <div class="row">
-          <!-- Hourly Rate -->
+          <!-- Duration -->
           <div
             *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
-            class="input-container bootstrap form-line-item-20">
-            <label>Hourly rate ($)<span class="required">*</span></label>
-            <div class="input-group dropdown">
-              <div class="input-group">
-                <input
-                  class="e-input"
-                  type="text"
-                  formControlName="hourlyRate"
-                  appValidateWithMessage
-                  maxlength="10"
-                  (focus)="priceUtils.setPriceMask(generalInformationForm, 'hourlyRate', $event)"
-                  (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- of Position -->
-          <div
-            *ngIf="quickOrderConditions.isTravelerOrder
-            || quickOrderConditions.isContactToPermOrder
-            || quickOrderConditions.isPermPlacementOrder"
             class="input-container bootstrap form-line-item-20"
           >
-            <label># Open Positions<span class="required">*</span></label>
-            <div class="input-group dropdown">
-              <div class="input-group">
-                <ejs-numerictextbox
-                  class="numeric-input"
-                  min="0"
-                  maxlength="10"
-                  appValidateWithMessage
-                  format="0"
-                  formControlName="openPositions"
-                  [showSpinButton]="false"
-                ></ejs-numerictextbox>
-              </div>
-            </div>
-          </div>
-
-          <div *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
-            class="input-container bootstrap form-line-item-20">
             <label>Duration<span class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist
@@ -287,6 +255,52 @@
                 [min]="generalInformationForm.controls['jobStartDate'].value"
               >
               </ejs-datepicker>
+            </div>
+          </div>
+
+          <!-- Hourly Rate -->
+          <div
+            *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
+            class="input-container bootstrap form-line-item-20"
+          >
+            <label>Hourly rate ($)<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <div class="input-group">
+                <input
+                  class="e-input"
+                  type="text"
+                  formControlName="hourlyRate"
+                  appValidateWithMessage
+                  maxlength="10"
+                  (focus)="priceUtils.setPriceMask(generalInformationForm, 'hourlyRate', $event)"
+                  (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- of Position -->
+          <div
+            *ngIf="
+              quickOrderConditions.isTravelerOrder ||
+              quickOrderConditions.isContactToPermOrder ||
+              quickOrderConditions.isPermPlacementOrder
+            "
+            class="input-container bootstrap form-line-item-20"
+          >
+            <label># Open Positions<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <div class="input-group">
+                <ejs-numerictextbox
+                  class="numeric-input"
+                  min="0"
+                  maxlength="10"
+                  appValidateWithMessage
+                  format="0"
+                  formControlName="openPositions"
+                  [showSpinButton]="false"
+                ></ejs-numerictextbox>
+              </div>
             </div>
           </div>
 

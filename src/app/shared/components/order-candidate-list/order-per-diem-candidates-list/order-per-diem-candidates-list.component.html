@@ -1,7 +1,16 @@
 <section class="candidates-list">
   <div class="e-gridcustomheader">
     <div class="title">
-      <h3>{{ system === systemType.IRP ? 'Candidates': 'Candidates List'}}</h3>
+      <h3>{{ system === systemType.IRP ? 'Candidates' : 'Candidates List' }}</h3>
+    </div>
+    <div class="grid-toolbar">
+      <app-search
+        class="search"
+        [placeholder]="candidateSearchPlaceholder"
+        [showClearButton]="true"
+        (inputKeyUpEnter)="searchByCandidateName($event)"
+        (clearInput)="clearInputField()"
+      ></app-search>
     </div>
   </div>
 
@@ -155,7 +164,7 @@
             </div>
           </ng-template>
         </e-column>
-        <e-column field="option" headerText="Option" textAlign="Left" width="110">
+        <e-column field="option" headerText="Work Commitment" textAlign="Left" width="140">
         </e-column>
         <e-column field="isContract" headerText="Contract Employee" textAlign="Left" width="116">
           <ng-template  #template let-data>

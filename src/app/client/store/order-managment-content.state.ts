@@ -92,6 +92,7 @@ import {
   RECORD_ADDED,
   RECORD_MODIFIED,
   updateCandidateJobMessage,
+  UpdateRegularRatesucceedcount
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -452,10 +453,10 @@ export class OrderManagementContentState {
   @Action(GetAgencyOrderCandidatesList)
   GetAgencyOrderCandidatesPage(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderId, organizationId, pageNumber, pageSize, excludeDeployed }: GetAgencyOrderCandidatesList
+    { orderId, organizationId, pageNumber, pageSize, excludeDeployed, searchTerm }: GetAgencyOrderCandidatesList
   ): Observable<OrderCandidatesListPage> {
     return this.orderManagementService
-      .getOrderCandidatesList(orderId, organizationId, pageNumber, pageSize, excludeDeployed)
+      .getOrderCandidatesList(orderId, organizationId, pageNumber, pageSize, excludeDeployed, searchTerm)
       .pipe(
         tap((payload) => {
           patchState({ orderCandidatesListPage: payload });
@@ -501,7 +502,7 @@ export class OrderManagementContentState {
         const { orderType, departmentId, jobStartDate, jobEndDate, isTemplate } = payload;
         const skill = payload.irpOrderMetadata ? payload.irpOrderMetadata.skillId : payload.skillId;
 
-        if (!isTemplate) {
+        if (!isTemplate && orderType && departmentId && jobStartDate && jobEndDate) {
           dispatch(
             new SetPredefinedBillRatesData(
               orderType,
@@ -1048,8 +1049,9 @@ export class OrderManagementContentState {
     { payload } : UpdateRegRateorder
   ) : Observable<UpdateRegrateModel | Observable<void>>{
     return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
-      tap((payload) => {
-        dispatch(new UpdateRegRateSucceeded(payload));
+      tap((payload) => {  
+        const count = payload.length;
+        dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Reg rate is not updated'))))
     );

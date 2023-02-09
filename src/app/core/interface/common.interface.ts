@@ -15,7 +15,9 @@ export interface DataSourceItem {
   id: number;
   name: string;
   organizationId?: number;
+  reason?: string;
 }
+
 export interface CommonDialogConformMessages {
   confirmUnsavedChages: string;
   confirmTabChange: string;
@@ -49,4 +51,9 @@ export interface PagerChangeEvent {
 export interface OrginazationModuleSettings {
   isFeatureIrpEnabled: boolean;
   isIrpDisplayed: boolean;
+}
+
+export interface DatePeriod {
+  from: string;
+  to: string;
 }

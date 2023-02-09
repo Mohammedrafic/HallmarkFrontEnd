@@ -46,7 +46,7 @@
                 </div>
 
                 <!-- Region -->
-                <div class="input-container bootstrap form-line-item-20">
+                <div class="input-container bootstrap form-line-item-20" *ngIf="(regions$ | async) as regionDataSource">
                   <label>Region<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -54,16 +54,18 @@
                       formControlName="regionId"
                       appValidateWithMessage
                       [allowFiltering]="true"
-                      [dataSource]="regions$ | async"
+                      [dataSource]="regionDataSource"
                       [fields]="optionFields"
                       (select)="onRegionDropDownChanged($event)"
+                      (filtering)="filterItemsBySubString($event, regionDataSource, optionFields)"
+                      (close)="closeDropdown()"
                     >
                     </ejs-dropdownlist>
                   </div>
                 </div>
 
                 <!-- Location -->
-                <div class="input-container bootstrap form-line-item-20">
+                <div class="input-container bootstrap form-line-item-20" *ngIf="(locations$ | async) as locationDataSource">
                   <label>Location<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -71,16 +73,18 @@
                       formControlName="locationId"
                       appValidateWithMessage
                       [allowFiltering]="true"
-                      [dataSource]="locations$ | async"
+                      [dataSource]="locationDataSource"
                       [fields]="optionFields"
                       (select)="onLocationDropDownChanged($event)"
+                      (filtering)="filterItemsBySubString($event, locationDataSource, optionFields)"
+                      (close)="closeDropdown()"
                     >
                     </ejs-dropdownlist>
                   </div>
                 </div>
 
                 <!-- Department -->
-                <div class="input-container bootstrap form-line-item-20">
+                <div class="input-container bootstrap form-line-item-20" *ngIf="(departments$ | async) as departmentDataSource">
                   <label>Department<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -88,16 +92,18 @@
                       formControlName="departmentId"
                       appValidateWithMessage
                       [allowFiltering]="true"
-                      [dataSource]="departments$ | async"
+                      [dataSource]="departmentDataSource"
                       [fields]="departmentFields"
                       (select)="onDepartmentDropDownChanged($event)"
+                      (filtering)="filterItemsBySubString($event, departmentDataSource, departmentFields)"
+                      (close)="closeDropdown()"
                     >
                     </ejs-dropdownlist>
                   </div>
                 </div>
 
                 <!-- Skill -->
-                <div class="input-container bootstrap form-line-item-20">
+                <div class="input-container bootstrap form-line-item-20" *ngIf="skills$ | async as skillDataSource">
                   <label>Skill<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -105,9 +111,11 @@
                       formControlName="skillId"
                       appValidateWithMessage
                       [allowFiltering]="true"
-                      [dataSource]="skills$ | async"
+                      [dataSource]="skillDataSource"
                       [fields]="skillFields"
                       (select)="onSkillsDropDownChanged($event)"
+                      (filtering)="filterItemsBySubString($event, skillDataSource, skillFields)"
+                      (close)="closeDropdown()"
                     >
                     </ejs-dropdownlist>
                   </div>
@@ -116,6 +124,57 @@
 
               <ng-container *ngIf="!isPerDiem">
                 <div class="form-line">
+                  <!-- Duration -->
+                  <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+                    <label>Duration<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist
+                        formControlName="duration"
+                        appValidateWithMessage
+                        [allowFiltering]="true"
+                        [dataSource]="durations"
+                        [fields]="optionFields"
+                      >
+                      </ejs-dropdownlist>
+                    </div>
+                  </div>
+
+                  <!-- Job Start Date -->
+                  <div class="datepicker-container form-line-item-20">
+                    <label>Job Start Date<span class="required">*</span></label>
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-datepicker
+                        class="datepicker"
+                        format="MM/dd/yyyy"
+                        placeholder="MM/DD/YYYY"
+                        formControlName="jobStartDate"
+                        appValidateWithMessage
+                        [enableMask]="true"
+                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                      >
+                      </ejs-datepicker>
+                    </div>
+                  </div>
+
+                  <!-- Job End Date -->
+                  <div *ngIf="!isPermPlacementOrder" class="datepicker-container form-line-item-20">
+                    <label>Job End Date<span class="required">*</span></label>
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-datepicker
+                        class="datepicker"
+                        format="MM/dd/yyyy"
+                        placeholder="MM/DD/YYYY"
+                        formControlName="jobEndDate"
+                        appValidateWithMessage
+                        [enableMask]="true"
+                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                        [enabled]="isJobEndDateControlEnabled"
+                        [min]="generalInformationForm.controls['jobStartDate'].value"
+                      >
+                      </ejs-datepicker>
+                    </div>
+                  </div>
+
                   <!-- Hourly rate -->
                   <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
                     <label>Hourly Rate<span class="required">*</span></label>
@@ -146,6 +205,61 @@
                     </div>
                   </div>
 
+                  <!-- Shift Requirements -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+                    <label>Shift Name<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist
+                        formControlName="shift"
+                        appValidateWithMessage
+                        [allowFiltering]="true"
+                        [dataSource]="masterShiftNames"
+                        [fields]="optionFields"
+                      >
+                      </ejs-dropdownlist>
+                    </div>
+                  </div>
+
+                  <!-- Shift Start Time -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
+                    <label for="startTime"
+                      >Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    >
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-timepicker
+                        placeholder="HH:MM"
+                        formControlName="shiftStartTime"
+                        appValidateWithMessage
+                        format="HH:mm"
+                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                        [enableMask]="true"
+                        maskPlaceholder="HH:MM"
+                      >
+                      </ejs-timepicker>
+                    </div>
+                  </div>
+
+                  <!-- Shift End Time -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
+                    <label for="startTime"
+                      >Shift End Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    >
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-timepicker
+                        placeholder="HH:MM"
+                        formControlName="shiftEndTime"
+                        appValidateWithMessage
+                        format="HH:mm"
+                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                        [enableMask]="true"
+                        maskPlaceholder="HH:MM"
+                      >
+                      </ejs-timepicker>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-line">
                   <!-- Min Yrs. Req. -->
                   <div class="input-container bootstrap form-line-item-20">
                     <label>Min Yrs. Req.</label>
@@ -246,112 +360,6 @@
                         (focus)="priceUtils.setPriceMask(generalInformationForm, 'compBonus', $event)"
                         (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'compBonus', $event)"
                       />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-line">
-                  <!-- Duration -->
-                  <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
-                    <label>Duration<span class="required">*</span></label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        formControlName="duration"
-                        appValidateWithMessage
-                        [allowFiltering]="true"
-                        [dataSource]="durations"
-                        [fields]="optionFields"
-                      >
-                      </ejs-dropdownlist>
-                    </div>
-                  </div>
-
-                  <!-- Job Start Date -->
-                  <div class="datepicker-container form-line-item-20">
-                    <label>Job Start Date<span class="required">*</span></label>
-                    <div class="input-group datepicker bootstrap">
-                      <ejs-datepicker
-                        class="datepicker"
-                        format="MM/dd/yyyy"
-                        placeholder="MM/DD/YYYY"
-                        formControlName="jobStartDate"
-                        appValidateWithMessage
-                        [enableMask]="true"
-                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                      >
-                      </ejs-datepicker>
-                    </div>
-                  </div>
-
-                  <!-- Job End Date -->
-                  <div *ngIf="!isPermPlacementOrder" class="datepicker-container form-line-item-20">
-                    <label>Job End Date<span class="required">*</span></label>
-                    <div class="input-group datepicker bootstrap">
-                      <ejs-datepicker
-                        class="datepicker"
-                        format="MM/dd/yyyy"
-                        placeholder="MM/DD/YYYY"
-                        formControlName="jobEndDate"
-                        appValidateWithMessage
-                        [enableMask]="true"
-                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                        [enabled]="isJobEndDateControlEnabled"
-                        [min]="generalInformationForm.controls['jobStartDate'].value"
-                      >
-                      </ejs-datepicker>
-                    </div>
-                  </div>
-
-                  <!-- Shift Requirements -->
-                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
-                    <label>Shift Name<span class="required">*</span></label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        formControlName="shift"
-                        appValidateWithMessage
-                        [allowFiltering]="true"
-                        [dataSource]="masterShiftNames"
-                        [fields]="optionFields"
-                      >
-                      </ejs-dropdownlist>
-                    </div>
-                  </div>
-
-                  <!-- Shift Start Time -->
-                  <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
-                    <label for="startTime"
-                      >Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
-                    >
-                    <div class="input-group datepicker bootstrap">
-                      <ejs-timepicker
-                        placeholder="HH:MM"
-                        formControlName="shiftStartTime"
-                        appValidateWithMessage
-                        format="HH:mm"
-                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                        [enableMask]="true"
-                        maskPlaceholder="HH:MM"
-                      >
-                      </ejs-timepicker>
-                    </div>
-                  </div>
-
-                  <!-- Shift End Time -->
-                  <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
-                    <label for="startTime"
-                      >Shift End Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
-                    >
-                    <div class="input-group datepicker bootstrap">
-                      <ejs-timepicker
-                        placeholder="HH:MM"
-                        formControlName="shiftEndTime"
-                        appValidateWithMessage
-                        format="HH:mm"
-                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                        [enableMask]="true"
-                        maskPlaceholder="HH:MM"
-                      >
-                      </ejs-timepicker>
                     </div>
                   </div>
                 </div>

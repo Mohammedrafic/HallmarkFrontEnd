@@ -1,4 +1,5 @@
 import { AbstractControl, FormGroup, ValidatorFn, ValidationErrors } from '@angular/forms';
+import { EmailValidation } from '@core/constants';
 
 export const DateRangeValidator: ValidatorFn = ((control: AbstractControl): ValidationErrors | null => {
   const timeIn = control.get('timeIn')?.value;
@@ -34,7 +35,7 @@ export const AllTimesheetTimeSet = (formGroup: FormGroup): ValidationErrors | nu
     timeOutControl?.setErrors({ notAllValuesSet: true });
     return { notAllValuesSet: true };
   }
-  
+
   if (!timeInValueExist && timeOutValueExist) {
     timeInControl?.setErrors({ notAllValuesSet: true });
     return { notAllValuesSet: true };
@@ -44,4 +45,20 @@ export const AllTimesheetTimeSet = (formGroup: FormGroup): ValidationErrors | nu
   timeOutControl?.setErrors(null);
 
   return null;
+};
+
+export const MultiEmailValidator = (control: AbstractControl): ValidationErrors | null => {
+  if (!control.value) {
+    return null;
+  }
+
+  const invalidEmailList = control.value.split(',').filter((mail: string): void | string => {
+    const email = mail.trim();
+
+    if(!EmailValidation.test(email)) {
+      return email;
+    }
+  });
+
+  return invalidEmailList?.length ? { invalidEmails: invalidEmailList } : null;
 };

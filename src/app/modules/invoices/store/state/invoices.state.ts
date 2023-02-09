@@ -11,7 +11,12 @@ import { DataSourceItem } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
 import { Invoices } from '../actions/invoices.actions';
-import { InvoicesApiService, InvoicesService, ManualInvoiceAttachmentsApiService } from '../../services';
+import {
+  InvoicesApiService,
+  InvoicesService,
+  ManualInvoiceAttachmentsApiService,
+  InvoicesFiltersService,
+} from '../../services';
 import {
   BaseInvoice,
   InvoiceDetail, InvoiceDialogActionPayload,
@@ -23,9 +28,14 @@ import {
   InvoicesFilterState,
   InvoiceStateDto,
   ManualInvoiceMeta,
-  ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData,
-  PendingApprovalInvoice, PendingApprovalInvoicesData, PendingInvoicesData,
+  ManualInvoiceReason,
+  ManualInvoicesData,
+  PrintInvoiceData,
+  PendingApprovalInvoice,
+  PendingApprovalInvoicesData,
+  PendingInvoicesData,
   InvoicesPendingInvoiceRecordsFilteringOptions,
+  InvoiceManualPendingRecordsFilteringOptions,
 } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import {
@@ -43,7 +53,7 @@ import { downloadBlobFile, saveSpreadSheetDocument } from '@shared/utils/file.ut
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Attachment } from '@shared/components/attachments';
 import { reduceFiltersState } from '@core/helpers/functions.helper';
-import { InvoicesFiltersService } from '../../services/invoices-filters.service';
+import { InvoiceFiltersAdapter } from '../../adapters';
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -275,6 +285,29 @@ export class InvoicesState {
         setState(patch({
           invoiceFiltersColumns: patch(this.invoicesFiltersService.preparePendingFiltersDataSources(
             res,
+            invoiceFiltersColumns,
+          )),
+        }));
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+      }),
+    );
+  }
+
+  @Action(Invoices.GetManualInvoiceRecordFiltersDataSource)
+  GetManualInvoiceRecordFiltersDataSource(
+    { setState, dispatch, getState }: StateContext<InvoicesModel>,
+    { organizationId }: Invoices.GetManualInvoiceRecordFiltersDataSource
+  ): Observable<InvoiceManualPendingRecordsFilteringOptions | void> {
+    return this.invoicesAPIService.getManualInvoicePendingFiltersDataSource(organizationId).pipe(
+      map(payload => (InvoiceFiltersAdapter.prepareDateToManualPendingInvoice(payload))),
+      tap(payload => {
+        const { invoiceFiltersColumns } = getState();
+
+        setState(patch({
+          invoiceFiltersColumns: patch(this.invoicesFiltersService.prepareManualPendingInvoiceFiltersDataSources(
+            payload,
             invoiceFiltersColumns,
           )),
         }));

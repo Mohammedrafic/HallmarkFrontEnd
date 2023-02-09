@@ -70,6 +70,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateDOBRequired, CandidateSSNRequired, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { SettingsViewService } from '@shared/services';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
+import { DateTimeHelper } from '@core/helpers';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -208,8 +209,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       let additionalValues = {};
       if (this.isOnBoard) {
         additionalValues = {
-          actualStartDate: toCorrectTimezoneFormat(this.candidateJob.actualStartDate),
-          actualEndDate: toCorrectTimezoneFormat(this.candidateJob.actualEndDate),
+          actualStartDate: DateTimeHelper.toUtcFormat(this.candidateJob.actualStartDate),
+          actualEndDate: DateTimeHelper.toUtcFormat(this.candidateJob.actualEndDate),
           guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
           clockId: this.candidateJob.clockId,
         };
@@ -221,7 +222,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         jobId: this.candidateJob.jobId,
         skillName: value.skillName,
         offeredBillRate: this.candidateJob?.offeredBillRate,
-        offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.offeredStartDate),
+        offeredStartDate: this.candidateJob ? DateTimeHelper.toUtcFormat(this.candidateJob.offeredStartDate) : undefined,
         candidateBillRate: this.candidateJob.candidateBillRate,
         nextApplicantStatus: {
           applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
@@ -462,6 +463,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
+    if (typeof value.actualStartDate === 'string') {
+      value.actualStartDate = new Date(value.actualStartDate);
+    }
+    if (typeof value.actualEndDate === 'string') {
+      value.actualEndDate = new Date(value.actualEndDate);
+    }
     if (this.form.valid) {
       const updatedValue = {
         organizationId: this.candidateJob.organizationId,
@@ -471,8 +478,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         candidateBillRate: this.candidateJob.candidateBillRate,
         offeredBillRate: value.offeredBillRate,
         requestComment: value.comments,
-        actualStartDate: toCorrectTimezoneFormat(new Date(value.actualStartDate).toISOString()),
-        actualEndDate: toCorrectTimezoneFormat(new Date(value.actualEndDate).toISOString()),
+        actualStartDate: DateTimeHelper.toUtcFormat(value.actualStartDate),
+        actualEndDate: DateTimeHelper.toUtcFormat(value.actualEndDate),
         offeredStartDate: this.candidateJob?.offeredStartDate,
         allowDeployWoCredentials: value.allowDeployCredentials,
         billRates: this.billRatesData,
