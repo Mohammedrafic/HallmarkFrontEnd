@@ -19,7 +19,7 @@
       <h3>Fee Exception</h3>
     </div>
     <div class="actions">
-      <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditFeeExceptions]" class="action-link" (click)="addNew()"
+      <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditFeeExceptions]" class="action-link" (click)="addNew(form.value.id)"
       ><i-feather name="plus" class="icon"></i-feather> Add Fee Exception</button
       >
     </div>
@@ -43,7 +43,7 @@
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]=!isLoaded>
-            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated" cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated" cssClass="e-flat primary-icon-button" (click)="onEdit(data,form.value.id)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditFeeExceptions]" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
