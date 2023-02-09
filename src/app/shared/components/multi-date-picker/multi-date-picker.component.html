@@ -1,6 +1,6 @@
 <div #inputWrapper class="bootstrap">
   <div class="input-container">
-    <div class="input-group multi-date">
+    <div class="input-group multi-date" [class.bottom-chips]="showChipsBelowControl">
       <input
         class="e-input"
         [class.active]="isCalendarShow"

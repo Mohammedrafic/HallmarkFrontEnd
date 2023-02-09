@@ -1,18 +1,17 @@
-import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
-import { Store } from '@ngxs/store';
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
+import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
+import { Store } from '@ngxs/store';
+
 import { AppState } from '../../../../store/app.state';
-import { AgencyModel, CandidateModel } from '@client/order-management/components/add-edit-reorder/models/candidate.model';
-import { ReorderRequestModel } from '@client/order-management/components/add-edit-reorder/models/reorder.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
-import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper } from '@core/helpers';
+import { AgencyModel, CandidateModel } from './models/candidate.model';
+import { ReorderRequest, ReorderRequestModel, ReorderResponse } from './models/reorder.model';
 
 @Injectable({
   providedIn: 'root',
@@ -60,39 +59,37 @@ export class AddEditReorderService {
     }
   }
 
-  public saveReorder(
-    { reOrderId, reOrderFromId, agencyIds, reorder }: ReorderRequestModel,
-    comments: Comment[]
-  ): Observable<any> {
-    reorder.reorderDate.setHours(0, 0, 0, 0);
-    const prepareFields = {
-      reOrderId,
-      reOrderFromId,
-      agencyIds,
-      candidateProfileIds: reorder.candidates,
-      reorderDate: DateTimeHelper.toUtcFormat(reorder.reorderDate),
-      shiftEndTime: new Date(DateTimeHelper.toUtcFormat(reorder.shiftEndTime)),
-      shiftStartTime: new Date(DateTimeHelper.toUtcFormat(reorder.shiftStartTime)),
-      billRate: reorder.billRate,
-      openPositions: reorder.openPosition,
-    };
-    return this.http.put<any>('/api/reorders', prepareFields).pipe(
-      tap((reOrder: any) => {
-        if (!prepareFields.reOrderId && comments?.length) {
-          comments.forEach((comment: Comment) => {
-            comment.commentContainerId = reOrder.commentContainerId as number;
-          });
-          this.http.post('/api/Comments', { comments }).subscribe();
-          return reOrder;
-        }
-        return reOrder;
-      })
-    );
+  public saveReorder(reorder: ReorderRequestModel, multipleReorderDates: Date[]): Observable<ReorderResponse[]> {
+    return this.http.put<ReorderResponse[]>('/api/reorders', this.adaptToReorderRequest(reorder, multipleReorderDates));
   }
 
   public getBillRate(departmentId: number, skillId: number): Observable<number> {
     return this.orderManagementContentService
       .getPredefinedBillRates(OrderType.OpenPerDiem, departmentId, skillId)
       .pipe(map((billRates: BillRate[]) => billRates[0].rateHour));
+  }
+
+  private adaptToReorderRequest(
+    { reOrderId, reOrderFromId, agencyIds, reorder }: ReorderRequestModel,
+    multipleReorderDates: Date[]
+  ): ReorderRequest {
+    const dates: Date[] = multipleReorderDates.length ? multipleReorderDates : [reorder.reorderDate];
+    const reorderDates: string[] = dates.map((date: Date) => {
+      date.setHours(0, 0, 0, 0);
+
+      return DateTimeHelper.toUtcFormat(date);
+    });
+
+    return {
+      reOrderId,
+      reOrderFromId,
+      agencyIds,
+      reorderDates,
+      candidateProfileIds: reorder.candidates,
+      shiftEndTime: new Date(DateTimeHelper.toUtcFormat(reorder.shiftEndTime)),
+      shiftStartTime: new Date(DateTimeHelper.toUtcFormat(reorder.shiftStartTime)),
+      billRate: reorder.billRate,
+      openPositions: reorder.openPosition,
+    };
   }
 }

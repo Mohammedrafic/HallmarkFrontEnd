@@ -21,6 +21,7 @@
     label="Agency Name"
   ></app-multiselect-dropdown>
   <app-datepicker
+    *ngIf="isEditMode"
     [formGroupInstance]="reorderForm"
     [enableMask]="true"
     [required]="true"
@@ -31,6 +32,10 @@
     format="MM/dd/yyyy"
     placeholder="MM/DD/YYYY"
   ></app-datepicker>
+  <div class="input-container" *ngIf="!isEditMode">
+    <label>Re-Order Date <span class="required">*</span></label>
+    <app-multi-date-picker [showChipsBelowControl]="true" (appliedDates)="setMultipleDates($event)"></app-multi-date-picker>
+  </div>
   <div class="row-controls">
     <app-timepicker
       [formGroupInstance]="reorderForm"

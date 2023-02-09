@@ -26,6 +26,7 @@ import { CalendarComponent } from '@syncfusion/ej2-angular-calendars';
 export class MultiDatePickerComponent extends Destroyable implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('inputWrapper') inputWrapper: ElementRef;
 
+  @Input() showChipsBelowControl = false;
   @Input() datesControl: FormControl = new FormControl([]);
   @Input() set valueSetter(dates: Date[]) {
     this.datesControl.setValue(dates);

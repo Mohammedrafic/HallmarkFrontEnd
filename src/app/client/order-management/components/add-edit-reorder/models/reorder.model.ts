@@ -21,3 +21,21 @@ export interface ReorderRequestModel {
   billRate: number;
   openPositions: number;
 }
+
+export interface ReorderResponse {
+  reOrderId: number;
+  reOrderFromId: number;
+  commentContainerId: number;
+}
+
+export interface ReorderRequest {
+  reOrderId: number | null;
+  reOrderFromId: number;
+  candidateProfileIds: number[];
+  agencyIds: number[] | null;
+  reorderDates: string[];
+  shiftStartTime: Date;
+  shiftEndTime: Date;
+  billRate: number;
+  openPositions: number;
+}

@@ -1,11 +1,24 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import isNil from 'lodash/fp/isNil';
 import uniq from 'lodash/fp/uniq';
 
-import { catchError, filter, first, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import {
+  catchError,
+  filter,
+  first,
+  map,
+  merge,
+  Observable,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+  throwError,
+} from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { AddEditReorderService } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.service';
@@ -15,6 +28,7 @@ import { Order } from '@shared/models/order-management.model';
 import {
   ReorderModel,
   ReorderRequestModel,
+  ReorderResponse,
 } from '@client/order-management/components/add-edit-reorder/models/reorder.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { shareReplay } from 'rxjs/operators';
@@ -66,13 +80,15 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   };
   private unsubscribe$: Subject<void> = new Subject();
   private numberOfAgencies: number;
+  private multipleReorderDates: Date[] = [];
 
   public constructor(
     private formBuilder: FormBuilder,
     private store: Store,
     private reorderService: AddEditReorderService,
     private commentsService: CommentsService,
-    private actions$: Actions
+    private actions$: Actions,
+    private cdr: ChangeDetectorRef,
   ) {
     super();
   }
@@ -127,9 +143,15 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public onSave(): void {
     if (this.reorderForm.invalid) {
       this.reorderForm.markAllAsTouched();
+      this.cdr.markForCheck();
     } else {
       this.saveReorder();
     }
+  }
+
+  public setMultipleDates(dates: Date[]): void {
+    this.reorderForm.get('reorderDate')?.setValue(dates.length ? dates[0] : null);
+    this.multipleReorderDates = dates;
   }
 
   private getComments(): void {
@@ -274,7 +296,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
     const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
-    const reOrderId = this.isEditMode ? this.order.id : 0;
+    const reOrderId = this.isEditMode ? this.order.id : null;
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;
     const payload = { reorder, agencyIds, reOrderId, reOrderFromId };
 
@@ -315,19 +337,22 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private save(payload: ReorderRequestModel): void {
-    this.reorderService
-      .saveReorder(<ReorderRequestModel>payload, this.comments)
+    this.reorderService.saveReorder(<ReorderRequestModel>payload, this.multipleReorderDates)
       .pipe(
         takeUntil(this.destroy$),
-        tap((data) => {
-          this.store.dispatch(new SaveOrderSucceeded(data));
+        catchError((error: HttpErrorResponse) => {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
+          return throwError(() => error);
+        }),
+        tap(() => {
           this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED));
           this.saveEmitter.emit();
-        }
-        ),
-        catchError((error) =>
-          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)))
-        )
+          this.multipleReorderDates = [];
+        }),
+        filter(() => !this.isEditMode && !!this.comments.length),
+        switchMap((reorders: ReorderResponse[]) => {
+          return merge(...this.getRequestsToSaveNewReordersComments(reorders));
+        })
       )
       .subscribe();
   }
@@ -356,4 +381,16 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     return candidate?.map(({ id }: CandidateModel) => id);
   }
 
+  private getRequestsToSaveNewReordersComments(reorders: ReorderResponse[]): Observable<Comment>[] {
+    return reorders.map((reOrder: ReorderResponse) => {
+      const reOrderComments = this.comments.map((comment: Comment) => {
+        return {
+          ...comment,
+          commentContainerId: reOrder.commentContainerId,
+        };
+      });
+
+      return this.commentsService.saveCommentsBulk(reOrderComments);
+    });
+  }
 }
