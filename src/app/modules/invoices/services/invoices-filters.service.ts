@@ -61,6 +61,7 @@ export class InvoicesFiltersService {
       serviceDateTo: [null],
       vendorFee: [null],
       reasonCodeIds: [null],
+      candidateName: [null],
     }) as CustomFormGroup<InvoiceFilterColumns>;
   }
 

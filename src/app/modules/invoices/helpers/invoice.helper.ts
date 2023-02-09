@@ -11,6 +11,8 @@ export const CreateInvoiceReasonList = (reasons: DataSourceItem[]): DataSourceIt
 export const CreateVendorFeeList = (): DataSourceItem[] => {
   return [VendorFee.All, VendorFee.Yes, VendorFee.No].map((value: VendorFee) => ({
     name: VendorFee[value],
+    text: VendorFee[value],
     id: value,
+    value,
   }));
 };

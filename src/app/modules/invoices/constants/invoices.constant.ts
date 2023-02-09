@@ -118,6 +118,7 @@ export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
   [InvoicesTableFiltersColumns.ServiceDateTo]: defaultDateMapping,
   [InvoicesTableFiltersColumns.VendorFee]: defaultDropdownColumnMapping,
   [InvoicesTableFiltersColumns.ReasonCodeIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.CandidateName]: defaultInputMapping,
 } as InvoiceFilterColumns;
 
 export const InvoicesFilteringOptionsMapping: Map<FilteringInvoicesOptionsFields, InvoicesTableFiltersColumns> = new Map()
@@ -145,7 +146,7 @@ export const ManualPendingInvoiceRecordsFilteringOptionsMapping: Map<FilteringMa
   .set(FilteringManualPendingInvoiceRecordsOptionsFields.Regions, InvoicesTableFiltersColumns.RegionIds)
   .set(FilteringManualPendingInvoiceRecordsOptionsFields.Locations, InvoicesTableFiltersColumns.LocationIds)
   .set(FilteringManualPendingInvoiceRecordsOptionsFields.Departments, InvoicesTableFiltersColumns.DepartmentIds)
-  .set(FilteringManualPendingInvoiceRecordsOptionsFields.Skills, InvoicesTableFiltersColumns.SkillIds)
+  .set(FilteringManualPendingInvoiceRecordsOptionsFields.Skills, InvoicesTableFiltersColumns.SkillIds);
 
 export const ApproveInvoiceConfirmDialogConfig = {
   title: 'Approve Invoice',
@@ -167,7 +168,7 @@ export const ManualInvoicesFiltersFormConfig = (isAgency: boolean): InvoiceFilte
   {
     type: ControlTypes.Text,
     title: 'Candidate Name',
-    field: InvoicesTableFiltersColumns.SearchTerm,
+    field: InvoicesTableFiltersColumns.CandidateName,
   },
   {
     type: ControlTypes.Text,

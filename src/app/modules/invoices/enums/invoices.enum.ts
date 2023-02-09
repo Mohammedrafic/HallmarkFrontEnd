@@ -94,6 +94,7 @@ export enum InvoicesTableFiltersColumns {
   ServiceDateTo = 'serviceDateTo',
   VendorFee = 'vendorFee',
   ReasonCodeIds = 'reasonCodeIds',
+  CandidateName = 'candidateName'
 }
 
 export enum FilteringInvoicesOptionsFields {
