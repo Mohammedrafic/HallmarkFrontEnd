@@ -1,10 +1,10 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { Observable, Subject, takeUntil, of, take } from 'rxjs';
+import { Observable, Subject, takeUntil, of, take, filter } from 'rxjs';
 
 import { ApplyOrderApplicants, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -16,7 +16,7 @@ import PriceUtils from '@shared/utils/price.utils';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { deployedCandidateMessage, DEPLOYED_CANDIDATE } from '@shared/constants';
+import { deployedCandidateMessage, DEPLOYED_CANDIDATE, REQUIRED_PERMISSIONS, SubmissionsLimitReached } from '@shared/constants';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
 
@@ -24,6 +24,7 @@ import { DateTimeHelper } from '@core/helpers';
   selector: 'app-apply-candidate',
   templateUrl: './apply-candidate.component.html',
   styleUrls: ['./apply-candidate.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [MaskedDateTimeService],
 })
 export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
@@ -49,6 +50,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public organizationId: number;
   public priceUtils = PriceUtils;
   public orderId: number;
+  public canApplyCandidate = true;
+  public applyRestrictionMessage = REQUIRED_PERMISSIONS;
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
@@ -197,22 +200,29 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private subscribeOnInitialData(): void {
-    this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrderCandidateJob) => {
+    this.candidateJobState$
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe((data: OrderCandidateJob) => {
       this.candidateJob = data;
 
       if (data?.candidateProfile.id === this.candidate.candidateId) {
         this.getComments();
       }
+      this.changeDetectorRef.markForCheck();
     });
     this.orderApplicantsInitialData$
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(
+        filter((data) => !!data),
+        takeUntil(this.unsubscribe$),
+        )
       .subscribe((data: OrderApplicantsInitialData) => {
-        if (data) {
-          this.organizationId = data.organizationId;
-          this.candidateId = data.candidateId;
-          this.orderId = data.orderId;
-          this.setFormValue(data);
-        }
+        this.organizationId = data.organizationId;
+        this.candidateId = data.candidateId;
+        this.orderId = data.orderId;
+        this.canApplyCandidate = data.canApplyCandidatesToOrder;
+        this.applyRestrictionMessage = this.canApplyCandidate ? REQUIRED_PERMISSIONS : SubmissionsLimitReached;
+        this.setFormValue(data);
+        this.changeDetectorRef.detectChanges();
       });
   }
 }

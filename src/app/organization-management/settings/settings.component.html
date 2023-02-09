@@ -239,7 +239,7 @@
       <div class="input-container bootstrap">
         <label for="attribute">Attribute</label>
         <div class="input-group">
-          <ejs-tooltip [content]="attribute.value" [showTipPointer]="false">
+          <ejs-tooltip [content]="organizationSettingsFormGroup.get('name')?.value" [showTipPointer]="false">
             <input
               #attribute
               id="attribute"

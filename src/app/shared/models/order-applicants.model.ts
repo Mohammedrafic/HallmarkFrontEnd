@@ -15,6 +15,7 @@ export type OrderApplicantsInitialData = {
   requestComment?: string;
   skill?: string;
   candidatePayRate: string | null;
+  canApplyCandidatesToOrder: boolean;
 }
 
 export type OrderApplicantsApplyData = {

@@ -85,3 +85,4 @@ export const UpdateRegularRatesucceedcount = (count: number) =>
   ` ${count} Order(s) affected , ` + REGULAR_RATE_UPDATE_SUCCESS;
 
 export const DOCUMENT_DOWNLOAD_SUCCESS = 'Document downloaded successfully';
+export const SubmissionsLimitReached = 'The order has reached its submission limit';
