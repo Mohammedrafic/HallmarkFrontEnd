@@ -18,6 +18,7 @@ export class UpdateRegRateComponent implements OnInit {
   public updateform: FormGroup;
   public getorderdatas:any;
   public disabledbtn:boolean = true;
+  @Output() public reloadItemsListforupdate: EventEmitter<void> = new EventEmitter<void>();
   @Input() public orderdatas: any;
   constructor(
         private formBuilder: FormBuilder,
@@ -49,6 +50,7 @@ export class UpdateRegRateComponent implements OnInit {
       "hourlyRate" : this.updateform.value.updaterate
     };
     this.store.dispatch(new UpdateRegRateorder(payload));
+    this.reloadItemsListforupdate.next();
   }
 
   ngOnChanges(orderdatas : SimpleChanges):void{
