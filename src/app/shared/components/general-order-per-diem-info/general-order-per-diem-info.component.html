@@ -74,6 +74,10 @@
         <div class="sup-title">Oncall</div>
       </div>
       <div class="column">
+        <div class="title">{{ orderInformation.asapStart | boolValueToText }}</div>
+        <div class="sup-title">ASAP Start</div>
+      </div>
+      <div class="column">
         <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No' }}</div>
         <div class="sup-title">Critical Order</div>
       </div>

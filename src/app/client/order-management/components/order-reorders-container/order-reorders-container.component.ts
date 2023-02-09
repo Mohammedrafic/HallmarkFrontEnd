@@ -15,7 +15,7 @@ export class OrderReOrdersContainerComponent {
   }
   @Input() isAgency = false;
 
-  @Input() activeSystem: OrderManagementIRPSystemId;
+  @Input() activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
 
   @Output() selectReOrder = new EventEmitter<{ reOrder: OrderManagement | AgencyOrderManagement, order: Order
     | OrderManagement | AgencyOrderManagement }>();
