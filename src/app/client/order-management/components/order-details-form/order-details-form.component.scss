@@ -13,22 +13,23 @@
     width: 30%;
   }
 
+  .order-job-title,
   .order-type-container {
-    width: 70%;
+    width: 40%;
   }
 
   .order-status-container {
-    width: 30%;
+    width: 20%;
   }
 
   .order-type-status-form {
     display: flex;
+    column-gap: 12px;
   }
 
   .input-container,
   .dropdown-container {
     margin-bottom: 15px;
-    margin-right: 10px;
   }
 
   .order-status-container {
@@ -104,12 +105,20 @@ label {
   width: 40%;
 }
 
+.form-line-item-45 {
+  width: 45%;
+}
+
 .form-line-item-50 {
   width: 50%;
 }
 
 .form-line-item-60 {
   width: 60%;
+}
+
+.form-line-item-100 {
+  width: 100%;
 }
 
 .comments {
@@ -219,6 +228,32 @@ ejs-textbox.e-control {
   }
 }
 
+.form-subline {
+  display: flex;
+  align-items: flex-end;
+  column-gap: 15px;
+
+  &__width-50 {
+    width: 50%;
+  }
+
+  &__width-35 {
+    width: calc(35% + 7px);
+  }
+
+  &__width-100 {
+    width: 100%;
+  }
+}
+
+.perm-form-30 {
+  width: calc(30% + 28px);
+}
+
+.perm-form-35 {
+  width: calc(32% + 15px);
+}
+
 @media #{$max-desktop-small} {
   .order-form-container {
     flex-direction: column;
@@ -246,11 +281,15 @@ ejs-textbox.e-control {
 }
 
 @media #{$max-mobile} {
+  .perm-form-30,
+  .perm-form-35,
   .form-line-item-20,
   .form-line-item-25,
   .form-line-item-30,
   .form-line-item-35,
-  .form-line-item-40 {
+  .form-line-item-40,
+  .form-line-item-45,
+  .form-line-item-50 {
     width: 100%;
   }
 
@@ -288,11 +327,19 @@ ejs-textbox.e-control {
     row-gap: 12px;
 
     .contact-btn,
+    .form-subline,
     .input-container,
     .datepicker-container,
     .job-description-checkboxes-container {
       padding-left: 0;
     }
+  }
+
+  .form-subline {
+    width: 100%;
+    flex-direction: column;
+    row-gap: 12px;
+    padding-left: 0;
   }
 
   .job-description-checkboxes-container {
@@ -319,6 +366,22 @@ ejs-textbox.e-control {
     .left-section {
       width: 100%;
       padding: 0;
+
+      .order-type-status-form {
+        flex-wrap: wrap !important;
+
+        .order-type-container {
+          width: 49%;
+        }
+
+        .job-title-wrapper {
+          flex-basis: 100%;
+        }
+
+        .order-job-title {
+          width: 100%;
+        }
+      }
     }
 
     .right-section {

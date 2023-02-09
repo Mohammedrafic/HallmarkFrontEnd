@@ -571,7 +571,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     const compBonus = order.compBonus ? parseFloat(order.compBonus.toString()).toFixed(2) : '';
     this.orderStatus = order.statusText;
     this.orderTypeForm.controls['orderType'].patchValue(order.orderType);
-    this.generalInformationForm.controls['title'].patchValue(order.title);
+    this.orderTypeForm.controls['title'].patchValue(order.title);
 
     this.skills$
       .pipe(takeUntil(this.componentDestroy()))
@@ -743,9 +743,10 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
     if (order.orderType === OrderType.OpenPerDiem && order.status === OrderStatus.Open) {
       this.handlePerDiemOrder();
+      this.orderTypeForm.get('title')?.disable();
       this.generalInformationForm = disableControls(
         this.generalInformationForm,
-        ['title', ...ControlsForDisable], false
+        [...ControlsForDisable], false
       );
     }
 
