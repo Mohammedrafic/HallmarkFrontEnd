@@ -562,6 +562,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.getOrders(clearedFilters);
   }
 
+  public updatePageforbulk(): void {
+    this.getOrders();
+    this.clearSelection(this.gridWithChildRow);
+  }
+
+
   public onAddReorderClose(): void {
     if (
       this.activeTab === OrganizationOrderManagementTabs.AllOrders ||
