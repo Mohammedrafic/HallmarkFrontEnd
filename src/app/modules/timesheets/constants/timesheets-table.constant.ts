@@ -208,7 +208,8 @@ export const filteringOptionsMapping: Map<FilteringOptionsFields, TimesheetsTabl
   .set(FilteringOptionsFields.Orders, TimesheetsTableFiltersColumns.OrderIds)
   .set(FilteringOptionsFields.Regions, TimesheetsTableFiltersColumns.RegionsIds)
   .set(FilteringOptionsFields.Skills, TimesheetsTableFiltersColumns.SkillIds)
-  .set(FilteringOptionsFields.Statuses, TimesheetsTableFiltersColumns.StatusIds);
+  .set(FilteringOptionsFields.Statuses, TimesheetsTableFiltersColumns.StatusIds)
+  .set(FilteringOptionsFields.Statuses, TimesheetsTableFiltersColumns.ContactEmails);
 
 
 export const BulkApproveSuccessMessage = {

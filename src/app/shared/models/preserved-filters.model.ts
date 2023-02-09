@@ -2,7 +2,7 @@ export type PreservedFilters = {
   organizations?: number[],
   regions: number[],
   locations: number[],
-  contactEmails?: string[] | null,
+  contactEmails?: string | null,
 };
 
 export type PreservedFiltersGlobal = {

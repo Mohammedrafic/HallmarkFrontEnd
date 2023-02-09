@@ -33,8 +33,6 @@ export class TimesheetsFilterDialogComponent extends
   @Input() isAgency: boolean;
 
   public showStatuses = true;
-  public filteredUsers: FilteredUser[] = [];
-  public userSearch$ = new Subject<FilteringEventArgs>();
 
   ngOnInit(): void {
     this.initFormGroup();

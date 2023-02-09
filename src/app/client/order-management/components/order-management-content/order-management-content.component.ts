@@ -1565,6 +1565,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       });
   }
 
+  private getPreservedContactPerson(contactEmails: string): void {
+    this.filterService.getUsersListBySearchTerm(contactEmails).subscribe((data) => {
+      this.filteredUsers = this.filterColumns.contactEmails.dataSource = data;
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    });
+  }
+
   private setDefaultFilter(): void {
     if (this.filterService.canPreserveFilters()) {
       const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
@@ -1577,7 +1584,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         }
       }
       if (preservedFilters?.contactEmails) {
-        this.OrderFilterFormGroup.get('contactEmails')?.setValue(preservedFilters.contactEmails[0]);
+        this.getPreservedContactPerson(preservedFilters.contactEmails);
+        this.OrderFilterFormGroup.get('contactEmails')?.setValue(preservedFilters.contactEmails);
+        this.filters.contactEmails = [preservedFilters.contactEmails];
       }
     }
     if (!(this.filters.isTemplate || this.isIncomplete)) {

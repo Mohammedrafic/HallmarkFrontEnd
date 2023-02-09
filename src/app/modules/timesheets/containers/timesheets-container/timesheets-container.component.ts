@@ -138,6 +138,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
             statusIds: this.tabConfig[tabIndex].value,
             regionsIds: [...preservedFilters.regions],
             locationIds: preservedFilters.locations,
+            contactEmails: preservedFilters.contactEmails ? [preservedFilters.contactEmails] : undefined,
           },
           this.activeTabIdx !== 0,
           false
@@ -300,6 +301,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
                 organizationId: orgId,
                 regionsIds: [...preservedFilters.regions],
                 locationIds: [...preservedFilters.locations],
+                contactEmails: preservedFilters.contactEmails ? [preservedFilters.contactEmails] : undefined,
               },
               this.activeTabIdx !== 0
             ),
@@ -358,6 +360,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
           new Timesheets.UpdateFiltersState({
             regionsIds: [...preservedFilters.regions],
             locationIds: [...preservedFilters.locations],
+            contactEmails: preservedFilters.contactEmails ? [preservedFilters.contactEmails] : undefined,
           }),
           new Timesheets.GetFiltersDataSource(),
         ]);

@@ -25,7 +25,12 @@ export class FilterService {
     if (this.canPreserveFilters()) {
       this.store.dispatch(
         new SetPreservedFilters(
-          { regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null, contactEmails: filters.contactEmails || null }
+          { 
+            regions: filters[regionPropName] || [], 
+            locations: filters.locationIds || [], 
+            organizations: filters.organizationIds || null, 
+            contactEmails: Array.isArray(filters.contactEmails) ? filters.contactEmails[0] : filters.contactEmails || null
+          }
         )
       );
     }
@@ -63,6 +68,7 @@ export class FilterService {
     } else if (
       filterColumns[event.column].type === ControlTypes.Date
       || filterColumns[event.column].type === ControlTypes.Dropdown
+      || filterColumns[event.column].type === ControlTypes.Autocomplete
       ) {
       form.controls[event.column].setValue(null);
     } else {
