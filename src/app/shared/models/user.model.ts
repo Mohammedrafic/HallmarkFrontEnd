@@ -33,3 +33,9 @@ export type UsersFilters = {
   roleIds?: number[];
   status?: boolean;
 };
+
+export type FilteredUser = {
+  fullName: string;
+  email: string;
+  userId: string;
+}

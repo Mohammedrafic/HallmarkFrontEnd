@@ -1,4 +1,5 @@
 import { DatePipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { DropdownOption } from '@core/interface';
@@ -6,13 +7,14 @@ import { Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
-import { User } from '@shared/models/user.model';
+import { FilteredUser, User } from '@shared/models/user.model';
 import { isBoolean, isDate, isEmpty, isNumber } from 'lodash';
+import { debounceTime, filter, Observable } from 'rxjs';
 import { SetPreservedFilters, SetPreservedFiltersForTimesheets } from 'src/app/store/preserved-filters.actions';
 
 @Injectable({ providedIn: 'root' })
 export class FilterService {
-  constructor(private store: Store) {}
+  constructor(private store: Store, private http: HttpClient) {}
 
   public canPreserveFilters(): boolean {
     const user = JSON.parse(localStorage.getItem('User') || '') as User;
@@ -21,7 +23,11 @@ export class FilterService {
 
   public setPreservedFIlters(filters: any, regionPropName = 'regionIds'): void {
     if (this.canPreserveFilters()) {
-      this.store.dispatch(new SetPreservedFilters({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }));
+      this.store.dispatch(
+        new SetPreservedFilters(
+          { regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null, contactEmails: filters.contactEmails || null }
+        )
+      );
     }
   }
 
@@ -100,6 +106,19 @@ export class FilterService {
             });
             break;
 
+          case ControlTypes.Autocomplete:
+            const filteredItem = filterColumns[key].dataSource?.find(
+              (data: any) => data[filterColumns[key].valueId] === val
+            );
+            chips.push({
+              text:
+                filterColumns[key].valueType === ValueType.Id ? filteredItem
+                && filteredItem[filterColumns[key].valueField] : val,
+              column: key,
+              value: val,
+            });
+            break;
+
           case ControlTypes.Checkbox:
             chips.push({ text: filterColumns[key].checkBoxTitle, column: key, value: val });
             break;
@@ -131,5 +150,9 @@ export class FilterService {
       });
 
     return chips;
+  }
+
+  public getUsersListBySearchTerm(searchTerm: string): Observable<FilteredUser[]> {
+    return this.http.get<FilteredUser[]>('/api/UserSearch', { params: { searchTerm } });
   }
 }

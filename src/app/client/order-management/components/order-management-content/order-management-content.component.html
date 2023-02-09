@@ -785,9 +785,10 @@
           <ejs-autocomplete
             mode="CheckBox"
             formControlName="contactEmails"
-            [allowFiltering]="true"
-            [dataSource]="filterColumns.projectTypeIds.dataSource"
-            [fields]="specialProjectCategoriesFields"
+            [dataSource]="filteredUsers"
+            [autofill]="true"
+            (filtering)="contactPersonFiltering($event)"
+            [fields]="contactPersonFields"
           >
           </ejs-autocomplete>
         </div>

@@ -669,6 +669,7 @@ export class OrderFilter {
   projectNameIds?: number | null;
   poNumberIds?: number | null;
   orderType?: number | null;
+  contactEmails?: string[] | string;
 }
 
 export class SortModel {
