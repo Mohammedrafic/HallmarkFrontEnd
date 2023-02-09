@@ -18,6 +18,8 @@ export class InvoiceFiltersAdapter {
       'paidDateTo',
       'weekPeriodFrom',
       'weekPeriodTo',
+      'serviceDateFrom',
+      'serviceDateTo',
     ];
 
 

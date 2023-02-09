@@ -90,6 +90,8 @@ export interface InvoicesFilterState {
   skillIds?: number[];
   weekPeriodFrom?: string;
   weekPeriodTo?: string;
+  serviceDateFrom?: string;
+  serviceDateTo?: string;
 }
 
 export type InvoiceFilterColumns = {
