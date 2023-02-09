@@ -47,6 +47,12 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
       this.changeTab.emit(1);
       window.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
+    //Rejected Tab navigation.
+    if(AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase()==this.alertTitle.toLowerCase()) {
+      this.tabComponent.selectedItem=3;
+      this.changeTab.emit(3);
+      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
   }
 
   public trackBy(_: number, item: TabsListConfig): string {
