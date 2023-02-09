@@ -22,20 +22,20 @@ export class QuickOrderService {
 
   public createOrganizationForm(): CustomFormGroup<OrganizationDTO> {
     return this.formBuilder.group({
-      organization: [null, Validators.required]
+      organization: [null, Validators.required],
+      title: [null, [Validators.required, Validators.maxLength(50)]],
     }) as CustomFormGroup<OrganizationDTO>;
   }
 
   public createOrderTypeForm(): CustomFormGroup<OrderTypeDTO> {
     return this.formBuilder.group({
-      orderType: [OrderType.Traveler, Validators.required]
+      orderType: [OrderType.Traveler, Validators.required],
     }) as CustomFormGroup<OrderTypeDTO>;
   }
 
   public createOrderInformationForm(): CustomFormGroup<OrderInformationDTO> {
     return this.formBuilder.group(
       {
-        title: [null, [Validators.required, Validators.maxLength(50)]],
         regionId: [null, Validators.required],
         locationId: [null, Validators.required],
         departmentId: [null, Validators.required],

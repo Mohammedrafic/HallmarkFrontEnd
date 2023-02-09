@@ -20,6 +20,8 @@
 
     .order-type-status-form {
       display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
 
       .order-type-container {
         flex: 1;
@@ -36,6 +38,14 @@
       justify-content: space-between;
       align-items: flex-end;
       flex: 1;
+    }
+  }
+
+  .quick-order-header-fields {
+    align-items: flex-start;
+
+    .title-job {
+      margin-top: 12px;
     }
   }
 
@@ -101,6 +111,10 @@
 
 .form-line-item-40 {
   width: 40%;
+}
+
+.form-line-item-50 {
+  width: 50%;
 }
 
 .form-line-item-60 {

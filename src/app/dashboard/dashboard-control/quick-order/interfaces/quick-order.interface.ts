@@ -18,6 +18,7 @@ export interface QuickOrderConditions {
 
 export interface OrganizationDTO {
   organization: number;
+  title: string;
 }
 
 export interface OrderTypeDTO {
@@ -25,7 +26,6 @@ export interface OrderTypeDTO {
 }
 
 export interface OrderInformationDTO {
-  title: string;
   regionId: number;
   locationId: number;
   departmentId: number;

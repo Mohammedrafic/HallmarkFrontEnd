@@ -234,7 +234,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   private initOrderInformationForm(): void {
     this.generalInformationForm = this.quickOrderService.createOrderInformationForm();
-
     this.shiftNameField = this.generalInformationForm.get('shift') as AbstractControl;
     this.shiftStartTimeField = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
     this.shiftEndTimeField = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
@@ -694,6 +693,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       const order = {
         isSubmit: true,
         isQuickOrder: true,
+        title: this.organizationForm.get('title')?.value,
         contactDetails: [this.contactDetailsForm.getRawValue()],
         ...this.orderTypeForm.getRawValue(),
         ...this.generalInformationForm.getRawValue(),

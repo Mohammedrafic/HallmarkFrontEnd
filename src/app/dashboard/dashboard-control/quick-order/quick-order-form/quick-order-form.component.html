@@ -1,6 +1,6 @@
 <div class="quick-order-form-container">
-  <div class="row bootstrap">
-    <form *ngIf="userIsAdmin" [formGroup]="organizationForm" class="form-line-item-40">
+  <div class="row quick-order-header-fields bootstrap">
+    <form *ngIf="userIsAdmin" [formGroup]="organizationForm" class="form-line-item-50">
       <div class="input-container">
         <label>Organization<span class="required">*</span></label>
         <div class="input-group dropdown">
@@ -15,8 +15,18 @@
           </ejs-dropdownlist>
         </div>
       </div>
+            
+      <!-- Job Title -->
+      <div class="input-container bootstrap title-job">
+        <label>Job Title<span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <div class="input-group">
+            <input class="e-input" type="text" appValidateWithMessage formControlName="title" maxlength="50" />
+          </div>
+        </div>
+      </div>
     </form>
-    <form [formGroup]="orderTypeForm" class="order-type-status-form form-line-item-60">
+    <form [formGroup]="orderTypeForm" class="order-type-status-form form-line-item-50">
       <div class="input-container order-type-container form-line-item-40">
         <label>Order Type<span class="required">*</span></label>
         <div class="input-group dropdown">
@@ -65,7 +75,9 @@
         </e-accordionitem>
         <e-accordionitem
           [content]="jobDistributionDescription"
-          [cssClass]="jobDistributionDescriptionForm.touched && jobDistributionDescriptionForm.invalid && 'form-invalid'"
+          [cssClass]="
+            jobDistributionDescriptionForm.touched && jobDistributionDescriptionForm.invalid && 'form-invalid'
+          "
         >
           <ng-template #header>
             <div class="header-title">
@@ -100,7 +112,9 @@
     </ejs-accordion>
   </section>
 
-  <button class="mobile-submit-btn" *ngIf="isMobile" ejs-button [isPrimary]="true" (click)="submitQuickOrderForm()">Submit</button>
+  <button class="mobile-submit-btn" *ngIf="isMobile" ejs-button [isPrimary]="true" (click)="submitQuickOrderForm()">
+    Submit
+  </button>
 </div>
 
 <!-- General Information -->
@@ -110,16 +124,6 @@
     <div class="general-information-form-container" id="generalInformation">
       <form [formGroup]="generalInformationForm">
         <div class="row">
-          <!-- Job Title -->
-          <div class="input-container bootstrap form-line-item-20">
-            <label>Job Title<span class="required">*</span></label>
-            <div class="input-group dropdown">
-              <div class="input-group">
-                <input class="e-input" type="text" appValidateWithMessage formControlName="title" maxlength="50" />
-              </div>
-            </div>
-          </div>
-
           <!-- Region -->
           <div class="input-container bootstrap form-line-item-20">
             <label>Region<span class="required">*</span></label>
@@ -181,7 +185,10 @@
           </div>
 
           <!-- Skill -->
-          <div class="input-container bootstrap form-line-item-20" *ngIf="organizationSkills$ | async as skillsDataSource">
+          <div
+            class="input-container bootstrap form-line-item-20"
+            *ngIf="organizationSkills$ | async as skillsDataSource"
+          >
             <label>Skill<span class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist
@@ -239,8 +246,10 @@
           </div>
 
           <!-- Job End Date -->
-          <div *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
-            class="datepicker-container form-line-item-20">
+          <div
+            *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
+            class="datepicker-container form-line-item-20"
+          >
             <label>Job End Date<span class="required">*</span></label>
             <div class="input-group datepicker bootstrap">
               <ejs-datepicker
@@ -356,10 +365,13 @@
           </div>
         </div>
 
-        <div class="row"
-          *ngIf="quickOrderConditions.isTravelerOrder
-          || quickOrderConditions.isContactToPermOrder
-          || quickOrderConditions.isPermPlacementOrder"
+        <div
+          class="row"
+          *ngIf="
+            quickOrderConditions.isTravelerOrder ||
+            quickOrderConditions.isContactToPermOrder ||
+            quickOrderConditions.isPermPlacementOrder
+          "
         >
           <!-- Job Start Date -->
           <div *ngIf="quickOrderConditions.isPermPlacementOrder" class="datepicker-container form-line-item-20">
@@ -395,7 +407,9 @@
 
           <!-- Shift Start Time -->
           <div class="input-container calendar form-line-item-20">
-            <label for="startTime">Shift Start Time<span class="required" *ngIf="quickOrderConditions.isShiftTimeRequired">*</span></label>
+            <label for="startTime"
+              >Shift Start Time<span class="required" *ngIf="quickOrderConditions.isShiftTimeRequired">*</span></label
+            >
             <div class="input-group datepicker bootstrap">
               <ejs-timepicker
                 placeholder="HH:MM"
@@ -412,7 +426,9 @@
 
           <!-- Shift End Time -->
           <div class="input-container calendar form-line-item-20">
-            <label for="startTime">Shift End Time<span class="required" *ngIf="quickOrderConditions.isShiftTimeRequired">*</span></label>
+            <label for="startTime"
+              >Shift End Time<span class="required" *ngIf="quickOrderConditions.isShiftTimeRequired">*</span></label
+            >
             <div class="input-group datepicker bootstrap">
               <ejs-timepicker
                 placeholder="HH:MM"
