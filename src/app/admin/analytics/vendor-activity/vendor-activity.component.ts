@@ -221,7 +221,7 @@ export class VendorActivityComponent implements OnInit {
 
     today.setDate(1); 
     let year = today.getMonth() == 0 ? today.getFullYear() - 1 : today.getFullYear();
-    let month = today.getMonth() == 0 ? 11 : today.getMonth();
+    let month = today.getMonth() == 0 ? 11 : today.getMonth()-1;
     let startDate = new Date(year, month , 1);
     let endDate = new Date(year, month+1, 0);
 
@@ -518,7 +518,7 @@ export class VendorActivityComponent implements OnInit {
 
     today.setDate(1);
     let year = today.getMonth() == 0 ? today.getFullYear() - 1 : today.getFullYear();
-    let month = today.getMonth() == 0 ? 11 : today.getMonth();
+    let month = today.getMonth() == 0 ? 11 : today.getMonth()-1;
     let startDate = new Date(year, month, 1);
     let endDate = new Date(year, month + 1, 0);
 
