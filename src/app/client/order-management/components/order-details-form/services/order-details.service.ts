@@ -29,12 +29,12 @@ export class OrderDetailsService {
   public createOrderTypeForm(): CustomFormGroup<OrderTypeDTO> {
     return this.formBuilder.group({
       orderType: [null, Validators.required],
+      title: [null, [Validators.required, Validators.maxLength(50)]],
     }) as CustomFormGroup<OrderTypeDTO>;
   }
 
   public createGeneralInformationForm(): CustomFormGroup<GeneralInformationDTO> {
     return this.formBuilder.group({
-        title: [null, [Validators.required, Validators.maxLength(50)]],
         regionId: [null, Validators.required],
         locationId: [null, Validators.required],
         departmentId: [null, Validators.required],

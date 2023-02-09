@@ -22,6 +22,16 @@
           <input class="e-input" type="text" [value]="orderStatus" [disabled]="true" />
         </div>
       </div>
+
+      <!-- Job Title -->
+      <div class="job-title-wrapper">
+        <div class="input-container bootstrap order-job-title">
+          <label>Job Title<span class="required">*</span></label>
+          <div class="input-group">
+            <input class="e-input" type="text" appValidateWithMessage formControlName="title" maxlength="50" />
+          </div>
+        </div>
+      </div>
     </form>
   </div>
 
@@ -37,16 +47,8 @@
           <div class="general-information-form-container">
             <form [formGroup]="generalInformationForm">
               <div class="form-line">
-                <!-- Job Title -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label>Job Title<span class="required">*</span></label>
-                  <div class="input-group">
-                    <input class="e-input" type="text" appValidateWithMessage formControlName="title" maxlength="50" />
-                  </div>
-                </div>
-
                 <!-- Region -->
-                <div class="input-container bootstrap form-line-item-20" *ngIf="(regions$ | async) as regionDataSource">
+                <div class="input-container bootstrap form-line-item-50" *ngIf="regions$ | async as regionDataSource">
                   <label>Region<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -65,7 +67,10 @@
                 </div>
 
                 <!-- Location -->
-                <div class="input-container bootstrap form-line-item-20" *ngIf="(locations$ | async) as locationDataSource">
+                <div
+                  class="input-container bootstrap form-line-item-50"
+                  *ngIf="locations$ | async as locationDataSource"
+                >
                   <label>Location<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -82,9 +87,13 @@
                     </ejs-dropdownlist>
                   </div>
                 </div>
-
+              </div>
+              <div class="form-line">
                 <!-- Department -->
-                <div class="input-container bootstrap form-line-item-20" *ngIf="(departments$ | async) as departmentDataSource">
+                <div
+                  class="input-container bootstrap form-line-item-50"
+                  *ngIf="departments$ | async as departmentDataSource"
+                >
                   <label>Department<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -103,7 +112,7 @@
                 </div>
 
                 <!-- Skill -->
-                <div class="input-container bootstrap form-line-item-20" *ngIf="skills$ | async as skillDataSource">
+                <div class="input-container bootstrap form-line-item-50" *ngIf="skills$ | async as skillDataSource">
                   <label>Skill<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -124,89 +133,105 @@
 
               <ng-container *ngIf="!isPerDiem">
                 <div class="form-line">
-                  <!-- Duration -->
-                  <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
-                    <label>Duration<span class="required">*</span></label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        formControlName="duration"
-                        appValidateWithMessage
-                        [allowFiltering]="true"
-                        [dataSource]="durations"
-                        [fields]="optionFields"
-                      >
-                      </ejs-dropdownlist>
+                  <div
+                    [ngClass]="isPermPlacementOrder ? 'form-subline__width-35' : 'form-subline__width-50'"
+                    class="form-subline"
+                  >
+                    <!-- Duration -->
+                    <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-45">
+                      <label>Duration<span class="required">*</span></label>
+                      <div class="input-group dropdown">
+                        <ejs-dropdownlist
+                          formControlName="duration"
+                          appValidateWithMessage
+                          [allowFiltering]="true"
+                          [dataSource]="durations"
+                          [fields]="optionFields"
+                        >
+                        </ejs-dropdownlist>
+                      </div>
+                    </div>
+
+                    <!-- Job Start Date -->
+                    <div
+                      [ngClass]="isPermPlacementOrder ? 'form-line-item-100' : 'form-line-item-30'"
+                      class="datepicker-container"
+                    >
+                      <label>Job Start Date<span class="required">*</span></label>
+                      <div class="input-group datepicker bootstrap">
+                        <ejs-datepicker
+                          class="datepicker"
+                          format="MM/dd/yyyy"
+                          placeholder="MM/DD/YYYY"
+                          formControlName="jobStartDate"
+                          appValidateWithMessage
+                          [enableMask]="true"
+                          [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                        >
+                        </ejs-datepicker>
+                      </div>
+                    </div>
+
+                    <!-- Job End Date -->
+                    <div *ngIf="!isPermPlacementOrder" class="datepicker-container form-line-item-30">
+                      <label>Job End Date<span class="required">*</span></label>
+                      <div class="input-group datepicker bootstrap">
+                        <ejs-datepicker
+                          class="datepicker"
+                          format="MM/dd/yyyy"
+                          placeholder="MM/DD/YYYY"
+                          formControlName="jobEndDate"
+                          appValidateWithMessage
+                          [enableMask]="true"
+                          [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                          [enabled]="isJobEndDateControlEnabled"
+                          [min]="generalInformationForm.controls['jobStartDate'].value"
+                        >
+                        </ejs-datepicker>
+                      </div>
                     </div>
                   </div>
 
-                  <!-- Job Start Date -->
-                  <div class="datepicker-container form-line-item-20">
-                    <label>Job Start Date<span class="required">*</span></label>
-                    <div class="input-group datepicker bootstrap">
-                      <ejs-datepicker
-                        class="datepicker"
-                        format="MM/dd/yyyy"
-                        placeholder="MM/DD/YYYY"
-                        formControlName="jobStartDate"
-                        appValidateWithMessage
-                        [enableMask]="true"
-                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                      >
-                      </ejs-datepicker>
+                  <div
+                    [ngClass]="isPermPlacementOrder ? 'form-subline__width-35' : 'form-subline__width-50'"
+                    class="form-subline"
+                  >
+                    <!-- Hourly rate -->
+                    <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-50">
+                      <label>Hourly Rate<span class="required">*</span></label>
+                      <div class="input-group">
+                        <input
+                          class="e-input"
+                          type="text"
+                          formControlName="hourlyRate"
+                          appValidateWithMessage
+                          maxlength="10"
+                          (focus)="priceUtils.setPriceMask(generalInformationForm, 'hourlyRate', $event)"
+                          (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <!-- Job End Date -->
-                  <div *ngIf="!isPermPlacementOrder" class="datepicker-container form-line-item-20">
-                    <label>Job End Date<span class="required">*</span></label>
-                    <div class="input-group datepicker bootstrap">
-                      <ejs-datepicker
-                        class="datepicker"
-                        format="MM/dd/yyyy"
-                        placeholder="MM/DD/YYYY"
-                        formControlName="jobEndDate"
-                        appValidateWithMessage
-                        [enableMask]="true"
-                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                        [enabled]="isJobEndDateControlEnabled"
-                        [min]="generalInformationForm.controls['jobStartDate'].value"
-                      >
-                      </ejs-datepicker>
-                    </div>
-                  </div>
-
-                  <!-- Hourly rate -->
-                  <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
-                    <label>Hourly Rate<span class="required">*</span></label>
-                    <div class="input-group">
-                      <input
-                        class="e-input"
-                        type="text"
-                        formControlName="hourlyRate"
-                        appValidateWithMessage
-                        maxlength="10"
-                        (focus)="priceUtils.setPriceMask(generalInformationForm, 'hourlyRate', $event)"
-                        (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
-                      />
-                    </div>
-                  </div>
-
-                  <!-- # Open Positions -->
-                  <div class="input-container bootstrap form-line-item-20">
-                    <label># Open Positions<span class="required">*</span></label>
-                    <div class="input-group">
-                      <input
-                        class="e-input"
-                        type="text"
-                        formControlName="openPositions"
-                        appValidateWithMessage
-                        maxlength="10"
-                      />
+                    <!-- # Open Positions -->
+                    <div
+                      [ngClass]="isPermPlacementOrder ? 'form-line-item-100' : 'form-line-item-50'"
+                      class="input-container bootstrap"
+                    >
+                      <label># Open Positions<span class="required">*</span></label>
+                      <div class="input-group">
+                        <input
+                          class="e-input"
+                          type="text"
+                          formControlName="openPositions"
+                          appValidateWithMessage
+                          maxlength="10"
+                        />
+                      </div>
                     </div>
                   </div>
 
                   <!-- Shift Requirements -->
-                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-30">
                     <label>Shift Name<span class="required">*</span></label>
                     <div class="input-group dropdown">
                       <ejs-dropdownlist
@@ -223,7 +248,7 @@
                   <!-- Shift Start Time -->
                   <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
                     <label for="startTime"
-                      >Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                      >Shift Start Time 2<span class="required" *ngIf="isShiftTimeRequired">*</span></label
                     >
                     <div class="input-group datepicker bootstrap">
                       <ejs-timepicker
@@ -258,163 +283,178 @@
                     </div>
                   </div>
                 </div>
-
                 <div class="form-line">
-                  <!-- Min Yrs. Req. -->
-                  <div class="input-container bootstrap form-line-item-20">
-                    <label>Min Yrs. Req.</label>
-                    <div class="input-group">
-                      <input
-                        class="e-input"
-                        type="text"
-                        formControlName="minYrsRequired"
-                        appValidateWithMessage
-                        maxlength="10"
-                      />
+                  <div class="form-subline form-line-item-50" *ngIf="!isPermPlacementOrder">
+                    <!-- Shift Requirements -->
+                    <div class="input-container bootstrap form-line-item-45">
+                      <label>Shift Name<span class="required">*</span></label>
+                      <div class="input-group dropdown">
+                        <ejs-dropdownlist
+                          formControlName="shift"
+                          appValidateWithMessage
+                          [allowFiltering]="true"
+                          [dataSource]="masterShiftNames"
+                          [fields]="optionFields"
+                        >
+                        </ejs-dropdownlist>
+                      </div>
+                    </div>
+
+                    <!-- Shift Start Time -->
+                    <div class="input-container calendar form-line-item-30">
+                      <label for="startTime"
+                        >Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                      >
+                      <div class="input-group datepicker bootstrap">
+                        <ejs-timepicker
+                          placeholder="HH:MM"
+                          formControlName="shiftStartTime"
+                          appValidateWithMessage
+                          format="HH:mm"
+                          [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                          [enableMask]="true"
+                          maskPlaceholder="HH:MM"
+                        >
+                        </ejs-timepicker>
+                      </div>
+                    </div>
+
+                    <!-- Shift End Time -->
+                    <div class="input-container calendar form-line-item-30">
+                      <label for="startTime"
+                        >Shift End Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                      >
+                      <div class="input-group datepicker bootstrap">
+                        <ejs-timepicker
+                          placeholder="HH:MM"
+                          formControlName="shiftEndTime"
+                          appValidateWithMessage
+                          format="HH:mm"
+                          [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                          [enableMask]="true"
+                          maskPlaceholder="HH:MM"
+                        >
+                        </ejs-timepicker>
+                      </div>
                     </div>
                   </div>
 
-                  <!-- Joining Bonus -->
                   <div
-                    *ngIf="!isPermPlacementOrder && userPermission[userPermissions.CanEnterJoiningCompletionBonus]"
-                    class="input-container bootstrap form-line-item-20"
+                    [ngClass]="isPermPlacementOrder ? 'form-subline__width-100' : 'form-subline__width-50'"
+                    class="form-subline"
                   >
-                    <label>Joining Bonus</label>
-                    <div class="input-group">
-                      <input
-                        class="e-input"
-                        formControlName="joiningBonus"
-                        maxlength="10"
-                        appValidateWithMessage
-                        type="text"
-                        (focus)="priceUtils.setPriceMask(generalInformationForm, 'joiningBonus', $event)"
-                        (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'joiningBonus', $event)"
-                      />
-                    </div>
-                  </div>
-
-                  <!-- Order Placement Fee (%) -->
-                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
-                    <label>Order Placement Fee (%)<span class="required">*</span></label>
-                    <div class="input-group">
-                      <ejs-numerictextbox
-                        class="e-input"
-                        formControlName="orderPlacementFee"
-                        format="###.00'%'"
-                        max="100"
-                        min="0"
-                        appValidateWithMessage
-                        [decimals]="2"
-                        [showSpinButton]="false"
-                        [validateDecimalOnType]="true"
-                        [htmlAttributes]="{ maxLength: '6' }"
-                      ></ejs-numerictextbox>
-                    </div>
-                  </div>
-
-                  <!-- Annual Salary Range From -->
-                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
-                    <label>Annual Salary Range From<span class="required">*</span></label>
-                    <div class="input-group">
-                      <input
-                        class="e-input"
-                        formControlName="annualSalaryRangeFrom"
-                        maxlength="10"
-                        appValidateWithMessage
-                        type="text"
-                        (focus)="priceUtils.setPriceMask(generalInformationForm, 'annualSalaryRangeFrom', $event)"
-                        (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'annualSalaryRangeFrom', $event)"
-                      />
-                    </div>
-                  </div>
-
-                  <!-- Annual Salary Range To -->
-                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
-                    <label>Annual Salary Range To<span class="required">*</span></label>
-                    <div class="input-group">
-                      <input
-                        class="e-input"
-                        formControlName="annualSalaryRangeTo"
-                        maxlength="10"
-                        appValidateWithMessage
-                        type="text"
-                        (focus)="priceUtils.setPriceMask(generalInformationForm, 'annualSalaryRangeTo', $event)"
-                        (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'annualSalaryRangeTo', $event)"
-                      />
-                    </div>
-                  </div>
-
-                  <!-- Comp. Bonus -->
-                  <div
-                    *ngIf="!isPermPlacementOrder && userPermission[userPermissions.CanEnterJoiningCompletionBonus]"
-                    class="input-container bootstrap form-line-item-20"
-                  >
-                    <label>Comp. Bonus</label>
-                    <div class="input-group">
-                      <input
-                        class="e-input"
-                        type="text"
-                        formControlName="compBonus"
-                        appValidateWithMessage
-                        maxlength="10"
-                        (focus)="priceUtils.setPriceMask(generalInformationForm, 'compBonus', $event)"
-                        (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'compBonus', $event)"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-line" *ngIf="!isPermPlacementOrder">
-                  <!-- Shift Requirements -->
-                  <div class="input-container bootstrap form-line-item-20">
-                    <label>Shift Name<span class="required">*</span></label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        formControlName="shift"
-                        appValidateWithMessage
-                        [allowFiltering]="true"
-                        [dataSource]="masterShiftNames"
-                        [fields]="optionFields"
-                      >
-                      </ejs-dropdownlist>
-                    </div>
-                  </div>
-
-                  <!-- Shift Start Time -->
-                  <div class="input-container calendar form-line-item-20">
-                    <label for="startTime"
-                      >Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    <!-- Min Yrs. Req. -->
+                    <div
+                      class="input-container bootstrap"
+                      [ngClass]="isPermPlacementOrder ? 'perm-form-35' : 'form-line-item-35'"
                     >
-                    <div class="input-group datepicker bootstrap">
-                      <ejs-timepicker
-                        placeholder="HH:MM"
-                        formControlName="shiftStartTime"
-                        appValidateWithMessage
-                        format="HH:mm"
-                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                        [enableMask]="true"
-                        maskPlaceholder="HH:MM"
-                      >
-                      </ejs-timepicker>
+                      <label>Min Yrs. Req.</label>
+                      <div class="input-group">
+                        <input
+                          class="e-input"
+                          type="text"
+                          formControlName="minYrsRequired"
+                          appValidateWithMessage
+                          maxlength="10"
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <!-- Shift End Time -->
-                  <div class="input-container calendar form-line-item-20">
-                    <label for="startTime"
-                      >Shift End Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    <!-- Joining Bonus -->
+                    <div
+                      *ngIf="!isPermPlacementOrder && userPermission[userPermissions.CanEnterJoiningCompletionBonus]"
+                      class="input-container bootstrap form-line-item-35"
                     >
-                    <div class="input-group datepicker bootstrap">
-                      <ejs-timepicker
-                        placeholder="HH:MM"
-                        formControlName="shiftEndTime"
-                        appValidateWithMessage
-                        format="HH:mm"
-                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                        [enableMask]="true"
-                        maskPlaceholder="HH:MM"
-                      >
-                      </ejs-timepicker>
+                      <label>Joining Bonus</label>
+                      <div class="input-group">
+                        <input
+                          class="e-input"
+                          formControlName="joiningBonus"
+                          maxlength="10"
+                          appValidateWithMessage
+                          type="text"
+                          (focus)="priceUtils.setPriceMask(generalInformationForm, 'joiningBonus', $event)"
+                          (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'joiningBonus', $event)"
+                        />
+                      </div>
+                    </div>
+
+                    <!-- Order Placement Fee (%) -->
+                    <div
+                      *ngIf="isPermPlacementOrder"
+                      class="input-container bootstrap"
+                      [ngClass]="isPermPlacementOrder ? 'perm-form-30' : 'form-line-item-35'"
+                    >
+                      <label>Order Placement Fee (%)<span class="required">*</span></label>
+                      <div class="input-group">
+                        <ejs-numerictextbox
+                          class="e-input"
+                          formControlName="orderPlacementFee"
+                          format="###.00'%'"
+                          max="100"
+                          min="0"
+                          appValidateWithMessage
+                          [decimals]="2"
+                          [showSpinButton]="false"
+                          [validateDecimalOnType]="true"
+                          [htmlAttributes]="{ maxLength: '6' }"
+                        ></ejs-numerictextbox>
+                      </div>
+                    </div>
+
+                    <!-- Annual Salary Range From -->
+                    <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-35">
+                      <label>Annual Salary Range From<span class="required">*</span></label>
+                      <div class="input-group">
+                        <input
+                          class="e-input"
+                          formControlName="annualSalaryRangeFrom"
+                          maxlength="10"
+                          appValidateWithMessage
+                          type="text"
+                          (focus)="priceUtils.setPriceMask(generalInformationForm, 'annualSalaryRangeFrom', $event)"
+                          (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'annualSalaryRangeFrom', $event)"
+                        />
+                      </div>
+                    </div>
+
+                    <!-- Annual Salary Range To -->
+                    <div
+                      *ngIf="isPermPlacementOrder"
+                      class="input-container bootstrap"
+                      [ngClass]="isPermPlacementOrder ? 'form-line-item-30' : 'form-line-item-35'"
+                    >
+                      <label>Annual Salary Range To<span class="required">*</span></label>
+                      <div class="input-group">
+                        <input
+                          class="e-input"
+                          formControlName="annualSalaryRangeTo"
+                          maxlength="10"
+                          appValidateWithMessage
+                          type="text"
+                          (focus)="priceUtils.setPriceMask(generalInformationForm, 'annualSalaryRangeTo', $event)"
+                          (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'annualSalaryRangeTo', $event)"
+                        />
+                      </div>
+                    </div>
+
+                    <!-- Comp. Bonus -->
+                    <div
+                      *ngIf="!isPermPlacementOrder && userPermission[userPermissions.CanEnterJoiningCompletionBonus]"
+                      class="input-container bootstrap form-line-item-35"
+                    >
+                      <label>Comp. Bonus</label>
+                      <div class="input-group">
+                        <input
+                          class="e-input"
+                          type="text"
+                          formControlName="compBonus"
+                          appValidateWithMessage
+                          maxlength="10"
+                          (focus)="priceUtils.setPriceMask(generalInformationForm, 'compBonus', $event)"
+                          (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'compBonus', $event)"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -428,7 +468,7 @@
           <div class="job-distribution-form-container">
             <form [formGroup]="jobDistributionForm">
               <div class="form-line">
-                <div class="input-container bootstrap form-line-item-40">
+                <div class="input-container bootstrap form-line-item-50">
                   <label>Job Distribution<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
@@ -441,7 +481,7 @@
                     </ejs-dropdownlist>
                   </div>
                 </div>
-                <div class="input-container bootstrap form-line-item-40">
+                <div class="input-container bootstrap form-line-item-50">
                   <label> Agency <span *ngIf="agencyControlEnabled" class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-multiselect
@@ -493,7 +533,7 @@
 
               <div class="form-line">
                 <!-- Job Description -->
-                <div class="input-container bootstrap form-line-item-40">
+                <div class="input-container bootstrap form-line-item-50">
                   <label for="comments">Job Description</label>
                   <div class="input-group">
                     <ejs-textbox
@@ -509,7 +549,7 @@
                 </div>
 
                 <!-- Unit Description -->
-                <div class="input-container bootstrap form-line-item-40">
+                <div class="input-container bootstrap form-line-item-50">
                   <label for="comments">Unit Description</label>
                   <div class="input-group">
                     <ejs-textbox
@@ -527,7 +567,7 @@
 
               <div class="form-line">
                 <!-- Reason of Requisition -->
-                <div class="input-container bootstrap form-line-item-40">
+                <div class="input-container bootstrap form-line-item-50">
                   <label>Reason for Requisition<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
