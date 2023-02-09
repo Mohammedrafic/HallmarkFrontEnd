@@ -14,7 +14,9 @@ export const DateRangeValidator: ValidatorFn = ((control: AbstractControl): Vali
 
 export const LeftOnlyValidValues = <T>(formGroup: FormGroup): T => {
   return Object.entries(formGroup.controls).reduce((acc: any, [key, control]: [string, AbstractControl]) => {
-    if (
+    if (!Array.isArray(control.value) && control.value && key === 'contactEmails') {
+      acc[key] = [control.value];
+    } else if (
       (!Array.isArray(control.value) && control.value ||
         Array.isArray(control.value) && control.value.length)
     ) {

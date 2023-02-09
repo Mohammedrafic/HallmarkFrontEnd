@@ -35,6 +35,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   public filteredItems: FilteredItem[] = [];
   public filterOptionFields = filterOptionFields;
   public skillFields: FieldSettingsModel = { text: 'name', value: 'masterSkillsId' };
+  public contactPersonFields: FieldSettingsModel = { text: 'fullName', value: 'email' };
   public filterColumns: T;
   public formGroup: CustomFormGroup<T>;
   public isAgencyArea: boolean;
@@ -56,7 +57,6 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   public applyFilters(): void {
     const filters: F = LeftOnlyValidValues(this.formGroup);
     const preservedFiltersState = this.formGroup.getRawValue();
-
     this.updateTableByFilters.emit(filters);
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
@@ -128,6 +128,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
           (this.filterColumns as any).locationIds.dataSource = dataSource;
           this.formGroup.controls['regionsIds'].setValue([...preservedFilters?.regions] || [], { emitEvent: false });
           this.formGroup.controls['locationIds'].setValue([...preservedFilters?.locations] || [], { emitEvent: false });
+          this.formGroup.controls['contactEmails'].setValue(preservedFilters?.contactEmails || '', { emitEvent: false });
           this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
           this.appliedFiltersAmount.emit(this.filteredItems.length);
         }

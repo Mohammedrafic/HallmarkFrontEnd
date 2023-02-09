@@ -108,6 +108,7 @@ export enum TimesheetsTableFiltersColumns {
   TotalHours = 'totalHours',
   BillRate = 'billRate',
   SkillIds = 'skillIds',
+  ContactEmails = 'contactEmails',
 }
 
 export enum FilteringOptionsFields {

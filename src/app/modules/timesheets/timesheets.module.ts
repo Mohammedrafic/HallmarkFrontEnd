@@ -47,7 +47,7 @@ import {
 } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
-import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
+import { AutoCompleteAllModule, DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 import { NumericTextBoxModule, TextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
 import { AccumulationChartAllModule, ChartAllModule } from '@syncfusion/ej2-angular-charts';
 
@@ -167,6 +167,7 @@ const gridIcons = {
     TimePickerModule,
     DialogAllModule,
     DateTimePickerModule,
+    AutoCompleteAllModule,
     NgxsModule.forFeature([TimesheetsState]),
     ChartAllModule,
     AccumulationChartAllModule,

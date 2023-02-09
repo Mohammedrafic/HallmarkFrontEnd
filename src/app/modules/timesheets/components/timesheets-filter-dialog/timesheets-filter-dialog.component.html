@@ -93,7 +93,23 @@
             placeholder=""></ejs-multiselect>
         </div>
       </div>
-      <div *ngIf="!isAgency" class="input-container">
+      <div class="input-container">
+        <label for="skill">Skill</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect
+            id="skill"
+            mode="CheckBox"
+            [allowFiltering]="true"
+            [fields]="skillFields"
+            [dataSource]="filterColumns.skillIds?.dataSource"
+            [showDropDownIcon]="true"
+            formControlName="skillIds"
+            placeholder=""></ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!isAgency" class="row">
+      <div class="input-container">
         <label for="agencyName">Select Agency</label>
         <div class="input-group dropdown">
           <ejs-multiselect
@@ -107,19 +123,18 @@
             placeholder=""></ejs-multiselect>
         </div>
       </div>
-    </div>
-    <div class="input-container">
-      <label for="skill">Skill</label>
-      <div class="input-group dropdown">
-        <ejs-multiselect
-          id="skill"
-          mode="CheckBox"
-          [allowFiltering]="true"
-          [fields]="skillFields"
-          [dataSource]="filterColumns.skillIds?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="skillIds"
-          placeholder=""></ejs-multiselect>
+      <div class="input-container">
+        <label>Contact Person</label>
+        <div class="input-group multiselect">
+          <ejs-autocomplete
+            formControlName="contactEmails"
+            [dataSource]="filteredUsers"
+            [autofill]="true"
+            (filtering)="contactPersonFiltering($event)"
+            [fields]="contactPersonFields"
+          >
+          </ejs-autocomplete>
+        </div>
       </div>
     </div>
   </form>

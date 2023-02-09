@@ -53,6 +53,7 @@ export interface TimesheetsFilterState {
   skillIds?: string[];
   isAgency?: boolean;
   timesheetIds?: number[];
+  contactEmails?: string[];
 }
 
 export interface TimesheetWeekFilter {
