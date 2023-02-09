@@ -20,7 +20,6 @@
 
     .order-type-status-form {
       display: flex;
-      flex-wrap: wrap;
       align-items: flex-start;
 
       .order-type-container {
@@ -44,8 +43,10 @@
   .quick-order-header-fields {
     align-items: flex-start;
 
-    .title-job {
-      margin-top: 12px;
+    .organization-title-form {
+      display: flex;
+      flex-direction: column;
+      row-gap: 12px;
     }
   }
 
@@ -215,16 +216,36 @@
     margin: 0 !important;
 
     > * {
-      padding: 15px 0 0 !important;
+      padding-top: 15px;
+      padding-left: 0 !important;
     }
 
     .order-status {
-      width: 50% !important;
+      width: 49% !important;
+      padding-left: 0 !important;
     }
 
     .contact-details-title-wrapper {
       width: 100%;
     }
+  }
+
+  .order-type-status-form,
+  .organization-title-form {
+    flex-direction: row !important;
+    width: 100%;
+    column-gap: 12px;
+
+    .input-container {
+      width: 50%;
+      padding-left: 0;
+    }
+  }
+  
+  .shift-name-form-line,
+  .duration-form-line {
+    width: 100%;
+    padding-top: 0 !important;
   }
 
   .job-description-form {
@@ -240,6 +261,7 @@
   .form-line-item-30,
   .form-line-item-35,
   .form-line-item-40,
+  .form-line-item-50,
   .form-line-item-60,
   .form-line-item-70 {
     width: 100%;
