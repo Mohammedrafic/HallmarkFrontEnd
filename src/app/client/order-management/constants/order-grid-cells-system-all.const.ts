@@ -13,8 +13,13 @@ import {
   GridHeaderActionsComponent,
 } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.component';
 import { OrderStatus } from '@shared/enums/order-management';
-import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
 import { GridValuesHelper } from '@core/helpers';
+import {
+  TableTypeCellComponent,
+} from '@client/order-management/components/order-management-content/sub-grid-components/table-type-cell';
+import {
+  CriticalCellComponent,
+} from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
 
 export const GridCellsSystemAll = (
   canCreateOrder = false,
@@ -110,7 +115,7 @@ export const GridCellsSystemAll = (
     field: 'isCritical',
     headerName: 'CRITICAL',
     width: 125,
-    cellRenderer: SwitchEditorComponent,
+    cellRenderer: CriticalCellComponent,
     cellRendererParams: {
       disabled: true,
       showCheckbox: true,
@@ -138,6 +143,7 @@ export const GridCellsSystemAll = (
     ...DefaultOrderCol,
     field: 'orderType',
     headerName: 'TYPE',
+    cellRenderer: TableTypeCellComponent,
     width: 85,
     minWidth: 70,
     maxWidth: 110,
