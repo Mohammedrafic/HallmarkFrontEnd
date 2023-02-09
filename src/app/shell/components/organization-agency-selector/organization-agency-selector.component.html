@@ -9,6 +9,7 @@
       [dataSource]="organizationsAgencies$ | async"
       [formControl]="organizationAgencyControl"
       popupHeight="402px"
+      (select)="selectBusinesUnitType()"
     >
       <ng-template #itemTemplate let-data>
         <div class="item-container" [ngClass]="isDarkTheme?' dark-item-container':''">

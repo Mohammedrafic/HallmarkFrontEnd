@@ -36,6 +36,7 @@ import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organizati
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { AgencyStatus } from 'src/app/shared/enums/status';
 import { UserStateModel } from '../../../store/user.state';
+import { ToggleSidebarState } from 'src/app/store/app.actions';
 
 interface IOrganizationAgency {
   id: number;
@@ -173,6 +174,13 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
           this.setAgencyStatus(selectedOrganizationAgency);
         }
       });
+  }
+
+  public selectBusinesUnitType(): void {
+    const isMobile = this.store.selectSnapshot(AppState.isMobileScreen);
+    if(isMobile) {
+      this.store.dispatch(new ToggleSidebarState(false));
+    }
   }
 
   ngOnDestroy(): void {
