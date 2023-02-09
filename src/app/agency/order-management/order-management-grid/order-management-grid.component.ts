@@ -189,7 +189,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         ? this.alertOrderId
         : 0;
         if(this.alertOrderId>0 ){
-          this.openDetailsTab = true;
           this.ordersPage.items= this.ordersPage.items.filter(x=>x.orderId===this.alertOrderId);
           this.gridWithChildRow.dataSource=this.ordersPage.items;
           this.onRowClick({data:this.ordersPage.items[0],isInteracted:false})
@@ -231,6 +230,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.alertOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
     (!this.alertOrderId)?this.alertOrderId=0:""
     window.localStorage.setItem("OrderId", JSON.stringify(""));
+    if(this.alertOrderId>0)
+      this.openDetailsTab = true;
   }
 
   public override customExport(): void {
@@ -779,6 +780,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         }
       } else {
         this.openDetailsTab = false;
+        if(this.alertOrderId>0)
+          this.openDetailsTab = true;
         this.openChildDialog.next(false);
         this.selectedCandidate = null;
         if (this.selectedReOrder?.selected.reOrder !== this.selectedOrder.orderId) {

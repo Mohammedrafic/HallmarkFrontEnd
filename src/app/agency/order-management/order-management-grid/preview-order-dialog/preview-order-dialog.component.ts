@@ -225,7 +225,9 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
     this.openEvent.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (isOpen) {
         if (this.openDetailsTab) {
-          this.tab.select(0);
+          setTimeout(()=>{
+            this.tab.select(0);
+          },100)
         } else {
           this.tab.select(1);
         }
