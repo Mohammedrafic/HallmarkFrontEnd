@@ -14,20 +14,17 @@ import {
   OrderCandidatesListPage,
 } from '@shared/models/order-management.model';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
-import { AppState } from "src/app/store/app.state";
+import { AppState } from 'src/app/store/app.state';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { PageOfCollections } from '@shared/models/page.model';
 import { CandidateSearchPlaceholder } from '@shared/constants/candidate-search-placeholder';
 
 @Directive()
-export abstract class AbstractOrderCandidateListComponent
-  extends AbstractPermissionGrid
-  implements OnInit, OnDestroy
-{
+export abstract class AbstractOrderCandidateListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('orderCandidatesGrid') grid: GridComponent;
 
   @Input() candidatesList: OrderCandidatesListPage | null;
@@ -43,12 +40,16 @@ export abstract class AbstractOrderCandidateListComponent
   @Select(OrderManagementState.candidatesJob)
   candidateJobAgencyState$: Observable<OrderCandidateJob>;
 
+  @Select(AppState.isMobileScreen)
+  private readonly isMobileScreen$: Observable<boolean>;
+
   public openDetails = new Subject<boolean>();
   public isAgency: boolean;
   public isOrganization: boolean;
-  public readonly searchByCandidateName$: Subject<string> = new Subject();
-  public readonly candidateSearchPlaceholder = CandidateSearchPlaceholder;
+  public candidateSearchPlaceholder = CandidateSearchPlaceholder;
 
+  private readonly searchByCandidateName$: Subject<string> = new Subject();
+  private searchTermByCandidateName: string;
   protected pageSubject = new Subject<number>();
   protected unsubscribe$: Subject<void> = new Subject();
 
@@ -63,6 +64,7 @@ export abstract class AbstractOrderCandidateListComponent
 
     combineLatest([this.onPageChanges(), this.onCloseDetails()]).pipe(takeUntil(this.unsubscribe$)).subscribe();
     this.searchCandidatesByName();
+    this.listenScreenResolution();
   }
 
   ngOnDestroy(): void {
@@ -122,6 +124,12 @@ export abstract class AbstractOrderCandidateListComponent
     this.searchByCandidateName$.next('');
   }
 
+  private listenScreenResolution(): void {
+    this.isMobileScreen$.pipe(takeUntil(this.unsubscribe$)).subscribe((isMobile) => {
+      this.candidateSearchPlaceholder = isMobile ? '' : CandidateSearchPlaceholder;
+    });
+  }
+
   private searchCandidateByName(value: string): void {
     this.getCandidatesList.emit({
       orderId: this.order.orderId,
@@ -137,6 +145,7 @@ export abstract class AbstractOrderCandidateListComponent
     this.searchByCandidateName$
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.unsubscribe$))
       .subscribe((queryString) => {
+        this.searchTermByCandidateName = queryString;
         this.searchCandidateByName(queryString);
       });
   }
@@ -155,12 +164,14 @@ export abstract class AbstractOrderCandidateListComponent
       currentPage: this.currentPage,
       pageSize: this.pageSize,
       excludeDeployed: !this.includeDeployedCandidates,
+      searchTerm: this.searchTermByCandidateName,
     });
   }
 
   protected onPageChanges(): Observable<unknown> {
     return this.pageSubject.pipe(
       debounceTime(1),
+      distinctUntilChanged(),
       tap((page) => {
         this.currentPage = page;
         this.emitGetCandidatesList();
