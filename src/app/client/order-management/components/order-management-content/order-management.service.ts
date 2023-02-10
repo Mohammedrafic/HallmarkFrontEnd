@@ -77,6 +77,7 @@ export class OrderManagementService extends DestroyableDirective {
       projectTypeIds: new FormControl(null),
       projectNameIds: new FormControl(null),
       poNumberIds: new FormControl(null),
+      contactEmails: new FormControl(null),
     });
   }
 

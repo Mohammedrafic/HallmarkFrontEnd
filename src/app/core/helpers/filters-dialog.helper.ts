@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Directive, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
@@ -15,9 +15,10 @@ import { APP_FILTERS_CONFIG, filterOptionFields } from '@core/constants/filters-
 
 import { findSelectedItems } from './functions.helper';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { FieldSettingsModel, FilteringEventArgs, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { ActivatedRoute } from '@angular/router';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { FilteredUser } from '@shared/models/user.model';
 
 @Directive()
 export class FiltersDialogHelper<T, F, S> extends Destroyable {
@@ -35,9 +36,12 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   public filteredItems: FilteredItem[] = [];
   public filterOptionFields = filterOptionFields;
   public skillFields: FieldSettingsModel = { text: 'name', value: 'masterSkillsId' };
+  public contactPersonFields: FieldSettingsModel = { text: 'fullName', value: 'email' };
   public filterColumns: T;
   public formGroup: CustomFormGroup<T>;
   public isAgencyArea: boolean;
+  public filteredUsers: FilteredUser[] = [];
+  public userSearch$ = new Subject<FilteringEventArgs>();
 
   private isPreservedFilterSet = false;
 
@@ -56,7 +60,6 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   public applyFilters(): void {
     const filters: F = LeftOnlyValidValues(this.formGroup);
     const preservedFiltersState = this.formGroup.getRawValue();
-
     this.updateTableByFilters.emit(filters);
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
@@ -128,6 +131,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
           (this.filterColumns as any).locationIds.dataSource = dataSource;
           this.formGroup.controls['regionsIds'].setValue([...preservedFilters?.regions] || [], { emitEvent: false });
           this.formGroup.controls['locationIds'].setValue([...preservedFilters?.locations] || [], { emitEvent: false });
+          this.getPreservedContactPerson(preservedFilters?.contactEmails);
           this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
           this.appliedFiltersAmount.emit(this.filteredItems.length);
         }
@@ -170,6 +174,18 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
           this.resetDataSourceAndChips(this.filtersConfig['DepartmentIds']);
         }
       });
+  }
+
+  private getPreservedContactPerson(contactEmails?: string | null): void {
+    if (contactEmails) {
+      this.filterService.getUsersListBySearchTerm(contactEmails).subscribe((data) => {
+        this.filteredUsers = data;
+        this.filtersHelperService.setDataSourceByFormKey(this.filtersConfig['ContactEmails'], data);
+        this.formGroup.controls['contactEmails'].setValue(contactEmails || '', { emitEvent: false });
+        this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
+        this.appliedFiltersAmount.emit(this.filteredItems.length);
+      })
+    }
   }
 
   private resetDataSourceAndChips(key: string): void {

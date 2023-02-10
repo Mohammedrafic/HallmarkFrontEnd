@@ -24,7 +24,7 @@ import {
   SortChangedEvent,
 } from '@ag-grid-community/core';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { FieldSettingsModel, FilteringEventArgs, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
@@ -47,6 +47,7 @@ import {
   throttleTime,
   map,
   distinctUntilChanged,
+  tap,
 } from 'rxjs';
 
 import { ORDERS_GRID_CONFIG } from '@client/client.config';
@@ -190,6 +191,7 @@ import { BreakpointObserverService } from '@core/services';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { MiddleTabletWidth, SmallDesktopWidth, TabletWidth } from '@shared/constants/media-query-breakpoints';
 import { UpdateRegRateComponent } from '../update-reg-rate/update-reg-rate.component';
+import { FilteredUser } from '@shared/models/user.model';
 
 @Component({
   selector: 'app-order-management-content',
@@ -249,6 +251,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
+  public readonly contactPersonFields: FieldSettingsModel = { text: 'fullName', value: 'email' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
@@ -349,7 +352,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public gridDomLayout: 'normal' | 'autoHeight' | 'print' | undefined;
   public openregrateupdate:boolean = false;
   public CurrentOrderDatas:any = [];
-
+  public filteredUsers: FilteredUser[] = [];
+  public userSearch$ = new Subject<FilteringEventArgs>();
 
   private isRedirectedFromDashboard: boolean;
   private orderStaus: number;
@@ -375,14 +379,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private eliteOrderId:number;
 
 
-    constructor(
+  constructor(
     protected override store: Store,
     private router: Router,
     private route: ActivatedRoute,
     private actions$: Actions,
     private confirmService: ConfirmService,
     private filterService: FilterService,
-    private fb: FormBuilder,
     private datePipe: DatePipe,
     private location: Location,
     private readonly actions: Actions,
@@ -488,6 +491,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.subscribeOnChanges();
     this.firstInitGridColumns();
     this.OnUpdateRegrateSucceededHandler();
+    this.subscribeOnUserSearch();
   }
 
   ngOnDestroy(): void {
@@ -512,6 +516,23 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
   }
 
+  private subscribeOnUserSearch(): void {
+    this.userSearch$.pipe(
+      filter((args) => args.text.length > 2),
+      tap((args) => {
+        this.filterColumns.contactEmails.dataSource = [];
+        args.updateData([]);
+      }),
+      debounceTime(300),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((args) => {
+      this.filterService.getUsersListBySearchTerm(args.text).subscribe(data => {
+        this.filterColumns.contactEmails.dataSource = data;
+        args.updateData(data);
+      });
+    });
+  }
+
   public override customExport(): void {
     if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
       // TODO new export for IRP system
@@ -520,6 +541,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.fileName = this.defaultFileName;
       this.store.dispatch(new ShowExportDialog(true));
     }
+  }
+
+  public contactPersonFiltering(args: FilteringEventArgs): void {
+    this.userSearch$.next(args);
   }
 
   public closeExport() {
@@ -705,6 +730,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       projectTypeIds: this.filters.projectTypeIds || null,
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
+      contactEmails: Array.isArray(this.filters.contactEmails) ? this.filters.contactEmails[0] : this.filters.contactEmails || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
@@ -789,6 +815,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public onFilterApply(): void {
     this.filterApplied = true;
     this.filters = this.OrderFilterFormGroup.getRawValue();
+    if (!Array.isArray(this.filters.contactEmails)) {
+      this.filters.contactEmails = this.filters.contactEmails ? [this.filters.contactEmails] : this.filters.contactEmails;
+    }
     this.filters.candidateName = this.filters.candidateName || null;
     this.filters.orderPublicId = this.filters.orderPublicId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;
@@ -1426,6 +1455,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         valueField: 'statusText',
         valueId: 'status',
       },
+      contactEmails: {
+        type: ControlTypes.Autocomplete,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'fullName',
+        valueId: 'email',
+      },
       candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },
       agencyIds: {
@@ -1535,6 +1571,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       });
   }
 
+  private getPreservedContactPerson(contactEmails: string): void {
+    this.filterService.getUsersListBySearchTerm(contactEmails).subscribe((data) => {
+      this.filteredUsers = this.filterColumns.contactEmails.dataSource = data;
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    });
+  }
+
   private setDefaultFilter(): void {
     if (this.filterService.canPreserveFilters()) {
       const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
@@ -1545,6 +1588,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
           this.filters.locationIds = [...preservedFilters.locations];
         }
+      }
+      if (preservedFilters?.contactEmails) {
+        this.getPreservedContactPerson(preservedFilters.contactEmails);
+        this.OrderFilterFormGroup.get('contactEmails')?.setValue(preservedFilters.contactEmails);
+        this.filters.contactEmails = [preservedFilters.contactEmails];
       }
     }
     if (!(this.filters.isTemplate || this.isIncomplete)) {
@@ -1860,6 +1908,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if (selectedOrderAfterRedirect) {
       this.OrderFilterFormGroup.patchValue({ orderId: selectedOrderAfterRedirect.orderId.toString() });
       this.filters = this.OrderFilterFormGroup.getRawValue();
+      if (!Array.isArray(this.filters.contactEmails)) {
+        this.filters.contactEmails = this.filters.contactEmails ? [this.filters.contactEmails] : this.filters.contactEmails;
+      }
       this.filters.orderPublicId = selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId;
       this.filters.agencyType = null;
       this.filters.includeReOrders = false;

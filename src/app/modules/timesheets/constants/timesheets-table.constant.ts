@@ -160,6 +160,13 @@ const skillsColumnMapping = {
   valueId: 'masterSkillsId',
 };
 
+const contactEmailsColumnMapping = {
+  type: ControlTypes.Autocomplete,
+  valueType: ValueType.Id,
+  valueField: 'fullName',
+  valueId: 'email',
+}
+
 export const DefaultFilterColumns: FilterColumns = {
   searchTerm: defaultInputMapping,
   orderIds: defaultColumnMapping,
@@ -169,6 +176,7 @@ export const DefaultFilterColumns: FilterColumns = {
   agencyIds: defaultColumnMapping,
   regionsIds: defaultColumnMapping,
   locationIds: defaultColumnMapping,
+  contactEmails: contactEmailsColumnMapping,
 } as FilterColumns;
 
 export const SavedFiltersParams: TimesheetsTableFiltersColumns[] = [
@@ -200,7 +208,8 @@ export const filteringOptionsMapping: Map<FilteringOptionsFields, TimesheetsTabl
   .set(FilteringOptionsFields.Orders, TimesheetsTableFiltersColumns.OrderIds)
   .set(FilteringOptionsFields.Regions, TimesheetsTableFiltersColumns.RegionsIds)
   .set(FilteringOptionsFields.Skills, TimesheetsTableFiltersColumns.SkillIds)
-  .set(FilteringOptionsFields.Statuses, TimesheetsTableFiltersColumns.StatusIds);
+  .set(FilteringOptionsFields.Statuses, TimesheetsTableFiltersColumns.StatusIds)
+  .set(FilteringOptionsFields.Statuses, TimesheetsTableFiltersColumns.ContactEmails);
 
 
 export const BulkApproveSuccessMessage = {

@@ -8,13 +8,15 @@ import {
 } from '@angular/core';
 
 import { Select } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
 
 import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
 
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimesheetsModel, TimeSheetsPage } from '../../store/model/timesheets.model';
 import { FilterColumns, TimesheetsFilterState } from '../../interface';
+import { FilteredUser } from '@shared/models/user.model';
+import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-timesheets-filter-dialog',
@@ -37,6 +39,7 @@ export class TimesheetsFilterDialogComponent extends
     this.initFiltersColumns(TimesheetsState.timesheetsFiltersColumns);
     this.startRegionsWatching();
     this.startLocationsWatching();
+    this.subscribeOnUserSearch();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -48,5 +51,26 @@ export class TimesheetsFilterDialogComponent extends
       this.showStatuses = this.activeTabIdx === 0;
       this.clearAllFilters(false);
     }
+  }
+
+  public contactPersonFiltering(args: FilteringEventArgs): void {
+    this.userSearch$.next(args);
+  }
+
+  private subscribeOnUserSearch(): void {
+    this.userSearch$.pipe(
+      filter((args) => args.text.length > 2),
+      tap((args) => {
+        this.filterColumns.contactEmails.dataSource = [];
+        args.updateData([]);
+      }),
+      debounceTime(300),
+      takeUntil(this.componentDestroy())
+    ).subscribe((args) => {
+      this.filterService.getUsersListBySearchTerm(args.text).subscribe(data => {
+        this.filterColumns.contactEmails.dataSource = data;
+        args.updateData(data);
+      });
+    });
   }
 }
