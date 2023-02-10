@@ -321,7 +321,7 @@
     </section>
 
     <section class="bill-rates">
-      <ng-container [ngTemplateOutlet]="isCancelled ? billRates : editBillRates"></ng-container>
+      <ng-container [ngTemplateOutlet]="isCancelled || isAgency ? billRates : editBillRates"></ng-container>
       <ng-template #billRates>
         <app-bill-rates-view-grid [billRatesData]="candidateJob?.billRates || []"></app-bill-rates-view-grid>
       </ng-template>
