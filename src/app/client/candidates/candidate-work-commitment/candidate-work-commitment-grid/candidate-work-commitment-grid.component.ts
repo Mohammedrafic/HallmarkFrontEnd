@@ -36,7 +36,7 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
   currentUserPermissions$: Observable<Permission>;
 
   public employeeId: number;
-  public readonly columnDef: ColumnDefinitionModel[] = CandidateWorkCommitmentColumnDef(this.editCommitment.bind(this), this.deleteCommitment.bind(this));
+  public columnDef: ColumnDefinitionModel[];
   public rowSelection = undefined;
   public customRowsPerPageDropDownObject = [ { text: '5 Rows', value: 5 } ];
   public pageNumber: number = 1;
@@ -52,6 +52,9 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
     private confirmService: ConfirmService,
   ) {
     super();
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    this.columnDef = CandidateWorkCommitmentColumnDef(this.editCommitment.bind(this), this.deleteCommitment.bind(this), todayDate);
   }
 
   public ngOnInit(): void {

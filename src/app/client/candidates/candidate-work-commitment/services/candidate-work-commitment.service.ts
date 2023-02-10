@@ -14,6 +14,9 @@ export class CandidateWorkCommitmentService {
   }
 
   public saveCandidateWorkCommitment(workCommitment: CandidateWorkCommitment): Observable<CandidateWorkCommitment> {
+    if (workCommitment.id) {
+      return this.httpClient.put<CandidateWorkCommitment>('/api/EmployeeWorkCommitments/' + workCommitment.id, workCommitment);
+    }
     return this.httpClient.post<CandidateWorkCommitment>('/api/EmployeeWorkCommitments', workCommitment);
   }
 
