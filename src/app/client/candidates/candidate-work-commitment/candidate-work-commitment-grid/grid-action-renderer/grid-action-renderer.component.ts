@@ -42,8 +42,4 @@ export class CandidateCommitmentGridActionRendererComponent extends AbstractPerm
   public deleteCommitment(): void {
     this.cellValue.delete!(this.cellValue.data);
   }
-
-  private checkIfCommitmentPast(): void {
-
-  }
 }
