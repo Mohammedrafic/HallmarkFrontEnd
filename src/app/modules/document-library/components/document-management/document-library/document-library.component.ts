@@ -1264,8 +1264,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   doCognitiveSearch(event: any) {
     const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
     const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
-    const keyword = event.target.value;
-    if (keyword.trim() != '' && event.code == 'Enter' && keyword.length >= 3) {
+    const keyword = event.target.value;    
+    if (keyword.trim() != '' && (event.code == 'Enter' || event.code == 'NumpadEnter') && keyword.length >= 3) {
       this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId));
     }
   }
