@@ -128,7 +128,7 @@ export const InvoicesFilteringOptionsMapping: Map<FilteringInvoicesOptionsFields
   .set(FilteringInvoicesOptionsFields.InvoiceStates, InvoicesTableFiltersColumns.StatusIds);
 
 export const PendingInvoiceRecordsFilteringOptionsMapping: Map<FilteringPendingInvoiceRecordsOptionsFields,
-InvoicesTableFiltersColumns> = new Map()
+  InvoicesTableFiltersColumns> = new Map()
   .set(FilteringPendingInvoiceRecordsOptionsFields.Types, InvoicesTableFiltersColumns.TimesheetType)
   .set(FilteringPendingInvoiceRecordsOptionsFields.Skills, InvoicesTableFiltersColumns.SkillIds)
   .set(FilteringPendingInvoiceRecordsOptionsFields.Agency, InvoicesTableFiltersColumns.AgencyIds)
@@ -155,11 +155,11 @@ export const ApproveInvoiceConfirmDialogConfig = {
 };
 
 export const ManualInvoicesFiltersFormConfig = (isAgency: boolean): InvoiceFilterFieldConfig[] => [
-  {
+  ...(isAgency ? [{
     type: ControlTypes.Multiselect,
     title: 'Status',
     field: InvoicesTableFiltersColumns.StatusIds,
-  },
+  }] : []),
   ...(!isAgency ? [{
     type: ControlTypes.Multiselect,
     title: 'Agency',
@@ -254,7 +254,7 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
     type: ControlTypes.Multiselect,
     title: 'Status',
     field: InvoicesTableFiltersColumns.StatusIds,
-  }]: []),
+  }] : []),
   {
     type: ControlTypes.Text,
     title: 'Amount From',
@@ -418,7 +418,7 @@ export const PendingInvoicesFiltersFormConfig = (): InvoiceFilterFieldConfig[] =
 ];
 
 export const DetectFormConfigBySelectedType = (selectedTabId: InvoiceTabId,
-  isAgency: boolean): InvoiceFilterFieldConfig[] => {
+                                               isAgency: boolean): InvoiceFilterFieldConfig[] => {
   if (
     selectedTabId !== InvoicesAgencyTabId.ManualInvoicePending
     && selectedTabId !== InvoicesOrgTabId.PendingInvoiceRecords
