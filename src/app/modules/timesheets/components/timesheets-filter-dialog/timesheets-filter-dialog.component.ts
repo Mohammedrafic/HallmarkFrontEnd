@@ -61,14 +61,14 @@ export class TimesheetsFilterDialogComponent extends
     this.userSearch$.pipe(
       filter((args) => args.text.length > 2),
       tap((args) => {
-        this.filteredUsers = this.filterColumns.contactEmails.dataSource = [];
+        this.filterColumns.contactEmails.dataSource = [];
         args.updateData([]);
       }),
       debounceTime(300),
       takeUntil(this.componentDestroy())
     ).subscribe((args) => {
       this.filterService.getUsersListBySearchTerm(args.text).subscribe(data => {
-        this.filteredUsers = this.filterColumns.contactEmails.dataSource = data;
+        this.filterColumns.contactEmails.dataSource = data;
         args.updateData(data);
       });
     });

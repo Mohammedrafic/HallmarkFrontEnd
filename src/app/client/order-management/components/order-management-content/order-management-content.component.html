@@ -788,8 +788,13 @@
             [dataSource]="filteredUsers"
             [autofill]="true"
             (filtering)="contactPersonFiltering($event)"
-            [fields]="contactPersonFields"
-          >
+            [fields]="contactPersonFields">
+            <ng-template #itemTemplate="" let-data="">
+              <div class="contact-option-container">
+                <span class="contact-name">{{data.fullName}}</span>
+                <span class="contact-email">{{data.email}}</span>
+              </div>
+            </ng-template>
           </ejs-autocomplete>
         </div>
       </div>
