@@ -49,6 +49,7 @@ export abstract class AbstractOrderCandidateListComponent
   public readonly searchByCandidateName$: Subject<string> = new Subject();
   public readonly candidateSearchPlaceholder = CandidateSearchPlaceholder;
 
+  private searchTermByCandidateName: string;
   protected pageSubject = new Subject<number>();
   protected unsubscribe$: Subject<void> = new Subject();
 
@@ -137,6 +138,7 @@ export abstract class AbstractOrderCandidateListComponent
     this.searchByCandidateName$
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.unsubscribe$))
       .subscribe((queryString) => {
+        this.searchTermByCandidateName = queryString;   
         this.searchCandidateByName(queryString);
       });
   }
@@ -155,12 +157,14 @@ export abstract class AbstractOrderCandidateListComponent
       currentPage: this.currentPage,
       pageSize: this.pageSize,
       excludeDeployed: !this.includeDeployedCandidates,
+      searchTerm: this.searchTermByCandidateName,
     });
   }
 
   protected onPageChanges(): Observable<unknown> {
     return this.pageSubject.pipe(
       debounceTime(1),
+      distinctUntilChanged(),
       tap((page) => {
         this.currentPage = page;
         this.emitGetCandidatesList();
