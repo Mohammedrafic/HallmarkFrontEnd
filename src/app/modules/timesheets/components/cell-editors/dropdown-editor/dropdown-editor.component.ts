@@ -67,7 +67,9 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
     }
 
     if (this.options && this.options.length) {
-      this.value = this.options.find((item) => item.value === params.value) as DropdownOption || { text: 'N/A', value: 0 };
+      this.value =
+        this.options.find((item) => item.value === params.value) as DropdownOption ||
+        { text: params.data?.costCenterFormattedName ?? 'N/A', value: 0 };
     }
     this.cd.markForCheck();
   }
