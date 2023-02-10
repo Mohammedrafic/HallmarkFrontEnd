@@ -3,6 +3,7 @@
     <app-invoices-table-tabs
       *ngIf="tabsConfig$ | async as tabsConfig"
       [tabConfig]="tabsConfig"
+      [preselectedTabIdx]="navigatedInvoiceId"
       (changeTab)="selectTab($event, tabsConfig)"
       class="tabs"
       appTabsMobileShadow>

@@ -10,8 +10,8 @@ import {
   SimpleChanges,
   TrackByFunction,
 } from '@angular/core';
-import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
 import { debounceTime, Observable, takeUntil } from 'rxjs';
@@ -30,7 +30,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { UserState } from '../../../../store/user.state';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { Invoices } from '../../store/actions/invoices.actions';
-import { InvoicesFiltersService } from '../../services';
+import { InvoicesFiltersService, InvoicesService } from '../../services';
 import { InvoiceFilterColumns, InvoiceFilterFieldConfig, InvoiceRecord, InvoicesFilterState,
   InvoiceTabId } from '../../interfaces';
 import { DetectFormConfigBySelectedType } from '../../constants';
@@ -78,12 +78,13 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     private cdr: ChangeDetectorRef,
     private invoicesFiltersService: InvoicesFiltersService,
     private store: Store,
-    private router: Router,
     private datePipe: DatePipe,
+    private invoicesService: InvoicesService,
+    private route: ActivatedRoute,
   ) {
     super();
 
-    this.isAgency = this.router.url.includes('agency');
+    this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
   }
 
   trackByFn: TrackByFunction<InvoiceFilterFieldConfig>
@@ -208,6 +209,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       this.appliedFiltersAmount.emit(this.filteredItems.length);
       this.regions = structure.regions;
       this.filterColumns.regionIds.dataSource = this.regions;
+      this.checkForNavigatedInvoice();
       this.cdr.markForCheck();
     });
   }
@@ -264,5 +266,22 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
 
         this.cdr.markForCheck();
       });
+  }
+
+  private checkForNavigatedInvoice(): void {
+    const param: string | undefined = this.route.snapshot.queryParams['invoiceId'];
+    if (param) {
+      this.formGroup.get('formattedInvoiceIds')?.patchValue(param);
+
+      this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+      this.appliedFiltersAmount.emit(this.filteredItems.length);
+      this.removeQueryParams();
+    }
+  }
+
+  private removeQueryParams(): void {
+    if (this.route.snapshot.queryParams['invoiceId']) {
+      this.invoicesService.removeQueryParams();
+    }   
   }
 }

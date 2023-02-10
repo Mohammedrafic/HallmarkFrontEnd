@@ -29,6 +29,8 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
   @Input()
   public tabConfig: TabsListConfig[];
 
+  @Input() preselectedTabIdx: number | null;
+
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
 
@@ -96,6 +98,11 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
 
   public trackBy(_: number, item: TabsListConfig): string {
     return item.title;
+  }
+
+  public preselectTab(idx: number): void {
+    this.tabComponent.selectedItem = idx;
+    this.tabComponent.refreshActiveTab();
   }
 
   private hideTab(index: number): void {

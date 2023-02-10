@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, NgZone, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef,
+  Component, Inject, NgZone, OnInit, ViewChild } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { FormControl } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { combineLatest, distinctUntilChanged, filter, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
@@ -38,7 +40,7 @@ import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
   styleUrls: ['./invoices-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoicesContainerComponent extends InvoicesPermissionHelper implements OnInit {
+export class InvoicesContainerComponent extends InvoicesPermissionHelper implements OnInit, AfterViewInit {
   @ViewChild(InvoicesTableTabsComponent)
   public invoicesTableTabsComponent: InvoicesTableTabsComponent;
 
@@ -108,7 +110,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public currentSelectedTableRowIndex: Observable<number>
     = this.invoicesService.getCurrentTableIdxStream();
   public isLoading: boolean;
-  public organizationId: number;
+  
   public rejectInvoiceId: number;
   public tabConfig: Interfaces.GridContainerTabConfig | null;
 
@@ -132,7 +134,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public organizationsList: DataSourceItem[];
 
+  public navigatedInvoiceId: number | null;
+
+  private navigatedOrgId: number | null;
+
   private previousSelectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab;
+
+  private organizationId: number;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -143,7 +151,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     private ngZone: NgZone,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
     @Inject(DOCUMENT) private document: Document,
-    store: Store
+    store: Store,
+    private route: ActivatedRoute,
   ) {
     super(store);
 
@@ -154,7 +163,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.organizationId$ = this.organizationControl.valueChanges
       .pipe(
         tap((id) => {
-          this.store.dispatch(new Invoices.GetOrganizationStructure(id, true));
+          this.store.dispatch(new Invoices.GetOrganizationStructure(id, true)); 
         }),
       );
     } else {
@@ -162,7 +171,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     }
 
     this.initDefaultSelectedTabId();
-    this.selectTab(0);
+    this.checkForNavigatedInvoice();
     this.tabConfig = this.invoicesContainerService.getTabConfig(this.selectedTabIdx);
   }
 
@@ -188,6 +197,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchForSavePaymentAction();
   }
 
+  ngAfterViewInit(): void {
+    this.invoicesTableTabsComponent.preselectTab(this.selectedTabIdx);
+  }
+
   public watchAgencyId(): void {
     if (this.isAgency) {
       this.agencyId$
@@ -206,7 +219,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             ? (this.organizationsList || []).filter(org => org.id === this.businessUnitId)[0].id
             : orgId;
 
-          this.organizationControl.setValue(value, { emitEvent: true, onlySelf: false });
+          this.organizationControl.setValue(this.navigatedOrgId || value, { emitEvent: true, onlySelf: false });
         });
     }
   }
@@ -231,6 +244,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.organizationId = id;
       this.store.dispatch(new Invoices.SelectOrganization(id));
       this.resetFilters();
+      this.navigatedInvoiceId = null;
+      this.navigatedOrgId = null;
     });
 
     this.invoicesFilters$
@@ -266,7 +281,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     } else {
       this.initDefaultSelectedTabId();
     }
-
     this.store.dispatch([
       new Invoices.SetTabIndex(tabIdx),
     ]);
@@ -276,6 +290,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.setGridConfig();
 
     this.tabConfig = this.invoicesContainerService.getTabConfig(tabIdx);
+    this.resetFilters();
     this.cdr.markForCheck();
   }
 
@@ -293,6 +308,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       new Invoices.UpdateFiltersState({
         pageNumber: GRID_CONFIG.initialPage,
         pageSize: GRID_CONFIG.initialRowsPerPage,
+        ...this.navigatedInvoiceId !== null ? { invoiceIds: [this.navigatedInvoiceId] } : {},
+        ...this.isAgency && this.navigatedOrgId ? { organizationId: this.navigatedOrgId } : {},
       })
     );
   }
@@ -348,9 +365,14 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public changePageSize(pageSize: number): void {
+    const filterstate = this.store.selectSnapshot(InvoicesState.invoicesFilters);
+    if (filterstate?.pageSize === pageSize) {
+      return;
+    }
+    const useFilterState = !!this.navigatedInvoiceId;
     this.store.dispatch(new Invoices.UpdateFiltersState({
       pageSize,
-    }, this.previousSelectedTabIdx === this.selectedTabIdx));
+    }, useFilterState));
     this.previousSelectedTabIdx = this.selectedTabIdx;
   }
 
@@ -552,6 +574,19 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   private initDefaultSelectedTabId(): void {
-    this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.ManualInvoicePending : 0;
+    if (!this.navigatedInvoiceId ) {
+      this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.ManualInvoicePending : 0;
+    }
+  }
+
+  private checkForNavigatedInvoice(): void {
+    const invoiceId: string | undefined = this.route.snapshot.queryParams['invoiceId'];
+    const orgId: string | undefined = this.route.snapshot.queryParams['orgId'];
+
+    this.navigatedInvoiceId = invoiceId ? Number(invoiceId) : null;
+    this.navigatedOrgId = orgId ? Number(orgId) : null;
+    const tabId = this.navigatedInvoiceId !== null ? this.invoicesContainerService.getAllTabId() : 0;
+    this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.AllInvoices : tabId;
+    this.selectTab(tabId);
   }
 }

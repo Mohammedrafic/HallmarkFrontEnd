@@ -29,6 +29,8 @@ export abstract class InvoicesContainerService {
     organizationId: number | null
   ): Observable<void>;
 
+  public abstract getAllTabId(): number;
+
   public getGridOptions(tab: AgencyInvoicesGridTab | OrganizationInvoicesGridTab,
     organizationId: number | null): GridOptions {
     return {};

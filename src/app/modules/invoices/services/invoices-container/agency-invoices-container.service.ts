@@ -13,6 +13,7 @@ import { invoiceDetailsColumnDefs, invoiceInfoItems,
   invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
 import { AllInvoicesGridHelper } from '../../helpers/grid/all-invoices-grid.helper';
 import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
+import { InvoiceTableType } from '../../enums/invoice-tab.enum';
 
 @Injectable()
 export class AgencyInvoicesContainerService extends InvoicesContainerService {
@@ -100,5 +101,9 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
       manualInvoiceCreationEnabled: [AgencyInvoicesGridTab.Manual].includes(tab),
       groupingEnabled: false,
     });
+  }
+
+  public getAllTabId(): number {
+    return InvoiceTableType.AgencyAll;
   }
 }

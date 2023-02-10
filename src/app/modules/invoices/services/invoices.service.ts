@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { RowNode } from '@ag-grid-community/core';
 import { Store } from '@ngxs/store';
@@ -31,6 +32,8 @@ export class InvoicesService {
     private confirmService: ConfirmService,
     private store: Store,
     private invoicesApiService: InvoicesApiService,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {
   }
 
@@ -131,5 +134,12 @@ export class InvoicesService {
         agencySuffix: data.agencySuffix,
       });
     });
+  }
+
+  public removeQueryParams(): void {
+    this.router.navigate([], { relativeTo: this.route, queryParams: {
+      invoiceId: null,
+      orgId: null,
+    }, queryParamsHandling: 'merge'});
   }
 }

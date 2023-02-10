@@ -87,7 +87,6 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
 
   public getRowData(tabIndex: OrganizationInvoicesGridTab, organizationId: number | null): Observable<void> {
     let action;
-
     switch (tabIndex) {
       case OrganizationInvoicesGridTab.PendingRecords:
         action = new Invoices.GetPendingInvoices(organizationId);
@@ -185,5 +184,9 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
 
   public getDetailsUIItems(data: InvoiceDetail): InvoiceInfoUIItem[] {
     return invoiceInfoItems(data, false);
+  }
+
+  public getAllTabId(): number {
+    return OrganizationInvoicesGridTab.All;
   }
 }
