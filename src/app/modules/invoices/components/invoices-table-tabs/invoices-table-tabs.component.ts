@@ -75,6 +75,14 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       }
       window.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
+    if ((AlertIdEnum[AlertIdEnum['Manual Invoice: Pending Approval']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
+      //Manual Invoice Pending tab navigation for orgnization
+      if (user?.businessUnitType === BusinessUnitType.Organization) {
+        this.changeTab.emit(1);
+        this.tabComponent.selectedItem = 1;
+      }
+      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
     this.asyncRefresh();
   }
 
