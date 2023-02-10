@@ -178,7 +178,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   public selectBusinesUnitType(): void {
     const isMobile = this.store.selectSnapshot(AppState.isMobileScreen);
-    if(isMobile) {
+    if (isMobile) {
       this.store.dispatch(new ToggleSidebarState(false));
     }
   }
