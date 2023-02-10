@@ -277,7 +277,7 @@
               *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
               class="input-container bootstrap form-line-item-30"
             >
-              <label>Hourly rate ($)<span class="required">*</span></label>
+              <label>Hourly Rate ($)<span class="required">*</span></label>
               <div class="input-group dropdown">
                 <div class="input-group">
                   <input
@@ -295,11 +295,7 @@
 
             <!-- of Position -->
             <div
-              *ngIf="
-                quickOrderConditions.isTravelerOrder ||
-                quickOrderConditions.isContactToPermOrder ||
-                quickOrderConditions.isPermPlacementOrder
-              "
+              *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
               class="input-container bootstrap form-line-item-30"
             >
               <label># Open Positions<span class="required">*</span></label>
@@ -315,6 +311,23 @@
                     [showSpinButton]="false"
                   ></ejs-numerictextbox>
                 </div>
+              </div>
+            </div>
+
+            <!-- Job Start Date -->
+            <div *ngIf="quickOrderConditions.isPermPlacementOrder" class="datepicker-container form-line-item-30">
+              <label>Job Start Date<span class="required">*</span></label>
+              <div class="input-group datepicker bootstrap">
+                <ejs-datepicker
+                  class="datepicker"
+                  format="MM/dd/yyyy"
+                  placeholder="MM/DD/YYYY"
+                  formControlName="jobStartDate"
+                  appValidateWithMessage
+                  [enableMask]="true"
+                  [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                >
+                </ejs-datepicker>
               </div>
             </div>
 
@@ -379,20 +392,21 @@
             quickOrderConditions.isPermPlacementOrder
           "
         >
-          <!-- Job Start Date -->
-          <div *ngIf="quickOrderConditions.isPermPlacementOrder" class="datepicker-container form-line-item-30">
-            <label>Job Start Date<span class="required">*</span></label>
-            <div class="input-group datepicker bootstrap">
-              <ejs-datepicker
-                class="datepicker"
-                format="MM/dd/yyyy"
-                placeholder="MM/DD/YYYY"
-                formControlName="jobStartDate"
-                appValidateWithMessage
-                [enableMask]="true"
-                [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-              >
-              </ejs-datepicker>
+          <!-- of Position -->
+          <div *ngIf="quickOrderConditions.isPermPlacementOrder" class="input-container bootstrap form-line-item-30">
+            <label># Open Positions<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <div class="input-group">
+                <ejs-numerictextbox
+                  class="numeric-input"
+                  min="0"
+                  maxlength="10"
+                  appValidateWithMessage
+                  format="0"
+                  formControlName="openPositions"
+                  [showSpinButton]="false"
+                ></ejs-numerictextbox>
+              </div>
             </div>
           </div>
 
