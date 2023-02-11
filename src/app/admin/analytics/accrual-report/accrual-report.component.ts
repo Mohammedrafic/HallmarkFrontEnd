@@ -199,6 +199,11 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
+
+  public masterRegionsList: Region[] = [];
+  public masterLocationsList: Location[] = [];
+  public masterDepartmentsList: Department[] = [];
+
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -229,35 +234,30 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
           this.filterOptionsData = data;
           this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
           this.filterColumns.skillIds.dataSource = [];
-          this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
 
-          this.filterColumns.agencyIds.dataSource = [];
-          this.filterColumns.agencyIds.dataSource = data?.agencies;
-
+          let masterSkills = this.filterOptionsData.masterSkills;
+          this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
+          let skills = masterSkills.filter((i) => i.skillCategoryId);
+          this.filterColumns.skillIds.dataSource = skills;
           this.agencyIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds) as AbstractControl;
-                let agencyIds = data?.agencies;
-                this.selectedAgencies = agencyIds;
-                this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
-                this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+          let agencyIds = data?.agencies;
+          this.filterColumns.agencyIds.dataSource = data?.agencies;
+          this.selectedAgencies = agencyIds;
+          this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
+          this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
 
-                if (this.isInitialLoad) {
-                  //ToDo: To add a spinner & may need to check if in 3seconds, skills and departments also get loaded
-                  setTimeout(()=>{this.SearchReport();},3000)
-                  this.isInitialLoad = false;
-                }
-
-          this.accrualReportForm.get(accrualConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
         }
       });
       this.SetReportData();
-      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
-        if (data.length > 0) {
-          this.logiReportComponent.SetReportData(data);
-        }
-      });
+     
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
+
       this.onFilterControlValueChangedHandler();
+      this.onFilterRegionChangedHandler();
+      this.onFilterLocationChangedHandler();
+      this.onFilterSkillCategoryChangedHandler();
+
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.accrualReportForm.get(accrualConstants.formControlNames.BusinessIds)?.enable() : this.accrualReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
@@ -268,9 +268,9 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     this.accrualReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        regionIds: new FormControl([], [Validators.required]),
-        locationIds: new FormControl([], [Validators.required]),
-        departmentIds: new FormControl([], [Validators.required]),
+        regionIds: new FormControl([]),
+        locationIds: new FormControl([]),
+        departmentIds: new FormControl([]),
         skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
         candidateName: new FormControl(null),
@@ -289,20 +289,20 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   }
 
   public onFilterControlValueChangedHandler(): void {
-    this.bussinessControl = this.accrualReportForm.get(accrualConstants.formControlNames.BusinessIds) as AbstractControl;
+    this.bussinessControl = this.accrualReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
     this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data != null && data.length > 0) {
         this.organizations = uniqBy(data, 'organizationId');
         this.filterColumns.businessIds.dataSource = this.organizations;
         this.defaultOrganizations = this.agencyOrganizationId;
-
-        this.accrualReportForm.get(accrualConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.accrualReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
         this.changeDetectorRef.detectChanges();
       }
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.accrualReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.isAlive = true;
         this.previousOrgId = data;
@@ -312,7 +312,8 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
-          let departmentsList: Department[] = [];         
+          let departmentsList: Department[] = [];
+
           orgList.forEach((value) => {
             regionsList.push(...value.regions);
             locationsList = regionsList.map(obj => {
@@ -322,9 +323,15 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
               return obj.departments.filter(department => department.locationId === obj.id);
             }).reduce((a, b) => a.concat(b), []);
           });
+
           this.regionsList = sortByField(regionsList, "name");
           this.locationsList = sortByField(locationsList, 'name');
           this.departmentsList = sortByField(departmentsList, 'name');
+
+
+          this.masterRegionsList = this.regionsList;
+          this.masterLocationsList = this.locationsList;
+          this.masterDepartmentsList = this.departmentsList;
 
           if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
             this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
@@ -337,93 +344,98 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
           let filter: CommonReportFilter = {
             businessUnitIds: businessIdData
           };
+
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+            if (data != null) {
+              this.isAlive = false;
+              this.filterOptionsData = data;
+              this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+         
+              setTimeout(() => { this.SearchReport() }, 3000);
+            }
+          });
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          this.defaultRegions = this.regionsList.map((list) => list.id);
-          this.accrualReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
-          this.changeDetectorRef.detectChanges();
         }
         else {
           this.isClearAll = false;
-          this.accrualReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue([]);
+          this.accrualReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }
     });
-    
+  }
 
-    this.regionIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.RegionIds) as AbstractControl;
+
+  public onFilterRegionChangedHandler(): void {
+
+    this.regionIdControl = this.accrualReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.departments = [];
+      this.locations = [];
+      this.accrualReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+      this.accrualReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.regionIdControl.value.length > 0) {
-        let regionList = this.regions?.filter((object) => data?.includes(object.id));
-        this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
-        this.defaultLocations = this.locations.map((list) => list.id);
-        this.accrualReportForm.get(accrualConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
-        this.changeDetectorRef.detectChanges();
+        this.departments = this.locations.map(obj => {
+          return obj.departments.filter(department => department.locationId === obj.id);
+        }).reduce((a, b) => a.concat(b), []);
       }
       else {
-        this.accrualReportForm.get(accrualConstants.formControlNames.LocationIds)?.setValue([]);
+        this.filterColumns.locationIds.dataSource = [];
+        this.accrualReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+        this.accrualReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
-    this.locationIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.LocationIds) as AbstractControl;
+  }
+
+  public onFilterLocationChangedHandler(): void {
+    this.locationIdControl = this.accrualReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.accrualReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.locationIdControl.value.length > 0) {
-        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
-        this.defaultDepartments = this.departments.map((list) => list.id);
-        this.accrualReportForm.get(accrualConstants.formControlNames.DepartmentIds)?.setValue(this.defaultDepartments);
-        this.changeDetectorRef.detectChanges();
       }
       else {
-        this.accrualReportForm.get(accrualConstants.formControlNames.DepartmentIds)?.setValue([]);
+        this.filterColumns.departmentIds.dataSource = [];
+        this.accrualReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
-    this.departmentIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.DepartmentIds) as AbstractControl;
+    this.departmentIdControl = this.accrualReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
+      this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
-    this.skillCategoryIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.SkillCategoryIds) as AbstractControl;
+  }
+
+  public onFilterSkillCategoryChangedHandler(): void {
+    this.skillCategoryIdControl = this.accrualReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds) as AbstractControl;
     this.skillCategoryIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.skillCategoryIdControl.value.length > 0) {
         let masterSkills = this.filterOptionsData.masterSkills;
         this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
         let skills = masterSkills.filter((i) => data?.includes(i.skillCategoryId));
         this.filterColumns.skillIds.dataSource = skills;
-        this.defaultSkills = skills.map((list) => list.id);
-        this.accrualReportForm.get(accrualConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
-        this.changeDetectorRef.detectChanges();
       }
       else {
-        this.accrualReportForm.get(accrualConstants.formControlNames.SkillIds)?.setValue([]);
+        this.accrualReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
       }
     });
-    this.skillIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.SkillIds) as AbstractControl;
+    this.skillIdControl = this.accrualReportForm.get(analyticsConstants.formControlNames.SkillIds) as AbstractControl;
     this.skillIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.skillIdControl.value.length > 0) {
         let masterSkills = this.filterOptionsData.masterSkills;
         this.selectedSkills = masterSkills?.filter((object) => data?.includes(object.id));
       }
-    });
-
-    this.skillIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.SkillIds) as AbstractControl;
-    this.skillIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (this.skillIdControl.value.length > 0) {
-        let masterSkills = this.filterOptionsData.masterSkills;
-        this.selectedSkills = masterSkills?.filter((object) => data?.includes(object.id));
-      }
-
       this.agencyIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds) as AbstractControl;
       this.agencyIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (this.agencyIdControl.value.length > 0) {
+        if (this.agencyIdControl.value.length > 0) {
           let agencyIds = this.agencyData;
           this.selectedAgencies = agencyIds?.filter((object) => data?.includes(object.agencyId));
-      }
+        }
+      });
     });
-    });
-    
   }
 
   public SearchReport(): void {   
@@ -437,7 +449,15 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     let {candidateName,departmentIds,orderId,locationIds,
       regionIds,skillCategoryIds,skillIds,startDate, endDate,agencyIds } = this.accrualReportForm.getRawValue();
     let byTimesheetOrInvoiceControl = this.accrualReportForm.get(accrualConstants.formControlNames.InvoiceType) as AbstractControl;
-    let byTimesheetOrInvoiceValue= byTimesheetOrInvoiceControl?.value;
+    let byTimesheetOrInvoiceValue = byTimesheetOrInvoiceControl?.value;
+
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+    skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
+    skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
+
+
     this.paramsData =
     {
 
@@ -448,12 +468,12 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
 
-      "OrganizationsAS":    this.selectedOrganizations.length == 0? "null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "RegionAS":            regionIds.length == 0 ? "null" :regionIds.join(","),
-      "LocationAS":          locationIds.length == 0 ? "null" :locationIds.join(","),
-      "DepartmentAS":        departmentIds.length == 0 ? "null" :departmentIds.join(","),
-      "SkillCategoryAC":     skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
-      "SkillAS":             skillIds.length==0?"null":skillIds.join(","),
+      "OrganizationsAS": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "RegionAS": regionIds.length == 0 ? "null" : regionIds,
+      "LocationAS": locationIds.length == 0 ? "null" : locationIds,
+      "DepartmentAS": departmentIds.length == 0 ? "null" : departmentIds,
+      "SkillCategoryAC": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
+      "SkillAS": skillIds.length == 0 ? "null" : skillIds,
       "AgencyAS":            agencyIds.length==0?"null":agencyIds.join(","),
       "Candidate" :          candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
       "OrderIdAS":           orderId ==null ? "null" : orderId,
@@ -468,12 +488,12 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "OrganizationsAD":    this.selectedOrganizations.length == 0? "null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "RegionAD":           regionIds.length == 0 ? "null" :regionIds.join(","),
-      "LocationAD":         locationIds.length == 0 ? "null" :locationIds.join(","),
-      "DepartmentAD":       departmentIds.length == 0 ? "null" :departmentIds.join(","),
-      "SkillCategoryAD":    skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
-      "SkillAD":            skillIds.length==0?"null":skillIds.join(","),
+      "OrganizationsAD": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "RegionAD": regionIds.length == 0 ? "null" : regionIds,
+      "LocationAD": locationIds.length == 0 ? "null" : locationIds,
+      "DepartmentAD": departmentIds.length == 0 ? "null" : departmentIds,
+      "SkillCategoryAD": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
+      "SkillAD": skillIds.length == 0 ? "null" : skillIds,
       "AgencyAD":           agencyIds.length==0?"null":agencyIds.join(","),
       "CandidateAD" :       candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
       "OrderIdAD":          orderId ==null ? "null" : orderId,
@@ -488,12 +508,13 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "OrganizationsAF":        this.selectedOrganizations.length == 0? "null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "RegionAF":               regionIds.length == 0 ? "null" :regionIds.join(","),
-      "LocationAF":             locationIds.length == 0 ? "null" :locationIds.join(","),
-      "DepartmentAF":           departmentIds.length == 0 ? "null" :departmentIds.join(","),
-      "SkillCategoryAF":        skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
-      "SkillAF":                skillIds.length==0?"null":skillIds.join(","),
+      "OrganizationsAF": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+
+      "RegionAF": regionIds.length == 0 ? "null" : regionIds,
+      "LocationAF": locationIds.length == 0 ? "null" : locationIds,
+      "DepartmentAF": departmentIds.length == 0 ? "null" : departmentIds,
+      "SkillCategoryAF": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
+      "SkillAF": skillIds.length == 0 ? "null" : skillIds,
       "AgencyAF":               agencyIds.length==0?"null":agencyIds.join(","),
       "CandidateAF" :           candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
       "OrderIdAF":              orderId ==null ? "null" : orderId,
@@ -506,6 +527,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
+
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
       businessIds: {
@@ -601,6 +623,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       // }
     }
   }
+
   private SetReportData() {
     const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
     if (logiReportData != null && logiReportData.length == 0) {
@@ -617,6 +640,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     }
     this.store.dispatch(new ShowFilterDialog(true));
   }
+
   public onFilterDelete(event: FilteredItem): void {
     this.filterService.removeValue(event, this.accrualReportForm, this.filterColumns);
   }
@@ -635,6 +659,12 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     this.accrualReportForm.get(accrualConstants.formControlNames.StartDate)?.setValue(startDate);
     this.accrualReportForm.get(accrualConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.filteredItems = [];
+    this.locations = [];
+    this.departments = [];
+
+    this.regionsList = this.masterRegionsList;
+    this.locationsList = this.masterLocationsList;
+    this.departmentsList = this.masterDepartmentsList;
   }
   public onFilterApply(): void {
     this.accrualReportForm.markAllAsTouched();
