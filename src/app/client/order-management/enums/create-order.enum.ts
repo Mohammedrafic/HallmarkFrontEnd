@@ -44,7 +44,7 @@ export enum FieldName {
   'projectNameId' = 'Project Name',
   'poNumberId' = 'PO#',
   'jobDates' = 'Job Date',
-  'minYears' = 'Min Years of Exp',
+  'minYrsRequired' = 'Min Yrs. Req',
   'name' = 'Contact Person',
   'email' = 'Email',
   'address' = 'Address',
