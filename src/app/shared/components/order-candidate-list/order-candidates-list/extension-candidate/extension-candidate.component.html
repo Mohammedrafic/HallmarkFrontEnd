@@ -166,7 +166,7 @@
                     <div class="d-flex">
                       <div class="input-container bootstrap">
                         <label class="input-group">Actual Start Date</label>
-                        <div class="input-group" [ngClass]="{'input-readonly': isOnBoard}">
+                        <div class="input-group">
                           <ejs-datepicker
                             id="startDate"
                             #startDate
@@ -174,7 +174,6 @@
                             format="MM/dd/yyyy"
                             placeholder="MM/DD/YYYY"
                             [enableMask]="true"
-                            [readonly]="isOnBoard"
                             [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                             formControlName="actualStartDate"
                             (change)="onStartDateChange($event)"
@@ -184,7 +183,7 @@
                       </div>
                       <div class="input-container bootstrap">
                         <label class="input-group">Actual End Date</label>
-                        <div class="input-group" [ngClass]="{'input-readonly': isOnBoard}">
+                        <div class="input-group">
                           <ejs-datepicker
                             id="endDate"
                             class="datepicker"
@@ -192,7 +191,6 @@
                             placeholder="MM/DD/YYYY"
                             [min]="actualStartDateValue"
                             [enableMask]="true"
-                            [readonly]="isOnBoard"
                             [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                             formControlName="actualEndDate"
                           >

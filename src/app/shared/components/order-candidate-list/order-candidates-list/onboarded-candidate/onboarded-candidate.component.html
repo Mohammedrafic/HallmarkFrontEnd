@@ -182,7 +182,7 @@
                 <div class="form-container date-container">
                   <div class="input-container bootstrap">
                     <label class="input-group">Actual Start Date</label>
-                    <div class="input-group datepicker" [ngClass]="{'input-readonly': isOnBoarded}">
+                    <div class="input-group datepicker">
                       <ejs-datepicker
                         id="startDate"
                         class="datepicker"
@@ -192,7 +192,6 @@
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                         formControlName="startDate"
-                        [readonly]="isOnBoarded"
                         (change)="onStartDateChange($event)"
                       >
                       </ejs-datepicker>
@@ -200,7 +199,7 @@
                   </div>
                   <div class="input-container bootstrap">
                     <label class="input-group">Actual End Date</label>
-                    <div class="input-group datepicker" [ngClass]="{'input-readonly': isOnBoarded}">
+                    <div class="input-group datepicker">
                       <ejs-datepicker
                         id="endDate"
                         class="datepicker"
@@ -209,7 +208,6 @@
                         placeholder="MM/DD/YYYY"
                         [min]="actualStartDateValue"
                         [enableMask]="true"
-                        [readonly]="isOnBoarded"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                         formControlName="endDate"
                       >
