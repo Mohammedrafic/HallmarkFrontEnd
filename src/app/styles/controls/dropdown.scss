@@ -199,3 +199,12 @@ body.dark {
     }
   }
 }
+
+.e-ddl.e-popup.e-control.e-popup-open.max-content {
+  .e-dropdownbase .e-list-item {
+    white-space: pre-wrap;
+    word-break: break-all;
+    text-indent: 0;
+    padding-left: 16px;
+  }
+}
