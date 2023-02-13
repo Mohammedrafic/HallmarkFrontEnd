@@ -28,7 +28,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
 
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
-  public alertTitle:string;
+  public alertTitle: string;
 
   constructor(
     private readonly ngZone: NgZone,
@@ -42,15 +42,19 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
     }
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
     //Pending Approval Tab navigation
-    if(AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase()==this.alertTitle.toLowerCase()) {
-      this.tabComponent.selectedItem=1;
-      this.changeTab.emit(1);
+    if (AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase() == this.alertTitle.toLowerCase()) {
+      setTimeout(() => {
+        this.tabComponent.selectedItem = 1;
+        this.changeTab.emit(1);
+      }, 5000);
       window.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
     //Rejected Tab navigation.
-    if(AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase()==this.alertTitle.toLowerCase()) {
-      this.tabComponent.selectedItem=3;
-      this.changeTab.emit(3);
+    if (AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase() == this.alertTitle.toLowerCase()) {
+      setTimeout(() => {
+        this.tabComponent.selectedItem = 3;
+        this.changeTab.emit(3);
+      }, 5000);
       window.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
   }
