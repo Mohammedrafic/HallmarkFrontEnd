@@ -4,13 +4,18 @@ import { CandidateWorkCommitment } from '../models/candidate-work-commitment.mod
 import { CandidateCommitmentGridActionRendererComponent } from './grid-action-renderer/grid-action-renderer.component';
 import { formatDate as formatDateString } from '@shared/constants/format-date';
 
-export const CandidateWorkCommitmentColumnDef = (editCallback: (value: CandidateWorkCommitment) => void, deleteCallback: (value: CandidateWorkCommitment) => void ) => ([
+export const CandidateWorkCommitmentColumnDef = (
+    editCallback: (value: CandidateWorkCommitment) => void,
+    deleteCallback: (value: CandidateWorkCommitment) => void,
+    today: Date
+  ) => ([
     {
       field: '',
       headerName: '',
       cellRenderer: CandidateCommitmentGridActionRendererComponent,
       maxWidth: 100,
       cellRendererParams: {
+        today: today,
         edit: (value: CandidateWorkCommitment) => {
           editCallback(value);
         },
