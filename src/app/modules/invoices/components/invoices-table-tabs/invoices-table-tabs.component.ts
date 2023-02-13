@@ -37,7 +37,7 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
   @ViewChild(TabComponent)
   public tabComponent: TabComponent;
   public alertTitle: string
-
+  public orgwidgetpendinginvoice:string;
   constructor(
     private readonly ngZone: NgZone,
     private store: Store
@@ -85,6 +85,15 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       }
       window.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
+    setTimeout(() => {
+      this.orgwidgetpendinginvoice = JSON.parse(localStorage.getItem('orgmanualinvoicewidget') || '""') as string;
+       //Pending Approval Tab navigation
+       if(this.orgwidgetpendinginvoice === "ManualInvoice") {
+         this.tabComponent.selectedItem=1;
+         this.changeTab.emit(1);
+         window.localStorage.setItem("orgmanualinvoicewidget", JSON.stringify(""));
+       }
+    }, 1000);
     this.asyncRefresh();
   }
 

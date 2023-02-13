@@ -37,10 +37,15 @@ export class OrgWidgetComponent implements OnInit {
       this.dashboardService.redirectToUrl('client/order-management/');
     } else if(orgname === 'ManualInvoice'){
       this.dashboardService.redirectToUrl('client/invoices/');
+      window.localStorage.setItem("orgmanualinvoicewidget",JSON.stringify(orgname));  
     } else if(orgname === 'pendingInvoice'){
       this.dashboardService.redirectToUrl('client/invoices/');
-    } else if(orgname === 'Timesheet'){
+    } else if(orgname === 'Pending Timesheet'){
       this.dashboardService.redirectToUrl('client/timesheets/');
-    }
+      window.localStorage.setItem("orgpendingwidget",JSON.stringify(orgname));  
+        }
   }
 }
+
+
+

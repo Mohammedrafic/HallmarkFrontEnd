@@ -1,6 +1,6 @@
 import {
   ChangeDetectionStrategy, Component, EventEmitter,
-  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild,
+  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild, AfterViewInit
 } from '@angular/core';
 
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -16,7 +16,7 @@ import { AlertIdEnum } from '@admin/alerts/alerts.enum';
   styleUrls: ['./timesheets-tabs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
+export class TimesheetsTabsComponent extends Destroyable implements OnChanges, AfterViewInit{
   @ViewChild(TabComponent)
   public tabComponent: TabComponent;
 
@@ -29,7 +29,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
   public alertTitle:string;
-
+  public orgwidgetpendingtimesheet:string;
   constructor(
     private readonly ngZone: NgZone,
   ) {
@@ -53,6 +53,18 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
       this.changeTab.emit(3);
       window.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
+  }
+
+  public ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.orgwidgetpendingtimesheet = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
+       //Pending Approval Tab navigation
+       if(this.orgwidgetpendingtimesheet === "Pending Timesheet") {
+         this.tabComponent.selectedItem=1;
+         this.changeTab.emit(1);
+         window.localStorage.setItem("orgpendingwidget", JSON.stringify(""));
+       }
+   }, 1000);
   }
 
   public trackBy(_: number, item: TabsListConfig): string {
