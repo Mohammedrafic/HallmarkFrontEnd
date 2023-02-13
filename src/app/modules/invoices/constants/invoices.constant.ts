@@ -91,12 +91,12 @@ const defaultDateMapping = {
 export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
   [InvoicesTableFiltersColumns.FormattedInvoiceIds]: defaultInputMapping,
   [InvoicesTableFiltersColumns.SearchTerm]: defaultInputMapping,
-  [InvoicesTableFiltersColumns.StatusIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.StatusIds]: {...defaultColumnMapping},
   [InvoicesTableFiltersColumns.AmountFrom]: defaultInputMapping,
   [InvoicesTableFiltersColumns.AmountTo]: defaultInputMapping,
-  [InvoicesTableFiltersColumns.ApDelivery]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.AggregateByType]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.AgencyIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.ApDelivery]: {...defaultColumnMapping},
+  [InvoicesTableFiltersColumns.AggregateByType]: {...defaultColumnMapping},
+  [InvoicesTableFiltersColumns.AgencyIds]: {...defaultColumnMapping},
   [InvoicesTableFiltersColumns.IssueDateFrom]: defaultDateMapping,
   [InvoicesTableFiltersColumns.IssueDateTo]: defaultDateMapping,
   [InvoicesTableFiltersColumns.DueDateFrom]: defaultDateMapping,
@@ -105,11 +105,11 @@ export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
   [InvoicesTableFiltersColumns.PaidDateTo]: defaultDateMapping,
 
   [InvoicesTableFiltersColumns.OrderIds]: defaultInputMapping,
-  [InvoicesTableFiltersColumns.TimesheetType]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.RegionIds]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.LocationIds]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.DepartmentIds]: defaultColumnMapping,
-  [InvoicesTableFiltersColumns.SkillIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.TimesheetType]: {...defaultColumnMapping},
+  [InvoicesTableFiltersColumns.RegionIds]: {...defaultColumnMapping},
+  [InvoicesTableFiltersColumns.LocationIds]: {...defaultColumnMapping},
+  [InvoicesTableFiltersColumns.DepartmentIds]: {...defaultColumnMapping},
+  [InvoicesTableFiltersColumns.SkillIds]: {...defaultColumnMapping},
   [InvoicesTableFiltersColumns.WeekPeriodFrom]: defaultDateMapping,
   [InvoicesTableFiltersColumns.WeekPeriodTo]: defaultDateMapping,
 
@@ -117,7 +117,7 @@ export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
   [InvoicesTableFiltersColumns.ServiceDateFrom]: defaultDateMapping,
   [InvoicesTableFiltersColumns.ServiceDateTo]: defaultDateMapping,
   [InvoicesTableFiltersColumns.VendorFee]: defaultDropdownColumnMapping,
-  [InvoicesTableFiltersColumns.ReasonCodeIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.ReasonCodeIds]: {...defaultColumnMapping},
   [InvoicesTableFiltersColumns.CandidateName]: defaultInputMapping,
 } as InvoiceFilterColumns;
 

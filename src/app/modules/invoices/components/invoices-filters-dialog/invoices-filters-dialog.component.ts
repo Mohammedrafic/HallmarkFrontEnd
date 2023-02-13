@@ -184,7 +184,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       filter(Boolean),
       takeUntil(this.componentDestroy()),
     ).subscribe((filters: InvoiceFilterColumns) => {
-      this.filterColumns = filters;
+      this.filterColumns = {...filters};
       this.filterColumns.regionIds.dataSource = this.regions;
       this.initFormConfig();
       this.cdr.detectChanges();
@@ -208,7 +208,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       this.filteredItems = [];
       this.appliedFiltersAmount.emit(this.filteredItems.length);
       this.regions = structure.regions;
-      this.filterColumns.regionIds.dataSource = this.regions;
+      this.filterColumns.regionIds.dataSource = [...this.regions];
       this.checkForNavigatedInvoice();
       this.cdr.markForCheck();
     });
@@ -226,14 +226,14 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
             return this.regions.find((region) => region.id === id) as OrganizationRegion;
           });
 
-          this.filterColumns.locationIds.dataSource = [];
           selectedRegions.forEach((region: OrganizationRegion) => {
             region?.locations?.forEach((location: OrganizationLocation) => {
               location.regionName = region.name;
             });
             regionLocations.push(...(region?.locations as []));
           });
-          this.filterColumns.locationIds.dataSource.push(...sortByField(regionLocations, 'name'));
+
+          this.filterColumns.locationIds.dataSource = sortByField(regionLocations, 'name');
         } else {
           this.formGroup.get('locationIds')?.setValue([]);
           this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
@@ -253,12 +253,12 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
             return (this.filterColumns.locationIds.dataSource as OrganizationLocation[])
               .find((location: OrganizationLocation) => location.id === id) as OrganizationLocation;
           });
-
+         
           selectedLocations.forEach((location: OrganizationLocation) => {
             locationDepartments.push(...(location?.departments as []));
           });
 
-          this.filterColumns.departmentIds.dataSource.push(...sortByField(locationDepartments, 'name'));
+          this.filterColumns.departmentIds.dataSource = sortByField(locationDepartments, 'name');
         } else {
           this.formGroup.get('departmentIds')?.setValue([]);
           this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);

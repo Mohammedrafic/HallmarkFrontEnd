@@ -10,5 +10,5 @@ export const filterOptionFields = {
 export const ExcludeSpinnerUrls = [
   'financialtimesheet/candidatesearch',
   '/api/Audit/uiaction',
-  'Alerts/GetAlertsForUser'
+  'Alerts/GetAlertsForUser',
 ];
