@@ -1,24 +1,24 @@
 import { DataSourceItem } from '@core/interface';
 import { PageOfCollections } from '@shared/models/page.model';
 import {
-  BaseInvoice, InvoiceDetail,
+  BaseInvoice,
+  InvoiceDetail,
   InvoiceFilterColumns,
   InvoicePayment,
   InvoicePaymentData,
   InvoicePermissions,
-  InvoiceRecord,
   InvoicesFilterState,
   ManualInvoiceMeta,
   ManualInvoiceReason,
   ManualInvoicesData,
+  PendingApprovalInvoicesData,
+  PendingInvoicesData,
   PrintInvoiceData,
 } from '../interfaces';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
-import { PendingApprovalInvoicesData } from '../interfaces/pending-approval-invoice.interface';
 
 export interface InvoicesModel {
-  invoicesData: PageOfCollections<InvoiceRecord> | null;
+  invoicesData: ManualInvoicesData | PendingInvoicesData | PendingApprovalInvoicesData | null;
   manualInvoicesData: ManualInvoicesData | null;
   pendingInvoicesData: PendingInvoicesData | null;
   pendingApprovalInvoicesData: PendingApprovalInvoicesData | null;
