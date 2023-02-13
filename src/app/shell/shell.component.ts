@@ -319,7 +319,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       this.alertStateModel$.subscribe((alertdata) => {
         this.alerts = alertdata;
       });
-    }, 60000
+    }, 300000
     );
 
   }
