@@ -46,7 +46,7 @@ import { GetOrganizationStructure } from '../../store/user.actions';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { Days } from '@shared/enums/days';
-import { GroupInvoicesOptions } from 'src/app/modules/invoices/constants';
+import { SettingsGroupInvoicesOptions } from 'src/app/modules/invoices/constants';
 import {
   AssociatedLink,
   billingSettingsKey,
@@ -95,7 +95,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     value: 'id',
   };
 
-  public readonly groupInvoicesOptions = GroupInvoicesOptions;
+  public readonly groupInvoicesOptions = SettingsGroupInvoicesOptions;
   public readonly groupInvoicesFields = {
     text: 'text',
     value: 'id',
