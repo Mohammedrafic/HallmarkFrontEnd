@@ -322,6 +322,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private calcTabsBadgeAmount(): void {
+    debugger;
     this.tabCounts$.pipe(filter(Boolean), takeUntil(this.componentDestroy())).subscribe((data) => {
       this.tabConfig = this.tabConfig.map((el, idx) => {
         if (idx === 1) {

@@ -516,6 +516,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
   }
 
+  private getUsersListBySearchTerm(args: FilteringEventArgs) {
+    this.filterService.getUsersListBySearchTerm(args.text).pipe(
+      tap((data) => {
+        args.updateData(data);
+      }),
+      delay(300)).subscribe(data => {
+        this.filteredUsers = this.filterColumns.contactEmails.dataSource = data;
+      }
+    );
+  }
+
   private subscribeOnUserSearch(): void {
     this.userSearch$.pipe(
       filter((args) => args.text.length > 2),
@@ -526,10 +537,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       debounceTime(300),
       takeUntil(this.unsubscribe$)
     ).subscribe((args) => {
-      this.filterService.getUsersListBySearchTerm(args.text).subscribe(data => {
-        this.filterColumns.contactEmails.dataSource = data;
-        args.updateData(data);
-      });
+      this.getUsersListBySearchTerm(args);
     });
   }
 
@@ -1589,7 +1597,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.filters.locationIds = [...preservedFilters.locations];
         }
       }
-      if (preservedFilters?.contactEmails) {
+      if (preservedFilters?.contactEmails && this.activeTab !== OrganizationOrderManagementTabs.OrderTemplates) {
         this.getPreservedContactPerson(preservedFilters.contactEmails);
         this.OrderFilterFormGroup.get('contactEmails')?.setValue(preservedFilters.contactEmails);
         this.filters.contactEmails = [preservedFilters.contactEmails];
