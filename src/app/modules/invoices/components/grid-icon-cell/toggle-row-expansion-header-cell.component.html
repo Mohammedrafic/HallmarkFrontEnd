@@ -1,4 +1,4 @@
-<div (click)="onSortRequested(nextSort, $event)" class="grid-icon-cell-container">
+<div (click)="sort(nextSort, $event)" class="grid-icon-cell-container">
     <button ejs-button cssClass="e-flat icon-button" (click)="toggleRowExpansion($event)">
         <span>
             <img *ngIf="expanded; else collapsed" src="assets/icons/menu-collapse.svg" alt="collapse" class="icon c">

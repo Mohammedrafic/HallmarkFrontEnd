@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+
 import { GridApi, IHeaderParams, RowNode } from '@ag-grid-community/core';
 import { IHeaderAngularComp } from '@ag-grid-community/angular';
+import { filter, fromEvent, takeUntil } from 'rxjs';
+
 import { Destroyable } from '@core/helpers';
-import { fromEvent, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-toggle-row-expansion-header-cell',
@@ -12,11 +14,10 @@ import { fromEvent, takeUntil, tap } from 'rxjs';
 })
 export class ToggleRowExpansionHeaderCellComponent extends Destroyable implements IHeaderAngularComp {
   public params: IHeaderParams | null = null;
-  public expanded: boolean = false;
+  public expanded = false;
   public currentSort: 'asc' | 'desc' | null = null;
   public nextSort: 'asc' | 'desc' | null = 'asc';
 
-  private skipCurComponent = false;
   private gridApi: GridApi;
 
   constructor(
@@ -49,10 +50,11 @@ export class ToggleRowExpansionHeaderCellComponent extends Destroyable implement
     this.expanded = this.checkIfAnyRowExpanded();
   }
 
-  public onSortRequested(order: 'asc' | 'desc' | null, event: { shiftKey: boolean }): void {
-    this.skipCurComponent = true;
-    this.params?.setSort(order, event.shiftKey);
-    this.sortChanged();
+  public sort(order: 'asc' | 'desc' | null, event: { shiftKey: boolean }): void {
+    if (this.params?.enableSorting) {
+      this.params?.setSort(order, event.shiftKey);
+      this.sortChanged();
+    }
   }
 
   private checkIfAnyRowExpanded(): boolean {
@@ -64,10 +66,10 @@ export class ToggleRowExpansionHeaderCellComponent extends Destroyable implement
 
   private startTableSortWatching(): void {
     fromEvent(this.params?.api as any, 'sortChanged').pipe(
-      tap(() => this.skipCurComponent ? null : this.resetSort()),
+      filter(() => this.isCurrentColumnSorting()),
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
-      this.skipCurComponent = false;
+      this.resetSort();
     });
   }
 
@@ -94,5 +96,12 @@ export class ToggleRowExpansionHeaderCellComponent extends Destroyable implement
 
     this.currentSort = null;
     this.nextSort = 'asc';
+  }
+
+  private isCurrentColumnSorting(): boolean {
+    const sortedColId = this.params?.columnApi.getColumnState().find((col) => col.sort !== null)?.colId;
+    const currentColId = this.params?.column.getColId();
+
+    return !!sortedColId && !!currentColId && sortedColId !== currentColId;
   }
 }
