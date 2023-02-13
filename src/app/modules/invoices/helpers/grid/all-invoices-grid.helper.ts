@@ -1,4 +1,5 @@
 import {
+  ColDef,
   GetDetailRowDataParams,
   GridOptions,
   ICellRendererParams,
@@ -30,6 +31,11 @@ interface AllColDefsConfig {
   pay?: (invoice: PendingApprovalInvoice) => void;
   actionTitle?: string,
 }
+
+const commonColumn: ColDef = {
+  sortable: true,
+  comparator: () => 0,
+};
 
 export class AllInvoicesGridHelper {
   public static getColDefs(canPay: boolean, { pay }: AllColDefsConfig): TypedColDef<PendingApprovalInvoice>[] {
@@ -66,6 +72,7 @@ export class AllInvoicesGridHelper {
         cellRenderer: 'agGroupCellRenderer',
         cellClass: 'expansion-toggle-icons-order-1 color-primary-active-blue-10 font-weight-bold',
         flex: 1,
+        ...commonColumn,
       },
       {
         field: 'invoiceStateText',
@@ -74,6 +81,7 @@ export class AllInvoicesGridHelper {
         flex: 1,
         cellRenderer: TableStatusCellComponent,
         cellClass: 'status-cell',
+        ...commonColumn,
       },
       {
         field: 'amount',
@@ -81,34 +89,40 @@ export class AllInvoicesGridHelper {
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
         valueFormatter: CurrencyFormatter,
+        ...commonColumn,
       },
       {
         field: 'apDeliveryText',
         headerName: 'Ap Delivery',
         minWidth: 270,
+        ...commonColumn,
       },
       {
         field: 'aggregateByTypeText',
         headerName: 'Group By Type',
         minWidth: 360,
+        ...commonColumn,
       },
       {
         field: 'issuedDate',
         minWidth: 230,
         headerName: 'Issued Date',
         valueFormatter: monthDayYearDateFormatter,
+        ...commonColumn,
       },
       {
         field: 'payDate',
         minWidth: 230,
         headerName: 'Paid Date',
         valueFormatter: monthDayYearDateFormatter,
+        ...commonColumn,
       },
       {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
         valueFormatter: monthDayYearDateFormatter,
+        ...commonColumn,
       },
     ];
   }

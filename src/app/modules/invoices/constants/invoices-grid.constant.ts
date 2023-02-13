@@ -17,6 +17,7 @@ import { TypedValueGetterParams } from '@core/interface';
 
 const commonColumn: ColDef = {
   sortable: true,
+  comparator: () => 0,
 };
 
 export const numberValueFormatter: (params: ValueFormatterParams) => string =

@@ -12,6 +12,7 @@ import { TypedColDef } from '../../interfaces';
 
 const commonColumn: ColDef = {
   sortable: true,
+  comparator: () => 0,
 };
 
 interface GetPendingInvoiceRecordsColDefsConfig {

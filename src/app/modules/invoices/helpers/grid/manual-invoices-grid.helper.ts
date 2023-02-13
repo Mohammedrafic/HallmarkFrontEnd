@@ -42,6 +42,7 @@ const invoiceRecordDescriptionMap: Record<InvoiceRecordType, string> = {
 
 const commonColumn: ColDef = {
   sortable: true,
+  comparator: () => 0,
 };
 
 const invoiceRecordTypeColDef: TypedColDef<ManualInvoice> = {

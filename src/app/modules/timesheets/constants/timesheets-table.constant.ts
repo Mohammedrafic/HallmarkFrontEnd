@@ -14,6 +14,7 @@ import { TableStatusCellComponent } from '@shared/components/table-status-cell/t
 
 const commonColumn: ColDef = {
   sortable: true,
+  comparator: () => 0,
   resizable: true,
   filter: true,
 };
@@ -136,7 +137,8 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       field: TimesheetsTableColumns.TotalDays,
       headerName: 'TOTAL DAYS',
       width: 160,
-      minWidth: 160
+      minWidth: 160,
+      ...commonColumn,
     },
   ];
 };
