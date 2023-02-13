@@ -58,7 +58,9 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
   }
 
   ngOnChanges() {
-    this.dispatchHistoricalEvents(this.organizationId, this.candidateJobId);
+    if (this.organizationId && this.candidateJobId) {
+      this.dispatchHistoricalEvents(this.organizationId, this.candidateJobId);
+    }
   }
 
   private subscribeToInitialObs(): void {
@@ -85,6 +87,7 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
           GetOrderById,
           GetOrgOrderById
         ),
+        filter(() => !!this.organizationId && !!this.candidateJobId),
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
