@@ -230,7 +230,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       this.orderFilterColumnsSetup();
       this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
-          this.isAlive = false;
+          this.isAlive = true;
           this.filterOptionsData = data;
           this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
           this.filterColumns.skillIds.dataSource = [];
@@ -240,6 +240,9 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
           let skills = masterSkills.filter((i) => i.skillCategoryId);
           this.filterColumns.skillIds.dataSource = skills;
           this.agencyIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds) as AbstractControl;
+          this.filterColumns.agencyIds.dataSource = [];
+          this.filterColumns.agencyIds.dataSource = data?.agencies;
+
           let agencyIds = data?.agencies;
           this.filterColumns.agencyIds.dataSource = data?.agencies;
           this.selectedAgencies = agencyIds;
@@ -297,6 +300,8 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
         this.filterColumns.businessIds.dataSource = this.organizations;
         this.defaultOrganizations = this.agencyOrganizationId;
         this.accrualReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+
+
         this.changeDetectorRef.detectChanges();
       }
     });
@@ -304,6 +309,9 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.accrualReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+        this.filterColumns.agencyIds.dataSource = [];
+        this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds)?.setValue([]);
+       
         this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
@@ -347,10 +355,23 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
 
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+            this.filterColumns.agencyIds.dataSource = [];
+            
             if (data != null) {
-              this.isAlive = false;
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+              this.filterColumns.skillIds.dataSource = [];
+
+              let masterSkills = this.filterOptionsData.masterSkills;
+              this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
+              let skills = masterSkills.filter((i) => i.skillCategoryId);
+              this.filterColumns.skillIds.dataSource = skills;
+              this.agencyIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds) as AbstractControl;
+              let agencyIds = data?.agencies;
+              this.filterColumns.agencyIds.dataSource = data?.agencies;
+              this.selectedAgencies = agencyIds;
+              this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
+              this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
          
               setTimeout(() => { this.SearchReport() }, 3000);
             }
