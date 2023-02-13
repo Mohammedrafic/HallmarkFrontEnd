@@ -6,6 +6,7 @@ import { Select, Store } from '@ngxs/store';
 import { WorkCommitmentDetails } from '@organization-management/work-commitment/interfaces';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { convertHolidaysToDataSource } from '@shared/helpers/dropdown-options.helper';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
@@ -122,7 +123,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       this.candidateWorkCommitmentForm.controls['holiday'].setValue(commitment.holiday);
       this.candidateWorkCommitmentForm.controls['comment'].setValue(commitment.comments);
       this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.minimumDate);
-      this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity();
+      this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
     });
   }
 
@@ -171,28 +172,30 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private getCandidateWorkCommitmentById(commitment: CandidateWorkCommitment): void {
     this.candidateWorkCommitmentService.getCandidateWorkCommitmentById(commitment.id as number).subscribe((commitment: CandidateWorkCommitment) => {
-      commitment.id = 0;
       commitment.startDate = commitment.startDate && DateTimeHelper.convertDateToUtc(commitment.startDate as string);
+      this.minimumDate = this.lastActiveDate;
       this.candidateWorkCommitmentForm.patchValue(commitment as {}, { emitEvent: false });
       this.candidateWorkCommitmentForm.controls['regionIds'].setValue(commitment.regionIds);
       this.candidateWorkCommitmentForm.controls['locationIds'].setValue(commitment.locationIds);
       this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.lastActiveDate);
+      this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
+      this.cd.detectChanges();
     });
   }
 
   private subscribeOnDialog(): void {
     this.dialogSubject$.pipe(takeUntil(this.destroy$)).subscribe((value: { isOpen: boolean, isEdit: boolean, commitment?: CandidateWorkCommitment }) => {
       if (value.isOpen) {
-        this.setWorkCommitmentDataSource();
+        !value.isEdit && this.setWorkCommitmentDataSource();
         this.getActiveWorkCommitment();
         this.sideDialog.show();
       } else {
         this.sideDialog.hide();
       }
-      this.title = value.isEdit ? 'Edit' : 'Add';
+      this.title = value.isEdit ? DialogMode.Edit : DialogMode.Add;
       if (value.isEdit) {
         this.enableControls();
-        this.getCandidateWorkCommitmentById(value.commitment as CandidateWorkCommitment);
+        this.setWorkCommitmentDataSource(value.commitment);
       } else {
         this.disableControls();
       }
@@ -235,9 +238,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     });
   }
 
-  private setWorkCommitmentDataSource(): void {
+  private setWorkCommitmentDataSource(commitment?: CandidateWorkCommitment): void {
     this.candidateWorkCommitmentService.getAvailableWorkCommitments(this.employeeId).subscribe((commitments: WorkCommitmentDataSource[]) => {
       this.workCommitments = commitments;
+      if (commitment) {
+        this.getCandidateWorkCommitmentById(commitment);
+      }
       this.cd.detectChanges();
     });
   }
