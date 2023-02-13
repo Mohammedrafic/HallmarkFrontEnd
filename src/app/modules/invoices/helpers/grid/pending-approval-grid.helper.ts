@@ -28,6 +28,7 @@ import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
 
 const commonColumn: ColDef = {
   sortable: true,
+  comparator: () => 0,
 };
 
 interface PendingApprovalColDefsConfig {

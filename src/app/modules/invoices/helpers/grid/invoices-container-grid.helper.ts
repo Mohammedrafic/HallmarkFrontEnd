@@ -22,6 +22,7 @@ type ColDefKey = BaseInvoiceColDefsKeys | CustomColDefsKeys;
 
 const commonColumn: ColDef = {
   sortable: true,
+  comparator: () => 0,
 };
 
 export class InvoicesContainerGridHelper {
@@ -66,6 +67,7 @@ export class InvoicesContainerGridHelper {
       },
       candidateName: {
         headerName: 'CANDIDATE NAME',
+        field: 'candidateName',
         valueGetter: (params: ValueGetterParams) => {
           const record = params.data as BaseInvoice;
 
@@ -82,12 +84,14 @@ export class InvoicesContainerGridHelper {
       },
       unitName: {
         headerName: agency ? 'ORGANIZATION' : 'AGENCY',
+        field: 'unitName',
         valueGetter: ({ data: { agencyName, organizationName } }: TypedValueGetterParams<BaseInvoice>) =>
           agency ? organizationName : agencyName,
         ...commonColumn,
       },
       weekPeriod: {
         headerName: 'WEEK PERIOD',
+        field: 'weekPeriod',
         width: 140,
         cellRenderer: GridCellLinkComponent,
         valueGetter: (params: ValueGetterParams) => {

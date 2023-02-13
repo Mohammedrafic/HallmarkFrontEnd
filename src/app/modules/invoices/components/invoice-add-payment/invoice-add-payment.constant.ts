@@ -62,6 +62,7 @@ export const AddPaymentFormConfig: PaymentFormConfig[] = [
 
 const commonColumn: ColDef = {
   sortable: true,
+  comparator: () => 0,
   resizable: true,
 };
 
