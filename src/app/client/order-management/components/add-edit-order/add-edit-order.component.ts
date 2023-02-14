@@ -641,7 +641,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private saveForLater(): void {
-    const titleControl = this.orderDetailsFormComponent.generalInformationForm.controls['title'];
+    const titleControl = this.orderDetailsFormComponent.orderTypeForm.controls['title'];
     const workLocationForm = this.orderDetailsFormComponent.workLocationForm;
 
     if (titleControl.invalid) {
