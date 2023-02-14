@@ -130,6 +130,8 @@
             formControlName="contactEmails"
             [dataSource]="filteredUsers"
             [autofill]="true"
+            [minLength]="3"
+            [allowCustom]="false" 
             (filtering)="contactPersonFiltering($event)"
             [fields]="contactPersonFields">
             <ng-template #itemTemplate="" let-data="">

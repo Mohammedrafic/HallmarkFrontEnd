@@ -19,11 +19,11 @@ import {
 } from '../../services';
 import {
   BaseInvoice,
-  InvoiceDetail, InvoiceDialogActionPayload,
+  InvoiceDetail,
+  InvoiceDialogActionPayload,
   InvoiceFilterColumns,
   InvoicePayment,
   InvoicePaymentData,
-  InvoiceRecord,
   InvoicesFilteringOptions,
   InvoicesFilterState,
   InvoiceStateDto,
@@ -70,7 +70,7 @@ export class InvoicesState {
   }
 
   @Selector([InvoicesState])
-  static invoicesData(state: InvoicesModel): PageOfCollections<InvoiceRecord> | null {
+  static invoicesData(state: InvoicesModel): ManualInvoicesData | PendingInvoicesData | PendingApprovalInvoicesData | null {
     return state?.invoicesData ?? null;
   }
 
@@ -526,9 +526,14 @@ export class InvoicesState {
       ...state.invoicesFilters,
       organizationId,
     }).pipe(
-      tap((data: ManualInvoicesData) => patchState({
-        manualInvoicesData: data,
-      })),
+      tap((data: ManualInvoicesData) => {
+        patchState({
+          manualInvoicesData: data,
+        });
+        patchState({
+          invoicesData: data,
+        });
+      }),
       catchError((err: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
@@ -546,9 +551,14 @@ export class InvoicesState {
       ...state.invoicesFilters,
       organizationId,
     }).pipe(
-      tap((data: PendingInvoicesData) => patchState({
-        pendingInvoicesData: data,
-      })),
+      tap((data: PendingInvoicesData) => {
+        patchState({
+          pendingInvoicesData: data,
+        });
+        patchState({
+          invoicesData: data,
+        });
+      }),
       catchError((err: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
@@ -568,9 +578,14 @@ export class InvoicesState {
     },
       getState().isAgencyArea,
     ).pipe(
-      tap((data: PendingApprovalInvoicesData) => patchState({
-        pendingApprovalInvoicesData: data,
-      })),
+      tap((data: PendingApprovalInvoicesData) => {
+        patchState({
+          pendingApprovalInvoicesData: data,
+        });
+        patchState({
+          invoicesData: data,
+        });
+      }),
       catchError((err: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
