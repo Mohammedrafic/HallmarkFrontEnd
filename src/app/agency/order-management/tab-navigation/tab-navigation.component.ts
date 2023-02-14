@@ -10,7 +10,7 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { OrderManagementState } from '../../store/order-management.state';
 import { SetOrdersTab } from '../../store/order-management.actions';
 import { OrderType } from '@shared/enums/order-type';
-import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive.ts/responsive-tabs.directive';
+import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive';
 
 @Component({
   selector: 'app-tab-navigation',

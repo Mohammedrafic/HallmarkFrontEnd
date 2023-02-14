@@ -9,8 +9,8 @@ import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.mo
 import { OutsideZone } from '@core/decorators';
 import { TabConfig } from '../../interface';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
-import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive.ts/responsive-tabs.directive';
 import { Store } from '@ngxs/store';
+import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive';
 
 @Component({
   selector: 'app-timesheets-tabs',

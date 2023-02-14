@@ -85,7 +85,6 @@ import { InvoicePaymentDetailsModule } from './components/invoice-payment-detail
 import { InvoicesFiltersService } from './services/invoices-filters.service';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { InvoiceGridExportComponent } from './components/invoice-grid-export/invoice-grid-export.component';
-import { ResponsiveTabsModule } from '@shared/directives/responsive-tabs.directive.ts/responsive-tabs.module';
 
 @NgModule({
   declarations: [
@@ -162,7 +161,6 @@ import { ResponsiveTabsModule } from '@shared/directives/responsive-tabs.directi
     InvoiceAddPaymentModule,
     InvoicePaymentDetailsModule,
     ValidateDirectiveModule,
-    ResponsiveTabsModule
   ],
   providers: [
     InvoicesService,

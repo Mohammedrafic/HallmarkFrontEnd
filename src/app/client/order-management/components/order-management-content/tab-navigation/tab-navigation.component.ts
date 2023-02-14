@@ -8,7 +8,7 @@ import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
 import { NavigationTabModel } from '@shared/models/navigation-tab.model';
 import { OrderType } from '@shared/enums/order-type';
-import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive.ts/responsive-tabs.directive';
+import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive';
 
 @Component({
   selector: 'app-tab-navigation',

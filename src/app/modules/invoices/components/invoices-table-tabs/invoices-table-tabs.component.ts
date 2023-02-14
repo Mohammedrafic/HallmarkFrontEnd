@@ -17,7 +17,7 @@ import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive.ts/responsive-tabs.directive';
+import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive';
 
 @Component({
   selector: 'app-invoices-table-tabs',
