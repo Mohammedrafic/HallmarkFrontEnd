@@ -722,6 +722,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.dialogWidth = '600px'
       this.shareDocumentIds = selectedIds;
       this.store.dispatch(new ShowSideDialog(true));
+      this.sharedWith.gridOptions.api?.setRowData([]);
     }
     else {
       this.store.dispatch([
