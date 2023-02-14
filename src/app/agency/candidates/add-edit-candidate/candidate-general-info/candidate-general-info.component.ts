@@ -29,7 +29,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
 
   @Input() set isCandidateCreated(value: boolean | null) {
     this.enableStatusFields = value as boolean;
-    this.statuses = this.candidateGeneralInfoService.getStatuses(value);
+    this.statuses = this.candidateGeneralInfoService.getStatuses(false);
   }
 
   @Select(CandidateListState.listOfRegions)
