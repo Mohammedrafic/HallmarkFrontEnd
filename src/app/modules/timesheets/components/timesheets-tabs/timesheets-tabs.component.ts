@@ -1,14 +1,6 @@
 import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  NgZone,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ViewChild,
-  Inject,
+  ChangeDetectionStrategy, Component, EventEmitter,
+  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild,Inject
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
@@ -86,24 +78,23 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
     });
   }
   @OutsideZone
-  private navigatingTab(): void {
+  private navigatingTab():void{
     setTimeout(() => {
       this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
-      //Pending Approval Tab navigation
-      if (
-        AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase() == this.alertTitle.toLowerCase()
-      ) {
+    //Pending Approval Tab navigation
+    if (AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase() == this.alertTitle.toLowerCase()) {
         this.tabComponent.selectedItem = 1;
         this.changeTab.emit(1);
-        this.document.defaultView?.localStorage.setItem('alertTitle', JSON.stringify(''));
-      }
-      //Rejected Tab navigation.
-      if (AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase() == this.alertTitle.toLowerCase()) {
+        this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
+    //Rejected Tab navigation.
+    if (AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase() == this.alertTitle.toLowerCase()) {
         this.tabComponent.selectedItem = 3;
         this.changeTab.emit(3);
-        this.document.defaultView?.localStorage.setItem('alertTitle', JSON.stringify(''));
-      }
-    }, 5000);
+        this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
+    },5000);
+
   }
 
   private getTabsWidth(): void {
