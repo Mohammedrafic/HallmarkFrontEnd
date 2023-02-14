@@ -1,4 +1,5 @@
-import { Directive } from '@angular/core';
+import { Directive, Inject } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 
 import { Store } from '@ngxs/store';
 import { distinctUntilChanged, filter, map, takeUntil, BehaviorSubject, debounceTime } from 'rxjs';
@@ -11,14 +12,15 @@ import { AppState } from 'src/app/store/app.state';
   selector: '[appResponsiveTabs]',
 })
 export class ResponsiveTabsDirective extends Destroyable {
-  public elementContainer: HTMLElement | null = document.body.querySelector('#main');
+  public elementContainer: HTMLElement;
 
   public tabsWidth$: BehaviorSubject<string> = new BehaviorSubject('100%');
 
   private resizeObserver: ResizeObserverModel;
 
-  constructor(protected readonly store: Store) {
+  constructor(protected readonly store: Store, @Inject(DOCUMENT) protected readonly document: Document) {
     super();
+    this.elementContainer = this.document.querySelector('#main') || this.document.body;
     this.initResizeObservable();
     this.listenResizeContent();
   }
@@ -29,7 +31,7 @@ export class ResponsiveTabsDirective extends Destroyable {
   }
 
   private initResizeObservable(): void {
-    this.resizeObserver = ResizeObserverService.init(this.elementContainer!);
+    this.resizeObserver = ResizeObserverService.init(this.elementContainer);
   }
 
   private listenResizeContent(): void {

@@ -1,7 +1,8 @@
 import {
   ChangeDetectionStrategy, Component, EventEmitter,
-  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild,
+  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild, Inject
 } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
@@ -32,10 +33,12 @@ export class TimesheetsTabsComponent extends ResponsiveTabsDirective implements 
   public alertTitle:string;
 
   constructor(
-    private readonly ngZone: NgZone,
+    @Inject(DOCUMENT) protected override document: Document,
     protected override store: Store,
+    private readonly ngZone: NgZone,
+    
   ) {
-    super(store);
+    super(store, document);
   }
 
   public ngOnChanges(changes: SimpleChanges): void {

@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, Inject } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
@@ -25,11 +26,12 @@ export class TabNavigationComponent extends ResponsiveTabsDirective implements O
   private tabsArray = Object.values(OrganizationOrderManagementTabs);
 
   public constructor(
+    @Inject(DOCUMENT) protected override document: Document,
+    protected override store: Store,
     private orderManagementService: OrderManagementService,
     private actions: Actions,
-    protected override store: Store,
   ) {
-    super(store);
+    super(store, document);
   }
 
   public ngOnInit(): void {

@@ -6,7 +6,9 @@ import {
   Input, NgZone,
   Output,
   ViewChild,
+  Inject,
 } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { BehaviorSubject, filter, takeUntil } from 'rxjs';
@@ -38,10 +40,11 @@ export class InvoicesTableTabsComponent extends ResponsiveTabsDirective implemen
   public alertTitle: string;
 
   constructor(
-    private readonly ngZone: NgZone,
+    @Inject(DOCUMENT) protected override document: Document,
     protected override store: Store,
+    private readonly ngZone: NgZone,
   ) {
-    super(store);
+    super(store, document);
   }
 
   public ngAfterViewInit(): void {
