@@ -46,7 +46,6 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
         })
       );
     }
-    debugger;
     this.router.navigate([url, this.cellValue.candidateProfileId], {
       state: {
         orderId: this.cellValue.orderId,
