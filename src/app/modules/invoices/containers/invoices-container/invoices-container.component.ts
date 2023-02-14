@@ -239,7 +239,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.organizationId$
     .pipe(
       distinctUntilChanged(),
-      filter((id) => !!id),
+      filter((id) => {
+        if (this.navigatedOrgId) {
+          return id === this.navigatedOrgId;
+        }
+        
+        return !!id;
+      }),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((id) => {

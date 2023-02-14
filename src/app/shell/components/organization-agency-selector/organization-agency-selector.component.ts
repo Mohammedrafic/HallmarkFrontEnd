@@ -4,13 +4,14 @@ import { FormControl } from '@angular/forms';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import {
   BehaviorSubject,
-  combineLatest,
   debounceTime,
   distinctUntilChanged,
+  filter,
   Observable,
   Subject,
   switchMap,
   takeUntil,
+  zip,
 } from 'rxjs';
 
 import {
@@ -37,6 +38,7 @@ import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { AgencyStatus } from 'src/app/shared/enums/status';
 import { UserStateModel } from '../../../store/user.state';
 import { ToggleSidebarState } from 'src/app/store/app.actions';
+import { ActivatedRoute } from '@angular/router';
 
 interface IOrganizationAgency {
   id: number;
@@ -96,7 +98,8 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     private store: Store,
     private cd: ChangeDetectorRef,
     private actions$: Actions,
-    @Inject(APP_SETTINGS) private appSettings: AppSettings
+    @Inject(APP_SETTINGS) private appSettings: AppSettings,
+    private route: ActivatedRoute,
   ) {
     this.baseUrl = this.appSettings.host;
   }
@@ -207,7 +210,14 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   }
 
   private isOrganizationAgencyAreaChange(): void {
-    this.isOrganizationAgencyArea$.pipe(takeUntil(this.unsubscribe$)).subscribe((area) => {
+    this.isOrganizationAgencyArea$
+    .pipe(
+      distinctUntilChanged((prev, next) => {
+        return prev.isAgencyArea === next.isAgencyArea && next.isOrganizationArea === next.isOrganizationArea;
+      }),
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((area) => {
       const isOrganizationArea = area.isOrganizationArea;
       const isAgencyArea = area.isAgencyArea;
       if (isOrganizationArea && isAgencyArea) {
@@ -224,8 +234,11 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   }
 
   private subscribeOrganizationAgencies(): void {
-    combineLatest([this.agencies$, this.organizations$])
-      .pipe(takeUntil(this.unsubscribe$))
+    zip(this.agencies$, this.organizations$)
+      .pipe(
+        filter((value) => !!value[0] && !!value[1]),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe((userAgenciesAndOrganizations) => {
         if (
           !Array.isArray(userAgenciesAndOrganizations) ||
@@ -294,8 +307,12 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
       this.setAgencyStatus(currentAgency);
     } else {
-      newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === lastSelectedOrganizationId)
-        ? lastSelectedOrganizationId
+      const navigateOrgId = this.route.snapshot.queryParams['orgId'] ? Number(this.route.snapshot.queryParams['orgId'])
+      : null;
+      const orgId = navigateOrgId || lastSelectedOrganizationId;
+
+      newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === orgId)
+        ? orgId
         : organizationsAgencies[0]?.id || null;
     }
     
