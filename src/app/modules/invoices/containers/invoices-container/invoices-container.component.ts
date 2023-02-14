@@ -213,6 +213,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             this.organizationsList = organizations;
           }),
           map(([firstOrganization]: DataSourceItem[]) => firstOrganization.id),
+          takeUntil(this.componentDestroy()),
         )
         .subscribe((orgId: number) => {
           const value = this.businessUnitId
@@ -239,6 +240,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     .pipe(
       distinctUntilChanged(),
       filter((id) => !!id),
+      takeUntil(this.componentDestroy()),
     )
     .subscribe((id) => {
       this.organizationId = id;
@@ -256,8 +258,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         }
         return true;
       }),
+      takeUntil(this.componentDestroy()),
     ).subscribe(() => {
-      this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
       this.setGridConfig();
       this.cdr.markForCheck();

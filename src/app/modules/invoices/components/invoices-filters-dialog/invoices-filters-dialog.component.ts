@@ -253,7 +253,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
             return (this.filterColumns.locationIds.dataSource as OrganizationLocation[])
               .find((location: OrganizationLocation) => location.id === id) as OrganizationLocation;
           });
-         
+
           selectedLocations.forEach((location: OrganizationLocation) => {
             locationDepartments.push(...(location?.departments as []));
           });
@@ -282,6 +282,6 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   private removeQueryParams(): void {
     if (this.route.snapshot.queryParams['invoiceId']) {
       this.invoicesService.removeQueryParams();
-    }   
+    }
   }
 }

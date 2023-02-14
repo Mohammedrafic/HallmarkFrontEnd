@@ -26,7 +26,6 @@ import {
   LinkService,
   RichTextEditorComponent,
   TableService,
-  ToolbarService,
   ToolbarType,
 } from '@syncfusion/ej2-angular-richtexteditor';
 import { Observable, Subject, takeWhile, filter } from 'rxjs';
@@ -68,23 +67,18 @@ import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { ShowDocPreviewSideDialog } from 'src/app/store/app.actions';
 import {
   PdfViewerComponent, 
-  LinkAnnotationService, 
-  BookmarkViewService, 
   MagnificationService, 
-  ThumbnailViewService,
   NavigationService, 
-  TextSearchService, 
   TextSelectionService, 
-  PrintService, 
   AnnotationService, 
-  FormFieldsService
+  ToolbarService,
 } from '@syncfusion/ej2-angular-pdfviewer';
 
 @Component({
   selector: 'app-send-group-email',
   templateUrl: './send-group-email.component.html',
   styleUrls: ['./send-group-email.component.scss'],
-  providers: [ToolbarService, LinkService, ImageService, HtmlEditorService, TableService],
+  providers: [ToolbarService, LinkService, ImageService, HtmlEditorService, TableService, MagnificationService, NavigationService, TextSelectionService, AnnotationService],
 })
 export class SendGroupEmailComponent
   extends AbstractGridConfigurationComponent

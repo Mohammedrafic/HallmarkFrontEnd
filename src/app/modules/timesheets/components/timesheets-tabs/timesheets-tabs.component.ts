@@ -30,13 +30,12 @@ export class TimesheetsTabsComponent extends ResponsiveTabsDirective implements 
 
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
-  public alertTitle:string;
+  public alertTitle: string;
 
   constructor(
     @Inject(DOCUMENT) protected override document: Document,
     protected override store: Store,
     private readonly ngZone: NgZone,
-    
   ) {
     super(store, document);
   }
@@ -44,20 +43,9 @@ export class TimesheetsTabsComponent extends ResponsiveTabsDirective implements 
   public ngOnChanges(changes: SimpleChanges): void {
     if (this.tabConfig) {
       this.asyncRefresh();
+      this.navigatingTab();
     }
-    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
-    //Pending Approval Tab navigation
-    if(AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase()==this.alertTitle.toLowerCase()) {
-      this.tabComponent.selectedItem=1;
-      this.changeTab.emit(1);
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
-    }
-    //Rejected Tab navigation.
-    if(AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase()==this.alertTitle.toLowerCase()) {
-      this.tabComponent.selectedItem=3;
-      this.changeTab.emit(3);
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
-    }
+    
   }
 
   public trackBy(_: number, item: TabsListConfig): string {
@@ -77,5 +65,23 @@ export class TimesheetsTabsComponent extends ResponsiveTabsDirective implements 
     setTimeout(() => {
       this.tabComponent.refreshActiveTabBorder();
     });
+  }
+  @OutsideZone
+  private navigatingTab():void{
+    setTimeout(() => {
+      this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+    //Pending Approval Tab navigation
+    if (AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase() == this.alertTitle.toLowerCase()) {
+        this.tabComponent.selectedItem = 1;
+        this.changeTab.emit(1);
+        this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
+    //Rejected Tab navigation.
+    if (AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase() == this.alertTitle.toLowerCase()) {
+        this.tabComponent.selectedItem = 3;
+        this.changeTab.emit(3);
+        this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
+    },5000);
   }
 }
