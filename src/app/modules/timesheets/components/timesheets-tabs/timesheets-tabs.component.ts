@@ -1,6 +1,6 @@
 import {
   ChangeDetectionStrategy, Component, EventEmitter,
-  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild, AfterViewInit
+  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild, Inject
 } from '@angular/core';
 
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -9,6 +9,7 @@ import { Destroyable } from '@core/helpers';
 import { OutsideZone } from '@core/decorators';
 import { TabConfig } from '../../interface';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -16,7 +17,7 @@ import { AlertIdEnum } from '@admin/alerts/alerts.enum';
   styleUrls: ['./timesheets-tabs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetsTabsComponent extends Destroyable implements OnChanges, AfterViewInit{
+export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
   @ViewChild(TabComponent)
   public tabComponent: TabComponent;
 
@@ -31,6 +32,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, A
   public alertTitle:string;
   public orgwidgetpendingtimesheet:string;
   constructor(
+    @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis,
     private readonly ngZone: NgZone,
   ) {
     super();
@@ -40,31 +42,22 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, A
     if (this.tabConfig) {
       this.asyncRefresh();
     }
-    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
-    //Pending Approval Tab navigation
+    this.getalerttitle();
     if(AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase()==this.alertTitle.toLowerCase()) {
       this.tabComponent.selectedItem=1;
       this.changeTab.emit(1);
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+      this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
-    //Rejected Tab navigation.
     if(AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase()==this.alertTitle.toLowerCase()) {
       this.tabComponent.selectedItem=3;
       this.changeTab.emit(3);
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+      this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
+    this.navigatetopendingtimesheet();
   }
 
-  public ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.orgwidgetpendingtimesheet = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
-       //Pending Approval Tab navigation
-       if(this.orgwidgetpendingtimesheet === "Pending Timesheet") {
-         this.tabComponent.selectedItem=1;
-         this.changeTab.emit(1);
-         window.localStorage.setItem("orgpendingwidget", JSON.stringify(""));
-       }
-   }, 1000);
+  public getalerttitle(): void {
+    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
   }
 
   public trackBy(_: number, item: TabsListConfig): string {
@@ -84,5 +77,15 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, A
     setTimeout(() => {
       this.tabComponent.refreshActiveTabBorder();
     });
+  }
+  private navigatetopendingtimesheet(): void {
+    setTimeout(() => {
+      this.orgwidgetpendingtimesheet = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
+       if(this.orgwidgetpendingtimesheet === "Pending Timesheet") {
+         this.tabComponent.selectedItem=1;
+         this.changeTab.emit(1);
+         this.globalWindow.localStorage.setItem("orgpendingwidget", JSON.stringify(""));
+       }
+   }, 1000);
   }
 }

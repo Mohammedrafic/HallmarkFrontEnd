@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Input, NgZone,
   Output,
+  Inject,
   ViewChild,
 } from '@angular/core';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
@@ -16,6 +17,7 @@ import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { GlobalWindow } from "@core/tokens";
 
 @Component({
   selector: 'app-invoices-table-tabs',
@@ -39,61 +41,50 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
   public alertTitle: string
   public orgwidgetpendinginvoice:string;
   constructor(
+    @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
     private readonly ngZone: NgZone,
     private store: Store
   ) {
     super();
   }
 
+
   public ngAfterViewInit(): void {
     const user = this.store.selectSnapshot(UserState.user);
-    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
-    //Paid Tab navigation
+    this.getalerttitle();
     if ((AlertIdEnum[AlertIdEnum['Invoice: Organization Paid']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
       if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {
         this.changeTab.emit(4);
         this.tabComponent.selectedItem = 4
-        window.localStorage.setItem("alertTitle", JSON.stringify(""));
+        this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
       }
     }
     if ((AlertIdEnum[AlertIdEnum['Invoice: Approved']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
-      //Pending payment tab navigation for organization
       if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {
         this.changeTab.emit(3);
         this.tabComponent.selectedItem = 3;
       }
-      //All invoices tab navigation for agency
       if (user?.businessUnitType === BusinessUnitType.Agency) {
         this.changeTab.emit(1);
         this.tabComponent.selectedItem = 1;
       }
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+      this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
     if ((AlertIdEnum[AlertIdEnum['Time Sheet: Org. Approved']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
-      //Pending invoice record tab navigation for organization
       if (user?.businessUnitType === BusinessUnitType.Organization) {
         this.changeTab.emit(0);
         this.tabComponent.selectedItem = 0;
       }
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+      this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
     if ((AlertIdEnum[AlertIdEnum['Manual Invoice: Pending Approval']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
-      //Manual Invoice Pending tab navigation for orgnization
       if (user?.businessUnitType === BusinessUnitType.Organization) {
         this.changeTab.emit(1);
         this.tabComponent.selectedItem = 1;
       }
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+      this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
-    setTimeout(() => {
-      this.orgwidgetpendinginvoice = JSON.parse(localStorage.getItem('orgmanualinvoicewidget') || '""') as string;
-       //Pending Approval Tab navigation
-       if(this.orgwidgetpendinginvoice === "ManualInvoice") {
-         this.tabComponent.selectedItem=1;
-         this.changeTab.emit(1);
-         window.localStorage.setItem("orgmanualinvoicewidget", JSON.stringify(""));
-       }
-    }, 1000);
+    this.pendinginvoicenavigation();
     this.asyncRefresh();
   }
 
@@ -120,6 +111,10 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
   public preselectTab(idx: number): void {
     this.tabComponent.selectedItem = idx;
     this.tabComponent.refreshActiveTab();
+  }
+
+  public getalerttitle(): void {
+    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
   }
 
   private hideTab(index: number): void {
@@ -151,5 +146,15 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
     setTimeout(() => {
       this.tabComponent.refreshActiveTabBorder();
     });
+  }
+  private pendinginvoicenavigation(): void {
+    setTimeout(() => {
+      this.orgwidgetpendinginvoice = JSON.parse(localStorage.getItem('orgmanualinvoicewidget') || '""') as string;
+       if(this.orgwidgetpendinginvoice === "ManualInvoice") {
+         this.tabComponent.selectedItem=1;
+         this.changeTab.emit(1);
+         this.globalWindow.localStorage.setItem("orgmanualinvoicewidget", JSON.stringify(""));
+       }
+    }, 2000);
   }
 }
