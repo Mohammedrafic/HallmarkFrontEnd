@@ -44,8 +44,6 @@ export class ResizeContentService {
       distinctUntilChanged(),
       debounceTime(200),
       tap((contentWidth) => {
-        console.error(contentWidth);
-        
         this.containerWidth$.next(contentWidth + 'px');
       })
     );
