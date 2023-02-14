@@ -1,8 +1,8 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild, Inject } from '@angular/core';
-import { DOCUMENT, Location } from '@angular/common';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Location } from '@angular/common';
 
 import { Store } from '@ngxs/store';
-import { takeUntil } from 'rxjs';
+import { takeUntil, Observable } from 'rxjs';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
@@ -10,14 +10,15 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { OrderManagementState } from '../../store/order-management.state';
 import { SetOrdersTab } from '../../store/order-management.actions';
 import { OrderType } from '@shared/enums/order-type';
-import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive';
+import { Destroyable } from '@core/helpers';
+import { ResizeContentService } from '@shared/services/resize-main-content.service';
 
 @Component({
   selector: 'app-tab-navigation',
   templateUrl: './tab-navigation.component.html',
   styleUrls: ['./tab-navigation.component.scss'],
 })
-export class TabNavigationComponent extends ResponsiveTabsDirective implements OnInit {
+export class TabNavigationComponent extends Destroyable implements OnInit {
   @ViewChild('tabNavigation') tabNavigation: TabComponent;
   @Output() selectedTab = new EventEmitter<AgencyOrderManagementTabs>();
 
@@ -29,22 +30,29 @@ export class TabNavigationComponent extends ResponsiveTabsDirective implements O
 
   private selectedTabIndex: number;
   private previousSelectedOrderId: number;
+  public tabsWidth$: Observable<string>;
 
   constructor(
-    @Inject(DOCUMENT) protected override document: Document,
-    protected override store: Store,
+    private store: Store,
     private orderManagementAgencyService: OrderManagementAgencyService,
     private location: Location,
+    private ResizeContentService: ResizeContentService,
   ) {
-    super(store, document);
+    super();
   }
 
   public ngOnInit(): void {
     this.selectPerDiemTab();
     this.selectReorderAfterNavigation();
-
+    this.getTabsWidth();
+  
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
+  }
+
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.ResizeContentService.detachResizeObservable();
   }
 
   public onSelect(event: SelectingEventArgs): void {
@@ -92,5 +100,12 @@ export class TabNavigationComponent extends ResponsiveTabsDirective implements O
     } else if (selectedOrderAfterRedirect?.orderType !== OrderType.ReOrder) {
       this.store.dispatch(new SetOrdersTab(this.tabsArray[0]));
     }
+  }
+
+  private getTabsWidth(): void {
+    this.ResizeContentService.initResizeObservable()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe();
+    this.tabsWidth$ = this.ResizeContentService.getContainerWidth();
   }
 }

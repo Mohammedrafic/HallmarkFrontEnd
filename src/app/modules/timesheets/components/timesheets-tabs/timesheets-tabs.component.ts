@@ -1,16 +1,26 @@
 import {
-  ChangeDetectionStrategy, Component, EventEmitter,
-  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild, Inject
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  NgZone,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild,
+  Inject,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
+import { Observable, takeUntil } from 'rxjs';
+
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { OutsideZone } from '@core/decorators';
 import { TabConfig } from '../../interface';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
-import { Store } from '@ngxs/store';
-import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive';
+import { Destroyable } from '@core/helpers';
+import { ResizeContentService } from '@shared/services/resize-main-content.service';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -18,7 +28,7 @@ import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.dire
   styleUrls: ['./timesheets-tabs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetsTabsComponent extends ResponsiveTabsDirective implements OnChanges {
+export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
   @ViewChild(TabComponent)
   public tabComponent: TabComponent;
 
@@ -31,13 +41,14 @@ export class TimesheetsTabsComponent extends ResponsiveTabsDirective implements 
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
   public alertTitle: string;
+  public tabsWidth$: Observable<string>;
 
   constructor(
-    @Inject(DOCUMENT) protected override document: Document,
-    protected override store: Store,
     private readonly ngZone: NgZone,
+    @Inject(DOCUMENT) private document: Document,
+    private ResizeContentService: ResizeContentService
   ) {
-    super(store, document);
+    super();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -45,7 +56,15 @@ export class TimesheetsTabsComponent extends ResponsiveTabsDirective implements 
       this.asyncRefresh();
       this.navigatingTab();
     }
-    
+  }
+
+  public ngAfterViewInit(): void {
+    this.getTabsWidth();
+  }
+
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.ResizeContentService.detachResizeObservable();
   }
 
   public trackBy(_: number, item: TabsListConfig): string {
@@ -67,21 +86,30 @@ export class TimesheetsTabsComponent extends ResponsiveTabsDirective implements 
     });
   }
   @OutsideZone
-  private navigatingTab():void{
+  private navigatingTab(): void {
     setTimeout(() => {
       this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
-    //Pending Approval Tab navigation
-    if (AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase() == this.alertTitle.toLowerCase()) {
+      //Pending Approval Tab navigation
+      if (
+        AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase() == this.alertTitle.toLowerCase()
+      ) {
         this.tabComponent.selectedItem = 1;
         this.changeTab.emit(1);
-        this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
-    }
-    //Rejected Tab navigation.
-    if (AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase() == this.alertTitle.toLowerCase()) {
+        this.document.defaultView?.localStorage.setItem('alertTitle', JSON.stringify(''));
+      }
+      //Rejected Tab navigation.
+      if (AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase() == this.alertTitle.toLowerCase()) {
         this.tabComponent.selectedItem = 3;
         this.changeTab.emit(3);
-        this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
-    }
-    },5000);
+        this.document.defaultView?.localStorage.setItem('alertTitle', JSON.stringify(''));
+      }
+    }, 5000);
+  }
+
+  private getTabsWidth(): void {
+    this.ResizeContentService.initResizeObservable()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe();
+    this.tabsWidth$ = this.ResizeContentService.getContainerWidth();
   }
 }
