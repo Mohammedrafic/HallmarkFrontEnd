@@ -84,11 +84,11 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   public clearAllFilters(eventEmmit = true, keepPreservedFilters = false): void {
     if (keepPreservedFilters) {
       Object.keys(this.formGroup.controls).forEach(key => {
-        if (key !== 'regionsIds' && key !== 'locationIds') {
+        if (key !== 'regionsIds' && key !== 'locationIds' && key !== 'contactEmails') {
           this.formGroup.controls[key].reset();
         }
       });
-      this.filteredItems = this.filteredItems.filter(item => item.column === 'regionsIds' || item.column === 'locationIds');
+      this.filteredItems = this.filteredItems.filter(item => item.column === 'regionsIds' || item.column === 'locationIds' || item.column === 'contactEmails');
     } else {
       this.formGroup.reset();
       this.filteredItems = [];
