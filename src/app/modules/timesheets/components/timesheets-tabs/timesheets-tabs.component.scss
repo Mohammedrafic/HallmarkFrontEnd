@@ -14,8 +14,12 @@
   }
 
   .tabs {
-    max-width: calc(100vw - 50px) !important;
+    max-width: calc(100% - 24px) !important;
     overflow: hidden !important;
+    @media #{$max-mobile} {
+      max-width: calc(100vw - 50px) !important;
+    }
+    
     .e-hscroll-content {
       padding: 0;
     }

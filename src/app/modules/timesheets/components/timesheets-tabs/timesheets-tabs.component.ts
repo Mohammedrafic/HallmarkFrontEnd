@@ -5,10 +5,11 @@ import {
 
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
-import { Destroyable } from '@core/helpers';
 import { OutsideZone } from '@core/decorators';
 import { TabConfig } from '../../interface';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
+import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive.ts/responsive-tabs.directive';
+import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -16,7 +17,7 @@ import { AlertIdEnum } from '@admin/alerts/alerts.enum';
   styleUrls: ['./timesheets-tabs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
+export class TimesheetsTabsComponent extends ResponsiveTabsDirective implements OnChanges {
   @ViewChild(TabComponent)
   public tabComponent: TabComponent;
 
@@ -32,8 +33,9 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
 
   constructor(
     private readonly ngZone: NgZone,
+    protected override store: Store,
   ) {
-    super();
+    super(store);
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
