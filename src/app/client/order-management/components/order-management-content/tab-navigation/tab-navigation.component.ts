@@ -2,19 +2,19 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { filter, takeUntil } from 'rxjs';
 import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
 import { NavigationTabModel } from '@shared/models/navigation-tab.model';
 import { OrderType } from '@shared/enums/order-type';
+import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive.ts/responsive-tabs.directive';
 
 @Component({
   selector: 'app-tab-navigation',
   templateUrl: './tab-navigation.component.html',
   styleUrls: ['./tab-navigation.component.scss'],
 })
-export class TabNavigationComponent extends DestroyableDirective implements OnInit {
+export class TabNavigationComponent extends ResponsiveTabsDirective implements OnInit {
   @ViewChild('tabNavigation') tabNavigation: TabComponent;
 
   @Input() incompleteCount: number;
@@ -27,9 +27,9 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   public constructor(
     private orderManagementService: OrderManagementService,
     private actions: Actions,
-    private store: Store,
+    protected override store: Store,
   ) {
-    super();
+    super(store);
   }
 
   public ngOnInit(): void {
@@ -49,7 +49,7 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   private selectPerDiemTab(): void {
     const perDiemTabIndex = 1;
     this.orderManagementService.orderPerDiemId$
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => this.tabNavigation.select(perDiemTabIndex));
   }
 
@@ -67,7 +67,7 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
       .pipe(
         ofActionDispatched(SelectNavigationTab),
         filter(({ active }: NavigationTabModel) => !!active),
-        takeUntil(this.destroy$)
+        takeUntil(this.componentDestroy())
       )
       .subscribe(({ active }: NavigationTabModel) => {
         const tabList = Object.values(OrganizationOrderManagementTabs);

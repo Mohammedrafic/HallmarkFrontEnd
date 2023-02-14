@@ -10,12 +10,12 @@ import {
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { BehaviorSubject, filter, takeUntil } from 'rxjs';
-import { Destroyable } from '@core/helpers';
 import { OutsideZone } from '@core/decorators';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive.ts/responsive-tabs.directive';
 
 @Component({
   selector: 'app-invoices-table-tabs',
@@ -23,9 +23,8 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
   styleUrls: ['./invoices-table-tabs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoicesTableTabsComponent extends Destroyable implements AfterViewInit {
+export class InvoicesTableTabsComponent extends ResponsiveTabsDirective implements AfterViewInit {
   private readonly tabsComponentCreated$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-
   @Input()
   public tabConfig: TabsListConfig[];
 
@@ -36,13 +35,13 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
 
   @ViewChild(TabComponent)
   public tabComponent: TabComponent;
-  public alertTitle: string
+  public alertTitle: string;
 
   constructor(
     private readonly ngZone: NgZone,
-    private store: Store
+    protected override store: Store,
   ) {
-    super();
+    super(store);
   }
 
   public ngAfterViewInit(): void {
