@@ -1,27 +1,26 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild, Inject } from '@angular/core';
+import { DOCUMENT, Location } from '@angular/common';
+
 import { Store } from '@ngxs/store';
 import { takeUntil } from 'rxjs';
-
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { OrderManagementState } from '../../store/order-management.state';
 import { SetOrdersTab } from '../../store/order-management.actions';
-import { Location } from '@angular/common';
 import { OrderType } from '@shared/enums/order-type';
+import { ResponsiveTabsDirective } from '@shared/directives/responsive-tabs.directive.ts/responsive-tabs.directive';
 
 @Component({
   selector: 'app-tab-navigation',
   templateUrl: './tab-navigation.component.html',
   styleUrls: ['./tab-navigation.component.scss'],
 })
-export class TabNavigationComponent extends DestroyableDirective implements OnInit {
+export class TabNavigationComponent extends ResponsiveTabsDirective implements OnInit {
   @ViewChild('tabNavigation') tabNavigation: TabComponent;
   @Output() selectedTab = new EventEmitter<AgencyOrderManagementTabs>();
 
-  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
   public width = '100%';
   public tabTitle = AgencyOrderManagementTabs;
   public tabsArray = Object.values(AgencyOrderManagementTabs).filter(
@@ -32,11 +31,12 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   private previousSelectedOrderId: number;
 
   constructor(
+    @Inject(DOCUMENT) protected override document: Document,
+    protected override store: Store,
     private orderManagementAgencyService: OrderManagementAgencyService,
-    private store: Store,
     private location: Location,
   ) {
-    super();
+    super(store, document);
   }
 
   public ngOnInit(): void {
@@ -66,14 +66,14 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   private selectPerDiemTab(): void {
     //TODO: change perDiemTabIndex to 3 , when we implemented other tabs
     const perDiemTabIndex = 1;
-    this.orderManagementAgencyService.orderPerDiemId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.orderManagementAgencyService.orderPerDiemId$.pipe(takeUntil(this.componentDestroy())).subscribe(() => {
       this.tabNavigation.select(perDiemTabIndex);
     });
   }
 
   private selectReorderAfterNavigation(): void {
     const perDiemTabIndex = 3;
-    this.orderManagementAgencyService.reorderId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.orderManagementAgencyService.reorderId$.pipe(takeUntil(this.componentDestroy())).subscribe(() => {
       this.tabNavigation.select(perDiemTabIndex);
     });
   }
