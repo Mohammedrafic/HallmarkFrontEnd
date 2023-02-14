@@ -214,7 +214,7 @@ const gridIcons = {
     OrganizationCandidatesModule,
     OrderManagementSubrowCandidatePositionModule,
     ScrollToTopModule,
-    NumericTextboxModule
+    NumericTextboxModule,
   ],
   providers: [
     ResizeService,

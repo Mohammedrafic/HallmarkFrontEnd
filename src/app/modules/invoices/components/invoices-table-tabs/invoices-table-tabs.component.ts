@@ -3,19 +3,23 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
-  Input, NgZone,
+  Input,
+  NgZone,
   Output,
   ViewChild,
 } from '@angular/core';
-import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { BehaviorSubject, filter, takeUntil } from 'rxjs';
-import { Destroyable } from '@core/helpers';
+import { BehaviorSubject, filter, takeUntil, Observable } from 'rxjs';
+import { Store } from '@ngxs/store';
+
+import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { OutsideZone } from '@core/decorators';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
-import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { Destroyable } from '@core/helpers';
+import { ResizeContentService } from '@shared/services/resize-main-content.service';
 
 @Component({
   selector: 'app-invoices-table-tabs',
@@ -25,7 +29,6 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 })
 export class InvoicesTableTabsComponent extends Destroyable implements AfterViewInit {
   private readonly tabsComponentCreated$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-
   @Input()
   public tabConfig: TabsListConfig[];
 
@@ -36,11 +39,13 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
 
   @ViewChild(TabComponent)
   public tabComponent: TabComponent;
-  public alertTitle: string
+  public alertTitle: string;
+  public tabsWidth$: Observable<string>;
 
   constructor(
+    private store: Store,
     private readonly ngZone: NgZone,
-    private store: Store
+    private ResizeContentService: ResizeContentService
   ) {
     super();
   }
@@ -49,16 +54,25 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
     const user = this.store.selectSnapshot(UserState.user);
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
     //Paid Tab navigation
-    if ((AlertIdEnum[AlertIdEnum['Invoice: Organization Paid']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
-      if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {
+    if (
+      AlertIdEnum[AlertIdEnum['Invoice: Organization Paid']].trim().toLowerCase() ==
+      this.alertTitle.trim().toLowerCase()
+    ) {
+      if (
+        user?.businessUnitType === BusinessUnitType.Organization ||
+        user?.businessUnitType === BusinessUnitType.Hallmark
+      ) {
         this.changeTab.emit(4);
-        this.tabComponent.selectedItem = 4
-        window.localStorage.setItem("alertTitle", JSON.stringify(""));
+        this.tabComponent.selectedItem = 4;
+        window.localStorage.setItem('alertTitle', JSON.stringify(''));
       }
     }
-    if ((AlertIdEnum[AlertIdEnum['Invoice: Approved']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
+    if (AlertIdEnum[AlertIdEnum['Invoice: Approved']].trim().toLowerCase() == this.alertTitle.trim().toLowerCase()) {
       //Pending payment tab navigation for organization
-      if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {
+      if (
+        user?.businessUnitType === BusinessUnitType.Organization ||
+        user?.businessUnitType === BusinessUnitType.Hallmark
+      ) {
         this.changeTab.emit(3);
         this.tabComponent.selectedItem = 3;
       }
@@ -67,25 +81,37 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
         this.changeTab.emit(1);
         this.tabComponent.selectedItem = 1;
       }
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+      window.localStorage.setItem('alertTitle', JSON.stringify(''));
     }
-    if ((AlertIdEnum[AlertIdEnum['Time Sheet: Org. Approved']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
+    if (
+      AlertIdEnum[AlertIdEnum['Time Sheet: Org. Approved']].trim().toLowerCase() == this.alertTitle.trim().toLowerCase()
+    ) {
       //Pending invoice record tab navigation for organization
       if (user?.businessUnitType === BusinessUnitType.Organization) {
         this.changeTab.emit(0);
         this.tabComponent.selectedItem = 0;
       }
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+      window.localStorage.setItem('alertTitle', JSON.stringify(''));
     }
-    if ((AlertIdEnum[AlertIdEnum['Manual Invoice: Pending Approval']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
+    if (
+      AlertIdEnum[AlertIdEnum['Manual Invoice: Pending Approval']].trim().toLowerCase() ==
+      this.alertTitle.trim().toLowerCase()
+    ) {
       //Manual Invoice Pending tab navigation for orgnization
       if (user?.businessUnitType === BusinessUnitType.Organization) {
         this.changeTab.emit(1);
         this.tabComponent.selectedItem = 1;
       }
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+      window.localStorage.setItem('alertTitle', JSON.stringify(''));
     }
     this.asyncRefresh();
+
+    this.getTabsWidth();
+  }
+
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.ResizeContentService.detachResizeObservable();
   }
 
   public onSelect(selectEvent: SelectingEventArgs): void {
@@ -117,24 +143,20 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
     this.tabsComponentCreated$
       .pipe(
         filter(Boolean),
-        takeUntil(this.componentDestroy())
-      )
+        takeUntil(this.componentDestroy()))
       .subscribe(() => {
-        this.tabComponent.hideTab(index, true);
-        this.asyncRefresh();
-      });
+      this.tabComponent.hideTab(index, true);
+      this.asyncRefresh();
+    });
   }
 
   private showTab(index: number): void {
     this.tabsComponentCreated$
-      .pipe(
-        filter(Boolean),
-        takeUntil(this.componentDestroy())
-      )
+      .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.tabComponent.hideTab(index, false);
         this.asyncRefresh();
-      });
+    });
   }
 
   @OutsideZone
@@ -142,5 +164,12 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
     setTimeout(() => {
       this.tabComponent.refreshActiveTabBorder();
     });
+  }
+
+  private getTabsWidth(): void {
+    this.ResizeContentService.initResizeObservable()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe();
+    this.tabsWidth$ = this.ResizeContentService.getContainerWidth();
   }
 }

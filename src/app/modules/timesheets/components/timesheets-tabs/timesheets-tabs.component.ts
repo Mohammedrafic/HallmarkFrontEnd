@@ -2,14 +2,17 @@ import {
   ChangeDetectionStrategy, Component, EventEmitter,
   Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild,Inject
 } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
+import { Observable, takeUntil } from 'rxjs';
+
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
-import { Destroyable } from '@core/helpers';
 import { OutsideZone } from '@core/decorators';
 import { TabConfig } from '../../interface';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
-import { DOCUMENT } from '@angular/common';
+import { Destroyable } from '@core/helpers';
+import { ResizeContentService } from '@shared/services/resize-main-content.service';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -30,10 +33,12 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
   public alertTitle: string;
+  public tabsWidth$: Observable<string>;
 
   constructor(
     private readonly ngZone: NgZone,
     @Inject(DOCUMENT) private document: Document,
+    private ResizeContentService: ResizeContentService
   ) {
     super();
   }
@@ -43,7 +48,15 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
       this.asyncRefresh();
       this.navigatingTab();
     }
-    
+  }
+
+  public ngAfterViewInit(): void {
+    this.getTabsWidth();
+  }
+
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.ResizeContentService.detachResizeObservable();
   }
 
   public trackBy(_: number, item: TabsListConfig): string {
@@ -81,5 +94,13 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
         this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
     },5000);
+
+  }
+
+  private getTabsWidth(): void {
+    this.ResizeContentService.initResizeObservable()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe();
+    this.tabsWidth$ = this.ResizeContentService.getContainerWidth();
   }
 }

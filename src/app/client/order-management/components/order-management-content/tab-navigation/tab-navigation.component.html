@@ -1,4 +1,13 @@
-<ejs-tab id="tab-default" heightAdjustMode="Auto" cssClass="tabs" #tabNavigation (selecting)="onSelect($event)" (created)="onTabCreated()" overflowMode="Scrollable">
+<ejs-tab
+  id="tab-default"
+  heightAdjustMode="Auto"
+  overflowMode="Scrollable"
+  cssClass="tabs"
+  [width]="tabsWidth$ | async"
+  #tabNavigation
+  (selecting)="onSelect($event)"
+  (created)="onTabCreated()"
+>
   <div class="e-tab-header">
     <div>{{ tabTitle.AllOrders }}</div>
     <div>{{ tabTitle.PerDiem }}</div>
