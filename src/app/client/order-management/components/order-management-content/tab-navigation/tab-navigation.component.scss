@@ -1,16 +1,33 @@
-@import "adaptive-response";
-.tab-navigation {
-  &.e-badge {
-    margin-left: 0.3rem;
+@import 'adaptive-response';
+:host::ng-deep {
+  .e-toolbar-items.e-lib.e-hscroll.e-control.e-touch {
+    padding: 0 !important;
+  }
+  .e-scroll-nav.e-scroll-right-nav.e-lib.e-touch,
+  .e-scroll-nav.e-scroll-left-nav.e-lib.e-touch {
+    display: none;
+  }
+
+  .tabs {
+    max-width: calc(100% - 24px) !important;
+    overflow: hidden !important;
+    @media #{$max-mobile} {
+      max-width: calc(100vw - 50px) !important;
+    }
+
+    .e-hscroll-content {
+      padding: 0;
+    }
   }
 }
 
-.tabs {
-  @media #{$max-tablet} {
-    max-width: calc(90vw - 50px) !important;
-  }
+.tab-item {
+  display: flex;
+  align-items: center;
+}
 
-  @media #{$max-mobile} {
-    max-width: calc(100vw - 50px) !important;
+.tab-navigation {
+  &.e-badge {
+    margin-left: 0.3rem;
   }
 }

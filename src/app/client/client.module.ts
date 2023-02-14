@@ -107,6 +107,7 @@ import { CandidateState } from '@agency/store/candidate.state';
 import { UpdateRegRateComponent
 } from './order-management/components/update-reg-rate/update-reg-rate.component';
 import { NumericTextboxModule } from '@shared/components/form-controls/numeric-textbox/numeric-textbox.module';
+import { ResponsiveTabsModule } from '@shared/directives/responsive-tabs.directive.ts/responsive-tabs.module';
 
 const gridIcons = {
   MessageSquare,
@@ -214,7 +215,8 @@ const gridIcons = {
     OrganizationCandidatesModule,
     OrderManagementSubrowCandidatePositionModule,
     ScrollToTopModule,
-    NumericTextboxModule
+    NumericTextboxModule,
+    ResponsiveTabsModule
   ],
   providers: [
     ResizeService,

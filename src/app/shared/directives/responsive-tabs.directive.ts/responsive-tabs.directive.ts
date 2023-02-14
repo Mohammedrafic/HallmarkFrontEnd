@@ -1,7 +1,7 @@
 import { Directive } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { distinctUntilChanged, filter, map, takeUntil, BehaviorSubject } from 'rxjs';
+import { distinctUntilChanged, filter, map, takeUntil, BehaviorSubject, debounceTime } from 'rxjs';
 
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { Destroyable } from '@core/helpers';
@@ -40,6 +40,7 @@ export class ResponsiveTabsDirective extends Destroyable {
         filter(() => isTablet && !isMobile),
         map((data) => Math.floor(data[0].contentRect.width)),
         distinctUntilChanged(),
+        debounceTime(200),
         takeUntil(this.componentDestroy())
       )
       .subscribe((contentWidth) => {
