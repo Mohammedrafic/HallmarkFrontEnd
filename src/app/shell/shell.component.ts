@@ -38,6 +38,7 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { AnalyticsApiService } from '@shared/services/analytics-api.service';
 import { InitPreservedFilters } from '../store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
+import { ResizeContentService } from '@shared/services/resize-main-content.service';
 
 
 
@@ -95,6 +96,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('searchMenuInstance')
   public searchMenuInstance: SearchMenuComponent;
+
+  @ViewChild('mainContainer', { static: true }) private mainContainer: ElementRef<HTMLElement>
 
   @Select(AppState.isSidebarOpened)
   isSideBarDocked$: Observable<boolean>;
@@ -179,6 +182,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     private analyticsApiService: AnalyticsApiService<string>,
     private filterService: FilterService,
     private readonly ngZone: NgZone,
+    private ResizeContentService: ResizeContentService,
   ) {
 
     this.filterService.canPreserveFilters() && store.dispatch(new InitPreservedFilters());
@@ -226,12 +230,14 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getAlertsPoolling();
 
     this.watchForUnreadMessages();
+    this.attachElementToResizeObserver();
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
+
   ngAfterViewInit(): void {
     this.hideAnalyticsSubMenuItems();
     this.getAlertsPoollingTime();
@@ -672,5 +678,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     if(title){
      window.localStorage.setItem("alertTitle",JSON.stringify(title)); 
     }
+  }
+
+  private attachElementToResizeObserver(): void {
+    this.ResizeContentService.attachResizeContainer(this.mainContainer);
   }
 }
