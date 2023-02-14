@@ -602,3 +602,6 @@ html, body {
 .user_subs_cls .ag-row-loading {
   display: none;
 }
+body.dark .title, body.dark .contact-name {
+  color: white !important;
+}
