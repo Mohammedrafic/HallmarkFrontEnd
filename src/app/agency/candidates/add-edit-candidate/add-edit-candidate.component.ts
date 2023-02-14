@@ -40,6 +40,8 @@ import {
 import { CandidateContactDetailsComponent } from './candidate-contact-details/candidate-contact-details.component';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { AgencySettingsService } from '@agency/services/agency-settings.service';
+import { toCorrectTimezoneFormat } from "@shared/utils/date-time.utils";
+import { DateTimeHelper } from "@core/helpers";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -204,6 +206,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       let candidate = this.getCandidateRequestObj(this.candidateForm.getRawValue());
       candidate = {
         ...candidate,
+        dob: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(candidate.dob)),
         ssn: candidate.ssn ? +candidate.ssn : null,
       };
 
@@ -306,7 +309,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       firstName,
       middleName,
       lastName,
-      dob,
+      dob: DateTimeHelper.convertDateToUtc(dob),
       classification,
       profileStatus,
       candidateAgencyStatus,
