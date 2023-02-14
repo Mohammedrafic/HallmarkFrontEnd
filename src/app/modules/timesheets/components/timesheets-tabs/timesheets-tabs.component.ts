@@ -1,6 +1,6 @@
 import {
   ChangeDetectionStrategy, Component, EventEmitter,
-  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild,
+  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild,Inject
 } from '@angular/core';
 
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -9,6 +9,7 @@ import { Destroyable } from '@core/helpers';
 import { OutsideZone } from '@core/decorators';
 import { TabConfig } from '../../interface';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -28,10 +29,11 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
 
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
-  public alertTitle:string;
+  public alertTitle: string;
 
   constructor(
     private readonly ngZone: NgZone,
+    @Inject(DOCUMENT) private document: Document,
   ) {
     super();
   }
@@ -39,20 +41,9 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
   public ngOnChanges(changes: SimpleChanges): void {
     if (this.tabConfig) {
       this.asyncRefresh();
+      this.navigatingTab();
     }
-    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
-    //Pending Approval Tab navigation
-    if(AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase()==this.alertTitle.toLowerCase()) {
-      this.tabComponent.selectedItem=1;
-      this.changeTab.emit(1);
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
-    }
-    //Rejected Tab navigation.
-    if(AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase()==this.alertTitle.toLowerCase()) {
-      this.tabComponent.selectedItem=3;
-      this.changeTab.emit(3);
-      window.localStorage.setItem("alertTitle", JSON.stringify(""));
-    }
+    
   }
 
   public trackBy(_: number, item: TabsListConfig): string {
@@ -72,5 +63,23 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
     setTimeout(() => {
       this.tabComponent.refreshActiveTabBorder();
     });
+  }
+  @OutsideZone
+  private navigatingTab():void{
+    setTimeout(() => {
+      this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+    //Pending Approval Tab navigation
+    if (AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase() == this.alertTitle.toLowerCase()) {
+        this.tabComponent.selectedItem = 1;
+        this.changeTab.emit(1);
+        this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
+    //Rejected Tab navigation.
+    if (AlertIdEnum[AlertIdEnum['Time Sheet: Rejected']].toLowerCase() == this.alertTitle.toLowerCase()) {
+        this.tabComponent.selectedItem = 3;
+        this.changeTab.emit(3);
+        this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
+    },5000);
   }
 }
