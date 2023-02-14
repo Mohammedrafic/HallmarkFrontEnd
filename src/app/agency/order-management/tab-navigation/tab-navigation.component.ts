@@ -66,16 +66,20 @@ export class TabNavigationComponent extends ResponsiveTabsDirective implements O
   private selectPerDiemTab(): void {
     //TODO: change perDiemTabIndex to 3 , when we implemented other tabs
     const perDiemTabIndex = 1;
-    this.orderManagementAgencyService.orderPerDiemId$.pipe(takeUntil(this.componentDestroy())).subscribe(() => {
-      this.tabNavigation.select(perDiemTabIndex);
-    });
+    this.orderManagementAgencyService.orderPerDiemId$
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.tabNavigation.select(perDiemTabIndex);
+      });
   }
 
   private selectReorderAfterNavigation(): void {
     const perDiemTabIndex = 3;
-    this.orderManagementAgencyService.reorderId$.pipe(takeUntil(this.componentDestroy())).subscribe(() => {
-      this.tabNavigation.select(perDiemTabIndex);
-    });
+    this.orderManagementAgencyService.reorderId$
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.tabNavigation.select(perDiemTabIndex);
+      });
   }
 
   private selectReOrderTab(): void {
