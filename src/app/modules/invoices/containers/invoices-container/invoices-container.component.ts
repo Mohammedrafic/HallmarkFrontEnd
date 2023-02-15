@@ -33,6 +33,7 @@ import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
 import { InvoicesFiltersDialogComponent } from '../../components/invoices-filters-dialog/invoices-filters-dialog.component';
 import * as Interfaces from '../../interfaces';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
+import { GridReadyEventModel } from '@shared/components/grid/models';
 
 @Component({
   selector: 'app-invoices-container',
@@ -141,6 +142,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   private previousSelectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab;
 
   private organizationId: number;
+
+  private gridInstance: GridReadyEventModel;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -312,6 +315,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public resetFilters(): void {
+    this.gridInstance?.columnApi.resetColumnState();
+
+    this.store.dispatch(new Invoices.UpdateFiltersState({ orderBy: '' }, false));
     this.store.dispatch(
       new Invoices.UpdateFiltersState({
         pageNumber: GRID_CONFIG.initialPage,
@@ -321,6 +327,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         ...this.isAgency && this.navigatedOrgId ? { organizationId: this.navigatedOrgId } : {},
       })
     );
+    this.cdr.detectChanges();
+  }
+
+  public gridReady(event: GridReadyEventModel): void {
+    this.gridInstance = event;
   }
 
   public updateTableByFilters(filters: Interfaces.InvoicesFilterState): void {

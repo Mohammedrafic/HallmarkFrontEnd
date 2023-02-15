@@ -56,6 +56,7 @@
 
 <section class="table-wrapper">
   <app-timesheets-table
+    #grid
     *ngIf="timesheets$ | async as timesheets"
     [tableData]="timesheets"
     [newSelectedIndex]="currentSelectedTableRowIndex | async"
