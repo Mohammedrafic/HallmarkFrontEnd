@@ -911,7 +911,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   /* Check if some pending tab is present and set it as active */
   private selectNavigationTab(): void {
     const { pending } = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
-    if (pending && this.ordersPage.items) {
+    if (pending && this.ordersPage?.items) {
       this.store.dispatch(new SelectNavigationTab(null, pending));
     }
   }
