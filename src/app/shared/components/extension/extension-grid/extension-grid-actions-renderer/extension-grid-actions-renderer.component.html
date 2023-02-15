@@ -1,8 +1,14 @@
-<i-feather name="message-square" class="icon comment" (click)="onOpen()"></i-feather>
-<i-feather
-  *ngIf="(isOrganizationAgencyArea$ | async)?.isOrganizationArea"
-  name="edit"
-  class="icon edit-action"
-  [class.disable]="!canCreateOrder"
-  (click)="onEdit()"
-></i-feather>
+<div class="row-tool-buttons">
+  <button ejs-button [disabled]="!canCreateOrder" cssClass="e-flat primary-icon-button" (click)="onOpen()">
+    <i-feather name="message-square" class="icon comment"></i-feather>
+  </button>
+  <button
+    *ngIf="(isOrganizationAgencyArea$ | async)?.isOrganizationArea"
+    ejs-button
+    [disabled]="!canCreateOrder"
+    cssClass="e-flat primary-icon-button edit"
+    (click)="onEdit()"
+  >
+    <span><i-feather name="edit" class="icon"></i-feather></span>
+  </button>
+</div>
