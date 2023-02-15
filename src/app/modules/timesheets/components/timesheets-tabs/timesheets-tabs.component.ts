@@ -72,6 +72,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
       this.tabComponent.refreshActiveTabBorder();
     });
   }
+  @OutsideZone
   private navigatetopendingtimesheet(): void {
     setTimeout(() => {
       this.orgwidgetpendingtimesheet = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
@@ -82,6 +83,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
        }
    }, 1000);
   }
+  @OutsideZone
   private navigatingTab():void{
     setTimeout(() => {
       this.getalerttitle();
