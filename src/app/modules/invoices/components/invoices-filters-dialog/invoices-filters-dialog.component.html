@@ -32,7 +32,7 @@
                 mode="CheckBox"
                 [allowFiltering]="true"
                 [showSelectAll]="fieldConfig.showSelectAll"
-                [fields]="filterOptionFields"
+                [fields]="fieldConfig.field === 'skillIds' ? skillOptionFields : filterOptionFields"
                 [dataSource]="filterColumns[fieldConfig.field]?.dataSource"
                 [showDropDownIcon]="true"
                 [formControlName]="fieldConfig.field"
