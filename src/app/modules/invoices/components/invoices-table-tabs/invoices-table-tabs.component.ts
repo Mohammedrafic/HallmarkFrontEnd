@@ -66,6 +66,11 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
         this.tabComponent.selectedItem = 4;
         window.localStorage.setItem('alertTitle', JSON.stringify(''));
       }
+      if (user?.businessUnitType === BusinessUnitType.Agency) {
+        this.changeTab.emit(1);
+        this.tabComponent.selectedItem = 1
+        window.localStorage.setItem("alertTitle", JSON.stringify(""));
+      }
     }
     if (AlertIdEnum[AlertIdEnum['Invoice: Approved']].trim().toLowerCase() == this.alertTitle.trim().toLowerCase()) {
       //Pending payment tab navigation for organization
@@ -145,9 +150,9 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
         filter(Boolean),
         takeUntil(this.componentDestroy()))
       .subscribe(() => {
-      this.tabComponent.hideTab(index, true);
-      this.asyncRefresh();
-    });
+        this.tabComponent.hideTab(index, true);
+        this.asyncRefresh();
+      });
   }
 
   private showTab(index: number): void {
@@ -156,7 +161,7 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       .subscribe(() => {
         this.tabComponent.hideTab(index, false);
         this.asyncRefresh();
-    });
+      });
   }
 
   @OutsideZone
