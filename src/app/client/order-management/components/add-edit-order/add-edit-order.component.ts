@@ -123,7 +123,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   public get generalInformationForm(): Order {
-    return this.orderDetailsFormComponent.generalInformationForm.getRawValue();
+    return {
+      ...this.orderDetailsFormComponent.generalInformationForm.getRawValue(),
+      title: this.orderDetailsFormComponent.orderTypeForm.get('title')?.value,
+    };
   }
 
   public ngOnInit(): void {
