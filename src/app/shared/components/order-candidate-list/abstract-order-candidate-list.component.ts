@@ -104,6 +104,15 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
     disabledBodyOverflow(false);
   }
 
+  public gridPerPageChanged(perPage: number): void {
+    this.pageSize = perPage;
+    this.pageSubject.next(1);
+  }
+
+  public gridPageChanged(page: number): void {
+    this.pageSubject.next(page);
+  }
+
   public onRowsDropDownChanged(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };

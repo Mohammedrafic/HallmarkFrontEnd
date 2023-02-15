@@ -11,7 +11,7 @@
   <app-order-close-reason-info [orderInformation]="order"></app-order-close-reason-info>
   <div class="separator"></div>
 </ng-container>
-<div class="candidates-list" *ngIf="orderCandidatePage || order.irpOrderMetadata && irpCandidates$" [ngSwitch]="order?.orderType">
+<div class="candidates-list" *ngIf="orderCandidatePage || order?.irpOrderMetadata && irpCandidates$" [ngSwitch]="order?.orderType">
   <app-reorder-candidates-list *ngSwitchCase="orderType.ReOrder"
     [candidatesList]="orderCandidatePage$ | async"
     [irpCandidates]="irpCandidates$ | async"
