@@ -88,6 +88,13 @@ const defaultDateMapping = {
   valueType: ValueType.Text,
 };
 
+const skillColumn = {
+  type: ControlTypes.Multiselect,
+  valueType: ValueType.Id,
+  valueField: 'name',
+  valueId: 'masterSkillId',
+};
+
 export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
   [InvoicesTableFiltersColumns.FormattedInvoiceIds]: defaultInputMapping,
   [InvoicesTableFiltersColumns.SearchTerm]: defaultInputMapping,
@@ -109,7 +116,7 @@ export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
   [InvoicesTableFiltersColumns.RegionIds]: {...defaultColumnMapping},
   [InvoicesTableFiltersColumns.LocationIds]: {...defaultColumnMapping},
   [InvoicesTableFiltersColumns.DepartmentIds]: {...defaultColumnMapping},
-  [InvoicesTableFiltersColumns.SkillIds]: {...defaultColumnMapping},
+  [InvoicesTableFiltersColumns.SkillIds]: {...skillColumn},
   [InvoicesTableFiltersColumns.WeekPeriodFrom]: defaultDateMapping,
   [InvoicesTableFiltersColumns.WeekPeriodTo]: defaultDateMapping,
 

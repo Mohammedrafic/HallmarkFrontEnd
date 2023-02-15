@@ -3,22 +3,26 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
-  Input, NgZone,
+  Input,
+  NgZone,
   Output,
   Inject,
   ViewChild,
 } from '@angular/core';
-import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { BehaviorSubject, filter, takeUntil } from 'rxjs';
-import { Destroyable } from '@core/helpers';
+import { BehaviorSubject, filter, takeUntil, Observable } from 'rxjs';
+import { Store } from '@ngxs/store';
+
+import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { OutsideZone } from '@core/decorators';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
-import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { GlobalWindow } from "@core/tokens";
-import { InvoicesAgencyTabId, InvoicesOrgTabId } from '../../enums';
+import { InvoicesOrgTabId } from '../../enums';
+import { Destroyable } from '@core/helpers';
+import { ResizeContentService } from '@shared/services/resize-main-content.service';
 
 @Component({
   selector: 'app-invoices-table-tabs',
@@ -28,7 +32,6 @@ import { InvoicesAgencyTabId, InvoicesOrgTabId } from '../../enums';
 })
 export class InvoicesTableTabsComponent extends Destroyable implements AfterViewInit {
   private readonly tabsComponentCreated$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-
   @Input()
   public tabConfig: TabsListConfig[];
 
@@ -41,10 +44,12 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
   public tabComponent: TabComponent;
   public alertTitle: string
   public orgwidgetpendinginvoice:string;
+  public tabsWidth$: Observable<string>;
   constructor(
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
+    private store: Store,
     private readonly ngZone: NgZone,
-    private store: Store
+    private ResizeContentService: ResizeContentService
   ) {
     super();
   }
@@ -52,8 +57,14 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
 
   public ngAfterViewInit(): void {
     this.pendinginvoiceNavigation();
-    this.asyncRefresh();
     this.navigatingTab();
+    this.asyncRefresh();
+    this.getTabsWidth();
+  }
+
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.ResizeContentService.detachResizeObservable();
   }
 
   public onSelect(selectEvent: SelectingEventArgs): void {
@@ -89,24 +100,20 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
     this.tabsComponentCreated$
       .pipe(
         filter(Boolean),
-        takeUntil(this.componentDestroy())
-      )
+        takeUntil(this.componentDestroy()))
       .subscribe(() => {
-        this.tabComponent.hideTab(index, true);
-        this.asyncRefresh();
-      });
+      this.tabComponent.hideTab(index, true);
+      this.asyncRefresh();
+    });
   }
 
   private showTab(index: number): void {
     this.tabsComponentCreated$
-      .pipe(
-        filter(Boolean),
-        takeUntil(this.componentDestroy())
-      )
+      .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.tabComponent.hideTab(index, false);
         this.asyncRefresh();
-      });
+    });
   }
 
   @OutsideZone
@@ -164,5 +171,11 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
   }, 1000);
+  }
+  private getTabsWidth(): void {
+    this.ResizeContentService.initResizeObservable()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe();
+    this.tabsWidth$ = this.ResizeContentService.getContainerWidth();
   }
 }

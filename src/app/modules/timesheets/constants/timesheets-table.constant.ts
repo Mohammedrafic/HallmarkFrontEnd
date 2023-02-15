@@ -70,7 +70,9 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
         return status.toLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST
           ? status : '';
       },
-      ...commonColumn,
+      resizable: true,
+      filter: true,
+      sortable: false,
     },
     {
       field: TimesheetsTableColumns.OrderId,

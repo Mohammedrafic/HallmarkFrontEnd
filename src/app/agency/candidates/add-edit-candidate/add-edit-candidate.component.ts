@@ -1,7 +1,7 @@
 import { positionIdStatuses } from "@agency/candidates/add-edit-candidate/add-edit-candidate.constants";
 import { CandidateAgencyComponent } from '@agency/candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
 import { Location } from '@angular/common';
-import { AfterViewInit, Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
@@ -18,7 +18,7 @@ import { CreatedCandidateStatus } from '@shared/enums/status';
 import { CredentialStorageFacadeService } from "@agency/services/credential-storage-facade.service";
 import { CandidateCredentialResponse } from "@shared/models/candidate-credential.model";
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { distinctUntilChanged, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
 import { CandidateGeneralInfoComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { CandidateProfessionalSummaryComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
@@ -40,13 +40,14 @@ import {
 import { CandidateContactDetailsComponent } from './candidate-contact-details/candidate-contact-details.component';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { AgencySettingsService } from '@agency/services/agency-settings.service';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-add-edit-candidate',
   templateUrl: './add-edit-candidate.component.html',
   styleUrls: ['./add-edit-candidate.component.scss'],
 })
-export class AddEditCandidateComponent extends AbstractPermission implements OnInit, OnDestroy, AfterViewInit {
+export class AddEditCandidateComponent extends AbstractPermission implements OnInit, OnDestroy {
 
   @ViewChild('stepper') tab: TabComponent;
 
@@ -91,6 +92,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     private credentialStorage: CredentialStorageFacadeService,
     private location: Location,
     private agencySettingsService: AgencySettingsService,
+    private cd: ChangeDetectorRef,
     private ngZone: NgZone,
   ) {
     super(store);
@@ -118,6 +120,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         !this.isNavigatedFromOrganizationArea && this.getCandidateLoginSetting(candidate.payload.id as number);
         this.candidateName = this.getCandidateName(this.fetchedCandidate);
         this.patchAgencyFormValue(this.fetchedCandidate);
+        if (this.isCandidateAssigned) {
+          this.selectCredentialsTab();
+        }
       });
     this.actions$
       .pipe(takeUntil(this.componentDestroy()), ofActionSuccessful(GetCandidatePhotoSucceeded))
@@ -132,12 +137,6 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     }
     this.pagePermissions();
     this.subscribeOnCandidateCredentialResponse();
-  }
-
-  ngAfterViewInit(): void {
-    if (this.isCandidateAssigned) {
-      this.selectCredentialsTab();
-    }
   }
 
   override ngOnDestroy(): void {
@@ -155,6 +154,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     .subscribe(setting => {
       this.isMobileLoginOn = !setting;
       this.isMobileLoginOn && this.handleMobileLoginRestriction();
+      this.cd.detectChanges();
     });
   }
 
@@ -204,6 +204,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       let candidate = this.getCandidateRequestObj(this.candidateForm.getRawValue());
       candidate = {
         ...candidate,
+        dob: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(candidate.dob)),
         ssn: candidate.ssn ? +candidate.ssn : null,
       };
 
@@ -306,7 +307,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       firstName,
       middleName,
       lastName,
-      dob,
+      dob: DateTimeHelper.convertDateToUtc(dob),
       classification,
       profileStatus,
       candidateAgencyStatus,

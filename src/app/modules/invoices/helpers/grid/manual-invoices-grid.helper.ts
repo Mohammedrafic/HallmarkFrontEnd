@@ -50,7 +50,7 @@ const invoiceRecordTypeColDef: TypedColDef<ManualInvoice> = {
   headerName: 'TYPE',
   valueGetter: (params: TypedValueGetterParams<ManualInvoice>) =>
     invoiceRecordDescriptionMap[params.data.invoiceRecordType],
-  ...commonColumn,
+  sortable: false,
 };
 
 export class ManualInvoicesGridHelper {

@@ -437,7 +437,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         let locationFilter: LocationsByRegionsFilter = {
           ids: data,
           getAll: true,
-          businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0
+          businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
+          orderBy:'Name'
         };
         this.store.dispatch(new GetLocationsByRegions(locationFilter));
         this.changeDetectorRef.markForCheck();
@@ -722,6 +723,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.dialogWidth = '600px'
       this.shareDocumentIds = selectedIds;
       this.store.dispatch(new ShowSideDialog(true));
+      this.sharedWith.gridOptions.api?.setRowData([]);
     }
     else {
       this.store.dispatch([

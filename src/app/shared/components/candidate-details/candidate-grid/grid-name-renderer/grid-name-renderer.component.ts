@@ -37,7 +37,6 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
     const url =
       user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
     const pageToBack = this.router.url;
-    const readonly = user?.businessUnitType === BusinessUnitType.Organization;
 
     if (user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP) {
       this.store.dispatch(
@@ -47,7 +46,6 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
         })
       );
     }
-
     this.router.navigate([url, this.cellValue.candidateProfileId], {
       state: {
         orderId: this.cellValue.orderId,
@@ -55,7 +53,7 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
         pageToBack,
         isNavigateFromCandidateDetails: true,
         isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
-        readonly,
+        readonly: isOrganizationAgencyArea.isOrganizationArea,
       },
     });
     disabledBodyOverflow(false);

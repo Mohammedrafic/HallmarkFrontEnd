@@ -1,27 +1,27 @@
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import { Store } from '@ngxs/store';
-import { takeUntil } from 'rxjs';
+import { Location } from '@angular/common';
 
+import { Store } from '@ngxs/store';
+import { takeUntil, Observable } from 'rxjs';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { OrderManagementState } from '../../store/order-management.state';
 import { SetOrdersTab } from '../../store/order-management.actions';
-import { Location } from '@angular/common';
 import { OrderType } from '@shared/enums/order-type';
+import { Destroyable } from '@core/helpers';
+import { ResizeContentService } from '@shared/services/resize-main-content.service';
 
 @Component({
   selector: 'app-tab-navigation',
   templateUrl: './tab-navigation.component.html',
   styleUrls: ['./tab-navigation.component.scss'],
 })
-export class TabNavigationComponent extends DestroyableDirective implements OnInit {
+export class TabNavigationComponent extends Destroyable implements OnInit {
   @ViewChild('tabNavigation') tabNavigation: TabComponent;
   @Output() selectedTab = new EventEmitter<AgencyOrderManagementTabs>();
 
-  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
   public width = '100%';
   public tabTitle = AgencyOrderManagementTabs;
   public tabsArray = Object.values(AgencyOrderManagementTabs).filter(
@@ -30,11 +30,13 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
 
   private selectedTabIndex: number;
   private previousSelectedOrderId: number;
+  public tabsWidth$: Observable<string>;
 
   constructor(
-    private orderManagementAgencyService: OrderManagementAgencyService,
     private store: Store,
+    private orderManagementAgencyService: OrderManagementAgencyService,
     private location: Location,
+    private ResizeContentService: ResizeContentService,
   ) {
     super();
   }
@@ -42,9 +44,15 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   public ngOnInit(): void {
     this.selectPerDiemTab();
     this.selectReorderAfterNavigation();
-
+    this.getTabsWidth();
+  
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
+  }
+
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.ResizeContentService.detachResizeObservable();
   }
 
   public onSelect(event: SelectingEventArgs): void {
@@ -66,16 +74,20 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   private selectPerDiemTab(): void {
     //TODO: change perDiemTabIndex to 3 , when we implemented other tabs
     const perDiemTabIndex = 1;
-    this.orderManagementAgencyService.orderPerDiemId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.tabNavigation.select(perDiemTabIndex);
-    });
+    this.orderManagementAgencyService.orderPerDiemId$
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.tabNavigation.select(perDiemTabIndex);
+      });
   }
 
   private selectReorderAfterNavigation(): void {
     const perDiemTabIndex = 3;
-    this.orderManagementAgencyService.reorderId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.tabNavigation.select(perDiemTabIndex);
-    });
+    this.orderManagementAgencyService.reorderId$
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.tabNavigation.select(perDiemTabIndex);
+      });
   }
 
   private selectReOrderTab(): void {
@@ -88,5 +100,12 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
     } else if (selectedOrderAfterRedirect?.orderType !== OrderType.ReOrder) {
       this.store.dispatch(new SetOrdersTab(this.tabsArray[0]));
     }
+  }
+
+  private getTabsWidth(): void {
+    this.ResizeContentService.initResizeObservable()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe();
+    this.tabsWidth$ = this.ResizeContentService.getContainerWidth();
   }
 }

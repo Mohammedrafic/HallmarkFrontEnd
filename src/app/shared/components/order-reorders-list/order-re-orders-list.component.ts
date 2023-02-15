@@ -102,4 +102,8 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
       this.canCreateOrder = canCreateOrder;
     });
   }
+
+  public gridPageChanged(page: number): void  {
+    this.pageSubject.next(page);  
+  }
 }
