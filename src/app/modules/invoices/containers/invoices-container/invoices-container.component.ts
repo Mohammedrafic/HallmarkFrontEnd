@@ -110,7 +110,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public currentSelectedTableRowIndex: Observable<number>
     = this.invoicesService.getCurrentTableIdxStream();
   public isLoading: boolean;
-  
+
   public rejectInvoiceId: number;
   public tabConfig: Interfaces.GridContainerTabConfig | null;
 
@@ -163,7 +163,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.organizationId$ = this.organizationControl.valueChanges
       .pipe(
         tap((id) => {
-          this.store.dispatch(new Invoices.GetOrganizationStructure(id, true)); 
+          this.store.dispatch(new Invoices.GetOrganizationStructure(id, true));
         }),
       );
     } else {
@@ -243,7 +243,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         if (this.navigatedOrgId) {
           return id === this.navigatedOrgId;
         }
-        
+
         return !!id;
       }),
       takeUntil(this.componentDestroy()),
@@ -316,6 +316,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       new Invoices.UpdateFiltersState({
         pageNumber: GRID_CONFIG.initialPage,
         pageSize: GRID_CONFIG.initialRowsPerPage,
+        orderBy: '',
         ...this.navigatedInvoiceId !== null ? { invoiceIds: [this.navigatedInvoiceId] } : {},
         ...this.isAgency && this.navigatedOrgId ? { organizationId: this.navigatedOrgId } : {},
       })
