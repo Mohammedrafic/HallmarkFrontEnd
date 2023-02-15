@@ -32,7 +32,7 @@ export class BreakpointObserverService {
     return this.listenMediaQueryBreakpoints();
   }
 
-  public listenBreakpoint(breakpoint: BreakpointQuery []): Observable<BreakpointState> {
+  public listenBreakpoint(breakpoint: BreakpointQuery[]): Observable<BreakpointState> {
     return this.breakpointObserver.observe(breakpoint);
   }
 }
