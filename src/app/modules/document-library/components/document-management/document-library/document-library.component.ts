@@ -1225,6 +1225,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
     else {
       this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
+      this.sharedWith.gridOptions.api?.setRowData([]);
     }
     this.changeDetectorRef.markForCheck();
   }
@@ -1250,6 +1251,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
     else {
       this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
+      this.sharedWith.gridOptions.api?.setRowData([]);
     }
     this.changeDetectorRef.markForCheck();
   }
