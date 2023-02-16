@@ -243,8 +243,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   public openAddCredentialDialog(): void {
-    this.store.dispatch(new GetCredentialStatuses(this.isOrganizationSide ?? true, this.orderId || null));
+    this.store.dispatch(new GetCredentialStatuses(this.isOrganizationSide, this.orderId || null));
     this.store.dispatch(new GetMasterCredentials('', ''));
+
     this.store
       .dispatch(new ShowSideDialog(true))
       .pipe(takeUntil(this.unsubscribe$))
