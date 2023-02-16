@@ -532,6 +532,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         case OrganizationSettingValidationType.MultipleEmails:
           validators.push(MultiEmailValidator);
           break;
+        case OrganizationSettingValidationType.MinNumberValue:
+          validators.push(Validators.min(parseInt(validation.value as string)));
+          break;
+        case OrganizationSettingValidationType.MaxNumberValue:
+          validators.push(Validators.max(parseInt(validation.value as string)));
+          break;
       }
     });
 
