@@ -86,3 +86,7 @@ export const UpdateRegularRatesucceedcount = (count: number) =>
 
 export const DOCUMENT_DOWNLOAD_SUCCESS = 'Document downloaded successfully';
 export const SubmissionsLimitReached = 'The order has reached its submission limit';
+
+export const BLOCK_RECORD_TEXT = 'Are you sure you want to block?';
+export const BLOCK_RECORD_TITLE = 'Block Record';
+export const BLOCK_RECORD_SUCCESS = 'Record Blocked';

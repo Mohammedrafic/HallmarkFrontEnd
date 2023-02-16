@@ -1,0 +1,45 @@
+@import "../../../styles/variables/colors.scss";
+
+.page-title {
+  display: flex;
+  align-items: center;
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.org-controls-container {
+
+  &>div {
+    display: flex;
+    flex-direction: row-reverse;
+
+    button {
+      margin-left: 10px;
+    }
+  }
+}
+
+.controls-header {
+  .icon {
+    margin-left: 10px;
+    cursor: pointer;
+    color: $secondary-dark-blue-20;
+  }
+}
+
+.grid-component {
+  height: 100%;
+  margin-bottom: 25px;
+  overflow-y: auto;
+}
+.required {
+  color: $supportive-red;
+  vertical-align: top;
+  font-size: 14px;
+}

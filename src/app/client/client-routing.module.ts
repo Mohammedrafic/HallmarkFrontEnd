@@ -6,6 +6,7 @@ import { CreateEditOrderComponent } from '@client/order-management/create-edit-o
 import { AssociateListComponent } from '@shared/components/associate-list/associate-list.component';
 import { CandidateDetailsComponent } from '@shared/components/candidate-details/candidate-details.component';
 import { ClientComponent } from './client.component';
+import { DoNotReturnDetailsComponent } from './do-not-return/do-not-return-details/do-not-return-details.component';
 import { UnsavedOrderChangesGuard } from './guards/unsaved-order-changes.guard';
 import { OrderManagementContentComponent,
 } from './order-management/components/order-management-content/order-management-content.component';
@@ -123,6 +124,14 @@ const routes: Routes = [
         component: CandidateDetailsComponent,
         data: {
           isOrganizationArea: true,
+        },
+      },
+      {
+        path: 'dnr-details',
+        component: DoNotReturnDetailsComponent,
+        data: {
+          isOrganizationArea: true,
+          isAgencyArea: false,
         },
       },
     ],
