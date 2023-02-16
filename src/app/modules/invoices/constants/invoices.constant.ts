@@ -439,3 +439,18 @@ export const DetectFormConfigBySelectedType = (selectedTabId: InvoiceTabId,
   }
   return ManualInvoicesFiltersFormConfig(isAgency);
 };
+
+
+export const InvoicesPerPageOptions: { text: string, value: number }[] = [
+  { text: '30 Rows', value: 30 },
+  { text: '50 Rows', value: 50 },
+  { text: '100 Rows', value: 100 },
+  { text: '500 Rows', value: 500 },
+  { text: '1000 Rows', value: 1000 },
+];
+
+export const InvoiceDefaulPerPageOptions: { text: string, value: number }[] = [
+  { text: '30 Rows', value: 30 },
+  { text: '50 Rows', value: 50 },
+  { text: '100 Rows', value: 100 },
+];
