@@ -1,4 +1,4 @@
-@import "colors";
+@import 'colors';
 
 :host {
   display: flex;
@@ -7,19 +7,21 @@
 }
 
 .icon {
-  cursor: pointer;
-}
-
-.edit-action {
   color: $primary-active-blue-10;
-
-  &.disable {
-    color: $secondary-dark-blue-30;
-    cursor: default;
-  }
 }
 
 .comment {
   color: $secondary-dark-blue-20;
-  margin-right: 17px;
+}
+
+button.e-control.e-btn {
+  padding: 8px 10px;
+
+  i-feather {
+    margin-left: 0;
+  }
+
+  &.edit:hover {
+    background-color: $primary-active-blue-70;
+  }
 }

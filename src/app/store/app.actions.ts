@@ -112,3 +112,7 @@ export class SetIrpFlag {
   static readonly type = '[app] Set Irp flag';
   constructor(public readonly irpEnabled: boolean) {}
 }
+
+export class GetDeviceScreenResolution {
+  static readonly type = '[app] Get Device Screen Resolution'
+}

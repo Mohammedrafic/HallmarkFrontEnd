@@ -33,6 +33,7 @@ import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
 import { InvoicesFiltersDialogComponent } from '../../components/invoices-filters-dialog/invoices-filters-dialog.component';
 import * as Interfaces from '../../interfaces';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
+import { GridReadyEventModel } from '@shared/components/grid/models';
 
 @Component({
   selector: 'app-invoices-container',
@@ -110,7 +111,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public currentSelectedTableRowIndex: Observable<number>
     = this.invoicesService.getCurrentTableIdxStream();
   public isLoading: boolean;
-  
+
   public rejectInvoiceId: number;
   public tabConfig: Interfaces.GridContainerTabConfig | null;
 
@@ -142,6 +143,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   private organizationId: number;
 
+  private gridInstance: GridReadyEventModel;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private invoicesService: InvoicesService,
@@ -163,7 +166,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.organizationId$ = this.organizationControl.valueChanges
       .pipe(
         tap((id) => {
-          this.store.dispatch(new Invoices.GetOrganizationStructure(id, true)); 
+          this.store.dispatch(new Invoices.GetOrganizationStructure(id, true));
         }),
       );
     } else {
@@ -239,7 +242,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.organizationId$
     .pipe(
       distinctUntilChanged(),
-      filter((id) => !!id),
+      filter((id) => {
+        if (this.navigatedOrgId) {
+          return id === this.navigatedOrgId;
+        }
+
+        return !!id;
+      }),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((id) => {
@@ -306,14 +315,23 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public resetFilters(): void {
+    this.gridInstance?.columnApi.resetColumnState();
+
+    this.store.dispatch(new Invoices.UpdateFiltersState({ orderBy: '' }, false));
     this.store.dispatch(
       new Invoices.UpdateFiltersState({
         pageNumber: GRID_CONFIG.initialPage,
         pageSize: GRID_CONFIG.initialRowsPerPage,
+        orderBy: '',
         ...this.navigatedInvoiceId !== null ? { invoiceIds: [this.navigatedInvoiceId] } : {},
         ...this.isAgency && this.navigatedOrgId ? { organizationId: this.navigatedOrgId } : {},
       })
     );
+    this.cdr.detectChanges();
+  }
+
+  public gridReady(event: GridReadyEventModel): void {
+    this.gridInstance = event;
   }
 
   public updateTableByFilters(filters: Interfaces.InvoicesFilterState): void {

@@ -61,7 +61,8 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { SideMenuService } from '@shared/components/side-menu/services';
 import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
 import { OrganizationSettingKeys } from '@shared/constants';
-import { MultiEmailValidator } from '@core/helpers';
+import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
+import { AutoGenerationPayload } from './settings.interface';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -483,16 +484,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         break;
 
       case OrganizationSettingControlType.InvoiceAutoGeneration:
-        const invoiceAutoGeneration = {
-          isEnabled: !!this.organizationSettingsFormGroup.controls['value'].value,
-
-          dayOfWeek: this.invoiceGeneratingFormGroup.controls['dayOfWeek'].value,
-
-          groupingBy: this.invoiceGeneratingFormGroup.controls['groupingBy'].value,
-
-          time: new Date(this.invoiceGeneratingFormGroup.controls['time'].value).toISOString(),
-        };
-        dynamicValue = JSON.stringify(invoiceAutoGeneration);
+        dynamicValue = JSON.stringify(this.createAutoGenerationPayload());
         break;
       case OrganizationSettingControlType.EmailAria:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
@@ -632,7 +624,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       if (dynamicValue?.isInvoice) {
         this.invoiceGeneratingFormGroup.setValue({
-          time: dynamicValue.time,
+          time: dynamicValue.time ? DateTimeHelper.convertDateToUtc(dynamicValue.time) : '',
           dayOfWeek: dynamicValue.dayOfWeek,
           groupingBy: dynamicValue.groupingBy,
         });
@@ -840,10 +832,23 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
 
   private disableDepForInvoiceGeneration(): void {
-    if (this.organizationSettingKey === OrganizationSettingKeys.InvoiceAutoGeneration || this.organizationSettingKey === OrganizationSettingKeys.PayHigherBillRates) {
+    if (this.organizationSettingKey === OrganizationSettingKeys.InvoiceAutoGeneration
+      || this.organizationSettingKey === OrganizationSettingKeys.PayHigherBillRates) {
       this.departmentFormGroup.get('departmentId')?.disable();
     } else {
       this.departmentFormGroup.get('departmentId')?.enable();
     }
+  }
+
+  private createAutoGenerationPayload(): AutoGenerationPayload {
+    return ({
+      isEnabled: !!this.organizationSettingsFormGroup.controls['value'].value,
+
+      dayOfWeek: this.invoiceGeneratingFormGroup.controls['dayOfWeek'].value,
+
+      groupingBy: this.invoiceGeneratingFormGroup.controls['groupingBy'].value,
+
+      time: DateTimeHelper.toUtcFormat(this.invoiceGeneratingFormGroup.controls['time'].value),
+    });
   }
 }

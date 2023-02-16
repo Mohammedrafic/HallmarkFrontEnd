@@ -12,7 +12,7 @@ import { ExtensionGridComponent } from '@shared/components/extension/extension-g
 import { GridModule } from '@shared/components/grid/grid.module';
 import { ExtensionGridActionsRendererComponent } from './extension-grid/extension-grid-actions-renderer/extension-grid-actions-renderer.component';
 import { ExtensionGridStatusRendererComponent } from './extension-grid/extension-grid-status-renderer/extension-grid-status-renderer.component';
-import { ChipListModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { ExtensionGridIdRendererComponent } from './extension-grid/extension-grid-id-renderer/extension-grid-id-renderer.component';
 
 @NgModule({
@@ -34,6 +34,7 @@ import { ExtensionGridIdRendererComponent } from './extension-grid/extension-gri
     FeatherModule,
     GridModule,
     ChipListModule,
+    ButtonModule,
   ],
   exports: [ExtensionSidebarComponent, ExtensionGridComponent],
 })

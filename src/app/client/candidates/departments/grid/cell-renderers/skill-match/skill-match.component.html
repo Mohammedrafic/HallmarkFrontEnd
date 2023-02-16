@@ -1,3 +1,6 @@
 <app-tooltip-container [showToolTip]="true" [message]="getTooltipMessage">
-  <span>{{params?.data?.skillType === skillTypeEnum.PrimarySkill ? 'P' : 'S' }}</span>
+  <span>{{
+    params?.data?.skillType === skillTypeEnum.PrimarySkill ? 'P' :
+    params?.data?.skillType === skillTypeEnum.PrimarySecondarySkill ? 'P/S' : 'S'
+  }}</span>
 </app-tooltip-container>

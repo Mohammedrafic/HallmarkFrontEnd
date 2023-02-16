@@ -19,7 +19,7 @@ import { filter } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
-import { filterOptionFields } from '@core/constants/filters-helper.constant';
+import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/filters-helper.constant';
 import { PageOfCollections } from '@shared/models/page.model';
 import { FilterService } from '@shared/services/filter.service';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -69,6 +69,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   public filterColumns: InvoiceFilterColumns;
   public formGroup: CustomFormGroup<InvoiceFilterColumns>;
   public filterOptionFields = filterOptionFields;
+  public skillOptionFields = SkillFilterOptionFields;
   public isAgency = false;
 
   private regions: OrganizationRegion[] = [];

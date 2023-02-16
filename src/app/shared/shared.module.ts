@@ -167,6 +167,7 @@ import { TabsMobileShadowDirective } from './directives/tabs-mobile-shadow.direc
 import { LocalDateTimePipe } from './pipes/local-date-time.pipe';
 import { NumericTextboxModule as CustomNumericTextboxModule} from './components/form-controls/numeric-textbox/numeric-textbox.module';
 import { ValidationErrorModule } from './pipes/validation-error/validation.error.module';
+import { GridPaginationModule } from './components/grid/grid-pagination/grid-pagination.module';
 
 const icons = {
   AlertCircle,
@@ -302,7 +303,8 @@ const COMPONENTS = [
     ValidateDirectiveModule,
     BoolValuePipeModule,
     CustomNumericTextboxModule,
-    ValidationErrorModule
+    ValidationErrorModule,
+    GridPaginationModule
   ],
   exports: [
     ...COMPONENTS,

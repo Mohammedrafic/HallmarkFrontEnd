@@ -231,6 +231,7 @@
           [header]="reOrderDialogTitle$ | async"
           (formCancelClicked)="clearEditReOrder()"
           (formSaveClicked)="onSaveReOrder()"
+          class="reorder-side-dialog"
         >
           <app-add-edit-reorder
             *ngIf="isReOrderDialogOpened$ | async"

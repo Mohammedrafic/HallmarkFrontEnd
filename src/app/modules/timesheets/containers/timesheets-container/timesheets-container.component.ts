@@ -12,9 +12,7 @@ import {
   filter,
   tap,
   of,
-  combineLatest,
   debounceTime,
-  take,
 } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
@@ -26,7 +24,13 @@ import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organizati
 import { DataSourceItem } from '@core/interface';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { TabConfig, TabCountConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
+import {
+  TabConfig,
+  TabCountConfig,
+  TimesheetsFilterState,
+  TimesheetsGrid,
+  TimesheetsSelectedRowEvent,
+} from '../../interface';
 import { TimesheetExportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
@@ -49,6 +53,8 @@ import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fiel
 export class TimesheetsContainerComponent extends Destroyable implements OnInit {
   @ViewChild(ProfileDetailsContainerComponent)
   public timesheetDetailsComponent: ProfileDetailsContainerComponent;
+
+  @ViewChild('grid') private grid: TimesheetsGrid;
 
   @ViewChild(TimesheetsTabsComponent)
   private timesheetsTabs: TimesheetsTabsComponent;
@@ -145,8 +151,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         )
       );
     } else {
+      this.grid?.gridInstance$?.value.columnApi.resetColumnState();
       this.store.dispatch(
-        new Timesheets.UpdateFiltersState({ statusIds: this.tabConfig[tabIndex].value }, this.activeTabIdx !== 0, false)
+        new Timesheets.UpdateFiltersState({
+          statusIds: this.tabConfig[tabIndex].value,
+        }, this.activeTabIdx !== 0, false)
       );
     }
   }

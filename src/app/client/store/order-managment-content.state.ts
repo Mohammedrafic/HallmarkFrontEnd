@@ -521,7 +521,7 @@ export class OrderManagementContentState {
 
   @Action(ClearSelectedOrder)
   ClearSelectedOrder({ patchState }: StateContext<OrderManagementContentStateModel>): void {
-    patchState({ selectedOrder: null });
+    patchState({ selectedOrder: null, contactDetails: null });
   }
 
   @Action(GetOrganizationStatesWithKeyCode)

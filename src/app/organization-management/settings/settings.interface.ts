@@ -16,3 +16,10 @@ export interface SettingsFilterColsConfig {
   departmentIds: SettingFilterColumn<OrganizationDepartment>,
   attributes: SettingFilterColumn<string>,
 }
+
+export interface AutoGenerationPayload {
+  isEnabled: boolean;
+  dayOfWeek: number;
+  groupingBy: number;
+  time: string;
+}

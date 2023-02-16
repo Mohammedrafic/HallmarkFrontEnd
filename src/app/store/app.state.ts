@@ -15,12 +15,14 @@ import {
   CheckScreen,
   ShouldDisableUserDropDown,
   SetIrpFlag,
+  GetDeviceScreenResolution,
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { map, Observable, tap } from 'rxjs';
-import { BreakpointObserver } from '@angular/cdk/layout';
 import { IS_DARK_THEME } from '@shared/constants';
+import { BreakpointObserverService } from '@core/services';
+import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 
 export interface AppStateModel {
   isMobile: boolean;
@@ -36,13 +38,19 @@ export interface AppStateModel {
   isDekstopScreen: boolean;
   shouldDisableUserDropDown: boolean;
   isIrpEnabled: boolean;
+  breakpoints: {
+    isMobile: boolean;
+    isTablet: boolean;
+    isDesktopSmall: boolean;
+    isDesktopLarge: boolean;
+  };
 }
 
 @State<AppStateModel>({
   name: 'app',
   defaults: {
     isMobile: false,
-    isDarkTheme: JSON.parse(window.localStorage.getItem(IS_DARK_THEME) as string) as boolean || false,
+    isDarkTheme: (JSON.parse(window.localStorage.getItem(IS_DARK_THEME) as string) as boolean) || false,
     headerState: null,
     isLoading: false,
     isFirstLoad: true,
@@ -51,38 +59,53 @@ export interface AppStateModel {
       isOrganizationArea: false,
       isAgencyArea: false,
     },
-    getAlertsForCurrentUser : [],
+    getAlertsForCurrentUser: [],
     isMobileScreen: false,
     isTabletScreen: false,
     isDekstopScreen: false,
-    shouldDisableUserDropDown:false,
+    shouldDisableUserDropDown: false,
     isIrpEnabled: false,
+    breakpoints: {
+      isMobile: false,
+      isTablet: false,
+      isDesktopSmall: false,
+      isDesktopLarge: false,
+    },
   },
 })
 @Injectable()
 export class AppState {
-  constructor(
-    private userService: UserService,
-    private breakpointObserver: BreakpointObserver
-    ) {}
+  constructor(private userService: UserService, private breakpointObserver: BreakpointObserverService) {}
 
   @Selector()
-  static isMobile(state: AppStateModel): boolean { return state.isMobile; }
+  static isMobile(state: AppStateModel): boolean {
+    return state.isMobile;
+  }
 
   @Selector()
-  static isLoading(state: AppStateModel): boolean { return state.isLoading; }
+  static isLoading(state: AppStateModel): boolean {
+    return state.isLoading;
+  }
 
   @Selector()
-  static headerState(state: AppStateModel): HeaderState | null { return state.headerState; }
+  static headerState(state: AppStateModel): HeaderState | null {
+    return state.headerState;
+  }
 
   @Selector()
-  static isDarkTheme(state: AppStateModel): boolean { return state.isDarkTheme; }
+  static isDarkTheme(state: AppStateModel): boolean {
+    return state.isDarkTheme;
+  }
 
   @Selector()
-  static isFirstLoad(state: AppStateModel): boolean { return state.isFirstLoad; }
+  static isFirstLoad(state: AppStateModel): boolean {
+    return state.isFirstLoad;
+  }
 
   @Selector()
-  static isSidebarOpened(state: AppStateModel): boolean { return state.isSidebarOpened; }
+  static isSidebarOpened(state: AppStateModel): boolean {
+    return state.isSidebarOpened;
+  }
 
   @Selector()
   static isOrganizationAgencyArea(state: AppStateModel): IsOrganizationAgencyAreaStateModel {
@@ -95,20 +118,33 @@ export class AppState {
   }
 
   @Selector()
-  static isMobileScreen(state: AppStateModel): boolean { return state.isMobileScreen; }
+  static isMobileScreen(state: AppStateModel): boolean {
+    return state.isMobileScreen;
+  }
 
   @Selector()
-  static isTabletScreen(state: AppStateModel): boolean { return state.isTabletScreen; }
+  static isTabletScreen(state: AppStateModel): boolean {
+    return state.isTabletScreen;
+  }
 
   @Selector()
-  static isDekstopScreen(state: AppStateModel): boolean { return state.isDekstopScreen; }
+  static isDekstopScreen(state: AppStateModel): boolean {
+    return state.isDekstopScreen;
+  }
 
   @Selector()
-  static shouldDisableUserDropDown(state: AppStateModel): boolean { return state.shouldDisableUserDropDown; }
+  static shouldDisableUserDropDown(state: AppStateModel): boolean {
+    return state.shouldDisableUserDropDown;
+  }
 
   @Selector()
   static isIrpFlagEnabled(state: AppStateModel): boolean {
     return state.isIrpEnabled;
+  }
+
+  @Selector()
+  static getDeviceScreenResolution(state: AppStateModel): AppStateModel['breakpoints'] {
+    return state.breakpoints;
   }
 
   @Action(ToggleMobileView)
@@ -138,7 +174,10 @@ export class AppState {
   }
 
   @Action(SetIsOrganizationAgencyArea)
-  SetIsOrganizationAgencyArea({ patchState }: StateContext<AppStateModel>, { payload }: SetIsOrganizationAgencyArea): void {
+  SetIsOrganizationAgencyArea(
+    { patchState }: StateContext<AppStateModel>,
+    { payload }: SetIsOrganizationAgencyArea
+  ): void {
     patchState({ isOrganizationAgencyArea: payload });
   }
 
@@ -157,18 +196,24 @@ export class AppState {
 
   @Action(CheckScreen)
   checkScreen({ patchState }: StateContext<AppStateModel>): void {
-    this.breakpointObserver.observe('(max-width: 640px)').pipe(map(({matches}) => matches))
-    .subscribe((res) => {
-      patchState({ isMobileScreen: res});
-    });
-    this.breakpointObserver.observe('(min-width: 641px)').pipe(map(({matches}) => matches))
-    .subscribe((res) => {
-      patchState({ isTabletScreen: res});
-    });
-    this.breakpointObserver.observe('(min-width: 1025px)').pipe(map(({matches}) => matches))
-    .subscribe((res) => {
-      patchState({ isDekstopScreen: res});
-    });
+    this.breakpointObserver
+      .listenBreakpoint([BreakpointQuery.MOBILE_MAX])
+      .pipe(map(({ matches }) => matches))
+      .subscribe((res) => {
+        patchState({ isMobileScreen: res });
+      });
+    this.breakpointObserver
+      .listenBreakpoint([BreakpointQuery.TABLET_MIN])
+      .pipe(map(({ matches }) => matches))
+      .subscribe((res) => {
+        patchState({ isTabletScreen: res });
+      });
+    this.breakpointObserver
+      .listenBreakpoint([BreakpointQuery.DESKTOP_SM_MIN])
+      .pipe(map(({ matches }) => matches))
+      .subscribe((res) => {
+        patchState({ isDekstopScreen: res });
+      });
   }
 
   @Action(ShouldDisableUserDropDown)
@@ -177,12 +222,25 @@ export class AppState {
   }
 
   @Action(SetIrpFlag)
-  SetIrpFlag(
-    { patchState }: StateContext<AppStateModel>,
-    { irpEnabled }: SetIrpFlag,
-  ): void {
+  SetIrpFlag({ patchState }: StateContext<AppStateModel>, { irpEnabled }: SetIrpFlag): void {
     patchState({
       isIrpEnabled: irpEnabled,
     });
+  }
+
+  @Action(GetDeviceScreenResolution)
+  GetDeviceScreenResolution({ patchState }: StateContext<AppStateModel>) {
+    this.breakpointObserver
+      .getBreakpointMediaRanges()
+      .subscribe(({ isMobile, isTablet, isDesktopSmall, isDesktopLarge }) => {
+        patchState({
+          breakpoints: {
+            isMobile,
+            isTablet,
+            isDesktopSmall,
+            isDesktopLarge,
+          },
+        });
+      });
   }
 }

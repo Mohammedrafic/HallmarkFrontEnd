@@ -8,5 +8,15 @@
       border-bottom-left-radius: 0 !important;
       border-bottom-right-radius: 0 !important;
     }
+
+    .custom-wrap {
+      .ag-header-cell-text {
+        white-space: pre-wrap;
+      }
+    }
+
+    .align-right {
+      text-align: right;
+    }
   }
 }

@@ -16,9 +16,18 @@ export class ExtensionGridComponent {
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = [
     {
+      field: '',
+      headerName: '',
+      cellRenderer: ExtensionGridActionsRendererComponent,
+      maxWidth: 80,
+      cellClass: 'extension-buttons',
+    },
+    {
       headerName: 'Extension ID',
       cellRenderer: ExtensionGridIdRendererComponent,
-      maxWidth: 140,
+      width: 140,
+      minWidth: 135,
+      headerClass: 'custom-wrap',
       valueGetter: (params) => `${params.data.organizationPrefix}-${params.data.publicId}`,
     },
     {
@@ -31,27 +40,29 @@ export class ExtensionGridComponent {
     {
       field: 'billRate',
       headerName: 'Bill Rate $',
+      type: 'rightAligned',
       valueFormatter: (params: ValueFormatterParams) => `$${params.data.billRate}`,
-      maxWidth: 130,
+      width: 130,
+      minWidth: 95,
+      headerClass: 'custom-wrap align-right',
     },
     {
       field: 'actualStartDate',
       headerName: 'Extension Start Date',
+      type: 'rightAligned',
       valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
-      maxWidth: 150,
+      width: 180,
+      minWidth: 130,
+      headerClass: 'custom-wrap align-right',
     },
     {
       field: 'actualEndDate',
       headerName: 'Extension End Date',
+      type: 'rightAligned',
       valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
-      maxWidth: 150,
-    },
-    {
-      field: '',
-      headerName: '',
-      cellRenderer: ExtensionGridActionsRendererComponent,
-      maxWidth: 80,
-      cellClass: 'extension-buttons',
+      width: 180,
+      minWidth: 130,
+      headerClass: 'custom-wrap align-right',
     },
   ];
 

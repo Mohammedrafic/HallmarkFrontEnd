@@ -34,12 +34,11 @@ export class ResizeContentService {
   }
 
   private listenResizeContent(): Observable<number> {
-    const isTablet = this.store.selectSnapshot(AppState.isTabletScreen);
-    const isMobile = this.store.selectSnapshot(AppState.isMobileScreen);
+    const { isTablet } = this.store.selectSnapshot(AppState.getDeviceScreenResolution);
     const padding = 48;
 
     return this.resizeObserver.resize$.pipe(
-      filter(() => isTablet && !isMobile),
+      filter(() => isTablet),
       map((data) => Math.floor(data[0].contentRect.width - padding)),
       distinctUntilChanged(),
       debounceTime(200),

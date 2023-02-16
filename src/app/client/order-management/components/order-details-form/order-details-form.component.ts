@@ -635,7 +635,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           takeUntil(this.componentDestroy())
         ).subscribe((data) => {
           this.selectedDepartment = data.organizationManagement.departments?.find((department: Department) => department.departmentId === order.departmentId);
-          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId, { emitEvent: false });
+          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
         });
     }
 
@@ -658,7 +658,6 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       .filter((jobDistribution: JobDistributionModel) =>
         jobDistribution.jobDistributionOption === OrderJobDistribution.Selected)
       .map((jobDistribution: JobDistributionModel) => jobDistribution.agencyId);
-
     this.jobDistributionForm.controls['jobDistribution'].patchValue(
       getFilteredJobDistribution(jobDistributionValues)[0]
     );
@@ -790,10 +789,13 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
     const contactDetails = (this.contactDetailsForm.controls['contactDetails'] as FormArray).at(0) as FormGroup;
     contactDetails.controls['isPrimaryContact'].patchValue(true);
+    let unitDescriptionValue: string | null = '';
 
     this.generalInformationForm.controls['departmentId'].valueChanges
       .pipe(
-        switchMap(() => {
+        filter(Boolean),
+        switchMap((d) => {
+          unitDescriptionValue = unitDescriptionValue === null ? unitDescriptionValue : this.jobDescriptionForm.get('unitDescription')?.value;
           return this.contactDetails$;
         }),
         filter(Boolean),
@@ -802,7 +804,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       .subscribe((contactDetails) => {
         const { facilityContact, facilityPhoneNo, facilityEmail, unitDescription } = contactDetails;
         this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
-        this.jobDescriptionForm.get('unitDescription')?.setValue(unitDescription);
+        this.jobDescriptionForm.get('unitDescription')?.setValue(unitDescriptionValue ? unitDescriptionValue : unitDescription);
+        unitDescriptionValue = null;
       });
   }
 
