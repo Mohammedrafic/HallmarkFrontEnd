@@ -1,6 +1,6 @@
 import { DismissAlertDto } from './../shared/models/alerts-template.model';
 import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
-import { GetAlertsForCurrentUser, ShowCustomSideDialog } from './../store/app.actions';
+import { GetAlertsForCurrentUser, GetDeviceScreenResolution, ShowCustomSideDialog } from './../store/app.actions';
 import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
 import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
@@ -198,6 +198,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
 
+    this.getDeviceScreenResolution();
   }
 
   ngOnInit(): void {
@@ -682,5 +683,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private attachElementToResizeObserver(): void {
     this.ResizeContentService.attachResizeContainer(this.mainContainer);
+  }
+
+  private getDeviceScreenResolution(): void {
+    this.store.dispatch(new GetDeviceScreenResolution());
   }
 }
