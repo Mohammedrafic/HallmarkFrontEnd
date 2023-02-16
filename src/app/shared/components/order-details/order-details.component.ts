@@ -14,6 +14,8 @@ import { OrganizationManagementState } from '../../../organization-management/st
 import { OrganizationSettingsGet } from '../../models/organization-settings.model';
 import { SettingsKeys } from '../../enums/settings';
 import { SettingsHelper } from '../../../core/helpers/settings.helper';
+import { UserState } from '../../../store/user.state';
+import { BusinessUnitType } from '../../enums/business-unit-type';
 
 type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
 @Component({
@@ -60,12 +62,17 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   }
 
   private subscribeForSettings(): void {
-    this.organizationSettings$.pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe((settings: OrganizationSettingsGet[]) => {
-      this.settings = SettingsHelper.mapSettings(settings);
-      this.isHideContactDetailsOfOrderInAgencyLogin = this.settings[SettingsKeys.HideContactDetailsOfOrderInAgencyLogin]?.value;
-    });
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType === BusinessUnitType.Agency) {
+      this.organizationSettings$.pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe((settings: OrganizationSettingsGet[]) => {
+        this.settings = SettingsHelper.mapSettings(settings);
+        this.isHideContactDetailsOfOrderInAgencyLogin = this.settings[SettingsKeys.HideContactDetailsOfOrderInAgencyLogin]?.value;
+      });
+    } else {
+      this.isHideContactDetailsOfOrderInAgencyLogin = true;
+    }
   }
 
   public ngOnDestroy(): void {
