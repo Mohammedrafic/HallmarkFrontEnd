@@ -1,10 +1,11 @@
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, forwardRef, Input, ViewChild } from '@angular/core';
 
 import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
 import { FormatObject } from '@syncfusion/ej2-calendars/src/datepicker/datepicker';
 import { MaskPlaceholderModel } from '@syncfusion/ej2-calendars/src/common/maskplaceholder-model';
 import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { datepickerMask } from '@shared/constants';
+import { DatePickerComponent } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
   selector: 'app-datepicker',
@@ -16,6 +17,7 @@ import { datepickerMask } from '@shared/constants';
   ],
 })
 export class DatepickerComponent extends BaseFormControlDirective {
+  @ViewChild('datepicker') datepicker: DatePickerComponent;
   @Input() format: string | FormatObject = 'MM/dd/yyyy';
   @Input() enableMask: boolean = true;
   @Input() maskPlaceholder: MaskPlaceholderModel = datepickerMask;

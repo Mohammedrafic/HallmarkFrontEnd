@@ -1,9 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, Input, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { OutsideZone } from '@core/decorators';
 import { DateTimeHelper } from '@core/helpers';
 import { Select, Store } from '@ngxs/store';
 import { WorkCommitmentDetails } from '@organization-management/work-commitment/interfaces';
+import { DatepickerComponent } from '@shared/components/form-controls/datepicker/datepicker.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
@@ -16,7 +18,7 @@ import { addDays } from '@shared/utils/date-time.utils';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { uniq } from 'lodash';
-import { catchError, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, delay, distinctUntilChanged, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { CandidateWorkCommitment, WorkCommitmentDataSource } from '../models/candidate-work-commitment.model';
@@ -30,6 +32,7 @@ import { CandidateWorkCommitmentService } from '../services/candidate-work-commi
 })
 export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective implements OnInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
+  @ViewChild('startDatePicker') startDatePicker: DatepickerComponent;
 
   @Input() public dialogSubject$: Subject<{ isOpen: boolean, isEdit: boolean, commitment?: CandidateWorkCommitment }>;
   @Input() public refreshSubject$: Subject<void>;
@@ -72,6 +75,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     private candidateWorkCommitmentService: CandidateWorkCommitmentService,
     private store: Store,
     private confirmService: ConfirmService,
+    private ngZone: NgZone,
   ) {
     super();
   }
@@ -104,36 +108,53 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     });
   }
 
-  private getWorkCommitmentById(id: number): void {
-    this.candidateWorkCommitmentService.getWorkCommitmentById(id).subscribe((commitment: WorkCommitmentDetails) => {
-      this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
-      this.minimumDate = this.lastActiveDate < this.selectWorkCommitmentStartDate ? this.selectWorkCommitmentStartDate : this.lastActiveDate;
+  private populateFormWithMasterCommitment(commitment: WorkCommitmentDetails): void {
+    let regions = commitment.workCommitmentOrgHierarchies.map((val) => val.regionId);
+    regions = uniq(regions);
+    let locations = commitment.workCommitmentOrgHierarchies.map((val) => val.locationId);
+    locations = uniq(locations);
+    this.candidateWorkCommitmentForm.controls['regionIds'].setValue(regions);
+    this.candidateWorkCommitmentForm.controls['locationIds'].setValue(locations);
+    this.candidateWorkCommitmentForm.controls['jobCode'].setValue(commitment.jobCode);
+    this.candidateWorkCommitmentForm.controls['availRequirement'].setValue(commitment.availabilityRequirement);
+    this.candidateWorkCommitmentForm.controls['schedulePeriod'].setValue(commitment.schedulePeriod);
+    this.candidateWorkCommitmentForm.controls['minWorkExperience'].setValue(commitment.minimumWorkExperience);
+    this.candidateWorkCommitmentForm.controls['criticalOrder'].setValue(commitment.criticalOrder);
+    this.candidateWorkCommitmentForm.controls['holiday'].setValue(commitment.holiday);
+    this.candidateWorkCommitmentForm.controls['comment'].setValue(commitment.comments);
+    this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.minimumDate);
+    this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
+  }
 
-      let regions = commitment.workCommitmentOrgHierarchies.map((val) => val.regionId);
-      regions = uniq(regions);
-      let locations = commitment.workCommitmentOrgHierarchies.map((val) => val.locationId);
-      locations = uniq(locations);
-      this.candidateWorkCommitmentForm.controls['regionIds'].setValue(regions);
-      this.candidateWorkCommitmentForm.controls['locationIds'].setValue(locations);
-      this.candidateWorkCommitmentForm.controls['jobCode'].setValue(commitment.jobCode);
-      this.candidateWorkCommitmentForm.controls['availRequirement'].setValue(commitment.availabilityRequirement);
-      this.candidateWorkCommitmentForm.controls['schedulePeriod'].setValue(commitment.schedulePeriod);
-      this.candidateWorkCommitmentForm.controls['minWorkExperience'].setValue(commitment.minimumWorkExperience);
-      this.candidateWorkCommitmentForm.controls['criticalOrder'].setValue(commitment.criticalOrder);
-      this.candidateWorkCommitmentForm.controls['holiday'].setValue(commitment.holiday);
-      this.candidateWorkCommitmentForm.controls['comment'].setValue(commitment.comments);
-      this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.minimumDate);
-      this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
-    });
+  @OutsideZone
+  private refreshDatepicker(): void {
+    setTimeout(() => this.startDatePicker.datepicker.refresh());
+  }
+
+  private getWorkCommitmentById(id: number, populateForm = true): void {
+    debugger;
+    this.candidateWorkCommitmentService.getWorkCommitmentById(id)
+      .subscribe((commitment: WorkCommitmentDetails) => {
+        this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
+        this.minimumDate = !populateForm || this.lastActiveDate < this.selectWorkCommitmentStartDate ? this.selectWorkCommitmentStartDate : this.lastActiveDate;
+        if (populateForm) {
+          this.populateFormWithMasterCommitment(commitment);
+        } else {
+          this.refreshDatepicker();
+          this.cd.detectChanges();
+        }
+      });
   }
 
   private subscribeOnCommitmentDropdownChange(): void {
-    this.candidateWorkCommitmentForm.controls['workCommitmentId'].valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
-      if (value) {
-        this.enableControls();
-        this.getWorkCommitmentById(value);
-      }
-    });
+    this.candidateWorkCommitmentForm.controls['workCommitmentId'].valueChanges
+      .pipe(takeUntil(this.destroy$), distinctUntilChanged())
+      .subscribe((value) => {
+        if (value) {
+          this.enableControls();
+          this.getWorkCommitmentById(value);
+        }
+      });
   }
 
   private getActiveWorkCommitment(): void {
@@ -172,12 +193,14 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private getCandidateWorkCommitmentById(commitment: CandidateWorkCommitment): void {
     this.candidateWorkCommitmentService.getCandidateWorkCommitmentById(commitment.id as number).subscribe((commitment: CandidateWorkCommitment) => {
+      if (commitment.workCommitmentId) {
+        this.useMinimumDate = true;
+        this.getWorkCommitmentById(commitment.workCommitmentId, false);
+      } 
       commitment.startDate = commitment.startDate && DateTimeHelper.convertDateToUtc(commitment.startDate as string);
-      this.minimumDate = this.lastActiveDate;
       this.candidateWorkCommitmentForm.patchValue(commitment as {}, { emitEvent: false });
       this.candidateWorkCommitmentForm.controls['regionIds'].setValue(commitment.regionIds);
       this.candidateWorkCommitmentForm.controls['locationIds'].setValue(commitment.locationIds);
-      this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.lastActiveDate);
       this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
       this.cd.detectChanges();
     });
@@ -187,7 +210,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.dialogSubject$.pipe(takeUntil(this.destroy$)).subscribe((value: { isOpen: boolean, isEdit: boolean, commitment?: CandidateWorkCommitment }) => {
       if (value.isOpen) {
         !value.isEdit && this.setWorkCommitmentDataSource();
-        this.getActiveWorkCommitment();
+        !value.isEdit && this.getActiveWorkCommitment();
         this.sideDialog.show();
       } else {
         this.sideDialog.hide();
