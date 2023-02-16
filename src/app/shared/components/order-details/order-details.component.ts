@@ -1,8 +1,8 @@
 import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
-import { Subject, takeUntil, throttleTime } from 'rxjs';
+import { filter, Observable, Subject, switchMap, takeUntil, throttleTime } from 'rxjs';
 import { OrderType } from '@shared/enums/order-type';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { SetIsDirtyOrderForm } from '@client/store/order-managment-content.actions';
@@ -10,6 +10,10 @@ import { HistoricalEventsService } from '@shared/services/historical-events.serv
 import { OrderHistoricalEvent } from '@shared/models';
 import { AppState } from '../../../store/app.state';
 import { AccordionComponent, ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { OrganizationManagementState } from '../../../organization-management/store/organization-management.state';
+import { OrganizationSettingsGet } from '../../models/organization-settings.model';
+import { SettingsKeys } from '../../enums/settings';
+import { SettingsHelper } from '../../../core/helpers/settings.helper';
 
 type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
 @Component({
@@ -33,9 +37,14 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   public contactDetails: ContactDetails;
   public comments: Comment[] = [];
   public events: OrderHistoricalEvent[];
+  public isHideContactDetailsOfOrderInAgencyLogin: boolean;
 
   private unsubscribe$: Subject<void> = new Subject();
   private eventsHandler: Subject<void> = new Subject();
+  @Select(OrganizationManagementState.organizationSettings)
+  private organizationSettings$: Observable<OrganizationSettingsGet[]>;
+  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  public SettingsKeys = SettingsKeys;
 
   constructor(
     private store: Store,
@@ -47,6 +56,16 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
       .subscribe(() => {
         this.getHistoricalEvents();
       });
+    this.subscribeForSettings();
+  }
+
+  private subscribeForSettings(): void {
+    this.organizationSettings$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((settings: OrganizationSettingsGet[]) => {
+      this.settings = SettingsHelper.mapSettings(settings);
+      this.isHideContactDetailsOfOrderInAgencyLogin = this.settings[SettingsKeys.HideContactDetailsOfOrderInAgencyLogin]?.value;
+    });
   }
 
   public ngOnDestroy(): void {
