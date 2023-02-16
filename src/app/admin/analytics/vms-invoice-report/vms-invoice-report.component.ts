@@ -198,9 +198,9 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
 
   private initForm(): void {
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 30);
+    startDate.setDate(startDate.getDate()-6);
     let endDate = new Date(Date.now());
-    endDate.setDate(endDate.getDate() + 30);
+    endDate.setDate(endDate.getDate());
     this.vmsInvoiceReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
@@ -371,7 +371,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     let { departmentIds, locationIds,
       regionIds, agencyIds, startDate, endDate,year,month,invoiceStatus,invoiceId } = this.vmsInvoiceReportForm.getRawValue();
     if (!this.vmsInvoiceReportForm.dirty) {
-      this.message = "Default filter selected with all regions ,locations and departments for last 30 and next 30 days";
+      this.message = "Default filter selected with all regions ,locations and departments for last 7 days";
     }
     else {
       this.isResetFilter = false;
@@ -494,9 +494,9 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
   public onFilterClearAll(): void {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 30);
+    startDate.setDate(startDate.getDate() -6);
     let endDate = new Date(Date.now());
-    endDate.setDate(endDate.getDate() + 30);
+    endDate.setDate(endDate.getDate());
     this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
     this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.LocationIds)?.setValue([]);
     this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.DepartmentIds)?.setValue([]);
