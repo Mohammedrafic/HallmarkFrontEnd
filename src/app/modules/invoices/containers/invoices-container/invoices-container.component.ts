@@ -21,7 +21,8 @@ import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fiel
 import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import { InvoicesTableTabsComponent } from '../../components/invoices-table-tabs/invoices-table-tabs.component';
-import { defaultGroupInvoicesOption, GroupInvoicesOption, GroupInvoicesOptions } from '../../constants';
+import { defaultGroupInvoicesOption, GroupInvoicesOption, GroupInvoicesOptions,
+  InvoiceDefaulPerPageOptions, InvoicesPerPageOptions } from '../../constants';
 import { AgencyInvoicesGridTab, InvoicesAgencyTabId, OrganizationInvoicesGridTab } from '../../enums';
 import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
 import { InvoicePrintingService, InvoicesService } from '../../services';
@@ -137,6 +138,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public navigatedInvoiceId: number | null;
 
+  public recordsPerPageOptions = InvoicesPerPageOptions;
+
   private navigatedOrgId: number | null;
 
   private previousSelectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab;
@@ -169,6 +172,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           this.store.dispatch(new Invoices.GetOrganizationStructure(id, true));
         }),
       );
+
+      this.recordsPerPageOptions = InvoiceDefaulPerPageOptions;
     } else {
       this.organizationId$ = this.organizationChangeId$;
     }
@@ -295,6 +300,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.store.dispatch([
       new Invoices.SetTabIndex(tabIdx),
     ]);
+
+    if (!this.isAgency && this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords) {
+      this.recordsPerPageOptions = InvoicesPerPageOptions;
+    } else {
+      this.recordsPerPageOptions = InvoiceDefaulPerPageOptions;
+    }
 
     this.clearSelections();
     this.clearGroupedInvoices();
