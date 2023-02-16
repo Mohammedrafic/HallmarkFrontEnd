@@ -132,7 +132,6 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private getWorkCommitmentById(id: number, populateForm = true): void {
-    debugger;
     this.candidateWorkCommitmentService.getWorkCommitmentById(id)
       .subscribe((commitment: WorkCommitmentDetails) => {
         this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
