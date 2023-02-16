@@ -192,7 +192,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.downloadDocument(params);
     }
   }
-  public sharedDocumentInformation:BusinessUnit[];
+  public sharedDocumentInformation:BusinessUnit[]=[];
   public allOption: string = "All";
   public optionFields = {
     text: 'name',
@@ -471,7 +471,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetSharedDocumentInformation(sharedDocumentInformation));
     this.sharedDocumentInformation$.pipe(takeUntil(this.unsubscribe$))
     .subscribe((data: BusinessUnit[]) => {
-      this.sharedDocumentInformation=data;
+      if(data.length>0)
+        this.sharedWith.gridOptions.api?.setRowData(data);
     });
   }
 
@@ -723,7 +724,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.dialogWidth = '600px'
       this.shareDocumentIds = selectedIds;
       this.store.dispatch(new ShowSideDialog(true));
-      this.sharedWith.gridOptions.api?.setRowData([]);
     }
     else {
       this.store.dispatch([
@@ -1189,7 +1189,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.dialogWidth = '600px'
       this.createForm();
       this.shareDocumentIds = [data.id];
-      this.sharedWith.gridOptions.api?.setRowData([]);
       this.store.dispatch(new ShowSideDialog(true));
     }
   }
