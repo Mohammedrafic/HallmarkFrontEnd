@@ -126,10 +126,15 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
   private pendinginvoiceNavigation(): void {
     setTimeout(() => {
       this.orgwidgetpendinginvoice = JSON.parse(localStorage.getItem('orgmanualinvoicewidget') || '""') as string;
+      this.orgwidgetpendinginvoice = JSON.parse(localStorage.getItem('pendingInvoiceApproval') || '""') as string;
        if(this.orgwidgetpendinginvoice === "ManualInvoice") {
          this.tabComponent.selectedItem= InvoicesOrgTabId.ManualInvoicePending;
          this.changeTab.emit(InvoicesOrgTabId.ManualInvoicePending);
          this.globalWindow.localStorage.setItem("orgmanualinvoicewidget", JSON.stringify(""));
+       } else if(this.orgwidgetpendinginvoice === "pendingInvoice") {
+         this.tabComponent.selectedItem= InvoicesOrgTabId.PendingApproval;
+         this.changeTab.emit(InvoicesOrgTabId.PendingApproval);
+         this.globalWindow.localStorage.setItem("pendingInvoiceApproval", JSON.stringify(""));
        }
     }, 2000);
   }

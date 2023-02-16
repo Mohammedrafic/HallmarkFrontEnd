@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  Inject
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
@@ -117,7 +118,7 @@ import {
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { SettingsKeys } from '@shared/enums/settings';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
-import { CandidatesStatusText, FilterOrderStatusText, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { CandidatesStatusText, CandidateStatus, FilterOrderStatusText, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { ButtonModel } from '@shared/models/buttons-group.model';
@@ -192,6 +193,7 @@ import { ResizeObserverModel, ResizeObserverService } from '@shared/services/res
 import { MiddleTabletWidth, SmallDesktopWidth, TabletWidth } from '@shared/constants/media-query-breakpoints';
 import { UpdateRegRateComponent } from '../update-reg-rate/update-reg-rate.component';
 import { FilteredUser } from '@shared/models/user.model';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-order-management-content',
@@ -264,7 +266,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public isLockMenuButtonsShown = true;
   public resizeObserver: ResizeObserverModel;
   public navigationPanelWidth: string;
-
+  public orgpendingOrderapproval: string;
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
     text: 'name',
@@ -395,7 +397,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService,
     private cd: ChangeDetectorRef,
-    private breakpointService: BreakpointObserverService
+    private breakpointService: BreakpointObserverService,
+    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis
   ) {
     super(store);
 
@@ -1525,8 +1528,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderFilterDataSources$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((data: OrderFilterDataSource) => {
-        let statuses = [];
-        let candidateStatuses = [];
+        let statuses: FilterOrderStatus[] = [];
+        let candidateStatuses: FilterStatus[] = [];
         const statusesByDefault = [
           CandidatStatus.Applied,
           CandidatStatus.Shortlisted,
@@ -1538,6 +1541,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           CandidatStatus.Rejected,
           CandidatStatus.Cancelled,
         ];
+        this.getapprovalorder();
         if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
           statuses = data.orderStatuses.filter((status) =>
             [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled, FilterOrderStatusText.Closed].includes(status.status)
@@ -1556,6 +1560,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
             ![FilterOrderStatusText.Filled, FilterOrderStatusText['In Progress']].includes(status.status)
           );
           candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
+        } else if(this.orgpendingOrderapproval === "OrdersforApproval") {
+          if(this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
+            statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
+              ![FilterOrderStatusText.Filled, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Closed, FilterOrderStatusText.Open, CandidateStatus.Incomplete].includes(status.status)
+            );
+            candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
+            this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
+          }
         } else {
           statuses = data.orderStatuses;
           candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
@@ -1563,7 +1575,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filterColumns.orderStatuses.dataSource = statuses;
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
         this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
-        if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
+        if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect && this.orgpendingOrderapproval != "") {
           this.setDefaultFilter();
         } else {
           this.redirectFromPerdiem = false;
@@ -2116,5 +2128,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.defaultExport(ExportedFileType.excel);
         break;
     }
+  }
+
+  public getapprovalorder():void {
+    this.orgpendingOrderapproval = JSON.parse(localStorage.getItem('pendingApprovalOrders') || '""') as string;
   }
 }
