@@ -1,6 +1,7 @@
 <app-form-control-wrapper [formGroup]="formGroupInstance" [label]="label" [id]="id" [required]="required">
   <div class="input-group datepicker">
     <ejs-datepicker
+      #datepicker
       class="datepicker"
       [format]="format"
       [formControlName]="controlName"
