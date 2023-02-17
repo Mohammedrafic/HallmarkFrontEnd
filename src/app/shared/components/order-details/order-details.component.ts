@@ -74,11 +74,13 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
           takeUntil(this.unsubscribe$)
         ).subscribe(({ HideContactDetailsOfOrderInAgencyLogin }) => {
           this.isHideContactDetailsOfOrderInAgencyLogin = HideContactDetailsOfOrderInAgencyLogin === "true";
+          this.cdr.markForCheck();
         })
       }
     
     } else {
       this.isHideContactDetailsOfOrderInAgencyLogin = false;
+      this.cdr.markForCheck();
     }
   }
 
