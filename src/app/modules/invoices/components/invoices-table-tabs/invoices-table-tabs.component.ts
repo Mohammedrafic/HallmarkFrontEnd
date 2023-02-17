@@ -102,9 +102,9 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
         filter(Boolean),
         takeUntil(this.componentDestroy()))
       .subscribe(() => {
-      this.tabComponent.hideTab(index, true);
-      this.asyncRefresh();
-    });
+        this.tabComponent.hideTab(index, true);
+        this.asyncRefresh();
+      });
   }
 
   private showTab(index: number): void {
@@ -113,7 +113,7 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       .subscribe(() => {
         this.tabComponent.hideTab(index, false);
         this.asyncRefresh();
-    });
+      });
   }
 
   @OutsideZone
@@ -147,6 +147,11 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {
         this.changeTab.emit(InvoicesOrgTabId.Paid);
         this.tabComponent.selectedItem = InvoicesOrgTabId.Paid;
+        this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+      }
+      if (user?.businessUnitType === BusinessUnitType.Agency) {
+        this.changeTab.emit(InvoicesOrgTabId.ManualInvoicePending);
+        this.tabComponent.selectedItem = InvoicesOrgTabId.ManualInvoicePending;
         this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
       }
     }
