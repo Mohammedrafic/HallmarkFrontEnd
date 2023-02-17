@@ -1,3 +1,5 @@
+@import 'colors';
+
 .reorder {
   margin-top: 34px;
   display: flex;
@@ -25,4 +27,8 @@
       height: 100%;
     }
   }
+}
+
+.error {
+  color: $supportive-red
 }

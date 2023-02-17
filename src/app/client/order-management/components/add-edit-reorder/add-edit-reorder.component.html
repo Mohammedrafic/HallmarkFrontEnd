@@ -34,7 +34,13 @@
   ></app-datepicker>
   <div class="input-container" *ngIf="!isEditMode">
     <label>Re-Order Date <span class="required">*</span></label>
-    <app-multi-date-picker [showChipsBelowControl]="true" (appliedDates)="setMultipleDates($event)"></app-multi-date-picker>
+    <app-multi-date-picker
+      [showChipsBelowControl]="true"
+      [hasError]="!!(!reorderForm.get('reorderDate')?.untouched && reorderForm.get('reorderDate')?.errors)"
+      (appliedDates)="setMultipleDates($event)"></app-multi-date-picker>
+      <span class="error"
+      *ngIf="!reorderForm.get('reorderDate')?.untouched && reorderForm.get('reorderDate')?.errors"
+      >{{ reorderForm.get('reorderDate')?.errors | validationError }}</span>
   </div>
   <div class="row-controls">
     <app-timepicker
