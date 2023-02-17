@@ -338,7 +338,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         ...this.isAgency && this.navigatedOrgId ? { organizationId: this.navigatedOrgId } : {},
       })
     );
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   public gridReady(event: GridReadyEventModel): void {
