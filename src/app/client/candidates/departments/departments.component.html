@@ -1,19 +1,26 @@
 <app-grid
   class="department-assigned-grid"
-  *ngIf="(departmentsAssigned$ | async) as departmentsAssigned"
+  *ngIf="departmentsAssigned$ | async as departmentsAssigned"
   gridTitle="Department Assigned"
   [rowSelection]="undefined"
   [rowData]="departmentsAssigned?.items"
   [columnDefinitions]="columnDef"
   [totalRecordsCount]="departmentsAssigned?.items?.length!"
 >
- <app-button
-   action-button
-   iconName="plus"
-   text="Assign Department"
-   [type]="buttonType.ACTION"
-   (clickEmitter)="showAssignDepartmentDialog()"
- ></app-button>
+  <app-button
+    action-button
+    iconName="sliders"
+    text="Filters"
+    [type]="buttonType.ACTION"
+    (clickEmitter)="showFilters()"
+  ></app-button>
+  <app-button
+    action-button
+    iconName="plus"
+    text="Assign Department"
+    [type]="buttonType.ACTION"
+    (clickEmitter)="showAssignDepartmentDialog()"
+  ></app-button>
 </app-grid>
 
 <app-side-dialog
@@ -29,3 +36,5 @@
     [saveForm$]="saveForm$"
   ></app-assign-department>
 </app-side-dialog>
+
+<app-filter-department></app-filter-department>

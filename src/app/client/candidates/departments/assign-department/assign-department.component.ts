@@ -6,7 +6,7 @@ import { debounceTime, Subject, takeUntil } from 'rxjs';
 
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { DepartmentAssigned } from '../departments.model';
-import { DepartmentsService } from '../departments.service';
+import { DepartmentsService } from '../services/departments.service';
 import { Destroyable } from '@core/helpers';
 
 @Component({

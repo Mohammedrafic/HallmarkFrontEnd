@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import { Store } from '@ngxs/store';
-import { ShowSideDialog } from '../../../store/app.actions';
+import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import { filter, Observable, Subject, switchMap } from 'rxjs';
 import { CandidateTabsEnum } from '@client/candidates/enums';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
-import { DepartmentsService } from '@client/candidates/departments/departments.service';
+import { DepartmentsService } from '@client/candidates/departments/services/departments.service';
 import { SideDialogTitleEnum } from '@client/candidates/departments/side-dialog-title.enum';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { DepartmentAssigned, DepartmentsPage } from '@client/candidates/departments/departments.model';
@@ -56,17 +56,21 @@ export class DepartmentsComponent implements OnInit {
   }
 
   public showAssignDepartmentDialog(): void {
-    this.showSideDialog(true);
     this.assignDepartment.resetAssignDepartmentForm();
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.AssignDepartment);
+    this.showSideDialog(true);
   }
 
   public onSave(): void {
     this.saveForm$.next(true);
   }
 
+  public showFilters(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
+  }
+
   public onCancel(): void {
-    if (this.assignDepartment.assignDepartmentForm.dirty) {
+    if (this.assignDepartment?.assignDepartmentForm.dirty) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
@@ -82,7 +86,7 @@ export class DepartmentsComponent implements OnInit {
     }
   }
 
-  private showSideDialog(isOpen: boolean): void  {
+  private showSideDialog(isOpen: boolean): void {
     this.store.dispatch(new ShowSideDialog(isOpen));
   }
 
