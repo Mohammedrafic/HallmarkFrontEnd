@@ -7,14 +7,13 @@
   [columnDefinitions]="columnDef"
   [totalRecordsCount]="departmentsAssigned?.items?.length!"
 >
-<!--  TODO: https://hallmarkhcs.atlassian.net/browse/EIN-8904 -->
-<!--  <app-button-->
-<!--    action-button-->
-<!--    iconName="plus"-->
-<!--    text="Assign Department"-->
-<!--    [type]="buttonType.ACTION"-->
-<!--    (clickEmitter)="showAssignDepartmentDialog()"-->
-<!--  ></app-button>-->
+ <app-button
+   action-button
+   iconName="plus"
+   text="Assign Department"
+   [type]="buttonType.ACTION"
+   (clickEmitter)="showAssignDepartmentDialog()"
+ ></app-button>
 </app-grid>
 
 <app-side-dialog
@@ -23,5 +22,10 @@
   (formCancelClicked)="onCancel()"
   (formSaveClicked)="onSave()"
 >
-  <app-assign-department *ngIf="(sideDialogTitle$ | async) !== sideDialogTitleEnum.Filter"></app-assign-department>
+  <app-assign-department
+    #assignDepartment
+    *ngIf="(sideDialogTitle$ | async) !== sideDialogTitleEnum.Filter"
+    [dialogData$]="dialogData$"
+    [saveForm$]="saveForm$"
+  ></app-assign-department>
 </app-side-dialog>

@@ -1,17 +1,20 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import { Store } from '@ngxs/store';
 import { ShowSideDialog } from '../../../store/app.actions';
-import { filter, Observable, switchMap } from 'rxjs';
+import { filter, Observable, Subject, switchMap } from 'rxjs';
 import { CandidateTabsEnum } from '@client/candidates/enums';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { DepartmentsService } from '@client/candidates/departments/departments.service';
 import { SideDialogTitleEnum } from '@client/candidates/departments/side-dialog-title.enum';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
-import { DepartmentsPage } from '@client/candidates/departments/departments.model';
+import { DepartmentAssigned, DepartmentsPage } from '@client/candidates/departments/departments.model';
 import { DatePipe } from '@angular/common';
 import { formatDate } from '@shared/constants';
 import { columnDef } from '@client/candidates/departments/grid/column-def.constant';
+import { AssignDepartmentComponent } from './assign-department/assign-department.component';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 
 @Component({
   selector: 'app-departments',
@@ -20,16 +23,19 @@ import { columnDef } from '@client/candidates/departments/grid/column-def.consta
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DepartmentsComponent implements OnInit {
+  @ViewChild('assignDepartment') private assignDepartment: AssignDepartmentComponent;
+
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
   public readonly sideDialogTitleEnum: typeof SideDialogTitleEnum = SideDialogTitleEnum;
+  public readonly dialogData$: Subject<DepartmentAssigned> = new Subject();
+  public readonly saveForm$: Subject<boolean> = new Subject();
 
   public readonly columnDef: ColumnDefinitionModel[] = columnDef({
     editHandler: this.editAssignedDepartment.bind(this),
     deleteHandler: this.deleteAssignedDepartment.bind(this),
     dateFormatter: this.getFormattedDate.bind(this),
   });
-
 
   public selectedTab$: Observable<CandidateTabsEnum>;
   public sideDialogTitle$: Observable<string>;
@@ -39,7 +45,8 @@ export class DepartmentsComponent implements OnInit {
     private store: Store,
     private candidatesService: CandidatesService,
     private departmentsService: DepartmentsService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private confirmService: ConfirmService,
   ) {}
 
   public ngOnInit(): void {
@@ -49,14 +56,34 @@ export class DepartmentsComponent implements OnInit {
   }
 
   public showAssignDepartmentDialog(): void {
-    this.store.dispatch(new ShowSideDialog(true));
+    this.showSideDialog(true);
+    this.assignDepartment.resetAssignDepartmentForm();
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.AssignDepartment);
   }
 
-  public onSave(): void {}
+  public onSave(): void {
+    this.saveForm$.next(true);
+  }
 
   public onCancel(): void {
-    this.store.dispatch(new ShowSideDialog(false));
+    if (this.assignDepartment.assignDepartmentForm.dirty) {
+      this.confirmService
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter(Boolean))
+        .subscribe(() => {
+          this.showSideDialog(false);
+        });
+    } else {
+      this.showSideDialog(false);
+    }
+  }
+
+  private showSideDialog(isOpen: boolean): void  {
+    this.store.dispatch(new ShowSideDialog(isOpen));
   }
 
   private getFormattedDate(date: string): string {
@@ -69,14 +96,17 @@ export class DepartmentsComponent implements OnInit {
 
   // Get new data if departments tab will be selected
   private getDepartmentsAssigned(): Observable<DepartmentsPage> {
-    return this.candidatesService
-      .getSelectedTab$()
-      .pipe(
-        filter((tab) => tab === CandidateTabsEnum.Departments),
-        switchMap(() => this.departmentsService.getDepartmentsAssigned()));
+    return this.candidatesService.getSelectedTab$().pipe(
+      filter((tab) => tab === CandidateTabsEnum.Departments),
+      switchMap(() => this.departmentsService.getDepartmentsAssigned())
+    );
   }
 
-  private editAssignedDepartment(): void {}
+  private editAssignedDepartment(department: DepartmentAssigned): void {
+    this.showSideDialog(true);
+    this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.EditAssignDepartment);
+    this.dialogData$.next(department);
+  }
 
   private deleteAssignedDepartment(): void {}
 }

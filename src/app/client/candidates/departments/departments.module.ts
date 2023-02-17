@@ -6,7 +6,6 @@ import { GridModule } from '@shared/components/grid/grid.module';
 import { FeatherModule } from 'angular-feather';
 import { ButtonModule } from '@shared/components/button/button.module';
 import { SharedModule } from '@shared/shared.module';
-import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
 import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
 import { ToggleModule } from '@shared/components/form-controls/toggle/toggle.module';
 import { DepartmentsService } from '@client/candidates/departments/departments.service';
@@ -16,6 +15,7 @@ import { OrientationCompletedComponent } from './grid/cell-renderers/orientation
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { MultiplePipeModule } from '@shared/pipes/multiple.pipe';
 import { JoinPipeModule } from '@shared/pipes/join.pipe';
+import { DropdownModule } from '@shared/components/form-controls/dropdown/dropdown.module';
 
 @NgModule({
   declarations: [
@@ -31,12 +31,12 @@ import { JoinPipeModule } from '@shared/pipes/join.pipe';
     FeatherModule,
     ButtonModule,
     SharedModule,
-    MultiselectDropdownModule,
     DatepickerModule,
     ToggleModule,
     TooltipContainerModule,
     MultiplePipeModule,
     JoinPipeModule,
+    DropdownModule
   ],
   providers: [DepartmentsService],
 })

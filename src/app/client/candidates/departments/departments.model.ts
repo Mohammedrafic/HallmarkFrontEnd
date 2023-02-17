@@ -21,4 +21,18 @@ interface Skill {
   name: string;
 }
 
+export interface EditAssignedDepartment{
+  assignedDepartmentIds: number[];
+  startDate: Date | string;
+  endDate: Date | string;
+}
+
+export interface AssignNewDepartment {
+  regionId: number;
+  locationId: number;
+  departmentId: number;
+  startDate: Date | string;
+  endDate?: Date | string;
+}
+
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;
