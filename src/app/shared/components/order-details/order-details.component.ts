@@ -29,6 +29,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
 
   @Input() isPosition: boolean = false;
   @Input() jobId: number;
+  @Input() comments: Comment[] = [];
   @Input() set currentOrder(value: Order) {
     this.order = value;
     this.getContactDetails();
@@ -37,7 +38,6 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   public order: Order;
   public orderType = OrderType;
   public contactDetails: ContactDetails;
-  public comments: Comment[] = [];
   public events: OrderHistoricalEvent[];
   public isHideContactDetailsOfOrderInAgencyLogin: boolean;
 
@@ -86,7 +86,6 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
     if (currentOrder?.currentValue) {
       this.accrdDescription?.expandItem(true, 1);
       this.accrdHistorical?.expandItem(false);
-      this.getComments();
     }
   }
 
@@ -103,16 +102,6 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
       this.events = data;
       this.cdr.markForCheck();
      });
-  }
-
-  private getComments(): void {
-    this.commentsService
-      .getComments(this.order.commentContainerId as number, null)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((comments: Comment[]) => {
-        this.comments = comments;
-        this.cdr.markForCheck();
-      });
   }
 
   public onBillRatesChanged(): void {
