@@ -28,12 +28,12 @@
         [externalCommentConfiguration]="order.externalCommentsConfiguration"
       ></app-comments>
     </div>
-    <div class="contacts-container"  *ngIf="isHideContactDetailsOfOrderInAgencyLogin">
+    <div class="contacts-container" >
       <div class="contacts">
-        <div class="contact-title">Supervisor Contacts</div>
+        <div class="contact-title">Supervisor/Work Location</div>
         <div class="contact-details">
-          <span> <i-feather name="user" class="icon"></i-feather> {{ contactDetails?.name }} </span>
-          <span> <i-feather name="mail" class="icon"></i-feather> {{ contactDetails?.email }} </span>
+          <span  *ngIf="!isHideContactDetailsOfOrderInAgencyLogin" > <i-feather name="user" class="icon"></i-feather> {{ contactDetails?.name }} </span>
+          <span  *ngIf="!isHideContactDetailsOfOrderInAgencyLogin" > <i-feather name="mail" class="icon"></i-feather> {{ contactDetails?.email }} </span>
           <span>
             <i-feather name="map-pin" class="icon"></i-feather>
             {{ contactDetails?.address }}, {{ contactDetails?.city }}, {{ contactDetails?.state }},

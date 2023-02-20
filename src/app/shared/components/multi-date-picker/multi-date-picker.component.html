@@ -4,6 +4,7 @@
       <input
         class="e-input"
         [class.active]="isCalendarShow"
+        [class.errored]="hasError"
         readonly
         placeholder="MM/DD/YYYY"
       />
@@ -19,6 +20,7 @@
         <i-feather (click)="removeChip(idx)" class="chip__icon" name="x"></i-feather>
       </div>
     </div>
+    <span class="error" *ngIf="!datesControl?.untouched && datesControl.errors">{{ datesControl.errors | validationError }}</span>
   </div>
 
   <ejs-calendar

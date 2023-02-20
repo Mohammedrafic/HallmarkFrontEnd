@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
-import { filter, Observable, Subject, switchMap, takeUntil, throttleTime } from 'rxjs';
+import { filter, Observable, Subject, switchMap, takeUntil, takeWhile, throttleTime } from 'rxjs';
 import { OrderType } from '@shared/enums/order-type';
 import { Select, Store } from '@ngxs/store';
 import { CommentsService } from '@shared/services/comments.service';
@@ -16,6 +16,8 @@ import { SettingsKeys } from '../../enums/settings';
 import { SettingsHelper } from '../../../core/helpers/settings.helper';
 import { UserState } from '../../../store/user.state';
 import { BusinessUnitType } from '../../enums/business-unit-type';
+import { OrganizationalHierarchy, OrganizationSettingKeys } from '../../constants/organization-settings';
+import { SettingsViewService } from '../../services/settings-view.service';
 
 type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
 @Component({
@@ -43,35 +45,42 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
   private eventsHandler: Subject<void> = new Subject();
-  @Select(OrganizationManagementState.organizationSettings)
-  private organizationSettings$: Observable<OrganizationSettingsGet[]>;
-  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
-  public SettingsKeys = SettingsKeys;
-
-  constructor(
+  
+    constructor(
     private store: Store,
     private commentsService: CommentsService,
     private cdr: ChangeDetectorRef,
-    private historicalEventsService: HistoricalEventsService
+    private historicalEventsService: HistoricalEventsService,
+    private settingsViewService: SettingsViewService
   ) {
     this.eventsHandler.pipe(takeUntil(this.unsubscribe$), throttleTime(500))
       .subscribe(() => {
         this.getHistoricalEvents();
       });
-    this.subscribeForSettings();
+
   }
 
   private subscribeForSettings(): void {
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType === BusinessUnitType.Agency) {
-      this.organizationSettings$.pipe(
-        takeUntil(this.unsubscribe$)
-      ).subscribe((settings: OrganizationSettingsGet[]) => {
-        this.settings = SettingsHelper.mapSettings(settings);
-        this.isHideContactDetailsOfOrderInAgencyLogin = this.settings[SettingsKeys.HideContactDetailsOfOrderInAgencyLogin]?.value;
-      });
+      const organizationId = this.order?.organizationId;
+      if (organizationId) {
+        this.settingsViewService.getViewSettingKey(
+          OrganizationSettingKeys.HideContactDetailsOfOrderInAgencyLogin,
+          OrganizationalHierarchy.Organization,
+          organizationId,
+          organizationId
+        ).pipe(
+          takeUntil(this.unsubscribe$)
+        ).subscribe(({ HideContactDetailsOfOrderInAgencyLogin }) => {
+          this.isHideContactDetailsOfOrderInAgencyLogin = HideContactDetailsOfOrderInAgencyLogin === "true";
+          this.cdr.markForCheck();
+        })
+      }
+    
     } else {
-      this.isHideContactDetailsOfOrderInAgencyLogin = true;
+      this.isHideContactDetailsOfOrderInAgencyLogin = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -86,6 +95,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
     if (currentOrder?.currentValue) {
       this.accrdDescription?.expandItem(true, 1);
       this.accrdHistorical?.expandItem(false);
+      this.subscribeForSettings();
     }
   }
 
@@ -101,7 +111,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
     this.historicalEventsService.getEvents(this.order.id, organizationId, this.jobId).subscribe(data => {
       this.events = data;
       this.cdr.markForCheck();
-     });
+    });
   }
 
   public onBillRatesChanged(): void {

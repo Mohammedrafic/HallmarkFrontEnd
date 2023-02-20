@@ -28,12 +28,14 @@ export class OrgWidgetComponent {
     this.mousePosition.y = $event.screenY;
   }
   public toSourceContent(orgname: string): void {
-    if(orgname === 'Order'){
+    if(orgname === 'OrdersforApproval'){
+      this.globalWindow.localStorage.setItem("pendingApprovalOrders",JSON.stringify(orgname));  
       this.dashboardService.redirectToUrl('client/order-management/');
     } else if(orgname === 'ManualInvoice'){
       this.dashboardService.redirectToUrl('client/invoices/');
       this.globalWindow.localStorage.setItem("orgmanualinvoicewidget",JSON.stringify(orgname));  
     } else if(orgname === 'pendingInvoice'){
+      this.globalWindow.localStorage.setItem("pendingInvoiceApproval",JSON.stringify(orgname));  
       this.dashboardService.redirectToUrl('client/invoices/');
     } else if(orgname === 'Pending Timesheet'){
       this.dashboardService.redirectToUrl('client/timesheets/');
