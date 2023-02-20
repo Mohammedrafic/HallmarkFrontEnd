@@ -107,7 +107,7 @@
       <e-column field="departmentName" headerText="DEPARTMENT" width=150></e-column>
       <e-column field="value" headerText="VALUE" width=400>
         <ng-template #template let-data>
-          <span *ngIf="data.controlType === organizationSettingControlType.Checkbox">{{data.value === 'true' ? 'Yes' : 'No'}}</span>
+          <span *ngIf="data.controlType === organizationSettingControlType.Checkbox">{{ data.value === 'true' ? 'Yes' : 'No'}}</span>
           <span *ngIf="data.controlType === organizationSettingControlType.Multiselect || data.controlType === organizationSettingControlType.Select">
             <span *ngFor="let option of data.value; let i = index">{{option.text}}
               <span *ngIf="i !== data.value.length - 1">, </span>
@@ -115,7 +115,8 @@
           </span>
           <span *ngIf="data.controlType === organizationSettingControlType.Text">{{data.value}}</span>
           <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{data.value | date: 'MM/dd/yyyy'}}</span>
-          <span *ngIf="data.controlType === organizationSettingControlType.InvoiceAutoGeneration">{{data.value.isEnabled ? 'Yes' : 'No'}}</span>
+          <span *ngIf="data.controlType === organizationSettingControlType.InvoiceAutoGeneration">
+            {{ data.parsedValue.isEnabled ? 'Yes' : 'No'}}</span>
         </ng-template>
       </e-column>
     </e-columns>
@@ -239,7 +240,7 @@
       <div class="input-container bootstrap">
         <label for="attribute">Attribute</label>
         <div class="input-group">
-          <ejs-tooltip [content]="organizationSettingsFormGroup.get('name')?.value" [showTipPointer]="false">
+          <ejs-tooltip [content]="attribute.value" [showTipPointer]="false">
             <input
               #attribute
               id="attribute"
