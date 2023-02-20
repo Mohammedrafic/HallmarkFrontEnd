@@ -5,6 +5,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { Comment } from '@shared/models/comment.model';
 
 @Component({
   selector: 'app-order-details-container',
@@ -14,6 +15,7 @@ import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.
 })
 export class OrderDetailsContainerComponent {
   @Input() activeSystem: OrderManagementIRPSystemId;
+  @Input() comments: Comment[] = [];
 
   public orderType = OrderType;
   public isClosedOrder = false;

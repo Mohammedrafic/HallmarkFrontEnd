@@ -193,6 +193,8 @@ import { ResizeObserverModel, ResizeObserverService } from '@shared/services/res
 import { MiddleTabletWidth, SmallDesktopWidth, TabletWidth } from '@shared/constants/media-query-breakpoints';
 import { UpdateRegRateComponent } from '../update-reg-rate/update-reg-rate.component';
 import { FilteredUser } from '@shared/models/user.model';
+import { Comment } from '@shared/models/comment.model';
+import { CommentsService } from '@shared/services/comments.service';
 import { GlobalWindow } from '@core/tokens';
 
 @Component({
@@ -266,6 +268,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public isLockMenuButtonsShown = true;
   public resizeObserver: ResizeObserverModel;
   public navigationPanelWidth: string;
+  public orderComments: Comment[] = [];
   public orgpendingOrderapproval: string;
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
@@ -398,6 +401,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private permissionService: PermissionService,
     private cd: ChangeDetectorRef,
     private breakpointService: BreakpointObserverService,
+    private commentsService: CommentsService,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis
   ) {
     super(store);
@@ -1676,6 +1680,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private onOrderDetailsDialogOpenEventHandler(): void {
     this.openDetails.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
       if (!isOpen) {
+        this.orderComments = [];
         this.clearSelection(this.gridWithChildRow);
         this.selectedReOrder = null;
         this.previousSelectedOrderId = null;
@@ -1688,9 +1693,20 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
   }
 
+  private getOrderComments(): void {
+    this.commentsService
+      .getComments(this.selectedOrder.commentContainerId as number, null)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((comments: Comment[]) => {
+        this.orderComments = comments;
+        this.cd$.next(true);
+      });
+  }
+
   private onSelectedOrderDataLoadHandler(): void {
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
       this.selectedOrder = order;
+      this.selectedOrder && this.getOrderComments();
       this.cd$.next(true);
     });
   }
