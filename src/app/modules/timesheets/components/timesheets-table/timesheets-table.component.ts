@@ -4,7 +4,6 @@ import { Store } from '@ngxs/store';
 
 import { BehaviorSubject, distinctUntilChanged, Observable, takeUntil, throttleTime } from 'rxjs';
 
-import { RowNode } from '@ag-grid-community/core';
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-event.model';
 import { AbstractPermission } from '@shared/helpers/permissions';
@@ -15,7 +14,7 @@ import { TimesheetsSelectedRowEvent } from '../../interface';
 import { TimesheetsColumnsDefinition } from '../../constants';
 import { TimesheetsTableColumns } from '../../enums';
 import { GRID_CONFIG } from '@shared/constants';
-import { BreakpointObserverService } from '@core/services';
+import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -39,13 +38,16 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
   @Output() readonly timesheetRowSelected: EventEmitter<TimesheetsSelectedRowEvent> =
     new EventEmitter<TimesheetsSelectedRowEvent>();
 
-  @Output() readonly bulkApproveEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
+  @Output() public bulkEventEmitter: EventEmitter<BulkActionDataModel> = new EventEmitter<BulkActionDataModel>();
 
-  @Output() readonly bulkExportEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = TimesheetsColumnsDefinition(
     this.router.url.includes('agency')
   );
+
+  public bulkActionConfig: BulkActionConfig = {
+    approve: true,
+  }
   public currentPageSubj: BaseObservable<number> = new BaseObservable<number>(1);
   public currentPage$: Observable<number> = this.currentPageSubj.getStream();
   public pageSize = GRID_CONFIG.initialRowsPerPage;

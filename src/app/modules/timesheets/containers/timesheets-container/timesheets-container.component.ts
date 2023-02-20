@@ -43,6 +43,8 @@ import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { FilterService } from '@shared/services/filter.service';
 import { PreservedFilters } from '@shared/models/preserved-filters.model';
 import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fields-settings';
+import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
+import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -219,11 +221,15 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     );
   }
 
-  public bulkApprove(data: RowNode[]): void {
-    this.store.dispatch(new Timesheets.BulkApprove(data));
+  public handleBulkEvent(event: BulkActionDataModel): void {
+    if(event.type === BulkTypeAction.APPROVE) {
+      this.bulkApprove(event.items);
+    }
   }
 
-  public bulkExport(data: RowNode[]): void {}
+  private bulkApprove(data: RowNode[]): void {
+    this.store.dispatch(new Timesheets.BulkApprove(data));
+  }
 
   private onOrganizationChangedHandler(): void {
     const idStream = this.isAgency ? this.agencyId$ : this.organizationId$;

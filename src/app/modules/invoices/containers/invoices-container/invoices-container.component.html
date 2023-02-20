@@ -208,8 +208,7 @@
           (gridReadyEmitter)="gridReady($event)"
           (navigateToPageEmitter)="changePage($event)"
           (pageSizeChangeEmitter)="changePageSize($event)"
-          (approveEmitter)="bulkApprove($event)"
-          (exportEmitter)="bulkExport($event)"
+          (bulkEventEmitter)="handleBulkAction($event)"
           (sortChanged)="changeSorting($event)"
           (multiSelectionChanged)="changeMultiSelection($event)"
           (gridSelectedRow)="selectRow($event)"
@@ -222,6 +221,7 @@
           [allowBulkSelection]="false"
           [allowBulkButton]="true"
           [rowSelection]="'multiple'"
+          [bulkActionConfig]="bulkActionConfig"
           [gridOptions]="gridOptions"
   ></app-grid>
 </ng-template>

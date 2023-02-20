@@ -25,34 +25,58 @@
         class="app-grid-pagination__navigate-to-control"
         placeholder="Go to:"
       ></app-numeric-textbox>
-      <div class="total-rows">
-        Total Rows: {{totalRecordsCount}}
-      </div>
+      <div class="total-rows">Total Rows: {{ totalRecordsCount }}</div>
     </section>
     <ng-template #bulkApproveTemplate>
       <section class="bulk-section">
-        <h3 class="bulk-section__amount">
-          {{ selectedTableRowsAmount }} Rows Selected
-        </h3>
+        <h3 class="bulk-section__amount">{{ selectedTableRowsAmount }} Rows Selected</h3>
 
-        <app-tooltip-container [showToolTip]="disableBulkButton">
+        <app-tooltip-container [showToolTip]="disableBulkButton" *ngIf="bulkActionConfig.approve">
           <button
             *ngIf="allowBulkButton"
             [disabled]="disableBulkButton"
-            (click)="approveEmitter.emit()"
+            (click)="bulkEventEmitter.emit(bulkTypeAction.APPROVE)"
             class="approve-button"
             ejs-button
-            cssClass="e-primary">
+            cssClass="e-primary"
+          >
             Approve
+          </button>
+        </app-tooltip-container>
+
+        <app-tooltip-container [showToolTip]="disableBulkButton" *ngIf="bulkActionConfig.edit">
+          <button
+            *ngIf="allowBulkButton"
+            [disabled]="disableBulkButton"
+            (click)="bulkEventEmitter.emit(bulkTypeAction.EDIT)"
+            class="approve-button"
+            ejs-button
+            cssClass="e-primary"
+          >
+            Edit
+          </button>
+        </app-tooltip-container>
+
+        <app-tooltip-container [showToolTip]="disableBulkButton" *ngIf="bulkActionConfig.delete">
+          <button
+            *ngIf="allowBulkButton"
+            [disabled]="disableBulkButton"
+            (click)="bulkEventEmitter.emit(bulkTypeAction.DELETE)"
+            class="approve-button"
+            ejs-button
+            cssClass="e-primary"
+          >
+            Delete
           </button>
         </app-tooltip-container>
 
         <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
         <button
           style="display: none"
-          (click)="exportEmitter.emit()"
+          (click)="bulkEventEmitter.emit(bulkTypeAction.EXPORT)"
           ejs-button
-          cssClass="e-primary button-export button--no-wrap">
+          cssClass="e-primary button-export button--no-wrap"
+        >
           Export <i-feather name="upload" class="icon"></i-feather>
         </button>
       </section>

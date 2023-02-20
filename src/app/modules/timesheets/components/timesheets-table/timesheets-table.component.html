@@ -3,8 +3,7 @@
   (gridReadyEmitter)="gridReady($event)"
   (navigateToPageEmitter)="onGoToClick($event)"
   (pageSizeChangeEmitter)="onRowsDropDownChanged($event)"
-  (approveEmitter)="bulkApproveEmitter.emit($event)"
-  (exportEmitter)="bulkExportEmitter.emit($event)"
+  (bulkEventEmitter)="bulkEventEmitter.emit($event)"
   (gridSelectedRow)="selectedRow($event)"
   (sortChanged)="sortHandler.emit($event)"
   [suppressRowClickSelection]="false"
@@ -18,6 +17,7 @@
   [changeTableSelectedIndex]="newSelectedIndex"
   [allowBulkSelection]="true"
   [allowBulkButton]="!isAgency"
+  [bulkActionConfig]="bulkActionConfig"
   [disableBulkButton]="!userPermission[userPermissions.CanOrganizationApproveRejectTimesheets]"
 >
 </app-grid>
