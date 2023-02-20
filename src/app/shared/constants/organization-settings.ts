@@ -37,7 +37,8 @@ export enum OrganizationSettingKeys {
   CandidateAppliedInLastNDays,
   SetDefaultCommentsScopeToExternal,
   LimitNumberOfSubmissionsInTotalToPosition,
-  HideContactDetailsOfOrderInAgencyLogin
+  HideContactDetailsOfOrderInAgencyLogin,
+  DisableAddEditTimesheetsInAgencyLogin
 }
 
 export enum OrganizationalHierarchy {

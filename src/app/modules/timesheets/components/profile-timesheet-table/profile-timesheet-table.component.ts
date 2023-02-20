@@ -35,6 +35,10 @@ import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { MiddleTabletWidth, SmallTabletWidth } from '@shared/constants/media-query-breakpoints';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { UserState } from 'src/app/store/user.state';
+import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import { SettingsViewService } from '@shared/services';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -178,7 +182,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     private timesheetRecordsService: TimesheetRecordsService,
     private timesheetDetailsTableService: TimesheetDetailsTableService,
     private cd: ChangeDetectorRef,
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    private settingsViewService: SettingsViewService,
   ) {
     super();
     this.context = {
@@ -198,6 +203,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.initBtnsState();
       this.setActionBtnState();
       this.initEditBtnsState();
+      this.subscribeForSettings();
       this.cd.detectChanges();
     }
   }
@@ -495,12 +501,40 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     }
   }
 
+  private subscribeForSettings(): void {
+    const currentTabMapping: Map<RecordFields, boolean> = new Map<RecordFields, boolean>()
+      .set(RecordFields.Time, this.timesheetDetails.canEditTimesheet)
+      .set(RecordFields.Miles, this.timesheetDetails.canEditMileage);
+    const user = this.store.selectSnapshot(UserState.user);
+    const { organizationId } = this.store.snapshot().timesheets.timesheetDetails;
+    if (user?.businessUnitType === BusinessUnitType.Agency) {
+      this.settingsViewService
+        .getViewSettingKey(
+          OrganizationSettingKeys.DisableAddEditTimesheetsInAgencyLogin,
+          OrganizationalHierarchy.Organization,
+          organizationId,
+          organizationId
+        )
+        .pipe(
+          takeUntil(this.componentDestroy()),
+          map(({ DisableAddEditTimesheetsInAgencyLogin }) => {
+            return DisableAddEditTimesheetsInAgencyLogin == 'true';
+          })
+        )
+        .subscribe((disabled: boolean) => {
+          this.isEditEnabled = !disabled && !!currentTabMapping.get(this.currentTab);
+          this.cd.markForCheck();
+        });
+    } else {
+      this.isEditEnabled = !!currentTabMapping.get(this.currentTab);
+      this.cd.markForCheck();
+    }
+  }
+
   private initEditBtnsState(): void {
     const currentTabMapping: Map<RecordFields, boolean> = new Map<RecordFields, boolean>()
       .set(RecordFields.Time, this.timesheetDetails.canEditTimesheet)
       .set(RecordFields.Miles, this.timesheetDetails.canEditMileage);
-
-    this.isEditEnabled = !!currentTabMapping.get(this.currentTab);
 
     if (this.isAgency) {
       this.isApproveBtnEnabled = !!currentTabMapping.get(this.currentTab);
