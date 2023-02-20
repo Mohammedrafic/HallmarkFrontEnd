@@ -15,6 +15,8 @@ import { columnDef } from '@client/candidates/departments/grid/column-def.consta
 import { AssignDepartmentComponent } from './assign-department/assign-department.component';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
+import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 
 @Component({
   selector: 'app-departments',
@@ -30,6 +32,10 @@ export class DepartmentsComponent implements OnInit {
   public readonly sideDialogTitleEnum: typeof SideDialogTitleEnum = SideDialogTitleEnum;
   public readonly dialogData$: Subject<DepartmentAssigned> = new Subject();
   public readonly saveForm$: Subject<boolean> = new Subject();
+  public readonly bulkActionConfig: BulkActionConfig = {
+    edit: true,
+    delete: true,
+  }
 
   public readonly columnDef: ColumnDefinitionModel[] = columnDef({
     editHandler: this.editAssignedDepartment.bind(this),
@@ -40,6 +46,7 @@ export class DepartmentsComponent implements OnInit {
   public selectedTab$: Observable<CandidateTabsEnum>;
   public sideDialogTitle$: Observable<string>;
   public departmentsAssigned$: Observable<DepartmentsPage>;
+  public rowSelection: 'single' | 'multiple' = 'multiple';
 
   public constructor(
     private store: Store,
@@ -93,6 +100,17 @@ export class DepartmentsComponent implements OnInit {
 
   public resetFilters(): void {
     this.getDepartmentsAssigned();
+  }
+
+  public handleBulkEvent(event: BulkActionDataModel): void {
+    if(event.type === BulkTypeAction.EDIT) {
+      console.error('edit', event.items);
+      return;
+    }
+    if(event.type === BulkTypeAction.DELETE) {
+      console.error('delete', event.items);
+      return;
+    }
   }
 
   private showSideDialog(isOpen: boolean): void {

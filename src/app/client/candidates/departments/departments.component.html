@@ -2,10 +2,16 @@
   class="department-assigned-grid"
   *ngIf="departmentsAssigned$ | async as departmentsAssigned"
   gridTitle="Department Assigned"
+  (bulkEventEmitter)="handleBulkEvent($event)"
   [rowSelection]="undefined"
   [rowData]="departmentsAssigned?.items"
   [columnDefinitions]="columnDef"
   [totalRecordsCount]="departmentsAssigned?.items?.length!"
+  [allowBulkSelection]="true"
+  [allowBulkButton]="true"
+  [disableBulkButton]="false"
+  [rowSelection]="rowSelection"
+  [bulkActionConfig]="bulkActionConfig"
 >
   <app-button
     action-button

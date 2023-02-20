@@ -13,6 +13,15 @@ export interface ColumnDefParams {
 
 export const columnDef = (columnParams: ColumnDefParams) => [
   {
+    field: 'checkbox',
+    headerName: '',
+    width: 50,
+    minWidth: 50,
+    headerCheckboxSelection: true,
+    headerCheckboxSelectionFilteredOnly: true,
+    checkboxSelection: true,
+  },
+  {
     field: '',
     headerName: '',
     maxWidth: 100,
