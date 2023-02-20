@@ -1,16 +1,14 @@
-import {
-  Component,
-  OnInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Output,
-  EventEmitter,
-} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { Select } from '@ngxs/store';
 import { filter, Observable, takeUntil } from 'rxjs';
-import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import {
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
 import { UserState } from 'src/app/store/user.state';
-import { ControlTypes } from '@shared/enums/control-types.enum';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/filters-helper.constant';
@@ -19,6 +17,13 @@ import { DepartmentFilterFieldConfig, DepartmentFiltersColumns } from '../depart
 import { FilterService } from '@shared/services/filter.service';
 import { DepartmentFilterFormConfig } from '@client/candidates/constants/department-filter.constant';
 import { DepartmentFilterService } from '../services/department-filter.service';
+import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { DatePipe } from '@angular/common';
+import { SortOrder } from '@syncfusion/ej2-angular-navigations';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { ListOfSkills } from '@shared/models/skill.model';
+import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 
 @Component({
   selector: 'app-filter-department',
@@ -31,36 +36,57 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   public filtersFormConfig: DepartmentFilterFieldConfig[] = [];
   public controlTypes = ControlTypes;
   public filteredItems: FilteredItem[] = [];
-  public filterColumns: DepartmentFiltersColumns;
+  public filterColumns: DepartmentFiltersColumns = {} as DepartmentFiltersColumns;
   public formGroup: CustomFormGroup<DepartmentFiltersColumns>;
   public filterOptionFields = filterOptionFields;
   public skillOptionFields = SkillFilterOptionFields;
+  public sortOrder: SortOrder = 'Ascending';
+
+  public departmentFiltersColumns = DepartmentFiltersColumnsEnum
 
   private regions: OrganizationRegion[] = [];
 
   @Select(UserState.organizationStructure)
   private readonly organizationStructure$: Observable<OrganizationStructure>;
 
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
+  public readonly skills$: Observable<ListOfSkills[]>;
+
   constructor(
     private readonly cdr: ChangeDetectorRef,
     private readonly filterService: FilterService,
-    private readonly departmentFilterService: DepartmentFilterService
+    private readonly departmentFilterService: DepartmentFilterService,
+    private readonly datePipe: DatePipe,
+    private readonly candidateProfileFormService: CandidateProfileFormService
   ) {
     super();
     this.initFilterForm();
   }
 
   public ngOnInit(): void {
+    this.initFiltersColumns();
     this.watchForOrganizationStructure();
     this.initFormConfig();
-    this.initFiltersColumns();
+    this.watchForControlsValueChanges();
+    this.subscribeOnSkills();
   }
 
   public trackByFn = (_: number, item: DepartmentFilterFieldConfig) => item.field;
 
-  public applyFilters(): void {}
+  public applyFilters(): void {
+    this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+    this.appliedFiltersAmount.emit(this.filteredItems.length);
+    this.cdr.markForCheck();
+  }
 
-  public clearAllFilters(): void {}
+  public clearAllFilters(): void {
+    this.formGroup.reset();
+    this.filteredItems = [];
+    this.appliedFiltersAmount.emit(this.filteredItems.length);
+    this.filterColumns.locationIds.dataSource = [];
+    this.filterColumns.departmentIds.dataSource = [];
+    this.cdr.markForCheck();
+  }
 
   public deleteFilter(event: FilteredItem): void {
     this.filterService.removeValue(event, this.formGroup, this.filterColumns);
@@ -87,6 +113,92 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     this.filtersFormConfig = DepartmentFilterFormConfig();
     this.cdr.detectChanges();
   }
-  
-  private initFiltersColumns(): void {}
+
+  private initFiltersColumns(): void {
+    Object.keys(this.formGroup.controls).forEach((key) => {
+      this.filterColumns[key as DepartmentFiltersColumnsEnum] = {
+        type: key === DepartmentFiltersColumnsEnum.END_DATE || key === DepartmentFiltersColumnsEnum.START_DATE ? ControlTypes.Date : ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField:
+          key === DepartmentFiltersColumnsEnum.SECONDARY_SKILLS || key === DepartmentFiltersColumnsEnum.PRIMARY_SKILLS
+            ? 'skillDescription'
+            : 'name',
+        valueId: 'id',
+      };
+    });
+  }
+
+  private watchForControlsValueChanges(): void {
+    this.formGroup
+      .get('regionIds')
+      ?.valueChanges.pipe(filter(Boolean), takeUntil(this.destroy$))
+      .subscribe((val) => {
+        console.error(val);
+        this.filterColumns.locationIds.dataSource = [];
+
+        if (val?.length) {
+          const regionLocations: OrganizationLocation[] = [];
+          const selectedRegions: OrganizationRegion[] = val.map((id: number) => {
+            return this.regions.find((region) => region.id === id) as OrganizationRegion;
+          });
+
+          selectedRegions.forEach((region: OrganizationRegion) => {
+            region?.locations?.forEach((location: OrganizationLocation) => {
+              location.regionName = region.name;
+            });
+            regionLocations.push(...(region?.locations as []));
+          });
+
+          this.filterColumns.locationIds.dataSource = regionLocations;
+        } else {
+          this.formGroup.get('locationIds')?.setValue([]);
+          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+        }
+
+        this.cdr.markForCheck();
+      });
+
+    this.formGroup
+      .get('locationIds')
+      ?.valueChanges.pipe(filter(Boolean), takeUntil(this.destroy$))
+      .subscribe((val: number[]) => {
+        console.error(val);
+
+        this.filterColumns.departmentIds.dataSource = [];
+        if (val?.length) {
+          const locationDepartments: OrganizationDepartment[] = [];
+          const selectedLocations: OrganizationLocation[] = val.map((id) => {
+            return (this.filterColumns.locationIds.dataSource as OrganizationLocation[]).find(
+              (location: OrganizationLocation) => location.id === id
+            ) as OrganizationLocation;
+          });
+
+          selectedLocations.forEach((location: OrganizationLocation) => {
+            locationDepartments.push(...(location?.departments as []));
+          });
+
+          this.filterColumns.departmentIds.dataSource = locationDepartments;
+        } else {
+          this.formGroup.get('departmentIds')?.setValue([]);
+          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+        }
+
+        this.cdr.markForCheck();
+      });
+  }
+
+  private subscribeOnSkills(): void {
+    this.skills$.pipe(takeUntil(this.destroy$)).subscribe((skills) => {
+      const primarySkillId = this.formGroup.controls['primarySkillIds'].value;
+      const primarySkillsDataSource = skills;
+      this.filterColumns.primarySkillIds.dataSource = primarySkillsDataSource;
+      const secondarySkillsDataSource = primarySkillId
+        ? this.candidateProfileFormService.getSecondarySkillsDataSource(primarySkillsDataSource, primarySkillId)
+        : skills;
+
+      this.filterColumns.secondarySkillIds.dataSource = secondarySkillsDataSource;
+      this.cdr.markForCheck();
+    });
+  }
 }
