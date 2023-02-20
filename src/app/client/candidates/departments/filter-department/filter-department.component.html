@@ -5,20 +5,47 @@
   (clearAllFiltersClicked)="clearAllFilters()"
   (applyFilterClicked)="applyFilters()"
 >
-  <form>
+  <form class="department-filter">
     <ng-container *ngFor="let fieldConfig of filtersFormConfig; trackBy: trackByFn">
-      <!-- <ng-container [ngSwitch]="fieldConfig.type"> -->
-        <!-- <app-multiselect-dropdown
-          mode="CheckBox"
+      <ng-container [ngSwitch]="fieldConfig.type">
+        <ng-container *ngSwitchCase="controlTypes.Multiselect">
+          <div class="item">
+          <app-multiselect-dropdown
+            mode="CheckBox"
+            [formGroupInstance]="formGroup"
+            [label]="fieldConfig.title"
+            [showSelectAll]="true"
+            [fields]="fieldConfig.field === 'secondarySkills' ? skillOptionFields : filterOptionFields"
+            [dataSource]="filterColumns[fieldConfig.field]?.dataSource"
+            [controlName]="fieldConfig.field"
+          >
+          </app-multiselect-dropdown>
+        </div>
+          <!-- {{ fieldConfig | json}} -->
+        </ng-container>
+        <ng-container *ngSwitchCase="controlTypes.Date">
+          <div class="item" [class.short]="fieldConfig.isShort">
+
+          <app-datepicker
           [formGroupInstance]="formGroup"
-          [showSelectAll]="true"
-          [fields]="fieldConfig.field === 'secondarySkills' ? skillOptionFields : filterOptionFields"
-          [dataSource]="filterColumns[fieldConfig.field]?.dataSource"
+          id="dob"
           [controlName]="fieldConfig.field"
-        >
-        </app-multiselect-dropdown> -->
-        {{ fieldConfig | json}}
-      <!-- </ng-container> -->
+          [label]="fieldConfig.title"
+        ></app-datepicker></div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="controlTypes.Radio">
+          <div *ngIf="false" class="item-radio" [class.short]="fieldConfig.isShort">
+
+          <ejs-radiobutton
+          formControlName="invoiceType"
+          [label]="fieldConfig.title"
+          name="invoiceType"
+          value="0"
+        ></ejs-radiobutton>
+        </div>
+        </ng-container>
+      </ng-container>
     </ng-container>
   </form>
 </app-filter-dialog>

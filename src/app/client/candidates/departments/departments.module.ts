@@ -1,5 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+import { RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
+
 import { DepartmentsComponent } from '@client/candidates/departments/departments.component';
 import { AssignDepartmentComponent } from '@client/candidates/departments/assign-department/assign-department.component';
 import { GridModule } from '@shared/components/grid/grid.module';
@@ -42,6 +45,7 @@ import { DepartmentFilterService } from './services/department-filter.service';
     MultiplePipeModule,
     JoinPipeModule,
     DropdownModule,
+    RadioButtonModule
   ],
   providers: [DepartmentsService, DepartmentFilterService],
 })

@@ -40,4 +40,22 @@ export const DepartmentFilterFormConfig = (): DepartmentFilterFieldConfig[] => [
     field: DepartmentFiltersColumnsEnum.END_DATE,
     isShort: true,
   },
+  {
+    type: ControlTypes.Radio,
+    title: 'Both',
+    field: DepartmentFiltersColumnsEnum.BOTH,
+    isShort: true,
+  },
+  {
+    type: ControlTypes.Radio,
+    title: 'Oriented',
+    field: DepartmentFiltersColumnsEnum.ORIENTED,
+    isShort: true,
+  },
+  {
+    type: ControlTypes.Radio,
+    title: 'Not Oriented',
+    field: DepartmentFiltersColumnsEnum.NOT_ORIENTED,
+    isShort: true,
+  },
 ];

@@ -1,0 +1,9 @@
+.department-filter {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 12px;
+
+  .item:not(.short) {
+    grid-column: 1/3;
+  }
+}
