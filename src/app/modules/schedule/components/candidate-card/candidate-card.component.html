@@ -17,8 +17,11 @@
     </ejs-tooltip> -->
   </div>
   <div class="block">
-    <ejs-tooltip content="ID" position="TopCenter" [showTipPointer]="false" class="block-id">
-      <span>{{ candidate.displayId }}</span>
+    <ejs-tooltip
+      [content]="candidate.displayId.length > 12 ? 'ID: ' + candidate.displayId : 'ID'"
+      position="TopCenter"
+      [showTipPointer]="false" class="block-id">
+      <span>{{ candidate.displayId | textElipsis: 12 }}</span>
     </ejs-tooltip>
     <span class="separator">|</span>
     <ejs-tooltip content="Primary Skill" position="TopCenter" [showTipPointer]="false" class="block-skill">

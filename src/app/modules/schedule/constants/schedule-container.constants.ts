@@ -6,7 +6,7 @@ export const TabListConfig: TabsListConfig[] = [
   {
     title: TabTitleConfig.Scheduling,
   },
-  {
-    title: TabTitleConfig.Analytics,
-  },
+  // {
+  //   title: TabTitleConfig.Analytics,
+  // },
 ];
