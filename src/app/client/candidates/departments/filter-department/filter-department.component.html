@@ -10,40 +10,38 @@
       <ng-container [ngSwitch]="fieldConfig.type">
         <ng-container *ngSwitchCase="controlTypes.Multiselect">
           <div class="item">
-          <app-multiselect-dropdown
-            mode="CheckBox"
-            [formGroupInstance]="formGroup"
-            [label]="fieldConfig.title"
-            [showSelectAll]="true"
-            [fields]="fieldConfig.field === 'secondarySkills' ? skillOptionFields : filterOptionFields"
-            [dataSource]="filterColumns[fieldConfig.field]?.dataSource"
-            [controlName]="fieldConfig.field"
-          >
-          </app-multiselect-dropdown>
-        </div>
+            <app-multiselect-dropdown
+              mode="CheckBox"
+              [formGroupInstance]="formGroup"
+              [label]="fieldConfig.title"
+              [showSelectAll]="true"
+              [fields]="fieldConfig.optionFields!"
+              [dataSource]="filterColumns[fieldConfig.field].dataSource"
+              [controlName]="fieldConfig.field"
+              [sortOrder]="fieldConfig.sortOrder!"
+            >
+            </app-multiselect-dropdown>
+          </div>
           <!-- {{ fieldConfig | json}} -->
         </ng-container>
         <ng-container *ngSwitchCase="controlTypes.Date">
           <div class="item" [class.short]="fieldConfig.isShort">
-
-          <app-datepicker
-          [formGroupInstance]="formGroup"
-          id="dob"
-          [controlName]="fieldConfig.field"
-          [label]="fieldConfig.title"
-        ></app-datepicker></div>
+            <app-datepicker
+              [formGroupInstance]="formGroup"
+              [controlName]="fieldConfig.field"
+              [label]="fieldConfig.title"
+            ></app-datepicker>
+          </div>
         </ng-container>
 
         <ng-container *ngSwitchCase="controlTypes.Radio">
           <div *ngIf="false" class="item-radio" [class.short]="fieldConfig.isShort">
-
-          <ejs-radiobutton
-          formControlName="invoiceType"
-          [label]="fieldConfig.title"
-          name="invoiceType"
-          value="0"
-        ></ejs-radiobutton>
-        </div>
+            <ejs-radiobutton
+              formControlName="control"
+              [label]="fieldConfig.title"
+              value="0"
+            ></ejs-radiobutton>
+          </div>
         </ng-container>
       </ng-container>
     </ng-container>

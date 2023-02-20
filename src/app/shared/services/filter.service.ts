@@ -9,7 +9,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilteredUser, User } from '@shared/models/user.model';
 import { isBoolean, isDate, isEmpty, isNumber } from 'lodash';
-import { debounceTime, filter, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { SetPreservedFilters, SetPreservedFiltersForTimesheets } from 'src/app/store/preserved-filters.actions';
 
 @Injectable({ providedIn: 'root' })

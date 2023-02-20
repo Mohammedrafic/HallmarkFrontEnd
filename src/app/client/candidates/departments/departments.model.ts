@@ -1,5 +1,6 @@
 import { DataSourceItem } from '@core/interface';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { PageOfCollections } from '@shared/models/page.model';
 import { DepartmentFiltersColumnsEnum } from '../enums';
 
@@ -44,6 +45,8 @@ export interface DepartmentFilterFieldConfig {
   field: DepartmentFiltersColumnsEnum;
   isShort?: boolean;
   showSelectAll?: boolean;
+  sortOrder?: SortOrder;
+  optionFields?: object;
 }
 
 export type DepartmentFiltersColumns =  {

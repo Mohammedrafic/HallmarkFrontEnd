@@ -5,21 +5,21 @@ import { DepartmentFiltersColumns } from '../departments.model';
 
 @Injectable()
 export class DepartmentFilterService {
-
-  constructor(private readonly formBuilder: FormBuilder) { }
+  constructor(private readonly formBuilder: FormBuilder) {}
 
   public createForm(): CustomFormGroup<DepartmentFiltersColumns> {
     return this.formBuilder.group({
       regionIds: [null],
       locationIds: [null],
-      departmentsIds: [null],
-      primariSkillsIds: [null],
-      secondarySkills: [null],
+      departmentIds: [null],
+      primarySkillIds: [null],
+      secondarySkillIds: [null],
       startDate: [null],
       endDate: [null],
       both: [true],
       oriented: [false],
-      notOriented: [false]
+      notOriented: [false],
     }) as CustomFormGroup<DepartmentFiltersColumns>;
   }
 }
+
