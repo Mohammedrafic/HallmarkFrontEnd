@@ -8,6 +8,7 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { Store } from '@ngxs/store';
 import {
   AssignNewDepartment,
+  DepartmentFilterState,
   DepartmentsPage,
   EditAssignedDepartment,
 } from '@client/candidates/departments/departments.model';
@@ -29,11 +30,12 @@ export class DepartmentsService {
     this.sideDialogTitle$.next(title);
   }
 
-  public getDepartmentsAssigned(): Observable<DepartmentsPage> {
+  public getDepartmentsAssigned(filters?: DepartmentFilterState): Observable<DepartmentsPage> {
     const params = {
       pageNumber: GRID_CONFIG.initialPage,
       pageSize: GRID_CONFIG.initialRowsPerPage,
       employeeId: this.candidatesService.employeeId,
+      ...(filters && filters)
     };
     const endpoint = '/api/EmployeeAssignedDepartment/GetAll';
 

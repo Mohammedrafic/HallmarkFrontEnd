@@ -37,4 +37,7 @@
   ></app-assign-department>
 </app-side-dialog>
 
-<app-filter-department></app-filter-department>
+<app-filter-department
+  (resetFilters)="resetFilters()"
+  (updateTableByFilters)="updateTableByFilters($event)"
+></app-filter-department>

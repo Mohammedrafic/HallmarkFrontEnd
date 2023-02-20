@@ -13,12 +13,11 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/filters-helper.constant';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { DepartmentFilterFieldConfig, DepartmentFiltersColumns } from '../departments.model';
+import { DepartmentFilterFieldConfig, DepartmentFiltersColumns, DepartmentFilterState } from '../departments.model';
 import { FilterService } from '@shared/services/filter.service';
 import { DepartmentFilterFormConfig } from '@client/candidates/constants/department-filter.constant';
 import { DepartmentFilterService } from '../services/department-filter.service';
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
-import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { DatePipe } from '@angular/common';
 import { SortOrder } from '@syncfusion/ej2-angular-navigations';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -33,6 +32,9 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
 })
 export class FilterDepartmentComponent extends DestroyableDirective implements OnInit {
   @Output() readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();
+  @Output() readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
+  @Output() readonly updateTableByFilters: EventEmitter<DepartmentFilterState> = new EventEmitter<DepartmentFilterState>();
+
   public filtersFormConfig: DepartmentFilterFieldConfig[] = [];
   public controlTypes = ControlTypes;
   public filteredItems: FilteredItem[] = [];
@@ -75,6 +77,8 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
 
   public applyFilters(): void {
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+    const filterState = this.formGroup.getRawValue();
+    this.updateTableByFilters.emit(filterState);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
     this.cdr.markForCheck();
   }
@@ -83,6 +87,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     this.formGroup.reset();
     this.filteredItems = [];
     this.appliedFiltersAmount.emit(this.filteredItems.length);
+    this.resetFilters.emit();
     this.filterColumns.locationIds.dataSource = [];
     this.filterColumns.departmentIds.dataSource = [];
     this.cdr.markForCheck();
@@ -134,7 +139,6 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
       .get('regionIds')
       ?.valueChanges.pipe(filter(Boolean), takeUntil(this.destroy$))
       .subscribe((val) => {
-        console.error(val);
         this.filterColumns.locationIds.dataSource = [];
 
         if (val?.length) {
@@ -163,8 +167,6 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
       .get('locationIds')
       ?.valueChanges.pipe(filter(Boolean), takeUntil(this.destroy$))
       .subscribe((val: number[]) => {
-        console.error(val);
-
         this.filterColumns.departmentIds.dataSource = [];
         if (val?.length) {
           const locationDepartments: OrganizationDepartment[] = [];

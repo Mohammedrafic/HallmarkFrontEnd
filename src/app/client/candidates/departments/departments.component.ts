@@ -8,7 +8,7 @@ import { CandidatesService } from '@client/candidates/services/candidates.servic
 import { DepartmentsService } from '@client/candidates/departments/services/departments.service';
 import { SideDialogTitleEnum } from '@client/candidates/departments/side-dialog-title.enum';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
-import { DepartmentAssigned, DepartmentsPage } from '@client/candidates/departments/departments.model';
+import { DepartmentAssigned, DepartmentFilterState, DepartmentsPage } from '@client/candidates/departments/departments.model';
 import { DatePipe } from '@angular/common';
 import { formatDate } from '@shared/constants';
 import { columnDef } from '@client/candidates/departments/grid/column-def.constant';
@@ -52,7 +52,7 @@ export class DepartmentsComponent implements OnInit {
   public ngOnInit(): void {
     this.selectedTab$ = this.candidatesService.getSelectedTab$();
     this.sideDialogTitle$ = this.departmentsService.getSideDialogTitle$();
-    this.departmentsAssigned$ = this.getDepartmentsAssigned();
+    this.getDepartmentsAssigned();
   }
 
   public showAssignDepartmentDialog(): void {
@@ -86,6 +86,15 @@ export class DepartmentsComponent implements OnInit {
     }
   }
 
+  public updateTableByFilters(filters: DepartmentFilterState): void {
+    this.getDepartmentsAssigned(filters);
+    this.store.dispatch(new ShowFilterDialog(false));
+  }
+
+  public resetFilters(): void {
+    this.getDepartmentsAssigned();
+  }
+
   private showSideDialog(isOpen: boolean): void {
     this.store.dispatch(new ShowSideDialog(isOpen));
   }
@@ -99,10 +108,10 @@ export class DepartmentsComponent implements OnInit {
   }
 
   // Get new data if departments tab will be selected
-  private getDepartmentsAssigned(): Observable<DepartmentsPage> {
-    return this.candidatesService.getSelectedTab$().pipe(
+  private getDepartmentsAssigned(filters?: DepartmentFilterState): void {
+    this.departmentsAssigned$ = this.candidatesService.getSelectedTab$().pipe(
       filter((tab) => tab === CandidateTabsEnum.Departments),
-      switchMap(() => this.departmentsService.getDepartmentsAssigned())
+      switchMap(() => this.departmentsService.getDepartmentsAssigned(filters))
     );
   }
 

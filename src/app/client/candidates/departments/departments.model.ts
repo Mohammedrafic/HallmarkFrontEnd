@@ -59,4 +59,15 @@ export type DepartmentFiltersColumns =  {
   }
 }
 
+export interface DepartmentFilterState {
+  regionId: number[];
+  locationId: number[];
+  departmentId: number[];
+  startDate: Date | string;
+  endDate: Date | string;
+  both: boolean;
+  oriented: boolean;
+  notOriented: boolean;
+}
+
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;
