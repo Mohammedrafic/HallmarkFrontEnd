@@ -4,8 +4,6 @@ import { DateTimeHelper } from '@core/helpers';
 
 
 export class DonoreturnFilters {
-  // firstname?: string;
-  // lastname?: string;
   candidatename?:string;
   ssn?: number;
   pageSize?: number;
@@ -27,8 +25,35 @@ name:string;
 }
 export class GetLocationByOrganization
 {
-id:number;
-name:string;
+Id: number;
+    OrganizationId: number;
+    RegionId: number;
+    ExternalId: string | null;
+    InvoiceId: string | null;
+    Name: string;
+    Address1: string;
+    Address2: string;
+    City: string;
+    State: string;
+    Zip: string;
+    ContactPerson: string | null;
+    ContactEmail: string | null;
+    PhoneNumber: string | null;
+    PhoneType: number | null;
+    Ext: string | null;
+    GLNumber: string | null;
+    /**Date starting from which Location deactivated */
+    InactiveDate: Date | string | null;
+    /**Date when Location can be active again */
+    ReactivateDate: Date | string | null;
+    /**Indicates if Location is currently deactivated */
+    IsDeactivated:boolean
+    LocationTypeId: number | null;
+    TimeZone: string | null;
+    BusinessLineId: number | null;
+    BusinessLine: string | null;
+    IncludeInIRP: boolean;
+    IncludeInIRPText?:string
 }
 export class DonoreturnAddedit {
   id?: number;
@@ -36,8 +61,7 @@ export class DonoreturnAddedit {
   locations:string;
   candidateProfileId:number;
   dnrRequestedBy: string;
-  dnrstatus: string;
-  // lastname: string;
+  dnrStatus: string;
   ssn:number;
   dnrComment:string;
   status:string;
@@ -47,8 +71,7 @@ export class DonoreturnAddedit {
     this.businessUnitId = donotreturn.businessUnitId;
     this.locations=donotreturn.locations;
     this.candidateProfileId=donotreturn.candidateProfileId;
-    this.dnrstatus=donotreturn.dnrstatus;
-    // this.lastname=donotreturn.lastname;
+    this.dnrStatus=donotreturn.dnrStatus;    ;
     this.ssn=donotreturn.ssn;
     this.dnrComment=donotreturn.dnrComment;
     this.dnrRequestedBy=donotreturn.dnrRequestedBy;
@@ -56,15 +79,54 @@ export class DonoreturnAddedit {
       }
 }
 
-// public int Id { get; set; }
-// public int? BusinessUnitId { get; set; }
-// public string Locations { get; set; }
-// public int CandidateProfileId { get; set; }
-// public string DNRComment { get; set; }
-// public string DNRRequestedBy { get; set; }
-// public int? SSN { get; set; }
+export class Donoreturnedit {
+  id?: number;
+  businessUnitId:number;
+  locations:string;
+  candidateProfileId:number;
+  dnrRequestedBy: string;
+  dnrstatus: string;
+  ssn:number;
+  dnrComment:string;
 
- //export type DonotReturnsPage = PageOfCollections<Donotreturn>;
+
+  constructor(donotreturn: Donoreturnedit) {
+    this.id = donotreturn.id||0;
+    this.businessUnitId = donotreturn.businessUnitId;
+    this.locations=donotreturn.locations;
+    this.candidateProfileId=donotreturn.candidateProfileId;
+    this.dnrstatus=donotreturn.dnrstatus;
+    this.ssn=donotreturn.ssn;
+    this.dnrComment=donotreturn.dnrComment;
+    this.dnrRequestedBy=donotreturn.dnrRequestedBy;
+    this.dnrstatus=donotreturn.dnrstatus;
+      }
+}
+
+export class ExportDonoreturn {
+  id?: number;
+  businessUnitId?:number;
+  firstname:string;
+  lastname:string;
+  dnrstatus: string;
+  dnrdate:DateTimeHelper;
+  ssn:number;
+  dnrComment:string;
+  email:string;
+
+  constructor(donotreturn: ExportDonoreturn) {
+    this.id = donotreturn.id||0;
+    this.businessUnitId = donotreturn.businessUnitId || 0;
+    this.firstname=donotreturn.firstname;
+    this.lastname=donotreturn.lastname;
+    this.dnrdate=donotreturn.dnrdate
+    this.dnrstatus=donotreturn.dnrstatus;
+    this.ssn=donotreturn.ssn;
+    this.dnrComment=donotreturn.dnrComment;
+    this.email=donotreturn.email;
+      }
+}
+
 
 export class Donotreturn {
   id: number;
@@ -115,22 +177,4 @@ export class DoNotReturnSearchCandidate{
   lastName:string;
   fullName:string;
 }
-// export interface DoNotReturn {
-//     Id: number;
-//     BusinessUnitId: number | null;
-//     BusinessUnit: BusinessUnit | null;
-//     Locations: string;
 
-//     CandidateProfileId: number;
-
-//     DNRStatus: string;
-
-//     DNRDate: Date | string;
-
-//     DNRComment: string;
-
-//     DNRRequestedBy: string;
-
-//     IsDeleted: boolean;
-   
-// }

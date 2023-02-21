@@ -30,7 +30,7 @@
       </e-column>
       <e-column field="ssn" headerText="ssn" width=250>
       </e-column>
-      <e-column field="dnrStatus" headerText="dnrStatus" width=250>
+      <e-column field="dnrstatus" headerText="dnrstatus" width=250>
       </e-column>
       <e-column field="dnrDate" headerText="dnrDate" width=250>
         <ng-template #template let-data>
@@ -51,7 +51,7 @@
                 [allowFiltering]="true" [(value)]="activeRowsPerPageDropDown" (change)="onRowsDropDownChanged()">
               </ejs-dropdownlist>
               <ejs-numerictextbox id="goToPage" class="numeric-input-no-border" format="#" placeholder="Go to:" min="1"
-                [max]="(donotreturnpage$ | async)?.totalPages" [showSpinButton]="false" (change)="onGoToClick($event)">
+                [max]="(donotreturnpage$ | async)?.totalPages" [showSpinButton]="false" (change)="onChangePage($event)">
               </ejs-numerictextbox>
               <div class="total-rows">
                 Total Rows: {{(donotreturnpage$ | async)?.totalCount}}
@@ -132,7 +132,7 @@
   (export)="export($event)"></app-export-dialog>
 
 <app-filter-dialog [items]="filteredItems" (clearAllFiltersClicked)="onFilterClearAll()"
-  (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+  (applyFilterClicked)="onFilterApply()">
   <form class="bootstrap" [formGroup]="doNotReturnFilterForm">
     <div class="input-container bootstrap">
       <label>Candidate name</label>

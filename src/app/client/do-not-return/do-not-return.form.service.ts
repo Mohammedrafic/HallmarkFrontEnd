@@ -19,7 +19,7 @@ export class DoNotReturnFormService {
       dnrComment:[''],
       dnrRequestedBy:[''],
       candidateProfileId:['',[Validators.required]],
-      dnrstatus:['Active'],
+      dnrStatus:['Active'],
         }) as CustomFormGroup<DoNotReturnForm>;
   }
   createDoNotreturnFilterForm(): CustomFormGroup<DoNotReturnFilterForm> {

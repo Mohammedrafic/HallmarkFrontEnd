@@ -8,7 +8,7 @@ import { Subject } from 'rxjs';
 import { DonoreturnFilters } from '@shared/models/donotreturn.model';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { ExportDonotreturn } from '@admin/store/donotreturn.actions';
-import { MasterDNRExportCols } from '../donotreturn-grid.constants';
+import { MasterDNRExportCols, TITLE } from '../donotreturn-grid.constants';
 @Component({
   selector: 'app-do-not-return-details',
   templateUrl: './do-not-return-details.component.html',
@@ -23,20 +23,23 @@ public filters: DonoreturnFilters = {
     pageSize: undefined,
     pageNumber: undefined,
   };
+  
   @ViewChild('grid')
   public grid: GridComponent;
+
   public fileName: string;
   public defaultFileName: string;
   public columnsToExport: ExportColumn[] = MasterDNRExportCols;
   public exportDonotreturn$ = new Subject<ExportedFileType>();
   public filteredItems$ = new Subject<number>();
+
   constructor(protected override store:Store) { 
     super(store)
-    store.dispatch(new SetHeaderState({ title: 'Do Not Return', iconName: 'users' }));
+    store.dispatch(new SetHeaderState({ title: TITLE, iconName: 'users' }));
   }
+
   override ngOnInit(): void {
     super.ngOnInit();
-    this.getPermissionSkillCategories();
   }
   
   public override customExport(): void {
@@ -44,7 +47,7 @@ public filters: DonoreturnFilters = {
   }
 
 
-  public closeExport() {
+  public closeExport() : void{
     this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
 
@@ -67,11 +70,6 @@ public filters: DonoreturnFilters = {
 
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
-  }
-  private getPermissionSkillCategories(): void {
-    
-      this.userPermission[this.userPermissions.CanEditMasterSkills] ;
-      this.userPermission[this.userPermissions.CanEditSkillCategories];
   }
   public AddDonotlist(): void {
     this.store.dispatch(new ShowSideDialog(true));

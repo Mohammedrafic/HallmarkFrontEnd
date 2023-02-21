@@ -3,13 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { DonoreturnFilters, DonoreturnAddedit, DoNotReturnsPage, AllOrganization, GetLocationByOrganization, DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
 import { ExportPayload } from '@shared/models/export.model';
-import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 
 @Injectable({ providedIn: 'root' })
 export class DonotreturnService {
 
-
   constructor(private http: HttpClient) { }
+
   public getDonotreturn(pageNumber: number, pageSize: number, filters: DonoreturnFilters): Observable<DoNotReturnsPage> {
     if (filters.candidatename || filters.ssn) {
       let parameters;
@@ -24,10 +24,7 @@ export class DonotreturnService {
     url = '/api/DoNotReturn';
     return this.http.get<DoNotReturnsPage>(url, params);
   }
-  public getMasterDoNotReturn(): Observable<DonoreturnAddedit[]> {
-
-    return this.http.get<DonoreturnAddedit[]>(`/api/MasterRegions`);
-  }
+ 
   public updateDoNotReturn(donotreturn: DonoreturnAddedit): Observable<DonoreturnAddedit> {
     return this.http.put<DonoreturnAddedit>(`/api/DoNotReturn/`, donotreturn);
   }
@@ -39,16 +36,17 @@ export class DonotreturnService {
       this.http.put<DonoreturnAddedit>(`/api/DoNotReturn`, donotreturn)
       : this.http.post<DonoreturnAddedit>(`/api/DoNotReturn`, donotreturn);
   }
-  public allOrganizations(): Observable<AllOrganization[]> {
-    return this.http.get<AllOrganization[]>(`/api/DoNotReturn/GetOrganization`).pipe(map((data) => sortByField(data, 'name')));
+
+  public allOrganizations(): Observable<UserAgencyOrganization> {
+    return this.http.get<UserAgencyOrganization>(`/api/Users/organizations`);
   }
 
   public getLocationsByOrganizationId(organizationId: number): Observable<GetLocationByOrganization[]> {
-    return this.http.get<GetLocationByOrganization[]>(`/api/DoNotReturn/Getlocation/${organizationId}`);
+    return this.http.get<GetLocationByOrganization[]>(`/api/Locations/organization/${organizationId}`);
   }
 
   public getCandidatesByOrganizationId(organizationId: number): Observable<Location[]> {
-    return this.http.get<Location[]>(`/api/DoNotReturn/Locations/${organizationId}`);
+    return this.http.get<Location[]>(`/api/DoNotReturn/organization/${organizationId}`);
   }
 
 

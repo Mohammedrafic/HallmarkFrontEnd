@@ -90,3 +90,4 @@ export const SubmissionsLimitReached = 'The order has reached its submission lim
 export const BLOCK_RECORD_TEXT = 'Are you sure you want to block?';
 export const BLOCK_RECORD_TITLE = 'Block Record';
 export const BLOCK_RECORD_SUCCESS = 'Record Blocked';
+export const CANDIDATE_DONOTRETURN ='Candidate cannot be blocked. This Candidate was used in '
