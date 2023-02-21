@@ -6,6 +6,7 @@ import { FeatherModule } from 'angular-feather';
 import { Compass, Flag } from 'angular-feather/icons';
 
 import { CandidateCardComponent } from './candidate-card.component';
+import { TextElipsisPipeModule } from '@shared/pipes/text-elipsis';
 
 const icons = {
   Compass,
@@ -20,6 +21,7 @@ const icons = {
     CommonModule,
     FeatherModule.pick(icons),
     TooltipModule,
+    TextElipsisPipeModule,
   ],
   exports: [CandidateCardComponent],
 })

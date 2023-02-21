@@ -13,11 +13,12 @@ export interface ScheduleCandidate {
   firstName: string;
   lastName: string;
   skill: string;
-  workCommitment: string;
+  workCommitments: string[] | null;
   employeeNote: string;
   workHours: number[];
   isOriented: boolean;
   fullName?: string;
+  workCommitmentText?: string;
 }
 
 export interface ScheduleItem {
