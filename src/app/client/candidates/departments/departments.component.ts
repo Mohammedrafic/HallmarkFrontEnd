@@ -113,7 +113,8 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
 
   public handleBulkEvent(event: BulkActionDataModel): void {
     if (event.type === BulkTypeAction.EDIT) {
-      console.error('edit', event.items);
+      this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.EditBulkDepartments);
+      this.showSideDialog(true)
       return;
     }
     if (event.type === BulkTypeAction.DELETE) {

@@ -36,10 +36,17 @@
 >
   <app-assign-department
     #assignDepartment
-    *ngIf="(sideDialogTitle$ | async) !== sideDialogTitleEnum.Filter"
+    *ngIf="
+      (sideDialogTitle$ | async) === sideDialogTitleEnum.AssignDepartment ||
+      (sideDialogTitle$ | async) === sideDialogTitleEnum.EditAssignDepartment
+    "
     [dialogData$]="dialogData$"
     [saveForm$]="saveForm$"
   ></app-assign-department>
+
+  <app-edit-departments
+    *ngIf="(sideDialogTitle$ | async) === sideDialogTitleEnum.EditBulkDepartments"
+  ></app-edit-departments>
 </app-side-dialog>
 
 <app-filter-department
