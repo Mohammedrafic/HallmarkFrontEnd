@@ -33,18 +33,19 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
 export class FilterDepartmentComponent extends DestroyableDirective implements OnInit {
   @Output() readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();
   @Output() readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
-  @Output() readonly updateTableByFilters: EventEmitter<DepartmentFilterState> = new EventEmitter<DepartmentFilterState>();
+  @Output() readonly updateTableByFilters: EventEmitter<DepartmentFilterState> =
+    new EventEmitter<DepartmentFilterState>();
 
   public filtersFormConfig: DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>[] = [];
   public controlTypes = ControlTypes;
   public filteredItems: FilteredItem[] = [];
-  public filterColumns: DepartmentFiltersColumns = {} as DepartmentFiltersColumns;
+  public filterColumns: DepartmentFiltersColumns;
   public formGroup: CustomFormGroup<DepartmentFiltersColumns>;
   public filterOptionFields = filterOptionFields;
   public skillOptionFields = SkillFilterOptionFields;
   public sortOrder: SortOrder = 'Ascending';
 
-  public departmentFiltersColumns = DepartmentFiltersColumnsEnum
+  public departmentFiltersColumns = DepartmentFiltersColumnsEnum;
 
   private regions: OrganizationRegion[] = [];
 
@@ -120,18 +121,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   }
 
   private initFiltersColumns(): void {
-    Object.keys(this.formGroup.controls).forEach((key) => {
-      this.filterColumns[key as DepartmentFiltersColumnsEnum] = {
-        type: key === DepartmentFiltersColumnsEnum.END_DATE || key === DepartmentFiltersColumnsEnum.START_DATE ? ControlTypes.Date : ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField:
-          key === DepartmentFiltersColumnsEnum.SECONDARY_SKILLS || key === DepartmentFiltersColumnsEnum.PRIMARY_SKILLS
-            ? 'skillDescription'
-            : 'name',
-        valueId: 'id',
-      };
-    });
+    this.filterColumns = this.departmentFormService.initFilterColumns();
   }
 
   private watchForControlsValueChanges(): void {

@@ -1,7 +1,7 @@
 import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/filters-helper.constant';
-import { ControlTypes } from '@shared/enums/control-types.enum';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
-import { DepartmentFormFieldConfig } from '../departments.model';
+import { DepartmentFormFieldConfig, DepartmentFiltersColumns } from '../departments.model';
 import { DepartmentFiltersColumnsEnum } from '../../enums';
 
 export const DepartmentFilterFormConfig = (): DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>[] => [
@@ -69,3 +69,23 @@ export const DepartmentFilterFormConfig = (): DepartmentFormFieldConfig<Departme
     isShort: true,
   },
 ];
+
+const commonColumnData = {
+  type: ControlTypes.Multiselect,
+  valueType: ValueType.Id,
+  valueField: 'name',
+  valueId: 'id',
+};
+
+export const FilterColumnConfig: DepartmentFiltersColumns = {
+  regionIds: commonColumnData,
+  locationIds: commonColumnData,
+  departmentIds: commonColumnData,
+  primarySkillIds: { ...commonColumnData, valueField: 'skillDescription' },
+  secondarySkillIds: { ...commonColumnData, valueField: 'skillDescription' },
+  startDate: { ...commonColumnData, type: ControlTypes.Date },
+  endDate: { ...commonColumnData, type: ControlTypes.Date },
+  both: { ...commonColumnData, type: ControlTypes.Radio },
+  oriented: { ...commonColumnData, type: ControlTypes.Radio },
+  notOriented: { ...commonColumnData, type: ControlTypes.Radio },
+};
