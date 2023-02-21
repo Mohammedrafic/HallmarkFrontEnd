@@ -23,7 +23,6 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
   @Input() public totalRecordsCount: number;
   @Input() public selectedTableRowsAmount: number = 0;
   @Input() public allowBulkSelection: boolean = false;
-  @Input() public allowBulkButton: boolean = false;
   @Input() public disableBulkButton: boolean = false;
   @Input() public isDarkTheme?: boolean | null;
   @Input() public customRowsPerPageDropDownObject: { text: string; value: number }[];

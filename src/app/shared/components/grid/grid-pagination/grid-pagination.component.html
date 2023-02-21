@@ -33,7 +33,6 @@
 
         <app-tooltip-container [showToolTip]="disableBulkButton" *ngIf="bulkActionConfig.approve">
           <button
-            *ngIf="allowBulkButton"
             [disabled]="disableBulkButton"
             (click)="bulkEventEmitter.emit(bulkTypeAction.APPROVE)"
             class="approve-button"
@@ -46,7 +45,6 @@
 
         <app-tooltip-container [showToolTip]="disableBulkButton" *ngIf="bulkActionConfig.edit">
           <button
-            *ngIf="allowBulkButton"
             [disabled]="disableBulkButton"
             (click)="bulkEventEmitter.emit(bulkTypeAction.EDIT)"
             class="approve-button"
@@ -59,7 +57,6 @@
 
         <app-tooltip-container [showToolTip]="disableBulkButton" *ngIf="bulkActionConfig.delete">
           <button
-            *ngIf="allowBulkButton"
             [disabled]="disableBulkButton"
             (click)="bulkEventEmitter.emit(bulkTypeAction.DELETE)"
             class="approve-button"

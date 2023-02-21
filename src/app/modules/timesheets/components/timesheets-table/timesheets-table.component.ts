@@ -45,9 +45,7 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
     this.router.url.includes('agency')
   );
 
-  public bulkActionConfig: BulkActionConfig = {
-    approve: true,
-  }
+  public bulkActionConfig: BulkActionConfig;
   public currentPageSubj: BaseObservable<number> = new BaseObservable<number>(1);
   public currentPage$: Observable<number> = this.currentPageSubj.getStream();
   public pageSize = GRID_CONFIG.initialRowsPerPage;
@@ -62,6 +60,9 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
     super(store);
 
     this.isAgency = this.router.url.includes('agency');
+    this.bulkActionConfig = {
+      approve: !this.isAgency,
+    }
   }
 
   override ngOnInit(): void {
