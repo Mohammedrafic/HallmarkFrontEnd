@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ShowSideDialog } from '../../../../store/app.actions';
 import { Store } from '@ngxs/store';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SetNavigationTab } from '../../../store/credentials.actions';
 import { CredentialsNavigationTabs } from '@shared/enums/credentials-navigation-tabs';
 
@@ -12,11 +12,12 @@ import { CredentialsNavigationTabs } from '@shared/enums/credentials-navigation-
 })
 export class GroupComponent {
   constructor(private store: Store,
-              private router: Router) { }
+              private router: Router,
+              private route: ActivatedRoute) { }
 
   onBackButtonClick(): void {
     this.store.dispatch(new SetNavigationTab(CredentialsNavigationTabs.Setup));
-    this.router.navigateByUrl('admin/organization-management/credentials/setup');
+    this.router.navigate(['..'], { relativeTo: this.route});
   }
 
   onAddGroupClick(): void {

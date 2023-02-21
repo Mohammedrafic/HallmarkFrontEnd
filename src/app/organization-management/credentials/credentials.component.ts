@@ -114,7 +114,7 @@ export class CredentialsComponent extends AbstractPermissionGrid implements OnIn
   }
 
   public onGroupsSetupClick(): void {
-    this.router.navigateByUrl('admin/organization-management/credentials/groups-setup');
+    this.router.navigate(['groups-setup'], { relativeTo: this.route });
   }
 
   public onAssignCredentialClick(): void {
