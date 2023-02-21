@@ -1,22 +1,29 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
-import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
+
 import { Store } from '@ngxs/store';
-import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
-import { filter, Observable, Subject, switchMap } from 'rxjs';
+import { filter, Observable, Subject, switchMap, take } from 'rxjs';
+
 import { CandidateTabsEnum } from '@client/candidates/enums';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { DepartmentsService } from '@client/candidates/departments/services/departments.service';
 import { SideDialogTitleEnum } from '@client/candidates/departments/side-dialog-title.enum';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
-import { DepartmentAssigned, DepartmentFilterState, DepartmentsPage } from '@client/candidates/departments/departments.model';
+import {
+  DepartmentAssigned,
+  DepartmentFilterState,
+  DepartmentsPage,
+} from '@client/candidates/departments/departments.model';
 import { DatePipe } from '@angular/common';
-import { formatDate } from '@shared/constants';
+import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, formatDate } from '@shared/constants';
 import { columnDef } from '@client/candidates/departments/grid/column-def.constant';
 import { AssignDepartmentComponent } from './assign-department/assign-department.component';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 
 @Component({
   selector: 'app-departments',
@@ -24,7 +31,7 @@ import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
   styleUrls: ['./departments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DepartmentsComponent implements OnInit {
+export class DepartmentsComponent extends DestroyableDirective implements OnInit {
   @ViewChild('assignDepartment') private assignDepartment: AssignDepartmentComponent;
 
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
@@ -35,7 +42,7 @@ export class DepartmentsComponent implements OnInit {
   public readonly bulkActionConfig: BulkActionConfig = {
     edit: true,
     delete: true,
-  }
+  };
 
   public readonly columnDef: ColumnDefinitionModel[] = columnDef({
     editHandler: this.editAssignedDepartment.bind(this),
@@ -53,8 +60,10 @@ export class DepartmentsComponent implements OnInit {
     private candidatesService: CandidatesService,
     private departmentsService: DepartmentsService,
     private datePipe: DatePipe,
-    private confirmService: ConfirmService,
-  ) {}
+    private confirmService: ConfirmService
+  ) {
+    super();
+  }
 
   public ngOnInit(): void {
     this.selectedTab$ = this.candidatesService.getSelectedTab$();
@@ -84,7 +93,7 @@ export class DepartmentsComponent implements OnInit {
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter(Boolean))
+        .pipe(filter(Boolean), take(1))
         .subscribe(() => {
           this.showSideDialog(false);
         });
@@ -103,11 +112,11 @@ export class DepartmentsComponent implements OnInit {
   }
 
   public handleBulkEvent(event: BulkActionDataModel): void {
-    if(event.type === BulkTypeAction.EDIT) {
+    if (event.type === BulkTypeAction.EDIT) {
       console.error('edit', event.items);
       return;
     }
-    if(event.type === BulkTypeAction.DELETE) {
+    if (event.type === BulkTypeAction.DELETE) {
       console.error('delete', event.items);
       return;
     }
@@ -139,5 +148,16 @@ export class DepartmentsComponent implements OnInit {
     this.dialogData$.next(department);
   }
 
-  private deleteAssignedDepartment(): void {}
+  private deleteAssignedDepartment(departmentId: number): void {
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button',
+        title: DELETE_RECORD_TITLE,
+      })
+      .pipe(filter(Boolean), take(1))
+      .subscribe(() => {
+        this.departmentsService.deleteAssignedDepartment(departmentId);
+      });
+  }
 }

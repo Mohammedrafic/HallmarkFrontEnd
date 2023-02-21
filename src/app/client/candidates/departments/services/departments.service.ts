@@ -47,6 +47,11 @@ export class DepartmentsService {
     );
   }
 
+  public deleteAssignedDepartment(departmentId: number): Observable<void> {
+    //TODO implement HTTP request after providing endpoint on BE
+    return of();
+  }
+
   public editAssignedDepartments(formData: EditAssignedDepartment, departmentIds: number[]): Observable<EditAssignedDepartment> {
     const payload = this.createDepartmentPayload(formData, departmentIds);
     //TODO implement HTTP request after providing endpoint on BE  

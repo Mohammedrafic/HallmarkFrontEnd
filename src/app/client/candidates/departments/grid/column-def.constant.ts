@@ -7,7 +7,7 @@ import { DepartmentAssigned } from '../departments.model';
 
 export interface ColumnDefParams {
   editHandler: (value: DepartmentAssigned) => void;
-  deleteHandler: () => void;
+  deleteHandler: (id: number) => void;
   dateFormatter: (date: string) => string;
 }
 
@@ -36,10 +36,10 @@ export const columnDef = (columnParams: ColumnDefParams) => [
             disabled: false,
           },
           {
-            action: columnParams.deleteHandler,
+            action: (value) => columnParams.deleteHandler((value as DepartmentAssigned).id),
             iconName: 'trash-2',
             iconClass: 'color-supportive-red',
-            disabled: true,
+            disabled: false,
           },
         ],
       };
