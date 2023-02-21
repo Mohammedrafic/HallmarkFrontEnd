@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
+import { isObjectsEqual } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 import { FilterColumnConfig } from '../constants/department-filter.constant';
 import { DepartmentFiltersColumns, EditDepartmentFormState } from '../departments.model';
@@ -50,5 +51,9 @@ export class DepartmentFormService {
     });
 
     return Object.fromEntries(filterColumnsEntries);
+  }
+
+  public compareFormState(prev: unknown, curr: unknown): boolean {
+    return isObjectsEqual(prev as Record<string, unknown>, curr as Record<string, unknown>);
   }
 }

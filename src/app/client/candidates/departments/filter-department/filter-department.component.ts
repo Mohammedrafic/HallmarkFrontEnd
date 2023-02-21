@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { Select } from '@ngxs/store';
-import { filter, Observable, takeUntil } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
 import {
   OrganizationDepartment,
   OrganizationLocation,
@@ -48,6 +48,8 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   public departmentFiltersColumns = DepartmentFiltersColumnsEnum;
 
   private regions: OrganizationRegion[] = [];
+  private readonly applyFilters$: BehaviorSubject<DepartmentFilterState | null> =
+    new BehaviorSubject<DepartmentFilterState | null>(null);
 
   @Select(UserState.organizationStructure)
   private readonly organizationStructure$: Observable<OrganizationStructure>;
@@ -72,6 +74,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     this.initFormConfig();
     this.watchForControlsValueChanges();
     this.subscribeOnSkills();
+    this.filterDepartments();
   }
 
   public trackByFn = (_: number, item: DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>) => item.field;
@@ -79,9 +82,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   public applyFilters(): void {
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
     const filterState = this.formGroup.getRawValue();
-    this.updateTableByFilters.emit(filterState);
-    this.appliedFiltersAmount.emit(this.filteredItems.length);
-    this.cdr.markForCheck();
+    this.applyFilters$.next(filterState);
   }
 
   public clearAllFilters(): void {
@@ -97,6 +98,20 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   public deleteFilter(event: FilteredItem): void {
     this.filterService.removeValue(event, this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
+  }
+
+  private filterDepartments(): void {
+    this.applyFilters$
+      .pipe(
+        filter(Boolean),
+        distinctUntilChanged((prev, curr) => this.departmentFormService.compareFormState(prev, curr)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((filterState) => {
+        this.updateTableByFilters.emit(filterState);
+        this.appliedFiltersAmount.emit(this.filteredItems.length);
+        this.cdr.markForCheck();
+      });
   }
 
   private watchForOrganizationStructure(): void {
