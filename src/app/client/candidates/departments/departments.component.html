@@ -1,12 +1,11 @@
 <app-grid
   class="department-assigned-grid"
-  *ngIf="departmentsAssigned$ | async as departmentsAssigned"
   gridTitle="Department Assigned"
   (bulkEventEmitter)="handleBulkEvent($event)"
   [rowSelection]="undefined"
-  [rowData]="departmentsAssigned?.items"
+  [rowData]="departmentsAssigned?.items ?? []"
   [columnDefinitions]="columnDef"
-  [totalRecordsCount]="departmentsAssigned?.items?.length!"
+  [totalRecordsCount]="departmentsAssigned?.totalCount ?? 0"
   [allowBulkSelection]="true"
   [disableBulkButton]="false"
   [rowSelection]="rowSelection"
@@ -34,14 +33,23 @@
   (formCancelClicked)="onCancel()"
   (formSaveClicked)="onSave()"
 >
-  <app-assign-department
-    #assignDepartment
-    *ngIf="dialogDefinition.assignDepartment || dialogDefinition.editAssignedDepartment"
-    [dialogData$]="dialogData$"
-    [saveForm$]="saveForm$"
-  ></app-assign-department>
+  <ng-container *ngIf="sideDialogTitle$ | async as dialogTitle">
+    <app-assign-department
+      #assignDepartment
+      *ngIf="
+        dialogTitle === sideDialogTitleEnum.AssignDepartment || dialogTitle === sideDialogTitleEnum.EditAssignDepartment
+      "
+      [dialogData$]="dialogData$"
+      [saveForm$]="saveForm$"
+    ></app-assign-department>
 
-  <app-edit-departments #editDepartments *ngIf="dialogDefinition.bulkEditDepartments"></app-edit-departments>
+    <app-edit-departments
+      #editDepartments
+      *ngIf="dialogTitle === sideDialogTitleEnum.EditBulkDepartments"
+      [saveForm$]="saveForm$"
+      [selectedDepartments]="selectedDepartments"
+    ></app-edit-departments>
+  </ng-container>
 </app-side-dialog>
 
 <app-filter-department

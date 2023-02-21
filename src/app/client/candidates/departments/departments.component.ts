@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { filter, Observable, Subject, switchMap, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, filter, Observable, Subject, switchMap, take, takeUntil } from 'rxjs';
 
 import { CandidateTabsEnum } from '@client/candidates/enums';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
@@ -12,7 +12,6 @@ import {
   DepartmentAssigned,
   DepartmentFilterState,
   DepartmentsPage,
-  DialogDefinition,
 } from '@client/candidates/departments/departments.model';
 import { DatePipe } from '@angular/common';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
@@ -25,6 +24,7 @@ import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-actio
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
+import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
 
 @Component({
   selector: 'app-departments',
@@ -34,11 +34,12 @@ import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum
 })
 export class DepartmentsComponent extends DestroyableDirective implements OnInit {
   @ViewChild('assignDepartment') private assignDepartment: AssignDepartmentComponent;
+  @ViewChild('editDepartments') private editDepartments: EditDepartmentsComponent;
 
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
   public readonly sideDialogTitleEnum: typeof SideDialogTitleEnum = SideDialogTitleEnum;
-  public readonly dialogData$: Subject<DepartmentAssigned> = new Subject();
+  public readonly dialogData$: BehaviorSubject<DepartmentAssigned | null> = new BehaviorSubject<DepartmentAssigned | null>(null);
   public readonly saveForm$: Subject<boolean> = new Subject();
   public readonly bulkActionConfig: BulkActionConfig = {
     edit: true,
@@ -51,11 +52,11 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
     dateFormatter: this.getFormattedDate.bind(this),
   });
 
+  public departmentsAssigned: DepartmentsPage;
   public selectedTab$: Observable<CandidateTabsEnum>;
   public sideDialogTitle$: Observable<string>;
-  public departmentsAssigned$: Observable<DepartmentsPage>;
   public rowSelection: 'single' | 'multiple' = 'multiple';
-  public dialogDefinition: DialogDefinition = {} as DialogDefinition;
+  public selectedDepartments: number[];
 
   public constructor(
     private store: Store,
@@ -72,7 +73,6 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
     this.selectedTab$ = this.candidatesService.getSelectedTab$();
     this.sideDialogTitle$ = this.departmentsService.getSideDialogTitle$();
     this.getDepartmentsAssigned();
-    this.subscribeToTitleDialog();
   }
 
   public showAssignDepartmentDialog(): void {
@@ -82,9 +82,6 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   }
 
   public onSave(): void {
-    if (this.dialogDefinition.bulkEditDepartments) {
-      return;
-    }
     this.saveForm$.next(true);
   }
 
@@ -119,26 +116,17 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   }
 
   public handleBulkEvent(event: BulkActionDataModel): void {
+    const selectedAll = this.departmentsAssigned.totalCount === event.items.length;
+    this.selectedDepartments = selectedAll ? [null] : event.items.map((item) => item.data.id);
+
     if (event.type === BulkTypeAction.EDIT) {
       this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.EditBulkDepartments);
       this.showSideDialog(true);
       return;
     }
     if (event.type === BulkTypeAction.DELETE) {
-      console.error('delete', event.items);
       return;
     }
-  }
-
-  private subscribeToTitleDialog(): void {
-    this.sideDialogTitle$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-      this.dialogDefinition = {
-        assignDepartment: data === SideDialogTitleEnum.AssignDepartment,
-        editAssignedDepartment: data === SideDialogTitleEnum.EditAssignDepartment,
-        bulkEditDepartments: data === SideDialogTitleEnum.EditBulkDepartments,
-      };
-      this.cdr.markForCheck();
-    });
   }
 
   private showSideDialog(isOpen: boolean): void {
@@ -155,13 +143,17 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
 
   // Get new data if departments tab will be selected
   private getDepartmentsAssigned(filters?: DepartmentFilterState): void {
-    this.departmentsAssigned$ = this.candidatesService.getSelectedTab$().pipe(
+    this.candidatesService.getSelectedTab$().pipe(
       filter((tab) => tab === CandidateTabsEnum.Departments),
-      switchMap(() => this.departmentsService.getDepartmentsAssigned(filters))
-    );
+      switchMap(() => this.departmentsService.getDepartmentsAssigned(filters)),
+      takeUntil(this.destroy$)
+    ).subscribe((departments) => {
+      this.departmentsAssigned = departments;
+      this.cdr.markForCheck();
+    })
   }
 
-  private editAssignedDepartment(department: DepartmentAssigned): void {
+  private editAssignedDepartment(department: DepartmentAssigned): void { 
     this.showSideDialog(true);
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.EditAssignDepartment);
     this.dialogData$.next(department);

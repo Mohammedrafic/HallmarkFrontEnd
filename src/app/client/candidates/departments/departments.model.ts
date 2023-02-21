@@ -27,9 +27,11 @@ interface Skill {
 }
 
 export interface EditAssignedDepartment {
-  assignedDepartmentIds: number[];
   startDate: Date | string;
   endDate: Date | string;
+  orientedStartDate?: Date | string;
+  homeCostCenter?: boolean;
+  oriented?: boolean
 }
 
 export interface AssignNewDepartment {
@@ -78,12 +80,6 @@ export interface EditDepartmentFormState {
   [EditDepartmentFieldsEnum.ORIENTED]: boolean;
   [EditDepartmentFieldsEnum.HOME_COST_CENTER]: boolean;
   [EditDepartmentFieldsEnum.ORIENTED_START_DATE]?: Date;
-}
-
-export interface DialogDefinition {
-  assignDepartment: boolean;
-  editAssignedDepartment: boolean;
-  bulkEditDepartments: boolean;
 }
 
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;

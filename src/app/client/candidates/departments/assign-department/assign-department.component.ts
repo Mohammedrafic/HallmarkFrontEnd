@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, Input, ChangeDetectorRef } 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { debounceTime, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, debounceTime, filter, Subject, takeUntil } from 'rxjs';
 
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { DepartmentAssigned } from '../departments.model';
@@ -16,7 +16,7 @@ import { Destroyable } from '@core/helpers';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssignDepartmentComponent extends Destroyable implements OnInit {
-  @Input() public dialogData$: Subject<DepartmentAssigned>;
+  @Input() public dialogData$: BehaviorSubject<DepartmentAssigned | null>;
   @Input() public saveForm$: Subject<boolean>;
 
   public assignDepartmentForm: FormGroup;
@@ -66,9 +66,8 @@ export class AssignDepartmentComponent extends Destroyable implements OnInit {
   }
 
   private subscribeOnDialogData(): void {
-    this.dialogData$.pipe(debounceTime(200), takeUntil(this.componentDestroy())).subscribe((data) => {
-      this.departmentId = data.departmentId;
-
+    this.dialogData$.pipe(filter(Boolean), debounceTime(200), takeUntil(this.componentDestroy())).subscribe((data) => {
+      this.departmentId = data.id;
       this.regions = [{ name: data.regionName, id: data.regionId }];
       this.locations = [{ name: data.locationName, id: data.locationId }];
       this.departments = [{ name: data.departmentName, id: data.departmentId }];

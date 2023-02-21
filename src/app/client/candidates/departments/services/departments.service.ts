@@ -35,7 +35,7 @@ export class DepartmentsService {
       pageNumber: GRID_CONFIG.initialPage,
       pageSize: GRID_CONFIG.initialRowsPerPage,
       employeeId: this.candidatesService.employeeId,
-      ...(filters && filters)
+      ...(filters && filters),
     };
     const endpoint = '/api/EmployeeAssignedDepartment/GetAll';
 
@@ -52,33 +52,34 @@ export class DepartmentsService {
     return of();
   }
 
-  public editAssignedDepartments(formData: EditAssignedDepartment, departmentIds: number[]): Observable<EditAssignedDepartment> {
-    const payload = this.createDepartmentPayload(formData, departmentIds);
-    //TODO implement HTTP request after providing endpoint on BE  
+  public editAssignedDepartments(
+    formData: EditAssignedDepartment,
+    departmentIds: number[]
+  ): Observable<EditAssignedDepartment> {
+    const { oriented, homeCostCenter, orientedStartDate } = formData;
+    const payload = {
+      startDate: formData.startDate && DateTimeHelper.toUtcFormat(formData.startDate),
+      endDate: formData.endDate && DateTimeHelper.toUtcFormat(formData.endDate),
+      assignedDepartmentIds: departmentIds,
+      ...(orientedStartDate && { orientedStartDate: DateTimeHelper.toUtcFormat(orientedStartDate) }),
+      ...(homeCostCenter && { homeCostCenter }),
+      ...(oriented && { oriented }),
+    };
+
+    //TODO implement HTTP request after providing endpoint on BE
     return of(payload);
   }
 
   public assignNewDepartment(formData: AssignNewDepartment): Observable<AssignNewDepartment> {
-    const payload = this.createDepartmentPayload(formData);
-    //TODO implement HTTP request after providing endpoint on BE  
-    return of(payload);
-  }
+    const payload = {
+      regionId: formData.regionId,
+      locationId: formData.locationId,
+      departmentId: formData.departmentId,
+      startDate: DateTimeHelper.toUtcFormat(formData.startDate),
+      endDate: formData.endDate && DateTimeHelper.toUtcFormat(formData.endDate),
+    };
 
-  private createDepartmentPayload(formData: any, departmentIds?: number[]): any {
-    if (departmentIds) {
-      return {
-        startDate: DateTimeHelper.toUtcFormat(formData.startDate),
-        endDate: formData.endDate && DateTimeHelper.toUtcFormat(formData.endDate),
-        assignedDepartmentIds: departmentIds,
-      };
-    } else {
-      return {
-        regionId: formData.region,
-        locationId: formData.location,
-        departmentId: formData.department,
-        startDate: DateTimeHelper.toUtcFormat(formData.startDate),
-        endDate: formData.endDate && DateTimeHelper.toUtcFormat(formData.endDate),
-      };
-    }
+    //TODO implement HTTP request after providing endpoint on BE
+    return of(payload);
   }
 }
