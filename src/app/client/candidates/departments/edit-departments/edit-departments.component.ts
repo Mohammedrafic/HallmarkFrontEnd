@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 
-import { Subject, takeUntil } from 'rxjs';
+import { filter, Subject, take, takeUntil } from 'rxjs';
 
 import { EditDepartmentFieldsEnum } from '@client/candidates/enums/edit-department.enum';
 import { CustomFormGroup } from '@core/interface';
@@ -10,6 +10,10 @@ import { EditDepartmentsFormConfig } from '../constants/edit-departments.constan
 import { DepartmentFormFieldConfig, EditDepartmentFormState } from '../departments.model';
 import { DepartmentFormService } from '../services/department-filter.service';
 import { DepartmentsService } from '../services/departments.service';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { EDIT_MULTIPLE_RECORDS_TEXT } from '@shared/constants';
+import { ShowSideDialog } from 'src/app/store/app.actions';
+import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-edit-departments',
@@ -29,7 +33,9 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   constructor(
     private readonly departmentFormService: DepartmentFormService,
     private readonly cdr: ChangeDetectorRef,
-    private readonly departmentService: DepartmentsService
+    private readonly departmentService: DepartmentsService,
+    private readonly confirmService: ConfirmService,
+    private readonly store: Store
   ) {
     super();
     this.initForm();
@@ -63,12 +69,18 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
 
   private saveFormData(): void {
     this.saveForm$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      if (this.formGroup.untouched) {
-        return;
-      } else {
-        const formData = this.formGroup.getRawValue();
-        this.departmentService.editAssignedDepartments(formData, this.selectedDepartments);
-      }
+      this.confirmService
+        .confirm(EDIT_MULTIPLE_RECORDS_TEXT, {
+          title: 'Warning',
+          okButtonLabel: 'Yes',
+          okButtonClass: 'ok-button',
+        })
+        .pipe(filter(Boolean), take(1))
+        .subscribe(() => {
+          const formData = this.formGroup.getRawValue();
+          this.departmentService.editAssignedDepartments(formData, this.selectedDepartments);
+          this.store.dispatch(new ShowSideDialog(false));
+        });
     });
   }
 }

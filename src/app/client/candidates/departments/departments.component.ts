@@ -15,7 +15,7 @@ import {
 } from '@client/candidates/departments/departments.model';
 import { DatePipe } from '@angular/common';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, formatDate } from '@shared/constants';
+import { DELETE_MULTIPLE_RECORDS_TEXT, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, formatDate } from '@shared/constants';
 import { columnDef } from '@client/candidates/departments/grid/column-def.constant';
 import { AssignDepartmentComponent } from './assign-department/assign-department.component';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -39,7 +39,8 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
   public readonly sideDialogTitleEnum: typeof SideDialogTitleEnum = SideDialogTitleEnum;
-  public readonly dialogData$: BehaviorSubject<DepartmentAssigned | null> = new BehaviorSubject<DepartmentAssigned | null>(null);
+  public readonly dialogData$: BehaviorSubject<DepartmentAssigned | null> =
+    new BehaviorSubject<DepartmentAssigned | null>(null);
   public readonly saveForm$: Subject<boolean> = new Subject();
   public readonly bulkActionConfig: BulkActionConfig = {
     edit: true,
@@ -48,7 +49,7 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
 
   public readonly columnDef: ColumnDefinitionModel[] = columnDef({
     editHandler: this.editAssignedDepartment.bind(this),
-    deleteHandler: this.deleteAssignedDepartment.bind(this),
+    deleteHandler: this.deleteAssignedDepartments.bind(this),
     dateFormatter: this.getFormattedDate.bind(this),
   });
 
@@ -125,6 +126,7 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
       return;
     }
     if (event.type === BulkTypeAction.DELETE) {
+      this.deleteAssignedDepartments(this.selectedDepartments, DELETE_MULTIPLE_RECORDS_TEXT);
       return;
     }
   }
@@ -143,32 +145,35 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
 
   // Get new data if departments tab will be selected
   private getDepartmentsAssigned(filters?: DepartmentFilterState): void {
-    this.candidatesService.getSelectedTab$().pipe(
-      filter((tab) => tab === CandidateTabsEnum.Departments),
-      switchMap(() => this.departmentsService.getDepartmentsAssigned(filters)),
-      takeUntil(this.destroy$)
-    ).subscribe((departments) => {
-      this.departmentsAssigned = departments;
-      this.cdr.markForCheck();
-    })
+    this.candidatesService
+      .getSelectedTab$()
+      .pipe(
+        filter((tab) => tab === CandidateTabsEnum.Departments),
+        switchMap(() => this.departmentsService.getDepartmentsAssigned(filters)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((departments) => {
+        this.departmentsAssigned = departments;
+        this.cdr.markForCheck();
+      });
   }
 
-  private editAssignedDepartment(department: DepartmentAssigned): void { 
+  private editAssignedDepartment(department: DepartmentAssigned): void {
     this.showSideDialog(true);
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.EditAssignDepartment);
     this.dialogData$.next(department);
   }
 
-  private deleteAssignedDepartment(departmentId: number): void {
+  private deleteAssignedDepartments(departmentIds: number[], text = DELETE_RECORD_TEXT): void {
     this.confirmService
-      .confirm(DELETE_RECORD_TEXT, {
+      .confirm(text, {
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
         title: DELETE_RECORD_TITLE,
       })
       .pipe(filter(Boolean), take(1))
       .subscribe(() => {
-        this.departmentsService.deleteAssignedDepartment(departmentId);
+        this.departmentsService.deleteAssignedDepartments(departmentIds);
       });
   }
 }

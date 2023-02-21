@@ -47,7 +47,7 @@ export class DepartmentsService {
     );
   }
 
-  public deleteAssignedDepartment(departmentId: number): Observable<void> {
+  public deleteAssignedDepartments(departmentIds: number[]): Observable<void> {
     //TODO implement HTTP request after providing endpoint on BE
     return of();
   }
