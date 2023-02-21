@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { filter, Observable, Subject, switchMap, take } from 'rxjs';
+import { filter, Observable, Subject, switchMap, take, takeUntil } from 'rxjs';
 
 import { CandidateTabsEnum } from '@client/candidates/enums';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
@@ -12,6 +12,7 @@ import {
   DepartmentAssigned,
   DepartmentFilterState,
   DepartmentsPage,
+  DialogDefinition,
 } from '@client/candidates/departments/departments.model';
 import { DatePipe } from '@angular/common';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
@@ -54,13 +55,15 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   public sideDialogTitle$: Observable<string>;
   public departmentsAssigned$: Observable<DepartmentsPage>;
   public rowSelection: 'single' | 'multiple' = 'multiple';
+  public dialogDefinition: DialogDefinition = {} as DialogDefinition;
 
   public constructor(
     private store: Store,
     private candidatesService: CandidatesService,
     private departmentsService: DepartmentsService,
     private datePipe: DatePipe,
-    private confirmService: ConfirmService
+    private confirmService: ConfirmService,
+    private cdr: ChangeDetectorRef
   ) {
     super();
   }
@@ -69,15 +72,19 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
     this.selectedTab$ = this.candidatesService.getSelectedTab$();
     this.sideDialogTitle$ = this.departmentsService.getSideDialogTitle$();
     this.getDepartmentsAssigned();
+    this.subscribeToTitleDialog();
   }
 
   public showAssignDepartmentDialog(): void {
-    this.assignDepartment.resetAssignDepartmentForm();
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.AssignDepartment);
     this.showSideDialog(true);
+    this.assignDepartment?.resetAssignDepartmentForm();
   }
 
   public onSave(): void {
+    if (this.dialogDefinition.bulkEditDepartments) {
+      return;
+    }
     this.saveForm$.next(true);
   }
 
@@ -114,13 +121,24 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   public handleBulkEvent(event: BulkActionDataModel): void {
     if (event.type === BulkTypeAction.EDIT) {
       this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.EditBulkDepartments);
-      this.showSideDialog(true)
+      this.showSideDialog(true);
       return;
     }
     if (event.type === BulkTypeAction.DELETE) {
       console.error('delete', event.items);
       return;
     }
+  }
+
+  private subscribeToTitleDialog(): void {
+    this.sideDialogTitle$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      this.dialogDefinition = {
+        assignDepartment: data === SideDialogTitleEnum.AssignDepartment,
+        editAssignedDepartment: data === SideDialogTitleEnum.EditAssignDepartment,
+        bulkEditDepartments: data === SideDialogTitleEnum.EditBulkDepartments,
+      };
+      this.cdr.markForCheck();
+    });
   }
 
   private showSideDialog(isOpen: boolean): void {
