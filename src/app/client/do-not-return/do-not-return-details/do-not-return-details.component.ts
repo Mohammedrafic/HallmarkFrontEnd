@@ -7,23 +7,24 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Subject } from 'rxjs';
 import { DonoreturnFilters } from '@shared/models/donotreturn.model';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { ExportDonotreturn } from '@admin/store/donotreturn.actions';
+import { DoNotReturn } from '@admin/store/donotreturn.actions';
 import { MasterDNRExportCols, TITLE } from '../donotreturn-grid.constants';
+
 @Component({
   selector: 'app-do-not-return-details',
   templateUrl: './do-not-return-details.component.html',
   styleUrls: ['./do-not-return-details.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class DoNotReturnDetailsComponent extends AbstractPermissionGrid implements OnInit {
-  
 public filters: DonoreturnFilters = {
   candidatename:undefined, 
     ssn: undefined,
     pageSize: undefined,
     pageNumber: undefined,
   };
-  
+
   @ViewChild('grid')
   public grid: GridComponent;
 
@@ -46,19 +47,18 @@ public filters: DonoreturnFilters = {
     this.store.dispatch(new ShowExportDialog(true));
   }
 
-
   public closeExport() : void{
     this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
-
   }
+
   public export(event: ExportOptions): void {
     this.closeExport();
     this.defaultExport(event.fileType, event);
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.store.dispatch(new ExportDonotreturn(new ExportPayload(
+    this.store.dispatch(new DoNotReturn.ExportDonotreturn(new ExportPayload(
       fileType,
       { ...this.filters },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
@@ -71,9 +71,11 @@ public filters: DonoreturnFilters = {
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }
+
   public AddDonotlist(): void {
     this.store.dispatch(new ShowSideDialog(true));
   }
+
   public addDoNotReturn(): void {
     this.store.dispatch(new ShowSideDialog(true));
   }

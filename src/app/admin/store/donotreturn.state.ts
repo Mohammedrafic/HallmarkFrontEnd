@@ -8,10 +8,10 @@ import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { catchError, Observable, tap } from "rxjs";
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
-import { DonotreturnByPage, ExportDonotreturn, GetAllOrganization, GetDoNotReturnCandidateListSearch, GetDoNotReturnCandidateSearch, GetDoNotReturnPage, GetLocationByOrgId, RemoveDonotReturn, RemoveDonotReturnSucceeded, SaveDonotreturn, UpdateDoNotReturn } from './donotreturn.actions';
+import { DoNotReturn } from './donotreturn.actions';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DoNotReturnStateModel } from '@client/do-not-return/do-not-return.interface';
-import { BLOCK_RECORD_SUCCESS, CANDIDATE_DONOTRETURN, RECORD_ADDED, RECORD_ALREADY_EXISTS, RECORD_MODIFIED } from '@shared/constants';
+import { BLOCK_RECORD_SUCCESS, RECORD_ADDED, RECORD_ALREADY_EXISTS, RECORD_MODIFIED } from '@shared/constants';
 
 @State<DoNotReturnStateModel>({
   name: 'donotreturn',
@@ -46,25 +46,25 @@ export class DonotReturnState {
 
   constructor(private DonotreturnService: DonotreturnService) { }
 
-  @Action(GetAllOrganization)
+  @Action(DoNotReturn.GetAllOrganization)
   GetAllOrganization({ patchState }: StateContext<DoNotReturnStateModel>,
-    { }: GetAllOrganization): Observable<UserAgencyOrganization> {
+    { }: DoNotReturn.GetAllOrganization): Observable<UserAgencyOrganization> {
     return this.DonotreturnService.allOrganizations().pipe(tap((data) => {
       patchState({ allOrganizations: data.businessUnits });
       return data;
     }));
   }
 
-  @Action(UpdateDoNotReturn)
+  @Action(DoNotReturn.UpdateDoNotReturn)
   UpdateDoNotReturn(
     { patchState, dispatch }: StateContext<DoNotReturnStateModel>,
-    { donotreturn }: UpdateDoNotReturn): Observable<DonoreturnAddedit> {
+    { donotreturn }: DoNotReturn.UpdateDoNotReturn): Observable<DonoreturnAddedit> {
     return this.DonotreturnService.updateDoNotReturn(donotreturn).pipe(
       tap((payload) => {
         patchState({ isLocationLoading: false });
         if (payload.id != 0) {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-          dispatch(new GetDoNotReturnPage());
+          dispatch(new DoNotReturn.GetDoNotReturnPage());
         } else {
           dispatch(new ShowToast(MessageTypes.Error, RECORD_ALREADY_EXISTS));
         }
@@ -73,8 +73,8 @@ export class DonotReturnState {
     );
   }
 
-  @Action(SaveDonotreturn)
-  SaveDonotreturn({ patchState, dispatch }: StateContext<DoNotReturnStateModel>, { donotreturn }: SaveDonotreturn): Observable<any> {
+  @Action(DoNotReturn.SaveDonotreturn)
+  SaveDonotreturn({ patchState, dispatch }: StateContext<DoNotReturnStateModel>, { donotreturn }: DoNotReturn.SaveDonotreturn): Observable<any> {
     const isCreating = !donotreturn.id;
     patchState({ isLocationLoading: true });
     return this.DonotreturnService.saveDonotReturn(donotreturn).pipe(tap((payload) => {
@@ -86,10 +86,10 @@ export class DonotReturnState {
     );
   }
 
-  @Action(GetLocationByOrgId)
+  @Action(DoNotReturn.GetLocationByOrgId)
   GetLocationsByOrgId(
     { patchState }: StateContext<DoNotReturnStateModel>,
-    { organizationId }: GetLocationByOrgId): Observable<GetLocationByOrganization[]> {
+    { organizationId }: DoNotReturn.GetLocationByOrgId): Observable<GetLocationByOrganization[]> {
     return this.DonotreturnService.getLocationsByOrganizationId(organizationId).pipe(
       tap((payload) => {
         patchState({ locations: payload });
@@ -98,18 +98,18 @@ export class DonotReturnState {
     );
   }
 
-  @Action(RemoveDonotReturn)
-  RemoveDonotReturn({ patchState, dispatch }: StateContext<DoNotReturnStateModel>, { payload }: RemoveDonotReturn): Observable<DonoreturnAddedit> {
+  @Action(DoNotReturn.RemoveDonotReturn)
+  RemoveDonotReturn({ patchState, dispatch }: StateContext<DoNotReturnStateModel>, { payload }: DoNotReturn.RemoveDonotReturn): Observable<DonoreturnAddedit> {
     patchState({ donotloadings: true });
     return this.DonotreturnService.removeDonotReturn(payload).pipe(tap((payload) => {
       patchState({ donotloadings: false });
-      dispatch([new RemoveDonotReturnSucceeded, new ShowToast(MessageTypes.Success, BLOCK_RECORD_SUCCESS)]);
+      dispatch([new DoNotReturn.RemoveDonotReturnSucceeded, new ShowToast(MessageTypes.Success, BLOCK_RECORD_SUCCESS)]);
       return payload;
     }))
   }
 
-  @Action(DonotreturnByPage)
-  DonotreturnByPage({ patchState }: StateContext<DoNotReturnStateModel>, { pageNumber, pageSize, filters }: DonotreturnByPage): Observable<DoNotReturnsPage> {
+  @Action(DoNotReturn.DonotreturnByPage)
+  DonotreturnByPage({ patchState }: StateContext<DoNotReturnStateModel>, { pageNumber, pageSize, filters }: DoNotReturn.DonotreturnByPage): Observable<DoNotReturnsPage> {
     patchState({ donotloadings: true });
     return this.DonotreturnService.getDonotreturn(pageNumber, pageSize, filters).pipe(
       tap((payload) => {
@@ -119,24 +119,24 @@ export class DonotReturnState {
     );
   }
 
-  @Action(ExportDonotreturn)
-  ExportSkills({ }: StateContext<DoNotReturnStateModel>, { payload }: ExportDonotreturn): Observable<Blob> {
+  @Action(DoNotReturn.ExportDonotreturn)
+  ExportSkills({ }: StateContext<DoNotReturnStateModel>, { payload }: DoNotReturn.ExportDonotreturn): Observable<Blob> {
     return this.DonotreturnService.export(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'DoNotReturn', payload.exportFileType);
     }));
   };
 
-  @Action(GetDoNotReturnCandidateSearch)
-  GetDoNotReturnCandidateSearch({ patchState }: StateContext<DoNotReturnStateModel>, { filter }: GetDoNotReturnCandidateSearch): Observable<DoNotReturnSearchCandidate[]> {
+  @Action(DoNotReturn.GetDoNotReturnCandidateSearch)
+  GetDoNotReturnCandidateSearch({ patchState }: StateContext<DoNotReturnStateModel>, { filter }: DoNotReturn.GetDoNotReturnCandidateSearch): Observable<DoNotReturnSearchCandidate[]> {
     return this.DonotreturnService.getDoNotCandidateSearch(filter).pipe(tap((payload: DoNotReturnSearchCandidate[]) => {
       patchState({ searchCandidates: payload });
       return payload
     }));
   }
 
-  @Action(GetDoNotReturnCandidateListSearch)
-  GetDoNotReturnCandidateListSearch({ patchState }: StateContext<DoNotReturnStateModel>, { filter }: GetDoNotReturnCandidateListSearch): Observable<DoNotReturnSearchCandidate[]> {
+  @Action(DoNotReturn.GetDoNotReturnCandidateListSearch)
+  GetDoNotReturnCandidateListSearch({ patchState }: StateContext<DoNotReturnStateModel>, { filter }: DoNotReturn.GetDoNotReturnCandidateListSearch): Observable<DoNotReturnSearchCandidate[]> {
     return this.DonotreturnService.getDoNotCandidateListSearch(filter).pipe(tap((payload: DoNotReturnSearchCandidate[]) => {
       patchState({ searchCandidates: payload });
       return payload

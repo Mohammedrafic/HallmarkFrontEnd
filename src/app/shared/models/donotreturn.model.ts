@@ -170,6 +170,13 @@ export class DoNotReturnCandidateListSearchFilter{
   candidateProfileId:number;
 }
 
+export class DonoreturnFilter  {
+  candidatename?: string;
+  ssn?: number;
+  pageSize?: number;
+  pageNumber?: number;
+};
+
 export class DoNotReturnSearchCandidate{
   id:number;
   firstName:string;

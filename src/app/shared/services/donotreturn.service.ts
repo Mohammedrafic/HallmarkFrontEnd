@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
-import { DonoreturnFilters, DonoreturnAddedit, DoNotReturnsPage, AllOrganization, GetLocationByOrganization, DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
+import { Observable } from 'rxjs';
+import { DonoreturnFilters, DonoreturnAddedit, DoNotReturnsPage, GetLocationByOrganization, DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 
@@ -24,7 +24,7 @@ export class DonotreturnService {
     url = '/api/DoNotReturn';
     return this.http.get<DoNotReturnsPage>(url, params);
   }
- 
+
   public updateDoNotReturn(donotreturn: DonoreturnAddedit): Observable<DonoreturnAddedit> {
     return this.http.put<DonoreturnAddedit>(`/api/DoNotReturn/`, donotreturn);
   }
