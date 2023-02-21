@@ -1,0 +1,47 @@
+<section class="flex-column">
+    <app-page-toolbar>
+      <ng-container left>
+        <section class="page-title">
+          <h3>Do Not Return List</h3>
+        </section>
+      </ng-container>
+      <ng-container right>
+        <section class="org-controls-container">
+          <div>
+            <button
+              ejs-dropdownbutton
+              appHideBeforeSyncfusionLoad
+              [items]="exportOptions"
+              (select)="exportSelected($event)"
+              id="exportButton"
+              cssClass="e-outline button-export"
+            >
+              <div class="button-export-container">
+                Export <i-feather name="upload" class="icon"></i-feather>
+              </div>
+            </button>
+            <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter"  (click)="showFilters()">
+              <div class="filter-button-content">
+                <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{
+                  filteredItems.length
+                }}</span>
+                Filters <i-feather name="sliders" class="icon"></i-feather>
+              </div>
+            </button>
+
+            <app-tooltip-container
+            [message]="toolTipMessage"
+            >
+            <button
+              ejs-button
+              appHideBeforeSyncfusionLoad
+              id="addDepartmentButton"
+              (click)="addDoNotReturn()"
+              [isPrimary]="true">Add </button>
+          </app-tooltip-container>
+          </div>
+        </section>
+      </ng-container>
+    </app-page-toolbar>
+    <app-do-not-return-grid [filteredItems$]="filteredItems$" [export$]="exportDonotreturn$"></app-do-not-return-grid> 
+  </section>
