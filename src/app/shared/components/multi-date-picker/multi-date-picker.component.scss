@@ -17,6 +17,10 @@
       border-color: $primary-active-blue-10;
       border-width: 2px;
     }
+
+    &.errored {
+      border-color: $supportive-red;
+    }
   }
 
   &:hover {

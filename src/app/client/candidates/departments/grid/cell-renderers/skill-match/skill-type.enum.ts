@@ -1,4 +1,5 @@
 export enum SkillTypeEnum {
   PrimarySkill,
-  SecondarySkill
+  SecondarySkill,
+  PrimarySecondarySkill,
 }

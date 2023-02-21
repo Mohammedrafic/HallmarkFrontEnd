@@ -30,6 +30,8 @@ import { GetAgencyExtensions } from '@agency/store/order-management.actions';
 import { OrderStatus } from '@shared/enums/order-management';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { UserState } from '../../../../store/user.state';
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
 
 @Component({
   selector: 'app-preview-order-dialog',
@@ -73,6 +75,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
   public orderType = OrderType;
   public agencyActionsAllowed = true;
   public isClosedOrder = false;
+  public orderComments: Comment[] = [];
   public readonly reasonClosure = {
     orderClosureReason: 'Candidate Rejected',
   } as Order;
@@ -98,7 +101,8 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
 
   constructor(private chipsCssClass: ChipsCssClass,
               protected override store: Store,
-              private cd: ChangeDetectorRef) {
+              private cd: ChangeDetectorRef,
+              private commentsService: CommentsService,) {
     super(store);
   }
 
@@ -132,9 +136,20 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
     this.unsubscribe$.complete();
   }
 
+  private getOrderComments(): void {
+    this.commentsService
+      .getComments(this.currentOrder.commentContainerId as number, null)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((comments: Comment[]) => {
+        this.orderComments = comments;
+        this.cd.markForCheck();
+      });
+  }
+
   private subsToSelectedOrder(): void {
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
       this.currentOrder = order;
+      this.currentOrder && this.getOrderComments();
       this.isClosedOrder = this.currentOrder?.status === OrderStatus.Closed;
       this.cd.markForCheck();
     });

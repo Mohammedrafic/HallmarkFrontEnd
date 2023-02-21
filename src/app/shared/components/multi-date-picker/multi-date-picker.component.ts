@@ -31,6 +31,8 @@ export class MultiDatePickerComponent extends Destroyable implements OnInit, Aft
   @Input() set valueSetter(dates: Date[]) {
     this.datesControl.setValue(dates);
   }
+  // Temporary solution
+  @Input() hasError = false;
 
   @Output() appliedDates: EventEmitter<Date[]> = new EventEmitter<Date[]>();
 

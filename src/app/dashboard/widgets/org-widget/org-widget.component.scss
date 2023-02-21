@@ -42,7 +42,7 @@
 
 .orgcount {
     text-align: right;
-    width: 50%;
+    width: -webkit-fill-available;
 }
 .orgname {
     text-align: left;
@@ -50,6 +50,7 @@
     color: #3E7FFF;
     cursor: pointer;
     font-size: 13px;
+    width: max-content;
 }
 .widget__type {
     display: flex;

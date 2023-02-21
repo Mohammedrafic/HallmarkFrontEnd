@@ -5,4 +5,6 @@ export enum OrganizationSettingValidationType {
   DigitsOnly = 4,
   Email = 5,
   MultipleEmails = 6,
+  MinNumberValue = 7,
+  MaxNumberValue = 8,
 }

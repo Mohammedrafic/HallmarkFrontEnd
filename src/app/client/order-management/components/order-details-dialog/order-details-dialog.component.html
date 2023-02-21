@@ -157,7 +157,7 @@
             <e-tabitem>
               <ng-template #headerText>{{ isReOrder && activeSystem !==  systemType.IRP ? 'Re-Order' : 'Order' }} Details</ng-template>
               <ng-template #content>
-                <app-order-details-container *ngIf="sideDialog.visible" [currentOrder]="order"
+                <app-order-details-container *ngIf="sideDialog.visible" [currentOrder]="order" [comments]="orderComments"
                   [activeSystem]="activeSystem"></app-order-details-container>
               </ng-template>
             </e-tabitem>
@@ -231,6 +231,7 @@
           [header]="reOrderDialogTitle$ | async"
           (formCancelClicked)="clearEditReOrder()"
           (formSaveClicked)="onSaveReOrder()"
+          class="reorder-side-dialog"
         >
           <app-add-edit-reorder
             *ngIf="isReOrderDialogOpened$ | async"

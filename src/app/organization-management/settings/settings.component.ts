@@ -532,6 +532,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         case OrganizationSettingValidationType.MultipleEmails:
           validators.push(MultiEmailValidator);
           break;
+        case OrganizationSettingValidationType.MinNumberValue:
+          validators.push(Validators.min(parseInt(validation.value as string)));
+          break;
+        case OrganizationSettingValidationType.MaxNumberValue:
+          validators.push(Validators.max(parseInt(validation.value as string)));
+          break;
       }
     });
 
@@ -724,6 +730,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private getRowsPerPage(data: object[], currentPage: number): object[] {
+    const invoiceGneration: any = data.find((setting: any) => {
+      return setting.controlType === this.organizationSettingControlType.InvoiceAutoGeneration;
+    });
+
+    if (invoiceGneration && invoiceGneration.value && typeof invoiceGneration.value === 'string') {
+      invoiceGneration.parsedValue = JSON.parse(invoiceGneration.value);
+    }
+
     return data.slice(
       currentPage * this.getActiveRowsPerPage() - this.getActiveRowsPerPage(),
       currentPage * this.getActiveRowsPerPage()

@@ -255,6 +255,22 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
           this.masterLocationsList = this.locationsList;
           this.masterDepartmentsList = this.departmentsList;
 
+          let businessIdData = [];
+          businessIdData.push(data);
+          let filter: CommonReportFilter = {
+            businessUnitIds: businessIdData
+          };
+          this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+            if (data != null) {
+              this.isAlive = false;
+              this.filterOptionsData = data;
+              this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.
+                filter(i => this.fixedCanidateStatusesTypes.includes(i.status));
+              this.changeDetectorRef.detectChanges();
+            }
+          });
+
           if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
             this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
           }

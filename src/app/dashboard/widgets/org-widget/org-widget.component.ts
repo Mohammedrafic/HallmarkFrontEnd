@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
-import { Actions, ofActionDispatched } from '@ngxs/store';
-import { Subject, takeUntil } from 'rxjs';
+import { ChangeDetectorRef, Component, Input, Inject, ChangeDetectionStrategy } from '@angular/core';
+import { Actions } from '@ngxs/store';
 import { OrgDetailsInfoModel } from '../../models/org-details-info.model';
 import { DashboardService } from '../../services/dashboard.service';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-org-widget',
@@ -10,7 +10,7 @@ import { DashboardService } from '../../services/dashboard.service';
   styleUrls: ['./org-widget.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OrgWidgetComponent implements OnInit {
+export class OrgWidgetComponent {
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean | false;
   @Input() public description: string;
@@ -20,27 +20,29 @@ export class OrgWidgetComponent implements OnInit {
     y: 0,
   };
 
-  constructor(private readonly dashboardService: DashboardService,private actions$: Actions, private cdr: ChangeDetectorRef) {}
+  constructor(private readonly dashboardService: DashboardService,private actions$: Actions, private cdr: ChangeDetectorRef,
+              @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis) {}
   
-  ngOnChanges(): void {
-    console.log(this.chartData,"chartdata");
-  }
-
   public defineMousePosition($event: MouseEvent): void {
     this.mousePosition.x = $event.screenX;
     this.mousePosition.y = $event.screenY;
   }
-  ngOnInit(): void {
-  }
   public toSourceContent(orgname: string): void {
-    if(orgname === 'Order'){
+    if(orgname === 'OrdersforApproval'){
+      this.globalWindow.localStorage.setItem("pendingApprovalOrders",JSON.stringify(orgname));  
       this.dashboardService.redirectToUrl('client/order-management/');
     } else if(orgname === 'ManualInvoice'){
       this.dashboardService.redirectToUrl('client/invoices/');
+      this.globalWindow.localStorage.setItem("orgmanualinvoicewidget",JSON.stringify(orgname));  
     } else if(orgname === 'pendingInvoice'){
+      this.globalWindow.localStorage.setItem("pendingInvoiceApproval",JSON.stringify(orgname));  
       this.dashboardService.redirectToUrl('client/invoices/');
-    } else if(orgname === 'Timesheet'){
+    } else if(orgname === 'Pending Timesheet'){
       this.dashboardService.redirectToUrl('client/timesheets/');
+      this.globalWindow.localStorage.setItem("orgpendingwidget",JSON.stringify(orgname));  
     }
   }
 }
+
+
+

@@ -39,15 +39,8 @@ import { AgencyStatus } from 'src/app/shared/enums/status';
 import { UserStateModel } from '../../../store/user.state';
 import { ToggleSidebarState } from 'src/app/store/app.actions';
 import { ActivatedRoute } from '@angular/router';
-
-interface IOrganizationAgency {
-  id: number;
-  name: string;
-  type: 'Organization' | 'Agency';
-  hasLogo?: boolean;
-  lastUpdateTicks?: number;
-  status?: AgencyStatus;
-}
+import { IOrganizationAgency } from './unit-selector.interface';
+import { UnitSelectorHelper } from './unit-selector.helper';
 
 @Component({
   selector: 'app-organization-agency-selector',
@@ -111,72 +104,8 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     this.subscribeUserChange();
     this.isOrganizationAgencyAreaChange();
     this.subscribeOrganizationAgencies();
+    this.observeSelectorControl();
 
-    this.organizationAgencyControl.valueChanges
-      .pipe(
-        takeUntil(this.unsubscribe$),
-        debounceTime(300),
-        distinctUntilChanged(),
-        switchMap(() => this.user$)
-      )
-      .subscribe((user) => {
-        const agencyOrganizations = [BusinessUnitType.Agency, BusinessUnitType.Organization];
-        if (!user) {
-          return;
-        }
-
-        if (agencyOrganizations.includes(user.businessUnitType)) {
-          this.store.dispatch(new LastSelectedOrganisationAgency(user.businessUnitName));
-          const isAgency = user.businessUnitType === BusinessUnitType.Agency;
-          this.store.dispatch(
-            new SaveLastSelectedOrganizationAgencyId(
-              {
-                lastSelectedOrganizationId: !isAgency ? user.businessUnitId : null,
-                lastSelectedAgencyId: isAgency ? user.businessUnitId : null,
-              },
-              !isAgency
-            )
-          );
-        }
-
-        const selectedOrganizationAgencyId: number = this.organizationAgencyControl.value;
-        const selectedOrganizationAgency = this.organizationsAgencies$
-          .getValue()
-          .find((i) => i.id === selectedOrganizationAgencyId);
-
-        if (!selectedOrganizationAgency) {
-          return;
-        }
-
-        const selectedType = selectedOrganizationAgency.type;
-
-        if (selectedType === 'Organization') {
-          this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
-          this.store.dispatch(
-            new SaveLastSelectedOrganizationAgencyId(
-              {
-                lastSelectedOrganizationId: selectedOrganizationAgencyId,
-                lastSelectedAgencyId: this.store.selectSnapshot(UserState.lastSelectedAgencyId),
-              },
-              true
-            )
-          );
-        }
-        if (selectedType === 'Agency') {
-          this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
-          this.store.dispatch(
-            new SaveLastSelectedOrganizationAgencyId(
-              {
-                lastSelectedOrganizationId: this.store.selectSnapshot(UserState.lastSelectedOrganizationId),
-                lastSelectedAgencyId: selectedOrganizationAgencyId,
-              },
-              false
-            )
-          );
-
-          this.setAgencyStatus(selectedOrganizationAgency);
-        }
-      });
   }
 
   public selectBusinesUnitType(): void {
@@ -192,15 +121,20 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   }
 
   private subscribeUserChange(): void {
-    this.actions$.pipe(ofActionDispatched(UserOrganizationsAgenciesChanged)).subscribe(() => {
+    this.actions$
+    .pipe(
+      ofActionDispatched(UserOrganizationsAgenciesChanged),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
       this.store.dispatch(new GetUserOrganizations());
       this.store.dispatch(new GetUserAgencies());
     });
-    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
-      if (!user) {
-        return;
-      }
 
+    this.user$
+    .pipe(
+      filter((user) => !!user),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((user) => {
       const agencyOrganizations = [BusinessUnitType.Agency, BusinessUnitType.Organization];
       this.isAgencyOrOrganization = agencyOrganizations.includes(user.businessUnitType);
 
@@ -213,20 +147,23 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     this.isOrganizationAgencyArea$
     .pipe(
       distinctUntilChanged((prev, next) => {
-        return prev.isAgencyArea === next.isAgencyArea && next.isOrganizationArea === next.isOrganizationArea;
+        return prev.isAgencyArea === next.isAgencyArea && prev.isOrganizationArea === next.isOrganizationArea;
       }),
       takeUntil(this.unsubscribe$),
     )
     .subscribe((area) => {
       const isOrganizationArea = area.isOrganizationArea;
       const isAgencyArea = area.isAgencyArea;
+
       if (isOrganizationArea && isAgencyArea) {
         this.applyOrganizationsAgencies(isOrganizationArea, isAgencyArea);
         return;
       }
       if (isOrganizationArea || isAgencyArea) {
         const currentArea = isOrganizationArea ? 'Organization' : 'Agency';
-        this.store.dispatch(new LastSelectedOrganisationAgency(currentArea)).subscribe(() => {
+        
+        this.store.dispatch(new LastSelectedOrganisationAgency(currentArea))
+        .subscribe(() => {
           this.applyOrganizationsAgencies(isOrganizationArea, isAgencyArea);
         });
       }
@@ -236,41 +173,25 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   private subscribeOrganizationAgencies(): void {
     zip(this.agencies$, this.organizations$)
       .pipe(
-        filter((value) => !!value[0] && !!value[1]),
-        takeUntil(this.unsubscribe$)
+        filter((value) => {
+          const dataExist = Array.isArray(value);
+          const bothValuesExist = !!value[0] && !!value[1];
+
+          return dataExist && bothValuesExist;
+        }),
+        takeUntil(this.unsubscribe$),
       )
       .subscribe((userAgenciesAndOrganizations) => {
-        if (
-          !Array.isArray(userAgenciesAndOrganizations) ||
-          !userAgenciesAndOrganizations[0] ||
-          !userAgenciesAndOrganizations[1]
-        ) {
-          return;
-        }
-
         this.userAgencies = userAgenciesAndOrganizations[0];
         this.userOrganizations = userAgenciesAndOrganizations[1];
 
-        const agencies = this.userAgencies.businessUnits;
-        const organizations = this.userOrganizations.businessUnits;
-
-        this.agencies = agencies.map((a: UserAgencyOrganizationBusinessUnit) => {
-          const { id, name, hasLogo, lastUpdateTicks, status } = a;
-          const agency: IOrganizationAgency = { id, name, type: 'Agency', hasLogo, lastUpdateTicks, status };
-
-          return agency;
-        });
-
-        this.organizations = organizations.map((o: UserAgencyOrganizationBusinessUnit) => {
-          const { id, name, hasLogo, lastUpdateTicks } = o;
-          const organization: IOrganizationAgency = { id, name, type: 'Organization', hasLogo, lastUpdateTicks };
-
-          return organization;
-        });
+        this.agencies = UnitSelectorHelper.createAgencies(this.userAgencies.businessUnits);
+        this.organizations = UnitSelectorHelper.createOrganizations(this.userOrganizations.businessUnits);
 
         const area = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-
         this.applyOrganizationsAgencies(area.isOrganizationArea, area.isAgencyArea);
+
+        this.cd.markForCheck();
       });
   }
 
@@ -343,5 +264,84 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     
     this.store.dispatch(new SetAgencyActionsAllowed(agencyIsActive));
     this.store.dispatch(new SetAgencyInvoicesActionsAllowed(invoiceActionsActive));
+  }
+
+  private observeSelectorControl(): void {
+    this.organizationAgencyControl.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(() => this.user$),
+        filter((user) => !!user),
+        takeUntil(this.unsubscribe$),
+      )
+      .subscribe((user) => {
+        const agencyOrganizations = [BusinessUnitType.Agency, BusinessUnitType.Organization];
+
+        if (agencyOrganizations.includes(user.businessUnitType)) {
+          this.store.dispatch(new LastSelectedOrganisationAgency(user.businessUnitName));
+          const isAgency = user.businessUnitType === BusinessUnitType.Agency;
+
+          this.store.dispatch(
+            new SaveLastSelectedOrganizationAgencyId(
+              {
+                lastSelectedOrganizationId: !isAgency ? user.businessUnitId : null,
+                lastSelectedAgencyId: isAgency ? user.businessUnitId : null,
+              },
+              !isAgency
+            )
+          );
+        }
+
+        const selectedOrganizationAgencyId: number = this.organizationAgencyControl.value;
+
+        const selectedOrganizationAgency = this.organizationsAgencies$
+          .getValue()
+          .find((i) => i.id === selectedOrganizationAgencyId);
+
+
+
+        if (!selectedOrganizationAgency) {
+          return;
+        }
+
+        const selectedType = selectedOrganizationAgency.type;
+
+        if (selectedType === 'Organization') {
+          this.selectOrganization(selectedType, selectedOrganizationAgencyId);
+        }
+
+        if (selectedType === 'Agency') {
+          this.selectAgency(selectedType, selectedOrganizationAgencyId, selectedOrganizationAgency);
+        }
+      });
+  }
+
+  private selectOrganization(type: 'Organization' | 'Agency', selectedId: number): void {
+    this.store.dispatch(new LastSelectedOrganisationAgency(type));
+    this.store.dispatch(
+      new SaveLastSelectedOrganizationAgencyId(
+        {
+          lastSelectedOrganizationId: selectedId,
+          lastSelectedAgencyId: this.store.selectSnapshot(UserState.lastSelectedAgencyId),
+        },
+        true
+      )
+    );
+  }
+
+  private selectAgency(type: 'Organization' | 'Agency', selectedId: number, unit: IOrganizationAgency): void {
+    this.store.dispatch(new LastSelectedOrganisationAgency(type));
+    this.store.dispatch(
+      new SaveLastSelectedOrganizationAgencyId(
+        {
+          lastSelectedOrganizationId: this.store.selectSnapshot(UserState.lastSelectedOrganizationId),
+          lastSelectedAgencyId: selectedId,
+        },
+        false
+      )
+    );
+
+    this.setAgencyStatus(unit);
   }
 }
