@@ -3,6 +3,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { PageOfCollections } from '@shared/models/page.model';
 import { DepartmentFiltersColumnsEnum } from '../enums';
+import { EditDepartmentFieldsEnum } from '../enums/edit-department.enum';
 
 export interface DepartmentAssigned {
   id: number;
@@ -25,7 +26,7 @@ interface Skill {
   name: string;
 }
 
-export interface EditAssignedDepartment{
+export interface EditAssignedDepartment {
   assignedDepartmentIds: number[];
   startDate: Date | string;
   endDate: Date | string;
@@ -39,25 +40,26 @@ export interface AssignNewDepartment {
   endDate?: Date | string;
 }
 
-export interface DepartmentFilterFieldConfig {
+export interface DepartmentFormFieldConfig<T> {
   type: ControlTypes;
   title: string;
-  field: DepartmentFiltersColumnsEnum;
+  field: T;
   isShort?: boolean;
   showSelectAll?: boolean;
   sortOrder?: SortOrder;
   optionFields?: object;
+  show?: boolean;
 }
 
-export type DepartmentFiltersColumns =  {
-  [key in DepartmentFiltersColumnsEnum ]:{
+export type DepartmentFiltersColumns = {
+  [key in DepartmentFiltersColumnsEnum]: {
     type: ControlTypes;
     valueType: ValueType;
     dataSource?: DataSourceItem[];
     valueField?: string;
     valueId?: string;
-  }
-}
+  };
+};
 
 export interface DepartmentFilterState {
   regionId: number[];
@@ -68,6 +70,20 @@ export interface DepartmentFilterState {
   both: boolean;
   oriented: boolean;
   notOriented: boolean;
+}
+
+export interface EditDepartmentFormState {
+  [EditDepartmentFieldsEnum.START_DATE]: Date;
+  [EditDepartmentFieldsEnum.END_DATE]: Date;
+  [EditDepartmentFieldsEnum.ORIENTED]: boolean;
+  [EditDepartmentFieldsEnum.HOME_COST_CENTER]: boolean;
+  [EditDepartmentFieldsEnum.ORIENTED_START_DATE]?: Date;
+}
+
+export interface DialogDefinition {
+  assignDepartment: boolean;
+  editAssignedDepartment: boolean;
+  bulkEditDepartments: boolean;
 }
 
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;

@@ -21,7 +21,7 @@ import { MultiplePipeModule } from '@shared/pipes/multiple.pipe';
 import { JoinPipeModule } from '@shared/pipes/join.pipe';
 import { DropdownModule } from '@shared/components/form-controls/dropdown/dropdown.module';
 import { FilterDepartmentComponent } from './filter-department/filter-department.component';
-import { DepartmentFilterService } from './services/department-filter.service';
+import { DepartmentFormService } from './services/department-filter.service';
 import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
 
 @NgModule({
@@ -49,6 +49,6 @@ import { EditDepartmentsComponent } from './edit-departments/edit-departments.co
     DropdownModule,
     RadioButtonModule
   ],
-  providers: [DepartmentsService, DepartmentFilterService],
+  providers: [DepartmentsService, DepartmentFormService],
 })
 export class DepartmentsModule {}

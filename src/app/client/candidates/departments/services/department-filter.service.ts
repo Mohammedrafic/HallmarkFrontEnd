@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { CustomFormGroup } from '@core/interface';
-import { DepartmentFiltersColumns } from '../departments.model';
+import { DepartmentFiltersColumns, EditDepartmentFormState } from '../departments.model';
 
 @Injectable()
-export class DepartmentFilterService {
+export class DepartmentFormService {
   constructor(private readonly formBuilder: FormBuilder) {}
 
-  public createForm(): CustomFormGroup<DepartmentFiltersColumns> {
+  public createFilterForm(): CustomFormGroup<DepartmentFiltersColumns> {
     return this.formBuilder.group({
       regionIds: [null],
       locationIds: [null],
@@ -21,5 +21,14 @@ export class DepartmentFilterService {
       notOriented: [false],
     }) as CustomFormGroup<DepartmentFiltersColumns>;
   }
-}
 
+  public createEditForm(): CustomFormGroup<EditDepartmentFormState> {
+    return this.formBuilder.group({
+      startDate: [null],
+      endDate: [null],
+      oriented: [false],
+      homeCostCenter: [false],
+      orientedStartDate: [null],
+    }) as CustomFormGroup<EditDepartmentFormState>;
+  }
+}

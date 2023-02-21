@@ -13,10 +13,10 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/filters-helper.constant';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { DepartmentFilterFieldConfig, DepartmentFiltersColumns, DepartmentFilterState } from '../departments.model';
+import { DepartmentFormFieldConfig, DepartmentFiltersColumns, DepartmentFilterState } from '../departments.model';
 import { FilterService } from '@shared/services/filter.service';
-import { DepartmentFilterFormConfig } from '@client/candidates/constants/department-filter.constant';
-import { DepartmentFilterService } from '../services/department-filter.service';
+import { DepartmentFilterFormConfig } from '@client/candidates/departments/constants/department-filter.constant';
+import { DepartmentFormService } from '../services/department-filter.service';
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
 import { DatePipe } from '@angular/common';
 import { SortOrder } from '@syncfusion/ej2-angular-navigations';
@@ -35,7 +35,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   @Output() readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
   @Output() readonly updateTableByFilters: EventEmitter<DepartmentFilterState> = new EventEmitter<DepartmentFilterState>();
 
-  public filtersFormConfig: DepartmentFilterFieldConfig[] = [];
+  public filtersFormConfig: DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>[] = [];
   public controlTypes = ControlTypes;
   public filteredItems: FilteredItem[] = [];
   public filterColumns: DepartmentFiltersColumns = {} as DepartmentFiltersColumns;
@@ -57,7 +57,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   constructor(
     private readonly cdr: ChangeDetectorRef,
     private readonly filterService: FilterService,
-    private readonly departmentFilterService: DepartmentFilterService,
+    private readonly departmentFormService: DepartmentFormService,
     private readonly datePipe: DatePipe,
     private readonly candidateProfileFormService: CandidateProfileFormService
   ) {
@@ -73,7 +73,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     this.subscribeOnSkills();
   }
 
-  public trackByFn = (_: number, item: DepartmentFilterFieldConfig) => item.field;
+  public trackByFn = (_: number, item: DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>) => item.field;
 
   public applyFilters(): void {
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
@@ -111,7 +111,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   }
 
   private initFilterForm(): void {
-    this.formGroup = this.departmentFilterService.createForm();
+    this.formGroup = this.departmentFormService.createFilterForm();
   }
 
   private initFormConfig(): void {
