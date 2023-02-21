@@ -1,0 +1,29 @@
+<section class="container">
+  <ejs-tab
+    (selected)="selectTab($event)"
+    [heightAdjustMode]="'Fill'"
+  >
+    <e-tabitems>
+      <e-tabitem>
+        <ng-template #headerText><div>Orientation Setup</div></ng-template>
+        <ng-template #content>
+          <app-orientation-setup></app-orientation-setup>
+        </ng-template>
+      </e-tabitem>
+
+      <e-tabitem>
+        <ng-template #headerText><div>Historical Data</div></ng-template>
+        <ng-template #content>
+          <app-orientation-historical-data></app-orientation-historical-data>
+        </ng-template>
+      </e-tabitem>
+
+      <e-tabitem>
+        <ng-template #headerText><div>Exceptions</div></ng-template>
+        <ng-template #content>
+          <app-orientation-exception></app-orientation-exception>
+        </ng-template>
+      </e-tabitem>
+    </e-tabitems>
+  </ejs-tab>
+</section>

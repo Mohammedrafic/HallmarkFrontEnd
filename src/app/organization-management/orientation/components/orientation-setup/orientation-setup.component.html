@@ -1,0 +1,30 @@
+<section class="flex-column">
+  <div class="orientation-type-container">
+    <form class="settings-form" [formGroup]="orientationTypeSettingsForm">
+      <div class="input-container">
+        <div class="input-group switch">
+          <ejs-switch id="switcher" class="switch" formControlName="isEnabled"></ejs-switch>
+          <label class="switch-label">{{ switcherValue }}</label>
+        </div>
+      </div>
+      <app-dropdown
+        [dataSource]="orientationTypeDataSource"
+        [fields]="fields"
+        [formGroupInstance]="orientationTypeSettingsForm"
+        [hideBorder]="false"
+        [required]="true"
+        label="Orientation Type"
+        id="orientationType"
+        class="orientation-type"
+        controlName="type"
+      ></app-dropdown>
+      <button
+        ejs-button
+        [isPrimary]="true"
+        [disabled]="orientationTypeSettingsForm.pristine"
+        (click)="saveOrientationSettingsHandler()"
+      >Save</button>
+    </form>
+  </div>
+  <app-orientation-grid gridTitle="Orientation Setup"></app-orientation-grid>
+</section>

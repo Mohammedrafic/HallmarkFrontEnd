@@ -37,4 +37,11 @@ export const ORG_SETTINGS: MenuSettings[] = [
     permissionKeys: ['CanViewWorkCommitmentData'],
     isIRPOnly: true,
   },
+  {
+    text: 'Orientation',
+    id: 16,
+    route: './orientation',
+    //permissionKeys: ['CanViewOrientation'], TODO: uncomment when permissions are ready
+    isIRPOnly: true,
+  },
 ];

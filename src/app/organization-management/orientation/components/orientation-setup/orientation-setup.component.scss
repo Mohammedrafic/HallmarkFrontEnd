@@ -1,0 +1,25 @@
+@import 'colors';
+
+.flex-column {
+  display: flex;
+  height: calc(100% - 50px);
+}
+
+.orientation-type-container {
+  margin-top: 20px;
+
+  .orientation-type {
+    margin-right: 12px;
+    margin-left: 12px;
+    width: 490px;
+  }
+
+  .switch {
+    width: 72px;
+  }
+
+  .settings-form {
+    display: flex;
+    align-items: end;
+  }
+}
