@@ -730,6 +730,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private getRowsPerPage(data: object[], currentPage: number): object[] {
+    const invoiceGneration: any = data.find((setting: any) => {
+      return setting.controlType === this.organizationSettingControlType.InvoiceAutoGeneration;
+    });
+
+    if (invoiceGneration && invoiceGneration.value && typeof invoiceGneration.value === 'string') {
+      invoiceGneration.parsedValue = JSON.parse(invoiceGneration.value);
+    }
+
     return data.slice(
       currentPage * this.getActiveRowsPerPage() - this.getActiveRowsPerPage(),
       currentPage * this.getActiveRowsPerPage()

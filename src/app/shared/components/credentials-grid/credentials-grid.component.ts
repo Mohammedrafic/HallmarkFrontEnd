@@ -508,11 +508,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }: CandidateCredential): void {
     if (this.masterCredentialId) {
       if (createdOn != null) {
-        createdOn = DateTimeHelper.toUtcFormat(createdOn);
+        createdOn = DateTimeHelper.setInitHours(createdOn);
       }
 
       if (createdUntil != null) {
-        createdUntil = DateTimeHelper.toUtcFormat(createdUntil);
+        createdUntil = DateTimeHelper.setInitHours(createdUntil);
       }
       if (this.isOrganizationAgencyArea.isAgencyArea) {
         this.store.dispatch(

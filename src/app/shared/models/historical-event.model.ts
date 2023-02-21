@@ -12,4 +12,5 @@ export interface OrderHistoricalEvent {
   userType: number;
   firstName: string;
   lastName: string;
+  localDateTime: string;
 }

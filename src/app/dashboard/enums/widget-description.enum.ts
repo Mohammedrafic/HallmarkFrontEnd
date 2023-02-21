@@ -18,6 +18,6 @@ export enum WidgetDescriptionEnum {
   IN_PROGRESS_POSITIONS_TREND = 'In_Progress_Positions_Trend',
   LTA_ORDER_ENDING = 'LTA order ending in 45 days',
   Candidate_Applied_In_Last_N_Days ='The number of candidates who are in Applied status for configured or more days',
-  ORG = 'Organization widget Description'
+  ORG = 'Organization Widget Description'
 
 }

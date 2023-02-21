@@ -162,6 +162,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'agency/candidate-details',
     },
+    86: {
+      // DNR Details
+      icon: 'users',
+      route: 'client/dnr-details',
+    },
     37: {
       // Candidate Details
       icon: 'users',
