@@ -69,9 +69,7 @@ export interface DepartmentFilterState {
   departmentId: number[];
   startDate: Date | string;
   endDate: Date | string;
-  both: boolean;
   oriented: boolean;
-  notOriented: boolean;
 }
 
 export interface EditDepartmentFormState {

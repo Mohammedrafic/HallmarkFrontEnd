@@ -52,22 +52,9 @@ export const DepartmentFilterFormConfig = (): DepartmentFormFieldConfig<Departme
   },
   {
     type: ControlTypes.Radio,
-    title: 'Both',
-    field: DepartmentFiltersColumnsEnum.BOTH,
-    isShort: true,
-  },
-  {
-    type: ControlTypes.Radio,
     title: 'Oriented',
     field: DepartmentFiltersColumnsEnum.ORIENTED,
-    isShort: true,
-  },
-  {
-    type: ControlTypes.Radio,
-    title: 'Not Oriented',
-    field: DepartmentFiltersColumnsEnum.NOT_ORIENTED,
-    isShort: true,
-  },
+  }
 ];
 
 const commonColumnData = {
@@ -85,7 +72,5 @@ export const FilterColumnConfig: DepartmentFiltersColumns = {
   secondarySkillIds: { ...commonColumnData, valueField: 'skillDescription' },
   startDate: { ...commonColumnData, type: ControlTypes.Date },
   endDate: { ...commonColumnData, type: ControlTypes.Date },
-  both: { ...commonColumnData, type: ControlTypes.Radio },
   oriented: { ...commonColumnData, type: ControlTypes.Radio },
-  notOriented: { ...commonColumnData, type: ControlTypes.Radio },
 };

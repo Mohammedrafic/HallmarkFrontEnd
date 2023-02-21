@@ -19,9 +19,7 @@ export class DepartmentFormService {
       secondarySkillIds: [null],
       startDate: [null],
       endDate: [null],
-      both: [true],
       oriented: [false],
-      notOriented: [false],
     }) as CustomFormGroup<DepartmentFiltersColumns>;
   }
 

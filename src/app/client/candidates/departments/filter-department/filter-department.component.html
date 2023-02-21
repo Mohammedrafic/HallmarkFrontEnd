@@ -1,6 +1,6 @@
 <app-filter-dialog
   [items]="filteredItems"
-  [count]="0"
+  [count]="filteredItems.length"
   (deleteFilter)="deleteFilter($event)"
   (clearAllFiltersClicked)="clearAllFilters()"
   (applyFilterClicked)="applyFilters()"
@@ -22,7 +22,6 @@
             >
             </app-multiselect-dropdown>
           </div>
-          <!-- {{ fieldConfig | json}} -->
         </ng-container>
         <ng-container *ngSwitchCase="controlTypes.Date">
           <div class="item" [class.short]="fieldConfig.isShort">
@@ -35,11 +34,24 @@
         </ng-container>
 
         <ng-container *ngSwitchCase="controlTypes.Radio">
-          <div *ngIf="false" class="item-radio" [class.short]="fieldConfig.isShort">
+          <div class="radio-buttons">
             <ejs-radiobutton
-              formControlName="control"
-              [label]="fieldConfig.title"
-              value="0"
+              formControlName="oriented"
+              id="1"
+              label="Both"
+              value="1"
+            ></ejs-radiobutton>
+            <ejs-radiobutton
+              formControlName="oriented"
+              id="2"
+              label="Oriented"
+              value="2"
+            ></ejs-radiobutton>
+            <ejs-radiobutton
+              formControlName="oriented"
+              id="3"
+              label="Not Oriented"
+              value="3"
             ></ejs-radiobutton>
           </div>
         </ng-container>
@@ -47,4 +59,3 @@
     </ng-container>
   </form>
 </app-filter-dialog>
-

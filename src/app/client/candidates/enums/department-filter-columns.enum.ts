@@ -6,7 +6,5 @@ export enum DepartmentFiltersColumnsEnum {
   SECONDARY_SKILLS = 'secondarySkillIds',
   START_DATE = 'startDate',
   END_DATE = 'endDate',
-  BOTH = 'both',
   ORIENTED = 'oriented',
-  NOT_ORIENTED = 'notOriented',
 }
