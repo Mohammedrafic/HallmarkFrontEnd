@@ -139,7 +139,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
   @Output() orderTypeChanged = new EventEmitter<OrderType>();
   @Output() hourlyRateSync = new EventEmitter<string>();
-  @Input() public externalCommentConfiguration ?: boolean | null; 
+  @Input() public externalCommentConfiguration ?: boolean | null;
 
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
@@ -202,6 +202,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   private alreadyShownDialog = false;
   private touchedFields: Set<string> = new Set();
   private orderControlsConfig: ControlsConfig;
+  private filteredJobDistributionValue: number | null = null;
 
   @Select(OrganizationManagementState.sortedRegions)
   public regions$: Observable<Region[]>;
@@ -471,7 +472,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     if(this.contactDetailsFormArray.invalid) {
       return;
     }
-    
+
     this.createContactForm();
   }
 
@@ -658,8 +659,11 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       .filter((jobDistribution: JobDistributionModel) =>
         jobDistribution.jobDistributionOption === OrderJobDistribution.Selected)
       .map((jobDistribution: JobDistributionModel) => jobDistribution.agencyId);
+
+    this.filteredJobDistributionValue = getFilteredJobDistribution(jobDistributionValues)[0];
+
     this.jobDistributionForm.controls['jobDistribution'].patchValue(
-      getFilteredJobDistribution(jobDistributionValues)[0]
+      this.filteredJobDistributionValue
     );
 
     this.associateAgencies$
@@ -915,10 +919,21 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         takeUntil(this.componentDestroy())
       ).subscribe(({ TieringLogic }) => {
       this.distribution = distributionSource(TieringLogic === TierLogic.Show);
+      this.patchJobDistributionValue();
+
       this.cd.markForCheck();
     });
   }
 
+  private patchJobDistributionValue(): void {
+    if(this.order && this.filteredJobDistributionValue) {
+      this.jobDistributionForm.controls['jobDistribution'].patchValue(
+        this.filteredJobDistributionValue
+      );
+      this.filteredJobDistributionValue = null;
+    }
+  }
+  
   private initOrderForms(): void {
     this.orderTypeForm = this.orderDetailsService.createOrderTypeForm();
     this.generalInformationForm = this.orderDetailsService.createGeneralInformationForm();
@@ -1084,7 +1099,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       ]).pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(([departmentId, skillId]) => {
-      if (!departmentId || !skillId || (this.isEditMode && this.order?.status !== OrderStatus.Incomplete)) { 
+      if (!departmentId || !skillId || (this.isEditMode && this.order?.status !== OrderStatus.Incomplete)) {
         return;
       }
 

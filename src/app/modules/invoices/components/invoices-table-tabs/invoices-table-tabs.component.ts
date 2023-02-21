@@ -45,6 +45,7 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
   public alertTitle: string
   public orgwidgetpendinginvoice:string;
   public tabsWidth$: Observable<string>;
+  public orgwidgetmanualinvoice: string;
   constructor(
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
     private store: Store,
@@ -125,9 +126,9 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
   @OutsideZone
   private pendinginvoiceNavigation(): void {
     setTimeout(() => {
-      this.orgwidgetpendinginvoice = JSON.parse(localStorage.getItem('orgmanualinvoicewidget') || '""') as string;
+      this.orgwidgetmanualinvoice = JSON.parse(localStorage.getItem('orgmanualinvoicewidget') || '""') as string;
       this.orgwidgetpendinginvoice = JSON.parse(localStorage.getItem('pendingInvoiceApproval') || '""') as string;
-       if(this.orgwidgetpendinginvoice === "ManualInvoice") {
+       if(this.orgwidgetmanualinvoice === "ManualInvoice") {
          this.tabComponent.selectedItem= InvoicesOrgTabId.ManualInvoicePending;
          this.changeTab.emit(InvoicesOrgTabId.ManualInvoicePending);
          this.globalWindow.localStorage.setItem("orgmanualinvoicewidget", JSON.stringify(""));

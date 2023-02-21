@@ -1141,6 +1141,7 @@
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
   (updateOrders)="getOrders()"
   (reOpenOrderSuccess)="updateOrderDetails($event)"
+  [orderComments]="orderComments"
 ></app-order-details-dialog>
 
 <app-update-reg-rate
@@ -1153,6 +1154,7 @@
 
 <app-child-order-dialog
   [order]="$any(selectedOrder)"
+  [orderComments]="orderComments"
   [candidate]="selectedCandidate"
   [openEvent]="openChildDialog"
   [activeSystem]="activeSystem"

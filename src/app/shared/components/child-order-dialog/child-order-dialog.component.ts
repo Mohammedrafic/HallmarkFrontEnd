@@ -121,6 +121,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
   @Input() activeSystem: OrderManagementIRPSystemId;
+  @Input() orderComments: Comment[] = [];
   @Output() saveEmitter = new EventEmitter<void>();
 
   // TODO: Delete it when we will have re-open sidebar
