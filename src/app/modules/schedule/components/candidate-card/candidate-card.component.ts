@@ -10,14 +10,25 @@ import { CandidateIconName } from '../../constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CandidateCardComponent implements OnInit {
-  @Input() candidate: ScheduleCandidate;
+  @Input() set candidate(candidate: ScheduleCandidate) {
+    if (candidate.workCommitments && candidate.workCommitments.length) {
+      candidate.workCommitmentText = 'Work Commitment: ' + candidate.workCommitments.join(', ');
+    } else {
+      candidate.workCommitmentText = 'Work Commitment';
+    }
+
+
+    this.candidateData = candidate;
+  }
+
+  candidateData: ScheduleCandidate;
 
   candidateIconName: string;
 
   iconTooltipMessage = '';
 
   ngOnInit(): void {
-    this.iconTooltipMessage = this.candidate.isOriented ? this.candidate.employeeNote : 'Not Oriented';
-    this.candidateIconName = CandidateIconName(this.candidate);
+    this.iconTooltipMessage = this.candidateData.isOriented ? this.candidateData.employeeNote : 'Not Oriented';
+    this.candidateIconName = CandidateIconName(this.candidateData);
   }
 }

@@ -237,11 +237,11 @@
           <ng-template #template let-data>
             <div class="link" (click)="onViewNavigation(data)">
               {{ data.lastName }}, {{ data.firstName }}
-              <ng-container *ngIf="data.deployedCandidateInfo && data.statusName !== 'Onboard'">
+              <!-- <ng-container *ngIf="data.deployedCandidateInfo && data.statusName !== 'Onboard'">
                 <ejs-tooltip content="Not oriented" position="TopRight">
                   <i-feather name="compass" class="icon"></i-feather>
                 </ejs-tooltip>
-              </ng-container>
+              </ng-container> -->
             </div>
           </ng-template>
         </e-column>
@@ -271,28 +271,6 @@
               {{data.isContract | boolValueToText }}
             </div>
           </ng-template>
-        </e-column>
-        <e-column field="lastShiftFrom" headerText="Last Shift Scheduled" textAlign="Left" width="116">
-          <ng-template  #template let-data>
-            <div>
-              {{data.lastShiftFrom | date: 'MM/dd/yyyy' }}
-            </div>
-          </ng-template>
-        </e-column>
-        <e-column field="lastShiftTime" headerText="Last Shift Time" textAlign="Left" width="116">
-        </e-column>
-        <e-column field="nextShiftFrom" headerText="Next Shift Scheduled" textAlign="Left" width="116">
-          <ng-template  #template let-data>
-            <div>
-              {{data.nextShiftFrom | date: 'MM/dd/yyyy' }}
-            </div>
-          </ng-template>
-        </e-column>
-        <e-column field="nextShiftTime" headerText="Next Shift Time" textAlign="Left" width="116">
-        </e-column>
-        <e-column field="weeklyHoursSchedule" headerText="Week hours SCH." textAlign="Left" width="116">
-        </e-column>
-        <e-column field="weekOvertime" headerText="Week Overtime" textAlign="Left" width="116">
         </e-column>
         <e-column field="payRate" headerText="Pay Rate" textAlign="Left" width="116">
         </e-column>

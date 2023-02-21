@@ -93,6 +93,7 @@ export const MapSystemWithTabs: Map<OrderManagementIRPSystemId, TabsListConfig[]
 export const ThreeDotsMenuOptions = (
   canCreateOrder: boolean,
   canCloseOrder: boolean,
+  isIrpSystem: OrderManagementIRPSystemId,
 ): Record<string, ItemModel[]> => ({
   moreMenuWithDeleteButton: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
@@ -102,7 +103,7 @@ export const ThreeDotsMenuOptions = (
   moreMenuWithCloseButton: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
-    { text: MoreMenuType[2], id: '2', disabled: !canCloseOrder },
+    { text: MoreMenuType[2], id: '2', disabled: !canCloseOrder || isIrpSystem === OrderManagementIRPSystemId.IRP },
   ],
   moreMenuWithReOpenButton: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
@@ -115,12 +116,16 @@ export const ThreeDotsMenuOptions = (
   ],
   reOrdersMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
-    { text: MoreMenuType[2], id: '2', disabled: !canCloseOrder },
+    { text: MoreMenuType[2], id: '2', disabled: !canCloseOrder  || isIrpSystem === OrderManagementIRPSystemId.IRP },
   ],
   filledReOrdersMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
   ],
   closedOrderMenu: [
+    { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
+  ],
+  irpIncompleteMenu: [
+    { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
   ],
 });
@@ -154,8 +159,10 @@ export const PrepareMenuItems = (order: OrderManagement, threeDotsMenuOptions: R
     return threeDotsMenuOptions['closedOrderMenu'];
   }
 
-  if (order.isMoreMenuWithDeleteButton) {
+  if (order.isMoreMenuWithDeleteButton && order?.status !== OrderStatus.Incomplete) {
     return threeDotsMenuOptions['moreMenuWithDeleteButton'];
+  } else if (order?.status === OrderStatus.Incomplete) {
+    return threeDotsMenuOptions['irpIncompleteMenu'];
   } else {
     const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
 

@@ -1,7 +1,7 @@
 <div class="card-wrapper">
   <div class="block block--name">
     <ejs-tooltip content="Candidate Name" position="TopCenter" [showTipPointer]="false">
-      <p class="name">{{ candidate.lastName }}, {{ candidate.firstName }}</p>
+      <p class="name">{{ candidateData.lastName }}, {{ candidateData.firstName }}</p>
     </ejs-tooltip>
     <!-- TODO: uncomment for feature implementation -->
     <!--<ejs-tooltip
@@ -18,23 +18,25 @@
   </div>
   <div class="block">
     <ejs-tooltip
-      [content]="candidate.displayId.length > 12 ? 'ID: ' + candidate.displayId : 'ID'"
+      [content]="candidateData.displayId.length > 12 ? 'ID: ' + candidateData.displayId : 'ID'"
       position="TopCenter"
       [showTipPointer]="false" class="block-id">
-      <span>{{ candidate.displayId | textElipsis: 12 }}</span>
+      <span>{{ candidateData.displayId | textElipsis: 12 }}</span>
     </ejs-tooltip>
     <span class="separator">|</span>
     <ejs-tooltip content="Primary Skill" position="TopCenter" [showTipPointer]="false" class="block-skill">
-      <span class="direction">{{ candidate.skill }}</span>
+      <span class="direction">{{ candidateData.skill }}</span>
     </ejs-tooltip>
   </div>
   <div class="block">
     <ejs-tooltip content="Scheduled Hours Per Week 1/Week 2" position="TopCenter" [showTipPointer]="false">
-      <span>{{ candidate.workHours.join('/') }}</span>
+      <span>{{ candidateData.workHours.join('/') }}</span>
     </ejs-tooltip>
     <span class="separator">|</span>
-    <ejs-tooltip content="Work Commitment" position="TopCenter" [showTipPointer]="false">
-      <span>{{ candidate.workCommitment }}</span>
+    <ejs-tooltip [content]="candidateData.workCommitmentText" position="TopRight" [showTipPointer]="false">
+      <span>
+        {{ candidateData.workCommitments && candidateData.workCommitments.length > 1
+          ? 'Multiple' : candidateData.workCommitments?.[0] }}</span>
     </ejs-tooltip>
   </div>
 </div>

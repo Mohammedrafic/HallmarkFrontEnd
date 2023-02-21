@@ -51,6 +51,7 @@
             </app-tooltip-container>
             <app-tooltip-container *ngIf="!canCloseOrder" [showToolTip]="!hasCreateEditOrderPermission">
               <button
+                *ngIf="activeSystem !== systemType.IRP"
                 ejs-button
                 cssClass="e-outline"
                 [class.custom-order-btn]="showApproveAndCancel"
@@ -84,6 +85,7 @@
             </app-tooltip-container>
             <app-tooltip-container *ngIf="!showCloseButton" [showToolTip]="!hasCreateEditOrderPermission">
               <button
+                *ngIf="activeSystem !== systemType.IRP"
                 ejs-button
                 cssClass="e-primary delete-button"
                 [class.custom-order-btn]="showApproveAndCancel"
@@ -118,6 +120,7 @@
 
             <app-tooltip-container *ngIf="showLockOrder" [showToolTip]="!hasCreateEditOrderPermission">
               <button
+              *ngIf="activeSystem !== systemType.IRP"
                 ejs-button
                 cssClass="e-outline"
                 [class.custom-order-btn]="showApproveAndCancel"
@@ -157,7 +160,8 @@
             <e-tabitem>
               <ng-template #headerText>{{ isReOrder && activeSystem !==  systemType.IRP ? 'Re-Order' : 'Order' }} Details</ng-template>
               <ng-template #content>
-                <app-order-details-container *ngIf="sideDialog.visible" [currentOrder]="order"
+                <app-order-details-container
+                  *ngIf="sideDialog.visible" [currentOrder]="order"
                   [activeSystem]="activeSystem"></app-order-details-container>
               </ng-template>
             </e-tabitem>

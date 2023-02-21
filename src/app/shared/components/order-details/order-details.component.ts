@@ -1,22 +1,21 @@
 import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
-import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
-import { filter, Observable, Subject, switchMap, takeUntil, takeWhile, throttleTime } from 'rxjs';
-import { OrderType } from '@shared/enums/order-type';
-import { Select, Store } from '@ngxs/store';
-import { CommentsService } from '@shared/services/comments.service';
-import { Comment } from '@shared/models/comment.model';
+
+import { Store } from '@ngxs/store';
+import { Subject, takeUntil, throttleTime } from 'rxjs';
+
 import { SetIsDirtyOrderForm } from '@client/store/order-managment-content.actions';
-import { HistoricalEventsService } from '@shared/services/historical-events.service';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { OrderType } from '@shared/enums/order-type';
 import { OrderHistoricalEvent } from '@shared/models';
-import { AppState } from '../../../store/app.state';
+import { Comment } from '@shared/models/comment.model';
+import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
+import { CommentsService } from '@shared/services/comments.service';
+import { HistoricalEventsService } from '@shared/services/historical-events.service';
 import { AccordionComponent, ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
-import { OrganizationManagementState } from '../../../organization-management/store/organization-management.state';
-import { OrganizationSettingsGet } from '../../models/organization-settings.model';
-import { SettingsKeys } from '../../enums/settings';
-import { SettingsHelper } from '../../../core/helpers/settings.helper';
+import { AppState } from '../../../store/app.state';
 import { UserState } from '../../../store/user.state';
-import { BusinessUnitType } from '../../enums/business-unit-type';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '../../constants/organization-settings';
+import { BusinessUnitType } from '../../enums/business-unit-type';
 import { SettingsViewService } from '../../services/settings-view.service';
 
 type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
@@ -29,8 +28,9 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   @ViewChild('accrdDescription') private readonly accrdDescription: AccordionComponent;
   @ViewChild('accrdHistorical') private readonly accrdHistorical: AccordionComponent;
 
-  @Input() isPosition: boolean = false;
+  @Input() isPosition = false;
   @Input() jobId: number;
+  @Input() activeSystem: OrderManagementIRPSystemId;
   @Input() set currentOrder(value: Order) {
     this.order = value;
     this.getContactDetails();
@@ -42,6 +42,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   public comments: Comment[] = [];
   public events: OrderHistoricalEvent[];
   public isHideContactDetailsOfOrderInAgencyLogin: boolean;
+  public readonly systemTypes = OrderManagementIRPSystemId;
 
   private unsubscribe$: Subject<void> = new Subject();
   private eventsHandler: Subject<void> = new Subject();
