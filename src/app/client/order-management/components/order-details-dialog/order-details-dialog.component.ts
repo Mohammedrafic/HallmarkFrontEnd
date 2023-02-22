@@ -63,6 +63,7 @@ import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { PermissionService } from '../../../../security/services/permission.service';
 import { UserState } from '../../../../store/user.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { Comment } from '@shared/models/comment.model';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -78,6 +79,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() hasCreateEditOrderPermission: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Input() activeSystem: OrderManagementIRPSystemId;
+  @Input() orderComments: Comment[] = [];
 
   @Output() nextPreviousOrderEvent = new EventEmitter<{ next: boolean, isIrpOrder: boolean}>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
@@ -182,7 +184,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get desktopSmallMenu(): { text: string }[] {
     let menu: { text: string }[] = [];
-    if (!this.canCloseOrder && !this.disableCloseOrder) {
+
+    if (!this.canCloseOrder && !this.disableCloseOrder && this.activeSystem !== this.systemType.IRP) {
       menu = [...menu, { text: MobileMenuItems.CloseOrder }];
     }
     if (this.canReOpen) {
@@ -191,10 +194,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     if (this.showCreateReOrder && !this.disableCreateReOrder) {
       menu = [...menu, { text: MobileMenuItems.CreateReOrder }];
     }
-    if (!this.showCloseButton) {
+    if (!this.showCloseButton && this.activeSystem !== this.systemType.IRP) {
       menu = [...menu, { text: MobileMenuItems.Delete }];
     }
-    if (!this.disabledLock && this.showLockOrder) {
+    if (!this.disabledLock && this.showLockOrder && this.activeSystem !== this.systemType.IRP) {
       menu = [...menu, { text: this.order?.isLocked ? MobileMenuItems.Unlock : MobileMenuItems.Lock }];
     }
     return menu;

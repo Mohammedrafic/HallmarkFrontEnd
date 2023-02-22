@@ -1,8 +1,11 @@
+@import 'colors';
+
 .reorder {
   margin-top: 34px;
   display: flex;
   flex-direction: column;
   row-gap: 12px;
+  height: 100%;
 
   .row-controls {
     display: flex;
@@ -16,12 +19,16 @@
 
   .comments {
     padding: 0;
-  
+    min-height: 250px;
+    height: 100%;
+
     .e-card-content {
       padding: 0;
-      height: 456px;
+      height: 100%;
     }
   }
 }
 
-
+.error {
+  color: $supportive-red
+}

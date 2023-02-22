@@ -107,6 +107,12 @@ import { CandidateState } from '@agency/store/candidate.state';
 import { UpdateRegRateComponent
 } from './order-management/components/update-reg-rate/update-reg-rate.component';
 import { NumericTextboxModule } from '@shared/components/form-controls/numeric-textbox/numeric-textbox.module';
+import { DoNotReturnDetailsComponent } from './do-not-return/do-not-return-details/do-not-return-details.component';
+import { DoNotReturnGridComponent } from './do-not-return/do-not-return-grid/do-not-return-grid.component';
+import { DonotReturnState } from '@admin/store/donotreturn.state';
+import { DonotreturnService } from '@shared/services/donotreturn.service';
+import { DoNotReturnFormService } from './do-not-return/do-not-return.form.service';
+
 
 const gridIcons = {
   MessageSquare,
@@ -157,7 +163,9 @@ const gridIcons = {
     OrderDetailsContainerComponent,
     OrderCandidatesContainerComponent,
     OrderImportComponent,
-    UpdateRegRateComponent
+    UpdateRegRateComponent,
+    DoNotReturnDetailsComponent,
+    DoNotReturnGridComponent
   ],
   imports: [
     CommonModule,
@@ -201,7 +209,7 @@ const gridIcons = {
     MatMenuModule,
     AutoCompleteAllModule,
     //STORE
-    NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState, CandidateState]),
+    NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState, CandidateState,DonotReturnState]),
     ExtensionModule,
     ImportDialogContentModule,
     ListBoxModule,
@@ -215,6 +223,7 @@ const gridIcons = {
     OrderManagementSubrowCandidatePositionModule,
     ScrollToTopModule,
     NumericTextboxModule,
+    AutoCompleteAllModule
   ],
   providers: [
     ResizeService,
@@ -231,6 +240,8 @@ const gridIcons = {
     OrderDetailsService,
     OrderManagementIrpApiService,
     OrderCandidateApiService,
+    DonotreturnService,
+    DoNotReturnFormService
   ],
 })
 export class ClientModule {}

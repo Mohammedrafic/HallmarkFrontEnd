@@ -34,6 +34,11 @@ export enum OrganizationSettingKeys {
   SSNRequiredToAcceptPosition,
   DateOfBirthRequiredToAcceptPosition,
   CandidatePayRate,
+  CandidateAppliedInLastNDays,
+  SetDefaultCommentsScopeToExternal,
+  LimitNumberOfSubmissionsInTotalToPosition,
+  HideContactDetailsOfOrderInAgencyLogin,
+  DisableAddEditTimesheetsInAgencyLogin
 }
 
 export enum OrganizationalHierarchy {

@@ -2,7 +2,7 @@
   <ng-container *ngIf="events?.length; else noData">
     <ng-container *ngFor="let event of events">
       <p>
-        <span class="historical-events__span">{{ event?.actionTime | date: 'MM/dd/yyyy, hh:mm:ss' }} </span>
+        <span class="historical-events__span">{{ event.localDateTime | localDateTime: 'MM/dd/yyyy, HH:mm:ss' }} </span>
         <span *ngIf="!event?.userId; else name">{{ event?.actionDescription }} by System</span>
         <ng-template #name>
           {{ event?.actionDescription }} by {{ businessUnitValues[event.userType] }} User

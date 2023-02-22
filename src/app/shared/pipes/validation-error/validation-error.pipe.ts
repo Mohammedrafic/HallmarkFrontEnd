@@ -42,6 +42,8 @@ export class ValidationErrorPipe implements PipeTransform {
           return `Min digits entered should be 9`;
         }
         return '';
+      case 'max' in value:
+        return `The maximum value should be ${value.max.max}`;
       default:
         return '';
     }

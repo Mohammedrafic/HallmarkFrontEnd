@@ -1,0 +1,154 @@
+<section class="grid-component">
+  <ejs-grid #grid [dataSource]="(donotreturnpage$ | async)?.items" [allowPaging]="allowPaging"
+    [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight"
+    [resizeSettings]="resizeSettings" [allowSorting]="allowSorting" [allowResizing]="allowResizing"
+    [enableVirtualization]="true" (rowSelected)="rowSelected($event, grid)"
+    (rowDeselected)="rowDeselected($event, grid)" (dataBound)="gridDataBound(grid)" (actionBegin)="actionBegin($event)"
+    [selectionSettings]="selectionSettings">
+
+
+    <e-columns>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+      <e-column textAlign="Right" width="120">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editDonotReturn(data, $event)">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="blockDonotReturn(data, $event)">
+              <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="firstName" headerText="first name" width="250"></e-column>
+      <e-column field="middleName" headerText="middle name" width=250>
+      </e-column>
+      <e-column field="lastName" headerText="last name" width=250>
+      </e-column>
+      <e-column field="email" headerText="email" width=250>
+      </e-column>
+      <e-column field="ssn" headerText="ssn" width=250>
+      </e-column>
+      <e-column field="dnrstatus" headerText="dnrstatus" width=250>
+      </e-column>
+      <e-column field="dnrDate" headerText="dnrDate" width=250>
+        <ng-template #template let-data>
+          {{ data.dnrDate | date: "MM/dd/yyyy HH:mm":"utc": "en-US" }}
+        </ng-template>
+      </e-column>
+      <e-column field="dnrComment" headerText="dnrComment" width=250>
+      </e-column>
+
+    </e-columns>
+
+    <ng-template #pagerTemplate let-data>
+      <div class="e-pagertemplate">
+        <div class="control-section">
+          <div class="content-wrapper">
+            <section class="left-side-pager-controls">
+              <ejs-dropdownlist id="rowsPerPage" class="dropdown-no-border" [dataSource]="rowsPerPageDropDown"
+                [allowFiltering]="true" [(value)]="activeRowsPerPageDropDown" (change)="onRowsDropDownChanged()">
+              </ejs-dropdownlist>
+              <ejs-numerictextbox id="goToPage" class="numeric-input-no-border" format="#" placeholder="Go to:" min="1"
+                [max]="(donotreturnpage$ | async)?.totalPages" [showSpinButton]="false" (change)="onChangePage($event)">
+              </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(donotreturnpage$ | async)?.totalCount}}
+              </div>
+            </section>
+            <section class="right-side-pager-controls">
+              <ejs-pager id="gridPager" #gridPager [pageSize]="pageSize"
+                [totalRecordsCount]="(donotreturnpage$ | async)?.totalCount" [enablePagerMessage]="false"
+                [currentPage]="currentPage">
+              </ejs-pager>
+            </section>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ejs-grid>
+</section>
+
+<app-side-dialog (formCancelClicked)="onFormCancelClick()" (formSaveClicked)="saveDonotReturn()" header="Do Not Return">
+  <form [formGroup]="doNotReturnFormGroup" class="donotreturn-form">
+
+    <div class="input-container bootstrap">
+      <label>Organization<span class="required">*</span></label>
+      <div class="input-group">
+        <ejs-dropdownlist appValidateWithMessage formControlName="businessUnitId" [fields]="optionFields"
+          [allowFiltering]="true" [dataSource]="allOrganizations$ | async"
+          (select)="onOrganizationDropDownChanged($event)">
+        </ejs-dropdownlist>
+      </div>
+    </div>
+
+    <div class="input-container bootstrap form-line-item-20">
+      <label>Location<span class="required">*</span></label>
+      <div class="input-group dropdown">
+        <ejs-multiselect appValidateWithMessage mode="CheckBox" popupWidth="auto" formControlName="locationIds"
+          [allowFiltering]="true" [fields]="optionFields" [dataSource]="locations$|async">
+        </ejs-multiselect>
+
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="group">
+        <div class="input-container bootstrap">
+          <label>Candidate Name<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-autocomplete formControlName="candidateProfileId" [dataSource]="CandidateNames" filterType='StartsWith'
+              [fields]='candidateNameFields' [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending'
+              (filtering)='onFiltering($event)'></ejs-autocomplete>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex">
+      <div class="input-container bootstrap f-grow-2">
+        <label>SSN<span class="required">*</span></label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='000-00-0000' />
+        </div>
+      </div>
+      <div class="input-container"></div>
+    </div>
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
+        <label>Comments</label>
+        <div class="input-group">
+          <textarea class="e-input" type="text" rows="3" maxlength="3000" appValidateWithMessage name="dnrComment"
+            formControlName="dnrComment" tabindex="9"></textarea>
+        </div>
+      </div>
+    </div>
+  </form>
+</app-side-dialog>
+
+<app-export-dialog *ngIf="isActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
+  (export)="export($event)"></app-export-dialog>
+
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
+  (export)="export($event)"></app-export-dialog>
+
+<app-filter-dialog [items]="filteredItems" (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()">
+  <form class="bootstrap" [formGroup]="doNotReturnFilterForm">
+    <div class="input-container bootstrap">
+      <label>Candidate name</label>
+      <div class="input-group">
+        <input class="e-input" type="text" appValidateWithMessage placeholder="e.g. Andrew Fuller" maxlength="100"
+          formControlName="candidatename" />
+      </div>
+    </div>
+    <div class="d-flex">
+      <div class="input-container bootstrap f-grow-2">
+        <label>SSN</label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='000-00-0000' />
+        </div>
+      </div>
+      <div class="input-container"></div>
+    </div>
+  </form>
+</app-filter-dialog>

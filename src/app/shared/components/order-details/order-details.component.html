@@ -20,7 +20,7 @@
         </e-accordionitem>
       </e-accordionitems>
     </ejs-accordion>
-    <div class="comments" *ngIf="!isPosition">
+    <div class="comments" *ngIf="!isPosition && activeSystem !== systemTypes.IRP">
       <app-comments
         [comments]="comments"
         [orderId]="order.id"
@@ -28,12 +28,12 @@
         [externalCommentConfiguration]="order.externalCommentsConfiguration"
       ></app-comments>
     </div>
-    <div class="contacts-container">
+    <div class="contacts-container" >
       <div class="contacts">
-        <div class="contact-title">Supervisor Contacts</div>
+        <div class="contact-title">Supervisor/Work Location</div>
         <div class="contact-details">
-          <span> <i-feather name="user" class="icon"></i-feather> {{ contactDetails?.name }} </span>
-          <span> <i-feather name="mail" class="icon"></i-feather> {{ contactDetails?.email }} </span>
+          <span  *ngIf="!isHideContactDetailsOfOrderInAgencyLogin" > <i-feather name="user" class="icon"></i-feather> {{ contactDetails?.name }} </span>
+          <span  *ngIf="!isHideContactDetailsOfOrderInAgencyLogin" > <i-feather name="mail" class="icon"></i-feather> {{ contactDetails?.email }} </span>
           <span>
             <i-feather name="map-pin" class="icon"></i-feather>
             {{ contactDetails?.address }}, {{ contactDetails?.city }}, {{ contactDetails?.state }},
@@ -106,7 +106,8 @@
 </section>
 <section
   class="bill-rates"
-  *ngIf="order && order?.orderType !== orderType.OpenPerDiem && order?.orderType !== orderType.PermPlacement"
+  *ngIf="order && order?.orderType !== orderType.OpenPerDiem && order?.orderType !== orderType.PermPlacement
+  && activeSystem !== systemTypes.IRP"
 >
   <app-bill-rates-view-grid [billRatesData]="order.billRates"></app-bill-rates-view-grid>
 </section>

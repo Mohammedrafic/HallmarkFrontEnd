@@ -1,15 +1,22 @@
 import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
-import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
-import { Subject, takeUntil, throttleTime } from 'rxjs';
-import { OrderType } from '@shared/enums/order-type';
+
 import { Store } from '@ngxs/store';
-import { CommentsService } from '@shared/services/comments.service';
-import { Comment } from '@shared/models/comment.model';
+import { Subject, takeUntil, throttleTime } from 'rxjs';
+
 import { SetIsDirtyOrderForm } from '@client/store/order-managment-content.actions';
-import { HistoricalEventsService } from '@shared/services/historical-events.service';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { OrderType } from '@shared/enums/order-type';
 import { OrderHistoricalEvent } from '@shared/models';
-import { AppState } from '../../../store/app.state';
+import { Comment } from '@shared/models/comment.model';
+import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
+import { CommentsService } from '@shared/services/comments.service';
+import { HistoricalEventsService } from '@shared/services/historical-events.service';
 import { AccordionComponent, ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { AppState } from '../../../store/app.state';
+import { UserState } from '../../../store/user.state';
+import { OrganizationalHierarchy, OrganizationSettingKeys } from '../../constants/organization-settings';
+import { BusinessUnitType } from '../../enums/business-unit-type';
+import { SettingsViewService } from '../../services/settings-view.service';
 
 type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
 @Component({
@@ -21,8 +28,10 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   @ViewChild('accrdDescription') private readonly accrdDescription: AccordionComponent;
   @ViewChild('accrdHistorical') private readonly accrdHistorical: AccordionComponent;
 
-  @Input() isPosition: boolean = false;
+  @Input() isPosition = false;
   @Input() jobId: number;
+  @Input() activeSystem: OrderManagementIRPSystemId;
+  @Input() comments: Comment[] = [];
   @Input() set currentOrder(value: Order) {
     this.order = value;
     this.getContactDetails();
@@ -31,22 +40,49 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   public order: Order;
   public orderType = OrderType;
   public contactDetails: ContactDetails;
-  public comments: Comment[] = [];
   public events: OrderHistoricalEvent[];
+  public isHideContactDetailsOfOrderInAgencyLogin: boolean;
+  public readonly systemTypes = OrderManagementIRPSystemId;
 
   private unsubscribe$: Subject<void> = new Subject();
   private eventsHandler: Subject<void> = new Subject();
-
-  constructor(
+  
+    constructor(
     private store: Store,
     private commentsService: CommentsService,
     private cdr: ChangeDetectorRef,
-    private historicalEventsService: HistoricalEventsService
+    private historicalEventsService: HistoricalEventsService,
+    private settingsViewService: SettingsViewService
   ) {
     this.eventsHandler.pipe(takeUntil(this.unsubscribe$), throttleTime(500))
       .subscribe(() => {
         this.getHistoricalEvents();
       });
+
+  }
+
+  private subscribeForSettings(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType === BusinessUnitType.Agency) {
+      const organizationId = this.order?.organizationId;
+      if (organizationId) {
+        this.settingsViewService.getViewSettingKey(
+          OrganizationSettingKeys.HideContactDetailsOfOrderInAgencyLogin,
+          OrganizationalHierarchy.Organization,
+          organizationId,
+          organizationId
+        ).pipe(
+          takeUntil(this.unsubscribe$)
+        ).subscribe(({ HideContactDetailsOfOrderInAgencyLogin }) => {
+          this.isHideContactDetailsOfOrderInAgencyLogin = HideContactDetailsOfOrderInAgencyLogin === "true";
+          this.cdr.markForCheck();
+        })
+      }
+    
+    } else {
+      this.isHideContactDetailsOfOrderInAgencyLogin = false;
+      this.cdr.markForCheck();
+    }
   }
 
   public ngOnDestroy(): void {
@@ -60,7 +96,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
     if (currentOrder?.currentValue) {
       this.accrdDescription?.expandItem(true, 1);
       this.accrdHistorical?.expandItem(false);
-      this.getComments();
+      this.subscribeForSettings();
     }
   }
 
@@ -76,17 +112,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
     this.historicalEventsService.getEvents(this.order.id, organizationId, this.jobId).subscribe(data => {
       this.events = data;
       this.cdr.markForCheck();
-     });
-  }
-
-  private getComments(): void {
-    this.commentsService
-      .getComments(this.order.commentContainerId as number, null)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((comments: Comment[]) => {
-        this.comments = comments;
-        this.cdr.markForCheck();
-      });
+    });
   }
 
   public onBillRatesChanged(): void {

@@ -310,13 +310,13 @@
               </div>
             </div>
           </div>
-          <div class="shared-with-grid">
+          <div class="shared-with-grid" *ngIf="!isUpload">
             <ag-grid-angular #sharedWith
                              [rowHeight]="50"
                              domLayout="autoHeight"
                              [headerHeight]="50"
                              [columnDefs]="columnDefs"
-                             [rowData]="sharedDocumentInformation$ | async"
+                             [rowData]="sharedDocumentInformation"
                              class="ag-theme-alpine grid app-grid__component">
             </ag-grid-angular>
           </div>
@@ -387,7 +387,7 @@
                          domLayout="autoHeight"
                          [headerHeight]="50"
                          [columnDefs]="columnDefs"
-                         [rowData]="sharedDocumentInformation$ | async"
+                         [rowData]="sharedDocumentInformation"
                          class="ag-theme-alpine grid app-grid__component">
         </ag-grid-angular>
       </div>

@@ -80,7 +80,8 @@
   @media #{$max-tablet} {
     display: flex;
 
-    button:not(.close-button, .menu-mobile, .edit-button), .vertical-divider {
+    button:not(.close-button, .menu-mobile, .edit-button),
+    .vertical-divider {
       display: none;
     }
 
@@ -97,7 +98,8 @@
     display: flex;
     margin-left: -15%;
 
-    button:not(.close-button, .menu-mobile), .vertical-divider {
+    button:not(.close-button, .menu-mobile),
+    .vertical-divider {
       display: none;
     }
 
@@ -108,7 +110,6 @@
       display: none !important;
     }
   }
-
 }
 
 .vertical-divider {
@@ -160,4 +161,12 @@
 .extension-grid {
   height: 500px;
   display: block;
+}
+
+::ng-deep {
+  .container {
+    &:has(app-add-edit-reorder) {
+      height: calc(100% - 115px);
+    }
+  }
 }
