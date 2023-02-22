@@ -1,11 +1,13 @@
-import { catchError, EMPTY, Observable, of, Subject } from 'rxjs';
-import { SideDialogTitleEnum } from '../side-dialog-title.enum';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+
+import { Store } from '@ngxs/store';
+import { catchError, EMPTY, Observable, of, Subject } from 'rxjs';
+
+import { SideDialogTitleEnum } from '../side-dialog-title.enum';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { Store } from '@ngxs/store';
 import {
   AssignNewDepartment,
   DepartmentFilterState,

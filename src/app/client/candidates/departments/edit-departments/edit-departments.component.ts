@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 
 import { filter, Subject, take, takeUntil } from 'rxjs';
+import { Store } from '@ngxs/store';
 
 import { EditDepartmentFieldsEnum } from '@client/candidates/enums/edit-department.enum';
 import { CustomFormGroup } from '@core/interface';
@@ -8,12 +9,11 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { EditDepartmentsFormConfig } from '../constants/edit-departments.constant';
 import { DepartmentFormFieldConfig, EditDepartmentFormState } from '../departments.model';
-import { DepartmentFormService } from '../services/department-filter.service';
+import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentsService } from '../services/departments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { EDIT_MULTIPLE_RECORDS_TEXT } from '@shared/constants';
 import { ShowSideDialog } from 'src/app/store/app.actions';
-import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-edit-departments',

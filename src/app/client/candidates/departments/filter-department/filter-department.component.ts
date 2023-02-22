@@ -1,6 +1,10 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
+import { DatePipe } from '@angular/common';
+
 import { Select } from '@ngxs/store';
 import { BehaviorSubject, distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
+import { SortOrder } from '@syncfusion/ej2-angular-navigations';
+
 import {
   OrganizationDepartment,
   OrganizationLocation,
@@ -8,7 +12,7 @@ import {
   OrganizationStructure,
 } from '@shared/models/organization.model';
 import { UserState } from 'src/app/store/user.state';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { ControlTypes } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/filters-helper.constant';
@@ -16,10 +20,8 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormFieldConfig, DepartmentFiltersColumns, DepartmentFilterState } from '../departments.model';
 import { FilterService } from '@shared/services/filter.service';
 import { DepartmentFilterFormConfig } from '@client/candidates/departments/constants/department-filter.constant';
-import { DepartmentFormService } from '../services/department-filter.service';
+import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
-import { DatePipe } from '@angular/common';
-import { SortOrder } from '@syncfusion/ej2-angular-navigations';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';

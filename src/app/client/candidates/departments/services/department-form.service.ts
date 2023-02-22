@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
 import { isObjectsEqual } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
