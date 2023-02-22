@@ -26,6 +26,7 @@ import { Destroyable } from '@core/helpers';
 export class AssignDepartmentComponent extends Destroyable implements OnInit {
   @Input() public dialogData$: BehaviorSubject<DepartmentAssigned | null>;
   @Input() public saveForm$: Subject<boolean>;
+  @Input() public employeeWorkCommitmentId: number;
 
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
@@ -117,7 +118,7 @@ export class AssignDepartmentComponent extends Destroyable implements OnInit {
         this.assignDepartmentForm.markAllAsTouched();
         this.cdr.markForCheck();
       } else {
-        const formData = this.assignDepartmentForm.getRawValue();
+        const formData = { ...this.assignDepartmentForm.getRawValue(), employeeWorkCommitmentId: this.employeeWorkCommitmentId };
 
         if (this.departmentId) {
           this.departmentService

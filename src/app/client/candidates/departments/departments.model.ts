@@ -27,6 +27,7 @@ interface Skill {
 }
 
 export interface EditAssignedDepartment {
+  employeeWorkCommitmentId: number;
   startDate: Date | string;
   endDate: Date | string;
   orientedStartDate?: Date | string;

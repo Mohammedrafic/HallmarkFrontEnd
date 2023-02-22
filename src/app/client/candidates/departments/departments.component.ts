@@ -60,6 +60,7 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   public selectedDepartments: number[];
 
   private filters: DepartmentFilterState | null;
+  employeeWorkCommitmentId: number;
 
   public constructor(
     private store: Store,
@@ -76,6 +77,7 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
     this.selectedTab$ = this.candidatesService.getSelectedTab$();
     this.sideDialogTitle$ = this.departmentsService.getSideDialogTitle$();
     this.getDepartmentsAssigned();
+    this.getEmployeeWorkCommitmentId();
   }
 
   public showAssignDepartmentDialog(): void {
@@ -183,5 +185,18 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
       .subscribe(() => {
         this.departmentsService.deleteAssignedDepartments(departmentIds);
       });
+  }
+
+  private getEmployeeWorkCommitmentId(): void {
+    this.candidatesService.getEmployeeWorkCommitmentId().pipe(takeUntil(this.destroy$)).subscribe((id) => {
+      this.employeeWorkCommitmentId = id;
+      this.cdr.markForCheck();
+    })
+  }
+
+  private getAssignedDepartmentHierarchy(): void {
+    this.departmentsService.getAssignedDepartmentHierarchy(this.employeeWorkCommitmentId).pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      //TODO provide functionality
+    })
   }
 }

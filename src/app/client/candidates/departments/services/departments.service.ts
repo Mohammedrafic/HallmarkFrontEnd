@@ -63,9 +63,9 @@ export class DepartmentsService {
     formData: EditAssignedDepartment,
     departmentIds: number[]
   ): Observable<EditAssignedDepartment> {
-    const { startDate, endDate, homeCostCenter, orientedStartDate, isOriented } = formData;
+    const { startDate, endDate, homeCostCenter, orientedStartDate, isOriented, employeeWorkCommitmentId } = formData;
     const payload = {
-      employeeWorkCommitmentId: this.candidatesService.employeeWorkCommitmentId,
+      employeeWorkCommitmentId: employeeWorkCommitmentId,
       startDate: startDate && DateTimeHelper.toUtcFormat(startDate),
       endDate: endDate && DateTimeHelper.toUtcFormat(endDate),
       ids: departmentIds,
@@ -98,5 +98,9 @@ export class DepartmentsService {
         return EMPTY;
       })
     );
+  }
+
+  public getAssignedDepartmentHierarchy(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/hierarchy/${id}`)
   }
 }
