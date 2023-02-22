@@ -355,7 +355,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public isMiddleTabletWidth = false;
   public isContentSmallDesktop = false;
   public gridDomLayout: 'normal' | 'autoHeight' | 'print' | undefined;
-  public openregrateupdate:boolean = false;
+  public openregrateupdate = false;
   public CurrentOrderDatas:any = [];
   public filteredUsers: FilteredUser[] = [];
   public userSearch$ = new Subject<FilteringEventArgs>();
@@ -2061,8 +2061,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.setPreviousSelectedSystem();
       this.activeSystem = this.previousSelectedSystemId
         ?? DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+        console.log(this.activeSystem, this.previousSelectedSystemId, 'previous')
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem);
-
+      this.initMenuItems();
       this.initGridColumns();
       this.getOrders();
 
