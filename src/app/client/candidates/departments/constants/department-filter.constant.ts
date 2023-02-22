@@ -28,27 +28,9 @@ export const DepartmentFilterFormConfig = (): DepartmentFormFieldConfig<Departme
   },
   {
     type: ControlTypes.Multiselect,
-    title: 'Primary Skill',
-    field: DepartmentFiltersColumnsEnum.PRIMARY_SKILLS,
+    title: 'Skill',
+    field: DepartmentFiltersColumnsEnum.SKILLS,
     optionFields: SkillFilterOptionFields,
-  },
-  {
-    type: ControlTypes.Multiselect,
-    title: 'Secondary Skill',
-    field: DepartmentFiltersColumnsEnum.SECONDARY_SKILLS,
-    optionFields: SkillFilterOptionFields,
-  },
-  {
-    type: ControlTypes.Date,
-    title: 'Start Date',
-    field: DepartmentFiltersColumnsEnum.START_DATE,
-    isShort: true,
-  },
-  {
-    type: ControlTypes.Date,
-    title: 'End Date',
-    field: DepartmentFiltersColumnsEnum.END_DATE,
-    isShort: true,
   },
   {
     type: ControlTypes.Radio,
@@ -68,9 +50,6 @@ export const FilterColumnConfig: DepartmentFiltersColumns = {
   regionIds: commonColumnData,
   locationIds: commonColumnData,
   departmentIds: commonColumnData,
-  primarySkillIds: { ...commonColumnData, valueField: 'skillDescription' },
-  secondarySkillIds: { ...commonColumnData, valueField: 'skillDescription' },
-  startDate: { ...commonColumnData, type: ControlTypes.Date },
-  endDate: { ...commonColumnData, type: ControlTypes.Date },
+  skillIds: { ...commonColumnData, valueField: 'skillDescription' },
   oriented: { ...commonColumnData, type: ControlTypes.Radio },
 };

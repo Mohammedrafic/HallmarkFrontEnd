@@ -199,14 +199,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
 
   private subscribeOnSkills(): void {
     this.skills$.pipe(takeUntil(this.destroy$)).subscribe((skills) => {
-      const primarySkillId = this.formGroup.controls['primarySkillIds'].value;
-      const primarySkillsDataSource = skills;
-      this.filterColumns.primarySkillIds.dataSource = primarySkillsDataSource;
-      const secondarySkillsDataSource = primarySkillId
-        ? this.candidateProfileFormService.getSecondarySkillsDataSource(primarySkillsDataSource, primarySkillId)
-        : skills;
-
-      this.filterColumns.secondarySkillIds.dataSource = secondarySkillsDataSource;
+      this.filterColumns.skillIds.dataSource = skills;
       this.cdr.markForCheck();
     });
   }

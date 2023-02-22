@@ -67,8 +67,7 @@ export interface DepartmentFilterState {
   regionId: number[];
   locationId: number[];
   departmentId: number[];
-  startDate: Date | string;
-  endDate: Date | string;
+  skills: number[];
   oriented: boolean;
 }
 

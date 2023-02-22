@@ -16,11 +16,8 @@ export class DepartmentFormService {
       regionIds: [null],
       locationIds: [null],
       departmentIds: [null],
-      primarySkillIds: [null],
-      secondarySkillIds: [null],
-      startDate: [null],
-      endDate: [null],
-      oriented: [false],
+      skillIds: [null],
+      oriented: [1],
     }) as CustomFormGroup<DepartmentFiltersColumns>;
   }
 
