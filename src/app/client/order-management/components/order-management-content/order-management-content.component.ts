@@ -2061,7 +2061,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.setPreviousSelectedSystem();
       this.activeSystem = this.previousSelectedSystemId
         ?? DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
-        console.log(this.activeSystem, this.previousSelectedSystemId, 'previous')
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem);
       this.initMenuItems();
       this.initGridColumns();
