@@ -47,6 +47,13 @@ export const CredentialConfig: CredentialListConfig[] = [
         type: FieldType.Input,
       },
       {
+        field: 'expireDateApplicable',
+        title: 'Expiry Date Applicable',
+        disabled: false,
+        required: false,
+        type: FieldType.CheckBox
+      },
+      {
         field: 'comment',
         title: 'Comment',
         disabled: false,
@@ -61,13 +68,6 @@ export const CredentialConfig: CredentialListConfig[] = [
         required: false,
         show: false,
         type: FieldType.TextArea,
-      },
-      {
-        field: 'expireDateApplicable',
-        title: 'Expiry Date Applicable',
-        disabled: false,
-        required: false,
-        type: FieldType.CheckBox
       }
     ]
   }
