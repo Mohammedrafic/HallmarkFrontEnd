@@ -31,7 +31,7 @@ export interface EditAssignedDepartment {
   endDate: Date | string;
   orientedStartDate?: Date | string;
   homeCostCenter?: boolean;
-  oriented?: boolean
+  isOriented?: boolean
 }
 
 export interface AssignNewDepartment {

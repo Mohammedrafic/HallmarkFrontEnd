@@ -40,6 +40,7 @@
         dialogTitle === sideDialogTitleEnum.AssignDepartment || dialogTitle === sideDialogTitleEnum.EditAssignDepartment
       "
       [dialogData$]="dialogData$"
+      (refreshGrid)="refreshGrid()"
       [saveForm$]="saveForm$"
     ></app-assign-department>
 

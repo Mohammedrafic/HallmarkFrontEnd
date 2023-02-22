@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+import {
+  EventEmitter,
+  Output,
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  Input,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
@@ -18,6 +26,8 @@ import { Destroyable } from '@core/helpers';
 export class AssignDepartmentComponent extends Destroyable implements OnInit {
   @Input() public dialogData$: BehaviorSubject<DepartmentAssigned | null>;
   @Input() public saveForm$: Subject<boolean>;
+
+  @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
   public assignDepartmentForm: FormGroup;
   public regions: { name: string; id: number }[] = [];
@@ -60,7 +70,7 @@ export class AssignDepartmentComponent extends Destroyable implements OnInit {
       department: [null, [Validators.required]],
       startDate: [null, [Validators.required]],
       endDate: [null],
-      oriented: [null],
+      isOriented: [null],
       homeCostCenter: [null],
     });
   }
@@ -80,15 +90,15 @@ export class AssignDepartmentComponent extends Destroyable implements OnInit {
   }
 
   private populateForm(formData: DepartmentAssigned): void {
-    const { regionId, locationId, departmentId, startDate } = formData;
+    const { regionId, locationId, departmentId, startDate, endDate, isOriented } = formData;
 
     this.assignDepartmentForm.patchValue({
       region: regionId,
       location: locationId,
       department: departmentId,
       startDate: startDate,
-      endDate: null,
-      oriented: true,
+      endDate: endDate,
+      isOriented: isOriented,
       homeCostCenter: false,
     });
 
@@ -117,6 +127,7 @@ export class AssignDepartmentComponent extends Destroyable implements OnInit {
               this.resetAssignDepartmentForm();
               this.departmentId = null;
               this.store.dispatch(new ShowSideDialog(false));
+              this.refreshGrid.emit();
             });
         } else {
           this.departmentService
@@ -125,6 +136,7 @@ export class AssignDepartmentComponent extends Destroyable implements OnInit {
             .subscribe(() => {
               this.resetAssignDepartmentForm();
               this.store.dispatch(new ShowSideDialog(false));
+              this.refreshGrid.emit();
             });
         }
       }

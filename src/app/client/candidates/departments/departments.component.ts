@@ -59,6 +59,8 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public selectedDepartments: number[];
 
+  private filters: DepartmentFilterState | null;
+
   public constructor(
     private store: Store,
     private candidatesService: CandidatesService,
@@ -108,11 +110,13 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   }
 
   public updateTableByFilters(filters: DepartmentFilterState): void {
-    this.getDepartmentsAssigned(filters);
+    this.filters = filters;
+    this.getDepartmentsAssigned(this.filters);
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
   public resetFilters(): void {
+    this.filters = null;
     this.getDepartmentsAssigned();
   }
 
@@ -131,6 +135,10 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
     }
   }
 
+  public refreshGrid(): void {
+    this.getDepartmentsAssigned(this.filters);
+  }
+
   private showSideDialog(isOpen: boolean): void {
     this.store.dispatch(new ShowSideDialog(isOpen));
   }
@@ -144,7 +152,7 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   }
 
   // Get new data if departments tab will be selected
-  private getDepartmentsAssigned(filters?: DepartmentFilterState): void {
+  private getDepartmentsAssigned(filters?: DepartmentFilterState | null): void {
     this.candidatesService
       .getSelectedTab$()
       .pipe(
