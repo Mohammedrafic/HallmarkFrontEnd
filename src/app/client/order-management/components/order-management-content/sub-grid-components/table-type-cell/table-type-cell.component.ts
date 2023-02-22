@@ -11,7 +11,7 @@ import { OrderTypeTooltipMessage } from '@client/order-management/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableTypeCellComponent implements ICellRendererAngularComp {
-  public cellValue: string;
+  public cellValue: string | undefined;
   public tooltipMessage: string;
 
   agInit(params: ICellRendererParams): void {
