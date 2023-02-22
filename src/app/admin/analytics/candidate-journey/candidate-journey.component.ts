@@ -271,8 +271,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
 
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.candidateJourneyFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
-            if (data != null) {
-              debugger;
+            if (data != null) {           
               this.isAlive = false;
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
