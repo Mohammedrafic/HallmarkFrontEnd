@@ -184,7 +184,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get desktopSmallMenu(): { text: string }[] {
     let menu: { text: string }[] = [];
-    if (!this.canCloseOrder && !this.disableCloseOrder) {
+
+    if (!this.canCloseOrder && !this.disableCloseOrder && this.activeSystem !== this.systemType.IRP) {
       menu = [...menu, { text: MobileMenuItems.CloseOrder }];
     }
     if (this.canReOpen) {
@@ -193,10 +194,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     if (this.showCreateReOrder && !this.disableCreateReOrder) {
       menu = [...menu, { text: MobileMenuItems.CreateReOrder }];
     }
-    if (!this.showCloseButton) {
+    if (!this.showCloseButton && this.activeSystem !== this.systemType.IRP) {
       menu = [...menu, { text: MobileMenuItems.Delete }];
     }
-    if (!this.disabledLock && this.showLockOrder) {
+    if (!this.disabledLock && this.showLockOrder && this.activeSystem !== this.systemType.IRP) {
       menu = [...menu, { text: this.order?.isLocked ? MobileMenuItems.Unlock : MobileMenuItems.Lock }];
     }
     return menu;

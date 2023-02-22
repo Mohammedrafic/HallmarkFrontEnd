@@ -1151,8 +1151,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   buttonGroupChange(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
+    
 
     this.clearFilters();
+    this.initMenuItems();
     this.initGridColumns();
     this.getOrders();
   }
@@ -2009,7 +2011,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private initMenuItems(): void {
-    this.threeDotsMenuOptions = ThreeDotsMenuOptions(this.canCreateOrder, this.canCloseOrder);
+    this.threeDotsMenuOptions = ThreeDotsMenuOptions(this.canCreateOrder, this.canCloseOrder, this.activeSystem);
   }
 
   private watchForPermissions(): void {

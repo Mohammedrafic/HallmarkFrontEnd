@@ -20,7 +20,7 @@
         </e-accordionitem>
       </e-accordionitems>
     </ejs-accordion>
-    <div class="comments" *ngIf="!isPosition">
+    <div class="comments" *ngIf="!isPosition && activeSystem !== systemTypes.IRP">
       <app-comments
         [comments]="comments"
         [orderId]="order.id"
@@ -106,7 +106,8 @@
 </section>
 <section
   class="bill-rates"
-  *ngIf="order && order?.orderType !== orderType.OpenPerDiem && order?.orderType !== orderType.PermPlacement"
+  *ngIf="order && order?.orderType !== orderType.OpenPerDiem && order?.orderType !== orderType.PermPlacement
+  && activeSystem !== systemTypes.IRP"
 >
   <app-bill-rates-view-grid [billRatesData]="order.billRates"></app-bill-rates-view-grid>
 </section>
