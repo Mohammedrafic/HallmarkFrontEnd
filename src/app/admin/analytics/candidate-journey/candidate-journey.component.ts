@@ -136,7 +136,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   private nullValue = "null";
   private joinString = ",";  
   private fixedJobStatusesIncluded:number[]=[3,4,7,8];
-  private fixedCandidateStatusesIncluded:number[]=[1,2,3,4,5,7,10,11,12];
+  private fixedCandidateStatusesIncluded:number[]=[1,2,3,4,5,7,10,11,12,13];
   private orderTypesList = OrderTypeOptionsForReport.filter(i => i.id != 1);
 
   public masterRegionsList: Region[] = [];
@@ -272,6 +272,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.candidateJourneyFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             if (data != null) {
+              debugger;
               this.isAlive = false;
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
