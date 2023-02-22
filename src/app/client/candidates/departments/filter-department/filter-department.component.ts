@@ -3,7 +3,6 @@ import { DatePipe } from '@angular/common';
 
 import { Select } from '@ngxs/store';
 import { BehaviorSubject, distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
-import { SortOrder } from '@syncfusion/ej2-angular-navigations';
 
 import {
   OrganizationDepartment,
@@ -45,7 +44,6 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   public formGroup: CustomFormGroup<DepartmentFiltersColumns>;
   public filterOptionFields = filterOptionFields;
   public skillOptionFields = SkillFilterOptionFields;
-  public sortOrder: SortOrder = 'Ascending';
 
   public departmentFiltersColumns = DepartmentFiltersColumnsEnum;
 
@@ -149,16 +147,15 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
         this.filterColumns.locationIds.dataSource = [];
 
         if (val?.length) {
-          const regionLocations: OrganizationLocation[] = [];
           const selectedRegions: OrganizationRegion[] = val.map((id: number) => {
             return this.regions.find((region) => region.id === id) as OrganizationRegion;
           });
 
-          selectedRegions.forEach((region: OrganizationRegion) => {
+          const regionLocations: OrganizationLocation[] = selectedRegions.flatMap((region) => {
             region?.locations?.forEach((location: OrganizationLocation) => {
               location.regionName = region.name;
             });
-            regionLocations.push(...(region?.locations as []));
+            return region?.locations ?? [];
           });
 
           this.filterColumns.locationIds.dataSource = regionLocations;
@@ -176,16 +173,13 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
       .subscribe((val: number[]) => {
         this.filterColumns.departmentIds.dataSource = [];
         if (val?.length) {
-          const locationDepartments: OrganizationDepartment[] = [];
           const selectedLocations: OrganizationLocation[] = val.map((id) => {
             return (this.filterColumns.locationIds.dataSource as OrganizationLocation[]).find(
               (location: OrganizationLocation) => location.id === id
             ) as OrganizationLocation;
           });
 
-          selectedLocations.forEach((location: OrganizationLocation) => {
-            locationDepartments.push(...(location?.departments as []));
-          });
+          const locationDepartments: OrganizationDepartment[] = selectedLocations.flatMap((location) => location.departments);
 
           this.filterColumns.departmentIds.dataSource = locationDepartments;
         } else {
