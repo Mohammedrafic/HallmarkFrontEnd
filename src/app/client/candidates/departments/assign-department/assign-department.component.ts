@@ -15,11 +15,12 @@ import { Store } from '@ngxs/store';
 import { BehaviorSubject, debounceTime, filter, Subject, takeUntil, distinctUntilChanged } from 'rxjs';
 
 import { ShowSideDialog } from 'src/app/store/app.actions';
-import { DepartmentAssigned } from '../departments.model';
+import { AssignDepartmentHierarchy, DepartmentAssigned } from '../departments.model';
 import { DepartmentsService } from '../services/departments.service';
 import { OrganizationRegion, OrganizationLocation, OrganizationDepartment } from '@shared/models/organization.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormService } from '../services/department-form.service';
+import { OptionFields } from '@client/order-management/constants';
 
 @Component({
   selector: 'app-assign-department',
@@ -35,14 +36,13 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
   public assignDepartmentForm: FormGroup;
-  public regions: OrganizationRegion[] = [];
-  public locations: OrganizationLocation[] = [];
-  public departments: OrganizationDepartment[] = [];
+  public dataSource: AssignDepartmentHierarchy = {
+    regions: [],
+    locations: [],
+    departments: []
+  }
 
-  public readonly departmentFields = {
-    text: 'name',
-    value: 'id',
-  };
+  public readonly departmentFields = OptionFields;
 
   private departmentId?: number | null = null;
 
@@ -65,14 +65,14 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
 
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['departmentHierarchy'].currentValue) {
-      this.regions = this.departmentHierarchy;
+      this.dataSource.regions = this.departmentHierarchy;
     }
   }
 
   public resetAssignDepartmentForm(): void {
     this.assignDepartmentForm.reset();
     this.assignDepartmentForm.enable();
-    this.regions = this.departmentHierarchy;
+    this.dataSource.regions = this.departmentHierarchy;
     this.cdr.markForCheck();
   }
 
@@ -91,9 +91,9 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   private subscribeOnDialogData(): void {
     this.dialogData$.pipe(filter(Boolean), debounceTime(200), takeUntil(this.destroy$)).subscribe((data) => {
       this.departmentId = data.id;
-      this.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
-      this.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
-      this.departments = [{ name: data.departmentName, id: data.departmentId } as OrganizationDepartment];
+      this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
+      this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
+      this.dataSource.departments = [{ name: data.departmentName, id: data.departmentId } as OrganizationDepartment];
 
       if (this.departmentId) {
         this.departmentFormService.patchForm(this.assignDepartmentForm, data);
@@ -150,8 +150,8 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       )
       .subscribe((value) => {
         this.departmentFormService.resetControls(this.assignDepartmentForm, ['locationId', 'departmentId']);
-        const selectedRegion = (this.regions as OrganizationRegion[]).find((region) => region.id === value);
-        this.locations = selectedRegion?.locations ?? [];
+        const selectedRegion = (this.dataSource.regions as OrganizationRegion[]).find((region) => region.id === value);
+        this.dataSource.locations = selectedRegion?.locations ?? [];
         this.cdr.markForCheck();
       });
 
@@ -164,8 +164,8 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       )
       .subscribe((value) => {
         this.departmentFormService.resetControls(this.assignDepartmentForm, ['departmentId']);
-        const selectedLocation = (this.locations as OrganizationLocation[]).find((location) => location.id === value);
-        this.departments = selectedLocation?.departments ?? [];
+        const selectedLocation = (this.dataSource.locations as OrganizationLocation[]).find((location) => location.id === value);
+        this.dataSource.departments = selectedLocation?.departments ?? [];
         this.cdr.markForCheck();
       });
 

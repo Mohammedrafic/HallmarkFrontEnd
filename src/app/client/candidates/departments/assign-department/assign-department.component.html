@@ -3,7 +3,7 @@
     <app-dropdown
       [formGroupInstance]="assignDepartmentForm"
       [fields]="departmentFields"
-      [dataSource]="regions"
+      [dataSource]="dataSource.regions"
       [required]="true"
       [hideBorder]="false"
       controlName="regionId"
@@ -13,7 +13,7 @@
     <app-dropdown
       [formGroupInstance]="assignDepartmentForm"
       [fields]="departmentFields"
-      [dataSource]="locations"
+      [dataSource]="dataSource.locations"
       [required]="true"
       [hideBorder]="false"
       controlName="locationId"
@@ -23,7 +23,7 @@
     <app-dropdown
       [formGroupInstance]="assignDepartmentForm"
       [fields]="departmentFields"
-      [dataSource]="departments"
+      [dataSource]="dataSource.departments"
       [required]="true"
       [hideBorder]="false"
       controlName="departmentId"

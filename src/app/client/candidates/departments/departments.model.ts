@@ -1,7 +1,7 @@
 import { DataSourceItem } from '@core/interface';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
-import { OrganizationRegion } from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { PageOfCollections } from '@shared/models/page.model';
 import { DepartmentFiltersColumnsEnum } from '../enums';
 import { EditDepartmentFieldsEnum } from '../enums/edit-department.enum';
@@ -87,6 +87,12 @@ export interface DepartmentHierarchy {
   organizationName: string;
   organizationPrefix: string;
   regions: OrganizationRegion[];
+}
+
+export interface AssignDepartmentHierarchy {
+  regions: OrganizationRegion[];
+  locations: OrganizationLocation[];
+  departments: OrganizationDepartment[];
 }
 
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;
