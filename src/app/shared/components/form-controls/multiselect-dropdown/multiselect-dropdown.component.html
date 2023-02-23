@@ -17,6 +17,7 @@
       [selectAllText]="selectAllText"
       [showSelectAll]="showSelectAll"
       (selectedAll)="selectAllEmitter.emit($event)"
+      [sortOrder]="sortOrder"
       (blur)="onBlur()"
       mode="CheckBox"
     ></ejs-multiselect>

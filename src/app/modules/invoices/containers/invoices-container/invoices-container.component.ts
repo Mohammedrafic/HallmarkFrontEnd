@@ -35,6 +35,8 @@ import { InvoicesFiltersDialogComponent } from '../../components/invoices-filter
 import * as Interfaces from '../../interfaces';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { GridReadyEventModel } from '@shared/components/grid/models';
+import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
+import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 
 @Component({
   selector: 'app-invoices-container',
@@ -106,6 +108,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public readonly defaultGroupInvoicesOption: GroupInvoicesOption = defaultGroupInvoicesOption;
 
   public readonly unitOrganizationsFields = baseDropdownFieldsSettings;
+
+  public readonly bulkActionConfig: BulkActionConfig = {
+    approve: true
+  }
 
   public groupInvoicesBy: GroupInvoicesOption = defaultGroupInvoicesOption;
 
@@ -419,14 +425,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       .subscribe(() => this.rejectReasonInputDialogComponent.hide());
   }
 
-  public bulkApprove(nodes: RowNode[]): void {
-    this.store.dispatch(
-      new Invoices.ApproveInvoices(nodes.map((node: RowNode) => (node.data as Interfaces.ManualInvoice).id))
-    );
-  }
-
-  public bulkExport(event: RowNode[]): void {}
-
   public groupInvoices(): void {
     this.store.dispatch(new Invoices.GroupInvoices({
       organizationId: this.organizationId,
@@ -512,6 +510,18 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
     this.clearSelections();
     this.gridSelections.rowNodes = [];
+  }
+
+  public handleBulkAction(event: BulkActionDataModel): void {
+    if(event.type === BulkTypeAction.APPROVE) {
+      this.bulkApprove(event.items)
+    }
+  }
+
+  private bulkApprove(nodes: RowNode[]): void {
+    this.store.dispatch(
+      new Invoices.ApproveInvoices(nodes.map((node: RowNode) => (node.data as Interfaces.ManualInvoice).id))
+    );
   }
 
   private clearGroupedInvoices(): void {

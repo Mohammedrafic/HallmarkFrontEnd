@@ -12,6 +12,7 @@ export const DELETE_RECORD_TITLE = 'Delete Record';
 export const DELETE_CONFIRM_TEXT = 'Are you sure you want to leave this page without saving?';
 export const DELETE_FOLDER_TEXT = 'Are you sure you want to delete folder?';
 export const DELETE_FOLDER_TITLE = 'Delete Folder';
+export const WARNING_TITLE = 'Warning';
 export const ADD_CONFIRM_TEXT =
   'Are you sure you want to add Bill rate for Onboarded Candidate? This may lead to recalculating values and generating new invoice records.';
 export const EDIT_CONFIRM_TEXT =
@@ -86,7 +87,8 @@ export const UpdateRegularRatesucceedcount = (count: number) =>
 
 export const DOCUMENT_DOWNLOAD_SUCCESS = 'Document downloaded successfully';
 export const SubmissionsLimitReached = 'The order has reached its submission limit';
-
+export const EDIT_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to edit multiple records';
+export const DELETE_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to delete multiple records';
 export const BLOCK_RECORD_TEXT = 'Are you sure you want to block?';
 export const BLOCK_RECORD_TITLE = 'Block Record';
 export const BLOCK_RECORD_SUCCESS = 'Record Blocked';

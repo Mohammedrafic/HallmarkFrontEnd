@@ -1,0 +1,6 @@
+.edit-department {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 12px;
+  margin-top: 16px;
+}

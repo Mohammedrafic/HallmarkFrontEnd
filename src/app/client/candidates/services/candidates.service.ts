@@ -6,6 +6,7 @@ import { CandidateTabsEnum } from '@client/candidates/enums/candidate-tabs.enum'
 export class CandidatesService {
   private selectedTab$: BehaviorSubject<CandidateTabsEnum> = new BehaviorSubject<CandidateTabsEnum>(CandidateTabsEnum.CandidateProfile);
   private candidateName$: Subject<string> = new Subject<string>();
+  private employeeWorkCommitmentId$: Subject<number> = new Subject<number>();
 
   public employeeId: number | null;
   public constructor() {
@@ -21,6 +22,14 @@ export class CandidatesService {
 
   public setCandidateName(name: string): void {
     this.candidateName$.next(name);
+  }
+
+  public setActiveEmployeeWorkCommitmentId(id: number): void {
+    this.employeeWorkCommitmentId$.next(id)
+  }
+
+  public getEmployeeWorkCommitmentId(): Observable<number> {
+    return this.employeeWorkCommitmentId$.asObservable();
   }
 
   public changeTab(tab: CandidateTabsEnum): void {

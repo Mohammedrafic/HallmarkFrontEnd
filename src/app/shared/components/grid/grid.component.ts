@@ -31,6 +31,8 @@ import { Select } from '@ngxs/store';
 import { AppState } from '../../../store/app.state';
 import { BreakpointObserverService } from '@core/services';
 import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
+import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
+import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 
 @Component({
   selector: 'app-grid',
@@ -45,7 +47,6 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Input() public isLoading: boolean | null = false;
   @Input() public suppressRowClickSelection: boolean = false;
   @Input() public allowBulkSelection: boolean = false;
-  @Input() public allowBulkButton: boolean = false;
   @Input() public disableBulkButton: boolean = false;
   @Input() public rowSelection: 'single' | 'multiple' | undefined = 'single';
   @Input() public rowDragManaged: boolean = false;
@@ -61,6 +62,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Input() public gridEmptyMessage: string = GRID_EMPTY_MESSAGE;
   @Input() public customRowsPerPageDropDownObject: { text: string, value: number }[];
   @Input() public disableRowsPerPageDropdown: boolean = false;
+  @Input() public bulkActionConfig: BulkActionConfig = {};
 
   @Input() set changeTableSelectedIndex(next: number | null) {
     if (next !== null) {
@@ -79,11 +81,10 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Output() public navigateToPageEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output() public pageSizeChangeEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output() public gridSelectedRow: EventEmitter<any> = new EventEmitter<any>();
-  @Output() public approveEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
-  @Output() public exportEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
   @Output() public sortChanged: EventEmitter<string> = new EventEmitter<string>();
   @Output() public multiSelectionChanged: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
   @Output() public dragRowEmitter: EventEmitter<RowDragEvent> = new EventEmitter<RowDragEvent>();
+  @Output() public bulkEventEmitter: EventEmitter<BulkActionDataModel> = new EventEmitter<BulkActionDataModel>();
 
   public readonly defaultColumnDefinition: ColumnDefinitionModel = { minWidth: 100, resizable: true };
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
@@ -142,6 +143,11 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
 
   public handleComponentStateChangeEvent(event: ComponentStateChangedEvent): void {
     this.componentStateChanged$.next(event);
+  }
+
+  public bulkActionEmitter(event: BulkTypeAction): void {
+    const bulkEmitter: BulkActionDataModel = { type: event, items: this.selectedTableRows };
+    this.bulkEventEmitter.emit(bulkEmitter);
   }
 
   private initLoadingStateChangesListener(): void {

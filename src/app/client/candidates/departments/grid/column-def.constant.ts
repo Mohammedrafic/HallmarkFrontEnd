@@ -3,14 +3,24 @@ import { ValueFormatterParams } from '@ag-grid-community/core';
 import { OrientationCompletedComponent } from './cell-renderers/orientation-completed/orientation-completed.component';
 import { SkillMatchComponent } from './cell-renderers/skill-match/skill-match.component';
 import { SkillNameComponent } from './cell-renderers/skill-name/skill-name.component';
+import { DepartmentAssigned } from '../departments.model';
 
 export interface ColumnDefParams {
-  editHandler: () => void;
-  deleteHandler: () => void;
+  editHandler: (value: DepartmentAssigned) => void;
+  deleteHandler: (id: number[]) => void;
   dateFormatter: (date: string) => string;
 }
 
 export const columnDef = (columnParams: ColumnDefParams) => [
+  {
+    field: 'checkbox',
+    headerName: '',
+    width: 50,
+    minWidth: 50,
+    headerCheckboxSelection: true,
+    headerCheckboxSelectionFilteredOnly: true,
+    checkboxSelection: true,
+  },
   {
     field: '',
     headerName: '',
@@ -20,16 +30,16 @@ export const columnDef = (columnParams: ColumnDefParams) => [
       return {
         actionsConfig: [
           {
-            action: columnParams.editHandler,
+            action: (value) => { columnParams.editHandler(value as DepartmentAssigned) },
             iconName: 'edit',
             iconClass: 'color-primary-active-blue-10',
-            disabled: true,
+            disabled: false,
           },
           {
-            action: columnParams.deleteHandler,
+            action: (value) => columnParams.deleteHandler([(value as DepartmentAssigned).id]),
             iconName: 'trash-2',
             iconClass: 'color-supportive-red',
-            disabled: true,
+            disabled: false,
           },
         ],
       };

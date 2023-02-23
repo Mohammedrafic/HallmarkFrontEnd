@@ -5,6 +5,7 @@ import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/cor
 
 import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
 import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 
 @Component({
   selector: 'app-multiselect-dropdown',
@@ -20,6 +21,7 @@ export class MultiselectDropdownComponent extends BaseFormControlDirective {
   @Input() public fields: FieldSettingsModel;
   @Input() public selectAllText: string;
   @Input() public showSelectAll: boolean;
+  @Input() public sortOrder: SortOrder = SortOrder.NONE;
 
   @Output() public selectAllEmitter: EventEmitter<ISelectAllEventArgs> = new EventEmitter<ISelectAllEventArgs>();
 }

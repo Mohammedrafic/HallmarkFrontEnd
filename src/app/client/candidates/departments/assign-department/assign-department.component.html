@@ -1,41 +1,38 @@
-<form>
+<form class="department-form">
   <ng-container *ngIf="true">
-    <app-multiselect-dropdown
+    <app-dropdown
       [formGroupInstance]="assignDepartmentForm"
-      [fields]="{}"
-      [dataSource]="[]"
-      [showSelectAll]="true"
+      [fields]="departmentFields"
+      [dataSource]="dataSource.regions"
       [required]="true"
-      controlName="region"
+      [hideBorder]="false"
+      controlName="regionId"
       id="region"
       label="Region"
-      selectAllText="All"
-    ></app-multiselect-dropdown>
-    <app-multiselect-dropdown
+    ></app-dropdown>
+    <app-dropdown
       [formGroupInstance]="assignDepartmentForm"
-      [fields]="{}"
-      [dataSource]="[]"
-      [showSelectAll]="true"
+      [fields]="departmentFields"
+      [dataSource]="dataSource.locations"
       [required]="true"
-      controlName="location"
+      [hideBorder]="false"
+      controlName="locationId"
       id="location"
       label="Location"
-      selectAllText="All"
-    ></app-multiselect-dropdown>
-    <app-multiselect-dropdown
+    ></app-dropdown>
+    <app-dropdown
       [formGroupInstance]="assignDepartmentForm"
-      [fields]="{}"
-      [dataSource]="[]"
-      [showSelectAll]="true"
+      [fields]="departmentFields"
+      [dataSource]="dataSource.departments"
       [required]="true"
-      controlName="department"
+      [hideBorder]="false"
+      controlName="departmentId"
       id="department"
       label="Department"
-      selectAllText="All"
-    ></app-multiselect-dropdown>
+    ></app-dropdown>
   </ng-container>
 
-  <div>
+  <div class="date-fields">
     <app-datepicker
       [formGroupInstance]="assignDepartmentForm"
       [required]="true"
@@ -54,14 +51,14 @@
     <app-toggle
       [formGroupInstance]="assignDepartmentForm"
       id="toggle2"
-      controlName="oriented"
-      label="toggle"
+      controlName="isOriented"
+      label="Oriented"
     ></app-toggle>
     <app-toggle
       [formGroupInstance]="assignDepartmentForm"
       id="toggle"
       controlName="homeCostCenter"
-      label="toggle"
+      label="Home Cost Center"
     ></app-toggle>
   </div>
 </form>

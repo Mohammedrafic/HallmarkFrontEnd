@@ -8,6 +8,8 @@ import { GRID_CONFIG } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { PagerChangeEventModel } from '@shared/components/grid/grid-pagination/models/pager-change-event.model';
 import { BreakpointObserverService } from '@core/services';
+import { BulkActionConfig } from '@shared/models/bulk-action-data.model';
+import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 
 @Component({
   selector: 'app-grid-pagination',
@@ -21,20 +23,21 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
   @Input() public totalRecordsCount: number;
   @Input() public selectedTableRowsAmount: number = 0;
   @Input() public allowBulkSelection: boolean = false;
-  @Input() public allowBulkButton: boolean = false;
   @Input() public disableBulkButton: boolean = false;
   @Input() public isDarkTheme?: boolean | null;
   @Input() public customRowsPerPageDropDownObject: { text: string; value: number }[];
   @Input() public disableRowsPerPageDropdown: boolean = false;
+  @Input() public bulkActionConfig: BulkActionConfig = {};
+
   @Output() public navigateToPageEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output() public pageSizeChangeEmitter: EventEmitter<number> = new EventEmitter<number>();
-  @Output() public approveEmitter: EventEmitter<void> = new EventEmitter<void>();
-  @Output() public exportEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output() public bulkEventEmitter: EventEmitter<BulkTypeAction> = new EventEmitter<BulkTypeAction>();
 
   public paginationFormGroup: FormGroup;
 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public readonly perPageFieldsSettings: FieldSettingsModel = { text: 'text', value: 'value' };
+  public readonly bulkTypeAction = BulkTypeAction;
 
   public isMobile = false;
   public isTablet = false;

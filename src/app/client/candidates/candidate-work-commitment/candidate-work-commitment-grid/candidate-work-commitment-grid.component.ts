@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { UserPermissions } from '@core/enums';
 import { Permission } from '@core/interface';
 import { Select, Store } from '@ngxs/store';
@@ -50,6 +51,7 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
     private candidateWorkCommitmentService: CandidateWorkCommitmentService,
     private store: Store,
     private confirmService: ConfirmService,
+    public candidatesService: CandidatesService,
   ) {
     super();
     const todayDate = new Date();
@@ -63,9 +65,15 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
 
   private dispatchNewPage(): void {
     this.candidateWorkCommitmentService.getCandidateWorkCommitmentByPage(this.pageNumber, this.pageSize, this.employeeId).subscribe((page) => {
+      this.setActiveWorkCommitmentId(page.items);
       this.candidateWorkCommitmentsPage = page;
       this.cd.markForCheck();
     });
+  }
+
+  private setActiveWorkCommitmentId(commitments: CandidateWorkCommitment[]): void {
+    const employeeWorkCommitmentId = commitments.find((item) => item.isActive)?.id;
+    employeeWorkCommitmentId && this.candidatesService.setActiveEmployeeWorkCommitmentId(employeeWorkCommitmentId);
   }
 
   private subscribeOnPageRefreshing(): void {
