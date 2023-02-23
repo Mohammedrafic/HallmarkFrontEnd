@@ -25,6 +25,7 @@ export type CandidateWorkCommitment = {
   criticalOrder: number;
   comment: string;
   created?: string | Date;
+  isActive: boolean;
 }
 
 export type CandidateWorkCommitmentsPage = PageOfCollections<CandidateWorkCommitment>;

@@ -65,11 +65,15 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
 
   private dispatchNewPage(): void {
     this.candidateWorkCommitmentService.getCandidateWorkCommitmentByPage(this.pageNumber, this.pageSize, this.employeeId).subscribe((page) => {
-      const employeeWorkCommitmentId = page.items[0].id;
-      employeeWorkCommitmentId && this.candidatesService.setEmployeeWorkCommitmentId(employeeWorkCommitmentId);
+      this.setActiveWorkCommitmentId(page.items);
       this.candidateWorkCommitmentsPage = page;
       this.cd.markForCheck();
     });
+  }
+
+  private setActiveWorkCommitmentId(commitments: CandidateWorkCommitment[]): void {
+    const employeeWorkCommitmentId = commitments.find((item) => item.isActive)?.id;
+    employeeWorkCommitmentId && this.candidatesService.setActiveEmployeeWorkCommitmentId(employeeWorkCommitmentId);
   }
 
   private subscribeOnPageRefreshing(): void {
