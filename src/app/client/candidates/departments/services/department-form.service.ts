@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
 import { isObjectsEqual } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 import { FilterColumnConfig } from '../constants/department-filter.constant';
-import { DepartmentFiltersColumns, EditDepartmentFormState } from '../departments.model';
+import { DepartmentAssigned, DepartmentFiltersColumns, EditDepartmentFormState } from '../departments.model';
 
 @Injectable()
 export class DepartmentFormService {
@@ -51,5 +51,36 @@ export class DepartmentFormService {
 
   public compareFormState(prev: unknown, curr: unknown): boolean {
     return isObjectsEqual(prev as Record<string, unknown>, curr as Record<string, unknown>);
+  }
+
+  public resetControls(formGroup: FormGroup, controlName: string[]): void {
+    controlName.forEach((name) => {
+      const control = formGroup.get(name);
+      if (control?.value) {
+        control.reset();
+      }
+    });
+  }
+
+  public disableControls(formGroup: FormGroup, controlName: string[]): void {
+    controlName.forEach((name) => {
+      const control = formGroup.get(name);
+      if (control) {
+        control.disable();
+      }
+    });
+  }
+
+  public patchForm(formGroup: FormGroup, formData: DepartmentAssigned): void {
+    const { regionId, locationId, departmentId, startDate, endDate, isOriented } = formData;
+    formGroup.patchValue({
+      regionId: regionId,
+      locationId: locationId,
+      departmentId: departmentId,
+      startDate: startDate,
+      endDate: endDate,
+      isOriented: isOriented,
+      homeCostCenter: false,
+    })
   }
 }
