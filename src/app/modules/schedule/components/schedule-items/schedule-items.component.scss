@@ -7,6 +7,53 @@
   margin: 25px -24px 0;
   background-color: $secondary-dark-blue-50;
 
+  .schedule-items-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 35px;
+
+    .group-error {
+      .header-itm {
+        text-align: right;
+      }
+
+      .error-message {
+        color: $supportive-red;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 18px;
+        margin-top: 5px;
+      }
+    }
+
+    .header-itm {
+      margin-top: 5px;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 13px;
+      color: $pure-black;
+      text-transform: uppercase;
+
+      span {
+        display: inline-block;
+        border-radius: 50%;
+        padding: 2px 3px;
+        color: $white;
+        margin-left: 14px;
+        min-width: 12px;
+        text-align: center;
+      }
+
+      &__count {
+        background-color: $primary-active-blue-10;
+      }
+
+      &__errors {
+        background-color: $supportive-red;
+      }
+    }
+  }
+
   .empty-list-text {
     color: $supportive-red;
     font-size: 14px;
@@ -37,6 +84,18 @@
       font-size: 12px;
     }
 
+    .candidate-name-error {
+      color: $supportive-red !important;
+    }
+
+    .date-errors {
+      border: 1px solid $supportive-red !important;
+
+      i-feather {
+        color: $supportive-red !important;
+      }
+    }
+
     .date {
       display: flex;
       align-items: center;
@@ -47,6 +106,10 @@
       font-size: 12px;
       color: $black;
 
+      .schedule-type {
+        font-weight: 700;
+      }
+
       i-feather {
         color: $secondary-dark-blue-20;
       }
@@ -54,19 +117,6 @@
       i-feather[name="x"] {
         color: $black;
       }
-
-      // TODO: uncomment and adjust for Booking implementation
-      //i-feather[name="clock"] {
-      //  color: $supportive-green-15;
-      //}
-      //
-      //i-feather[name="alert-triangle"] {
-      //  color: $supportive-red;
-      //}
-      //
-      //i-feather[name="briefcase"] {
-      //  color: $primary-active-blue-10;
-      //}
     }
   }
 }

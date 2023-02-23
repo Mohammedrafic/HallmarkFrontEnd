@@ -1,22 +1,32 @@
 import { Injectable } from '@angular/core';
 
-import { DateTimeHelper } from '@core/helpers';
+import { distinctUntilChanged, Observable } from 'rxjs';
+
+import { BaseObservable, DateTimeHelper, isObjectsEqual } from '@core/helpers';
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
 import { CreateScheduleService } from './create-schedule.service';
+import { CreateBookTooltip, CreateScheduleDateItems, CreateTooltip, GetScheduleDayWithEarliestTime } from '../helpers';
+import { ScheduleBookingErrors } from '../interface';
+import { ScheduleItemType } from '../constants';
 
 @Injectable()
 export class ScheduleItemsService {
+  private readonly itemsErrorStore: BaseObservable<ScheduleBookingErrors[]> =
+    new BaseObservable([] as ScheduleBookingErrors[]);
 
   constructor(private createScheduleService: CreateScheduleService) {}
 
-  getScheduleItems(scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots): CreateScheduleItem[] {
+  getScheduleItems(
+    scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots,
+    scheduleType: ScheduleItemType
+  ): CreateScheduleItem[] {
     return scheduleSelectedSlots.candidates.map((candidate: ScheduleInt.ScheduleCandidate) => {
       return  {
         candidateName: `${candidate.lastName}, ${candidate.firstName}`,
         candidateId: candidate.id,
         selectedDates: scheduleSelectedSlots.dates.map((date: string) => new Date(date)),
-        dateItems: this.getScheduleDateItems(scheduleSelectedSlots.dates, candidate.id),
+        dateItems: this.getDateItems(scheduleSelectedSlots.dates, candidate.id, scheduleType),
       };
     });
   }
@@ -24,21 +34,39 @@ export class ScheduleItemsService {
   getScheduleDateItems(dates: string[], candidateId: number): DateItem[] {
     const scheduleDateItems: DateItem[] = [];
 
-    dates.forEach((dateString: string) => {
-      const daySchedules: ScheduleInt.ScheduleItem[] = this.createScheduleService.getDaySchedules(candidateId, dateString);
+    dates.forEach((dateValue: string) => {
+      const daySchedules: ScheduleInt.ScheduleItem[] = this.createScheduleService.getDaySchedules(candidateId, dateValue);
 
       if (daySchedules.length) {
         daySchedules.forEach((scheduleItem: ScheduleInt.ScheduleItem) => {
-          scheduleDateItems.push(this.getScheduleDateItem(scheduleItem, dateString));
+          scheduleDateItems.push(this.getScheduleDateItem(scheduleItem, dateValue));
         });
       } else {
-        const date = new Date(dateString);
+        scheduleDateItems.push(CreateScheduleDateItems(dateValue));
+      }
+    });
+
+    return scheduleDateItems;
+  }
+
+  getBookScheduleDateItems(dates: string[], candidateId: number): DateItem[]  {
+    const scheduleDateItems: DateItem[] = [];
+
+    dates.forEach((dateValue: string) => {
+      const daySchedules: ScheduleInt.ScheduleItem[] = this.createScheduleService.getDaySchedules(candidateId, dateValue);
+      if (daySchedules.length) {
+        const scheduleDayWithEarliestTime = GetScheduleDayWithEarliestTime(daySchedules);
+        const date = new Date(dateValue);
 
         scheduleDateItems.push({
-          dateString: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
-          id: null,
+          dateValue: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+          tooltipContent: CreateBookTooltip(daySchedules) as string,
+          scheduleType: scheduleDayWithEarliestTime.scheduleType,
+          id: scheduleDayWithEarliestTime.id,
           date,
         });
+      } else {
+        scheduleDateItems.push(CreateScheduleDateItems(dateValue));
       }
     });
 
@@ -46,43 +74,45 @@ export class ScheduleItemsService {
   }
 
   getSelectedDates(scheduleItem: CreateScheduleItem): Date[] {
-    const dates = scheduleItem.dateItems.map((item: DateItem) => item.dateString);
+    const dates = scheduleItem.dateItems.map((item: DateItem) => item.dateValue);
     const uniqueDates = [...new Set(dates)];
 
     return uniqueDates.map((date: string) => new Date(date));
+  }
+
+  setErrors(errors: ScheduleBookingErrors[]): void {
+    if(errors) {
+      this.itemsErrorStore.set(errors);
+    }
+  }
+
+  getErrorsStream(): Observable<ScheduleBookingErrors[]> {
+    return this.itemsErrorStore.getStream()
+      .pipe(
+        distinctUntilChanged((previous: ScheduleBookingErrors[], current: ScheduleBookingErrors[]) => isObjectsEqual(
+          previous[0] as unknown as Record<string, unknown>,
+          current[0] as unknown as Record<string, unknown>
+        )),
+      );
   }
 
   private getScheduleDateItem(daySchedule: ScheduleInt.ScheduleItem, dateString: string): DateItem {
     const date = new Date(dateString);
 
     return {
-      dateString: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
-      tooltipContent: this.getTooltipContent(daySchedule),
+      dateValue: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+      tooltipContent: CreateTooltip(daySchedule),
       scheduleType: daySchedule.scheduleType,
       id: daySchedule.id,
       date,
     };
   }
 
-  private getTooltipContent(daySchedule: ScheduleInt.ScheduleItem): string {
-    const timeRange = this.getTimeRange(daySchedule.startDate, daySchedule.endDate);
-
-    if (timeRange && daySchedule.unavailabilityReason) {
-      return `${timeRange} ${daySchedule.unavailabilityReason}`;
+  private getDateItems(dates: string[], candidateId: number, scheduleType: ScheduleItemType): DateItem[] {
+    if(scheduleType === ScheduleItemType.Book) {
+      return this.getBookScheduleDateItems(dates, candidateId);
+    } else {
+      return this.getScheduleDateItems(dates, candidateId);
     }
-
-    if (timeRange) {
-      return `${timeRange}`;
-    }
-
-    return '';
-  }
-
-  private getTimeRange(startDate: string, endDate: string): string {
-    if (startDate && endDate) {
-      return `${DateTimeHelper.formatDateUTC(startDate, 'HH:mm')} - ${DateTimeHelper.formatDateUTC(endDate, 'HH:mm')}`;
-    }
-
-    return '';
   }
 }

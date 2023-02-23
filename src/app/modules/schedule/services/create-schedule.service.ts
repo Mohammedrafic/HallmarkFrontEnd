@@ -1,11 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 
-import { getTimeFromDate, setTimeToDate } from '@shared/utils/date-time.utils';
+import { getTime, getTimeFromDate, setTimeToDate } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { ShowToast } from 'src/app/store/app.actions';
@@ -13,6 +13,8 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { CreateScheduleItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
+import { ScheduleItemsComponent } from '../components/schedule-items/schedule-items.component';
+import { EmployeeBookingDay, ScheduleBookingErrors } from '../interface';
 
 @Injectable()
 export class CreateScheduleService {
@@ -51,10 +53,69 @@ export class CreateScheduleService {
     }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
   }
 
+  createBookForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
+    return this.fb.group({
+      shiftId: [null, Validators.required],
+      startTime: [null, Validators.required],
+      endTime: [null, Validators.required],
+      hours: [null],
+      regionId: [null],
+      locationId: [null],
+      departmentId: [null],
+      skillId: [null],
+    }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
+  }
+
   handleError(error: HttpErrorResponse): Observable<never> {
     this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
 
     return EMPTY;
+  }
+
+  handleErrorMessage(error: HttpErrorResponse): Observable<ScheduleBookingErrors[]>{
+    const bookErrors = error.error.errors.CreateBookingsCommand;
+
+    if(bookErrors) {
+      return of(JSON.parse(bookErrors));
+    } else {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      return EMPTY;
+    }
+  }
+
+  createAvailabilityUnavailability(
+    scheduleForm: FormGroup,
+    scheduleItemsComponent: ScheduleItemsComponent,
+    scheduleType: number,
+    customShiftId: number
+  ): ScheduleInt.Schedule {
+    const { shiftId, startTime, endTime, unavailabilityReasonId = null } = scheduleForm.getRawValue();
+    return  {
+      employeeScheduledDays: this.getEmployeeScheduledDays(scheduleItemsComponent.scheduleItems, startTime, endTime),
+      scheduleType,
+      startTime: getTime(startTime),
+      endTime: getTime(endTime),
+      unavailabilityReasonId,
+      shiftId: shiftId !== customShiftId ? shiftId : null,
+    };
+  }
+
+  createBooking(
+    scheduleForm: FormGroup,
+    scheduleItemsComponent: ScheduleItemsComponent,
+    customShiftId: number
+  ): ScheduleInt.ScheduleBook {
+    const { departmentId,skillId, shiftId, startTime, endTime } = scheduleForm.getRawValue();
+    //TODO: orderType hardcoded , change to correct type in future;
+    return  {
+      employeeBookedDays: this.getEmployeeBookedDays(scheduleItemsComponent.scheduleItems),
+      departmentId: departmentId,
+      skillId: skillId,
+      orderType: 10,
+      shiftId: shiftId !== customShiftId ? shiftId : null,
+      startTime: getTime(startTime),
+      endTime: getTime(endTime),
+    };
   }
 
   getEmployeeScheduledDays(
@@ -64,17 +125,29 @@ export class CreateScheduleService {
   ): ScheduleInt.EmployeeScheduledDay[] {
     return scheduleItems.map((item: CreateScheduleItem) => {
       const scheduledDays: ScheduleInt.ScheduledDay[] = item.selectedDates.map((date: Date) => {
-        const dateString: string =  DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date));
+        const dateValue: string =  DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date));
 
         return {
-          schedulesToOverrideIds: this.getScheduleToOverrideIds(item.candidateId, dateString, startTime, endTime),
-          date: dateString,
+          schedulesToOverrideIds: this.getScheduleToOverrideIds(item.candidateId, dateValue, startTime, endTime),
+          date: dateValue,
         };
       });
 
       return {
         employeeId: item.candidateId,
         scheduledDays,
+      };
+    });
+  }
+
+  getEmployeeBookedDays(scheduleItems: CreateScheduleItem[]): EmployeeBookingDay[] {
+    return scheduleItems.map((item: CreateScheduleItem) => {
+      const bookedDays = item.selectedDates.map((date: Date) =>
+        DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)));
+
+      return {
+        employeeId: item.candidateId,
+        bookedDays,
       };
     });
   }

@@ -14,32 +14,43 @@ import { FormControl } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
-import { catchError, filter, map, Subscription, take, takeUntil, tap } from 'rxjs';
+import { catchError, filter, map, Subscription, switchMap, take, takeUntil, tap } from 'rxjs';
 
 import { FieldType } from '@core/enums';
 import { DestroyDialog } from '@core/helpers';
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED, RECORDS_ADDED } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { MessageTypes } from '@shared/enums/message-types';
 import { ShiftsService } from '@shared/services/shift.service';
-import { convertMsToTime, getHoursMinutesSeconds, getTime } from '@shared/utils/date-time.utils';
+import { convertMsToTime, getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import {
   AvailabilityFormConfig,
+  BookFormConfig,
   ScheduleFormSourceKeys,
-  ScheduleTypeNumber,
+  ScheduleItemType,
+  ScheduleSourcesMap,
   ScheduleTypes,
   UnavailabilityFormConfig,
 } from '../../constants';
+import { ScheduleBookingErrors, ScheduleFiltersConfig, ScheduleFilterStructure } from '../../interface';
 import { CreateScheduleService } from '../../services/create-schedule.service';
-import { ShowToast } from '../../../../store/app.actions';
 import { ScheduleItemsComponent } from '../schedule-items/schedule-items.component';
-import { ScheduleApiService } from '../../services';
+import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 import * as ScheduleInt from '../../interface';
+import {
+  CreateBookingSuccessMessage,
+  CreateScheduleSuccessMessage,
+  DisableScheduleControls,
+  ScheduleFilterHelper,
+} from '../../helpers';
+import { Skill } from '@shared/models/skill.model';
+import { ShowToast } from '../../../../store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ScheduleItemsService } from '../../services/schedule-items.service';
 
 @Component({
   selector: 'app-create-schedule',
@@ -50,8 +61,17 @@ import * as ScheduleInt from '../../interface';
 export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   @ViewChild(ScheduleItemsComponent) scheduleItemsComponent: ScheduleItemsComponent;
 
+  @Input() scheduleFilterData: ScheduleFiltersConfig;
+  @Input() selectedScheduleFilters: ScheduleInt.ScheduleFilters;
   @Input() scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
   @Input() datePickerLimitations: DatePickerLimitations;
+
+  @Input() set scheduleStructure(structure: ScheduleFilterStructure) {
+    if (structure.regions?.length) {
+      this.setScheduleStructure(structure);
+    }
+  }
+
   @Input() set scheduleData(page: ScheduleInt.ScheduleModelPage | null) {
     if (page) {
       this.createScheduleService.scheduleData = page.items;
@@ -61,33 +81,33 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   @Output() updateScheduleGrid: EventEmitter<void> = new EventEmitter<void>();
 
   readonly targetElement: HTMLBodyElement = this.globalWindow.document.body as HTMLBodyElement;
-  readonly scheduleTypes: ScheduleInt.ScheduleTypeRadioButton[] = ScheduleTypes;
-  readonly scheduleTypeNumberEnum = ScheduleTypeNumber;
+  readonly scheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = ScheduleTypes;
+  readonly scheduleTypeNumberEnum = ScheduleItemType;
   readonly FieldTypes = FieldType;
-  // TODO: change to Book when it is implemented
-  readonly scheduleTypesControl: FormControl = new FormControl(this.scheduleTypeNumberEnum.Unavailability);
+  readonly scheduleTypesControl: FormControl = new FormControl(this.scheduleTypeNumberEnum.Book);
   readonly dropDownFields = { text: 'text', value: 'value' };
-  readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = {
-    [ScheduleFormSourceKeys.Shifts]: [],
-    [ScheduleFormSourceKeys.Reasons]: [],
-  };
+  readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = ScheduleSourcesMap;
 
   scheduleForm: CustomFormGroup<ScheduleInt.ScheduleForm>;
   scheduleFormConfig: ScheduleInt.ScheduleFormConfig;
-  scheduleTypeNumber: ScheduleTypeNumber;
+  scheduleTypeNumber: ScheduleItemType;
   showScheduleForm = true;
+  selectedScheduleType: ScheduleItemType | null = null;
 
   private readonly customShiftId = -1;
   private shiftControlSubscription: Subscription | null;
   private scheduleShifts: ScheduleShift[] = [];
+  private scheduleStructureList: ScheduleFilterStructure;
 
   constructor(
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
     private createScheduleService: CreateScheduleService,
+    private scheduleItemsService: ScheduleItemsService,
     private scheduleApiService: ScheduleApiService,
     private confirmService: ConfirmService,
     private shiftsService: ShiftsService,
     private cdr: ChangeDetectorRef,
+    private scheduleFiltersService: ScheduleFiltersService,
     private store: Store,
   ) {
     super();
@@ -97,7 +117,9 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
     this.watchForCloseStream();
     this.getUnavailabilityReasons();
     this.getShifts();
-    this.updateScheduleDialogConfig(ScheduleTypeNumber.Unavailability); // TODO: change to Book when it is implemented
+    this.updateScheduleDialogConfig(ScheduleItemType.Book);
+    this.watchForControls();
+    this.watchForScheduleType();
   }
 
   closeScheduleDialog(): void {
@@ -114,15 +136,15 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
           filter(Boolean),
         )
         .subscribe(() => {
-          this.closeDialog();
+          this.handleCloseDialog();
         });
     } else {
-      this.closeDialog();
+      this.handleCloseDialog();
     }
   }
 
   changeScheduleType(event: ChangeArgs): void {
-    this.updateScheduleDialogConfig(event.value as unknown as ScheduleTypeNumber);
+    this.updateScheduleDialogConfig(event.value as unknown as ScheduleItemType);
   }
 
   hideScheduleForm(): void {
@@ -134,8 +156,8 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   setHours(): void {
-    const startTimeDate =  this.scheduleForm.get('startTime')?.value;
-    const endTimeDate =  this.scheduleForm.get('endTime')?.value;
+    const startTimeDate = this.scheduleForm.get('startTime')?.value;
+    const endTimeDate = this.scheduleForm.get('endTime')?.value;
 
     // TODO: move to service
     if (startTimeDate && endTimeDate) {
@@ -157,31 +179,19 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
       return;
     }
 
-    const { shiftId, startTime, endTime, unavailabilityReasonId = null } = this.scheduleForm.getRawValue();
-    const schedule: ScheduleInt.Schedule = {
-      employeeScheduledDays: this.createScheduleService
-        .getEmployeeScheduledDays(this.scheduleItemsComponent.scheduleItems, startTime, endTime),
-      scheduleType: this.scheduleTypesControl.value,
-      startTime: getTime(startTime),
-      endTime: getTime(endTime),
-      unavailabilityReasonId,
-      shiftId: shiftId !== this.customShiftId ? shiftId : null,
-    };
-    const successMessage = schedule.employeeScheduledDays.length === 1
-      && schedule.employeeScheduledDays[0].scheduledDays.length === 1
-        ? RECORD_ADDED
-        : RECORDS_ADDED;
-
-    this.scheduleApiService.createSchedule(schedule)
-      .pipe(
-        catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
-        takeUntil(this.componentDestroy())
-      )
-      .subscribe(() => {
-        this.updateScheduleGrid.emit();
-        this.scheduleForm.markAsUntouched();
-        this.store.dispatch(new ShowToast(MessageTypes.Success, successMessage));
-      });
+    switch (true) {
+      case this.selectedScheduleType === ScheduleItemType.Book:
+        this.saveBooking();
+        return;
+      case this.selectedScheduleType === ScheduleItemType.Unavailability:
+        this.saveAvailabilityUnavailability();
+        return;
+      case this.selectedScheduleType === ScheduleItemType.Availability:
+        this.saveAvailabilityUnavailability();
+        return;
+      default:
+        this.saveBooking();
+    }
   }
 
   private getUnavailabilityReasons(): void {
@@ -214,18 +224,20 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
       });
   }
 
-  private updateScheduleDialogConfig(scheduleTypeMode: ScheduleTypeNumber): void {
+  private updateScheduleDialogConfig(scheduleTypeMode: ScheduleItemType): void {
     this.scheduleTypeNumber = scheduleTypeMode;
 
     switch (this.scheduleTypeNumber) {
-      case ScheduleTypeNumber.Book:
-        // TODO: handle when Book functionality is implemented
+      case ScheduleItemType.Book:
+        this.scheduleFormConfig = BookFormConfig;
+        this.scheduleForm = this.createScheduleService.createBookForm();
+        this.patchBookForm();
         break;
-      case ScheduleTypeNumber.Unavailability:
+      case ScheduleItemType.Unavailability:
         this.scheduleFormConfig = UnavailabilityFormConfig;
         this.scheduleForm = this.createScheduleService.createUnavailabilityForm();
         break;
-      case ScheduleTypeNumber.Availability:
+      case ScheduleItemType.Availability:
         this.scheduleFormConfig = AvailabilityFormConfig;
         this.scheduleForm = this.createScheduleService.createAvailabilityForm();
         break;
@@ -258,5 +270,140 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
           this.setHours();
         }
       }) as Subscription;
+  }
+
+  private isCandidatesFiltered(): boolean {
+    return !!this.selectedScheduleFilters.regionIds?.length && !!this.selectedScheduleFilters.locationIds?.length;
+  }
+
+  private patchBookForm(): void {
+    if (!this.isCandidatesFiltered()) {
+      return;
+    }
+
+    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Regions] = this.scheduleFilterData.regionIds.dataSource;
+    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations] = this.scheduleFilterData.locationIds.dataSource;
+    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = this.scheduleFilterData.departmentsIds.dataSource;
+    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = this.scheduleFilterData.skillIds.dataSource;
+
+    this.scheduleForm.get('regionId')?.setValue(((this.selectedScheduleFilters.regionIds as number[])[0]));
+    this.scheduleForm.get('locationId')?.setValue((this.selectedScheduleFilters.locationIds as number[])[0]);
+    this.scheduleForm.get('departmentId')?.setValue((this.selectedScheduleFilters.departmentsIds as number[])[0]);
+    if (this.selectedScheduleFilters.skillIds) {
+      this.scheduleForm.get('skillId')?.setValue((this.selectedScheduleFilters.skillIds as number[])[0]);
+    }
+
+    DisableScheduleControls(this.scheduleForm, ['regionId', 'locationId', 'departmentId']);
+  }
+
+  private watchForControls(): void {
+    if (!this.selectedScheduleFilters?.regionIds?.length && !this.selectedScheduleFilters?.locationIds?.length) {
+      this.scheduleForm.get('regionId')?.valueChanges.pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe((value: number) => {
+        this.scheduleForm.get('locationId')?.patchValue([], { emitEvent: false, onlySelf: true });
+        this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations] = this.scheduleFiltersService
+          .getSelectedLocatinOptions(this.scheduleStructureList, [value]);
+        this.cdr.markForCheck();
+      });
+
+      this.scheduleForm.get('locationId')?.valueChanges.pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe((value: number) => {
+        this.scheduleForm.get('departmentsId')?.patchValue([], { emitEvent: false, onlySelf: true });
+        this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = this.scheduleFiltersService
+          .getSelectedDepartmentOptions(this.scheduleStructureList, [value]);
+
+        this.cdr.markForCheck();
+      });
+
+      this.scheduleForm.get('departmentId')?.valueChanges.pipe(
+        filter(Boolean),
+        switchMap((value: number) => {
+          return this.scheduleApiService.getSkillsByEmployees(this.scheduleSelectedSlots.candidates[0].id, value);
+        }),
+        takeUntil(this.componentDestroy())
+      ).subscribe((skills: Skill[]) => {
+        this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
+
+        this.cdr.markForCheck();
+      });
+    }
+  }
+
+  private setScheduleStructure(structure: ScheduleFilterStructure): void {
+    this.scheduleStructureList = structure;
+    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Regions] =
+      ScheduleFilterHelper.adaptRegionToOption(structure.regions);
+  }
+
+  private watchForScheduleType(): void {
+    this.scheduleTypesControl.valueChanges.pipe(
+      map((type: number) => {
+        if (type === ScheduleItemType.Book) {
+          this.watchForControls();
+        }
+        return type;
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe((type: number) => {
+      this.selectedScheduleType = type;
+    });
+  }
+
+  private handleCloseDialog(): void {
+    this.closeDialog();
+    this.scheduleItemsService.setErrors([]);
+  }
+
+  private saveAvailabilityUnavailability(): void {
+    const schedule = this.createScheduleService.createAvailabilityUnavailability(
+      this.scheduleForm,
+      this.scheduleItemsComponent,
+      this.scheduleTypesControl.value,
+      this.customShiftId
+    );
+    const successMessage = CreateScheduleSuccessMessage(schedule);
+
+    this.scheduleApiService.createSchedule(schedule)
+      .pipe(
+        catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.handleSuccessSaveDate(successMessage);
+      });
+  }
+
+  private saveBooking(): void {
+    const schedule = this.createScheduleService.createBooking(
+      this.scheduleForm,
+      this.scheduleItemsComponent,
+      this.customShiftId,
+    );
+    const successMessage = CreateBookingSuccessMessage(schedule);
+
+    this.scheduleApiService.createBookSchedule(schedule).pipe(
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleErrorMessage(error)),
+      tap((errors: ScheduleBookingErrors[]) => {
+        this.scheduleItemsService.setErrors(errors);
+        return errors;
+      }),
+      filter((errors: ScheduleBookingErrors[]) => {
+        return !errors;
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.scheduleItemsService.setErrors([]);
+      this.handleSuccessSaveDate(successMessage);
+    });
+  }
+
+  private handleSuccessSaveDate(message: string): void {
+    this.updateScheduleGrid.emit();
+    this.scheduleForm.markAsUntouched();
+    this.store.dispatch(new ShowToast(MessageTypes.Success, message));
   }
 }

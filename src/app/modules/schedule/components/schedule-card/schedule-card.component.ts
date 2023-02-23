@@ -3,6 +3,8 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 import { ScheduleCardService } from '../../services/schedule-card.service';
 import { ScheduleCardConfig, ScheduleDateItem, ScheduleItem } from '../../interface';
 import { GetScheduleCardConfig } from '../../constants';
+import { CardTitle } from '../../helpers';
+import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 
 @Component({
   selector: 'app-schedule-card',
@@ -14,6 +16,8 @@ export class ScheduleCardComponent implements OnInit {
   @Input() dateSchedule: ScheduleDateItem;
 
   firstDaySchedule: ScheduleItem;
+
+  perDiemOrder: IrpOrderType = IrpOrderType.PerDiem;
 
   cardConfig: ScheduleCardConfig | undefined;
 
@@ -34,14 +38,13 @@ export class ScheduleCardComponent implements OnInit {
     this.cardConfig = GetScheduleCardConfig(this.dateSchedule);
     this.cardTitle = this.prepareCardTitle(this.dateSchedule.daySchedules[0]);
     this.cardIconName = this.prepareCardIconName();
-
     this.createTooltips();
   }
 
   private prepareCardTitle(scheduleItem: ScheduleItem): string {
     return this.cardConfig?.title
       || scheduleItem.unavailabilityReason
-      || `${scheduleItem.location.slice(0, 3)}-${scheduleItem.department.slice(0, 3)}`;
+      || CardTitle(scheduleItem);
   }
 
   private prepareCardIconName(): string {
@@ -52,7 +55,7 @@ export class ScheduleCardComponent implements OnInit {
     this.overlappingTooltipMessage = this.scheduleCardService.getOverlappingTooltipMessage(this.dateSchedule);
 
     this.tooltipMessage =
-      `OrderID-${this.firstDaySchedule.orderId} ${this.firstDaySchedule.location} ${this.firstDaySchedule.department}`;
+      `OrderID-${this.firstDaySchedule.orderMetadata?.orderPublicId} ${this.firstDaySchedule.orderMetadata?.location} ${this.firstDaySchedule.orderMetadata?.department}`;
 
     this.additionalTooltipMessage =
       `<pre class="schedule-custom-tooltip-container">${

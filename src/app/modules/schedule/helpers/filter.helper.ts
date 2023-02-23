@@ -18,4 +18,8 @@ export class ScheduleFilterHelper {
   static adaptSkillToOption(skills: Skill[]): DropdownOption[] {
     return skills.map((skill) => ({ text: skill.skillDescription, value: skill.id }));
   }
+
+  static adaptMasterSkillToOption(skills: Skill[]): DropdownOption[] {
+    return skills.map((skill) => ({ text: skill.name, value: skill.id })) as DropdownOption[];
+  }
 }

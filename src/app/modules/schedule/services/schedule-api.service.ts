@@ -3,8 +3,18 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { CandidateSchedules, Schedule, ScheduleCandidatesPage, ScheduleFilters } from '../interface';
+import {
+  CandidateSchedules,
+  EmployeesFilters,
+  Schedule,
+  ScheduleBookingErrors,
+  ScheduleCandidatesPage,
+  ScheduleFilters,
+} from '../interface';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
+import { OrganizationStructure } from '@shared/models/organization.model';
+import { Skill } from '@shared/models/skill.model';
+import * as ScheduleInt from '../interface';
 
 @Injectable()
 export class ScheduleApiService {
@@ -17,7 +27,7 @@ export class ScheduleApiService {
 
   getSchedulesByEmployeesIds(
     employeeIds: number[],
-    filters: { startDate: string | Date; endDate: string | Date, departmentsIds: number[] }
+    filters: EmployeesFilters,
   ): Observable<CandidateSchedules[]> {
     return this.http.post<CandidateSchedules[]>('/api/Schedules/byEmployeesIds', { employeeIds, ...filters });
   }
@@ -31,5 +41,22 @@ export class ScheduleApiService {
 
   createSchedule(employeeScheduledDays: Schedule): Observable<void> {
     return this.http.post<void>('/api/Schedules/create', employeeScheduledDays);
+  }
+
+  createBookSchedule(employeeBookDays: ScheduleInt.ScheduleBook):Observable<ScheduleBookingErrors[]> {
+    return this.http.post<ScheduleBookingErrors[]>('/api/Schedules/book', employeeBookDays);
+  }
+
+  getEmployeesStructure(employeeId: number): Observable<OrganizationStructure> {
+    return this.http.get<OrganizationStructure>(
+      `/api/EmployeeFilterOptions/structuredDepartments`, { params: { EmployeeId: employeeId }}
+    );
+  }
+
+  getSkillsByEmployees(employeeId: number, departmentId: number): Observable<Skill[]> {
+    return this.http.get<Skill[]>('/api/EmployeeFilterOptions/skillsByDepartment', { params: {
+        EmployeeId: employeeId,
+        DepartmentId: departmentId,
+      }});
   }
 }

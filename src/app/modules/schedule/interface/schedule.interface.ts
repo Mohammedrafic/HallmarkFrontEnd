@@ -4,8 +4,9 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { PageOfCollections } from '@shared/models/page.model';
 import { ValueType } from '@syncfusion/ej2-angular-grids';
-import { ChipItem } from '../../../shared/components/inline-chips';
+import { ChipItem } from '@shared/components/inline-chips';
 import { ScheduleOrderType, ScheduleType } from '../enums';
+import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 
 export interface ScheduleCandidate {
   id: number;
@@ -31,7 +32,13 @@ export interface ScheduleItem {
   scheduleOrderType: ScheduleOrderType;
   location: string;
   department: string;
-  unavailabilityReason: string
+  unavailabilityReason: string;
+  orderMetadata: {
+    orderType: IrpOrderType;
+    location: string;
+    department: string;
+    orderPublicId: string;
+  }
 }
 
 export interface ScheduleModel {
@@ -116,4 +123,10 @@ export interface ScheduleFilterStructure {
   regions: OrganizationRegion[];
   locations: OrganizationLocation[];
   departments: OrganizationDepartment[];
+}
+
+export interface EmployeesFilters {
+  startDate: string | Date;
+  endDate: string | Date;
+  departmentsIds: number[];
 }

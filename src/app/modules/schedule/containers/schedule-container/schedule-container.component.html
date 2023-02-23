@@ -23,14 +23,14 @@
         </button>
         <app-tooltip-container
           *ngIf="activeTabIndex === tabIndex.Scheduling"
-          [showToolTip]="!scheduleSelectedSlots?.dates?.length"
-          message="Select at least one date to Schedule"
+          [showToolTip]="!!scheduleButtonTooltip"
+          [message]="scheduleButtonTooltip"
         >
           <button
             ejs-button
             appHideBeforeSyncfusionLoad
             cssClass="e-primary"
-            [disabled]="!scheduleSelectedSlots?.dates?.length"
+            [disabled]="!!scheduleButtonTooltip"
             (click)="openScheduleDialog()"
           >
             Schedule
@@ -59,12 +59,15 @@
   </ng-container>
 </div>
 
-<app-schedule-filters [count]="totalCount" (updateScheduleFilter)="updateScheduleFilter($event)"></app-schedule-filters>
+<app-schedule-filters #filters [count]="totalCount" (updateScheduleFilter)="updateScheduleFilter($event)"></app-schedule-filters>
 
 <app-create-schedule
   *ngIf="createScheduleDialogOpen"
   [datePickerLimitations]="datePickerLimitations"
   [scheduleSelectedSlots]="scheduleSelectedSlots"
+  [scheduleStructure]="scheduleStructure"
+  [selectedScheduleFilters]="scheduleFilters"
+  [scheduleFilterData]="filters.filterColumns"
   [scheduleData]="scheduleData"
   (destroyDialog)="closeScheduleDialog()"
   (updateScheduleGrid)="updateScheduleGrid()"

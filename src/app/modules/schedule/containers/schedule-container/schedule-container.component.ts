@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { Observable, switchMap, takeUntil } from 'rxjs';
+import { filter, Observable, switchMap, takeUntil } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
@@ -10,10 +10,13 @@ import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import { ScheduleGridAdapter } from '../../adapters';
-import { TabListConfig } from '../../constants';
+import { ButtonRegionTooltip, ButtonSelectDataTooltip, TabListConfig } from '../../constants';
 import { ActiveTabIndex } from '../../enums';
 import * as ScheduleInt from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
+import { ScheduleFilterStructure } from '../../interface';
+import { OrganizationStructure } from '@shared/models/organization.model';
+import { GetScheduleFilterByEmployees } from '../../helpers';
 
 @Component({
   selector: 'app-schedule-container',
@@ -44,6 +47,14 @@ export class ScheduleContainerComponent extends Destroyable {
 
   chipsData: ChipItem[];
 
+  scheduleButtonTooltip: string;
+
+  scheduleStructure: ScheduleFilterStructure = {
+    regions: [],
+    locations: [],
+    departments: [],
+  };
+
   private selectedCandidate: ScheduleInt.ScheduleCandidate | null;
 
   constructor(
@@ -51,6 +62,7 @@ export class ScheduleContainerComponent extends Destroyable {
     private cdr: ChangeDetectorRef,
     private scheduleApiService: ScheduleApiService,
     private filterService: ScheduleFiltersService,
+    private scheduleFiltersService: ScheduleFiltersService,
   ) {
     super();
 
@@ -90,6 +102,7 @@ export class ScheduleContainerComponent extends Destroyable {
 
   selectCells(cells: ScheduleInt.ScheduleSelectedSlots): void {
     this.scheduleSelectedSlots = cells;
+    this.setScheduleButtonTooltip();
   }
 
   scheduleCell(cells: ScheduleInt.ScheduleSelectedSlots): void {
@@ -98,6 +111,7 @@ export class ScheduleContainerComponent extends Destroyable {
   }
 
   openScheduleDialog(): void {
+    this.setScheduleStructure();
     this.createScheduleDialogOpen = true;
   }
 
@@ -113,6 +127,7 @@ export class ScheduleContainerComponent extends Destroyable {
     this.chipsData = data.chipsData;
     this.changeFilters(data.filters);
     this.appliedFiltersAmount = data.filteredItems?.length;
+    this.setScheduleButtonTooltip();
   }
 
   selectCandidate(selectedCandidate: ScheduleInt.ScheduleCandidate | null): void {
@@ -183,11 +198,9 @@ export class ScheduleContainerComponent extends Destroyable {
   private getSchedulesByEmployeesIds(
     candidates: ScheduleInt.ScheduleCandidatesPage,
   ): Observable<ScheduleInt.ScheduleModelPage> {
-    const { startDate, endDate } = this.scheduleFilters;
-
     return this.scheduleApiService.getSchedulesByEmployeesIds(
-      candidates.items.map(el => el.id),
-      { startDate: startDate || '', endDate: endDate || '',  departmentsIds: this.scheduleFilters.departmentsIds ?? [] }
+      candidates.items.map(candidate => candidate.id),
+      GetScheduleFilterByEmployees(this.scheduleFilters),
     ).pipe(
       take(1),
       map((candidateSchedules: ScheduleInt.CandidateSchedules[]): ScheduleInt.ScheduleModelPage =>
@@ -211,5 +224,39 @@ export class ScheduleContainerComponent extends Destroyable {
       || !!this.scheduleFilters.firstLastNameOrId
       || !!this.scheduleFilters.regionIds?.length
       || !!this.scheduleFilters.locationIds?.length;
+  }
+
+  private setScheduleButtonTooltip(): void {
+    if (this.showButtonTooltip()) {
+      this.scheduleButtonTooltip = ButtonRegionTooltip;
+      return;
+    }
+
+    if (!this.scheduleSelectedSlots?.dates?.length) {
+      this.scheduleButtonTooltip = ButtonSelectDataTooltip;
+      return;
+    }
+
+    this.scheduleButtonTooltip = '';
+  }
+
+  private showButtonTooltip(): boolean | undefined {
+    return this.scheduleFilters.regionIds && this.scheduleFilters.regionIds.length > 1 ||
+      this.scheduleFilters.locationIds && this.scheduleFilters.locationIds.length > 1 ||
+      this.scheduleFilters.departmentsIds && this.scheduleFilters.departmentsIds.length > 1;
+  }
+
+  private setScheduleStructure(): void {
+    if(!this.scheduleFilters.locationIds?.length && !this.scheduleFilters.regionIds?.length) {
+      this.scheduleApiService.getEmployeesStructure(this.scheduleSelectedSlots.candidates[0].id).pipe(
+        filter(Boolean),
+        map((structure: OrganizationStructure) => {
+          return this.scheduleFiltersService.createFilterStructure(structure.regions);
+        }),
+        takeUntil(this.componentDestroy()),
+      ).subscribe((structure: ScheduleFilterStructure) => {
+        this.scheduleStructure = { ...structure };
+      });
+    }
   }
 }

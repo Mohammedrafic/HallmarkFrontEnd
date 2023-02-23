@@ -115,7 +115,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   handleCellSingleClick(date: string, candidate: ScheduleInt.ScheduleCandidate, cellDate?: ScheduleDateItem): void {
     // TODO: refactor, move to directive
-    if(!cellDate?.isDisabled && this.getSelectionAvailable()) {
+    if(!cellDate?.isDisabled) {
       this.preventCellSingleClick = false;
       this.cellClickTimer = setTimeout(() => {
         if (!this.preventCellSingleClick) {
@@ -142,7 +142,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     candidate: ScheduleInt.ScheduleCandidate,
     cellDate?: ScheduleDateItem
   ): void {
-    if(!cellDate?.isDisabled && this.getSelectionAvailable()) {
+    if(!cellDate?.isDisabled) {
       this.preventCellSingleClick = true;
       clearTimeout(this.cellClickTimer);
       this.selectedCandidatesSlot.clear();

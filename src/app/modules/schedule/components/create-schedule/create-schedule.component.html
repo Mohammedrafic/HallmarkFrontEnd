@@ -1,7 +1,7 @@
 <ejs-dialog
   #destroyableDialog
   cssClass="dialog"
-  [width]="536"
+  [width]="545"
   [visible]="false"
   [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
@@ -98,6 +98,7 @@
         [scheduleSelectedSlots]="scheduleSelectedSlots"
         (isEmpty)="hideScheduleForm()"
         [datePickerLimitations]="datePickerLimitations"
+        [selectedScheduleType]="selectedScheduleType"
       ></app-schedule-items>
     </div>
   </ng-template>

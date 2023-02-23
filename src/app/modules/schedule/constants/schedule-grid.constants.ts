@@ -36,7 +36,7 @@ export const ScheduleCardTypeMap: Map<ScheduleType, ScheduleCardConfig> = new Ma
   .set(ScheduleType.Book, {
     bgColor: '#C5D9FF',
     title: '',
-    iconName: '',
+    iconName: 'calendar',
     iconColor: '#3E7FFF',
     showTitleToolTip: true,
   })

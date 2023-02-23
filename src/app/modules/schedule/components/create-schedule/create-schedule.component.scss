@@ -65,23 +65,36 @@ app-schedule-items {
 
 .availability-form {
   display: grid;
-  grid-template-columns: 1.6fr 0.9fr 0.9fr 0.6fr;
+  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.6fr;
   grid-template-rows: 1fr;
-  gap: 16px 12px;
+  gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
-    "shift startTime endTime hours";
+    "shift startTime startTime endTime hours";
 }
 
 .unavailability-form {
   display: grid;
-  grid-template-columns: 1.6fr 0.9fr 0.9fr 0.6fr;
+  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.6fr;
   grid-template-rows: 1fr 1fr;
-  gap: 16px 12px;
+  gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
-    "reason reason reason reason"
-    "shift startTime endTime hours";
+    "reason reason reason reason reason"
+    "shift startTime startTime endTime hours";
+}
+
+.book-form {
+  display: grid;
+  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.6fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  gap: 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "shift startTime startTime endTime hours"
+    "region region location location location"
+    "department department department department department"
+    "skill skill skill skill skill";
 }
 
 .reason {
@@ -102,4 +115,20 @@ app-schedule-items {
 
 .hours {
   grid-area: hours;
+}
+
+.region {
+  grid-area: region;
+}
+
+.location {
+  grid-area: location;
+}
+
+.department {
+  grid-area: department;
+}
+
+.skill {
+  grid-area: skill;
 }

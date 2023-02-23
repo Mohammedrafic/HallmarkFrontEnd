@@ -10,3 +10,6 @@ export const TabListConfig: TabsListConfig[] = [
   //   title: TabTitleConfig.Analytics,
   // },
 ];
+
+export const ButtonRegionTooltip = 'Select a single Region-Location-Department to Schedule';
+export const ButtonSelectDataTooltip = 'Select at least one date to Schedule';

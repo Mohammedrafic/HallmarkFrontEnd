@@ -4,7 +4,7 @@ import { ScheduleType } from "../enums";
 import * as ScheduleInt from '../interface';
 
 
-export enum ScheduleTypeNumber {
+export enum ScheduleItemType {
   Book = 0,
   Availability = 1,
   Unavailability = 2,
@@ -13,24 +13,26 @@ export enum ScheduleTypeNumber {
 export enum ScheduleFormSourceKeys {
   Shifts = 'shifts',
   Reasons = 'reasons',
+  Regions = 'regions',
+  Locations = 'locations',
+  Departments = 'departments',
+  Skills = 'skill',
 }
 
-
-export const ScheduleTypes: ScheduleInt.ScheduleTypeRadioButton[] = [
-  // TODO: uncomment when Book is implemented
-  // {
-  //   label: ScheduleType.Book,
-  //   value: ScheduleTypeMode.Book,
-  //   name: 'scheduleType',
-  // },
+export const ScheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = [
+  {
+    label: ScheduleType.Book,
+    value: ScheduleItemType.Book,
+    name: 'scheduleType',
+  },
   {
     label: ScheduleType.Unavailability,
-    value: ScheduleTypeNumber.Unavailability,
+    value: ScheduleItemType.Unavailability,
     name: 'scheduleType',
   },
   {
     label: ScheduleType.Availability,
-    value: ScheduleTypeNumber.Availability,
+    value: ScheduleItemType.Availability,
     name: 'scheduleType',
   },
 ];
@@ -81,6 +83,42 @@ const unavailabilityFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
   ...availabilityFormFields,
 ];
 
+const bookFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
+  ...availabilityFormFields,
+  {
+    field: 'regionId',
+    title: 'Region',
+    type: FieldType.Dropdown,
+    gridAreaName: 'region',
+    required: false,
+    sourceKey: ScheduleFormSourceKeys.Regions,
+  },
+  {
+    field: 'locationId',
+    title: 'Location',
+    type: FieldType.Dropdown,
+    gridAreaName: 'location',
+    required: false,
+    sourceKey: ScheduleFormSourceKeys.Locations,
+  },
+  {
+    field: 'departmentId',
+    title: 'Department',
+    type: FieldType.Dropdown,
+    gridAreaName: 'department',
+    required: false,
+    sourceKey: ScheduleFormSourceKeys.Departments,
+  },
+  {
+    field: 'skillId',
+    title: 'Skill',
+    type: FieldType.Dropdown,
+    gridAreaName: 'skill',
+    required: false,
+    sourceKey: ScheduleFormSourceKeys.Skills,
+  },
+];
+
 export const AvailabilityFormConfig: ScheduleInt.ScheduleFormConfig = {
   formClass: 'availability-form',
   formFields: availabilityFormFields,
@@ -89,4 +127,18 @@ export const AvailabilityFormConfig: ScheduleInt.ScheduleFormConfig = {
 export const UnavailabilityFormConfig: ScheduleInt.ScheduleFormConfig = {
   formClass: 'unavailability-form',
   formFields: unavailabilityFormFields,
+};
+
+export const BookFormConfig: ScheduleInt.ScheduleFormConfig = {
+  formClass: 'book-form',
+  formFields: bookFormFields,
+};
+
+export const ScheduleSourcesMap: ScheduleInt.ScheduleFormSource = {
+  [ScheduleFormSourceKeys.Shifts]: [],
+  [ScheduleFormSourceKeys.Reasons]: [],
+  [ScheduleFormSourceKeys.Regions]: [],
+  [ScheduleFormSourceKeys.Locations]: [],
+  [ScheduleFormSourceKeys.Departments]: [],
+  [ScheduleFormSourceKeys.Skills]: [],
 };
