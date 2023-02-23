@@ -24,7 +24,7 @@ export class CandidatesService {
     this.candidateName$.next(name);
   }
 
-  public setEmployeeWorkCommitmentId(id: number): void {
+  public setActiveEmployeeWorkCommitmentId(id: number): void {
     this.employeeWorkCommitmentId$.next(id)
   }
 

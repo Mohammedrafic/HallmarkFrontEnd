@@ -11,6 +11,7 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import {
   AssignNewDepartment,
   DepartmentFilterState,
+  DepartmentHierarchy,
   DepartmentsPage,
   EditAssignedDepartment,
 } from '@client/candidates/departments/departments.model';
@@ -23,6 +24,8 @@ export class DepartmentsService {
   private sideDialogTitle$: Subject<SideDialogTitleEnum> = new Subject<SideDialogTitleEnum>();
 
   private baseUrl = '/api/EmployeeAssignedDepartment';
+
+  public employeeWorkCommitmentId: number;
 
   public constructor(private http: HttpClient, private store: Store, private candidatesService: CandidatesService) {}
 
@@ -51,7 +54,7 @@ export class DepartmentsService {
   }
 
   public deleteAssignedDepartments(departmentIds: number[]): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/delete`, departmentIds).pipe(
+    return this.http.post<void>(`${this.baseUrl}/delete`, { ids: departmentIds }).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));
         return EMPTY;
@@ -63,9 +66,9 @@ export class DepartmentsService {
     formData: EditAssignedDepartment,
     departmentIds: number[]
   ): Observable<EditAssignedDepartment> {
-    const { startDate, endDate, homeCostCenter, orientedStartDate, isOriented, employeeWorkCommitmentId } = formData;
+    const { startDate, endDate, homeCostCenter, orientedStartDate, isOriented } = formData;
     const payload = {
-      employeeWorkCommitmentId: employeeWorkCommitmentId,
+      employeeWorkCommitmentId: this.employeeWorkCommitmentId,
       startDate: startDate && DateTimeHelper.toUtcFormat(startDate),
       endDate: endDate && DateTimeHelper.toUtcFormat(endDate),
       ids: departmentIds,
@@ -83,15 +86,14 @@ export class DepartmentsService {
   }
 
   public assignNewDepartment(formData: AssignNewDepartment): Observable<AssignNewDepartment> {
-    const { regionId, locationId, departmentId, startDate, endDate } = formData;
+    const { departmentId, startDate, endDate, isOriented } = formData;
     const payload = {
-      regionId: regionId,
-      locationId: locationId,
+      employeeWorkCommitmentId: this.employeeWorkCommitmentId,
       departmentId: departmentId,
+      isOriented: !!isOriented,
       startDate: startDate && DateTimeHelper.toUtcFormat(startDate),
       endDate: endDate && DateTimeHelper.toUtcFormat(endDate),
     };
-
     return this.http.post<AssignNewDepartment>(`${this.baseUrl}`, payload).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));
@@ -100,7 +102,7 @@ export class DepartmentsService {
     );
   }
 
-  public getAssignedDepartmentHierarchy(id: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/hierarchy/${id}`)
+  public getAssignedDepartmentHierarchy(id: number): Observable<DepartmentHierarchy> {
+    return this.http.get<DepartmentHierarchy>(`${this.baseUrl}/hierarchy/${id}`);
   }
 }

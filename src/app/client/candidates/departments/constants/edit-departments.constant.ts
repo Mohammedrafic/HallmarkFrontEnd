@@ -3,19 +3,21 @@ import { ControlTypes } from '@shared/enums/control-types.enum';
 import { DepartmentFormFieldConfig } from '../departments.model';
 
 export const EditDepartmentsFormConfig = (
-  isOriented: boolean
+  isOriented: boolean,
 ): DepartmentFormFieldConfig<EditDepartmentFieldsEnum>[] => [
   {
     type: ControlTypes.Date,
     title: 'Start Date',
     field: EditDepartmentFieldsEnum.START_DATE,
     show: true,
+    disabled: false,
   },
   {
     type: ControlTypes.Date,
     title: 'End Date',
     field: EditDepartmentFieldsEnum.END_DATE,
     show: true,
+    disabled: true,
   },
   {
     type: ControlTypes.Checkbox,

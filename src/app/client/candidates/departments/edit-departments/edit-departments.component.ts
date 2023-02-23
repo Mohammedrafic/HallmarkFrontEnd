@@ -1,6 +1,14 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Input,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 
-import { filter, Subject, take, takeUntil } from 'rxjs';
+import { filter, Subject, take, takeUntil, switchMap } from 'rxjs';
 import { Store } from '@ngxs/store';
 
 import { EditDepartmentFieldsEnum } from '@client/candidates/enums/edit-department.enum';
@@ -25,6 +33,8 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   @Input() public saveForm$: Subject<boolean>;
   @Input() public selectedDepartments: number[];
 
+  @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
+
   public filtersFormConfig: DepartmentFormFieldConfig<EditDepartmentFieldsEnum>[] = [];
   public formGroup: CustomFormGroup<EditDepartmentFormState>;
   public controlTypes = ControlTypes;
@@ -45,6 +55,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
     this.initFormConfig(false);
     this.watchForOrientedControl();
     this.saveFormData();
+    this.watchForControls();
   }
 
   public trackByFn = (_: number, item: DepartmentFormFieldConfig<EditDepartmentFieldsEnum>) => item.field + item.show;
@@ -75,13 +86,33 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
           okButtonLabel: 'Yes',
           okButtonClass: 'ok-button',
         })
-        .pipe(filter(Boolean), take(1))
+        .pipe(
+          filter(Boolean),
+          switchMap(() => {
+            const formData = this.formGroup.getRawValue();
+            return this.departmentService.editAssignedDepartments(formData, this.selectedDepartments);
+          }),
+          take(1)
+        )
         .subscribe(() => {
-          const formData = this.formGroup.getRawValue();
-          this.departmentService.editAssignedDepartments(formData, this.selectedDepartments);
           this.store.dispatch(new ShowSideDialog(false));
+          this.refreshGrid.emit();
         });
     });
   }
-}
 
+  private watchForControls(): void {
+    this.formGroup
+      .get('startDate')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((value) => {
+        const endDateControl = this.formGroup.get('endDate');
+        if (value) {
+          endDateControl?.enable();
+        } else {
+          endDateControl?.reset();
+          endDateControl?.disable();
+        }
+      });
+  }
+}
