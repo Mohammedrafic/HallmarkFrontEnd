@@ -8,7 +8,7 @@ import {
   EventEmitter,
 } from '@angular/core';
 
-import { filter, Subject, take, takeUntil, switchMap } from 'rxjs';
+import { filter, Subject, takeUntil, switchMap, Observable } from 'rxjs';
 import { Store } from '@ngxs/store';
 
 import { EditDepartmentFieldsEnum } from '@client/candidates/enums/edit-department.enum';
@@ -16,7 +16,7 @@ import { CustomFormGroup } from '@core/interface';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { EditDepartmentsFormConfig } from '../constants/edit-departments.constant';
-import { DepartmentFormFieldConfig, EditDepartmentFormState } from '../departments.model';
+import { DepartmentFormFieldConfig, EditAssignedDepartment, EditDepartmentFormState } from '../departments.model';
 import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentsService } from '../services/departments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -35,7 +35,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
 
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
-  public filtersFormConfig: DepartmentFormFieldConfig<EditDepartmentFieldsEnum>[] = [];
+  public filtersFormConfig: ReadonlyArray<DepartmentFormFieldConfig<EditDepartmentFieldsEnum>> = [];
   public formGroup: CustomFormGroup<EditDepartmentFormState>;
   public controlTypes = ControlTypes;
   public editDepFields = EditDepartmentFieldsEnum;
@@ -79,26 +79,31 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   }
 
   private saveFormData(): void {
-    this.saveForm$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.confirmService
-        .confirm(EDIT_MULTIPLE_RECORDS_TEXT, {
-          title: 'Warning',
-          okButtonLabel: 'Yes',
-          okButtonClass: 'ok-button',
-        })
-        .pipe(
-          filter(Boolean),
-          switchMap(() => {
-            const formData = this.formGroup.getRawValue();
-            return this.departmentService.editAssignedDepartments(formData, this.selectedDepartments);
-          }),
-          take(1)
-        )
-        .subscribe(() => {
-          this.store.dispatch(new ShowSideDialog(false));
-          this.refreshGrid.emit();
-        });
-    });
+    this.saveForm$
+      .pipe(
+        switchMap(() => this.confirmAction()),
+        switchMap(() => this.editDepartments()),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.refreshGrid.emit();
+      });
+  }
+
+  private editDepartments(): Observable<EditAssignedDepartment> {
+    const formData = this.formGroup.getRawValue();
+    return this.departmentService.editAssignedDepartments(formData, this.selectedDepartments);
+  }
+
+  private confirmAction(): Observable<boolean> {
+    return this.confirmService
+      .confirm(EDIT_MULTIPLE_RECORDS_TEXT, {
+        title: 'Warning',
+        okButtonLabel: 'Yes',
+        okButtonClass: 'ok-button',
+      })
+      .pipe(filter(Boolean));
   }
 
   private watchForControls(): void {

@@ -4,7 +4,7 @@ import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { DepartmentFormFieldConfig, DepartmentFiltersColumns } from '../departments.model';
 import { DepartmentFiltersColumnsEnum } from '../../enums';
 
-export const DepartmentFilterFormConfig = (): DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>[] => [
+export const DepartmentFilterFormConfig = (): ReadonlyArray<DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>> => [
   {
     type: ControlTypes.Multiselect,
     title: 'Region ',

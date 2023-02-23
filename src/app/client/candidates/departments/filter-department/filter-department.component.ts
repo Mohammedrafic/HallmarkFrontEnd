@@ -23,7 +23,6 @@ import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { ListOfSkills } from '@shared/models/skill.model';
-import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 
 @Component({
   selector: 'app-filter-department',
@@ -37,7 +36,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   @Output() readonly updateTableByFilters: EventEmitter<DepartmentFilterState> =
     new EventEmitter<DepartmentFilterState>();
 
-  public filtersFormConfig: DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>[] = [];
+  public filtersFormConfig: ReadonlyArray<DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>> = [];
   public controlTypes = ControlTypes;
   public filteredItems: FilteredItem[] = [];
   public filterColumns: DepartmentFiltersColumns;
@@ -62,7 +61,6 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     private readonly filterService: FilterService,
     private readonly departmentFormService: DepartmentFormService,
     private readonly datePipe: DatePipe,
-    private readonly candidateProfileFormService: CandidateProfileFormService
   ) {
     super();
     this.initFilterForm();

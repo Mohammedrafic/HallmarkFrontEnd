@@ -3,8 +3,8 @@ import { ControlTypes } from '@shared/enums/control-types.enum';
 import { DepartmentFormFieldConfig } from '../departments.model';
 
 export const EditDepartmentsFormConfig = (
-  isOriented: boolean,
-): DepartmentFormFieldConfig<EditDepartmentFieldsEnum>[] => [
+  isOriented: boolean
+): ReadonlyArray<DepartmentFormFieldConfig<EditDepartmentFieldsEnum>> => [
   {
     type: ControlTypes.Date,
     title: 'Start Date',
