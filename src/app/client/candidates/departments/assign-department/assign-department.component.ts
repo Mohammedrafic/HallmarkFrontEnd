@@ -39,8 +39,8 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   public dataSource: AssignDepartmentHierarchy = {
     regions: [],
     locations: [],
-    departments: []
-  }
+    departments: [],
+  };
 
   public readonly departmentFields = OptionFields;
 
@@ -114,30 +114,34 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         this.assignDepartmentForm.markAllAsTouched();
         this.cdr.markForCheck();
       } else {
-        const formData = this.assignDepartmentForm.getRawValue();
-
-        if (this.departmentId) {
-          this.departmentService
-            .editAssignedDepartments(formData, [this.departmentId])
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(() => {
-              this.resetAssignDepartmentForm();
-              this.departmentId = null;
-              this.store.dispatch(new ShowSideDialog(false));
-              this.refreshGrid.emit();
-            });
-        } else {
-          this.departmentService
-            .assignNewDepartment(formData)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(() => {
-              this.resetAssignDepartmentForm();
-              this.store.dispatch(new ShowSideDialog(false));
-              this.refreshGrid.emit();
-            });
-        }
+        this.saveAssignedDepartment();
       }
     });
+  }
+
+  private saveAssignedDepartment(): void {
+    const formData = this.assignDepartmentForm.getRawValue();
+
+    if (this.departmentId) {
+      this.departmentService
+        .editAssignedDepartments(formData, [this.departmentId])
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.resetAssignDepartmentForm();
+          this.departmentId = null;
+          this.store.dispatch(new ShowSideDialog(false));
+          this.refreshGrid.emit();
+        });
+    } else {
+      this.departmentService
+        .assignNewDepartment(formData)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.resetAssignDepartmentForm();
+          this.store.dispatch(new ShowSideDialog(false));
+          this.refreshGrid.emit();
+        });
+    }
   }
 
   private watchForControlsValueChanges(): void {
@@ -164,7 +168,9 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       )
       .subscribe((value) => {
         this.departmentFormService.resetControls(this.assignDepartmentForm, ['departmentId']);
-        const selectedLocation = (this.dataSource.locations as OrganizationLocation[]).find((location) => location.id === value);
+        const selectedLocation = (this.dataSource.locations as OrganizationLocation[]).find(
+          (location) => location.id === value
+        );
         this.dataSource.departments = selectedLocation?.departments ?? [];
         this.cdr.markForCheck();
       });
