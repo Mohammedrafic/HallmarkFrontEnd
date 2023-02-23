@@ -159,7 +159,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   fileAsBase64: string;
   public allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
   public isSharedFolderClick: boolean = false;
-  public totalRecordsCount: number;
+  public totalRecordsCount: number = 0;
   @ViewChild('sharedWith') sharedWith:AgGridAngular
 
   public gridApi!: GridApi;
@@ -675,7 +675,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.gridApi?.hideOverlay();
         const documentData = [...new Set(data.items.map((item: ShareDocumentDto) => item.document))]
         this.rowData = documentData;
-        this.totalRecordsCount = data.totalPages;
+        this.totalRecordsCount = data.totalCount;
         this.gridApi?.setRowData(this.rowData);
       }
     });
@@ -704,6 +704,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.gridApi?.hideOverlay();
         this.rowData = dataFilter.items;
         this.gridApi?.setRowData(this.rowData);
+        this.totalRecordsCount = data.totalCount;
         this.store.dispatch(new IsDeleteEmptyFolder(false));
       }
     });
