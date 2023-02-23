@@ -56,7 +56,7 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   public selectedTab$: Observable<CandidateTabsEnum>;
   public sideDialogTitle$: Observable<string>;
   public rowSelection: 'single' | 'multiple' = 'multiple';
-  public selectedDepartments: number[];
+  public selectedDepartments: number[] | null;
 
   public departmentHierarchy: OrganizationRegion[] = [];
 
@@ -125,7 +125,7 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
 
   public handleBulkEvent(event: BulkActionDataModel): void {
     const selectedAll = this.departmentsAssigned.totalCount === event.items.length;
-    this.selectedDepartments = selectedAll ? [null] : event.items.map((item) => item.data.id);
+    this.selectedDepartments = selectedAll ? null : event.items.map((item) => item.data.id);
 
     if (event.type === BulkTypeAction.EDIT) {
       this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.EditBulkDepartments);
@@ -175,7 +175,7 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
     this.dialogData$.next(department);
   }
 
-  private deleteAssignedDepartments(departmentIds: number[], text = DELETE_RECORD_TEXT): void {
+  private deleteAssignedDepartments(departmentIds: number[] | null, text = DELETE_RECORD_TEXT): void {
     this.confirmService
       .confirm(text, {
         okButtonLabel: 'Delete',

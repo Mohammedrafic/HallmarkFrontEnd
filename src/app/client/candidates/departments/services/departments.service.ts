@@ -53,7 +53,7 @@ export class DepartmentsService {
     );
   }
 
-  public deleteAssignedDepartments(departmentIds: number[]): Observable<void> {
+  public deleteAssignedDepartments(departmentIds: number[] | null): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/delete`, { ids: departmentIds }).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));
@@ -64,7 +64,7 @@ export class DepartmentsService {
 
   public editAssignedDepartments(
     formData: EditAssignedDepartment,
-    departmentIds: number[]
+    departmentIds: number[] | null
   ): Observable<EditAssignedDepartment> {
     const { startDate, endDate, homeCostCenter, orientedStartDate, isOriented } = formData;
     const payload = {

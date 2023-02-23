@@ -31,7 +31,7 @@ import { ShowSideDialog } from 'src/app/store/app.actions';
 })
 export class EditDepartmentsComponent extends DestroyableDirective implements OnInit {
   @Input() public saveForm$: Subject<boolean>;
-  @Input() public selectedDepartments: number[];
+  @Input() public selectedDepartments: number[] | null;
 
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
