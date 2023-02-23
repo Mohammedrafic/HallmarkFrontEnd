@@ -30,7 +30,7 @@
       </e-column>
       <e-column field="ssn" headerText="ssn" width=250>
       </e-column>
-      <e-column field="dnrstatus" headerText="dnrstatus" width=250>
+      <e-column field="dnrStatus" headerText="dnrstatus" width=250>
       </e-column>
       <e-column field="dnrDate" headerText="dnrDate" width=250>
         <ng-template #template let-data>
@@ -87,9 +87,9 @@
       <label>Location<span class="required">*</span></label>
       <div class="input-group dropdown">
         <ejs-multiselect appValidateWithMessage mode="CheckBox" popupWidth="auto" formControlName="locationIds"
-          [allowFiltering]="true" [fields]="optionFields" [dataSource]="locations$|async">
+          [allowFiltering]="true" [fields]="optionFields" showSelectAll=true [showDropDownIcon]="true"
+          [dataSource]="locations$|async">
         </ejs-multiselect>
-
       </div>
     </div>
     <div class="form-elemet">
