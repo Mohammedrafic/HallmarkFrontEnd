@@ -252,6 +252,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   @Select(DocumentLibraryState.getSharedDocumentInformation)
   public sharedDocumentInformation$: Observable<BusinessUnit[]>;
 
+  public IsSearchDone:boolean = false;
 
   constructor(private store: Store, private datePipe: DatePipe,
     private changeDetectorRef: ChangeDetectorRef,
@@ -663,6 +664,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public getSharedDocuments(selectedBusinessUnitId: number | null): void {
+    this.IsSearchDone = false;
     this.store.dispatch(new GetSharedDocuments(this.getShareDocumentInfoFilter(selectedBusinessUnitId)));
     this.shareDocumentInfoPage$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       this.gridApi?.setRowData([]);
@@ -694,7 +696,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
       if (!dataFilter || !dataFilter?.items.length) {
         this.gridApi?.showNoRowsOverlay();
-        if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && dataFilter != null) {
+        if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && dataFilter != null && !this.IsSearchDone) {          
           this.store.dispatch(new IsDeleteEmptyFolder(true));
         }
       }
@@ -1262,11 +1264,13 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   doCognitiveSearch(event: any) {
+    this.IsSearchDone = false;
     const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
     const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
     const keyword = event.target.value;    
-    if (keyword.trim() != '' && (event.code == 'Enter' || event.code == 'NumpadEnter') && keyword.length >= 3) {
-      this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId));
+    if (keyword.trim() != '' && (event.code == 'Enter' || event.code == 'NumpadEnter') && keyword.length >= 3) {      
+      this.IsSearchDone = true;
+      this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId));      
     }
   }
 }
