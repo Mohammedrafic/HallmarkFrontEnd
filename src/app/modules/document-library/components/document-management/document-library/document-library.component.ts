@@ -159,7 +159,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   fileAsBase64: string;
   public allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
   public isSharedFolderClick: boolean = false;
-  public totalRecordsCount: number;
+  public totalRecordsCount: number = 0;
   @ViewChild('sharedWith') sharedWith:AgGridAngular
 
   public gridApi!: GridApi;
@@ -252,6 +252,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   @Select(DocumentLibraryState.getSharedDocumentInformation)
   public sharedDocumentInformation$: Observable<BusinessUnit[]>;
 
+  public IsSearchDone:boolean = false;
 
   constructor(private store: Store, private datePipe: DatePipe,
     private changeDetectorRef: ChangeDetectorRef,
@@ -665,17 +666,19 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public getSharedDocuments(selectedBusinessUnitId: number | null): void {
+    this.IsSearchDone = false;
     this.store.dispatch(new GetSharedDocuments(this.getShareDocumentInfoFilter(selectedBusinessUnitId)));
     this.shareDocumentInfoPage$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       this.gridApi?.setRowData([]);
       if (!data || !data?.items.length) {
         this.gridApi?.showNoRowsOverlay();
+        this.totalRecordsCount = 0;
       }
       else {
         this.gridApi?.hideOverlay();
         const documentData = [...new Set(data.items.map((item: ShareDocumentDto) => item.document))]
         this.rowData = documentData;
-        this.totalRecordsCount = data.totalPages;
+        this.totalRecordsCount = data.totalCount;
         this.gridApi?.setRowData(this.rowData);
       }
     });
@@ -696,14 +699,16 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
       if (!dataFilter || !dataFilter?.items.length) {
         this.gridApi?.showNoRowsOverlay();
-        if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && dataFilter != null) {
+        if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && dataFilter != null && !this.IsSearchDone) {          
           this.store.dispatch(new IsDeleteEmptyFolder(true));
         }
+        this.totalRecordsCount = 0;
       }
       else {
         this.gridApi?.hideOverlay();
         this.rowData = dataFilter.items;
         this.gridApi?.setRowData(this.rowData);
+        this.totalRecordsCount = data.totalCount;
         this.store.dispatch(new IsDeleteEmptyFolder(false));
       }
     });
@@ -980,7 +985,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             businessUnitId: this.filterSelectedBusinesUnitId
           }
           this.store.dispatch(new DeletDocuments(deletedocumentFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
-            this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelecetdBusinesType }));
+            this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelectedBusinesUnitId }));
           });
         }
         this.removeActiveCssClass();
@@ -1265,11 +1270,13 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   doCognitiveSearch(event: any) {
+    this.IsSearchDone = false;
     const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
     const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
-    const keyword = event.target.value;
-    if (keyword.trim() != '' && event.code == 'Enter' && keyword.length >= 3) {
-      this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId));
+    const keyword = event.target.value;    
+    if (keyword.trim() != '' && (event.code == 'Enter' || event.code == 'NumpadEnter') && keyword.length >= 3) {      
+      this.IsSearchDone = true;
+      this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId));      
     }
   }
 }
