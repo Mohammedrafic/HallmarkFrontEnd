@@ -24,6 +24,12 @@ import { OrientationHistoricalDataComponent } from './components/orientation-his
 import { OrientationSetupComponent } from './components/orientation-setup/orientation-setup.component';
 import { OrientationGridComponent } from './components/orientation-grid/orientation-grid.component';
 import { DropdownModule } from '@shared/components/form-controls/dropdown/dropdown.module';
+import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
+import { OrientationGridActionRendererComponent } from './components/orientation-grid/grid-action-renderer/grid-action-renderer.component';
+import { SkillNameRendererComponent } from './components/orientation-grid/skill-name-renderer/skill-name.component';
+import { JoinPipeModule } from '@shared/pipes/join.pipe';
+import { MultiplePipeModule } from '@shared/pipes/multiple.pipe';
+import { SkillCategoryRendererComponent } from './components/orientation-grid/skill-category-renderer/skill-category.component';
 
 const icons = {
   Edit,
@@ -52,6 +58,9 @@ const icons = {
     ValidateDirectiveModule,
     OrientationRoutingModule,
     DropdownModule,
+    DatepickerModule,
+    MultiplePipeModule,
+    JoinPipeModule,
   ],
   declarations: [
     OrientationComponent,
@@ -59,6 +68,9 @@ const icons = {
     OrientationHistoricalDataComponent,
     OrientationGridComponent,
     OrientationSetupComponent,
+    OrientationGridActionRendererComponent,
+    SkillNameRendererComponent,
+    SkillCategoryRendererComponent,
   ],
   providers: [OrientationService],
   exports: [OrientationComponent],

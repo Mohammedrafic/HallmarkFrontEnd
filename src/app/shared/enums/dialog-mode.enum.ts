@@ -3,4 +3,5 @@ export enum DialogMode {
   Copy = 'Copy',
   Edit = 'Edit',
   Assign = 'Assign',
+  Archive = 'Archive',
 };

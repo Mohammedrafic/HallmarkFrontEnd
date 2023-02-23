@@ -3,8 +3,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { ICellRendererParams } from "@ag-grid-community/core";
 import { AbstractPermission } from '@shared/helpers/permissions';
-import { CommitmentGridColumns } from '../../interfaces/candidate-work-commitment.interface';
-import { formatDate } from '@angular/common';
+import { OrientationGridColumns } from '@organization-management/orientation/models/orientation.model';
 
 @Component({
   selector: 'app-grid-action-renderer',
@@ -12,9 +11,8 @@ import { formatDate } from '@angular/common';
   styleUrls: ['./grid-action-renderer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CandidateCommitmentGridActionRendererComponent extends AbstractPermission {
-  public cellValue: CommitmentGridColumns;
-  public isPast: boolean = false;
+export class OrientationGridActionRendererComponent extends AbstractPermission {
+  public cellValue: OrientationGridColumns;
 
   constructor(
     protected override store: Store,
@@ -24,10 +22,6 @@ export class CandidateCommitmentGridActionRendererComponent extends AbstractPerm
 
   public agInit(params: ICellRendererParams): void {
     this.cellValue = params;
-    if (this.cellValue.today) {
-      this.isPast = (this.cellValue.data.endDate && new Date(formatDate(this.cellValue.data.endDate, 'MM/dd/yyyy', 'en-US')) < this.cellValue.today) ||
-                     this.cellValue.data.isInUse;
-    }
   }
 
   public refresh(params: ICellRendererParams): boolean {
@@ -35,11 +29,11 @@ export class CandidateCommitmentGridActionRendererComponent extends AbstractPerm
     return true;
   }
 
-  public editCommitment(): void {
+  public edit(): void {
     this.cellValue.edit!(this.cellValue.data);
   }
 
-  public deleteCommitment(): void {
+  public delete(): void {
     this.cellValue.delete!(this.cellValue.data);
   }
 }

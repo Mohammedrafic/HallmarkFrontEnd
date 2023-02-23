@@ -1,12 +1,13 @@
 <app-grid
   [gridTitle]="gridTitle"
-  [rowData]="[]"
+  [rowData]="dataSource?.items || []"
   [columnDefinitions]="columnDef"
   [rowSelection]="'multiple'"
-  [totalRecordsCount]="0"
+  [totalRecordsCount]="dataSource?.totalCount || 0"
   [pageSize]="pageSize"
   [currentPage]="pageNumber"
   (navigateToPageEmitter)="handleChangePage($event)"
+  (pageSizeChangeEmitter)="handleChangePageSize($event)"
 >
   <button
     *ngIf="gridTitle"

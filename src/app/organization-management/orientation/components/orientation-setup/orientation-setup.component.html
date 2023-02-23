@@ -26,5 +26,225 @@
       >Save</button>
     </form>
   </div>
-  <app-orientation-grid gridTitle="Orientation Setup"></app-orientation-grid>
+  <app-orientation-grid 
+    gridTitle="Orientation Setup" 
+    (pageChange)="pageChange($event)"
+    (openDialog)="openDialog($event)"
+    (onEdit)="openDialog($event)"
+    (onDelete)="deleteRecord($event)"
+    [dataSource]="dataSource">
+  </app-orientation-grid>
 </section>
+
+<app-side-dialog
+  header="{{ title }} Setup"
+  (formSaveClicked)="saveRecord()"
+  (formCancelClicked)="closeDialog()"
+  [width]="'562px'"
+>
+
+  <form *ngIf="!isArchive; else archiveFormTemplate" [formGroup]="orientationForm" class="record-form">
+    <div>
+      <div class="input-container">
+        <label for="regionIds">Region<span class="required">*</span>
+        </label>
+        <div class="dropdown-wrapper">
+          <div class="input-group bootstrap">
+            <ejs-multiselect
+              appValidateWithMessage
+              mode="CheckBox"
+              [dataSource]="regions"
+              [fields]="optionFields"
+              [showSelectAll]="false"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              formControlName="regionIds"
+            >
+            </ejs-multiselect>
+          </div>
+          <div class="switch">
+            <ejs-switch
+              name="allRegions"
+              [checked]="allRecords.regionIds"
+              (change)="allRecordsChange($event, 'regionIds')"
+              label="All"
+              [disabled]="regionToggleDisable"
+            ></ejs-switch>
+            <label for="allRegions" class="switch-text">All</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label for="locationIds">Location<span class="required">*</span>
+        </label>
+        <div class="dropdown-wrapper">
+          <div class="input-group bootstrap">
+            <ejs-multiselect
+              appValidateWithMessage
+              mode="CheckBox"
+              [dataSource]="locationsDataSource"
+              [fields]="optionFields"
+              [showSelectAll]="false"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              formControlName="locationIds"
+            >
+            </ejs-multiselect>
+          </div>
+          <div class="switch">
+            <ejs-switch
+              name="allLocations"
+              [checked]="allRecords.locationIds"
+              (change)="allRecordsChange($event, 'locationIds')"
+              label="All"
+              [disabled]="locationToggleDisable"
+            ></ejs-switch>
+            <label for="allLocations" class="switch-text">All</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label for="departmentIds">Department<span class="required">*</span>
+        </label>
+        <div class="dropdown-wrapper">
+          <div class="input-group bootstrap">
+            <ejs-multiselect
+              appValidateWithMessage
+              mode="CheckBox"
+              [dataSource]="departmentsDataSource"
+              [fields]="optionFields"
+              [showSelectAll]="false"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              formControlName="departmentIds"
+              [query]="query"
+              (filtering)="onDepartmentsFiltering($event)"
+            >
+            </ejs-multiselect>
+          </div>
+          <div class="switch">
+            <ejs-switch
+              name="allDepartments"
+              [checked]="allRecords.departmentIds"
+              (change)="allRecordsChange($event, 'departmentIds')"
+              label="All"
+              [disabled]="departmentToggleDisable"
+            ></ejs-switch>
+            <label for="allDepartments" class="switch-text">All</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label for="skillCategory">Skill Category<span class="required">*</span>
+        </label>
+        <div class="dropdown-wrapper">
+          <div class="input-group bootstrap">
+            <ejs-multiselect
+              appValidateWithMessage
+              mode="CheckBox"
+              selectAllText="Select All"
+              [dataSource]="(allSkillsCategories$ | async)?.items"
+              [fields]="optionFields"
+              [showSelectAll]="true"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              formControlName="skillCategory"
+            >
+            </ejs-multiselect>
+          </div>
+          <div class="switch"></div>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label for="skillIds">Skill<span class="required">*</span>
+        </label>
+        <div class="dropdown-wrapper">
+          <div class="input-group bootstrap">
+            <ejs-multiselect
+              #skillMultiselect
+              appValidateWithMessage
+              mode="CheckBox"
+              selectAllText="Select All"
+              [dataSource]="skills$ | async"
+              [fields]="optionFields"
+              [showSelectAll]="true"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              formControlName="skillIds"
+            >
+            </ejs-multiselect>
+          </div>
+          <div class="switch"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="row">
+          <div class="input-container">
+            <label for="skillIds">Complete Orientation In (Days)<span class="required">*</span>
+            </label>
+            <div class="dropdown-wrapper">
+              <div class="input-group bootstrap">
+                <ejs-numerictextbox
+                  format="#"
+                  [decimals]="decimals"
+                  min="1"
+                  max="99"
+                  [showSpinButton]="false"
+                  formControlName="completedOrientation">
+                </ejs-numerictextbox>
+              </div>
+            </div>
+          </div>
+          <div class="input-container">
+            <label for="skillIds">Remove Orientation In (Days)
+            </label>
+            <div class="dropdown-wrapper">
+              <div class="input-group bootstrap">
+                <ejs-numerictextbox
+                  format="#"
+                  [decimals]="decimals"
+                  min="1"
+                  max="999"
+                  [showSpinButton]="false"
+                  formControlName="removeOrientation">
+                </ejs-numerictextbox>
+              </div>
+            </div>
+          </div>
+          <div class="row-switch"></div>
+        </div>
+        <div class="row">
+          <app-datepicker
+            class="control date"
+            [formGroupInstance]="orientationForm"
+            controlName="startDate"
+            label="Start Date"
+            [required]="true">
+          </app-datepicker>
+          <app-datepicker
+            class="control date"
+            [formGroupInstance]="orientationForm"
+            controlName="endDate"
+            label="End Date"
+            [required]="false">
+          </app-datepicker>
+          <div class="date-switch"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <ng-template #archiveFormTemplate>
+    Archive
+    <form [formGroup]="archiveForm" class="record-form">
+
+
+    </form>
+
+  </ng-template>
+</app-side-dialog>

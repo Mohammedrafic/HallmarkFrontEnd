@@ -41,7 +41,7 @@ export const ORG_SETTINGS: MenuSettings[] = [
     text: 'Orientation',
     id: 16,
     route: './orientation',
-    //permissionKeys: ['CanViewOrientation'], TODO: uncomment when permissions are ready
+    permissionKeys: ['CanViewOrientation'],
     isIRPOnly: true,
   },
 ];

@@ -23,3 +23,51 @@
     align-items: end;
   }
 }
+
+.record-form {
+  margin-top: 20px;
+
+  .row {
+    display: flex;
+  }
+
+  .input-group {
+    margin-top: 5px;
+  }
+
+  .input-container {
+    margin-bottom: 15px;
+  }
+
+  .switch, .row-switch {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+  }
+
+  .row-switch {
+    width: 75px;
+  }
+
+  .date-switch {
+    width: 35%;
+  }
+
+  .dropdown-wrapper {
+    display: flex;
+
+    .input-group {
+      width: 100%;
+      margin-right: 12px;
+    }
+  }
+
+  .control {
+    margin-right: 12px;
+
+    &.date {
+      width: 100%;
+    }
+  }
+}

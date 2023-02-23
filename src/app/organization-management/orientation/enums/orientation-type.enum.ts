@@ -6,8 +6,8 @@ export enum OrientationType {
 }
 
 export const OrientationTypeDataSource = [
-  { id: OrientationType.OrganizationWise, text: 'Organization Wise' },
-  { id: OrientationType.RegionWise, text: 'Region Wise' },
-  { id: OrientationType.LocationWise, text: 'Location Wise' },
-  { id: OrientationType.DepartmentWise, text: 'Department Wise' },
+  { id: OrientationType.OrganizationWise, text: 'Organization' },
+  { id: OrientationType.RegionWise, text: 'Region' },
+  { id: OrientationType.LocationWise, text: 'Location' },
+  { id: OrientationType.DepartmentWise, text: 'Department' },
 ];
