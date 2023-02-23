@@ -1,6 +1,7 @@
 import { DataSourceItem } from '@core/interface';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
+import { OrganizationRegion } from '@shared/models/organization.model';
 import { PageOfCollections } from '@shared/models/page.model';
 import { DepartmentFiltersColumnsEnum } from '../enums';
 import { EditDepartmentFieldsEnum } from '../enums/edit-department.enum';
@@ -32,10 +33,12 @@ export interface EditAssignedDepartment {
   endDate: Date | string;
   orientedStartDate?: Date | string;
   homeCostCenter?: boolean;
-  isOriented?: boolean
+  isOriented?: boolean;
 }
 
 export interface AssignNewDepartment {
+  employeeWorkCommitmentId: number;
+  isOriented: number;
   regionId: number;
   locationId: number;
   departmentId: number;
@@ -71,13 +74,18 @@ export interface DepartmentFilterState {
   skills: number[];
   oriented: boolean;
 }
-
 export interface EditDepartmentFormState {
   [EditDepartmentFieldsEnum.START_DATE]: Date;
   [EditDepartmentFieldsEnum.END_DATE]: Date;
   [EditDepartmentFieldsEnum.ORIENTED]: boolean;
   [EditDepartmentFieldsEnum.HOME_COST_CENTER]: boolean;
   [EditDepartmentFieldsEnum.ORIENTED_START_DATE]?: Date;
+}
+export interface DepartmentHierarchy {
+  organizationId: number;
+  organizationName: string;
+  organizationPrefix: string;
+  regions: OrganizationRegion[];
 }
 
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;

@@ -25,6 +25,7 @@ import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
+import { OrganizationRegion } from '@shared/models/organization.model';
 
 @Component({
   selector: 'app-departments',
@@ -59,6 +60,8 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public selectedDepartments: number[];
 
+  public departmentHierarchy: OrganizationRegion[] = [];
+
   private filters: DepartmentFilterState | null;
   employeeWorkCommitmentId: number;
 
@@ -77,13 +80,14 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
     this.selectedTab$ = this.candidatesService.getSelectedTab$();
     this.sideDialogTitle$ = this.departmentsService.getSideDialogTitle$();
     this.getDepartmentsAssigned();
-    this.getEmployeeWorkCommitmentId();
+    this.getAssignedDepartmentHierarchy();
   }
 
   public showAssignDepartmentDialog(): void {
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.AssignDepartment);
     this.showSideDialog(true);
     this.assignDepartment?.resetAssignDepartmentForm();
+    this.cdr.markForCheck();
   }
 
   public onSave(): void {
@@ -187,16 +191,14 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
       });
   }
 
-  private getEmployeeWorkCommitmentId(): void {
-    this.candidatesService.getEmployeeWorkCommitmentId().pipe(takeUntil(this.destroy$)).subscribe((id) => {
-      this.employeeWorkCommitmentId = id;
-      this.cdr.markForCheck();
-    })
-  }
-
   private getAssignedDepartmentHierarchy(): void {
-    this.departmentsService.getAssignedDepartmentHierarchy(this.employeeWorkCommitmentId).pipe(takeUntil(this.destroy$)).subscribe((data) => {
-      //TODO provide functionality
+    this.candidatesService.getEmployeeWorkCommitmentId().pipe(switchMap((id) => {
+      this.employeeWorkCommitmentId = id;
+      return this.departmentsService.getAssignedDepartmentHierarchy(this.employeeWorkCommitmentId);
+    }), takeUntil(this.destroy$)).subscribe((data) => {
+      console.error(data);
+      this.departmentHierarchy = data.regions;
+      this.cdr.markForCheck();
     })
   }
 }
