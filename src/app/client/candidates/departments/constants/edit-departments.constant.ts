@@ -1,38 +1,38 @@
-import { EditDepartmentFieldsEnum } from '@client/candidates/enums/edit-department.enum';
+import { EditDepartmentFields } from '@client/candidates/enums/edit-department.enum';
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { DepartmentFormFieldConfig } from '../departments.model';
 
 export const EditDepartmentsFormConfig = (
   isOriented: boolean
-): ReadonlyArray<DepartmentFormFieldConfig<EditDepartmentFieldsEnum>> => [
+): ReadonlyArray<DepartmentFormFieldConfig<EditDepartmentFields>> => [
   {
     type: ControlTypes.Date,
     title: 'Start Date',
-    field: EditDepartmentFieldsEnum.START_DATE,
+    field: EditDepartmentFields.START_DATE,
     show: true,
     disabled: false,
   },
   {
     type: ControlTypes.Date,
     title: 'End Date',
-    field: EditDepartmentFieldsEnum.END_DATE,
+    field: EditDepartmentFields.END_DATE,
     show: true,
     disabled: true,
   },
   {
     type: ControlTypes.Checkbox,
     title: 'Oriented',
-    field: EditDepartmentFieldsEnum.ORIENTED,
+    field: EditDepartmentFields.ORIENTED,
   },
   {
     type: ControlTypes.Checkbox,
     title: 'Home Cost Center',
-    field: EditDepartmentFieldsEnum.HOME_COST_CENTER,
+    field: EditDepartmentFields.HOME_COST_CENTER,
   },
   {
     type: ControlTypes.Date,
     title: 'Orientation Start Date',
-    field: EditDepartmentFieldsEnum.ORIENTED_START_DATE,
+    field: EditDepartmentFields.ORIENTED_START_DATE,
     show: isOriented,
   },
 ];

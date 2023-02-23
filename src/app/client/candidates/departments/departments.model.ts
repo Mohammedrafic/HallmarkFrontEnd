@@ -4,7 +4,7 @@ import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { PageOfCollections } from '@shared/models/page.model';
 import { DepartmentFiltersColumnsEnum } from '../enums';
-import { EditDepartmentFieldsEnum } from '../enums/edit-department.enum';
+import { EditDepartmentFields } from '../enums/edit-department.enum';
 
 export interface DepartmentAssigned {
   id: number;
@@ -76,11 +76,11 @@ export interface DepartmentFilterState {
   oriented: boolean;
 }
 export interface EditDepartmentFormState {
-  [EditDepartmentFieldsEnum.START_DATE]: Date;
-  [EditDepartmentFieldsEnum.END_DATE]: Date;
-  [EditDepartmentFieldsEnum.ORIENTED]: boolean;
-  [EditDepartmentFieldsEnum.HOME_COST_CENTER]: boolean;
-  [EditDepartmentFieldsEnum.ORIENTED_START_DATE]?: Date;
+  [EditDepartmentFields.START_DATE]: Date;
+  [EditDepartmentFields.END_DATE]: Date;
+  [EditDepartmentFields.ORIENTED]: boolean;
+  [EditDepartmentFields.HOME_COST_CENTER]: boolean;
+  [EditDepartmentFields.ORIENTED_START_DATE]?: Date;
 }
 export interface DepartmentHierarchy {
   organizationId: number;
@@ -93,6 +93,24 @@ export interface AssignDepartmentHierarchy {
   regions: OrganizationRegion[];
   locations: OrganizationLocation[];
   departments: OrganizationDepartment[];
+}
+
+export interface EditDepartmentPayload {
+  isOriented?: true | undefined;
+  homeCostCenter?: true | undefined;
+  orientedStartDate?: string | undefined;
+  employeeWorkCommitmentId: number;
+  startDate: string;
+  endDate: string;
+  ids: number[] | null;
+}
+
+export interface NewDepartmentPayload {
+  employeeWorkCommitmentId: number;
+  departmentId: number;
+  isOriented: boolean;
+  startDate: string;
+  endDate: string | undefined;
 }
 
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;

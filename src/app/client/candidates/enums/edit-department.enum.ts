@@ -1,4 +1,4 @@
-export enum EditDepartmentFieldsEnum {
+export enum EditDepartmentFields {
   START_DATE = 'startDate',
   END_DATE = 'endDate',
   ORIENTED = 'oriented',

@@ -17,7 +17,7 @@ import {
 } from '@client/candidates/departments/departments.model';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { GRID_CONFIG } from '@shared/constants';
-import { DateTimeHelper } from '@core/helpers';
+import { DepartmentHelper } from '../helpers/department.helper';
 
 @Injectable()
 export class DepartmentsService {
@@ -66,17 +66,7 @@ export class DepartmentsService {
     formData: EditAssignedDepartment,
     departmentIds: number[] | null
   ): Observable<EditAssignedDepartment> {
-    const { startDate, endDate, homeCostCenter, orientedStartDate, isOriented } = formData;
-    const payload = {
-      employeeWorkCommitmentId: this.employeeWorkCommitmentId,
-      startDate: startDate && DateTimeHelper.toUtcFormat(startDate),
-      endDate: endDate && DateTimeHelper.toUtcFormat(endDate),
-      ids: departmentIds,
-      ...(orientedStartDate && { orientedStartDate: DateTimeHelper.toUtcFormat(orientedStartDate) }),
-      ...(homeCostCenter && { homeCostCenter }),
-      ...(isOriented && { isOriented }),
-    };
-
+    const payload = DepartmentHelper.elitDepartmentPayload(formData, departmentIds, this.employeeWorkCommitmentId);
     return this.http.put<EditAssignedDepartment>(`${this.baseUrl}`, payload).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));
@@ -86,14 +76,7 @@ export class DepartmentsService {
   }
 
   public assignNewDepartment(formData: AssignNewDepartment): Observable<AssignNewDepartment> {
-    const { departmentId, startDate, endDate, isOriented } = formData;
-    const payload = {
-      employeeWorkCommitmentId: this.employeeWorkCommitmentId,
-      departmentId: departmentId,
-      isOriented: !!isOriented,
-      startDate: startDate && DateTimeHelper.toUtcFormat(startDate),
-      endDate: endDate && DateTimeHelper.toUtcFormat(endDate),
-    };
+    const payload = DepartmentHelper.newDepartmentPayload(formData, this.employeeWorkCommitmentId);
     return this.http.post<AssignNewDepartment>(`${this.baseUrl}`, payload).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));

@@ -23,6 +23,7 @@ import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { ListOfSkills } from '@shared/models/skill.model';
+import { DepartmentHelper } from '../helpers/department.helper';
 
 @Component({
   selector: 'app-filter-department',
@@ -60,7 +61,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     private readonly cdr: ChangeDetectorRef,
     private readonly filterService: FilterService,
     private readonly departmentFormService: DepartmentFormService,
-    private readonly datePipe: DatePipe,
+    private readonly datePipe: DatePipe
   ) {
     super();
     this.initFilterForm();
@@ -145,10 +146,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
         this.filterColumns.locationIds.dataSource = [];
 
         if (val?.length) {
-          const selectedRegions: OrganizationRegion[] = val.map((id: number) => {
-            return this.regions.find((region) => region.id === id) as OrganizationRegion;
-          });
-
+          const selectedRegions: OrganizationRegion[] = DepartmentHelper.findSelectedItems(val, this.regions) as OrganizationRegion[];
           const regionLocations: OrganizationLocation[] = selectedRegions.flatMap((region) => {
             region?.locations?.forEach((location: OrganizationLocation) => {
               location.regionName = region.name;
@@ -171,13 +169,11 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
       .subscribe((val: number[]) => {
         this.filterColumns.departmentIds.dataSource = [];
         if (val?.length) {
-          const selectedLocations: OrganizationLocation[] = val.map((id) => {
-            return (this.filterColumns.locationIds.dataSource as OrganizationLocation[]).find(
-              (location: OrganizationLocation) => location.id === id
-            ) as OrganizationLocation;
-          });
-
-          const locationDepartments: OrganizationDepartment[] = selectedLocations.flatMap((location) => location.departments);
+          const locationDataSource = this.filterColumns.locationIds.dataSource as OrganizationLocation[];
+          const selectedLocations: OrganizationLocation[] = DepartmentHelper.findSelectedItems(val, locationDataSource) as OrganizationLocation[];
+          const locationDepartments: OrganizationDepartment[] = selectedLocations.flatMap(
+            (location) => location.departments
+          );
 
           this.filterColumns.departmentIds.dataSource = locationDepartments;
         } else {

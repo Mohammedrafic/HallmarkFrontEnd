@@ -12,10 +12,25 @@ import {
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { BehaviorSubject, debounceTime, filter, Subject, takeUntil, distinctUntilChanged } from 'rxjs';
+import {
+  BehaviorSubject,
+  debounceTime,
+  filter,
+  Subject,
+  takeUntil,
+  distinctUntilChanged,
+  switchMap,
+  Observable,
+  of,
+} from 'rxjs';
 
 import { ShowSideDialog } from 'src/app/store/app.actions';
-import { AssignDepartmentHierarchy, DepartmentAssigned } from '../departments.model';
+import {
+  AssignDepartmentHierarchy,
+  AssignNewDepartment,
+  DepartmentAssigned,
+  EditAssignedDepartment,
+} from '../departments.model';
 import { DepartmentsService } from '../services/departments.service';
 import { OrganizationRegion, OrganizationLocation, OrganizationDepartment } from '@shared/models/organization.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -109,38 +124,36 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   }
 
   private saveFormData(): void {
-    this.saveForm$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      if (this.assignDepartmentForm.invalid) {
-        this.assignDepartmentForm.markAllAsTouched();
-        this.cdr.markForCheck();
-      } else {
-        this.saveAssignedDepartment();
-      }
-    });
-  }
-
-  private saveAssignedDepartment(): void {
-    const formData = this.assignDepartmentForm.getRawValue();
-
-    if (this.departmentId) {
-      this.departmentService
-        .editAssignedDepartments(formData, [this.departmentId])
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(() => {
+    this.saveForm$
+      .pipe(
+        switchMap(() => {
+          const formInvalid = this.assignDepartmentForm.invalid;
+          if (formInvalid) {
+            this.assignDepartmentForm.markAllAsTouched();
+            this.cdr.markForCheck();
+            return of(false);
+          }
+          return this.saveAssignedDepartment();
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((formValid) => {
+        if (formValid) {
           this.resetAssignDepartmentForm();
           this.departmentId = null;
           this.store.dispatch(new ShowSideDialog(false));
           this.refreshGrid.emit();
-        });
+        }
+      });
+  }
+
+  private saveAssignedDepartment(): Observable<AssignNewDepartment | EditAssignedDepartment> {
+    const formData = this.assignDepartmentForm.getRawValue();
+
+    if (this.departmentId) {
+      return this.departmentService.editAssignedDepartments(formData, [this.departmentId]);
     } else {
-      this.departmentService
-        .assignNewDepartment(formData)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(() => {
-          this.resetAssignDepartmentForm();
-          this.store.dispatch(new ShowSideDialog(false));
-          this.refreshGrid.emit();
-        });
+      return this.departmentService.assignNewDepartment(formData);
     }
   }
 

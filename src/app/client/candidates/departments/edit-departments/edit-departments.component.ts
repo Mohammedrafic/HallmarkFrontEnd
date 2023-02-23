@@ -11,7 +11,7 @@ import {
 import { filter, Subject, takeUntil, switchMap, Observable } from 'rxjs';
 import { Store } from '@ngxs/store';
 
-import { EditDepartmentFieldsEnum } from '@client/candidates/enums/edit-department.enum';
+import { EditDepartmentFields } from '@client/candidates/enums/edit-department.enum';
 import { CustomFormGroup } from '@core/interface';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes } from '@shared/enums/control-types.enum';
@@ -20,7 +20,7 @@ import { DepartmentFormFieldConfig, EditAssignedDepartment, EditDepartmentFormSt
 import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentsService } from '../services/departments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { EDIT_MULTIPLE_RECORDS_TEXT } from '@shared/constants';
+import { EDIT_MULTIPLE_RECORDS_TEXT, WARNING_TITLE } from '@shared/constants';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 
 @Component({
@@ -35,10 +35,10 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
 
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
-  public filtersFormConfig: ReadonlyArray<DepartmentFormFieldConfig<EditDepartmentFieldsEnum>> = [];
+  public filtersFormConfig: ReadonlyArray<DepartmentFormFieldConfig<EditDepartmentFields>> = [];
   public formGroup: CustomFormGroup<EditDepartmentFormState>;
   public controlTypes = ControlTypes;
-  public editDepFields = EditDepartmentFieldsEnum;
+  public editDepFields = EditDepartmentFields;
 
   constructor(
     private readonly departmentFormService: DepartmentFormService,
@@ -58,7 +58,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
     this.watchForControls();
   }
 
-  public trackByFn = (_: number, item: DepartmentFormFieldConfig<EditDepartmentFieldsEnum>) => item.field + item.show;
+  public trackByFn = (_: number, item: DepartmentFormFieldConfig<EditDepartmentFields>) => item.field + item.show;
 
   private initForm(): void {
     this.formGroup = this.departmentFormService.createEditForm();
@@ -71,7 +71,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
 
   private watchForOrientedControl(): void {
     this.formGroup
-      .get(EditDepartmentFieldsEnum.ORIENTED)
+      .get(EditDepartmentFields.ORIENTED)
       ?.valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe((isOriented) => {
         this.initFormConfig(isOriented);
@@ -99,7 +99,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   private confirmAction(): Observable<boolean> {
     return this.confirmService
       .confirm(EDIT_MULTIPLE_RECORDS_TEXT, {
-        title: 'Warning',
+        title: WARNING_TITLE,
         okButtonLabel: 'Yes',
         okButtonClass: 'ok-button',
       })
