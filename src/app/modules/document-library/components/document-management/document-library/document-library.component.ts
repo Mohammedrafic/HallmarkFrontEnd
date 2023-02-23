@@ -670,6 +670,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.gridApi?.setRowData([]);
       if (!data || !data?.items.length) {
         this.gridApi?.showNoRowsOverlay();
+        this.totalRecordsCount = 0;
       }
       else {
         this.gridApi?.hideOverlay();
@@ -699,6 +700,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && dataFilter != null && !this.IsSearchDone) {          
           this.store.dispatch(new IsDeleteEmptyFolder(true));
         }
+        this.totalRecordsCount = 0;
       }
       else {
         this.gridApi?.hideOverlay();
