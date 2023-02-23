@@ -42,13 +42,12 @@
       [dialogData$]="dialogData$"
       (refreshGrid)="refreshGrid()"
       [saveForm$]="saveForm$"
-      [employeeWorkCommitmentId]="employeeWorkCommitmentId"
       [departmentHierarchy]="departmentHierarchy"
     ></app-assign-department>
 
     <app-edit-departments
-      #editDepartments
       *ngIf="dialogTitle === sideDialogTitleEnum.EditBulkDepartments"
+      (refreshGrid)="refreshGrid()"
       [saveForm$]="saveForm$"
       [selectedDepartments]="selectedDepartments"
     ></app-edit-departments>

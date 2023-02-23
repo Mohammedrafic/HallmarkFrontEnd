@@ -24,7 +24,6 @@ import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-actio
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
-import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
 import { OrganizationRegion } from '@shared/models/organization.model';
 
 @Component({
@@ -35,7 +34,6 @@ import { OrganizationRegion } from '@shared/models/organization.model';
 })
 export class DepartmentsComponent extends DestroyableDirective implements OnInit {
   @ViewChild('assignDepartment') private assignDepartment: AssignDepartmentComponent;
-  @ViewChild('editDepartments') private editDepartments: EditDepartmentsComponent;
 
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
@@ -63,7 +61,6 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   public departmentHierarchy: OrganizationRegion[] = [];
 
   private filters: DepartmentFilterState | null;
-  employeeWorkCommitmentId: number;
 
   public constructor(
     private store: Store,
@@ -185,20 +182,29 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
         okButtonClass: 'delete-button',
         title: DELETE_RECORD_TITLE,
       })
-      .pipe(filter(Boolean), take(1))
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.departmentsService.deleteAssignedDepartments(departmentIds)),
+        take(1)
+      )
       .subscribe(() => {
-        this.departmentsService.deleteAssignedDepartments(departmentIds);
+        this.getDepartmentsAssigned(this.filters);
       });
   }
 
   private getAssignedDepartmentHierarchy(): void {
-    this.candidatesService.getEmployeeWorkCommitmentId().pipe(switchMap((id) => {
-      this.employeeWorkCommitmentId = id;
-      return this.departmentsService.getAssignedDepartmentHierarchy(this.employeeWorkCommitmentId);
-    }), takeUntil(this.destroy$)).subscribe((data) => {
-      console.error(data);
-      this.departmentHierarchy = data.regions;
-      this.cdr.markForCheck();
-    })
+    this.candidatesService
+      .getEmployeeWorkCommitmentId()
+      .pipe(
+        switchMap((id) => {
+          this.departmentsService.employeeWorkCommitmentId = id;
+          return this.departmentsService.getAssignedDepartmentHierarchy(id);
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((data) => {
+        this.departmentHierarchy = data.regions;
+        this.cdr.markForCheck();
+      });
   }
 }

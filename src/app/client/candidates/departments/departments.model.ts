@@ -55,6 +55,7 @@ export interface DepartmentFormFieldConfig<T> {
   sortOrder?: SortOrder;
   optionFields?: object;
   show?: boolean;
+  disabled?: boolean;
 }
 
 export type DepartmentFiltersColumns = {

@@ -20,7 +20,6 @@ import { DepartmentsService } from '../services/departments.service';
 import { OrganizationRegion, OrganizationLocation, OrganizationDepartment } from '@shared/models/organization.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormService } from '../services/department-form.service';
-import { change } from '@syncfusion/ej2-angular-grids';
 
 @Component({
   selector: 'app-assign-department',
@@ -31,7 +30,6 @@ import { change } from '@syncfusion/ej2-angular-grids';
 export class AssignDepartmentComponent extends DestroyableDirective implements OnInit, OnChanges {
   @Input() public dialogData$: BehaviorSubject<DepartmentAssigned | null>;
   @Input() public saveForm$: Subject<boolean>;
-  @Input() public employeeWorkCommitmentId: number;
   @Input() public departmentHierarchy: OrganizationRegion[];
 
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
@@ -116,10 +114,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         this.assignDepartmentForm.markAllAsTouched();
         this.cdr.markForCheck();
       } else {
-        const formData = {
-          ...this.assignDepartmentForm.getRawValue(),
-          employeeWorkCommitmentId: this.employeeWorkCommitmentId,
-        };
+        const formData = this.assignDepartmentForm.getRawValue();
 
         if (this.departmentId) {
           this.departmentService
