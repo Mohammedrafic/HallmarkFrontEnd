@@ -15,6 +15,7 @@ export class OrgWidgetComponent {
   @Input() public isDarkTheme: boolean | false;
   @Input() public description: string;
   @Input() public chartData: OrgDetailsInfoModel | undefined;
+  public countzero = "Ordercountzero";
   private mousePosition = {
     x: 0,
     y: 0,
@@ -29,7 +30,11 @@ export class OrgWidgetComponent {
   }
   public toSourceContent(orgname: string): void {
     if(orgname === 'OrdersforApproval'){
-      this.globalWindow.localStorage.setItem("pendingApprovalOrders",JSON.stringify(orgname));  
+      if(this.chartData?.pendingOrders == 0){
+        this.globalWindow.localStorage.setItem("pendingApprovalOrders",JSON.stringify(this.countzero))
+      } else {
+        this.globalWindow.localStorage.setItem("pendingApprovalOrders",JSON.stringify(orgname));
+      }
       this.dashboardService.redirectToUrl('client/order-management/');
     } else if(orgname === 'ManualInvoice'){
       this.dashboardService.redirectToUrl('client/invoices/');

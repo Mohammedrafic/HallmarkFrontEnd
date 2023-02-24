@@ -667,8 +667,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.filters.isTemplate = false;
           this.filters.includeReOrders = true;
           this.hasOrderAllOrdersId();
-          cleared ? this.store.dispatch([new GetOrders(this.filters)])
-            : this.store.dispatch([new GetOrderFilterDataSources()]);
+          cleared ? this.store.dispatch([new GetOrders(this.filters)]) 
+          : this.store.dispatch([new GetOrderFilterDataSources()]);
           break;
         case OrganizationOrderManagementTabs.PerDiem:
           this.filters.orderTypes = [OrderType.OpenPerDiem];
@@ -1534,7 +1534,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderFilterDataSources$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((data: OrderFilterDataSource) => {
-        let statuses: FilterOrderStatus[] = [];
+        let statuses : any = [];
         let candidateStatuses: FilterStatus[] = [];
         const statusesByDefault = [
           CandidatStatus.Applied,
@@ -1574,6 +1574,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
             candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
             this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
           }
+        } else if(this.orgpendingOrderapproval === "Ordercountzero"){
+          if(this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
+            statuses = [{"status" : "No Pending Orders", "statusText" : "No Pending Orders"}]
+            candidateStatuses = [];
+            this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
+          }
         } else {
           statuses = data.orderStatuses;
           candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
@@ -1591,9 +1597,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.clearFilters();
           this.store.dispatch(new GetIRPOrders(this.filters));
         } else {
-          this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
+            this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
         }
         this.cd$.next(true);
+        setTimeout(() => {
+          this.clearstorage();
+        }, 5000);
+    
       });
   }
 
@@ -2150,5 +2160,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public getapprovalorder():void {
     this.orgpendingOrderapproval = JSON.parse(localStorage.getItem('pendingApprovalOrders') || '""') as string;
+    console.log(this.orgpendingOrderapproval);
+  }
+
+  clearstorage():void{
+    this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
+    this.orgpendingOrderapproval = "";
+    console.log(this.orgpendingOrderapproval);
   }
 }
