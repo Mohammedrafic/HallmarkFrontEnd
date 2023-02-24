@@ -14,7 +14,6 @@ import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { GlobalWindow } from '@core/tokens';
 import { Destroyable } from '@core/helpers';
 import { ResizeContentService } from '@shared/services/resize-main-content.service';
-import { SpinnerService } from '@core/services/spinner';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -42,8 +41,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
     @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis,
     private readonly ngZone: NgZone,
     @Inject(DOCUMENT) private document: Document,
-    private ResizeContentService: ResizeContentService,
-    private spinnerService: SpinnerService
+    private ResizeContentService: ResizeContentService
   ) {
     super();
   }
@@ -90,7 +88,6 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
   }
   @OutsideZone
   private navigatetopendingtimesheet(): void {
-    this.spinnerService.show();
     setTimeout(() => {
       this.orgwidgetpendingtimesheet = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
        if(this.orgwidgetpendingtimesheet === "Pending Timesheet") {
@@ -98,8 +95,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
          this.changeTab.emit(1);
          this.globalWindow.localStorage.setItem("orgpendingwidget", JSON.stringify(""));
        }
-       this.spinnerService.hide()
-   }, 5000);
+   }, 2500);
   }
   @OutsideZone
   private navigatingTab():void{
