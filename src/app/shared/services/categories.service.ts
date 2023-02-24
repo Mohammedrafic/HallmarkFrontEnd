@@ -26,7 +26,7 @@ export class CategoriesService {
    * @return list of skills categories
    */
   public getAllSkillsCategories(): Observable<SkillCategoriesPage> {
-    return this.http.get<SkillCategoriesPage>(`/api/skillCategories`, { params: { PageNumber: 1, PageSize: 100 }}).pipe(map((data) => ({
+    return this.http.get<SkillCategoriesPage>(`/api/skillCategories`, { params: { PageNumber: 1, PageSize: 2147483647 }}).pipe(map((data) => ({
       ...data,
       items: sortByField(data.items, 'name')
     })));

@@ -1,0 +1,6 @@
+<app-tooltip-container
+  [showToolTip]="skillCategories.length > 1"
+  [message]="skillCategories | join : ', '"
+>
+  {{ skillCategories | multiple }}
+</app-tooltip-container>

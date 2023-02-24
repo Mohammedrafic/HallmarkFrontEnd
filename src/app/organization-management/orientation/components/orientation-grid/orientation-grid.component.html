@@ -1,0 +1,23 @@
+<app-grid
+  [gridTitle]="gridTitle"
+  [rowData]="dataSource?.items || []"
+  [columnDefinitions]="columnDef"
+  [rowSelection]="'multiple'"
+  [totalRecordsCount]="dataSource?.totalCount || 0"
+  [pageSize]="pageSize"
+  [currentPage]="pageNumber"
+  (navigateToPageEmitter)="handleChangePage($event)"
+  (pageSizeChangeEmitter)="handleChangePageSize($event)"
+>
+  <button
+    *ngIf="gridTitle"
+    action-button
+    class="add-action"
+    cssClass="e-action-button"
+    ejs-button
+    (click)="addRecord()"
+  >
+    <i-feather name="plus" class="icon"></i-feather>
+    Add Setup
+  </button>
+</app-grid>

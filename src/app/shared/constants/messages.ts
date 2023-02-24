@@ -69,6 +69,7 @@ export const deployedCandidateMessage = (orderIds: string[]) =>
   `<span class="deployed-candidate__message">Candidate is already working on order <span class="deployed-candidate__order-id"> ${orderIds.join(
     ', '
   )}</span>. Do you wish to proceed?</span>`;
+export const CHANGES_SAVED = 'Changes have been saved';
 export const SEND_EMAIL = 'Sent email';
 export const SEND_EMAIL_REQUIRED = 'Required';
 export const DOCUMENT_UPLOAD_SUCCESS = 'Document uploaded successfully';
