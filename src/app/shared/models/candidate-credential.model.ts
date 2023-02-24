@@ -11,8 +11,8 @@ export interface CandidateCredential {
   number?: string;
   insitute?: string;
   experience?: string;
-  createdOn?: string;
-  createdUntil?: string;
+  createdOn?: string | Date;
+  createdUntil?: string | Date;
   credentialFiles?: CredentialFile[];
   expireDateApplicable?: boolean;
   orderId?: number | null;

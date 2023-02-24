@@ -58,6 +58,14 @@ export class DateTimeHelper {
     return this.toUtcFormat(date);
   }
 
+  public static setInitDateHours(date: Date | string): Date {
+    if (typeof date === 'object') {
+      return new Date(date.setHours(0, 0, 0));
+    }
+
+    return new Date(new Date(date).setHours(0, 0, 0));
+  }
+
   public static geFirstDayofWeek(date: Date): Date {
     return new Date(date.setDate(date.getDate() - date.getDay()));
   }
