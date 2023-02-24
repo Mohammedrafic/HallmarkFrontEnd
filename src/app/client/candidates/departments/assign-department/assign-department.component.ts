@@ -36,6 +36,8 @@ import { OrganizationRegion, OrganizationLocation, OrganizationDepartment } from
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormService } from '../services/department-form.service';
 import { OptionFields } from '@client/order-management/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ASSIGN_HOME_COST_CENTER, WARNING_TITLE } from '@shared/constants';
 
 @Component({
   selector: 'app-assign-department',
@@ -66,6 +68,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     private readonly cdr: ChangeDetectorRef,
     private readonly departmentService: DepartmentsService,
     private readonly departmentFormService: DepartmentFormService,
+    private readonly confirmService: ConfirmService,
     private readonly store: Store
   ) {
     super();
@@ -128,23 +131,39 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       .pipe(
         switchMap(() => {
           const formInvalid = this.assignDepartmentForm.invalid;
+          const { homeCostCenter } = this.assignDepartmentForm.getRawValue();
+          const hasHomeCostCenter = true;
           if (formInvalid) {
             this.assignDepartmentForm.markAllAsTouched();
             this.cdr.markForCheck();
             return of(false);
           }
-          return this.saveAssignedDepartment();
+          if (hasHomeCostCenter && homeCostCenter) {
+            return this.handleHomeCostCenter();
+          }
+          return of(true);
         }),
+        switchMap((formValid) => (formValid ? this.saveAssignedDepartment() : of(formValid))),
         takeUntil(this.destroy$)
       )
-      .subscribe((formValid) => {
-        if (formValid) {
+      .subscribe((success) => {
+        if (success) {
           this.resetAssignDepartmentForm();
           this.departmentId = null;
           this.store.dispatch(new ShowSideDialog(false));
           this.refreshGrid.emit();
         }
       });
+  }
+
+  private handleHomeCostCenter(): Observable<boolean> {
+    return this.confirmService
+      .confirm(ASSIGN_HOME_COST_CENTER, {
+        title: WARNING_TITLE,
+        okButtonLabel: 'Yes',
+        okButtonClass: 'ok-button',
+      })
+      .pipe(filter(Boolean));
   }
 
   private saveAssignedDepartment(): Observable<AssignNewDepartment | EditAssignedDepartment> {
