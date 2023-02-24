@@ -393,7 +393,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       locationsControl?.disable();
       let departments: OrganizationDepartment[] = [];
       let locations: OrganizationLocation[] = this.locationsDataSource;
-      locations?.forEach((location: any) => {
+      locations?.forEach((location: OrganizationLocation) => {
         const filteredDepartments = location.departments || [];
         departments = [...departments, ...filteredDepartments] as OrganizationDepartment[];
       });

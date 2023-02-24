@@ -17,12 +17,12 @@ import { filter, Observable, takeUntil } from 'rxjs';
 })
 @TakeUntilDestroy
 export class OrientationGridComponent extends AbstractPermissionGrid implements OnInit {
-  @Input() gridTitle: string;
-  @Input() dataSource: OrientationConfigurationPage;
-  @Output() pageChange = new EventEmitter();
-  @Output() openDialog = new EventEmitter();
-  @Output() onEdit = new EventEmitter();
-  @Output() onDelete = new EventEmitter();
+  @Input() public gridTitle: string;
+  @Input() public dataSource: OrientationConfigurationPage;
+  @Output() public pageChange = new EventEmitter();
+  @Output() public openDialog = new EventEmitter();
+  @Output() public onEdit = new EventEmitter();
+  @Output() public onDelete = new EventEmitter();
 
   public columnDef: ColumnDefinitionModel[];
   public pageNumber: number = 1;
