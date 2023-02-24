@@ -87,7 +87,6 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   public resetAssignDepartmentForm(): void {
     this.assignDepartmentForm.reset();
     this.assignDepartmentForm.enable();
-    this.dataSource.regions = this.departmentHierarchy;
     this.cdr.markForCheck();
   }
 

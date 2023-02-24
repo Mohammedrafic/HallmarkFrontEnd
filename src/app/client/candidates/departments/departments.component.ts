@@ -83,8 +83,8 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     super.ngOnInit();
     this.selectedTab$ = this.candidatesService.getSelectedTab$();
     this.sideDialogTitle$ = this.departmentsService.getSideDialogTitle$();
+    this.getActiveEmployeeWorkCommitmentId();
     this.getDepartmentsAssigned();
-    this.getAssignedDepartmentHierarchy();
     this.getUserPermission();
   }
 
@@ -92,6 +92,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.AssignDepartment);
     this.showSideDialog(true);
     this.assignDepartment?.resetAssignDepartmentForm();
+    this.getAssignedDepartmentHierarchy();
     this.cdr.markForCheck();
   }
 
@@ -201,18 +202,21 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   }
 
   private getAssignedDepartmentHierarchy(): void {
-    this.candidatesService
-      .getEmployeeWorkCommitmentId()
-      .pipe(
-        switchMap((id) => {
-          this.departmentsService.employeeWorkCommitmentId = id;
-          return this.departmentsService.getAssignedDepartmentHierarchy(id);
-        }),
-        takeUntil(this.componentDestroy())
-      )
+    this.departmentsService
+      .getAssignedDepartmentHierarchy(this.departmentsService.employeeWorkCommitmentId)
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe((data) => {
         this.departmentHierarchy = data.regions;
         this.cdr.markForCheck();
+      });
+  }
+
+  private getActiveEmployeeWorkCommitmentId(): void {
+    this.candidatesService
+      .getEmployeeWorkCommitmentId()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((employeeWorkCommitmentId) => {
+        this.departmentsService.employeeWorkCommitmentId = employeeWorkCommitmentId;
       });
   }
 
