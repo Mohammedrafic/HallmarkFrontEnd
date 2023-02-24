@@ -35,6 +35,7 @@ import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { AbstractPermission } from '@shared/helpers/permissions';
+import { CandidateWorkCommitment } from '../candidate-work-commitment/models/candidate-work-commitment.model';
 
 @Component({
   selector: 'app-departments',
@@ -63,7 +64,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public sideDialogTitle$: Observable<string>;
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public selectedDepartments: number[] | null;
-
+  public employeeWorkCommitment: CandidateWorkCommitment;
   public departmentHierarchy: OrganizationRegion[] = [];
 
   private filters: DepartmentFilterState | null;
@@ -83,7 +84,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     super.ngOnInit();
     this.selectedTab$ = this.candidatesService.getSelectedTab$();
     this.sideDialogTitle$ = this.departmentsService.getSideDialogTitle$();
-    this.getActiveEmployeeWorkCommitmentId();
+    this.getActiveEmployeeWorkCommitment();
     this.getDepartmentsAssigned();
     this.getUserPermission();
   }
@@ -211,12 +212,14 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       });
   }
 
-  private getActiveEmployeeWorkCommitmentId(): void {
+  private getActiveEmployeeWorkCommitment(): void {
     this.candidatesService
-      .getEmployeeWorkCommitmentId()
+      .getActiveEmployeeWorkCommitment()
       .pipe(takeUntil(this.componentDestroy()))
-      .subscribe((employeeWorkCommitmentId) => {
-        this.departmentsService.employeeWorkCommitmentId = employeeWorkCommitmentId;
+      .subscribe((employeeWorkCommitment) => {
+        this.departmentsService.employeeWorkCommitmentId = employeeWorkCommitment.id!;
+        this.employeeWorkCommitment = employeeWorkCommitment;
+        this.cdr.markForCheck();
       });
   }
 
