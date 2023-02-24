@@ -1,7 +1,18 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { DatePipe } from '@angular/common';
 
 import { Store } from '@ngxs/store';
-import { BehaviorSubject, filter, Observable, Subject, switchMap, take, takeUntil } from 'rxjs';
+import {
+  BehaviorSubject,
+  filter,
+  Observable,
+  Subject,
+  switchMap,
+  take,
+  takeUntil,
+  distinctUntilChanged,
+  map,
+} from 'rxjs';
 
 import { CandidateTabsEnum } from '@client/candidates/enums';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
@@ -13,7 +24,6 @@ import {
   DepartmentFilterState,
   DepartmentsPage,
 } from '@client/candidates/departments/departments.model';
-import { DatePipe } from '@angular/common';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import { DELETE_MULTIPLE_RECORDS_TEXT, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, formatDate } from '@shared/constants';
 import { columnDef } from '@client/candidates/departments/grid/column-def.constant';
@@ -22,9 +32,9 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import { OrganizationRegion } from '@shared/models/organization.model';
+import { AbstractPermission } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-departments',
@@ -32,7 +42,7 @@ import { OrganizationRegion } from '@shared/models/organization.model';
   styleUrls: ['./departments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DepartmentsComponent extends DestroyableDirective implements OnInit {
+export class DepartmentsComponent extends AbstractPermission implements OnInit {
   @ViewChild('assignDepartment') private assignDepartment: AssignDepartmentComponent;
 
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
@@ -46,11 +56,7 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
     delete: true,
   };
 
-  public readonly columnDef: ColumnDefinitionModel[] = columnDef({
-    editHandler: this.editAssignedDepartment.bind(this),
-    deleteHandler: this.deleteAssignedDepartments.bind(this),
-    dateFormatter: this.getFormattedDate.bind(this),
-  });
+  public columnDef: ColumnDefinitionModel[];
 
   public departmentsAssigned: DepartmentsPage;
   public selectedTab$: Observable<CandidateTabsEnum>;
@@ -63,27 +69,30 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   private filters: DepartmentFilterState | null;
 
   public constructor(
-    private store: Store,
+    protected override store: Store,
     private candidatesService: CandidatesService,
     private departmentsService: DepartmentsService,
     private datePipe: DatePipe,
     private confirmService: ConfirmService,
     private cdr: ChangeDetectorRef
   ) {
-    super();
+    super(store);
   }
 
-  public ngOnInit(): void {
+  public override ngOnInit(): void {
+    super.ngOnInit();
     this.selectedTab$ = this.candidatesService.getSelectedTab$();
     this.sideDialogTitle$ = this.departmentsService.getSideDialogTitle$();
+    this.getActiveEmployeeWorkCommitmentId();
     this.getDepartmentsAssigned();
-    this.getAssignedDepartmentHierarchy();
+    this.getUserPermission();
   }
 
   public showAssignDepartmentDialog(): void {
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.AssignDepartment);
     this.showSideDialog(true);
     this.assignDepartment?.resetAssignDepartmentForm();
+    this.getAssignedDepartmentHierarchy();
     this.cdr.markForCheck();
   }
 
@@ -161,7 +170,7 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
       .pipe(
         filter((tab) => tab === CandidateTabsEnum.Departments),
         switchMap(() => this.departmentsService.getDepartmentsAssigned(filters)),
-        takeUntil(this.destroy$)
+        takeUntil(this.componentDestroy())
       )
       .subscribe((departments) => {
         this.departmentsAssigned = departments;
@@ -193,18 +202,42 @@ export class DepartmentsComponent extends DestroyableDirective implements OnInit
   }
 
   private getAssignedDepartmentHierarchy(): void {
-    this.candidatesService
-      .getEmployeeWorkCommitmentId()
-      .pipe(
-        switchMap((id) => {
-          this.departmentsService.employeeWorkCommitmentId = id;
-          return this.departmentsService.getAssignedDepartmentHierarchy(id);
-        }),
-        takeUntil(this.destroy$)
-      )
+    this.departmentsService
+      .getAssignedDepartmentHierarchy(this.departmentsService.employeeWorkCommitmentId)
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe((data) => {
         this.departmentHierarchy = data.regions;
         this.cdr.markForCheck();
       });
+  }
+
+  private getActiveEmployeeWorkCommitmentId(): void {
+    this.candidatesService
+      .getEmployeeWorkCommitmentId()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((employeeWorkCommitmentId) => {
+        this.departmentsService.employeeWorkCommitmentId = employeeWorkCommitmentId;
+      });
+  }
+
+  private getUserPermission(): void {
+    this.getPermissionStream()
+      .pipe(
+        map((permission) => permission[this.userPermissions.ManageIrpCandidateProfile]),
+        distinctUntilChanged(),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((canManageIrpCandidateProfile) => {
+        this.initColumnDefinitions(!canManageIrpCandidateProfile);
+      });
+  }
+
+  private initColumnDefinitions(disableActions: boolean): void {
+    this.columnDef = columnDef({
+      editHandler: this.editAssignedDepartment.bind(this),
+      deleteHandler: this.deleteAssignedDepartments.bind(this),
+      dateFormatter: this.getFormattedDate.bind(this),
+      disable: disableActions,
+    });
   }
 }
