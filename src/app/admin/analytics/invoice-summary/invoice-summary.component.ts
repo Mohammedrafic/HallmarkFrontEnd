@@ -210,9 +210,9 @@ export class InvoiceSummaryComponent implements OnInit, OnDestroy {
     this.invoiceSummaryReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        regionIds: new FormControl([], [Validators.required]),
-        locationIds: new FormControl([], [Validators.required]),
-        departmentIds: new FormControl([], [Validators.required]),
+        regionIds: new FormControl([]),
+        locationIds: new FormControl([]),
+        departmentIds: new FormControl([]),
         candidateName: new FormControl(null),
         agencyIds: new FormControl([], [Validators.required]),
         invoiceNumber: new FormControl(null),
