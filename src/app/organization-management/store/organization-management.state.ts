@@ -11,6 +11,7 @@ import { Organization } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 
 import {
+  ClearAssignedSkillsByOrganization,
   ClearDepartmentList,
   ClearLocationList,
   DeleteDepartmentById,
@@ -897,6 +898,13 @@ export class OrganizationManagementState {
        patchState({ assignedSkillsByOrganization: payload.map((skill) => ({...skill, id: skill.masterSkillId, name: skill.skillDescription})) });
       })
     );
+  }
+
+  @Action(ClearAssignedSkillsByOrganization)
+  ClearAssignedSkillsByOrganization(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+  ): OrganizationManagementStateModel {
+    return patchState({ assignedSkillsByOrganization: [] });
   }
 
   @Action(GetAllSkillsCategories)

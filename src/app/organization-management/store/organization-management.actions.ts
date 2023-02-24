@@ -194,6 +194,11 @@ export class GetAssignedSkillsByOrganization {
   constructor(public params?: SkillParams) {}
 }
 
+export class ClearAssignedSkillsByOrganization {
+  static readonly type = '[organizationManagement] Clear Assigned Skills by Organization';
+  constructor() {}
+}
+
 export class GetAllSkillsCategories {
   static readonly type = '[organizationManagement] Get All Skills Categories';
   constructor() {}

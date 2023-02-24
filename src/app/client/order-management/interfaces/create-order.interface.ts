@@ -148,5 +148,6 @@ export interface ContactDetailsUser {
 export interface SkillParams {
   params: {
     SystemType: OrderSystem | SystemType;
+    SkillCategoryIds?: number[];
   }
 }

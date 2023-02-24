@@ -1,0 +1,6 @@
+<app-tooltip-container
+  [showToolTip]="skills.length > 1"
+  [message]="skills | join : ', '"
+>
+  {{ skills | multiple : 'Skills'}}
+</app-tooltip-container>

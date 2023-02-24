@@ -1,0 +1,14 @@
+@import 'colors.scss';
+
+.container {
+  padding-top: 24px;
+  height: calc(100% - 20px);
+}
+
+::ng-deep {
+  ejs-tab {
+    .e-content.e-lib.e-touch {
+      height: 94% !important;
+    }
+  }
+}

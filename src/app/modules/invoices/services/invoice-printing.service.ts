@@ -20,7 +20,7 @@ export class InvoicePrintingService {
       }
 
       this.addInvoiceHeader(doc, invoice.meta);
-      this.addInvoiceBody(doc, invoice, logo);
+      this.addOrgInvoiceBody(doc, invoice, logo);
     });
 
     this.addPageFooter(doc);
@@ -199,8 +199,53 @@ Hauppauge, NY 11788`,
     });
   }
 
-  private addInvoiceBody(doc: jsPDF, data: PrintInvoiceData, img: HTMLImageElement): void {
-    const footer: RowInput[] = [
+  private addOrgInvoiceBody(doc: jsPDF, data: PrintInvoiceData, img: HTMLImageElement): void {
+    const bodyRows: RowInput[] = data.invoiceRecords.map((record) => {
+      const formatedValue = record.total > 0 ? GridValuesHelper.formatAbsNumber(record.value, '1.2-2')
+      : `(${GridValuesHelper.formatAbsNumber(record.value, '1.2-2')})`;
+
+      return [
+        {
+          content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
+          styles: {
+            halign: 'left',
+          },
+        },
+        {
+          content: DateTimeHelper.formatDateUTC(record.timeIn, 'MM/dd/YYYY HH:mm'),
+          styles: {
+            halign: 'left',
+          },
+        },
+        DateTimeHelper.formatDateUTC(record.timeOut, 'MM/dd/YYYY HH:mm'),
+        record.billRateConfigName,
+        record.costCenterFormattedName,
+        record.formattedJobId,
+        `${record.candidateFirstName}, ${record.candidateLastName}`,
+        record.agencyName,
+        record.skillName,
+        {
+          content: formatedValue,
+          styles: {
+            halign: 'right',
+          },
+        },
+        {
+          content: GridValuesHelper.formatAbsCurrency(record.rate),
+          styles: {
+            halign: 'right',
+          },
+        },
+        {
+          content: GridValuesHelper.formatAbsCurrency(record.total),
+          styles: {
+            halign: 'right',
+          },
+        },
+      ];
+    });
+
+    const totalRows: RowInput[] = [
       [
         {
           content: '',
@@ -211,13 +256,16 @@ Hauppauge, NY 11788`,
         {
           content: 'Invoice Amount:',
           colSpan: 11,
-          styles: { halign: 'right' },
+          styles: { halign: 'right', fontStyle: 'bold' },
         },
         {
           content: GridValuesHelper.formatAbsCurrency(data.totals.amount),
           styles: { halign: 'right', fontStyle: 'normal' },
         },
       ],
+    ];
+
+    const summaryRows: RowInput[] = [
       [
         {
           content: 'Summary',
@@ -237,6 +285,7 @@ Hauppauge, NY 11788`,
             fillColor: '#CFCFCF',
             lineColor: '#181919',
             halign: 'left',
+            minCellWidth: 80,
           },
         },
         {
@@ -246,6 +295,7 @@ Hauppauge, NY 11788`,
             fillColor: '#CFCFCF',
             lineColor: '#181919',
             halign: 'left',
+            minCellWidth: 80,
           },
         },
         {
@@ -279,10 +329,13 @@ Hauppauge, NY 11788`,
             fillColor: '#CFCFCF',
             lineColor: '#181919',
             halign: 'left',
+            minCellWidth: 150,
           },
         },
       ],
     ];
+
+    bodyRows.push(...totalRows);
 
     data.summary.forEach((summary) => {
       summary.items.forEach((detail, idx: number) => {
@@ -352,11 +405,11 @@ Hauppauge, NY 11788`,
           sum.splice(0, 1);
         }
 
-        footer.push(sum);
+        summaryRows.push(sum);
       });
     });
 
-    footer.push([
+    summaryRows.push([
       {
         content: 'Total',
         colSpan: 3,
@@ -404,7 +457,7 @@ Hauppauge, NY 11788`,
       },
     ]);
 
-    footer.push([
+    summaryRows.push([
       {
         content: '',
         styles: {
@@ -479,7 +532,7 @@ Hauppauge, NY 11788`,
       },
     ]);
 
-    footer.push([
+    summaryRows.push([
       {
         content: '',
         styles: {
@@ -551,7 +604,6 @@ Hauppauge, NY 11788`,
       margin: { top: 50, left: 20, right: 20 },
       tableLineColor: '#181919',
       tableLineWidth: 1,
-      showFoot: 'lastPage',
       head: [['Week End', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
       'Agency', 'Skill', 'Hours/Miles', 'Bill Rate', 'Total']],
       headStyles: {
@@ -565,63 +617,48 @@ Hauppauge, NY 11788`,
         lineWidth: 1,
         cellPadding: 2,
       },
-      body: data.invoiceRecords.map((record) => {
-        const formatedValue = record.total > 0 ? GridValuesHelper.formatAbsNumber(record.value, '1.2-2')
-        : `(${GridValuesHelper.formatAbsNumber(record.value, '1.2-2')})`;
+      body: bodyRows,
+      bodyStyles: {
+        lineColor: '#181919',
+        lineWidth: 1,
+        fontSize: 10,
+        overflow: 'linebreak',
+        cellPadding: 2,
+      },
+      theme: 'plain',
+      didDrawPage: ()=> {
+        doc.addImage(img, 'png', 20, 15, 80, 20);
+      },
+    });
 
-        return [
-          {
-            content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
-            styles: {
-              halign: 'left',
-            },
-          },
-          {
-            content: DateTimeHelper.formatDateUTC(record.timeIn, 'MM/dd/YYYY HH:mm'),
-            styles: {
-              halign: 'left',
-            },
-          },
-          DateTimeHelper.formatDateUTC(record.timeOut, 'MM/dd/YYYY HH:mm'),
-          record.billRateConfigName,
-          record.costCenterFormattedName,
-          record.formattedJobId,
-          `${record.candidateFirstName}, ${record.candidateLastName}`,
-          record.agencyName,
-          record.skillName,
-          {
-            content: formatedValue,
-            styles: {
-              halign: 'right',
-            },
-          },
-          {
-            content: GridValuesHelper.formatAbsCurrency(record.rate),
-            styles: {
-              halign: 'right',
-            },
-          },
-          {
-            content: GridValuesHelper.formatAbsCurrency(record.total),
-            styles: {
-              halign: 'right',
-            },
-          },
-        ];
-      }),
-      foot: footer,
-      footStyles: {
+    autoTable(doc, {
+      margin: { top: 50, left: 20, right: 20 },
+      tableLineColor: '#181919',
+      tableLineWidth: 1,
+      pageBreak: 'avoid',
+      rowPageBreak: 'avoid',
+      head: [['Week End', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
+      'Agency', 'Skill', 'Hours/Miles', 'Bill Rate', 'Total']],
+      showHead: 'never',
+      headStyles: {
+        fillColor: '#CFCFCF',
+        fontStyle: 'bold',
+        fontSize: 10,
+        overflow: 'linebreak',
+        halign: 'center',
+        valign: 'middle',
+        lineColor: '#181919',
+        lineWidth: 1,
+        cellPadding: 2,
+      },
+      body: summaryRows,
+      bodyStyles: {
         lineColor: '#D9D9D9',
         lineWidth: 0.8,
         fontSize: 10,
         fontStyle: 'bold',
         cellPadding: 2,
-      },
-      bodyStyles: {
-        lineColor: '#181919',
-        lineWidth: 1,
-        fontSize: 10,
-        cellPadding: 2,
+        overflow: 'linebreak',
       },
       theme: 'plain',
       didDrawPage: ()=> {
@@ -631,7 +668,58 @@ Hauppauge, NY 11788`,
   }
 
   private addAgencyInvoiceBody(doc: jsPDF, data: PrintInvoiceData, img: HTMLImageElement): void {
-    const footer: RowInput[] = [
+    const bodyRows: RowInput[] = data.invoiceRecords.map((record) => {
+      const formatedValue = record.total > 0 ? GridValuesHelper.formatAbsNumber(record.value, '1.2-2')
+      : `(${GridValuesHelper.formatAbsNumber(record.value, '1.2-2')})`;
+
+      return [
+        {
+          content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
+          styles: {
+            halign: 'left',
+          },
+        },
+        {
+          content: formatDate(DateTimeHelper.toUtcFormat(record.timeIn), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
+          styles: {
+            halign: 'left',
+          },
+        },
+        formatDate(DateTimeHelper.toUtcFormat(record.timeOut), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
+        record.billRateConfigName,
+        record.costCenterFormattedName,
+        record.formattedJobId,
+        `${record.candidateFirstName}, ${record.candidateLastName}`,
+        record.organizationName,
+        record.skillName,
+        {
+          content: formatedValue,
+          styles: {
+            halign: 'right',
+          },
+        },
+        {
+          content: GridValuesHelper.formatAbsCurrency(record.rate),
+          styles: {
+            halign: 'right',
+          },
+        },
+        {
+          content: `${GridValuesHelper.formatNumber(record.fee, '1.2-2')}`,
+          styles: {
+            halign: 'right',
+          },
+        },
+        {
+          content: GridValuesHelper.formatAbsCurrency(record.total),
+          styles: {
+            halign: 'right',
+          },
+        },
+      ];
+    });
+
+    const totalRows: RowInput[] = [
       [
         {
           content: '',
@@ -642,7 +730,7 @@ Hauppauge, NY 11788`,
         {
           content: 'Invoice Amount:',
           colSpan: 12,
-          styles: { halign: 'right' },
+          styles: { halign: 'right', fontStyle: 'bold' },
         },
         {
           content: GridValuesHelper.formatAbsCurrency(data.totals.amount),
@@ -653,13 +741,18 @@ Hauppauge, NY 11788`,
         {
           content: 'Fee:',
           colSpan: 12,
-          styles: { halign: 'right' },
+          styles: { halign: 'right', fontStyle: 'bold' },
         },
         {
           content: GridValuesHelper.formatAbsCurrency(data.totals.feeTotal),
           styles: { halign: 'right', fontStyle: 'normal' },
         },
       ],
+    ];
+
+    bodyRows.push(...totalRows);
+
+    const summaryRows: RowInput[] = [
       [
         {
           content: 'Summary',
@@ -811,11 +904,11 @@ Hauppauge, NY 11788`,
           sum.splice(0, 1);
         }
 
-        footer.push(sum);
+        summaryRows.push(sum);
       });
     });
 
-    footer.push([
+    summaryRows.push([
       {
         content: 'Total',
         colSpan: 3,
@@ -871,7 +964,7 @@ Hauppauge, NY 11788`,
       },
     ]);
 
-    footer.push([
+    summaryRows.push([
       {
         content: '',
         styles: {
@@ -952,7 +1045,7 @@ Hauppauge, NY 11788`,
       },
     ]);
 
-    footer.push([
+    summaryRows.push([
       {
         content: '',
         styles: {
@@ -1030,7 +1123,6 @@ Hauppauge, NY 11788`,
       margin: { top: 50, left: 20, right: 20 },
       tableLineColor: '#181919',
       tableLineWidth: 1,
-      showFoot: 'lastPage',
       head: [['Week End', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
       'Organization', 'Skill', 'Hours/Miles', 'Bill Rate', 'Fee, %', 'Total']],
       headStyles: {
@@ -1044,68 +1136,45 @@ Hauppauge, NY 11788`,
         lineWidth: 1,
         cellPadding: 2,
       },
-      body: data.invoiceRecords.map((record) => {
-        const formatedValue = record.total > 0 ? GridValuesHelper.formatAbsNumber(record.value, '1.2-2')
-        : `(${GridValuesHelper.formatAbsNumber(record.value, '1.2-2')})`;
-
-        return [
-          {
-            content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
-            styles: {
-              halign: 'left',
-            },
-          },
-          {
-            content: formatDate(DateTimeHelper.toUtcFormat(record.timeIn), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
-            styles: {
-              halign: 'left',
-            },
-          },
-          formatDate(DateTimeHelper.toUtcFormat(record.timeOut), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
-          record.billRateConfigName,
-          record.costCenterFormattedName,
-          record.formattedJobId,
-          `${record.candidateFirstName}, ${record.candidateLastName}`,
-          record.organizationName,
-          record.skillName,
-          {
-            content: formatedValue,
-            styles: {
-              halign: 'right',
-            },
-          },
-          {
-            content: GridValuesHelper.formatAbsCurrency(record.rate),
-            styles: {
-              halign: 'right',
-            },
-          },
-          {
-            content: `${GridValuesHelper.formatNumber(record.fee, '1.2-2')}`,
-            styles: {
-              halign: 'right',
-            },
-          },
-          {
-            content: GridValuesHelper.formatAbsCurrency(record.total),
-            styles: {
-              halign: 'right',
-            },
-          },
-        ];
-      }),
-      foot: footer,
-      footStyles: {
-        lineColor: '#D9D9D9',
-        lineWidth: 0.8,
-        fontSize: 10,
-        fontStyle: 'bold',
-        cellPadding: 2,
-      },
+      body: bodyRows,
       bodyStyles: {
         lineColor: '#181919',
         lineWidth: 1,
         fontSize: 10,
+        cellPadding: 2,
+      },
+      theme: 'plain',
+      didDrawPage: ()=> {
+        doc.addImage(img, 'png', 20, 15, 80, 20);
+      },
+    });
+
+    autoTable(doc, {
+      margin: { top: 50, left: 20, right: 20 },
+      tableLineColor: '#181919',
+      tableLineWidth: 1,
+      pageBreak: 'avoid',
+      rowPageBreak: 'avoid',
+      head: [['Week End', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
+      'Organization', 'Skill', 'Hours/Miles', 'Bill Rate', 'Fee, %', 'Total']],
+      showHead: 'never',
+      headStyles: {
+        fillColor: '#CFCFCF',
+        fontStyle: 'bold',
+        fontSize: 10,
+        overflow: 'linebreak',
+        halign: 'center',
+        valign: 'middle',
+        lineColor: '#181919',
+        lineWidth: 1,
+        cellPadding: 2,
+      },
+      body: summaryRows,
+      bodyStyles: {
+        lineColor: '#D9D9D9',
+        lineWidth: 0.8,
+        fontSize: 10,
+        fontStyle: 'bold',
         cellPadding: 2,
       },
       theme: 'plain',
