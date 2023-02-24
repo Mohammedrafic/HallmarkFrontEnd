@@ -36,12 +36,16 @@
     <app-datepicker
       [formGroupInstance]="assignDepartmentForm"
       [required]="true"
+      [min]="dateRanges.min"
+      [max]="dateRanges.max"
       id="start-date"
       controlName="startDate"
       label="Start Date"
     ></app-datepicker>
     <app-datepicker
       [formGroupInstance]="assignDepartmentForm"
+      [min]="dateRanges.min"
+      [max]="dateRanges.max"
       id="end-date"
       controlName="endDate"
       label="End Date"

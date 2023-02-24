@@ -113,4 +113,9 @@ export interface NewDepartmentPayload {
   endDate: string | undefined;
 }
 
+export interface DateRanges {
+  min?: Date;
+  max?: Date;
+}
+
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;
