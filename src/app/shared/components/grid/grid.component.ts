@@ -115,6 +115,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
     this.initLoadingStateChangesListener();
     this.adjustColumnWidth();
     this.watchForMobile();
+    this.deselectGridRowsAfterStateChanged();
   }
 
   public handleGridReadyEvent(event: GridReadyEventModel): void {
@@ -191,5 +192,15 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
           this.gridDomLayout = 'normal';
         }
       });
+  }
+
+  private deselectGridRowsAfterStateChanged(): void {
+    this.componentStateChanged$
+      .pipe(throttleTime(150), takeUntil(this.destroy$))
+      .subscribe((event) => {
+        if(this.selectedTableRows.length) {
+          event.api.deselectAll();
+        }
+    });
   }
 }
