@@ -78,8 +78,7 @@ export interface DepartmentFilterState {
 export interface EditDepartmentFormState {
   [EditDepartmentFields.START_DATE]: Date;
   [EditDepartmentFields.END_DATE]: Date;
-  [EditDepartmentFields.ORIENTED]: boolean;
-  [EditDepartmentFields.HOME_COST_CENTER]: boolean;
+  [EditDepartmentFields.IS_ORIENTED]: boolean;
   [EditDepartmentFields.ORIENTED_START_DATE]?: Date;
 }
 export interface DepartmentHierarchy {

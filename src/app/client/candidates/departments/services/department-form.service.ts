@@ -25,7 +25,7 @@ export class DepartmentFormService {
     return this.formBuilder.group({
       startDate: [null],
       endDate: [null],
-      oriented: [false],
+      isOriented: [false],
       homeCostCenter: [false],
       orientedStartDate: [null],
     }) as CustomFormGroup<EditDepartmentFormState>;

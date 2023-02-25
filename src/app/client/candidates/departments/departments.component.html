@@ -47,6 +47,7 @@
     ></app-assign-department>
 
     <app-edit-departments
+      #editDepartments
       *ngIf="dialogTitle === sideDialogTitleEnum.EditBulkDepartments"
       (refreshGrid)="refreshGrid()"
       [saveForm$]="saveForm$"

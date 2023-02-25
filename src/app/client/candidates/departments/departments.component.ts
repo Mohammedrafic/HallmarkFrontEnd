@@ -36,6 +36,7 @@ import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { CandidateWorkCommitment } from '../candidate-work-commitment/models/candidate-work-commitment.model';
+import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
 
 @Component({
   selector: 'app-departments',
@@ -45,6 +46,7 @@ import { CandidateWorkCommitment } from '../candidate-work-commitment/models/can
 })
 export class DepartmentsComponent extends AbstractPermission implements OnInit {
   @ViewChild('assignDepartment') private assignDepartment: AssignDepartmentComponent;
+  @ViewChild('editDepartments') private editDepartments: EditDepartmentsComponent;
 
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
@@ -138,6 +140,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     this.selectedDepartments = selectedAll ? null : event.items.map((item) => item.data.id);
 
     if (event.type === BulkTypeAction.EDIT) {
+      this.editDepartments?.resetEditDepartmentForm();
       this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.EditBulkDepartments);
       this.showSideDialog(true);
       return;

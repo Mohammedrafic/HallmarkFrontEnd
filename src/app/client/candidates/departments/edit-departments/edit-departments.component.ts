@@ -58,6 +58,12 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
     this.watchForControls();
   }
 
+  public resetEditDepartmentForm(): void {
+    this.formGroup.reset();
+    this.departmentFormService.disableControls(this.formGroup, ['endDate']);
+    this.cdr.markForCheck();
+  }
+
   public trackByFn = (_: number, item: DepartmentFormFieldConfig<EditDepartmentFields>) => item.field + item.show;
 
   private initForm(): void {
@@ -71,7 +77,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
 
   private watchForOrientedControl(): void {
     this.formGroup
-      .get(EditDepartmentFields.ORIENTED)
+      .get(EditDepartmentFields.IS_ORIENTED)
       ?.valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe((isOriented) => {
         this.initFormConfig(isOriented);
