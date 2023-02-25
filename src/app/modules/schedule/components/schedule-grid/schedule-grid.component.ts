@@ -120,7 +120,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       this.cellClickTimer = setTimeout(() => {
         if (!this.preventCellSingleClick) {
           this.selectDateSlot(date, candidate);
-          this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
+          this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot, cellDate));
         }
       }, 250);
     }

@@ -9,6 +9,7 @@ import { CreateScheduleService } from './create-schedule.service';
 import { CreateBookTooltip, CreateScheduleDateItems, CreateTooltip, GetScheduleDayWithEarliestTime } from '../helpers';
 import { ScheduleBookingErrors } from '../interface';
 import { ScheduleItemType } from '../constants';
+import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 
 @Injectable()
 export class ScheduleItemsService {
@@ -26,7 +27,7 @@ export class ScheduleItemsService {
         candidateName: `${candidate.lastName}, ${candidate.firstName}`,
         candidateId: candidate.id,
         selectedDates: scheduleSelectedSlots.dates.map((date: string) => new Date(date)),
-        dateItems: this.getDateItems(scheduleSelectedSlots.dates, candidate.id, scheduleType),
+        dateItems: this.getDateItems(scheduleSelectedSlots.dates, candidate.id, scheduleType, candidate.orderType),
       };
     });
   }
@@ -49,7 +50,7 @@ export class ScheduleItemsService {
     return scheduleDateItems;
   }
 
-  getBookScheduleDateItems(dates: string[], candidateId: number): DateItem[]  {
+  getBookScheduleDateItems(dates: string[], candidateId: number, orderType: IrpOrderType | null): DateItem[]  {
     const scheduleDateItems: DateItem[] = [];
 
     dates.forEach((dateValue: string) => {
@@ -62,6 +63,7 @@ export class ScheduleItemsService {
           dateValue: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
           tooltipContent: CreateBookTooltip(daySchedules) as string,
           scheduleType: scheduleDayWithEarliestTime.scheduleType,
+          orderType,
           id: scheduleDayWithEarliestTime.id,
           date,
         });
@@ -108,9 +110,14 @@ export class ScheduleItemsService {
     };
   }
 
-  private getDateItems(dates: string[], candidateId: number, scheduleType: ScheduleItemType): DateItem[] {
+  private getDateItems(
+    dates: string[],
+    candidateId: number,
+    scheduleType: ScheduleItemType,
+    orderType: IrpOrderType | null
+  ): DateItem[] {
     if(scheduleType === ScheduleItemType.Book) {
-      return this.getBookScheduleDateItems(dates, candidateId);
+      return this.getBookScheduleDateItems(dates, candidateId, orderType);
     } else {
       return this.getScheduleDateItems(dates, candidateId);
     }

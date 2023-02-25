@@ -4,6 +4,7 @@ import {
   CandidateSchedules,
   ScheduleCandidate,
   ScheduleCandidatesPage,
+  ScheduleDateItem,
   ScheduleDateSlot,
   ScheduleModelPage,
   ScheduleSelectedSlots,
@@ -33,10 +34,11 @@ export class ScheduleGridAdapter {
     };
   }
 
-  static prepareSelectedCells(slots: Map<number, ScheduleDateSlot>): ScheduleSelectedSlots {
+  static prepareSelectedCells(slots: Map<number, ScheduleDateSlot>, cellDate?: ScheduleDateItem): ScheduleSelectedSlots {
     const iteratedDates: string[] = [];
 
     const candidates = [...slots.values()].reduce((acc: ScheduleCandidate[], slot: ScheduleDateSlot) => {
+      slot.candidate.orderType = cellDate?.daySchedules[0]?.orderMetadata?.orderType ?? null;
       acc.push(slot.candidate);
       iteratedDates.push(...slot.dates.values());
 

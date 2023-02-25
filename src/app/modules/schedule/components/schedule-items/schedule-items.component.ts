@@ -10,6 +10,7 @@ import { ScheduleType } from '../../enums';
 import { ScheduleBookingErrors, ScheduleSelectedSlots } from '../../interface';
 import { GetCountErrors, ScheduleItemsWithErrors } from '../../helpers';
 import { ScheduleItemType } from '../../constants';
+import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 
 @Component({
   selector: 'app-schedule-items',
@@ -34,6 +35,7 @@ export class ScheduleItemsComponent extends Destroyable implements OnInit {
 
   scheduleItems: CreateScheduleItem[] = [];
   itemsErrorCounter: number;
+  ltaOrder: IrpOrderType = IrpOrderType.LongTermAssignment;
 
   readonly scheduleType = ScheduleType;
   selectedType: ScheduleItemType = ScheduleItemType.Book;
