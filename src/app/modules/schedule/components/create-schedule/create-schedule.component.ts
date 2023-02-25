@@ -427,6 +427,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   private handleSuccessSaveDate(message: string): void {
     this.updateScheduleGrid.emit();
     this.scheduleForm.markAsUntouched();
+    this.closeDialog();
     this.store.dispatch(new ShowToast(MessageTypes.Success, message));
   }
 }
