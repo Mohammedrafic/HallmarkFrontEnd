@@ -147,3 +147,13 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
     departmentsIds: departmentsIds ?? [],
   };
 };
+
+export const HasDepartment = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
+  return filters.departmentsIds && !filters.departmentsIds.length;
+};
+
+export const ShowButtonTooltip = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
+  return filters.regionIds && filters.regionIds.length > 1 ||
+    filters.locationIds && filters.locationIds.length > 1 ||
+    filters.departmentsIds && filters.departmentsIds.length > 1;
+};
