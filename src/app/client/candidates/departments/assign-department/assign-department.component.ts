@@ -9,7 +9,6 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
 import {
@@ -26,6 +25,7 @@ import {
 
 import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import {
+  AssignDepartmentFormState,
   AssignDepartmentHierarchy,
   AssignNewDepartment,
   DateRanges,
@@ -39,6 +39,7 @@ import { DepartmentFormService } from '../services/department-form.service';
 import { OptionFields } from '@client/order-management/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { CustomFormGroup } from '@core/interface';
 
 @Component({
   selector: 'app-assign-department',
@@ -54,7 +55,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
 
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
-  public assignDepartmentForm: FormGroup;
+  public assignDepartmentForm: CustomFormGroup<AssignDepartmentFormState>;
   public dataSource: AssignDepartmentHierarchy = {
     regions: [],
     locations: [],
