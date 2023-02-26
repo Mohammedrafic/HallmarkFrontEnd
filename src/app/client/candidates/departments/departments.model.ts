@@ -69,10 +69,10 @@ export type DepartmentFiltersColumns = {
 };
 
 export interface DepartmentFilterState {
-  regionId: number[];
-  locationId: number[];
-  departmentId: number[];
-  skills: number[];
+  regionIds: number[];
+  locationIds: number[];
+  departmentsIds: number[];
+  skillIds: number[];
   oriented: boolean;
 }
 export interface EditDepartmentFormState {

@@ -15,7 +15,7 @@ export class DepartmentFormService {
     return this.formBuilder.group({
       regionIds: [null],
       locationIds: [null],
-      departmentIds: [null],
+      departmentsIds: [null],
       skillIds: [null],
       oriented: [1],
     }) as CustomFormGroup<DepartmentFiltersColumns>;
