@@ -14,6 +14,7 @@ export interface ScheduleCandidate {
   firstName: string;
   lastName: string;
   skill: string;
+  dates: string[];
   orderType: IrpOrderType | null;
   workCommitments: string[] | null;
   employeeNote: string;

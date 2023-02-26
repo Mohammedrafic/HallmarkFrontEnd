@@ -26,8 +26,8 @@ export class ScheduleItemsService {
       return  {
         candidateName: `${candidate.lastName}, ${candidate.firstName}`,
         candidateId: candidate.id,
-        selectedDates: scheduleSelectedSlots.dates.map((date: string) => new Date(date)),
-        dateItems: this.getDateItems(scheduleSelectedSlots.dates, candidate.id, scheduleType, candidate.orderType),
+        selectedDates: candidate.dates.map((date: string) => new Date(date)),
+        dateItems: this.getDateItems(candidate.dates, candidate.id, scheduleType, candidate.orderType),
       };
     });
   }
