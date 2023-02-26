@@ -7,7 +7,7 @@
   [columnDefinitions]="columnDef"
   [totalRecordsCount]="departmentsAssigned?.totalCount ?? 0"
   [allowBulkSelection]="true"
-  [disableBulkButton]="false"
+  [disableBulkButton]="disableBulkButton"
   [rowSelection]="rowSelection"
   [bulkActionConfig]="bulkActionConfig"
 >
@@ -43,7 +43,7 @@
       (refreshGrid)="refreshGrid()"
       [saveForm$]="saveForm$"
       [departmentHierarchy]="departmentHierarchy"
-      [employeeWorkCommitment]="employeeWorkCommitment"
+      [dateRanges]="dateRanges"
     ></app-assign-department>
 
     <app-edit-departments
@@ -52,6 +52,7 @@
       (refreshGrid)="refreshGrid()"
       [saveForm$]="saveForm$"
       [selectedDepartments]="selectedDepartments"
+      [dateRanges]="dateRanges"
     ></app-edit-departments>
   </ng-container>
 </app-side-dialog>

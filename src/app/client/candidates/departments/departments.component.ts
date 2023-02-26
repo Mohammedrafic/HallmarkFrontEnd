@@ -20,12 +20,19 @@ import { DepartmentsService } from '@client/candidates/departments/services/depa
 import { SideDialogTitleEnum } from '@client/candidates/departments/side-dialog-title.enum';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import {
+  DateRanges,
   DepartmentAssigned,
   DepartmentFilterState,
   DepartmentsPage,
 } from '@client/candidates/departments/departments.model';
-import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
-import { DELETE_MULTIPLE_RECORDS_TEXT, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, formatDate } from '@shared/constants';
+import { ShowFilterDialog, ShowSideDialog, ShowToast } from '../../../store/app.actions';
+import {
+  DELETE_MULTIPLE_RECORDS_TEXT,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+  formatDate,
+  RECORD_DELETE,
+} from '@shared/constants';
 import { columnDef } from '@client/candidates/departments/grid/column-def.constant';
 import { AssignDepartmentComponent } from './assign-department/assign-department.component';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -37,6 +44,7 @@ import { OrganizationRegion } from '@shared/models/organization.model';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { CandidateWorkCommitment } from '../candidate-work-commitment/models/candidate-work-commitment.model';
 import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-departments',
@@ -60,14 +68,15 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   };
 
   public columnDef: ColumnDefinitionModel[];
+  public dateRanges: DateRanges = {};
 
   public departmentsAssigned: DepartmentsPage;
   public selectedTab$: Observable<CandidateTabsEnum>;
   public sideDialogTitle$: Observable<string>;
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public selectedDepartments: number[] | null;
-  public employeeWorkCommitment: CandidateWorkCommitment;
   public departmentHierarchy: OrganizationRegion[] = [];
+  public disableBulkButton: boolean = false;
 
   private filters: DepartmentFilterState | null;
 
@@ -202,6 +211,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       )
       .subscribe(() => {
         this.getDepartmentsAssigned(this.filters);
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
       });
   }
 
@@ -221,7 +231,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((employeeWorkCommitment) => {
         this.departmentsService.employeeWorkCommitmentId = employeeWorkCommitment.id!;
-        this.employeeWorkCommitment = employeeWorkCommitment;
+        this.setDateRanges(employeeWorkCommitment);
         this.cdr.markForCheck();
       });
   }
@@ -234,6 +244,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
         takeUntil(this.componentDestroy())
       )
       .subscribe((canManageIrpCandidateProfile) => {
+        this.disableBulkButton = !canManageIrpCandidateProfile;
         this.initColumnDefinitions(!canManageIrpCandidateProfile);
       });
   }
@@ -245,5 +256,11 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       dateFormatter: this.getFormattedDate.bind(this),
       disable: disableActions,
     });
+  }
+
+  private setDateRanges(employeeWorkCommitment: CandidateWorkCommitment): void {
+    const { startDate, endDate } = employeeWorkCommitment;
+    this.dateRanges.max = endDate ? new Date(endDate) : undefined;
+    this.dateRanges.min = startDate ? new Date(startDate) : undefined;
   }
 }

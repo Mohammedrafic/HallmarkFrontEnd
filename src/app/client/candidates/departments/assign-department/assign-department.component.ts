@@ -24,7 +24,7 @@ import {
   of,
 } from 'rxjs';
 
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import {
   AssignDepartmentHierarchy,
   AssignNewDepartment,
@@ -37,7 +37,8 @@ import { OrganizationRegion, OrganizationLocation, OrganizationDepartment } from
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormService } from '../services/department-form.service';
 import { OptionFields } from '@client/order-management/constants';
-import { CandidateWorkCommitment } from '@client/candidates/candidate-work-commitment/models/candidate-work-commitment.model';
+import { MessageTypes } from '@shared/enums/message-types';
+import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 
 @Component({
   selector: 'app-assign-department',
@@ -49,7 +50,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   @Input() public dialogData$: BehaviorSubject<DepartmentAssigned | null>;
   @Input() public saveForm$: Subject<boolean>;
   @Input() public departmentHierarchy: OrganizationRegion[];
-  @Input() public employeeWorkCommitment: CandidateWorkCommitment;
+  @Input() public dateRanges: DateRanges;
 
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
@@ -59,7 +60,6 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     locations: [],
     departments: [],
   };
-  public dateRanges: DateRanges = {};
 
   public readonly departmentFields = OptionFields;
 
@@ -85,10 +85,6 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['departmentHierarchy']?.currentValue) {
       this.dataSource.regions = this.departmentHierarchy;
-    }
-
-    if (changes['employeeWorkCommitment']?.currentValue) {
-      this.setDateRanges(this.employeeWorkCommitment);
     }
   }
 
@@ -147,8 +143,9 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       .subscribe((formValid) => {
         if (formValid) {
           this.resetAssignDepartmentForm();
+          const MESSAGE = this.departmentId ? RECORD_MODIFIED : RECORD_ADDED;
+          this.store.dispatch([new ShowSideDialog(false), new ShowToast(MessageTypes.Success, MESSAGE)]);
           this.departmentId = null;
-          this.store.dispatch(new ShowSideDialog(false));
           this.refreshGrid.emit();
         }
       });
@@ -203,11 +200,5 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         takeUntil(this.destroy$)
       )
       .subscribe(() => this.cdr.markForCheck());
-  }
-
-  private setDateRanges(employeeWorkCommitment: CandidateWorkCommitment): void {
-    const { startDate, endDate } = employeeWorkCommitment;
-    this.dateRanges.max = endDate ? new Date(endDate) : undefined;
-    this.dateRanges.min = startDate ? new Date(startDate) : undefined;
   }
 }
