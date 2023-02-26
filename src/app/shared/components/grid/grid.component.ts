@@ -198,7 +198,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
     this.componentStateChanged$
       .pipe(throttleTime(150), takeUntil(this.destroy$))
       .subscribe((event) => {
-        if(this.selectedTableRows.length) {
+        if(this.selectedTableRows.length && this.allowBulkSelection) {
           event.api.deselectAll();
         }
     });
