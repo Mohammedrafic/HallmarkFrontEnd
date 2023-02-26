@@ -66,7 +66,6 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   private departmentId?: number | null = null;
 
   public constructor(
-    private readonly formBuilder: FormBuilder,
     private readonly cdr: ChangeDetectorRef,
     private readonly departmentService: DepartmentsService,
     private readonly departmentFormService: DepartmentFormService,
@@ -91,19 +90,12 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   public resetAssignDepartmentForm(): void {
     this.assignDepartmentForm.reset();
     this.assignDepartmentForm.enable();
+    this.assignDepartmentForm.get('startDate')?.setValue(new Date());
     this.cdr.markForCheck();
   }
 
   private initForm(): void {
-    this.assignDepartmentForm = this.formBuilder.group({
-      regionId: [null, [Validators.required]],
-      locationId: [null, [Validators.required]],
-      departmentId: [null, [Validators.required]],
-      startDate: [null, [Validators.required]],
-      endDate: [null],
-      isOriented: [null],
-      homeCostCenter: [null],
-    });
+    this.assignDepartmentForm = this.departmentFormService.createAssignDepartmentForm();
   }
 
   private subscribeOnDialogData(): void {

@@ -68,6 +68,16 @@ export type DepartmentFiltersColumns = {
   };
 };
 
+export interface AssignDepartmentFormState {
+  regionId: number;
+  locationId: number;
+  departmentId: number;
+  startDate: Date;
+  endDate: Date | null;
+  isOriented: boolean;
+  homeCostCenter: boolean;
+}
+
 export interface DepartmentFilterState {
   regionIds: number[];
   locationIds: number[];

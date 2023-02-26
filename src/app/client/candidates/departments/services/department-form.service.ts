@@ -1,15 +1,27 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
 import { isObjectsEqual } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 import { FilterColumnConfig } from '../constants/department-filter.constant';
-import { DepartmentAssigned, DepartmentFiltersColumns, EditDepartmentFormState } from '../departments.model';
+import { AssignDepartmentFormState, DepartmentAssigned, DepartmentFiltersColumns, EditDepartmentFormState } from '../departments.model';
 
 @Injectable()
 export class DepartmentFormService {
   constructor(private readonly formBuilder: FormBuilder) {}
+
+  public createAssignDepartmentForm(): CustomFormGroup<AssignDepartmentFormState> {
+    return this.formBuilder.group({
+      regionId: [null, [Validators.required]],
+      locationId: [null, [Validators.required]],
+      departmentId: [null, [Validators.required]],
+      startDate: [new Date(), [Validators.required]],
+      endDate: [null],
+      isOriented: [null],
+      homeCostCenter: [null],
+    }) as CustomFormGroup<AssignDepartmentFormState>;
+  }
 
   public createFilterForm(): CustomFormGroup<DepartmentFiltersColumns> {
     return this.formBuilder.group({
