@@ -111,7 +111,6 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
         this.getSkills();
         this.getOrientationSettings();
         this.getOrientationConfigs();
-        //this.clearFilterForm(); TODO: add filters
       });
   }
 

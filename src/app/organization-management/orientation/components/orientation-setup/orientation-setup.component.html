@@ -32,7 +32,9 @@
     (openDialog)="openDialog($event)"
     (onEdit)="openDialog($event)"
     (onDelete)="deleteRecord($event)"
-    [dataSource]="dataSource">
+    [dataSource]="dataSource"
+    [skillCategories]="(allSkillsCategories$ | async)?.items"
+    [regions]="regions">
   </app-orientation-grid>
 </section>
 
