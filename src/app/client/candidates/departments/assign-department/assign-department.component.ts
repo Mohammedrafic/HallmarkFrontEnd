@@ -130,9 +130,8 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
             this.assignDepartmentForm.markAllAsTouched();
             this.cdr.markForCheck();
           }
-          return of(formValid);
+          return formValid ? this.saveAssignedDepartment() : of(formValid);
         }),
-        switchMap((formValid) => (formValid ? this.saveAssignedDepartment() : of(formValid))),
         takeUntil(this.destroy$)
       )
       .subscribe((success) => {

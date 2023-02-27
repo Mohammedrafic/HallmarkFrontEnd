@@ -114,7 +114,7 @@ export class DepartmentsService {
         const forceUpdate = errorResponse.error['errors'].ForceUpdate && errorResponse.error.status === 400;
         return forceUpdate
           ? this.handleHomeCostCenter(
-              this.http.put<EditAssignedDepartment>(`${this.baseUrl}`, { ...payload, forceUpdate: true, startDate: null })
+              this.http.put<EditAssignedDepartment>(`${this.baseUrl}`, { ...payload, forceUpdate: true })
             )
           : throwError(() => errorResponse);
       })
