@@ -81,6 +81,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() isCandidateAssigned = false;
   @Input() userPermission: Permission;
   @Input() employee: string | null;
+  @Input() isIRP: boolean = false;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
@@ -694,7 +695,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.disableAddCredentialButton =
       !this.areAgencyActionsAllowed ||
       !this.hasPermissions() ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile);
+      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP);
   }
 
   private setGridItems(response: CandidateCredentialResponse): void {
@@ -728,7 +729,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.disabledCopy ||
       item.id === this.orderCredentialId ||
       !this.hasPermissions() ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile)
+      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
     );
   }
 
@@ -738,7 +739,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       item.id === this.orderCredentialId ||
       ((item.status === this.statusEnum.Reviewed || item.status === this.statusEnum.Verified) &&
         !this.isOrganizationSide) ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile)
+      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
     );
   }
 
@@ -747,7 +748,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       !this.areAgencyActionsAllowed ||
       item.id === this.orderCredentialId ||
       !this.hasPermissions() ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile)
+      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
     );
   }
 
