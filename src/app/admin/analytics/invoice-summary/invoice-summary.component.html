@@ -2,11 +2,11 @@
   <section class="toolbar">
     <section class="toolbar-header">
       <div class="toolbar-header-div">{{title }}
-      </div>     
+      </div>
     </section>
     <section class="toolbar-message">
       <div class="toolbar-message-div">{{message}}
-      </div> 
+      </div>
     </section>
     <section class="toolbar-buttons">
       <button ejs-button
@@ -22,11 +22,11 @@
 </section>
 <section class="accrual-report-section">
   <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName"
-    [reportType]="reportType"></app-logi-report>
+                   [reportType]="reportType"></app-logi-report>
   <router-outlet></router-outlet>
 </section>
 <app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)"
-  (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+                   (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
   <form [formGroup]="invoiceSummaryReportForm" class="filter-form-dialog form-container bootstrap">
     <div class="form-elemet">
       <div class="input-container bootstrap">
@@ -44,34 +44,33 @@
     </div>
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Region<span class="required">*</span></label>
+        <label>Region</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage placeholder="All"
-            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
-            [fields]="regionFields" [selectAllText]='allOption' showSelectAll=true>
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
+                           [fields]="regionFields">
           </ejs-multiselect>
         </div>
       </div>
     </div>
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Location<span class="required">*</span></label>
+        <label>Location</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="locationIds" appValidateWithMessage
-            [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
-            [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields" [selectAllText]='allOption'
-            showSelectAll=true>
+                           [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields">
           </ejs-multiselect>
         </div>
       </div>
     </div>
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Department<span class="required">*</span></label>
+        <label>Department</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="departmentIds" appValidateWithMessage placeholder="All"
-            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
-            [fields]="departmentFields" [selectAllText]='allOption' showSelectAll=true>
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
+                           [fields]="departmentFields">
           </ejs-multiselect>
         </div>
       </div>
@@ -82,22 +81,22 @@
           <label>Agency<span class="required">*</span></label>
           <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="agencyIds"  placeholder="All" appValidateWithMessage
-              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="this.filterColumns.agencyIds.dataSource"
-              [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true>
+                             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="this.filterColumns.agencyIds.dataSource"
+                             [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
       </div>
     </div>
-    
+
     <div class="form-elemet">
       <div class="group">
         <div class="input-container bootstrap">
           <label>Candidate Name</label>
-          <div class="input-group dropdown">          
-            <ejs-autocomplete formControlName="candidateName"  [dataSource]="filterColumns.candidateName.dataSource" 
-             filterType='StartsWith' [fields]='candidateNameFields'
-                    [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
+          <div class="input-group dropdown">
+            <ejs-autocomplete formControlName="candidateName"  [dataSource]="filterColumns.candidateName.dataSource"
+                              filterType='StartsWith' [fields]='candidateNameFields'
+                              [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
           </div>
         </div>
         <div class="input-container dropdown">
@@ -118,7 +117,7 @@
           <label>Start Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-              appValidateWithMessage formControlName="startDate">
+                            appValidateWithMessage formControlName="startDate">
             </ejs-datepicker>
           </div>
         </div>
@@ -126,8 +125,8 @@
           <label>End Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-              appValidateWithMessage formControlName="endDate"
-              [min]="invoiceSummaryReportForm.controls['startDate'].value">
+                            appValidateWithMessage formControlName="endDate"
+                            [min]="invoiceSummaryReportForm.controls['startDate'].value">
             </ejs-datepicker>
           </div>
         </div>
