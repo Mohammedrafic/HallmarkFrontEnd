@@ -19,7 +19,7 @@ export class DepartmentFormService {
       startDate: [new Date(), [Validators.required]],
       endDate: [null],
       isOriented: [null],
-      homeCostCenter: [null],
+      isHomeCostCenter: [null],
     }) as CustomFormGroup<AssignDepartmentFormState>;
   }
 
@@ -38,7 +38,7 @@ export class DepartmentFormService {
       startDate: [null],
       endDate: [null],
       isOriented: [false],
-      homeCostCenter: [false],
+      isHomeCostCenter: [false],
       orientedStartDate: [null],
     }) as CustomFormGroup<EditDepartmentFormState>;
   }
@@ -84,7 +84,7 @@ export class DepartmentFormService {
   }
 
   public patchForm(formGroup: FormGroup, formData: DepartmentAssigned): void {
-    const { regionId, locationId, departmentId, startDate, endDate, isOriented } = formData;
+    const { regionId, locationId, departmentId, startDate, endDate, isOriented, isHomeCostCenter } = formData;
     formGroup.patchValue({
       regionId: regionId,
       locationId: locationId,
@@ -92,7 +92,7 @@ export class DepartmentFormService {
       startDate: startDate,
       endDate: endDate,
       isOriented: isOriented,
-      homeCostCenter: false,
+      isHomeCostCenter: isHomeCostCenter,
     })
   }
 }

@@ -37,6 +37,7 @@ import { OrganizationRegion, OrganizationLocation, OrganizationDepartment } from
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormService } from '../services/department-form.service';
 import { OptionFields } from '@client/order-management/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CustomFormGroup } from '@core/interface';
@@ -70,6 +71,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     private readonly cdr: ChangeDetectorRef,
     private readonly departmentService: DepartmentsService,
     private readonly departmentFormService: DepartmentFormService,
+    private readonly confirmService: ConfirmService,
     private readonly store: Store
   ) {
     super();
@@ -123,18 +125,17 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     this.saveForm$
       .pipe(
         switchMap(() => {
-          const formInvalid = this.assignDepartmentForm.invalid;
-          if (formInvalid) {
+          const formValid = this.assignDepartmentForm.valid;
+          if (!formValid) {
             this.assignDepartmentForm.markAllAsTouched();
             this.cdr.markForCheck();
-            return of(false);
           }
-          return this.saveAssignedDepartment();
+          return formValid ? this.saveAssignedDepartment() : of(formValid);
         }),
         takeUntil(this.destroy$)
       )
-      .subscribe((formValid) => {
-        if (formValid) {
+      .subscribe((success) => {
+        if (success) {
           this.resetAssignDepartmentForm();
           const MESSAGE = this.departmentId ? RECORD_MODIFIED : RECORD_ADDED;
           this.store.dispatch([new ShowSideDialog(false), new ShowToast(MessageTypes.Success, MESSAGE)]);

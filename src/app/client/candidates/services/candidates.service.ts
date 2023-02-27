@@ -26,7 +26,7 @@ export class CandidatesService {
   }
 
   public setActiveEmployeeWorkCommitment(commitment: CandidateWorkCommitment): void {
-    this.activeEmployeeWorkCommitment$.next(commitment)
+    this.activeEmployeeWorkCommitment$.next(commitment);
   }
 
   public getActiveEmployeeWorkCommitment(): Observable<CandidateWorkCommitment> {
