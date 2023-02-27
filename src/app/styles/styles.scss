@@ -608,3 +608,11 @@ body.dark .title, body.dark .contact-name {
 .credential-wrapper .checkbox-container {
   padding-bottom: 25px;
 }
+.document-grid .ag-body-viewport.ag-layout-auto-height.ag-row-no-animation {
+  height: calc(74vh - 164px) !important;
+  overflow: auto;
+}
+  
+.document-grid {
+  height: calc(89vh - 164px) !important;
+}
