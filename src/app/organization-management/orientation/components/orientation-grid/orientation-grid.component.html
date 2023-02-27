@@ -1,0 +1,137 @@
+<app-grid
+  [gridTitle]="gridTitle"
+  [rowData]="dataSource?.items || []"
+  [columnDefinitions]="columnDef"
+  [rowSelection]="'multiple'"
+  [totalRecordsCount]="dataSource?.totalCount || 0"
+  [pageSize]="filters.pageSize"
+  [currentPage]="filters.pageNumber"
+  (navigateToPageEmitter)="handleChangePage($event)"
+  (pageSizeChangeEmitter)="handleChangePageSize($event)"
+>
+  <button
+    *ngIf="gridTitle"
+    action-button
+    class="add-action"
+    cssClass="e-action-button"
+    ejs-button
+    (click)="showFilters()"
+    >
+    <div class="filter-button-content">
+      <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
+      Filters <i-feather name="sliders" class="icon"></i-feather>
+    </div>
+  </button>
+  <button
+    *ngIf="gridTitle"
+    action-button
+    class="add-action"
+    cssClass="e-action-button"
+    ejs-button
+    (click)="addRecord()"
+  >
+    <i-feather name="plus" class="icon"></i-feather>
+    Add Setup
+  </button>
+</app-grid>
+
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="dataSource?.totalCount || 0"
+  [targetElement]="targetElement"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
+  <form [formGroup]="filtersForm">
+    <div class="filter-row bootstrap">
+      <div class="input-container">
+        <label>Region</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="regionIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.regionIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Location</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="locationIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.locationIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Department</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="departmentsIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.departmentsIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="filter-row bootstrap">
+      <div class="input-container">
+        <label>Skill Category</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="skillCategoryIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.skillCategoryIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="filter-row bootstrap">
+      <div class="input-container">
+        <label>Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="skillIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.skillIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>

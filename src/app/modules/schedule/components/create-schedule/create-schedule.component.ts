@@ -36,13 +36,12 @@ import {
   ScheduleTypes,
   UnavailabilityFormConfig,
 } from '../../constants';
+import * as ScheduleInt from '../../interface';
 import { ScheduleBookingErrors, ScheduleFiltersConfig, ScheduleFilterStructure } from '../../interface';
 import { CreateScheduleService } from '../../services/create-schedule.service';
 import { ScheduleItemsComponent } from '../schedule-items/schedule-items.component';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
-import * as ScheduleInt from '../../interface';
-import {
-  CreateBookingSuccessMessage,
+import { CreateBookingSuccessMessage,
   CreateScheduleSuccessMessage,
   DisableScheduleControls,
   ScheduleFilterHelper,
@@ -98,6 +97,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   private shiftControlSubscription: Subscription | null;
   private scheduleShifts: ScheduleShift[] = [];
   private scheduleStructureList: ScheduleFilterStructure;
+  private firstLoadDialog = true;
 
   constructor(
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
@@ -137,9 +137,11 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
         )
         .subscribe(() => {
           this.handleCloseDialog();
+          this.firstLoadDialog = false;
         });
     } else {
       this.handleCloseDialog();
+      this.firstLoadDialog = false;
     }
   }
 
@@ -232,6 +234,9 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
         this.scheduleFormConfig = BookFormConfig;
         this.scheduleForm = this.createScheduleService.createBookForm();
         this.patchBookForm();
+        if(!this.firstLoadDialog) {
+          this.patchBookForSingleCandidate();
+        }
         break;
       case ScheduleItemType.Unavailability:
         this.scheduleFormConfig = UnavailabilityFormConfig;
@@ -273,27 +278,25 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   private isCandidatesFiltered(): boolean {
-    return !!this.selectedScheduleFilters.regionIds?.length && !!this.selectedScheduleFilters.locationIds?.length;
+    return !!this.selectedScheduleFilters?.regionIds?.length && !!this.selectedScheduleFilters?.locationIds?.length;
   }
 
   private patchBookForm(): void {
-    if (!this.isCandidatesFiltered()) {
-      return;
+    if (this.isCandidatesFiltered()) {
+      this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Regions] = this.scheduleFilterData.regionIds.dataSource;
+      this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations] = this.scheduleFilterData.locationIds.dataSource;
+      this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = this.scheduleFilterData.departmentsIds.dataSource;
+      this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = this.scheduleFilterData.skillIds.dataSource;
+
+      this.scheduleForm.get('regionId')?.setValue(((this.selectedScheduleFilters.regionIds as number[])[0]));
+      this.scheduleForm.get('locationId')?.setValue((this.selectedScheduleFilters.locationIds as number[])[0]);
+      this.scheduleForm.get('departmentId')?.setValue((this.selectedScheduleFilters.departmentsIds as number[])[0]);
+      if (this.selectedScheduleFilters.skillIds) {
+        this.scheduleForm.get('skillId')?.setValue((this.selectedScheduleFilters.skillIds as number[])[0]);
+      }
+
+      DisableScheduleControls(this.scheduleForm, ['regionId', 'locationId', 'departmentId']);
     }
-
-    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Regions] = this.scheduleFilterData.regionIds.dataSource;
-    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations] = this.scheduleFilterData.locationIds.dataSource;
-    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = this.scheduleFilterData.departmentsIds.dataSource;
-    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = this.scheduleFilterData.skillIds.dataSource;
-
-    this.scheduleForm.get('regionId')?.setValue(((this.selectedScheduleFilters.regionIds as number[])[0]));
-    this.scheduleForm.get('locationId')?.setValue((this.selectedScheduleFilters.locationIds as number[])[0]);
-    this.scheduleForm.get('departmentId')?.setValue((this.selectedScheduleFilters.departmentsIds as number[])[0]);
-    if (this.selectedScheduleFilters.skillIds) {
-      this.scheduleForm.get('skillId')?.setValue((this.selectedScheduleFilters.skillIds as number[])[0]);
-    }
-
-    DisableScheduleControls(this.scheduleForm, ['regionId', 'locationId', 'departmentId']);
   }
 
   private watchForControls(): void {
@@ -326,8 +329,13 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
         }),
         takeUntil(this.componentDestroy())
       ).subscribe((skills: Skill[]) => {
-        this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
+        const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
+        this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = skillOption;
 
+        if(this.firstLoadDialog && this.isSelectedCandidateWithoutFilters()) {
+          this.scheduleForm?.get('skillId')?.setValue(skillOption[0]?.value);
+          this.firstLoadDialog = false;
+        }
         this.cdr.markForCheck();
       });
     }
@@ -337,6 +345,21 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
     this.scheduleStructureList = structure;
     this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Regions] =
       ScheduleFilterHelper.adaptRegionToOption(structure.regions);
+
+    this.patchBookForSingleCandidate();
+  }
+
+  private patchBookForSingleCandidate(): void {
+    if(this.isSelectedCandidateWithoutFilters()) {
+      this.scheduleForm?.get('regionId')?.setValue(this.scheduleStructureList.regions[0].id);
+      this.scheduleForm?.get('locationId')?.setValue(this.scheduleFormSourcesMap.locations[0]?.value);
+      this.scheduleForm?.get('departmentId')?.setValue(this.scheduleFormSourcesMap.departments[0]?.value);
+      this.scheduleForm?.get('skillId')?.setValue(this.scheduleFormSourcesMap.skill[0]?.value);
+    }
+  }
+
+  private isSelectedCandidateWithoutFilters(): boolean {
+    return !this.isCandidatesFiltered() && this.scheduleSelectedSlots.candidates?.length === 1;
   }
 
   private watchForScheduleType(): void {
@@ -404,6 +427,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   private handleSuccessSaveDate(message: string): void {
     this.updateScheduleGrid.emit();
     this.scheduleForm.markAsUntouched();
+    this.closeDialog();
     this.store.dispatch(new ShowToast(MessageTypes.Success, message));
   }
 }

@@ -1,3 +1,6 @@
+@import 'colors';
+@import 'mixins';
+
 :host {
   height: calc(100vh - 340px);
 }
@@ -6,6 +9,32 @@
   ::ng-deep {
     .ag-header-cell-text {
       white-space: normal;
+    }
+
+    .ag-cell {
+      padding: 8px 12px;
+
+      .edit-button {
+        padding: 6px 10px;
+
+        @include grid-action-button(
+          $secondary_dark-blue-20,
+          $primary-active-blue,
+          $primary-active-blue-70,
+          $secondary-dark-blue-40
+        );
+      }
+
+      .remove-button {
+        padding: 6px 10px;
+
+        @include grid-action-button(
+          $supportive-red,
+          $supportive-red-00,
+          $supportive-red-40,
+          $supportive-red-40
+        );
+      }
     }
   }
 }

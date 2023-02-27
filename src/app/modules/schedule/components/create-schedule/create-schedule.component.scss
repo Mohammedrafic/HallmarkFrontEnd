@@ -65,7 +65,7 @@ app-schedule-items {
 
 .availability-form {
   display: grid;
-  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.6fr;
+  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.7fr;
   grid-template-rows: 1fr;
   gap: 12px;
   grid-auto-flow: row;
@@ -75,7 +75,7 @@ app-schedule-items {
 
 .unavailability-form {
   display: grid;
-  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.6fr;
+  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.7fr;
   grid-template-rows: 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
@@ -86,7 +86,7 @@ app-schedule-items {
 
 .book-form {
   display: grid;
-  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.6fr;
+  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.7fr;
   grid-template-rows: 1fr 1fr 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;

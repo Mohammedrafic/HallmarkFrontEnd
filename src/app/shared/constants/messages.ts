@@ -69,6 +69,7 @@ export const deployedCandidateMessage = (orderIds: string[]) =>
   `<span class="deployed-candidate__message">Candidate is already working on order <span class="deployed-candidate__order-id"> ${orderIds.join(
     ', '
   )}</span>. Do you wish to proceed?</span>`;
+export const CHANGES_SAVED = 'Changes have been saved';
 export const SEND_EMAIL = 'Sent email';
 export const SEND_EMAIL_REQUIRED = 'Required';
 export const DOCUMENT_UPLOAD_SUCCESS = 'Document uploaded successfully';
@@ -87,8 +88,8 @@ export const UpdateRegularRatesucceedcount = (count: number) =>
 
 export const DOCUMENT_DOWNLOAD_SUCCESS = 'Document downloaded successfully';
 export const SubmissionsLimitReached = 'The order has reached its submission limit';
-export const EDIT_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to edit multiple records';
-export const DELETE_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to delete multiple records';
+export const EDIT_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to edit multiple records?';
+export const DELETE_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to delete multiple records?';
 export const BLOCK_RECORD_TEXT = 'Are you sure you want to block?';
 export const BLOCK_RECORD_TITLE = 'Block Record';
 export const BLOCK_RECORD_SUCCESS = 'Record Blocked';

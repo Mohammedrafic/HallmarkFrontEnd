@@ -128,6 +128,13 @@ const routes: Routes = [
         },
       },
       {
+        path: 'orientation',
+        loadChildren: () => import('./orientation/orientation.module').then((m) => m.OrientationModule),
+        data: {
+          isOrganizationArea: true,
+        },
+      },
+      {
         path: 'specialproject',
         component: SpecialProjectContainerComponent,
         data: {

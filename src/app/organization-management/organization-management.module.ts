@@ -139,6 +139,7 @@ import { ReasonsModule } from './reasons/reasons.module';
 import { SingleMultipleSkillPipe } from './departments/single-multiple-skill.pipe';
 import { JoinPipeModule } from '@shared/pipes/join.pipe';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
+import { OrientationModule } from './orientation/orientation.module';
 
 const sidebarIcons = {
   Download,
@@ -269,6 +270,7 @@ const sidebarIcons = {
     IrpSystemGridTextPipeModule,
     BoolValuePipeModule,
     ReasonsModule,
+    OrientationModule,
     JoinPipeModule
   ],
   exports: [BillRatesComponent],

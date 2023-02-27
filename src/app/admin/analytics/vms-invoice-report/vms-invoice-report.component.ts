@@ -53,7 +53,9 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     "InvoiceIdParamVMSIR": "",
     "BearerParamVMSIR": "",
     "BusinessUnitIdParamVMSIR": "",
-    "HostName": ""
+    "HostName": "",
+    "organizationNameVMSIR": "",
+    "reportPulledMessageVMSIR": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReport/VMSInvoiceReport.wls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReport/VMSInvoiceReport.cat" };
@@ -385,7 +387,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
 
-
+    let currentDate = new Date(Date.now());
 
     this.paramsData =
     {
@@ -405,7 +407,9 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "HostName": this.baseUrl
+      "HostName": this.baseUrl,
+      "organizationNameVMSIR": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "reportPulledMessageVMSIR": "Report pulled on " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString()
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

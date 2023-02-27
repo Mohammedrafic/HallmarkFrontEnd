@@ -56,7 +56,7 @@
     <i-feather *ngIf="dateItem.scheduleType === scheduleType.Unavailability" name="alert-triangle" class="icon"></i-feather>
     <i-feather *ngIf="dateItem.scheduleType === scheduleType.Book" name="briefcase" class="icon"></i-feather>
     <span>{{dateItem.date | date: "MM/dd/yyyy"}}
-      <span class="schedule-type" *ngIf="dateItem.scheduleType === scheduleType.Book">L</span>
+      <span class="schedule-type" *ngIf="dateItem.scheduleType === scheduleType.Book && dateItem.orderType === ltaOrder">L</span>
     </span>
     <button ejs-button cssClass="e-flat" (click)="removeDateItem(item.candidateId, dateItem.dateValue, dateItem.id)">
       <i-feather name="x" class="icon"></i-feather>

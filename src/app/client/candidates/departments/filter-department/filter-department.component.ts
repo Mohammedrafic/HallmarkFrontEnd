@@ -32,9 +32,9 @@ import { DepartmentHelper } from '../helpers/department.helper';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterDepartmentComponent extends DestroyableDirective implements OnInit {
-  @Output() readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();
-  @Output() readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
-  @Output() readonly updateTableByFilters: EventEmitter<DepartmentFilterState> =
+  @Output() public readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();
+  @Output() public readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
+  @Output() public readonly updateTableByFilters: EventEmitter<DepartmentFilterState> =
     new EventEmitter<DepartmentFilterState>();
 
   public filtersFormConfig: ReadonlyArray<DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>> = [];
@@ -90,7 +90,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     this.appliedFiltersAmount.emit(this.filteredItems.length);
     this.resetFilters.emit();
     this.filterColumns.locationIds.dataSource = [];
-    this.filterColumns.departmentIds.dataSource = [];
+    this.filterColumns.departmentsIds.dataSource = [];
     this.cdr.markForCheck();
   }
 
@@ -167,7 +167,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
       .get('locationIds')
       ?.valueChanges.pipe(filter(Boolean), takeUntil(this.destroy$))
       .subscribe((val: number[]) => {
-        this.filterColumns.departmentIds.dataSource = [];
+        this.filterColumns.departmentsIds.dataSource = [];
         if (val?.length) {
           const locationDataSource = this.filterColumns.locationIds.dataSource as OrganizationLocation[];
           const selectedLocations: OrganizationLocation[] = DepartmentHelper.findSelectedItems(val, locationDataSource) as OrganizationLocation[];
@@ -175,7 +175,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
             (location) => location.departments
           );
 
-          this.filterColumns.departmentIds.dataSource = locationDepartments;
+          this.filterColumns.departmentsIds.dataSource = locationDepartments;
         } else {
           this.formGroup.get('departmentIds')?.setValue([]);
           this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);

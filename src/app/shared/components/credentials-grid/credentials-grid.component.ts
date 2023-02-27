@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { OutsideZone } from '@core/decorators';
@@ -208,7 +208,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     private actions$: Actions,
     private credentialGridService: CredentialGridService,
     private confirmService: ConfirmService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
@@ -389,6 +390,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.credentialStatus = status as CredentialStatus;
     this.masterCredentialId = masterCredentialId;
     this.setExistingFiles(credentialFiles);
+
     this.store.dispatch(
       new GetCredentialStatuses(
         this.isOrganizationSide ?? true,
@@ -397,16 +399,19 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         id as number
       )
     );
+
     this.store
       .dispatch(new ShowSideDialog(true))
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.setDropElement();
       });
+
     this.searchCredentialForm.patchValue({
       searchTerm: masterName,
       credentialTypeId: credentialTypeName,
     });
+
     this.addCredentialForm.patchValue({
       insitute,
       createdOn,
@@ -508,12 +513,13 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }: CandidateCredential): void {
     if (this.masterCredentialId) {
       if (createdOn != null) {
-        createdOn = DateTimeHelper.setInitHours(createdOn);
+        createdOn = DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(createdOn));
       }
 
       if (createdUntil != null) {
-        createdUntil = DateTimeHelper.setInitHours(createdUntil);
+        createdUntil = DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(createdUntil));
       }
+
       if (this.isOrganizationAgencyArea.isAgencyArea) {
         this.store.dispatch(
           new SaveCandidatesCredential({

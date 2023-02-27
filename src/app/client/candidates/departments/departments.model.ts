@@ -68,18 +68,27 @@ export type DepartmentFiltersColumns = {
   };
 };
 
+export interface AssignDepartmentFormState {
+  regionId: number;
+  locationId: number;
+  departmentId: number;
+  startDate: Date;
+  endDate: Date | null;
+  isOriented: boolean;
+  homeCostCenter: boolean;
+}
+
 export interface DepartmentFilterState {
-  regionId: number[];
-  locationId: number[];
-  departmentId: number[];
-  skills: number[];
+  regionIds: number[];
+  locationIds: number[];
+  departmentsIds: number[];
+  skillIds: number[];
   oriented: boolean;
 }
 export interface EditDepartmentFormState {
   [EditDepartmentFields.START_DATE]: Date;
   [EditDepartmentFields.END_DATE]: Date;
-  [EditDepartmentFields.ORIENTED]: boolean;
-  [EditDepartmentFields.HOME_COST_CENTER]: boolean;
+  [EditDepartmentFields.IS_ORIENTED]: boolean;
   [EditDepartmentFields.ORIENTED_START_DATE]?: Date;
 }
 export interface DepartmentHierarchy {
@@ -111,6 +120,11 @@ export interface NewDepartmentPayload {
   isOriented: boolean;
   startDate: string;
   endDate: string | undefined;
+}
+
+export interface DateRanges {
+  min?: Date;
+  max?: Date;
 }
 
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;

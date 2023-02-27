@@ -1,7 +1,7 @@
 export enum DepartmentFiltersColumnsEnum {
   REGION = 'regionIds',
   LOCATION = 'locationIds',
-  DEPARTMENT = 'departmentIds',
+  DEPARTMENT = 'departmentsIds',
   SKILLS = 'skillIds',
   ORIENTED = 'oriented',
 }

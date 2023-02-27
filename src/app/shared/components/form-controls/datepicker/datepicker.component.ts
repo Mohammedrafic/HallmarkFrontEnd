@@ -21,7 +21,7 @@ export class DatepickerComponent extends BaseFormControlDirective {
   @Input() format: string | FormatObject = 'MM/dd/yyyy';
   @Input() enableMask: boolean = true;
   @Input() maskPlaceholder: MaskPlaceholderModel = datepickerMask;
-  @Input() min: Date | null;
-  @Input() max: Date | null;
+  @Input() min: Date | null | undefined;
+  @Input() max: Date | null | undefined;
   @Input() public override placeholder = 'MM/DD/YYYY';
 }

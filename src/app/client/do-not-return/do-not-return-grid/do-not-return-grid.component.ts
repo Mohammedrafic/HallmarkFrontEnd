@@ -175,11 +175,11 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.addActiveCssClass(event);
     this.getEditBasedValues(data, event);
     setTimeout(() =>
-      this.doNotReturnFormGroup.setValue({
+      this.doNotReturnFormGroup.patchValue({
         id: data.id,
         businessUnitId: data.businessUnitId,
         candidateProfileId: data.candidateProfileId,
-        locationIds: data.locations.split(','),
+        locationIds: (data.locations.split(',')).map(m => parseInt(m)),
         locations: data.locations,
         dnrComment: data.dnrComment,
         ssn: data.ssn,
@@ -194,6 +194,9 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
   getEditBasedValues(data: DonoreturnAddedit, event: any) {
     this.store.dispatch(new DoNotReturn.GetLocationByOrgId(data.businessUnitId))
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((result) => {
+      });
     let filter: DoNotReturnCandidateListSearchFilter = {
       candidateProfileId: data.candidateProfileId
     };

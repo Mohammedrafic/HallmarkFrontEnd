@@ -21,10 +21,10 @@ export const HrInternalTransfersRecruitments = [
 ];
 
 export const OrientationConfigurations = [
-  { id: 0, name: 'Organization wise' },
-  { id: 1, name: 'Region wise' },
-  { id: 2, name: 'Location wise' },
-  { id: 3, name: 'Department wise' }
+  { id: 0, name: 'Organization' },
+  { id: 1, name: 'Region' },
+  { id: 2, name: 'Location' },
+  { id: 3, name: 'Department' }
 ];
 
 export const HrCompanyCodes = [
