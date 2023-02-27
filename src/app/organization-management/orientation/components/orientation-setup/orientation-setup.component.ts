@@ -189,6 +189,9 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
         this.selectedOrientationSettings = null;
         this.orientationTypeSettingsForm.reset();
       }
+      if (!this.userPermission[this.userPermissions.CanEditOrientation]) {
+        this.orientationTypeSettingsForm.disable({ emitEvent: false });
+      }
       this.setGRidControlsState();
     });
   }
