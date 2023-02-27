@@ -20,7 +20,7 @@ export class CredentialsComponent extends AbstractPermission implements OnInit {
   constructor(
     protected override store: Store,
     private credentialStorage: CredentialStorageFacadeService,
-    private candidateService: CandidatesService
+    public candidateService: CandidatesService
   ) {
     super(store);
   }
