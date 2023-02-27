@@ -109,6 +109,11 @@ export class GetCandidatesCredentialByPage {
   constructor(public credentialRequestParams: CredentialRequestParams, public candidateProfileId: number) {}
 }
 
+export class ClearCandidatesCredentials {
+  static readonly type = '[candidate] Clear Candidates Credentials';
+  constructor() {}
+}
+
 export class GetMasterCredentials {
   static readonly type = '[candidate] Get Master Credentials by searchTerm and credentialTypeId';
   constructor(public searchTerm: string, public credentialTypeId: number | string) {}

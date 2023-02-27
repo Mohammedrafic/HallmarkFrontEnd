@@ -14,6 +14,7 @@ import { CustomFormGroup, Permission } from '@core/interface';
 import { FileSize, UserPermissions } from '@core/enums';
 import { DateTimeHelper } from '@core/helpers';
 import {
+  ClearCandidatesCredentials,
   DownloadCredentialFiles,
   DownloadCredentialFilesSucceeded,
   GetCandidatesCredentialByPage,
@@ -82,6 +83,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() userPermission: Permission;
   @Input() employee: string | null;
   @Input() isIRP: boolean = false;
+  @Input() set employeeId(value: number | null | undefined) {
+    if (value) {
+      this.candidateProfileId = value;
+    }
+  }
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
@@ -116,7 +122,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private credentialStatus = CredentialStatus.Pending;
   private removeExistingFiles = false;
   private file: CredentialFile | null;
-  private readonly candidateProfileId: number;
+  private candidateProfileId: number;
   public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
 
   @Select(CandidateState.candidateCredential)
@@ -232,6 +238,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnDestroy(): void {
+    this.store.dispatch(new ClearCandidatesCredentials());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
