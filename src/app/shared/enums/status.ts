@@ -128,6 +128,12 @@ export enum FilterOrderStatusText {
   'In Progress' = 'InProgress',
   Filled = 'Filled',
   Closed = 'Closed',
+  NoRecordsFound = "NoRecordsFound"
+}
+
+export enum LocalStorageStatus {
+  Ordercountzero = "Ordercountzero",
+  OrdersforApproval = "OrdersforApproval"
 }
 
 export enum CandidatesStatusText {
