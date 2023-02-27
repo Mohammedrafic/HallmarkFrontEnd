@@ -16,23 +16,25 @@
 
       .edit-button {
         padding: 6px 10px;
+        opacity: 1 !important;
 
         @include grid-action-button(
-          $secondary_dark-blue-20,
+          $primary-active-blue-10,
           $primary-active-blue,
           $primary-active-blue-70,
-          $secondary-dark-blue-40
+          $secondary-dark-blue-30
         );
       }
 
       .remove-button {
         padding: 6px 10px;
+        opacity: 1 !important;
 
         @include grid-action-button(
           $supportive-red,
           $supportive-red-00,
           $supportive-red-40,
-          $supportive-red-40
+          $secondary-dark-blue-30
         );
       }
     }
