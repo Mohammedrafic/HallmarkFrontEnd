@@ -8,14 +8,16 @@ import { SkillCategoryRendererComponent } from '../components/orientation-grid/s
 
 export const OrientationColumnDef = (
   editCallback: (value: OrientationConfiguration) => void,
-  deleteCallback: (value: OrientationConfiguration) => void
+  deleteCallback: (value: OrientationConfiguration) => void,
+  gridActionsParams: { disableControls: boolean }
 ) => ([
   {
-    field: '',
+    field: 'id',
     headerName: '',
     cellRenderer: OrientationGridActionRendererComponent,
     maxWidth: 100,
     cellRendererParams: {
+      gridActionsParams: gridActionsParams,
       edit: (value: OrientationConfiguration) => {
         editCallback(value);
       },

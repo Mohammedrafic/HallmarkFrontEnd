@@ -35,6 +35,10 @@ import { UserState } from 'src/app/store/user.state';
 export class OrientationGridComponent extends AbstractPermissionGrid implements OnInit {
   @Input() public gridTitle: string;
   @Input() public dataSource: OrientationConfigurationPage;
+  @Input('disableControls') set disableControls(value: boolean) {
+    this.gridActionsParams.disableControls = value;
+    this.columnDef = OrientationColumnDef(this.edit.bind(this), this.delete.bind(this), this.gridActionsParams);
+  };
   @Input('skillCategories') set skillCategories(value: SkillCategory[] | undefined) {
     if (value) {
       this.filterColumns.skillCategoryIds.dataSource = value as [];
@@ -69,6 +73,9 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     text: 'name',
     value: 'id',
   };
+  public gridActionsParams = {
+    disableControls: false
+  }
   protected componentDestroy: () => Observable<unknown>;
 
   @Select(UserState.lastSelectedOrganizationId)
@@ -86,7 +93,6 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     private orientationService: OrientationService,
   ) {
     super(store);
-    this.columnDef = OrientationColumnDef(this.edit.bind(this), this.delete.bind(this));;
   }
 
   public override ngOnInit(): void {
