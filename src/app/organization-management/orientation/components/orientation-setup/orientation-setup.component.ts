@@ -45,10 +45,11 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   public isEdit: boolean = false;
   public isArchive: boolean = false;
   public orientationTypeDataSource = OrientationTypeDataSource;
-  public selectedOrientationSettings: OrientationType;
+  public selectedOrientationSettings: OrientationType | null;
   public regionToggleDisable = false;
   public locationToggleDisable = false;
   public departmentToggleDisable = false;
+  public disableControls: boolean =  false;
 
   public switcherValue = 'Off';
   public settingIsOff = true;
@@ -100,7 +101,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   }
 
   private getSkills(): void {
-    this.store.dispatch([new GetAllSkillsCategories()]);
+    this.store.dispatch([new GetAllSkillsCategories({ params: { SystemType: SystemType.IRP } })]);
   }
 
   private watchForOrgChange(): void {
@@ -172,15 +173,26 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     });
   }
 
+  private setGRidControlsState(): void {
+    this.disableControls = (this.settingIsOff || this.selectedOrientationSettings === null);
+    this.cd.detectChanges();
+  }
+
   private getOrientationSettings(): void {
     this.orientationService.getOrientationSetting().subscribe(setting => {
       if (setting) {
+        this.settingIsOff = !setting.isEnabled;
         this.selectedOrientationSettings = setting.type;
         this.orientationTypeHandler(this.selectedOrientationSettings);
         this.orientationTypeSettingsForm.patchValue(setting);
       } else {
+        this.selectedOrientationSettings = null;
         this.orientationTypeSettingsForm.reset();
       }
+      if (!this.userPermission[this.userPermissions.CanEditOrientation]) {
+        this.orientationTypeSettingsForm.disable({ emitEvent: false });
+      }
+      this.setGRidControlsState();
     });
   }
 
@@ -188,6 +200,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     const { isEnabled, type } = this.orientationTypeSettingsForm.getRawValue();
     this.orientationService.saveOrientationSetting({ isEnabled, type }).subscribe(() => {
       this.orientationTypeSettingsForm.markAsPristine();
+      this.setGRidControlsState();
       this.selectedOrientationSettings = type;
       this.orientationTypeHandler(this.selectedOrientationSettings);
       this.getOrientationConfigs();
@@ -222,7 +235,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     });
   }
 
-  public orientationTypeHandler(type: OrientationType): void {
+  public orientationTypeHandler(type: OrientationType | null): void {
     if (type === OrientationType.OrganizationWise) {
       this.orientationForm.controls['regionIds'].disable();
       this.orientationForm.controls['locationIds'].disable();

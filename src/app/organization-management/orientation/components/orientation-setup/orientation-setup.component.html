@@ -34,7 +34,8 @@
     (onDelete)="deleteRecord($event)"
     [dataSource]="dataSource"
     [skillCategories]="(allSkillsCategories$ | async)?.items"
-    [regions]="regions">
+    [regions]="regions"
+    [disableControls]="disableControls">
   </app-orientation-grid>
 </section>
 

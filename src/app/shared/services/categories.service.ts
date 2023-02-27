@@ -5,6 +5,7 @@ import { map, Observable } from 'rxjs';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { SkillParams } from '@client/order-management/interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class CategoriesService {
@@ -25,8 +26,14 @@ export class CategoriesService {
    * Get all skills categories by page number
    * @return list of skills categories
    */
-  public getAllSkillsCategories(): Observable<SkillCategoriesPage> {
-    return this.http.get<SkillCategoriesPage>(`/api/skillCategories`, { params: { PageNumber: 1, PageSize: 2147483647 }}).pipe(map((data) => ({
+  public getAllSkillsCategories(params?: SkillParams): Observable<SkillCategoriesPage> {
+    let getParams;
+    if (params) {
+      getParams = { params: { SystemType: params.params.SystemType, PageNumber: 1, PageSize: 2147483647 }};
+    } else {
+      getParams = { params: { PageNumber: 1, PageSize: 2147483647 }};
+    }
+    return this.http.get<SkillCategoriesPage>(`/api/skillCategories`, getParams).pipe(map((data) => ({
       ...data,
       items: sortByField(data.items, 'name')
     })));

@@ -930,9 +930,9 @@ export class OrganizationManagementState {
   @Action(GetAllSkillsCategories)
   GetAllSkillsCategories(
     { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: GetAllSkillsCategories
+    { params }: GetAllSkillsCategories
   ): Observable<SkillCategoriesPage> {
-    return this.categoriesService.getAllSkillsCategories().pipe(
+    return this.categoriesService.getAllSkillsCategories(params).pipe(
       tap((payload) => {
         patchState({ allSkillsCategories: payload });
         return payload;

@@ -28,6 +28,7 @@
     class="add-action"
     cssClass="e-action-button"
     ejs-button
+    [disabled]="gridActionsParams.disableControls || !userPermission[userPermissions.CanEditOrientation]"
     (click)="addRecord()"
   >
     <i-feather name="plus" class="icon"></i-feather>
