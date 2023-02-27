@@ -47,11 +47,12 @@
           <button
             [disabled]="disableBulkButton"
             (click)="bulkEventEmitter.emit(bulkTypeAction.EDIT)"
-            class="approve-button"
+            class="edit-button"
             ejs-button
             cssClass="e-primary"
           >
-            Edit
+            <i-feather name="edit" class="icon"></i-feather>
+            <span>Edit</span>
           </button>
         </app-tooltip-container>
 
@@ -59,11 +60,12 @@
           <button
             [disabled]="disableBulkButton"
             (click)="bulkEventEmitter.emit(bulkTypeAction.DELETE)"
-            class="approve-button"
+            class="delete-button"
             ejs-button
             cssClass="e-primary"
           >
-            Delete
+            <i-feather name="trash-2" class="icon"></i-feather>
+            <span>Delete</span>
           </button>
         </app-tooltip-container>
 

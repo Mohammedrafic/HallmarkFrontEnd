@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { CandidateTabsEnum } from '@client/candidates/enums/candidate-tabs.enum';
+import { CandidateWorkCommitment } from '../candidate-work-commitment/models/candidate-work-commitment.model';
 
 @Injectable()
 export class CandidatesService {
   private selectedTab$: BehaviorSubject<CandidateTabsEnum> = new BehaviorSubject<CandidateTabsEnum>(CandidateTabsEnum.CandidateProfile);
   private candidateName$: Subject<string> = new Subject<string>();
-  private employeeWorkCommitmentId$: Subject<number> = new Subject<number>();
+  private activeEmployeeWorkCommitment$: Subject<CandidateWorkCommitment> = new Subject<CandidateWorkCommitment>();
 
   public employeeId: number | null;
   public constructor() {
@@ -24,12 +25,12 @@ export class CandidatesService {
     this.candidateName$.next(name);
   }
 
-  public setActiveEmployeeWorkCommitmentId(id: number): void {
-    this.employeeWorkCommitmentId$.next(id)
+  public setActiveEmployeeWorkCommitment(commitment: CandidateWorkCommitment): void {
+    this.activeEmployeeWorkCommitment$.next(commitment)
   }
 
-  public getEmployeeWorkCommitmentId(): Observable<number> {
-    return this.employeeWorkCommitmentId$.asObservable();
+  public getActiveEmployeeWorkCommitment(): Observable<CandidateWorkCommitment> {
+    return this.activeEmployeeWorkCommitment$.asObservable();
   }
 
   public changeTab(tab: CandidateTabsEnum): void {
