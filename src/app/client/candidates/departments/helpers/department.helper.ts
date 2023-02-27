@@ -7,19 +7,20 @@ import {
 } from '../departments.model';
 
 export class DepartmentHelper {
-  static elitDepartmentPayload(
+  static editDepartmentPayload(
     formData: EditAssignedDepartment,
     departmentIds: number[] | null,
     employeeWorkCommitmentId: number
   ): EditDepartmentPayload {
-    const { startDate, endDate, homeCostCenter, orientedStartDate, isOriented } = formData;
+    const { startDate, endDate, isHomeCostCenter, orientedStartDate, isOriented } = formData;
     return {
+      forceUpdate: false,
       employeeWorkCommitmentId: employeeWorkCommitmentId,
       startDate: startDate && DateTimeHelper.toUtcFormat(startDate),
       endDate: endDate && DateTimeHelper.toUtcFormat(endDate),
       ids: departmentIds,
       ...(orientedStartDate && { orientedStartDate: DateTimeHelper.toUtcFormat(orientedStartDate) }),
-      ...(homeCostCenter && { homeCostCenter }),
+      ...(isHomeCostCenter && { isHomeCostCenter }),
       ...(isOriented && { isOriented }),
     };
   }
@@ -27,6 +28,7 @@ export class DepartmentHelper {
   static newDepartmentPayload(formData: AssignNewDepartment, employeeWorkCommitmentId: number): NewDepartmentPayload {
     const { departmentId, startDate, endDate, isOriented } = formData;
     return {
+      forceUpdate: false,
       employeeWorkCommitmentId: employeeWorkCommitmentId,
       departmentId: departmentId,
       isOriented: !!isOriented,

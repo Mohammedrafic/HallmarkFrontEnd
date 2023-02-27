@@ -20,6 +20,7 @@ export interface DepartmentAssigned {
   isOriented: boolean;
   startDate: Date;
   endDate: Date;
+  isHomeCostCenter: boolean;
 }
 
 interface Skill {
@@ -32,7 +33,7 @@ export interface EditAssignedDepartment {
   startDate: Date | string;
   endDate: Date | string;
   orientedStartDate?: Date | string;
-  homeCostCenter?: boolean;
+  isHomeCostCenter?: boolean;
   isOriented?: boolean;
 }
 
@@ -75,7 +76,7 @@ export interface AssignDepartmentFormState {
   startDate: Date;
   endDate: Date | null;
   isOriented: boolean;
-  homeCostCenter: boolean;
+  isHomeCostCenter: boolean;
 }
 
 export interface DepartmentFilterState {
@@ -105,8 +106,9 @@ export interface AssignDepartmentHierarchy {
 }
 
 export interface EditDepartmentPayload {
+  forceUpdate: boolean;
   isOriented?: true | undefined;
-  homeCostCenter?: true | undefined;
+  isHomeCostCenter?: true | undefined;
   orientedStartDate?: string | undefined;
   employeeWorkCommitmentId: number;
   startDate: string;
@@ -115,6 +117,7 @@ export interface EditDepartmentPayload {
 }
 
 export interface NewDepartmentPayload {
+  forceUpdate: boolean;
   employeeWorkCommitmentId: number;
   departmentId: number;
   isOriented: boolean;

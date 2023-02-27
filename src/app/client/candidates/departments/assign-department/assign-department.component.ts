@@ -127,14 +127,14 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       .pipe(
         switchMap(() => {
           const formInvalid = this.assignDepartmentForm.invalid;
-          const { homeCostCenter } = this.assignDepartmentForm.getRawValue();
+          const { isHomeCostCenter } = this.assignDepartmentForm.getRawValue();
           const hasHomeCostCenter = true;
           if (formInvalid) {
             this.assignDepartmentForm.markAllAsTouched();
             this.cdr.markForCheck();
             return of(false);
           }
-          if (hasHomeCostCenter && homeCostCenter) {
+          if (hasHomeCostCenter && isHomeCostCenter) {
             return this.handleHomeCostCenter();
           }
           return of(true);
