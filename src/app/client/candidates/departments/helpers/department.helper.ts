@@ -26,7 +26,7 @@ export class DepartmentHelper {
   }
 
   static newDepartmentPayload(formData: AssignNewDepartment, employeeWorkCommitmentId: number): NewDepartmentPayload {
-    const { departmentId, startDate, endDate, isOriented } = formData;
+    const { departmentId, startDate, endDate, isOriented, isHomeCostCenter } = formData;
     return {
       forceUpdate: false,
       employeeWorkCommitmentId: employeeWorkCommitmentId,
@@ -34,6 +34,7 @@ export class DepartmentHelper {
       isOriented: !!isOriented,
       startDate: startDate && DateTimeHelper.toUtcFormat(startDate),
       endDate: endDate && DateTimeHelper.toUtcFormat(endDate),
+      ...(isHomeCostCenter && { isHomeCostCenter }),
     };
   }
 

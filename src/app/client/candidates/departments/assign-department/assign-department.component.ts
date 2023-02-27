@@ -38,7 +38,6 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormService } from '../services/department-form.service';
 import { OptionFields } from '@client/order-management/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { ASSIGN_HOME_COST_CENTER, WARNING_TITLE } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CustomFormGroup } from '@core/interface';
@@ -126,18 +125,12 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     this.saveForm$
       .pipe(
         switchMap(() => {
-          const formInvalid = this.assignDepartmentForm.invalid;
-          const { isHomeCostCenter } = this.assignDepartmentForm.getRawValue();
-          const hasHomeCostCenter = true;
-          if (formInvalid) {
+          const formValid = this.assignDepartmentForm.valid;
+          if (!formValid) {
             this.assignDepartmentForm.markAllAsTouched();
             this.cdr.markForCheck();
-            return of(false);
           }
-          if (hasHomeCostCenter && isHomeCostCenter) {
-            return this.handleHomeCostCenter();
-          }
-          return of(true);
+          return of(formValid);
         }),
         switchMap((formValid) => (formValid ? this.saveAssignedDepartment() : of(formValid))),
         takeUntil(this.destroy$)
@@ -151,16 +144,6 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
           this.refreshGrid.emit();
         }
       });
-  }
-
-  private handleHomeCostCenter(): Observable<boolean> {
-    return this.confirmService
-      .confirm(ASSIGN_HOME_COST_CENTER, {
-        title: WARNING_TITLE,
-        okButtonLabel: 'Yes',
-        okButtonClass: 'ok-button',
-      })
-      .pipe(filter(Boolean));
   }
 
   private saveAssignedDepartment(): Observable<AssignNewDepartment | EditAssignedDepartment> {

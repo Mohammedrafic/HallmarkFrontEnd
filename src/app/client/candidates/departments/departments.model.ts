@@ -45,6 +45,7 @@ export interface AssignNewDepartment {
   departmentId: number;
   startDate: Date | string;
   endDate?: Date | string;
+  isHomeCostCenter?: boolean;
 }
 
 export interface DepartmentFormFieldConfig<T> {
@@ -123,6 +124,7 @@ export interface NewDepartmentPayload {
   isOriented: boolean;
   startDate: string;
   endDate: string | undefined;
+  isHomeCostCenter?: boolean;
 }
 
 export interface DateRanges {
