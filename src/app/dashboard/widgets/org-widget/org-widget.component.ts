@@ -3,6 +3,7 @@ import { Actions } from '@ngxs/store';
 import { OrgDetailsInfoModel } from '../../models/org-details-info.model';
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalWindow } from '@core/tokens';
+import { LocalStorageStatus } from '@shared/enums/status';
 
 @Component({
   selector: 'app-org-widget',
@@ -29,7 +30,7 @@ export class OrgWidgetComponent {
     this.mousePosition.y = $event.screenY;
   }
   public toSourceContent(orgname: string): void {
-    if(orgname === 'OrdersforApproval'){
+    if(orgname === LocalStorageStatus.OrdersforApproval){
       if(this.chartData?.pendingOrders == 0){
         this.globalWindow.localStorage.setItem("pendingApprovalOrders",JSON.stringify(this.countzero))
       } else {
