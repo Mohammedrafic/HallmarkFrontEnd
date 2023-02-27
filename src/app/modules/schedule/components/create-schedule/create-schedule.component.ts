@@ -26,7 +26,7 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ShiftsService } from '@shared/services/shift.service';
-import { convertMsToTime, getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
+import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import {
   AvailabilityFormConfig,
   BookFormConfig,
@@ -161,17 +161,8 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
     const startTimeDate = this.scheduleForm.get('startTime')?.value;
     const endTimeDate = this.scheduleForm.get('endTime')?.value;
 
-    // TODO: move to service
     if (startTimeDate && endTimeDate) {
-      const startTimeMs: number = startTimeDate.getTime();
-      let endTimeMs: number = endTimeDate.getTime();
-
-      if (startTimeMs > endTimeMs) {
-        const dayMs = 86400000;
-        endTimeMs = endTimeMs + dayMs;
-      }
-
-      this.scheduleForm.get('hours')?.setValue(convertMsToTime(endTimeMs - startTimeMs));
+      this.scheduleForm.get('hours')?.setValue(this.createScheduleService.getShiftHours(startTimeDate, endTimeDate));
     }
   }
 

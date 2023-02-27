@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { EMPTY, Observable, of } from 'rxjs';
 
-import { getTime, getTimeFromDate, setTimeToDate } from '@shared/utils/date-time.utils';
+import { convertMsToTime, getTime, getTimeFromDate, setTimeToDate } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { ShowToast } from 'src/app/store/app.actions';
@@ -179,6 +179,18 @@ export class CreateScheduleService {
         value: item.id,
       };
     });
+  }
+
+  getShiftHours(startTimeDate: Date, endTimeDate: Date): string {
+    const startTimeMs: number = startTimeDate.setMilliseconds(0);
+    let endTimeMs: number = endTimeDate.setMilliseconds(0);
+
+    if (startTimeMs > endTimeMs) {
+      const dayMs = 86400000;
+      endTimeMs = endTimeMs + dayMs;
+    }
+
+    return convertMsToTime(endTimeMs - startTimeMs);
   }
 
   private getScheduleToOverrideIds(
