@@ -157,7 +157,7 @@
       [height]="300"
     >
       <e-columns>
-        <e-column textAlign="Right" width="80">
+        <e-column textAlign="Right" width="120">
           <ng-template #template let-data>
             <div class="row-tool-buttons">
               <div
@@ -180,6 +180,7 @@
                 ejs-button
                 cssClass="e-flat primary-icon-button custom-button"
                 [class.btn-icon__disabled]="order?.isClosed"
+                (click)="changeIrpCandidateStatus(data)"
               >
                 <span class="edit-button"><i-feather name="calendar" class="icon"></i-feather></span>
               </div>

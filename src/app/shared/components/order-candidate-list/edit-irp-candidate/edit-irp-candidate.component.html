@@ -1,0 +1,70 @@
+<ejs-dialog
+  #candidateDialog
+  [visible]="false"
+  cssClass="dialog"
+  [isModal]="true"
+  [width]="400"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <div class="header-candidate">
+    <div class="title">
+      {{title}}
+    </div>
+    <div class="button-group">
+      <button
+        ejs-button
+        cssClass="e-outline close-button"
+        (click)="closeModal()"
+      > Cancel </button>
+      <button
+        ejs-button
+        [isPrimary]="true"
+        class="save-button"
+        (click)="saveCandidate()"
+        [disabled]="disableSaveButton"
+      > Save
+      </button>
+    </div>
+  </div>
+  <div class="form-wrapper" *ngIf="candidateForm">
+    <div>
+      <form [formGroup]="candidateForm" class="form bootstrap">
+        <ng-container *ngFor="let field of dialogConfig; trackBy: trackByCandidateField">
+          <ng-container [ngSwitch]="field.type">
+
+            <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
+              <div class="input-container {{field?.cssClass}}">
+                <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                </label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist
+                    appValidateWithMessage
+                    [formControlName]="field.field"
+                    [allowFiltering]="true"
+                    [fields]="optionFields"
+                    [dataSource]="field.dataSource"
+                  ></ejs-dropdownlist>
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template [ngSwitchCase]="FieldTypes.Date">
+              <div class="input-container calendar {{field?.cssClass}}">
+                <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
+                <ejs-datepicker
+                  [id]="field.field"
+                  class="datepicker"
+                  appValidateWithMessage
+                  format="MM/dd/yyyy"
+                  placeholder="MM/DD/YYYY"
+                  [formControlName]="field.field"
+                ></ejs-datepicker>
+              </div>
+            </ng-template>
+
+          </ng-container>
+        </ng-container>
+      </form>
+    </div>
+  </div>
+</ejs-dialog>
