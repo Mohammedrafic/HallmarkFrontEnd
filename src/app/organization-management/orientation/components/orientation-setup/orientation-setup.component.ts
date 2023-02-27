@@ -101,7 +101,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   }
 
   private getSkills(): void {
-    this.store.dispatch([new GetAllSkillsCategories()]);
+    this.store.dispatch([new GetAllSkillsCategories({ params: { SystemType: SystemType.IRP } })]);
   }
 
   private watchForOrgChange(): void {
