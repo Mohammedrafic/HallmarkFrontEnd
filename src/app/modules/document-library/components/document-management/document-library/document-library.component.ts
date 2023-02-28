@@ -444,6 +444,14 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.store.dispatch(new GetLocationsByRegions(locationFilter));
         this.changeDetectorRef.markForCheck();
       }
+      else{
+        let locationFilter: LocationsByRegionsFilter = {
+          ids: data,
+          getAll: true,
+          businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
+        };
+        this.store.dispatch(new GetLocationsByRegions(locationFilter));
+      }
     });
   }
 
