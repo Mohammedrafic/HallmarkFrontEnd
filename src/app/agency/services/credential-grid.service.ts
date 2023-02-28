@@ -65,10 +65,10 @@ export class CredentialGridService {
     return this.fb.group({
       status: new FormControl(null, [Validators.required]),
       insitute: new FormControl(null, [Validators.maxLength(100)]),
-      createdOn: new FormControl(null),
+      createdOn: new FormControl(null, [Validators.required]),
       number: new FormControl(null, [Validators.maxLength(100)]),
       experience: new FormControl(null, [Validators.maxLength(20)]),
-      createdUntil: new FormControl(null),
+      createdUntil: new FormControl(null, [Validators.required]),
       completedDate: new FormControl(null),
       rejectReason: new FormControl(null),
     }) as CustomFormGroup<AddCredentialForm>;
