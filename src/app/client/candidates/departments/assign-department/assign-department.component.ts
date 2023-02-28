@@ -86,6 +86,10 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       this.dataSource.regions = this.departmentHierarchy;
     }
   }
+  
+  public toggleChecked(): void {
+    this.assignDepartmentForm.markAsDirty();
+  }
 
   private initForm(): void {
     this.assignDepartmentForm = this.departmentFormService.createAssignDepartmentForm();

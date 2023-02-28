@@ -127,6 +127,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
         })
         .pipe(filter(Boolean), take(1))
         .subscribe(() => {
+          this.assignDepartment?.assignDepartmentForm.reset();
           this.showSideDialog(false);
         });
     } else {
