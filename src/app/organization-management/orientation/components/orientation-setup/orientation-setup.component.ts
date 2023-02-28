@@ -313,7 +313,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       completedOrientation: data.completedOrientation,
       removeOrientation: data.removeOrientation,
       startDate: DateTimeHelper.convertDateToUtc(data.startDate.toString()),
-      endDate: DateTimeHelper.convertDateToUtc(data.endDate.toString()),
+      endDate: data.endDate ? DateTimeHelper.convertDateToUtc(data.endDate.toString()) : null,
     });
     this.cd.markForCheck();
   }
