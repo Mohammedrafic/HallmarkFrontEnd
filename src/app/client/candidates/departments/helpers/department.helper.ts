@@ -16,8 +16,8 @@ export class DepartmentHelper {
     return {
       forceUpdate: false,
       employeeWorkCommitmentId: employeeWorkCommitmentId,
-      startDate: startDate && DateTimeHelper.toUtcFormat(startDate),
-      endDate: endDate && DateTimeHelper.toUtcFormat(endDate),
+      startDate: startDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(startDate)),
+      endDate: endDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(endDate)),
       ids: departmentIds,
       ...(orientedStartDate && { orientedStartDate: DateTimeHelper.toUtcFormat(orientedStartDate) }),
       ...(isHomeCostCenter && { isHomeCostCenter }),
@@ -32,8 +32,8 @@ export class DepartmentHelper {
       employeeWorkCommitmentId: employeeWorkCommitmentId,
       departmentId: departmentId,
       isOriented: !!isOriented,
-      startDate: startDate && DateTimeHelper.toUtcFormat(startDate),
-      endDate: endDate && DateTimeHelper.toUtcFormat(endDate),
+      startDate: startDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(startDate)),
+      endDate: endDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(endDate)),
       ...(isHomeCostCenter && { isHomeCostCenter }),
     };
   }

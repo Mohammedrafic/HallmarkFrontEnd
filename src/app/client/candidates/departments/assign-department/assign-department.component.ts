@@ -37,7 +37,6 @@ import { OrganizationRegion, OrganizationLocation, OrganizationDepartment } from
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormService } from '../services/department-form.service';
 import { OptionFields } from '@client/order-management/constants';
-import { ConfirmService } from '@shared/services/confirm.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CustomFormGroup } from '@core/interface';
@@ -64,14 +63,12 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   };
 
   public readonly departmentFields = OptionFields;
-
-  private departmentId?: number | null = null;
+  public departmentId: number | null = null;
 
   public constructor(
     private readonly cdr: ChangeDetectorRef,
     private readonly departmentService: DepartmentsService,
     private readonly departmentFormService: DepartmentFormService,
-    private readonly confirmService: ConfirmService,
     private readonly store: Store
   ) {
     super();
@@ -94,6 +91,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     this.assignDepartmentForm.reset();
     this.assignDepartmentForm.enable();
     this.assignDepartmentForm.get('startDate')?.setValue(new Date());
+    this.departmentId = null;
     this.cdr.markForCheck();
   }
 
