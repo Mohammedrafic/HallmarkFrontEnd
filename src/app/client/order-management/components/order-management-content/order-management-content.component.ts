@@ -269,7 +269,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public resizeObserver: ResizeObserverModel;
   public navigationPanelWidth: string;
   public orderComments: Comment[] = [];
-  public orgpendingOrderapproval: string;
+  public orgpendingOrderapproval: string = "";
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
     text: 'name',
@@ -1575,7 +1575,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           }
         } else if(this.orgpendingOrderapproval === LocalStorageStatus.Ordercountzero){
           if(this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
-            statuses = [{"status" : FilterOrderStatusText.NoRecordsFound}]
+            statuses = [{"status" : FilterOrderStatusText.NoRecordsFound, "statusText" : FilterOrderStatusText.NoRecordsFound}]
             candidateStatuses = [];
           }
         } else {
