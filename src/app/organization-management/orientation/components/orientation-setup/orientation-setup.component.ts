@@ -200,8 +200,8 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     const { isEnabled, type } = this.orientationTypeSettingsForm.getRawValue();
     this.orientationService.saveOrientationSetting({ isEnabled, type }).subscribe(() => {
       this.orientationTypeSettingsForm.markAsPristine();
-      this.setGRidControlsState();
       this.selectedOrientationSettings = type;
+      this.setGRidControlsState();
       this.orientationTypeHandler(this.selectedOrientationSettings);
       this.getOrientationConfigs();
       this.cd.markForCheck();
