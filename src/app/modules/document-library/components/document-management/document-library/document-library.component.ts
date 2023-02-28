@@ -132,6 +132,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public documentLibraryform: FormGroup;
   public isAddNewFolder: boolean = false;
   public isUpload: boolean = false;
+  public isShowSharedWith: boolean = false;
   public formDailogTitle: string = '';
   public today = new Date();
   public startDate: any = new Date();
@@ -480,8 +481,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetSharedDocumentInformation(sharedDocumentInformation));
     this.sharedDocumentInformation$.pipe(takeUntil(this.unsubscribe$))
     .subscribe((data: BusinessUnit[]) => {
-      if(data.length>0)
+      if(data.length>0){
         this.sharedWith.gridOptions.api?.setRowData(data);
+      }
+      else{
+        this.sharedWith.gridOptions.api?.setRowData(data);
+      }
     });
   }
 
@@ -736,6 +741,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.isShare = true;
       this.dialogWidth = '600px'
       this.shareDocumentIds = selectedIds;
+      this.isShowSharedWith=false;
       this.store.dispatch(new ShowSideDialog(true));
     }
     else {
@@ -1201,6 +1207,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.isShare = true;
       this.dialogWidth = '600px'
       this.createForm();
+      this.isShowSharedWith=false;
       this.shareDocumentIds = [data.id];
       this.store.dispatch(new ShowSideDialog(true));
     }
@@ -1229,6 +1236,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.agencySwitch = !this.agencySwitch;
     if (this.agencySwitch) {
       this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
+      this.isShowSharedWith=true;
       this.getSharedDocumentInformation(this.documentId,BusinessUnitType.Agency)
       this.getAssociateAgencyData();
       this.isShare = true;
@@ -1238,6 +1246,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     else {
       this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
       this.sharedWith.gridOptions.api?.setRowData([]);
+      this.isShowSharedWith=false;
     }
     this.changeDetectorRef.markForCheck();
   }
@@ -1255,6 +1264,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.organizationSwitch = !this.organizationSwitch;
     if (this.organizationSwitch) {
       this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
+      this.isShowSharedWith=true;
       this.getSharedDocumentInformation(this.documentId,BusinessUnitType.Organization)
       this.getShareOrganizationsData();
       this.isShare = true;
@@ -1264,6 +1274,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     else {
       this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
       this.sharedWith.gridOptions.api?.setRowData([]);
+      this.isShowSharedWith=false;
     }
     this.changeDetectorRef.markForCheck();
   }
