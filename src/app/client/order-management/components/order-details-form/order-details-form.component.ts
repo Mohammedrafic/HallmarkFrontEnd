@@ -12,6 +12,7 @@ import {
   switchMap,
   take,
   takeUntil,
+  tap,
   throttleTime,
 } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel, FilteringEventArgs, highlightSearch } from '@syncfusion/ej2-angular-dropdowns';
@@ -414,8 +415,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     }
   }
 
-  private subscribeForSettings(): void {
-    this.organizationSettings$
+  private subscribeForSettings(): Observable<ProjectSpecialData> {
+    return this.organizationSettings$
       .pipe(
         filter((settings: OrganizationSettingsGet[]) => !!settings.length),
         switchMap((settings: OrganizationSettingsGet[]) => {
@@ -423,17 +424,18 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
           return this.projectSpecialData$;
         }),
+        tap((data: ProjectSpecialData) => {
+          this.setProjectSpecialData(data);
+          this.orderTypeDataSourceHandler();
+  
+          if (this.specialProject != null) {
+            this.setRequiredFieldsForSpecialProject();
+            updateValidationToForm(this.specialProject, SpecialProjectControlsConfig);
+          }
+          this.cd.markForCheck();
+        }),
         takeUntil(this.componentDestroy()),
-      ).subscribe((data: ProjectSpecialData) => {
-        this.setProjectSpecialData(data);
-        this.orderTypeDataSourceHandler();
-
-        if (this.specialProject != null) {
-          this.setRequiredFieldsForSpecialProject();
-          updateValidationToForm(this.specialProject, SpecialProjectControlsConfig);
-        }
-        this.cd.markForCheck();
-    });
+      );
   }
 
   private setProjectSpecialData(data: ProjectSpecialData): void {
@@ -877,14 +879,16 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
         this.getComments();
-        this.populateForms(order);
-        this.subscribeForSettings();
+        this.subscribeForSettings().subscribe(() => {
+          this.populateForms(order);
+        });
       } else if (order?.isTemplate) {
         this.order = order;
-        this.populateForms(order);
-        this.subscribeForSettings();
+        this.subscribeForSettings().subscribe(() => {
+          this.populateForms(order);
+        });
       } else if (!isEditMode) {
-        this.subscribeForSettings();
+        this.subscribeForSettings().subscribe();
         this.isEditMode = false;
         this.order = null;
         this.populateNewOrderForm();
