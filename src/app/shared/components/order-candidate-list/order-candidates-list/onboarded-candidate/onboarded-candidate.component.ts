@@ -555,7 +555,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.form.controls['endDate'].enable();
       this.form.controls['clockId'].enable();
     }
-    if (!this.canOnboard) {
+    if (!this.canOnboard || this.isOnBoarded) {
       this.form.controls['allow'].disable();
     } else {
       this.form.controls['allow'].enable();

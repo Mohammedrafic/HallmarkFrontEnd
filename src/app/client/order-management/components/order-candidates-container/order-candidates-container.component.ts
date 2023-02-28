@@ -64,17 +64,25 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
 
   public onGetCandidatesList(event: CandidateListEvent): void {
     this.orderManagementService.excludeDeployed = event.excludeDeployed;
-    const Action = this.order.irpOrderMetadata ? GetIrpOrderCandidates : GetAgencyOrderCandidatesList;
+    this.orderManagementService.setIsAvailable(event.isAvailable);
 
-    this.store.dispatch(
-      new Action(
+    if (this.order.irpOrderMetadata) {
+      this.store.dispatch(new GetIrpOrderCandidates(
+        event.orderId,
+        event.organizationId,
+        event.currentPage,
+        event.pageSize,
+        event.isAvailable,
+      ));
+    } else {
+      this.store.dispatch(new GetAgencyOrderCandidatesList(
         event.orderId,
         event.organizationId,
         event.currentPage,
         event.pageSize,
         event.excludeDeployed,
         event.searchTerm,
-      )
-    );
+      ));
+    }
   }
 }

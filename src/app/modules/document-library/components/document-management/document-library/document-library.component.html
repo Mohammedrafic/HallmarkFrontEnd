@@ -310,7 +310,7 @@
               </div>
             </div>
           </div>
-          <div class="shared-with-grid" *ngIf="!isUpload">
+          <div class="shared-with-grid" *ngIf="!isUpload && (sharedDocumentInformation$ |async) && isShowSharedWith">
             <ag-grid-angular #sharedWith
                              [rowHeight]="50"
                              domLayout="autoHeight"
@@ -381,8 +381,8 @@
           </div>
         </div>
       </div>
-      <div class="shared-with-grid">
-        <ag-grid-angular #sharedWith
+      <div class="shared-with-grid" *ngIf="(sharedDocumentInformation$ |async) && isShowSharedWith">
+        <ag-grid-angular #sharedWith 
                          [rowHeight]="50"
                          domLayout="autoHeight"
                          [headerHeight]="50"

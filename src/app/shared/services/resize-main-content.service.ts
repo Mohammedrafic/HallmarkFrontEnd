@@ -35,7 +35,7 @@ export class ResizeContentService {
 
   private listenResizeContent(): Observable<number> {
     const { isTablet } = this.store.selectSnapshot(AppState.getDeviceScreenResolution);
-    const padding = 48;
+    const padding = 32;
 
     return this.resizeObserver.resize$.pipe(
       filter(() => isTablet),

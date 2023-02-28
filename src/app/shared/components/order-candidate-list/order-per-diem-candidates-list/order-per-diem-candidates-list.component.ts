@@ -98,6 +98,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
       currentPage: this.currentPage,
       pageSize: this.pageSize,
       excludeDeployed: false,
+      isAvailable: this.isAvailable,
     });
   }
 

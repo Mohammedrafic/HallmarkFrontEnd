@@ -280,11 +280,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new ShowExportDialog(false));
   }
 
-  public export(event: ExportOptions): void {
-    this.closeExport();
-    this.defaultExport(event.fileType, event);
-  }
-
   private watchForDefaultExport(): void {
     this.export$.pipe(
       takeUntil(this.unsubscribe$),
@@ -303,17 +298,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.defaultFileName = 'Do Not Return Candidatelist' + this.generateDateTime(this.datePipe);
       this.fileName = this.defaultFileName;
     });
-  }
-
-  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.store.dispatch(new DoNotReturn.ExportDonotreturn(new ExportPayload(
-      fileType,
-      { ...this.filters },
-      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
-      options?.fileName || this.defaultFileName
-    )));
-    this.clearSelection(this.grid);
   }
 
   public onFilterClearAll(): void {
@@ -336,6 +320,23 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
   public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
     this.onFilterChild(e);
+  }
+
+
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.store.dispatch(new DoNotReturn.ExportDonotreturn(new ExportPayload(
+      fileType,
+      { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset())  },
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
+      options?.fileName || this.defaultFileName
+    )));
+    this.clearSelection(this.grid);
   }
 
   @OutsideZone
