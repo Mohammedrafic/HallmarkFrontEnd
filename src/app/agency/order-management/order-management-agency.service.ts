@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
+
 import { Subject, takeUntil } from 'rxjs';
+
+import { BaseObservable } from '@core/helpers';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
 
@@ -15,6 +18,7 @@ export class OrderManagementAgencyService extends DestroyableDirective {
 
   private _orderPerDiemId: number | null;
   private _selectedOrderAfterRedirect: OrderTab | null;
+  private readonly isAvailable: BaseObservable<boolean> = new BaseObservable<boolean>(false);
 
   constructor() {
     super();
@@ -38,5 +42,13 @@ export class OrderManagementAgencyService extends DestroyableDirective {
 
   get selectedOrderAfterRedirect(): OrderTab | null {
     return this._selectedOrderAfterRedirect;
+  }
+
+  setIsAvailable(state: boolean): void {
+    this.isAvailable.set(state);
+  }
+
+  getIsAvailable(): boolean {
+    return this.isAvailable.get();
   }
 }

@@ -417,7 +417,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderStaus = routerState?.['orderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
     this.quickOrderId = routerState?.['publicId'];
-    this.prefix = routerState?.['prefix'];    
+    this.prefix = routerState?.['prefix'];
     (routerState?.['status'] =="In Progress (Pending)" ||   routerState?.['status'] =="In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] =="In Progress" ? this.SelectedStatus.push("InProgress"): routerState?.['status']?this.SelectedStatus.push(routerState?.['status']):"";
     this.candidateStatusId = routerState?.['candidateStatusId'] || 0;
     routerState?.['candidateStatus']!=undefined&&routerState?.['candidateStatus']!=''?this.SelectedCandiateStatuses.push(routerState?.['candidateStatus']):"";
@@ -667,7 +667,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.filters.isTemplate = false;
           this.filters.includeReOrders = true;
           this.hasOrderAllOrdersId();
-          cleared ? this.store.dispatch([new GetOrders(this.filters)]) 
+          cleared ? this.store.dispatch([new GetOrders(this.filters)])
           : this.store.dispatch([new GetOrderFilterDataSources()]);
           break;
         case OrganizationOrderManagementTabs.PerDiem:
@@ -1151,7 +1151,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   buttonGroupChange(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
-    
+
 
     this.clearFilters();
     this.initMenuItems();
@@ -1601,7 +1601,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         setTimeout(() => {
           this.clearstorage();
         }, 5000);
-    
+
       });
   }
 
@@ -2049,7 +2049,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         organizationId,
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
-        this.orderManagementService.excludeDeployed
+        isIrp ? this.orderManagementService.getIsAvailable() : this.orderManagementService.excludeDeployed,
       )
     );
   }

@@ -491,6 +491,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onRowClick(event: any): void {
     if (event.target) {
       this.orderManagementAgencyService.excludeDeployed = false;
+      this.orderManagementAgencyService.setIsAvailable(false);
     }
 
     this.rowSelected(event, this.gridWithChildRow);
@@ -508,7 +509,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           event.data.organizationId,
           GRID_CONFIG.initialPage,
           GRID_CONFIG.initialRowsPerPage,
-          this.orderManagementAgencyService.excludeDeployed
+          event.data.irpOrderMetadata
+            ? this.orderManagementAgencyService.getIsAvailable()
+            : this.orderManagementAgencyService.excludeDeployed,
         )
       );
       this.orderPositionSelected$.next(false);

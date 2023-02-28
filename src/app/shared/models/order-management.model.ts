@@ -721,6 +721,7 @@ export type CandidateListEvent = {
   currentPage: number;
   pageSize: number;
   excludeDeployed: boolean;
+  isAvailable: boolean;
   searchTerm?: string;
 };
 

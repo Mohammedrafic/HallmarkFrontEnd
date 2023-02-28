@@ -468,12 +468,12 @@ export class OrderManagementContentState {
   @Action(GetIrpOrderCandidates)
   GetIrpOrderCandidates(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderId, organizationId, pageNumber, pageSize, isAvaliable }: GetIrpOrderCandidates
+    { orderId, pageNumber, pageSize, isAvailable }: GetIrpOrderCandidates
   ): Observable<PageOfCollections<IrpOrderCandidate>> {
     const params: IrpCandidatesParams = {
       PageSize: pageSize,
       PageNumber: pageNumber,
-      isAvailable: !isAvaliable,
+      isAvailable,
     };
 
     return this.orderManagementService.getIrpCandidates(orderId, params)
@@ -1049,7 +1049,7 @@ export class OrderManagementContentState {
     { payload } : UpdateRegRateorder
   ) : Observable<UpdateRegrateModel | Observable<void>>{
     return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
-      tap((payload) => {  
+      tap((payload) => {
         const count = payload.length;
         dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
       }),
