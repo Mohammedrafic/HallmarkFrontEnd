@@ -13,11 +13,11 @@
     overflow: hidden !important;
 
     @media #{$max-tablet} {
-      max-width: calc(100% - 24px) !important;
+      max-width: calc(100% - 12px) !important;
     }
 
     @media #{$max-mobile} {
-      max-width: calc(100vw - 50px) !important;
+      max-width: calc(100vw - 32px) !important;
     }
 
     .e-hscroll-content {
