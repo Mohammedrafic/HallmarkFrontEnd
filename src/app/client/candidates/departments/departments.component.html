@@ -16,6 +16,7 @@
     iconName="sliders"
     text="Filters"
     [type]="buttonType.ACTION"
+    [badgeText]="filtersAmount"
     (clickEmitter)="showFilters()"
   ></app-button>
   <app-button
@@ -23,6 +24,7 @@
     iconName="plus"
     text="Assign Department"
     [type]="buttonType.ACTION"
+    [disabled]="!userPermission[this.userPermissions.ManageIrpCandidateProfile]"
     (clickEmitter)="showAssignDepartmentDialog()"
   ></app-button>
 </app-grid>
@@ -60,4 +62,5 @@
 <app-filter-department
   (resetFilters)="resetFilters()"
   (updateTableByFilters)="updateTableByFilters($event)"
+  (appliedFiltersAmount)="applyFiltersAmount($event)"
 ></app-filter-department>

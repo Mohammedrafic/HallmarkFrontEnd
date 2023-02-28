@@ -77,6 +77,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public selectedDepartments: number[] | null;
   public departmentHierarchy: OrganizationRegion[] = [];
   public disableBulkButton: boolean = false;
+  public filtersAmount: number = 0;
 
   private filters: DepartmentFilterState | null;
 
@@ -162,6 +163,10 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
 
   public refreshGrid(): void {
     this.getDepartmentsAssigned(this.filters);
+  }
+
+  public applyFiltersAmount(event: number): void {
+    this.filtersAmount = event;
   }
 
   private showSideDialog(isOpen: boolean): void {
