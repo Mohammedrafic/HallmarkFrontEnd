@@ -44,7 +44,7 @@ import {
   ManualInvoiceMessages,
   SavedInvoicesFiltersParams,
 } from '../../constants';
-import { InvoiceMessageHelper, InvoiceMetaAdapter } from '../../helpers';
+import { CreateInvoiceData, InvoiceMessageHelper, InvoiceMetaAdapter } from '../../helpers';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -167,7 +167,7 @@ export class InvoicesState {
   ToggleInvoiceDialog(
     { patchState, dispatch }: StateContext<InvoicesModel>,
     { action, isAgency, payload, prevId, nextId }: Invoices.ToggleInvoiceDialog
-  ): Observable<InvoiceDetail[] | void> | void {
+  ): Observable<InvoiceDetail | void> | void {
     const isOpen = action === DialogAction.Open;
 
     if (!isOpen) {
@@ -180,8 +180,9 @@ export class InvoicesState {
 
     return this.invoicesAPIService.getInvoicesForPrinting(payload!, !!isAgency)
     .pipe(
-      tap((res: InvoiceDetail[]) => patchState({
-        invoiceDetail: res[0],
+      map((response) => CreateInvoiceData(response[0])),
+      tap((res: InvoiceDetail) => patchState({
+        invoiceDetail: res,
         isInvoiceDetailDialogOpen: isOpen,
           ...(isOpen ? { prevInvoiceId: prevId, nextInvoiceId: nextId } : {}),
         })

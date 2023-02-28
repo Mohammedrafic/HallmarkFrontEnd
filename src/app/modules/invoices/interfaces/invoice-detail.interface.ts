@@ -1,6 +1,6 @@
 import { InvoiceState } from '../enums';
 
-export interface InvoiceDetail {
+export interface InvoiceDetailDto {
   meta: InvoiceDetailMeta;
   invoiceRecords: InvoiceDetailRecord[];
   totals: {
@@ -11,6 +11,19 @@ export interface InvoiceDetail {
     calculatedTotal: number;
   };
   summary: InvoiceDetailSummary[];
+}
+
+export interface InvoiceDetail {
+  meta: InvoiceDetailMeta;
+  invoiceRecords: InvoiceDetailRecord[];
+  totals: {
+    total: number;
+    amount: number;
+    amountToPay: number;
+    feeTotal: number;
+    calculatedTotal: number;
+  };
+  summary: InvoiceSummaryItem[];
 }
 
 export interface InvoiceDetailMeta {
@@ -78,6 +91,7 @@ export interface InvoiceSummaryItem {
   extDepartmentId: string;
   feeTotal: number; 
   calculatedTotal: number;
+  locationName: string;
 }
 
 export interface InvoiceInfoUIItem {

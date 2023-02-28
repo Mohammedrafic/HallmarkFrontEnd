@@ -18,7 +18,7 @@ export abstract class InvoicesContainerService {
 
   public abstract getDetailColDef(): ColDef[];
 
-  public abstract getDetailSummaryColDef(summaryLocation: string): ColDef[];
+  public abstract getDetailSummaryColDef(): ColDef[];
 
   public abstract isAgency(): boolean;
 

@@ -28,6 +28,7 @@ import {
   PendingInvoicesData,
   InvoicesPendingInvoiceRecordsFilteringOptions,
   InvoiceManualPendingRecordsFilteringOptions,
+  InvoiceDetailDto,
 } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
@@ -159,8 +160,8 @@ export class InvoicesApiService {
   public getInvoicesForPrinting(
     payload: { organizationIds?: number[]; invoiceIds: number[] },
     isAgency = false
-  ): Observable<InvoiceDetail[]> {
-    return this.http.post<InvoiceDetail[]>(`/api/Invoices${isAgency ? '/agency' : ''}/printing`, payload);
+  ): Observable<InvoiceDetailDto[]> {
+    return this.http.post<InvoiceDetailDto[]>(`/api/Invoices${isAgency ? '/agency' : ''}/printing`, payload);
   }
 
   public export(data: ExportPayload): Observable<Blob>  {

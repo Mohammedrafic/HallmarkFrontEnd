@@ -205,16 +205,15 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
   return result;
 };
 
-export const invoiceSummaryColumnDefs = (location: string): ColDef[] => [
+export const InvoiceSummaryColumnDefs: ColDef[] = [
   {
-    field: '',
+    field: 'locationName',
     headerName: 'Location',
     width: 150,
     minWidth: 125,
     autoHeight: true,
     wrapText: true,
     cellClass: 'custom-line-height',
-    valueFormatter: () => location,
   },
   {
     field: 'departmentName',
