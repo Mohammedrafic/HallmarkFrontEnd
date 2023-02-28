@@ -175,7 +175,7 @@
                   </div>
                 </div>
                 <div class="input-container bootstrap" *ngIf="candidateJobState$ | async as candidateJobState">
-                  <div *ngIf="!candidateJobState.hasAllRequiredOnboardedCredentials">
+                  <div *ngIf="isAccepted || isOnBoarded">
                     <ejs-checkbox formControlName="allow" label="Allow deploy w/o credentials"></ejs-checkbox>
                   </div>
                 </div>
