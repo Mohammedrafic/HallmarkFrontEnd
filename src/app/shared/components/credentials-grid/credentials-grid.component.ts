@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, Validators } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { OutsideZone } from '@core/decorators';
 
@@ -8,7 +8,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FileInfo, FilesPropModel, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil, combineLatest } from 'rxjs';
 
 import { CustomFormGroup, Permission } from '@core/interface';
 import { FileSize, UserPermissions } from '@core/enums';
@@ -110,7 +110,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public openFileViewerDialog = new EventEmitter<number>();
   public today = new Date();
   public disableAddCredentialButton: boolean;
-  public requiredCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
   public existingFiles: FilesPropModel[] = [];
   public hideFileSize = false;
@@ -234,7 +233,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.watchForSearchUpdate();
     this.watchForCandidateCredential();
     this.watchForDownloadCredentialFiles();
-    this.watchWorkingArea()
+    this.watchWorkingArea();
+    this.watchForCertifiedOnUntilControls();
   }
 
   ngOnDestroy(): void {
@@ -386,14 +386,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       masterCredentialId,
       id,
       credentialFiles,
-      expireDateApplicable,
       credentialTypeName,
       masterName,
       rejectReason,
     }: CandidateCredential
   ) {
     event.stopPropagation();
-    this.checkCertifiedFields(!!expireDateApplicable);
     this.credentialId = id as number;
     this.credentialStatus = status as CredentialStatus;
     this.masterCredentialId = masterCredentialId;
@@ -479,7 +477,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public selectMasterCredentialId(event: { data: Credential }): void {
     this.masterCredentialId = event.data.id as number;
-    this.checkCertifiedFields(event.data.expireDateApplicable);
   }
 
   public clearMasterCredentialId(): void {
@@ -773,26 +770,15 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     );
   }
 
-  private checkCertifiedFields(expireDateApplicable: boolean): void {
-    this.requiredCertifiedFields = expireDateApplicable;
-
-    if (this.requiredCertifiedFields) {
-      this.createdOnControl?.setValidators([Validators.required]);
-      this.createdUntilControl?.setValidators([Validators.required]);
-    } else {
-      this.createdOnControl?.setValidators([]);
-      this.createdUntilControl?.setValidators([]);
-      this.createdOnControl?.setValue(null);
-      this.createdUntilControl?.setValue(null);
-    }
-
-    this.createdOnControl?.updateValueAndValidity();
-    this.createdUntilControl?.updateValueAndValidity();
-  }
-
   private watchWorkingArea(): void {
     this.isOrganizationAgencyArea$.pipe(takeUntil(this.unsubscribe$)).subscribe((area) => {
       this.isOrganizationAgencyArea = area;
     });
+  }
+
+  private watchForCertifiedOnUntilControls(): void {
+    combineLatest([this.createdOnControl?.valueChanges, this.createdUntilControl?.valueChanges])
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => this.cdr.markForCheck());
   }
 }
