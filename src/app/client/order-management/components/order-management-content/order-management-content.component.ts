@@ -269,7 +269,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public resizeObserver: ResizeObserverModel;
   public navigationPanelWidth: string;
   public orderComments: Comment[] = [];
-  public orgpendingOrderapproval: string;
+  public orgpendingOrderapproval: string = "";
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
     text: 'name',
@@ -1572,13 +1572,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
               ![FilterOrderStatusText.Filled, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Closed, FilterOrderStatusText.Open, CandidateStatus.Incomplete].includes(status.status)
             );
             candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
-            this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
           }
         } else if(this.orgpendingOrderapproval === LocalStorageStatus.Ordercountzero){
           if(this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
-            statuses = [{"status" : FilterOrderStatusText.NoRecordsFound}]
+            statuses = [{"status" : FilterOrderStatusText.NoRecordsFound, "statusText" : FilterOrderStatusText.NoRecordsFound}]
             candidateStatuses = [];
-            this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
           }
         } else {
           statuses = data.orderStatuses;
@@ -1587,7 +1585,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filterColumns.orderStatuses.dataSource = statuses;
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
         this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
-        if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect && this.orgpendingOrderapproval != "") {
+        if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
           this.setDefaultFilter();
         } else {
           this.redirectFromPerdiem = false;
