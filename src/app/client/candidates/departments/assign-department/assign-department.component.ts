@@ -63,7 +63,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   };
 
   public readonly departmentFields = OptionFields;
-  public departmentId: number | null = null;
+  public departmentId?: number | null = null;
 
   public constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -87,28 +87,22 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     }
   }
 
-  public resetAssignDepartmentForm(): void {
-    this.assignDepartmentForm.reset();
-    this.assignDepartmentForm.enable();
-    this.assignDepartmentForm.get('startDate')?.setValue(new Date());
-    this.departmentId = null;
-    this.cdr.markForCheck();
-  }
-
   private initForm(): void {
     this.assignDepartmentForm = this.departmentFormService.createAssignDepartmentForm();
   }
 
   private subscribeOnDialogData(): void {
-    this.dialogData$.pipe(filter(Boolean), debounceTime(200), takeUntil(this.destroy$)).subscribe((data) => {
-      this.departmentId = data.id;
-      this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
-      this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
-      this.dataSource.departments = [{ name: data.departmentName, id: data.departmentId } as OrganizationDepartment];
+    this.dialogData$.pipe(debounceTime(200), takeUntil(this.destroy$)).subscribe((data) => {
+      this.departmentId = data?.id;
 
-      if (this.departmentId) {
+      if (data && this.departmentId) {
+        this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
+        this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
+        this.dataSource.departments = [{ name: data.departmentName, id: data.departmentId } as OrganizationDepartment];
         this.departmentFormService.patchForm(this.assignDepartmentForm, data);
         this.disableControls();
+      } else {
+        this.resetAssignDepartmentForm();
       }
       this.cdr.markForCheck();
     });
@@ -192,5 +186,13 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         takeUntil(this.destroy$)
       )
       .subscribe(() => this.cdr.markForCheck());
+  }
+
+  private resetAssignDepartmentForm(): void {
+    this.assignDepartmentForm.reset();
+    this.assignDepartmentForm.enable();
+    this.assignDepartmentForm.get('startDate')?.setValue(new Date());
+    this.departmentId = null;
+    this.cdr.markForCheck();
   }
 }
