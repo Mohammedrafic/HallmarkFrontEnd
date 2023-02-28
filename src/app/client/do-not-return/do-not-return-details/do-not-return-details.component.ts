@@ -30,6 +30,7 @@ public filters: DonoreturnFilters = {
 
   public fileName: string;
   public defaultFileName: string;
+  public isdnrActive=true;
   public columnsToExport: ExportColumn[] = MasterDNRExportCols;
   public exportDonotreturn$ = new Subject<ExportedFileType>();
   public filteredItems$ = new Subject<number>();
@@ -47,25 +48,10 @@ public filters: DonoreturnFilters = {
     this.store.dispatch(new ShowExportDialog(true));
   }
 
-  public closeExport() : void{
-    this.fileName = '';
-    this.store.dispatch(new ShowExportDialog(false));
-  }
-
-  public export(event: ExportOptions): void {
-    this.closeExport();
-    this.defaultExport(event.fileType, event);
-  }
-
-  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.store.dispatch(new DoNotReturn.ExportDonotreturn(new ExportPayload(
-      fileType,
-      { ...this.filters },
-      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
-      options?.fileName || this.defaultFileName
-    )));
-    this.clearSelection(this.grid);
+  public override defaultExport(fileType: ExportedFileType): void {
+    if (this.isdnrActive) {
+      this.exportDonotreturn$.next(fileType);
+    } 
   }
 
   public showFilters(): void {
