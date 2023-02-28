@@ -60,6 +60,7 @@
 </app-side-dialog>
 
 <app-filter-department
+  *ngIf="(selectedTab$ | async) === candidateTabsEnum.Departments"
   (resetFilters)="resetFilters()"
   (updateTableByFilters)="updateTableByFilters($event)"
   (appliedFiltersAmount)="applyFiltersAmount($event)"
