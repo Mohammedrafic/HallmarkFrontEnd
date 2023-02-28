@@ -91,6 +91,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     this.resetFilters.emit();
     this.filterColumns.locationIds.dataSource = [];
     this.filterColumns.departmentsIds.dataSource = [];
+    this.applyFilters$.next(null);
     this.cdr.markForCheck();
   }
 
@@ -102,8 +103,8 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   private filterDepartments(): void {
     this.applyFilters$
       .pipe(
-        filter(Boolean),
         distinctUntilChanged((prev, curr) => this.departmentFormService.compareFormState(prev, curr)),
+        filter(Boolean),
         takeUntil(this.destroy$)
       )
       .subscribe((filterState) => {
@@ -146,7 +147,10 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
         this.filterColumns.locationIds.dataSource = [];
 
         if (val?.length) {
-          const selectedRegions: OrganizationRegion[] = DepartmentHelper.findSelectedItems(val, this.regions) as OrganizationRegion[];
+          const selectedRegions: OrganizationRegion[] = DepartmentHelper.findSelectedItems(
+            val,
+            this.regions
+          ) as OrganizationRegion[];
           const regionLocations: OrganizationLocation[] = selectedRegions.flatMap((region) => {
             region?.locations?.forEach((location: OrganizationLocation) => {
               location.regionName = region.name;
@@ -170,14 +174,17 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
         this.filterColumns.departmentsIds.dataSource = [];
         if (val?.length) {
           const locationDataSource = this.filterColumns.locationIds.dataSource as OrganizationLocation[];
-          const selectedLocations: OrganizationLocation[] = DepartmentHelper.findSelectedItems(val, locationDataSource) as OrganizationLocation[];
+          const selectedLocations: OrganizationLocation[] = DepartmentHelper.findSelectedItems(
+            val,
+            locationDataSource
+          ) as OrganizationLocation[];
           const locationDepartments: OrganizationDepartment[] = selectedLocations.flatMap(
             (location) => location.departments
           );
 
           this.filterColumns.departmentsIds.dataSource = locationDepartments;
         } else {
-          this.formGroup.get('departmentIds')?.setValue([]);
+          this.formGroup.get('departmentsIds')?.setValue([]);
           this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
         }
 
