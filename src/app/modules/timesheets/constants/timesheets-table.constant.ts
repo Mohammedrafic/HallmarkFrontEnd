@@ -4,11 +4,14 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models/column-def
 import { ColDef, ValueGetterParams } from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
-import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
+import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns,
+  TIMETHEETS_STATUSES } from '../enums';
 import { FilterColumns, TimesheetsFilterState } from '../interface';
-import { TimesheetTableApproveCellComponent } from '../components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
+import { TimesheetTableApproveCellComponent,
+} from '../components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
-import { TimesheetTableLinkComponent } from '../components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
+import { TimesheetTableLinkComponent,
+} from '../components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { GridValuesHelper } from '../helpers';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 
@@ -108,7 +111,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       ...commonColumn,
       valueFormatter: (params: ValueFormatterParams) => {
         const weekNum = params.data.workWeek;
-        return `${weekNum} - ${GridValuesHelper.formatDate(params.value, 'ccc MM/dd/yyyy')}`
+        return `${weekNum} - ${GridValuesHelper.formatDate(params.value, 'ccc MM/dd/yyyy')}`;
       },
     },
     {
@@ -169,7 +172,7 @@ const contactEmailsColumnMapping = {
   valueType: ValueType.Id,
   valueField: 'fullName',
   valueId: 'email',
-}
+};
 
 export const DefaultFilterColumns: FilterColumns = {
   searchTerm: defaultInputMapping,
@@ -212,9 +215,7 @@ export const filteringOptionsMapping: Map<FilteringOptionsFields, TimesheetsTabl
   .set(FilteringOptionsFields.Orders, TimesheetsTableFiltersColumns.OrderIds)
   .set(FilteringOptionsFields.Regions, TimesheetsTableFiltersColumns.RegionsIds)
   .set(FilteringOptionsFields.Skills, TimesheetsTableFiltersColumns.SkillIds)
-  .set(FilteringOptionsFields.Statuses, TimesheetsTableFiltersColumns.StatusIds)
-  .set(FilteringOptionsFields.Statuses, TimesheetsTableFiltersColumns.ContactEmails);
-
+  .set(FilteringOptionsFields.Statuses, TimesheetsTableFiltersColumns.StatusIds);
 
 export const BulkApproveSuccessMessage = {
   successMessage: 'Success. Timesheets Approved',
