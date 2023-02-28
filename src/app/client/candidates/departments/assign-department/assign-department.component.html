@@ -59,6 +59,7 @@
       label="Oriented"
     ></app-toggle>
     <app-toggle
+      *ngIf="departmentId"
       [formGroupInstance]="assignDepartmentForm"
       id="toggle"
       controlName="isHomeCostCenter"
