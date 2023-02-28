@@ -23,7 +23,7 @@ import { Skill } from '@shared/models/skill.model';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, ORIENTATION_CHANGE_CONFIRM_TITLE, ORIENTATION_CHANGE_TEXT, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrientationType } from "../../enums/orientation-type.enum";
 
@@ -375,7 +375,20 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     if (this.orientationTypeSettingsForm.invalid) {
       this.orientationTypeSettingsForm.markAllAsTouched();
     } else {
-      this.saveOrientationSettings();
+      if (this.selectedOrientationSettings !== null) {
+        this.confirmService
+        .confirm(ORIENTATION_CHANGE_TEXT, {
+          title: ORIENTATION_CHANGE_CONFIRM_TITLE,
+          okButtonLabel: 'Yes',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm: boolean) => !!confirm))
+        .subscribe(() => {
+          this.saveOrientationSettings();
+        });
+      } else {
+        this.saveOrientationSettings();
+      }
     }
   }
   

@@ -18,6 +18,8 @@ export const ADD_CONFIRM_TEXT =
 export const EDIT_CONFIRM_TEXT =
   'Are you sure you want to edit the Bill rate for Onboarded Candidate? This may lead to recalculating values and generating new invoice records.';
 export const DELETE_CONFIRM_TITLE = 'Unsaved Progress';
+export const ORIENTATION_CHANGE_CONFIRM_TITLE = 'Change Orientation Type';
+export const ORIENTATION_CHANGE_TEXT = 'Are you sure you want to provide those changes? It will cause deleting all records from the Orientation Setup gird.';
 export const UNSAVED_TABS_TEXT = 'Are you sure you want to leave this tab without saving?';
 export const CANCEL_CONFIRM_TEXT = 'Are you sure you want to cancel? All data will be deleted.';
 export const RESEND_EMAIL_TITLE = 'Sending Welcome Email';
