@@ -117,3 +117,7 @@ $headerHeight: 19px;
     border: 2px solid #000;
   }
 }
+.app-widget-wrapper__agency_count{
+  height: calc(100% - 19px);
+  overflow: auto;
+}

@@ -1,8 +1,10 @@
-import { ChangeDetectorRef, Component, Input, Inject, ChangeDetectionStrategy, OnInit } from '@angular/core';
-import { Actions } from '@ngxs/store';
+import { Component, Input, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalWindow } from '@core/tokens';
-import {  AgencyPositionModel } from '../../models/agency-position.model';
+import { AgencyPositionModel } from '../../models/agency-position.model';
+import { Store } from '@ngxs/store';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
+import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 
 @Component({
   selector: 'app-agencyposition-widget',
@@ -10,29 +12,38 @@ import {  AgencyPositionModel } from '../../models/agency-position.model';
   styleUrls: ['./agencyposition-widget.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AgencypositionWidgetComponent implements OnInit {
+export class AgencypositionWidgetComponent extends AbstractPermissionGrid {
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean | false;
   @Input() public description: string;
-  @Input() public agencyData: AgencyPositionModel | undefined;
+  @Input() public chartData: AgencyPositionModel | undefined;
   public agencydata:any;
   private mousePosition = {
     x: 0,
     y: 0,
   };
 
-  constructor(private readonly dashboardService: DashboardService,private actions$: Actions, private cdr: ChangeDetectorRef,
-              @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis) {}
+  constructor(private readonly dashboardService: DashboardService,protected override store: Store,
+              @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis) {
+                super(store);
+              }
 
-  ngOnInit(): void {
-     this.agencydata = this.agencyData;
+  ngOnChanges():void {
+    this.agencydata = this.chartData;
   }
   
   public defineMousePosition($event: MouseEvent): void {
     this.mousePosition.x = $event.screenX;
     this.mousePosition.y = $event.screenY;
   }
+
   public toSourceContent(orgId:number): void {
-    this.dashboardService.redirectToUrl('client/order-management/',undefined);
+    this.store.dispatch(
+        new SetLastSelectedOrganizationAgencyId({
+          lastSelectedAgencyId: null,
+          lastSelectedOrganizationId: orgId,
+        })
+      );
+    this.dashboardService.redirectToUrl('client/order-management/');
   }
 }
