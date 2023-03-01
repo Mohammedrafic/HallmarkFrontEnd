@@ -6,6 +6,7 @@ import { CandidatesPositionDataModel } from './candidates-positions.model';
 import { PositionTrend } from './position-trend.model';
 import { CandidateStatusDataModel } from './candidate-status-dto.model';
 import { OrgDetailsInfoModel } from './org-details-info.model';
+import { AgencyPositionModel } from './agency-position.model';
 
 export interface WidgetsDataModel {
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: CandidatesByStateWidgetAggregatedDataModel;
@@ -25,4 +26,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.LTA_ORDER_ENDING]: CandidatesPositionDataModel;
   [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: CandidateStatusDataModel;
   [WidgetTypeEnum.ORG]: OrgDetailsInfoModel;
+  [WidgetTypeEnum.AGENCY_POSITION_COUNT]: AgencyPositionModel;
 }

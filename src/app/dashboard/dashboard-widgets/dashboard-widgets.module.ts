@@ -14,6 +14,7 @@ import { TrendChartModule } from '../widgets/trend-chart/trend-chart.module';
 import { ChatModule } from '../widgets/chat/chat.module';
 import { InvoicesChartModule } from '../widgets/invoices-chart/invoices-chart.module';
 import { OrgWidgetModule } from '../widgets/org-widget/org-widget.module';
+import { AgencypositionWidgetModule } from '../widgets/agencyposition-widget/agencyposition-widget.module';
 import { UserState } from '../../store/user.state';
 import { CandidateChartModule } from '../widgets/candidate-chart/candidate-chart.module';
 
@@ -34,6 +35,7 @@ import { CandidateChartModule } from '../widgets/candidate-chart/candidate-chart
     InvoicesChartModule,
     CandidateChartModule,
     OrgWidgetModule,
+    AgencypositionWidgetModule,
     NgxsModule.forFeature([ UserState])
   ]
 })
