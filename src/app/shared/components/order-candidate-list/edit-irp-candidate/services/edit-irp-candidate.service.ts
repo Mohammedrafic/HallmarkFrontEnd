@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Observable } from 'rxjs';
 
@@ -24,9 +24,9 @@ constructor(
 
   public createCandidateForm(): CustomFormGroup<CandidateForm> {
     return this.formBuilder.group({
-      status: null,
-      actualStartDate: null,
-      actualEndDate: null,
+      status: [null, Validators.required],
+      actualStartDate: [null],
+      actualEndDate: [null],
     }) as CustomFormGroup<CandidateForm>;
   }
 
