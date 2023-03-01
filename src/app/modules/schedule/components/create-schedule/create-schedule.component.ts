@@ -308,7 +308,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
       ).subscribe((value: number) => {
         this.scheduleForm.get('departmentsId')?.patchValue([], { emitEvent: false, onlySelf: true });
         this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = this.scheduleFiltersService
-          .getSelectedDepartmentOptions(this.scheduleStructureList, [value]);
+          .getSelectedDepartmentOptions(this.scheduleStructureList, [value], false);
 
         this.cdr.markForCheck();
       });
