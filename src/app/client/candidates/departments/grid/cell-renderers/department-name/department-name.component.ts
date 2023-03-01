@@ -9,5 +9,6 @@ import { GridCellRenderer } from '@shared/components/grid/models';
   styleUrls: ['./department-name.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DepartmentNameComponent extends GridCellRenderer<DepartmentAssigned & ICellRendererParams> {}
-
+export class DepartmentNameComponent extends GridCellRenderer<DepartmentAssigned & ICellRendererParams> {
+  public readonly tooltip = 'Home Cost Center';
+}
