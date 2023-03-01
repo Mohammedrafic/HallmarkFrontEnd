@@ -1,5 +1,5 @@
 import { CandidateModel } from '@client/order-management/components/add-edit-reorder/models/candidate.model';
-import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as CandidateStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { Duration } from '@shared/enums/durations';
 import { JobClassification } from '@shared/enums/job-classification';
 import { OrderStatus } from '@shared/enums/order-management';
@@ -249,6 +249,7 @@ export type OrderCandidatesList = {
   hourlyBillRate: number;
   lastName: string;
   middleName?: string;
+  candidateProfileId: number;
   onboardedPercentage: number;
   skill: string;
   status: number;
@@ -720,6 +721,7 @@ export type CandidateListEvent = {
   currentPage: number;
   pageSize: number;
   excludeDeployed: boolean;
+  isAvailable: boolean;
   searchTerm?: string;
 };
 
@@ -737,12 +739,14 @@ export interface IrpOrderCandidateDto {
   profileStatus: number;
   primarySkill: IrpPrimarySkill;
   option: string;
+  status: CandidatStatus;
   isOriented: boolean;
   isContract: boolean;
   lastShiftFrom: string;
   lastShiftTo: string;
   nextShiftFrom: string;
   nextShiftTo: string;
+  candidateJobId: number;
   weeklyHoursSchedule: number;
   weekOvertime: number;
   payRate: number;

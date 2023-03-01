@@ -58,4 +58,5 @@ export type OrientationConfigurationPage = PageOfCollections<OrientationConfigur
 export interface OrientationGridColumns extends ICellRendererParams {
   edit?: (commitment: OrientationConfiguration) => OrientationConfiguration;
   delete?: (commitment: OrientationConfiguration) => OrientationConfiguration;
+  gridActionsParams: { disableControls: boolean };
 }

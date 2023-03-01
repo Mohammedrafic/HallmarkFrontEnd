@@ -2,7 +2,9 @@
   [name]="controlName"
   [attr.id]="id"
   [checked]="toggleValue"
-  (change)="onChange($event)"></ejs-switch>
+  [disabled]="disabled"
+  (change)="onChange($event)"
+  ></ejs-switch>
 <label [attr.for]="id">{{label}}</label>
 <app-error-message [control]="getControl()"></app-error-message>
 

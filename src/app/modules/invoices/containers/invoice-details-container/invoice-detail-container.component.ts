@@ -224,9 +224,9 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       });
   }
 
-  private initTableColumns(summaryLocation: string): void {
+  private initTableColumns(): void {
     this.columnDefinitions = this.invoicesContainerService.getDetailColDef();
-    this.columnSummaryDefinitions = this.invoicesContainerService.getDetailSummaryColDef(summaryLocation);
+    this.columnSummaryDefinitions = this.invoicesContainerService.getDetailSummaryColDef();
   }
 
   private checkActionBtnDisabled(): boolean {
@@ -268,7 +268,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   private setInvoiceData(): void {
     this.setActionBtnText();
     this.invoiceDetailsConfig.isActionBtnDisabled = this.checkActionBtnDisabled();
-    this.initTableColumns(this.invoiceDetail.summary[0]?.locationName || '');
+    this.initTableColumns();
 
     if (this.chipList) {
       this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);

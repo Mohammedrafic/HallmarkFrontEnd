@@ -4,11 +4,13 @@ import { OrientationCompletedComponent } from './cell-renderers/orientation-comp
 import { SkillMatchComponent } from './cell-renderers/skill-match/skill-match.component';
 import { SkillNameComponent } from './cell-renderers/skill-name/skill-name.component';
 import { DepartmentAssigned } from '../departments.model';
+import { DepartmentNameComponent } from './cell-renderers/department-name/department-name.component';
 
 export interface ColumnDefParams {
   editHandler: (value: DepartmentAssigned) => void;
   deleteHandler: (id: number[]) => void;
   dateFormatter: (date: string) => string;
+  disable: boolean;
 }
 
 export const columnDef = (columnParams: ColumnDefParams) => [
@@ -32,14 +34,14 @@ export const columnDef = (columnParams: ColumnDefParams) => [
           {
             action: (value) => { columnParams.editHandler(value as DepartmentAssigned) },
             iconName: 'edit',
-            iconClass: 'color-primary-active-blue-10',
-            disabled: false,
+            buttonClass: 'edit-button',
+            disabled: columnParams.disable,
           },
           {
             action: (value) => columnParams.deleteHandler([(value as DepartmentAssigned).id]),
             iconName: 'trash-2',
-            iconClass: 'color-supportive-red',
-            disabled: false,
+            buttonClass: 'remove-button',
+            disabled: columnParams.disable,
           },
         ],
       };
@@ -59,6 +61,7 @@ export const columnDef = (columnParams: ColumnDefParams) => [
     field: 'departmentName',
     headerName: 'Department',
     flex: 1,
+    cellRenderer: DepartmentNameComponent,
   },
 
   {

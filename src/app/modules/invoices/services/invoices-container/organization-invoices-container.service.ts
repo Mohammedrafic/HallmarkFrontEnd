@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 
 import { Attachment } from '@shared/components/attachments';
 import {
-  invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs,
+  invoiceDetailsColumnDefs, invoiceInfoItems, InvoiceSummaryColumnDefs,
 } from '../../constants/invoice-detail.constant';
 import { InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
 import { ManualInvoicesGridHelper, PendingInvoiceRowDetailsGridHelper, PendingInvoicesGridHelper } from '../../helpers';
@@ -174,8 +174,8 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
     return invoiceDetailsColumnDefs(false);
   }
 
-  public getDetailSummaryColDef(location: string): ColDef[] {
-    return invoiceSummaryColumnDefs(location);
+  public getDetailSummaryColDef(): ColDef[] {
+    return InvoiceSummaryColumnDefs;
   }
 
   public isAgency(): boolean {

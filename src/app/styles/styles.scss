@@ -610,4 +610,11 @@ body.dark .title, body.dark .contact-name {
 }
 #Position_count_for_Agency_body .app-widget-wrapper__projection-wrapper {
   overflow: auto;
+.document-grid .ag-body-viewport.ag-layout-auto-height.ag-row-no-animation {
+  height: calc(74vh - 164px) !important;
+  overflow: auto;
+}
+  
+.document-grid {
+  height: calc(89vh - 164px) !important;
 }

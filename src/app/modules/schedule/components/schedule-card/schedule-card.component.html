@@ -27,7 +27,7 @@
     <span class="time__text">{{ firstDaySchedule.startDate | date: 'HH:mm': 'UTC' }}</span>
     <span class="time__text">-</span>
     <span class="time__text">{{ firstDaySchedule.endDate | date: 'HH:mm': 'UTC' }}</span>
-    <span *ngIf="firstDaySchedule?.orderMetadata?.orderType === perDiemOrder" class="time__text"> L </span>
+    <span *ngIf="firstDaySchedule?.orderMetadata?.orderType === ltaOrder" class="time__text"> L </span>
     <ejs-tooltip
       *ngIf="firstDaySchedule.scheduleOrderType"
       [content]="firstDaySchedule.scheduleOrderType"

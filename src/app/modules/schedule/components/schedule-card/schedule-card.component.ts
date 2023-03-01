@@ -17,7 +17,7 @@ export class ScheduleCardComponent implements OnInit {
 
   firstDaySchedule: ScheduleItem;
 
-  perDiemOrder: IrpOrderType = IrpOrderType.PerDiem;
+  ltaOrder: IrpOrderType = IrpOrderType.LongTermAssignment;
 
   cardConfig: ScheduleCardConfig | undefined;
 

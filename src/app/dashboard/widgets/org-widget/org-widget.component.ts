@@ -3,6 +3,7 @@ import { Actions } from '@ngxs/store';
 import { OrgDetailsInfoModel } from '../../models/org-details-info.model';
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalWindow } from '@core/tokens';
+import { LocalStorageStatus } from '@shared/enums/status';
 
 @Component({
   selector: 'app-org-widget',
@@ -15,6 +16,7 @@ export class OrgWidgetComponent {
   @Input() public isDarkTheme: boolean | false;
   @Input() public description: string;
   @Input() public chartData: OrgDetailsInfoModel | undefined;
+  public countzero = "Ordercountzero";
   private mousePosition = {
     x: 0,
     y: 0,
@@ -28,8 +30,12 @@ export class OrgWidgetComponent {
     this.mousePosition.y = $event.screenY;
   }
   public toSourceContent(orgname: string): void {
-    if(orgname === 'OrdersforApproval'){
-      this.globalWindow.localStorage.setItem("pendingApprovalOrders",JSON.stringify(orgname));  
+    if(orgname === LocalStorageStatus.OrdersforApproval){
+      if(this.chartData?.pendingOrders == 0){
+        this.globalWindow.localStorage.setItem("pendingApprovalOrders",JSON.stringify(this.countzero))
+      } else {
+        this.globalWindow.localStorage.setItem("pendingApprovalOrders",JSON.stringify(orgname));
+      }
       this.dashboardService.redirectToUrl('client/order-management/');
     } else if(orgname === 'ManualInvoice'){
       this.dashboardService.redirectToUrl('client/invoices/');

@@ -59,7 +59,9 @@ body.dark {
           width: 16px;
           height: 16px;
           border-radius: 2px;
-          line-height: 14px;
+          border-width: 2px;
+          border-color: $secondary-dark-blue-30;
+          line-height: 12px;
           font-size: 10px;
 
           &.e-check {

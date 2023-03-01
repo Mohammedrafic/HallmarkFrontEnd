@@ -1,0 +1,48 @@
+@import "colors";
+
+.dialog {
+  padding: 24px;
+
+  .header-candidate {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      color: $black;
+      margin: 0;
+    }
+
+    .save-button {
+      margin-left: 8px;
+    }
+  }
+
+  .input-group {
+    margin-top: 5px;
+    width: 100%;
+
+    label {
+      margin-bottom: 12px;
+    }
+  }
+
+  .form-wrapper {
+    margin-top: 24px;
+
+    .form {
+      display: grid;
+      grid-auto-columns: 1fr;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 10px;
+      grid-template-areas:
+    "status status"
+    ". .";
+    }
+
+    .status { grid-area: status; }
+  }
+}

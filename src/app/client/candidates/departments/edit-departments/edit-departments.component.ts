@@ -16,12 +16,13 @@ import { CustomFormGroup } from '@core/interface';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { EditDepartmentsFormConfig } from '../constants/edit-departments.constant';
-import { DepartmentFormFieldConfig, EditAssignedDepartment, EditDepartmentFormState } from '../departments.model';
+import { DateRanges, DepartmentFormFieldConfig, EditAssignedDepartment, EditDepartmentFormState } from '../departments.model';
 import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentsService } from '../services/departments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { EDIT_MULTIPLE_RECORDS_TEXT, WARNING_TITLE } from '@shared/constants';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { EDIT_MULTIPLE_RECORDS_TEXT, RECORD_MODIFIED, WARNING_TITLE } from '@shared/constants';
+import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-edit-departments',
@@ -32,6 +33,7 @@ import { ShowSideDialog } from 'src/app/store/app.actions';
 export class EditDepartmentsComponent extends DestroyableDirective implements OnInit {
   @Input() public saveForm$: Subject<boolean>;
   @Input() public selectedDepartments: number[] | null;
+  @Input() public dateRanges: DateRanges;
 
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
@@ -58,6 +60,12 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
     this.watchForControls();
   }
 
+  public resetEditDepartmentForm(): void {
+    this.formGroup.reset();
+    this.departmentFormService.disableControls(this.formGroup, ['endDate']);
+    this.cdr.markForCheck();
+  }
+
   public trackByFn = (_: number, item: DepartmentFormFieldConfig<EditDepartmentFields>) => item.field + item.show;
 
   private initForm(): void {
@@ -71,7 +79,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
 
   private watchForOrientedControl(): void {
     this.formGroup
-      .get(EditDepartmentFields.ORIENTED)
+      .get(EditDepartmentFields.IS_ORIENTED)
       ?.valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe((isOriented) => {
         this.initFormConfig(isOriented);
@@ -86,7 +94,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
+        this.store.dispatch([new ShowSideDialog(false), new ShowToast(MessageTypes.Success, RECORD_MODIFIED)]);
         this.refreshGrid.emit();
       });
   }

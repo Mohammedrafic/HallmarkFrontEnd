@@ -16,7 +16,7 @@ import * as ScheduleInt from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { ScheduleFilterStructure } from '../../interface';
 import { OrganizationStructure } from '@shared/models/organization.model';
-import { GetScheduleFilterByEmployees } from '../../helpers';
+import { GetScheduleFilterByEmployees, HasDepartment, ShowButtonTooltip } from '../../helpers';
 
 @Component({
   selector: 'app-schedule-container',
@@ -227,24 +227,15 @@ export class ScheduleContainerComponent extends Destroyable {
   }
 
   private setScheduleButtonTooltip(): void {
-    if (this.showButtonTooltip()) {
+    if (ShowButtonTooltip(this.scheduleFilters) || HasDepartment(this.scheduleFilters)) {
       this.scheduleButtonTooltip = ButtonRegionTooltip;
-      return;
-    }
-
-    if (!this.scheduleSelectedSlots?.dates?.length) {
+    } else if (!this.scheduleSelectedSlots?.dates?.length) {
       this.scheduleButtonTooltip = ButtonSelectDataTooltip;
-      return;
+    } else {
+      this.scheduleButtonTooltip = '';
     }
-
-    this.scheduleButtonTooltip = '';
   }
 
-  private showButtonTooltip(): boolean | undefined {
-    return this.scheduleFilters.regionIds && this.scheduleFilters.regionIds.length > 1 ||
-      this.scheduleFilters.locationIds && this.scheduleFilters.locationIds.length > 1 ||
-      this.scheduleFilters.departmentsIds && this.scheduleFilters.departmentsIds.length > 1;
-  }
 
   private setScheduleStructure(): void {
     if(!this.scheduleFilters.locationIds?.length && !this.scheduleFilters.regionIds?.length) {

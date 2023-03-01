@@ -2,12 +2,14 @@
   <ng-container *ngFor="let fieldConfig of filtersFormConfig; trackBy: trackByFn">
     <ng-container [ngSwitch]="fieldConfig.type">
       <ng-container *ngSwitchCase="controlTypes.Date">
-        <div class="item" *ngIf="fieldConfig.show">
+        <div class="item" [class.short]="fieldConfig.isShort" *ngIf="fieldConfig.show">
           <app-datepicker
             [formGroupInstance]="formGroup"
             [controlName]="fieldConfig.field"
             [label]="fieldConfig.title"
             [disabled]="!!fieldConfig.disabled"
+            [min]="dateRanges.min"
+            [max]="dateRanges.max"
           ></app-datepicker>
         </div>
       </ng-container>
@@ -19,6 +21,7 @@
             [id]="fieldConfig.field"
             [controlName]="fieldConfig.field"
             [label]="fieldConfig.title"
+            [disabled]="!!fieldConfig.disabled"
           >
           </app-toggle>
         </div>
@@ -26,4 +29,3 @@
     </ng-container>
   </ng-container>
 </form>
-

@@ -5,17 +5,21 @@ import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/or
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
-import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import { OrganizationalHierarchy, OrganizationSettingKeys, RECORD_MODIFIED } from '@shared/constants';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 import { Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { SettingsViewService } from '@shared/services';
-import { distinctUntilChanged, filter, merge, Observable, takeUntil, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, merge, Observable, takeUntil, tap } from 'rxjs';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { OrderCandidateApiService } from '../order-candidate-api.service';
+import { CreateCandidateDto } from '@shared/components/order-candidate-list/edit-candidate-list.helper';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ShowToast } from '../../../../store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
 
 enum ReorderCandidateStatuses {
   BillRatePending = 44,
@@ -56,6 +60,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     private actions$: Actions,
     private settingService: SettingsViewService,
     private cdr: ChangeDetectorRef,
+    private orderCandidateApiService: OrderCandidateApiService
   ) {
     super(store, router);
     this.setIrpFeatureFlag();
@@ -111,6 +116,19 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
       previous: first.candidateId !== selectedOrder.candidateId,
       next: last.candidateId !== selectedOrder.candidateId,
     };
+  }
+
+  public changeIrpCandidateStatus(candidate: OrderCandidatesList): void {
+    this.orderCandidateApiService.createIrpCandidate(
+      CreateCandidateDto(candidate.candidateProfileId, this.selectedOrder.id)
+    ).pipe(
+      catchError((error: HttpErrorResponse) => this.orderCandidateApiService.handleError(error)),
+      filter(Boolean),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      this.emitGetCandidatesList();
+    });
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {

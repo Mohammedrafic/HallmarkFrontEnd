@@ -22,17 +22,13 @@ export const EditDepartmentsFormConfig = (
   {
     type: ControlTypes.Checkbox,
     title: 'Oriented',
-    field: EditDepartmentFields.ORIENTED,
-  },
-  {
-    type: ControlTypes.Checkbox,
-    title: 'Home Cost Center',
-    field: EditDepartmentFields.HOME_COST_CENTER,
+    field: EditDepartmentFields.IS_ORIENTED,
   },
   {
     type: ControlTypes.Date,
     title: 'Orientation Start Date',
     field: EditDepartmentFields.ORIENTED_START_DATE,
     show: isOriented,
+    isShort: true,
   },
 ];

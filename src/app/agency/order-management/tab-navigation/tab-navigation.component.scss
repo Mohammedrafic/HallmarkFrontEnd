@@ -7,13 +7,15 @@
 }
 
 .tabs {
-  max-width: calc(100% - 24px) !important;
+  max-width: calc(100% - 12px) !important;
 
   @media #{$max-mobile} {
-    max-width: calc(100vw - 48px) !important;
+    max-width: calc(100vw - 32px) !important;
   }
 }
 
-.e-toolbar.e-control {
-  padding-right: 14px;
+@media #{$min-desktop-small} {
+  .e-toolbar.e-control {
+    padding-right: 14px;
+  }
 }

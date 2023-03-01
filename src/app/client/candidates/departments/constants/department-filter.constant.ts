@@ -49,7 +49,7 @@ const commonColumnData = {
 export const FilterColumnConfig: DepartmentFiltersColumns = {
   regionIds: commonColumnData,
   locationIds: commonColumnData,
-  departmentIds: commonColumnData,
+  departmentsIds: commonColumnData,
   skillIds: { ...commonColumnData, valueField: 'skillDescription' },
   oriented: { ...commonColumnData, type: ControlTypes.Radio },
 };

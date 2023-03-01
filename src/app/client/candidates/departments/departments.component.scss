@@ -1,3 +1,6 @@
+@import 'colors';
+@import 'mixins';
+
 :host {
   height: calc(100vh - 340px);
 }
@@ -6,6 +9,38 @@
   ::ng-deep {
     .ag-header-cell-text {
       white-space: normal;
+    }
+
+    .ag-selection-checkbox {
+      padding-left: 5px;
+    }
+
+    .ag-cell {
+      padding: 8px 12px;
+
+      .edit-button {
+        padding: 6px 10px;
+        opacity: 1 !important;
+
+        @include grid-action-button(
+          $primary-active-blue-10,
+          $primary-active-blue,
+          $primary-active-blue-70,
+          $secondary-dark-blue-30
+        );
+      }
+
+      .remove-button {
+        padding: 6px 10px;
+        opacity: 1 !important;
+
+        @include grid-action-button(
+          $supportive-red,
+          $supportive-red-00,
+          $supportive-red-40,
+          $secondary-dark-blue-30
+        );
+      }
     }
   }
 }

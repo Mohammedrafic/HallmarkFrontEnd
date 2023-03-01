@@ -118,7 +118,7 @@ import {
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { SettingsKeys } from '@shared/enums/settings';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
-import { CandidatesStatusText, CandidateStatus, FilterOrderStatusText, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { CandidatesStatusText, CandidateStatus, FilterOrderStatusText, LocalStorageStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { ButtonModel } from '@shared/models/buttons-group.model';
@@ -269,7 +269,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public resizeObserver: ResizeObserverModel;
   public navigationPanelWidth: string;
   public orderComments: Comment[] = [];
-  public orgpendingOrderapproval: string;
+  public orgpendingOrderapproval: string = "";
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
     text: 'name',
@@ -417,7 +417,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderStaus = routerState?.['orderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
     this.quickOrderId = routerState?.['publicId'];
-    this.prefix = routerState?.['prefix'];    
+    this.prefix = routerState?.['prefix'];
     (routerState?.['status'] =="In Progress (Pending)" ||   routerState?.['status'] =="In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] =="In Progress" ? this.SelectedStatus.push("InProgress"): routerState?.['status']?this.SelectedStatus.push(routerState?.['status']):"";
     this.candidateStatusId = routerState?.['candidateStatusId'] || 0;
     routerState?.['candidateStatus']!=undefined&&routerState?.['candidateStatus']!=''?this.SelectedCandiateStatuses.push(routerState?.['candidateStatus']):"";
@@ -668,7 +668,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.filters.includeReOrders = true;
           this.hasOrderAllOrdersId();
           cleared ? this.store.dispatch([new GetOrders(this.filters)])
-            : this.store.dispatch([new GetOrderFilterDataSources()]);
+          : this.store.dispatch([new GetOrderFilterDataSources()]);
           break;
         case OrganizationOrderManagementTabs.PerDiem:
           this.filters.orderTypes = [OrderType.OpenPerDiem];
@@ -1151,7 +1151,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   buttonGroupChange(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
-    
+
 
     this.clearFilters();
     this.initMenuItems();
@@ -1534,7 +1534,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderFilterDataSources$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((data: OrderFilterDataSource) => {
-        let statuses: FilterOrderStatus[] = [];
+        let statuses : any = [];
         let candidateStatuses: FilterStatus[] = [];
         const statusesByDefault = [
           CandidatStatus.Applied,
@@ -1566,13 +1566,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
             ![FilterOrderStatusText.Filled, FilterOrderStatusText['In Progress']].includes(status.status)
           );
           candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
-        } else if(this.orgpendingOrderapproval === "OrdersforApproval") {
+        } else if(this.orgpendingOrderapproval === LocalStorageStatus.OrdersforApproval) {
           if(this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
             statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
               ![FilterOrderStatusText.Filled, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Closed, FilterOrderStatusText.Open, CandidateStatus.Incomplete].includes(status.status)
             );
             candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
-            this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
+          }
+        } else if(this.orgpendingOrderapproval === LocalStorageStatus.Ordercountzero){
+          if(this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
+            statuses = [{"status" : FilterOrderStatusText.NoRecordsFound, "statusText" : FilterOrderStatusText.NoRecordsFound}]
+            candidateStatuses = [];
           }
         } else {
           statuses = data.orderStatuses;
@@ -1581,7 +1585,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filterColumns.orderStatuses.dataSource = statuses;
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
         this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
-        if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect && this.orgpendingOrderapproval != "") {
+        if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
           this.setDefaultFilter();
         } else {
           this.redirectFromPerdiem = false;
@@ -1591,9 +1595,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.clearFilters();
           this.store.dispatch(new GetIRPOrders(this.filters));
         } else {
-          this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
+            this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
         }
         this.cd$.next(true);
+        setTimeout(() => {
+          this.clearstorage();
+        }, 5000);
+
       });
   }
 
@@ -2041,7 +2049,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         organizationId,
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
-        this.orderManagementService.excludeDeployed
+        isIrp ? this.orderManagementService.getIsAvailable() : this.orderManagementService.excludeDeployed,
       )
     );
   }
@@ -2150,5 +2158,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public getapprovalorder():void {
     this.orgpendingOrderapproval = JSON.parse(localStorage.getItem('pendingApprovalOrders') || '""') as string;
+  }
+
+  clearstorage():void{
+    this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
+    this.orgpendingOrderapproval = "";
   }
 }

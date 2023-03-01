@@ -8,15 +8,13 @@ import {
 } from '@angular/core';
 
 import { Select } from '@ngxs/store';
-import { debounceTime, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { debounceTime, filter, Observable, takeUntil, tap } from 'rxjs';
+import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
-
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimesheetsModel, TimeSheetsPage } from '../../store/model/timesheets.model';
 import { FilterColumns, TimesheetsFilterState } from '../../interface';
-import { FilteredUser } from '@shared/models/user.model';
-import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-timesheets-filter-dialog',

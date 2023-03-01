@@ -149,24 +149,14 @@
   }
 
   .secondary-icon-button {
-    color: $supportive-red;
-
-    &.e-active,
-    &:focus {
-      color: $white;
-      background-color: $supportive-red-00;
-    }
-
-    &:hover {
-      color: $supportive-red;
-      background-color: $supportive-red-40;
-    }
+    @include grid-action-button(
+      $supportive-red,
+      $supportive-red-00,
+      $supportive-red-40,
+      $supportive-red-40
+    );
 
     &[disabled] {
-      pointer-events: none;
-      background-color: transparent;
-      color: $supportive-red-40;
-
       app-custom-icon.icon.supportive-green-10 {
         color: $supportive-green-40;
       }
@@ -174,23 +164,32 @@
   }
 
   .primary-icon-button {
-    color: $primary-active-blue-10;
+    @include grid-action-button(
+      $primary-active-blue-10,
+      $primary-active-blue,
+      $primary-active-blue-70,
+      $primary-active-blue-50
+    );
+  }
+}
 
-    &.e-active,
-    &:focus {
-      color: $white;
-      background-color: $primary-active-blue;
-    }
+@mixin grid-action-button($text, $focus, $hover, $disabled) {
+  color: $text;
 
-    &:hover {
-      color: $primary-active-blue-10;
-      background-color: $primary-active-blue-70;
-    }
+  &.e-active,
+  &:focus {
+    color: $white;
+    background-color: $focus;
+  }
 
-    &[disabled] {
-      pointer-events: none;
-      background-color: transparent;
-      color: $primary-active-blue-50;
-    }
+  &:hover {
+    color: $text;
+    background-color: $hover;
+  }
+
+  &[disabled] {
+    pointer-events: none;
+    background-color: transparent;
+    color: $disabled;
   }
 }

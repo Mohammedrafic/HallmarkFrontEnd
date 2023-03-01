@@ -10,7 +10,7 @@ import { Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import { Order, OrderCandidatesList } from '@shared/models/order-management.model';
+import { IrpOrderCandidate, Order, OrderCandidatesList } from '@shared/models/order-management.model';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -29,6 +29,7 @@ import { AppState } from 'src/app/store/app.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { SettingsViewService } from '@shared/services';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -73,6 +74,11 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public isFeatureIrpEnabled = false;
   public readonly systemType = OrderManagementIRPSystemId;
   public isCandidatePayRateVisible: boolean;
+  public editCandidateDialogState: EditCandidateDialogState = {
+    isOpen: false,
+    candidate: {} as IrpOrderCandidate,
+    order: {} as Order,
+  };
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -172,9 +178,28 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     }
   }
 
+  public saveIrpCandidate(): void {
+    this.emitGetCandidatesList();
+  }
+
   public onCloseDialog(): void {
     this.clearDeployedCandidateOrderInfo();
     this.sideDialog.hide();
+  }
+
+  public openEditCandidateModal(candidate: IrpOrderCandidate): void {
+    this.editCandidateDialogState = {
+      isOpen: true,
+      candidate,
+      order: this.selectedOrder,
+    };
+  }
+
+  public closeEditCandidateModal(event: boolean): void {
+    this.editCandidateDialogState = {
+      ...this.editCandidateDialogState,
+      isOpen: event,
+    };
   }
 
   private getDeployedCandidateOrders(): void {
