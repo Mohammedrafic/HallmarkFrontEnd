@@ -24,6 +24,7 @@ import { FilterDepartmentComponent } from './filter-department/filter-department
 import { DepartmentFormService } from './services/department-form.service';
 import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
 import { DepartmentNameComponent } from './grid/cell-renderers/department-name/department-name.component';
+import { HomeCostCenterPipe } from './pipes/home-cost-center.pipe';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { DepartmentNameComponent } from './grid/cell-renderers/department-name/d
     OrientationCompletedComponent,
     FilterDepartmentComponent,
     EditDepartmentsComponent,
-    DepartmentNameComponent
+    DepartmentNameComponent,
+    HomeCostCenterPipe
   ],
   imports: [
     CommonModule,

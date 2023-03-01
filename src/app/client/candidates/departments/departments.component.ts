@@ -104,7 +104,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public showAssignDepartmentDialog(): void {
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.AssignDepartment);
     this.showSideDialog(true);
-    this.assignDepartment?.resetAssignDepartmentForm();
+    this.dialogData$.next(null);
     this.getAssignedDepartmentHierarchy();
     this.cdr.markForCheck();
   }
@@ -127,6 +127,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
         })
         .pipe(filter(Boolean), take(1))
         .subscribe(() => {
+          this.assignDepartment?.assignDepartmentForm.reset();
           this.showSideDialog(false);
         });
     } else {
