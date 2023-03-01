@@ -452,6 +452,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
         };
         this.store.dispatch(new GetLocationsByRegions(locationFilter));
+        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]); 
       }
     });
   }
