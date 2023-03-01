@@ -1000,7 +1000,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             businessUnitId: this.filterSelectedBusinesUnitId
           }
           this.store.dispatch(new DeletDocuments(deletedocumentFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
-            this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelectedBusinesUnitId }));
+            this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelectedBusinesUnitId })).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
+              this.getDocuments(this.filterSelectedBusinesUnitId);
+            });
           });
         }
         this.removeActiveCssClass();
