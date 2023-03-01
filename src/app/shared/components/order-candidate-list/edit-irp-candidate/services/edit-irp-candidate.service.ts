@@ -17,7 +17,7 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 @Injectable()
 export class EditIrpCandidateService {
 
-  constructor(
+constructor(
     private formBuilder: FormBuilder,
     private orderCandidateApiService: OrderCandidateApiService
   ) {}

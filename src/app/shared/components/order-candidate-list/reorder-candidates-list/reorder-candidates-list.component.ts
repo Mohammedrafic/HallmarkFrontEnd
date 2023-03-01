@@ -20,6 +20,9 @@ import { CreateCandidateDto } from '@shared/components/order-candidate-list/edit
 import { HttpErrorResponse } from '@angular/common/http';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
 
 enum ReorderCandidateStatuses {
   BillRatePending = 44,
@@ -61,7 +64,8 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     private actions$: Actions,
     private settingService: SettingsViewService,
     private cdr: ChangeDetectorRef,
-    private orderCandidateApiService: OrderCandidateApiService
+    private orderCandidateApiService: OrderCandidateApiService,
+    private orderManagementService: OrderManagementService
   ) {
     super(store, router);
     this.setIrpFeatureFlag();
@@ -123,7 +127,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     if(candidate.status === this.onboardedCandidate) {
       return;
     }
- 
+
     this.orderCandidateApiService.createIrpCandidate(
       CreateCandidateDto(candidate.candidateProfileId, this.selectedOrder.id)
     ).pipe(
@@ -133,6 +137,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     ).subscribe(() => {
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       this.emitGetCandidatesList();
+      this.orderManagementService.setCandidate(true);
     });
   }
 

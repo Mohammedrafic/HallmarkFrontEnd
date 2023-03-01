@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
-import { Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 
 import { BaseObservable } from '@core/helpers';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -32,6 +32,7 @@ export class OrderManagementService extends DestroyableDirective {
   private orderManagementSystem: OrderManagementIRPSystemId | null;
   private previousSelectedOrganizationId: number;
   private readonly isAvailable: BaseObservable<boolean> = new BaseObservable<boolean>(false);
+  private readonly updatedCandidate: BaseObservable<boolean> = new BaseObservable<boolean>(false);
 
   constructor(
     private fb: FormBuilder
@@ -108,5 +109,13 @@ export class OrderManagementService extends DestroyableDirective {
 
   getIsAvailable(): boolean {
     return this.isAvailable.get();
+  }
+
+  setCandidate(edit: boolean): void {
+    this.updatedCandidate.set(edit);
+  }
+
+  getCandidate(): Observable<boolean> {
+    return this.updatedCandidate.getStream();
   }
 }

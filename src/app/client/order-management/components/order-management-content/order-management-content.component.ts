@@ -6,9 +6,9 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
-  Inject
+  Inject,
 } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -402,7 +402,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private cd: ChangeDetectorRef,
     private breakpointService: BreakpointObserverService,
     private commentsService: CommentsService,
-    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis
+    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
 
@@ -499,6 +499,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.firstInitGridColumns();
     this.OnUpdateRegrateSucceededHandler();
     this.subscribeOnUserSearch();
+    this.watchForUpdateCandidate();
   }
 
   ngOnDestroy(): void {
@@ -2120,6 +2121,15 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private initResizeObserver(): void {
     this.resizeObserver = ResizeObserverService.init(this.targetElement!);
+  }
+
+  private watchForUpdateCandidate(): void {
+    this.orderManagementService.getCandidate().pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.store.dispatch(new GetIRPOrders(this.filters));
+    });
   }
 
   private listenParentContainerWidth(): void {

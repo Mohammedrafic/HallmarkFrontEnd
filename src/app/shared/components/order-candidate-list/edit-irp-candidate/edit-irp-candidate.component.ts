@@ -35,6 +35,9 @@ import { CandidateDetails, EditCandidateDialogState } from '@shared/components/o
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CustomFormGroup } from '@core/interface';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -71,6 +74,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     private orderCandidateApiService: OrderCandidateApiService,
     private cdr: ChangeDetectorRef,
     private store: Store,
+    private orderManagementService: OrderManagementService
   ) {
     super();
   }
@@ -112,6 +116,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       this.handleSuccessSaveCandidate.emit();
       this.hideDialog();
+      this.orderManagementService.setCandidate(true);
     });
   }
 
