@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { catchError, filter, Observable, tap } from 'rxjs';
+import { filter, Observable, tap } from 'rxjs';
 
 import { MsalBroadcastService, MsalGuardConfiguration, MsalService, MSAL_GUARD_CONFIG } from '@azure/msal-angular';
 import {
