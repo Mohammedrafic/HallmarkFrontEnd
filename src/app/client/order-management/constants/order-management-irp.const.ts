@@ -206,7 +206,7 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
     width: 160,
   },
   {
-    field: 'commitment',
+    field: 'workCommitment',
     headerName: 'Work Commitment',
     width: 140,
   },
