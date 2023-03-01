@@ -7,7 +7,7 @@ import { DepartmentAssigned } from '../departments.model';
 export class HomeCostCenterPipe implements PipeTransform {
   transform(value: DepartmentAssigned[]): DepartmentAssigned[] {
     const isHomeCostCenter = value.findIndex((item) => item.isHomeCostCenter);
-    if (isHomeCostCenter >= 0) {
+    if (isHomeCostCenter > 0) {
       const [homeCostCenter] = value.splice(isHomeCostCenter, 1);
       return [homeCostCenter, ...value];
     } else {
