@@ -27,7 +27,7 @@ export const AdaptIrpCandidates = (
       const irpCandidate: IrpOrderCandidate = {
         ...candidate,
         lastShiftTime: candidate.lastShiftFrom ? `${lastTimeFrom} - ${lastTimeTo}` : '',
-        nextShiftTime: `${nextTimeFrom} - ${nextTimeTo}`,
+        nextShiftTime: candidate.nextShiftFrom ? `${nextTimeFrom} - ${nextTimeTo}` : '',
       };
 
       return irpCandidate;
