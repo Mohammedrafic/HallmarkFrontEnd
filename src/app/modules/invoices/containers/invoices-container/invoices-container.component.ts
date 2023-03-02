@@ -629,7 +629,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.navigatedInvoiceId = invoiceId ? Number(invoiceId) : null;
     this.navigatedOrgId = orgId ? Number(orgId) : null;
     const tabId = this.navigatedInvoiceId !== null ? this.invoicesContainerService.getAllTabId() : 0;
-    this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.AllInvoices : tabId;
+    this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.ManualInvoicePending : tabId;
     this.selectTab(tabId);
   }
 
