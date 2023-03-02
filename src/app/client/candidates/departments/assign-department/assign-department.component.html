@@ -53,17 +53,19 @@
   </div>
   <div class="toggles">
     <app-toggle
-      [formGroupInstance]="assignDepartmentForm"
       id="toggle2"
       controlName="isOriented"
       label="Oriented"
+      [formGroupInstance]="assignDepartmentForm"
+      (checked)="toggleChecked()"
     ></app-toggle>
     <app-toggle
       *ngIf="departmentId"
-      [formGroupInstance]="assignDepartmentForm"
       id="toggle"
       controlName="isHomeCostCenter"
       label="Home Cost Center"
+      [formGroupInstance]="assignDepartmentForm"
+      (checked)="toggleChecked()"
     ></app-toggle>
   </div>
 </form>

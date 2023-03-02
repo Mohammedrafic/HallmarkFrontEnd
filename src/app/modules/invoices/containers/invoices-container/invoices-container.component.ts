@@ -5,7 +5,7 @@ import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { combineLatest, distinctUntilChanged, filter, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
 
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
 import { OutsideZone } from '@core/decorators';
@@ -21,11 +21,11 @@ import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fiel
 import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import { InvoicesTableTabsComponent } from '../../components/invoices-table-tabs/invoices-table-tabs.component';
-import { defaultGroupInvoicesOption, GroupInvoicesOption, GroupInvoicesOptions,
+import { CreatGroupingOptions, GroupInvoicesOption,
   InvoiceDefaulPerPageOptions, InvoicesPerPageOptions } from '../../constants';
 import { AgencyInvoicesGridTab, InvoicesAgencyTabId, OrganizationInvoicesGridTab } from '../../enums';
 import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
-import { InvoicePrintingService, InvoicesService } from '../../services';
+import { InvoicePrintingService, InvoicesApiService, InvoicesService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
@@ -103,20 +103,17 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public gridOptions: GridOptions = {};
 
-  public readonly groupInvoicesOptions = GroupInvoicesOptions;
+  public groupInvoicesOptions: GroupInvoicesOption[] = [];
 
-  public readonly defaultGroupInvoicesOption: GroupInvoicesOption = defaultGroupInvoicesOption;
+  public groupInvoicesBy: GroupInvoicesOption;
 
   public readonly unitOrganizationsFields = baseDropdownFieldsSettings;
 
   public readonly bulkActionConfig: BulkActionConfig = {
-    approve: true
-  }
+    approve: true,
+  };
 
-  public groupInvoicesBy: GroupInvoicesOption = defaultGroupInvoicesOption;
-
-  public currentSelectedTableRowIndex: Observable<number>
-    = this.invoicesService.getCurrentTableIdxStream();
+  public currentSelectedTableRowIndex = this.invoicesService.getCurrentTableIdxStream();
   public isLoading: boolean;
 
   public rejectInvoiceId: number;
@@ -161,6 +158,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     private invoicesContainerService: InvoicesContainerService,
     private printingService: InvoicePrintingService,
     private ngZone: NgZone,
+    private invoiceApiService: InvoicesApiService,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
     @Inject(DOCUMENT) private document: Document,
     store: Store,
@@ -268,6 +266,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.resetFilters();
       this.navigatedInvoiceId = null;
       this.navigatedOrgId = null;
+      this.getGroupingOptions();
     });
 
     this.invoicesFilters$
@@ -291,27 +290,30 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public selectTab(tabIdx: number, tabsConfig: unknown[] = []): void {
-    this.previousSelectedTabIdx = this.selectedTabIdx;
+    this.previousSelectedTabIdx = this.selectedTabIdx; 
+    
     if (this.selectedTabIdx === tabIdx) {
       return;
     }
 
     this.selectedTabIdx = tabIdx;
 
+    if (!this.isAgency && this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords) {
+      this.recordsPerPageOptions = InvoicesPerPageOptions;
+      this.getGroupingOptions();
+    } else {
+      this.recordsPerPageOptions = InvoiceDefaulPerPageOptions;
+    }
+
     if (tabsConfig.length) {
       this.selectedTabId = (tabsConfig[tabIdx] as Interfaces.InvoicesTabItem).tabId;
     } else {
       this.initDefaultSelectedTabId();
     }
+
     this.store.dispatch([
       new Invoices.SetTabIndex(tabIdx),
     ]);
-
-    if (!this.isAgency && this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords) {
-      this.recordsPerPageOptions = InvoicesPerPageOptions;
-    } else {
-      this.recordsPerPageOptions = InvoiceDefaulPerPageOptions;
-    }
 
     this.clearSelections();
     this.clearGroupedInvoices();
@@ -629,5 +631,19 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     const tabId = this.navigatedInvoiceId !== null ? this.invoicesContainerService.getAllTabId() : 0;
     this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.AllInvoices : tabId;
     this.selectTab(tabId);
+  }
+
+  private getGroupingOptions(): void {
+    if (!this.isAgency && this.organizationId && this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords) {
+      this.invoiceApiService.getGroupingOptionsIds(this.organizationId)
+      .pipe(
+        take(1)
+      )
+      .subscribe((optionIds) => {
+        this.groupInvoicesOptions = CreatGroupingOptions(optionIds);
+        this.groupInvoicesBy = this.groupInvoicesOptions[0];
+        this.cdr.markForCheck();
+      });
+    }
   }
 }

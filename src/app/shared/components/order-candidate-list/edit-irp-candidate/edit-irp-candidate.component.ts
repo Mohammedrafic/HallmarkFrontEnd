@@ -28,13 +28,15 @@ import { CandidateField, CandidateForm } from '@shared/components/order-candidat
 import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
-  DisableControls,
   GetConfigField,
 } from '@shared/components/order-candidate-list/edit-candidate-list.helper';
 import { CandidateDetails, EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CustomFormGroup } from '@core/interface';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -71,6 +73,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     private orderCandidateApiService: OrderCandidateApiService,
     private cdr: ChangeDetectorRef,
     private store: Store,
+    private orderManagementService: OrderManagementService
   ) {
     super();
   }
@@ -105,14 +108,19 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   public saveCandidate(): void {
-    this.editIrpCandidateService.getCandidateAction(this.candidateForm, this.candidateModelState).pipe(
-      catchError((error: HttpErrorResponse) => this.orderCandidateApiService.handleError(error)),
-      takeUntil(this.componentDestroy()),
-    ).subscribe(() => {
-      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      this.handleSuccessSaveCandidate.emit();
-      this.hideDialog();
-    });
+    if(this.candidateForm.valid) {
+      this.editIrpCandidateService.getCandidateAction(this.candidateForm, this.candidateModelState).pipe(
+        catchError((error: HttpErrorResponse) => this.orderCandidateApiService.handleError(error)),
+        takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        this.handleSuccessSaveCandidate.emit();
+        this.hideDialog();
+        this.orderManagementService.setCandidate(true);
+      });
+    } else {
+      this.candidateForm.markAllAsTouched();
+    }
   }
 
   private getCandidateDetails(): void {
@@ -132,9 +140,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   private disableCandidateControls(): void {
-    if (this.candidateModelState.candidate.status === CandidatStatus.OnBoard) {
-      DisableControls(['actualStartDate','actualEndDate'], this.candidateForm);
-    } else if(this.candidateModelState.candidate.status === CandidatStatus.Cancelled) {
+    if(this.candidateModelState.candidate.status === CandidatStatus.Cancelled) {
       this.candidateForm.disable();
       this.disableSaveButton = true;
     } else {

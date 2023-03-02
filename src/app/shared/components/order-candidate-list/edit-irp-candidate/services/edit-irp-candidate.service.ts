@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Observable } from 'rxjs';
 
@@ -17,16 +17,16 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 @Injectable()
 export class EditIrpCandidateService {
 
-  constructor(
+constructor(
     private formBuilder: FormBuilder,
     private orderCandidateApiService: OrderCandidateApiService
   ) {}
 
   public createCandidateForm(): CustomFormGroup<CandidateForm> {
     return this.formBuilder.group({
-      status: null,
-      actualStartDate: null,
-      actualEndDate: null,
+      status: [null, Validators.required],
+      actualStartDate: [null],
+      actualEndDate: [null],
     }) as CustomFormGroup<CandidateForm>;
   }
 

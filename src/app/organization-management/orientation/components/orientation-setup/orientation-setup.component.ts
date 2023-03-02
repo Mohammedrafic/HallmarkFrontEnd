@@ -200,8 +200,8 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     const { isEnabled, type } = this.orientationTypeSettingsForm.getRawValue();
     this.orientationService.saveOrientationSetting({ isEnabled, type }).subscribe(() => {
       this.orientationTypeSettingsForm.markAsPristine();
-      this.setGRidControlsState();
       this.selectedOrientationSettings = type;
+      this.setGRidControlsState();
       this.orientationTypeHandler(this.selectedOrientationSettings);
       this.getOrientationConfigs();
       this.cd.markForCheck();
@@ -313,7 +313,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       completedOrientation: data.completedOrientation,
       removeOrientation: data.removeOrientation,
       startDate: DateTimeHelper.convertDateToUtc(data.startDate.toString()),
-      endDate: DateTimeHelper.convertDateToUtc(data.endDate.toString()),
+      endDate: data.endDate ? DateTimeHelper.convertDateToUtc(data.endDate.toString()) : null,
     });
     this.cd.markForCheck();
   }

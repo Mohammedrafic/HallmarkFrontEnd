@@ -393,7 +393,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         timeZone: this.locationDetailsFormGroup.controls['timeZone'].value,
         locationTypeId: this.locationDetailsFormGroup.controls['locationType'].value,
         organizationId : this.businessUnitId,
-        includeInIRP: this.locationDetailsFormGroup.controls['includeInIRP'].value,
+        includeInIRP: this.createIrpValue(this.locationDetailsFormGroup.controls['includeInIRP'].value),
       };
 
       this.saveOrUpdateLocation(location, ignoreWarning);
@@ -713,5 +713,17 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
 
       return column;
     });
+  }
+
+  private createIrpValue(value: boolean): boolean {
+    if (this.isOrgIrpEnabled && !this.isOrgVMSEnabled) {
+      return true;
+    }
+
+    if (this.isOrgIrpEnabled && this.isOrgVMSEnabled) {
+      return value;
+    }
+
+    return false;
   }
 }

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit, ProviderToken } from '@angular/core';
 
-import { ofActionDispatched, Select } from '@ngxs/store';
+import { ofActionDispatched, ofActionSuccessful, Select } from '@ngxs/store';
 import { filter, Observable, takeUntil, tap, distinctUntilChanged, debounceTime, map } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import { AddDialogHelper } from '@core/helpers';
 import { CustomFormGroup, FileForUpload } from '@core/interface';
@@ -120,7 +120,13 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
           this.store.dispatch(new Invoices.SaveManulaInvoice(dto, this.filesForUpload, this.isAgency));
         }
 
-        this.closeDialog();
+        this.actions$
+        .pipe(
+          ofActionSuccessful(Invoices.UpdateManualInvoice, Invoices.SaveManulaInvoice),
+          take(1)
+        ).subscribe(() => {
+          this.closeDialog();
+        });
       });
   }
 

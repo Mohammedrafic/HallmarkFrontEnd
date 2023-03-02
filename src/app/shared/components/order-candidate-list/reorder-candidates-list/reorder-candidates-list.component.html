@@ -18,7 +18,7 @@
               id="switcher"
               class="switch"
               (change)="onSwitcher($event)"
-              [checked]="includeDeployedCandidates"
+              [checked]="isAvailable"
             ></ejs-switch>
             <label class="switch-label" for="switcher">is Available</label>
           </div>
@@ -179,7 +179,7 @@
               <div
                 ejs-button
                 cssClass="e-flat primary-icon-button custom-button"
-                [class.btn-icon__disabled]="order?.isClosed"
+                [class.btn-icon__disabled]="order?.isClosed || data?.status === onboardedCandidate"
                 (click)="changeIrpCandidateStatus(data)"
               >
                 <span class="edit-button"><i-feather name="calendar" class="icon"></i-feather></span>

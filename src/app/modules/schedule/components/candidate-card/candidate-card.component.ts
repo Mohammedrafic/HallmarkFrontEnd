@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
-import { ScheduleCandidate } from '../../interface';
+import { ScheduleCandidate, ScheduleModel } from '../../interface';
 import { CandidateIconName } from '../../constants';
+import { GetCandidateTypeTooltip, PrepareScheduleCandidate } from './candidate-card.helper';
 
 @Component({
   selector: 'app-candidate-card',
@@ -10,25 +11,32 @@ import { CandidateIconName } from '../../constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CandidateCardComponent implements OnInit {
-  @Input() set candidate(candidate: ScheduleCandidate) {
-    if (candidate.workCommitments && candidate.workCommitments.length) {
-      candidate.workCommitmentText = 'Work Commitment: ' + candidate.workCommitments.join(', ');
+  @Input() set candidate(schedule: ScheduleModel) {
+    if (schedule.candidate.workCommitments && schedule.candidate.workCommitments.length) {
+      schedule.candidate.workCommitmentText = 'Work Commitment: ' + schedule.candidate.workCommitments.join(', ');
     } else {
-      candidate.workCommitmentText = 'Work Commitment';
+      schedule.candidate.workCommitmentText = 'Work Commitment';
     }
 
-
-    this.candidateData = candidate;
+    this.createToolTipForSchedule(schedule);
+    this.candidateData = schedule.candidate;
   }
 
   candidateData: ScheduleCandidate;
-
   candidateIconName: string;
-
   iconTooltipMessage = '';
+  candidateTypeTooltip: string;
 
   ngOnInit(): void {
     this.iconTooltipMessage = this.candidateData.isOriented ? this.candidateData.employeeNote : 'Not Oriented';
     this.candidateIconName = CandidateIconName(this.candidateData);
+  }
+
+  private createToolTipForSchedule(schedule: ScheduleModel): void {
+    const candidateCard = PrepareScheduleCandidate(schedule.schedule);
+
+    if (candidateCard?.length) {
+      this.candidateTypeTooltip = GetCandidateTypeTooltip(candidateCard);
+    }
   }
 }

@@ -1,8 +1,9 @@
 <div class="department">
   <div *ngIf="params.data.isHomeCostCenter">
-    <i-feather name="briefcase" class="icon"></i-feather>
+    <ejs-tooltip id="tooltip" [content]="tooltip" position="TopCenter">
+      <i-feather name="briefcase" class="icon"></i-feather>
+    </ejs-tooltip>
   </div>
 
   <div class="text">{{ params.data.departmentName }}</div>
 </div>
-

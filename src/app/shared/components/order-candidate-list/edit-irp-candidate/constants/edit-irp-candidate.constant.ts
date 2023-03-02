@@ -17,7 +17,7 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     field: 'status',
     title: 'Select Status',
     disabled: false,
-    required: false,
+    required: true,
     type: FieldType.Dropdown,
     cssClass: 'status',
     dataSource: [],

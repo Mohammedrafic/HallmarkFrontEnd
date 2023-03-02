@@ -27,6 +27,9 @@ export enum PermissionTypes {
   CanManageNotificationsForOtherUsers = 3400,
   CanManageNotificationTemplates = 3401,
   WidgetLTAOrderEnding = 3403,
+  OpenAndInProgressPositionsWidget = 6100,
+
+
 
   // Credentials
   ManageOrganizationCredential= 401,

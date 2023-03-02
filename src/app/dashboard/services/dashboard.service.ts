@@ -57,6 +57,7 @@ import { CandidateStatusDataModel } from '../models/candidate-status-dto.model';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { CandidateStatusDto } from '@admin/analytics/models/common-report.model';
 import { OrgDetailsInfoModel } from '../models/org-details-info.model';
+import { AgencyPositionModel } from '../models/agency-position.model';
 
 @Injectable()
 export class DashboardService {
@@ -80,8 +81,9 @@ export class DashboardService {
     [WidgetTypeEnum.OPEN_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getOpenPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getInProgressPositionTrendWidgetData(filters),
     [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
-      [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
-    [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters)
+    [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
+    [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters),
+    [WidgetTypeEnum.AGENCY_POSITION_COUNT] : (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -327,6 +329,11 @@ export class DashboardService {
   }
   private getOrganizationWidgetdata(filter: DashboartFilterDto) : Observable<OrgDetailsInfoModel> {
     return this.httpClient.post<OrgDetailsInfoModel>(`${this.baseUrl}/organizationpendingcounts`, { ...filter }).pipe(
+      map((data)=> data)
+    )
+  }
+  private getAgencyPositionCount(filter: DashboartFilterDto) : Observable<AgencyPositionModel[]> {
+    return this.httpClient.post<AgencyPositionModel[]>(`${this.baseUrl}/getOpenAndInprogressOpenPositions`, { ...filter }).pipe(
       map((data)=> data)
     )
   }

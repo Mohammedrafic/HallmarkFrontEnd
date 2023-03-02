@@ -26,8 +26,8 @@ export const AdaptIrpCandidates = (
       const nextTimeTo = DateTimeHelper.formatDateUTC(candidate.nextShiftTo, timeFormat);
       const irpCandidate: IrpOrderCandidate = {
         ...candidate,
-        lastShiftTime: `${lastTimeFrom} - ${lastTimeTo}`,
-        nextShiftTime: `${nextTimeFrom} - ${nextTimeTo}`,
+        lastShiftTime: candidate.lastShiftFrom ? `${lastTimeFrom} - ${lastTimeTo}` : '',
+        nextShiftTime: candidate.nextShiftFrom ? `${nextTimeFrom} - ${nextTimeTo}` : '',
       };
 
       return irpCandidate;

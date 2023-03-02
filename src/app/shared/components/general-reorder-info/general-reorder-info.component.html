@@ -59,7 +59,11 @@
           <div class="sup-title">Reason for Requisition</div>
         </div>
       </div>
-      <div class="last-column"></div>
+      <div class="column links">
+        <div class="accent link" (click)="moveToPerDiem()">
+          Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}
+        </div>
+      </div>
       <div class="column">
         <div class="icon">
           <i-feather name="briefcase" class="icon"></i-feather>
@@ -72,11 +76,7 @@
       <div class="column" *ngIf="!(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea"></div>
       <div class="column empty-column"></div>
       <div class="column empty-column"></div>
-      <div class="column">
-        <div class="accent link" (click)="moveToPerDiem()">
-          Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}
-        </div>
-      </div>
+      <div class="last-column"></div>
     </div>
   </section>
 

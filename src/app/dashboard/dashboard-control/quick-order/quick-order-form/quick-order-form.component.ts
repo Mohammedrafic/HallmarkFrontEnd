@@ -62,7 +62,7 @@ import { distributionSource, ORDER_JOB_DISTRIBUTION } from '@shared/constants/or
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { ManualInvoiceReason } from '@shared/models/manual-invoice-reasons.model';
 import { DurationService } from '@shared/services/duration.service';
-import { DateTimeHelper } from '@core/helpers';
+import { DateTimeHelper, GenerateLocationDepartmentOverlapMessage } from '@core/helpers';
 import { TierLogic } from '@shared/enums/tier-logic.enum';
 import { SettingsViewService } from '@shared/services';
 import {
@@ -87,6 +87,8 @@ import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { PartialSearchService } from '@shared/services/partial-search.service';
 import { PartialSearchDataType } from '@shared/models/partial-search-data-source.model';
+import { CreateOrderDto } from '@shared/models/order-management.model';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-quick-order-form',
@@ -139,6 +141,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public jobDistributions = ORDER_JOB_DISTRIBUTION;
 
   private selectedOrganizationId: number;
+  private selectedLocation: OrganizationLocation;
+  private selectedDepartment: OrganizationDepartment;
 
   @Select(OrderManagementContentState.associateAgencies)
   public associateAgencies$: Observable<AssociateAgency[]>;
@@ -192,7 +196,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     private readonly durationService: DurationService,
     private readonly settingsViewService: SettingsViewService,
     private readonly quickOrderService: QuickOrderService,
-    private readonly partialSearchService: PartialSearchService
+    private readonly partialSearchService: PartialSearchService,
+    private readonly confirmService: ConfirmService,
   ) {
     super();
     this.initOrderForms();
@@ -288,14 +293,14 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   public changeLocationDropdown(event: ChangeEventArgs): void {
     this.resetDepartment();
-    const selectedLocation = event.itemData as OrganizationLocation;
-    this.departmentDataSource = this.getActiveDepartments(selectedLocation.departments);
+    this.selectedLocation = event.itemData as OrganizationLocation;
+    this.departmentDataSource = this.getActiveDepartments(this.selectedLocation.departments);
     this.quickOrderConditions.isDepartmentsDropDownEnabled = true;
   }
 
   public changeDepartmentDropdown(event: ChangeEventArgs): void {
-    const selectedDepartment = event.itemData as OrganizationDepartment;
-    this.store.dispatch(new GetContactDetails(selectedDepartment.id, selectedDepartment.organizationId));
+    this.selectedDepartment = event.itemData as OrganizationDepartment;
+    this.store.dispatch(new GetContactDetails(this.selectedDepartment.id, this.selectedDepartment.organizationId));
   }
 
   private resetLocation(): void {
@@ -344,12 +349,14 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.locationDataSource = region.locations ? this.getActiveLocations(region.locations) : [];
     }
     if (this.locationDataSource.length > 0) {
+      this.selectedLocation = this.locationDataSource[0];
       this.generalInformationForm.controls['locationId'].patchValue(this.locationDataSource[0].id);
       this.quickOrderConditions.isLocationsDropDownEnabled = true;
       this.departmentDataSource = this.getActiveDepartments(this.locationDataSource[0].departments);
     }
 
     if (this.departmentDataSource.length > 0) {
+      this.selectedDepartment = this.departmentDataSource[0];
       this.generalInformationForm.controls['departmentId'].patchValue(this.departmentDataSource[0].id);
       this.store.dispatch(
         new GetContactDetails(this.departmentDataSource[0].id, this.departmentDataSource[0].organizationId)
@@ -681,6 +688,50 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     });
   }
 
+  private showConfirmLocationDepartmentOverlap(order: CreateOrderDto, message: string): void {
+    this.confirmService
+      .confirm(message, {
+        title: 'Confirmation',
+        okButtonLabel: 'Yes',
+        cancelButtonLabel: 'Cancel',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(filter((confirm) => !!confirm))
+      .subscribe((res) => {
+        this.proceedWithSaving(order);
+      });
+  }
+
+  private proceedWithSaving(order: CreateOrderDto): void {
+    const selectedBusinessUnitId = this.organizationForm.value.organization;
+    this.store.dispatch(new SaveOrder(order, [], undefined, selectedBusinessUnitId));
+    this.actions$.pipe(takeUntil(this.destroy$), ofActionSuccessful(SaveOrder)).subscribe(() => {
+      this.store.dispatch(new ToggleQuickOrderDialog(false));
+    });
+  }
+
+  private checkInactiveLocationDepartmentOverlap(order: CreateOrderDto): void {
+    if (this.selectedLocation && this.selectedDepartment && (order.orderType !== OrderType.OpenPerDiem)) {
+      const jobEndDate = order.jobEndDate;
+      const locationInactiveDate = this.selectedLocation.inactiveDate ?
+        new Date(DateTimeHelper.formatDateUTC(this.selectedLocation.inactiveDate, 'MM/dd/yyyy')) : null;
+      const departmentInactiveDate = this.selectedDepartment.inactiveDate ?
+        new Date(DateTimeHelper.formatDateUTC(this.selectedDepartment.inactiveDate, 'MM/dd/yyyy')) : null;
+        locationInactiveDate && locationInactiveDate.setHours(0, 0, 0, 0);
+        departmentInactiveDate && departmentInactiveDate.setHours(0, 0, 0, 0);
+      const isLocationOverlaps = !!locationInactiveDate && DateTimeHelper.isDateBefore(locationInactiveDate, jobEndDate);
+      const isDepartmentOverlaps = !!departmentInactiveDate && DateTimeHelper.isDateBefore(departmentInactiveDate, jobEndDate);
+      const isLocationDepartmentDateSame = this.selectedLocation.inactiveDate === this.selectedDepartment.inactiveDate;
+      if (isLocationOverlaps || isDepartmentOverlaps) {
+        this.showConfirmLocationDepartmentOverlap(order, GenerateLocationDepartmentOverlapMessage(isLocationOverlaps, isDepartmentOverlaps, isLocationDepartmentDateSame, locationInactiveDate as Date, departmentInactiveDate as Date));
+      } else {
+        this.proceedWithSaving(order);
+      }
+    } else {
+      this.proceedWithSaving(order);
+    }
+  }
+
   public submitQuickOrderForm(): void {
     if (
       this.organizationForm.valid &&
@@ -700,11 +751,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         ...this.specialProjectForm.getRawValue(),
         ...this.jobDistributionDescriptionForm.getRawValue(),
       };
-      const selectedBusinessUnitId = this.organizationForm.value.organization;
-      this.store.dispatch(new SaveOrder(order, [], undefined, selectedBusinessUnitId));
-      this.actions$.pipe(takeUntil(this.destroy$), ofActionSuccessful(SaveOrder)).subscribe(() => {
-        this.store.dispatch(new ToggleQuickOrderDialog(false));
-      });
+      this.checkInactiveLocationDepartmentOverlap(order);
     } else {
       this.organizationForm.markAllAsTouched();
       this.orderTypeForm.markAllAsTouched();

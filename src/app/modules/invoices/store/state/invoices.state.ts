@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
-import { catchError, debounceTime, forkJoin, map, Observable, of, switchMap, throttleTime } from 'rxjs';
+import { catchError, debounceTime, forkJoin, map, Observable, of, switchMap, throttleTime, throwError } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
 
 import { PageOfCollections } from '@shared/models/page.model';
@@ -389,7 +389,7 @@ export class InvoicesState {
     /**
      * TODO: change return type afte invoice get implementation
      */
-  ): Observable<number[] | void> {
+  ): Observable<number[] | HttpErrorResponse> {
     return this.invoicesAPIService.saveManualInvoice(payload)
     .pipe(
       switchMap((res) => this.invoicesAPIService.saveManualInvoiceAttachments(
@@ -405,7 +405,8 @@ export class InvoicesState {
         }
       }),
       catchError((err: HttpErrorResponse) => {
-        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+        ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+        return throwError(() => err);
       }),
     );
   }
@@ -414,7 +415,7 @@ export class InvoicesState {
   UpdateManualInvoice(
     ctx: StateContext<InvoicesModel>,
     { payload, files, filesToDelete, isAgency }: Invoices.UpdateManualInvoice,
-  ): Observable<number[]> {
+  ): Observable<number[] | HttpErrorResponse> {
     const organizationId = isAgency ? payload.organizationId : null;
 
     return this.invoicesAPIService.updateManualInvoice(payload)
@@ -439,7 +440,7 @@ export class InvoicesState {
             new ShowToast(MessageTypes.Error, getAllErrors(err.error))
           );
 
-          return of([]);
+          return throwError(() => err);
         }),
       );
   }

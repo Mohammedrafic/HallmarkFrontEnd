@@ -37,6 +37,7 @@ import { ChangeStatusData } from '../../timesheets/interface';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { GetQueryParams } from '@core/helpers/functions.helper';
+import { InvoicesAggregationType } from '../enums';
 
 @Injectable()
 export class InvoicesApiService {
@@ -197,6 +198,11 @@ export class InvoicesApiService {
 
   public deletePayment(id: number): Observable<void> {
     return this.http.delete<void>(`/api/Invoices/payments/${id}`);
+  }
+
+  public getGroupingOptionsIds(orgId: number): Observable<InvoicesAggregationType[]> {
+    return this.http.post<InvoicesAggregationType[]>(`/api/PendingInvoices/createinvoicebyoptions`,
+    { organizationId: orgId });
   }
 
   public exportInvoices(payload: ExportPayload, isAgency: boolean): Observable<Blob> {

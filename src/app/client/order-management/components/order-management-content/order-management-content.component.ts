@@ -6,9 +6,9 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
-  Inject
+  Inject,
 } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -269,7 +269,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public resizeObserver: ResizeObserverModel;
   public navigationPanelWidth: string;
   public orderComments: Comment[] = [];
-  public orgpendingOrderapproval: string;
+  public orgpendingOrderapproval: string = "";
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
     text: 'name',
@@ -402,7 +402,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private cd: ChangeDetectorRef,
     private breakpointService: BreakpointObserverService,
     private commentsService: CommentsService,
-    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis
+    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
 
@@ -417,7 +417,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderStaus = routerState?.['orderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
     this.quickOrderId = routerState?.['publicId'];
-    this.prefix = routerState?.['prefix'];    
+    this.prefix = routerState?.['prefix'];
     (routerState?.['status'] =="In Progress (Pending)" ||   routerState?.['status'] =="In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] =="In Progress" ? this.SelectedStatus.push("InProgress"): routerState?.['status']?this.SelectedStatus.push(routerState?.['status']):"";
     this.candidateStatusId = routerState?.['candidateStatusId'] || 0;
     routerState?.['candidateStatus']!=undefined&&routerState?.['candidateStatus']!=''?this.SelectedCandiateStatuses.push(routerState?.['candidateStatus']):"";
@@ -499,6 +499,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.firstInitGridColumns();
     this.OnUpdateRegrateSucceededHandler();
     this.subscribeOnUserSearch();
+    this.watchForUpdateCandidate();
   }
 
   ngOnDestroy(): void {
@@ -667,7 +668,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.filters.isTemplate = false;
           this.filters.includeReOrders = true;
           this.hasOrderAllOrdersId();
-          cleared ? this.store.dispatch([new GetOrders(this.filters)]) 
+          cleared ? this.store.dispatch([new GetOrders(this.filters)])
           : this.store.dispatch([new GetOrderFilterDataSources()]);
           break;
         case OrganizationOrderManagementTabs.PerDiem:
@@ -1151,7 +1152,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   buttonGroupChange(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
-    
+
 
     this.clearFilters();
     this.initMenuItems();
@@ -1572,13 +1573,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
               ![FilterOrderStatusText.Filled, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Closed, FilterOrderStatusText.Open, CandidateStatus.Incomplete].includes(status.status)
             );
             candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
-            this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
           }
         } else if(this.orgpendingOrderapproval === LocalStorageStatus.Ordercountzero){
           if(this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
-            statuses = [{"status" : FilterOrderStatusText.NoRecordsFound}]
+            statuses = [{"status" : FilterOrderStatusText.NoRecordsFound, "statusText" : FilterOrderStatusText.NoRecordsFound}]
             candidateStatuses = [];
-            this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
           }
         } else {
           statuses = data.orderStatuses;
@@ -1587,7 +1586,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filterColumns.orderStatuses.dataSource = statuses;
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
         this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
-        if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect && this.orgpendingOrderapproval != "") {
+        if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
           this.setDefaultFilter();
         } else {
           this.redirectFromPerdiem = false;
@@ -1603,7 +1602,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         setTimeout(() => {
           this.clearstorage();
         }, 5000);
-    
+
       });
   }
 
@@ -2051,7 +2050,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         organizationId,
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
-        this.orderManagementService.excludeDeployed
+        isIrp ? this.orderManagementService.getIsAvailable() : this.orderManagementService.excludeDeployed,
       )
     );
   }
@@ -2122,6 +2121,15 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private initResizeObserver(): void {
     this.resizeObserver = ResizeObserverService.init(this.targetElement!);
+  }
+
+  private watchForUpdateCandidate(): void {
+    this.orderManagementService.getCandidate().pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.store.dispatch(new GetIRPOrders(this.filters));
+    });
   }
 
   private listenParentContainerWidth(): void {

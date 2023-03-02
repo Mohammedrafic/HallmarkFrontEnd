@@ -34,5 +34,8 @@
     <div *ngIf="OrgChart" class="app-widget-wrapper__org-chart">
       <ng-container [ngTemplateOutlet]="OrgChart"></ng-container>
     </div>
+    <div *ngIf="agency_count" class="app-widget-wrapper__agency_count">
+      <ng-container [ngTemplateOutlet]="agency_count"></ng-container>
+    </div>
   </div> 
 </ng-template>

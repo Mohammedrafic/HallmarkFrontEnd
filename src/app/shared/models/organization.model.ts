@@ -127,6 +127,7 @@ export class OrganizationDepartment {
   locationId?: number;
   includeInIRP?: boolean;
   isDeactivated?: boolean;
+  inactiveDate?: string;
 }
 
 export class OrganizationLocation {
@@ -139,6 +140,7 @@ export class OrganizationLocation {
   locationId?: number;
   includeInIRP?: boolean;
   isDeactivated?: boolean;
+  inactiveDate?: string;
 }
 
 export class OrganizationRegion {

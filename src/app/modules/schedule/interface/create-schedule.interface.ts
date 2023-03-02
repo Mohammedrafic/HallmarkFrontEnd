@@ -72,7 +72,6 @@ export interface ScheduleBook {
   endTime: string | null;
   departmentId: number | string;
   skillId: number | null;
-  orderType: number;
   employeeBookedDays: EmployeeBookingDay[];
 }
 

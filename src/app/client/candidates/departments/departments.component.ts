@@ -77,6 +77,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public selectedDepartments: number[] | null;
   public departmentHierarchy: OrganizationRegion[] = [];
   public disableBulkButton: boolean = false;
+  public filtersAmount: number = 0;
 
   private filters: DepartmentFilterState | null;
 
@@ -103,7 +104,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public showAssignDepartmentDialog(): void {
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.AssignDepartment);
     this.showSideDialog(true);
-    this.assignDepartment?.resetAssignDepartmentForm();
+    this.dialogData$.next(null);
     this.getAssignedDepartmentHierarchy();
     this.cdr.markForCheck();
   }
@@ -126,6 +127,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
         })
         .pipe(filter(Boolean), take(1))
         .subscribe(() => {
+          this.assignDepartment?.assignDepartmentForm.reset();
           this.showSideDialog(false);
         });
     } else {
@@ -135,13 +137,13 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
 
   public updateTableByFilters(filters: DepartmentFilterState): void {
     this.filters = filters;
-    this.getDepartmentsAssigned(this.filters);
+    this.getDepartmentsWithFilters(this.filters);
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
   public resetFilters(): void {
-    this.filters = null;
-    this.getDepartmentsAssigned();
+    this.clearFilterState();
+    this.getDepartmentsWithFilters(this.filters);
   }
 
   public handleBulkEvent(event: BulkActionDataModel): void {
@@ -161,7 +163,11 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   }
 
   public refreshGrid(): void {
-    this.getDepartmentsAssigned(this.filters);
+    this.getDepartmentsWithFilters(this.filters);
+  }
+
+  public applyFiltersAmount(event: number): void {
+    this.filtersAmount = event;
   }
 
   private showSideDialog(isOpen: boolean): void {
@@ -177,18 +183,32 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   }
 
   // Get new data if departments tab will be selected
-  private getDepartmentsAssigned(filters?: DepartmentFilterState | null): void {
+  private getDepartmentsAssigned(): void {
     this.candidatesService
       .getSelectedTab$()
       .pipe(
         filter((tab) => tab === CandidateTabsEnum.Departments),
-        switchMap(() => this.departmentsService.getDepartmentsAssigned(filters)),
+        switchMap(() => this.departmentsService.getDepartmentsAssigned()),
         takeUntil(this.componentDestroy())
       )
       .subscribe((departments) => {
-        this.departmentsAssigned = departments;
-        this.cdr.markForCheck();
+        this.clearFilterState();
+        this.updateGridState(departments);
       });
+  }
+
+  private getDepartmentsWithFilters(filters: DepartmentFilterState | null): void {
+    this.departmentsService
+      .getDepartmentsAssigned(filters)
+      .pipe(take(1))
+      .subscribe((departments) => {
+        this.updateGridState(departments);
+      });
+  }
+
+  private updateGridState(departments: DepartmentsPage): void {
+    this.departmentsAssigned = departments;
+    this.cdr.markForCheck();
   }
 
   private editAssignedDepartment(department: DepartmentAssigned): void {
@@ -207,10 +227,11 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       .pipe(
         filter(Boolean),
         switchMap(() => this.departmentsService.deleteAssignedDepartments(departmentIds)),
+        switchMap(() => this.departmentsService.getDepartmentsAssigned(this.filters)),
         take(1)
       )
-      .subscribe(() => {
-        this.getDepartmentsAssigned(this.filters);
+      .subscribe((departments) => {
+        this.updateGridState(departments);
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
       });
   }
@@ -262,5 +283,10 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     const { startDate, endDate } = employeeWorkCommitment;
     this.dateRanges.max = endDate ? new Date(endDate) : undefined;
     this.dateRanges.min = startDate ? new Date(startDate) : undefined;
+  }
+
+  private clearFilterState(): void {
+    this.filtersAmount = 0;
+    this.filters = null;
   }
 }
