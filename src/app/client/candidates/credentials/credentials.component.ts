@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, take, filter } from 'rxjs';
 
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { CredentialStorageFacadeService } from '@agency/services/credential-storage-facade.service';
@@ -12,7 +12,7 @@ import { CandidateTabsEnum } from '../enums';
   selector: 'app-credentials',
   templateUrl: './credentials.component.html',
   styleUrls: ['./credentials.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CredentialsComponent extends AbstractPermission implements OnInit {
   public isNavigatedFromOrganizationArea: boolean;
@@ -22,11 +22,13 @@ export class CredentialsComponent extends AbstractPermission implements OnInit {
   public selectedTab$: Observable<CandidateTabsEnum>;
 
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
+  public renderCredentialGrid: boolean = false;
 
   constructor(
     protected override store: Store,
     private credentialStorage: CredentialStorageFacadeService,
-    public candidatesService: CandidatesService
+    public candidatesService: CandidatesService,
+    private cdr: ChangeDetectorRef
   ) {
     super(store);
   }
@@ -35,6 +37,7 @@ export class CredentialsComponent extends AbstractPermission implements OnInit {
     super.ngOnInit();
     this.setCredentialParams();
     this.selectedTab$ = this.candidatesService.getSelectedTab$();
+    this.showCredentialGrid();
   }
 
   private setCredentialParams(): void {
@@ -43,4 +46,15 @@ export class CredentialsComponent extends AbstractPermission implements OnInit {
     this.isNavigatedFromOrganizationArea = isNavigatedFromOrganizationArea as boolean;
   }
 
+  private showCredentialGrid(): void {
+    this.selectedTab$
+      .pipe(
+        filter((tab) => tab === this.candidateTabsEnum.Credentials),
+        take(1)
+      )
+      .subscribe(() => {
+        this.renderCredentialGrid = true;
+        this.cdr.markForCheck();
+      });
+  }
 }
