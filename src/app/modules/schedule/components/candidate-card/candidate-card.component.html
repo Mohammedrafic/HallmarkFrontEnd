@@ -3,6 +3,14 @@
     <ejs-tooltip content="Candidate Name" position="TopCenter" [showTipPointer]="false">
       <p class="name">{{ candidateData.lastName }}, {{ candidateData.firstName }}</p>
     </ejs-tooltip>
+    <ejs-tooltip
+      *ngIf="candidateTypeTooltip"
+      [content]="candidateTypeTooltip"
+      position="TopCenter"
+      [showTipPointer]="false"
+    >
+      <p class="order-type">L</p>
+    </ejs-tooltip>
     <!-- TODO: uncomment for feature implementation -->
     <!--<ejs-tooltip
       *ngIf="candidateIconName"

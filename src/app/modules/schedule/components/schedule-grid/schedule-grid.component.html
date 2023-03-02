@@ -63,7 +63,7 @@
         <tr *ngFor="let scheduleItem of scheduleData?.items; trackBy: trackByScheduleData" class="table-row">
           <td class="table-cell candidates-cell fixed fixed--left">
             <app-candidate-card
-              [candidate]="scheduleItem.candidate"
+              [candidate]="scheduleItem"
               (click)="selectCandidate.emit(scheduleItem.candidate)"
             ></app-candidate-card>
           </td>

@@ -40,6 +40,7 @@ export interface ScheduleItem {
     location: string;
     department: string;
     orderPublicId: string;
+    region: string;
   }
 }
 
@@ -131,4 +132,13 @@ export interface EmployeesFilters {
   startDate: string | Date;
   endDate: string | Date;
   departmentsIds: number[];
+}
+
+export interface ScheduleCandidateCard {
+  startDate: string | Date;
+  endDate: string | Date;
+  orderType: IrpOrderType;
+  region: string;
+  location: string;
+  department: string;
 }
