@@ -83,6 +83,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() userPermission: Permission;
   @Input() employee: string | null;
   @Input() isIRP: boolean = false;
+  @Input() isActive: boolean = true;
   @Input() set employeeId(value: number | null | undefined) {
     if (value) {
       this.candidateProfileId = value;

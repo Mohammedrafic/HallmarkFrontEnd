@@ -15,8 +15,8 @@ import { takeUntil } from 'rxjs';
 })
 export class SideDialogComponent extends DestroyableDirective implements OnInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
-  public targetElement: HTMLElement | null = this.document.body.querySelector('#main');
-
+  
+  @Input() targetElement: HTMLElement | null = this.document.body.querySelector('#main');
   @Input() header: string | null;
   @Input() width: string = '434px';
   @Input() disableSaveButton: boolean = false;
