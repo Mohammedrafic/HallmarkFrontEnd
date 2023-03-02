@@ -91,7 +91,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
       candidateProfileId: education.candidateProfileId,
       degree: education.degree,
       schoolName: education.schoolName,
-      graduationDate: education.graduationDate,
+      graduationDate: DateTimeHelper.convertDateToUtc(education.graduationDate),
       fieldOfStudy: education.fieldOfStudy,
     });
     this.store.dispatch(new ShowSideDialog(true));
