@@ -423,10 +423,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
     this.addCredentialForm.patchValue({
       insitute,
-      createdOn,
+      createdOn: createdOn && DateTimeHelper.convertDateToUtc(createdOn.toString()),
       number,
       experience,
-      createdUntil,
+      createdUntil: createdUntil && DateTimeHelper.convertDateToUtc(createdUntil.toString()),
       completedDate,
       rejectReason,
     });
