@@ -350,6 +350,11 @@
   }
 }
 
+.buttons-container {
+  display: flex;
+  column-gap: 12px;
+}
+
 @media #{$max-tablet} {
   ::ng-deep {
     app-page-toolbar {
@@ -359,7 +364,6 @@
         .right-content {
           justify-content: flex-start;
           margin-top: 12px;
-          margin-left: -10px;
         }
       }
     }
