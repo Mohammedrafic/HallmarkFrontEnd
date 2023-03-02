@@ -30,7 +30,7 @@
       <e-column field="degree" headerText="Degree Type" width="320" [valueAccessor]="degreeAccessor"></e-column>
       <e-column field="schoolName" headerText="School Name" width="320"></e-column>
       <e-column headerText="Graduation Month/Year" width="220" textAlign="Right">
-        <ng-template #template let-data>{{data.graduationDate | date:"MM/yyyy"}}</ng-template>
+        <ng-template #template let-data>{{data.graduationDate | date:"MM/yyyy" : "UTC"}}</ng-template>
       </e-column>
       <e-column field="fieldOfStudy" headerText="Field Of Study" width="540"></e-column>
     </e-columns>

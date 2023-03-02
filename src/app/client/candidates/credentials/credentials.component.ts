@@ -17,14 +17,16 @@ import { CandidateTabsEnum } from '../enums';
 export class CredentialsComponent extends AbstractPermission implements OnInit {
   public isNavigatedFromOrganizationArea: boolean;
   public orderId: number | null = null;
-  public candidateName$: Observable<string> = this.candidateService.getCandidateName();
+
+  public candidateName$: Observable<string> = this.candidatesService.getCandidateName();
   public selectedTab$: Observable<CandidateTabsEnum>;
+
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
 
   constructor(
     protected override store: Store,
     private credentialStorage: CredentialStorageFacadeService,
-    public candidateService: CandidatesService
+    public candidatesService: CandidatesService
   ) {
     super(store);
   }
@@ -32,7 +34,7 @@ export class CredentialsComponent extends AbstractPermission implements OnInit {
   public override ngOnInit() {
     super.ngOnInit();
     this.setCredentialParams();
-    this.selectedTab$ = this.candidateService.getSelectedTab$();
+    this.selectedTab$ = this.candidatesService.getSelectedTab$();
   }
 
   private setCredentialParams(): void {

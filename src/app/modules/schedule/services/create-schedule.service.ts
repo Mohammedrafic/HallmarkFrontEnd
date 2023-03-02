@@ -106,12 +106,11 @@ export class CreateScheduleService {
     customShiftId: number
   ): ScheduleInt.ScheduleBook {
     const { departmentId,skillId, shiftId, startTime, endTime } = scheduleForm.getRawValue();
-    //TODO: orderType hardcoded , change to correct type in future;
+
     return  {
       employeeBookedDays: this.getEmployeeBookedDays(scheduleItemsComponent.scheduleItems),
       departmentId: departmentId,
       skillId: skillId,
-      orderType: 10,
       shiftId: shiftId !== customShiftId ? shiftId : null,
       startTime: getTime(startTime),
       endTime: getTime(endTime),

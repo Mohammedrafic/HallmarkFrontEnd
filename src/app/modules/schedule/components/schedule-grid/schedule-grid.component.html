@@ -6,6 +6,7 @@
           <div class="input-group dropdown candidate-autocomplete">
             <i-feather name="search" class="search-icon"></i-feather>
             <ejs-autocomplete
+              #autoCompleteSearch
               [dataSource]="candidatesSuggestions"
               filterType="StartsWith"
               [fields]="candidateNameFields"
@@ -63,7 +64,7 @@
         <tr *ngFor="let scheduleItem of scheduleData?.items; trackBy: trackByScheduleData" class="table-row">
           <td class="table-cell candidates-cell fixed fixed--left">
             <app-candidate-card
-              [candidate]="scheduleItem.candidate"
+              [candidate]="scheduleItem"
               (click)="selectCandidate.emit(scheduleItem.candidate)"
             ></app-candidate-card>
           </td>
