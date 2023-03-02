@@ -1,9 +1,12 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { AbstractPermission } from '@shared/helpers/permissions';
+
 import { Store } from '@ngxs/store';
+import { Observable } from 'rxjs';
+
+import { AbstractPermission } from '@shared/helpers/permissions';
 import { CredentialStorageFacadeService } from '@agency/services/credential-storage-facade.service';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
-import { Observable } from 'rxjs';
+import { CandidateTabsEnum } from '../enums';
 
 @Component({
   selector: 'app-credentials',
@@ -14,8 +17,9 @@ import { Observable } from 'rxjs';
 export class CredentialsComponent extends AbstractPermission implements OnInit {
   public isNavigatedFromOrganizationArea: boolean;
   public orderId: number | null = null;
-
   public candidateName$: Observable<string> = this.candidateService.getCandidateName();
+  public selectedTab$: Observable<CandidateTabsEnum>;
+  public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
 
   constructor(
     protected override store: Store,
@@ -28,6 +32,7 @@ export class CredentialsComponent extends AbstractPermission implements OnInit {
   public override ngOnInit() {
     super.ngOnInit();
     this.setCredentialParams();
+    this.selectedTab$ = this.candidateService.getSelectedTab$();
   }
 
   private setCredentialParams(): void {
