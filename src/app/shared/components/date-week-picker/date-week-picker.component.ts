@@ -41,6 +41,8 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   @Input() firstDayOfWeek: number;
 
+  @Input() disabled = false;
+
   @Output() rangeChanged: EventEmitter<Date[]> = new EventEmitter<Date[]>();
 
   public maxDate: Date | null = new Date(new Date().setHours(23, 59, 59));
@@ -154,7 +156,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
       this.minDate = null;
       this.maxDate = null;
     }
-    
+
     if (this.initDates) {
       this.startDateValue = this.initDates[0].toDateString();
       this.startDate = this.initDates[0];

@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { DatePipe, DOCUMENT } from '@angular/common';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { GeneralNotesGridActionsRendererComponent } from './general-notes-grid-actions-renderer/general-notes-grid-actions-renderer.component';
-import { Actions, Select, Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { ShowSideDialog } from '../../../../store/app.actions';
 import { AddEditNoteComponent } from '@client/candidates/candidate-profile/general-notes/add-edit-note/add-edit-note.component';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
@@ -62,11 +62,12 @@ export class GeneralNotesComponent extends DestroyableDirective implements OnIni
   public generalNotes$ = this.generalNotesService.notes$;
   public categories: CategoryModel[];
   public selectedTab$: Observable<CandidateTabsEnum>;
+  public targetElement: HTMLElement | null = this.document.body;
 
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
 
   public constructor(
-    private actions: Actions,
+    @Inject(DOCUMENT) private document: Document,
     private datePipe: DatePipe,
     private store: Store,
     private generalNotesService: GeneralNotesService,

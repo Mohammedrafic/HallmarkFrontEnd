@@ -7,6 +7,7 @@ import { TimePickerModule } from "@syncfusion/ej2-angular-calendars";
 import { DropDownListModule } from "@syncfusion/ej2-angular-dropdowns";
 import { DialogModule } from "@syncfusion/ej2-angular-popups";
 
+import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { ScheduleItemsModule } from '../schedule-items/schedule-items.module';
 import { CreateScheduleService } from "../../services/create-schedule.service";
 import { CreateScheduleComponent } from "./create-schedule.component";
@@ -24,6 +25,7 @@ import { CreateScheduleComponent } from "./create-schedule.component";
     DropDownListModule,
     TimePickerModule,
     ScheduleItemsModule,
+    TooltipContainerModule,
   ],
   exports: [CreateScheduleComponent],
   providers: [CreateScheduleService],

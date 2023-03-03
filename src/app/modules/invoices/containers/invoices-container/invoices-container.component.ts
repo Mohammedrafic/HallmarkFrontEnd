@@ -336,7 +336,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public resetFilters(): void {
     this.gridInstance?.columnApi.resetColumnState();
 
-    this.store.dispatch(new Invoices.UpdateFiltersState({ orderBy: '' }, false));
     this.store.dispatch(
       new Invoices.UpdateFiltersState({
         pageNumber: GRID_CONFIG.initialPage,
@@ -629,7 +628,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.navigatedInvoiceId = invoiceId ? Number(invoiceId) : null;
     this.navigatedOrgId = orgId ? Number(orgId) : null;
     const tabId = this.navigatedInvoiceId !== null ? this.invoicesContainerService.getAllTabId() : 0;
-    this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.AllInvoices : tabId;
+    this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.ManualInvoicePending : tabId;
     this.selectTab(tabId);
   }
 

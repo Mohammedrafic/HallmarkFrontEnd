@@ -1,4 +1,4 @@
-import { FieldType, InputAttrType } from "@core/enums";
+import { FieldType, InputAttrType, UserPermissions } from "@core/enums";
 import { DropdownOption } from "@core/interface";
 import { ScheduleFormSourceKeys, ScheduleItemType } from "src/app/modules/schedule/constants";
 
@@ -31,6 +31,8 @@ export interface ScheduleTypeRadioButton {
   label: string;
   value: ScheduleItemType;
   name: string;
+  disabled: boolean;
+  permission: UserPermissions;
 }
 
 export interface ScheduleFormSource {
@@ -72,7 +74,6 @@ export interface ScheduleBook {
   endTime: string | null;
   departmentId: number | string;
   skillId: number | null;
-  orderType: number;
   employeeBookedDays: EmployeeBookingDay[];
 }
 

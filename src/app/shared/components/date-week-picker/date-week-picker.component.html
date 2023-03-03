@@ -2,7 +2,7 @@
   <button
     ejs-button cssClass="e-outline"
     (click)="prevWeek()"
-    [disabled]="isPrevDisabled">
+    [disabled]="isPrevDisabled || disabled">
     <i-feather name="chevron-left" class="icon"></i-feather>
   </button>
   <ejs-datepicker
@@ -11,6 +11,7 @@
       class="datepicker datepicker--custom"
       format="dd/MM/yyyy"
       placeholder="From:DD/MM/YYYY - To:DD/MM/YYYY"
+      [enabled]="!disabled"
       [formControl]="dateControl"
       [showClearButton]="false"
       [showTodayButton]="false"
@@ -26,7 +27,7 @@
     ejs-button
     cssClass="e-outline"
     (click)="nextWeek()"
-    [disabled]="isNextDisabled">
+    [disabled]="isNextDisabled || disabled">
     <i-feather name="chevron-right" class="icon"></i-feather>
   </button>
 </div>
