@@ -493,6 +493,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return found ? found[0] : 'e-default';
   }
 
+  public addMissingCredentials(): void {
+    //TODO add method body after BE implementation
+  }
+
   private closeSideDialog(): void {
     this.store
       .dispatch(new ShowSideDialog(false))
