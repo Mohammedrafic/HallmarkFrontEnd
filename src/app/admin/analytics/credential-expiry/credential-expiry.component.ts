@@ -286,6 +286,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
 
     this.candidateStatusesIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses) as AbstractControl;
     this.candidateStatusesIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.selectedCandidateStatuses=[]
       if (this.candidateStatusesIdControl.value.length > 0) {
         let candidateStatusesData = this.filterOptionsData.candidateStatuses;
         this.selectedCandidateStatuses = candidateStatusesData?.filter((object) => data?.includes(object.status));
@@ -347,7 +348,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { departmentIds, locationIds,  regionIds, startDate, endDate, jobId } = this.credentialExpiryForm.getRawValue();
+    let { departmentIds, locationIds,  regionIds, startDate, endDate, jobId,candidateStatuses } = this.credentialExpiryForm.getRawValue();
 
     if (!this.credentialExpiryForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
@@ -363,7 +364,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
     locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
-  
+    candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : this.filterOptionsData.candidateStatuses?.length > 0 ? this.filterOptionsData.candidateStatuses.map(x => x.status).join(",") : "null";
 
       this.paramsData =
       {
@@ -374,7 +375,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       "LocationParamCREXP": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentParamCREXP": departmentIds.length == 0 ? "null" : departmentIds,
       "AgencyParamCREXP": this.selectedAgencies.length ==0?"null":this.selectedAgencies?.map((list) => list.agencyId).join(","),
-      "CandidateStatusCREXP": this.selectedCandidateStatuses.length == 0 ? "null" : this.selectedCandidateStatuses?.map((list) => list.status).join(","),
+      "CandidateStatusCREXP": this.selectedCandidateStatuses.length == 0 ? candidateStatuses : this.selectedCandidateStatuses?.map((list) => list.status).join(","),
       "JobIdCREXP": jobId.trim() == "" ? "null" : jobId.trim(),
       "BearerParamCREXP":auth,
       "BusinessUnitIdParamCREXP":window.localStorage.getItem("lastSelectedOrganizationId") == null 
@@ -383,6 +384,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       window.localStorage.getItem("lastSelectedOrganizationId"),
         "HostName": this.baseUrl,
       };
+      debugger;
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
   }  
