@@ -28,6 +28,7 @@ import {
   PendingInvoicesData,
   InvoicesPendingInvoiceRecordsFilteringOptions,
   InvoiceManualPendingRecordsFilteringOptions,
+  InvoiceDetailDto,
 } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
@@ -36,6 +37,7 @@ import { ChangeStatusData } from '../../timesheets/interface';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { GetQueryParams } from '@core/helpers/functions.helper';
+import { InvoicesAggregationType } from '../enums';
 
 @Injectable()
 export class InvoicesApiService {
@@ -159,8 +161,8 @@ export class InvoicesApiService {
   public getInvoicesForPrinting(
     payload: { organizationIds?: number[]; invoiceIds: number[] },
     isAgency = false
-  ): Observable<InvoiceDetail[]> {
-    return this.http.post<InvoiceDetail[]>(`/api/Invoices${isAgency ? '/agency' : ''}/printing`, payload);
+  ): Observable<InvoiceDetailDto[]> {
+    return this.http.post<InvoiceDetailDto[]>(`/api/Invoices${isAgency ? '/agency' : ''}/printing`, payload);
   }
 
   public export(data: ExportPayload): Observable<Blob>  {
@@ -196,6 +198,11 @@ export class InvoicesApiService {
 
   public deletePayment(id: number): Observable<void> {
     return this.http.delete<void>(`/api/Invoices/payments/${id}`);
+  }
+
+  public getGroupingOptionsIds(orgId: number): Observable<InvoicesAggregationType[]> {
+    return this.http.post<InvoicesAggregationType[]>(`/api/PendingInvoices/createinvoicebyoptions`,
+    { organizationId: orgId });
   }
 
   public exportInvoices(payload: ExportPayload, isAgency: boolean): Observable<Blob> {

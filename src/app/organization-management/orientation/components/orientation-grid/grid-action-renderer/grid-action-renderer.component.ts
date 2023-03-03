@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { ICellRendererParams } from "@ag-grid-community/core";
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { OrientationGridColumns } from '@organization-management/orientation/models/orientation.model';
 
@@ -20,11 +19,11 @@ export class OrientationGridActionRendererComponent extends AbstractPermission {
     super(store);
   }
 
-  public agInit(params: ICellRendererParams): void {
+  public agInit(params: OrientationGridColumns): void {
     this.cellValue = params;
   }
 
-  public refresh(params: ICellRendererParams): boolean {
+  public refresh(params: OrientationGridColumns): boolean {
     this.cellValue = params;
     return true;
   }

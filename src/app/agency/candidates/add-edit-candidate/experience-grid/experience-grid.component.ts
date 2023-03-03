@@ -25,6 +25,7 @@ import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-experience-grid',
@@ -92,8 +93,8 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
       candidateProfileId: experience.candidateProfileId,
       employer: experience.employer,
       jobTitle: experience.jobTitle,
-      startDate: experience.startDate,
-      endDate: experience.endDate,
+      startDate: DateTimeHelper.convertDateToUtc(experience.startDate),
+      endDate: DateTimeHelper.convertDateToUtc(experience.endDate),
       comments: experience.comments,
     });
     if (this.readonlyMode) {
@@ -142,7 +143,10 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
 
   public saveExperience(): void {
     if (this.experienceForm.valid) {
-      this.store.dispatch(new SaveExperience(this.experienceForm.getRawValue()));
+      const experience: Experience = this.experienceForm.getRawValue();
+      experience.startDate = experience.startDate ? DateTimeHelper.toUtcFormat(experience.startDate) : experience.startDate;
+      experience.endDate = experience.endDate ? DateTimeHelper.toUtcFormat(experience.endDate) : experience.endDate;
+      this.store.dispatch(new SaveExperience(experience));
     } else {
       this.experienceForm.markAllAsTouched();
     }

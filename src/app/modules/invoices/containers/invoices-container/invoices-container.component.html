@@ -118,7 +118,7 @@
         position="BottomCenter"
         [opensOn]="!groupingInvoiceRecordsIds.length || !createInvoiceEnabled ? 'Auto' : 'Custom'"
       >
-        <div class="invoices-split-button" *ngIf="tabConfig?.groupingEnabled">
+        <div class="invoices-split-button" *ngIf="tabConfig?.groupingEnabled && groupInvoicesBy">
           <button
             ejs-button
             appHideBeforeSyncfusionLoad

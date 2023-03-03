@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+
+import { Observable, Subject, takeUntil } from 'rxjs';
+
+import { BaseObservable } from '@core/helpers';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Injectable({
@@ -28,6 +31,8 @@ export class OrderManagementService extends DestroyableDirective {
   private _selectedOrderAfterRedirect: OrderTab | null;
   private orderManagementSystem: OrderManagementIRPSystemId | null;
   private previousSelectedOrganizationId: number;
+  private readonly isAvailable: BaseObservable<boolean> = new BaseObservable<boolean>(false);
+  private readonly updatedCandidate: BaseObservable<boolean> = new BaseObservable<boolean>(false);
 
   constructor(
     private fb: FormBuilder
@@ -96,5 +101,21 @@ export class OrderManagementService extends DestroyableDirective {
     }
 
     this.previousSelectedOrganizationId = id;
+  }
+
+  setIsAvailable(state: boolean): void {
+    this.isAvailable.set(state);
+  }
+
+  getIsAvailable(): boolean {
+    return this.isAvailable.get();
+  }
+
+  setCandidate(edit: boolean): void {
+    this.updatedCandidate.set(edit);
+  }
+
+  getCandidate(): Observable<boolean> {
+    return this.updatedCandidate.getStream();
   }
 }

@@ -38,8 +38,11 @@ export class ScheduleGridAdapter {
     const iteratedDates: string[] = [];
 
     const candidates = [...slots.values()].reduce((acc: ScheduleCandidate[], slot: ScheduleDateSlot) => {
-      slot.candidate.orderType = cellDate?.daySchedules[0]?.orderMetadata?.orderType ?? null;
-      acc.push(slot.candidate);
+      acc.push({
+        ...slot.candidate,
+        orderType: cellDate?.daySchedules[0]?.orderMetadata?.orderType ?? null,
+        dates: [...slot.dates.values()],
+      });
       iteratedDates.push(...slot.dates.values());
 
       return acc;

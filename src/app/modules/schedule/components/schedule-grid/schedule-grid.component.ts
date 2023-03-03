@@ -5,6 +5,7 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  NgZone,
   OnChanges,
   OnInit,
   Output,
@@ -15,6 +16,7 @@ import { FormControl } from '@angular/forms';
 import Timeout = NodeJS.Timeout;
 
 import { Select, Store } from '@ngxs/store';
+import { AutoCompleteComponent } from '@syncfusion/ej2-angular-dropdowns/src/auto-complete/autocomplete.component';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
 import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
@@ -24,6 +26,7 @@ import { filter } from 'rxjs/operators';
 import { DatesRangeType } from '@shared/enums';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
+import { OutsideZone } from '@core/decorators';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { ScheduleApiService } from '../../services';
@@ -44,9 +47,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   private organizationId$: Observable<number>;
 
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
+  @ViewChild('autoCompleteSearch') autoCompleteSearch: AutoCompleteComponent;
 
   @Input() scheduleData: ScheduleInt.ScheduleModelPage | null;
   @Input() selectedFilters: ScheduleInt.ScheduleFilters;
+  @Input() hasViewPermission = false;
 
   @Output() changeFilter: EventEmitter<ScheduleInt.ScheduleFilters> = new EventEmitter<ScheduleInt.ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
@@ -87,6 +92,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     private weekService: DateWeekService,
     private scheduleApiService: ScheduleApiService,
     private cdr: ChangeDetectorRef,
+    private readonly ngZone: NgZone,
   ) {
     super();
   }
@@ -109,10 +115,13 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   changeActiveDatePeriod(selectedPeriod: string | undefined): void {
-    this.activePeriod = selectedPeriod as DatesRangeType;
-    this.cdr.detectChanges();
+    if (this.hasViewPermission) {
+      this.activePeriod = selectedPeriod as DatesRangeType;
+      this.cdr.detectChanges();
+    }
   }
 
+  @OutsideZone
   handleCellSingleClick(date: string, candidate: ScheduleInt.ScheduleCandidate, cellDate?: ScheduleDateItem): void {
     // TODO: refactor, move to directive
     if(!cellDate?.isDisabled) {
@@ -179,6 +188,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   private startOrgIdWatching(): void {
     this.organizationId$.pipe(
       filter(Boolean),
+      tap(() => this.autoCompleteSearch?.clear()),
       switchMap((businessUnitId: number) => {
         return this.store.dispatch(new GetOrganizationById(businessUnitId));
       }),

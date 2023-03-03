@@ -18,7 +18,7 @@ import { catchError, filter, map, Subscription, switchMap, take, takeUntil, tap 
 
 import { FieldType } from '@core/enums';
 import { DestroyDialog } from '@core/helpers';
-import { CustomFormGroup, DropdownOption } from '@core/interface';
+import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
@@ -26,7 +26,7 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ShiftsService } from '@shared/services/shift.service';
-import { convertMsToTime, getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
+import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import {
   AvailabilityFormConfig,
   BookFormConfig,
@@ -64,6 +64,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   @Input() selectedScheduleFilters: ScheduleInt.ScheduleFilters;
   @Input() scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
   @Input() datePickerLimitations: DatePickerLimitations;
+  @Input() userPermission: Permission = {};
 
   @Input() set scheduleStructure(structure: ScheduleFilterStructure) {
     if (structure.regions?.length) {
@@ -80,16 +81,16 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   @Output() updateScheduleGrid: EventEmitter<void> = new EventEmitter<void>();
 
   readonly targetElement: HTMLBodyElement = this.globalWindow.document.body as HTMLBodyElement;
-  readonly scheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = ScheduleTypes;
   readonly scheduleTypeNumberEnum = ScheduleItemType;
   readonly FieldTypes = FieldType;
   readonly scheduleTypesControl: FormControl = new FormControl(this.scheduleTypeNumberEnum.Book);
   readonly dropDownFields = { text: 'text', value: 'value' };
   readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = ScheduleSourcesMap;
 
+  scheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = ScheduleTypes;
   scheduleForm: CustomFormGroup<ScheduleInt.ScheduleForm>;
   scheduleFormConfig: ScheduleInt.ScheduleFormConfig;
-  scheduleTypeNumber: ScheduleItemType;
+  scheduleType: ScheduleItemType;
   showScheduleForm = true;
   selectedScheduleType: ScheduleItemType | null = null;
 
@@ -114,10 +115,10 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setScheduleTypesPermissions();
     this.watchForCloseStream();
     this.getUnavailabilityReasons();
     this.getShifts();
-    this.updateScheduleDialogConfig(ScheduleItemType.Book);
     this.watchForControls();
     this.watchForScheduleType();
   }
@@ -161,17 +162,8 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
     const startTimeDate = this.scheduleForm.get('startTime')?.value;
     const endTimeDate = this.scheduleForm.get('endTime')?.value;
 
-    // TODO: move to service
     if (startTimeDate && endTimeDate) {
-      const startTimeMs: number = startTimeDate.getTime();
-      let endTimeMs: number = endTimeDate.getTime();
-
-      if (startTimeMs > endTimeMs) {
-        const dayMs = 86400000;
-        endTimeMs = endTimeMs + dayMs;
-      }
-
-      this.scheduleForm.get('hours')?.setValue(convertMsToTime(endTimeMs - startTimeMs));
+      this.scheduleForm.get('hours')?.setValue(this.createScheduleService.getShiftHours(startTimeDate, endTimeDate));
     }
   }
 
@@ -227,9 +219,9 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   private updateScheduleDialogConfig(scheduleTypeMode: ScheduleItemType): void {
-    this.scheduleTypeNumber = scheduleTypeMode;
+    this.scheduleType = scheduleTypeMode;
 
-    switch (this.scheduleTypeNumber) {
+    switch (this.scheduleType) {
       case ScheduleItemType.Book:
         this.scheduleFormConfig = BookFormConfig;
         this.scheduleForm = this.createScheduleService.createBookForm();
@@ -317,7 +309,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
       ).subscribe((value: number) => {
         this.scheduleForm.get('departmentsId')?.patchValue([], { emitEvent: false, onlySelf: true });
         this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = this.scheduleFiltersService
-          .getSelectedDepartmentOptions(this.scheduleStructureList, [value]);
+          .getSelectedDepartmentOptions(this.scheduleStructureList, [value], false);
 
         this.cdr.markForCheck();
       });
@@ -429,5 +421,12 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
     this.scheduleForm.markAsUntouched();
     this.closeDialog();
     this.store.dispatch(new ShowToast(MessageTypes.Success, message));
+  }
+
+  private setScheduleTypesPermissions(): void {
+    this.scheduleTypes = this.createScheduleService.getScheduleTypesWithPermissions(this.scheduleTypes, this.userPermission);
+    this.scheduleType = this.createScheduleService.getFirstAllowedScheduleType(this.scheduleTypes);
+    this.scheduleTypesControl.setValue(this.scheduleType);
+    this.updateScheduleDialogConfig(this.scheduleType);
   }
 }

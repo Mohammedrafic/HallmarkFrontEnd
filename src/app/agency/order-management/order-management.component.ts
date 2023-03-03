@@ -10,6 +10,7 @@ import { SearchComponent } from '@shared/components/search/search.component';
 import {
   TabNavigationComponent,
 } from '@client/order-management/components/order-management-content/tab-navigation/tab-navigation.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-management',
@@ -25,11 +26,15 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   public filteredItems$ = new Subject<number>();
   public exportSelected$ = new Subject<any>();
   public search$ = new Subject<string>();
+  public orderStatus: string[]=[];
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store) {
+
+  constructor(private store: Store,private router: Router,) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
+  const routerState = this.router.getCurrentNavigation()?.extras?.state;
+  this.orderStatus.push(routerState?.['status']== "In Progress" ? 'InProgress' : routerState?.['status'] );
   }
 
   ngOnDestroy(): void {

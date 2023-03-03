@@ -199,8 +199,9 @@
                     <!-- Hourly rate -->
                     <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-50">
                       <label>Hourly Rate<span class="required">*</span></label>
-                      <div class="input-group">
+                      <div class="input-group" [ngClass]="{'input-readonly': !userPermission[userPermissions.CanEditOrderBillRate]}">
                         <input
+                          [readonly]="!userPermission[userPermissions.CanEditOrderBillRate]"
                           class="e-input"
                           type="text"
                           formControlName="hourlyRate"

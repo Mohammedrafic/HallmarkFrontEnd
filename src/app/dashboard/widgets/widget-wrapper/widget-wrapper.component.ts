@@ -19,4 +19,5 @@ export class WidgetWrapperComponent {
   @ContentChild('positionChat') public readonly positionChart: TemplateRef<HTMLElement>;
   @ContentChild('legend') public readonly legend: TemplateRef<HTMLElement>;
   @ContentChild("OrgChart") public readonly OrgChart: TemplateRef<HTMLElement>;
+  @ContentChild("agency_count") public readonly agency_count: TemplateRef<HTMLElement>;
 }

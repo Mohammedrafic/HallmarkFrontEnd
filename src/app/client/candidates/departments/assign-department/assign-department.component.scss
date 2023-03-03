@@ -1,8 +1,8 @@
 .toggles {
   display: flex;
-  flex-direction: column;
-  row-gap: 12px;
-  margin-top: 10px;
+  justify-content: space-between;
+  column-gap: 12px;
+  margin: 10px 15px 0 0;
 }
 
 .department-form {

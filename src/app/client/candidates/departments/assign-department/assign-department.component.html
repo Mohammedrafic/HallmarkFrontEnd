@@ -36,12 +36,16 @@
     <app-datepicker
       [formGroupInstance]="assignDepartmentForm"
       [required]="true"
+      [min]="dateRanges.min"
+      [max]="dateRanges.max"
       id="start-date"
       controlName="startDate"
       label="Start Date"
     ></app-datepicker>
     <app-datepicker
       [formGroupInstance]="assignDepartmentForm"
+      [min]="dateRanges.min"
+      [max]="dateRanges.max"
       id="end-date"
       controlName="endDate"
       label="End Date"
@@ -49,16 +53,19 @@
   </div>
   <div class="toggles">
     <app-toggle
-      [formGroupInstance]="assignDepartmentForm"
       id="toggle2"
       controlName="isOriented"
       label="Oriented"
+      [formGroupInstance]="assignDepartmentForm"
+      (checked)="toggleChecked()"
     ></app-toggle>
     <app-toggle
-      [formGroupInstance]="assignDepartmentForm"
+      *ngIf="departmentId"
       id="toggle"
-      controlName="homeCostCenter"
+      controlName="isHomeCostCenter"
       label="Home Cost Center"
+      [formGroupInstance]="assignDepartmentForm"
+      (checked)="toggleChecked()"
     ></app-toggle>
   </div>
 </form>

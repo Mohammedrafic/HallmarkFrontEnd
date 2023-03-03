@@ -9,7 +9,6 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
 import {
@@ -24,10 +23,12 @@ import {
   of,
 } from 'rxjs';
 
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import {
+  AssignDepartmentFormState,
   AssignDepartmentHierarchy,
   AssignNewDepartment,
+  DateRanges,
   DepartmentAssigned,
   EditAssignedDepartment,
 } from '../departments.model';
@@ -36,6 +37,9 @@ import { OrganizationRegion, OrganizationLocation, OrganizationDepartment } from
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormService } from '../services/department-form.service';
 import { OptionFields } from '@client/order-management/constants';
+import { MessageTypes } from '@shared/enums/message-types';
+import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { CustomFormGroup } from '@core/interface';
 
 @Component({
   selector: 'app-assign-department',
@@ -47,10 +51,11 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   @Input() public dialogData$: BehaviorSubject<DepartmentAssigned | null>;
   @Input() public saveForm$: Subject<boolean>;
   @Input() public departmentHierarchy: OrganizationRegion[];
+  @Input() public dateRanges: DateRanges;
 
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
-  public assignDepartmentForm: FormGroup;
+  public assignDepartmentForm: CustomFormGroup<AssignDepartmentFormState>;
   public dataSource: AssignDepartmentHierarchy = {
     regions: [],
     locations: [],
@@ -58,11 +63,9 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   };
 
   public readonly departmentFields = OptionFields;
-
-  private departmentId?: number | null = null;
+  public departmentId?: number | null = null;
 
   public constructor(
-    private readonly formBuilder: FormBuilder,
     private readonly cdr: ChangeDetectorRef,
     private readonly departmentService: DepartmentsService,
     private readonly departmentFormService: DepartmentFormService,
@@ -79,39 +82,31 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    if (changes['departmentHierarchy'].currentValue) {
+    if (changes['departmentHierarchy']?.currentValue) {
       this.dataSource.regions = this.departmentHierarchy;
     }
   }
-
-  public resetAssignDepartmentForm(): void {
-    this.assignDepartmentForm.reset();
-    this.assignDepartmentForm.enable();
-    this.cdr.markForCheck();
+  
+  public toggleChecked(): void {
+    this.assignDepartmentForm.markAsDirty();
   }
 
   private initForm(): void {
-    this.assignDepartmentForm = this.formBuilder.group({
-      regionId: [null, [Validators.required]],
-      locationId: [null, [Validators.required]],
-      departmentId: [null, [Validators.required]],
-      startDate: [null, [Validators.required]],
-      endDate: [null],
-      isOriented: [null],
-      homeCostCenter: [null],
-    });
+    this.assignDepartmentForm = this.departmentFormService.createAssignDepartmentForm();
   }
 
   private subscribeOnDialogData(): void {
-    this.dialogData$.pipe(filter(Boolean), debounceTime(200), takeUntil(this.destroy$)).subscribe((data) => {
-      this.departmentId = data.id;
-      this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
-      this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
-      this.dataSource.departments = [{ name: data.departmentName, id: data.departmentId } as OrganizationDepartment];
+    this.dialogData$.pipe(debounceTime(200), takeUntil(this.destroy$)).subscribe((data) => {
+      this.departmentId = data?.id;
 
-      if (this.departmentId) {
+      if (data && this.departmentId) {
+        this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
+        this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
+        this.dataSource.departments = [{ name: data.departmentName, id: data.departmentId } as OrganizationDepartment];
         this.departmentFormService.patchForm(this.assignDepartmentForm, data);
         this.disableControls();
+      } else {
+        this.resetAssignDepartmentForm();
       }
       this.cdr.markForCheck();
     });
@@ -126,21 +121,21 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     this.saveForm$
       .pipe(
         switchMap(() => {
-          const formInvalid = this.assignDepartmentForm.invalid;
-          if (formInvalid) {
+          const formValid = this.assignDepartmentForm.valid;
+          if (!formValid) {
             this.assignDepartmentForm.markAllAsTouched();
             this.cdr.markForCheck();
-            return of(false);
           }
-          return this.saveAssignedDepartment();
+          return formValid ? this.saveAssignedDepartment() : of(formValid);
         }),
         takeUntil(this.destroy$)
       )
-      .subscribe((formValid) => {
-        if (formValid) {
+      .subscribe((success) => {
+        if (success) {
           this.resetAssignDepartmentForm();
+          const MESSAGE = this.departmentId ? RECORD_MODIFIED : RECORD_ADDED;
+          this.store.dispatch([new ShowSideDialog(false), new ShowToast(MessageTypes.Success, MESSAGE)]);
           this.departmentId = null;
-          this.store.dispatch(new ShowSideDialog(false));
           this.refreshGrid.emit();
         }
       });
@@ -195,5 +190,13 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         takeUntil(this.destroy$)
       )
       .subscribe(() => this.cdr.markForCheck());
+  }
+
+  private resetAssignDepartmentForm(): void {
+    this.assignDepartmentForm.reset();
+    this.assignDepartmentForm.enable();
+    this.assignDepartmentForm.get('startDate')?.setValue(new Date());
+    this.departmentId = null;
+    this.cdr.markForCheck();
   }
 }

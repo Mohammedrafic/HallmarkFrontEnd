@@ -14,12 +14,12 @@
   }
 
   .tabs {
-    max-width: calc(100% - 24px) !important;
+    max-width: calc(100% - 12px) !important;
     overflow: hidden !important;
     @media #{$max-mobile} {
-      max-width: calc(100vw - 50px) !important;
+      max-width: calc(100vw - 32px) !important;
     }
-    
+
     .e-hscroll-content {
       padding: 0;
     }
@@ -42,6 +42,8 @@
   }
 }
 
-.e-toolbar.e-control {
-  padding-right: 14px;
+@media #{$min-desktop-small} {
+  .e-toolbar.e-control {
+    padding-right: 14px;
+  }
 }

@@ -176,6 +176,13 @@ export enum UserPermissions {
   MasterWorkCommitments = 4155,
   OrganizationWorkCommitments = 4156,
 
+  // Schedule
+  Schedule = 4200,
+  CanViewSchedule = 4201,
+  CanAddAvailability = 4202,
+  CanAddUnavailability = 4203,
+  CanAddShift = 4204,
+
   //Group email permission
   CanViewGroupEmail = 5101,
   CanSendGroupEmail = 5102,

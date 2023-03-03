@@ -20,6 +20,7 @@ export interface DepartmentAssigned {
   isOriented: boolean;
   startDate: Date;
   endDate: Date;
+  isHomeCostCenter: boolean;
 }
 
 interface Skill {
@@ -32,7 +33,7 @@ export interface EditAssignedDepartment {
   startDate: Date | string;
   endDate: Date | string;
   orientedStartDate?: Date | string;
-  homeCostCenter?: boolean;
+  isHomeCostCenter?: boolean;
   isOriented?: boolean;
 }
 
@@ -44,6 +45,7 @@ export interface AssignNewDepartment {
   departmentId: number;
   startDate: Date | string;
   endDate?: Date | string;
+  isHomeCostCenter?: boolean;
 }
 
 export interface DepartmentFormFieldConfig<T> {
@@ -68,18 +70,27 @@ export type DepartmentFiltersColumns = {
   };
 };
 
+export interface AssignDepartmentFormState {
+  regionId: number;
+  locationId: number;
+  departmentId: number;
+  startDate: Date;
+  endDate: Date | null;
+  isOriented: boolean;
+  isHomeCostCenter: boolean;
+}
+
 export interface DepartmentFilterState {
-  regionId: number[];
-  locationId: number[];
-  departmentId: number[];
-  skills: number[];
+  regionIds: number[];
+  locationIds: number[];
+  departmentsIds: number[];
+  skillIds: number[];
   oriented: boolean;
 }
 export interface EditDepartmentFormState {
   [EditDepartmentFields.START_DATE]: Date;
   [EditDepartmentFields.END_DATE]: Date;
-  [EditDepartmentFields.ORIENTED]: boolean;
-  [EditDepartmentFields.HOME_COST_CENTER]: boolean;
+  [EditDepartmentFields.IS_ORIENTED]: boolean;
   [EditDepartmentFields.ORIENTED_START_DATE]?: Date;
 }
 export interface DepartmentHierarchy {
@@ -96,8 +107,9 @@ export interface AssignDepartmentHierarchy {
 }
 
 export interface EditDepartmentPayload {
+  forceUpdate: boolean;
   isOriented?: true | undefined;
-  homeCostCenter?: true | undefined;
+  isHomeCostCenter?: true | undefined;
   orientedStartDate?: string | undefined;
   employeeWorkCommitmentId: number;
   startDate: string;
@@ -106,11 +118,18 @@ export interface EditDepartmentPayload {
 }
 
 export interface NewDepartmentPayload {
+  forceUpdate: boolean;
   employeeWorkCommitmentId: number;
   departmentId: number;
   isOriented: boolean;
   startDate: string;
   endDate: string | undefined;
+  isHomeCostCenter?: boolean;
+}
+
+export interface DateRanges {
+  min?: Date;
+  max?: Date;
 }
 
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;

@@ -1,3 +1,4 @@
+import { formatDate } from '@angular/common';
 import { AbstractControl, FormGroup, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { EmailValidation } from '@core/constants';
 
@@ -64,3 +65,21 @@ export const MultiEmailValidator = (control: AbstractControl): ValidationErrors 
 
   return invalidEmailList?.length ? { invalidEmails: invalidEmailList } : null;
 };
+
+export const GenerateLocationDepartmentOverlapMessage = (isLocationOverlaps: boolean, isDepartmentOverlaps: boolean, isLocationDepartmentDateSame: boolean, locationInactiveDate: Date, departmentInactiveDate: Date): string => {
+  let message = '';
+  if (isLocationOverlaps) {
+    if (isDepartmentOverlaps) {
+      if (isLocationDepartmentDateSame) {
+        message = `Location and Department will be inactivated at ${formatDate(locationInactiveDate, 'MM/dd/yyyy', 'en-US')}. Are you sure you want to proceed?`;
+      } else {
+        message = `Location will be inactivated at ${formatDate(locationInactiveDate, 'MM/dd/yyyy', 'en-US')} and Department will be inactivated at ${formatDate(departmentInactiveDate, 'MM/dd/yyyy', 'en-US')}. Are you sure you want to proceed?`;
+      }
+    } else {
+      message = `Location will be inactivated at ${formatDate(locationInactiveDate, 'MM/dd/yyyy', 'en-US')}. Are you sure you want to proceed?`;
+    }
+  } else if (isDepartmentOverlaps) {
+    message = `Department will be inactivated at ${formatDate(departmentInactiveDate, 'MM/dd/yyyy', 'en-US')}. Are you sure you want to proceed?`;
+  }
+  return message;
+}

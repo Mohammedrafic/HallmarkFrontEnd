@@ -384,9 +384,15 @@ export class DocumentLibraryState {
   @Action(GetSharedDocumentInformation)
   GetSharedDocumentInformation({ patchState }: StateContext<DocumentLibraryStateModel>, { sharedDocumentInformation }: GetSharedDocumentInformation): Observable<BusinessUnit[]> {
     return this.documentLibraryService.getSharedDocumentInformation(sharedDocumentInformation).pipe(
-      tap((payload) => {
-        patchState({ businessUnits: payload });
-        return payload;
+      tap((payload: any) => {
+        if(payload.length>0){
+          patchState({ businessUnits: payload });
+          return payload;
+        }
+        else{
+          patchState({ businessUnits: null });
+          return null;
+        }
       })
     );
   }

@@ -28,23 +28,19 @@
       <div class="input-container bootstrap">
         <label>Organization Name<span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="businessIds"
-                           placeholder="All"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           appValidateWithMessage
-                           [fields]="bussinesDataFields"
-                           [dataSource]="filterColumns.businessIds.dataSource"
-                           [selectAllText]='allOption'
-                           showSelectAll=true [value]="defaultOrganizations">
-          </ejs-multiselect>
+          <ejs-dropdownlist appValidateWithMessage
+                            formControlName="businessIds"
+                            [fields]="organizationFields"
+                            [dataSource]="filterColumns.businessIds.dataSource"
+                            [allowFiltering]="true"
+                            placeholder="Business">
+          </ejs-dropdownlist>
         </div>
       </div>
     </div>
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Region<span class="required">*</span></label>
+        <label>Region</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox"
                            formControlName="regionIds"
@@ -53,16 +49,14 @@
                            [allowFiltering]="true"
                            [showDropDownIcon]="true"
                            [dataSource]="filterColumns.regionIds.dataSource"
-                           [fields]="regionFields"
-                           [selectAllText]='allOption'
-                           showSelectAll=true [value]="defaultRegions">
+                           [fields]="regionFields">
           </ejs-multiselect>
         </div>
       </div>
     </div>
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Location<span class="required">*</span></label>
+        <label>Location</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox"
                            formControlName="locationIds"
@@ -71,16 +65,14 @@
                            [allowFiltering]="true"
                            [showDropDownIcon]="true"
                            [dataSource]="filterColumns.locationIds.dataSource"
-                           [fields]="locationFields"
-                           [selectAllText]='allOption'
-                           showSelectAll=true [value]="defaultLocations">
+                           [fields]="locationFields">
           </ejs-multiselect>
         </div>
       </div>
     </div>
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Department<span class="required">*</span></label>
+        <label>Department</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox"
                            formControlName="departmentIds"
@@ -89,9 +81,7 @@
                            [allowFiltering]="true"
                            [showDropDownIcon]="true"
                            [dataSource]="filterColumns.departmentIds.dataSource"
-                           [fields]="departmentFields"
-                           [selectAllText]='allOption'
-                           showSelectAll=true [value]="defaultDepartments">
+                           [fields]="departmentFields">
           </ejs-multiselect>
         </div>
       </div>
@@ -128,4 +118,4 @@
   </form>
 </app-filter-dialog>
 
-  
+

@@ -4,6 +4,7 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
 
 import { Store } from '@ngxs/store';
 import { CHANGES_SAVED } from '@shared/constants';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { Observable,tap } from 'rxjs';
@@ -12,6 +13,44 @@ import { OrientationConfiguration, OrientationConfigurationDTO, OrientationConfi
 
 @Injectable()
 export class OrientationService {
+  public filterColumns = {
+    regionIds: {
+      type: ControlTypes.Multiselect,
+      valueType: ValueType.Id,
+      dataSource: [],
+      valueField: 'name',
+      valueId: 'id',
+    },
+    locationIds: {
+      type: ControlTypes.Multiselect,
+      valueType: ValueType.Id,
+      dataSource: [],
+      valueField: 'name',
+      valueId: 'id',
+    },
+    departmentsIds: {
+      type: ControlTypes.Multiselect,
+      valueType: ValueType.Id,
+      dataSource: [],
+      valueField: 'name',
+      valueId: 'id',
+    },
+    skillCategoryIds: {
+      type: ControlTypes.Multiselect,
+      valueType: ValueType.Id,
+      dataSource: [],
+      valueField: 'name',
+      valueId: 'id',
+    },
+    skillIds: {
+      type: ControlTypes.Multiselect,
+      valueType: ValueType.Id,
+      dataSource: [],
+      valueField: 'skillDescription',
+      valueId: 'id',
+    },
+  };
+  
   constructor(
     private store: Store,
     private http: HttpClient,
@@ -67,5 +106,15 @@ export class OrientationService {
     endTimeField.valueChanges.subscribe(() => startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
 
     return form;
+  }
+
+  public generateConfigurationFilterForm(): FormGroup {
+    return new FormGroup({
+      regionIds: new FormControl(null),
+      locationIds: new FormControl(null),
+      departmentsIds: new FormControl(null),
+      skillIds: new FormControl(null),
+      skillCategoryIds: new FormControl(null),
+    });
   }
 }

@@ -41,6 +41,7 @@ import {
   GetDepartmentsImportErrorsSucceeded,
   GetDepartmentsImportTemplate,
   GetDepartmentsImportTemplateSucceeded,
+  GetFilteringAssignedSkillsByOrganization,
   GetLocationById,
   GetLocationFilterOptions,
   GetLocationsByOrganizationId,
@@ -227,6 +228,7 @@ export interface OrganizationManagementStateModel {
   loctionTypes: LocationType[] | null;
   isLocationTypesLoading: boolean;
   assignedSkillsByOrganization: ListOfSkills[];
+  filteringAssignedSkillsByOrganization: ListOfSkills[];
 }
 
 @State<OrganizationManagementStateModel>({
@@ -283,7 +285,8 @@ export interface OrganizationManagementStateModel {
     timeZones: [],
     loctionTypes: [],
     isLocationTypesLoading: false,
-    assignedSkillsByOrganization: []
+    assignedSkillsByOrganization: [],
+    filteringAssignedSkillsByOrganization: []
   },
 })
 @Injectable()
@@ -400,6 +403,11 @@ export class OrganizationManagementState {
   @Selector()
   static assignedSkillsByOrganization(state: OrganizationManagementStateModel): ListOfSkills[] {
     return state.assignedSkillsByOrganization;
+  }
+
+  @Selector()
+  static filteringAssignedSkillsByOrganization(state: OrganizationManagementStateModel): ListOfSkills[] {
+    return state.filteringAssignedSkillsByOrganization;
   }
 
   @Selector()
@@ -900,6 +908,18 @@ export class OrganizationManagementState {
     );
   }
 
+  @Action(GetFilteringAssignedSkillsByOrganization)
+  GetFilteringAssignedSkillsByOrganization(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { params }: GetFilteringAssignedSkillsByOrganization,
+  ): Observable<AssignedSkillsByOrganization[]> {
+    return this.skillsService.getAssignedSkillsByOrganization(params).pipe(
+      tap((payload) => {
+       patchState({ filteringAssignedSkillsByOrganization: payload.map((skill) => ({...skill, id: skill.masterSkillId, name: skill.skillDescription})) });
+      })
+    );
+  }
+
   @Action(ClearAssignedSkillsByOrganization)
   ClearAssignedSkillsByOrganization(
     { patchState }: StateContext<OrganizationManagementStateModel>,
@@ -910,9 +930,9 @@ export class OrganizationManagementState {
   @Action(GetAllSkillsCategories)
   GetAllSkillsCategories(
     { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: GetAllSkillsCategories
+    { params }: GetAllSkillsCategories
   ): Observable<SkillCategoriesPage> {
-    return this.categoriesService.getAllSkillsCategories().pipe(
+    return this.categoriesService.getAllSkillsCategories(params).pipe(
       tap((payload) => {
         patchState({ allSkillsCategories: payload });
         return payload;

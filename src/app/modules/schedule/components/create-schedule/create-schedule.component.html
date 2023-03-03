@@ -27,13 +27,16 @@
       <div class="input-container schedule-types">
         <ng-container *ngFor="let type of scheduleTypes">
           <div class="input-group radio">
-            <ejs-radiobutton
-              (change)="changeScheduleType($event)"
-              [formControl]="scheduleTypesControl"
-              [label]="type.label"
-              [value]="type.value"
-              [name]="type.name"
-            ></ejs-radiobutton>
+            <app-tooltip-container [showToolTip]="type.disabled">
+              <ejs-radiobutton
+                (change)="changeScheduleType($event)"
+                [formControl]="scheduleTypesControl"
+                [label]="type.label"
+                [value]="type.value"
+                [name]="type.name"
+                [disabled]="type.disabled"
+              ></ejs-radiobutton>
+            </app-tooltip-container>
           </div>
         </ng-container>
       </div>

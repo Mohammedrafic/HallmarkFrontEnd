@@ -10,7 +10,7 @@ import { GridContainerTabConfig, InvoiceDetail, InvoiceInfoUIItem, ManualInvoice
 import { Invoices } from '../../store/actions/invoices.actions';
 import { AgencyInvoicesGridTab } from '../../enums';
 import { invoiceDetailsColumnDefs, invoiceInfoItems,
-  invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
+  InvoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
 import { AllInvoicesGridHelper } from '../../helpers/grid/all-invoices-grid.helper';
 import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
 import { InvoiceTableType } from '../../enums/invoice-tab.enum';
@@ -84,8 +84,8 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
     return invoiceDetailsColumnDefs(true);
   }
 
-  public getDetailSummaryColDef(location: string): ColDef[] {
-    return invoiceSummaryColumnDefs(location);
+  public getDetailSummaryColDef(): ColDef[] {
+    return InvoiceSummaryColumnDefs;
   }
 
   public isAgency(): boolean {

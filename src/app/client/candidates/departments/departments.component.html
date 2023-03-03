@@ -3,11 +3,11 @@
   gridTitle="Department Assigned"
   (bulkEventEmitter)="handleBulkEvent($event)"
   [rowSelection]="undefined"
-  [rowData]="departmentsAssigned?.items ?? []"
+  [rowData]="(departmentsAssigned?.items ?? []) | sortByHomeCostCenter"
   [columnDefinitions]="columnDef"
   [totalRecordsCount]="departmentsAssigned?.totalCount ?? 0"
   [allowBulkSelection]="true"
-  [disableBulkButton]="false"
+  [disableBulkButton]="disableBulkButton"
   [rowSelection]="rowSelection"
   [bulkActionConfig]="bulkActionConfig"
 >
@@ -16,6 +16,7 @@
     iconName="sliders"
     text="Filters"
     [type]="buttonType.ACTION"
+    [badgeText]="filtersAmount"
     (clickEmitter)="showFilters()"
   ></app-button>
   <app-button
@@ -23,6 +24,7 @@
     iconName="plus"
     text="Assign Department"
     [type]="buttonType.ACTION"
+    [disabled]="!userPermission[this.userPermissions.ManageIrpCandidateProfile]"
     (clickEmitter)="showAssignDepartmentDialog()"
   ></app-button>
 </app-grid>
@@ -43,18 +45,23 @@
       (refreshGrid)="refreshGrid()"
       [saveForm$]="saveForm$"
       [departmentHierarchy]="departmentHierarchy"
+      [dateRanges]="dateRanges"
     ></app-assign-department>
 
     <app-edit-departments
+      #editDepartments
       *ngIf="dialogTitle === sideDialogTitleEnum.EditBulkDepartments"
       (refreshGrid)="refreshGrid()"
       [saveForm$]="saveForm$"
       [selectedDepartments]="selectedDepartments"
+      [dateRanges]="dateRanges"
     ></app-edit-departments>
   </ng-container>
 </app-side-dialog>
 
 <app-filter-department
+  *ngIf="(selectedTab$ | async) === candidateTabsEnum.Departments"
   (resetFilters)="resetFilters()"
   (updateTableByFilters)="updateTableByFilters($event)"
+  (appliedFiltersAmount)="applyFiltersAmount($event)"
 ></app-filter-department>

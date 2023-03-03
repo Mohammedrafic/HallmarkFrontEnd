@@ -350,13 +350,21 @@ Hauppauge, NY 11788`,
           idx === 0 ? {
             content: summary.locationName, 
             colSpan: 3,
-            rowSpan: summary.items.length,
             styles: {
               halign: 'left',
               fontStyle: 'normal',
               lineColor: '#181919',
             },
-          } :  {},
+          } :  {
+            content: ' ', 
+            colSpan: 3,
+            styles: {
+              halign: 'left',
+              fontStyle: 'normal',
+              lineColor: '#00000000',
+              lineWidth: 0,
+            },
+          },
           {
             content: detail.departmentName,
             colSpan: 3,
@@ -532,7 +540,9 @@ Hauppauge, NY 11788`,
       },
     ]);
 
-    summaryRows.push([
+    const footer: RowInput[] = [];
+
+    footer.push([
       {
         content: '',
         styles: {
@@ -635,23 +645,21 @@ Hauppauge, NY 11788`,
       margin: { top: 50, left: 20, right: 20 },
       tableLineColor: '#181919',
       tableLineWidth: 1,
-      pageBreak: 'avoid',
       rowPageBreak: 'avoid',
       head: [['Week End', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
       'Agency', 'Skill', 'Hours/Miles', 'Bill Rate', 'Total']],
       showHead: 'never',
-      headStyles: {
-        fillColor: '#CFCFCF',
-        fontStyle: 'bold',
-        fontSize: 10,
-        overflow: 'linebreak',
-        halign: 'center',
-        valign: 'middle',
-        lineColor: '#181919',
-        lineWidth: 1,
-        cellPadding: 2,
-      },
       body: summaryRows,
+      foot: footer,
+      showFoot: 'lastPage',
+      footStyles: {
+        lineColor: '#D9D9D9',
+        lineWidth: 0.8,
+        fontSize: 10,
+        fontStyle: 'bold',
+        cellPadding: 2,
+        overflow: 'linebreak',
+      },
       bodyStyles: {
         lineColor: '#D9D9D9',
         lineWidth: 0.8,
@@ -841,13 +849,21 @@ Hauppauge, NY 11788`,
           idx === 0 ? {
             content: summary.locationName, 
             colSpan: 3,
-            rowSpan: summary.items.length,
             styles: {
               halign: 'left',
               fontStyle: 'normal',
               lineColor: '#181919',
             },
-          } :  {},
+          } :  {
+            content: ' ', 
+            colSpan: 3,
+            styles: {
+              halign: 'left',
+              fontStyle: 'normal',
+              lineColor: '#00000000',
+              lineWidth: 0,
+            },
+          },
           {
             content: detail.costCenterFormattedName,
             colSpan: 2,
@@ -1045,7 +1061,9 @@ Hauppauge, NY 11788`,
       },
     ]);
 
-    summaryRows.push([
+    const footer: RowInput[] = [];
+
+    footer.push([
       {
         content: '',
         styles: {
@@ -1153,23 +1171,21 @@ Hauppauge, NY 11788`,
       margin: { top: 50, left: 20, right: 20 },
       tableLineColor: '#181919',
       tableLineWidth: 1,
-      pageBreak: 'avoid',
       rowPageBreak: 'avoid',
       head: [['Week End', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
       'Organization', 'Skill', 'Hours/Miles', 'Bill Rate', 'Fee, %', 'Total']],
       showHead: 'never',
-      headStyles: {
-        fillColor: '#CFCFCF',
-        fontStyle: 'bold',
-        fontSize: 10,
-        overflow: 'linebreak',
-        halign: 'center',
-        valign: 'middle',
-        lineColor: '#181919',
-        lineWidth: 1,
-        cellPadding: 2,
-      },
       body: summaryRows,
+      foot: footer,
+      showFoot: 'lastPage',
+      footStyles: {
+        lineColor: '#D9D9D9',
+        lineWidth: 0.8,
+        fontSize: 10,
+        fontStyle: 'bold',
+        cellPadding: 2,
+        overflow: 'linebreak',
+      },
       bodyStyles: {
         lineColor: '#D9D9D9',
         lineWidth: 0.8,

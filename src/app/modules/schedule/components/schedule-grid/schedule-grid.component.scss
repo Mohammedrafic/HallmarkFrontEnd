@@ -82,6 +82,12 @@
       &.active {
         font-weight: 700;
       }
+
+      &.disabled {
+        cursor: default;
+        color: $secondary-dark-blue-30;
+        font-weight: unset;
+      }
     }
   }
 }
@@ -134,7 +140,7 @@ th, td {
   line-height: 18px;
   text-align: left;
   white-space: nowrap;
-  color: $secondary-dark-blue-20;
+  color: $black;
 
   &.date {
     min-width: 112px;

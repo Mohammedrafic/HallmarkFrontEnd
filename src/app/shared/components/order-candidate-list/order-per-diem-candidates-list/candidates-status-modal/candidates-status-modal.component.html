@@ -109,7 +109,7 @@
                       </div>
                     </div>
                     <!--TODO: create and use ReadOnly Mode for it-->
-                    <div *ngIf="showClockId && !orderCandidateJob?.hasAllRequiredOnboardedCredentials" class="input-container bootstrap">
+                    <div *ngIf="showClockId" class="input-container bootstrap">
                       <ejs-checkbox [disabled]="isAgency || isOnboard" formControlName="allow" label="Allow deploy w/o credentials"
                                     maxlength="50"></ejs-checkbox>
                     </div>

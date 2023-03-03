@@ -18,6 +18,7 @@ import { SkillsService } from 'src/app/shared/services/skills.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { CandidateService } from '../services/candidates.service';
 import {
+  ClearCandidatesCredentials,
   DownloadCredentialFiles,
   DownloadCredentialFilesSucceeded,
   GetAllSkills,
@@ -336,6 +337,13 @@ export class CandidateState {
           patchState({ isCandidateLoading: false, candidateCredentialResponse: payload });
         })
       );
+  }
+
+  @Action(ClearCandidatesCredentials, { cancelUncompleted: true })
+  ClearCandidatesCredentials(
+    { patchState }: StateContext<CandidateStateModel>
+  ): void {
+    patchState({ candidateCredentialResponse: null });
   }
 
   @Action(GetMasterCredentials)

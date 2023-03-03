@@ -18,10 +18,7 @@
   &>div {
     display: flex;
     flex-direction: row-reverse;
-
-    button {
-      margin-left: 10px;
-    }
+    column-gap: 10px;
   }
 }
 

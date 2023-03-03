@@ -37,7 +37,7 @@
             id="switcher"
             class="switch"
             (change)="onSwitcher($event)"
-            [checked]="includeDeployedCandidates"
+            [checked]="isAvailable"
           ></ejs-switch>
           <label class="switch-label" for="switcher">is Available</label>
         </div>
@@ -225,10 +225,13 @@
               </div>
               <div
                 ejs-button
+                (click)="openEditCandidateModal(data)"
                 cssClass="e-flat primary-icon-button custom-button"
                 [class.btn-icon__disabled]="order?.isClosed || data.status === applicantStatus.Offboard"
               >
-                <span class="edit-button"><i-feather name="calendar" class="icon"></i-feather></span>
+                <ejs-tooltip id="tooltip" content="Edit" position="TopCenter">
+                  <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+                </ejs-tooltip>
               </div>
             </div>
           </ng-template>
@@ -322,6 +325,12 @@
   </ng-container>
 </section>
 
+<app-edit-irp-candidate
+  [handleOpenModal]="editCandidateDialogState"
+  (handleCloseModal)="closeEditCandidateModal($event)"
+  (handleSuccessSaveCandidate)="saveIrpCandidate()"
+></app-edit-irp-candidate>
+
 <ejs-dialog
   id="dialog"
   #sideDialog
@@ -393,6 +402,7 @@
       [isCandidatePayRateVisible]="isCandidatePayRateVisible"
     ></app-offer-deployment>
   </ng-template>
+
   <ng-template #footerTemplate>
     <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>
   </ng-template>

@@ -22,6 +22,7 @@
   [header]="sideDialogTitle$ | async"
   (formCancelClicked)="onCancel()"
   (formSaveClicked)="onSave()"
+  [targetElement]="targetElement"
 >
   <app-add-edit-note #addEditNoteComponent></app-add-edit-note>
 </app-side-dialog>

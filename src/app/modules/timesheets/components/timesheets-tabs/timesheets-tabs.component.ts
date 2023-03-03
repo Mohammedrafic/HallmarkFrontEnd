@@ -95,7 +95,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
          this.changeTab.emit(1);
          this.globalWindow.localStorage.setItem("orgpendingwidget", JSON.stringify(""));
        }
-   }, 5000);
+   }, 2500);
   }
   @OutsideZone
   private navigatingTab():void{

@@ -45,12 +45,12 @@ export class ScheduleFiltersService {
     return ScheduleFilterHelper.adaptLocationToOption(sortByField(locations, 'name'));
   }
 
-  getSelectedDepartmentOptions(structure: ScheduleFilterStructure, selectedIds: number[]): DropdownOption[] {
+  getSelectedDepartmentOptions(structure: ScheduleFilterStructure, selectedIds: number[], sort = true): DropdownOption[] {
     const selectedLocations = structure.locations
     .filter((location) => selectedIds.includes(location.id));
     const departments = selectedLocations.flatMap((location) => location.departments as OrganizationDepartment[]);
 
-    return ScheduleFilterHelper.adaptDepartmentToOption(sortByField(departments, 'name'));
+    return ScheduleFilterHelper.adaptDepartmentToOption(sort ? sortByField(departments, 'name') : departments);
   }
 
   createChipsData(

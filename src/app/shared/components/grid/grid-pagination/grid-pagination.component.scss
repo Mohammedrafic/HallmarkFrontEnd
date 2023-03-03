@@ -75,6 +75,7 @@
   & .bulk-section {
     display: flex;
     align-items: center;
+    column-gap: 10px;
 
     &__amount {
       margin-right: 60px;
@@ -90,6 +91,17 @@
 
       &:disabled {
         color: $white;
+      }
+    }
+
+    .edit-button,
+    .delete-button {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+
+      .icon {
+        margin: 0;
       }
     }
   }

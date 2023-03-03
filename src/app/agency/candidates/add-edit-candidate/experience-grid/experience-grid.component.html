@@ -30,10 +30,10 @@
       <e-column field="employer" headerText="Employer" width="320"></e-column>
       <e-column field="jobTitle" headerText="Job Title" width="320"></e-column>
       <e-column headerText="Start Month/Year" width="220" textAlign="Right">
-        <ng-template #template let-data>{{data.startDate | date:"MM/yyyy"}}</ng-template>
+        <ng-template #template let-data>{{data.startDate | date:"MM/yyyy" : "UTC"}}</ng-template>
       </e-column>
       <e-column headerText="End Month/Year" width="220" textAlign="Right">
-        <ng-template #template let-data>{{data.endDate | date:"MM/yyyy"}}</ng-template>
+        <ng-template #template let-data>{{data.endDate | date:"MM/yyyy" : "UTC"}}</ng-template>
       </e-column>
       <e-column field="comments" headerText="Comments" width="520"></e-column>
     </e-columns>

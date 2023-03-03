@@ -350,6 +350,11 @@
   }
 }
 
+.buttons-container {
+  display: flex;
+  column-gap: 12px;
+}
+
 @media #{$max-tablet} {
   ::ng-deep {
     app-page-toolbar {
@@ -359,9 +364,15 @@
         .right-content {
           justify-content: flex-start;
           margin-top: 12px;
-          margin-left: -10px;
         }
       }
+    }
+  }
+
+  :host {
+    .button-group {
+      margin-top: 12px;
+      padding-bottom: 12px;
     }
   }
 }
@@ -407,7 +418,7 @@
     left: 50%;
     z-index: 3;
     margin-top: 0 !important;
-    padding: 24px;
+    padding: 12px 24px;
     transform: translateX(-50%);
     background-color: $background;
     display: flex !important;
@@ -416,11 +427,11 @@
 
   .navigation-wrapper {
     position: fixed;
-    top: 160px;
+    top: 145px;
     z-index: 2;
     width: 100%;
     margin: auto -24px;
-    padding: 15px 24px 0 24px;
+    padding: 12px 24px 0 24px;
     background-color: $background;
 
     .table-tabs.irp {
@@ -444,6 +455,5 @@
   height: 100% !important;
   .e-gridcontent{
     height: calc(100% - 106px);
-    
   }
 }

@@ -168,6 +168,7 @@ import { LocalDateTimePipe } from './pipes/local-date-time.pipe';
 import { NumericTextboxModule as CustomNumericTextboxModule} from './components/form-controls/numeric-textbox/numeric-textbox.module';
 import { ValidationErrorModule } from './pipes/validation-error/validation.error.module';
 import { GridPaginationModule } from './components/grid/grid-pagination/grid-pagination.module';
+import { EditIrpCandidateModule } from '@shared/components/order-candidate-list/edit-irp-candidate/edit-irp-candidate.module';
 
 const icons = {
   AlertCircle,
@@ -304,7 +305,8 @@ const COMPONENTS = [
     BoolValuePipeModule,
     CustomNumericTextboxModule,
     ValidationErrorModule,
-    GridPaginationModule
+    GridPaginationModule,
+    EditIrpCandidateModule,
   ],
   exports: [
     ...COMPONENTS,

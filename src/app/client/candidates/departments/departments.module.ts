@@ -23,6 +23,8 @@ import { DropdownModule } from '@shared/components/form-controls/dropdown/dropdo
 import { FilterDepartmentComponent } from './filter-department/filter-department.component';
 import { DepartmentFormService } from './services/department-form.service';
 import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
+import { DepartmentNameComponent } from './grid/cell-renderers/department-name/department-name.component';
+import { HomeCostCenterPipe } from './pipes/home-cost-center.pipe';
 
 @NgModule({
   declarations: [
@@ -32,7 +34,9 @@ import { EditDepartmentsComponent } from './edit-departments/edit-departments.co
     SkillNameComponent,
     OrientationCompletedComponent,
     FilterDepartmentComponent,
-    EditDepartmentsComponent
+    EditDepartmentsComponent,
+    DepartmentNameComponent,
+    HomeCostCenterPipe
   ],
   imports: [
     CommonModule,

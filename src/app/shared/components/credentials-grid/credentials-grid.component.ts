@@ -8,12 +8,13 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FileInfo, FilesPropModel, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil, combineLatest } from 'rxjs';
 
 import { CustomFormGroup, Permission } from '@core/interface';
 import { FileSize, UserPermissions } from '@core/enums';
 import { DateTimeHelper } from '@core/helpers';
 import {
+  ClearCandidatesCredentials,
   DownloadCredentialFiles,
   DownloadCredentialFilesSucceeded,
   GetCandidatesCredentialByPage,
@@ -81,6 +82,13 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() isCandidateAssigned = false;
   @Input() userPermission: Permission;
   @Input() employee: string | null;
+  @Input() isIRP: boolean = false;
+  @Input() isActive: boolean = true;
+  @Input() set employeeId(value: number | null | undefined) {
+    if (value) {
+      this.candidateProfileId = value;
+    }
+  }
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
@@ -115,7 +123,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private credentialStatus = CredentialStatus.Pending;
   private removeExistingFiles = false;
   private file: CredentialFile | null;
-  private readonly candidateProfileId: number;
+  private candidateProfileId: number;
   public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
 
   @Select(CandidateState.candidateCredential)
@@ -227,10 +235,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.watchForSearchUpdate();
     this.watchForCandidateCredential();
     this.watchForDownloadCredentialFiles();
-    this.watchWorkingArea()
+    this.watchWorkingArea();
+    this.watchForCertifiedOnUntilControls();
   }
 
   ngOnDestroy(): void {
+    this.store.dispatch(new ClearCandidatesCredentials());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
@@ -414,10 +424,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
     this.addCredentialForm.patchValue({
       insitute,
-      createdOn,
+      createdOn: createdOn && DateTimeHelper.convertDateToUtc(createdOn.toString()),
       number,
       experience,
-      createdUntil,
+      createdUntil: createdUntil && DateTimeHelper.convertDateToUtc(createdUntil.toString()),
       completedDate,
       rejectReason,
     });
@@ -694,7 +704,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.disableAddCredentialButton =
       !this.areAgencyActionsAllowed ||
       !this.hasPermissions() ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile);
+      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP);
   }
 
   private setGridItems(response: CandidateCredentialResponse): void {
@@ -728,7 +738,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.disabledCopy ||
       item.id === this.orderCredentialId ||
       !this.hasPermissions() ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile)
+      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
     );
   }
 
@@ -738,7 +748,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       item.id === this.orderCredentialId ||
       ((item.status === this.statusEnum.Reviewed || item.status === this.statusEnum.Verified) &&
         !this.isOrganizationSide) ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile)
+      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
     );
   }
 
@@ -747,7 +757,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       !this.areAgencyActionsAllowed ||
       item.id === this.orderCredentialId ||
       !this.hasPermissions() ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile)
+      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
     );
   }
 
@@ -786,5 +796,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.isOrganizationAgencyArea$.pipe(takeUntil(this.unsubscribe$)).subscribe((area) => {
       this.isOrganizationAgencyArea = area;
     });
+  }
+
+  private watchForCertifiedOnUntilControls(): void {
+    combineLatest([this.createdOnControl?.valueChanges, this.createdUntilControl?.valueChanges])
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => this.cdr.markForCheck());
   }
 }

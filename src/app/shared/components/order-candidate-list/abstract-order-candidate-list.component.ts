@@ -47,6 +47,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   public isAgency: boolean;
   public isOrganization: boolean;
   public candidateSearchPlaceholder = CandidateSearchPlaceholder;
+  public isAvailable = false;
 
   private readonly searchByCandidateName$: Subject<string> = new Subject();
   private searchTermByCandidateName: string;
@@ -74,6 +75,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
 
   public onSwitcher(event: { checked: boolean }): void {
     this.includeDeployedCandidates = event.checked;
+    this.isAvailable = event.checked;
     this.emitGetCandidatesList();
   }
 
@@ -146,6 +148,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
       currentPage: this.currentPage,
       pageSize: this.pageSize,
       excludeDeployed: !this.includeDeployedCandidates,
+      isAvailable: this.isAvailable,
       searchTerm: value,
     });
   }
@@ -173,6 +176,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
       currentPage: this.currentPage,
       pageSize: this.pageSize,
       excludeDeployed: !this.includeDeployedCandidates,
+      isAvailable: this.isAvailable,
       searchTerm: this.searchTermByCandidateName,
     });
   }

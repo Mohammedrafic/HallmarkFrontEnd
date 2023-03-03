@@ -33,28 +33,26 @@ export class OrganizationStrategy implements ManualInvoiceStrategy {
         return;
       }
 
+      options.invoiceAgencies = [];
+      options.invoiceAgencies = sortByField(InvoiceMetaAdapter.createAgencyOptions(meta), 'text');
+
       if (isPosition) {
+        options.invoiceCandidates = [];
         const invoiceCandidates = meta.map(el => ({
           text: `${el.candidateFirstName} ${el.candidateLastName}`,
           value: el.candidateId,
         }));
+
         options.invoiceCandidates = sortByField(invoiceCandidates, 'text');
-
-        const invoiceAgencies = meta.map(el => ({
-          text: el.agencyName,
-          value: el.agencyId,
-        }));
-        options.invoiceAgencies = sortByField(invoiceAgencies, 'text');
-
-        this.connectConfigOptions(config, options);
+        
         form.get('unitId')?.patchValue(meta[0].agencyId, { emitEvent: false, onlySelf: true });
         form.get('nameId')?.patchValue(meta[0].candidateId);
       } else {
-        options.invoiceAgencies = sortByField(InvoiceMetaAdapter.createAgencyOptions(meta), 'text');
-        this.connectConfigOptions(config, options);
         form.get('unitId')?.patchValue(options.invoiceAgencies[0].value);
         form.get('nameId')?.patchValue(options.invoiceCandidates[0].value);
       }
+      
+      this.connectConfigOptions(config, options);
       form.get('locationId')?.patchValue(meta[0].locationId);
       form.get('departmentId')?.patchValue(meta[0].departmentId);
   }
@@ -88,6 +86,7 @@ export class OrganizationStrategy implements ManualInvoiceStrategy {
   public connectConfigOptions(config: AddManInvoiceDialogConfig, options: ManualInvoiceInputOptions): void {
     config.fields.forEach((item) => {
       if (item.optionsStateKey) {
+        item.options = [];
         item.options = options[item.optionsStateKey] as DropdownOption[];
       }
     });

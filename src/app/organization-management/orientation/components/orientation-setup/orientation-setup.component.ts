@@ -23,7 +23,7 @@ import { Skill } from '@shared/models/skill.model';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, ORIENTATION_CHANGE_CONFIRM_TITLE, ORIENTATION_CHANGE_TEXT, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrientationType } from "../../enums/orientation-type.enum";
 
@@ -45,10 +45,11 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   public isEdit: boolean = false;
   public isArchive: boolean = false;
   public orientationTypeDataSource = OrientationTypeDataSource;
-  public selectedOrientationSettings: OrientationType;
+  public selectedOrientationSettings: OrientationType | null;
   public regionToggleDisable = false;
   public locationToggleDisable = false;
   public departmentToggleDisable = false;
+  public disableControls: boolean =  false;
 
   public switcherValue = 'Off';
   public settingIsOff = true;
@@ -100,7 +101,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   }
 
   private getSkills(): void {
-    this.store.dispatch([new GetAllSkillsCategories()]);
+    this.store.dispatch([new GetAllSkillsCategories({ params: { SystemType: SystemType.IRP } })]);
   }
 
   private watchForOrgChange(): void {
@@ -111,7 +112,6 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
         this.getSkills();
         this.getOrientationSettings();
         this.getOrientationConfigs();
-        //this.clearFilterForm(); TODO: add filters
       });
   }
 
@@ -173,15 +173,26 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     });
   }
 
+  private setGRidControlsState(): void {
+    this.disableControls = (this.settingIsOff || this.selectedOrientationSettings === null);
+    this.cd.detectChanges();
+  }
+
   private getOrientationSettings(): void {
     this.orientationService.getOrientationSetting().subscribe(setting => {
       if (setting) {
+        this.settingIsOff = !setting.isEnabled;
         this.selectedOrientationSettings = setting.type;
         this.orientationTypeHandler(this.selectedOrientationSettings);
         this.orientationTypeSettingsForm.patchValue(setting);
       } else {
+        this.selectedOrientationSettings = null;
         this.orientationTypeSettingsForm.reset();
       }
+      if (!this.userPermission[this.userPermissions.CanEditOrientation]) {
+        this.orientationTypeSettingsForm.disable({ emitEvent: false });
+      }
+      this.setGRidControlsState();
     });
   }
 
@@ -190,6 +201,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     this.orientationService.saveOrientationSetting({ isEnabled, type }).subscribe(() => {
       this.orientationTypeSettingsForm.markAsPristine();
       this.selectedOrientationSettings = type;
+      this.setGRidControlsState();
       this.orientationTypeHandler(this.selectedOrientationSettings);
       this.getOrientationConfigs();
       this.cd.markForCheck();
@@ -223,7 +235,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     });
   }
 
-  public orientationTypeHandler(type: OrientationType): void {
+  public orientationTypeHandler(type: OrientationType | null): void {
     if (type === OrientationType.OrganizationWise) {
       this.orientationForm.controls['regionIds'].disable();
       this.orientationForm.controls['locationIds'].disable();
@@ -301,7 +313,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       completedOrientation: data.completedOrientation,
       removeOrientation: data.removeOrientation,
       startDate: DateTimeHelper.convertDateToUtc(data.startDate.toString()),
-      endDate: DateTimeHelper.convertDateToUtc(data.endDate.toString()),
+      endDate: data.endDate ? DateTimeHelper.convertDateToUtc(data.endDate.toString()) : null,
     });
     this.cd.markForCheck();
   }
@@ -363,7 +375,20 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     if (this.orientationTypeSettingsForm.invalid) {
       this.orientationTypeSettingsForm.markAllAsTouched();
     } else {
-      this.saveOrientationSettings();
+      if (this.selectedOrientationSettings !== null) {
+        this.confirmService
+        .confirm(ORIENTATION_CHANGE_TEXT, {
+          title: ORIENTATION_CHANGE_CONFIRM_TITLE,
+          okButtonLabel: 'Yes',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm: boolean) => !!confirm))
+        .subscribe(() => {
+          this.saveOrientationSettings();
+        });
+      } else {
+        this.saveOrientationSettings();
+      }
     }
   }
   

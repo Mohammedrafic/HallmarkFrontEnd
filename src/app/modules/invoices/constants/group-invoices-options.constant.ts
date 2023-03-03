@@ -18,7 +18,7 @@ export interface GroupInvoicesOption {
   // [key: string]: Object;
 }
 
-export const GroupInvoicesOptions: GroupInvoicesOption[] = [
+const groupInvoicesOptions: ReadonlyArray<GroupInvoicesOption> = [
   {
     id: InvoicesAggregationType.Agency,
     text: 'Agency (Location - Agency)',
@@ -74,4 +74,6 @@ export const SettingsGroupInvoicesOptions: GroupInvoicesOption[] = [
   },
 ];
 
-export const defaultGroupInvoicesOption: GroupInvoicesOption = GroupInvoicesOptions[0];
+export const CreatGroupingOptions = (optionIds: InvoicesAggregationType[]): GroupInvoicesOption[] => {
+  return groupInvoicesOptions.filter((option) => optionIds.includes(option.id));
+};

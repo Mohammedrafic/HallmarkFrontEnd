@@ -1,0 +1,17 @@
+@import 'colors';
+@import 'mixins';
+
+.department {
+  display: flex;
+  align-items: center;
+  column-gap: 6px;
+
+  .icon {
+    color: $secondary-dark-blue-30;
+  }
+
+  .text {
+    @include with-ellipsis;
+    margin-bottom: 5px;
+  }
+}

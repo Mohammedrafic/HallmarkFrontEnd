@@ -32,9 +32,9 @@ import { DepartmentHelper } from '../helpers/department.helper';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterDepartmentComponent extends DestroyableDirective implements OnInit {
-  @Output() readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();
-  @Output() readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
-  @Output() readonly updateTableByFilters: EventEmitter<DepartmentFilterState> =
+  @Output() public readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();
+  @Output() public readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
+  @Output() public readonly updateTableByFilters: EventEmitter<DepartmentFilterState> =
     new EventEmitter<DepartmentFilterState>();
 
   public filtersFormConfig: ReadonlyArray<DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>> = [];
@@ -90,7 +90,8 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     this.appliedFiltersAmount.emit(this.filteredItems.length);
     this.resetFilters.emit();
     this.filterColumns.locationIds.dataSource = [];
-    this.filterColumns.departmentIds.dataSource = [];
+    this.filterColumns.departmentsIds.dataSource = [];
+    this.applyFilters$.next(null);
     this.cdr.markForCheck();
   }
 
@@ -102,8 +103,8 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   private filterDepartments(): void {
     this.applyFilters$
       .pipe(
-        filter(Boolean),
         distinctUntilChanged((prev, curr) => this.departmentFormService.compareFormState(prev, curr)),
+        filter(Boolean),
         takeUntil(this.destroy$)
       )
       .subscribe((filterState) => {
@@ -146,7 +147,10 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
         this.filterColumns.locationIds.dataSource = [];
 
         if (val?.length) {
-          const selectedRegions: OrganizationRegion[] = DepartmentHelper.findSelectedItems(val, this.regions) as OrganizationRegion[];
+          const selectedRegions: OrganizationRegion[] = DepartmentHelper.findSelectedItems(
+            val,
+            this.regions
+          ) as OrganizationRegion[];
           const regionLocations: OrganizationLocation[] = selectedRegions.flatMap((region) => {
             region?.locations?.forEach((location: OrganizationLocation) => {
               location.regionName = region.name;
@@ -167,17 +171,20 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
       .get('locationIds')
       ?.valueChanges.pipe(filter(Boolean), takeUntil(this.destroy$))
       .subscribe((val: number[]) => {
-        this.filterColumns.departmentIds.dataSource = [];
+        this.filterColumns.departmentsIds.dataSource = [];
         if (val?.length) {
           const locationDataSource = this.filterColumns.locationIds.dataSource as OrganizationLocation[];
-          const selectedLocations: OrganizationLocation[] = DepartmentHelper.findSelectedItems(val, locationDataSource) as OrganizationLocation[];
+          const selectedLocations: OrganizationLocation[] = DepartmentHelper.findSelectedItems(
+            val,
+            locationDataSource
+          ) as OrganizationLocation[];
           const locationDepartments: OrganizationDepartment[] = selectedLocations.flatMap(
             (location) => location.departments
           );
 
-          this.filterColumns.departmentIds.dataSource = locationDepartments;
+          this.filterColumns.departmentsIds.dataSource = locationDepartments;
         } else {
-          this.formGroup.get('departmentIds')?.setValue([]);
+          this.formGroup.get('departmentsIds')?.setValue([]);
           this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
         }
 

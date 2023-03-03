@@ -5,5 +5,5 @@ export interface OrgDetailsInfoModel {
     pendingOrders: number;
     pendingOrganizationInvoices: number;
     pendingTimeSheets: number;
-    id : WidgetTypeEnum.TASKS;
+    id : WidgetTypeEnum.ORG;
 }

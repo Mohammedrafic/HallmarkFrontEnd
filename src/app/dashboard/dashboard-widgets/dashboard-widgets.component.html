@@ -73,6 +73,11 @@
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.ORG"
                               [isDarkTheme]="isDarkTheme"></app-org-widget>
+          <app-agencyposition-widget *ngSwitchCase="widgetTypeEnum.AGENCY_POSITION_COUNT"    
+                              [chartData]="widgetsData?.[widgetTypeEnum.AGENCY_POSITION_COUNT]"
+                              [isLoading]="isLoading"
+                              [description]="widgetDescriptionEnum.AGENCY_POSITION_COUNT"
+                              [isDarkTheme]="isDarkTheme"></app-agencyposition-widget>
         </ng-template>
       </e-panel>
     </e-panels>
