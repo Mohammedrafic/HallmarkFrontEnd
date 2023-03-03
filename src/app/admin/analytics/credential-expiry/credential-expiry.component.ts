@@ -384,7 +384,6 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       window.localStorage.getItem("lastSelectedOrganizationId"),
         "HostName": this.baseUrl,
       };
-      debugger;
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
   }  
