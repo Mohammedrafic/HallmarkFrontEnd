@@ -231,25 +231,30 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     .subscribe((structure: OrganizationStructure) => {
       this.regions = structure.regions;
     });
-    this.candidateWorkCommitmentForm.controls['regionIds'].valueChanges.pipe(takeUntil(this.destroy$)).subscribe((val: number[]) => {
-      if (val?.length) {
-        const selectedRegions: OrganizationRegion[] = [];
-        const locations: OrganizationLocation[] = [];
+    this.candidateWorkCommitmentForm.controls['regionIds'].valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((val: number[]) => {
+        if (val?.length) {
+          const selectedRegions: OrganizationRegion[] = [];
+          const locations: OrganizationLocation[] = [];
 
-        val.forEach((id) =>
-          selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
-        );
-        this.locations = [];
-        selectedRegions.forEach((region) => {
-          region.locations?.forEach((location) => (location.regionName = region.name));
-          locations.push(...region.locations as []);
-        });
-        this.locations.push(...sortByField(locations, 'name'));
-      } else {
-        this.locations = [];
+          val.forEach((id) =>
+            selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
+          );
+          this.locations = [];
+          selectedRegions.forEach((region) => {
+            region.locations?.forEach((location) => (location.regionName = region.name));
+            locations.push(...region.locations as []);
+          });
+          this.locations.push(...sortByField(locations, 'name'));
+        } else {
+          this.locations = [];
+        }
         this.candidateWorkCommitmentForm.controls['locationIds'].setValue([]);
-      }
-      this.cd.markForCheck();
+        this.cd.markForCheck();
     });
   }
 
