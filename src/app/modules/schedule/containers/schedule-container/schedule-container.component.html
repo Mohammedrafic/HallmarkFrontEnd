@@ -7,20 +7,22 @@
       >
       </app-tabs-list>
       <div>
-        <button
-          *ngIf="activeTabIndex === tabIndex.Scheduling"
-          ejs-button
-          appHideBeforeSyncfusionLoad
-          cssClass="e-outline button-filter"
-          (click)="showFilters()"
-        >
-          <div class="filter-button-content">
+        <app-tooltip-container *ngIf="activeTabIndex === tabIndex.Scheduling" [showToolTip]="!hasViewPermission">
+          <button
+            ejs-button
+            appHideBeforeSyncfusionLoad
+            cssClass="e-outline button-filter"
+            [disabled]="!hasViewPermission"
+            (click)="showFilters()"
+          >
+            <div class="filter-button-content">
             <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-pill align-text">
               {{ appliedFiltersAmount }}
             </span>
-            <span class="filter-button-text">Filters</span> <i-feather name="sliders" class="icon"></i-feather>
-          </div>
-        </button>
+              <span class="filter-button-text">Filters</span> <i-feather name="sliders" class="icon"></i-feather>
+            </div>
+          </button>
+        </app-tooltip-container>
         <app-tooltip-container
           *ngIf="activeTabIndex === tabIndex.Scheduling"
           [showToolTip]="!!scheduleButtonTooltip"
@@ -46,6 +48,7 @@
 <div class="content">
   <ng-container *ngIf="activeTabIndex === tabIndex.Scheduling">
     <app-schedule-grid
+      [hasViewPermission]="hasViewPermission"
       [scheduleData]="scheduleData"
       [selectedFilters]="scheduleFilters"
       (changeFilter)="changeFilters($event)"
@@ -69,6 +72,7 @@
   [selectedScheduleFilters]="scheduleFilters"
   [scheduleFilterData]="filters.filterColumns"
   [scheduleData]="scheduleData"
+  [userPermission]="userPermission"
   (destroyDialog)="closeScheduleDialog()"
   (updateScheduleGrid)="updateScheduleGrid()"
 ></app-create-schedule>

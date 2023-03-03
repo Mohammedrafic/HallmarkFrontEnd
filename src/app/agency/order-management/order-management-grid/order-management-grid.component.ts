@@ -67,6 +67,7 @@ import { UpdateGridCommentsCounter } from '@shared/components/comments/store/com
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { GetIrpOrderCandidates } from '@client/store/order-managment-content.actions';
 import { BreakpointObserverService } from '@core/services';
+import { Router } from '@angular/router';
 import { GlobalWindow } from '@core/tokens';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 
@@ -82,6 +83,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() exportButtonClicked: boolean;
   @Input() onExportClicked$: Subject<any>;
   @Input() search$: Subject<string>;
+  @Input() public orderStatus: string[];
+
+  
   @Output() selectTab = new EventEmitter<number>();
 
   @Output() reOrderNumber = new EventEmitter<number>();
@@ -109,6 +113,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
   };
+
+
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public openCandidat = new Subject<boolean>();
@@ -141,6 +147,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderId: number | null;
   private redirectFromPerDiem = false;
 
+
   private isAlive = true;
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
@@ -153,6 +160,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private location: Location,
     private actions$: Actions,
     private datePipe: DatePipe,
+    private router: Router,
     private filterService: FilterService,
     private orderManagementAgencyService: OrderManagementAgencyService,
     private breakpointService: BreakpointObserverService,
@@ -160,7 +168,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   ) {
     super();
     this.listenRedirectFromExtension();
+    
   }
+
+
+  
 
   ngOnInit(): void {
     this.getAlertOrderId();
@@ -382,7 +394,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           this.setDefaultStatuses(statuses);
         });
       } else {
-        this.setDefaultStatuses(statuses);
+          this.setDefaultStatuses(statuses);
       }
     } else {
       const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
@@ -396,7 +408,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private setDefaultStatuses(statuses: number[]): void {
-    this.filters.orderStatuses = statuses;
+    const statuse = this.filterColumns.orderStatuses.dataSource
+    this.OrderFilterFormGroup.get('orderStatuses')?.setValue((this.orderStatus.length > 0) ? this.orderStatus : statuses);
+    this.filters.orderStatuses = (this.orderStatus.length > 0) ? this.orderStatus : statuse;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.filteredItems$.next(this.filteredItems.length);
     this.dispatchNewPage();
@@ -743,6 +757,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
+    this.filters.regionIds = this.filters.regionIds || [];
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));

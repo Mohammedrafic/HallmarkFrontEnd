@@ -336,7 +336,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public resetFilters(): void {
     this.gridInstance?.columnApi.resetColumnState();
 
-    this.store.dispatch(new Invoices.UpdateFiltersState({ orderBy: '' }, false));
     this.store.dispatch(
       new Invoices.UpdateFiltersState({
         pageNumber: GRID_CONFIG.initialPage,
