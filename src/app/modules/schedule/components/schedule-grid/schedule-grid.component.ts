@@ -51,6 +51,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   @Input() scheduleData: ScheduleInt.ScheduleModelPage | null;
   @Input() selectedFilters: ScheduleInt.ScheduleFilters;
+  @Input() hasViewPermission = false;
 
   @Output() changeFilter: EventEmitter<ScheduleInt.ScheduleFilters> = new EventEmitter<ScheduleInt.ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
@@ -114,8 +115,10 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   changeActiveDatePeriod(selectedPeriod: string | undefined): void {
-    this.activePeriod = selectedPeriod as DatesRangeType;
-    this.cdr.detectChanges();
+    if (this.hasViewPermission) {
+      this.activePeriod = selectedPeriod as DatesRangeType;
+      this.cdr.detectChanges();
+    }
   }
 
   @OutsideZone
