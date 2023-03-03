@@ -29,68 +29,77 @@
   </ng-container>
   <ng-container right>
     <ng-container *ngIf="!isMobile">
-      <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
-      <button
-        *ngIf="!isIRPFlagEnabled && !isContentSmallDesktop"
-        ejs-button
-        appHideBeforeSyncfusionLoad
-        cssClass="e-outline button-template"
-        [disabled]="isIRPFlagEnabled"
-      >
-        <div class="filter-button-content">Templates <i-feather name="clipboard" class="icon"></i-feather></div>
-      </button>
-      <ng-container *ngIf="!isActiveSystemIRP && !(isContentTabletWidth || isMiddleTabletWidth)" [ngTemplateOutlet]="filterButton"></ng-container>
-      <app-tooltip-container
-        *ngIf="!isActiveSystemIRP && !(isContentSmallDesktop || isMiddleTabletWidth)"
-        [message]="toolTipMessage"
-        [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
-      >
+      <div class="buttons-container">
+        <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
         <button
-          [disabled]="isActiveSystemIRP || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+          *ngIf="!isIRPFlagEnabled && !isContentSmallDesktop"
           ejs-button
           appHideBeforeSyncfusionLoad
-          (click)="openImportDialog()"
-          class="e-outline"
+          cssClass="e-outline button-template"
+          [disabled]="isIRPFlagEnabled"
         >
-          <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
+          <div class="filter-button-content">Templates <i-feather name="clipboard" class="icon"></i-feather></div>
         </button>
-      </app-tooltip-container>
-      <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
-      <button
-        *ngIf="
-          activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
-          activeTab !== OrganizationOrderManagementTabs.Incomplete &&
-          !isActiveSystemIRP && !(isContentSmallDesktop || isMiddleTabletWidth)
-        "
-        ejs-dropdownbutton
-        appHideBeforeSyncfusionLoad
-        [items]="exportOptions"
-        (select)="exportSelected($event)"
-        id="importButton"
-        cssClass="e-outline button-export"
-        [disabled]="isActiveSystemIRP"
-      >
-        <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
-      </button>
-
-      <ng-container *ngIf="!isActiveSystemIRP && (isContentSmallDesktop || isMiddleTabletWidth)" [ngTemplateOutlet]="smallMenuButton">
-      </ng-container>
-
-      <app-tooltip-container
-        *ngIf="!isMobile"
-        [message]="toolTipMessage"
-        [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
-      >
+        <ng-container
+          *ngIf="!isActiveSystemIRP && !(isContentTabletWidth || isMiddleTabletWidth)"
+          [ngTemplateOutlet]="filterButton"
+        ></ng-container>
+        <app-tooltip-container
+          *ngIf="!isActiveSystemIRP && !(isContentSmallDesktop || isMiddleTabletWidth)"
+          [message]="toolTipMessage"
+          [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
+        >
+          <button
+            [disabled]="isActiveSystemIRP || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+            ejs-button
+            appHideBeforeSyncfusionLoad
+            (click)="openImportDialog()"
+            class="e-outline"
+          >
+            <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
+          </button>
+        </app-tooltip-container>
+        <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
         <button
-          [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
-          ejs-button
+          *ngIf="
+            activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
+            activeTab !== OrganizationOrderManagementTabs.Incomplete &&
+            !isActiveSystemIRP &&
+            !(isContentSmallDesktop || isMiddleTabletWidth)
+          "
+          ejs-dropdownbutton
           appHideBeforeSyncfusionLoad
-          [isPrimary]="true"
-          (click)="navigateToOrderForm()"
+          [items]="exportOptions"
+          (select)="exportSelected($event)"
+          id="importButton"
+          cssClass="e-outline button-export"
+          [disabled]="isActiveSystemIRP"
         >
-          Create Order
+          <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
         </button>
-      </app-tooltip-container>
+
+        <ng-container
+          *ngIf="!isActiveSystemIRP && (isContentSmallDesktop || isMiddleTabletWidth)"
+          [ngTemplateOutlet]="smallMenuButton"
+        >
+        </ng-container>
+
+        <app-tooltip-container
+          *ngIf="!isMobile"
+          [message]="toolTipMessage"
+          [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
+        >
+          <button
+            [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+            ejs-button
+            appHideBeforeSyncfusionLoad
+            [isPrimary]="true"
+            (click)="navigateToOrderForm()"
+          >
+            Create Order
+          </button>
+        </app-tooltip-container>
+      </div>
     </ng-container>
   </ng-container>
 </app-page-toolbar>
@@ -181,7 +190,7 @@
 </ng-template>
 
 <ng-template #vmsGridTemplate>
-  <div class="mobile-group-button" [ngClass]="isIRPFlagEnabled ? 'irp': 'vms'" *ngIf="isMobile">
+  <div class="mobile-group-button" [ngClass]="isIRPFlagEnabled ? 'irp' : 'vms'" *ngIf="isMobile">
     <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
   </div>
   <section class="grid-component">
@@ -788,13 +797,14 @@
             [dataSource]="filteredUsers"
             [autofill]="true"
             [minLength]="3"
-            [allowCustom]="false" 
+            [allowCustom]="false"
             (filtering)="contactPersonFiltering($event)"
-            [fields]="contactPersonFields">
+            [fields]="contactPersonFields"
+          >
             <ng-template #itemTemplate="" let-data="">
               <div class="contact-option-container">
-                <span class="contact-name">{{data.fullName}}</span>
-                <span class="contact-email">{{data.email}}</span>
+                <span class="contact-name">{{ data.fullName }}</span>
+                <span class="contact-email">{{ data.email }}</span>
               </div>
             </ng-template>
           </ejs-autocomplete>
@@ -1150,7 +1160,6 @@
   [orderdatas]="CurrentOrderDatas"
   (reloadItemsListforupdate)="updatePageforbulk()"
 ></app-update-reg-rate>
-
 
 <app-child-order-dialog
   [order]="$any(selectedOrder)"
