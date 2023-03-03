@@ -26,19 +26,20 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   public filteredItems$ = new Subject<number>();
   public exportSelected$ = new Subject<any>();
   public search$ = new Subject<string>();
+  public orderStatus: string[]=[];
   private unsubscribe$: Subject<void> = new Subject();
-  public orderStatus: string[] = [];
   public organizationIds: number[] = [];
+
   constructor(private store: Store,private router: Router) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
-    if(routerState?.['status'] == "Open&Inprogress"){
+    if(routerState?.['condition'] == "Open&Inprogress"){
       this.orderStatus.push("Open");
       this.orderStatus.push("InProgress");
       this.organizationIds.push(routerState?.['orderStatus'])
     } else {
-      routerState?.['status'];
+      this.orderStatus.push(routerState?.['status']== "In Progress" ? 'InProgress' : routerState?.['status'] );
     }
   }
 

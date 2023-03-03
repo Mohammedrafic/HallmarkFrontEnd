@@ -340,6 +340,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.businessFilterForm.disable();
       this.filterBbusinessControl.patchValue(this.user?.businessUnitId);
     }
+    this.skipBusinessUnit();
   }
 
   ngAfterViewInit(): void {
@@ -359,6 +360,14 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   get bussinesUserData$(): Observable<BusinessUnit[]> {
     return this.businessUserData$.pipe(map((fn) => fn(this.filterBbusinessControl?.value)));
+  }
+
+  private skipBusinessUnit() {
+    this.businessUnits.forEach((element, index) => {
+      if (element.id == BusinessUnitType.Hallmark || element.id == BusinessUnitType.MSP) {
+        delete this.businessUnits[index];
+      }
+    });
   }
 
   private generateFilterBusinessForm(): FormGroup {

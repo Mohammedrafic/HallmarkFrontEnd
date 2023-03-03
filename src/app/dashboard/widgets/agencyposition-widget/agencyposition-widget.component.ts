@@ -42,12 +42,12 @@ export class AgencypositionWidgetComponent extends AbstractPermissionGrid {
     this.mousePosition.y = $event.screenY;
   }
 
-  public toSourceContent(OrgId:number, status:string): void {
+  public toSourceContent(OrgId:number, condition:string): void {
     const orderStatus = OrgId;
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
       this.filterservice.setPreservedFIlters({organizations : OrgId});
-      this.dashboardService.redirectToUrl('agency/order-management',orderStatus,status);
+      this.dashboardService.redirectToUrlWithAgencyposition('agency/order-management',orderStatus,condition);
     } else {
       this.store.dispatch(
         new SetLastSelectedOrganizationAgencyId({

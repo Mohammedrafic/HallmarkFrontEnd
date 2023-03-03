@@ -82,8 +82,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() exportButtonClicked: boolean;
   @Input() onExportClicked$: Subject<any>;
   @Input() search$: Subject<string>;
-  @Output() selectTab = new EventEmitter<number>();
   @Input() public orderStatus: string[];
+
+  
+  @Output() selectTab = new EventEmitter<number>();
   @Input() public Organizations: number[];
 
   @Output() reOrderNumber = new EventEmitter<number>();
@@ -111,6 +113,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
   };
+
+
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public openCandidat = new Subject<boolean>();
@@ -143,6 +147,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderId: number | null;
   private redirectFromPerDiem = false;
 
+
   private isAlive = true;
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
@@ -158,11 +163,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private orderManagementAgencyService: OrderManagementAgencyService,
     private breakpointService: BreakpointObserverService,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
-    private router: Router,
+    private router: Router
   ) {
     super();
     this.listenRedirectFromExtension();
+    
   }
+
+
+  
 
   ngOnInit(): void {
     this.getAlertOrderId();
@@ -755,6 +764,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
+    this.filters.regionIds = this.filters.regionIds || [];
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));

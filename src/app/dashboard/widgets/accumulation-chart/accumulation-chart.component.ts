@@ -118,7 +118,7 @@ export class AccumulationChartComponent
       }
       if (Enumvalues > 0) {
         if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
-          this.dashboardService.redirectToUrl('agency/candidate-details');
+          this.dashboardService.redirectToUrl('agency/candidate-details',Enumvalues,undefined);
         } else {
           this.dashboardService.redirectToUrl('client/candidate-details',Enumvalues,undefined);
         }
