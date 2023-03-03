@@ -196,6 +196,7 @@ import { FilteredUser } from '@shared/models/user.model';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { GlobalWindow } from '@core/tokens';
+import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 
 @Component({
   selector: 'app-order-management-content',
@@ -382,6 +383,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private candidateStatusIds: number[] = [];
   private SelectedCandiateStatuses: any[] = [];
   private eliteOrderId:number;
+  private alertTitle:string;
+  public isCondidateTab:boolean=false;
 
 
   constructor(
@@ -457,6 +460,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.eliteOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
     (!this.eliteOrderId)?this.eliteOrderId=0:"";
     window.localStorage.setItem("OrderId", JSON.stringify(""));
+    this.getalerttitle()
     super.ngOnInit();
 
     this.getDeviceScreen();
@@ -507,6 +511,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.store.dispatch(new ClearSelectedOrder());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+  public getalerttitle(): void {
+    debugger;
+    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+	  this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+    if(Object.values(AlertIdEnum).includes(this.alertTitle)){
+      this.isCondidateTab=true;
+    }
   }
 
   private subscribeOnChanges(): void {

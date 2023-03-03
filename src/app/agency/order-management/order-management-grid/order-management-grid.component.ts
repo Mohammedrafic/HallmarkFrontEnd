@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -67,6 +67,8 @@ import { UpdateGridCommentsCounter } from '@shared/components/comments/store/com
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { GetIrpOrderCandidates } from '@client/store/order-managment-content.actions';
 import { BreakpointObserverService } from '@core/services';
+import { GlobalWindow } from '@core/tokens';
+import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -144,6 +146,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private alertOrderId:number;
+  private alertTitle:string;
 
   constructor(
     private store: Store,
@@ -152,7 +155,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private datePipe: DatePipe,
     private filterService: FilterService,
     private orderManagementAgencyService: OrderManagementAgencyService,
-    private breakpointService: BreakpointObserverService
+    private breakpointService: BreakpointObserverService,
+    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super();
     this.listenRedirectFromExtension();
@@ -160,6 +164,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   ngOnInit(): void {
     this.getAlertOrderId();
+    this.getalerttitle();
     this.getDeviceScreen();
     this.onOrderPreviewChange();
     this.onAgencyChange();
@@ -232,6 +237,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     window.localStorage.setItem("OrderId", JSON.stringify(""));
     if(this.alertOrderId>0)
       this.openDetailsTab = true;
+  }
+  public getalerttitle(): void {
+    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+	  this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+    if(Object.values(AlertIdEnum).includes(this.alertTitle)){
+      this.openDetailsTab = false;
+    }
   }
 
   public override customExport(): void {
