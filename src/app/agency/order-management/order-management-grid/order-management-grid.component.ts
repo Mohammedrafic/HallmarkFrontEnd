@@ -69,7 +69,6 @@ import { GetIrpOrderCandidates } from '@client/store/order-managment-content.act
 import { BreakpointObserverService } from '@core/services';
 import { GlobalWindow } from '@core/tokens';
 import { Router } from '@angular/router';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-order-management-grid',
