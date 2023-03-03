@@ -28,13 +28,19 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   public search$ = new Subject<string>();
   public orderStatus: string[]=[];
   private unsubscribe$: Subject<void> = new Subject();
+  public organizationIds: number[] = [];
 
-
-  constructor(private store: Store,private router: Router,) {
+  constructor(private store: Store,private router: Router) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
-  const routerState = this.router.getCurrentNavigation()?.extras?.state;
-  this.orderStatus.push(routerState?.['status']== "In Progress" ? 'InProgress' : routerState?.['status'] );
+    const routerState = this.router.getCurrentNavigation()?.extras?.state;
+    if(routerState?.['condition'] == "Open&Inprogress"){
+      this.orderStatus.push("Open");
+      this.orderStatus.push("InProgress");
+      this.organizationIds.push(routerState?.['orderStatus'])
+    } else {
+      this.orderStatus.push(routerState?.['status']== "In Progress" ? 'InProgress' : routerState?.['status'] );
+    }
   }
 
   ngOnDestroy(): void {

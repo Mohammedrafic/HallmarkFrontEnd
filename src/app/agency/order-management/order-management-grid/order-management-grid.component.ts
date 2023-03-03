@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -67,6 +67,7 @@ import { UpdateGridCommentsCounter } from '@shared/components/comments/store/com
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { GetIrpOrderCandidates } from '@client/store/order-managment-content.actions';
 import { BreakpointObserverService } from '@core/services';
+import { GlobalWindow } from '@core/tokens';
 import { Router } from '@angular/router';
 
 @Component({
@@ -85,6 +86,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   
   @Output() selectTab = new EventEmitter<number>();
+  @Input() public Organizations: number[];
 
   @Output() reOrderNumber = new EventEmitter<number>();
 
@@ -157,10 +159,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private location: Location,
     private actions$: Actions,
     private datePipe: DatePipe,
-    private router: Router,
     private filterService: FilterService,
     private orderManagementAgencyService: OrderManagementAgencyService,
-    private breakpointService: BreakpointObserverService
+    private breakpointService: BreakpointObserverService,
+    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
+    private router: Router
   ) {
     super();
     this.listenRedirectFromExtension();
@@ -367,9 +370,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public setDefaultFilters(statuses: number[]): void {
     if (this.filterService.canPreserveFilters()) {
       const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
-      if (preservedFilters?.organizations?.length) {
-        this.OrderFilterFormGroup.get('organizationIds')?.setValue(preservedFilters.organizations);
-        this.filters.organizationIds = preservedFilters.organizations;
+      if(this.Organizations.length > 0){
+        this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
+        this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
         this.actions$.pipe(ofActionSuccessful(GetOrganizationStructure), take(1)).subscribe(() => {
           if (preservedFilters?.regions) {
             this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
@@ -378,11 +381,27 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
               this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
               this.filters.locationIds = [...preservedFilters.locations];
             }
-          }
+          }  
           this.setDefaultStatuses(statuses);
         });
       } else {
+        if (preservedFilters?.organizations?.length) {
+            this.OrderFilterFormGroup.get('organizationIds')?.setValue(preservedFilters.organizations);
+            this.filters.organizationIds = preservedFilters.organizations;
+            this.actions$.pipe(ofActionSuccessful(GetOrganizationStructure), take(1)).subscribe(() => {
+              if (preservedFilters?.regions) {
+                this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
+                this.filters.regionIds = [...preservedFilters.regions];
+                if (preservedFilters?.locations) {
+                  this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
+                  this.filters.locationIds = [...preservedFilters.locations];
+                }
+              }
+              this.setDefaultStatuses(statuses);
+            });
+        } else {
           this.setDefaultStatuses(statuses);
+        }
       }
     } else {
       const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
@@ -396,7 +415,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private setDefaultStatuses(statuses: number[]): void {
-    const statuse = this.filterColumns.orderStatuses.dataSource
+    const statuse = this.filterColumns.orderStatuses.dataSource;
     this.OrderFilterFormGroup.get('orderStatuses')?.setValue((this.orderStatus.length > 0) ? this.orderStatus : statuses);
     this.filters.orderStatuses = (this.orderStatus.length > 0) ? this.orderStatus : statuse;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
