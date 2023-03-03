@@ -91,6 +91,11 @@ export class FilterService {
         return !isEmpty(value) || isDate(value) || isBoolean(value) || isNumber(value);
       })
       .forEach((key) => {
+        if (!filterColumns[key]) {
+          console.warn(key + ' is not defined in filter config.');
+          return;
+        }
+
         const val = form.controls[key].value;
 
         switch (filterColumns[key].type) {
