@@ -5,6 +5,10 @@ import { AgencyPositionModel } from '../../models/agency-position.model';
 import { Store } from '@ngxs/store';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
+import { UserState } from '../../../store/user.state';
+import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
+import { SetPreservedFilters } from 'src/app/store/preserved-filters.actions';
+import { FilterService } from '@shared/services/filter.service';
 
 @Component({
   selector: 'app-agencyposition-widget',
@@ -24,7 +28,8 @@ export class AgencypositionWidgetComponent extends AbstractPermissionGrid {
   };
 
   constructor(private readonly dashboardService: DashboardService,protected override store: Store,
-              @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis) {
+              @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
+              public filterservice : FilterService) {
                 super(store);
               }
 
@@ -37,13 +42,22 @@ export class AgencypositionWidgetComponent extends AbstractPermissionGrid {
     this.mousePosition.y = $event.screenY;
   }
 
-  public toSourceContent(orgId:number): void {
-    this.store.dispatch(
+  public toSourceContent(OrgId:number, status:string): void {
+    const orderStatus = OrgId;
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+      this.filterservice.setPreservedFIlters({organizations : OrgId});
+      this.dashboardService.redirectToUrl('agency/order-management',orderStatus,status);
+    } else {
+      this.store.dispatch(
         new SetLastSelectedOrganizationAgencyId({
           lastSelectedAgencyId: null,
-          lastSelectedOrganizationId: orgId,
+          lastSelectedOrganizationId: OrgId
         })
       );
-    this.dashboardService.redirectToUrl('client/order-management/');
+      this.dashboardService.redirectToUrl('client/order-management');
+    }
+
+
   }
 }
