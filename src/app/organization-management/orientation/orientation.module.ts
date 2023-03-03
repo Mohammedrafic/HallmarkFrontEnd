@@ -12,14 +12,13 @@ import { GridAllModule, PagerAllModule } from '@syncfusion/ej2-angular-grids';
 import { NumericTextBoxAllModule, TextBoxAllModule } from '@syncfusion/ej2-angular-inputs';
 import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { FeatherModule } from 'angular-feather';
-import { Edit, Trash2 } from 'angular-feather/icons';
+import { Edit, Trash2, RotateCw } from 'angular-feather/icons';
 
 import { ToggleIconRendererModule } from '@shared/components/cell-renderers/toggle-icon-renderer';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { OrientationComponent } from './orientation.component';
 import { OrientationService } from './services/orientation.service';
 import { OrientationRoutingModule } from './orientation-routing.module';
-import { OrientationExceptionsComponent } from './components/orientation-exceptions/orientation-exception.component';
 import { OrientationHistoricalDataComponent } from './components/orientation-historical-data/orientation-historical-data.component';
 import { OrientationSetupComponent } from './components/orientation-setup/orientation-setup.component';
 import { OrientationGridComponent } from './components/orientation-grid/orientation-grid.component';
@@ -30,10 +29,12 @@ import { SkillNameRendererComponent } from './components/orientation-grid/skill-
 import { JoinPipeModule } from '@shared/pipes/join.pipe';
 import { MultiplePipeModule } from '@shared/pipes/multiple.pipe';
 import { SkillCategoryRendererComponent } from './components/orientation-grid/skill-category-renderer/skill-category.component';
+import { HistoricalDataActionRendererComponent } from './components/orientation-grid/historical-data-action-renderer/historical-data-action-renderer.component';
 
 const icons = {
   Edit,
   Trash2,
+  RotateCw
 };
 
 @NgModule({
@@ -64,13 +65,13 @@ const icons = {
   ],
   declarations: [
     OrientationComponent,
-    OrientationExceptionsComponent,
     OrientationHistoricalDataComponent,
     OrientationGridComponent,
     OrientationSetupComponent,
     OrientationGridActionRendererComponent,
     SkillNameRendererComponent,
     SkillCategoryRendererComponent,
+    HistoricalDataActionRendererComponent,
   ],
   providers: [OrientationService],
   exports: [OrientationComponent],
