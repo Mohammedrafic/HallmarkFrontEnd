@@ -191,6 +191,12 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
       disabled: true,
     },
   },
+  {
+    field: 'Location',
+    headerName: 'Location',
+    width: 125,
+    minWidth: 105,  
+  },
   editableCostCenterDef,
   {
     field: 'billRateConfigName',
