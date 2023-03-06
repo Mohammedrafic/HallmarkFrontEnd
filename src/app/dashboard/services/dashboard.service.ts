@@ -363,6 +363,9 @@ export class DashboardService {
   public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :number,candidateStatus?:string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus} });
   }
+  public redirectToUrlWithAgencyposition(url: string,orderStatus? :number,condition? : string): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,condition: condition} });
+  }
   private getTasksWidgetData(): Observable<string> {
     return of('temporary-collapsed-widget-tasks');
   }

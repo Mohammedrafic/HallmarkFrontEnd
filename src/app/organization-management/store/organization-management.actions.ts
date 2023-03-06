@@ -593,3 +593,7 @@ export class SaveRegionsImportResultSucceeded {
   constructor(public payload: ImportResult<ImportedRegion>) { }
 }
 
+export class SetOrderGridPageNumber {
+  static readonly type = '[candidate] Set Order Grid Page Number';
+  constructor(public page: number) {}
+}

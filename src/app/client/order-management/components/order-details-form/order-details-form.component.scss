@@ -257,21 +257,25 @@ ejs-textbox.e-control {
 @media #{$max-desktop-small} {
   .order-form-container {
     flex-direction: column;
+    padding-right: 16px;
 
     .left-section {
       width: 100%;
-      padding-bottom: 20px;
+      padding: 0 0 20px 0;
     }
 
     .right-section {
+      padding: 0;
       width: 100%;
     }
   }
 
   .order-type-status-container {
+    padding-right: 16px;
+
     .left-section {
       width: 100%;
-      padding-right: 0;
+      padding: 0;
     }
 
     .right-section {
@@ -386,12 +390,6 @@ ejs-textbox.e-control {
 
     .right-section {
       display: none;
-    }
-  }
-
-  ::ng-deep {
-    .e-popup-full-page .e-popup-open {
-      height: fit-content !important;
     }
   }
 }

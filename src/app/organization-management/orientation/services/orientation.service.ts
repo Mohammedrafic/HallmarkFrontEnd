@@ -7,7 +7,7 @@ import { CHANGES_SAVED } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
-import { Observable,tap } from 'rxjs';
+import { BehaviorSubject, Observable,Subject,tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { OrientationConfiguration, OrientationConfigurationDTO, OrientationConfigurationFilters, OrientationConfigurationPage, OrientationSetting } from '../models/orientation.model';
 
@@ -50,11 +50,21 @@ export class OrientationService {
       valueId: 'id',
     },
   };
+
+  private isSettingsOff$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   
   constructor(
     private store: Store,
     private http: HttpClient,
   ) {}
+
+  public checkIfSettingOff(): Observable<boolean> {
+    return this.isSettingsOff$.asObservable();
+  }
+
+  public setSettingState(state: boolean): void {
+    this.isSettingsOff$.next(state);
+  }
 
   public getOrientationConfigs(filters: OrientationConfigurationFilters): Observable<OrientationConfigurationPage> {
     return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/configurations/list', filters)

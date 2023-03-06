@@ -9,6 +9,7 @@ import {
   OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   TrackByFunction,
   ViewChild,
 } from '@angular/core';
@@ -20,7 +21,7 @@ import { AutoCompleteComponent } from '@syncfusion/ej2-angular-dropdowns/src/aut
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
 import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { debounceTime, fromEvent, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { debounceTime, fromEvent, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { DatesRangeType } from '@shared/enums';
@@ -34,7 +35,7 @@ import { UserState } from '../../../../store/user.state';
 import { ScheduleGridAdapter } from '../../adapters';
 import { DatesPeriods } from '../../constants';
 import * as ScheduleInt from '../../interface';
-import { ScheduleDateItem } from '../../interface';
+import { ScheduleCandidatesPage, ScheduleDateItem } from '../../interface';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -83,9 +84,13 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   preventCellSingleClick = false;
 
+  isEmployee = false;
+
   private cellClickTimer: Timeout;
 
   private itemsPerPage = 30;
+
+  private filteredByEmployee = false;
 
   constructor(
     private store: Store,
@@ -110,8 +115,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.watchForCandidateSearch();
   }
 
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
     this.selectedCandidatesSlot.clear();
+    if (changes['selectedFilters'] && !this.filteredByEmployee) {
+      this.filterByEmployee();
+    }
   }
 
   changeActiveDatePeriod(selectedPeriod: string | undefined): void {
@@ -188,7 +196,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   private startOrgIdWatching(): void {
     this.organizationId$.pipe(
       filter(Boolean),
-      tap(() => this.autoCompleteSearch?.clear()),
+      tap(() => {
+        if (!this.isEmployee) {
+          this.autoCompleteSearch?.clear();
+        }
+      }),
       switchMap((businessUnitId: number) => {
         return this.store.dispatch(new GetOrganizationById(businessUnitId));
       }),
@@ -275,6 +287,25 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       return !!(this.scheduleData &&
         this.scheduleData?.items.length > 1 &&
         this.selectedFilters.departmentsIds?.length === 1);
+    }
+  }
+
+  private filterByEmployee(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    this.isEmployee = user?.isEmployee || false;
+
+    if (user?.isEmployee && this.selectedFilters.startDate && this.selectedFilters.endDate) {
+      this.filteredByEmployee = true;
+      this.autoCompleteSearch?.writeValue(user.fullName);
+      this.scheduleApiService.getScheduleEmployees({
+        firstLastNameOrId: user.fullName,
+        startDate: this.selectedFilters.startDate,
+        endDate: this.selectedFilters.endDate,
+      })
+        .pipe(take(1))
+        .subscribe((page: ScheduleCandidatesPage) => {
+          this.autoSelectCandidate(page.items[0]);
+        });
     }
   }
 }

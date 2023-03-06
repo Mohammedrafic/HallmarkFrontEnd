@@ -160,6 +160,18 @@ button.e-control.e-btn.e-dropdown-btn {
 }
 
 .row-tool-buttons.action-renderer.ag-grid-cell-renderer {
+  button {
+    border: none;
+    background-color: inherit;
+    padding: 10px;
+
+    i-feather {
+      margin-top: 4px;
+    }
+
+    color: $secondary-dark-blue-30;
+  }
+
   button.e-control.e-btn {
     i-feather {
       margin: 0;

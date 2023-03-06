@@ -10,6 +10,7 @@ import { REQUIRED_PERMISSIONS } from '@shared/constants';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import { ScheduleGridAdapter } from '../../adapters';
 import { ButtonRegionTooltip, ButtonSelectDataTooltip, TabListConfig } from '../../constants';
@@ -55,6 +56,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   hasSchedulePermission = false;
 
+  isEmployee = false;
+
   scheduleStructure: ScheduleFilterStructure = {
     regions: [],
     locations: [],
@@ -78,6 +81,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   public override ngOnInit(): void {
     super.ngOnInit();
     this.watchForPermissions();
+    this.setIsEmployee();
   }
 
   changeTab(tabIndex: ActiveTabIndex): void {
@@ -282,5 +286,9 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
         this.hasViewPermission = permissions[this.userPermissions.CanViewSchedule] || this.hasSchedulePermission;
         this.setScheduleButtonTooltip();
       });
+  }
+
+  private setIsEmployee(): void {
+    this.isEmployee = this.store.selectSnapshot(UserState.user)?.isEmployee || false;
   }
 }

@@ -11,3 +11,8 @@ export const OrientationTypeDataSource = [
   { id: OrientationType.LocationWise, text: 'Location' },
   { id: OrientationType.DepartmentWise, text: 'Department' },
 ];
+
+export enum OrientationTab {
+  Setup,
+  HistoricalData
+}

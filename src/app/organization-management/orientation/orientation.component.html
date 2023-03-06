@@ -7,23 +7,16 @@
       <e-tabitem>
         <ng-template #headerText><div>Orientation Setup</div></ng-template>
         <ng-template #content>
-          <app-orientation-setup></app-orientation-setup>
+          <app-orientation-setup [isActive]="selectedTab === orientationTab.Setup"></app-orientation-setup>
         </ng-template>
       </e-tabitem>
 
-      <!--e-tabitem> TODO: EIN-11557
+      <e-tabitem>
         <ng-template #headerText><div>Historical Data</div></ng-template>
         <ng-template #content>
-          <app-orientation-historical-data></app-orientation-historical-data>
+          <app-orientation-historical-data [isActive]="selectedTab === orientationTab.HistoricalData"></app-orientation-historical-data>
         </ng-template>
-      </e-tabitem-->
-
-      <!--e-tabitem> TODO: EIN-11194
-        <ng-template #headerText><div>Exceptions</div></ng-template>
-        <ng-template #content>
-          <app-orientation-exception></app-orientation-exception>
-        </ng-template>
-      </e-tabitem-->
+      </e-tabitem>
     </e-tabitems>
   </ejs-tab>
 </section>

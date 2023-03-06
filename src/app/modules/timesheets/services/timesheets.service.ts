@@ -46,10 +46,7 @@ export class TimesheetsService {
     this.store.dispatch(new Timesheets.SetFiltersDataSource(key, source));
   }
 
-  /**
-   * TODO: rename it
-   */
-  public getStream(): Observable<number> {
+  public getSelectedTimesheetRowStream(): Observable<number> {
     return this.currentSelectedTableRowIndex.getStream();
   }
 

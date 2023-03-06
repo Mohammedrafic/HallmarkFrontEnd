@@ -1,0 +1,9 @@
+<div class="row-tool-buttons action-renderer ag-grid-cell-renderer">
+  <button 
+    ejs-button class="edit-button" 
+    cssClass="e-flat primary-icon-button" 
+    (click)="edit()" 
+    [disabled]="cellValue.gridActionsParams.disableControls || !userPermission[userPermissions.CanEditOrientation]">
+    <span class="edit-button"><i-feather name="rotate-cw" class="icon"></i-feather></span>
+  </button>
+</div>
