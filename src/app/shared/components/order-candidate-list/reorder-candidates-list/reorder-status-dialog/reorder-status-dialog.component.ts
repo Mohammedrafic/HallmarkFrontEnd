@@ -7,7 +7,7 @@ import {
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { DatePipe } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import {
   CancelOrganizationCandidateJob,
@@ -162,7 +162,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     private store: Store,
     private actions$: Actions,
     private orderCandidateListViewService: OrderCandidateListViewService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private cdr: ChangeDetectorRef,
   ) {
     super();
   }
@@ -407,7 +408,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   private subscribeOnReasonsList(): Observable<RejectReason[]> {
     return merge(this.rejectionReasonsList$, this.agencyRejectionReasonsList$).pipe(
-      tap((reasons: RejectReason[]) => (this.rejectReasons = reasons))
+      tap((reasons: RejectReason[]) => {
+        this.rejectReasons = reasons;
+        this.cdr.markForCheck();
+      })
     );
   }
 
