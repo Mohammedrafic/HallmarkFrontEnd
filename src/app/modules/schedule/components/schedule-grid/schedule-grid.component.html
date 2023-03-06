@@ -8,7 +8,7 @@
               <i-feather name="search" class="search-icon"></i-feather>
               <ejs-autocomplete
                 #autoCompleteSearch
-                [enabled]="hasViewPermission"
+                [enabled]="hasViewPermission && !isEmployee"
                 [dataSource]="candidatesSuggestions"
                 filterType="StartsWith"
                 [fields]="candidateNameFields"

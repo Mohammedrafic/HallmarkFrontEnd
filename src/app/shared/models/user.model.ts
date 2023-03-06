@@ -5,12 +5,14 @@ export class User {
   email: string;
   firstName: string;
   lastName: string;
+  fullName: string;
   businessUnitId: number | null;
   businessUnitType: BusinessUnitType;
   businessUnitName: string;
   agencyStatus?: number;
   isChatEnabled?: boolean;
   isDeleted?: boolean;
+  isEmployee?: boolean;
 }
 
 export class UsersPage {

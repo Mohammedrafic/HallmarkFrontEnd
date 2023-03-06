@@ -9,6 +9,7 @@
       <div>
         <app-tooltip-container *ngIf="activeTabIndex === tabIndex.Scheduling" [showToolTip]="!hasViewPermission">
           <button
+            *ngIf="!isEmployee"
             ejs-button
             appHideBeforeSyncfusionLoad
             cssClass="e-outline button-filter"

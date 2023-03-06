@@ -1,10 +1,13 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+
+import { Store } from '@ngxs/store';
 import { combineLatest, takeUntil, tap } from 'rxjs';
+import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { B2CAuthService } from 'src/app/b2c-auth/b2c-auth.service';
-import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-login-page',
@@ -14,7 +17,9 @@ import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 export class LoginPageComponent extends DestroyableDirective implements AfterViewInit {
   @ViewChild('spiner') spiner: ElementRef;
 
-  constructor(private router: Router, private b2CAuthService: B2CAuthService) {
+  constructor(private router: Router,
+              private b2CAuthService: B2CAuthService,
+              private store: Store) {
     super();
   }
 
@@ -27,7 +32,7 @@ export class LoginPageComponent extends DestroyableDirective implements AfterVie
       this.b2CAuthService.onLoginSuccess().pipe(
         takeUntil(this.destroy$),
         tap(() => showSpinner(this.spiner.nativeElement)),
-        tap(() => this.router.navigate(['/']))
+        tap(() => this.navigateToDefaultPage())
       ),
       this.b2CAuthService.interactionStatusNone().pipe(
         tap(() => {
@@ -44,6 +49,13 @@ export class LoginPageComponent extends DestroyableDirective implements AfterVie
   public loginWithSSO(): void {
     showSpinner(this.spiner.nativeElement);
     this.b2CAuthService.loginSSO();
+  }
+
+  private navigateToDefaultPage(): void {
+    const isEmployee = this.store.selectSnapshot(UserState.user)?.isEmployee;
+    const defaultUrl = isEmployee ? '/client/scheduling' : '/';
+
+    this.router.navigate([defaultUrl]);
   }
 }
 
