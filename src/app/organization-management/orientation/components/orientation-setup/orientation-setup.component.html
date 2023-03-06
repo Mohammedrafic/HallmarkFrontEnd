@@ -27,7 +27,8 @@
     </form>
   </div>
   <app-orientation-grid 
-    gridTitle="Orientation Setup" 
+    gridTitle="Orientation Setup"
+    [isActive]="isActive"
     (pageChange)="pageChange($event)"
     (openDialog)="openDialog($event)"
     (onEdit)="openDialog($event)"
@@ -35,7 +36,8 @@
     [dataSource]="dataSource"
     [skillCategories]="(allSkillsCategories$ | async)?.items"
     [regions]="regions"
-    [disableControls]="disableControls">
+    [disableControls]="disableControls"
+    [orientationTab]="orientationTab.Setup">
   </app-orientation-grid>
 </section>
 

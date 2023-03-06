@@ -1,3 +1,14 @@
 <section class="flex-column">
-  
+  <app-orientation-grid
+    *ngIf="isActive"
+    gridTitle="Historical Data"
+    [isActive]="isActive"
+    (pageChange)="pageChange($event)"
+    (onEdit)="openDialog($event)"
+    [dataSource]="dataSource"
+    [skillCategories]="[]"
+    [regions]="[]"
+    [disableControls]="disableControls"
+    [orientationTab]="orientationTab.HistoricalData">
+  </app-orientation-grid>
 </section>
