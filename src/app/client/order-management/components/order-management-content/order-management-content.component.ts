@@ -97,7 +97,7 @@ import {
   GetAssignedSkillsByOrganization,
   GetOrganizationById,
   GetOrganizationSettings,
-  SetorderGridPageNumber,
+  SetOrderGridPageNumber,
 } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
@@ -1406,7 +1406,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private onGridPageChangedHandler(): void {
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new SetorderGridPageNumber(page));
+      this.store.dispatch(new SetOrderGridPageNumber(page));
       const { selectedOrderAfterRedirect } = this.orderManagementService;
       if (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect) {
         this.filters.orderPublicId = (this.prefix || selectedOrderAfterRedirect?.prefix) + '-' + (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect?.orderId);

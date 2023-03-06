@@ -111,7 +111,7 @@ import {
   SetBillingStatesByCountry,
   SetDirtyState,
   SetGeneralStatesByCountry,
-  SetorderGridPageNumber,
+  SetOrderGridPageNumber,
   UpdateCredentialType,
   UpdateDepartment,
   UpdateLocation,
@@ -1721,10 +1721,10 @@ export class OrganizationManagementState {
     );
   }
 
-  @Action(SetorderGridPageNumber)
-  SetorderGridPageNumber(
+  @Action(SetOrderGridPageNumber)
+  SetOrderGridPageNumber(
     { patchState }: StateContext<OrganizationManagementStateModel>,
-    { page }: SetorderGridPageNumber
+    { page }: SetOrderGridPageNumber
   ): void {
     patchState({ orderGridPageNumber: page });
   }
