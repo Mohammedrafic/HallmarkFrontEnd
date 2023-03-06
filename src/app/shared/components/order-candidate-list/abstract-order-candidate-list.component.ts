@@ -31,6 +31,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   @Input() order: AgencyOrder;
   @Input() includeDeployedCandidates = true;
   @Input() irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
+  @Input() orderGridPageNumber: number | null;
 
   @Output() getCandidatesList = new EventEmitter<CandidateListEvent>();
 
@@ -98,6 +99,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
         orderId: this.order.orderId,
         candidateStatus: data.status,
         pageToBack,
+        orderGridPageNumber: this.orderGridPageNumber,
         readonly: !this.isAgency,
         isRedirectFromOrder: true,
         isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,

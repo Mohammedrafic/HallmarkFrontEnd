@@ -19,7 +19,9 @@
     [includeDeployedCandidates]="!excludeDeployed"
     [order]="orderCandidates"
     [system]="activeSystem"
-    [selectedOrder]="order">
+    [selectedOrder]="order"
+    [orderGridPageNumber]="orderGridPageNumber$ | async"
+    >
   </app-reorder-candidates-list>
   <app-order-per-diem-candidates-list *ngSwitchCase="orderType.OpenPerDiem"
     [candidatesList]="orderCandidatePage$ | async"
@@ -28,7 +30,9 @@
     [includeDeployedCandidates]="!excludeDeployed"
     [order]="orderCandidates"
     [system]="activeSystem"
-    [selectedOrder]="order">
+    [selectedOrder]="order"
+    [orderGridPageNumber]="orderGridPageNumber$ | async"
+    >
   </app-order-per-diem-candidates-list>
   <app-order-candidates-list *ngSwitchDefault
     [candidatesList]="orderCandidatePage$ | async"
@@ -36,6 +40,8 @@
     [includeDeployedCandidates]="!excludeDeployed"
     (getCandidatesList)="onGetCandidatesList($event)"
     [system]="activeSystem"
-    [order]="orderCandidates">
+    [order]="orderCandidates"
+    [orderGridPageNumber]="orderGridPageNumber$ | async"
+    >
   </app-order-candidates-list>
 </div>
