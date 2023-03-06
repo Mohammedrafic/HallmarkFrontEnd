@@ -112,6 +112,8 @@ import { DoNotReturnGridComponent } from './do-not-return/do-not-return-grid/do-
 import { DonotReturnState } from '@admin/store/donotreturn.state';
 import { DonotreturnService } from '@shared/services/donotreturn.service';
 import { DoNotReturnFormService } from './do-not-return/do-not-return.form.service';
+import { LogiReportState } from '@organization-management/store/logi-report.state';
+import { DocumentLibraryState } from '../modules/document-library/store/state/document-library.state';
 
 
 const gridIcons = {
@@ -209,7 +211,7 @@ const gridIcons = {
     MatMenuModule,
     AutoCompleteAllModule,
     //STORE
-    NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState, CandidateState,DonotReturnState]),
+    NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState, CandidateState,DonotReturnState,DocumentLibraryState]),
     ExtensionModule,
     ImportDialogContentModule,
     ListBoxModule,

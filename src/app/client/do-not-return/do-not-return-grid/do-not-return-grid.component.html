@@ -82,8 +82,46 @@
         </ejs-dropdownlist>
       </div>
     </div>
-
-    <div class="input-container bootstrap form-line-item-20">
+    <div class="form-elemet">
+      <div class="group">
+        <div class="input-container calendar">
+          <label for="regionIds">Region <span class="required">*</span></label>
+          <div class="input-group bootstrap" >
+            <ejs-multiselect #regionIdsControl id="regionIds" mode="CheckBox"
+                             formControlName="regionIds"
+                             placeholder="All"
+                             [fields]="optionFields"
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             appValidateWithMessage
+                             [dataSource]="regions$ | async"
+                             [selectAllText]='allOption'
+                             (select)="onRegionSelect($event)"
+                             [showSelectAll]="true"
+                             tabindex="2">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container">
+          <label for="locationIds">Location <span class="required">*</span></label>
+          <div class="input-group bootstrap">
+            <ejs-multiselect id="locationIds" mode="CheckBox"
+                             formControlName="locationIds"
+                             placeholder="All"
+                             [fields]="optionFields"
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             appValidateWithMessage
+                             [dataSource]="locations$ | async"
+                             [selectAllText]='allOption'
+                             [showSelectAll]="true"
+                             tabindex="3">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="input-container bootstrap form-line-item-20">
       <label>Location<span class="required">*</span></label>
       <div class="input-group dropdown">
         <ejs-multiselect appValidateWithMessage mode="CheckBox" popupWidth="auto" formControlName="locationIds"
@@ -91,7 +129,7 @@
           [dataSource]="locations$|async">
         </ejs-multiselect>
       </div>
-    </div>
+    </div> -->
     <div class="form-elemet">
       <div class="group">
         <div class="input-container bootstrap">

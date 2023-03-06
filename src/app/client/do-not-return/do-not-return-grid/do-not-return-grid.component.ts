@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, OnDestroy, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, OnDestroy, NgZone, ChangeDetectorRef } from '@angular/core';
 import { DonotReturnState } from '@admin/store/donotreturn.state';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { UserPermissions } from '@core/enums';
@@ -8,7 +8,7 @@ import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/stor
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import {
   DonoreturnAddedit, DoNotReturnsPage,
-  AllOrganization, GetLocationByOrganization, DoNotReturnCandidateSearchFilter, DoNotReturnCandidateListSearchFilter, DoNotReturnSearchCandidate, DonoreturnFilter
+  AllOrganization, DoNotReturnCandidateSearchFilter, DoNotReturnCandidateListSearchFilter, DoNotReturnSearchCandidate, DonoreturnFilter
 } from '@shared/models/donotreturn.model';
 import { DoNotReturn } from '@admin/store/donotreturn.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -25,13 +25,19 @@ import { DoNotReturnFormService } from '../do-not-return.form.service';
 import { ChangeEventArgs, FieldSettingsModel, FilteringEventArgs, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { EmitType } from '@syncfusion/ej2-base';
 import { OutsideZone } from '@core/decorators';
-import { Location } from '@shared/models/visibility-settings.model';
+
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { doNotReturnFilterConfig, MasterDNRExportCols, WATERMARK } from '../donotreturn-grid.constants';
 import { DatePipe } from '@angular/common';
 import { FilterService } from '@shared/services/filter.service';
 import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
+
+import { LocationsByRegionsFilter ,regionFilter} from 'src/app/modules/document-library/store/model/document-library.model';
+import { DocumentLibraryState } from 'src/app/modules/document-library/store/state/document-library.state';
+import { Region } from '@shared/models/region.model';
+import { GetLocationsByRegions, GetRegionsByOrganizations } from 'src/app/modules/document-library/store/actions/document-library.actions';
+import { FormControlNames } from '../enums/dnotreturn.enum';
 
 @Component({
   selector: 'app-do-not-return-grid',
@@ -43,14 +49,12 @@ import { UserAgencyOrganization } from '@shared/models/user-agency-organization.
 export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   public organizationAgencyControl: FormControl = new FormControl();
   public generalInformationForm: FormGroup;
-  public locationIdControl: AbstractControl;
   public columnsToExport: ExportColumn[] = MasterDNRExportCols;
   public filterColumns = doNotReturnFilterConfig;
   public customAttributes: object;
-  public location: Location[];
   public doNotReturnForm: FormGroup;
   public isEdit: boolean = false;
-  public doNotReturnFormGroup: CustomFormGroup<DoNotReturnForm>;
+  public doNotReturnFormGroup: FormGroup;
   public doNotReturnFilterForm: CustomFormGroup<DoNotReturnFilterForm>;
   public fileName: string;
   public defaultFileName: string;
@@ -61,6 +65,11 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   public editedDNRId?: number;
   public candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   public remoteWaterMark: string = WATERMARK;
+  public allOption: string = "All";
+  public regionIdControl: AbstractControl;
+  public locationIdControl: AbstractControl;
+
+  filterSelectedBusinesUnitId: number | null;
 
   public optionFields = {
     text: 'name',
@@ -104,10 +113,13 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   @Select(DonotReturnState.allOrganizations)
   allOrganizations$: Observable<UserAgencyOrganization>;
 
+  @Select(DocumentLibraryState.regions)
+  public regions$: Observable<Region[]>;
+  selectedRegions: Region[];
 
-  @Select(DonotReturnState.GetLocationsByOrgId)
-  locations$: Observable<GetLocationByOrganization[]>;
-
+  @Select(DocumentLibraryState.locations)
+  public locations$: Observable<Location[]>;
+  selectedLocations: Location[];
 
   get reasonControl(): AbstractControl | null {
     return this.doNotReturnForm.get('firstName');
@@ -120,6 +132,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   constructor(private store: Store, private confirmService: ConfirmService, private readonly fb: FormBuilder,
     private donoreturnservice: DoNotReturnFormService, private readonly ngZone: NgZone,
     private actions$: Actions,
+    private changeDetectorRef: ChangeDetectorRef,
     private filterService: FilterService,
     private datePipe: DatePipe,) {
     super();
@@ -128,6 +141,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
+    this.createForm();
     this.getDoNotReturn();
     this.GetAllOrganization();
     this.watchForExportDialog();
@@ -170,6 +184,92 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     return this.doNotReturnForm.get('organizationIds')?.value?.length || 0;
   }
 
+  public createForm(): void {
+    this.doNotReturnFormGroup = new FormGroup({})
+    this.addRemoveFormcontrols();
+  }
+
+  public addRemoveFormcontrols() {
+      this.doNotReturnFormGroup.addControl(FormControlNames.BusinessUnitId, new FormControl('', []));
+      this.doNotReturnFormGroup.addControl(FormControlNames.RegionIds, new FormControl('', []));
+      this.doNotReturnFormGroup.addControl(FormControlNames.LocationIds, new FormControl('', []));
+      this.doNotReturnFormGroup.addControl(FormControlNames.CandidateProfileId, new FormControl('', []));
+      this.doNotReturnFormGroup.addControl(FormControlNames.Ssn, new FormControl('', []));
+      this.doNotReturnFormGroup.addControl(FormControlNames.DnrComment, new FormControl('', []));
+  }
+
+
+  public onRegionSelect(event: any) {
+    this.regionIdControl = this.doNotReturnFormGroup.get(FormControlNames.RegionIds) as AbstractControl;
+    this.regionIdControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      if (this.regionIdControl?.value?.length > 0) {
+        let locationFilter: LocationsByRegionsFilter = {
+          ids: data,
+          getAll: true,
+          businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
+          orderBy:'Name'
+        };
+        this.store.dispatch(new GetLocationsByRegions(locationFilter));
+        this.changeDetectorRef.markForCheck();
+      }
+      else{
+        let locationFilter: LocationsByRegionsFilter = {
+          ids: data,
+          getAll: true,
+          businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
+        };
+        this.store.dispatch(new GetLocationsByRegions(locationFilter));
+        this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue([]); 
+      }
+    });
+  }
+
+  public loadRegionsAndLocations(selectedBusinessUnitId: number) {
+    this.createForm();
+      this.regionIdControl = this.doNotReturnFormGroup.get(FormControlNames.RegionIds) as AbstractControl;
+      let regionFilter: regionFilter = {
+        businessUnitId: selectedBusinessUnitId,
+        getAll: true,
+        ids: [selectedBusinessUnitId]
+      };
+      this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
+      this.changeDetectorRef.markForCheck();
+
+      this.regionIdControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+        if (this.regionIdControl?.value?.length > 0) {
+          let locationFilter: LocationsByRegionsFilter = {
+            ids: data,
+            getAll: true,
+            businessUnitId: selectedBusinessUnitId,
+            orderBy:'Name'
+          };
+          this.store.dispatch(new GetLocationsByRegions(locationFilter));
+          this.changeDetectorRef.markForCheck();
+        }
+      });
+  }
+  
+  public setRegionsOnEdit(editRegionIds: any) {
+
+    if (editRegionIds.length > 0) {
+      this.regions$.subscribe((data) => {
+        this.doNotReturnFormGroup.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
+      });
+    } else {
+      this.doNotReturnFormGroup.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
+    }
+  }
+
+  public setLocationsOnEdit(editLocationIds: any) {
+    if (editLocationIds.length > 0) {
+      this.locations$.subscribe((data) => {
+        this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
+      });
+    } else {
+      this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
+    }
+  }
+
   @OutsideZone
   public editDonotReturn(data: DonoreturnAddedit, event: any): void {
     this.addActiveCssClass(event);
@@ -210,7 +310,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   public onOrganizationDropDownChanged(event: ChangeEventArgs): void {
     this.selectedOrganization = event.itemData as AllOrganization;
     if (this.selectedOrganization.id) {
-      this.store.dispatch(new DoNotReturn.GetLocationByOrgId(this.selectedOrganization.id));
+      this.loadRegionsAndLocations(this.selectedOrganization.id);
     }
   }
 

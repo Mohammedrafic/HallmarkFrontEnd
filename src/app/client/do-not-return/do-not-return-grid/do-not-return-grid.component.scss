@@ -80,3 +80,151 @@
   vertical-align: top;
   font-size: 14px;
 }
+.form-container {
+  padding-top: 24px;
+
+  .group {
+    display: flex;
+
+    .input-container:first-child {
+      padding-right: 13px;
+    }
+
+    .input-container {
+      width: 100%;
+
+      ejs-numerictextbox {
+        span.e-disabled {
+          border: 1px solid $grey;
+          background-color: $secondary-dark-blue-50;
+        }
+      }
+    }
+
+    .e-switch-wrapper {
+      height: 14px !important;
+      width: 34px !important;
+    }
+
+    .e-switch-handle {
+      height: 20px !important;
+      width: 20px !important;
+    }
+  }
+}
+
+
+.business-dropdowns {
+  display: flex;
+
+  .dropdown-container {
+    margin-right: 12px;
+  }
+}
+
+
+
+.e-switch-wrapper {
+  height: 14px !important;
+  width: 34px !important;
+}
+
+.e-switch-handle {
+  height: 20px !important;
+  width: 20px !important;
+}
+
+.button-group {
+  width: auto;
+  display: flex;
+  align-items: center;
+
+  button {
+    margin-right: 12px;
+  }
+}
+
+.document {
+  margin-top: 24px;
+
+  .e-gridcustomheader {
+    width: unset;
+  }
+
+  .switch-text {
+    color: $secondary-dark-blue-30;
+  }
+
+  .row-tool-buttons .primary-icon-button {
+    color: $primary-active-blue;
+  }
+
+  .row-tool-buttons .secondary-icon-button {
+    color: $supportive-red;
+  }
+
+  .row-tool-buttons .seconadry-dark-icon-button {
+    color: $secondary-dark-blue-30;
+  }
+}
+
+.documentlibrary-addnewfolder-form-dialog {
+  &.form-container {
+    margin-top: 20px;
+  }
+
+  .form-elemet {
+    margin-bottom: 15px;
+
+    .agency-switcher-container {
+      margin-top: 10px;
+    }
+  }
+}
+
+.form-container {
+  padding-top: 24px;
+
+  .group {
+    display: flex;
+
+    .input-container:first-child {
+      padding-right: 13px;
+    }
+
+    .input-container {
+      width: 100%;
+
+      ejs-numerictextbox {
+        span.e-disabled {
+          border: 1px solid $grey;
+          background-color: $secondary-dark-blue-50;
+        }
+      }
+    }
+
+    .e-switch-wrapper {
+      height: 14px !important;
+      width: 34px !important;
+    }
+
+    .e-switch-handle {
+      height: 20px !important;
+      width: 20px !important;
+    }
+  }
+}
+
+.share-with-text {
+  color: $black;
+  font-weight: 600;
+  font-size:14px;
+  margin-left:10px;
+}
+.shared-with-grid{
+  width: 400px;
+}
+
+.e-switch-handle.e-switch-active {
+  background: $primary-active-blue-10 !important;
+}
