@@ -1,1 +1,35 @@
 @import 'colors';
+
+.flex-column {
+  display: flex;
+
+}
+
+.record-form {
+  margin-top: 20px;
+
+  .row {
+    display: flex;
+
+    &.note {
+      font-size: 10px;
+      color: $secondary-dark-blue-20;
+      line-height: 20px;
+      margin-top: 5px;
+    }
+  }
+
+  .input-group {
+    margin-top: 5px;
+  }
+
+  .input-container {
+    margin-bottom: 15px;
+  }
+
+  .control {
+    &.date {
+      width: 40%;
+    }
+  }
+}

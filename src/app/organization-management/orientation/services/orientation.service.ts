@@ -118,6 +118,14 @@ export class OrientationService {
     return form;
   }
 
+  public generateHistoricalDataForm(): FormGroup {
+    const form = new FormGroup({
+      endDate: new FormControl(null),
+    });
+
+    return form;
+  }
+
   public generateConfigurationFilterForm(): FormGroup {
     return new FormGroup({
       regionIds: new FormControl(null),

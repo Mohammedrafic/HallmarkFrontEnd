@@ -1,15 +1,18 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { TakeUntilDestroy } from '@core/decorators';
+import { DateTimeHelper } from '@core/helpers';
 import { Select, Store } from '@ngxs/store';
 import { OrientationTab } from '@organization-management/orientation/enums/orientation-type.enum';
 import { OrientationConfiguration, OrientationConfigurationFilters, OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
 import { OrientationService } from '@organization-management/orientation/services/orientation.service';
-import { DialogMode } from '@shared/enums/dialog-mode.enum';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SETUPS_ACTIVATED } from '@shared/constants';
+import { MessageTypes } from '@shared/enums/message-types';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
-import { OrganizationStructure } from '@shared/models/organization.model';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { getAllErrors } from '@shared/utils/error.utils';
 import { filter, Observable, takeUntil } from 'rxjs';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 
 @Component({
@@ -25,9 +28,9 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   public readonly orientationTab = OrientationTab;
   public dataSource: OrientationConfigurationPage;
   public filters: OrientationConfigurationFilters = { pageNumber: 1, pageSize: this.pageSize };
-  public title: DialogMode;
   public isEdit: boolean = false;
   public disableControls: boolean = false;
+  public orientationForm: FormGroup = this.orientationService.generateHistoricalDataForm();
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;
@@ -77,6 +80,46 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
     this.cd.markForCheck();
   }
 
+  private closeHandler(): void {
+    this.orientationForm.reset();
+    this.store.dispatch(new ShowSideDialog(false));
+  }
+
+  public closeDialog(): void {
+    if (this.orientationForm.dirty) {
+      this.confirmService
+        .confirm(CANCEL_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm: boolean) => !!confirm))
+        .subscribe(() => {
+          this.closeHandler();
+        });
+    } else {
+      this.closeHandler();
+    }
+  }
+
+  
+  public saveRecord(): void {
+    if (this.orientationForm.invalid) {
+      this.orientationForm.markAllAsTouched();
+    } else {
+      const data = this.orientationForm.getRawValue();
+      data.endDate = data.endDate ? DateTimeHelper.toUtcFormat(data.endDate) : data.endDate;
+      this.orientationService.saveOrientationConfiguration(data).subscribe({ // TODO: replace with correct API
+        next: () => {
+          this.store.dispatch(new ShowToast(MessageTypes.Success, SETUPS_ACTIVATED));
+          this.closeHandler();
+          this.getOrientationHistoricalData();
+        },
+        error: (error) => this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
+      });
+    }
+  }
+
   public pageChange(data: OrientationConfigurationFilters): void {
     this.filters = data;
     this.getOrientationHistoricalData();
@@ -84,7 +127,6 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
 
   public openDialog(data: OrientationConfiguration): void {
     if (data) {
-      this.title = DialogMode.Edit;
       this.isEdit = true;
       this.populateForm(data);
       this.store.dispatch(new ShowSideDialog(true));
