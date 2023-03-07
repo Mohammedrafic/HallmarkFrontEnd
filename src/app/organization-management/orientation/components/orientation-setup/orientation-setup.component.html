@@ -27,6 +27,7 @@
     </form>
   </div>
   <app-orientation-grid 
+    *ngIf="isActive"
     gridTitle="Orientation Setup"
     [isActive]="isActive"
     (pageChange)="pageChange($event)"
@@ -37,11 +38,13 @@
     [skillCategories]="(allSkillsCategories$ | async)?.items"
     [regions]="regions"
     [disableControls]="disableControls"
-    [orientationTab]="orientationTab.Setup">
+    [orientationTab]="orientationTab.Setup"
+    [allowBulkSelection]="false">
   </app-orientation-grid>
 </section>
 
 <app-side-dialog
+  *ngIf="isActive"
   header="{{ title }} Setup"
   (formSaveClicked)="saveRecord()"
   (formCancelClicked)="closeDialog()"

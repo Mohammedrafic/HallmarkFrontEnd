@@ -1,6 +1,7 @@
 export const RECORD_ADDED = 'Record has been added';
 export const RECORDS_ADDED = 'Records have been added';
 export const RECORD_MODIFIED = 'Record has been modified';
+export const SETUPS_ACTIVATED = 'Setups were successfully activated';
 export const RECORD_SAVED = 'Record has been saved';
 export const RECORD_DELETE = 'Record has been deleted';
 export const RECORD_CANNOT_BE_DELETED = 'Record cannot be deleted';

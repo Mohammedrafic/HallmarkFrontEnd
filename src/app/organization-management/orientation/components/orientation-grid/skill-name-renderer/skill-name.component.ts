@@ -16,6 +16,7 @@ export class SkillNameRendererComponent extends GridCellRenderer<Skill & ICellRe
   }
 
   public ngOnInit(): void {
-    this.skills = this.params.data.orientationConfigurationSkills.map(({ skillName }: { skillName: string }) => skillName);
+    const configurationSkills = this.params.data.orientationConfigurationSkills || this.params.data.historicalOrientationConfigurationSkills;
+    this.skills = configurationSkills.map(({ skillName }: { skillName: string }) => skillName);
   }
 }

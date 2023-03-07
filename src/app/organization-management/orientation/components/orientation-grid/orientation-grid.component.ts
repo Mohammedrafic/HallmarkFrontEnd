@@ -16,6 +16,7 @@ import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { SkillCategory } from '@shared/models/skill-category.model';
@@ -38,6 +39,9 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   @Input() public gridTitle: string;
   @Input() public dataSource: OrientationConfigurationPage;
   @Input() public orientationTab: OrientationTab;
+  @Input() public allowBulkSelection: boolean = true;
+  @Input() public rowSelection: 'single' | 'multiple' = 'multiple';
+  @Input() public bulkActionConfig: BulkActionConfig;
   @Input('disableControls') set disableControls(value: boolean) {
     this.gridActionsParams.disableControls = value;
     this.gridDefHandler();
@@ -192,6 +196,13 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     this.filters = { pageNumber: 1, pageSize: this.filters.pageSize };
   }
 
+  public handleBulkEvent(event: BulkActionDataModel): void {
+    this.onEdit.emit({
+      isBulk: true,
+      data: event
+    });
+  }
+
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }
@@ -235,7 +246,10 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   }
 
   public edit(data: OrientationConfiguration): void {
-    this.onEdit.emit(data);
+    this.onEdit.emit({
+      isBulk: false,
+      data: data
+    });
   }
 
   public delete(data: OrientationConfiguration): void {
