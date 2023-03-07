@@ -69,6 +69,7 @@ import { GetIrpOrderCandidates } from '@client/store/order-managment-content.act
 import { BreakpointObserverService } from '@core/services';
 import { GlobalWindow } from '@core/tokens';
 import { Router } from '@angular/router';
+import { SetOrderGridPageNumber } from '@agency/store/candidate.actions';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -290,6 +291,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onDataBound(): void {
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
+      const { orderGridPageNumber } = this.location.getState() as { orderGridPageNumber?: number; };
+      this.currentPage = orderGridPageNumber ?? this.currentPage; 
       const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
         this.previousSelectedOrderId
       );
@@ -903,6 +906,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
       this.currentPage = page;
+      this.store.dispatch(new SetOrderGridPageNumber(page));
       this.dispatchNewPage();
     });
   }

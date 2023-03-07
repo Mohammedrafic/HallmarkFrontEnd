@@ -1415,7 +1415,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private onGridPageChangedHandler(): void {
-    this.pageSubject.pipe(throttleTime(150), takeUntil(this.unsubscribe$)).subscribe((page) => {
+    this.pageSubject.pipe(throttleTime(25), takeUntil(this.unsubscribe$)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new SetOrderGridPageNumber(page));
       const { selectedOrderAfterRedirect } = this.orderManagementService;
