@@ -84,7 +84,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() search$: Subject<string>;
   @Input() public orderStatus: string[];
 
-  
+
   @Output() selectTab = new EventEmitter<number>();
   @Input() public Organizations: number[];
 
@@ -167,11 +167,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   ) {
     super();
     this.listenRedirectFromExtension();
-    
+
   }
 
 
-  
+
 
   ngOnInit(): void {
     this.getAlertOrderId();
@@ -381,7 +381,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
               this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
               this.filters.locationIds = [...preservedFilters.locations];
             }
-          }  
+          }
           this.setDefaultStatuses(statuses);
         });
       } else {

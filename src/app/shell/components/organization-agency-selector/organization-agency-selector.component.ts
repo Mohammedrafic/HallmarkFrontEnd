@@ -161,7 +161,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
       }
       if (isOrganizationArea || isAgencyArea) {
         const currentArea = isOrganizationArea ? 'Organization' : 'Agency';
-        
+
         this.store.dispatch(new LastSelectedOrganisationAgency(currentArea))
         .subscribe(() => {
           this.applyOrganizationsAgencies(isOrganizationArea, isAgencyArea);
@@ -219,12 +219,15 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     const lastSelectedOrganizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
     const lastSelectedAgencyId = this.store.selectSnapshot(UserState.lastSelectedAgencyId);
     const isAgency = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'Agency';
-    
+
     let newOrganizationAgencyControlValue: number | null;
 
     if (isAgencyArea && isAgency) {
-      const currentAgency = organizationsAgencies.find((agency) => agency.id === lastSelectedAgencyId);
-      newOrganizationAgencyControlValue = currentAgency ? lastSelectedAgencyId : organizationsAgencies[0]?.id || null;
+      const navigateAgencyId = this.route.snapshot.queryParams['agId'] ? Number(this.route.snapshot.queryParams['agId'])
+      : null;
+      const aid = navigateAgencyId || lastSelectedAgencyId;
+      const currentAgency = organizationsAgencies.find((agency) => agency.id === aid);
+      newOrganizationAgencyControlValue = currentAgency ? aid : organizationsAgencies[0]?.id || null;
 
       this.setAgencyStatus(currentAgency);
     } else {
@@ -236,13 +239,13 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         ? orgId
         : organizationsAgencies[0]?.id || null;
     }
-    
+
      if(this.eliteBusinessUnitId>0){
       newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === this.eliteBusinessUnitId)
         ? this.eliteBusinessUnitId
         : organizationsAgencies[0]?.id || null;
     }
-    
+
     this.organizationAgencyControl.patchValue(newOrganizationAgencyControlValue);
 
     setTimeout(() => this.cd.markForCheck());
@@ -261,7 +264,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     } else {
       invoiceActionsActive = true;
     }
-    
+
     this.store.dispatch(new SetAgencyActionsAllowed(agencyIsActive));
     this.store.dispatch(new SetAgencyInvoicesActionsAllowed(invoiceActionsActive));
   }
