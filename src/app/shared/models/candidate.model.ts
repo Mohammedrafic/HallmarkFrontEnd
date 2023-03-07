@@ -92,4 +92,5 @@ export interface CandidateStateModel {
   credentialTypes: CredentialType[];
   masterCredentials: Credential[];
   groupedCandidateCredentialsFiles: CredentialGroupedFiles[];
+  orderGridPageNumber: number;
 }

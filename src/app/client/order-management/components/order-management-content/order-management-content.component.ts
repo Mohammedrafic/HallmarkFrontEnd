@@ -97,7 +97,6 @@ import {
   GetAssignedSkillsByOrganization,
   GetOrganizationById,
   GetOrganizationSettings,
-  SetOrderGridPageNumber,
 } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
@@ -198,6 +197,7 @@ import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { GlobalWindow } from '@core/tokens';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
+import { SetOrderGridPageNumber } from '@agency/store/candidate.actions';
 
 @Component({
   selector: 'app-order-management-content',
@@ -514,7 +514,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.unsubscribe$.complete();
   }
   public getalerttitle(): void {
-    debugger;
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
 	  this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     if(Object.values(AlertIdEnum).includes(this.alertTitle)){
@@ -1416,7 +1415,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private onGridPageChangedHandler(): void {
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
+    this.pageSubject.pipe(throttleTime(150), takeUntil(this.unsubscribe$)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new SetOrderGridPageNumber(page));
       const { selectedOrderAfterRedirect } = this.orderManagementService;
