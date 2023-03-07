@@ -1,0 +1,5 @@
+@import 'mixins';
+
+.order-type-text-cell {
+  @include order-type-text-cell;
+}

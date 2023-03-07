@@ -180,7 +180,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       }
 
       this.totalCount = scheduleData.totalCount;
-
       this.cdr.detectChanges();
     });
   }

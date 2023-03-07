@@ -4,7 +4,7 @@
   class="card-wrapper"
 >
   <app-tooltip-container
-    [message]="tooltipMessage"
+    [message]="tooltips.orderTooltip"
     [showToolTip]="!!cardConfig.showTitleToolTip"
     position="TopCenter"
   >
@@ -24,23 +24,23 @@
   </app-tooltip-container>
 
   <div class="time">
-    <span class="time__text">{{ firstDaySchedule.startDate | date: 'HH:mm': 'UTC' }}</span>
+    <span class="time__text">{{ firstSchedule.startDate | date: 'HH:mm': 'UTC' }}</span>
     <span class="time__text">-</span>
-    <span class="time__text">{{ firstDaySchedule.endDate | date: 'HH:mm': 'UTC' }}</span>
-    <span *ngIf="firstDaySchedule?.orderMetadata?.orderType === ltaOrder" class="time__text"> L </span>
+    <span class="time__text">{{ firstSchedule.endDate | date: 'HH:mm': 'UTC' }}</span>
+    <span *ngIf="firstSchedule?.orderMetadata?.orderType === ltaOrder" class="time__text"> L </span>
     <ejs-tooltip
-      *ngIf="firstDaySchedule.scheduleOrderType"
-      [content]="firstDaySchedule.scheduleOrderType"
+      *ngIf="firstSchedule.scheduleOrderType"
+      [content]="firstSchedule.scheduleOrderType"
       position="TopCenter"
       [showTipPointer]="false"
     >
-      <span class="time__text">{{ firstDaySchedule.scheduleOrderType.slice(0, 1) }}</span>
+      <span class="time__text">{{ firstSchedule.scheduleOrderType[0] }}</span>
     </ejs-tooltip>
   </div>
 
   <ejs-tooltip
-    *ngIf="dateSchedule.isInDifferentDepartments"
-    [content]="additionalTooltipMessage"
+    *ngIf="tooltips.additionalTooltip"
+    [content]="tooltips.additionalTooltip"
     position="TopCenter"
     [showTipPointer]="false"
   >
@@ -49,14 +49,4 @@
     </div>
   </ejs-tooltip>
 
-  <ejs-tooltip
-    *ngIf="dateSchedule.daySchedules.length > 1"
-    [content]="overlappingTooltipMessage"
-    position="TopCenter"
-    [showTipPointer]="false"
-  >
-    <div class="badge">
-      +{{ dateSchedule.daySchedules.length - 1 }}
-    </div>
-  </ejs-tooltip>
 </div>

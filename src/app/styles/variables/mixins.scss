@@ -193,3 +193,9 @@
     color: $disabled;
   }
 }
+
+@mixin order-type-text-cell {
+  color: $secondary-dark-blue-15;
+  font-weight: 700;
+  font-size: 14px;
+}

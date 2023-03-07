@@ -25,9 +25,8 @@ export class OrderManagementIrpGridHelper {
       return GridCellsSystemAll(...restArguments);
     }
 
-    if (
-      isSystemIRP
-        && (activeTab === OrderManagementIRPTabsIndex.AllOrders || activeTab === OrderManagementIRPTabsIndex.Incomplete)
+    if (isSystemIRP && (activeTab === OrderManagementIRPTabsIndex.AllOrders
+      || activeTab === OrderManagementIRPTabsIndex.Incomplete)
     ) {
       return GridCellsSystemIRPTabAll(
         threeDotsMenuOptions,
