@@ -120,6 +120,7 @@ export class OrientationService {
 
   public generateHistoricalDataForm(): FormGroup {
     const form = new FormGroup({
+      ids: new FormControl([]),
       endDate: new FormControl(null),
     });
 

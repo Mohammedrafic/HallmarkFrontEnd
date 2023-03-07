@@ -324,12 +324,15 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     this.cd.markForCheck();
   }
 
-  public openDialog(data: OrientationConfiguration): void {
-    if (data) {
+  public openDialog(event: {
+    isBulk: boolean
+    data: OrientationConfiguration
+  }): void {
+    if (event.data) {
       this.title = DialogMode.Edit;
       this.isEdit = true;
       this.orientationForm.patchValue({
-        skillCategory: data.skillCategories.map(v => v.id),
+        skillCategory: event.data.skillCategories.map(v => v.id),
       });
       this.skills$
       .pipe(
@@ -338,7 +341,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
         debounceTime(500)
       )
       .subscribe(() => {
-        this.populateForm(data);
+        this.populateForm(event.data);
       });  
     } else {
       this.title = DialogMode.Add;

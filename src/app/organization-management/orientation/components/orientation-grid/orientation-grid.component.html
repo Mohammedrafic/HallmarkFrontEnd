@@ -8,6 +8,10 @@
   [currentPage]="filters.pageNumber"
   (navigateToPageEmitter)="handleChangePage($event)"
   (pageSizeChangeEmitter)="handleChangePageSize($event)"
+  (bulkEventEmitter)="handleBulkEvent($event)"
+  [allowBulkSelection]="allowBulkSelection"
+  [rowSelection]="rowSelection"
+  [bulkActionConfig]="bulkActionConfig"
 >
   <button
     *ngIf="gridTitle"

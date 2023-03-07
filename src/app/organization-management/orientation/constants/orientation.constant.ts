@@ -98,6 +98,15 @@ export const OrientationHistoricalDataColumnDef = (
   gridActionsParams: { disableControls: boolean }
 ) => ([
   {
+    field: 'checkbox',
+    headerName: '',
+    width: 50,
+    minWidth: 50,
+    headerCheckboxSelection: true,
+    headerCheckboxSelectionFilteredOnly: true,
+    checkboxSelection: true,
+  },
+  {
     field: 'id',
     headerName: '',
     cellRenderer: HistoricalDataActionRendererComponent,

@@ -9,7 +9,8 @@
     [skillCategories]="[]"
     [regions]="[]"
     [disableControls]="disableControls"
-    [orientationTab]="orientationTab.HistoricalData">
+    [orientationTab]="orientationTab.HistoricalData"
+    [bulkActionConfig]="bulkActionConfig">
   </app-orientation-grid>
 </section>
 
@@ -30,7 +31,7 @@
           [formGroupInstance]="orientationForm"
           controlName="endDate"
           label="End Date"
-          [required]="true">
+          [required]="false">
         </app-datepicker>
       </div>
       <div class="row note">

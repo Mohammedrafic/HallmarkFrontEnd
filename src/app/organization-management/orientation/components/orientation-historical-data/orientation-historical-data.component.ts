@@ -9,6 +9,7 @@ import { OrientationService } from '@organization-management/orientation/service
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SETUPS_ACTIVATED } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
+import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { filter, Observable, takeUntil } from 'rxjs';
@@ -28,9 +29,9 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   public readonly orientationTab = OrientationTab;
   public dataSource: OrientationConfigurationPage;
   public filters: OrientationConfigurationFilters = { pageNumber: 1, pageSize: this.pageSize };
-  public isEdit: boolean = false;
   public disableControls: boolean = false;
   public orientationForm: FormGroup = this.orientationService.generateHistoricalDataForm();
+  public bulkActionConfig: BulkActionConfig = { activate: true };
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;
@@ -75,8 +76,11 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
     });
   }
 
-  private populateForm(data: OrientationConfiguration): void {
-    // TODO: create formGroup
+  private populateForm(data: number[]): void {
+    this.orientationForm.patchValue({
+      ids: data,
+      endDate: null,
+    });
     this.cd.markForCheck();
   }
 
@@ -125,11 +129,16 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
     this.getOrientationHistoricalData();
   }
 
-  public openDialog(data: OrientationConfiguration): void {
-    if (data) {
-      this.isEdit = true;
-      this.populateForm(data);
-      this.store.dispatch(new ShowSideDialog(true));
+  public openDialog(event: {
+    isBulk: boolean
+    data: OrientationConfiguration | BulkActionDataModel
+  }): void {
+    if (!event.isBulk) {
+      this.populateForm([(event.data as OrientationConfiguration).id]);    
+    } else {
+      const ids = (event.data as BulkActionDataModel).items.map(item => item.data.id);
+      this.populateForm(ids);
     }
+    this.store.dispatch(new ShowSideDialog(true));
   }
 }

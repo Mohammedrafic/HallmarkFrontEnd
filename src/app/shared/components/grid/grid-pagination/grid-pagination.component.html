@@ -69,6 +69,19 @@
           </button>
         </app-tooltip-container>
 
+        <app-tooltip-container [showToolTip]="disableBulkButton" *ngIf="bulkActionConfig.activate">
+          <button
+            [disabled]="disableBulkButton"
+            (click)="bulkEventEmitter.emit(bulkTypeAction.ACTIVATE)"
+            class="delete-button"
+            ejs-button
+            cssClass="e-primary"
+          >
+            <i-feather name="rotate-cw" class="icon"></i-feather>
+            <span>Activate</span>
+          </button>
+        </app-tooltip-container>
+
         <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
         <button
           style="display: none"
