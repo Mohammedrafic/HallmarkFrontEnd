@@ -170,3 +170,8 @@ export class GetGroupEmailCandidates {
     public businessUnitIds: string
   ) { }
 }
+
+export class Toaster{
+  static readonly type = "User Subscription CatchError";
+  constructor(){}
+}

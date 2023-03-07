@@ -28,6 +28,7 @@ import {
   GetUserSubscriptionPage,
   SaveTemplateByAlertId,
   SendGroupEmail,
+  Toaster,
   UpdateTemplateByAlertId,
   UpdateUserSubscription,
 } from './alerts.actions';
@@ -163,7 +164,7 @@ export class AlertsState {
           return payload;
         }),
         catchError((error: HttpErrorResponse) => {
-          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+          return dispatch(new Toaster());
         })
       );
   }
@@ -196,7 +197,7 @@ export class AlertsState {
           return payload;
         }),
         catchError((error: HttpErrorResponse) => {
-          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+          return dispatch(new Toaster());
         })
       );
   }
