@@ -401,3 +401,9 @@ ejs-textbox.e-control {
     border: 1px solid $secondary-dark-blue-40 !important;
   }
 }
+
+::ng-deep {
+  .e-input-filter:focus {
+    visibility: visible !important;
+  }
+}
