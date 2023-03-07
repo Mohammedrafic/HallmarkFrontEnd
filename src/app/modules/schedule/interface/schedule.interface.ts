@@ -13,6 +13,7 @@ export interface ScheduleCandidate {
   displayId: string;
   firstName: string;
   lastName: string;
+  ltaAssignment: LtaAssignment | null;
   skill: string;
   dates: string[];
   orderType: IrpOrderType | null;
@@ -22,6 +23,14 @@ export interface ScheduleCandidate {
   isOriented: boolean;
   fullName?: string;
   workCommitmentText?: string;
+}
+
+export interface LtaAssignment {
+  department: string;
+  endDate: string;
+  location: string;
+  region: string;
+  startDate: string;
 }
 
 export interface ScheduleItem {
@@ -132,13 +141,4 @@ export interface EmployeesFilters {
   startDate: string | Date;
   endDate: string | Date;
   departmentsIds: number[];
-}
-
-export interface ScheduleCandidateCard {
-  startDate: string | Date;
-  endDate: string | Date;
-  orderType: IrpOrderType;
-  region: string;
-  location: string;
-  department: string;
 }
