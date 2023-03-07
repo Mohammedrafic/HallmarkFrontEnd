@@ -70,8 +70,8 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   }
 
   private getOrientationHistoricalData(): void {
-    this.orientationService.getOrientationConfigs(this.filters).subscribe(data => {
-      this.dataSource = data; // TODO: use historical data API
+    this.orientationService.getHistoricalOrientationConfigs(this.filters).subscribe(data => {
+      this.dataSource = data;
       this.cd.markForCheck();
     });
   }
@@ -113,7 +113,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
     } else {
       const data = this.orientationForm.getRawValue();
       data.endDate = data.endDate ? DateTimeHelper.toUtcFormat(data.endDate) : data.endDate;
-      this.orientationService.saveOrientationConfiguration(data).subscribe({ // TODO: replace with correct API
+      this.orientationService.reactivateOrientationConfiguration(data).subscribe({
         next: () => {
           this.store.dispatch(new ShowToast(MessageTypes.Success, SETUPS_ACTIVATED));
           this.closeHandler();

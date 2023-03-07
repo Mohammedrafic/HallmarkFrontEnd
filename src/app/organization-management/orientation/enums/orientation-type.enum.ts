@@ -1,15 +1,15 @@
 export enum OrientationType {
-  OrganizationWise = 0,
-  RegionWise = 1,
-  LocationWise = 2,
-  DepartmentWise = 3
+  Organization = 0,
+  Region = 1,
+  Location = 2,
+  Department = 3
 }
 
 export const OrientationTypeDataSource = [
-  { id: OrientationType.OrganizationWise, text: 'Organization' },
-  { id: OrientationType.RegionWise, text: 'Region' },
-  { id: OrientationType.LocationWise, text: 'Location' },
-  { id: OrientationType.DepartmentWise, text: 'Department' },
+  { id: OrientationType.Organization, text: 'Organization' },
+  { id: OrientationType.Region, text: 'Region' },
+  { id: OrientationType.Location, text: 'Location' },
+  { id: OrientationType.Department, text: 'Department' },
 ];
 
 export enum OrientationTab {

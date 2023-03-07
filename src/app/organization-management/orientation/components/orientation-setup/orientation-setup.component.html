@@ -27,6 +27,7 @@
     </form>
   </div>
   <app-orientation-grid 
+    *ngIf="isActive"
     gridTitle="Orientation Setup"
     [isActive]="isActive"
     (pageChange)="pageChange($event)"

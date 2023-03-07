@@ -9,7 +9,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { BehaviorSubject, Observable,Subject,tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
-import { OrientationConfiguration, OrientationConfigurationDTO, OrientationConfigurationFilters, OrientationConfigurationPage, OrientationSetting } from '../models/orientation.model';
+import { HistoricalOrientationConfigurationDTO, OrientationConfiguration, OrientationConfigurationDTO, OrientationConfigurationFilters, OrientationConfigurationPage, OrientationSetting } from '../models/orientation.model';
 
 @Injectable()
 export class OrientationService {
@@ -70,6 +70,10 @@ export class OrientationService {
     return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/configurations/list', filters)
   }
 
+  public getHistoricalOrientationConfigs(filters: OrientationConfigurationFilters): Observable<OrientationConfigurationPage> {
+    return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/historical/configurations/list', filters)
+  }
+
   public saveOrientationConfiguration(params: OrientationConfigurationDTO): Observable<void> {
     if (params.orientationConfigurationId) {
       return this.http.put<void>('/api/OrientationSettings/configurations/' + params.orientationConfigurationId, params);
@@ -77,6 +81,10 @@ export class OrientationService {
       params.orientationConfigurationId = undefined;
       return this.http.post<void>('/api/OrientationSettings/configurations', params);
     }
+  }
+
+  public reactivateOrientationConfiguration(params: HistoricalOrientationConfigurationDTO): Observable<void> {
+    return this.http.post<void>('/api/OrientationSettings/historical/configurations/reactivate', params);
   }
 
   public getOrientationSetting(): Observable<OrientationSetting> {
