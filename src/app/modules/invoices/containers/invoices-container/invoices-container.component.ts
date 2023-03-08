@@ -143,11 +143,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public recordsPerPageOptions = InvoicesPerPageOptions;
 
+  public organizationId: number;
+
   private navigatedOrgId: number | null;
 
   private previousSelectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab;
-
-  private organizationId: number;
 
   private gridInstance: GridReadyEventModel;
 
@@ -290,8 +290,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public selectTab(tabIdx: number, tabsConfig: unknown[] = []): void {
-    this.previousSelectedTabIdx = this.selectedTabIdx; 
-    
+    this.previousSelectedTabIdx = this.selectedTabIdx;
+
     if (this.selectedTabIdx === tabIdx) {
       return;
     }
