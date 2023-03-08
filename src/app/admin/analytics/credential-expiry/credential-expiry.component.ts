@@ -160,14 +160,14 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         if (data != null) {
           this.isAlive = false;
           this.filterOptionsData = data;
-          let notLoadingStatuses :string[]= ['Applied','Shortlisted','Rejected','Bill Rate Pending','Offered Bill Rate','Offboard','Withdraw','Cancelled','Not Applied'];
+          let notLoadingStatuses :string[]= ['Applied','Shortlisted','Rejected','Bill Rate Pending','Offered Bill Rate','Withdraw','Cancelled','Not Applied'];
           
           data.candidateStatuses=(data.candidateStatuses||[]).filter(f=>!(notLoadingStatuses).includes(f.statusText)) ;
             this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
               this.filterColumns.agencyIds.dataSource = data.agencies;
              this.defaultCandidateStatuses = (data.candidateStatuses||[]).map((list) => list.status);
              this.defaultAgencys = data.agencies.map((list) => list.agencyId);
-              this.credentialExpiryForm.controls["candidateStatuses"].setValue(this.defaultCandidateStatuses);
+              this.credentialExpiryForm.controls["candidateStatuses"].setValue(this.defaultCandidateStatuses.filter(f=>f !==90));
           if (this.isInitialLoad) {
             setTimeout(() => { this.SearchReport(); }, 3000)
             this.isInitialLoad = false;
