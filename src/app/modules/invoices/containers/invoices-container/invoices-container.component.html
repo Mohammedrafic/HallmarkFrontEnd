@@ -63,7 +63,7 @@
           ejs-button
           *ngIf="(!isAgency && (selectedTabIdx === 3 || selectedTabIdx === 5)) || (isAgency && selectedTabIdx !== 0)"
           [disabled]="
-            !invoiceContainerConfig.invoicePayAllowed ||
+            !canPay ||
             !gridSelections.selectedInvoiceIds ||
             !gridSelections.selectedInvoiceIds.length
           "
@@ -234,7 +234,7 @@
   [maxRowIndex]="0"
   [actionAllowed]="invoiceContainerConfig.invoicePayAllowed"
   [approveAllowed]="approveInvoiceEnabled"
-  [payAllowed]="payInvoiceEnabled"
+  [payAllowed]="canPay"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
   (updateTable)="updateTable($event)"
 ></app-invoice-detail-container>
