@@ -456,7 +456,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       }
       else{
         let locationFilter: LocationsByRegionsFilter = {
-          ids: [data.length],
+          ids: data,
           getAll: true,
           businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
         };
