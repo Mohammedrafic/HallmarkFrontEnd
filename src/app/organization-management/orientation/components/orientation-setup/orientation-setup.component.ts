@@ -328,7 +328,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     isBulk: boolean
     data: OrientationConfiguration
   }): void {
-    if (event.data) {
+    if (event?.data) {
       this.title = DialogMode.Edit;
       this.isEdit = true;
       this.orientationForm.patchValue({
