@@ -112,7 +112,9 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     this.watchForSkills();
     this.watchForRegions();
     this.watchForLocation();
+    this.watchForDepartments();
     this.watchForSkillCategory();
+    this.watchForSkillSelection();
     this.getDeviceScreen();
     this.gridDefHandler();
   }
@@ -139,14 +141,20 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   private watchForRegions(): void {
     this.filtersForm?.get('regionIds')?.valueChanges
       .pipe(
-        filter((value: number[]) => !!value?.length),
         takeUntil(this.componentDestroy())
       )
       .subscribe((value: number[]) => {
-        const selectedRegions: OrganizationRegion[] = findSelectedItems(value, this.allRegions);
-        const selectedLocation: OrganizationLocation[] = mapperSelectedItems(selectedRegions, 'locations');
-        this.locations = sortByField(selectedLocation, 'name');
-        this.filterColumns.locationIds.dataSource = this.locations as [];
+        if(value?.length) {
+          const selectedRegions: OrganizationRegion[] = findSelectedItems(value, this.allRegions);
+          const selectedLocation: OrganizationLocation[] = mapperSelectedItems(selectedRegions, 'locations');
+          this.locations = sortByField(selectedLocation, 'name');
+          this.filterColumns.locationIds.dataSource = this.locations as [];
+        } else {
+          this.locations = []
+          this.filterColumns.locationIds.dataSource = [];
+          this.filtersForm?.get('locationIds')?.setValue([]);
+          this.generateFilteredChips();
+        }
         this.cd.markForCheck();
       });
   }
@@ -154,13 +162,31 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   private watchForLocation(): void {
     this.filtersForm?.get('locationIds')?.valueChanges
       .pipe(
-        filter((value: number[]) => !!value?.length),
         takeUntil(this.componentDestroy())
       )
       .subscribe((value: number[]) => {
-        const selectedLocation: OrganizationLocation[] = findSelectedItems(value, this.locations);
-        const selectedDepartment: OrganizationDepartment[] = mapperSelectedItems(selectedLocation, 'departments');
-        this.filterColumns.departmentsIds.dataSource =  sortByField(selectedDepartment, 'name') as [];
+        if(value?.length) {
+          const selectedLocation: OrganizationLocation[] = findSelectedItems(value, this.locations);
+          const selectedDepartment: OrganizationDepartment[] = mapperSelectedItems(selectedLocation, 'departments');
+          this.filterColumns.departmentsIds.dataSource = sortByField(selectedDepartment, 'name') as [];
+        } else {
+          this.filterColumns.departmentsIds.dataSource = [];
+          this.filtersForm?.get('departmentsIds')?.setValue([]);
+          this.generateFilteredChips();
+        }
+        this.cd.markForCheck();
+      });
+  }
+
+  private watchForDepartments(): void {
+    this.filtersForm
+      ?.get('departmentsIds')
+      ?.valueChanges.pipe(
+        filter((deps) => !deps?.length),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.generateFilteredChips();
         this.cd.markForCheck();
       });
   }
@@ -170,10 +196,27 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
       ?.get('skillCategoryIds')
       ?.valueChanges.pipe(takeUntil(this.componentDestroy()))
       .subscribe((value: number[]) => {
-        const skills = value.length
-          ? value.flatMap((categoryId: number) => this.skills.filter((skill: Skill) => skill.categoryId === categoryId))
-          : this.skills;
-        this.filterColumns.skillIds.dataSource = skills as [];
+        if(value?.length) {
+          const skills = value.flatMap((categoryId: number) => this.skills.filter((skill: Skill) => skill.categoryId === categoryId));
+          this.filterColumns.skillIds.dataSource = skills as [];
+        } else {
+          this.generateFilteredChips();
+          this.filtersForm?.get('skillIds')?.setValue([])
+          this.filterColumns.skillIds.dataSource = this.skills as [];
+        }
+        this.cd.markForCheck();
+      });
+  }
+
+  private watchForSkillSelection(): void {
+    this.filtersForm
+      ?.get('skillIds')
+      ?.valueChanges.pipe(
+        filter((skill) => !skill?.length),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.generateFilteredChips();
         this.cd.markForCheck();
       });
   }
@@ -214,6 +257,10 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     this.filters = { pageNumber: 1, pageSize: this.filters.pageSize };
   }
 
+  private generateFilteredChips(): void {
+    this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
+  }
+
   public handleBulkEvent(event: BulkActionDataModel): void {
     this.onEdit.emit({
       isBulk: true,
@@ -236,13 +283,13 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
 
   public onFilterApply(): void {
     this.filters = { pageNumber: this.filters.pageNumber, pageSize: this.filters.pageSize, ...this.filtersForm.getRawValue()} ;
-    this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
+    this.generateFilteredChips();
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
   public onFilterClose() {
-    this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
+    this.generateFilteredChips();
   }
 
   public handleChangePage(pageNumber: number): void {
