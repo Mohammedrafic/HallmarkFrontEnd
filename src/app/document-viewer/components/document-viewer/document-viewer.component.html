@@ -1,0 +1,127 @@
+<section class="container">
+  <section class="file-viewer-container">
+    <div class="right">
+      <ejs-toolbar cssClass="dockToolbar" id="dockToolbar">
+        <e-items>
+          <e-item *ngIf="!hideSidebarKeepOpenButton">
+            <ng-template #template>
+              <button mat-stroked-button (click)="isSidebarOpen = !isSidebarOpen">
+                <i-feather name="chevrons-left" *ngIf="isSidebarOpen"></i-feather>
+                <i-feather name="chevrons-right" *ngIf="!isSidebarOpen"></i-feather>
+              </button>
+            </ng-template>
+          </e-item>
+
+          <e-item type="Separator" *ngIf="!imageMode && !hideSidebarKeepOpenButton"></e-item>
+
+          <e-item *ngIf="!imageMode">
+            <ng-template #template>
+              <button mat-stroked-button (click)="incrementZoom(-0.1)">
+                <i-feather name="zoom-out" class="icon"></i-feather>
+              </button>
+            </ng-template>
+          </e-item>
+
+          <e-item *ngIf="!imageMode">
+            <ng-template #template>
+              <button mat-stroked-button (click)="incrementZoom(0.1)">
+                <i-feather name="zoom-in" class="icon"></i-feather>
+              </button>
+            </ng-template>
+          </e-item>
+
+          <e-item *ngIf="!imageMode">
+            <ng-template #template>
+              <button mat-stroked-button (click)="resetZoom()">
+                <i-feather name="refresh-cw" class="icon"></i-feather>
+              </button>
+            </ng-template>
+          </e-item>
+
+          <e-item type="Separator" *ngIf="!imageMode"></e-item>
+
+          <e-item *ngIf="!imageMode">
+            <ng-template #template>
+              <button mat-stroked-button (click)="firstPage()">
+                <i-feather name="chevrons-left" class="icon"></i-feather>
+              </button>
+            </ng-template>
+          </e-item>
+
+          <e-item *ngIf="!imageMode">
+            <ng-template #template>
+              <button mat-stroked-button (click)="prevPage()">
+                <i-feather name="chevrons-left" class="icon"></i-feather>
+              </button>
+            </ng-template>
+          </e-item>
+
+          <e-item *ngIf="!imageMode">
+            <ng-template #template>
+              <button mat-stroked-button (click)="nextPage()">
+                <i-feather name="chevron-right" class="icon"></i-feather>
+              </button>
+            </ng-template>
+          </e-item>
+
+          <e-item *ngIf="!imageMode">
+            <ng-template #template>
+              <button mat-stroked-button (click)="lastPage()">
+                <i-feather name="chevron-right" class="icon"></i-feather>
+              </button>
+            </ng-template>
+          </e-item>
+
+          <e-item type="Separator" *ngIf="!imageMode"></e-item>
+
+          <e-item *ngIf="!imageMode">
+            <ng-template #template>
+              <input class="smallimput" id="name" type="number" min="1" [formControl]="pageSelection" />
+              <span class="pl-2"> of {{ totalPages }} </span>
+            </ng-template>
+          </e-item>
+        </e-items>
+      </ejs-toolbar>
+      <ejs-sidebar
+        target=".file-viewer"
+        *ngIf="previewFile"
+        #sidebarInstance
+        class="side-menu"
+        [type]="sidebarType"
+        [isOpen]="isSidebarOpen"
+      >
+        <div class="keep-open-section" *ngIf="!hideSidebarKeepOpenButton">
+          <ejs-checkbox [(ngModel)]="keepSidebarOpen" label="Keep Open"></ejs-checkbox>
+        </div>
+        <ejs-listbox
+          id="listBox"
+          *ngIf="previewFile"
+          class="list-box"
+          [dataSource]="data"
+          [fields]="fields"
+          [selectionSettings]="selectionSettings"
+          (created)="onListBoxCreated()"
+          (change)="selectFile($event)"
+        >
+        </ejs-listbox>
+      </ejs-sidebar>
+      <div class="file-viewer">
+        <div *ngIf="!imageMode">
+          <pdf-viewer
+            class="pdf-container"
+            [src]="loadedFileUrl"
+            [render-text]="true"
+            [fit-to-page]="true"
+            [original-size]="false"
+            [page]="page"
+            [zoom]="zoom"
+            (pagechanging)="pagechanging($event)"
+            (after-load-complete)="afterLoadComplete($event)"
+          ></pdf-viewer>
+        </div>
+        <div *ngIf="imageMode" class="image-container"><img class="image" [src]="imageSrs" /></div>
+      </div>
+    </div>
+  </section>
+</section>
+
