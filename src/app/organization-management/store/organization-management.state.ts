@@ -111,7 +111,6 @@ import {
   SetBillingStatesByCountry,
   SetDirtyState,
   SetGeneralStatesByCountry,
-  SetOrderGridPageNumber,
   UpdateCredentialType,
   UpdateDepartment,
   UpdateLocation,
@@ -230,7 +229,6 @@ export interface OrganizationManagementStateModel {
   isLocationTypesLoading: boolean;
   assignedSkillsByOrganization: ListOfSkills[];
   filteringAssignedSkillsByOrganization: ListOfSkills[];
-  orderGridPageNumber: number;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -289,7 +287,6 @@ export interface OrganizationManagementStateModel {
     isLocationTypesLoading: false,
     assignedSkillsByOrganization: [],
     filteringAssignedSkillsByOrganization: [],
-    orderGridPageNumber: 1,
   },
 })
 @Injectable()
@@ -485,11 +482,6 @@ export class OrganizationManagementState {
   @Selector()
   static locationTypes(state: OrganizationManagementStateModel): LocationType[] | null {
     return state.loctionTypes;
-  }
-
-  @Selector()
-  static orderGridPageNumber (state: OrganizationManagementStateModel): number {
-    return state.orderGridPageNumber;
   }
 
   constructor(
@@ -1719,13 +1711,5 @@ export class OrganizationManagementState {
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Regions were not imported'))))
     );
-  }
-
-  @Action(SetOrderGridPageNumber)
-  SetOrderGridPageNumber(
-    { patchState }: StateContext<OrganizationManagementStateModel>,
-    { page }: SetOrderGridPageNumber
-  ): void {
-    patchState({ orderGridPageNumber: page });
   }
 }

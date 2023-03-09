@@ -256,3 +256,8 @@ export class DownloadCredentialFilesSucceeded {
   static readonly type = '[candidate] Download Credential Files Succeeded';
   constructor(public file: Blob, public candidateName: string) {}
 }
+
+export class SetOrderGridPageNumber {
+  static readonly type = '[candidate] Set Order Grid Page Number';
+  constructor(public page: number) {}
+}

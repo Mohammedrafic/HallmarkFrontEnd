@@ -10,6 +10,7 @@ import { GetAgencyOrderCandidatesList } from '@agency/store/order-management.act
 import { OrderType } from '@shared/enums/order-type';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { OrderStatus } from '@shared/enums/order-management';
+import { CandidateState } from '@agency/store/candidate.state';
 
 @Component({
   selector: 'app-candidates-order',
@@ -28,6 +29,9 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
 
   @Select(OrderManagementState.orderCandidatesInformation)
   public orderCandidatesInformation$: Observable<Order>;
+
+  @Select(CandidateState.orderGridPageNumber)
+  public orderGridPageNumber$: Observable<number>;
 
   constructor(private store: Store, private orderManagementAgencyService: OrderManagementAgencyService) {
     super();

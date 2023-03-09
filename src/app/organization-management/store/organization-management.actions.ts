@@ -592,8 +592,3 @@ export class SaveRegionsImportResultSucceeded {
   static readonly type = '[candidate] Save Regions Import Result Succeeded';
   constructor(public payload: ImportResult<ImportedRegion>) { }
 }
-
-export class SetOrderGridPageNumber {
-  static readonly type = '[candidate] Set Order Grid Page Number';
-  constructor(public page: number) {}
-}
