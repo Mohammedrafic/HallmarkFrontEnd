@@ -35,7 +35,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
   templateUrl: './ytd-summary.component.html',
   styleUrls: ['./ytd-summary.component.scss']
 })
-export class YtdSummaryComponent implements OnInit {
+export class YtdSummaryComponent implements OnInit, OnDestroy {
   public title: string = "YTD Summary";
 
   public paramsData: any = {
@@ -156,7 +156,6 @@ export class YtdSummaryComponent implements OnInit {
     if (this.user?.id != null) {
       this.store.dispatch(new GetOrganizationsStructureAll(this.user?.id));
     }
-    this.SetReportData();
   }
 
   ngOnInit(): void {
@@ -172,11 +171,10 @@ export class YtdSummaryComponent implements OnInit {
           this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
           this.filterColumns.skillIds.dataSource = [];
           this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-
-          if (this.isInitialLoad) {            let currentDate = new Date();
-            this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Month)?.setValue(currentDate.getMonth() + 1); 
-            this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Year)?.setValue(currentDate.getFullYear());
-            
+          let currentDate = new Date();
+          this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Month)?.setValue(currentDate.getMonth() + 1);
+          this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Year)?.setValue(currentDate.getFullYear());
+          if (this.isInitialLoad) {            
             setTimeout(() => { this.SearchReport(); }, 3000)
             this.isInitialLoad = false;
           }
@@ -184,7 +182,6 @@ export class YtdSummaryComponent implements OnInit {
           this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
         }
       });
-      this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
           this.logiReportComponent.SetReportData(data);
@@ -193,6 +190,9 @@ export class YtdSummaryComponent implements OnInit {
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
       this.onFilterControlValueChangedHandler();
+      this.onFilterRegionChangedHandler();
+      this.onFilterLocationChangedHandler();
+      this.onFilterSkillCategoryChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.BusinessIds)?.enable() : this.ytdSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
@@ -201,9 +201,9 @@ export class YtdSummaryComponent implements OnInit {
     this.ytdSummaryReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        regionIds: new FormControl([], [Validators.required]),
-        locationIds: new FormControl([], [Validators.required]),
-        departmentIds: new FormControl([], [Validators.required]),
+        regionIds: new FormControl([]),
+        locationIds: new FormControl([]),
+        departmentIds: new FormControl([]),
         skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
         year: new FormControl([], [Validators.required]),
@@ -294,8 +294,10 @@ export class YtdSummaryComponent implements OnInit {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          this.defaultRegions = this.regionsList.map((list) => list.id);
-          this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+          if (this.isInitialLoad) {
+            setTimeout(() => { this.SearchReport() }, 3000);
+            this.isInitialLoad = false;
+          }
           this.changeDetectorRef.detectChanges();
         }
         else {
@@ -304,73 +306,71 @@ export class YtdSummaryComponent implements OnInit {
         }
       }
     });
+  }
 
-
+  public onFilterRegionChangedHandler(): void {
     this.regionIdControl = this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.LocationIds)?.setValue([]);
+      this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.locations = [];
+      this.departments = [];
+
       if (this.regionIdControl.value.length > 0) {
-        let regionList = this.regions?.filter((object) => data?.includes(object.id));
-        this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
-        this.defaultLocations = this.locations.map((list) => list.id);
-        this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
-        this.changeDetectorRef.detectChanges();
+        this.departments = this.locations.map(obj => {
+          return obj.departments.filter(department => department.locationId === obj.id);
+        }).reduce((a, b) => a.concat(b), []);
       }
       else {
+        this.filterColumns.locationIds.dataSource = [];
         this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.LocationIds)?.setValue([]);
+        this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
+  }
+
+  public onFilterLocationChangedHandler(): void {
     this.locationIdControl = this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.DepartmentIds)?.setValue([]);
+
       if (this.locationIdControl.value.length > 0) {
-        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
-        this.defaultDepartments = this.departments.map((list) => list.id);
-        this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.DepartmentIds)?.setValue(this.defaultDepartments);
-        this.changeDetectorRef.detectChanges();
       }
       else {
+        this.filterColumns.departmentIds.dataSource = [];
         this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
     this.departmentIdControl = this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
+      this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
-    this.skillCategoryIdControl = this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillCategoryIds) as AbstractControl;
+  }
+
+  public onFilterSkillCategoryChangedHandler(): void {
+    this.skillCategoryIdControl = this.ytdSummaryReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds) as AbstractControl;
     this.skillCategoryIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.skillCategoryIdControl.value.length > 0) {
         let masterSkills = this.filterOptionsData.masterSkills;
         this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
         let skills = masterSkills.filter((i) => data?.includes(i.skillCategoryId));
         this.filterColumns.skillIds.dataSource = skills;
-        this.defaultSkills = skills.map((list) => list.id);
-        this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
-        this.changeDetectorRef.detectChanges();
       }
       else {
-        this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillIds)?.setValue([]);
+        this.ytdSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
       }
     });
-    this.skillIdControl = this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillIds) as AbstractControl;
+    this.skillIdControl = this.ytdSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds) as AbstractControl;
     this.skillIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.skillIdControl.value.length > 0) {
         let masterSkills = this.filterOptionsData.masterSkills;
         this.selectedSkills = masterSkills?.filter((object) => data?.includes(object.id));
       }
     });
-
-    this.skillIdControl = this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillIds) as AbstractControl;
-    this.skillIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (this.skillIdControl.value.length > 0) {
-        let masterSkills = this.filterOptionsData.masterSkills;
-        this.selectedSkills = masterSkills?.filter((object) => data?.includes(object.id));
-      }
-
-    });
-
   }
 
   public SearchReport(): void {
@@ -382,6 +382,12 @@ export class YtdSummaryComponent implements OnInit {
       }
     }
     let { departmentIds, locationIds,regionIds, skillCategoryIds, skillIds, year, month} = this.ytdSummaryReportForm.getRawValue();
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
+
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
 
 
     let currentDate = new Date(Date.now());
@@ -396,9 +402,9 @@ export class YtdSummaryComponent implements OnInit {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "OrganizationsYTDS": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "regionYTDS": regionIds.length == 0 ? "null" : regionIds.join(","),
-      "locationYTDS": locationIds.length == 0 ? "null" : locationIds.join(","),
-      "departmentYTDS": departmentIds.length == 0 ? "null" : departmentIds.join(","),
+      "regionYTDS": regionIds.length == 0 ? "null" : regionIds,
+      "locationYTDS": locationIds.length == 0 ? "null" : locationIds,
+      "departmentYTDS": departmentIds.length == 0 ? "null" : departmentIds,
       "skillCategoryYTDS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
       "skillYTDS": skillIds.length == 0 ? "null" : skillIds.join(","),
       "yearYTDS": year,
@@ -406,7 +412,7 @@ export class YtdSummaryComponent implements OnInit {
 
       "organizationNameYTDS": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
       "reportPulledMessageYTDS": "Data for 01/01/" + year.toString() + " - " + String(selectedMonthDate.getMonth() + 1).padStart(2, '0') + "/" + selectedMonthDate.getDate() + "/" + year.toString() + " pulled on " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString()
-      };
+    };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
@@ -470,16 +476,6 @@ export class YtdSummaryComponent implements OnInit {
       }
     }
   }
-  private SetReportData() {
-    const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
-    if (logiReportData != null && logiReportData.length == 0) {
-      this.store.dispatch(new GetLogiReportData());
-    }
-    else {
-      this.logiReportComponent?.SetReportData(logiReportData);
-    }
-  }
-
   public showFilters(): void {
     if (this.isResetFilter) {
       this.onFilterControlValueChangedHandler();
@@ -499,11 +495,24 @@ export class YtdSummaryComponent implements OnInit {
     this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Year)?.setValue([]);
     this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Month)?.setValue([]);
     this.filteredItems = [];
+    this.locations = [];
+    this.departments = [];
+    this.filterColumns.locationIds.dataSource = [];
+    this.filterColumns.departmentIds.dataSource = [];
   }
   public onFilterApply(): void {
-    this.ytdSummaryReportForm.markAllAsTouched();
-    if (this.ytdSummaryReportForm?.invalid) {
-      return;
+    let { regionIds, locationIds, departmentIds, agingGroupIds } = this.ytdSummaryReportForm.getRawValue();
+
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+
+    if (!(regionIds.length > 0 && locationIds.length > 0 && departmentIds.length > 0)) {
+
+      this.ytdSummaryReportForm.markAllAsTouched();
+      if (this.ytdSummaryReportForm?.invalid) {
+        return;
+      }
     }
     this.filteredItems = [];
     this.SearchReport();
