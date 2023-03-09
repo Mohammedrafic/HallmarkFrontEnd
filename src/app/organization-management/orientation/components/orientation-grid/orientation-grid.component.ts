@@ -84,6 +84,9 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   public gridActionsParams = {
     disableControls: false
   }
+
+  private skills: Skill[] = [];
+
   protected componentDestroy: () => Observable<unknown>;
 
   @Select(UserState.lastSelectedOrganizationId)
@@ -109,6 +112,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     this.watchForSkills();
     this.watchForRegions();
     this.watchForLocation();
+    this.watchForSkillCategory();
     this.getDeviceScreen();
     this.gridDefHandler();
   }
@@ -127,6 +131,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     this.skills$.pipe(
       takeUntil(this.componentDestroy()),
     ).subscribe((skills: Skill[]) => {
+      this.skills = skills;
       this.filterColumns.skillIds.dataSource = skills as [];
     });
   }
@@ -156,6 +161,19 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
         const selectedLocation: OrganizationLocation[] = findSelectedItems(value, this.locations);
         const selectedDepartment: OrganizationDepartment[] = mapperSelectedItems(selectedLocation, 'departments');
         this.filterColumns.departmentsIds.dataSource =  sortByField(selectedDepartment, 'name') as [];
+        this.cd.markForCheck();
+      });
+  }
+
+  private watchForSkillCategory(): void {
+    this.filtersForm
+      ?.get('skillCategoryIds')
+      ?.valueChanges.pipe(takeUntil(this.componentDestroy()))
+      .subscribe((value: number[]) => {
+        const skills = value.length
+          ? value.flatMap((categoryId: number) => this.skills.filter((skill: Skill) => skill.categoryId === categoryId))
+          : this.skills;
+        this.filterColumns.skillIds.dataSource = skills as [];
         this.cd.markForCheck();
       });
   }
