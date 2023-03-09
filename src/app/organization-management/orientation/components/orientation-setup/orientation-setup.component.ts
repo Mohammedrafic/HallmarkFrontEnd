@@ -242,7 +242,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   }
 
   public orientationTypeHandler(type: OrientationType | null): void {
-    if (type === OrientationType.OrganizationWise) {
+    if (type === OrientationType.Organization) {
       this.orientationForm.controls['regionIds'].disable();
       this.orientationForm.controls['locationIds'].disable();
       this.orientationForm.controls['departmentIds'].disable();
@@ -250,7 +250,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       this.allRecords.locationIds = this.locationToggleDisable = true;
       this.allRecords.departmentIds = this.departmentToggleDisable = true;
     }
-    if (type === OrientationType.RegionWise) {
+    if (type === OrientationType.Region) {
       this.orientationForm.controls['regionIds'].enable();
       this.orientationForm.controls['locationIds'].disable();
       this.orientationForm.controls['departmentIds'].disable();
@@ -258,7 +258,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       this.allRecords.locationIds = this.locationToggleDisable = true;
       this.allRecords.departmentIds = this.departmentToggleDisable = true;
     }
-    if (type === OrientationType.LocationWise) {
+    if (type === OrientationType.Location) {
       this.orientationForm.controls['regionIds'].enable();
       this.orientationForm.controls['locationIds'].enable();
       this.orientationForm.controls['departmentIds'].disable();
@@ -266,7 +266,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       this.allRecords.locationIds = this.locationToggleDisable = false;
       this.allRecords.departmentIds = this.departmentToggleDisable = true;
     }
-    if (type === OrientationType.DepartmentWise) {
+    if (type === OrientationType.Department) {
       this.orientationForm.controls['regionIds'].enable();
       this.orientationForm.controls['locationIds'].enable();
       this.orientationForm.controls['departmentIds'].enable();
@@ -324,12 +324,15 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     this.cd.markForCheck();
   }
 
-  public openDialog(data: OrientationConfiguration): void {
-    if (data) {
+  public openDialog(event: {
+    isBulk: boolean
+    data: OrientationConfiguration
+  }): void {
+    if (event.data) {
       this.title = DialogMode.Edit;
       this.isEdit = true;
       this.orientationForm.patchValue({
-        skillCategory: data.skillCategories.map(v => v.id),
+        skillCategory: event.data.skillCategories.map(v => v.id),
       });
       this.skills$
       .pipe(
@@ -338,7 +341,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
         debounceTime(500)
       )
       .subscribe(() => {
-        this.populateForm(data);
+        this.populateForm(event.data);
       });  
     } else {
       this.title = DialogMode.Add;

@@ -211,7 +211,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         if (this.activeTab === AgencyOrderManagementTabs.ReOrders) {
           statuses = orderStatuses.filter((status) =>
           [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled, FilterOrderStatusText.Closed].includes(status.status)
-          );
+          ).map(data => data.status);
           candidateStatusesData = candidateStatuses.filter((status) =>
             [
               CandidatesStatusText['Bill Rate Pending'],
@@ -224,10 +224,10 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         } else if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {
           statuses = orderStatuses.filter((status) =>
             ![FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled].includes(status.status)
-          );
+          ).map(data => data.status);
           candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
-          statuses = orderStatuses;
+          statuses = orderStatuses.map(data => data.status);
           candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         }
 
@@ -245,9 +245,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   private setDefaultFilter(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     if (!selectedOrderAfterRedirect) {
-      const statuses = this.filterColumns.orderStatuses.dataSource
-        .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed].includes(status.status))
-        .map((status: FilterStatus) => status.status);
+      const statuses = this.filterColumns.orderStatuses.dataSource.filter((data:any) => data !== FilterOrderStatusText["Closed"]);
       this.form.get('orderStatuses')?.setValue(statuses);
       this.setDefault.emit(statuses);
     } else {

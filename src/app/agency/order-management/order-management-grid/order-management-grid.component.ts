@@ -422,6 +422,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.OrderFilterFormGroup.get('orderStatuses')?.setValue((this.orderStatus.length > 0) ? this.orderStatus : statuses);
     this.filters.orderStatuses = (this.orderStatus.length > 0) ? this.orderStatus : statuse;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    for(let i=0;i<this.filteredItems.length;i++){
+      if(this.filteredItems[i].text == undefined){
+        this.filteredItems[i].text = this.filteredItems[i].value;
+      }
+    }
     this.filteredItems$.next(this.filteredItems.length);
     this.dispatchNewPage();
   }
@@ -697,6 +702,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       poNumberIds: this.filters.poNumberIds || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    for(let i=0;i<this.filteredItems.length;i++){
+      if(this.filteredItems[i].text == undefined){
+        this.filteredItems[i].text = this.filteredItems[i].value;
+      }
+    }
     this.filteredItems$.next(this.filteredItems.length);
   }
 
