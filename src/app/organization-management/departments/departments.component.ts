@@ -374,6 +374,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   onAddDepartmentClick(): void {
     if (this.selectedLocation && this.selectedRegion) {
       this.departmentsDetailsFormGroup.controls['inactiveDate'].enable();
+      this.departmentsDetailsFormGroup.controls['includeInIRP'].setValue(this.isIRPFlagEnabled && !this.isOrgUseIRPAndVMS);
       this.isLocationIRPEnabled = this.selectedLocation.includeInIRP;
       this.reactivationDateHandler();
       this.store.dispatch(new ShowSideDialog(true));
@@ -415,7 +416,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         this.selectedLocation.id,
         this.departmentsDetailsFormGroup
       );
-
+      debugger;
       this.saveOrUpdateDepartment(department, ignoreWarning);
     } else {
       this.departmentsDetailsFormGroup.markAllAsTouched();
@@ -451,10 +452,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       this.departmentsDetailsFormGroup.removeControl('invoiceDepartmentId');
     }
 
-    if (!this.isOrgUseIRPAndVMS) {
-      this.departmentsDetailsFormGroup.removeControl('includeInIRP');
-    }
-
     this.grid.getColumnByField('invoiceDepartmentId').visible = this.isInvoiceDepartmentIdFieldShow;
     this.grid.getColumnByField('includeInIRP').visible = this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS;
     this.grid.getColumnByField('primarySkillNames').visible = this.isIRPFlagEnabled && !!isIRPEnabled;
@@ -468,7 +465,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   private createDepartmentsForm(): void {
-    this.departmentsDetailsFormGroup = this.departmentService.createDepartmentDetailForm(this.isIRPFlagEnabled);
+    this.departmentsDetailsFormGroup = this.departmentService.createDepartmentDetailForm(this.isIRPFlagEnabled, this.isOrgUseIRPAndVMS);
     this.DepartmentFilterFormGroup = this.departmentService.createDepartmentFilterForm(this.isIRPFlagEnabled);
     this.addDatesValidation();
   }
