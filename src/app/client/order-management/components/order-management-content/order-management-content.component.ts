@@ -197,7 +197,8 @@ import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { GlobalWindow } from '@core/tokens';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
-import { SetOrderGridPageNumber } from '@agency/store/candidate.actions';
+import { SetOrderManagementPagerState } from '@agency/store/candidate.actions';
+import { OrderManagementPagerState } from '@shared/models/candidate.model';
 
 @Component({
   selector: 'app-order-management-content',
@@ -385,6 +386,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private SelectedCandiateStatuses: any[] = [];
   private eliteOrderId:number;
   private alertTitle:string;
+  private orderManagementPagerState: OrderManagementPagerState | null;
   public isCondidateTab:boolean=false;
 
 
@@ -478,8 +480,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
     this.onSelectedOrderDataLoadHandler();
 
-    const locationState = this.location.getState() as { orderId: number };
-    this.previousSelectedOrderId = locationState.orderId;
+    this.getLocationState();
 
     this.onGridPageChangedHandler();
     this.onOrganizationChangedHandler();
@@ -780,7 +781,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.OrderFilterFormGroup.reset();
     this.OrderFilterFormGroup.controls['agencyType'].setValue('0');
     this.filteredItems = [];
-    this.currentPage = 1;
+    this.currentPage = this.orderManagementPagerState?.page ?? 1;
     this.filters = {};
     this.search?.clear();
   }
@@ -869,8 +870,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
-      const { orderGridPageNumber } = this.location.getState() as { orderGridPageNumber?: number; };
-      this.currentPage = orderGridPageNumber ?? this.currentPage;
+      this.currentPage = this.orderManagementPagerState?.page ?? this.currentPage;
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
         this.previousSelectedOrderId
       );
@@ -1415,9 +1415,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private onGridPageChangedHandler(): void {
-    this.pageSubject.pipe(throttleTime(25), takeUntil(this.unsubscribe$)).subscribe((page) => {
+    this.pageSubject.pipe(debounceTime(1), takeUntil(this.unsubscribe$)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new SetOrderGridPageNumber(page));
+      this.store.dispatch(new SetOrderManagementPagerState({ page, pageSize: this.pageSize }));
       const { selectedOrderAfterRedirect } = this.orderManagementService;
       if (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect) {
         this.filters.orderPublicId = (this.prefix || selectedOrderAfterRedirect?.prefix) + '-' + (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect?.orderId);
@@ -1710,6 +1710,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.clearSelection(this.gridWithChildRow);
         this.selectedReOrder = null;
         this.previousSelectedOrderId = null;
+        this.orderManagementPagerState = null;
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
           table.style.transform = 'translate(0px, 0px)';
@@ -2188,5 +2189,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   clearstorage():void{
     this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
     this.orgpendingOrderapproval = "";
+  }
+
+  private getLocationState(): void {
+    const locationState = this.location.getState() as { orderId: number,  orderManagementPagerState: OrderManagementPagerState };
+    this.previousSelectedOrderId = locationState.orderId;
+    this.orderManagementPagerState = locationState?.orderManagementPagerState;
+    this.pageSize = this.orderManagementPagerState?.pageSize ?? this.pageSize;
+    this.cd.markForCheck();
   }
 }

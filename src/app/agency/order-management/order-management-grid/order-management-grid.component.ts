@@ -69,7 +69,8 @@ import { GetIrpOrderCandidates } from '@client/store/order-managment-content.act
 import { BreakpointObserverService } from '@core/services';
 import { GlobalWindow } from '@core/tokens';
 import { Router } from '@angular/router';
-import { SetOrderGridPageNumber } from '@agency/store/candidate.actions';
+import { SetOrderManagementPagerState } from '@agency/store/candidate.actions';
+import { OrderManagementPagerState } from '@shared/models/candidate.model';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -147,7 +148,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private prefix: string | null;
   private orderId: number | null;
   private redirectFromPerDiem = false;
-
+  private orderManagementPagerState: OrderManagementPagerState | null;
 
   private isAlive = true;
   private selectedIndex: number | null;
@@ -171,17 +172,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   }
 
-
-
-
   ngOnInit(): void {
     this.getAlertOrderId();
     this.getDeviceScreen();
     this.onOrderPreviewChange();
     this.onAgencyChange();
     this.onChildDialogChange();
-    const locationState = this.location.getState() as { orderId: number };
-    this.previousSelectedOrderId = locationState.orderId;
+    this.getLocationState();
     this.onReloadOrderCandidatesLists();
     this.onExportSelectedSubscribe();
     this.idFieldName = 'orderId';
@@ -291,8 +288,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onDataBound(): void {
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
-      const { orderGridPageNumber } = this.location.getState() as { orderGridPageNumber?: number; };
-      this.currentPage = orderGridPageNumber ?? this.currentPage; 
+       this.currentPage = this.orderManagementPagerState?.page ?? this.currentPage;
       const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
         this.previousSelectedOrderId
       );
@@ -717,7 +713,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private clearFilters(): void {
     this.OrderFilterFormGroup.reset();
     this.filteredItems = [];
-    this.currentPage = 1;
+    this.currentPage = this.orderManagementPagerState?.page ?? 1;
     this.filters = {
       includeReOrders: true,
     };
@@ -823,6 +819,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.openCandidat.next(false);
         this.clearSelection(this.gridWithChildRow);
         this.previousSelectedOrderId = null;
+        this.orderManagementPagerState = null;
         this.selectedIndex = null;
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
@@ -916,7 +913,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
       this.currentPage = page;
-      this.store.dispatch(new SetOrderGridPageNumber(page));
+      this.store.dispatch(new SetOrderManagementPagerState({ page, pageSize: this.pageSize }));
       this.dispatchNewPage();
     });
   }
@@ -941,4 +938,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       });
   }
 
+  private getLocationState(): void {
+    const locationState = this.location.getState() as { orderId: number,  orderManagementPagerState: OrderManagementPagerState | null };
+    this.previousSelectedOrderId = locationState.orderId;
+    this.orderManagementPagerState = locationState?.orderManagementPagerState;
+    this.pageSize = this.orderManagementPagerState?.pageSize ?? this.pageSize;
+  }
 }
