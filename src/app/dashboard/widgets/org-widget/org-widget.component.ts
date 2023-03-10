@@ -7,6 +7,7 @@ import { LocalStorageStatus } from '@shared/enums/status';
 import { UserState } from '../../../store/user.state';
 import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
+import { Timesheets } from 'src/app/modules/timesheets/store/actions/timesheets.actions';
 
 @Component({
   selector: 'app-org-widget',
@@ -25,6 +26,7 @@ export class OrgWidgetComponent extends AbstractPermissionGrid {
     x: 0,
     y: 0,
   };
+  filterservice: any;
 
   constructor(private readonly dashboardService: DashboardService,
               private actions$: Actions, 
@@ -59,11 +61,14 @@ export class OrgWidgetComponent extends AbstractPermissionGrid {
     } else if(orgname === 'Pending Timesheet'){
       this.dashboardService.redirectToUrl('client/timesheets/');
       this.globalWindow.localStorage.setItem("orgpendingwidget",JSON.stringify(orgname));  
+    } else if(orgname === 'Missing Credentials'){
+      this.dashboardService.redirectToUrl('agency/candidates');
     }
   }
 
   public toTimesheetcontent(orgId : number):void{
-
+    this.globalWindow.localStorage.setItem("timeSheetMissing",JSON.stringify("Missing"));  
+    this.dashboardService.redirectToUrlWithAgencyposition('agency/timesheets',orgId,"setOrg");
   }
 }
 
