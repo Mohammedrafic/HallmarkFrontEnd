@@ -416,7 +416,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         this.selectedLocation.id,
         this.departmentsDetailsFormGroup
       );
-      debugger;
       this.saveOrUpdateDepartment(department, ignoreWarning);
     } else {
       this.departmentsDetailsFormGroup.markAllAsTouched();
