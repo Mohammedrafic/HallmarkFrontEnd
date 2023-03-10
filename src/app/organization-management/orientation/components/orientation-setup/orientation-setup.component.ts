@@ -27,6 +27,7 @@ import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, ORIENTATION_CHANGE_CONFIRM_T
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrientationType } from "../../enums/orientation-type.enum";
 import { OrientationGridComponent } from '../orientation-grid/orientation-grid.component';
+import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 
 @Component({
   selector: 'app-orientation-setup',
@@ -143,7 +144,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
         const selectedRegions: OrganizationRegion[] = findSelectedItems(value, this.regions);
         const selectedLocation: OrganizationLocation[] = mapperSelectedItems(selectedRegions, 'locations');
         this.locations = sortByField(selectedLocation, 'name');
-        this.locationsDataSource = this.locations;
+        this.locationsDataSource = getIRPOrgItems(this.locations);
         this.cd.markForCheck();
       });
   }
@@ -157,7 +158,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       .subscribe((value: number[]) => {
         const selectedLocation: OrganizationLocation[] = findSelectedItems(value, this.locations);
         const selectedDepartment: OrganizationDepartment[] = mapperSelectedItems(selectedLocation, 'departments');
-        this.departmentsDataSource =  sortByField(selectedDepartment, 'name');
+        this.departmentsDataSource =  sortByField(getIRPOrgItems(selectedDepartment), 'name');
         this.cd.markForCheck();
       });
   }
@@ -417,7 +418,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
         locations = [...locations, ...filteredLocation];
       });
       this.locations = sortByField(locations, 'name');
-      this.locationsDataSource =  locations;
+      this.locationsDataSource =  getIRPOrgItems(this.locations);
     } else {
       regionsControl?.enable();
     }
@@ -435,7 +436,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
         const filteredDepartments = location.departments || [];
         departments = [...departments, ...filteredDepartments] as OrganizationDepartment[];
       });
-      this.departmentsDataSource = departments;
+      this.departmentsDataSource = getIRPOrgItems(departments);
     } else {
       locationsControl?.enable();
     }
