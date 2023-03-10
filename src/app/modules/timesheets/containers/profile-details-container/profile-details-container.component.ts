@@ -456,7 +456,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       }),
       filter(Boolean),
       filter((details) => !details.isNotExist),
-      distinctUntilChanged((prev, next) => prev.id === next.id),
       switchMap((details) => {
         this.timesheetId = details.id;
         this.mileageTimesheetId = details.mileageTimesheetId;
