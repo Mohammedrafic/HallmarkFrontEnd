@@ -41,6 +41,12 @@ export interface CandidateListRequest {
   tab: number;
   candidateName: string | null;
   includeDeployedCandidates: boolean;
+  candidateId?: string | null;
+  locationIds?: number[];
+  departmentIds?: number[];
+  primarySkillIds?: number[];
+  secondarySkillIds?: number[]; 
+  hireDate?: string | null;
 }
 
 export type CandidateListFilters = {
@@ -49,6 +55,12 @@ export type CandidateListFilters = {
   skillsIds?: number[];
   regionsNames?: string[];
   tab?: number;
+  candidateId?: string | null;
+  locationIds?: number[];
+  departmentIds?: number[];
+  primarySkillIds?: number[];
+  secondarySkillIds?: number[]; 
+  hireDate?: string | null;
 };
 
 export interface FilterColumn {
@@ -65,10 +77,16 @@ export interface CandidateNameFilterColumn {
 }
 
 export interface CandidateListFiltersColumn {
-  profileStatuses: FilterColumn;
-  skillsIds: FilterColumn;
-  regionsNames: FilterColumn;
-  candidateName: CandidateNameFilterColumn;
+  profileStatuses?: FilterColumn;
+  skillsIds?: FilterColumn;
+  regionsNames?: FilterColumn;
+  candidateName?: CandidateNameFilterColumn;
+  candidateId?: CandidateNameFilterColumn;
+  locationIds?: FilterColumn;
+  departmentIds?: FilterColumn;
+  primarySkillIds?: FilterColumn;
+  secondarySkillIds?: FilterColumn;
+  hireDate?: CandidateNameFilterColumn;
 }
 
 export type CandidateListExport = {
