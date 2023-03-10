@@ -67,6 +67,7 @@ import {
 import { AddCredentialForm, SearchCredentialForm } from './credentials-grid.interface';
 import { AppState } from '../../../store/app.state';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { CandidateService } from '@agency/services/candidates.service';
 
 @Component({
   selector: 'app-credentials-grid',
@@ -217,6 +218,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     private credentialGridService: CredentialGridService,
     private confirmService: ConfirmService,
     private cdr: ChangeDetectorRef,
+    private candidateService: CandidateService,
     private ngZone: NgZone,
   ) {
     super();
@@ -494,7 +496,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   public addMissingCredentials(): void {
-    //TODO add method body after BE implementation
+    this.candidateService.getMissingCredentials(this.candidateProfileId).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
+    })
   }
 
   private closeSideDialog(): void {

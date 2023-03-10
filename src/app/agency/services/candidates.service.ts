@@ -239,4 +239,8 @@ export class CandidateService {
       { responseType: 'blob' }
     );
   }
+
+  public getMissingCredentials(candidateProfileId: number): Observable<object> {
+    return this.http.post('/api/EmployeeCredentials/addMissingCredentials', { candidateProfileId });
+  }
 }
