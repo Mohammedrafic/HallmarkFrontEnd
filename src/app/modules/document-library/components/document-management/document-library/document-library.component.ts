@@ -568,7 +568,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public uploadToFile(file: Blob | null) {
     this.selectedFile = file;
     const fileData: any = file;
-    this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(fileData?.name.split('.').slice(0, -1).join('.'));
+    this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(fileData?.name);
   }
 
 
@@ -643,7 +643,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     suppressRowClickSelection: true,
     onCellClicked: (e: CellClickedEvent) => {
       const column: any = e.column;
-      if (column?.colId == documentsColumnField.FileName) {
+      if (column?.colId == documentsColumnField.Name) {
         this.documentPreview(e.data);
       }
     }
