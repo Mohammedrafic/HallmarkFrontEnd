@@ -34,8 +34,8 @@ const isOrderDateMatchedWithFilter = (
   const filterEndDateMs = getDateTime(filterEndDate);
 
   return (orderStartDateMs >= filterStartDateMs && orderEndDateMs <= filterEndDateMs)
-    || (orderEndDateMs > filterStartDateMs && orderStartDateMs < filterStartDateMs)
-    || (orderStartDateMs < filterEndDateMs && orderEndDateMs > filterEndDateMs);
+    || (orderEndDateMs >= filterStartDateMs && orderStartDateMs <= filterStartDateMs)
+    || (orderStartDateMs <= filterEndDateMs && orderEndDateMs >= filterEndDateMs);
 };
 
 const getDateTime = (date: string): number => {
