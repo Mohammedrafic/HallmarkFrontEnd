@@ -9,6 +9,34 @@
     [skillCategories]="[]"
     [regions]="[]"
     [disableControls]="disableControls"
-    [orientationTab]="orientationTab.HistoricalData">
+    [orientationTab]="orientationTab.HistoricalData"
+    [bulkActionConfig]="bulkActionConfig">
   </app-orientation-grid>
 </section>
+
+<app-side-dialog
+  *ngIf="isActive"
+  header="Activate Setup"
+  (formSaveClicked)="saveRecord()"
+  (formCancelClicked)="closeDialog()"
+  [width]="'562px'"
+  saveButtonLabel="Activate"
+>
+
+  <form [formGroup]="orientationForm" class="record-form">
+    <div>
+      <div class="row">
+        <app-datepicker
+          class="control date"
+          [formGroupInstance]="orientationForm"
+          controlName="endDate"
+          label="End Date"
+          [required]="false">
+        </app-datepicker>
+      </div>
+      <div class="row note">
+        After passing the End Date the record will be moved to Historical Data
+      </div>
+    </div>
+  </form>
+</app-side-dialog>

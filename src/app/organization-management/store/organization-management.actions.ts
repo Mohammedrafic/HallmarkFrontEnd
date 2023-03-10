@@ -592,4 +592,3 @@ export class SaveRegionsImportResultSucceeded {
   static readonly type = '[candidate] Save Regions Import Result Succeeded';
   constructor(public payload: ImportResult<ImportedRegion>) { }
 }
-

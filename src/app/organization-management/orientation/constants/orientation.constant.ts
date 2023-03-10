@@ -6,6 +6,7 @@ import { OrientationGridActionRendererComponent } from '../components/orientatio
 import { SkillNameRendererComponent } from '../components/orientation-grid/skill-name-renderer/skill-name.component';
 import { SkillCategoryRendererComponent } from '../components/orientation-grid/skill-category-renderer/skill-category.component';
 import { HistoricalDataActionRendererComponent } from '../components/orientation-grid/historical-data-action-renderer/historical-data-action-renderer.component';
+import { OrientationType } from '../enums/orientation-type.enum';
 
 export const OrientationColumnDef = (
   editCallback: (value: OrientationConfiguration) => void,
@@ -98,6 +99,15 @@ export const OrientationHistoricalDataColumnDef = (
   gridActionsParams: { disableControls: boolean }
 ) => ([
   {
+    field: 'checkbox',
+    headerName: '',
+    width: 50,
+    minWidth: 50,
+    headerCheckboxSelection: true,
+    headerCheckboxSelectionFilteredOnly: true,
+    checkboxSelection: true,
+  },
+  {
     field: 'id',
     headerName: '',
     cellRenderer: HistoricalDataActionRendererComponent,
@@ -112,8 +122,8 @@ export const OrientationHistoricalDataColumnDef = (
   {
     field: 'orientationType',
     headerName: 'Orientation Type',
-    flex: 1,
-    maxWidth: 120,
+    valueFormatter: (params: ValueFormatterParams) => OrientationType[params.value],
+    minWidth: 170,
   },
   {
     field: 'startDate',

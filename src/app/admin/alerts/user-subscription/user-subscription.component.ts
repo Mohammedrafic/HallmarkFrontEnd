@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -33,9 +33,10 @@ import { SetHeaderState, ShouldDisableUserDropDown, ShowToast } from 'src/app/st
 import { User, UsersPage } from '@shared/models/user.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
-import { GRID_CONFIG, RECORD_MODIFIED } from '@shared/constants';
+import { GRID_CONFIG, RECORD_MODIFIED, USER_SUBSCRIPTION_PERMISSION } from '@shared/constants';
 import { AppState } from '../../../store/app.state';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
+import { OutsideZone } from '@core/decorators';
 
 @Component({
   selector: 'app-user-subscription',
@@ -101,6 +102,9 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   defaultUserValue: any;
   userData: User[];
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
+  public showtoast:boolean = true;
+  public getdata: any;
+
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
   }
@@ -112,6 +116,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     return this.businessForm.get('user') as AbstractControl;
   }
   constructor(private actions$: Actions,
+    private readonly ngZone: NgZone,
     private store: Store) {
     super();
     store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
@@ -361,7 +366,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     const { businessUnit } = this.businessForm?.getRawValue();
     if (user != 0) {
       this.userGuid = user;
-      this.store.dispatch(new GetUserSubscriptionPage(businessUnit || null, user, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+      this.getdata = this.store.dispatch(new GetUserSubscriptionPage(businessUnit || null, user, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+      this.getErrorAlert();
     }
   }
   private dispatchUserPage(businessUnitIds: number[]) {
@@ -392,6 +398,18 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       });
 
     }
+  }
+
+  @OutsideZone
+  getErrorAlert(){
+    setTimeout(()=> {
+      this.getdata.subscribe((data:any)=> {
+        if(data.null.userSubscriptionPage == undefined && this.showtoast == true){
+          this.store.dispatch(new ShowToast(MessageTypes.Error, USER_SUBSCRIPTION_PERMISSION));
+          this.showtoast = false;
+        }
+      });
+    },3000)
   }
 
 }

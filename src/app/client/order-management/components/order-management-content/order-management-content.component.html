@@ -406,7 +406,7 @@
           <ng-template #template let-data>
             <div class="order-type-column" *ngIf="orderTypes[data.orderType] as orderType">
               <ejs-tooltip id="tooltip" [content]="orderType" position="TopCenter">
-                <span class="e-badge e-badge-primary e-badge-circle">{{ orderType[0] }}</span>
+                <span class="order-type-text-cell">{{ orderType[0] }}</span>
               </ejs-tooltip>
             </div>
           </ng-template>
@@ -1141,6 +1141,7 @@
   [children]="selectedDataRow?.children"
   [settings]="settings"
   [openEvent]="openDetails"
+  [isCondidateTab]="isCondidateTab"
   [activeSystem]="activeSystem"
   [orderPositionSelected$]="orderPositionSelected$"
   [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"

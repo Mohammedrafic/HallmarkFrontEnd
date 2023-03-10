@@ -382,11 +382,12 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       orderId: number;
       pageToBack: string;
       isNavigateFromCandidateDetails: boolean;
-    };
+      orderGridPageNumber?: number;
+    }; 
 
     switch (true) {
       case location.orderId && !location.isNavigateFromCandidateDetails:
-        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId } });
+        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId, orderGridPageNumber: location.orderGridPageNumber } });
         const selectedNavigation = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
         this.store.dispatch(new SelectNavigationTab(selectedNavigation?.current));
         break;

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { TakeUntilDestroy } from '@core/decorators';
 import { Select, Store } from '@ngxs/store';
@@ -26,6 +26,7 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, ORIENTATION_CHANGE_CONFIRM_TITLE, ORIENTATION_CHANGE_TEXT, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrientationType } from "../../enums/orientation-type.enum";
+import { OrientationGridComponent } from '../orientation-grid/orientation-grid.component';
 
 @Component({
   selector: 'app-orientation-setup',
@@ -35,6 +36,8 @@ import { OrientationType } from "../../enums/orientation-type.enum";
 })
 @TakeUntilDestroy
 export class OrientationSetupComponent extends AbstractPermissionGrid implements OnInit {
+  @ViewChild('orientationGrid') private orientationGrid: OrientationGridComponent
+  
   @Input() public isActive: boolean;
 
   public orientationTypeSettingsForm: FormGroup = new FormGroup({
@@ -206,6 +209,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     this.orientationService.saveOrientationSetting({ isEnabled, type }).subscribe(() => {
       this.orientationTypeSettingsForm.markAsPristine();
       this.selectedOrientationSettings = type;
+      this.orientationGrid.filtersForm.reset();
       this.orientationService.setSettingState(this.settingIsOff);
       this.setGRidControlsState();
       this.orientationTypeHandler(this.selectedOrientationSettings);
@@ -242,7 +246,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   }
 
   public orientationTypeHandler(type: OrientationType | null): void {
-    if (type === OrientationType.OrganizationWise) {
+    if (type === OrientationType.Organization) {
       this.orientationForm.controls['regionIds'].disable();
       this.orientationForm.controls['locationIds'].disable();
       this.orientationForm.controls['departmentIds'].disable();
@@ -250,7 +254,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       this.allRecords.locationIds = this.locationToggleDisable = true;
       this.allRecords.departmentIds = this.departmentToggleDisable = true;
     }
-    if (type === OrientationType.RegionWise) {
+    if (type === OrientationType.Region) {
       this.orientationForm.controls['regionIds'].enable();
       this.orientationForm.controls['locationIds'].disable();
       this.orientationForm.controls['departmentIds'].disable();
@@ -258,7 +262,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       this.allRecords.locationIds = this.locationToggleDisable = true;
       this.allRecords.departmentIds = this.departmentToggleDisable = true;
     }
-    if (type === OrientationType.LocationWise) {
+    if (type === OrientationType.Location) {
       this.orientationForm.controls['regionIds'].enable();
       this.orientationForm.controls['locationIds'].enable();
       this.orientationForm.controls['departmentIds'].disable();
@@ -266,7 +270,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       this.allRecords.locationIds = this.locationToggleDisable = false;
       this.allRecords.departmentIds = this.departmentToggleDisable = true;
     }
-    if (type === OrientationType.DepartmentWise) {
+    if (type === OrientationType.Department) {
       this.orientationForm.controls['regionIds'].enable();
       this.orientationForm.controls['locationIds'].enable();
       this.orientationForm.controls['departmentIds'].enable();
@@ -324,12 +328,15 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     this.cd.markForCheck();
   }
 
-  public openDialog(data: OrientationConfiguration): void {
-    if (data) {
+  public openDialog(event: {
+    isBulk: boolean
+    data: OrientationConfiguration
+  }): void {
+    if (event?.data) {
       this.title = DialogMode.Edit;
       this.isEdit = true;
       this.orientationForm.patchValue({
-        skillCategory: data.skillCategories.map(v => v.id),
+        skillCategory: event.data.skillCategories.map(v => v.id),
       });
       this.skills$
       .pipe(
@@ -338,7 +345,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
         debounceTime(500)
       )
       .subscribe(() => {
-        this.populateForm(data);
+        this.populateForm(event.data);
       });  
     } else {
       this.title = DialogMode.Add;

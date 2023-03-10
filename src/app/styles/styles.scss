@@ -581,10 +581,6 @@ html, body {
 .order-type-column {
   display: inline-block;
   cursor: default;
-
-  span:first-child {
-    background-color: $secondary-dark-blue-20 !important;
-  }
 }
 
 .deployed-candidate {

@@ -22,6 +22,7 @@ import { Invoices } from '../../store/actions/invoices.actions';
 export class InvoiceGridExportComponent extends AbstractGridConfigurationComponent {
   @Input() public selectedRows: InvoiceGridSelections;
   @Input() public isAgency = false;
+  @Input() public organizationId: number;
   @Input() set selectedTab(selectedTabIdx: number | never) {
    this.setSelectedTab(selectedTabIdx);
   }
@@ -63,16 +64,21 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     const filters = this.store.selectSnapshot(InvoicesState.invoicesFilters);
     const ids = this.selectedRows.selectedInvoiceIds.length ? this.selectedRows.selectedInvoiceIds : null;
-    this.getDefaultFileName();
+    const filterQuery = {
+      ...filters,
+      offset: Math.abs(new Date().getTimezoneOffset()),
+      invoiceState: this.invoiceState,
+      ids,
+    };
 
-   this.store.dispatch(new Invoices.ExportInvoices(new ExportPayload(
+    if (this.isAgency) {
+      filterQuery.organizationId = this.organizationId;
+    }
+
+    this.getDefaultFileName();
+    this.store.dispatch(new Invoices.ExportInvoices(new ExportPayload(
       fileType,
-      {
-        ...filters,
-        offset: Math.abs(new Date().getTimezoneOffset()),
-        invoiceState: this.invoiceState,
-        ids,
-      },
+      filterQuery,
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       ids,
       options?.fileName || this.defaultFileName,

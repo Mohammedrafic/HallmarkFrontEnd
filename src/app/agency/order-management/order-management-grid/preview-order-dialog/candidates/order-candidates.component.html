@@ -22,6 +22,7 @@
     (getCandidatesList)="onGetCandidatesList($event)"
     [order]="orderCandidates"
     [selectedOrder]="currentOrder"
+    [orderGridPageNumber]="orderGridPageNumber$ | async"
   >
   </app-order-per-diem-candidates-list>
   <app-reorder-candidates-list
@@ -31,6 +32,7 @@
     (getCandidatesList)="onGetCandidatesList($event)"
     [order]="orderCandidates"
     [selectedOrder]="currentOrder"
+    [orderGridPageNumber]="orderGridPageNumber$ | async"
   ></app-reorder-candidates-list>
   <app-order-candidates-list
     *ngSwitchDefault
@@ -38,6 +40,7 @@
     [includeDeployedCandidates]="!excludeDeployed"
     (getCandidatesList)="onGetCandidatesList($event)"
     [order]="orderCandidates"
+    [orderGridPageNumber]="orderGridPageNumber$ | async"
   >
   </app-order-candidates-list>
 </div>

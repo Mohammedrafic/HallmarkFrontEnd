@@ -1,4 +1,5 @@
 @import 'colors';
+@import 'mixins';
 @import 'adaptive-response';
 @import '@ag-grid-community/core/dist/styles/ag-grid.scss';
 @import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
@@ -456,4 +457,8 @@
   .e-gridcontent{
     height: calc(100% - 106px);
   }
+}
+
+.order-type-text-cell {
+  @include order-type-text-cell;
 }

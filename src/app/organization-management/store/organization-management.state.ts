@@ -286,7 +286,7 @@ export interface OrganizationManagementStateModel {
     loctionTypes: [],
     isLocationTypesLoading: false,
     assignedSkillsByOrganization: [],
-    filteringAssignedSkillsByOrganization: []
+    filteringAssignedSkillsByOrganization: [],
   },
 })
 @Injectable()

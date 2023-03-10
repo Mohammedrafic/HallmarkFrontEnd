@@ -69,6 +69,7 @@ import { GetIrpOrderCandidates } from '@client/store/order-managment-content.act
 import { BreakpointObserverService } from '@core/services';
 import { GlobalWindow } from '@core/tokens';
 import { Router } from '@angular/router';
+import { SetOrderGridPageNumber } from '@agency/store/candidate.actions';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -84,7 +85,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() search$: Subject<string>;
   @Input() public orderStatus: string[];
 
-  
+
   @Output() selectTab = new EventEmitter<number>();
   @Input() public Organizations: number[];
 
@@ -167,11 +168,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   ) {
     super();
     this.listenRedirectFromExtension();
-    
+
   }
 
 
-  
+
 
   ngOnInit(): void {
     this.getAlertOrderId();
@@ -290,6 +291,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onDataBound(): void {
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
+      const { orderGridPageNumber } = this.location.getState() as { orderGridPageNumber?: number; };
+      this.currentPage = orderGridPageNumber ?? this.currentPage; 
       const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
         this.previousSelectedOrderId
       );
@@ -381,7 +384,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
               this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
               this.filters.locationIds = [...preservedFilters.locations];
             }
-          }  
+          }
           this.setDefaultStatuses(statuses);
         });
       } else {
@@ -419,6 +422,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.OrderFilterFormGroup.get('orderStatuses')?.setValue((this.orderStatus.length > 0) ? this.orderStatus : statuses);
     this.filters.orderStatuses = (this.orderStatus.length > 0) ? this.orderStatus : statuse;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    for(let i=0;i<this.filteredItems.length;i++){
+      if(this.filteredItems[i].text == undefined){
+        this.filteredItems[i].text = this.filteredItems[i].value;
+      }
+    }
     this.filteredItems$.next(this.filteredItems.length);
     this.dispatchNewPage();
   }
@@ -694,6 +702,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       poNumberIds: this.filters.poNumberIds || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    for(let i=0;i<this.filteredItems.length;i++){
+      if(this.filteredItems[i].text == undefined){
+        this.filteredItems[i].text = this.filteredItems[i].value;
+      }
+    }
     this.filteredItems$.next(this.filteredItems.length);
   }
 
@@ -903,6 +916,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
       this.currentPage = page;
+      this.store.dispatch(new SetOrderGridPageNumber(page));
       this.dispatchNewPage();
     });
   }

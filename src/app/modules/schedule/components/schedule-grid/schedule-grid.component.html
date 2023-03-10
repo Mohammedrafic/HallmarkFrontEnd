@@ -8,7 +8,7 @@
               <i-feather name="search" class="search-icon"></i-feather>
               <ejs-autocomplete
                 #autoCompleteSearch
-                [enabled]="hasViewPermission"
+                [enabled]="hasViewPermission && !isEmployee"
                 [dataSource]="candidatesSuggestions"
                 filterType="StartsWith"
                 [fields]="candidateNameFields"
@@ -65,7 +65,7 @@
             *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
             class="table-title date fixed fixed--top"
           >
-            {{ dateHead | date: 'EEEE dd/MM' }}
+            {{ dateHead | date: 'EEEE MM/dd' }}
           </th>
         </tr>
       </thead>

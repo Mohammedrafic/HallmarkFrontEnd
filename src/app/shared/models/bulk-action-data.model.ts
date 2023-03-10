@@ -6,6 +6,7 @@ export interface BulkActionConfig {
   edit?: boolean;
   delete?: boolean;
   export?: boolean;
+  activate?: boolean;
 }
 
 export interface BulkActionDataModel {

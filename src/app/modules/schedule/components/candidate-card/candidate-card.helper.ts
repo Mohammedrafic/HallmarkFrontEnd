@@ -1,28 +1,16 @@
 import { formatDate } from '@angular/common';
 
-import { ScheduleCandidateCard, ScheduleDateItem, ScheduleItem } from '../../interface';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { LtaAssignment } from '../../interface';
 
-export const PrepareScheduleCandidate = (schedule: ScheduleDateItem[]): ScheduleCandidateCard[] => {
-  return schedule.map((card: ScheduleDateItem) => {
-    return card.daySchedules
-      .filter((day: ScheduleItem) => day.orderMetadata?.orderType === IrpOrderType.LongTermAssignment)
-      .map((day: ScheduleItem) => {
-        return {
-          startDate: formatDate(day.startDate, 'MM/dd/yyyy', 'en-US'),
-          endDate: formatDate(day.endDate, 'MM/dd/yyyy', 'en-US'),
-          orderType: day.orderMetadata?.orderType,
-          region: day.orderMetadata?.region,
-          location: day.orderMetadata?.location,
-          department: day.orderMetadata?.department,
-        };
-      });
-  }).flat();
-};
 
-export const GetCandidateTypeTooltip = (candidateCard: ScheduleCandidateCard[]): string => {
-  return candidateCard.map((schedule: ScheduleCandidateCard) => {
-    const { startDate,endDate,region,location,department } = schedule;
-    return `${region} - ${location} - ${department}, ${startDate} - ${endDate}`;
-  }).join(' ');
+export const GetCandidateTypeTooltip = (ltaAssignment: LtaAssignment | null): string => {
+  if (!ltaAssignment) {
+    return '';
+  }
+
+  const { startDate, endDate, region, location, department } = ltaAssignment;
+  const formattedStartDate = formatDate(startDate, 'MM/dd/yyyy', 'en-US');
+  const formattedEndDate = formatDate(endDate, 'MM/dd/yyyy', 'en-US');
+
+  return `${region} - ${location} - ${department}, ${formattedStartDate} - ${formattedEndDate}`;
 };

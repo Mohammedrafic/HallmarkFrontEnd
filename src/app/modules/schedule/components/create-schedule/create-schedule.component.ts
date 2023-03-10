@@ -92,7 +92,6 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   scheduleFormConfig: ScheduleInt.ScheduleFormConfig;
   scheduleType: ScheduleItemType;
   showScheduleForm = true;
-  selectedScheduleType: ScheduleItemType | null = null;
 
   private readonly customShiftId = -1;
   private shiftControlSubscription: Subscription | null;
@@ -174,13 +173,13 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
     }
 
     switch (true) {
-      case this.selectedScheduleType === ScheduleItemType.Book:
+      case this.scheduleType === ScheduleItemType.Book:
         this.saveBooking();
         return;
-      case this.selectedScheduleType === ScheduleItemType.Unavailability:
+      case this.scheduleType === ScheduleItemType.Unavailability:
         this.saveAvailabilityUnavailability();
         return;
-      case this.selectedScheduleType === ScheduleItemType.Availability:
+      case this.scheduleType === ScheduleItemType.Availability:
         this.saveAvailabilityUnavailability();
         return;
       default:
@@ -364,7 +363,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
       }),
       takeUntil(this.componentDestroy())
     ).subscribe((type: number) => {
-      this.selectedScheduleType = type;
+      this.scheduleType = type;
     });
   }
 

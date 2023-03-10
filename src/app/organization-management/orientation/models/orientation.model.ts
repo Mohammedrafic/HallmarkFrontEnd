@@ -42,6 +42,11 @@ export class OrientationConfigurationDTO {
   endDate: Date;
 }
 
+export class HistoricalOrientationConfigurationDTO {
+  ids: number[];
+  endDate: Date;
+}
+
 export class OrientationConfigurationFilters {
   orderBy?: string;
   pageNumber: number;

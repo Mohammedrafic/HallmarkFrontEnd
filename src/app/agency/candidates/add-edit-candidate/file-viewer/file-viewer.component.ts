@@ -1,11 +1,16 @@
 import { CandidateState } from '@agency/store/candidate.state';
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { downloadBlobFile } from '@shared/utils/file.utils';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, Subscription, debounceTime, fromEvent, takeUntil } from 'rxjs';
 
 import { ListBox, SelectionSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { MagnificationService, NavigationService, TextSelectionService, ToolbarService } from '@syncfusion/ej2-angular-pdfviewer';
+import {
+  MagnificationService,
+  NavigationService,
+  TextSelectionService,
+  ToolbarService,
+} from '@syncfusion/ej2-angular-pdfviewer';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { getInstance } from '@syncfusion/ej2-base';
 
@@ -30,14 +35,17 @@ interface ListBoxItem {
   selector: 'app-file-viewer',
   templateUrl: './file-viewer.component.html',
   styleUrls: ['./file-viewer.component.scss'],
-  providers: [ToolbarService, NavigationService, TextSelectionService, MagnificationService]
+  providers: [ToolbarService, NavigationService, TextSelectionService, MagnificationService],
 })
-export class FileViewerComponent implements OnInit, OnDestroy {
+export class FileViewerComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
   @Input() openEvent: Subject<number>;
 
   public isFullScreen: boolean;
+  public isSidebarOpen = true;
+  public keepSidebarOpen = true;
+  public hideSidebarKeepOpenButton: boolean;
   public width = `${window.innerWidth * 0.6}px`;
   public targetElement: HTMLElement = document.body;
   public data: ListBoxItem[] = [];
@@ -61,6 +69,9 @@ export class FileViewerComponent implements OnInit, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
   private isDownloading = false;
+  private resizeObservable$: Observable<Event>;
+  private resizeSubscription$: Subscription;
+  sidebarType = 'Over';
 
   @Select(CandidateState.groupedCandidateCredentialsFiles)
   public groupedCandidateCredentialsFiles$: Observable<CredentialGroupedFiles[]>;
@@ -76,6 +87,28 @@ export class FileViewerComponent implements OnInit, OnDestroy {
     this.pageSelection.valueChanges.subscribe(x => {
       this.page = x;
     });
+
+    this.resizeObservable$ = fromEvent(window, 'resize');
+    this.resizeSubscription$ = this.resizeObservable$
+      .pipe(debounceTime(500), takeUntil(this.unsubscribe$))
+      .subscribe(() => this.setResponsiveWidths());
+  }
+
+  ngAfterViewInit(): void {
+    this.setResponsiveWidths();
+  }
+
+  private setResponsiveWidths() {
+      if (window.innerWidth < 1130) {
+        this.keepSidebarOpen = false;
+        this.hideSidebarKeepOpenButton = false;
+        this.width = `${window.innerWidth - 66}px`;
+    } else {
+      this.width = `${window.innerWidth * 0.6}px`;
+      this.isSidebarOpen = true;
+      this.keepSidebarOpen = true;
+      this.hideSidebarKeepOpenButton = true;
+    }
   }
 
   ngOnDestroy(): void {
@@ -104,6 +137,7 @@ export class FileViewerComponent implements OnInit, OnDestroy {
     } else {
       this.getPdfFileById((this.previewFile as ListBoxItem).id);
     }
+    this.isSidebarOpen = this.keepSidebarOpen ? this.isSidebarOpen : false;
   }
 
   public downloadFile(): void {

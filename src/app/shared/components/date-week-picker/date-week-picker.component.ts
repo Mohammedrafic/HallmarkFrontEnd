@@ -237,9 +237,9 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
       this.firstDayOfWeek, !!this.maxDate);
 
     this.weekService.setRange([
-      DateTimeHelper.toUtcFormat(startRangeDate),
-      DateTimeHelper.toUtcFormat(DateTimeHelper.getDynamicWeekDate(value, false, this.startDate, this.rangeType,
-        this.firstDayOfWeek, !!this.maxDate)),
+      DateTimeHelper.toUtcFormat(new Date(startRangeDate.setHours(0, 0, 0))),
+      DateTimeHelper.toUtcFormat(new Date(DateTimeHelper.getDynamicWeekDate(value, false, this.startDate, this.rangeType,
+        this.firstDayOfWeek, !!this.maxDate).setHours(0, 0, 0))),
     ]);
 
     if (this.overrideInitDates && this.initDates) {
