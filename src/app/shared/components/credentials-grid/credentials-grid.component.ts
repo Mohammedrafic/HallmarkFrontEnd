@@ -757,7 +757,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       !this.areAgencyActionsAllowed ||
       item.id === this.orderCredentialId ||
       !this.hasPermissions() ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
+      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP) ||
+      (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile])
     );
   }
 
