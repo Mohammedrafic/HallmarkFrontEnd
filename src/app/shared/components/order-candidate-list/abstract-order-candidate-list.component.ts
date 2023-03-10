@@ -22,6 +22,7 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { PageOfCollections } from '@shared/models/page.model';
 import { CandidateSearchPlaceholder } from '@shared/constants/candidate-search-placeholder';
+import { OrderManagementPagerState } from '@shared/models/candidate.model';
 
 @Directive()
 export abstract class AbstractOrderCandidateListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
@@ -31,7 +32,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   @Input() order: AgencyOrder;
   @Input() includeDeployedCandidates = true;
   @Input() irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
-  @Input() orderGridPageNumber: number | null;
+  @Input() orderManagementPagerState: OrderManagementPagerState | null;
 
   @Output() getCandidatesList = new EventEmitter<CandidateListEvent>();
 
@@ -99,7 +100,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
         orderId: this.order.orderId,
         candidateStatus: data.status,
         pageToBack,
-        orderGridPageNumber: this.orderGridPageNumber,
+        orderManagementPagerState: this.orderManagementPagerState,
         readonly: !this.isAgency,
         isRedirectFromOrder: true,
         isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,

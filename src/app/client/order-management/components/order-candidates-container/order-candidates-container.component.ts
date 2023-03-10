@@ -13,6 +13,7 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { PageOfCollections } from '@shared/models/page.model';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { CandidateState } from '@agency/store/candidate.state';
+import { OrderManagementPagerState } from '@shared/models/candidate.model';
 
 @Component({
   selector: 'app-order-candidates-container',
@@ -37,8 +38,8 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
   @Select(OrderManagementContentState.getIrpCandidates)
   public irpCandidates$: Observable<PageOfCollections<IrpOrderCandidate>>;
 
-  @Select(CandidateState.orderGridPageNumber)
-  public orderGridPageNumber$: Observable<number>;
+  @Select(CandidateState.orderManagementPagerState)
+  public orderManagementPagerState$: Observable<OrderManagementPagerState | null>;
   get excludeDeployed(): boolean {
     return this.orderManagementService.excludeDeployed;
   }

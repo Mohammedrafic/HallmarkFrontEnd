@@ -1,9 +1,9 @@
-import { CandidateCredentialResponse, CredentialGroupedFiles } from "./candidate-credential.model";
-import { CredentialType } from "./credential-type.model";
-import { Credential } from "./credential.model";
-import { Education } from "./education.model";
-import { Experience } from "./experience.model";
-import { MasterSkill } from "./skill.model";
+import { CandidateCredentialResponse, CredentialGroupedFiles } from './candidate-credential.model';
+import { CredentialType } from './credential-type.model';
+import { Credential } from './credential.model';
+import { Education } from './education.model';
+import { Experience } from './experience.model';
+import { MasterSkill } from './skill.model';
 import { PageOfCollections } from './page.model';
 import { JobDistributionMasterSkills } from './associate-organizations.model';
 
@@ -39,7 +39,6 @@ export class Candidate {
     this.candidateAgencyStatus = candidateForm.generalInfo.candidateAgencyStatus;
     this.candidateProfileSkills = candidateForm.generalInfo.candidateProfileSkills;
     this.candidateProfileRegions = candidateForm.generalInfo.candidateProfileRegions;
-
   }
 }
 
@@ -92,5 +91,10 @@ export interface CandidateStateModel {
   credentialTypes: CredentialType[];
   masterCredentials: Credential[];
   groupedCandidateCredentialsFiles: CredentialGroupedFiles[];
-  orderGridPageNumber: number;
+  orderManagementPagerState: OrderManagementPagerState | null;
+}
+
+export interface OrderManagementPagerState {
+  page: number;
+  pageSize: number;
 }
