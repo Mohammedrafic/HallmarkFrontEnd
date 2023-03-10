@@ -50,9 +50,9 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
     if (this.tabConfig) {
       this.asyncRefresh();
       this.navigatingTab();
+      this.getalerttitle();
+      this.navigatetopendingtimesheet();  
     }
-    this.getalerttitle();
-    this.navigatetopendingtimesheet();
   }
 
   public getalerttitle(): void {

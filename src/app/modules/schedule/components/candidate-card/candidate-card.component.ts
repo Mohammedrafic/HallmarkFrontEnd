@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 
 import { ScheduleCandidate, ScheduleModel } from '../../interface';
 import { CandidateIconName } from '../../constants';
-import { GetCandidateTypeTooltip, PrepareScheduleCandidate } from './candidate-card.helper';
+import { GetCandidateTypeTooltip } from './candidate-card.helper';
 
 @Component({
   selector: 'app-candidate-card',
@@ -33,10 +33,6 @@ export class CandidateCardComponent implements OnInit {
   }
 
   private createToolTipForSchedule(schedule: ScheduleModel): void {
-    const candidateCard = PrepareScheduleCandidate(schedule.schedule);
-
-    if (candidateCard?.length) {
-      this.candidateTypeTooltip = GetCandidateTypeTooltip(candidateCard);
-    }
+    this.candidateTypeTooltip = GetCandidateTypeTooltip(schedule.candidate.ltaAssignment);
   }
 }

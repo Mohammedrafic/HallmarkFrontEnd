@@ -1,5 +1,5 @@
 import { ActivatedRoute } from '@angular/router';
-import { ChangeDetectorRef, Directive, Inject, Injector, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Directive, Inject, Injector, NgZone, ViewChild } from '@angular/core';
 
 import { Actions, Store } from '@ngxs/store';
 import { filter, takeUntil } from 'rxjs';
@@ -42,6 +42,7 @@ export class AddDialogHelper<T> extends TimesheetDateHelper {
     protected route: ActivatedRoute,
     protected injector: Injector,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
+    private ngZone: NgZone,
   ) {
     super();
     this.targetElement = this.globalWindow.document.body as HTMLBodyElement;

@@ -196,6 +196,8 @@ import { FilteredUser } from '@shared/models/user.model';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { GlobalWindow } from '@core/tokens';
+import { AlertIdEnum } from '@admin/alerts/alerts.enum';
+import { SetOrderGridPageNumber } from '@agency/store/candidate.actions';
 
 @Component({
   selector: 'app-order-management-content',
@@ -382,6 +384,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private candidateStatusIds: number[] = [];
   private SelectedCandiateStatuses: any[] = [];
   private eliteOrderId:number;
+  private alertTitle:string;
+  public isCondidateTab:boolean=false;
 
 
   constructor(
@@ -457,6 +461,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.eliteOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
     (!this.eliteOrderId)?this.eliteOrderId=0:"";
     window.localStorage.setItem("OrderId", JSON.stringify(""));
+    this.getalerttitle()
     super.ngOnInit();
 
     this.getDeviceScreen();
@@ -507,6 +512,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.store.dispatch(new ClearSelectedOrder());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+  public getalerttitle(): void {
+    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+	  this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+    if(Object.values(AlertIdEnum).includes(this.alertTitle)){
+      this.isCondidateTab=true;
+    }
   }
 
   private subscribeOnChanges(): void {
@@ -857,6 +869,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
+      const { orderGridPageNumber } = this.location.getState() as { orderGridPageNumber?: number; };
+      this.currentPage = orderGridPageNumber ?? this.currentPage;
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
         this.previousSelectedOrderId
       );
@@ -1401,8 +1415,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private onGridPageChangedHandler(): void {
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
+    this.pageSubject.pipe(throttleTime(25), takeUntil(this.unsubscribe$)).subscribe((page) => {
       this.currentPage = page;
+      this.store.dispatch(new SetOrderGridPageNumber(page));
       const { selectedOrderAfterRedirect } = this.orderManagementService;
       if (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect) {
         this.filters.orderPublicId = (this.prefix || selectedOrderAfterRedirect?.prefix) + '-' + (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect?.orderId);

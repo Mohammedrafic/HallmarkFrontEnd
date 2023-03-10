@@ -8,6 +8,10 @@
   [currentPage]="filters.pageNumber"
   (navigateToPageEmitter)="handleChangePage($event)"
   (pageSizeChangeEmitter)="handleChangePageSize($event)"
+  (bulkEventEmitter)="handleBulkEvent($event)"
+  [allowBulkSelection]="allowBulkSelection"
+  [rowSelection]="rowSelection"
+  [bulkActionConfig]="bulkActionConfig"
 >
   <button
     *ngIf="gridTitle"
@@ -23,7 +27,7 @@
     </div>
   </button>
   <button
-    *ngIf="gridTitle"
+    *ngIf="gridTitle && orientationTab === orientationTabEnum.Setup"
     action-button
     class="add-action"
     cssClass="e-action-button"
@@ -37,6 +41,7 @@
 </app-grid>
 
 <app-filter-dialog
+  *ngIf="isActive"
   [items]="filteredItems"
   [count]="dataSource?.totalCount || 0"
   [targetElement]="targetElement"

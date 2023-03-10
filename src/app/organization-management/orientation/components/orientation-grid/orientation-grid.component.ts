@@ -4,7 +4,8 @@ import { TakeUntilDestroy } from '@core/decorators';
 import { findSelectedItems } from '@core/helpers';
 import { BreakpointObserverService } from '@core/services';
 import { Select, Store } from '@ngxs/store';
-import { OrientationColumnDef } from '@organization-management/orientation/constants/orientation.constant';
+import { OrientationColumnDef, OrientationHistoricalDataColumnDef } from '@organization-management/orientation/constants/orientation.constant';
+import { OrientationTab } from '@organization-management/orientation/enums/orientation-type.enum';
 import { OrientationConfiguration, OrientationConfigurationFilters, OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
 import { OrientationService } from '@organization-management/orientation/services/orientation.service';
 import { GetFilteringAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
@@ -15,6 +16,7 @@ import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { SkillCategory } from '@shared/models/skill-category.model';
@@ -33,11 +35,16 @@ import { UserState } from 'src/app/store/user.state';
 })
 @TakeUntilDestroy
 export class OrientationGridComponent extends AbstractPermissionGrid implements OnInit {
+  @Input() public isActive: boolean;
   @Input() public gridTitle: string;
   @Input() public dataSource: OrientationConfigurationPage;
+  @Input() public orientationTab: OrientationTab;
+  @Input() public allowBulkSelection: boolean = true;
+  @Input() public rowSelection: 'single' | 'multiple' = 'multiple';
+  @Input() public bulkActionConfig: BulkActionConfig;
   @Input('disableControls') set disableControls(value: boolean) {
     this.gridActionsParams.disableControls = value;
-    this.columnDef = OrientationColumnDef(this.edit.bind(this), this.delete.bind(this), this.gridActionsParams);
+    this.gridDefHandler();
   };
   @Input('skillCategories') set skillCategories(value: SkillCategory[] | undefined) {
     if (value) {
@@ -55,6 +62,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   @Output() public onDelete = new EventEmitter();
 
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
+  public readonly orientationTabEnum = OrientationTab;
 
   public columnDef: ColumnDefinitionModel[];
   public allRegions: OrganizationRegion[];
@@ -102,6 +110,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     this.watchForRegions();
     this.watchForLocation();
     this.getDeviceScreen();
+    this.gridDefHandler();
   }
 
   private watchForOrgChange(): void {
@@ -151,6 +160,16 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
       });
   }
 
+  private gridDefHandler(): void {
+    if (this.orientationTab === OrientationTab.Setup) {
+      this.columnDef = OrientationColumnDef(this.edit.bind(this), this.delete.bind(this), this.gridActionsParams);
+    }
+    if (this.orientationTab === OrientationTab.HistoricalData) {
+      this.columnDef = OrientationHistoricalDataColumnDef(this.edit.bind(this), this.gridActionsParams);
+    }
+    this.cd.markForCheck();
+  }
+
   private getSkills(): void {
     this.store.dispatch([new GetFilteringAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } })]);
   }
@@ -175,6 +194,13 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = { pageNumber: 1, pageSize: this.filters.pageSize };
+  }
+
+  public handleBulkEvent(event: BulkActionDataModel): void {
+    this.onEdit.emit({
+      isBulk: true,
+      data: event
+    });
   }
 
   public showFilters(): void {
@@ -220,7 +246,10 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   }
 
   public edit(data: OrientationConfiguration): void {
-    this.onEdit.emit(data);
+    this.onEdit.emit({
+      isBulk: false,
+      data: data
+    });
   }
 
   public delete(data: OrientationConfiguration): void {

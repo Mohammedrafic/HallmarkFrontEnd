@@ -92,6 +92,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public groupingInvoiceRecordsIds: number[] = [];
 
+  public canPay = false;
+
   public readonly defaultGridOptions: GridOptions = {
     onRowSelected: (event: RowSelectedEvent): void => {
       this.groupingInvoiceRecordsIds = event.api.getSelectedRows()
@@ -143,11 +145,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public recordsPerPageOptions = InvoicesPerPageOptions;
 
+  public organizationId: number;
+
   private navigatedOrgId: number | null;
 
   private previousSelectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab;
-
-  private organizationId: number;
 
   private gridInstance: GridReadyEventModel;
 
@@ -290,8 +292,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public selectTab(tabIdx: number, tabsConfig: unknown[] = []): void {
-    this.previousSelectedTabIdx = this.selectedTabIdx; 
-    
+    this.previousSelectedTabIdx = this.selectedTabIdx;
+
     if (this.selectedTabIdx === tabIdx) {
       return;
     }
@@ -336,7 +338,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public resetFilters(): void {
     this.gridInstance?.columnApi.resetColumnState();
 
-    this.store.dispatch(new Invoices.UpdateFiltersState({ orderBy: '' }, false));
     this.store.dispatch(
       new Invoices.UpdateFiltersState({
         pageNumber: GRID_CONFIG.initialPage,
@@ -606,12 +607,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       ...this.defaultGridOptions,
       ...this.invoicesContainerService.getGridOptions(this.selectedTabIdx, this.organizationId),
     };
-
+    this.canPay = (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay
+      || this.invoiceContainerConfig.invoicePayAllowed && this.payInvoiceEnabled;
     this.colDefs = this.invoicesContainerService.getColDefsByTab(this.selectedTabIdx,
       {
         organizationId: this.organizationId,
-        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay
-          || this.invoiceContainerConfig.invoicePayAllowed && this.payInvoiceEnabled,
+        canPay: this.canPay,
         canEdit: this.invoiceContainerConfig.agencyActionsAllowed && this.approveInvoiceEnabled,
       });
   }
@@ -629,7 +630,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.navigatedInvoiceId = invoiceId ? Number(invoiceId) : null;
     this.navigatedOrgId = orgId ? Number(orgId) : null;
     const tabId = this.navigatedInvoiceId !== null ? this.invoicesContainerService.getAllTabId() : 0;
-    this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.AllInvoices : tabId;
+    this.selectedTabId = this.isAgency ? InvoicesAgencyTabId.ManualInvoicePending : tabId;
     this.selectTab(tabId);
   }
 

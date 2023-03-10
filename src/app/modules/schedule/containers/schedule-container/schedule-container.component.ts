@@ -1,13 +1,16 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
-import { Destroyable } from '@core/helpers';
+import { AbstractPermission } from '@shared/helpers/permissions';
+import { Permission } from '@core/interface';
+import { REQUIRED_PERMISSIONS } from '@shared/constants';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import { ScheduleGridAdapter } from '../../adapters';
 import { ButtonRegionTooltip, ButtonSelectDataTooltip, TabListConfig } from '../../constants';
@@ -24,7 +27,7 @@ import { GetScheduleFilterByEmployees, HasDepartment, ShowButtonTooltip } from '
   styleUrls: ['./schedule-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ScheduleContainerComponent extends Destroyable {
+export class ScheduleContainerComponent extends AbstractPermission implements OnInit {
   tabsListConfig: TabsListConfig[] = TabListConfig;
 
   activeTabIndex: ActiveTabIndex = ActiveTabIndex.Scheduling;
@@ -49,6 +52,12 @@ export class ScheduleContainerComponent extends Destroyable {
 
   scheduleButtonTooltip: string;
 
+  hasViewPermission = false;
+
+  hasSchedulePermission = false;
+
+  isEmployee = false;
+
   scheduleStructure: ScheduleFilterStructure = {
     regions: [],
     locations: [],
@@ -58,15 +67,21 @@ export class ScheduleContainerComponent extends Destroyable {
   private selectedCandidate: ScheduleInt.ScheduleCandidate | null;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private cdr: ChangeDetectorRef,
     private scheduleApiService: ScheduleApiService,
     private filterService: ScheduleFiltersService,
     private scheduleFiltersService: ScheduleFiltersService,
   ) {
-    super();
+    super(store);
 
     store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'file-text' }));
+  }
+
+  public override ngOnInit(): void {
+    super.ngOnInit();
+    this.watchForPermissions();
+    this.setIsEmployee();
   }
 
   changeTab(tabIndex: ActiveTabIndex): void {
@@ -106,6 +121,10 @@ export class ScheduleContainerComponent extends Destroyable {
   }
 
   scheduleCell(cells: ScheduleInt.ScheduleSelectedSlots): void {
+    if (!this.hasSchedulePermission) {
+      return;
+    }
+
     this.selectCells(cells);
     this.openScheduleDialog();
   }
@@ -161,7 +180,6 @@ export class ScheduleContainerComponent extends Destroyable {
       }
 
       this.totalCount = scheduleData.totalCount;
-
       this.cdr.detectChanges();
     });
   }
@@ -227,6 +245,12 @@ export class ScheduleContainerComponent extends Destroyable {
   }
 
   private setScheduleButtonTooltip(): void {
+    if (!this.hasSchedulePermission) {
+      this.scheduleButtonTooltip = REQUIRED_PERMISSIONS;
+
+      return;
+    }
+
     if (ShowButtonTooltip(this.scheduleFilters) || HasDepartment(this.scheduleFilters)) {
       this.scheduleButtonTooltip = ButtonRegionTooltip;
     } else if (!this.scheduleSelectedSlots?.dates?.length) {
@@ -249,5 +273,21 @@ export class ScheduleContainerComponent extends Destroyable {
         this.scheduleStructure = { ...structure };
       });
     }
+  }
+
+  private watchForPermissions(): void {
+    this.getPermissionStream()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((permissions: Permission) => {
+        this.hasSchedulePermission = permissions[this.userPermissions.CanAddAvailability]
+          || permissions[this.userPermissions.CanAddUnavailability]
+          || permissions[this.userPermissions.CanAddShift];
+        this.hasViewPermission = permissions[this.userPermissions.CanViewSchedule] || this.hasSchedulePermission;
+        this.setScheduleButtonTooltip();
+      });
+  }
+
+  private setIsEmployee(): void {
+    this.isEmployee = this.store.selectSnapshot(UserState.user)?.isEmployee || false;
   }
 }

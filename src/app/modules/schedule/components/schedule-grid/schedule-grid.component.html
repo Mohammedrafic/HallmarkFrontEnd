@@ -2,22 +2,25 @@
   <div class="grid-header">
     <div class="left">
       <div class="group">
-        <div class="input-container bootstrap">
-          <div class="input-group dropdown candidate-autocomplete">
-            <i-feather name="search" class="search-icon"></i-feather>
-            <ejs-autocomplete
-              #autoCompleteSearch
-              [dataSource]="candidatesSuggestions"
-              filterType="StartsWith"
-              [fields]="candidateNameFields"
-              [autofill]="true"
-              placeholder="Name or ID"
-              sortOrder="Ascending"
-              (valueChange)="$event === null ? autoSelectCandidate($event) : null"
-              (select)="autoSelectCandidate($event.itemData)"
-              (filtering)="filteringCandidates($event)"></ejs-autocomplete>
+        <app-tooltip-container [showToolTip]="!hasViewPermission">
+          <div class="input-container bootstrap">
+            <div class="input-group dropdown candidate-autocomplete">
+              <i-feather name="search" class="search-icon"></i-feather>
+              <ejs-autocomplete
+                #autoCompleteSearch
+                [enabled]="hasViewPermission && !isEmployee"
+                [dataSource]="candidatesSuggestions"
+                filterType="StartsWith"
+                [fields]="candidateNameFields"
+                [autofill]="true"
+                placeholder="Name or ID"
+                sortOrder="Ascending"
+                (valueChange)="$event === null ? autoSelectCandidate($event) : null"
+                (select)="autoSelectCandidate($event.itemData)"
+                (filtering)="filteringCandidates($event)"></ejs-autocomplete>
+            </div>
           </div>
-        </div>
+        </app-tooltip-container>
       </div>
 <!--      TODO: uncomment when sorting is implemented-->
 <!--      <button-->
@@ -29,22 +32,28 @@
 <!--      </button>-->
     </div>
     <div class="right">
-      <app-date-week-picker
-        [initDates]="weekPeriod"
-        [rangeType]="activePeriod"
-        [firstDayOfWeek]="orgFirstDayOfWeek"
-        [overrideInitDates]="true"
-      ></app-date-week-picker>
+      <app-tooltip-container [showToolTip]="!hasViewPermission">
+        <app-date-week-picker
+          [initDates]="weekPeriod"
+          [rangeType]="activePeriod"
+          [firstDayOfWeek]="orgFirstDayOfWeek"
+          [overrideInitDates]="true"
+          [disabled]="!hasViewPermission"
+        ></app-date-week-picker>
+      </app-tooltip-container>
 
-      <div class="date-periods">
-        <div *ngFor="let datePeriod of datesPeriods; trackBy: trackByPeriods"
-             [class.active]="datePeriod.id === activePeriod"
-             class="date-item"
-             (click)="changeActiveDatePeriod(datePeriod.id)"
-        >
-          {{ datePeriod.text }}
+      <app-tooltip-container [showToolTip]="!hasViewPermission">
+        <div class="date-periods">
+          <div *ngFor="let datePeriod of datesPeriods; trackBy: trackByPeriods"
+               [class.active]="datePeriod.id === activePeriod"
+               [class.disabled]="!hasViewPermission"
+               class="date-item"
+               (click)="changeActiveDatePeriod(datePeriod.id)"
+          >
+            {{ datePeriod.text }}
+          </div>
         </div>
-      </div>
+      </app-tooltip-container>
     </div>
   </div>
   <div #scrollArea class="grid-body">
@@ -56,7 +65,7 @@
             *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
             class="table-title date fixed fixed--top"
           >
-            {{ dateHead | date: 'EEEE dd/MM' }}
+            {{ dateHead | date: 'EEEE MM/dd' }}
           </th>
         </tr>
       </thead>

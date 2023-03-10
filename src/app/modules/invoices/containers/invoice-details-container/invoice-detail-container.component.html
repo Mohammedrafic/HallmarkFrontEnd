@@ -109,8 +109,8 @@
       </div>
     </section>
     <app-navigation-panel
-      prevLabel="Previous Order"
-      nextLabel="Next Order"
+      prevLabel="Previous Invoice"
+      nextLabel="Next Invoice"
       [prevDisabled]="(prevId$ | async) === null"
       [nextDisabled]="(nextId$ | async) === null"
       (prevClick)="onNextPreviousOrder(false)"

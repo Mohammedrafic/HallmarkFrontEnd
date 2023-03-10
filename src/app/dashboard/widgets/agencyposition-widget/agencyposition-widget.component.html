@@ -16,7 +16,7 @@
   <ng-template #agency_count>
     <div class="widget">
       <span class="widget__type" *ngFor="let data of agencydata"
-            (mousedown)="defineMousePosition($event)" (click)="toSourceContent(data.organizationId)">
+            (mousedown)="defineMousePosition($event)" (click)="toSourceContent(data.organizationId,'Open&Inprogress')">
             <p class="orgname">{{data.organizationName}}</p><p class="orgcount">{{data.count}}</p>
       </span>
     </div>

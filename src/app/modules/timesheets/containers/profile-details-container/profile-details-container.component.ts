@@ -8,7 +8,7 @@ import { FileExtensionsString } from '@core/constants';
 import { DialogAction, FileSize } from '@core/enums';
 import { DateTimeHelper } from '@core/helpers';
 import { FileForUpload, Permission } from '@core/interface';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionCompleted, Select, Store } from '@ngxs/store';
 import { Attachment, AttachmentsListConfig } from '@shared/components/attachments';
 import { UploadFileAreaComponent } from '@shared/components/upload-file-area/upload-file-area.component';
 import { GRID_CONFIG } from '@shared/constants';
@@ -169,6 +169,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     private timesheetDetailsService: TimesheetDetailsService,
     private breakpointObserver: BreakpointObserver,
     private cd: ChangeDetectorRef,
+    private actions: Actions,
   ) {
     super(store);
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
@@ -184,8 +185,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public override ngOnInit(): void {
     super.ngOnInit();
     this.watchForPermissions();
-    this.getDialogState();
-    this.watchForDetails();
     this.startSelectedTimesheetWatching();
     this.closeDialogOnNavigationStart();
     this.setOrgId();
@@ -205,9 +204,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     ).subscribe(() => this.closeDialog());
   }
 
-  /**
-   * TODO: add debouncer
-   */
   public onNextPreviousOrder(next: boolean): void {
     if (!this.isChangesSaved) {
       this.timesheetDetailsService.confirmTimesheetLeave(TimesheetConfirmMessages.confirmOrderChange)
@@ -450,17 +446,14 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       filter(Boolean),
       switchMap((timesheet: TimesheetInt.Timesheet) => {
         this.countOfTimesheetUpdates = 0;
-        return this.store.dispatch(new Timesheets.GetTimesheetDetails(
+        this.store.dispatch(new Timesheets.GetTimesheetDetails(
           timesheet.id, timesheet.organizationId, this.isAgency));
+        return this.actions;
       }),
-      takeUntil(this.componentDestroy()),
-    ).subscribe(
-      () => this.chipList?.refresh()
-    );
-  }
-
-  private watchForDetails(): void {
-    this.timesheetDetails$.pipe(
+      ofActionCompleted(Timesheets.GetTimesheetDetails),
+      switchMap(() => {
+        return this.timesheetDetails$;
+      }),
       filter(Boolean),
       filter((details) => !details.isNotExist),
       switchMap((details) => {
@@ -470,26 +463,24 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         .toLocaleLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST;
         this.costCenterId = details.departmentId;
 
-        return this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
+        this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
           details.id, details.organizationId, this.isAgency));
+
+        return this.actions;
       }),
+      ofActionCompleted(TimesheetDetails.GetTimesheetRecords),
+      tap(() => {
+        // eslint-disable-next-line no-plusplus
+        this.countOfTimesheetUpdates++;
+        this.chipList?.refresh();
+        this.cd.detectChanges();
+      }),
+      tap(() => {
+        this.chipList?.refresh();
+      }),
+      filter(() => this.store.selectSnapshot(TimesheetsState.isTimesheetOpen)),
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
-      // eslint-disable-next-line no-plusplus
-      this.countOfTimesheetUpdates++;
-      this.chipList?.refresh();
-      this.cd.detectChanges();
-    });
-  }
-
-  private getDialogState(): void {
-    this.isTimesheetOpen$
-    .pipe(
-      throttleTime(100),
-      filter(Boolean),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe(() => {
       this.candidateDialog?.show();
     });
   }

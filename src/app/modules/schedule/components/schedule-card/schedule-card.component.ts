@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
-import { ScheduleCardService } from '../../services/schedule-card.service';
-import { ScheduleCardConfig, ScheduleDateItem, ScheduleItem } from '../../interface';
+import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 import { GetScheduleCardConfig } from '../../constants';
 import { CardTitle } from '../../helpers';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { ScheduleCardConfig, ScheduleDateItem, ScheduleItem } from '../../interface';
+import { ScheduleCardTooltips } from './schedule-card.interface';
+import { ScheduleCardService } from './schedule-card.service';
 
 @Component({
   selector: 'app-schedule-card',
@@ -15,7 +16,7 @@ import { IrpOrderType } from '@client/order-management/components/irp-tabs/order
 export class ScheduleCardComponent implements OnInit {
   @Input() dateSchedule: ScheduleDateItem;
 
-  firstDaySchedule: ScheduleItem;
+  firstSchedule: ScheduleItem;
 
   ltaOrder: IrpOrderType = IrpOrderType.LongTermAssignment;
 
@@ -25,16 +26,15 @@ export class ScheduleCardComponent implements OnInit {
 
   cardIconName: string;
 
-  tooltipMessage: string;
-
-  additionalTooltipMessage: string;
-
-  overlappingTooltipMessage: string;
+  tooltips: ScheduleCardTooltips = {
+    orderTooltip: '',
+    additionalTooltip: '',
+  };
 
   constructor(private scheduleCardService: ScheduleCardService) {}
 
   ngOnInit(): void {
-    this.firstDaySchedule = this.dateSchedule.daySchedules[0];
+    this.firstSchedule = this.dateSchedule.daySchedules[0];
     this.cardConfig = GetScheduleCardConfig(this.dateSchedule);
     this.cardTitle = this.prepareCardTitle(this.dateSchedule.daySchedules[0]);
     this.cardIconName = this.prepareCardIconName();
@@ -52,15 +52,6 @@ export class ScheduleCardComponent implements OnInit {
   }
 
   private createTooltips(): void {
-    this.overlappingTooltipMessage = this.scheduleCardService.getOverlappingTooltipMessage(this.dateSchedule);
-
-    this.tooltipMessage =
-      `OrderID-${this.firstDaySchedule.orderMetadata?.orderPublicId} ${this.firstDaySchedule.orderMetadata?.location} ${this.firstDaySchedule.orderMetadata?.department}`;
-
-    this.additionalTooltipMessage =
-      `<pre class="schedule-custom-tooltip-container">${
-        this.dateSchedule.daySchedules.slice(1).map(el => `OrderID-${ el.orderId } ${ el.location } ${ el.department }`)
-          .join(`<br>`)
-      }</pre>`;
+    this.tooltips = this.scheduleCardService.createAdditionalTooltip(this.dateSchedule.daySchedules);
   }
 }

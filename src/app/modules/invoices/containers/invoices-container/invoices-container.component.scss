@@ -197,9 +197,7 @@
 .buttons-group,
 .buttons-container {
   display: flex;
-  & > *:not(:first-child) {
-    margin-left: 12px;
-  }
+  column-gap: 12px;
 }
 
 @media #{$max-mobile} {

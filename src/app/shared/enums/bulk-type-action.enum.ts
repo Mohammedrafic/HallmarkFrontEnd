@@ -3,4 +3,5 @@ export enum BulkTypeAction {
   EDIT = 2,
   DELETE = 3,
   EXPORT = 4,
+  ACTIVATE = 5,
 }

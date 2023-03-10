@@ -7,14 +7,15 @@ import { EMPTY, Observable, of } from 'rxjs';
 
 import { convertMsToTime, getTime, getTimeFromDate, setTimeToDate } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
-import { CustomFormGroup, DropdownOption } from '@core/interface';
+import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
+import { ScheduleItemType } from 'src/app/modules/schedule/constants';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { CreateScheduleItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
 import { ScheduleItemsComponent } from '../components/schedule-items/schedule-items.component';
-import { EmployeeBookingDay, ScheduleBookingErrors } from '../interface';
+import { EmployeeBookingDay, ScheduleBookingErrors, ScheduleTypeRadioButton } from '../interface';
 
 @Injectable()
 export class CreateScheduleService {
@@ -67,7 +68,7 @@ export class CreateScheduleService {
   }
 
   handleError(error: HttpErrorResponse): Observable<never> {
-    this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+    this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error) || error.error.detail));
 
     return EMPTY;
   }
@@ -190,6 +191,22 @@ export class CreateScheduleService {
     }
 
     return convertMsToTime(endTimeMs - startTimeMs);
+  }
+
+  getScheduleTypesWithPermissions(
+    scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>,
+    userPermission: Permission
+  ): ReadonlyArray<ScheduleTypeRadioButton> {
+    return scheduleTypes.map((item: ScheduleTypeRadioButton) => {
+      return {
+        ...item,
+        disabled: !userPermission[item.permission],
+      };
+    });
+  }
+
+  getFirstAllowedScheduleType(scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>): ScheduleItemType {
+    return (scheduleTypes.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
   }
 
   private getScheduleToOverrideIds(

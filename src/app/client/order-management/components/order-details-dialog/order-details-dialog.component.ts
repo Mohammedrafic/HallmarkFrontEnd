@@ -80,6 +80,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Input() activeSystem: OrderManagementIRPSystemId;
   @Input() orderComments: Comment[] = [];
+  @Input() isCondidateTab: boolean;
 
   @Output() nextPreviousOrderEvent = new EventEmitter<{ next: boolean, isIrpOrder: boolean}>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
@@ -479,6 +480,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     if (!this.secondHasOpenedOnes && !!locationState.orderId) {
       this.tab.select(1);
       this.secondHasOpenedOnes = true;
+    }
+    if(this.isCondidateTab==true){
+      this.tab.select(1);
     }
   }
 

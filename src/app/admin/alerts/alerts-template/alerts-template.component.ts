@@ -1,6 +1,6 @@
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, NgZone } from '@angular/core';
 import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -37,11 +37,12 @@ import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { GRID_CONFIG, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { GRID_CONFIG, RECORD_ADDED, RECORD_MODIFIED, USER_ALERTS_PERMISSION } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AppState } from '../../../store/app.state';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
+import { OutsideZone } from '@core/decorators';
 
 @Component({
   selector: 'app-template',
@@ -118,6 +119,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public title: string = "Notification Templates";
   public export$ = new Subject<ExportedFileType>();
   public totalRecordsCount: number;
+  public getdata:any;
+  public showtoast:boolean = true;
 
   defaultValue: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
@@ -146,6 +149,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
 
   constructor(private actions$: Actions,
     private confirmService: ConfirmService,
+    private readonly ngZone: NgZone,
     private store: Store) {
     super();
     store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
@@ -373,7 +377,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     }
   }
   private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
-    this.store.dispatch(new GetAlertsTemplatePage(this.businessUnitControl.value, this.businessControl.value == 0 ? null : this.businessControl.value, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    this.getdata = this.store.dispatch(new GetAlertsTemplatePage(this.businessUnitControl.value, this.businessControl.value == 0 ? null : this.businessControl.value, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    this.getErrorAlert();
   }
   private dispatchEditAlertTemplate(alertId: number, alertChannel: AlertChannel,businessUnitId:number|null): void {
     this.store.dispatch(new GetTemplateByAlertId(alertId, alertChannel,businessUnitId));
@@ -568,4 +573,16 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     }
 
   }
+  @OutsideZone
+  getErrorAlert(){
+    setTimeout(()=> {
+      this.getdata.subscribe((data:any)=> {
+        if(data.null.alertsTemplatePage == undefined && this.showtoast == true){
+          this.store.dispatch(new ShowToast(MessageTypes.Error, USER_ALERTS_PERMISSION));
+          this.showtoast = false;
+        }
+      });
+    },3000)
+  }
+
 }

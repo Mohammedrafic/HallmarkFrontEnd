@@ -354,7 +354,7 @@
     }
 
     @media #{$max-mobile} {
-      &:has(app-order-management-content, app-order-management) {
+      &:has(app-order-management-content, app-order-management, app-create-edit-order) {
         height: unset;
       }
     }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -67,6 +67,9 @@ import { UpdateGridCommentsCounter } from '@shared/components/comments/store/com
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { GetIrpOrderCandidates } from '@client/store/order-managment-content.actions';
 import { BreakpointObserverService } from '@core/services';
+import { GlobalWindow } from '@core/tokens';
+import { Router } from '@angular/router';
+import { SetOrderGridPageNumber } from '@agency/store/candidate.actions';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -80,7 +83,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() exportButtonClicked: boolean;
   @Input() onExportClicked$: Subject<any>;
   @Input() search$: Subject<string>;
+  @Input() public orderStatus: string[];
+
+
   @Output() selectTab = new EventEmitter<number>();
+  @Input() public Organizations: number[];
 
   @Output() reOrderNumber = new EventEmitter<number>();
 
@@ -107,6 +114,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
   };
+
+
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public openCandidat = new Subject<boolean>();
@@ -139,6 +148,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderId: number | null;
   private redirectFromPerDiem = false;
 
+
   private isAlive = true;
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
@@ -152,11 +162,17 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private datePipe: DatePipe,
     private filterService: FilterService,
     private orderManagementAgencyService: OrderManagementAgencyService,
-    private breakpointService: BreakpointObserverService
+    private breakpointService: BreakpointObserverService,
+    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
+    private router: Router
   ) {
     super();
     this.listenRedirectFromExtension();
+
   }
+
+
+
 
   ngOnInit(): void {
     this.getAlertOrderId();
@@ -275,6 +291,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onDataBound(): void {
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
+      const { orderGridPageNumber } = this.location.getState() as { orderGridPageNumber?: number; };
+      this.currentPage = orderGridPageNumber ?? this.currentPage; 
       const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
         this.previousSelectedOrderId
       );
@@ -355,9 +373,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public setDefaultFilters(statuses: number[]): void {
     if (this.filterService.canPreserveFilters()) {
       const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
-      if (preservedFilters?.organizations?.length) {
-        this.OrderFilterFormGroup.get('organizationIds')?.setValue(preservedFilters.organizations);
-        this.filters.organizationIds = preservedFilters.organizations;
+      if(this.Organizations.length > 0){
+        this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
+        this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
         this.actions$.pipe(ofActionSuccessful(GetOrganizationStructure), take(1)).subscribe(() => {
           if (preservedFilters?.regions) {
             this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
@@ -370,7 +388,23 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           this.setDefaultStatuses(statuses);
         });
       } else {
-        this.setDefaultStatuses(statuses);
+        if (preservedFilters?.organizations?.length) {
+            this.OrderFilterFormGroup.get('organizationIds')?.setValue(preservedFilters.organizations);
+            this.filters.organizationIds = preservedFilters.organizations;
+            this.actions$.pipe(ofActionSuccessful(GetOrganizationStructure), take(1)).subscribe(() => {
+              if (preservedFilters?.regions) {
+                this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
+                this.filters.regionIds = [...preservedFilters.regions];
+                if (preservedFilters?.locations) {
+                  this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
+                  this.filters.locationIds = [...preservedFilters.locations];
+                }
+              }
+              this.setDefaultStatuses(statuses);
+            });
+        } else {
+          this.setDefaultStatuses(statuses);
+        }
       }
     } else {
       const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
@@ -384,8 +418,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private setDefaultStatuses(statuses: number[]): void {
-    this.filters.orderStatuses = statuses;
+    const statuse = this.filterColumns.orderStatuses.dataSource;
+    this.OrderFilterFormGroup.get('orderStatuses')?.setValue((this.orderStatus.length > 0) ? this.orderStatus : statuses);
+    this.filters.orderStatuses = (this.orderStatus.length > 0) ? this.orderStatus : statuse;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    for(let i=0;i<this.filteredItems.length;i++){
+      if(this.filteredItems[i].text == undefined){
+        this.filteredItems[i].text = this.filteredItems[i].value;
+      }
+    }
     this.filteredItems$.next(this.filteredItems.length);
     this.dispatchNewPage();
   }
@@ -661,6 +702,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       poNumberIds: this.filters.poNumberIds || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    for(let i=0;i<this.filteredItems.length;i++){
+      if(this.filteredItems[i].text == undefined){
+        this.filteredItems[i].text = this.filteredItems[i].value;
+      }
+    }
     this.filteredItems$.next(this.filteredItems.length);
   }
 
@@ -731,6 +777,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
+    this.filters.regionIds = this.filters.regionIds || [];
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -869,6 +916,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
       this.currentPage = page;
+      this.store.dispatch(new SetOrderGridPageNumber(page));
       this.dispatchNewPage();
     });
   }

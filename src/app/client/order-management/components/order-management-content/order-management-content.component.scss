@@ -1,4 +1,5 @@
 @import 'colors';
+@import 'mixins';
 @import 'adaptive-response';
 @import '@ag-grid-community/core/dist/styles/ag-grid.scss';
 @import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
@@ -350,6 +351,11 @@
   }
 }
 
+.buttons-container {
+  display: flex;
+  column-gap: 12px;
+}
+
 @media #{$max-tablet} {
   ::ng-deep {
     app-page-toolbar {
@@ -359,7 +365,6 @@
         .right-content {
           justify-content: flex-start;
           margin-top: 12px;
-          margin-left: -10px;
         }
       }
     }
@@ -452,4 +457,8 @@
   .e-gridcontent{
     height: calc(100% - 106px);
   }
+}
+
+.order-type-text-cell {
+  @include order-type-text-cell;
 }

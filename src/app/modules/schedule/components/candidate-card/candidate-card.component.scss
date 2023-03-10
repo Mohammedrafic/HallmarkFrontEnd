@@ -25,7 +25,7 @@
   gap: 12px;
 
   &--name {
-    margin-bottom: 11px;
+    margin-bottom: 10px;
     padding-right: 2px;
     justify-content: space-between;
   }
@@ -75,6 +75,7 @@
 .order-type {
   font-size: 16px;
   font-weight: 700;
+  line-height: 0;
 }
 
 .icon {

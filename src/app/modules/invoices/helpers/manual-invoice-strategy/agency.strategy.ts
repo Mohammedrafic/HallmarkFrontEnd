@@ -28,6 +28,7 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
     options: ManualInvoiceInputOptions,
     form: CustomFormGroup<AddManInvoiceForm>,
     config: AddManInvoiceDialogConfig,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     isPosition: boolean,
     ): void {
       if (!meta.length) {
@@ -35,15 +36,7 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
         return;
       }
 
-      if (isPosition) {
-        const invoiceCandidates = meta.map(el => ({
-          text: `${el.candidateFirstName} ${el.candidateLastName}`,
-          value: el.candidateId,
-        }));
-        options.invoiceCandidates = sortByField(invoiceCandidates, 'text');
-      } else {
-        options.invoiceCandidates = sortByField(InvoiceMetaAdapter.createCandidateOptions(meta), 'text');
-      }
+      options.invoiceCandidates = sortByField(InvoiceMetaAdapter.createCandidateOptions(meta), 'text');
       this.connectConfigOptions(config, options);
       form.get('nameId')?.patchValue(meta[0].candidateId);
       form.get('locationId')?.patchValue(meta[0].locationId);

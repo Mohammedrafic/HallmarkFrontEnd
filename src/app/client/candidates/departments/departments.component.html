@@ -2,7 +2,6 @@
   class="department-assigned-grid"
   gridTitle="Department Assigned"
   (bulkEventEmitter)="handleBulkEvent($event)"
-  [rowSelection]="undefined"
   [rowData]="(departmentsAssigned?.items ?? []) | sortByHomeCostCenter"
   [columnDefinitions]="columnDef"
   [totalRecordsCount]="departmentsAssigned?.totalCount ?? 0"

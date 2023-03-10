@@ -7,9 +7,9 @@ import { CHANGES_SAVED } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
-import { Observable,tap } from 'rxjs';
+import { BehaviorSubject, Observable,Subject,tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
-import { OrientationConfiguration, OrientationConfigurationDTO, OrientationConfigurationFilters, OrientationConfigurationPage, OrientationSetting } from '../models/orientation.model';
+import { HistoricalOrientationConfigurationDTO, OrientationConfiguration, OrientationConfigurationDTO, OrientationConfigurationFilters, OrientationConfigurationPage, OrientationSetting } from '../models/orientation.model';
 
 @Injectable()
 export class OrientationService {
@@ -50,14 +50,28 @@ export class OrientationService {
       valueId: 'id',
     },
   };
+
+  private isSettingsOff$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   
   constructor(
     private store: Store,
     private http: HttpClient,
   ) {}
 
+  public checkIfSettingOff(): Observable<boolean> {
+    return this.isSettingsOff$.asObservable();
+  }
+
+  public setSettingState(state: boolean): void {
+    this.isSettingsOff$.next(state);
+  }
+
   public getOrientationConfigs(filters: OrientationConfigurationFilters): Observable<OrientationConfigurationPage> {
     return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/configurations/list', filters)
+  }
+
+  public getHistoricalOrientationConfigs(filters: OrientationConfigurationFilters): Observable<OrientationConfigurationPage> {
+    return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/historical/configurations/list', filters)
   }
 
   public saveOrientationConfiguration(params: OrientationConfigurationDTO): Observable<void> {
@@ -67,6 +81,10 @@ export class OrientationService {
       params.orientationConfigurationId = undefined;
       return this.http.post<void>('/api/OrientationSettings/configurations', params);
     }
+  }
+
+  public reactivateOrientationConfiguration(params: HistoricalOrientationConfigurationDTO): Observable<void> {
+    return this.http.post<void>('/api/OrientationSettings/historical/configurations/reactivate', params);
   }
 
   public getOrientationSetting(): Observable<OrientationSetting> {
@@ -104,6 +122,15 @@ export class OrientationService {
     const endTimeField = form.get('endDate') as AbstractControl;
     endTimeField.addValidators(endDateValidator(form, 'startDate'));
     endTimeField.valueChanges.subscribe(() => startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+
+    return form;
+  }
+
+  public generateHistoricalDataForm(): FormGroup {
+    const form = new FormGroup({
+      ids: new FormControl([]),
+      endDate: new FormControl(null),
+    });
 
     return form;
   }

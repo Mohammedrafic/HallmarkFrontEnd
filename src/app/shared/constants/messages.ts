@@ -1,6 +1,7 @@
 export const RECORD_ADDED = 'Record has been added';
 export const RECORDS_ADDED = 'Records have been added';
 export const RECORD_MODIFIED = 'Record has been modified';
+export const SETUPS_ACTIVATED = 'Setups were successfully activated';
 export const RECORD_SAVED = 'Record has been saved';
 export const RECORD_DELETE = 'Record has been deleted';
 export const RECORD_CANNOT_BE_DELETED = 'Record cannot be deleted';
@@ -19,7 +20,7 @@ export const EDIT_CONFIRM_TEXT =
   'Are you sure you want to edit the Bill rate for Onboarded Candidate? This may lead to recalculating values and generating new invoice records.';
 export const DELETE_CONFIRM_TITLE = 'Unsaved Progress';
 export const ORIENTATION_CHANGE_CONFIRM_TITLE = 'Change Orientation Type';
-export const ORIENTATION_CHANGE_TEXT = 'Are you sure you want to provide those changes? It will cause deleting all records from the Orientation Setup gird.';
+export const ORIENTATION_CHANGE_TEXT = 'Are you sure you want to provide those changes? It will cause moving all records to Historical Data gird.';
 export const UNSAVED_TABS_TEXT = 'Are you sure you want to leave this tab without saving?';
 export const CANCEL_CONFIRM_TEXT = 'Are you sure you want to cancel? All data will be deleted.';
 export const RESEND_EMAIL_TITLE = 'Sending Welcome Email';
@@ -97,3 +98,5 @@ export const BLOCK_RECORD_TITLE = 'Block Record';
 export const BLOCK_RECORD_SUCCESS = 'Record Blocked';
 export const CANDIDATE_DONOTRETURN ='Candidate cannot be blocked. This Candidate was used in '
 export const ASSIGN_HOME_COST_CENTER = 'Home Cost Center is already assigned, are you sure you want to reassign this department as Home Cost Center department?';
+export const USER_SUBSCRIPTION_PERMISSION = 'User missing required permissions(CanViewSubscriptions)';
+export const USER_ALERTS_PERMISSION = 'User missing required permissions(CanViewTemplates)';

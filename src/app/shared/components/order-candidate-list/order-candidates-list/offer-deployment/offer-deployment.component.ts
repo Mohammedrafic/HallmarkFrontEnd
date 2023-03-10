@@ -445,6 +445,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private subscribeOnReasonsList(): void {
     this.rejectionReasonsList$.pipe(takeUntil(this.unsubscribe$)).subscribe((reasons) => {
       this.rejectReasons = reasons;
+      this.changeDetectorRef.markForCheck();
     });
   }
 

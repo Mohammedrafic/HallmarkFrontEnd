@@ -102,7 +102,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public readonly unitOrganizationsFields = baseDropdownFieldsSettings;
   public filters: TimesheetsFilterState | undefined;
   public readonly organizationControl: FormControl = new FormControl(null);
-  public readonly currentSelectedTableRowIndex: Observable<number> = this.timesheetsService.getStream();
+  public readonly currentSelectedTableRowIndex: Observable<number> = this.timesheetsService.getSelectedTimesheetRowStream();
   public isAgency: boolean;
 
   constructor(

@@ -1,4 +1,4 @@
-import { FieldType } from "@core/enums";
+import { FieldType, UserPermissions } from "@core/enums";
 
 import { ScheduleType } from "../enums";
 import * as ScheduleInt from '../interface';
@@ -24,16 +24,22 @@ export const ScheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> =
     label: ScheduleType.Book,
     value: ScheduleItemType.Book,
     name: 'scheduleType',
+    disabled: false,
+    permission: UserPermissions.CanAddShift,
   },
   {
     label: ScheduleType.Unavailability,
     value: ScheduleItemType.Unavailability,
     name: 'scheduleType',
+    disabled: false,
+    permission: UserPermissions.CanAddUnavailability,
   },
   {
     label: ScheduleType.Availability,
     value: ScheduleItemType.Availability,
     name: 'scheduleType',
+    disabled: false,
+    permission: UserPermissions.CanAddAvailability,
   },
 ];
 
