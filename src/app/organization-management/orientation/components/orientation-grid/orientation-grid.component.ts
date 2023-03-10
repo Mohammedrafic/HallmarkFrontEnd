@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { FormGroup } from '@angular/forms';
 import { TakeUntilDestroy } from '@core/decorators';
 import { findSelectedItems } from '@core/helpers';
+import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 import { BreakpointObserverService } from '@core/services';
 import { Select, Store } from '@ngxs/store';
 import { OrientationColumnDef, OrientationHistoricalDataColumnDef } from '@organization-management/orientation/constants/orientation.constant';
@@ -147,7 +148,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
         const selectedRegions: OrganizationRegion[] = value?.length ? findSelectedItems(value, this.allRegions) : [];
         const selectedLocation: OrganizationLocation[] = mapperSelectedItems(selectedRegions, 'locations');
         this.locations = sortByField(selectedLocation, 'name');
-        setDataSourceValue(this.filterColumns, 'locationIds', this.locations);
+        setDataSourceValue(this.filterColumns, 'locationIds', getIRPOrgItems(this.locations));
         clearFormControl(value, this.filtersForm, 'locationIds');
         this.generateFilteredChips();
         this.cd.markForCheck();
@@ -160,7 +161,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
       .subscribe((value: number[]) => {
         const selectedLocation: OrganizationLocation[] = value?.length ? findSelectedItems(value, this.locations) : [];
         const selectedDepartment: OrganizationDepartment[] = mapperSelectedItems(selectedLocation, 'departments');
-        setDataSourceValue(this.filterColumns, 'departmentsIds', sortByField(selectedDepartment, 'name'));
+        setDataSourceValue(this.filterColumns, 'departmentsIds', sortByField(getIRPOrgItems(selectedDepartment), 'name'));
         clearFormControl(value, this.filtersForm, 'departmentsIds');
         this.generateFilteredChips();
         this.cd.markForCheck();

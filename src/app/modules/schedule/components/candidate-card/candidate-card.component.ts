@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 
-import { ScheduleCandidate, ScheduleModel } from '../../interface';
+import { ScheduleCandidate, ScheduleFilters, ScheduleModel } from '../../interface';
 import { CandidateIconName } from '../../constants';
 import { GetCandidateTypeTooltip } from './candidate-card.helper';
 
@@ -10,7 +10,7 @@ import { GetCandidateTypeTooltip } from './candidate-card.helper';
   styleUrls: ['./candidate-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CandidateCardComponent implements OnInit {
+export class CandidateCardComponent implements OnInit, OnChanges {
   @Input() set candidate(schedule: ScheduleModel) {
     if (schedule.candidate.workCommitments && schedule.candidate.workCommitments.length) {
       schedule.candidate.workCommitmentText = 'Work Commitment: ' + schedule.candidate.workCommitments.join(', ');
@@ -18,9 +18,9 @@ export class CandidateCardComponent implements OnInit {
       schedule.candidate.workCommitmentText = 'Work Commitment';
     }
 
-    this.createToolTipForSchedule(schedule);
     this.candidateData = schedule.candidate;
   }
+  @Input() selectedFilters: ScheduleFilters;
 
   candidateData: ScheduleCandidate;
   candidateIconName: string;
@@ -32,7 +32,17 @@ export class CandidateCardComponent implements OnInit {
     this.candidateIconName = CandidateIconName(this.candidateData);
   }
 
-  private createToolTipForSchedule(schedule: ScheduleModel): void {
-    this.candidateTypeTooltip = GetCandidateTypeTooltip(schedule.candidate.ltaAssignment);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedFilters']?.currentValue && changes['candidate']?.currentValue) {
+      this.createToolTipForSchedule(changes['candidate'].currentValue, changes['selectedFilters'].currentValue);
+    }
+  }
+
+  private createToolTipForSchedule(schedule: ScheduleModel, filters: ScheduleFilters ): void {
+    this.candidateTypeTooltip = GetCandidateTypeTooltip(
+      schedule.candidate.ltaAssignment,
+      filters.startDate as string,
+      filters.endDate as string,
+    );
   }
 }

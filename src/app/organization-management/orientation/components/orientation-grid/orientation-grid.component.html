@@ -11,7 +11,9 @@
   (bulkEventEmitter)="handleBulkEvent($event)"
   [allowBulkSelection]="allowBulkSelection"
   [rowSelection]="rowSelection"
+  [suppressRowClickSelection]="true"
   [bulkActionConfig]="bulkActionConfig"
+  [disableBulkButton]="gridActionsParams.disableControls"
 >
   <button
     *ngIf="gridTitle"
