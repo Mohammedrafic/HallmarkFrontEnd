@@ -33,7 +33,7 @@ export class CandidateCardComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedFilters'].currentValue && changes['candidate'].currentValue) {
+    if (changes['selectedFilters']?.currentValue && changes['candidate']?.currentValue) {
       this.createToolTipForSchedule(changes['candidate'].currentValue, changes['selectedFilters'].currentValue);
     }
   }
