@@ -45,8 +45,10 @@ export class InvoicesApiService {
     private http: HttpClient,
   ) {}
 
-  public getFiltersDataSource(): Observable<InvoicesFilteringOptions> {
-    return this.http.get<InvoicesFilteringOptions>(`/api/Invoices/filteroptions`);
+  public getFiltersDataSource(orgId: number | null): Observable<InvoicesFilteringOptions> {
+    return this.http.post<InvoicesFilteringOptions>(`/api/Invoices/filteroptions`, {
+      organizationId: orgId,
+    });
   }
 
   public getPendingInvoicesFiltersDataSource(): Observable<InvoicesPendingInvoiceRecordsFilteringOptions> {

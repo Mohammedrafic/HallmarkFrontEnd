@@ -140,7 +140,8 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     ) {
       this.initManualPendingFiltersDataSources();
     } else {
-      this.store.dispatch(new Invoices.GetFiltersDataSource());
+      const orgId = this.isAgency ? null : (this.store.snapshot().invoices as InvoicesModel).selectedOrganizationId;
+      this.store.dispatch(new Invoices.GetFiltersDataSource(orgId));
     }
   }
 
