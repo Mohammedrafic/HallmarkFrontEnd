@@ -6,6 +6,7 @@ export class Skill {
   masterSkillId?: number;
   masterSkill?: Skill;
   skillCategoryId: number;
+  categoryId?: number;
   skillAbbr: string;
   skillDescription: string;
   skillCategory?: SkillCategory;
