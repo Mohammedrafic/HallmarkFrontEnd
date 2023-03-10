@@ -388,7 +388,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     if (this.orientationTypeSettingsForm.invalid) {
       this.orientationTypeSettingsForm.markAllAsTouched();
     } else {
-      if (this.selectedOrientationSettings !== null) {
+      if (this.selectedOrientationSettings !== null && this.orientationTypeSettingsForm.controls['type'].dirty) {
         this.confirmService
         .confirm(ORIENTATION_CHANGE_TEXT, {
           title: ORIENTATION_CHANGE_CONFIRM_TITLE,

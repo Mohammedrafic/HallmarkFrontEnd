@@ -8,7 +8,7 @@
     [dataSource]="dataSource"
     [skillCategories]="[]"
     [regions]="[]"
-    [disableControls]="disableControls"
+    [disableControls]="disableControls || !userPermission[userPermissions.CanEditOrientation]"
     [orientationTab]="orientationTab.HistoricalData"
     [bulkActionConfig]="bulkActionConfig">
   </app-orientation-grid>
