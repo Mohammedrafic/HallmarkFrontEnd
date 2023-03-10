@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
-import { MessageTypes } from 'src/app/shared/enums/message-types';
-import { ShowToast } from 'src/app/store/app.actions';
 import { DocumentViewerModel, FileGroup } from './document-viewer.state.model';
 import { GetFiles, GetFilesSucceeded, GetGroupedFiles, GetPdfFiles, GetPdfFilesSucceeded } from './document-viewer.actions';
 import { DocumentViewerService } from '@shared/services/document-viewer.service';
@@ -30,12 +28,11 @@ export class DocumentViewerState {
     { dispatch }: StateContext<DocumentViewerModel>,
     { fileHash, fileId }: GetFiles
   ): Observable<Blob> | Observable<unknown> {
-    return this.documentViewerService.getFile(fileId, fileHash).pipe(
+    return this.documentViewerService.getFile(fileHash, fileId).pipe(
       tap((payload: Blob) => {
         dispatch(new GetFilesSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'No files found'))))
     );
   }
 
@@ -43,13 +40,12 @@ export class DocumentViewerState {
   GetPdfFiles(
     { dispatch }: StateContext<DocumentViewerModel>,
     { fileHash, fileId }: GetPdfFiles
-  ): Observable<Blob> | Observable<unknown> {
-    return this.documentViewerService.getPdfFile(fileId, fileHash).pipe(
+  ): Observable<Blob> {
+    return this.documentViewerService.getPdfFile(fileHash, fileId).pipe(
       tap((payload: Blob) => {
         dispatch(new GetPdfFilesSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'No files found'))))
     );
   }
 

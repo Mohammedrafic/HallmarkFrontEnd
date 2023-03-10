@@ -1,6 +1,6 @@
 export class GetFiles {
   static readonly type = '[document-viewer] Get Files';
-  constructor(public fileHash: string, public fileId: string) {}
+  constructor(public fileHash: string, public fileId: number) {}
 }
 
 export class GetFilesSucceeded {
@@ -10,7 +10,7 @@ export class GetFilesSucceeded {
 
 export class GetPdfFiles {
   static readonly type = '[document-viewer] Get PDF Files';
-  constructor(public fileHash: string, public fileId: string) {}
+  constructor(public fileHash: string, public fileId: number) {}
 }
 
 

@@ -10,13 +10,14 @@ import {
   ChangeDetectorRef,
   Input,
   OnDestroy,
+  ViewEncapsulation,
 } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { ListBoxItem } from '@shared/models/imported-order.model';
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { SelectionSettingsModel, ListBox } from '@syncfusion/ej2-angular-dropdowns';
-import { Subject, Observable, Subscription, fromEvent, debounceTime, takeUntil } from 'rxjs';
+import { Subject, Observable, Subscription, fromEvent, debounceTime, takeUntil, filter } from 'rxjs';
 import { ToolbarService } from '@syncfusion/ej2-angular-grids';
 import { TextSelectionService, MagnificationService, NavigationService } from '@syncfusion/ej2-angular-pdfviewer';
 import { DocumentViewerState } from 'src/app/document-viewer/store/document-viewer.state';
@@ -28,13 +29,14 @@ import {
   GetPdfFiles,
   GetPdfFilesSucceeded,
 } from 'src/app/document-viewer/store/document-viewer.actions';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-document-viewer',
   templateUrl: './document-viewer.component.html',
   styleUrls: ['./document-viewer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
   providers: [ToolbarService, NavigationService, TextSelectionService, MagnificationService],
 })
 export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -65,6 +67,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
 
   public service = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
 
+  private fileHash: string;
   private unsubscribe$: Subject<void> = new Subject();
   private isDownloading = false;
   private resizeObservable$: Observable<Event>;
@@ -76,6 +79,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
 
   constructor(
     private activeRoute: ActivatedRoute,
+    private router: Router,
     private store: Store,
     private actions$: Actions,
     private cdr: ChangeDetectorRef
@@ -110,6 +114,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
       this.keepSidebarOpen = true;
       this.hideSidebarKeepOpenButton = true;
     }
+    this.cdr.markForCheck();
   }
 
   ngOnDestroy(): void {
@@ -156,17 +161,18 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   private getPdfFileById(id: number): void {
-    this.store.dispatch(new GetPdfFiles(id));
+    this.store.dispatch(new GetPdfFiles(this.fileHash, id));
   }
 
   private getOriginalFileById(id: number): void {
-    this.store.dispatch(new GetFiles(id));
+    this.store.dispatch(new GetFiles(this.fileHash, id));
   }
 
   private subscribeOnOpenEvent(): void {
     this.activeRoute.params.pipe(takeUntil(this.unsubscribe$)).subscribe((params) => {
       if (params['id']) {
-        this.store.dispatch(new GetGroupedFiles(params['id']));
+        this.fileHash = params['id'];
+        this.store.dispatch(new GetGroupedFiles(this.fileHash));
         this.initialFileId = params['initialId'];
       }
     });
@@ -194,27 +200,35 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
           downloadBlobFile(file.payload, (this.previewFile as ListBoxItem).name);
           // Convert blob to url
           this.loadedFileUrl = URL.createObjectURL(file.payload);
-          this.cdr.markForCheck();
         } else {
           this.setImage(file.payload);
         }
+        this.cdr.markForCheck();
       });
   }
 
   private subscribeOnGroupedCandidateCredentialsFiles(): void {
-    this.files$.pipe(takeUntil(this.unsubscribe$)).subscribe((groupedFiles: FileGroup[]) => {
-      this.data = [];
-      groupedFiles.forEach((category) => {
-        const dataItems = category.files.map((file) => {
-          return { name: file.name, id: file.id, category: category.groupName } as ListBoxItem;
+    this.files$
+      .pipe(
+        filter((x: FileGroup[]) => x !== null && x !== undefined),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((groupedFiles: FileGroup[]) => {
+        this.data = [];
+        groupedFiles.forEach((category) => {
+          const dataItems = category.files.map((file) => {
+            return { name: file.name, id: file.id, category: category.groupName } as ListBoxItem;
+          });
+          this.data = this.data.concat(dataItems);
         });
-        this.data = this.data.concat(dataItems);
-      });
 
-      if (this.data.length > 0) {
-        this.previewFile = this.data.find((item) => item.id === this.initialFileId) as ListBoxItem || this.data[0];
-      }
-    });
+        if (this.data.length > 0) {
+          this.previewFile = (this.data.find((item) => item.id === this.initialFileId) as ListBoxItem) || this.data[0];
+        } else {
+          // this.router.navigate(['/', 'document-viewer']);
+        }
+        this.cdr.markForCheck();
+      });
   }
 
   private setMode(): void {
@@ -276,4 +290,3 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
     this.pageSelection.setValue(1);
   }
 }
-

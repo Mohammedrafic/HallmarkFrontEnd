@@ -10,13 +10,13 @@ export class DocumentViewerService {
 
   constructor(private http: HttpClient) {}
 
-  getFile(fileId: string, fileHash: string) {
+  getFile(fileHash: string, fileId: number) {
     const params = { params: { fileHash, fileId } };
   const url = '/api/document-viewer/file';
   return this.http.get<Blob>(url, params);
   }
 
-  getPdfFile(fileId: string, fileHash: string) {
+  getPdfFile(fileHash: string, fileId: number) {
     const params = { params: { fileHash, fileId } };
   const url = '/api/document-viewer/pdf';
   return this.http.get<Blob>(url, params);

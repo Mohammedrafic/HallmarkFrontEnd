@@ -23,6 +23,8 @@ import {
   ZoomIn,
   ZoomOut,
 } from 'angular-feather/icons';
+import { NgxsModule } from '@ngxs/store';
+import { DocumentViewerState } from './store/document-viewer.state';
 
 const icons = {
   X,
@@ -56,6 +58,9 @@ const icons = {
     FeatherModule.pick(icons),
     CommonModule,
     DocumentViewerRoutingModule,
+    NgxsModule.forFeature([
+      DocumentViewerState,
+    ]),
   ],
 })
 export class DocumentViewerModule {}

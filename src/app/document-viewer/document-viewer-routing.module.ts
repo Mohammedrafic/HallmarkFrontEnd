@@ -9,11 +9,7 @@ const routes: Routes = [
     component: FailedDocumentViewerComponent,
   },
   {
-    path: 'failed',
-    component: FailedDocumentViewerComponent,
-  },
-  {
-    path: '{id}',
+    path: ':id',
     component: DocumentViewerComponent,
   },
 ];
