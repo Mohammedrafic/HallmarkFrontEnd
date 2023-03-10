@@ -240,7 +240,7 @@ export class CandidateService {
     );
   }
 
-  public getMissingCredentials(candidateProfileId: number): Observable<object> {
-    return this.http.post('/api/EmployeeCredentials/addMissingCredentials', { candidateProfileId });
+  public getMissingCredentials(candidateProfileId: number): Observable<void> {
+    return this.http.post<void>('/api/EmployeeCredentials/addMissingCredentials', { candidateProfileId });
   }
 }
