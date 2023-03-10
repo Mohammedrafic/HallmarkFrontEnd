@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
@@ -135,10 +135,7 @@ export class FilterService {
             break;
 
           case ControlTypes.Date:
-            if (datePipe) {
-              // TODO use formatDate instead of date Pipe
-              chips.push({ text: datePipe.transform(val, 'MM/dd/yyyy'), column: key, value: val });
-            }
+              chips.push({ text: formatDate(val, 'MM/dd/yyyy', 'en-US'), column: key, value: val });
             break;
 
           case ControlTypes.Radio:

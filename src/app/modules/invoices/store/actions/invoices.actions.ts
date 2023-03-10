@@ -78,10 +78,14 @@ export namespace Invoices {
 
   export class GetFiltersDataSource {
     static readonly type = INVOICES_ACTIONS.GET_FILTERS_DATA_SOURCE;
+
+    constructor(public readonly orgId: number | null) {}
   }
 
   export class GetPendingRecordsFiltersDataSource {
     static readonly type = INVOICES_ACTIONS.GET_PENDING_RECORDS_FILTERS_DATA_SOURCE;
+
+
   }
 
   export class SetFiltersDataSource {

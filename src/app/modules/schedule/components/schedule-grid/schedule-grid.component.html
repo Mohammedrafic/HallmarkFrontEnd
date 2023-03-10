@@ -74,6 +74,7 @@
           <td class="table-cell candidates-cell fixed fixed--left">
             <app-candidate-card
               [candidate]="scheduleItem"
+              [selectedFilters]="selectedFilters"
               (click)="selectCandidate.emit(scheduleItem.candidate)"
             ></app-candidate-card>
           </td>

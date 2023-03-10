@@ -1,3 +1,4 @@
+import { ProfileStatuses } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { ControlTypes, ValueType } from '../../../../enums/control-types.enum';
 import { CandidateStatusOptions } from '../../../../enums/status';
 import { CandidateListFiltersColumn } from '../../types/candidate-list.model';
@@ -25,6 +26,47 @@ export const filterColumns: CandidateListFiltersColumn = {
     valueId: 'id',
   },
   candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+};
+
+export const IRPFilterColumns: CandidateListFiltersColumn = {
+  profileStatuses: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: ProfileStatuses,
+    valueField: 'name',
+    valueId: 'id',
+  },
+  candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+  candidateId: { type: ControlTypes.Text, valueType: ValueType.Text },
+  locationIds: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'name',
+    valueId: 'id',
+  },
+  departmentIds: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'name',
+    valueId: 'id',
+  },
+  primarySkillIds: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'name',
+    valueId: 'id',
+  },
+  secondarySkillIds: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'name',
+    valueId: 'id',
+  },
+  hireDate: { type: ControlTypes.Date, valueType: ValueType.Text },
 };
 
 export const VMSCandidates = [

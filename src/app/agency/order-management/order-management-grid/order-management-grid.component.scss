@@ -1,5 +1,6 @@
-@import "../../../styles/variables/colors";
+@import "colors";
 @import "adaptive-response";
+@import 'mixins';
 
 .e-grid {
   border-radius: 12px;
@@ -80,4 +81,8 @@
   .e-grid .e-content {
     overflow-y: hidden !important;
   }
+}
+
+.order-type-text-cell {
+  @include order-type-text-cell;
 }

@@ -1,9 +1,5 @@
 @import "colors";
 
-.input-container {
-  margin-bottom: 15px;
-}
-
 .user-photo {
   background-color: $secondary-dark-blue-40;
   width: 30px;
@@ -23,4 +19,25 @@
 .name-wrapper {
   display: flex;
   align-items: center;
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+
+  &.candidate-id {
+    width: 30%;
+    margin-right: 12px;
+  }
+
+  &.candidate-name {
+    width: 70%;
+  }
+}
+
+.row {
+  display: flex;
 }
