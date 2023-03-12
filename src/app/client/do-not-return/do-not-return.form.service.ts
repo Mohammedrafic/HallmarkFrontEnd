@@ -19,6 +19,7 @@ export class DoNotReturnFormService {
       locations: [''],
       locationIds: ['', [Validators.required]],
       ssn: ['', [Validators.required, Validators.minLength(9), Validators.pattern(ONLY_NUMBER)]],
+      candidateEmail: ['',[Validators.email, Validators.maxLength(200)]],
       dnrComment: [''],
       dnrRequestedBy: [''],
       candidateProfileId: ['', [Validators.required]],

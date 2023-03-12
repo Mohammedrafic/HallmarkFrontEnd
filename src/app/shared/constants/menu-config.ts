@@ -164,7 +164,7 @@ export const MENU_CONFIG: any = {
     },
     86: {
       // DNR Details
-      icon: 'users',
+      icon: 'user-X',
       route: 'client/dnr-details',
     },
     37: {
@@ -947,6 +947,11 @@ export const MENU_CONFIG: any = {
       // Vendor Activity Report
       icon: '',
       route: '/analytics/vendor-activity',
+    },
+    86: {
+      // DNR Details
+      icon: 'users',
+      route: 'client/dnr-details',
     },
   },
 

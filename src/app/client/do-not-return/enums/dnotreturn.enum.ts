@@ -6,3 +6,8 @@ export enum FormControlNames {
     Ssn = 'ssn',
     DnrComment = 'dnrComment'
   }
+
+export enum Candidatests {
+Block="Block",
+UnBlock="Unblock"
+}
