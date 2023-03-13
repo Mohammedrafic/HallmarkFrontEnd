@@ -46,6 +46,12 @@
 
     .rich-text-container {
         margin-bottom: 30px;
+        #smsDefaultRTE {
+          max-width: 614px;
+          overflow: auto;
+          white-space: nowrap;
+      }
+      
     }
 
     
