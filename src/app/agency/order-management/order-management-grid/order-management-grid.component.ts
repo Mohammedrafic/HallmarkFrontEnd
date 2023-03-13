@@ -169,7 +169,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   ) {
     super();
     this.listenRedirectFromExtension();
-    console.error(AgencyOrderFiltersComponent.generateFilterColumns());
   }
 
   ngOnInit(): void {

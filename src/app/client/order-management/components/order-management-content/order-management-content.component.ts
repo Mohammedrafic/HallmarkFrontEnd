@@ -1635,7 +1635,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private setDefaultFilter(): void {
-    if(this.orderManagementPagerState?.filters) {
+    if(this.orderManagementPagerState?.filters) { // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
       this.patchFilterForm();
       return;
