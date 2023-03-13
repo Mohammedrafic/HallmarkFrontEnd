@@ -50,7 +50,6 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
     if (this.tabConfig) {
       this.asyncRefresh();
       this.navigatingTab();
-      this.getalerttitle();
       this.navigatetopendingtimesheet();  
     }
   }
@@ -111,7 +110,12 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
         this.changeTab.emit(3);
         this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
-    },5000);
+    if(AlertIdEnum[AlertIdEnum['Time Sheet: DNW']].toLowerCase() == this.alertTitle.toLowerCase()){
+      this.tabComponent.selectedItem = 1;
+      this.changeTab.emit(1);
+      this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
+    },10000);
 
   }
 
