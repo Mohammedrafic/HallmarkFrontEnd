@@ -166,10 +166,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.subscribeOnActions();
     this.subscribeOnDeploydCandidates();
     this.subscribeOnSkills();
-    this.subscribeOnRegions();
     this.subscribeOnExportAction();
     this.setFileName();
     this.filterColumns = !this.isIRP ? filterColumns : IRPFilterColumns;
+    this.subscribeOnRegions();
     this.CandidateFilterFormGroup = !this.isIRP ? this.candidateListService.generateVMSCandidateFilterForm() : this.candidateListService.generateIRPCandidateFilterForm();
     this.subscribeOnOrgStructure();
     this.subscribeOnLocationChange();
