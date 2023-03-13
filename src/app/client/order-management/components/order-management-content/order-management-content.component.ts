@@ -197,7 +197,8 @@ import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { GlobalWindow } from '@core/tokens';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
-import { SetOrderGridPageNumber } from '@agency/store/candidate.actions';
+import { SetOrderManagementPagerState } from '@agency/store/candidate.actions';
+import { OrderManagementPagerState } from '@shared/models/candidate.model';
 
 @Component({
   selector: 'app-order-management-content',
@@ -385,6 +386,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private SelectedCandiateStatuses: any[] = [];
   private eliteOrderId:number;
   private alertTitle:string;
+  private orderManagementPagerState: OrderManagementPagerState | null;
   public isCondidateTab:boolean=false;
 
 
@@ -478,8 +480,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
     this.onSelectedOrderDataLoadHandler();
 
-    const locationState = this.location.getState() as { orderId: number };
-    this.previousSelectedOrderId = locationState.orderId;
+    this.getLocationState();
 
     this.onGridPageChangedHandler();
     this.onOrganizationChangedHandler();
@@ -723,6 +724,23 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public onFilterClose() {
+    this.patchFilterForm();
+  }
+
+  public showFilters(): void {
+    if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
+      // TODO new filters for IRP system
+    } else {
+      this.store.dispatch(new ShowFilterDialog(true));
+      setTimeout(() => { this.orderStatusFilter?.refresh(); this.cd$.next(true); }, 300);
+    }
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
+  }
+
+  private patchFilterForm(): void {
     this.OrderFilterFormGroup.setValue({
       orderPublicId: this.filters.orderPublicId || null,
       regionIds: this.filters.regionIds || [],
@@ -759,28 +777,16 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
       contactEmails: Array.isArray(this.filters.contactEmails) ? this.filters.contactEmails[0] : this.filters.contactEmails || null,
+      orderId: this.filters.orderId || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-  }
-
-  public showFilters(): void {
-    if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      // TODO new filters for IRP system
-    } else {
-      this.store.dispatch(new ShowFilterDialog(true));
-      setTimeout(() => { this.orderStatusFilter?.refresh(); this.cd$.next(true); }, 300);
-    }
-  }
-
-  public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
   }
 
   private clearFilters(): void {
     this.OrderFilterFormGroup.reset();
     this.OrderFilterFormGroup.controls['agencyType'].setValue('0');
     this.filteredItems = [];
-    this.currentPage = 1;
+    this.currentPage = this.orderManagementPagerState?.page ?? 1;
     this.filters = {};
     this.search?.clear();
   }
@@ -869,8 +875,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
-      const { orderGridPageNumber } = this.location.getState() as { orderGridPageNumber?: number; };
-      this.currentPage = orderGridPageNumber ?? this.currentPage;
+      this.currentPage = this.orderManagementPagerState?.page ?? this.currentPage;
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
         this.previousSelectedOrderId
       );
@@ -989,6 +994,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.creatingReorder = false;
       return;
     }
+
+    this.store.dispatch(new SetOrderManagementPagerState({ page: this.currentPage, pageSize: this.pageSize, filters: this.filters }));
 
     this.rowSelected(event, this.gridWithChildRow);
     if (!event.isInteracted) {
@@ -1415,9 +1422,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private onGridPageChangedHandler(): void {
-    this.pageSubject.pipe(throttleTime(25), takeUntil(this.unsubscribe$)).subscribe((page) => {
+    this.pageSubject.pipe(debounceTime(1), takeUntil(this.unsubscribe$)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new SetOrderGridPageNumber(page));
       const { selectedOrderAfterRedirect } = this.orderManagementService;
       if (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect) {
         this.filters.orderPublicId = (this.prefix || selectedOrderAfterRedirect?.prefix) + '-' + (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect?.orderId);
@@ -1548,7 +1554,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private onOrderFilterDataSourcesLoadHandler(): void {
     this.orderFilterDataSources$
-      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .pipe(throttleTime(100), takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((data: OrderFilterDataSource) => {
         let statuses : any = [];
         let candidateStatuses: FilterStatus[] = [];
@@ -1629,6 +1635,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private setDefaultFilter(): void {
+    if(this.orderManagementPagerState?.filters) { // apply preserved filters by redirecting back from the candidate profile
+      this.filters = { ...this.orderManagementPagerState?.filters };
+      this.patchFilterForm();
+      return;
+    }
+
     if (this.filterService.canPreserveFilters()) {
       const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
       if (preservedFilters?.regions) {
@@ -1710,6 +1722,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.clearSelection(this.gridWithChildRow);
         this.selectedReOrder = null;
         this.previousSelectedOrderId = null;
+        this.orderManagementPagerState = null;
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
           table.style.transform = 'translate(0px, 0px)';
@@ -1748,7 +1761,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private onOrganizationStructureDataLoadHandler(): void {
     this.organizationStructure$
-      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .pipe(throttleTime(50), filter(Boolean), takeUntil(this.unsubscribe$))
       .subscribe((structure: OrganizationStructure) => {
         this.orgStructure = structure;
         this.regions = structure.regions;
@@ -2188,5 +2201,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   clearstorage():void{
     this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
     this.orgpendingOrderapproval = "";
+  }
+
+  private getLocationState(): void {
+    const locationState = this.location.getState() as { orderId: number,  orderManagementPagerState: OrderManagementPagerState };
+    this.previousSelectedOrderId = locationState.orderId;
+    this.orderManagementPagerState = locationState?.orderManagementPagerState;
+    this.pageSize = this.orderManagementPagerState?.pageSize ?? this.pageSize;
+    this.cd.markForCheck();
   }
 }
