@@ -169,7 +169,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   ) {
     super();
     this.listenRedirectFromExtension();
-
+    console.error(AgencyOrderFiltersComponent.generateFilterColumns());
   }
 
   ngOnInit(): void {
@@ -367,6 +367,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public setDefaultFilters(statuses: number[]): void {
+    if(this.orderManagementPagerState?.filters ) { // apply preserved filters by redirecting back from the candidate profile
+      this.filters = { ...this.orderManagementPagerState?.filters };
+      this.patchFilterForm();
+      this.dispatchNewPage();
+      return;
+    }
+    
     if (this.filterService.canPreserveFilters()) {
       const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
       if(this.Organizations.length > 0){
@@ -531,6 +538,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.orderManagementAgencyService.setIsAvailable(false);
     }
 
+    this.store.dispatch(new SetOrderManagementPagerState({ page: this.currentPage, pageSize: this.pageSize, filters: this.filters }));
+
     this.rowSelected(event, this.gridWithChildRow);
 
     if (!event.isInteracted && event.data.orderId) {
@@ -663,6 +672,24 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   // Filter
   public onFilterClose() {
+    this.patchFilterForm();
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
+  }
+
+  private clearFilters(): void {
+    this.OrderFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = this.orderManagementPagerState?.page ?? 1;
+    this.filters = {
+      includeReOrders: true,
+    };
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  private patchFilterForm(): void {
     this.OrderFilterFormGroup.setValue({
       orderPublicId: this.filters.orderPublicId || null,
       regionIds: this.filters.regionIds || [],
@@ -697,26 +724,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
     });
+
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     for(let i=0;i<this.filteredItems.length;i++){
       if(this.filteredItems[i].text == undefined){
         this.filteredItems[i].text = this.filteredItems[i].value;
       }
     }
-    this.filteredItems$.next(this.filteredItems.length);
-  }
-
-  public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
-  }
-
-  private clearFilters(): void {
-    this.OrderFilterFormGroup.reset();
-    this.filteredItems = [];
-    this.currentPage = this.orderManagementPagerState?.page ?? 1;
-    this.filters = {
-      includeReOrders: true,
-    };
     this.filteredItems$.next(this.filteredItems.length);
   }
 
@@ -913,7 +927,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
       this.currentPage = page;
-      this.store.dispatch(new SetOrderManagementPagerState({ page, pageSize: this.pageSize }));
       this.dispatchNewPage();
     });
   }

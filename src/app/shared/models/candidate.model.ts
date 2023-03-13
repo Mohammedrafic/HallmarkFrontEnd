@@ -6,6 +6,7 @@ import { Experience } from './experience.model';
 import { MasterSkill } from './skill.model';
 import { PageOfCollections } from './page.model';
 import { JobDistributionMasterSkills } from './associate-organizations.model';
+import { OrderFilter } from './order-management.model';
 
 export class Candidate {
   id?: number;
@@ -97,4 +98,5 @@ export interface CandidateStateModel {
 export interface OrderManagementPagerState {
   page: number;
   pageSize: number;
+  filters: OrderFilter
 }

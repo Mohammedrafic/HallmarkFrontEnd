@@ -724,6 +724,23 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public onFilterClose() {
+    this.patchFilterForm();
+  }
+
+  public showFilters(): void {
+    if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
+      // TODO new filters for IRP system
+    } else {
+      this.store.dispatch(new ShowFilterDialog(true));
+      setTimeout(() => { this.orderStatusFilter?.refresh(); this.cd$.next(true); }, 300);
+    }
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
+  }
+
+  private patchFilterForm(): void {
     this.OrderFilterFormGroup.setValue({
       orderPublicId: this.filters.orderPublicId || null,
       regionIds: this.filters.regionIds || [],
@@ -760,21 +777,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
       contactEmails: Array.isArray(this.filters.contactEmails) ? this.filters.contactEmails[0] : this.filters.contactEmails || null,
+      orderId: this.filters.orderId || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-  }
-
-  public showFilters(): void {
-    if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      // TODO new filters for IRP system
-    } else {
-      this.store.dispatch(new ShowFilterDialog(true));
-      setTimeout(() => { this.orderStatusFilter?.refresh(); this.cd$.next(true); }, 300);
-    }
-  }
-
-  public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
   }
 
   private clearFilters(): void {
@@ -989,6 +994,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.creatingReorder = false;
       return;
     }
+
+    this.store.dispatch(new SetOrderManagementPagerState({ page: this.currentPage, pageSize: this.pageSize, filters: this.filters }));
 
     this.rowSelected(event, this.gridWithChildRow);
 
@@ -1417,7 +1424,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private onGridPageChangedHandler(): void {
     this.pageSubject.pipe(debounceTime(1), takeUntil(this.unsubscribe$)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new SetOrderManagementPagerState({ page, pageSize: this.pageSize }));
       const { selectedOrderAfterRedirect } = this.orderManagementService;
       if (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect) {
         this.filters.orderPublicId = (this.prefix || selectedOrderAfterRedirect?.prefix) + '-' + (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect?.orderId);
@@ -1548,7 +1554,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private onOrderFilterDataSourcesLoadHandler(): void {
     this.orderFilterDataSources$
-      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .pipe(throttleTime(100), takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((data: OrderFilterDataSource) => {
         let statuses : any = [];
         let candidateStatuses: FilterStatus[] = [];
@@ -1629,6 +1635,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private setDefaultFilter(): void {
+    if(this.orderManagementPagerState?.filters) {
+      this.filters = { ...this.orderManagementPagerState?.filters };
+      this.patchFilterForm();
+      return;
+    }
+
     if (this.filterService.canPreserveFilters()) {
       const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
       if (preservedFilters?.regions) {
@@ -1749,7 +1761,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private onOrganizationStructureDataLoadHandler(): void {
     this.organizationStructure$
-      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .pipe(throttleTime(50), filter(Boolean), takeUntil(this.unsubscribe$))
       .subscribe((structure: OrganizationStructure) => {
         this.orgStructure = structure;
         this.regions = structure.regions;
