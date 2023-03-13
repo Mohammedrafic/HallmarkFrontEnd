@@ -1307,7 +1307,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     const keyword = event.target.value;    
     if (keyword.trim() != '' && (event.code == 'Enter' || event.code == 'NumpadEnter') && keyword.length >= 3) {      
       this.IsSearchDone = true;
-      this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId));      
+      let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
+      this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId, folderId));      
     }
   }
 }
