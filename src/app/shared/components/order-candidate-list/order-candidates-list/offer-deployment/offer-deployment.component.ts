@@ -392,6 +392,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       } else {
         this.statusesFormControl.enable();
       }
+      this.changeDetectorRef.markForCheck();
     });
     this.orderPermissions$
       .pipe(takeUntil(this.unsubscribe$))
