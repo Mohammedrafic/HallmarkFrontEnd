@@ -6,6 +6,7 @@ import { ClearCacheComponent } from '@shared/components/clear-cache/clear-cache.
 
 import { LoginGuard, UserGuard } from '@shared/guards';
 import { LoginPageComponent } from './b2c-auth/login-page/login-page.component';
+import { CanViewDocumentGuard } from './document-viewer/guards/can-view-document.guard';
 
 const routes: Routes = [
   {
@@ -19,6 +20,11 @@ const routes: Routes = [
       {
         path: 'util/clear-cache',
         component: ClearCacheComponent,
+      },
+      {
+        path: 'document-viewer',
+        loadChildren: () =>
+          import('./document-viewer/document-viewer.module').then((m) => m.DocumentViewerModule),
       },
       {
         path: '',
