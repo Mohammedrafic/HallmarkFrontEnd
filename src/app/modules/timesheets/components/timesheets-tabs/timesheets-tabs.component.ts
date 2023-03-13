@@ -35,6 +35,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
   public alertTitle: string;
   public orgwidgetpendingtimesheet: string;
+  public missingtimesheet: string;
   public tabsWidth$: Observable<string>;
 
   constructor(
@@ -50,7 +51,6 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
     if (this.tabConfig) {
       this.asyncRefresh();
       this.navigatingTab();
-      this.getalerttitle();
       this.navigatetopendingtimesheet();  
     }
   }
@@ -90,11 +90,17 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
   private navigatetopendingtimesheet(): void {
     setTimeout(() => {
       this.orgwidgetpendingtimesheet = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
+      this.missingtimesheet = JSON.parse(localStorage.getItem('timeSheetMissing') || '""') as string;
        if(this.orgwidgetpendingtimesheet === "Pending Timesheet") {
          this.tabComponent.selectedItem=1;
          this.changeTab.emit(1);
          this.globalWindow.localStorage.setItem("orgpendingwidget", JSON.stringify(""));
        }
+       if(this.missingtimesheet === "Missing") {
+        this.tabComponent.selectedItem=2;
+        this.changeTab.emit(2);
+        this.globalWindow.localStorage.setItem("timeSheetMissing", JSON.stringify(""));
+      }
    }, 2500);
   }
   @OutsideZone
@@ -111,7 +117,12 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
         this.changeTab.emit(3);
         this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
-    },5000);
+    if(AlertIdEnum[AlertIdEnum['Time Sheet: DNW']].toLowerCase() == this.alertTitle.toLowerCase()){
+      this.tabComponent.selectedItem = 1;
+      this.changeTab.emit(1);
+      this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
+    },10000);
 
   }
 

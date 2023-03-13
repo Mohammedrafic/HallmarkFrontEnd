@@ -15,9 +15,11 @@ export class DoNotReturnFormService {
     return this.fb.group({
       id: [0],
       businessUnitId: ['', [Validators.required]],
+      regionIds:['',[Validators.required]],
       locations: [''],
       locationIds: ['', [Validators.required]],
       ssn: ['', [Validators.required, Validators.minLength(9), Validators.pattern(ONLY_NUMBER)]],
+      candidateEmail: ['',[Validators.email, Validators.maxLength(200)]],
       dnrComment: [''],
       dnrRequestedBy: [''],
       candidateProfileId: ['', [Validators.required]],

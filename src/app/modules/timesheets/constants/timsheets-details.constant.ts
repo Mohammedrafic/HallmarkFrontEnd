@@ -197,7 +197,8 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     ...commonColumn,
     width: 125,
     minWidth: 105,
-    headerClass: 'custom-wrap',    
+    headerClass: 'custom-wrap',
+    type: 'rightAligned'    
   },
   editableCostCenterDef,
   {

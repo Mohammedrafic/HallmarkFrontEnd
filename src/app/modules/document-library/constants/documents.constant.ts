@@ -63,16 +63,17 @@ export const DocumentLibraryColumnsDefinition = (actionCellParams: ICellRenderer
       resizable: false,
       filter: false,
     },
-    {
-      field: documentsColumnField.FileName,
-      headerName: documentsColumnHeaderText.FileName,
-      ...commonColumn,
-      cellStyle: { color: '#3e7fff', fontWeight: '600', cursor:'pointer' }
-    },
+    // {
+    //   field: documentsColumnField.FileName,
+    //   headerName: documentsColumnHeaderText.FileName,
+    //   ...commonColumn,
+    //   cellStyle: { color: '#3e7fff', fontWeight: '600', cursor:'pointer' }
+    // },
     {
       field: documentsColumnField.Name,
       headerName: documentsColumnHeaderText.Name,
       ...commonColumn,
+      cellStyle: { color: '#3e7fff', fontWeight: '600', cursor:'pointer' }
     },
     {
       field: documentsColumnField.Status,

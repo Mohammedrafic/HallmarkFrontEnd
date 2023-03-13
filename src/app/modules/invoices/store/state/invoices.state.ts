@@ -251,8 +251,9 @@ export class InvoicesState {
   @Action(Invoices.GetFiltersDataSource)
   GetFiltersDataSource(
     { setState, dispatch, getState }: StateContext<InvoicesModel>,
+    { orgId }: Invoices.GetFiltersDataSource,
   ): Observable<InvoicesFilteringOptions | void> {
-    return this.invoicesAPIService.getFiltersDataSource().pipe(
+    return this.invoicesAPIService.getFiltersDataSource(orgId).pipe(
       tap((res) => {
         const { invoiceFiltersColumns } = getState();
 

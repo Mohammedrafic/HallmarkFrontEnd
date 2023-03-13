@@ -408,10 +408,10 @@ export class OrderManagementContentState {
   @Action(GetOrderById)
   GetOrderById(
     { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id, options }: GetOrderById
+    { id, options, isIrp }: GetOrderById
   ): Observable<Order> {
     patchState({ orderDialogOptions: options });
-    return this.orderManagementService.getOrderById(id).pipe(
+    return this.orderManagementService.getOrderById(id, isIrp).pipe(
       tap((payload) => {
         const groupedCredentials = getGroupedCredentials(payload.credentials ?? payload.reOrderFrom?.credentials);
         payload.groupedCredentials = groupedCredentials;

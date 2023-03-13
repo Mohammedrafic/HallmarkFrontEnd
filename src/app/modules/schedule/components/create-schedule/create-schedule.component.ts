@@ -118,7 +118,6 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
     this.watchForCloseStream();
     this.getUnavailabilityReasons();
     this.getShifts();
-    this.watchForControls();
     this.watchForScheduleType();
   }
 
@@ -224,10 +223,9 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
       case ScheduleItemType.Book:
         this.scheduleFormConfig = BookFormConfig;
         this.scheduleForm = this.createScheduleService.createBookForm();
+        this.watchForControls();
         this.patchBookForm();
-        if(!this.firstLoadDialog) {
-          this.patchBookForSingleCandidate();
-        }
+        this.patchBookForSingleCandidate();
         break;
       case ScheduleItemType.Unavailability:
         this.scheduleFormConfig = UnavailabilityFormConfig;
@@ -336,13 +334,17 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
     this.scheduleStructureList = structure;
     this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Regions] =
       ScheduleFilterHelper.adaptRegionToOption(structure.regions);
-
-    this.patchBookForSingleCandidate();
   }
 
   private patchBookForSingleCandidate(): void {
     if(this.isSelectedCandidateWithoutFilters()) {
-      this.scheduleForm?.get('regionId')?.setValue(this.scheduleStructureList.regions[0].id);
+      const region = this.scheduleStructureList.regions[0];
+      this.scheduleFormSourcesMap.locations = this.scheduleFiltersService
+      .getSelectedLocatinOptions(this.scheduleStructureList, [region.id as number]);
+      this.scheduleFormSourcesMap.departments = this.scheduleFiltersService
+      .getSelectedDepartmentOptions(this.scheduleStructureList, [this.scheduleFormSourcesMap.locations[0].value as number]);
+
+      this.scheduleForm?.get('regionId')?.setValue(region.id);
       this.scheduleForm?.get('locationId')?.setValue(this.scheduleFormSourcesMap.locations[0]?.value);
       this.scheduleForm?.get('departmentId')?.setValue(this.scheduleFormSourcesMap.departments[0]?.value);
       this.scheduleForm?.get('skillId')?.setValue(this.scheduleFormSourcesMap.skill[0]?.value);

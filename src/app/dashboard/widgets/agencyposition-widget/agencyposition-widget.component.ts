@@ -46,7 +46,6 @@ export class AgencypositionWidgetComponent extends AbstractPermissionGrid {
     const orderStatus = OrgId;
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
-      this.filterservice.setPreservedFIlters({organizations : OrgId});
       this.dashboardService.redirectToUrlWithAgencyposition('agency/order-management',orderStatus,condition);
     } else {
       this.store.dispatch(

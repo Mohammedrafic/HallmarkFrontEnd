@@ -12,6 +12,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NgxsModule } from '@ngxs/store';
 import { CandidateListState } from './store/candidate-list.state';
 import { CandidateListService } from './services/candidate-list.service';
+import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 const COMPONENTS = [CandidateListComponent];
 const icons = { User };
@@ -30,6 +31,7 @@ const icons = { User };
     ReactiveFormsModule,
     MultiSelectModule,
     ButtonModule,
+    DatePickerModule,
     NgxsModule.forFeature([CandidateListState]),
   ],
   declarations: [...COMPONENTS],

@@ -2,10 +2,12 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { FormGroup } from '@angular/forms';
 import { TakeUntilDestroy } from '@core/decorators';
 import { findSelectedItems } from '@core/helpers';
+import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 import { BreakpointObserverService } from '@core/services';
 import { Select, Store } from '@ngxs/store';
 import { OrientationColumnDef, OrientationHistoricalDataColumnDef } from '@organization-management/orientation/constants/orientation.constant';
 import { OrientationTab } from '@organization-management/orientation/enums/orientation-type.enum';
+import { clearFormControl, setDataSourceValue } from '@organization-management/orientation/helpers/orientation-dialog.helper';
 import { OrientationConfiguration, OrientationConfigurationFilters, OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
 import { OrientationService } from '@organization-management/orientation/services/orientation.service';
 import { GetFilteringAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
@@ -17,8 +19,8 @@ import { SystemType } from '@shared/enums/system-type.enum';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
-import { FilteredItem } from '@shared/models/filter.model';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { FilterColumnsModel, FilteredItem } from '@shared/models/filter.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { SkillCategory } from '@shared/models/skill-category.model';
 import { Skill } from '@shared/models/skill.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -48,12 +50,13 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   };
   @Input('skillCategories') set skillCategories(value: SkillCategory[] | undefined) {
     if (value) {
-      this.filterColumns.skillCategoryIds.dataSource = value as [];
+      setDataSourceValue(this.filterColumns, 'skillCategoryIds', value);
     }
   };
   @Input('regions') set regions(value: OrganizationRegion[] | undefined) {
     if (value) {
-      this.allRegions = this.filterColumns.regionIds.dataSource = value as [];
+      this.allRegions = value;
+      setDataSourceValue(this.filterColumns, 'regionIds', this.allRegions);
     }
   };
   @Output() public pageChange = new EventEmitter();
@@ -73,7 +76,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   public isDesktop = false;
   public gridDomLayout: 'normal' | 'autoHeight' | 'print' | undefined;
   public filtersForm: FormGroup = this.orientationService.generateConfigurationFilterForm();
-  public filterColumns = this.orientationService.filterColumns;
+  public filterColumns: FilterColumnsModel = this.orientationService.filterColumns;
   public filters: OrientationConfigurationFilters = {
     pageNumber: 1, pageSize: this.pageSize
   };
@@ -84,6 +87,9 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   public gridActionsParams = {
     disableControls: false
   }
+
+  private skills: Skill[] = [];
+
   protected componentDestroy: () => Observable<unknown>;
 
   @Select(UserState.lastSelectedOrganizationId)
@@ -109,6 +115,9 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     this.watchForSkills();
     this.watchForRegions();
     this.watchForLocation();
+    this.watchForDepartments();
+    this.watchForSkillCategory();
+    this.watchForSkillSelection();
     this.getDeviceScreen();
     this.gridDefHandler();
   }
@@ -127,35 +136,69 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     this.skills$.pipe(
       takeUntil(this.componentDestroy()),
     ).subscribe((skills: Skill[]) => {
-      this.filterColumns.skillIds.dataSource = skills as [];
+      this.skills = skills;
+      setDataSourceValue(this.filterColumns, 'skillIds', this.skills);
     });
   }
 
   private watchForRegions(): void {
     this.filtersForm?.get('regionIds')?.valueChanges
-      .pipe(
-        filter((value: number[]) => !!value?.length),
-        takeUntil(this.componentDestroy())
-      )
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe((value: number[]) => {
-        const selectedRegions: OrganizationRegion[] = findSelectedItems(value, this.allRegions);
+        const selectedRegions: OrganizationRegion[] = value?.length ? findSelectedItems(value, this.allRegions) : [];
         const selectedLocation: OrganizationLocation[] = mapperSelectedItems(selectedRegions, 'locations');
         this.locations = sortByField(selectedLocation, 'name');
-        this.filterColumns.locationIds.dataSource = this.locations as [];
+        setDataSourceValue(this.filterColumns, 'locationIds', getIRPOrgItems(this.locations));
+        clearFormControl(value, this.filtersForm, 'locationIds');
+        this.generateFilteredChips();
         this.cd.markForCheck();
       });
   }
 
   private watchForLocation(): void {
     this.filtersForm?.get('locationIds')?.valueChanges
-      .pipe(
-        filter((value: number[]) => !!value?.length),
-        takeUntil(this.componentDestroy())
-      )
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe((value: number[]) => {
-        const selectedLocation: OrganizationLocation[] = findSelectedItems(value, this.locations);
+        const selectedLocation: OrganizationLocation[] = value?.length ? findSelectedItems(value, this.locations) : [];
         const selectedDepartment: OrganizationDepartment[] = mapperSelectedItems(selectedLocation, 'departments');
-        this.filterColumns.departmentsIds.dataSource =  sortByField(selectedDepartment, 'name') as [];
+        setDataSourceValue(this.filterColumns, 'departmentsIds', sortByField(getIRPOrgItems(selectedDepartment), 'name'));
+        clearFormControl(value, this.filtersForm, 'departmentsIds');
+        this.generateFilteredChips();
+        this.cd.markForCheck();
+      });
+  }
+
+  private watchForDepartments(): void {
+    this.filtersForm
+      ?.get('departmentsIds')
+      ?.valueChanges.pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.generateFilteredChips();
+        this.cd.markForCheck();
+      });
+  }
+
+  private watchForSkillCategory(): void {
+    this.filtersForm
+      ?.get('skillCategoryIds')
+      ?.valueChanges.pipe(takeUntil(this.componentDestroy()))
+      .subscribe((value: number[]) => {
+        const skills = value?.length
+          ? value.flatMap((categoryId: number) => this.skills.filter((skill: Skill) => skill.categoryId === categoryId))
+          : this.skills;
+        setDataSourceValue(this.filterColumns, 'skillIds', sortByField(skills, 'name'));
+        clearFormControl(value, this.filtersForm, 'skillIds');
+        this.generateFilteredChips();
+        this.cd.markForCheck();
+      });
+  }
+
+  private watchForSkillSelection(): void {
+    this.filtersForm
+      ?.get('skillIds')
+      ?.valueChanges.pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.generateFilteredChips();
         this.cd.markForCheck();
       });
   }
@@ -196,6 +239,10 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     this.filters = { pageNumber: 1, pageSize: this.filters.pageSize };
   }
 
+  private generateFilteredChips(): void {
+    this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
+  }
+
   public handleBulkEvent(event: BulkActionDataModel): void {
     this.onEdit.emit({
       isBulk: true,
@@ -218,13 +265,13 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
 
   public onFilterApply(): void {
     this.filters = { pageNumber: this.filters.pageNumber, pageSize: this.filters.pageSize, ...this.filtersForm.getRawValue()} ;
-    this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
+    this.generateFilteredChips();
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
   public onFilterClose() {
-    this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
+    this.generateFilteredChips();
   }
 
   public handleChangePage(pageNumber: number): void {
