@@ -199,7 +199,7 @@ export class OrderManagementContentService {
 
   public getOrderById(id: number, isIRP?: boolean): Observable<Order> {
     if(isIRP) {
-      return this.http.get<Order>(`/api/Orders/${id}`, { params: { isIRPTab: isIRP }});
+      return this.http.get<Order>(`/api/Orders/${id}`, { params: GetQueryParams({ isIRPTab: isIRP })});
     } else {
       return this.http.get<Order>(`/api/Orders/${id}`);
     }

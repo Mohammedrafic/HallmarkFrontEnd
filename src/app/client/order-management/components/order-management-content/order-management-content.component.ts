@@ -967,7 +967,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.gridApi.selectNode(event.node as RowNode);
     this.selectedDataRow = orderData;
     const options = this.getDialogNextPreviousOption(orderData, true);
-    this.store.dispatch(new GetOrderById(orderData.id, orderData.organizationId, options));
+    this.store.dispatch(new GetOrderById(orderData.id, orderData.organizationId, options, true));
     this.dispatchAgencyOrderCandidatesList(orderData.id, orderData.organizationId, true);
     this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
     this.openChildDialog.next(false);
@@ -991,7 +991,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
 
     this.rowSelected(event, this.gridWithChildRow);
-
     if (!event.isInteracted) {
       if (event.data?.isTemplate) {
         if (!this.canCreateOrder) {
@@ -1003,7 +1002,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         const data = isArray(event.data) ? event.data[0] : event.data;
         this.selectedDataRow = data;
         const options = this.getDialogNextPreviousOption(data);
-        this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
+        this.store.dispatch(new GetOrderById(data.id, data.organizationId, options,
+          this.activeSystem === OrderManagementIRPSystemId.IRP));
         this.dispatchAgencyOrderCandidatesList(data.id, data.organizationId, !!data.irpOrderMetadata);
         this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
         this.openChildDialog.next(false);

@@ -34,7 +34,8 @@ export class ClearOrders {
 
 export class GetOrderById {
   static readonly type = '[order management] Get Order By Id';
-  constructor(public id: number, public organizationId: number, public options?: DialogNextPreviousOption) {}
+  constructor(public id: number, public organizationId: number, public options?: DialogNextPreviousOption,
+    public readonly isIrp = false) {}
 }
 
 export class GetOrderByIdSucceeded {
