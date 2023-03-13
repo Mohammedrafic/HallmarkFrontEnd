@@ -125,7 +125,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public filters: BillRateFilters = {};
   public filterColumns: any;
   public billRateToPost?: BillRateSetupPost;
-  public isReadOnly = false; // TODO: temporary solution, until specific service provided
   public additionalLableForMinMax: string | null = null;
   public hideFilds = new Set<string>();
   public isWeeklyOT = false;
@@ -197,8 +196,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.clearFilters();
       this.loadData();
     });
-
-    this.handlePagePermission();
 
     this.filterColumns = {
       regionIds: {
@@ -585,38 +582,34 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   }
 
   public onEditRecordButtonClick(data: BillRateSetup, event: Event): void {
-    if (!this.isReadOnly) {
-      this.addActiveCssClass(event);
-      this.isEdit = true;
-      this.editRecordId = data.billRateSettingId;
+    this.addActiveCssClass(event);
+    this.isEdit = true;
+    this.editRecordId = data.billRateSettingId;
 
-      setTimeout(() => this.setupFormValues(data));
+    setTimeout(() => this.setupFormValues(data));
 
-      this.store.dispatch(new ShowSideDialog(true));
-    }
+    this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onRemoveRecordButtonClick(data: BillRateSetup, event: any): void {
-    if (!this.isReadOnly) {
-      this.addActiveCssClass(event);
-      this.confirmService
-        .confirm(DELETE_RECORD_TEXT, {
-          title: DELETE_RECORD_TITLE,
-          okButtonLabel: 'Delete',
-          okButtonClass: 'delete-button',
-        })
-        .subscribe((confirm) => {
-          if (confirm) {
-            const filters = {
-              pageNumber: this.currentPage,
-              pageSize: this.pageSize,
-              ...this.filters,
-            };
-            this.store.dispatch(new DeleteBillRatesById(data.billRateSettingId, filters));
-          }
-          this.removeActiveCssClass();
-        });
-    }
+    this.addActiveCssClass(event);
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button',
+      })
+      .subscribe((confirm) => {
+        if (confirm) {
+          const filters = {
+            pageNumber: this.currentPage,
+            pageSize: this.pageSize,
+            ...this.filters,
+          };
+          this.store.dispatch(new DeleteBillRatesById(data.billRateSettingId, filters));
+        }
+        this.removeActiveCssClass();
+      });
   }
 
   public considerForWeeklyOtChange(data: any, event: any): void {
@@ -910,14 +903,12 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   }
 
   private onClickedCheckboxHandler(data: any, controlName: string, isChecked: boolean): void {
-    if (!this.isReadOnly) {
-      this.editRecordId = data.billRateSettingId;
-      this.setupFormValues(data);
-      setTimeout(() => {
-        this.billRatesFormGroup.controls[controlName].setValue(isChecked);
-        this.onFormSaveClick();
-      });
-    }
+    this.editRecordId = data.billRateSettingId;
+    this.setupFormValues(data);
+    setTimeout(() => {
+      this.billRatesFormGroup.controls[controlName].setValue(isChecked);
+      this.onFormSaveClick();
+    });
   }
 
   private setupFormValues(data: BillRateSetup): void {
@@ -984,12 +975,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesFormGroup.controls['considerFor7thDayOt'].setValue(data.considerFor7thDayOT);
     this.billRatesFormGroup.controls['displayInJob'].setValue(data.displayInJob);
     this.billRatesFormGroup.controls['billRatesType'].setValue(data.billType);
-  }
-
-  // TODO: temporary solution, until specific service provided
-  private handlePagePermission(): void {
-    const user = this.store.selectSnapshot(UserState.user);
-    this.isReadOnly = user?.businessUnitType === BusinessUnitType.Organization;
   }
 
   private setFormatDecimalsValues(): void {
