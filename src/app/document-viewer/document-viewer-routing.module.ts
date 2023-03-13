@@ -7,10 +7,12 @@ const routes: Routes = [
   {
     path: '',
     component: FailedDocumentViewerComponent,
+    data: { skipAuthentication: true },
   },
   {
     path: ':id',
     component: DocumentViewerComponent,
+    data: { skipAuthentication: true },
   },
 ];
 
@@ -19,4 +21,3 @@ const routes: Routes = [
   exports: [RouterModule],
 })
 export class DocumentViewerRoutingModule {}
-

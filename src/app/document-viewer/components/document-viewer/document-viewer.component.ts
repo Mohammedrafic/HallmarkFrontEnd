@@ -11,10 +11,10 @@ import {
   Input,
   OnDestroy,
   ViewEncapsulation,
+  AfterContentInit,
 } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
-import { ListBoxItem } from '@shared/models/imported-order.model';
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { SelectionSettingsModel, ListBox } from '@syncfusion/ej2-angular-dropdowns';
 import { Subject, Observable, Subscription, fromEvent, debounceTime, takeUntil, filter } from 'rxjs';
@@ -39,22 +39,20 @@ import { ActivatedRoute, Router } from '@angular/router';
   encapsulation: ViewEncapsulation.None,
   providers: [ToolbarService, NavigationService, TextSelectionService, MagnificationService],
 })
-export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit {
-  @Input() openEvent: Subject<number>;
-
+export class DocumentViewerComponent implements OnInit, OnDestroy, AfterContentInit {
   public isFullScreen: boolean;
   public isSidebarOpen = true;
   public keepSidebarOpen = true;
   public hideSidebarKeepOpenButton: boolean;
   public targetElement: HTMLElement = document.body;
-  public data: ListBoxItem[] = [];
+  public data: ListBoxItem<string>[] = [];
   public fields = {
     groupBy: 'category',
     text: 'name',
     value: 'id',
   };
   public selectionSettings: SelectionSettingsModel = { mode: 'Single' };
-  public previewFile: ListBoxItem | null;
+  public previewFile: ListBoxItem<string> | null;
   public imageSrs = '';
   public imageMode = false;
   public loadedFileUrl = '';
@@ -63,7 +61,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
   public page = 1;
   public totalPages = 0;
   public pageSelection: FormControl = new FormControl('');
-  public initialFileId: number;
+  public initialFileId: string;
 
   public service = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
 
@@ -101,7 +99,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
       .subscribe(() => this.setResponsiveWidths());
   }
 
-  ngAfterViewInit(): void {
+  ngAfterContentInit(): void {
     this.setResponsiveWidths();
   }
 
@@ -137,34 +135,34 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
     this.previewFile = event.items[0];
     this.setMode();
     if (this.imageMode) {
-      this.getOriginalFileById((this.previewFile as ListBoxItem).id);
+      this.getOriginalFileById((this.previewFile as ListBoxItem<string>).id);
     } else {
-      this.getPdfFileById((this.previewFile as ListBoxItem).id);
+      this.getPdfFileById((this.previewFile as ListBoxItem<string>).id);
     }
     this.isSidebarOpen = this.keepSidebarOpen ? this.isSidebarOpen : false;
   }
 
   public downloadFile(): void {
     this.isDownloading = true;
-    this.getOriginalFileById((this.previewFile as ListBoxItem).id);
+    this.getOriginalFileById((this.previewFile as ListBoxItem<string>).id);
   }
 
   public onListBoxCreated(): void {
     const listBoxObj: ListBox = getInstance(document.getElementById('listBox') as HTMLElement, ListBox) as ListBox;
 
-    listBoxObj.selectItems([(this.previewFile as ListBoxItem).name]);
+    listBoxObj.selectItems([(this.previewFile as ListBoxItem<string>).name]);
     if (this.imageMode) {
-      this.getOriginalFileById((this.previewFile as ListBoxItem).id);
+      this.getOriginalFileById((this.previewFile as ListBoxItem<string>).id);
     } else {
-      this.getPdfFileById((this.previewFile as ListBoxItem).id);
+      this.getPdfFileById((this.previewFile as ListBoxItem<string>).id);
     }
   }
 
-  private getPdfFileById(id: number): void {
+  private getPdfFileById(id: string): void {
     this.store.dispatch(new GetPdfFiles(this.fileHash, id));
   }
 
-  private getOriginalFileById(id: number): void {
+  private getOriginalFileById(id: string): void {
     this.store.dispatch(new GetFiles(this.fileHash, id));
   }
 
@@ -197,7 +195,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
       .subscribe((file: { payload: Blob }) => {
         if (this.isDownloading) {
           this.isDownloading = false;
-          downloadBlobFile(file.payload, (this.previewFile as ListBoxItem).name);
+          downloadBlobFile(file.payload, (this.previewFile as ListBoxItem<string>).name);
           // Convert blob to url
           this.loadedFileUrl = URL.createObjectURL(file.payload);
         } else {
@@ -217,13 +215,14 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
         this.data = [];
         groupedFiles.forEach((category) => {
           const dataItems = category.files.map((file) => {
-            return { name: file.name, id: file.id, category: category.groupName } as ListBoxItem;
+            return { name: file.name, id: file.fileId, category: category.groupName } as ListBoxItem<string>;
           });
           this.data = this.data.concat(dataItems);
         });
 
         if (this.data.length > 0) {
-          this.previewFile = (this.data.find((item) => item.id === this.initialFileId) as ListBoxItem) || this.data[0];
+          this.previewFile =
+            (this.data.find((item) => item.id === this.initialFileId) as ListBoxItem<string>) || this.data[0];
         } else {
           // this.router.navigate(['/', 'document-viewer']);
         }
@@ -289,4 +288,9 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterViewInit
     this.page = 1;
     this.pageSelection.setValue(1);
   }
+}
+export interface ListBoxItem<T> {
+  name: string;
+  id: T;
+  category: string;
 }

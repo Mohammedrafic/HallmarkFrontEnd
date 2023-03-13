@@ -5,7 +5,7 @@ import { Observable, tap } from 'rxjs';
 
 import { DocumentViewerModel, FileGroup } from './document-viewer.state.model';
 import { GetFiles, GetFilesSucceeded, GetGroupedFiles, GetPdfFiles, GetPdfFilesSucceeded } from './document-viewer.actions';
-import { DocumentViewerService } from '@shared/services/document-viewer.service';
+import { DocumentViewerService } from 'src/app/document-viewer/services/document-viewer.service';
 
 @State<DocumentViewerModel>({
   name: 'documentViewer',
