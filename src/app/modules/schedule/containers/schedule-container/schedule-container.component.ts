@@ -131,7 +131,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   openScheduleDialog(): void {
     this.setScheduleStructure();
-    this.createScheduleDialogOpen = true;
   }
 
   closeScheduleDialog(): void {
@@ -271,7 +270,11 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
         takeUntil(this.componentDestroy()),
       ).subscribe((structure: ScheduleFilterStructure) => {
         this.scheduleStructure = { ...structure };
+        this.createScheduleDialogOpen = true;
+        this.cdr.markForCheck();
       });
+    } else {
+      this.createScheduleDialogOpen = true;
     }
   }
 
