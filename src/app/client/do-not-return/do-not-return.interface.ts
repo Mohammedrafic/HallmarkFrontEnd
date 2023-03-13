@@ -13,6 +13,7 @@ export interface DoNotReturnForm {
   dnrRequestedBy: string;
   dnrStatus: string;
   ssn:number;
+  candidateEmail:string;
   }
 
   export interface DoNotReturnStateModel {

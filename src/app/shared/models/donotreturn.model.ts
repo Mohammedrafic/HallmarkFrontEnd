@@ -55,27 +55,37 @@ Id: number;
     IncludeInIRP: boolean;
     IncludeInIRPText?:string
 }
+
+
+
 export class DonoreturnAddedit {
   id?: number;
   businessUnitId:number;
-  locations:string;
+  locationId:string;
+  regionId:string;
+  regionLocationMappings: { [id: number]: number[]; } | null;
   candidateProfileId:number;
   dnrRequestedBy: string;
   dnrStatus: string;
   ssn:number;
   dnrComment:string;
   status:string;
+  candidateEmail?:string;
+
 
   constructor(donotreturn: DonoreturnAddedit) {
     this.id = donotreturn.id||0;
     this.businessUnitId = donotreturn.businessUnitId;
-    this.locations=donotreturn.locations;
+    this.locationId=donotreturn.locationId;
+    this.regionId=donotreturn.regionId;
     this.candidateProfileId=donotreturn.candidateProfileId;
-    this.dnrStatus=donotreturn.dnrStatus;    ;
+    this.dnrStatus=donotreturn.dnrStatus;    
+    this.regionLocationMappings=donotreturn.regionLocationMappings
     this.ssn=donotreturn.ssn;
     this.dnrComment=donotreturn.dnrComment;
     this.dnrRequestedBy=donotreturn.dnrRequestedBy;
     this.status=donotreturn.status;
+    this.candidateEmail=donotreturn.candidateEmail||""
       }
 }
 
@@ -131,7 +141,10 @@ export class ExportDonoreturn {
 export class Donotreturn {
   id: number;
   businessUnitId?: number;
-  locations?: string;
+  locationsid?: string;
+  regionsid?:string;
+  regionname?:string
+  locationname?:string
   candidateProfileId?: number;
   dnrStatus?: string;
   dnrDate?: DateTimeHelper;
@@ -148,6 +161,10 @@ export class Donotreturn {
   constructor(donotreturn: Donotreturn) {
     this.id = donotreturn.id||0;
     this.businessUnitId = donotreturn.businessUnitId;
+    this.regionsid=donotreturn.regionsid;
+    this.regionname=donotreturn.regionname;
+    this.locationsid=donotreturn.locationsid;
+    this.locationname=donotreturn.locationname;
     this.candidateProfileId=donotreturn.candidateProfileId;
     this.dnrStatus=donotreturn.dnrStatus;
     this.dnrDate=donotreturn.dnrDate;

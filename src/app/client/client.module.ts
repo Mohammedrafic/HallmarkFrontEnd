@@ -35,6 +35,7 @@ import {
   Unlock,
   Upload,
   User,
+  UserX,
   X,
   XCircle
 } from 'angular-feather/icons';
@@ -56,7 +57,7 @@ import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncf
 import { AutoCompleteAllModule, DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, MaskedDateTimeService, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
-
+import { NgxMaskModule } from 'ngx-mask';
 import { ClientRoutingModule } from './client-routing.module';
 import { OrderManagementContentComponent } from './order-management/components/order-management-content/order-management-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
@@ -112,6 +113,9 @@ import { DoNotReturnGridComponent } from './do-not-return/do-not-return-grid/do-
 import { DonotReturnState } from '@admin/store/donotreturn.state';
 import { DonotreturnService } from '@shared/services/donotreturn.service';
 import { DoNotReturnFormService } from './do-not-return/do-not-return.form.service';
+import { LogiReportState } from '@organization-management/store/logi-report.state';
+import { DocumentLibraryState } from '../modules/document-library/store/state/document-library.state';
+import { InputModule } from '@shared/components/form-controls/input/input.module';
 
 
 const gridIcons = {
@@ -135,6 +139,7 @@ const gridIcons = {
   Trash2,
   X,
   User,
+  UserX,
   MapPin,
   Briefcase,
   Calendar,
@@ -206,10 +211,12 @@ const gridIcons = {
     AssociateListModule,
     DropDownButtonAllModule,
     TooltipContainerModule,
+    InputModule,
     MatMenuModule,
     AutoCompleteAllModule,
+    NgxMaskModule,
     //STORE
-    NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState, CandidateState,DonotReturnState]),
+    NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState, CandidateState,DonotReturnState,DocumentLibraryState]),
     ExtensionModule,
     ImportDialogContentModule,
     ListBoxModule,

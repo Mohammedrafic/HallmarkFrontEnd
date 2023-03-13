@@ -37,10 +37,11 @@ public filters: DonoreturnFilters = {
 
   constructor(protected override store:Store) { 
     super(store)
-    store.dispatch(new SetHeaderState({ title: TITLE, iconName: 'users' }));
+    store.dispatch(new SetHeaderState({ title: TITLE, iconName: 'user-X' }));
   }
 
   override ngOnInit(): void {
+    this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters)]);
     super.ngOnInit();
   }
   

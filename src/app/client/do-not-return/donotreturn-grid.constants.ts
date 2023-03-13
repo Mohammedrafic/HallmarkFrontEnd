@@ -3,8 +3,10 @@ import { FilterConfig, MasterDoNotReturnExportColumn } from "./do-not-return.int
 
 export const MasterDNRExportCols: MasterDoNotReturnExportColumn[] = [
   { text: 'first name', column: 'FirstName' },
-  { text: 'middle name', column: 'Middle Name' },
+  { text: 'middle name', column: 'MiddleName' },
   { text: 'last name', column: 'LastName' },
+  {text: 'RegionName',column:'RegionName'},
+  {text: 'LocationName',column:'LocationName'},
   { text: 'email', column: 'EMAIL' },
   { text: 'ssn', column: 'SSN' },
   { text: 'dnrStatus', column: 'DNRStatus' },
