@@ -103,7 +103,7 @@ export const ThreeDotsMenuOptions = (
   moreMenuWithCloseButton: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
-    { text: MoreMenuType[2], id: '2', disabled: !canCloseOrder || isIrpSystem === OrderManagementIRPSystemId.IRP },
+    { text: MoreMenuType[2], id: '2', disabled: !canCloseOrder },
   ],
   moreMenuWithReOpenButton: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
@@ -116,7 +116,7 @@ export const ThreeDotsMenuOptions = (
   ],
   reOrdersMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
-    { text: MoreMenuType[2], id: '2', disabled: !canCloseOrder  || isIrpSystem === OrderManagementIRPSystemId.IRP },
+    { text: MoreMenuType[2], id: '2', disabled: !canCloseOrder },
   ],
   filledReOrdersMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },

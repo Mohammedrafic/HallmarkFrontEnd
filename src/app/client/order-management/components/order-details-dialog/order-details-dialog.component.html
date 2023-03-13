@@ -51,7 +51,6 @@
             </app-tooltip-container>
             <app-tooltip-container *ngIf="!canCloseOrder" [showToolTip]="!hasCreateEditOrderPermission">
               <button
-                *ngIf="activeSystem !== systemType.IRP"
                 ejs-button
                 cssClass="e-outline"
                 [class.custom-order-btn]="showApproveAndCancel"

@@ -100,3 +100,5 @@ export const CANDIDATE_DONOTRETURN ='Candidate cannot be blocked. This Candidate
 export const ASSIGN_HOME_COST_CENTER = 'Home Cost Center is already assigned, are you sure you want to reassign this department as Home Cost Center department?';
 export const USER_SUBSCRIPTION_PERMISSION = 'User missing required permissions(CanViewSubscriptions)';
 export const USER_ALERTS_PERMISSION = 'User missing required permissions(CanViewTemplates)';
+export const MULTI_CLOSE_ORDER = 'Order will be closed in VMS and IRP. Are you sure you want to proceed?';
+export const CLOSE_ORDER_TITLE = 'Close order';
