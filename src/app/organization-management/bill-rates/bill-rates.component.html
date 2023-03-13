@@ -11,10 +11,10 @@
     </button>
     <app-tooltip-container
       [message]="toolTipMessage"
-      [showToolTip]="isReadOnly || !userPermission[userPermissions.CanEditSettingsBillRates]">
+      [showToolTip]="!userPermission[userPermissions.CanEditSettingsBillRates]">
       <button
         *ngIf="isBillRateSetupTabActive"
-        [disabled]="isReadOnly || !userPermission[userPermissions.CanEditSettingsBillRates]"
+        [disabled]="!userPermission[userPermissions.CanEditSettingsBillRates]"
         ejs-button
         id="importButton"
         cssClass="e-outline button-import"
