@@ -181,6 +181,13 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       }
       this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
+    if ((AlertIdEnum[AlertIdEnum['Manual Invoice: Rejected']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
+      if (user?.businessUnitType === BusinessUnitType.Organization) {
+        this.changeTab.emit(InvoicesOrgTabId.ManualInvoicePending);
+        this.tabComponent.selectedItem = InvoicesOrgTabId.ManualInvoicePending;
+      }
+      this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
   }, 1000);
   }
   private getTabsWidth(): void {
