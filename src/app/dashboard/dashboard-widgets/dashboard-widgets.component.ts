@@ -7,6 +7,9 @@ import type { WidgetsDataModel } from '../models/widgets-data.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { WidgetDescriptionEnum } from '../enums/widget-description.enum';
+import { UserState } from 'src/app/store/user.state';
+import { Store } from '@ngxs/store';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-dashboard-widgets',
@@ -22,6 +25,7 @@ export class DashboardWidgetsComponent extends AbstractSFComponentDirective<Dash
   @Input() public isDarkTheme: boolean;
   @Input() public description: string;
   @Input() public UserType:number;
+  public isAgencyUser:boolean = false;
   
   @Output() public dashboardCreatedEmitter: EventEmitter<void> = new EventEmitter();
   @Output() public dragStopEmitter: EventEmitter<void> = new EventEmitter();
@@ -30,6 +34,14 @@ export class DashboardWidgetsComponent extends AbstractSFComponentDirective<Dash
   public readonly columns = 12;
   public readonly widgetTypeEnum: typeof WidgetTypeEnum = WidgetTypeEnum;
   public readonly widgetDescriptionEnum: typeof WidgetDescriptionEnum = WidgetDescriptionEnum;
+
+  constructor(protected store: Store){
+    super();
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+      this.isAgencyUser = true;
+    }
+  }
 
   public trackByHandler(_: number, panel: PanelModel): string {
     return panel.id ?? '';
