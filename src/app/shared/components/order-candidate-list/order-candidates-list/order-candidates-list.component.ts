@@ -30,6 +30,7 @@ import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.
 import { SettingsViewService } from '@shared/services';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
+import { OrderStatus } from '@shared/enums/order-management';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -74,6 +75,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public isFeatureIrpEnabled = false;
   public readonly systemType = OrderManagementIRPSystemId;
   public isCandidatePayRateVisible: boolean;
+  public readonly orderStatus = OrderStatus;
   public editCandidateDialogState: EditCandidateDialogState = {
     isOpen: false,
     candidate: {} as IrpOrderCandidate,

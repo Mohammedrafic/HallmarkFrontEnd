@@ -128,6 +128,7 @@ import {
   FilterOrderStatus,
   FilterStatus,
   IRPOrderManagement,
+  IRPOrderPositionMain,
   Order,
   OrderCandidateJob,
   OrderFilter,
@@ -199,6 +200,7 @@ import { GlobalWindow } from '@core/tokens';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { SetOrderManagementPagerState } from '@agency/store/candidate.actions';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
+import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -1837,11 +1839,15 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public getMoreMenu(order: OrderManagement): ItemModel[] {
     const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
+
     if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
       if (order.children?.some((child) => orderStatuses.includes(child.orderStatus))) {
         return order.orderType === OrderType.OpenPerDiem
           ? this.threeDotsMenuOptions['moreMenuWithCloseButton']
           : this.threeDotsMenuOptions['moreMenu'];
+      } else if (this.activeSystem === OrderManagementIRPSystemId.IRP
+        && order.activeCandidatesCount && order.activeCandidatesCount > 0) {
+        return this.threeDotsMenuOptions['moreMenu'];
       }
     }
     return this.canReOpen(order)

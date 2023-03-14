@@ -57,6 +57,8 @@ export class OrderManagement {
   commentContainerId?: number;
   extensionFromId?: number | null;
   irpOrderMetadata?: IRPMetaData;
+  irpCandidatesCount?: number;
+  activeCandidatesCount?: number;
 }
 
 export interface IRPOrderManagement {
@@ -464,6 +466,7 @@ export class Order {
   canRevoke?: boolean;
   canProceedRevoke?: boolean;
   externalCommentsConfiguration?:boolean | null;
+  activeCandidatesCount?: number;
 }
 
 export class ReOrder {

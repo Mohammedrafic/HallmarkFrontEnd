@@ -274,14 +274,19 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       return;
     }
 
-    if (!this.children?.length) {
+    if (!this.children?.length && this.activeSystem === this.systemType.VMS) {
       this.disabledCloseButton = false;
       return;
     }
 
     const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
+
     if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
       this.disabledCloseButton = Boolean(this.children?.some((child) => orderStatuses.includes(child.orderStatus)));
+    }
+
+    if (this.activeSystem === this.systemType.IRP) {
+      this.disabledCloseButton = !!(this.order.activeCandidatesCount && this.order.activeCandidatesCount > 0);
     }
   }
 
