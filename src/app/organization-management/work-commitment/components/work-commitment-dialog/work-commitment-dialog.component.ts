@@ -41,6 +41,7 @@ import { GetOrganizationStructure } from '../../../../store/user.actions';
 import { WorkCommitmentAdapter } from '../../adapters/work-commitment.adapter';
 import { AbstractControl } from '@angular/forms';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
+import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 
 @Component({
   selector: 'app-work-commitment-dialog',
@@ -220,7 +221,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
       .subscribe((value) => {
         this.selectedRegions = findSelectedItems(value, this.regions);
         const selectedLocation: OrganizationLocation[] = mapperSelectedItems(this.selectedRegions, 'locations');
-        setDataSourceValue(this.dialogConfig.fields, 'locations', selectedLocation);
+        setDataSourceValue(this.dialogConfig.fields, 'locations', getIRPOrgItems(selectedLocation));
         this.changeDetection.markForCheck();
       });
   }
