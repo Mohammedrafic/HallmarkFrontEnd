@@ -214,10 +214,10 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
     this.commitmentForm
       ?.get('regions')
       ?.valueChanges.pipe(
-        filter((value: number[]) => !!value?.length),
         takeUntil(this.destroy$)
       )
       .subscribe((value) => {
+        this.commitmentForm?.get('locations')?.setValue([]);
         this.selectedRegions = findSelectedItems(value, this.regions);
         const selectedLocation: OrganizationLocation[] = mapperSelectedItems(this.selectedRegions, 'locations');
         setDataSourceValue(this.dialogConfig.fields, 'locations', selectedLocation);
