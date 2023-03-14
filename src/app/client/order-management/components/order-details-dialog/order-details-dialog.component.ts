@@ -556,8 +556,12 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private getOrderStatus(): OrderStatus {
+    if (!this.order) {
+      return OrderStatus.NoOrder;
+    }
+
     if (this.activeSystem === this.systemType.IRP) {
-      return this.order.irpOrderMetadata?.status as OrderStatus
+      return this.order.irpOrderMetadata?.status as OrderStatus;
     }
 
     return this.order.status;
