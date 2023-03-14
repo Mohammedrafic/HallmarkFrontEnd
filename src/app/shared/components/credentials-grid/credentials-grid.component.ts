@@ -612,6 +612,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.candidateCredentialResponse = response;
       this.setDisableAddCredentialButton();
       this.setGridItems(response);
+      this.cdr.markForCheck();
     });
   }
 
@@ -729,12 +730,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         disableDelete: this.disableDelete(item),
       };
     });
-    if (this.grid) {
-      this.grid.getColumnByField('experience').visible = this.isOrganizationAgencyArea.isAgencyArea;
-      this.grid.getColumnByField('insitute').visible = this.isOrganizationAgencyArea.isAgencyArea;
-      this.grid.refreshColumns();
-      this.cdr.markForCheck();
-    }
   }
  private disableViewDocument(item:CandidateCredential):boolean{
   let length= item.credentialFiles==null?0:item.credentialFiles?.length;
