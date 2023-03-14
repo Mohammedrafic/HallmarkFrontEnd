@@ -143,8 +143,8 @@ export class Donotreturn {
   businessUnitId?: number;
   locationsid?: string;
   regionsid?:string;
-  regionname?:string
-  locationname?:string
+  regionName?:string
+  locationName?:string
   candidateProfileId?: number;
   dnrStatus?: string;
   dnrDate?: DateTimeHelper;
@@ -162,9 +162,9 @@ export class Donotreturn {
     this.id = donotreturn.id||0;
     this.businessUnitId = donotreturn.businessUnitId;
     this.regionsid=donotreturn.regionsid;
-    this.regionname=donotreturn.regionname;
+    this.regionName=donotreturn.regionName;
     this.locationsid=donotreturn.locationsid;
-    this.locationname=donotreturn.locationname;
+    this.locationName=donotreturn.locationName;
     this.candidateProfileId=donotreturn.candidateProfileId;
     this.dnrStatus=donotreturn.dnrStatus;
     this.dnrDate=donotreturn.dnrDate;
