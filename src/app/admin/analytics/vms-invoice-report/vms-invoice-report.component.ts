@@ -166,6 +166,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.loadYearAndMonth();
       this.loadInvoiceStatus();
+     
       this.CommonReportFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
           this.filterOptionsData = data;
@@ -302,7 +303,12 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
           else {
             this.isResetFilter = true;
           }
-
+          let businessIdData = [];
+          businessIdData.push(data);
+          let filter: CommonReportFilter = {
+            businessUnitIds: businessIdData
+          };
+          this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           if (this.isInitialLoad) {
