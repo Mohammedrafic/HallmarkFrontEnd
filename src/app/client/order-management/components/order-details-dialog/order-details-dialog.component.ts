@@ -149,11 +149,11 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get canCloseOrder(): boolean {
     const canNotClose = [this.orderStatus.PreOpen, this.orderStatus.Incomplete];
-    return this.canReOpen || canNotClose.includes(this.order?.status);
+    return this.canReOpen || canNotClose.includes(this.getOrderStatus());
   }
 
   get canReOpen(): boolean {
-    return this.order?.status !== OrderStatus.Closed && Boolean(this.order?.orderClosureReasonId);
+    return this.getOrderStatus() !== OrderStatus.Closed && Boolean(this.order?.orderClosureReasonId);
   }
 
   get showApproveAndCancel(): boolean {
@@ -176,7 +176,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   get disableEdit(): boolean {
-    return this.order?.status === this.orderStatus.Closed;
+    return this.getOrderStatus() === this.orderStatus.Closed;
   }
 
   get disableCloseOrder(): boolean {
@@ -553,5 +553,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       this.canCloseOrderPermission = canCloseOrder;
       this.canCreateOrder = canCreateOrder;
     });
+  }
+
+  private getOrderStatus(): OrderStatus {
+    if (this.activeSystem === this.systemType.IRP) {
+      return this.order.irpOrderMetadata?.status as OrderStatus
+    }
+
+    return this.order.status;
   }
 }
