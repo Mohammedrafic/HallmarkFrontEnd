@@ -98,7 +98,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   }
 
   private handleEditingCandidate(): void {
-    this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } })).subscribe(() => {
+    this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } })).pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.candidateId) {
         this.candidateProfileService
           .getCandidateById(this.candidateId)
