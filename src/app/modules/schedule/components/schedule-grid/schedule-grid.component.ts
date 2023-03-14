@@ -62,6 +62,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     = new EventEmitter<ScheduleInt.ScheduleSelectedSlots>();
   @Output() selectCandidate: EventEmitter<ScheduleInt.ScheduleCandidate | null>
     = new EventEmitter<ScheduleInt.ScheduleCandidate | null>();
+  @Output() editCell: EventEmitter<ScheduleInt.ScheduledItem> = new EventEmitter<ScheduleInt.ScheduledItem>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
@@ -160,10 +161,13 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     cellDate?: ScheduleDateItem
   ): void {
     if(!cellDate?.isDisabled) {
+      const dateStringLength = 10;
+      const formattedDateSting = schedule.date.substring(0, dateStringLength);
       this.preventCellSingleClick = true;
       clearTimeout(this.cellClickTimer);
       this.selectedCandidatesSlot.clear();
-      // TODO: edit functionality (will be added in the next sprint)
+      this.selectDateSlot(formattedDateSting, candidate);
+      this.editCell.emit({ candidate, schedule });
     }
   }
 

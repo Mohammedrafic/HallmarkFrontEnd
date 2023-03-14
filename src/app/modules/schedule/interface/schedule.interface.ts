@@ -44,12 +44,18 @@ export interface ScheduleItem {
   location: string;
   department: string;
   unavailabilityReason: string;
+  shiftId: number;
   orderMetadata: {
     orderType: IrpOrderType;
     location: string;
     department: string;
     orderPublicId: string;
     region: string;
+    primarySkill: number;
+    primarySkillId: number;
+    regionId: number;
+    locationId: number;
+    departmentId: number;
   }
 }
 
@@ -70,10 +76,17 @@ export interface ScheduleDateItem {
   extendedDays: number;
   daySchedules: ScheduleItem[];
   isInDifferentDepartments: boolean;
+  isHomeCostCenterDepartment: boolean;
+  isDepartmentMatchWithFilter: boolean;
   employeeStatus: number;
   departmentStartDate: string;
   departmentEndDate: string;
   isDisabled?: boolean;
+}
+
+export interface ScheduledItem {
+  candidate: ScheduleCandidate;
+  schedule: ScheduleDateItem;
 }
 
 export interface ScheduleDateSlot {

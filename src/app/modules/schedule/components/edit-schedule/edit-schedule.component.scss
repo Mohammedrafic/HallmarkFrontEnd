@@ -1,0 +1,103 @@
+@import "colors";
+@import "mixins";
+
+.dialog-container {
+  padding: 24px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  .title {
+    @include dialog-title;
+  }
+}
+
+.button-cancel {
+  margin-right: 8px;
+}
+
+.separator {
+  height: 1px;
+  background-color: $secondary-dark-blue-45;
+  margin: 0 0 28px 0;
+}
+
+.form-container {
+  .validation-icon {
+    display: none !important;
+  }
+}
+
+.input-container .input-group.input-readonly {
+  .e-input[readonly] {
+    background-color: $secondary-dark-blue-50;
+    color: $secondary-dark-blue-30;
+    border: 1px solid $secondary-dark-blue-40 !important;
+  }
+}
+
+.schedule-footer {
+  display: flex;
+  padding: 14px 26px;
+
+  .checkbox-container {
+    padding: 10px 0;
+  }
+}
+
+.scheduled-shift-form {
+  display: grid;
+  grid-template-columns:  2.5fr 2.7fr 1.9fr 1.9fr 1.2fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  gap: 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "date date date date date"
+    "shift shift startTime endTime hours"
+    "region region location location location"
+    "department department skill skill skill";
+}
+
+.date {
+  grid-area: date;
+}
+
+.reason {
+  grid-area: reason;
+}
+
+.shift {
+  grid-area: shift;
+}
+
+.startTime {
+  grid-area: startTime;
+}
+
+.endTime {
+  grid-area: endTime;
+}
+
+.hours {
+  grid-area: hours;
+}
+
+.region {
+  grid-area: region;
+}
+
+.location {
+  grid-area: location;
+}
+
+.department {
+  grid-area: department;
+}
+
+.skill {
+  grid-area: skill;
+}

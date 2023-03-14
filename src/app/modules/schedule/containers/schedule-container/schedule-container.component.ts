@@ -17,7 +17,7 @@ import { ButtonRegionTooltip, ButtonSelectDataTooltip, TabListConfig } from '../
 import { ActiveTabIndex } from '../../enums';
 import * as ScheduleInt from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
-import { ScheduleFilterStructure } from '../../interface';
+import { ScheduledItem, ScheduleFilterStructure } from '../../interface';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { GetScheduleFilterByEmployees, HasDepartment, ShowButtonTooltip } from '../../helpers';
 
@@ -36,6 +36,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   scheduleData: ScheduleInt.ScheduleModelPage | null;
 
+  scheduledShift: ScheduledItem;
+
   appliedFiltersAmount = 0;
 
   totalCount = 0;
@@ -43,6 +45,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   scheduleFilters: ScheduleInt.ScheduleFilters = {};
 
   createScheduleDialogOpen = false;
+
+  editScheduleDialogOpen = false;
 
   scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
 
@@ -137,6 +141,15 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.createScheduleDialogOpen = false;
   }
 
+  editScheduledItem(scheduledItem: ScheduledItem): void {
+    this.scheduledShift = scheduledItem;
+    this.openEditScheduleDialog();
+  }
+
+  closeEditScheduleDialog(): void {
+    this.editScheduleDialogOpen = false;
+  }
+
   showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }
@@ -158,6 +171,10 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   deleteFilterItem(event: ChipDeleteEventType): void {
     this.filterService.deleteInlineChip(event);
+  }
+
+  private openEditScheduleDialog(): void {
+    this.editScheduleDialogOpen = true;
   }
 
   private initScheduleData(isLoadMore = false): void {
