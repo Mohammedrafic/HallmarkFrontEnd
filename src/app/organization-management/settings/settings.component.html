@@ -73,6 +73,9 @@
             </span>
             <span *ngIf="data.controlType === organizationSettingControlType.Text">{{child.value}}</span>
             <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{child.value | date: 'MM/dd/yyyy'}}</span>
+            <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
+              {{ child.parsedValue.value && child.parsedValue.isEnabled ? child.parsedValue.value : 'No' }}
+            </span>
           </td>
         </tr>
         </tbody>
@@ -117,6 +120,9 @@
           <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{data.value | date: 'MM/dd/yyyy'}}</span>
           <span *ngIf="data.controlType === organizationSettingControlType.InvoiceAutoGeneration">
             {{ data.parsedValue?.isEnabled ? 'Yes' : 'No'}}</span>
+          <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
+            {{ data.parsedValue.value && data.parsedValue.isEnabled ? data.parsedValue.value : 'No' }}
+          </span>
         </ng-template>
       </e-column>
     </e-columns>
