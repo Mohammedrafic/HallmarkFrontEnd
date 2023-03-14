@@ -156,29 +156,19 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
 
       if (this.selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
         this.store.dispatch(new Invoices.GetPendingRecordsFiltersDataSource());
-      } else if (
-        this.selectedTabId === InvoicesOrgTabId.ManualInvoicePending
+      } else if (this.selectedTabId === InvoicesOrgTabId.ManualInvoicePending
         || this.selectedTabId === InvoicesAgencyTabId.ManualInvoicePending
       ) {
-        this.initManualPendingFiltersDataSources();
+        this.initManualPendingFiltersDataSources(id);
       } else {
         this.store.dispatch(new Invoices.GetFiltersDataSource(orgId));
       }
     });
   }
 
-  private initManualPendingFiltersDataSources(): void {
+  private initManualPendingFiltersDataSources(id: number): void {
     if(this.isAgency) {
-      const currentOrgId = (this.store.snapshot().invoices as InvoicesModel).selectedOrganizationId;
-
-      this.organizations$.pipe(
-        filter((organizations: DataSourceItem[]) => !!organizations.length),
-        takeUntil(this.componentDestroy()),
-      ).subscribe((organizations: DataSourceItem[]) => {
-        const id = currentOrgId ? currentOrgId : organizations[0].id;
-        this.store.dispatch(new Invoices.GetManualInvoiceRecordFiltersDataSource(id));
-      });
-
+      this.store.dispatch(new Invoices.GetManualInvoiceRecordFiltersDataSource(id));
     } else {
       this.store.dispatch(new Invoices.GetManualInvoiceRecordFiltersDataSource(null));
     }

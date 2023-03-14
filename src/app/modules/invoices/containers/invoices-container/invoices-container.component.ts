@@ -213,7 +213,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   ngAfterViewInit(): void {
-    this.invoicesTableTabsComponent.preselectTab(this.selectedTabIdx);
+    if (this.organizationId) {
+      this.invoicesTableTabsComponent.preselectTab(this.selectedTabIdx);
+    }
   }
 
   public watchAgencyId(): void {
@@ -222,6 +224,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         .pipe(
           filter(Boolean),
           distinctUntilChanged(),
+          tap(() => {
+            this.organizationId = 0;
+            this.organizationControl.reset();
+            this.organizationsList = [];
+            this.store.dispatch(new Invoices.SelectOrganization(0));
+          }),
           switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
           switchMap(() => this.organizations$),
           filter((organizations: DataSourceItem[]) => !!organizations.length),
