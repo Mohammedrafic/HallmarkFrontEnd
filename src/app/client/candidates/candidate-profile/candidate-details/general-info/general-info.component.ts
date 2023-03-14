@@ -1,15 +1,13 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractContactDetails } from '@client/candidates/candidate-profile/candidate-details/abstract-contact-details';
 import { ProfileStatuses, ProfileStatusesEnum, TerminationReasons } from '@client/candidates/candidate-profile/candidate-profile.constants';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Validators } from '@angular/forms';
 import { JobClassifications } from '@client/order-management/constants';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { Select, Store } from '@ngxs/store';
+import { Select } from '@ngxs/store';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { distinctUntilChanged, Observable, takeUntil } from 'rxjs';
-import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
-import { SystemType } from '@shared/enums/system-type.enum';
 
 @Component({
   selector: 'app-general-info',
@@ -33,8 +31,6 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   public readonly today = new Date();
 
   constructor(
-    private formBuilder: FormBuilder,
-    private store: Store,
     protected override cdr: ChangeDetectorRef,
     protected override candidateProfileFormService: CandidateProfileFormService
   ) {
@@ -46,7 +42,6 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.listenProfileStatusChanges();
     this.listenSkillsChanges();
     this.subscribeOnSkills();
-    this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
   }
 
   public override ngOnDestroy(): void {
