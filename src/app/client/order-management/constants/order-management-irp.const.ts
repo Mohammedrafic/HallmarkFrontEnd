@@ -182,7 +182,7 @@ export const PrepareMenuItems = (order: OrderManagement, threeDotsMenuOptions: R
 export const DefaultOrderManagementSubGridCells: ColDef[] = [
   {
     field: 'candidateStatus',
-    width: 140,
+    width: 150,
   },
   {
     field: 'system',
