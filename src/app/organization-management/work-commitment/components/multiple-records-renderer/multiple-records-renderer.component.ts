@@ -17,7 +17,6 @@ export class MultipleRecordsRendererComponent extends GridCellRenderer<ICellRend
   }
 
   public ngOnInit(): void {
-    debugger;
     if (this.params.field === 'skillNames') {
       this.skillsHandler();
     }
