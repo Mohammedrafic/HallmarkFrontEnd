@@ -4,6 +4,7 @@ import { WorkCommitmentButtonRenderer } from '../components/work-commitment-butt
 import { ValueFormatterParams } from '@ag-grid-community/core';
 import { formatDate } from '@angular/common';
 import { formatDate as formatDateString } from '@shared/constants/format-date';
+import { MultipleRecordsRendererComponent } from '../components/multiple-records-renderer/multiple-records-renderer.component';
 
 export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkCommitmentGrid) => void) => [
   {
@@ -29,21 +30,30 @@ export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkC
     headerName: 'REGION',
     minWidth: 140,
     sortable: true,
-    valueGetter: (params: { data: WorkCommitmentGrid }) => getCorrectLocationValue(params.data.regionName),
+    cellRenderer: MultipleRecordsRendererComponent,
+    cellRendererParams: {
+      field: 'regionName'
+    },
   },
   {
     field: 'locationName',
     headerName: 'LOCATION',
     minWidth: 140,
     sortable: true,
-    valueGetter: (params: { data: WorkCommitmentGrid }) => getCorrectLocationValue(params.data.locationName),
+    cellRenderer: MultipleRecordsRendererComponent,
+    cellRendererParams: {
+      field: 'locationName'
+    },
   },
   {
     field: 'skillNames',
     headerName: 'SKILL',
     minWidth: 140,
     sortable: true,
-    valueGetter: (params: { data: WorkCommitmentGrid }) => getCorrectSkillsValue(params.data.skillNames),
+    cellRenderer: MultipleRecordsRendererComponent,
+    cellRendererParams: {
+      field: 'skillNames'
+    },
   },
   {
     field: 'minimumWorkExperience',

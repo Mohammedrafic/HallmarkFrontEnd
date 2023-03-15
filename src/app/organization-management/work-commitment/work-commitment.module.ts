@@ -7,9 +7,10 @@ import { ButtonModule } from '@shared/components/button/button.module';
 import { WorkCommitmentGridModule } from './components/work-commitment-grid/work-commitment-grid.module';
 import { WorkCommitmentDialogModule } from './components/work-commitment-dialog/work-commitment-dialog.module';
 import { WorkCommitmentButtonRendererModule } from './components/work-commitment-button-renderer/work-commitment-button-renderer.module';
+import { MultipleRecordsRendererComponent } from './components/multiple-records-renderer/multiple-records-renderer.component';
 
 @NgModule({
-  declarations: [WorkCommitmentComponent],
+  declarations: [WorkCommitmentComponent, MultipleRecordsRendererComponent],
   imports: [
     CommonModule,
     WorkCommitmentGridModule,
