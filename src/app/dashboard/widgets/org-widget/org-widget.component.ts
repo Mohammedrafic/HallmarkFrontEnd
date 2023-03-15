@@ -62,7 +62,7 @@ export class OrgWidgetComponent extends AbstractPermissionGrid {
       this.dashboardService.redirectToUrl('client/timesheets/');
       this.globalWindow.localStorage.setItem("orgpendingwidget",JSON.stringify(orgname));  
     } else if(orgname === 'MissingCredentials'){
-      this.dashboardService.redirectToUrl('agency/candidates');
+      this.dashboardService.redirectToUrl('agency/candidate-details');
     }
   }
 
