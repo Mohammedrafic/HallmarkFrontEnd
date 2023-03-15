@@ -27,6 +27,7 @@ import { ReasonsService } from './services/reasons.service';
 import { UnavailabilityReasonsModule } from './components/unavailability-reasons';
 import { ToggleIconRendererModule } from '@shared/components/cell-renderers/toggle-icon-renderer';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
+import { InternalTransferComponent } from './components/internal-transfer/internal-transfer.component';
 
 const icons = {
     Edit,
@@ -63,6 +64,7 @@ const icons = {
         OrderRequisitionComponent,
         PenaltiesComponent,
         CandidateRejectReasonComponent,
+        InternalTransferComponent,
     ],
     providers: [ReasonsFormsService, ReasonsService],
     exports: [ReasonsComponent],

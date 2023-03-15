@@ -16,7 +16,7 @@ import {
   UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess,
   GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty,
   SavePenaltySuccess, SavePenaltyError, RemovePenalty, ShowOverridePenaltyDialog, GetUnavailabilityReasons,
-  SaveUnavailabilityReason, RemoveUnavailabilityReason,
+  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess,
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
 import { RejectReason, RejectReasonPage, UnavailabilityReasons } from "@shared/models/reject-reason.model";
@@ -37,6 +37,7 @@ export interface RejectReasonStateModel {
   penalties: PenaltyPage | null;
   isReasonLoading: boolean;
   unavailabilityReasons: PageOfCollections<UnavailabilityReasons> | null;
+  internalTransfer: RejectReasonPage | null;
 }
 
 @State<RejectReasonStateModel>({
@@ -49,6 +50,7 @@ export interface RejectReasonStateModel {
     penalties: null,
     isReasonLoading: false,
     unavailabilityReasons: null,
+    internalTransfer: null
   },
 })
 @Injectable()
@@ -88,6 +90,11 @@ export class RejectReasonState {
   @Selector()
   static getUnavailabilityReasons(state: RejectReasonStateModel): PageOfCollections<UnavailabilityReasons> | null {
     return state.unavailabilityReasons;
+  }
+
+  @Selector()
+  static internalTransfer(state: RejectReasonStateModel) : RejectReasonPage | null {
+    return state.internalTransfer;
   }
 
   constructor(private rejectReasonService:RejectReasonService) {}
@@ -434,4 +441,66 @@ export class RejectReasonState {
       }),
     );
   }
+
+  @Action(GetInternalTransferReasons)
+  GetInternalTransferReasons(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    { pageNumber, pageSize }: GetInternalTransferReasons
+  ): Observable<RejectReasonPage> {
+    patchState({ isReasonLoading: true });
+
+    return this.rejectReasonService.getInternalTransferReason(pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({internalTransfer: payload});
+        return payload;
+      })
+    );
+  }
+
+
+  @Action(SaveInternalTransferReasons)
+  SaveInternalTransferReasons(
+    { dispatch}: StateContext<RejectReasonStateModel>,
+    { payload }: SaveInternalTransferReasons
+  ): Observable<RejectReason | void> {
+    return this.rejectReasonService.saveInternalTransferReason(payload).pipe(
+      tap(payload => {
+        dispatch(new UpdateInternalTransferReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(RemoveInternalTransferReasons)
+  RemoveInternalTransferReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { id }: RemoveInternalTransferReasons
+  ): Observable<void> {
+    return this.rejectReasonService.removeInternalTransferReason(id).pipe(
+      tap(() => {
+        dispatch(new UpdateInternalTransferReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      })
+    );  }
+
+  @Action(UpdateInternalTransferReasons)
+  UpdateInternalTransferReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { payload }: UpdateInternalTransferReasons
+  ): Observable<void> {
+    return this.rejectReasonService.updateInternalTransferReason(payload).pipe(
+      tap(() => {
+        dispatch(new UpdateInternalTransferReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
 }
+
