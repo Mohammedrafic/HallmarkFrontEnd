@@ -88,8 +88,7 @@
                   </label>
                   <div class="input-group">
                     <ejs-timepicker
-                      (close)="setHours()"
-                      (change)="selectCustomShift()"
+                      (change)="changeTimeControls($event, control.field)"
                       placeholder="HH:MM"
                       [formControlName]="control.field"
                       format="HH:mm"

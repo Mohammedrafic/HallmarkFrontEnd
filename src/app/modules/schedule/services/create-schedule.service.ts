@@ -182,19 +182,6 @@ export class CreateScheduleService {
     });
   }
 
-  // TODO: replace with helper function from schedule.helper.ts
-  getShiftHours(startTimeDate: Date, endTimeDate: Date): string {
-    const startTimeMs: number = startTimeDate.setMilliseconds(0);
-    let endTimeMs: number = endTimeDate.setMilliseconds(0);
-
-    if (startTimeMs > endTimeMs) {
-      const dayMs = 86400000;
-      endTimeMs = endTimeMs + dayMs;
-    }
-
-    return convertMsToTime(endTimeMs - startTimeMs);
-  }
-
   getScheduleTypesWithPermissions(
     scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>,
     userPermission: Permission

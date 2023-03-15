@@ -12,6 +12,7 @@ import {
 import { FormControl } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
+import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
 import { catchError, filter, map, Observable, switchMap, take, takeUntil, tap, zip } from 'rxjs';
 
 import { FieldType } from '@core/enums';
@@ -26,11 +27,17 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { Skill } from '@shared/models/skill.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ShiftsService } from '@shared/services/shift.service';
-import { getHoursMinutesSeconds, getTime } from '@shared/utils/date-time.utils';
+import { getTime } from '@shared/utils/date-time.utils';
 import { ScheduleFormSourceKeys } from 'src/app/modules/schedule/constants';
 import { ScheduleType } from 'src/app/modules/schedule/enums';
 import { ShowToast } from 'src/app/store/app.actions';
-import { GetScheduleTabItems, GetShiftHours, MapToDropdownOptions, ScheduleFilterHelper } from '../../helpers';
+import {
+  GetScheduleTabItems,
+  GetShiftHours,
+  GetShiftTimeControlsValue,
+  MapToDropdownOptions,
+  ScheduleFilterHelper,
+} from '../../helpers';
 import { ScheduledItem, ScheduleFilterStructure, ScheduleItem } from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { EditScheduleFormSourceKeys, EditScheduleSourcesMap, ScheduledShiftFormConfig } from './edit-schedule.constants';
@@ -140,17 +147,16 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     this.scheduleForm.patchValue(patchData);
   }
 
-  selectCustomShift(): void {
-    this.scheduleForm.get('shiftId')?.setValue(this.customShiftId);
-  }
+  changeTimeControls(event: ChangeEventArgs, field: string): void {
+    const shiftIdControl = this.scheduleForm.get('shiftId');
+    const startTimeDate = field === 'startTime' ? event.value : this.scheduleForm.get('startTime')?.value;
+    const endTimeDate = field === 'endTime' ? event.value : this.scheduleForm.get('endTime')?.value;
 
-  setHours(): void {
-    const startTimeDate = this.scheduleForm.get('startTime')?.value;
-    const endTimeDate = this.scheduleForm.get('endTime')?.value;
-
-    if (startTimeDate && endTimeDate) {
-      this.scheduleForm.get('hours')?.setValue(GetShiftHours(startTimeDate, endTimeDate));
+    if (shiftIdControl?.value !== this.customShiftId) {
+      shiftIdControl?.setValue(this.customShiftId);
     }
+
+    this.setHours(startTimeDate, endTimeDate);
   }
 
   saveSchedule(): void {
@@ -160,6 +166,15 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     }
 
     this.updateScheduledShift();
+  }
+
+  private setHours(
+    startTimeDate: Date = this.scheduleForm.get('startTime')?.value,
+    endTimeDate: Date = this.scheduleForm.get('endTime')?.value,
+  ): void {
+    if (startTimeDate && endTimeDate) {
+      this.scheduleForm.get('hours')?.setValue(GetShiftHours(startTimeDate, endTimeDate));
+    }
   }
 
   private getScheduleFilterStructure(): Observable<ScheduleFilterStructure> {
@@ -197,14 +212,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
         takeUntil(this.componentDestroy()),
       )
       .subscribe((shift: ScheduleShift) => {
-        const [startH, startM, startS] = getHoursMinutesSeconds(shift.startTime);
-        const [endH, endM, endS] = getHoursMinutesSeconds(shift.endTime);
-        const startTime = new Date();
-        const endTime = new Date();
-        startTime.setHours(startH, startM, startS);
-        endTime.setHours(endH, endM, endS);
-
-        this.scheduleForm.patchValue({ startTime, endTime });
+        this.scheduleForm.patchValue(GetShiftTimeControlsValue(shift.startTime, shift.endTime));
         this.setHours();
       });
   }

@@ -2,7 +2,7 @@ import { FormGroup } from '@angular/forms';
 
 import * as ScheduleInt from '../interface';
 import { DropdownOption } from '@core/interface';
-import { convertMsToTime } from '@shared/utils/date-time.utils';
+import { convertMsToTime, getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { ShiftTab } from '../components/edit-schedule/edit-schedule.interface';
 import { ScheduleType } from '../enums';
 import { BookingError, ScheduleBookingErrors, ScheduleItem } from '../interface';
@@ -200,3 +200,15 @@ export const GetScheduleTabItems = (daySchedules: ScheduleItem[]): ShiftTab[] =>
     };
   });
 };
+
+export const GetShiftTimeControlsValue =
+  (shiftStartTime: string, shiftEndTime: string): { startTime: Date, endTime: Date } => {
+    const [startH, startM, startS] = getHoursMinutesSeconds(shiftStartTime);
+    const [endH, endM, endS] = getHoursMinutesSeconds(shiftEndTime);
+    const startTime = new Date();
+    const endTime = new Date();
+    startTime.setHours(startH, startM, startS);
+    endTime.setHours(endH, endM, endS);
+
+    return { startTime, endTime };
+  };
