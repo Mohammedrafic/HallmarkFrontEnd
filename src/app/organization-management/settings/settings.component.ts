@@ -547,6 +547,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     if (this.formControlType === OrganizationSettingControlType.SwitchedValue) {
       this.switchedValueForm.get('value')?.addValidators(validators);
+      this.observeToggleControl();
     }
 
     if (validators.length > 0) {
@@ -747,9 +748,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       groupingBy: [null, Validators.required],
     });
 
+    // Remove this validation after be implementation. This is be bug.
     this.switchedValueForm = this.formBuilder.group({
       isEnabled: [false],
-      value: [null],
+      value: [null, [Validators.min(1), Validators.max(99)]],
     });
   }
 
@@ -913,6 +915,21 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     return ({
       value: this.switchedValueForm.get('value')?.value,
       isEnabled: !!this.switchedValueForm.get('isEnabled')?.value,
+    });
+  }
+
+  private observeToggleControl(): void {
+    this.switchedValueForm.get('isEnabled')?.valueChanges
+    .pipe(
+      takeUntil(this.unsubscribe$)
+    )
+    .subscribe((value: boolean) => {
+      if (value) {
+        this.switchedValueForm.get('value')?.addValidators(Validators.required);
+      } else {
+        this.switchedValueForm.get('value')?.removeValidators(Validators.required);
+      }
+      this.switchedValueForm.get('value')?.updateValueAndValidity();
     });
   }
 }
