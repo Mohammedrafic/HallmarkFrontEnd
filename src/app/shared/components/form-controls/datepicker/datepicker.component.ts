@@ -24,4 +24,5 @@ export class DatepickerComponent extends BaseFormControlDirective {
   @Input() min: Date | null | undefined;
   @Input() max: Date | null | undefined;
   @Input() public override placeholder = 'MM/DD/YYYY';
+  @Input() public strictMode: boolean = false;
 }

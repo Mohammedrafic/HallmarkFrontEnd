@@ -65,7 +65,8 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public todayDate = new Date();
   public lastActiveDate: Date;
   public selectWorkCommitmentStartDate: Date;
-  public minimumDate: Date;
+  public minimumDate: Date | undefined;
+  public maximumDate: Date | undefined;
 
   public useMinimumDate: boolean = false;
 
@@ -136,6 +137,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       .subscribe((commitment: WorkCommitmentDetails) => {
         this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
         this.minimumDate = !populateForm || this.lastActiveDate < this.selectWorkCommitmentStartDate ? this.selectWorkCommitmentStartDate : this.lastActiveDate;
+        this.maximumDate = commitment.endDate ? DateTimeHelper.convertDateToUtc(commitment.endDate as string) : undefined;
         if (populateForm) {
           this.populateFormWithMasterCommitment(commitment);
         } else {
@@ -150,10 +152,18 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       .pipe(takeUntil(this.destroy$), distinctUntilChanged())
       .subscribe((value) => {
         if (value) {
+          this.resetStartDateField();
           this.enableControls();
           this.getWorkCommitmentById(value);
         }
       });
+  }
+
+  private resetStartDateField(): void {
+    this.candidateWorkCommitmentForm.get('startDate')?.reset();
+    this.maximumDate = undefined;
+    this.minimumDate = undefined;
+    this.cd.markForCheck();
   }
 
   private getActiveWorkCommitment(): void {
