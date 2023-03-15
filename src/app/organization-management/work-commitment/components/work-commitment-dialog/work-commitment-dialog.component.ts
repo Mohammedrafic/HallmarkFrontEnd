@@ -11,7 +11,7 @@ import {
 import { CustomFormGroup } from '@core/interface';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { filter, Observable, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
 import { ShowSideDialog } from '../../../../store/app.actions';
@@ -22,9 +22,7 @@ import { WorkCommitmentService } from '../../services/work-commitment.service';
 import {
   CommitmentDialogConfig,
   CommitmentsInputConfig,
-  Option,
   RegionsDTO,
-  WorkCommitmentDetails,
   WorkCommitmentDTO,
   WorkCommitmentForm,
   WorkCommitmentGrid,
@@ -41,6 +39,7 @@ import { GetOrganizationStructure } from '../../../../store/user.actions';
 import { WorkCommitmentAdapter } from '../../adapters/work-commitment.adapter';
 import { AbstractControl } from '@angular/forms';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
+import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 
 @Component({
   selector: 'app-work-commitment-dialog',
@@ -214,13 +213,14 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
     this.commitmentForm
       ?.get('regions')
       ?.valueChanges.pipe(
-        filter((value: number[]) => !!value?.length),
+        distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
       .subscribe((value) => {
+        this.commitmentForm?.get('locations')?.setValue([]);
         this.selectedRegions = findSelectedItems(value, this.regions);
         const selectedLocation: OrganizationLocation[] = mapperSelectedItems(this.selectedRegions, 'locations');
-        setDataSourceValue(this.dialogConfig.fields, 'locations', selectedLocation);
+        setDataSourceValue(this.dialogConfig.fields, 'locations', getIRPOrgItems(selectedLocation));
         this.changeDetection.markForCheck();
       });
   }

@@ -4,7 +4,7 @@ import { Store } from '@ngxs/store';
 
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { ShowSideDialog } from '../../../../store/app.actions';
-import { WorkCommitmentDetails, WorkCommitmentDTO, WorkCommitmentGrid } from '../../interfaces';
+import { WorkCommitmentDTO, WorkCommitmentGrid } from '../../interfaces';
 import { WorkCommitment } from '../../../store/work-commitment.actions';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 

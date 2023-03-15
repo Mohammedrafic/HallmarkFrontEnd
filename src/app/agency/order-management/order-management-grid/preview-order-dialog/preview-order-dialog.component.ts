@@ -32,6 +32,7 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { UserState } from '../../../../store/user.state';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-preview-order-dialog',
@@ -76,6 +77,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
   public agencyActionsAllowed = true;
   public isClosedOrder = false;
   public orderComments: Comment[] = [];
+  public readonly system = OrderManagementIRPSystemId.VMS;
   public readonly reasonClosure = {
     orderClosureReason: 'Candidate Rejected',
   } as Order;
@@ -147,7 +149,9 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
   }
 
   private subsToSelectedOrder(): void {
-    this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+    this.selectedOrder$
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe((order) => {
       this.currentOrder = order;
       this.currentOrder && this.getOrderComments();
       this.isClosedOrder = this.currentOrder?.status === OrderStatus.Closed;

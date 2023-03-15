@@ -61,7 +61,7 @@ import {
   SaveEducationSucceeded,
   SaveExperience,
   SaveExperienceSucceeded,
-  SetOrderGridPageNumber,
+  SetOrderManagementPagerState,
   UploadCandidatePhoto,
   UploadCandidateProfileFile,
   UploadCandidateProfileFileSucceeded,
@@ -87,7 +87,7 @@ import { CredentialStatus } from '@shared/enums/status';
     credentialTypes: [],
     masterCredentials: [],
     groupedCandidateCredentialsFiles: [],
-    orderGridPageNumber: 1,
+    orderManagementPagerState: null,
   },
 })
 @Injectable()
@@ -138,8 +138,8 @@ export class CandidateState {
   }
 
   @Selector()
-  static orderGridPageNumber (state: CandidateStateModel): number {
-    return state.orderGridPageNumber;
+  static orderManagementPagerState (state: CandidateStateModel): CandidateStateModel['orderManagementPagerState'] {
+    return state.orderManagementPagerState;
   }
 
   constructor(private candidateService: CandidateService, private skillsService: SkillsService) {}
@@ -595,11 +595,11 @@ export class CandidateState {
       );
   }
 
-  @Action(SetOrderGridPageNumber)
+  @Action(SetOrderManagementPagerState)
   SetOrderGridPageNumber(
     { patchState }: StateContext<CandidateStateModel>,
-    { page }: SetOrderGridPageNumber
+    { state }: SetOrderManagementPagerState
   ): void {
-    patchState({ orderGridPageNumber: page });
+    patchState({ orderManagementPagerState: state });
   }
 }

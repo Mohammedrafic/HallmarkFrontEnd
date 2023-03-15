@@ -45,7 +45,7 @@ export class DateTimeHelper {
         Date.UTC(gmt.getFullYear(), gmt.getMonth(), gmt.getDate(), gmt.getHours(), gmt.getMinutes())
       ).toISOString();
     }
-    
+
     return new Date(
       Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes())
     ).toISOString();
@@ -207,7 +207,7 @@ export class DateTimeHelper {
     const result = [];
 
     for(let curDate = new Date(startDate); curDate <= new Date(endDate); curDate.setDate(curDate.getDate()+1)) {
-      result.push(new Date(curDate).toISOString().split('T')[0]);
+      result.push(formatDate(curDate,'yyyy-MM-dd', 'en-US'));
     }
 
     return result;
@@ -221,7 +221,7 @@ export class DateTimeHelper {
     const msPerDay = 1000 * 60 * 60 * 24;
     const utc1 = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
     const utc2 = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
-  
+
     return Math.floor((utc2 - utc1) / msPerDay);
   }
 

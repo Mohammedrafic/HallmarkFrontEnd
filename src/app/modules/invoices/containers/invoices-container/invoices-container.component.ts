@@ -174,6 +174,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     if (this.isAgency) {
       this.organizationId$ = this.organizationControl.valueChanges
       .pipe(
+        filter(Boolean),
         tap((id) => {
           this.store.dispatch(new Invoices.GetOrganizationStructure(id, true));
         }),
@@ -212,14 +213,23 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   ngAfterViewInit(): void {
-    this.invoicesTableTabsComponent.preselectTab(this.selectedTabIdx);
+    if (this.organizationId) {
+      this.invoicesTableTabsComponent.preselectTab(this.selectedTabIdx);
+    }
   }
 
   public watchAgencyId(): void {
     if (this.isAgency) {
       this.agencyId$
         .pipe(
+          filter(Boolean),
           distinctUntilChanged(),
+          tap(() => {
+            this.organizationId = 0;
+            this.organizationControl.reset();
+            this.organizationsList = [];
+            this.store.dispatch(new Invoices.SelectOrganization(0));
+          }),
           switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
           switchMap(() => this.organizations$),
           filter((organizations: DataSourceItem[]) => !!organizations.length),
@@ -273,12 +283,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
     this.invoicesFilters$
     .pipe(
-      filter(() => {
-        if (this.isAgency) {
-          return !!this.organizationId;
-        }
-        return true;
-      }),
+      filter(() => !!this.organizationId),
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);

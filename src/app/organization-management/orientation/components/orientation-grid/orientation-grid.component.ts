@@ -271,6 +271,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   }
 
   public onFilterClose() {
+    this.orientationService.refreshFilterForm(this.filtersForm, this.filters);
     this.generateFilteredChips();
   }
 

@@ -172,6 +172,7 @@ export class CreateScheduleService {
     return [];
   }
 
+  // TODO: replace with helper function from schedule.helper.ts
   mapToDropdownOptions(items: { name: string; id: number }[]): DropdownOption[] {
     return items.map(item => {
       return {
@@ -181,6 +182,7 @@ export class CreateScheduleService {
     });
   }
 
+  // TODO: replace with helper function from schedule.helper.ts
   getShiftHours(startTimeDate: Date, endTimeDate: Date): string {
     const startTimeMs: number = startTimeDate.setMilliseconds(0);
     let endTimeMs: number = endTimeDate.setMilliseconds(0);

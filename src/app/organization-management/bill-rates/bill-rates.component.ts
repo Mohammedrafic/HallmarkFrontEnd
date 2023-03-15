@@ -39,7 +39,6 @@ export class BillRatesComponent extends AbstractPermissionGrid implements OnInit
     [BillRateNavigationTabs.ExternalBillRateType, new Subject<ExportedFileType>()],
     [BillRateNavigationTabs.ExternalBillRateTypeMapping, new Subject<ExportedFileType>()],
   ]);
-  public isReadOnly = false; // TODO: temporary solution, until specific service provided
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
   public canAddBillRate = true;
 
@@ -66,7 +65,6 @@ export class BillRatesComponent extends AbstractPermissionGrid implements OnInit
   override ngOnInit(): void {
     super.ngOnInit();
     this.canAddRates();
-    this.handlePagePermission();
     this.store.dispatch(new GetOrganizationStructure());
   }
 
@@ -129,13 +127,6 @@ export class BillRatesComponent extends AbstractPermissionGrid implements OnInit
     this.importDialogEvent.next(true);
   }
 
-  private handlePagePermission(): void {
-    const user = this.store.selectSnapshot(UserState.user);
-    this.isReadOnly = user?.businessUnitType === BusinessUnitType.Organization;
-    if (this.isReadOnly) {
-      this.store.dispatch(new GetPermissionsTree(BusinessUnitType.Organization));
-    }
-  }
 
   subsToSearch(): void {
     this.search?.inputKeyUpEnter

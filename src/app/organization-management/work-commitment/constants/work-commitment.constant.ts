@@ -48,31 +48,31 @@ export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkC
   {
     field: 'minimumWorkExperience',
     headerName: 'MIN WORK EXPERIENCE',
-    minWidth: 130,
+    minWidth: 185,
     sortable: true,
   },
   {
     field: 'availabilityRequirement',
     headerName: 'AVAILABILITY REQUIREMENT',
-    minWidth: 130,
+    minWidth: 215,
     sortable: true,
   },
   {
     field: 'schedulePeriod',
     headerName: 'SCHEDULE PERIOD',
-    minWidth: 100,
+    minWidth: 160,
     sortable: true,
   },
   {
     field: 'criticalOrder',
     headerName: 'CRITICAL ORDER',
-    minWidth: 100,
+    minWidth: 150,
     sortable: true,
   },
   {
     field: 'holiday',
     headerName: 'HOLIDAY',
-    minWidth: 100,
+    minWidth: 110,
     sortable: true,
   },
   {
@@ -94,7 +94,7 @@ export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkC
   {
     field: 'jobCode',
     headerName: 'JOB CODE',
-    minWidth: 100,
+    minWidth: 120,
     sortable: true,
   },
   {

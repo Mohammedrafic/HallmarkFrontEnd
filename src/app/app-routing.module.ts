@@ -25,6 +25,7 @@ const routes: Routes = [
         path: 'document-viewer',
         loadChildren: () =>
           import('./document-viewer/document-viewer.module').then((m) => m.DocumentViewerModule),
+          data: { skipAuthentication: true },
       },
       {
         path: '',

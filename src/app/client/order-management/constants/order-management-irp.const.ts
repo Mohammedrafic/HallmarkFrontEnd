@@ -164,11 +164,9 @@ export const PrepareMenuItems = (order: OrderManagement, threeDotsMenuOptions: R
   } else if (order?.status === OrderStatus.Incomplete) {
     return threeDotsMenuOptions['irpIncompleteMenu'];
   } else {
-    const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
 
-    if (order.children?.some((child) => orderStatuses.includes(child.orderStatus))) {
-      return order.orderType === OrderType.OpenPerDiem
-        ? threeDotsMenuOptions['moreMenuWithCloseButton'] : threeDotsMenuOptions['moreMenu'];
+    if (order.activeCandidatesCount && order.activeCandidatesCount > 0) {
+      return threeDotsMenuOptions['moreMenu'];
     }
 
     if (order?.status !== OrderStatus.Closed && Boolean(order?.orderClosureReasonId)) {
@@ -182,7 +180,7 @@ export const PrepareMenuItems = (order: OrderManagement, threeDotsMenuOptions: R
 export const DefaultOrderManagementSubGridCells: ColDef[] = [
   {
     field: 'candidateStatus',
-    width: 140,
+    width: 150,
   },
   {
     field: 'system',

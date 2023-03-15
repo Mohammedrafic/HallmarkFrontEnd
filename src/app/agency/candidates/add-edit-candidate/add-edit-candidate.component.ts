@@ -22,7 +22,7 @@ import { distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
 import { CandidateGeneralInfoComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { CandidateProfessionalSummaryComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
-import { Candidate } from 'src/app/shared/models/candidate.model';
+import { Candidate, CandidateStateModel, OrderManagementPagerState } from 'src/app/shared/models/candidate.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -382,12 +382,12 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       orderId: number;
       pageToBack: string;
       isNavigateFromCandidateDetails: boolean;
-      orderGridPageNumber?: number;
+      orderManagementPagerState?: OrderManagementPagerState | null;
     }; 
 
     switch (true) {
       case location.orderId && !location.isNavigateFromCandidateDetails:
-        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId, orderGridPageNumber: location.orderGridPageNumber } });
+        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId, orderManagementPagerState: location.orderManagementPagerState } });
         const selectedNavigation = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
         this.store.dispatch(new SelectNavigationTab(selectedNavigation?.current));
         break;

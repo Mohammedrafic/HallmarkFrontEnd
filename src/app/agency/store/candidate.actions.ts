@@ -1,7 +1,7 @@
 import { CredentialStatus } from '@shared/enums/status';
 import { CandidateImportRecord, CandidateImportResult } from '@shared/models/candidate-profile-import.model';
 import { BulkVerifyCandidateCredential, CandidateCredential, CredentialRequestParams } from '@shared/models/candidate-credential.model';
-import { Candidate } from 'src/app/shared/models/candidate.model';
+import { Candidate, OrderManagementPagerState } from 'src/app/shared/models/candidate.model';
 import { Education } from 'src/app/shared/models/education.model';
 import { Experience } from 'src/app/shared/models/experience.model';
 
@@ -257,7 +257,7 @@ export class DownloadCredentialFilesSucceeded {
   constructor(public file: Blob, public candidateName: string) {}
 }
 
-export class SetOrderGridPageNumber {
-  static readonly type = '[candidate] Set Order Grid Page Number';
-  constructor(public page: number) {}
+export class SetOrderManagementPagerState {
+  static readonly type = '[candidate] Set Order Management Grid State';
+  constructor(public state: OrderManagementPagerState | null) {}
 }

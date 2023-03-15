@@ -210,14 +210,16 @@
               <div
                 ejs-button
                 cssClass="e-flat primary-icon-button custom-button"
-                [class.btn-icon__disabled]="order?.isClosed || data.status === applicantStatus.Offboard"
+                [class.btn-icon__disabled]="selectedOrder?.irpOrderMetadata?.status === orderStatus.Closed
+                 || data.status === applicantStatus.Offboard"
               >
               <span class="edit-button"><i-feather name="flag" class="icon"></i-feather></span>
               </div>
               <div
                 ejs-button
                 cssClass="e-flat primary-icon-button custom-button"
-                [class.btn-icon__disabled]="order?.isClosed || data.status === applicantStatus.Offboard"
+                [class.btn-icon__disabled]="selectedOrder?.irpOrderMetadata?.status === orderStatus.Closed
+                || data.status === applicantStatus.Offboard"
               >
               <ejs-tooltip id="tooltip" content="Notify" position="TopCenter">
                 <span class="edit-button"><i-feather name="mail" class="icon"></i-feather></span>
@@ -227,7 +229,8 @@
                 ejs-button
                 (click)="openEditCandidateModal(data)"
                 cssClass="e-flat primary-icon-button custom-button"
-                [class.btn-icon__disabled]="order?.isClosed || data.status === applicantStatus.Offboard"
+                [class.btn-icon__disabled]="selectedOrder?.irpOrderMetadata?.status === orderStatus.Closed
+                || data.status === applicantStatus.Offboard"
               >
                 <ejs-tooltip id="tooltip" content="Edit" position="TopCenter">
                   <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>

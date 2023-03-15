@@ -21,9 +21,12 @@ import {
   ManualPendingInvoiceRecordsFilteringOptionsMapping,
   PendingInvoiceRecordsFilteringOptionsMapping,
 } from '../constants';
+import { BaseObservable } from '@core/helpers';
+import { filter, Observable } from 'rxjs';
 
 @Injectable()
 export class InvoicesFiltersService {
+  private readonly slectedTabIndex = new BaseObservable<number | null>(null);
   
   constructor(private fb: FormBuilder) {
   }
@@ -141,5 +144,14 @@ export class InvoicesFiltersService {
 
       return acc;
     }, {} as InvoiceFilterColumns);
+  }
+
+  getSelectedTabStream(): Observable<number | null> {
+    return this.slectedTabIndex.getStream()
+    .pipe(filter((id) => id !== null));
+  }
+
+  setTabIndex(id: number): void {
+    this.slectedTabIndex.set(id);
   }
 }

@@ -6,7 +6,7 @@
       class="header-itm">
       Candidates Selected <span class="header-itm__count">{{scheduleItems.length}}</span>
     </div>
-    <div class="group-error" *ngIf="itemsErrorCounter">
+    <div class="group-error" *ngIf="itemsErrorCounter && scheduleItems.length">
       <div class="header-itm">
         Errors
         <span class="header-itm__errors">{{itemsErrorCounter}}</span>

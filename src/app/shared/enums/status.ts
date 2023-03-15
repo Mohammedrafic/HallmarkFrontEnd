@@ -145,6 +145,7 @@ export enum CandidatesStatusText {
   'Bill Rate Pending' = 44,
   'Offered Bill Rate' = 47,
   Rejected = 100,
+  Cancelled = 110,
 }
 
 export const CandidateStatusOptions = [

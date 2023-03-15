@@ -6,7 +6,5 @@ export function setDataSourceValue<T>(filterColumns: FilterColumnsModel, key: st
 }
 
 export function clearFormControl(value: number[], form: FormGroup, control: string): void {
-  if(!value?.length) {
-    form.get(control)?.setValue([]);
-  }
+  form.get(control)?.setValue([]);
 }
