@@ -87,7 +87,7 @@ import {
   ReloadOrganisationOrderCandidatesLists,
   SelectNavigationTab,
   SetLock,
-  UpdateRegRateSucceeded
+  UpdateRegRateSucceeded,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -118,7 +118,13 @@ import {
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { SettingsKeys } from '@shared/enums/settings';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
-import { CandidatesStatusText, CandidateStatus, FilterOrderStatusText, LocalStorageStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import {
+  CandidatesStatusText,
+  CandidateStatus,
+  FilterOrderStatusText,
+  LocalStorageStatus,
+  STATUS_COLOR_GROUP,
+} from '@shared/enums/status';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { ButtonModel } from '@shared/models/buttons-group.model';
@@ -128,7 +134,6 @@ import {
   FilterOrderStatus,
   FilterStatus,
   IRPOrderManagement,
-  IRPOrderPositionMain,
   Order,
   OrderCandidateJob,
   OrderFilter,
@@ -200,7 +205,6 @@ import { GlobalWindow } from '@core/tokens';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { SetOrderManagementPagerState } from '@agency/store/candidate.actions';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
-import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -2162,7 +2166,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       filter(Boolean),
       takeUntil(this.unsubscribe$),
     ).subscribe(() => {
-      this.store.dispatch(new GetIRPOrders(this.filters));
+      const options = this.getDialogNextPreviousOption(this.selectedDataRow, true);
+      this.store.dispatch([
+        new GetIRPOrders(this.filters),
+        new GetOrderById(this.selectedOrder.id, this.selectedOrder.organizationId as number, options, true),
+      ]);
     });
   }
 
