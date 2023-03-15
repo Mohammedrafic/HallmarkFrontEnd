@@ -19,13 +19,17 @@ export class DocumentViewerService {
   getFile(fileHash: string, fileId: string) {
     const params = { params: { fileHash, fileId } };
   const url = this.baseUrl + '/api/document-viewer/file';
-  return this.http.get<Blob>(url, params);
+    return this.http.get(this.baseUrl + `/api/document-viewer/file?fileHash=${fileHash}&fileId=${fileId}`, {
+      responseType: 'blob'
+    });
   }
 
   getPdfFile(fileHash: string, fileId: string) {
     const params = { params: { fileHash, fileId } };
-  const url = this.baseUrl + '/api/document-viewer/pdf';
-  return this.http.get<Blob>(url, params);
+    const url = this.baseUrl + '/api/document-viewer/pdf';
+    return this.http.get(this.baseUrl +`/api/document-viewer/pdf?fileHash=${fileHash}&fileId=${fileId}`, {
+      responseType: 'blob'
+    });
   }
 
   public getFileGroups(fileHash: string): Observable<FileGroup[]> {
