@@ -167,3 +167,28 @@ export class RemoveUnavailabilityReason {
 
   constructor(public readonly id: number) {}
 }
+
+export class GetInternalTransferReasons {
+  static readonly type = '[reject reason] Get Internal Transfer reason by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class SaveInternalTransferReasons {
+  static readonly type = '[reject reason] Save InternalTransfer Reason';
+  constructor(public payload: RejectReason){}
+}
+
+export class RemoveInternalTransferReasons {
+  static readonly type = '[reject reason] Remove InternalTransfer Reason';
+  constructor(public id: number){}
+}
+
+export class UpdateInternalTransferReasons {
+  static readonly type = '[reject reason] Update InternalTransfer Reason';
+  constructor(public payload: RejectReason) {
+  } 
+}
+
+export class UpdateInternalTransferReasonsSuccess {
+  static readonly type = '[reject reason] Update Internal Transfer Reason Success';
+}

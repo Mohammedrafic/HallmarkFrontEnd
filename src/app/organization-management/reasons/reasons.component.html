@@ -61,6 +61,16 @@
             (editReason)="editReason($event)"></app-unavailability-reasons>
         </ng-template>
       </e-tabitem>
+      <e-tabitem>
+        <ng-template #headerText><div>Internal transfer/recruitment</div></ng-template>
+        <ng-template #content>
+          <app-internal-transfer
+            [userPermission]="userPermission"
+            (editReason)="editReason($event)"
+            [form]="reasonForm"></app-internal-transfer>
+        </ng-template>
+      </e-tabitem>
+
     </e-tabitems>
   </ejs-tab>
 </section>
