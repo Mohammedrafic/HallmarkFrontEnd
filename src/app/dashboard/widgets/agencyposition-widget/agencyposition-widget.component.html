@@ -1,7 +1,7 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
     <ng-template #header>
       <div class="app-accumulation-chart__title">
-        <h3 class="widget-header__title">Open and Inprogress Widgets</h3>
+        <h3 class="widget-header__title">Open and In-progress Positions</h3>
       </div>
       <div class="app-widget-wrapper__tooltip" *ngIf="description.length > 0">
         <ejs-tooltip [content]="description" position='TopCenter'>
