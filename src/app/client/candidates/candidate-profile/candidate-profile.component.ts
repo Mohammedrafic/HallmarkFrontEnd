@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationWrapperService } from '@shared/services/navigation-wrapper.service';
 import { CandidateProfileService } from '@client/candidates/candidate-profile/candidate-profile.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { EMPTY, Observable, switchMap, takeUntil } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -9,6 +9,9 @@ import { CandidateModel } from '@client/candidates/candidate-profile/candidate.m
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
 import { CandidatesService } from '../services/candidates.service';
 import { CandidateTabsEnum } from '@client/candidates/enums';
+import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
+import { Store } from '@ngxs/store';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 @Component({
   selector: 'app-candidate-profile',
@@ -29,10 +32,9 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     private candidateProfileService: CandidateProfileService,
     private candidateService: CandidatesService,
     private generalNotesService: GeneralNotesService,
-    private cdr: ChangeDetectorRef,
-    private router: Router,
     private route: ActivatedRoute,
-    private navigationWrapperService: NavigationWrapperService
+    private navigationWrapperService: NavigationWrapperService,
+    private store: Store,
   ) {
     super();
     this.employeeIdHandler();
@@ -96,18 +98,20 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   }
 
   private handleEditingCandidate(): void {
-    if (this.candidateId) {
-      this.candidateProfileService
-        .getCandidateById(this.candidateId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((candidate) => {
-          this.candidateProfileFormService.populateCandidateForm(candidate);
-          this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
-          this.generalNotesService.notes$.next(candidate.generalNotes);
-        });
-
-      this.photo$ = this.candidateProfileService.getCandidatePhotoById(this.candidateId);
-    }
+    this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } })).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      if (this.candidateId) {
+        this.candidateProfileService
+          .getCandidateById(this.candidateId)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((candidate) => {
+            this.candidateProfileFormService.populateCandidateForm(candidate);
+            this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
+            this.generalNotesService.notes$.next(candidate.generalNotes);
+          });
+  
+        this.photo$ = this.candidateProfileService.getCandidatePhotoById(this.candidateId);
+      }
+    });
   }
 
   private initSelectedTab(): void {

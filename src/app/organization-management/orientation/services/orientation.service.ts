@@ -144,4 +144,14 @@ export class OrientationService {
       skillCategoryIds: new FormControl(null),
     });
   }
+
+  public refreshFilterForm(form: FormGroup, filters: OrientationConfigurationFilters): void {
+    form.setValue({
+      regionIds: filters.regionIds || null,
+      locationIds: filters.locationIds || null,
+      departmentsIds: filters.departmentsIds || null,
+      skillIds: filters.skillIds || null,
+      skillCategoryIds: filters.skillCategoryIds || null,
+    });
+  }
 }

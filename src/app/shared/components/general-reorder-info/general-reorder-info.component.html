@@ -59,11 +59,9 @@
           <div class="sup-title">Reason for Requisition</div>
         </div>
       </div>
-      <div class="column links">
-        <div class="accent link" (click)="moveToPerDiem()">
-          Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}
-        </div>
-      </div>
+      <ng-container *ngIf="(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
+        <ng-container *ngTemplateOutlet="orderIdText"></ng-container>
+      </ng-container>
       <div class="column">
         <div class="icon">
           <i-feather name="briefcase" class="icon"></i-feather>
@@ -73,6 +71,9 @@
           <div class="sup-title">Skill</div>
         </div>
       </div>
+      <ng-container *ngIf="(isOrganizationOrAgencyArea$ | async)?.isAgencyArea">
+        <ng-container *ngTemplateOutlet="orderIdText"></ng-container>
+      </ng-container>
       <div class="column" *ngIf="!(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea"></div>
       <div class="column empty-column"></div>
       <div class="column empty-column"></div>
@@ -247,4 +248,12 @@
       </section>
     </ng-template>
   </ng-container>
+</ng-template>
+
+<ng-template #orderIdText>
+  <div class="column links">
+    <div class="accent link" (click)="moveToPerDiem()">
+      Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}
+    </div>
+  </div>
 </ng-template>

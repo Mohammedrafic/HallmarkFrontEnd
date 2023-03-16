@@ -29,7 +29,11 @@ section {
     &.link {
       cursor: pointer;
       flex: 1;
-      text-align: left;
+      text-align: right;
+
+      @media #{$max-mobile} {
+        text-align: left;
+      }
     }
   }
 
@@ -86,7 +90,8 @@ section {
         padding-bottom: 0;
       }
 
-      &.extension, &.reorders {
+      &.extension,
+      &.reorders {
         grid-template-columns: repeat(4, 1fr);
       }
     }
@@ -181,9 +186,13 @@ section {
   align-items: center;
 }
 
-@media #{$max-mobile} {
-  .links {
-    grid-column: 1/5;
-    order: 1
+.links {
+  display: flex;
+  justify-content: flex-end;
+
+  @media #{$max-mobile} {
+    justify-content: flex-start;
+    grid-column: 1/5 !important;
+    order: 1;
   }
 }

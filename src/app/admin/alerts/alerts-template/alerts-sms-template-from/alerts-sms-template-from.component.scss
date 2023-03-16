@@ -45,7 +45,10 @@
     }
 
     .rich-text-container {
-        margin-bottom: 30px;
+      margin-bottom: 30px;
+      max-width: 614px;
+      overflow: auto;
+      white-space: nowrap;
     }
 
     

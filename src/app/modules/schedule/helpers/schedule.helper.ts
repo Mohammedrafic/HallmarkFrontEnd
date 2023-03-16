@@ -1,6 +1,10 @@
 import { FormGroup } from '@angular/forms';
 
 import * as ScheduleInt from '../interface';
+import { DropdownOption } from '@core/interface';
+import { convertMsToTime, getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
+import { ShiftTab } from '../components/edit-schedule/edit-schedule.interface';
+import { ScheduleType } from '../enums';
 import { BookingError, ScheduleBookingErrors, ScheduleItem } from '../interface';
 import { DateTimeHelper } from '@core/helpers';
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
@@ -148,12 +152,63 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
   };
 };
 
-export const HasDepartment = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
+export const HasNotDepartment = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
   return filters.departmentsIds && !filters.departmentsIds.length;
 };
 
-export const ShowButtonTooltip = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
+export const HasMultipleFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
   return filters.regionIds && filters.regionIds.length > 1 ||
     filters.locationIds && filters.locationIds.length > 1 ||
     filters.departmentsIds && filters.departmentsIds.length > 1;
 };
+
+export const GetShiftHours = (startTimeDate: Date, endTimeDate: Date): string => {
+  const startTimeMs: number = startTimeDate.setMilliseconds(0);
+  let endTimeMs: number = endTimeDate.setMilliseconds(0);
+
+  if (startTimeMs > endTimeMs) {
+    const dayMs = 86400000;
+    endTimeMs = endTimeMs + dayMs;
+  }
+
+  return convertMsToTime(endTimeMs - startTimeMs);
+};
+
+export const MapToDropdownOptions = (items: { name: string; id: number }[]): DropdownOption[] => {
+  return items.map(item => {
+    return {
+      text: item.name,
+      value: item.id,
+    };
+  });
+};
+
+export const GetScheduleTabItems = (daySchedules: ScheduleItem[]): ShiftTab[] => {
+  const scheduleTitleMapper: Record<ScheduleType, string> = {
+    [ScheduleType.Book]: 'Booked',
+    [ScheduleType.Unavailability]: 'Unavailable',
+    [ScheduleType.Availability]: 'Available',
+  };
+
+  return daySchedules.map((schedule: ScheduleItem) => {
+    return {
+      title: schedule.orderMetadata?.orderPublicId
+        ? schedule.orderMetadata.orderPublicId
+        : scheduleTitleMapper[schedule.scheduleType],
+      time: GetTimeRange(schedule.startDate, schedule.endDate),
+      id: schedule.id,
+    };
+  });
+};
+
+export const GetShiftTimeControlsValue =
+  (shiftStartTime: string, shiftEndTime: string): { startTime: Date, endTime: Date } => {
+    const [startH, startM, startS] = getHoursMinutesSeconds(shiftStartTime);
+    const [endH, endM, endS] = getHoursMinutesSeconds(shiftEndTime);
+    const startTime = new Date();
+    const endTime = new Date();
+    startTime.setHours(startH, startM, startS);
+    endTime.setHours(endH, endM, endS);
+
+    return { startTime, endTime };
+  };

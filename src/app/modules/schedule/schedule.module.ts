@@ -8,6 +8,7 @@ import { Sliders } from 'angular-feather/icons';
 import { InlineChipsModule } from '@shared/components/inline-chips';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { SharedModule } from '@shared/shared.module';
+import { EditScheduleModule } from './components/edit-schedule/edit-schedule.module';
 import { CreateScheduleModule } from './components/create-schedule/create-schedule.module';
 import { ScheduleFiltersModule } from './components/schedule-filters/schedule-filters.module';
 import { ScheduleGridModule } from './components/schedule-grid/schedule-grid.module';
@@ -26,6 +27,7 @@ const icons = { Sliders };
     ScheduleFiltersModule,
     ScheduleGridModule,
     CreateScheduleModule,
+    EditScheduleModule,
     FeatherModule.pick(icons),
     ButtonModule,
     TooltipContainerModule,

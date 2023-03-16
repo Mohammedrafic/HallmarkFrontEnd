@@ -205,4 +205,21 @@ export class RejectReasonService {
   public removeUnavailabilityReason(id: number): Observable<void> {
     return this.http.delete<void>(`/api/UnavailabilityReasons/${id}`);
   }
+
+  public getInternalTransferReason(pageNumber: number, pageSize: number): Observable<RejectReasonPage> {
+    return this.http.get<RejectReasonPage>(`/api/InternalTransferRecruitmentReasons?PageNumber=${pageNumber}&PageSize=${pageSize}`);
+  }
+
+  public saveInternalTransferReason(payload: {reason: string}): Observable<RejectReason> {
+    return this.http.post<RejectReason>('/api/InternalTransferRecruitmentReasons', payload);
+  }
+
+  public removeInternalTransferReason(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/InternalTransferRecruitmentReasons?reasonId=${id}`);
+  }
+
+  public updateInternalTransferReason(payload: RejectReason): Observable<void> {
+    return this.http.put<void>('/api/InternalTransferRecruitmentReasons', payload);
+  }
+
 }

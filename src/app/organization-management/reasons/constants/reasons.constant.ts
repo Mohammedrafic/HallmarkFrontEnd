@@ -69,6 +69,7 @@ export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
   3: ReasonFormType.ClosureReason,
   4: ReasonFormType.DefaultReason,
   5: ReasonFormType.Unavailability,
+  6: ReasonFormType.DefaultReason
 };
 
 export const NewReasonsActionsMap = {
@@ -76,6 +77,7 @@ export const NewReasonsActionsMap = {
   [ReasonsNavigationTabs.ManualInvoice]: ReasonActions.CreateManualInvoiceRejectReason,
   [ReasonsNavigationTabs.Rejection]: ReasonActions.SaveRejectReasons,
   [ReasonsNavigationTabs.Requisition]: ReasonActions.SaveOrderRequisition,
+  [ReasonsNavigationTabs.InternalTransfer]: ReasonActions.SaveInternalTransferReasons,
 };
 
 export const UpdateReasonsActionsMap = {
@@ -83,6 +85,7 @@ export const UpdateReasonsActionsMap = {
   [ReasonsNavigationTabs.ManualInvoice]: ReasonActions.UpdateManualInvoiceRejectReason,
   [ReasonsNavigationTabs.Rejection]: ReasonActions.UpdateRejectReasons,
   [ReasonsNavigationTabs.Requisition]: ReasonActions.SaveOrderRequisition,
+  [ReasonsNavigationTabs.InternalTransfer]: ReasonActions.UpdateInternalTransferReasons,
 };
 
 export const UnavailabilityDialogConfig: ReasonFormConfig[] = [

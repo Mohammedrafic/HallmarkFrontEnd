@@ -14,8 +14,8 @@ import { DatePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { debounceTime, Observable, takeUntil } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { combineLatest, debounceTime, Observable, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
@@ -57,6 +57,9 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   @Select(InvoicesState.invoicesOrganizations)
   public readonly organizations$: Observable<DataSourceItem[]>;
 
+  @Select(InvoicesState.selectedOrgId)
+  private readonly orgId$: Observable<number>;
+
   @Input() selectedTabId: InvoiceTabId;
 
   @Output() readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();
@@ -84,7 +87,6 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     private route: ActivatedRoute,
   ) {
     super();
-
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
   }
 
@@ -106,7 +108,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       this.clearAllFilters(false);
       this.initFormConfig();
     }
-    this.initFiltersDataSources();
+    this.invoicesFiltersService.setTabIndex(this.selectedTabId);
   }
 
   deleteFilter(event: FilteredItem): void {
@@ -132,30 +134,41 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   initFiltersDataSources(): void {
-    if (this.selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
-      this.store.dispatch(new Invoices.GetPendingRecordsFiltersDataSource());
-    } else if (
-      this.selectedTabId === InvoicesOrgTabId.ManualInvoicePending
-      || this.selectedTabId === InvoicesAgencyTabId.ManualInvoicePending
-    ) {
-      this.initManualPendingFiltersDataSources();
-    } else {
-      this.store.dispatch(new Invoices.GetFiltersDataSource());
-    }
+    const orgIdStream = this.orgId$
+    .pipe(
+      filter((id) => !!id),
+      distinctUntilChanged(),
+    );
+
+    const tabStream = this.invoicesFiltersService.getSelectedTabStream()
+    .pipe(
+      filter((id) => id !== null),
+      distinctUntilChanged(),
+    );
+
+    combineLatest([orgIdStream, tabStream])
+    .pipe(
+      map((mergedData) => mergedData[0]),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((id) => {
+      const orgId = this.isAgency ? null : id;
+
+      if (this.selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
+        this.store.dispatch(new Invoices.GetPendingRecordsFiltersDataSource());
+      } else if (this.selectedTabId === InvoicesOrgTabId.ManualInvoicePending
+        || this.selectedTabId === InvoicesAgencyTabId.ManualInvoicePending
+      ) {
+        this.initManualPendingFiltersDataSources(id);
+      } else {
+        this.store.dispatch(new Invoices.GetFiltersDataSource(orgId));
+      }
+    });
   }
 
-  private initManualPendingFiltersDataSources(): void {
+  private initManualPendingFiltersDataSources(id: number): void {
     if(this.isAgency) {
-      const currentOrgId = (this.store.snapshot().invoices as InvoicesModel).selectedOrganizationId;
-
-      this.organizations$.pipe(
-        filter((organizations: DataSourceItem[]) => !!organizations.length),
-        takeUntil(this.componentDestroy()),
-      ).subscribe((organizations: DataSourceItem[]) => {
-        const id = currentOrgId ? currentOrgId : organizations[0].id;
-        this.store.dispatch(new Invoices.GetManualInvoiceRecordFiltersDataSource(id));
-      });
-
+      this.store.dispatch(new Invoices.GetManualInvoiceRecordFiltersDataSource(id));
     } else {
       this.store.dispatch(new Invoices.GetManualInvoiceRecordFiltersDataSource(null));
     }

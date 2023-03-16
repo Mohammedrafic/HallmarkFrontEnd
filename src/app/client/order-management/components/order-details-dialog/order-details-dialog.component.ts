@@ -149,11 +149,11 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get canCloseOrder(): boolean {
     const canNotClose = [this.orderStatus.PreOpen, this.orderStatus.Incomplete];
-    return this.canReOpen || canNotClose.includes(this.order?.status);
+    return this.canReOpen || canNotClose.includes(this.getOrderStatus());
   }
 
   get canReOpen(): boolean {
-    return this.order?.status !== OrderStatus.Closed && Boolean(this.order?.orderClosureReasonId);
+    return this.getOrderStatus() !== OrderStatus.Closed && Boolean(this.order?.orderClosureReasonId);
   }
 
   get showApproveAndCancel(): boolean {
@@ -176,7 +176,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   get disableEdit(): boolean {
-    return this.order?.status === this.orderStatus.Closed;
+    return this.getOrderStatus() === this.orderStatus.Closed;
   }
 
   get disableCloseOrder(): boolean {
@@ -274,14 +274,19 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       return;
     }
 
-    if (!this.children?.length) {
+    if (!this.children?.length && this.activeSystem === this.systemType.VMS) {
       this.disabledCloseButton = false;
       return;
     }
 
     const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
+
     if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
       this.disabledCloseButton = Boolean(this.children?.some((child) => orderStatuses.includes(child.orderStatus)));
+    }
+
+    if (this.activeSystem === this.systemType.IRP) {
+      this.disabledCloseButton = !!(this.order.activeCandidatesCount && this.order.activeCandidatesCount > 0);
     }
   }
 
@@ -553,5 +558,17 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       this.canCloseOrderPermission = canCloseOrder;
       this.canCreateOrder = canCreateOrder;
     });
+  }
+
+  private getOrderStatus(): OrderStatus {
+    if (!this.order) {
+      return OrderStatus.NoOrder;
+    }
+
+    if (this.activeSystem === this.systemType.IRP) {
+      return this.order.irpOrderMetadata?.status as OrderStatus;
+    }
+
+    return this.order.status;
   }
 }

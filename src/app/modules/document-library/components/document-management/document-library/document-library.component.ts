@@ -456,7 +456,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       }
       else{
         let locationFilter: LocationsByRegionsFilter = {
-          ids: data,
+          ids: [data.length],
           getAll: true,
           businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
         };
@@ -568,7 +568,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public uploadToFile(file: Blob | null) {
     this.selectedFile = file;
     const fileData: any = file;
-    this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(fileData?.name.split('.').slice(0, -1).join('.'));
+    this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(fileData?.name);
   }
 
 
@@ -643,7 +643,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     suppressRowClickSelection: true,
     onCellClicked: (e: CellClickedEvent) => {
       const column: any = e.column;
-      if (column?.colId == documentsColumnField.FileName) {
+      if (column?.colId == documentsColumnField.Name) {
         this.documentPreview(e.data);
       }
     }
@@ -1307,7 +1307,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     const keyword = event.target.value;    
     if (keyword.trim() != '' && (event.code == 'Enter' || event.code == 'NumpadEnter') && keyword.length >= 3) {      
       this.IsSearchDone = true;
-      this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId));      
+      let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
+      this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId, folderId));      
     }
   }
 }

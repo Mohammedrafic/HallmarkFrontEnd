@@ -78,15 +78,17 @@ export class TabNavigationComponent extends Destroyable implements OnInit {
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.tabNavigation.select(perDiemTabIndex);
+        this.store.dispatch(new SetOrdersTab(this.tabsArray[perDiemTabIndex]));
       });
   }
 
   private selectReorderAfterNavigation(): void {
-    const perDiemTabIndex = 3;
+    const reorderTabIndex = 3;
     this.orderManagementAgencyService.reorderId$
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
-        this.tabNavigation.select(perDiemTabIndex);
+        this.tabNavigation.select(reorderTabIndex);
+        this.store.dispatch(new SetOrdersTab(this.tabsArray[reorderTabIndex]));
       });
   }
 
@@ -97,8 +99,6 @@ export class TabNavigationComponent extends Destroyable implements OnInit {
     if (selectedOrderAfterRedirect?.orderType === OrderType.ReOrder) {
       this.tabNavigation.select(reOrders);
       this.selectedTab.emit(this.tabsArray[reOrders]);
-    } else if (selectedOrderAfterRedirect?.orderType !== OrderType.ReOrder) {
-      this.store.dispatch(new SetOrdersTab(this.tabsArray[0]));
     }
   }
 

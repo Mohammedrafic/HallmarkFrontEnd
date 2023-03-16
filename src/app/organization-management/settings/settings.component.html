@@ -73,6 +73,9 @@
             </span>
             <span *ngIf="data.controlType === organizationSettingControlType.Text">{{child.value}}</span>
             <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{child.value | date: 'MM/dd/yyyy'}}</span>
+            <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
+              {{ child.parsedValue.value && child.parsedValue.isEnabled ? child.parsedValue.value : 'No' }}
+            </span>
           </td>
         </tr>
         </tbody>
@@ -117,6 +120,9 @@
           <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{data.value | date: 'MM/dd/yyyy'}}</span>
           <span *ngIf="data.controlType === organizationSettingControlType.InvoiceAutoGeneration">
             {{ data.parsedValue?.isEnabled ? 'Yes' : 'No'}}</span>
+          <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
+            {{ data.parsedValue.value && data.parsedValue.isEnabled ? data.parsedValue.value : 'No' }}
+          </span>
         </ng-template>
       </e-column>
     </e-columns>
@@ -405,6 +411,36 @@
       </div>
     </div>
   </form>
+
+    <form
+    *ngIf="formControlType === organizationSettingControlType.SwitchedValue"
+    [formGroup]="switchedValueForm">
+
+      <div class="input-container bootstrap">
+        <label for="numeric">Value<span class="required">*</span></label>
+        <div class="input-group">
+          <ejs-numerictextbox
+            id="numeric"
+            class="numeric-input"
+            min="0"
+            [maxlength]="maxFieldLength"
+            [validateDecimalOnType]='true'
+            decimals='0'
+            format="#"
+            [showSpinButton]="false"
+            appValidateWithMessage
+            formControlName="value"
+          ></ejs-numerictextbox>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <div class="input-group switch">
+          <ejs-switch id="switcher" class="switch" formControlName="isEnabled"></ejs-switch>
+          <label class="switch-label">Turned {{ switchedValueForm.get('isEnabled')?.value ? 'on' : 'off' }}</label>
+        </div>
+      </div>
+    </form>
 
     <div [ngSwitch]="formControlType">
       <ng-container *ngSwitchCase="organizationSettingControlType.Checkbox">

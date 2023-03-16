@@ -67,6 +67,7 @@ import {
 import { AddCredentialForm, SearchCredentialForm } from './credentials-grid.interface';
 import { AppState } from '../../../store/app.state';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { CandidateService } from '@agency/services/candidates.service';
 
 @Component({
   selector: 'app-credentials-grid',
@@ -217,6 +218,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     private credentialGridService: CredentialGridService,
     private confirmService: ConfirmService,
     private cdr: ChangeDetectorRef,
+    private candidateService: CandidateService,
     private ngZone: NgZone,
   ) {
     super();
@@ -493,6 +495,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return found ? found[0] : 'e-default';
   }
 
+  public addMissingCredentials(): void {
+    this.candidateService.getMissingCredentials(this.candidateProfileId).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
+    })
+  }
+
   private closeSideDialog(): void {
     this.store
       .dispatch(new ShowSideDialog(false))
@@ -604,6 +612,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.candidateCredentialResponse = response;
       this.setDisableAddCredentialButton();
       this.setGridItems(response);
+      this.cdr.markForCheck();
     });
   }
 
@@ -721,12 +730,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         disableDelete: this.disableDelete(item),
       };
     });
-    if (this.grid) {
-      this.grid.getColumnByField('experience').visible = this.isOrganizationAgencyArea.isAgencyArea;
-      this.grid.getColumnByField('insitute').visible = this.isOrganizationAgencyArea.isAgencyArea;
-      this.grid.refreshColumns();
-      this.cdr.markForCheck();
-    }
   }
  private disableViewDocument(item:CandidateCredential):boolean{
   let length= item.credentialFiles==null?0:item.credentialFiles?.length;
@@ -757,7 +760,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       !this.areAgencyActionsAllowed ||
       item.id === this.orderCredentialId ||
       !this.hasPermissions() ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
+      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP) ||
+      (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile])
     );
   }
 

@@ -167,66 +167,174 @@
   (closeDialogClicked)="onFilterClose()"
 >
   <form [formGroup]="CandidateFilterFormGroup">
-    <div class="bootstrap">
-      <div class="input-container">
-        <label>Candidate Name</label>
-        <div class="input-group">
-          <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
+    <ng-container *ngIf="!isIRP && CandidateFilterFormGroup">
+      <div class="bootstrap">
+        <div class="input-container">
+          <label>Candidate Name</label>
+          <div class="input-group">
+            <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
+          </div>
         </div>
       </div>
-    </div>
-    <div class="bootstrap">
-      <div class="input-container">
-        <label>Region</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect
-            #regionMultiselect
-            mode="CheckBox"
-            formControlName="regionsNames"
-            placeholder="All"
-            [fields]="regionFields"
-            [allowFiltering]="true"
-            [showDropDownIcon]="true"
-            [dataSource]="filterColumns.regionsNames.dataSource"
-          >
-          </ejs-multiselect>
+      <div class="bootstrap">
+        <div class="input-container">
+          <label>Region</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect
+              #regionMultiselect
+              mode="CheckBox"
+              formControlName="regionsNames"
+              placeholder="All"
+              [fields]="regionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.regionsNames?.dataSource"
+            >
+            </ejs-multiselect>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="bootstrap">
-      <div class="input-container">
-        <label>Skill</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect
-            mode="CheckBox"
-            formControlName="skillsIds"
-            placeholder="All"
-            [fields]="optionFields"
-            [allowFiltering]="true"
-            [showDropDownIcon]="true"
-            [dataSource]="filterColumns.skillsIds.dataSource"
-          >
-          </ejs-multiselect>
+      <div class="bootstrap">
+        <div class="input-container">
+          <label>Skill</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="skillsIds"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.skillsIds?.dataSource"
+            >
+            </ejs-multiselect>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="bootstrap">
-      <div class="input-container">
-        <label>Profile Status</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect
-            mode="CheckBox"
-            formControlName="profileStatuses"
-            placeholder="All"
-            [fields]="optionFields"
-            [allowFiltering]="true"
-            [showDropDownIcon]="true"
-            [dataSource]="filterColumns.profileStatuses.dataSource"
-          >
-          </ejs-multiselect>
+      <div class="bootstrap">
+        <div class="input-container">
+          <label>Profile Status</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="profileStatuses"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.profileStatuses?.dataSource"
+            >
+            </ejs-multiselect>
+          </div>
         </div>
       </div>
-    </div>
+    </ng-container>
+    <ng-container *ngIf="isIRP && CandidateFilterFormGroup">
+      <div class="bootstrap row">
+        <div class="input-container candidate-id">
+          <label>Candidate ID</label>
+          <div class="input-group">
+            <input class="e-input" type="text" maxlength="10" formControlName="candidateId" />
+          </div>
+        </div>
+        <div class="input-container candidate-name">
+          <label>Candidate Name</label>
+          <div class="input-group">
+            <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
+          </div>
+        </div>
+      </div>
+      <div class="bootstrap">
+        <div class="input-container">
+          <label>Profile Status</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="profileStatuses"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.profileStatuses?.dataSource"
+            >
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container">
+          <label>Location</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="locationIds"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.locationIds?.dataSource"
+            >
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container">
+          <label>Department</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="departmentIds"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.departmentIds?.dataSource"
+            >
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container">
+          <label>Primary SKill</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="primarySkillIds"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.primarySkillIds?.dataSource"
+            >
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container">
+          <label>Secondary Skill</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="secondarySkillIds"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.secondarySkillIds?.dataSource"
+            >
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container calendar">
+          <label>Hire Date</label>
+          <div class="input-group datepicker">
+            <ejs-datepicker
+              class="datepicker"
+              format="MM/dd/yyyy"
+              placeholder="MM/DD/YYYY"
+              [enableMask]="true"
+              [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+              formControlName="hireDate">
+            </ejs-datepicker>
+          </div>
+        </div>
+      </div>
+    </ng-container>
   </form>
 </app-filter-dialog>
 

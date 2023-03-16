@@ -14,7 +14,7 @@ import { CloseOrderService } from '@client/order-management/components/close-ord
 import { GetClosureReasonsByPage } from '@organization-management/store/reject-reason.actions';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { CloseOrderPayload } from '@client/order-management/components/close-order/models/closeOrderPayload.model';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { CLOSE_ORDER_TITLE, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, MULTI_CLOSE_ORDER } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ClosePositionPayload } from '@client/order-management/components/close-order/models/closePositionPayload.model';
 import { CommentsService } from '@shared/services/comments.service';
@@ -32,8 +32,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   @Input() public order: Order | OrderManagement;
   @Input() candidate: OrderManagementChild;
   @Output() private closeOrderSuccess: EventEmitter<Order | OrderManagement> = new EventEmitter<
-    Order | OrderManagement
-  >();
+    Order | OrderManagement>();
   @Output() private closePositionSuccess: EventEmitter<OrderManagementChild> = new EventEmitter<OrderManagementChild>();
 
   @Select(UserState.lastSelectedOrganizationId)
@@ -161,6 +160,9 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   private submit(): void {
+    const currentOrder = this.order as Order;
+    const isIrpOrder = !!currentOrder.irpOrderMetadata;
+
     let formData = this.closeForm.getRawValue();
     const { closingDate } = formData;
     formData = { ...formData, closingDate: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(closingDate)) };
@@ -168,12 +170,32 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     if (this.isPosition) {
       this.closePosition(formData);
     } else {
-      this.closeOrder(formData);
+
+    if (currentOrder.irpOrderMetadata && !currentOrder.isIRPOnly) {
+      this.confirmService.confirm(MULTI_CLOSE_ORDER, {
+        title: CLOSE_ORDER_TITLE,
+        okButtonLabel: 'Close',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(
+        filter((confirm) => !!confirm)
+      )
+      .subscribe(() => {
+        this.closeOrder(formData, isIrpOrder);
+      });
+    } else {
+      this.closeOrder(formData, isIrpOrder);
+    }
+      
     }
   }
 
-  private closeOrder(formData: Omit<CloseOrderPayload, 'orderId'>): void {
-    this.closeOrderService.closeOrder({ ...formData, orderId: this.order.id }).subscribe(() => {
+  private closeOrder(formData: Omit<CloseOrderPayload, 'orderId'>, isIrpOrder: boolean): void {
+    this.closeOrderService.closeOrder({ ...formData, orderId: this.order.id }, isIrpOrder)
+    .pipe(
+      takeUntil(this.destroy$)
+    )
+    .subscribe(() => {
       this.store.dispatch(new SaveCloseOrderSucceeded(this.order));
       this.closeOrderSuccess.emit(this.order);
       this.closeDialog();
@@ -181,7 +203,11 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   private closePosition(formData: ClosePositionPayload): void {
-    this.closeOrderService.closePosition({ ...formData, jobId: this.candidate.jobId }).subscribe(() => {
+    this.closeOrderService.closePosition({ ...formData, jobId: this.candidate.jobId })
+    .pipe(
+      takeUntil(this.destroy$)
+    )
+    .subscribe(() => {
       this.closePositionSuccess.emit(this.candidate);
       this.closeDialog();
     });

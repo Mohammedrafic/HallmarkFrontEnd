@@ -1,0 +1,118 @@
+<ejs-dialog
+  #destroyableDialog
+  cssClass="dialog"
+  [width]="744"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }"
+  [target]="targetElement"
+>
+  <ng-template #content>
+    <div class="dialog-container">
+      <div class="dialog-header">
+        <h3 class="title">{{scheduledItem.candidate.lastName}}, {{scheduledItem.candidate.firstName}}</h3>
+        <div class="controls">
+          <button ejs-button cssClass="e-outline button-cancel" (click)="closeScheduleDialog()">Cancel</button>
+          <button
+            (click)="saveSchedule()"
+            [isPrimary]="true"
+            ejs-button>
+            Save
+          </button>
+        </div>
+      </div>
+
+      <ejs-tab
+        class="stepper"
+        (selected)="selectScheduledItem($event.selectedIndex)"
+        (created)="setInitData()">
+        <div class="e-tab-header">
+          <div *ngFor="let tab of shiftTabs">
+            <div class="stepper-header">
+              <div class="stepper-title">{{tab.title}}</div>
+              <div class="stepper-sub-title">{{tab.time}}</div>
+            </div>
+          </div>
+        </div>
+        <div class="e-content">
+          <ng-template *ngFor="let tab of shiftTabs"></ng-template>
+        </div>
+      </ejs-tab>
+      <div class="separator"></div>
+      <div class="form-container">
+        <form [formGroup]="scheduleForm" [class]="scheduleFormConfig.formClass">
+          <ng-container *ngFor="let control of scheduleFormConfig.formFields">
+            <ng-container [ngSwitch]="control.type">
+              <ng-template [ngSwitchCase]="FieldTypes.Calendar">
+                <app-datepicker
+                  class="input-container bootstrap"
+                  [label]="control.title"
+                  [required]="control.required"
+                  [controlName]="control.field"
+                  [min]="datePickerLimitations.minDate"
+                  [max]="datePickerLimitations.maxDate"
+                  [formGroupInstance]="scheduleForm"
+                ></app-datepicker>
+              </ng-template>
+              <ng-template [ngSwitchCase]="FieldTypes.Input">
+                <div class="input-container bootstrap"  [ngStyle]="{'grid-area': control.gridAreaName}">
+                  <label [for]="control.field">{{ control.title }} <span *ngIf="control.required" class="required">*</span></label>
+                  <div class="input-group" [ngClass]="{'input-readonly': control.readonly}">
+                    <input
+                      class="e-input"
+                      [name]="control.field"
+                      [readonly]="control.readonly"
+                      [formControlName]="control.field"
+                    />
+                  </div>
+                </div>
+              </ng-template>
+              <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
+                <div class="input-container bootstrap" [ngStyle]="{'grid-area': control.gridAreaName}">
+                  <label [for]="control.field">
+                    {{control.title}}
+                    <span class="required" *ngIf="control.required">*</span>
+                  </label>
+                  <div class="input-group dropdown" *ngIf="control.sourceKey">
+                    <ejs-dropdownlist
+                      [dataSource]="scheduleFormSourcesMap[control.sourceKey]"
+                      [fields]="dropDownFields"
+                      [formControlName]="control.field">
+                    </ejs-dropdownlist>
+                  </div>
+                </div>
+              </ng-template>
+              <ng-template [ngSwitchCase]="FieldTypes.Time">
+                <div class="input-container bootstrap" [ngStyle]="{'grid-area': control.gridAreaName}">
+                  <label [for]="control.field">{{ control.title }} <span *ngIf="control.required" class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <ejs-timepicker
+                      (change)="changeTimeControls($event, control.field)"
+                      placeholder="HH:MM"
+                      [formControlName]="control.field"
+                      format="HH:mm"
+                      [showClearButton]="false"
+                      [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                      [enableMask]="true"
+                      [step]="15"
+                      maskPlaceholder="HH:MM">
+                    </ejs-timepicker>
+                  </div>
+                </div>
+              </ng-template>
+            </ng-container>
+          </ng-container>
+        </form>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="schedule-footer">
+      <div class="checkbox-container bootstrap">
+        <ejs-checkbox [formControl]="createPerDiemOrderControl" label="Create Per Diem Order"></ejs-checkbox>
+      </div>
+    </div>
+  </ng-template>
+</ejs-dialog>

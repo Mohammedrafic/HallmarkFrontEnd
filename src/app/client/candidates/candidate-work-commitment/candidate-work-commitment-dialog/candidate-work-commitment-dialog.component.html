@@ -89,7 +89,9 @@
               class="control control-field"
               label="Start Date"
               [required]="true"
-              [min]="useMinimumDate ? minimumDate : null"
+              [strictMode]="true"
+              [min]="useMinimumDate ? minimumDate : undefined"
+              [max]="maximumDate"
             ></app-datepicker>
             <app-numeric-textbox
               [formGroupInstance]="candidateWorkCommitmentForm"

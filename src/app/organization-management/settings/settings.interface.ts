@@ -23,3 +23,8 @@ export interface AutoGenerationPayload {
   groupingBy: number;
   time: string;
 }
+
+export interface SwitchValuePayload {
+  isEnabled: boolean;
+  value: number | null;
+}

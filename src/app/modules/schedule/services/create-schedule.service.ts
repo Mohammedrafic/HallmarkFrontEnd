@@ -5,13 +5,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { EMPTY, Observable, of } from 'rxjs';
 
-import { convertMsToTime, getTime, getTimeFromDate, setTimeToDate } from '@shared/utils/date-time.utils';
+import { getTime, getTimeFromDate, setTimeToDate } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
 import { ScheduleItemType } from 'src/app/modules/schedule/constants';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { UserState } from 'src/app/store/user.state';
 import { CreateScheduleItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
 import { ScheduleItemsComponent } from '../components/schedule-items/schedule-items.component';
@@ -172,6 +173,7 @@ export class CreateScheduleService {
     return [];
   }
 
+  // TODO: replace with helper function from schedule.helper.ts
   mapToDropdownOptions(items: { name: string; id: number }[]): DropdownOption[] {
     return items.map(item => {
       return {
@@ -181,28 +183,22 @@ export class CreateScheduleService {
     });
   }
 
-  getShiftHours(startTimeDate: Date, endTimeDate: Date): string {
-    const startTimeMs: number = startTimeDate.setMilliseconds(0);
-    let endTimeMs: number = endTimeDate.setMilliseconds(0);
-
-    if (startTimeMs > endTimeMs) {
-      const dayMs = 86400000;
-      endTimeMs = endTimeMs + dayMs;
-    }
-
-    return convertMsToTime(endTimeMs - startTimeMs);
-  }
-
   getScheduleTypesWithPermissions(
     scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>,
     userPermission: Permission
   ): ReadonlyArray<ScheduleTypeRadioButton> {
-    return scheduleTypes.map((item: ScheduleTypeRadioButton) => {
+    let types = scheduleTypes.map((item: ScheduleTypeRadioButton) => {
       return {
         ...item,
         disabled: !userPermission[item.permission],
       };
     });
+
+    if (this.store.selectSnapshot(UserState.user)?.isEmployee) {
+      types = types.filter((type: ScheduleTypeRadioButton) => type.value !== ScheduleItemType.Book);
+    }
+
+    return types;
   }
 
   getFirstAllowedScheduleType(scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>): ScheduleItemType {

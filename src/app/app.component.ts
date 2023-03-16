@@ -7,9 +7,6 @@ import { B2CAuthService } from './b2c-auth/b2c-auth.service';
 
 import { CheckScreen, SetIsOrganizationAgencyArea } from './store/app.actions';
 import { SetUserPermissions } from "./store/user.actions";
-import { tap } from "rxjs";
-import { InitPreservedFilters } from './store/preserved-filters.actions';
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -25,7 +22,7 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.store.dispatch([new CheckScreen(), new SetUserPermissions()]);
+    this.store.dispatch([new CheckScreen()]);
 
     this.isIframe = window !== window.parent && !window.opener;
 
@@ -33,17 +30,20 @@ export class AppComponent implements OnInit {
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
-      tap(() => this.store.dispatch(new SetUserPermissions())),
       map(() => this.router.routerState.root),
-      map(route => {
-        while (route.firstChild) route = route.firstChild;
-        return route;
+      map((route) => {
+        let r = route;
+        while (r.firstChild) r = r.firstChild;
+        return r;
       }),
       mergeMap(route => route.data)
     ).subscribe(data => {
-      const isOrganizationArea = data?.['isOrganizationArea'] || false;
-      const isAgencyArea = data?.['isAgencyArea'] || false;
-      this.store.dispatch(new SetIsOrganizationAgencyArea({ isOrganizationArea, isAgencyArea }));
+      if (!data?.['skipAuthentication']) {
+        const isOrganizationArea = data?.['isOrganizationArea'] || false;
+        const isAgencyArea = data?.['isAgencyArea'] || false;
+        this.store.dispatch(new SetIsOrganizationAgencyArea({ isOrganizationArea, isAgencyArea }));
+        this.store.dispatch(new SetUserPermissions());
+      }
     });
   }
 }

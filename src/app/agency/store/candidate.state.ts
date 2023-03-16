@@ -61,6 +61,7 @@ import {
   SaveEducationSucceeded,
   SaveExperience,
   SaveExperienceSucceeded,
+  SetOrderManagementPagerState,
   UploadCandidatePhoto,
   UploadCandidateProfileFile,
   UploadCandidateProfileFileSucceeded,
@@ -86,6 +87,7 @@ import { CredentialStatus } from '@shared/enums/status';
     credentialTypes: [],
     masterCredentials: [],
     groupedCandidateCredentialsFiles: [],
+    orderManagementPagerState: null,
   },
 })
 @Injectable()
@@ -133,6 +135,11 @@ export class CandidateState {
   @Selector()
   static groupedCandidateCredentialsFiles(state: CandidateStateModel): CredentialGroupedFiles[] {
     return state.groupedCandidateCredentialsFiles;
+  }
+
+  @Selector()
+  static orderManagementPagerState (state: CandidateStateModel): CandidateStateModel['orderManagementPagerState'] {
+    return state.orderManagementPagerState;
   }
 
   constructor(private candidateService: CandidateService, private skillsService: SkillsService) {}
@@ -586,5 +593,13 @@ export class CandidateState {
         }),
         catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download files'))))
       );
+  }
+
+  @Action(SetOrderManagementPagerState)
+  SetOrderGridPageNumber(
+    { patchState }: StateContext<CandidateStateModel>,
+    { state }: SetOrderManagementPagerState
+  ): void {
+    patchState({ orderManagementPagerState: state });
   }
 }

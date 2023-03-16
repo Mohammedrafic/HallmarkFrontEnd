@@ -14,6 +14,7 @@ import {
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
+import { ScheduledShift } from '../components/edit-schedule/edit-schedule.interface';
 import * as ScheduleInt from '../interface';
 
 @Injectable()
@@ -58,5 +59,9 @@ export class ScheduleApiService {
         EmployeeId: employeeId,
         DepartmentId: departmentId,
       }});
+  }
+
+  updateScheduledShift(scheduledShift: ScheduledShift):Observable<void> {
+    return this.http.post<void>('/api/Schedules/booking/update', scheduledShift);
   }
 }

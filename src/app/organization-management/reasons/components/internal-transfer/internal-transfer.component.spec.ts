@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrderManagementComponent } from './order-management.component';
+import { InternalTransferComponent } from './internal-transfer.component';
 
-describe('OrderManagementComponent', () => {
-  let component: OrderManagementComponent;
-  let fixture: ComponentFixture<OrderManagementComponent>;
+describe('InternalTransferComponent', () => {
+  let component: InternalTransferComponent;
+  let fixture: ComponentFixture<InternalTransferComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OrderManagementComponent ]
+      declarations: [ InternalTransferComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OrderManagementComponent);
+    fixture = TestBed.createComponent(InternalTransferComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

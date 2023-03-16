@@ -25,7 +25,7 @@
               ejs-button
               cssClass="e-flat primary-icon-button"
               (click)="onEditRecordButtonClick(data, $event)"
-              [disabled]="isReadOnly || !userPermission[userPermissions.CanEditSettingsBillRates]"
+              [disabled]="!userPermission[userPermissions.CanEditSettingsBillRates]"
             >
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
@@ -33,7 +33,7 @@
               ejs-button
               cssClass="e-flat secondary-icon-button"
               (click)="onRemoveRecordButtonClick(data, $event)"
-              [disabled]="isReadOnly || !userPermission[userPermissions.CanDeleteSettingsBillRates]"
+              [disabled]="!userPermission[userPermissions.CanDeleteSettingsBillRates]"
             >
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
@@ -104,7 +104,7 @@
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox
               [checked]="data.considerForWeeklyOT"
-              [disabled]="isReadOnly"
+              [disabled]="!userPermission[userPermissions.CanEditSettingsBillRates]"
               (change)="considerForWeeklyOtChange(data, $event)"
             ></ejs-checkbox>
           </div>
@@ -115,7 +115,7 @@
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox
               [checked]="data.considerForDailyOT"
-              [disabled]="isReadOnly"
+              [disabled]="!userPermission[userPermissions.CanEditSettingsBillRates]"
               (change)="considerForDailyOtChange(data, $event)"
             ></ejs-checkbox>
           </div>
@@ -126,7 +126,7 @@
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox
               [checked]="data.considerFor7thDayOT"
-              [disabled]="isReadOnly"
+              [disabled]="!userPermission[userPermissions.CanEditSettingsBillRates]"
               (change)="considerFor7thDayOtChange(data, $event)"
             ></ejs-checkbox>
           </div>
@@ -137,7 +137,7 @@
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox
               [checked]="data.displayInJob"
-              [disabled]="isReadOnly"
+              [disabled]="!userPermission[userPermissions.CanEditSettingsBillRates]"
               (change)="displayInJobChange(data, $event)"
             ></ejs-checkbox>
           </div>

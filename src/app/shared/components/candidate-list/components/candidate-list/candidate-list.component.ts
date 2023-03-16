@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { debounceTime, filter, map, merge, Observable, Subject, switchMap, takeUntil, takeWhile } from 'rxjs';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { CandidatesStatusText, CandidateStatus, EmployeeStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
@@ -34,7 +34,7 @@ import {
   GetIRPCandidatesByPage,
   GetRegionList
 } from '../../store/candidate-list.actions';
-import { MasterSkill } from '@shared/models/skill.model';
+import { ListOfSkills, MasterSkill } from '@shared/models/skill.model';
 import { CandidateState } from '@agency/store/candidate.state';
 import { ExportColumn, ExportOptions } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -42,11 +42,19 @@ import { DatePipe } from '@angular/common';
 import { isNil } from 'lodash';
 import { optionFields, regionFields } from '@shared/constants';
 import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
-import { filterColumns, IRPCandidates, VMSCandidates } from './candidate-list.constants';
+import { filterColumns, IRPCandidates, IRPFilterColumns, VMSCandidates } from './candidate-list.constants';
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { CandidateListService } from '../../services/candidate-list.service';
+import { OrganizationDepartment, OrganizationLocation, OrganizationStructure } from '@shared/models/organization.model';
+import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
+import { DepartmentHelper } from '@client/candidates/departments/helpers/department.helper';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
+import { SystemType } from '@shared/enums/system-type.enum';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-candidate-list',
@@ -75,6 +83,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Select(CandidateListState.listOfRegions)
   regions$: Observable<string[]>;
 
+  @Select(UserState.organizationStructure)
+  organizationStructure$: Observable<OrganizationStructure>;
+
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
+  assignedSkills$: Observable<ListOfSkills[]>;
+
   @Input() filteredItems$: Subject<number>;
   @Input() export$: Subject<ExportedFileType>;
   @Input() search$: Subject<string>;
@@ -98,7 +112,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     tab: 0,
   };
   public CandidateFilterFormGroup: FormGroup;
-  public filterColumns: CandidateListFiltersColumn = filterColumns;
+  public filterColumns: CandidateListFiltersColumn;
+  public allLocations: OrganizationLocation[];
   public readonly statusEnum = CandidateStatus;
   public readonly employeeStatusEnum = EmployeeStatus;
   public readonly candidateStatus = CandidatesStatusText;
@@ -137,16 +152,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     private actions$: Actions,
     private confirmService: ConfirmService,
     private filterService: FilterService,
-    private fb: FormBuilder,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private candidateListService: CandidateListService,
   ) {
     super();
-    this.CandidateFilterFormGroup = this.fb.group({
-      candidateName: new FormControl([]),
-      profileStatuses: new FormControl([]),
-      regionsNames: new FormControl([]),
-      skillsIds: new FormControl([]),
-    });
   }
 
   ngOnInit(): void {
@@ -157,9 +166,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.subscribeOnActions();
     this.subscribeOnDeploydCandidates();
     this.subscribeOnSkills();
-    this.subscribeOnRegions();
     this.subscribeOnExportAction();
     this.setFileName();
+    this.filterColumns = !this.isIRP ? filterColumns : IRPFilterColumns;
+    this.subscribeOnRegions();
+    this.CandidateFilterFormGroup = !this.isIRP ? this.candidateListService.generateVMSCandidateFilterForm() : this.candidateListService.generateIRPCandidateFilterForm();
+    this.subscribeOnOrgStructure();
+    this.subscribeOnLocationChange();
   }
 
   ngOnDestroy(): void {
@@ -203,12 +216,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFilterClose(): void {
-    this.CandidateFilterFormGroup.setValue({
-      candidateName: this.filters.candidateName || '',
-      profileStatuses: this.filters.profileStatuses || [],
-      regionsNames: this.filters.regionsNames || [],
-      skillsIds: this.filters.skillsIds || [],
-    });
+    this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
     this.filteredItems = this.filterService.generateChips(this.CandidateFilterFormGroup, this.filterColumns);
     this.filteredItems$.next(this.filteredItems.length);
   }
@@ -311,6 +319,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       candidateName: this.filters.candidateName!,
       tab: this.activeTab ?? 0,
       includeDeployedCandidates: this.includeDeployedCandidates,
+      candidateId: this.filters.candidateId!,
+      locationIds: this.filters.locationIds!,
+      departmentIds: this.filters.departmentIds!,
+      primarySkillIds: this.filters.primarySkillIds!,
+      secondarySkillIds: this.filters.secondarySkillIds!,
+      hireDate: this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
     };
     this.store.dispatch(
       this.isIRP
@@ -433,6 +447,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.setDefaultFilter();
         this.dispatchNewPage();
         this.store.dispatch([new GetAllSkills()]);
+        this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
       });
   }
 
@@ -455,7 +470,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       debounceTime(300),
       takeUntil(this.unsubscribe$)
     ).subscribe(() => {
-      this.regionMultiselect.refresh();
+      this.regionMultiselect?.refresh();
     });
   }
 
@@ -473,7 +488,18 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         takeUntil(this.unsubscribe$)
       )
       .subscribe((skills) => {
-        this.filterColumns.skillsIds.dataSource = skills;
+        if (this.filterColumns?.skillsIds) {
+          this.filterColumns.skillsIds.dataSource = skills;
+        }
+      });
+
+    this.assignedSkills$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((skills) => {
+        if (this.filterColumns?.primarySkillIds && this.filterColumns?.secondarySkillIds) {
+          this.filterColumns.primarySkillIds.dataSource = skills;
+          this.filterColumns.secondarySkillIds.dataSource = skills;
+        }
       });
   }
 
@@ -484,7 +510,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         takeUntil(this.unsubscribe$)
       )
       .subscribe((regions) => {
-        this.filterColumns.regionsNames.dataSource = adaptToNameEntity(regions);
+        if (this.filterColumns.regionsNames) {
+          this.filterColumns.regionsNames.dataSource = adaptToNameEntity(regions);
+        }
       });
   }
 
@@ -502,6 +530,44 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private setFileName(): void {
     this.fileName = `Candidates ${this.generateDateTime(this.datePipe)}`;
+  }
+
+  private subscribeOnOrgStructure(): void {
+    this.organizationStructure$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((structure: OrganizationStructure) => {
+        this.allLocations = [];
+        structure.regions.forEach(region => {
+          region.locations && this.allLocations.push(...getIRPOrgItems(region.locations));
+        });
+        if (this.filterColumns.locationIds) {
+          this.filterColumns.locationIds.dataSource = this.allLocations;
+        }
+      });
+  }
+
+  private subscribeOnLocationChange(): void {
+    this.CandidateFilterFormGroup.get('locationIds')?.valueChanges
+      .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
+      .subscribe((val: number[]) => {
+        if (this.filterColumns.departmentIds) {
+          this.filterColumns.departmentIds.dataSource = [];
+          if (val?.length) {
+            const locationDataSource = this.filterColumns.locationIds?.dataSource as OrganizationLocation[];
+            const selectedLocations: OrganizationLocation[] = DepartmentHelper.findSelectedItems(
+              val,
+              locationDataSource
+            ) as OrganizationLocation[];
+            const locationDepartments: OrganizationDepartment[] = selectedLocations.flatMap(
+              (location) => location.departments
+            );
+
+            this.filterColumns.departmentIds.dataSource = getIRPOrgItems(locationDepartments);
+          } else {
+            this.CandidateFilterFormGroup.get('departmentIds')?.setValue([]);
+          }
+        }
+      });
   }
 
   private getRegions(): void {

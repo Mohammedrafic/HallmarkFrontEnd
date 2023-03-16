@@ -145,12 +145,13 @@ export class DocumentLibraryService {
     return this.http.get<DocumentLibraryDto>(`/api/DocumentLibrary/GetById/${Id}`);
   }
 
-  public GetDocumentsByCognitiveSearch(keyword: string, businessUnitType: any, businessUnitId?: any): Observable<DocumentsLibraryPage> {
+  public GetDocumentsByCognitiveSearch(keyword: string, businessUnitType: any, businessUnitId?: any, folderId?: any): Observable<DocumentsLibraryPage> {
     let params = new HttpParams();
     params = params.append("Keyword", keyword);
     params = params.append("BusinessUnitType", businessUnitType);
     params = params.append("BusinessUnitId", businessUnitId);
     params = params.append("IncludeContent", true);
+    params = params.append("folderId", folderId);
     return this.http.get<DocumentsLibraryPage>(`/api/DocumentLibrary/CognitiveSearchDocuments`, {params: params});
   }
 

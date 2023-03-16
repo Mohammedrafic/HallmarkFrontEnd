@@ -20,7 +20,7 @@
     [order]="orderCandidates"
     [system]="activeSystem"
     [selectedOrder]="order"
-    [orderGridPageNumber]="orderGridPageNumber$ | async"
+    [orderManagementPagerState]="orderManagementPagerState$ | async"
     >
   </app-reorder-candidates-list>
   <app-order-per-diem-candidates-list *ngSwitchCase="orderType.OpenPerDiem"
@@ -31,7 +31,7 @@
     [order]="orderCandidates"
     [system]="activeSystem"
     [selectedOrder]="order"
-    [orderGridPageNumber]="orderGridPageNumber$ | async"
+    [orderManagementPagerState]="orderManagementPagerState$ | async"
     >
   </app-order-per-diem-candidates-list>
   <app-order-candidates-list *ngSwitchDefault
@@ -41,7 +41,7 @@
     (getCandidatesList)="onGetCandidatesList($event)"
     [system]="activeSystem"
     [order]="orderCandidates"
-    [orderGridPageNumber]="orderGridPageNumber$ | async"
+    [orderManagementPagerState]="orderManagementPagerState$ | async"
     >
   </app-order-candidates-list>
 </div>

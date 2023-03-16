@@ -53,6 +53,17 @@ export namespace DoNotReturn {
     constructor() { }
   }
 
+  export class SaveDonotReturnSucceeded {
+    static readonly type = DoNotReturnActionsTypesEnum.SAVEDONOTRETURNSUCCEEDED;
+    constructor() { }
+  }
+
+  export class UpdateDonotReturnSucceeded {
+    static readonly type = DoNotReturnActionsTypesEnum.UPDATEDONOTRETURNSUCCEEDED;
+    constructor() { }
+  }
+
+
   export class GetDoNotReturnCandidateSearch {
     static readonly type = DoNotReturnActionsTypesEnum.GETDONOTRETURNCANDIDATESEARCH;
     constructor(public filter: DoNotReturnCandidateSearchFilter) { }

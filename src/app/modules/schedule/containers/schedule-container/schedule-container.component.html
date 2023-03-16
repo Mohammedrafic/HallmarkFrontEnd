@@ -56,6 +56,7 @@
       (loadMoreData)="loadMoreData($event)"
       (selectedCells)="selectCells($event)"
       (scheduleCell)="scheduleCell($event)"
+      (editCell)="editScheduledItem($event)"
       (selectCandidate)="selectCandidate($event)"
     ></app-schedule-grid>
   </ng-container>
@@ -77,3 +78,12 @@
   (destroyDialog)="closeScheduleDialog()"
   (updateScheduleGrid)="updateScheduleGrid()"
 ></app-create-schedule>
+
+<app-edit-schedule
+  *ngIf="editScheduleDialogOpen"
+  [datePickerLimitations]="datePickerLimitations"
+  [scheduledShift]="scheduledShift"
+  [userPermission]="userPermission"
+  (destroyDialog)="closeEditScheduleDialog()"
+  (updateScheduleGrid)="updateScheduleGrid()"
+></app-edit-schedule>

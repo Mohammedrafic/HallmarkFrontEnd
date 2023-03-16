@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, map, Observable, Subject, takeUntil } from 'rxjs';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -62,7 +62,7 @@ import { SideMenuService } from '@shared/components/side-menu/services';
 import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
 import { OrganizationSettingKeys } from '@shared/constants';
 import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
-import { AutoGenerationPayload } from './settings.interface';
+import { AutoGenerationPayload, SwitchValuePayload } from './settings.interface';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -88,6 +88,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public departmentFormGroup: FormGroup;
   public pushStartDateFormGroup: FormGroup;
   public invoiceGeneratingFormGroup: FormGroup;
+  public switchedValueForm: FormGroup;
   public formBuilder: FormBuilder;
 
   public readonly daysOfWeek = Days;
@@ -489,6 +490,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       case OrganizationSettingControlType.EmailAria:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
         break;
+      case OrganizationSettingControlType.SwitchedValue:
+        dynamicValue = JSON.stringify(this.createSwitchValuePayload());
+        break;
       default:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
         break;
@@ -540,6 +544,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           break;
       }
     });
+
+    if (this.formControlType === OrganizationSettingControlType.SwitchedValue) {
+      this.switchedValueForm.get('value')?.addValidators(validators);
+      this.observeToggleControl();
+    }
 
     if (validators.length > 0) {
       this.organizationSettingsFormGroup.get('value')?.addValidators(validators);
@@ -611,6 +620,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       dynamicValue = this.isParentEdit ? parentData.value : childData.value;
     }
 
+    if (this.formControlType === OrganizationSettingControlType.SwitchedValue) {
+      const valueOptions = this.isParentEdit ? parentData.value : childData.value;
+      dynamicValue = { ...JSON.parse(valueOptions), isSwitchedValue: true };
+    }
+
+
+
     // TODO: run outside zone
     setTimeout(() => {
       this.organizationSettingsFormGroup.setValue({
@@ -633,6 +649,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           time: dynamicValue.time ? DateTimeHelper.convertDateToUtc(dynamicValue.time) : '',
           dayOfWeek: dynamicValue.dayOfWeek,
           groupingBy: dynamicValue.groupingBy,
+        });
+      }
+
+      if (dynamicValue.isSwitchedValue) {
+        this.switchedValueForm.setValue({
+          value: dynamicValue.value,
+          isEnabled: dynamicValue.isEnabled,
         });
       }
     });
@@ -688,6 +711,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.departmentFormGroup.reset();
     this.pushStartDateFormGroup.reset();
     this.invoiceGeneratingFormGroup.reset();
+    this.switchedValueForm.reset();
     this.isEdit = false;
     this.isParentEdit = false;
     this.dropdownDataSource = [];
@@ -723,6 +747,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       time: [null, Validators.required],
       groupingBy: [null, Validators.required],
     });
+
+    // Remove this validation after be implementation. This is be bug.
+    this.switchedValueForm = this.formBuilder.group({
+      isEnabled: [false],
+      value: [null, [Validators.min(1), Validators.max(99)]],
+    });
   }
 
   private getActiveRowsPerPage(): number {
@@ -737,6 +767,24 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (invoiceGneration && invoiceGneration.value && typeof invoiceGneration.value === 'string') {
       invoiceGneration.parsedValue = JSON.parse(invoiceGneration.value);
     }
+
+    const switchedValues: any[] = data.filter((setting: any) => {
+      return setting.controlType === this.organizationSettingControlType.SwitchedValue;
+    });
+
+    switchedValues.forEach((setting) => {
+      if (setting.value && typeof setting.value === 'string') {
+        setting.parsedValue = JSON.parse(setting.value);
+      }
+
+      if (setting.children && setting.children.length) {
+        setting.children.forEach((child: any) => {
+          if (child.value && typeof child.value === 'string') {
+            child.parsedValue = JSON.parse(child.value);
+          }
+        });
+      }
+    });
 
     return data.slice(
       currentPage * this.getActiveRowsPerPage() - this.getActiveRowsPerPage(),
@@ -840,10 +888,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     });
   }
 
-    private handleShowToggleMessage(key: string): void {
-      this.showToggleMessage = key === tierSettingsKey;
-      this.showBillingMessage = key === billingSettingsKey || key === invoiceGeneratingSettingsKey;
-    }
+  private handleShowToggleMessage(key: string): void {
+    this.showToggleMessage = key === tierSettingsKey;
+    this.showBillingMessage = key === billingSettingsKey || key === invoiceGeneratingSettingsKey;
+  }
 
   private disableDepForInvoiceGeneration(): void {
     if (this.organizationSettingKey === OrganizationSettingKeys.InvoiceAutoGeneration
@@ -857,12 +905,31 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private createAutoGenerationPayload(): AutoGenerationPayload {
     return ({
       isEnabled: !!this.organizationSettingsFormGroup.controls['value'].value,
-
       dayOfWeek: this.invoiceGeneratingFormGroup.controls['dayOfWeek'].value,
-
       groupingBy: this.invoiceGeneratingFormGroup.controls['groupingBy'].value,
-
       time: DateTimeHelper.toUtcFormat(this.invoiceGeneratingFormGroup.controls['time'].value),
+    });
+  }
+
+  private createSwitchValuePayload(): SwitchValuePayload {
+    return ({
+      value: this.switchedValueForm.get('value')?.value,
+      isEnabled: !!this.switchedValueForm.get('isEnabled')?.value,
+    });
+  }
+
+  private observeToggleControl(): void {
+    this.switchedValueForm.get('isEnabled')?.valueChanges
+    .pipe(
+      takeUntil(this.unsubscribe$)
+    )
+    .subscribe((value: boolean) => {
+      if (value) {
+        this.switchedValueForm.get('value')?.addValidators(Validators.required);
+      } else {
+        this.switchedValueForm.get('value')?.removeValidators(Validators.required);
+      }
+      this.switchedValueForm.get('value')?.updateValueAndValidity();
     });
   }
 }

@@ -15,7 +15,9 @@
         class="icon"
       ></i-feather>
       <span
-        [class.bordered]="dateSchedule.isInDifferentDepartments"
+        [class.bordered]="dateSchedule.isInDifferentDepartments
+          || !dateSchedule.isDepartmentMatchWithFilter
+          || !dateSchedule.isHomeCostCenterDepartment"
         class="title__text"
       >
       {{ cardTitle }}

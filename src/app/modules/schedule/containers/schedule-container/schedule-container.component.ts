@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil } from 'rxjs';
@@ -17,9 +17,10 @@ import { ButtonRegionTooltip, ButtonSelectDataTooltip, TabListConfig } from '../
 import { ActiveTabIndex } from '../../enums';
 import * as ScheduleInt from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
-import { ScheduleFilterStructure } from '../../interface';
+import { ScheduledItem, ScheduleFilterStructure } from '../../interface';
 import { OrganizationStructure } from '@shared/models/organization.model';
-import { GetScheduleFilterByEmployees, HasDepartment, ShowButtonTooltip } from '../../helpers';
+import { GetScheduleFilterByEmployees, HasNotDepartment, HasMultipleFilters } from '../../helpers';
+import { ScheduleGridComponent } from './../../components/schedule-grid/schedule-grid.component';
 
 @Component({
   selector: 'app-schedule-container',
@@ -28,6 +29,8 @@ import { GetScheduleFilterByEmployees, HasDepartment, ShowButtonTooltip } from '
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleContainerComponent extends AbstractPermission implements OnInit {
+  @ViewChild(ScheduleGridComponent) scheduleGrid: ScheduleGridComponent;
+
   tabsListConfig: TabsListConfig[] = TabListConfig;
 
   activeTabIndex: ActiveTabIndex = ActiveTabIndex.Scheduling;
@@ -36,6 +39,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   scheduleData: ScheduleInt.ScheduleModelPage | null;
 
+  scheduledShift: ScheduledItem;
+
   appliedFiltersAmount = 0;
 
   totalCount = 0;
@@ -43,6 +48,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   scheduleFilters: ScheduleInt.ScheduleFilters = {};
 
   createScheduleDialogOpen = false;
+
+  editScheduleDialogOpen = false;
 
   scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
 
@@ -121,7 +128,10 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   scheduleCell(cells: ScheduleInt.ScheduleSelectedSlots): void {
-    if (!this.hasSchedulePermission) {
+    if (!this.hasSchedulePermission
+      || HasMultipleFilters(this.scheduleFilters)
+      || HasNotDepartment(this.scheduleFilters)
+    ) {
       return;
     }
 
@@ -131,11 +141,24 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   openScheduleDialog(): void {
     this.setScheduleStructure();
-    this.createScheduleDialogOpen = true;
   }
 
   closeScheduleDialog(): void {
     this.createScheduleDialogOpen = false;
+  }
+
+  editScheduledItem(scheduledItem: ScheduledItem): void {
+    if (HasMultipleFilters(this.scheduleFilters) || HasNotDepartment(this.scheduleFilters)) {
+      return;
+    }
+
+    this.scheduledShift = scheduledItem;
+    this.openEditScheduleDialog();
+  }
+
+  closeEditScheduleDialog(): void {
+    this.editScheduleDialogOpen = false;
+    this.scheduleGrid?.clearSelectedCandidatesSlot();
   }
 
   showFilters(): void {
@@ -159,6 +182,10 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   deleteFilterItem(event: ChipDeleteEventType): void {
     this.filterService.deleteInlineChip(event);
+  }
+
+  private openEditScheduleDialog(): void {
+    this.editScheduleDialogOpen = true;
   }
 
   private initScheduleData(isLoadMore = false): void {
@@ -251,7 +278,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       return;
     }
 
-    if (ShowButtonTooltip(this.scheduleFilters) || HasDepartment(this.scheduleFilters)) {
+    if (HasMultipleFilters(this.scheduleFilters) || HasNotDepartment(this.scheduleFilters)) {
       this.scheduleButtonTooltip = ButtonRegionTooltip;
     } else if (!this.scheduleSelectedSlots?.dates?.length) {
       this.scheduleButtonTooltip = ButtonSelectDataTooltip;
@@ -271,7 +298,11 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
         takeUntil(this.componentDestroy()),
       ).subscribe((structure: ScheduleFilterStructure) => {
         this.scheduleStructure = { ...structure };
+        this.createScheduleDialogOpen = true;
+        this.cdr.markForCheck();
       });
+    } else {
+      this.createScheduleDialogOpen = true;
     }
   }
 

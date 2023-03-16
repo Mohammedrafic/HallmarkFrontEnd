@@ -10,12 +10,12 @@ import { ClosePositionPayload } from "@client/order-management/components/close-
 export class CloseOrderService {
   public constructor(private http: HttpClient) {}
 
-  public closeOrder(payload: CloseOrderPayload): Observable<void> {
-    return this.http.post<void>(`/api/Order/close`, payload);
+  public closeOrder(payload: CloseOrderPayload, isIrpOrder: boolean): Observable<void> {
+    const path = isIrpOrder ? 'IRPOrders' : 'Order';
+    return this.http.post<void>(`/api/${path}/close`, payload);
   }
 
   public closePosition(payload: ClosePositionPayload): Observable<void> {
     return this.http.post<void>(`/api/AppliedCandidates/closePosition`, payload);
   }
-
 }

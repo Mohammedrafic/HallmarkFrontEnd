@@ -10,7 +10,7 @@ export class DepartmentService {
   constructor(private fb: FormBuilder) {
   }
 
-  createDepartmentDetailForm(isIRPFlagEnabled: boolean): FormGroup {
+  createDepartmentDetailForm(isIRPFlagEnabled: boolean, isOrgUseIRPAndVMS: boolean): FormGroup {
     return this.fb.group({
       extDepartmentId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       invoiceDepartmentId: isIRPFlagEnabled
@@ -23,7 +23,7 @@ export class DepartmentService {
       inactiveDate: [null],
       reactivateDate: [null],
       ...(isIRPFlagEnabled && {
-        includeInIRP: [false],
+        includeInIRP: [isOrgUseIRPAndVMS ? false : true],
         unitDescription: ['', [Validators.maxLength(2000)]],
         primarySkills: [null],
         secondarySkills: [null]
