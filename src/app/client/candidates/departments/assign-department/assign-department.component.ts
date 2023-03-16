@@ -9,6 +9,7 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
+import { Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
 import {
@@ -64,6 +65,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
 
   public readonly departmentFields = OptionFields;
   public departmentId?: number | null = null;
+  public isOriented$: Subject<boolean> = new Subject();
 
   public constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -79,6 +81,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     this.subscribeOnDialogData();
     this.saveFormData();
     this.watchForControlsValueChanges();
+    this.adjustOrientationDateField();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -86,7 +89,12 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       this.dataSource.regions = this.departmentHierarchy;
     }
   }
-  
+
+  public orientedChecked(event: boolean): void {
+    this.isOriented$.next(event);
+    this.assignDepartmentForm.markAsDirty();
+  }
+
   public toggleChecked(): void {
     this.assignDepartmentForm.markAsDirty();
   }
@@ -103,6 +111,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
         this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
         this.dataSource.departments = [{ name: data.departmentName, id: data.departmentId } as OrganizationDepartment];
+        this.isOriented$.next(data.isOriented);
         this.departmentFormService.patchForm(this.assignDepartmentForm, data);
         this.disableControls();
       } else {
@@ -198,5 +207,18 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     this.assignDepartmentForm.get('startDate')?.setValue(new Date());
     this.departmentId = null;
     this.cdr.markForCheck();
+  }
+
+  private adjustOrientationDateField(): void {
+    this.isOriented$.pipe(takeUntil(this.destroy$)).subscribe((isOriented) => {
+      const orientationDateControl = this.assignDepartmentForm.get('orientationDate');
+      if (isOriented) {
+        orientationDateControl?.setValidators([Validators.required]);
+      } else {
+        orientationDateControl?.setValidators([]);
+        orientationDateControl?.reset();
+      }
+      this.cdr.markForCheck();
+    });
   }
 }
