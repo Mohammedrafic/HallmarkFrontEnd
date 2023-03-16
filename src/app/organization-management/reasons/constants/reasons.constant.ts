@@ -78,6 +78,7 @@ export const NewReasonsActionsMap = {
   [ReasonsNavigationTabs.Rejection]: ReasonActions.SaveRejectReasons,
   [ReasonsNavigationTabs.Requisition]: ReasonActions.SaveOrderRequisition,
   [ReasonsNavigationTabs.InternalTransfer]: ReasonActions.SaveInternalTransferReasons,
+  [ReasonsNavigationTabs.Termination]: ReasonActions.SaveTerminationReasons,
 };
 
 export const UpdateReasonsActionsMap = {
@@ -86,6 +87,7 @@ export const UpdateReasonsActionsMap = {
   [ReasonsNavigationTabs.Rejection]: ReasonActions.UpdateRejectReasons,
   [ReasonsNavigationTabs.Requisition]: ReasonActions.SaveOrderRequisition,
   [ReasonsNavigationTabs.InternalTransfer]: ReasonActions.UpdateInternalTransferReasons,
+  [ReasonsNavigationTabs.Termination]: ReasonActions.UpdateTerminationReasons,
 };
 
 export const UnavailabilityDialogConfig: ReasonFormConfig[] = [
