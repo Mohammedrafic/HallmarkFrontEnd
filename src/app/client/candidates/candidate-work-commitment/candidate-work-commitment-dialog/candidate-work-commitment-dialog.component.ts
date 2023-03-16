@@ -123,7 +123,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.candidateWorkCommitmentForm.controls['criticalOrder'].setValue(commitment.criticalOrder);
     this.candidateWorkCommitmentForm.controls['holiday'].setValue(commitment.holiday);
     this.candidateWorkCommitmentForm.controls['comment'].setValue(commitment.comments);
-    this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.minimumDate);
+    this.candidateWorkCommitmentForm.controls['startDate'].setValue(new Date());
     this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
   }
 
@@ -136,8 +136,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.candidateWorkCommitmentService.getWorkCommitmentById(id)
       .subscribe((commitment: WorkCommitmentDetails) => {
         this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
-        this.minimumDate = !populateForm || this.lastActiveDate < this.selectWorkCommitmentStartDate ? this.selectWorkCommitmentStartDate : this.lastActiveDate;
-        this.maximumDate = commitment.endDate ? DateTimeHelper.convertDateToUtc(commitment.endDate as string) : undefined;
+        this.minimumDate = this.selectWorkCommitmentStartDate;
+        const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
+        this.maximumDate = this.minimumDate < commitmentEndDate ? commitmentEndDate : undefined;
         if (populateForm) {
           this.populateFormWithMasterCommitment(commitment);
         } else {
