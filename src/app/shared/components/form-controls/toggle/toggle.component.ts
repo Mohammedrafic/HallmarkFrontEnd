@@ -8,7 +8,7 @@ import { BaseFormControlDirective } from '@shared/components/form-controls/base-
   styleUrls: ['./toggle.component.scss'],
 })
 export class ToggleComponent extends BaseFormControlDirective implements OnInit {
-  @Output() public checked: EventEmitter<void> = new EventEmitter();
+  @Output() public checked: EventEmitter<boolean> = new EventEmitter();
 
   constructor() {
     super();
@@ -22,7 +22,7 @@ export class ToggleComponent extends BaseFormControlDirective implements OnInit 
   }
 
   public onChange({ checked }: ChangeEventArgs): void {
-    this.checked.emit();
+    this.checked.emit(checked);
     this.getControl()?.setValue(checked);
   }
 }

@@ -20,6 +20,7 @@ export class DepartmentFormService {
       endDate: [null],
       isOriented: [null],
       isHomeCostCenter: [null],
+      orientationDate: [null],
     }) as CustomFormGroup<AssignDepartmentFormState>;
   }
 
@@ -39,7 +40,7 @@ export class DepartmentFormService {
       endDate: [null],
       isOriented: [false],
       isHomeCostCenter: [false],
-      orientedStartDate: [null],
+      orientationDate: [null],
     }) as CustomFormGroup<EditDepartmentFormState>;
   }
 

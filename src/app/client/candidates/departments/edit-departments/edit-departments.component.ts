@@ -16,7 +16,7 @@ import { CustomFormGroup } from '@core/interface';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { EditDepartmentsFormConfig } from '../constants/edit-departments.constant';
-import { DateRanges, DepartmentFormFieldConfig, EditAssignedDepartment, EditDepartmentFormState } from '../departments.model';
+import { DateRanges, DepartmentFormFieldConfig, DepartmentPayload, EditDepartmentFormState } from '../departments.model';
 import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentsService } from '../services/departments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -99,7 +99,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
       });
   }
 
-  private editDepartments(): Observable<EditAssignedDepartment> {
+  private editDepartments(): Observable<DepartmentPayload> {
     const formData = this.formGroup.getRawValue();
     return this.departmentService.editAssignedDepartments(formData, this.selectedDepartments);
   }

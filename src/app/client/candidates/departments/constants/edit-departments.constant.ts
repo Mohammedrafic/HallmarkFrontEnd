@@ -27,7 +27,7 @@ export const EditDepartmentsFormConfig = (
   {
     type: ControlTypes.Date,
     title: 'Orientation Start Date',
-    field: EditDepartmentFields.ORIENTED_START_DATE,
+    field: EditDepartmentFields.ORIENTATION_DATE,
     show: isOriented,
     isShort: true,
   },

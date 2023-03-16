@@ -28,10 +28,9 @@ import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import {
   AssignDepartmentFormState,
   AssignDepartmentHierarchy,
-  AssignNewDepartment,
   DateRanges,
   DepartmentAssigned,
-  EditAssignedDepartment,
+  DepartmentPayload,
 } from '../departments.model';
 import { DepartmentsService } from '../services/departments.service';
 import { OrganizationRegion, OrganizationLocation, OrganizationDepartment } from '@shared/models/organization.model';
@@ -150,7 +149,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       });
   }
 
-  private saveAssignedDepartment(): Observable<AssignNewDepartment | EditAssignedDepartment> {
+  private saveAssignedDepartment(): Observable<DepartmentPayload> {
     const formData = this.assignDepartmentForm.getRawValue();
 
     if (this.departmentId) {
@@ -205,6 +204,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     this.assignDepartmentForm.reset();
     this.assignDepartmentForm.enable();
     this.assignDepartmentForm.get('startDate')?.setValue(new Date());
+    this.isOriented$.next(false);
     this.departmentId = null;
     this.cdr.markForCheck();
   }
