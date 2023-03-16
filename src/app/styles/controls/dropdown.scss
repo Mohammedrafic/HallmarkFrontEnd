@@ -211,4 +211,5 @@ body.dark {
 
 .e-ddl.e-popup.e-control.e-ddl-device.e-ddl-device-filter.e-popup-full-page.e-popup-open {
   position: fixed;
+  transform: translate(0, 0); // IOS scroll fix
 }
