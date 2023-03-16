@@ -6,7 +6,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { GridModule } from '@shared/components/grid/grid.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { SharedModule } from '@shared/shared.module';
-import { ButtonModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, RadioButtonModule, SwitchModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { GridAllModule, PagerAllModule } from '@syncfusion/ej2-angular-grids';
 import { NumericTextBoxAllModule, TextBoxAllModule } from '@syncfusion/ej2-angular-inputs';
@@ -27,7 +27,7 @@ import { ReasonsService } from './services/reasons.service';
 import { UnavailabilityReasonsModule } from './components/unavailability-reasons';
 import { ToggleIconRendererModule } from '@shared/components/cell-renderers/toggle-icon-renderer';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
-
+  
 const icons = {
     Edit,
     Trash2,
@@ -55,6 +55,7 @@ const icons = {
         SwitchModule,
         TextBoxAllModule,
         ValidateDirectiveModule,
+        CheckBoxModule,
     ],
     declarations: [
         ReasonsComponent,

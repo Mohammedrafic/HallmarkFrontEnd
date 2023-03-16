@@ -65,8 +65,8 @@ export const UnavaliabilityGridConfig: ColDef[] = [
 export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
   0: ReasonFormType.DefaultReason,
   1: ReasonFormType.PenaltyReason,
-  2: ReasonFormType.DefaultReason,
-  3: ReasonFormType.DefaultReason,
+  2: ReasonFormType.RequisitionReason,
+  3: ReasonFormType.ClosureReason,
   4: ReasonFormType.DefaultReason,
   5: ReasonFormType.Unavailability,
 };
@@ -127,8 +127,60 @@ export const defaultDialogConfig: ReasonFormConfig[]  = [
   },
 ];
 
+export const requisitionDialogConfig: ReasonFormConfig[]  = [
+  {
+    field: '',
+    title: 'Select System',
+    fieldType: FieldType.CheckBoxGroup,
+    required: true,
+    checkBoxes: [
+      {
+        field: 'includeInIRP',
+        title: 'IRP',
+      },
+      {
+        field: 'includeInVMS',
+        title: 'VMS',
+      },
+    ],
+  },
+  {
+    field: 'reason',
+    title: 'Reason',
+    required: true,
+    fieldType: FieldType.Input,
+  }
+];
+
+export const closureDialogConfig: ReasonFormConfig[]  = [
+  {
+    field: '',
+    title: 'Select System',
+    fieldType: FieldType.CheckBoxGroup,
+    required: true,
+    checkBoxes: [
+      {
+        field: 'includeInIRP',
+        title: 'IRP',
+      },
+      {
+        field: 'includeInVMS',
+        title: 'VMS',
+      },
+    ],
+  },
+  {
+    field: 'reason',
+    title: 'Reason',
+    required: true,
+    fieldType: FieldType.Input,
+  }
+];
+
 export const ReasonDialogConfig: ReasonFormConfigMap = {
   [ReasonFormType.DefaultReason]: defaultDialogConfig,
   [ReasonFormType.Unavailability]: UnavailabilityDialogConfig,
   [ReasonFormType.PenaltyReason]: null,
+  [ReasonFormType.RequisitionReason]: requisitionDialogConfig,
+  [ReasonFormType.ClosureReason]: closureDialogConfig,
 };

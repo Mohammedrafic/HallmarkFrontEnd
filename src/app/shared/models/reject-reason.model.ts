@@ -28,3 +28,4 @@ export interface UnavailabilityPaging {
   PageNumber: number;
   PageSize: number;
 }
+

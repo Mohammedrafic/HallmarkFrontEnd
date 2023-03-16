@@ -11,4 +11,6 @@ export enum ReasonFormType {
   DefaultReason = 'defaultReason',
   PenaltyReason = 'penaltyReason',
   Unavailability = 'unavailability',
+  RequisitionReason = "RequisitionReason",
+  ClosureReason = "ClosureReason",
 }

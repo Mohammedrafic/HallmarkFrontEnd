@@ -17,7 +17,7 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { Organization, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Penalty } from '@shared/models/penalty.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -27,9 +27,13 @@ import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { ReasonDialogConfig, ReasonFormsTypeMap } from './constants';
 import { ReasonFormType, ReasonsNavigationTabs } from './enums';
-import { ReasonFormConfig, UnavailabilityValue } from './interfaces';
+import { Closurevalue, ReasonCheckBoxGroup, ReasonFormConfig, UnavailabilityValue } from './interfaces';
 import { ReasonsFormsService } from './services/reasons-form.service';
 import { ReasonsService } from './services/reasons.service';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
+import { SelectedSystems } from '@shared/components/credentials-list/constants';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-reasons',
@@ -56,15 +60,19 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
   public dialogConfig: ReasonFormConfig[] | null;
   public readonly inputType = FieldType;
   public isIRPFlagEnabled = false;
+  public selectedSystem: SelectedSystemsFlag = SelectedSystems;
 
   private isAllRegionsSelected = false;
   private isAllLocationsSelected = false;
   private isEdit = false;
-  private formType = ReasonFormType.DefaultReason;
+  private formType;
   protected componentDestroy: () => Observable<unknown>;
 
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
+
+  @Select(OrganizationManagementState.organization)
+  public readonly organization$: Observable<Organization>;
 
   constructor(
     protected override store: Store,
@@ -77,19 +85,42 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
     super(store);
     const cancellationReasons = Object.entries(CancellationReasonsMap).map(([key, value]) => ({ id: +key, name: value}));
     this.cancellationReasons = sortByField(cancellationReasons, 'name');
+    if(this.selectedSystem.isIRP){
+      this.selectedTab = ReasonsNavigationTabs.Rejection;
+      this.formType = ReasonFormType.DefaultReason;
+    } else {
+      this.selectedTab = ReasonsNavigationTabs.Requisition;
+      this.formType = ReasonFormType.RequisitionReason;
+    }
     this.dialogConfig = ReasonDialogConfig[this.formType];
     this.createForm();
     this.setIRPFlag();
+   
+
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
     this.subscribeOnSaveReasonSuccess();
     this.canRejectOrClosureReason();
+    this.getOrganizagionData();
   }
 
   selectTab(selectedTab: SelectEventArgs): void {
-    this.selectedTab = selectedTab.selectedIndex;
+    if(selectedTab.selectedItem.innerText === "Candidate Rejection"){
+      this.selectedTab = ReasonsNavigationTabs.Rejection;
+    } else if(selectedTab.selectedItem.innerText === "Candidate Cancellation (Penalties)"){
+      this.selectedTab = ReasonsNavigationTabs.Penalties;
+    } else if(selectedTab.selectedItem.innerText === "Order Requisition"){
+      this.selectedTab = ReasonsNavigationTabs.Requisition;
+    } else if(selectedTab.selectedItem.innerText === "Order Closure"){
+      this.selectedTab = ReasonsNavigationTabs.Closure;
+    } else if(selectedTab.selectedItem.innerText === "Manual Invoice"){
+      this.selectedTab = ReasonsNavigationTabs.ManualInvoice;
+    } else if(selectedTab.selectedItem.innerText === "Unavailability"){
+      this.selectedTab = ReasonsNavigationTabs.Unavailability;
+    }
+    
     this.formType = ReasonFormsTypeMap[this.selectedTab];
     this.createForm();
     this.dialogConfig = ReasonDialogConfig[this.formType];
@@ -126,7 +157,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  editReason(data: RejectReason | Penalty | UnavailabilityValue): void {
+  editReason(data: RejectReason | Penalty | UnavailabilityValue | Closurevalue): void {
     this.isEdit = true;
     this.title = DialogMode.Edit;
 
@@ -159,6 +190,14 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
         eligibleToBeScheduled: !!reason.eligibleToBeScheduled,
         visibleForIRPCandidates: !!reason.visibleForIRPCandidates,
       });
+    } else if((this.selectedTab === ReasonsNavigationTabs.Requisition || ReasonsNavigationTabs.Closure)) {
+      const reason  = data as Closurevalue;
+      this.reasonForm.patchValue({
+        id: reason.id,
+        reason: reason.reason,
+        includeInIRP: reason.includeInIRP,
+        includeInVMS: reason.includeInVMS,
+        });
     } else {
       this.reasonForm.patchValue({
         id: (data as RejectReason).id,
@@ -295,6 +334,26 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
       this.saveReason(true);
+    });
+  }
+  
+  trackByField(index: number, item: ReasonFormConfig | ReasonCheckBoxGroup): string {
+    return item.field;
+  }
+
+  private getOrganizagionData(): void {
+    this.organization$
+    .pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((organization : Organization) => {
+      console.log(organization);
+      const isOrgUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
+      this.selectedSystem = {
+        isIRP: !!organization.preferences.isIRPEnabled,
+        isVMS: !!organization.preferences.isVMCEnabled,
+      };
     });
   }
 
