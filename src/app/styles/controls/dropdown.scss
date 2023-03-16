@@ -211,7 +211,6 @@ body.dark {
 
 .e-ddl.e-popup.e-control.e-ddl-device.e-ddl-device-filter.e-popup-full-page.e-popup-open {
   position: fixed;
-  min-height: 100dvh;
-  height: -webkit-fill-available;
+  height: 100dvh;
   -webkit-overflow-scrolling: touch;
 }
