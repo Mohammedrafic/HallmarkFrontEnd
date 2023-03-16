@@ -69,7 +69,8 @@ export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
   3: ReasonFormType.DefaultReason,
   4: ReasonFormType.DefaultReason,
   5: ReasonFormType.Unavailability,
-  6: ReasonFormType.DefaultReason
+  6: ReasonFormType.DefaultReason,
+  7: ReasonFormType.DefaultReason
 };
 
 export const NewReasonsActionsMap = {
