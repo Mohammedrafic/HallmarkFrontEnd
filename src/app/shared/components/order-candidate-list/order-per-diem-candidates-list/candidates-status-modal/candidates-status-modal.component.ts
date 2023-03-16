@@ -231,6 +231,13 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
 
   public onApply(): void {
     if (this.orderApplicantsInitialData) {
+      if (this.candidateSSNRequired) {
+        if (!this.form.controls["ssn"].value) {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
+          return;
+        }
+      }
+
       this.store
         .dispatch(
           new ApplyOrderApplicants({
@@ -254,12 +261,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
         return;
       }
     }
-    if(this.candidateSSNRequired){
-      if(!this.form.controls["ssn"].value){
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
-        return;
-      }
-    }
+   
     
     if (this.candidatePayRateRequired && this.form.get('candidatePayRate')?.invalid) {
       this.form.markAllAsTouched();
