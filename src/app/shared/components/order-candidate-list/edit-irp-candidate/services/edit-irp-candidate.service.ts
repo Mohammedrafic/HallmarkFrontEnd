@@ -27,6 +27,9 @@ constructor(
       status: [null, Validators.required],
       actualStartDate: [null],
       actualEndDate: [null],
+      isClosed: [false],
+      reason: [null],
+      closeDate: [null],
     }) as CustomFormGroup<CandidateForm>;
   }
 

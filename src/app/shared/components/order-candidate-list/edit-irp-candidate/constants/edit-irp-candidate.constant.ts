@@ -38,4 +38,28 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     type: FieldType.Date,
     cssClass: 'date-field',
   },
+  {
+    field: 'isClosed',
+    title: 'Close Position',
+    disabled: false,
+    required: false,
+    type: FieldType.Toggle,
+    cssClass: 'close-switch',
+  },
+  {
+    field: 'reason',
+    title: 'Reason',
+    disabled: false,
+    required: false,
+    type: FieldType.Dropdown,
+    cssClass: 'status',
+  },
+  {
+    field: 'closeDate',
+    title: 'Closing Date',
+    disabled: false,
+    required: false,
+    type: FieldType.Date,
+    cssClass: 'date-field',
+  },
 ];
