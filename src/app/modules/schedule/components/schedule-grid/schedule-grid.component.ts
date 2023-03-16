@@ -197,6 +197,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.selectCandidate.emit(candidate);
   }
 
+  clearSelectedCandidatesSlot(): void {
+    this.selectedCandidatesSlot.clear();
+    this.cdr.markForCheck();
+  }
+
   private startOrgIdWatching(): void {
     this.organizationId$.pipe(
       filter(Boolean),

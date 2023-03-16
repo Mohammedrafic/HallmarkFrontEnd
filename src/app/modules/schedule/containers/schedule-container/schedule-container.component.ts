@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil } from 'rxjs';
@@ -19,7 +19,8 @@ import * as ScheduleInt from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { ScheduledItem, ScheduleFilterStructure } from '../../interface';
 import { OrganizationStructure } from '@shared/models/organization.model';
-import { GetScheduleFilterByEmployees, HasDepartment, ShowButtonTooltip } from '../../helpers';
+import { GetScheduleFilterByEmployees, HasNotDepartment, HasMultipleFilters } from '../../helpers';
+import { ScheduleGridComponent } from './../../components/schedule-grid/schedule-grid.component';
 
 @Component({
   selector: 'app-schedule-container',
@@ -28,6 +29,8 @@ import { GetScheduleFilterByEmployees, HasDepartment, ShowButtonTooltip } from '
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleContainerComponent extends AbstractPermission implements OnInit {
+  @ViewChild(ScheduleGridComponent) scheduleGrid: ScheduleGridComponent;
+
   tabsListConfig: TabsListConfig[] = TabListConfig;
 
   activeTabIndex: ActiveTabIndex = ActiveTabIndex.Scheduling;
@@ -125,7 +128,10 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   scheduleCell(cells: ScheduleInt.ScheduleSelectedSlots): void {
-    if (!this.hasSchedulePermission) {
+    if (!this.hasSchedulePermission
+      || HasMultipleFilters(this.scheduleFilters)
+      || HasNotDepartment(this.scheduleFilters)
+    ) {
       return;
     }
 
@@ -142,12 +148,17 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   editScheduledItem(scheduledItem: ScheduledItem): void {
+    if (HasMultipleFilters(this.scheduleFilters) || HasNotDepartment(this.scheduleFilters)) {
+      return;
+    }
+
     this.scheduledShift = scheduledItem;
     this.openEditScheduleDialog();
   }
 
   closeEditScheduleDialog(): void {
     this.editScheduleDialogOpen = false;
+    this.scheduleGrid?.clearSelectedCandidatesSlot();
   }
 
   showFilters(): void {
@@ -267,7 +278,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       return;
     }
 
-    if (ShowButtonTooltip(this.scheduleFilters) || HasDepartment(this.scheduleFilters)) {
+    if (HasMultipleFilters(this.scheduleFilters) || HasNotDepartment(this.scheduleFilters)) {
       this.scheduleButtonTooltip = ButtonRegionTooltip;
     } else if (!this.scheduleSelectedSlots?.dates?.length) {
       this.scheduleButtonTooltip = ButtonSelectDataTooltip;
