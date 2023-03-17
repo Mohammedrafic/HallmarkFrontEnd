@@ -128,6 +128,7 @@ export class OrganizationDepartment {
   includeInIRP?: boolean;
   isDeactivated?: boolean;
   inactiveDate?: string;
+  extDepartmentId?: string;
 }
 
 export class OrganizationLocation {

@@ -40,6 +40,7 @@ import { OptionFields } from '@client/order-management/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CustomFormGroup } from '@core/interface';
+import { departmentName } from '../helpers/department.helper';
 
 @Component({
   selector: 'app-assign-department',
@@ -109,7 +110,12 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       if (data && this.departmentId) {
         this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
         this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
-        this.dataSource.departments = [{ name: data.departmentName, id: data.departmentId } as OrganizationDepartment];
+        this.dataSource.departments = [
+          {
+            name: departmentName(data.departmentName, data.extDepartmentId),
+            id: data.departmentId,
+          } as OrganizationDepartment,
+        ];
         this.isOriented$.next(data.isOriented);
         this.departmentFormService.patchForm(this.assignDepartmentForm, data);
         this.disableControls();
@@ -185,7 +191,11 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         const selectedLocation = (this.dataSource.locations as OrganizationLocation[]).find(
           (location) => location.id === value
         );
-        this.dataSource.departments = selectedLocation?.departments ?? [];
+        const departments = selectedLocation?.departments ?? [];
+        this.dataSource.departments = departments.map((department) => ({
+          ...department,
+          name: departmentName(department.name, department.extDepartmentId ?? ''),
+        }));
         this.cdr.markForCheck();
       });
 

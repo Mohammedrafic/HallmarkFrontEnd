@@ -31,8 +31,8 @@ export class OrganizationStructureService {
   }
 
   public getDepartmentsById(id: number): OrganizationDepartment[] {
-    return this.getSources(this.selectedLocations, id, 'departments')
-    .filter((department) => !department.isDeactivated);
+    return (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[])
+    .filter((department: OrganizationDepartment) => !department?.isDeactivated);
   }
 
   //TODO: add correct model, and enum for type param

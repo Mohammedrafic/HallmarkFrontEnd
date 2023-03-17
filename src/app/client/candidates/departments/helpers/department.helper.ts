@@ -37,3 +37,7 @@ function createDepartmentPayload(formData: DepartmentPayload, employeeWorkCommit
     ...(isHomeCostCenter && { isHomeCostCenter }),
   };
 }
+
+export function departmentName(name: string, id: string): string {
+  return `${name} (${id})`;
+}

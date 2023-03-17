@@ -22,6 +22,7 @@ export interface DepartmentAssigned {
   endDate: Date;
   isHomeCostCenter: boolean;
   orientationDate: Date | null;
+  extDepartmentId: string;
 }
 
 interface Skill {

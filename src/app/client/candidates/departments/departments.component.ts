@@ -106,7 +106,6 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     this.showSideDialog(true);
     this.dialogData$.next(null);
     this.getAssignedDepartmentHierarchy();
-    this.cdr.markForCheck();
   }
 
   public onSave(): void {
