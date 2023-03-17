@@ -18,7 +18,7 @@ import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/fil
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormFieldConfig, DepartmentFiltersColumns, DepartmentFilterState } from '../departments.model';
 import { FilterService } from '@shared/services/filter.service';
-import { DepartmentFilterFormConfig } from '@client/candidates/departments/constants/department-filter.constant';
+import { DepartmentFilterFormConfig, OrientedFilterPayload } from '@client/candidates/departments/constants/department-filter.constant';
 import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -80,7 +80,8 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
 
   public applyFilters(): void {
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
-    const filterState = this.formGroup.getRawValue();
+    const formState = this.formGroup.getRawValue();
+    const filterState = { ...formState, isOriented: OrientedFilterPayload[formState.isOriented] };
     this.applyFilters$.next(filterState);
   }
 
@@ -128,7 +129,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
 
   private resetFilterForm(): void {
     if (this.formGroup.dirty) {
-      this.formGroup.reset({ oriented: 1 });
+      this.formGroup.reset({ isOriented: 0 });
     }
   }
 

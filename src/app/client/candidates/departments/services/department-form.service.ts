@@ -30,7 +30,7 @@ export class DepartmentFormService {
       locationIds: [null],
       departmentsIds: [null],
       skillIds: [null],
-      oriented: [1],
+      isOriented: [0],
     }) as CustomFormGroup<DepartmentFiltersColumns>;
   }
 
@@ -85,7 +85,7 @@ export class DepartmentFormService {
   }
 
   public patchForm(formGroup: FormGroup, formData: DepartmentAssigned): void {
-    const { regionId, locationId, departmentId, startDate, endDate, isOriented, isHomeCostCenter } = formData;
+    const { regionId, locationId, departmentId, startDate, endDate, isOriented, isHomeCostCenter, orientationDate } = formData;
     formGroup.patchValue({
       regionId: regionId,
       locationId: locationId,
@@ -94,6 +94,7 @@ export class DepartmentFormService {
       endDate: endDate,
       isOriented: isOriented,
       isHomeCostCenter: isHomeCostCenter,
+      orientationDate: orientationDate
     })
   }
 
