@@ -116,7 +116,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   }
 
   private checkIsCredentialsValid(formState: ListOfKeyForms): void {
-    if(this.orderCredentials?.length || this.selectedOrder.orderType === OrderType.ReOrder) {
+    if(this.orderCredentials?.length || this.selectedOrder?.orderType === OrderType.ReOrder) {
       this.saveOrder(formState);
     } else {
       showMessageForInvalidCredentials();
