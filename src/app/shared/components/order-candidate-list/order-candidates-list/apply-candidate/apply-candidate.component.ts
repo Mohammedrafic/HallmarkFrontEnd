@@ -16,9 +16,11 @@ import PriceUtils from '@shared/utils/price.utils';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { deployedCandidateMessage, DEPLOYED_CANDIDATE, REQUIRED_PERMISSIONS, SubmissionsLimitReached } from '@shared/constants';
+import { CandidateSSNRequired, deployedCandidateMessage, DEPLOYED_CANDIDATE, REQUIRED_PERMISSIONS, SubmissionsLimitReached } from '@shared/constants';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
+import { MessageTypes } from '../../../../enums/message-types';
+import { ShowToast } from '../../../../../store/app.actions';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -52,6 +54,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public orderId: number;
   public canApplyCandidate = true;
   public applyRestrictionMessage = REQUIRED_PERMISSIONS;
+  public candidateSSNRequired: boolean;
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
@@ -113,6 +116,14 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public applyOrderApplicants(): void {
     this.formGroup.markAllAsTouched();
     if (this.formGroup.valid) {
+
+      if (this.candidateSSNRequired) {
+        if (!this.formGroup.controls["ssn"].value) {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
+          return;
+        }
+      }
+
       this.shouldApplyDeployedCandidate()
         .pipe(take(1))
         .subscribe((isConfirm) => {
@@ -172,6 +183,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       candidateBillRate: new FormControl(null, [Validators.required]),
       expAsTravelers: new FormControl(0),
       requestComment: new FormControl('', [Validators.maxLength(2000)]),
+      ssn: new FormControl('')
     });
   }
 
@@ -186,6 +198,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       candidateBillRate: PriceUtils.formatNumbers(data.orderBillRate),
       expAsTravelers: data.expAsTravelers || 0,
       requestComment: data.requestComment || '',
+      ssn: data.ssn,
     });
   }
 
@@ -202,9 +215,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private subscribeOnInitialData(): void {
     this.candidateJobState$
     .pipe(takeUntil(this.unsubscribe$))
-    .subscribe((data: OrderCandidateJob) => {
+      .subscribe((data: OrderCandidateJob) => {
       this.candidateJob = data;
-
       if (data?.candidateProfile.id === this.candidate.candidateId) {
         this.getComments();
       }
@@ -216,6 +228,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         takeUntil(this.unsubscribe$),
         )
       .subscribe((data: OrderApplicantsInitialData) => {
+        this.candidateSSNRequired = data.candidateSSNRequired;
         this.organizationId = data.organizationId;
         this.candidateId = data.candidateId;
         this.orderId = data.orderId;
