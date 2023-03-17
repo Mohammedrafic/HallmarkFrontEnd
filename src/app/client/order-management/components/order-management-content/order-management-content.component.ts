@@ -520,6 +520,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
+
   public getalerttitle(): void {
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
 	  this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
@@ -627,7 +628,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.clearSelection(this.gridWithChildRow);
   }
 
-
   public onAddReorderClose(): void {
     if (
       this.activeTab === OrganizationOrderManagementTabs.AllOrders ||
@@ -669,7 +669,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
     this.filters.pageSize = this.pageSize;
     this.isIncomplete = false;
-
+    
     if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
       this.filters = {}; // TODO remove and implement IRP filters
 
@@ -1176,7 +1176,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.cd$.next(true);
   }
 
-  buttonGroupChange(selectedBtn: ButtonModel) {
+  changeSystem(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
 
@@ -1391,9 +1391,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
         this.clearFilters();
       }
+
       if (!this.previousSelectedOrderId) {
         this.pageSubject.next(1);
       }
+
       this.store.dispatch(new GetAssignedSkillsByOrganization());
 
       this.orderManagementService.setPreviousOrganizationId(id);
@@ -2106,8 +2108,19 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.isOrgVMSEnabled = !!isVMCEnabled;
 
       this.setPreviousSelectedSystem();
-      this.activeSystem = this.previousSelectedSystemId
-        ?? DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
+      }
+
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
+      }
+
+      if (!this.previousSelectedSystemId) {
+        this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+      }
+
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem);
       this.initMenuItems();
       this.initGridColumns();

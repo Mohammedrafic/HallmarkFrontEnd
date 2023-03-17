@@ -2,7 +2,7 @@
   class="button-group system-buttons"
   *ngIf="isIRPFlagEnabled"
   [buttonOptions]="systemGroupConfig"
-  (buttonChange)="buttonGroupChange($event)"
+  (buttonChange)="changeSystem($event)"
 ></app-button-group>
 <app-page-toolbar>
   <ng-container left>
