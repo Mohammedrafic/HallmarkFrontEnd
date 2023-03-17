@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ofActionSuccessful, Select } from "@ngxs/store";
 import { Observable, takeWhile } from "rxjs";
 import {
@@ -10,6 +10,10 @@ import {
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { RejectReasonPage } from "@shared/models/reject-reason.model";
 import { ReasonsComponent } from '@organization-management/reasons/models/reasons-component.class';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { Organization } from '@shared/models/organization.model';
+import { SelectedSystems } from '@shared/components/credentials-list/constants';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 
 @Component({
   selector: 'app-order-requisition',
@@ -19,6 +23,13 @@ import { ReasonsComponent } from '@organization-management/reasons/models/reason
 export class OrderRequisitionComponent extends ReasonsComponent implements OnInit,OnDestroy {
   @Select(RejectReasonState.orderRequisition)
   public reasons$: Observable<RejectReasonPage>;
+  
+  @Select(OrganizationManagementState.organization)
+  public readonly organization$: Observable<Organization>;
+  @Input() showSystem: boolean;
+
+  protected componentDestroy: () => Observable<unknown>;
+  public selectedSystem: SelectedSystemsFlag = SelectedSystems;
 
   protected getData(): void {
     this.store.dispatch(new GetOrderRequisitionByPage(this.currentPage, this.pageSize, this.orderBy));
@@ -41,4 +52,5 @@ export class OrderRequisitionComponent extends ReasonsComponent implements OnIni
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.getData());
   }
+
 }

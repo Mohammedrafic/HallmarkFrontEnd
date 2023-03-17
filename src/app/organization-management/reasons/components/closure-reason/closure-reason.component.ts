@@ -1,10 +1,10 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { ofActionSuccessful, Select } from '@ngxs/store';
+import { ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { Observable, takeWhile } from 'rxjs';
 
 import { UserPermissions } from '@core/enums';
-import { Permission } from '@core/interface';
+import { OrginazationModuleSettings, Permission } from '@core/interface';
 import { ReasonsComponent } from '@organization-management/reasons/models/reasons-component.class';
 import {
   GetClosureReasonsByPage,
@@ -14,6 +14,11 @@ import {
 } from '@organization-management/store/reject-reason.actions';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { Organization } from '@shared/models/organization.model';
+import { SelectedSystems } from '@shared/components/credentials-list/constants';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
 
 @Component({
   selector: 'app-closure-reason',
@@ -26,6 +31,15 @@ export class ClosureReasonComponent extends ReasonsComponent implements OnInit,O
   @Select(RejectReasonState.closureReasonsPage)
   public reasons$: Observable<RejectReasonPage>;
   public readonly userPermissions = UserPermissions;
+  @Select(OrganizationManagementState.organization)
+  public readonly organization$: Observable<Organization>;
+  @ViewChild('grid') grid: GridComponent;
+  @Input() showSystem: boolean;
+  orgModuleSettings: OrginazationModuleSettings = {
+    isFeatureIrpEnabled: false,
+    isIrpDisplayed: false,
+  };
+  public selectedSystem: SelectedSystemsFlag = SelectedSystems;
 
   protected getData(): void {
     this.store.dispatch(new GetClosureReasonsByPage(this.currentPage, this.pageSize, this.orderBy));

@@ -25,7 +25,7 @@ export interface Closurevalue {
 }
 
 
-export type ReasonValueType = RejectReason | UnavailabilityValue;
+export type ReasonValueType = RejectReason | UnavailabilityValue | Closurevalue;
 
 export interface SaveReasonParams {
   selectedTab: ReasonsNavigationTabs;

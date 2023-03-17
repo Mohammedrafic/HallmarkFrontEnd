@@ -6,6 +6,14 @@ export type RejectReason = {
   businessUnitId?: number;
 }
 
+export type RejectReasonwithSystem = {
+  id?: number;
+  reason: string;
+  businessUnitId?: number;
+  includeInVMS?: boolean;
+  includeInIRP?: boolean;
+}
+
 export type RejectReasonPayload = {
   organizationId: number;
   jobId: number;

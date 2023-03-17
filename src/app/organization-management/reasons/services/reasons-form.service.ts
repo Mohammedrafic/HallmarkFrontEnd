@@ -35,6 +35,14 @@ export class ReasonsFormsService {
         eligibleToBeScheduled: [false],
         visibleForIRPCandidates: [false],
       });
+    } else if (formType === ReasonFormType.ClosureReason || ReasonFormType.RequisitionReason) {
+      this.form = this.fb.group({
+        id: [],
+        reason: ['', [Validators.required, Validators.maxLength(100),
+          Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
+        includeInIRP: [false],
+        includeInVMS: [false],
+      });
     } else {
       this.form = this.fb.group({
         id: [],

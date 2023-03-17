@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 
-import { SavePenalty, SaveUnavailabilityReason } from '@organization-management/store/reject-reason.actions';
+import { SaveClosureReasons, SaveOrderRequisition, SavePenalty, SaveUnavailabilityReason, UpdateClosureReasonsSuccess } from '@organization-management/store/reject-reason.actions';
 import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { Penalty, PenaltyPayload } from '@shared/models/penalty.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { NewReasonsActionsMap, UpdateReasonsActionsMap } from '../constants';
 import { ReasonsNavigationTabs } from '../enums';
-import { SaveReasonParams, UnavailabilityValue } from '../interfaces';
+import { Closurevalue, SaveReasonParams, UnavailabilityValue } from '../interfaces';
 
 @Injectable()
 export class ReasonsService {
@@ -73,7 +73,25 @@ export class ReasonsService {
         eligibleToBeScheduled: !!value.eligibleToBeScheduled,
         visibleForIRPCandidates: !!value.visibleForIRPCandidates,
       }));
-    } else {
+    } else if (params.selectedTab === ReasonsNavigationTabs.Closure) {
+      const value = params.formValue as Closurevalue;
+
+      this.store.dispatch(new SaveClosureReasons({
+        id: value.id || undefined,
+        reason: value.reason,
+        includeInVMS: value.includeInVMS,
+        includeInIRP: value.includeInIRP
+      }));
+    } else if(params.selectedTab === ReasonsNavigationTabs.Requisition){
+      const value = params.formValue as Closurevalue;
+
+      this.store.dispatch(new SaveOrderRequisition({
+        id: value.id || undefined,
+        reason: value.reason,
+        includeInVMS: value.includeInVMS,
+        includeInIRP: value.includeInIRP
+      }));
+    }else {
       const Action = params.editMode ? UpdateReasonsActionsMap[params.selectedTab]
       : NewReasonsActionsMap[params.selectedTab];
       const payload = params.editMode ? this.createUpdateReasonPayload(params) : this.createNewReasonPayload(params);

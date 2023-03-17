@@ -19,7 +19,7 @@ import {
   SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess,
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
-import { RejectReason, RejectReasonPage, UnavailabilityReasons } from "@shared/models/reject-reason.model";
+import { RejectReason, RejectReasonPage, RejectReasonwithSystem, UnavailabilityReasons } from "@shared/models/reject-reason.model";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ShowToast } from "../../store/app.actions";
 import { MessageTypes } from "@shared/enums/message-types";
@@ -203,7 +203,7 @@ export class RejectReasonState {
   SaveClosureReasons(
     { dispatch}: StateContext<RejectReasonStateModel>,
     { payload }: SaveClosureReasons
-  ): Observable<RejectReason | void> {
+  ): Observable<RejectReasonwithSystem | void> {
     return this.rejectReasonService.saveClosureReasons(payload).pipe(
       tap(payload => {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));

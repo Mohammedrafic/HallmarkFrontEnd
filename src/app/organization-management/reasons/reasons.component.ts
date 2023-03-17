@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -42,7 +42,8 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 })
 @TakeUntilDestroy
 export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
-  public selectedTab = ReasonsNavigationTabs.Rejection;
+  // public selectedTab = ReasonsNavigationTabs.Rejection;
+  public selectedTab : any;
   public reasonsNavigationTabs = ReasonsNavigationTabs;
   public canRejectOrClosure = true;
   public title = '';
@@ -73,10 +74,10 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
 
   @Select(OrganizationManagementState.organization)
   public readonly organization$: Observable<Organization>;
-
+  public showSystem:boolean = false;
   constructor(
     protected override store: Store,
-    private confirmService: ConfirmService,
+    public confirmService: ConfirmService,
     private actions$: Actions,
     private reasonFormService: ReasonsFormsService,
     private reasonsService: ReasonsService,
@@ -113,12 +114,16 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
       this.selectedTab = ReasonsNavigationTabs.Penalties;
     } else if(selectedTab.selectedItem.innerText === "Order Requisition"){
       this.selectedTab = ReasonsNavigationTabs.Requisition;
+      this.showhidesystem();
     } else if(selectedTab.selectedItem.innerText === "Order Closure"){
       this.selectedTab = ReasonsNavigationTabs.Closure;
+      this.showhidesystem();
     } else if(selectedTab.selectedItem.innerText === "Manual Invoice"){
       this.selectedTab = ReasonsNavigationTabs.ManualInvoice;
     } else if(selectedTab.selectedItem.innerText === "Unavailability"){
       this.selectedTab = ReasonsNavigationTabs.Unavailability;
+    } else if(selectedTab.selectedItem.innerText === "Internal Transfer/Recruitment"){
+      this.selectedTab = ReasonsNavigationTabs.InternalTransfer;
     }
     
     this.formType = ReasonFormsTypeMap[this.selectedTab];
@@ -349,13 +354,20 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
       takeUntil(this.componentDestroy()),
     )
     .subscribe((organization : Organization) => {
-      console.log(organization);
       const isOrgUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
       this.selectedSystem = {
         isIRP: !!organization.preferences.isIRPEnabled,
         isVMS: !!organization.preferences.isVMCEnabled,
       };
     });
+  }
+
+  private showhidesystem(){
+    if((this.selectedSystem.isIRP) && (this.selectedSystem.isVMS)){
+      this.showSystem = true;
+    } else {
+      this.showSystem = false;
+    }
   }
 
   private setIRPFlag(): void {
