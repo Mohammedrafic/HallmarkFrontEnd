@@ -223,19 +223,19 @@ export class RejectReasonService {
   }
 
   public getTerminationReason(pageNumber: number, pageSize: number): Observable<RejectReasonPage> {
-    return this.http.get<RejectReasonPage>(`/api/InternalTransferRecruitmentReasons?PageNumber=${pageNumber}&PageSize=${pageSize}`);
+    return this.http.get<RejectReasonPage>(`/api/TerminatedReason?PageNumber=${pageNumber}&PageSize=${pageSize}`);
   }
 
   public saveTerminationReason(payload: {reason: string}): Observable<RejectReason> {
-    return this.http.post<RejectReason>('/api/InternalTransferRecruitmentReasons', payload);
+    return this.http.post<RejectReason>('/api/TerminatedReason', payload);
   }
 
   public removeTerminationReason(id: number): Observable<void> {
-    return this.http.delete<void>(`/api/InternalTransferRecruitmentReasons?reasonId=${id}`);
+    return this.http.delete<void>(`/api/TerminatedReason?reasonId=${id}`);
   }
 
   public updateTerminationReason(payload: RejectReason): Observable<void> {
-    return this.http.put<void>('/api/InternalTransferRecruitmentReasons', payload);
+    return this.http.put<void>('/api/TerminatedReason', payload);
   }
 
 }
