@@ -21,7 +21,7 @@ export class OrderRequisitionComponent extends ReasonsComponent implements OnIni
   public reasons$: Observable<RejectReasonPage>;
 
   protected getData(): void {
-    this.store.dispatch(new GetOrderRequisitionByPage(this.currentPage, this.pageSize, this.orderBy));
+    this.store.dispatch(new GetOrderRequisitionByPage(this.currentPage, this.pageSize, this.orderBy, undefined, true));
   }
 
   protected remove(id: number): void {
