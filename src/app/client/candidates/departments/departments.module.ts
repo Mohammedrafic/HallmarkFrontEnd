@@ -13,7 +13,6 @@ import { ToggleModule } from '@shared/components/form-controls/toggle/toggle.mod
 import { DepartmentsService } from '@client/candidates/departments/services/departments.service';
 import { SkillMatchComponent } from './grid/cell-renderers/skill-match/skill-match.component';
 import { SkillNameComponent } from './grid/cell-renderers/skill-name/skill-name.component';
-import { OrientationCompletedComponent } from './grid/cell-renderers/orientation-completed/orientation-completed.component';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { MultiplePipeModule } from '@shared/pipes/multiple.pipe';
 import { JoinPipeModule } from '@shared/pipes/join.pipe';
@@ -31,7 +30,6 @@ import { RadioButtonModule } from '@shared/components/form-controls/radio-button
     AssignDepartmentComponent,
     SkillMatchComponent,
     SkillNameComponent,
-    OrientationCompletedComponent,
     FilterDepartmentComponent,
     EditDepartmentsComponent,
     DepartmentNameComponent,
