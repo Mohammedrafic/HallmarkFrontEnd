@@ -304,12 +304,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         return;
       }
     }
-    if (this.candidateSSNRequired) {
-      if (!this.form.controls["ssn"].value) {
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
-        return;
-      }
-    }
 
     if (this.isAgency && this.isCandidatePayRateVisible && this.isOffered && this.form.get('candidatePayRate')?.invalid) {
       this.form.markAllAsTouched();

@@ -31,14 +31,15 @@ export enum OrganizationSettingKeys {
   SubmissionRequiredMinimum,
   CandidateEditTimesheets,
   AllowCandidateLogin,
-  SSNRequiredToAcceptPosition,
+  SSNRequiredToApplyPosition,
   DateOfBirthRequiredToAcceptPosition,
   CandidatePayRate,
   CandidateAppliedInLastNDays,
   SetDefaultCommentsScopeToExternal,
   LimitNumberOfSubmissionsInTotalToPosition,
   HideContactDetailsOfOrderInAgencyLogin,
-  DisableAddEditTimesheetsInAgencyLogin
+  DisableAddEditTimesheetsInAgencyLogin,
+  DefaultTimezone,
 }
 
 export enum OrganizationalHierarchy {

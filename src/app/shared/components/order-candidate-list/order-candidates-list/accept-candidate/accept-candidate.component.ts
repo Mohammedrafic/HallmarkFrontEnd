@@ -215,12 +215,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         return;
       }
     }
-    if (this.candidateSSNRequired) {
-      if (!this.form.controls["ssn"].value) {
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
-        return;
-      }
-    }
+    
 
     if (this.candidatePayRateRequired && this.form.get('candidatePayRate')?.invalid) {
       this.form.markAllAsTouched();
@@ -238,6 +233,13 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   public onApply(): void {
     if (this.form.valid) {
+      if (this.candidateSSNRequired) {
+        if (!this.form.controls["ssn"].value) {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
+          return;
+        }
+      }
+
       this.shouldChangeCandidateStatus()
         .pipe(take(1))
         .subscribe((isConfirm) => {
