@@ -84,8 +84,9 @@
               class="table-cell date-slot"
               [attr.colspan]="dateSchedule.extendedDays"
               [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
-              (click)="handleCellSingleClick(dateSlot, scheduleItem.candidate, dateSchedule)"
-              (dblclick)="handleScheduleCardDblClick(dateSchedule, scheduleItem.candidate)"
+              appDoubleClick
+              (singleClick)="handleCellSingleClick(dateSlot, scheduleItem.candidate, dateSchedule)"
+              (dbClick)="handleScheduleCardDblClick(dateSchedule, scheduleItem.candidate)"
             >
 
               <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
@@ -104,8 +105,9 @@
               <td
                 class="table-cell date-slot empty-cell"
                 [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
-                (click)="handleCellSingleClick(dateSlot, scheduleItem.candidate)"
-                (dblclick)="handleCellDblClick(dateSlot, scheduleItem.candidate)"
+                appDoubleClick
+                (singleClick)="handleCellSingleClick(dateSlot, scheduleItem.candidate)"
+                (dbClick)="handleCellDblClick(dateSlot, scheduleItem.candidate)"
               ></td>
             </ng-template>
           </ng-container>
