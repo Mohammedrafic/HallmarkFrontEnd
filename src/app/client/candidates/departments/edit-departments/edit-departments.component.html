@@ -22,7 +22,7 @@
             [controlName]="fieldConfig.field"
             [label]="fieldConfig.title"
             [disabled]="!!fieldConfig.disabled"
-            (checked)="fieldConfig?.toggleHandler($event, fieldConfig.field)"
+            (checked)="toggleHandler($event, fieldConfig.field)"
           >
           </app-toggle>
         </div>

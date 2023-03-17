@@ -21,6 +21,7 @@ export interface DepartmentAssigned {
   startDate: Date;
   endDate: Date;
   isHomeCostCenter: boolean;
+  orientationDate: Date | null;
 }
 
 interface Skill {
@@ -39,7 +40,6 @@ export interface DepartmentFormFieldConfig<T> {
   show?: boolean;
   disabled?: boolean;
   required?: boolean;
-  toggleHandler?: (event: boolean, type: EditDepartmentFields) => void
 }
 
 export type DepartmentFiltersColumns = {

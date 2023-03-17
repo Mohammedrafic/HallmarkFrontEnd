@@ -71,11 +71,11 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   }
 
   private initFormConfig(isOriented: boolean): void {
-    this.filtersFormConfig = EditDepartmentsFormConfig(isOriented, this.toggleHandler.bind(this));
+    this.filtersFormConfig = EditDepartmentsFormConfig(isOriented);
     this.cdr.markForCheck();
   }
 
-  private toggleHandler(event: boolean, field: EditDepartmentFields): void {
+  public toggleHandler(event: boolean, field: EditDepartmentFields): void {
     if (field === EditDepartmentFields.IS_ORIENTED) {
       this.initFormConfig(event);
       this.formGroup.markAsDirty();
