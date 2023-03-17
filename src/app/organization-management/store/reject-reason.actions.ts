@@ -104,8 +104,13 @@ export class RemoveOrderRequisition {
 
 export class GetOrderRequisitionByPage {
   static readonly type = '[reject reason] Get Order Requisition by Page';
-  constructor(public pageNumber?: number,
-    public pageSize?: number, public orderBy?: string, public lastSelectedBusinessUnitId?: number) { }
+  constructor(
+    public pageNumber?: number,
+    public pageSize?: number,
+    public orderBy?: string,
+    public lastSelectedBusinessUnitId?: number,
+    public excludeOpenPositionReason = false,
+  ) { }
 }
 
 export class SaveOrderRequisition {
@@ -186,7 +191,7 @@ export class RemoveInternalTransferReasons {
 export class UpdateInternalTransferReasons {
   static readonly type = '[reject reason] Update InternalTransfer Reason';
   constructor(public payload: RejectReason) {
-  } 
+  }
 }
 
 export class UpdateInternalTransferReasonsSuccess {
