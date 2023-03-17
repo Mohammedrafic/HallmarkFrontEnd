@@ -78,8 +78,7 @@ export const columnDef = (columnParams: ColumnDefParams) => [
   },
   {
     field: 'orientationDate',
-    headerName: 'Orientation completed',
-    
+    headerName: 'Orientation Completion',
     valueFormatter: (params: ValueFormatterParams) => columnParams.dateFormatter(params.value),
     width: 140,
     minWidth: 140,
