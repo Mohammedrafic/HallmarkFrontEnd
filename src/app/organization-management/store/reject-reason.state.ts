@@ -16,7 +16,7 @@ import {
   UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess,
   GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty,
   SavePenaltySuccess, SavePenaltyError, RemovePenalty, ShowOverridePenaltyDialog, GetUnavailabilityReasons,
-  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess,
+  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess, GetTerminationReasons, SaveTerminationReasons, RemoveTerminationReasons, UpdateTerminationReasons, UpdateTerminationReasonsSuccess,
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
 import { RejectReason, RejectReasonPage, RejectReasonwithSystem, UnavailabilityReasons } from "@shared/models/reject-reason.model";
@@ -38,6 +38,7 @@ export interface RejectReasonStateModel {
   isReasonLoading: boolean;
   unavailabilityReasons: PageOfCollections<UnavailabilityReasons> | null;
   internalTransfer: RejectReasonPage | null;
+  terminationReasons: RejectReasonPage | null;
 }
 
 @State<RejectReasonStateModel>({
@@ -50,7 +51,8 @@ export interface RejectReasonStateModel {
     penalties: null,
     isReasonLoading: false,
     unavailabilityReasons: null,
-    internalTransfer: null
+    internalTransfer: null,
+    terminationReasons: null
   },
 })
 @Injectable()
@@ -95,6 +97,11 @@ export class RejectReasonState {
   @Selector()
   static internalTransfer(state: RejectReasonStateModel) : RejectReasonPage | null {
     return state.internalTransfer;
+  }
+
+  @Selector()
+  static terminationReasons(state: RejectReasonStateModel) : RejectReasonPage | null {
+    return state.terminationReasons;
   }
 
   constructor(private rejectReasonService:RejectReasonService) {}
@@ -508,5 +515,67 @@ export class RejectReasonState {
       })
     );
   }
+
+  @Action(GetTerminationReasons)
+  GetTerminationReasons(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    { pageNumber, pageSize }: GetTerminationReasons
+  ): Observable<RejectReasonPage> {
+    patchState({ isReasonLoading: true });
+
+    return this.rejectReasonService.getTerminationReason(pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({terminationReasons: payload});
+        return payload;
+      })
+    );
+  }
+
+
+  @Action(SaveTerminationReasons)
+  SaveTerminationReasons(
+    { dispatch}: StateContext<RejectReasonStateModel>,
+    { payload }: SaveTerminationReasons
+  ): Observable<RejectReason | void> {
+    return this.rejectReasonService.saveTerminationReason(payload).pipe(
+      tap(payload => {
+        dispatch(new UpdateTerminationReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(RemoveTerminationReasons)
+  RemoveTerminationReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { id }: RemoveTerminationReasons
+  ): Observable<void> {
+    return this.rejectReasonService.removeTerminationReason(id).pipe(
+      tap(() => {
+        dispatch(new UpdateTerminationReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      })
+    );  }
+
+  @Action(UpdateTerminationReasons)
+  UpdateTerminationReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { payload }: UpdateTerminationReasons
+  ): Observable<void> {
+    return this.rejectReasonService.updateTerminationReason(payload).pipe(
+      tap(() => {
+        dispatch(new UpdateTerminationReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
 }
 

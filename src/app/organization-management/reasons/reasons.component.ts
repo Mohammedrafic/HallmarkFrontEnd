@@ -275,7 +275,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
     this.actions$.pipe(
       ofActionSuccessful(ReasonActions.SaveRejectReasonsSuccess, ReasonActions.UpdateClosureReasonsSuccess,
         ReasonActions.UpdateManualInvoiceRejectReasonSuccess, ReasonActions.UpdateOrderRequisitionSuccess,
-        ReasonActions.UpdateInternalTransferReasonsSuccess,
+        ReasonActions.UpdateInternalTransferReasonsSuccess, ReasonActions.UpdateTerminationReasonsSuccess,
         ReasonActions.SavePenaltySuccess, ReasonActions.SaveUnavailabilityReason, ReasonActions.RemoveUnavailabilityReason),
       takeUntil(this.componentDestroy()),
     ).subscribe(() =>this.closeSideDialog());

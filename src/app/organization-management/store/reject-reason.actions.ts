@@ -197,3 +197,29 @@ export class UpdateInternalTransferReasons {
 export class UpdateInternalTransferReasonsSuccess {
   static readonly type = '[reject reason] Update Internal Transfer Reason Success';
 }
+
+
+export class GetTerminationReasons {
+  static readonly type = '[reject reason] Get Termination reason by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class SaveTerminationReasons {
+  static readonly type = '[reject reason] Save Termination Reason';
+  constructor(public payload: RejectReason){}
+}
+
+export class RemoveTerminationReasons {
+  static readonly type = '[reject reason] Remove Termination Reason';
+  constructor(public id: number){}
+}
+
+export class UpdateTerminationReasons {
+  static readonly type = '[reject reason] Update Termination Reason';
+  constructor(public payload: RejectReason) {
+  } 
+}
+
+export class UpdateTerminationReasonsSuccess {
+  static readonly type = '[reject reason] Update Termination Reason Success';
+}

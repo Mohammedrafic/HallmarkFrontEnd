@@ -65,9 +65,16 @@
         <ng-template #headerText><div>Internal transfer/recruitment</div></ng-template>
         <ng-template #content>
           <app-internal-transfer
-            [userPermission]="userPermission"
             (editReason)="editReason($event)"
             [form]="reasonForm"></app-internal-transfer>
+        </ng-template>
+      </e-tabitem>
+      <e-tabitem>
+        <ng-template #headerText><div>Terminated Reason</div></ng-template>
+        <ng-template #content>
+          <app-emp-termination
+            (editReason)="editReason($event)"
+            [form]="reasonForm"></app-emp-termination>
         </ng-template>
       </e-tabitem>
 
