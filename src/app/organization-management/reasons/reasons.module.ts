@@ -28,6 +28,7 @@ import { UnavailabilityReasonsModule } from './components/unavailability-reasons
 import { ToggleIconRendererModule } from '@shared/components/cell-renderers/toggle-icon-renderer';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { InternalTransferComponent } from './components/internal-transfer/internal-transfer.component';
+import { EmpTerminationComponent } from './components/emp-termination/emp-termination.component';
 
 const icons = {
     Edit,
@@ -65,6 +66,7 @@ const icons = {
         PenaltiesComponent,
         CandidateRejectReasonComponent,
         InternalTransferComponent,
+        EmpTerminationComponent,
     ],
     providers: [ReasonsFormsService, ReasonsService],
     exports: [ReasonsComponent],
