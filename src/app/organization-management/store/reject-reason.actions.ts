@@ -223,3 +223,28 @@ export class UpdateTerminationReasons {
 export class UpdateTerminationReasonsSuccess {
   static readonly type = '[reject reason] Update Termination Reason Success';
 }
+
+export class GetCategoryNoteReasons {
+  static readonly type = '[reject reason] Get CategoryNote reason by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class SaveCategoryNoteReasons {
+  static readonly type = '[reject reason] Save CategoryNote Reason';
+  constructor(public payload: RejectReason){}
+}
+
+export class RemoveCategoryNoteReasons {
+  static readonly type = '[reject reason] Remove CategoryNote Reason';
+  constructor(public id: number){}
+}
+
+export class UpdateCategoryNoteReasons {
+  static readonly type = '[reject reason] Update CategoryNote Reason';
+  constructor(public payload: RejectReason) {
+  } 
+}
+
+export class UpdateCategoryNoteReasonsSuccess {
+  static readonly type = '[reject reason] Update CategoryNote Reason Success';
+}

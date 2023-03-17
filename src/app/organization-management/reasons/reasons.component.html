@@ -62,6 +62,14 @@
         </ng-template>
       </e-tabitem>
       <e-tabitem *ngIf="selectedSystem.isIRP">
+        <ng-template #headerText><div>Terminated Reason</div></ng-template>
+        <ng-template #content>
+          <app-emp-termination
+            (editReason)="editReason($event)"
+            [form]="reasonForm"></app-emp-termination>
+        </ng-template>
+      </e-tabitem>
+      <e-tabitem *ngIf="selectedSystem.isIRP">
         <ng-template #headerText><div>Internal transfer/recruitment</div></ng-template>
         <ng-template #content>
           <app-internal-transfer
@@ -69,12 +77,12 @@
             [form]="reasonForm"></app-internal-transfer>
         </ng-template>
       </e-tabitem>
-      <e-tabitem>
-        <ng-template #headerText><div>Terminated Reason</div></ng-template>
+      <e-tabitem *ngIf="selectedSystem.isIRP">
+        <ng-template #headerText><div>Category Note</div></ng-template>
         <ng-template #content>
-          <app-emp-termination
+          <app-category-note
             (editReason)="editReason($event)"
-            [form]="reasonForm"></app-emp-termination>
+            [form]="reasonForm"></app-category-note>
         </ng-template>
       </e-tabitem>
 

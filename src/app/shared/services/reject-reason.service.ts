@@ -244,4 +244,21 @@ export class RejectReasonService {
     return this.http.put<void>('/api/TerminatedReason', payload);
   }
 
+  public getCategoryNoteReason(pageNumber: number, pageSize: number): Observable<RejectReasonPage> {
+    return this.http.get<RejectReasonPage>(`/api/TerminatedReason?PageNumber=${pageNumber}&PageSize=${pageSize}`);
+  }
+
+  public saveCategoryNoteReason(payload: {reason: string}): Observable<RejectReason> {
+    return this.http.post<RejectReason>('/api/TerminatedReason', payload);
+  }
+
+  public removeCategoryNoteReason(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/TerminatedReason?reasonId=${id}`);
+  }
+
+  public updateCategoryNoteReason(payload: RejectReason): Observable<void> {
+    return this.http.put<void>('/api/TerminatedReason', payload);
+  }
+
+
 }

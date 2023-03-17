@@ -29,6 +29,7 @@ import { ToggleIconRendererModule } from '@shared/components/cell-renderers/togg
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { InternalTransferComponent } from './components/internal-transfer/internal-transfer.component';
 import { EmpTerminationComponent } from './components/emp-termination/emp-termination.component';
+import { CategoryNoteComponent } from './components/category-note/category-note.component';
 
 const icons = {
     Edit,
@@ -68,6 +69,7 @@ const icons = {
         CandidateRejectReasonComponent,
         InternalTransferComponent,
         EmpTerminationComponent,
+        CategoryNoteComponent,
     ],
     providers: [ReasonsFormsService, ReasonsService],
     exports: [ReasonsComponent],

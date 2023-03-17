@@ -70,7 +70,8 @@ export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
   4: ReasonFormType.DefaultReason,
   5: ReasonFormType.Unavailability,
   6: ReasonFormType.DefaultReason,
-  7: ReasonFormType.DefaultReason
+  7: ReasonFormType.DefaultReason,
+  8: ReasonFormType.DefaultReason
 };
 
 export const NewReasonsActionsMap = {
@@ -80,6 +81,7 @@ export const NewReasonsActionsMap = {
   [ReasonsNavigationTabs.Requisition]: ReasonActions.SaveOrderRequisition,
   [ReasonsNavigationTabs.InternalTransfer]: ReasonActions.SaveInternalTransferReasons,
   [ReasonsNavigationTabs.Termination]: ReasonActions.SaveTerminationReasons,
+  [ReasonsNavigationTabs.CategoryNote]: ReasonActions.SaveCategoryNoteReasons,
 };
 
 export const UpdateReasonsActionsMap = {
@@ -89,6 +91,7 @@ export const UpdateReasonsActionsMap = {
   [ReasonsNavigationTabs.Requisition]: ReasonActions.SaveOrderRequisition,
   [ReasonsNavigationTabs.InternalTransfer]: ReasonActions.UpdateInternalTransferReasons,
   [ReasonsNavigationTabs.Termination]: ReasonActions.UpdateTerminationReasons,
+  [ReasonsNavigationTabs.CategoryNote]: ReasonActions.UpdateCategoryNoteReasons,
 };
 
 export const UnavailabilityDialogConfig: ReasonFormConfig[] = [
