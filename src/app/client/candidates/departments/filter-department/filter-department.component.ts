@@ -85,7 +85,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   }
 
   public clearAllFilters(): void {
-    this.formGroup.reset();
+    this.resetFilterForm();
     this.filteredItems = [];
     this.appliedFiltersAmount.emit(this.filteredItems.length);
     this.resetFilters.emit();
@@ -118,12 +118,18 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     this.organizationStructure$
       .pipe(filter(Boolean), takeUntil(this.destroy$))
       .subscribe((structure: OrganizationStructure) => {
-        this.formGroup.reset();
+        this.resetFilterForm();
         this.filteredItems = [];
         this.regions = structure.regions;
         this.filterColumns.regionIds.dataSource = [...(this.regions as DataSourceItem[])];
         this.cdr.markForCheck();
       });
+  }
+
+  private resetFilterForm(): void {
+    if (this.formGroup.dirty) {
+      this.formGroup.reset({ oriented: 1 });
+    }
   }
 
   private initFilterForm(): void {

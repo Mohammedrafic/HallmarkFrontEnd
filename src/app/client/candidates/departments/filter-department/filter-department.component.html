@@ -34,26 +34,25 @@
         </ng-container>
 
         <ng-container *ngSwitchCase="controlTypes.Radio">
-          <!-- TODO show buttons and add functionality (to be included in future iterations) -->
-          <div *ngIf="false" class="radio-buttons">
-            <ejs-radiobutton
-              formControlName="oriented"
-              id="1"
-              label="Both"
-              value="1"
-            ></ejs-radiobutton>
-            <ejs-radiobutton
-              formControlName="oriented"
-              id="2"
-              label="Oriented"
-              value="2"
-            ></ejs-radiobutton>
-            <ejs-radiobutton
-              formControlName="oriented"
-              id="3"
-              label="Not Oriented"
-              value="3"
-            ></ejs-radiobutton>
+          <div class="radio-buttons">
+            <app-radio-button
+              [formGroupInstance]="formGroup"
+              [controlName]="fieldConfig.field"
+              [value]="1"
+              [label]="'Both'"
+            ></app-radio-button>
+            <app-radio-button
+              [formGroupInstance]="formGroup"
+              [controlName]="fieldConfig.field"
+              [value]="2"
+              [label]="'Oriented'"
+            ></app-radio-button>
+            <app-radio-button
+              [formGroupInstance]="formGroup"
+              [controlName]="fieldConfig.field"
+              [value]="3"
+              [label]="'Not Oriented'"
+            ></app-radio-button>
           </div>
         </ng-container>
       </ng-container>
