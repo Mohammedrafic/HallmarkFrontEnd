@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
 import { isObjectsEqual } from '@core/helpers';
@@ -36,7 +36,7 @@ export class DepartmentFormService {
 
   public createEditForm(): CustomFormGroup<EditDepartmentFormState> {
     return this.formBuilder.group({
-      startDate: [null],
+      startDate: [null, [Validators.required]],
       endDate: [null],
       isOriented: [false],
       isHomeCostCenter: [false],
@@ -95,5 +95,14 @@ export class DepartmentFormService {
       isOriented: isOriented,
       isHomeCostCenter: isHomeCostCenter,
     })
+  }
+
+  public addRemoveValidator(control: AbstractControl | null, term: boolean): void {
+    if(term) {
+      control?.setValidators([Validators.required]);
+    } else {
+      control?.setValidators([]);
+      control?.reset();
+    }
   }
 }

@@ -136,16 +136,15 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
           }
           return formValid ? this.saveAssignedDepartment() : of(formValid);
         }),
+        filter(Boolean),
         takeUntil(this.destroy$)
       )
-      .subscribe((success) => {
-        if (success) {
-          this.resetAssignDepartmentForm();
-          const MESSAGE = this.departmentId ? RECORD_MODIFIED : RECORD_ADDED;
-          this.store.dispatch([new ShowSideDialog(false), new ShowToast(MessageTypes.Success, MESSAGE)]);
-          this.departmentId = null;
-          this.refreshGrid.emit();
-        }
+      .subscribe(() => {
+        this.resetAssignDepartmentForm();
+        const MESSAGE = this.departmentId ? RECORD_MODIFIED : RECORD_ADDED;
+        this.store.dispatch([new ShowSideDialog(false), new ShowToast(MessageTypes.Success, MESSAGE)]);
+        this.departmentId = null;
+        this.refreshGrid.emit();
       });
   }
 
@@ -212,12 +211,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   private adjustOrientationDateField(): void {
     this.isOriented$.pipe(takeUntil(this.destroy$)).subscribe((isOriented) => {
       const orientationDateControl = this.assignDepartmentForm.get('orientationDate');
-      if (isOriented) {
-        orientationDateControl?.setValidators([Validators.required]);
-      } else {
-        orientationDateControl?.setValidators([]);
-        orientationDateControl?.reset();
-      }
+      this.departmentFormService.addRemoveValidator(orientationDateControl, isOriented);
       this.cdr.markForCheck();
     });
   }

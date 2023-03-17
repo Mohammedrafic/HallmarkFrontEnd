@@ -8,7 +8,7 @@ import {
   EventEmitter,
 } from '@angular/core';
 
-import { filter, Subject, takeUntil, switchMap, Observable } from 'rxjs';
+import { filter, Subject, takeUntil, switchMap, Observable, of } from 'rxjs';
 import { Store } from '@ngxs/store';
 
 import { EditDepartmentFields } from '@client/candidates/enums/edit-department.enum';
@@ -55,14 +55,12 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
 
   public ngOnInit(): void {
     this.initFormConfig(false);
-    this.watchForOrientedControl();
     this.saveFormData();
-    this.watchForControls();
   }
 
   public resetEditDepartmentForm(): void {
     this.formGroup.reset();
-    this.departmentFormService.disableControls(this.formGroup, ['endDate']);
+    this.initFormConfig(false);
     this.cdr.markForCheck();
   }
 
@@ -73,23 +71,31 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   }
 
   private initFormConfig(isOriented: boolean): void {
-    this.filtersFormConfig = EditDepartmentsFormConfig(isOriented);
+    this.filtersFormConfig = EditDepartmentsFormConfig(isOriented, this.toggleHandler.bind(this));
     this.cdr.markForCheck();
   }
 
-  private watchForOrientedControl(): void {
-    this.formGroup
-      .get(EditDepartmentFields.IS_ORIENTED)
-      ?.valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe((isOriented) => {
-        this.initFormConfig(isOriented);
-      });
+  private toggleHandler(event: boolean, field: EditDepartmentFields): void {
+    if (field === EditDepartmentFields.IS_ORIENTED) {
+      this.initFormConfig(event);
+      this.formGroup.markAsDirty();
+      const orientationDateControl = this.formGroup.get(EditDepartmentFields.ORIENTATION_DATE);
+      this.departmentFormService.addRemoveValidator(orientationDateControl, event);
+    }
   }
 
   private saveFormData(): void {
     this.saveForm$
       .pipe(
-        switchMap(() => this.confirmAction()),
+        switchMap(() => {
+          const formValid = this.formGroup.valid;
+          if (!formValid) {
+            this.formGroup.markAllAsTouched();
+            this.cdr.markForCheck();
+          }
+          return formValid ? this.confirmAction() : of(formValid);
+        }),
+        filter(Boolean),
         switchMap(() => this.editDepartments()),
         takeUntil(this.destroy$)
       )
@@ -105,27 +111,10 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   }
 
   private confirmAction(): Observable<boolean> {
-    return this.confirmService
-      .confirm(EDIT_MULTIPLE_RECORDS_TEXT, {
-        title: WARNING_TITLE,
-        okButtonLabel: 'Yes',
-        okButtonClass: 'ok-button',
-      })
-      .pipe(filter(Boolean));
-  }
-
-  private watchForControls(): void {
-    this.formGroup
-      .get('startDate')
-      ?.valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe((value) => {
-        const endDateControl = this.formGroup.get('endDate');
-        if (value) {
-          endDateControl?.enable();
-        } else {
-          endDateControl?.reset();
-          endDateControl?.disable();
-        }
-      });
+    return this.confirmService.confirm(EDIT_MULTIPLE_RECORDS_TEXT, {
+      title: WARNING_TITLE,
+      okButtonLabel: 'Yes',
+      okButtonClass: 'ok-button',
+    });
   }
 }

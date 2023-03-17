@@ -38,6 +38,8 @@ export interface DepartmentFormFieldConfig<T> {
   optionFields?: object;
   show?: boolean;
   disabled?: boolean;
+  required?: boolean;
+  toggleHandler?: (event: boolean, type: EditDepartmentFields) => void
 }
 
 export type DepartmentFiltersColumns = {
