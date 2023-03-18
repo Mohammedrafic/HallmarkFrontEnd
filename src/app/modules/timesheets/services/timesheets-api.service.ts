@@ -13,6 +13,7 @@ import {
 import { CostCenterAdapter, RecordsAdapter } from '../helpers';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable()
 export class TimesheetsApiService {
@@ -143,5 +144,9 @@ export class TimesheetsApiService {
         `/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files/${fileId}`);
     }
     return this.http.delete<void>(`/api/TimesheetRecords/${timesheetRecordId}/files/${fileId}`);
+  }
+  public exportTimeSheets(payload: ExportPayload): Observable<Blob> {
+    const url =  '/api/Timesheets/exporttimesheets';
+    return this.http.post(url, payload, { responseType: 'blob' });
   }
 }

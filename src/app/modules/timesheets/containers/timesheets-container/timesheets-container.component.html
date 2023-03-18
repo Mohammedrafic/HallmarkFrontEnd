@@ -44,6 +44,13 @@
             <span class="filter-button-text">Filters</span> <i-feather name="sliders" class="icon"></i-feather>
           </div>
         </button>
+        <app-timesheet-grid-export
+        [selectedTab]="activeTabIdx"
+        [selectedRows]="gridSelections"
+        [isAgency]="isAgency"
+        [organizationId]="OrganizationId"
+        (resetTableSelection)="resetTableSelection()"
+      ></app-timesheet-grid-export>
       </div>
       <app-date-range-week-picker
         (range)="setRange($event)"
@@ -66,6 +73,8 @@
     (timesheetRowSelected)="rowSelected($event)"
     (sortHandler)="sortHandler($event)"
     (bulkEventEmitter)="handleBulkEvent($event)"
+    (multiSelectionChanged)="handleExport($event)"
+
   >
   </app-timesheets-table>
 </section>

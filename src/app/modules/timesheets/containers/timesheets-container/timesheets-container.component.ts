@@ -45,6 +45,8 @@ import { PreservedFilters } from '@shared/models/preserved-filters.model';
 import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fields-settings';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
+import * as Interfaces from '../../interface';
+import { ExportDataModel } from '@shared/models/export.model';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -105,7 +107,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public readonly currentSelectedTableRowIndex: Observable<number> = this.timesheetsService.getSelectedTimesheetRowStream();
   public isAgency: boolean;
   routerState:any;
-
+  public gridSelections: Interfaces.TimesheetGridSelections = {
+    selectedTimesheetIds: [],
+    rowNodes: [],
+  };
+  public OrganizationId:number;
   constructor(
     private store: Store,
     private timesheetsService: TimesheetsService,
@@ -229,12 +235,24 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       this.bulkApprove(event.items);
     }
   }
-
+  public handleExport(event:RowNode[]):void{
+    let nodes=event;
+    if (nodes.length) {
+      this.gridSelections.selectedTimesheetIds = nodes.map((node) => node.data.timesheetId);
+      this.gridSelections.rowNodes = nodes;
+    } else {
+      this.gridSelections.selectedTimesheetIds = [];
+      this.gridSelections.rowNodes = [];    
+    }
+  }
   private bulkApprove(data: RowNode[]): void {
     this.store.dispatch(new Timesheets.BulkApprove(data));
   }
 
   private onOrganizationChangedHandler(): void {
+   this.organizationId$.pipe( takeUntil(this.componentDestroy())).subscribe((value)=>{
+    if(value!=null&&value!=undefined){this.OrganizationId=value}
+    });
     const idStream = this.isAgency ? this.agencyId$ : this.organizationId$;
 
     if (this.filterService.canPreserveFilters()) {
@@ -412,5 +430,17 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         )
         .subscribe();
     }
+  }
+  
+  public resetTableSelection(): void {
+    this.gridSelections.rowNodes.forEach((node: RowNode) => {
+      node.setSelected(false);
+    });
+
+    this.clearSelections();
+    this.gridSelections.rowNodes = [];
+  }
+  private clearSelections(): void {
+    this.gridSelections.selectedTimesheetIds = [];
   }
 }
