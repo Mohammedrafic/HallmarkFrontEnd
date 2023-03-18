@@ -27,6 +27,7 @@ export enum TIMESHEETS_ACTIONS {
   PREVIEW_ATTACHMENT = '[timesheets] PREVIEW ATTACHMENT',
   DOWNLOAD_ATTACHMENT = '[timesheets] DOWNLOAD Attachment',
   DELETE_ATTACHMENT = '[timesheets] DELETE Attachment',
+  EXPORT_TIMESHEETS='[timesheets] Export TIMESHEETS'
 }
 
 export enum TimesheetDetailsActions {

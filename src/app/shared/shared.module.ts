@@ -170,6 +170,7 @@ import { NumericTextboxModule as CustomNumericTextboxModule} from './components/
 import { ValidationErrorModule } from './pipes/validation-error/validation.error.module';
 import { GridPaginationModule } from './components/grid/grid-pagination/grid-pagination.module';
 import { EditIrpCandidateModule } from '@shared/components/order-candidate-list/edit-irp-candidate/edit-irp-candidate.module';
+import { CustomExportDialogComponent } from './components/custom-export-dialog/custom-export-dialog.component';
 
 const icons = {
   AlertCircle,
@@ -259,6 +260,7 @@ const COMPONENTS = [
   SendEmailSideDialogComponent,
   DocumentPreviewSideDialogComponent,
   CustomSideDialogComponent,
+  CustomExportDialogComponent,
 ];
 
 @NgModule({

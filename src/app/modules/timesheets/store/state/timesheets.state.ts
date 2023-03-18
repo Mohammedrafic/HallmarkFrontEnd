@@ -6,7 +6,7 @@ import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
 import { RowNode } from '@ag-grid-community/core';
-import { downloadBlobFile } from '@shared/utils/file.utils';
+import { downloadBlobFile, saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -814,5 +814,20 @@ export class TimesheetsState {
           return ctx.dispatch(new ShowToast(MessageTypes.Error, GetBydateErrMessage));
         })
       );
+  }
+  @Action(Timesheets.ExportTimesheets)
+  ExportTimeSheets(
+    { dispatch }: StateContext<TimesheetsModel>,
+    { payload}: Timesheets.ExportTimesheets
+  ): Observable<void | Blob> {
+    return this.timesheetsApiService.exportTimeSheets(payload).pipe(
+      tap((file: Blob) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+      }),
+    );
   }
 }

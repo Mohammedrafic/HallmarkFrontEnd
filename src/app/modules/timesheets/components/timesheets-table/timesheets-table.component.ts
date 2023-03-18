@@ -15,6 +15,8 @@ import { TimesheetsColumnsDefinition } from '../../constants';
 import { TimesheetsTableColumns } from '../../enums';
 import { GRID_CONFIG } from '@shared/constants';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
+import { ExportDataModel } from '@shared/models/export.model';
+import { RowNode } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -40,6 +42,7 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
 
   @Output() public bulkEventEmitter: EventEmitter<BulkActionDataModel> = new EventEmitter<BulkActionDataModel>();
 
+  @Output() public multiSelectionChanged: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = TimesheetsColumnsDefinition(
     this.router.url.includes('agency')
@@ -111,4 +114,8 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
         this.changePage.emit(pageNumber);
       });
   }
+  // public changeMultiSelection(event: RowNode[]): void {
+   
+  //   this.exportEventEmitter.emit(event);
+  // }
 }

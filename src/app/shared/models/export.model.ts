@@ -1,3 +1,4 @@
+import { RowNode } from '@ag-grid-community/core';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 export class ExportColumn {
@@ -43,5 +44,8 @@ export class ExportPayload {
     if (offset) {
       this.offset = offset;
     }
-  }
+  }  
+}
+export class ExportDataModel {
+  items: RowNode[]
 }
