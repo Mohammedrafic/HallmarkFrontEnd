@@ -2,7 +2,7 @@
   class="department-assigned-grid"
   gridTitle="Department Assigned"
   (bulkEventEmitter)="handleBulkEvent($event)"
-  [rowData]="(departmentsAssigned?.items ?? []) | sortByHomeCostCenter"
+  [rowData]="departmentsAssigned?.items ?? [] | sortByHomeCostCenter"
   [columnDefinitions]="columnDef"
   [totalRecordsCount]="departmentsAssigned?.totalCount ?? 0"
   [allowBulkSelection]="true"
@@ -10,6 +10,20 @@
   [rowSelection]="rowSelection"
   [bulkActionConfig]="bulkActionConfig"
 >
+  <app-tooltip-container
+    action-button
+    position="TopCenter"
+    [showToolTip]="disableAllToggle"
+    [message]="tooggleTooltipMsg"
+  >
+    <app-toggle
+      action-button
+      label="All"
+      [value]="showAllDepartments"
+      [disabled]="disableAllToggle"
+      (checked)="showHideActiveDepartments($event)"
+    ></app-toggle>
+  </app-tooltip-container>
   <app-button
     action-button
     iconName="sliders"
@@ -18,14 +32,20 @@
     [badgeText]="filtersAmount"
     (clickEmitter)="showFilters()"
   ></app-button>
-  <app-button
+  <app-tooltip-container
     action-button
-    iconName="plus"
-    text="Assign Department"
-    [type]="buttonType.ACTION"
-    [disabled]="!userPermission[this.userPermissions.ManageIrpCandidateProfile]"
-    (clickEmitter)="showAssignDepartmentDialog()"
-  ></app-button>
+    position="TopCenter"
+    [showToolTip]="showAllDepartments"
+    [message]="assignDepTooltipMsg"
+  >
+    <app-button
+      iconName="plus"
+      text="Assign Department"
+      [type]="buttonType.ACTION"
+      [disabled]="!userPermission[this.userPermissions.ManageIrpCandidateProfile] || showAllDepartments"
+      (clickEmitter)="showAssignDepartmentDialog()"
+    ></app-button>
+  </app-tooltip-container>
 </app-grid>
 
 <app-side-dialog
