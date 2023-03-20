@@ -170,6 +170,10 @@
   .input-container {
     width: 100%;
 
+    &.number-of-positions {
+      width: 80%;
+    }
+
     &:nth-child(n + 2) {
       margin-left: 0;
 
