@@ -16,7 +16,22 @@ export interface UnavailabilityValue {
   visibleForIRPCandidates: boolean;
 }
 
-export type ReasonValueType = RejectReason | UnavailabilityValue;
+export interface CategoryNoteValue {
+  id?: number | null;
+  reason: string;
+  isRedFlagCategory: boolean;
+}
+
+
+export interface Closurevalue {
+  id?: number | null;
+  reason: string;
+  includeInIRP: boolean;
+  includeInVMS: boolean;
+}
+
+
+export type ReasonValueType = RejectReason | UnavailabilityValue | Closurevalue | CategoryNoteValue;
 
 export interface SaveReasonParams {
   selectedTab: ReasonsNavigationTabs;
@@ -33,10 +48,19 @@ export interface ReasonFormConfig {
   title: string;
   required: boolean;
   fieldType: FieldType;
+  checkBoxes?: ReasonCheckBoxGroup[];
+}
+
+export interface ReasonCheckBoxGroup {
+  field: string;
+  title: string;
 }
 
 export interface ReasonFormConfigMap {
   [ReasonFormType.DefaultReason]: ReasonFormConfig[];
   [ReasonFormType.Unavailability]: ReasonFormConfig[];
   [ReasonFormType.PenaltyReason]: null;
+  [ReasonFormType.RequisitionReason] : ReasonFormConfig[];
+  [ReasonFormType.ClosureReason] : ReasonFormConfig[];
+  [ReasonFormType.CategoryNoteReason] : ReasonFormConfig[];
 }

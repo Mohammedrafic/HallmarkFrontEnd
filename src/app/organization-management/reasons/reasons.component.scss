@@ -93,3 +93,20 @@
     }
   }
 }
+.input-group {
+  margin-top: 5px;
+
+  &.checkboxes {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    ejs-checkbox {
+      margin-right: 16px;
+    }
+  }
+}
+.toolbar-buttons{
+  justify-content: flex-end;
+    display: flex;
+}
