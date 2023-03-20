@@ -1,4 +1,4 @@
-export interface EmployeeWorkCommitment {
+export interface CandidateWorkCommitmentShort {
   id: number;
   name: string;
   isActive: boolean;

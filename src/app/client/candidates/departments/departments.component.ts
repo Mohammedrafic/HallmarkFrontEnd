@@ -47,7 +47,7 @@ import { OrganizationRegion } from '@shared/models/organization.model';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
 import { MessageTypes } from '@shared/enums/message-types';
-import { EmployeeWorkCommitment } from '../interface/employee-work-commitments.model';
+import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
 
 @Component({
   selector: 'app-departments',
@@ -298,7 +298,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     });
   }
 
-  private setDateRanges(employeeWorkCommitment: EmployeeWorkCommitment): void {
+  private setDateRanges(employeeWorkCommitment: CandidateWorkCommitmentShort): void {
     const { startDate, endDate } = employeeWorkCommitment;
     this.dateRanges.max = endDate ? new Date(endDate) : undefined;
     this.dateRanges.min = startDate ? new Date(startDate) : undefined;

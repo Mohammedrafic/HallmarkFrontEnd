@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
 import { CandidateTabsEnum } from '@client/candidates/enums/candidate-tabs.enum';
 import { HttpClient } from '@angular/common/http';
-import { EmployeeWorkCommitment } from '../interface/employee-work-commitments.model';
+import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
 
 @Injectable()
 export class CandidatesService {
@@ -10,7 +10,7 @@ export class CandidatesService {
     CandidateTabsEnum.CandidateProfile
   );
   private candidateName$: Subject<string> = new Subject<string>();
-  private activeEmployeeWorkCommitment$: Subject<EmployeeWorkCommitment> = new Subject<EmployeeWorkCommitment>();
+  private activeEmployeeWorkCommitment$: Subject<CandidateWorkCommitmentShort> = new Subject<CandidateWorkCommitmentShort>();
 
   public employeeId: number | null;
   public constructor(private httpClient: HttpClient) {}
@@ -27,11 +27,11 @@ export class CandidatesService {
     this.candidateName$.next(name);
   }
 
-  public setActiveEmployeeWorkCommitment(commitment: EmployeeWorkCommitment): void {
+  public setActiveEmployeeWorkCommitment(commitment: CandidateWorkCommitmentShort): void {
     this.activeEmployeeWorkCommitment$.next(commitment);
   }
 
-  public getActiveEmployeeWorkCommitment(): Observable<EmployeeWorkCommitment> {
+  public getActiveEmployeeWorkCommitment(): Observable<CandidateWorkCommitmentShort> {
     return this.activeEmployeeWorkCommitment$.asObservable();
   }
 
@@ -39,9 +39,9 @@ export class CandidatesService {
     this.selectedTab$.next(tab);
   }
 
-  public getEmployeeWorkCommitments(): Observable<EmployeeWorkCommitment | undefined> {
+  public getEmployeeWorkCommitments(): Observable<CandidateWorkCommitmentShort | undefined> {
     return this.httpClient
-      .get<EmployeeWorkCommitment[]>('/api/EmployeeWorkCommitments/compact', {
+      .get<CandidateWorkCommitmentShort[]>('/api/EmployeeWorkCommitments/compact', {
         params: { employeeId: this.employeeId! },
       })
       .pipe(
