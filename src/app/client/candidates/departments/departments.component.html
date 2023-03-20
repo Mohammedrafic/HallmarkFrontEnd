@@ -6,21 +6,21 @@
   [columnDefinitions]="columnDef"
   [totalRecordsCount]="departmentsAssigned?.totalCount ?? 0"
   [allowBulkSelection]="true"
-  [disableBulkButton]="disableBulkButton"
+  [disableBulkButton]="conditions.disableBulkButton"
   [rowSelection]="rowSelection"
   [bulkActionConfig]="bulkActionConfig"
 >
   <app-tooltip-container
     action-button
     position="TopCenter"
-    [showToolTip]="disableAllToggle"
+    [showToolTip]="conditions.disableAllToggle"
     [message]="tooggleTooltipMsg"
   >
     <app-toggle
       action-button
       label="All"
-      [value]="showAllDepartments"
-      [disabled]="disableAllToggle"
+      [value]="conditions.showAllDepartments"
+      [disabled]="conditions.disableAllToggle"
       (checked)="showHideActiveDepartments($event)"
     ></app-toggle>
   </app-tooltip-container>
@@ -35,14 +35,14 @@
   <app-tooltip-container
     action-button
     position="TopCenter"
-    [showToolTip]="showAllDepartments"
+    [showToolTip]="conditions.showAllDepartments"
     [message]="assignDepTooltipMsg"
   >
     <app-button
       iconName="plus"
       text="Assign Department"
       [type]="buttonType.ACTION"
-      [disabled]="!userPermission[this.userPermissions.ManageIrpCandidateProfile] || showAllDepartments"
+      [disabled]="!userPermission[this.userPermissions.ManageIrpCandidateProfile] || conditions.showAllDepartments"
       (clickEmitter)="showAssignDepartmentDialog()"
     ></app-button>
   </app-tooltip-container>
