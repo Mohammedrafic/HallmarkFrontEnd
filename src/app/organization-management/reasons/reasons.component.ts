@@ -27,7 +27,7 @@ import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { ReasonDialogConfig, ReasonFormsTypeMap } from './constants';
 import { ReasonFormType, ReasonsNavigationTabs } from './enums';
-import { Closurevalue, ReasonCheckBoxGroup, ReasonFormConfig, UnavailabilityValue } from './interfaces';
+import { CategoryNoteValue, Closurevalue, ReasonCheckBoxGroup, ReasonFormConfig, UnavailabilityValue } from './interfaces';
 import { ReasonsFormsService } from './services/reasons-form.service';
 import { ReasonsService } from './services/reasons.service';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -41,7 +41,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
   styleUrls: ['./reasons.component.scss'],
 })
 @TakeUntilDestroy
-export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
+export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   // public selectedTab = ReasonsNavigationTabs.Rejection;
   public selectedTab : any;
   public reasonsNavigationTabs = ReasonsNavigationTabs;
@@ -86,13 +86,14 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
     super(store);
     const cancellationReasons = Object.entries(CancellationReasonsMap).map(([key, value]) => ({ id: +key, name: value}));
     this.cancellationReasons = sortByField(cancellationReasons, 'name');
-    if(this.selectedSystem.isIRP){
-      this.selectedTab = ReasonsNavigationTabs.Rejection;
-      this.formType = ReasonFormType.DefaultReason;
-    } else {
+    this.getOrganizagionData();
+    if(this.selectedSystem.isIRP == true && this.selectedSystem.isVMS == false){
       this.selectedTab = ReasonsNavigationTabs.Requisition;
       this.formType = ReasonFormType.RequisitionReason;
-    }
+    } else {
+      this.selectedTab = ReasonsNavigationTabs.Rejection;
+      this.formType = ReasonFormType.DefaultReason;
+    } 
     this.dialogConfig = ReasonDialogConfig[this.formType];
     this.createForm();
     this.setIRPFlag();
@@ -104,7 +105,6 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
     super.ngOnInit();
     this.subscribeOnSaveReasonSuccess();
     this.canRejectOrClosureReason();
-    this.getOrganizagionData();
   }
 
   selectTab(selectedTab: SelectEventArgs): void {
@@ -166,7 +166,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  editReason(data: RejectReason | Penalty | UnavailabilityValue | Closurevalue): void {
+  editReason(data: RejectReason | Penalty | UnavailabilityValue | Closurevalue | CategoryNoteValue): void {
     this.isEdit = true;
     this.title = DialogMode.Edit;
 
@@ -199,13 +199,30 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
         eligibleToBeScheduled: !!reason.eligibleToBeScheduled,
         visibleForIRPCandidates: !!reason.visibleForIRPCandidates,
       });
-    } else if((this.selectedTab === ReasonsNavigationTabs.Requisition || ReasonsNavigationTabs.Closure)) {
+    } else if((this.selectedTab === ReasonsNavigationTabs.Requisition )) {
+
       const reason  = data as Closurevalue;
       this.reasonForm.patchValue({
         id: reason.id,
         reason: reason.reason,
         includeInIRP: reason.includeInIRP,
         includeInVMS: reason.includeInVMS,
+        });
+    } else if((this.selectedTab === ReasonsNavigationTabs.Closure)) {
+
+      const reason  = data as Closurevalue;
+      this.reasonForm.patchValue({
+        id: reason.id,
+        reason: reason.reason,
+        includeInIRP: reason.includeInIRP,
+        includeInVMS: reason.includeInVMS,
+        });
+    } else if((this.selectedTab === ReasonsNavigationTabs.CategoryNote)) {
+      const reason  = data as CategoryNoteValue;
+      this.reasonForm.patchValue({
+        id: reason.id,
+        reason: reason.reason,
+        isRedFlagCategory: !!reason.isRedFlagCategory,
         });
     } else {
       this.reasonForm.patchValue({
@@ -280,6 +297,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit {
       ofActionSuccessful(ReasonActions.SaveRejectReasonsSuccess, ReasonActions.UpdateClosureReasonsSuccess,
         ReasonActions.UpdateManualInvoiceRejectReasonSuccess, ReasonActions.UpdateOrderRequisitionSuccess,
         ReasonActions.UpdateInternalTransferReasonsSuccess, ReasonActions.UpdateTerminationReasonsSuccess,
+        ReasonActions.UpdateCategoryNoteReasonsSuccess,
         ReasonActions.SavePenaltySuccess, ReasonActions.SaveUnavailabilityReason, ReasonActions.RemoveUnavailabilityReason),
       takeUntil(this.componentDestroy()),
     ).subscribe(() =>this.closeSideDialog());

@@ -14,6 +14,13 @@ export type RejectReasonwithSystem = {
   includeInIRP?: boolean;
 }
 
+export type RejectReasonWithRedflag = {
+  id?: number;
+  reason: string;
+  organizationId?: number;
+  isRedFlagCategory: boolean;
+}
+
 export type RejectReasonPayload = {
   organizationId: number;
   jobId: number;

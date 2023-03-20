@@ -12,7 +12,7 @@ import { RejectReason, RejectReasonPage, UnavailabilityReasons } from '@shared/m
 import { ConfirmService } from '@shared/services/confirm.service';
 import { UserState } from '../../../store/user.state';
 import { PageOfCollections } from '@shared/models/page.model';
-import { UnavailabilityValue } from '../interfaces';
+import { CategoryNoteValue, Closurevalue, UnavailabilityValue } from '../interfaces';
 
 @Directive()
 export abstract class ReasonsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
@@ -21,7 +21,7 @@ export abstract class ReasonsComponent extends AbstractGridConfigurationComponen
 
   @Output()
   public readonly editReason: EventEmitter<RejectReason
-  | Penalty | UnavailabilityValue> = new EventEmitter<RejectReason | Penalty | UnavailabilityValue>();
+  | Penalty | UnavailabilityValue | CategoryNoteValue | Closurevalue> = new EventEmitter<RejectReason | Penalty | UnavailabilityValue | CategoryNoteValue | Closurevalue>();
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;

@@ -71,7 +71,7 @@ export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
   5: ReasonFormType.Unavailability,
   6: ReasonFormType.DefaultReason,
   7: ReasonFormType.DefaultReason,
-  8: ReasonFormType.DefaultReason
+  8: ReasonFormType.CategoryNoteReason
 };
 
 export const NewReasonsActionsMap = {
@@ -136,6 +136,21 @@ export const defaultDialogConfig: ReasonFormConfig[]  = [
   },
 ];
 
+export const categoryNoteDialogConfig: ReasonFormConfig[]  = [
+  {
+    field: 'reason',
+    title: 'Reason',
+    required: true,
+    fieldType: FieldType.Input,
+  },
+  {
+    field: 'isRedFlagCategory',
+    title: 'Red Flag Category',
+    required: false,
+    fieldType: FieldType.Toggle,
+  },
+];
+
 export const requisitionDialogConfig: ReasonFormConfig[]  = [
   {
     field: '',
@@ -192,4 +207,5 @@ export const ReasonDialogConfig: ReasonFormConfigMap = {
   [ReasonFormType.PenaltyReason]: null,
   [ReasonFormType.RequisitionReason]: requisitionDialogConfig,
   [ReasonFormType.ClosureReason]: closureDialogConfig,
+  [ReasonFormType.CategoryNoteReason]: categoryNoteDialogConfig
 };

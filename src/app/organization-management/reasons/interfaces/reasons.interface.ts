@@ -16,6 +16,12 @@ export interface UnavailabilityValue {
   visibleForIRPCandidates: boolean;
 }
 
+export interface CategoryNoteValue {
+  id?: number | null;
+  reason: string;
+  isRedFlagCategory: boolean;
+}
+
 
 export interface Closurevalue {
   id?: number | null;
@@ -25,7 +31,7 @@ export interface Closurevalue {
 }
 
 
-export type ReasonValueType = RejectReason | UnavailabilityValue | Closurevalue;
+export type ReasonValueType = RejectReason | UnavailabilityValue | Closurevalue | CategoryNoteValue;
 
 export interface SaveReasonParams {
   selectedTab: ReasonsNavigationTabs;
@@ -56,4 +62,5 @@ export interface ReasonFormConfigMap {
   [ReasonFormType.PenaltyReason]: null;
   [ReasonFormType.RequisitionReason] : ReasonFormConfig[];
   [ReasonFormType.ClosureReason] : ReasonFormConfig[];
+  [ReasonFormType.CategoryNoteReason] : ReasonFormConfig[];
 }

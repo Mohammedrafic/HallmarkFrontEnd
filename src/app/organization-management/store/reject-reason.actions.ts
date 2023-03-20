@@ -1,6 +1,6 @@
 import { UnavailabilityValue } from '@organization-management/reasons/interfaces';
 import { PenaltyPayload } from "@shared/models/penalty.model";
-import { RejectReason, RejectReasonwithSystem } from "@shared/models/reject-reason.model";
+import { RejectReason, RejectReasonWithRedflag, RejectReasonwithSystem } from "@shared/models/reject-reason.model";
 
 export class GetRejectReasonsByPage {
   static readonly type = '[reject reason] Get Reject reason by Page';
@@ -231,7 +231,7 @@ export class GetCategoryNoteReasons {
 
 export class SaveCategoryNoteReasons {
   static readonly type = '[reject reason] Save CategoryNote Reason';
-  constructor(public payload: RejectReason){}
+  constructor(public payload: RejectReasonWithRedflag){}
 }
 
 export class RemoveCategoryNoteReasons {
@@ -241,7 +241,7 @@ export class RemoveCategoryNoteReasons {
 
 export class UpdateCategoryNoteReasons {
   static readonly type = '[reject reason] Update CategoryNote Reason';
-  constructor(public payload: RejectReason) {
+  constructor(public payload: RejectReasonWithRedflag) {
   } 
 }
 

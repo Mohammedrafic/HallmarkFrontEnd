@@ -7,8 +7,6 @@ import {
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { RejectReasonPage } from "@shared/models/reject-reason.model";
 import { ReasonsComponent } from '@organization-management/reasons/models/reasons-component.class';
-import { UserPermissions } from "@core/enums";
-import { Permission } from "@core/interface";
 
 @Component({
   selector: 'app-emp-termination',
@@ -18,11 +16,9 @@ import { Permission } from "@core/interface";
 })
 export class EmpTerminationComponent extends ReasonsComponent implements OnInit,OnDestroy {
 
-  @Input() userPermission: Permission;
 
   @Select(RejectReasonState.terminationReasons)
   public reasons$: Observable<RejectReasonPage>;
-  public readonly userPermissions = UserPermissions;
 
   protected getData(): void {
     this.store.dispatch(new GetTerminationReasons(this.currentPage, this.pageSize));
