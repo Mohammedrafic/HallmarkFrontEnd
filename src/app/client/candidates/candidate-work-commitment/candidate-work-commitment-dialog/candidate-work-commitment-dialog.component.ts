@@ -18,7 +18,7 @@ import { addDays } from '@shared/utils/date-time.utils';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { uniq } from 'lodash';
-import { catchError, delay, distinctUntilChanged, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { CandidateWorkCommitment, WorkCommitmentDataSource } from '../models/candidate-work-commitment.model';
@@ -68,7 +68,6 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public minimumDate: Date | undefined;
   public maximumDate: Date | undefined;
 
-  public useMinimumDate: boolean = false;
 
   constructor(
     private cd: ChangeDetectorRef,
@@ -136,7 +135,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.candidateWorkCommitmentService.getWorkCommitmentById(id)
       .subscribe((commitment: WorkCommitmentDetails) => {
         this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
-        this.minimumDate = this.selectWorkCommitmentStartDate;
+        this.minimumDate = this.lastActiveDate ? this.lastActiveDate : this.selectWorkCommitmentStartDate;
         const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
         this.maximumDate = this.minimumDate < commitmentEndDate ? commitmentEndDate : undefined;
         if (populateForm) {
@@ -173,15 +172,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         if (activeCommitment) {
           this.lastActiveDate = DateTimeHelper.convertDateToUtc(activeCommitment.startDate as string);
           this.lastActiveDate = addDays(this.lastActiveDate, 1) as Date;
-          this.useMinimumDate = true;
         } else {
-          this.lastActiveDate = this.todayDate;
-          this.useMinimumDate = false;
+          this.minimumDate = undefined;
         }
       });
     } else {
-      this.lastActiveDate = this.todayDate;
-      this.useMinimumDate = false;
+      this.minimumDate = undefined;
     }
   }
 
@@ -204,7 +200,6 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   private getCandidateWorkCommitmentById(commitment: CandidateWorkCommitment): void {
     this.candidateWorkCommitmentService.getCandidateWorkCommitmentById(commitment.id as number).subscribe((commitment: CandidateWorkCommitment) => {
       if (commitment.workCommitmentId) {
-        this.useMinimumDate = true;
         this.getWorkCommitmentById(commitment.workCommitmentId, false);
       } 
       commitment.startDate = commitment.startDate && DateTimeHelper.convertDateToUtc(commitment.startDate as string);

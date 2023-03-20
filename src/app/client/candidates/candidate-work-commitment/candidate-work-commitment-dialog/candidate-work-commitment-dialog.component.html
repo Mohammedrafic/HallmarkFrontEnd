@@ -90,7 +90,7 @@
               label="Start Date"
               [required]="true"
               [strictMode]="true"
-              [min]="useMinimumDate ? minimumDate : undefined"
+              [min]="minimumDate"
               [max]="maximumDate"
             ></app-datepicker>
             <app-numeric-textbox
