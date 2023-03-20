@@ -307,7 +307,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public saveCommitment(): void {
     if (this.candidateWorkCommitmentForm.valid) {
       const candidateWorkCommitment: CandidateWorkCommitment = this.candidateWorkCommitmentForm.getRawValue();
-      candidateWorkCommitment.startDate = candidateWorkCommitment.startDate && DateTimeHelper.toUtcFormat(candidateWorkCommitment.startDate);
+      candidateWorkCommitment.startDate =
+      candidateWorkCommitment.startDate &&
+      DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(candidateWorkCommitment.startDate));
       candidateWorkCommitment.employeeId = this.employeeId;
       this.candidateWorkCommitmentService.saveCandidateWorkCommitment(candidateWorkCommitment).pipe(
         tap(() => {
