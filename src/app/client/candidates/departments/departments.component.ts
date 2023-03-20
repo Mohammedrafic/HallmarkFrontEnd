@@ -81,7 +81,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public departmentHierarchy: OrganizationRegion[] = [];
   public filtersAmount: number = 0;
   public assignDepTooltipMsg = ALL_DEPARTMENTS_SELECTED;
-  public tooggleTooltipMsg = NO_ACTIVE_WORK_COMMITMETS;
+  public toggleTooltipMsg = NO_ACTIVE_WORK_COMMITMETS;
   public conditions: DepartmentConditions = {
     showAllDepartments: false,
     disableAllToggle: false,

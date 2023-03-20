@@ -39,7 +39,7 @@ export class CandidatesService {
     this.selectedTab$.next(tab);
   }
 
-  public getEmployeeWorkCommitments(): Observable<EmployeeWorkCommitment | void> {
+  public getEmployeeWorkCommitments(): Observable<EmployeeWorkCommitment | undefined> {
     return this.httpClient
       .get<EmployeeWorkCommitment[]>('/api/EmployeeWorkCommitments/compact', {
         params: { employeeId: this.employeeId! },
