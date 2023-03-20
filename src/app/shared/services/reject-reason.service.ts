@@ -155,9 +155,7 @@ export class RejectReasonService {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
     }
 
-    return this.http.post<RejectReasonPage>(`/api/OrderRequisition/all`,
-      { params }, { headers }
-    );
+    return this.http.post<RejectReasonPage>(`/api/OrderRequisition/all`, params , { headers });
   }
 
   /**

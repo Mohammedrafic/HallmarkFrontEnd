@@ -4,7 +4,7 @@ import { DataSourceItem } from '@core/interface';
 import { FilteringOptionsFields, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
 import { AgencyStatus } from '@shared/enums/status';
 import { Grid } from '@syncfusion/ej2-grids';
-import { GridReadyEvent } from '@ag-grid-community/core';
+import { GridReadyEvent, RowNode } from '@ag-grid-community/core';
 import { BehaviorSubject } from 'rxjs';
 
 export interface Timesheet {
@@ -90,4 +90,8 @@ export type FilterDataSource = {
 
 export interface TimesheetsGrid extends Grid {
   gridInstance$: BehaviorSubject<GridReadyEvent>
+}
+export interface TimesheetGridSelections {
+  selectedTimesheetIds: number[];
+  rowNodes: RowNode[];
 }

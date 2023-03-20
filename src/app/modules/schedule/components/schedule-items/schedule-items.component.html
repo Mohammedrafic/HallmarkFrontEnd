@@ -59,7 +59,7 @@
     <i-feather *ngIf="dateItem.scheduleType === scheduleType.Availability" name="clock" class="icon"></i-feather>
     <i-feather *ngIf="dateItem.scheduleType === scheduleType.Unavailability" name="alert-triangle" class="icon"></i-feather>
     <i-feather *ngIf="dateItem.scheduleType === scheduleType.Book" name="briefcase" class="icon"></i-feather>
-    <span>{{dateItem.date | date: "MM/dd/yyyy"}}
+    <span>{{dateItem.date | date: "MM/dd/yyyy" : "UTC"}}
 <!--      TODO: will be implemented in scope of EIN-12052-->
 <!--      <span class="schedule-type" *ngIf="dateItem.scheduleType === scheduleType.Book && dateItem.orderType === ltaOrder">L</span>-->
     </span>

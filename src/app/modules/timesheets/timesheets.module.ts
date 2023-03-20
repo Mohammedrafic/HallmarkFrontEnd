@@ -97,6 +97,7 @@ import { UploadDocumentsComponent } from './components/upload-documents/upload-d
 import { TimesheetDetailsTableService } from './services';
 import { UploadFileAreaModule } from '@shared/components/upload-file-area/upload-file-area.module';
 import { SwitchEditorModule } from '@shared/components/switch-editor/switch-editor.module';
+import { TimesheetGridExportComponent } from './components/timesheet-grid-export/timesheet-grid-export.component';
 
 const gridIcons = {
   MessageSquare,
@@ -148,6 +149,7 @@ const gridIcons = {
     TimesheetsTabsComponent,
     RecordStatusCellComponent,
     UploadDocumentsComponent,
+    TimesheetGridExportComponent,
   ],
   imports: [
     CommonModule,

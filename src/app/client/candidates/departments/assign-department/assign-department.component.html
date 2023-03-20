@@ -57,7 +57,7 @@
       controlName="isOriented"
       label="Oriented"
       [formGroupInstance]="assignDepartmentForm"
-      (checked)="toggleChecked()"
+      (checked)="orientedChecked($event)"
     ></app-toggle>
     <app-toggle
       *ngIf="departmentId"
@@ -67,5 +67,18 @@
       [formGroupInstance]="assignDepartmentForm"
       (checked)="toggleChecked()"
     ></app-toggle>
+  </div>
+
+  <div class="date-fields">
+    <app-datepicker
+      *ngIf="isOriented$ | async as isOriented"
+      [formGroupInstance]="assignDepartmentForm"
+      [required]="isOriented"
+      [min]="dateRanges.min"
+      [max]="dateRanges.max"
+      id="start-date"
+      controlName="orientationDate"
+      label="Orientation Date"
+    ></app-datepicker>
   </div>
 </form>

@@ -116,3 +116,7 @@ export class SetIrpFlag {
 export class GetDeviceScreenResolution {
   static readonly type = '[app] Get Device Screen Resolution'
 }
+export class ShowCustomExportDialog {
+  static readonly type = '[app] Set Custom Export Dialog Showing state';
+  constructor(public isDialogShown: boolean) { }
+}

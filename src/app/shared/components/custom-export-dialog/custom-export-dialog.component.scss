@@ -1,0 +1,105 @@
+@import '../../../styles/variables/colors';
+
+.dialog {
+  right: 0;
+  top: 60px !important;
+  left: auto !important;
+  height: calc(100% - 60px) !important;
+
+  .e-dlg-content, .e-dlg-header-content {
+    padding: 0;
+  }
+
+  &.e-dialog .e-dlg-header {
+    width: 100%;
+  }
+
+  .e-dlg-content {
+    .container {
+      padding-top: 0;
+    }
+  }
+
+  .container {
+    padding: 24px;
+
+    .export-label {
+      line-height: 20px;
+    }
+
+    .header-container {
+      .e-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .e-card-title {
+          color: $black;
+          font-size: 24px;
+          font-weight: 700;
+        }
+
+        .e-card-content {
+          .button-cancel {
+            margin-right: 8px;
+          }
+
+          button {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    .input-container {
+      padding-top: 20px;
+
+      input {
+        margin-top: 8px;
+      }
+    }
+
+    .inline-radio-container {
+      margin-bottom: 10px;
+      margin-top: 15px;
+
+      ejs-radiobutton {
+        margin-right: 20px;
+      }
+
+      label {
+        margin: 0;
+      }
+    }
+
+    .exported-columns {
+      padding-top: 20px;
+
+      ejs-chiplist {
+        .e-chip {
+          margin: 5px 10px 5px 0;
+          width: auto;
+          text-transform: initial;
+          font-variant: common-ligatures;
+          font-weight: normal;
+          font-size: 12px;
+          height: 24px;
+          background-color: $secondary-dark-blue-50;
+          color: $black;
+          border: 1px solid $secondary-dark-blue-40;
+          line-height: 15px;
+
+          &::before {
+            display: none;
+          }
+
+          &.e-active {
+            background-color: $primary-active-blue;
+            color: #fff;
+            border: none;
+          }
+        }
+      }
+    }
+  }
+}

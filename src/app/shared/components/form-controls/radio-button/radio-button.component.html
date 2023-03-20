@@ -1,0 +1,9 @@
+<app-form-control-wrapper [formGroup]="formGroupInstance" class="app-numeric-textbox">
+  <ejs-radiobutton
+    [formControlName]="controlName"
+    [id]="id"
+    [label]="label"
+    [value]="radioValue"
+    (change)="onChange($event)"
+  ></ejs-radiobutton>
+</app-form-control-wrapper>

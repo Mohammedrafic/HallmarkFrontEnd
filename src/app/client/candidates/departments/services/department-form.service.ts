@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
 import { isObjectsEqual } from '@core/helpers';
@@ -20,6 +20,7 @@ export class DepartmentFormService {
       endDate: [null],
       isOriented: [null],
       isHomeCostCenter: [null],
+      orientationDate: [null],
     }) as CustomFormGroup<AssignDepartmentFormState>;
   }
 
@@ -29,17 +30,17 @@ export class DepartmentFormService {
       locationIds: [null],
       departmentsIds: [null],
       skillIds: [null],
-      oriented: [1],
+      isOriented: [0],
     }) as CustomFormGroup<DepartmentFiltersColumns>;
   }
 
   public createEditForm(): CustomFormGroup<EditDepartmentFormState> {
     return this.formBuilder.group({
-      startDate: [null],
+      startDate: [null, [Validators.required]],
       endDate: [null],
       isOriented: [false],
       isHomeCostCenter: [false],
-      orientedStartDate: [null],
+      orientationDate: [null],
     }) as CustomFormGroup<EditDepartmentFormState>;
   }
 
@@ -84,7 +85,7 @@ export class DepartmentFormService {
   }
 
   public patchForm(formGroup: FormGroup, formData: DepartmentAssigned): void {
-    const { regionId, locationId, departmentId, startDate, endDate, isOriented, isHomeCostCenter } = formData;
+    const { regionId, locationId, departmentId, startDate, endDate, isOriented, isHomeCostCenter, orientationDate } = formData;
     formGroup.patchValue({
       regionId: regionId,
       locationId: locationId,
@@ -93,6 +94,16 @@ export class DepartmentFormService {
       endDate: endDate,
       isOriented: isOriented,
       isHomeCostCenter: isHomeCostCenter,
+      orientationDate: orientationDate
     })
+  }
+
+  public addRemoveValidator(control: AbstractControl | null, term: boolean): void {
+    if(term) {
+      control?.setValidators([Validators.required]);
+    } else {
+      control?.setValidators([]);
+      control?.reset();
+    }
   }
 }

@@ -132,7 +132,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     }
 
     const patchData = {
-      date: this.scheduledItem.schedule.date,
+      date: DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date),
       shiftId: this.selectedDaySchedule.shiftId || this.customShiftId,
     } as EditSchedule.ScheduledShiftForm;
 

@@ -9,6 +9,7 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
+import { Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
 import {
@@ -27,10 +28,9 @@ import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import {
   AssignDepartmentFormState,
   AssignDepartmentHierarchy,
-  AssignNewDepartment,
   DateRanges,
   DepartmentAssigned,
-  EditAssignedDepartment,
+  DepartmentPayload,
 } from '../departments.model';
 import { DepartmentsService } from '../services/departments.service';
 import { OrganizationRegion, OrganizationLocation, OrganizationDepartment } from '@shared/models/organization.model';
@@ -40,6 +40,7 @@ import { OptionFields } from '@client/order-management/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CustomFormGroup } from '@core/interface';
+import { departmentName } from '../helpers/department.helper';
 
 @Component({
   selector: 'app-assign-department',
@@ -64,6 +65,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
 
   public readonly departmentFields = OptionFields;
   public departmentId?: number | null = null;
+  public isOriented$: Subject<boolean> = new Subject();
 
   public constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -79,6 +81,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     this.subscribeOnDialogData();
     this.saveFormData();
     this.watchForControlsValueChanges();
+    this.adjustOrientationDateField();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -86,7 +89,12 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       this.dataSource.regions = this.departmentHierarchy;
     }
   }
-  
+
+  public orientedChecked(event: boolean): void {
+    this.isOriented$.next(event);
+    this.assignDepartmentForm.markAsDirty();
+  }
+
   public toggleChecked(): void {
     this.assignDepartmentForm.markAsDirty();
   }
@@ -102,7 +110,13 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       if (data && this.departmentId) {
         this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
         this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
-        this.dataSource.departments = [{ name: data.departmentName, id: data.departmentId } as OrganizationDepartment];
+        this.dataSource.departments = [
+          {
+            name: departmentName(data.departmentName, data.extDepartmentId),
+            id: data.departmentId,
+          } as OrganizationDepartment,
+        ];
+        this.isOriented$.next(data.isOriented);
         this.departmentFormService.patchForm(this.assignDepartmentForm, data);
         this.disableControls();
       } else {
@@ -128,20 +142,19 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
           }
           return formValid ? this.saveAssignedDepartment() : of(formValid);
         }),
+        filter(Boolean),
         takeUntil(this.destroy$)
       )
-      .subscribe((success) => {
-        if (success) {
-          this.resetAssignDepartmentForm();
-          const MESSAGE = this.departmentId ? RECORD_MODIFIED : RECORD_ADDED;
-          this.store.dispatch([new ShowSideDialog(false), new ShowToast(MessageTypes.Success, MESSAGE)]);
-          this.departmentId = null;
-          this.refreshGrid.emit();
-        }
+      .subscribe(() => {
+        this.resetAssignDepartmentForm();
+        const MESSAGE = this.departmentId ? RECORD_MODIFIED : RECORD_ADDED;
+        this.store.dispatch([new ShowSideDialog(false), new ShowToast(MessageTypes.Success, MESSAGE)]);
+        this.departmentId = null;
+        this.refreshGrid.emit();
       });
   }
 
-  private saveAssignedDepartment(): Observable<AssignNewDepartment | EditAssignedDepartment> {
+  private saveAssignedDepartment(): Observable<DepartmentPayload> {
     const formData = this.assignDepartmentForm.getRawValue();
 
     if (this.departmentId) {
@@ -178,7 +191,11 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         const selectedLocation = (this.dataSource.locations as OrganizationLocation[]).find(
           (location) => location.id === value
         );
-        this.dataSource.departments = selectedLocation?.departments ?? [];
+        const departments = selectedLocation?.departments ?? [];
+        this.dataSource.departments = departments.map((department) => ({
+          ...department,
+          name: departmentName(department.name, department.extDepartmentId ?? ''),
+        }));
         this.cdr.markForCheck();
       });
 
@@ -196,7 +213,16 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     this.assignDepartmentForm.reset();
     this.assignDepartmentForm.enable();
     this.assignDepartmentForm.get('startDate')?.setValue(new Date());
+    this.isOriented$.next(false);
     this.departmentId = null;
     this.cdr.markForCheck();
+  }
+
+  private adjustOrientationDateField(): void {
+    this.isOriented$.pipe(takeUntil(this.destroy$)).subscribe((isOriented) => {
+      const orientationDateControl = this.assignDepartmentForm.get('orientationDate');
+      this.departmentFormService.addRemoveValidator(orientationDateControl, isOriented);
+      this.cdr.markForCheck();
+    });
   }
 }

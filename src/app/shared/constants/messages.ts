@@ -83,7 +83,7 @@ export const DOCUMENT_UNSHARED_SUCCESS = 'Documents UnShared successfully';
 export const FOLDER_DELETE_SUCCESS = 'Folder deleted successfully';
 export const EMAIL_RESEND_SUCCESS = 'Email was sent successfully';
 export const CANDIDATE_STATUS= 'Selected Candidate status is unavailable';
-export const CandidateSSNRequired = 'SSN of Candidate is mandatory to apply the offer. Please update SSN field on Candidate Profile screen and come back here to apply offer.';
+export const CandidateSSNRequired = 'SSN of Candidate is mandatory to submit candidate application. Once SSN is updated on Candidate Profile screen and come back here to apply.';
 export const CandidateDOBRequired= 'DOB of Candidate is mandatory to accept the offer. Please update DOB of candidate on Candidate Profile screen and come back here to accept offer.';
 export const REGULAR_RATE_UPDATE_SUCCESS = 'Regular Rate on Open and In-Progress Status are updated. Other Positions stays unaffected';
 export const UpdateRegularRatesucceedcount = (count: number) =>
