@@ -52,6 +52,9 @@ app-grid {
       .action-button {
         position: absolute;
         right: 8px;
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
       }
     }
 

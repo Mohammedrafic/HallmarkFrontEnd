@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { ChangeEventArgs } from '@syncfusion/ej2-buttons';
 import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
 
@@ -7,7 +7,8 @@ import { BaseFormControlDirective } from '@shared/components/form-controls/base-
   templateUrl: './toggle.component.html',
   styleUrls: ['./toggle.component.scss'],
 })
-export class ToggleComponent extends BaseFormControlDirective implements OnInit {
+export class ToggleComponent extends BaseFormControlDirective {
+  @Input('value') public toggleChecked: boolean;
   @Output() public checked: EventEmitter<boolean> = new EventEmitter();
 
   constructor() {
@@ -15,10 +16,7 @@ export class ToggleComponent extends BaseFormControlDirective implements OnInit 
   }
 
   public get toggleValue(): boolean {
-    return this.getControl()?.value;
-  }
-
-  ngOnInit(): void {
+    return this.getControl()?.value ?? this.toggleChecked;
   }
 
   public onChange({ checked }: ChangeEventArgs): void {
