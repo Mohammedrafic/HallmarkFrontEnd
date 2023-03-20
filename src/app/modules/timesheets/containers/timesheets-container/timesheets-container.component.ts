@@ -211,7 +211,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public sortHandler(event: string): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ orderBy: event }, this.activeTabIdx !== 0));
+    this.store.dispatch(new Timesheets.UpdateFiltersState({ orderBy: event }, this.activeTabIdx !== 0, false, true));
   }
 
   public changeFiltersAmount(amount: number): void {
@@ -225,7 +225,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
           startDate: range[0],
           endDate: range[1],
         },
-        this.activeTabIdx !== 0
+        this.activeTabIdx !== 0,
+        false,
+        true
       )
     );
   }
