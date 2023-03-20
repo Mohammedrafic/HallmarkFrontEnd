@@ -21,31 +21,13 @@ export interface DepartmentAssigned {
   startDate: Date;
   endDate: Date;
   isHomeCostCenter: boolean;
+  orientationDate: Date | null;
+  extDepartmentId: string;
 }
 
 interface Skill {
   id: number;
   name: string;
-}
-
-export interface EditAssignedDepartment {
-  employeeWorkCommitmentId: number;
-  startDate: Date | string;
-  endDate: Date | string;
-  orientedStartDate?: Date | string;
-  isHomeCostCenter?: boolean;
-  isOriented?: boolean;
-}
-
-export interface AssignNewDepartment {
-  employeeWorkCommitmentId: number;
-  isOriented: number;
-  regionId: number;
-  locationId: number;
-  departmentId: number;
-  startDate: Date | string;
-  endDate?: Date | string;
-  isHomeCostCenter?: boolean;
 }
 
 export interface DepartmentFormFieldConfig<T> {
@@ -58,6 +40,7 @@ export interface DepartmentFormFieldConfig<T> {
   optionFields?: object;
   show?: boolean;
   disabled?: boolean;
+  required?: boolean;
 }
 
 export type DepartmentFiltersColumns = {
@@ -91,7 +74,7 @@ export interface EditDepartmentFormState {
   [EditDepartmentFields.START_DATE]: Date;
   [EditDepartmentFields.END_DATE]: Date;
   [EditDepartmentFields.IS_ORIENTED]: boolean;
-  [EditDepartmentFields.ORIENTED_START_DATE]?: Date;
+  [EditDepartmentFields.ORIENTATION_DATE]?: Date;
 }
 export interface DepartmentHierarchy {
   organizationId: number;
@@ -106,25 +89,16 @@ export interface AssignDepartmentHierarchy {
   departments: OrganizationDepartment[];
 }
 
-export interface EditDepartmentPayload {
-  forceUpdate: boolean;
-  isOriented?: true | undefined;
-  isHomeCostCenter?: true | undefined;
-  orientedStartDate?: string | undefined;
-  employeeWorkCommitmentId: number;
-  startDate: string;
-  endDate: string;
-  ids: number[] | null;
-}
-
-export interface NewDepartmentPayload {
+export interface DepartmentPayload {
   forceUpdate: boolean;
   employeeWorkCommitmentId: number;
-  departmentId: number;
   isOriented: boolean;
   startDate: string;
-  endDate: string | undefined;
+  endDate?: string;
   isHomeCostCenter?: boolean;
+  orientationDate?: string;
+  ids?: number[] | null;
+  departmentId?: number;
 }
 
 export interface DateRanges {

@@ -1,6 +1,5 @@
 import { GridActionsCellComponent, GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { ValueFormatterParams } from '@ag-grid-community/core';
-import { OrientationCompletedComponent } from './cell-renderers/orientation-completed/orientation-completed.component';
 import { SkillMatchComponent } from './cell-renderers/skill-match/skill-match.component';
 import { SkillNameComponent } from './cell-renderers/skill-name/skill-name.component';
 import { DepartmentAssigned } from '../departments.model';
@@ -78,9 +77,9 @@ export const columnDef = (columnParams: ColumnDefParams) => [
     flex: 1,
   },
   {
-    field: 'isOriented',
-    headerName: 'Orientation completed',
-    cellRenderer: OrientationCompletedComponent,
+    field: 'orientationDate',
+    headerName: 'Orientation Completion',
+    valueFormatter: (params: ValueFormatterParams) => columnParams.dateFormatter(params.value),
     width: 140,
     minWidth: 140,
   },

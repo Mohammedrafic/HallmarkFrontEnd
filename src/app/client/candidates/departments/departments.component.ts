@@ -106,7 +106,6 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     this.showSideDialog(true);
     this.dialogData$.next(null);
     this.getAssignedDepartmentHierarchy();
-    this.cdr.markForCheck();
   }
 
   public onSave(): void {
@@ -118,7 +117,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   }
 
   public onCancel(): void {
-    if (this.assignDepartment?.assignDepartmentForm.dirty) {
+    if (this.assignDepartment?.assignDepartmentForm.dirty || this.editDepartments?.formGroup.dirty) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,

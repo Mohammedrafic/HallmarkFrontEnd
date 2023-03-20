@@ -18,7 +18,7 @@ import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/fil
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormFieldConfig, DepartmentFiltersColumns, DepartmentFilterState } from '../departments.model';
 import { FilterService } from '@shared/services/filter.service';
-import { DepartmentFilterFormConfig } from '@client/candidates/departments/constants/department-filter.constant';
+import { DepartmentFilterFormConfig, OrientedFilterPayload } from '@client/candidates/departments/constants/department-filter.constant';
 import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -80,12 +80,13 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
 
   public applyFilters(): void {
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
-    const filterState = this.formGroup.getRawValue();
+    const formState = this.formGroup.getRawValue();
+    const filterState = { ...formState, isOriented: OrientedFilterPayload[formState.isOriented] };
     this.applyFilters$.next(filterState);
   }
 
   public clearAllFilters(): void {
-    this.formGroup.reset();
+    this.resetFilterForm();
     this.filteredItems = [];
     this.appliedFiltersAmount.emit(this.filteredItems.length);
     this.resetFilters.emit();
@@ -118,12 +119,18 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     this.organizationStructure$
       .pipe(filter(Boolean), takeUntil(this.destroy$))
       .subscribe((structure: OrganizationStructure) => {
-        this.formGroup.reset();
+        this.resetFilterForm();
         this.filteredItems = [];
         this.regions = structure.regions;
         this.filterColumns.regionIds.dataSource = [...(this.regions as DataSourceItem[])];
         this.cdr.markForCheck();
       });
+  }
+
+  private resetFilterForm(): void {
+    if (this.formGroup.dirty) {
+      this.formGroup.reset({ isOriented: 0 });
+    }
   }
 
   private initFilterForm(): void {
