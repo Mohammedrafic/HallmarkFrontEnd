@@ -75,9 +75,7 @@ export interface ScheduleDateItem {
   date: string;
   extendedDays: number;
   daySchedules: ScheduleItem[];
-  isInDifferentDepartments: boolean;
-  isHomeCostCenterDepartment: boolean;
-  isDepartmentMatchWithFilter: boolean;
+  showWhiteFrame: boolean;
   employeeStatus: number;
   departmentStartDate: string;
   departmentEndDate: string;
