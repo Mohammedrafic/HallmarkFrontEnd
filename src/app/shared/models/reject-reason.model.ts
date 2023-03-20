@@ -6,6 +6,21 @@ export type RejectReason = {
   businessUnitId?: number;
 }
 
+export type RejectReasonwithSystem = {
+  id?: number;
+  reason: string;
+  businessUnitId?: number;
+  includeInVMS?: boolean;
+  includeInIRP?: boolean;
+}
+
+export type RejectReasonWithRedflag = {
+  id?: number;
+  reason: string;
+  organizationId?: number;
+  isRedFlagCategory: boolean;
+}
+
 export type RejectReasonPayload = {
   organizationId: number;
   jobId: number;
@@ -28,3 +43,4 @@ export interface UnavailabilityPaging {
   PageNumber: number;
   PageSize: number;
 }
+

@@ -18,7 +18,7 @@
     [heightAdjustMode]="'Fill'"
   >
     <e-tabitems>
-      <e-tabitem>
+      <e-tabitem *ngIf="selectedSystem.isVMS">
         <ng-template #headerText><div>Candidate Rejection</div></ng-template>
         <ng-template #content>
           <app-candidate-reject-reason [userPermission]="userPermission"
@@ -26,7 +26,7 @@
         </ng-template>
       </e-tabitem>
 
-      <e-tabitem>
+      <e-tabitem *ngIf="selectedSystem.isVMS">
         <ng-template #headerText><div>Candidate Cancellation (Penalties)</div></ng-template>
         <ng-template #content>
           <app-penalties (editReason)="editReason($event)" [form]="reasonForm"></app-penalties>
@@ -36,24 +36,24 @@
       <e-tabitem>
         <ng-template #headerText><div>Order Requisition</div></ng-template>
         <ng-template #content>
-          <app-order-requisition (editReason)="editReason($event)" [form]="reasonForm"></app-order-requisition>
+          <app-order-requisition (editReason)="editReason($event)" [form]="reasonForm" [showSystem]="showSystem"></app-order-requisition>
         </ng-template>
       </e-tabitem>
 
       <e-tabitem *ngIf="userPermission[userPermissions.CanViewOrderClosureReasons] && userPermission[userPermissions.CanManageOrderClosureReasons]">
         <ng-template #headerText><div>Order Closure</div></ng-template>
         <ng-template #content>
-          <app-closure-reason [userPermission]="userPermission" (editReason)="editReason($event)" [form]="reasonForm"></app-closure-reason>
+          <app-closure-reason [userPermission]="userPermission" (editReason)="editReason($event)" [showSystem]="showSystem" [form]="reasonForm"></app-closure-reason>
         </ng-template>
       </e-tabitem>
 
-      <e-tabitem>
+      <e-tabitem *ngIf="selectedSystem.isVMS">
         <ng-template #headerText><div>Manual Invoice</div></ng-template>
         <ng-template #content>
           <app-manual-invoice-reject-reason (editReason)="editReason($event)" [form]="reasonForm"></app-manual-invoice-reject-reason>
         </ng-template>
       </e-tabitem>
-      <e-tabitem *ngIf="isIRPFlagEnabled && userPermission[userPermissions.ViewUnavailabilityReasons]">
+      <e-tabitem *ngIf="isIRPFlagEnabled && userPermission[userPermissions.ViewUnavailabilityReasons] && selectedSystem.isIRP">
         <ng-template #headerText><div>Unavailability</div></ng-template>
         <ng-template #content>
           <app-unavailability-reasons
@@ -61,7 +61,15 @@
             (editReason)="editReason($event)"></app-unavailability-reasons>
         </ng-template>
       </e-tabitem>
-      <e-tabitem>
+      <e-tabitem *ngIf="selectedSystem.isIRP">
+        <ng-template #headerText><div>Terminated Reason</div></ng-template>
+        <ng-template #content>
+          <app-emp-termination
+            (editReason)="editReason($event)"
+            [form]="reasonForm"></app-emp-termination>
+        </ng-template>
+      </e-tabitem>
+      <e-tabitem *ngIf="selectedSystem.isIRP">
         <ng-template #headerText><div>Internal transfer/recruitment</div></ng-template>
         <ng-template #content>
           <app-internal-transfer
@@ -69,12 +77,12 @@
             [form]="reasonForm"></app-internal-transfer>
         </ng-template>
       </e-tabitem>
-      <e-tabitem>
-        <ng-template #headerText><div>Terminated Reason</div></ng-template>
+      <e-tabitem *ngIf="selectedSystem.isIRP">
+        <ng-template #headerText><div>Category Note</div></ng-template>
         <ng-template #content>
-          <app-emp-termination
+          <app-category-note
             (editReason)="editReason($event)"
-            [form]="reasonForm"></app-emp-termination>
+            [form]="reasonForm"></app-category-note>
         </ng-template>
       </e-tabitem>
 
@@ -89,7 +97,6 @@
   (formCancelClicked)="closeDialog()"
   [width]="reasonsNavigationTabs.Penalties === selectedTab ? '572px' : '434px'"
 >
-
   <form *ngIf="reasonsNavigationTabs.Penalties === selectedTab; else dynamicForm" [formGroup]="reasonForm" class="penalties-form">
     <div>
       <div class="input-container bootstrap">
@@ -271,6 +278,21 @@
       <!-- trackBy will prevent correct appValidateWithMessage work as it's not reasigning control -->
       <ng-container *ngFor="let control of dialogConfig">
         <ng-container [ngSwitch]="control.fieldType">
+
+          <ng-template [ngSwitchCase]="inputType.CheckBoxGroup" *ngIf="showSystem">
+            <div class="input-container">
+              <span class="controls-group-title">{{control.title}}</span>
+              <span class="required" *ngIf="control.required"> *</span>
+              
+                <div class="input-group checkboxes">
+                  <div class="control-block" *ngFor="let checkbox of control.checkBoxes; trackBy: trackByField">
+                    <ejs-tooltip content="At least one system should be selected">
+                      <ejs-checkbox [formControlName]="checkbox.field" [label]="checkbox.title"></ejs-checkbox>
+                    </ejs-tooltip>
+                  </div>
+                </div>
+            </div>
+          </ng-template>
   
           <ng-template [ngSwitchCase]="inputType.Input">
             <div class="input-container bootstrap">

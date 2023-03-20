@@ -48,7 +48,7 @@ export class ScheduleCardComponent implements OnInit {
   }
 
   private prepareCardIconName(): string {
-    return this.cardConfig?.iconName || (this.dateSchedule.isInDifferentDepartments ? 'briefcase' : 'calendar');
+    return this.cardConfig?.iconName || 'calendar';
   }
 
   private createTooltips(): void {
