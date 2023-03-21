@@ -61,7 +61,11 @@ export class DepartmentsService {
   }
 
   public deleteAssignedDepartments(departmentIds: number[] | null): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/delete`, { ids: departmentIds }).pipe(
+    const params = {
+      ids: departmentIds,
+      employeeWorkCommitmentId: this.showAllDepartments ? null : this.employeeWorkCommitmentId
+    }
+    return this.http.post<void>(`${this.baseUrl}/delete`, params).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));
         return EMPTY;

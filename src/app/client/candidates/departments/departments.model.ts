@@ -18,10 +18,10 @@ export interface DepartmentAssigned {
   skillType: number;
   skills: Skill[];
   isOriented: boolean;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   isHomeCostCenter: boolean;
-  orientationDate: Date | null;
+  orientationDate: string | null;
   extDepartmentId: string;
 }
 
@@ -47,7 +47,7 @@ export type DepartmentFiltersColumns = {
   [key in DepartmentFiltersColumnsEnum]: {
     type: ControlTypes;
     valueType: ValueType;
-    dataSource?: DataSourceItem[];
+    dataSource?: DataSourceItem[] | Record<number, string>;
     valueField?: string;
     valueId?: string;
   };
@@ -105,8 +105,8 @@ export interface DepartmentPayload {
 
 export interface DepartmentConditions {
   showAllDepartments: boolean;
-  disableAllToggle: boolean;
   disableBulkButton: boolean;
+  noActiveWC: boolean;
 }
 
 export interface DateRanges {
