@@ -48,6 +48,7 @@ import { AbstractPermission } from '@shared/helpers/permissions';
 import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-departments',
@@ -300,8 +301,9 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
 
   private setDateRanges(employeeWorkCommitment: CandidateWorkCommitmentShort): void {
     const { startDate, endDate } = employeeWorkCommitment;
-    this.dateRanges.max = endDate ? new Date(endDate) : undefined;
-    this.dateRanges.min = startDate ? new Date(startDate) : undefined;
+
+    this.dateRanges.max = endDate ? DateTimeHelper.convertDateToUtc(endDate) : undefined;
+    this.dateRanges.min = startDate ? DateTimeHelper.convertDateToUtc(startDate) : undefined;
     this.cdr.markForCheck();
   }
 
