@@ -69,11 +69,6 @@ export class TimesheetGridExportComponent extends AbstractGridConfigurationCompo
       timesheetStatus: this.timesheetStatus,
       ids,
     };
-
-    if (this.isAgency) {
-      filterQuery.organizationId = this.organizationId;
-    }
-
     this.getDefaultFileName();
     this.store.dispatch(new Timesheets.ExportTimesheets(new ExportPayload(
       fileType,
@@ -90,7 +85,7 @@ export class TimesheetGridExportComponent extends AbstractGridConfigurationCompo
     const tabsToExport = [0,1,2,3];
     this.selectedTabIndex = selectedTabIdx;
     if (this.isAgency) {
-      this.showExport = false;
+      this.showExport = true;
     }
     else {
       this.showExport = tabsToExport.includes(selectedTabIdx);
