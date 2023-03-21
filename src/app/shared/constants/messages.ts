@@ -105,5 +105,5 @@ export const USER_ALERTS_PERMISSION = 'User missing required permissions(CanView
 export const MULTI_CLOSE_ORDER = 'Order will be closed in VMS and IRP. Are you sure you want to proceed?';
 export const CLOSE_ORDER_TITLE = 'Close order';
 export const ALL_DEPARTMENTS_SELECTED = 'You can`t assign Departments manually when "All" is selected';
-export const NO_ACTIVE_WORK_COMMITMETS = 'No active Work Commitments';
+export const NO_ACTIVE = 'No active';
 export const REASON_WARNING = 'Please select a System for Reason';

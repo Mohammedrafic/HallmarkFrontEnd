@@ -13,5 +13,9 @@
   .date-fields {
     display: flex;
     column-gap: 12px;
+
+    .orientation-date {
+      width: calc(50% - 6px);
+    }
   }
 }
