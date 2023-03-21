@@ -1,44 +1,44 @@
 import { DateTimeHelper } from '@core/helpers';
-import {
-  AssignNewDepartment,
-  EditAssignedDepartment,
-  EditDepartmentPayload,
-  NewDepartmentPayload,
-} from '../departments.model';
+import { DepartmentPayload } from '../departments.model';
 
 export class DepartmentHelper {
   static editDepartmentPayload(
-    formData: EditAssignedDepartment,
+    formData: DepartmentPayload,
     departmentIds: number[] | null,
-    employeeWorkCommitmentId: number
-  ): EditDepartmentPayload {
-    const { startDate, endDate, isHomeCostCenter, orientedStartDate, isOriented } = formData;
+    employeeId: number
+  ): DepartmentPayload {
     return {
-      forceUpdate: false,
-      employeeWorkCommitmentId: employeeWorkCommitmentId,
-      startDate: startDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(startDate)),
-      endDate: endDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(endDate)),
+      ...createDepartmentPayload(formData),
       ids: departmentIds,
-      ...(orientedStartDate && { orientedStartDate: DateTimeHelper.toUtcFormat(orientedStartDate) }),
-      ...(isHomeCostCenter && { isHomeCostCenter }),
-      ...(isOriented && { isOriented }),
+      employeeId: employeeId,
     };
   }
 
-  static newDepartmentPayload(formData: AssignNewDepartment, employeeWorkCommitmentId: number): NewDepartmentPayload {
-    const { departmentId, startDate, endDate, isOriented, isHomeCostCenter } = formData;
+  static newDepartmentPayload(formData: DepartmentPayload, employeeWorkCommitmentId: number): DepartmentPayload {
     return {
-      forceUpdate: false,
+      ...createDepartmentPayload(formData),
       employeeWorkCommitmentId: employeeWorkCommitmentId,
-      departmentId: departmentId,
-      isOriented: !!isOriented,
-      startDate: startDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(startDate)),
-      endDate: endDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(endDate)),
-      ...(isHomeCostCenter && { isHomeCostCenter }),
     };
   }
 
   static findSelectedItems(values: number[], structureData: unknown[]): unknown[] {
     return values.map((id: number) => (structureData as { id: number }[]).find((item) => item.id === id));
   }
+}
+
+function createDepartmentPayload(formData: DepartmentPayload): DepartmentPayload {
+  const { departmentId, startDate, endDate, isOriented, isHomeCostCenter, orientationDate } = formData;
+  return {
+    forceUpdate: false,
+    isOriented: !!isOriented,
+    startDate: startDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(startDate)),
+    endDate: endDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(endDate)),
+    orientationDate: orientationDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(orientationDate)),
+    ...(departmentId && { departmentId }),
+    ...(isHomeCostCenter && { isHomeCostCenter }),
+  };
+}
+
+export function departmentName(name: string, id: string): string {
+  return `${name} (${id})`;
 }

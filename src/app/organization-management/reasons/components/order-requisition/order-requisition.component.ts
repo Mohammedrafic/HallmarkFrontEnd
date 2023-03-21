@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ofActionSuccessful, Select } from "@ngxs/store";
 import { Observable, takeWhile } from "rxjs";
 import {
@@ -19,6 +19,8 @@ import { ReasonsComponent } from '@organization-management/reasons/models/reason
 export class OrderRequisitionComponent extends ReasonsComponent implements OnInit,OnDestroy {
   @Select(RejectReasonState.orderRequisition)
   public reasons$: Observable<RejectReasonPage>;
+  
+  @Input() showSystem: boolean;
 
   protected getData(): void {
     this.store.dispatch(new GetOrderRequisitionByPage(this.currentPage, this.pageSize, this.orderBy, undefined, true));
@@ -41,4 +43,5 @@ export class OrderRequisitionComponent extends ReasonsComponent implements OnIni
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.getData());
   }
+
 }

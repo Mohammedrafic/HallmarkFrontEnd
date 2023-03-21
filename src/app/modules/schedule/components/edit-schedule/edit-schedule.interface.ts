@@ -15,7 +15,7 @@ export interface ScheduledShift {
 }
 
 export interface ScheduledShiftForm {
-  date: string;
+  date: Date;
   shiftId: number;
   startTime: string;
   hours: string;

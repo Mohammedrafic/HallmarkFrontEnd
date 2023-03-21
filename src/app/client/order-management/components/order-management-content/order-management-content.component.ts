@@ -2118,10 +2118,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
       if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
         this.activeSystem = OrderManagementIRPSystemId.VMS;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
       }
 
-      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgIRPEnabled) {
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
         this.activeSystem = OrderManagementIRPSystemId.IRP;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && this.isOrgVMSEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
       }
 
       if (!this.previousSelectedSystemId) {

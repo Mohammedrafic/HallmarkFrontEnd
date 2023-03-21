@@ -155,9 +155,7 @@ export class RejectReasonService {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
     }
 
-    return this.http.post<RejectReasonPage>(`/api/OrderRequisition/all`,
-      { params }, { headers }
-    );
+    return this.http.post<RejectReasonPage>(`/api/OrderRequisition/all`, params , { headers });
   }
 
   /**
@@ -243,5 +241,22 @@ export class RejectReasonService {
   public updateTerminationReason(payload: RejectReason): Observable<void> {
     return this.http.put<void>('/api/TerminatedReason', payload);
   }
+
+  public getCategoryNoteReason(pageNumber: number, pageSize: number): Observable<RejectReasonPage> {
+    return this.http.get<RejectReasonPage>(`/api/CategoryReason?PageNumber=${pageNumber}&PageSize=${pageSize}`);
+  }
+
+  public saveCategoryNoteReason(payload: {reason: string}): Observable<RejectReason> {
+    return this.http.post<RejectReason>('/api/CategoryReason', payload);
+  }
+
+  public removeCategoryNoteReason(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/CategoryReason?reasonId=${id}`);
+  }
+
+  public updateCategoryNoteReason(payload: RejectReason): Observable<void> {
+    return this.http.put<void>('/api/CategoryReason', payload);
+  }
+
 
 }

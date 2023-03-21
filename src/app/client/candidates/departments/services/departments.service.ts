@@ -9,13 +9,10 @@ import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
 import {
-  AssignNewDepartment,
   DepartmentFilterState,
   DepartmentHierarchy,
+  DepartmentPayload,
   DepartmentsPage,
-  EditAssignedDepartment,
-  EditDepartmentPayload,
-  NewDepartmentPayload,
 } from '@client/candidates/departments/departments.model';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { ASSIGN_HOME_COST_CENTER, GRID_CONFIG, WARNING_TITLE } from '@shared/constants';
@@ -29,6 +26,7 @@ export class DepartmentsService {
   private baseUrl = '/api/EmployeeAssignedDepartment';
 
   public employeeWorkCommitmentId: number;
+  public showAllDepartments = false;
 
   public constructor(
     private http: HttpClient,
@@ -50,6 +48,7 @@ export class DepartmentsService {
       pageNumber: GRID_CONFIG.initialPage,
       pageSize: GRID_CONFIG.initialRowsPerPage,
       employeeId: this.candidatesService.employeeId,
+      ...(!this.showAllDepartments && { employeeWorkCommitmentId: this.employeeWorkCommitmentId }),
       ...(filters && filters),
     };
 
@@ -71,10 +70,10 @@ export class DepartmentsService {
   }
 
   public editAssignedDepartments(
-    formData: EditAssignedDepartment,
+    formData: DepartmentPayload,
     departmentIds: number[] | null
-  ): Observable<EditAssignedDepartment> {
-    const payload = DepartmentHelper.editDepartmentPayload(formData, departmentIds, this.employeeWorkCommitmentId);
+  ): Observable<DepartmentPayload> {
+    const payload = DepartmentHelper.editDepartmentPayload(formData, departmentIds, this.candidatesService.employeeId!);
     return this.editDepartmnet(payload).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));
@@ -83,7 +82,7 @@ export class DepartmentsService {
     );
   }
 
-  public assignNewDepartment(formData: AssignNewDepartment): Observable<AssignNewDepartment> {
+  public assignNewDepartment(formData: DepartmentPayload): Observable<DepartmentPayload> {
     const payload = DepartmentHelper.newDepartmentPayload(formData, this.employeeWorkCommitmentId);
     return this.addDepartment(payload).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
@@ -108,26 +107,26 @@ export class DepartmentsService {
       .pipe(switchMap(() => source));
   }
 
-  private editDepartmnet(payload: EditDepartmentPayload): Observable<EditAssignedDepartment> {
-    return this.http.put<EditAssignedDepartment>(`${this.baseUrl}`, payload).pipe(
+  private editDepartmnet(payload: DepartmentPayload): Observable<DepartmentPayload> {
+    return this.http.put<DepartmentPayload>(`${this.baseUrl}`, payload).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         const forceUpdate = errorResponse.error['errors'].ForceUpdate && errorResponse.error.status === 400;
         return forceUpdate
           ? this.handleHomeCostCenter(
-              this.http.put<EditAssignedDepartment>(`${this.baseUrl}`, { ...payload, forceUpdate: true })
+              this.http.put<DepartmentPayload>(`${this.baseUrl}`, { ...payload, forceUpdate: true })
             )
           : throwError(() => errorResponse);
       })
     );
   }
 
-  private addDepartment(payload: NewDepartmentPayload): Observable<AssignNewDepartment> {
-    return this.http.post<AssignNewDepartment>(`${this.baseUrl}`, payload).pipe(
+  private addDepartment(payload: DepartmentPayload): Observable<DepartmentPayload> {
+    return this.http.post<DepartmentPayload>(`${this.baseUrl}`, payload).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         const forceUpdate = errorResponse.error['errors'].ForceUpdate && errorResponse.error.status === 400;
         return forceUpdate
           ? this.handleHomeCostCenter(
-              this.http.post<AssignNewDepartment>(`${this.baseUrl}`, { ...payload, forceUpdate: true })
+              this.http.post<DepartmentPayload>(`${this.baseUrl}`, { ...payload, forceUpdate: true })
             )
           : throwError(() => errorResponse);
       })
