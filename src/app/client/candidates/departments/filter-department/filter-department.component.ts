@@ -99,6 +99,10 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   public deleteFilter(event: FilteredItem): void {
     this.filterService.removeValue(event, this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
+
+    if (event.column === DepartmentFiltersColumnsEnum.ORIENTED) {
+      this.formGroup.get(DepartmentFiltersColumnsEnum.ORIENTED)?.setValue(0);
+    }
   }
 
   private filterDepartments(): void {

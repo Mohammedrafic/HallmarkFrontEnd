@@ -47,7 +47,7 @@ export type DepartmentFiltersColumns = {
   [key in DepartmentFiltersColumnsEnum]: {
     type: ControlTypes;
     valueType: ValueType;
-    dataSource?: DataSourceItem[];
+    dataSource?: DataSourceItem[] | Record<number, string>;
     valueField?: string;
     valueId?: string;
   };

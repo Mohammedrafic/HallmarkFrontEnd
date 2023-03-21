@@ -52,7 +52,7 @@ export class DepartmentFormService {
         {
           type: filterColumn.type,
           valueType: filterColumn.valueType,
-          dataSource: [],
+          dataSource: filterColumn.dataSource,
           valueField: filterColumn.valueField,
           valueId: filterColumn.valueId,
         },
