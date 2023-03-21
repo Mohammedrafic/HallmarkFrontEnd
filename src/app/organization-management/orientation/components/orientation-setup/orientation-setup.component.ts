@@ -10,7 +10,7 @@ import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { debounceTime, filter, Observable, take, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, Observable, take, takeUntil } from 'rxjs';
 import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { Query } from "@syncfusion/ej2-data";
@@ -137,14 +137,21 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   private watchForRegions(): void {
     this.orientationForm?.get('regionIds')?.valueChanges
       .pipe(
-        filter((value: number[]) => !!value?.length),
+        distinctUntilChanged(),
         takeUntil(this.componentDestroy())
       )
       .subscribe((value: number[]) => {
-        const selectedRegions: OrganizationRegion[] = findSelectedItems(value, this.regions);
-        const selectedLocation: OrganizationLocation[] = mapperSelectedItems(selectedRegions, 'locations');
-        this.locations = sortByField(selectedLocation, 'name');
-        this.locationsDataSource = getIRPOrgItems(this.locations);
+        this.orientationForm?.get('departmentIds')?.setValue([]);
+        this.orientationForm?.get('locationIds')?.setValue([]);
+        if (value?.length) {
+          const selectedRegions: OrganizationRegion[] = findSelectedItems(value, this.regions);
+          const selectedLocation: OrganizationLocation[] = mapperSelectedItems(selectedRegions, 'locations');
+          this.locations = sortByField(selectedLocation, 'name');
+          this.locationsDataSource = getIRPOrgItems(this.locations);
+        } else {
+          this.locationsDataSource = [];
+          this.departmentsDataSource = [];
+        }
         this.cd.markForCheck();
       });
   }
@@ -152,13 +159,18 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   private watchForLocation(): void {
     this.orientationForm?.get('locationIds')?.valueChanges
       .pipe(
-        filter((value: number[]) => !!value?.length),
+        distinctUntilChanged(),
         takeUntil(this.componentDestroy())
       )
       .subscribe((value: number[]) => {
-        const selectedLocation: OrganizationLocation[] = findSelectedItems(value, this.locations);
-        const selectedDepartment: OrganizationDepartment[] = mapperSelectedItems(selectedLocation, 'departments');
-        this.departmentsDataSource =  sortByField(getIRPOrgItems(selectedDepartment), 'name');
+        this.orientationForm?.get('departmentIds')?.setValue([]);
+        if (value?.length) {
+          const selectedLocation: OrganizationLocation[] = findSelectedItems(value, this.locations);
+          const selectedDepartment: OrganizationDepartment[] = mapperSelectedItems(selectedLocation, 'departments');
+          this.departmentsDataSource = sortByField(getIRPOrgItems(selectedDepartment), 'name');
+        } else {
+          this.departmentsDataSource = [];
+        }
         this.cd.markForCheck();
       });
   }
@@ -166,11 +178,14 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   private watchForSkillCategory(): void {
     this.orientationForm?.get('skillCategory')?.valueChanges
       .pipe(
-        filter((value: number[]) => !!value?.length),
+        distinctUntilChanged(),
         takeUntil(this.componentDestroy())
       )
       .subscribe((value: number[]) => {
-        this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP, SkillCategoryIds: value } }));
+        this.orientationForm?.get('skillIds')?.setValue([]);
+        if (value?.length) {
+          this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP, SkillCategoryIds: value } }));
+        }
       });
   }
 
