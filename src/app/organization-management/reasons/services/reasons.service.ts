@@ -78,28 +78,47 @@ export class ReasonsService {
       }));
     } else if (params.selectedTab === ReasonsNavigationTabs.Closure) {
       const value = params.formValue as Closurevalue;
-      if((!value.includeInIRP) && (!value.includeInVMS)){
-        this.store.dispatch(new ShowToast(MessageTypes.Error,REASON_WARNING));
-      } else {
+      if(params.isVMSIRP){
+        if((value.includeInIRP == false) && (value.includeInVMS == false)){
+          this.store.dispatch(new ShowToast(MessageTypes.Error, REASON_WARNING));
+        } else {
+          this.store.dispatch(new SaveClosureReasons({
+            id: value.id || undefined,
+            reason: value.reason,
+            includeInVMS: !!value.includeInVMS,
+            includeInIRP: !!value.includeInIRP,
+          }));
+        }
+       } else {
         this.store.dispatch(new SaveClosureReasons({
           id: value.id || undefined,
           reason: value.reason,
-          includeInVMS: value.includeInVMS,
-          includeInIRP: value.includeInIRP
+          includeInVMS: !!value.includeInVMS,
+          includeInIRP: !!value.includeInIRP,
         }));
-      }
+        }
     } else if(params.selectedTab === ReasonsNavigationTabs.Requisition){
       const value = params.formValue as Closurevalue;
-      if((!value.includeInIRP) && (!value.includeInVMS)){
-        this.store.dispatch(new ShowToast(MessageTypes.Error,REASON_WARNING));
+      if(params.isVMSIRP){
+        if((value.includeInIRP == false) && (value.includeInVMS == false)){
+          this.store.dispatch(new ShowToast(MessageTypes.Error, REASON_WARNING));
+        } else {
+          this.store.dispatch(new SaveOrderRequisition({
+            id: value.id || undefined,
+            reason: value.reason,
+            includeInVMS: !!value.includeInVMS,
+            includeInIRP: !!value.includeInIRP,
+          }));
+        }
       } else {
         this.store.dispatch(new SaveOrderRequisition({
           id: value.id || undefined,
           reason: value.reason,
-          includeInVMS: value.includeInVMS,
-          includeInIRP: value.includeInIRP
+          includeInVMS: !!value.includeInVMS,
+          includeInIRP: !!value.includeInIRP,
         }));
       }
+        
     } else if(params.selectedTab === ReasonsNavigationTabs.CategoryNote){
       const value = params.formValue as CategoryNoteValue;
       if(value.id != undefined || null){

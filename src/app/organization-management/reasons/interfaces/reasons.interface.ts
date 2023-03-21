@@ -41,6 +41,7 @@ export interface SaveReasonParams {
   allRegionsSelected?: boolean;
   allLocationsSelected?: boolean;
   forceUpsert?: boolean;
+  isVMSIRP?: boolean;
 }
 
 export interface ReasonFormConfig {
@@ -63,4 +64,8 @@ export interface ReasonFormConfigMap {
   [ReasonFormType.RequisitionReason] : ReasonFormConfig[];
   [ReasonFormType.ClosureReason] : ReasonFormConfig[];
   [ReasonFormType.CategoryNoteReason] : ReasonFormConfig[];
+  [ReasonFormType.InternalTransferReason] : ReasonFormConfig[];
+  [ReasonFormType.ManualInvoiceReason] : ReasonFormConfig[];
+  [ReasonFormType.TerminatedReason] : ReasonFormConfig[];
+
 }

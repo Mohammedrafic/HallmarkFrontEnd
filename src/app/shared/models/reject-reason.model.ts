@@ -12,6 +12,7 @@ export type RejectReasonwithSystem = {
   businessUnitId?: number;
   includeInVMS?: boolean;
   includeInIRP?: boolean;
+  isVMSIRP?:boolean;
 }
 
 export type RejectReasonWithRedflag = {

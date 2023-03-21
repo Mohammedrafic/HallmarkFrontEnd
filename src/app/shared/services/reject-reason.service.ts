@@ -8,7 +8,7 @@ import { UnavailabilityValue } from '@organization-management/reasons/interfaces
 import { PageOfCollections } from '@shared/models/page.model';
 import { Penalty, PenaltyPage, PenaltyPayload } from '@shared/models/penalty.model';
 import {
-  RejectReason, RejectReasonPage, UnavailabilityPaging, UnavailabilityReasons,
+  RejectReason, RejectReasonPage, RejectReasonwithSystem, UnavailabilityPaging, UnavailabilityReasons,
 } from '@shared/models/reject-reason.model';
 
 /**
@@ -162,7 +162,7 @@ export class RejectReasonService {
    * Save order requisition
    * @param payload
    */
-  public saveOrderRequisitions(payload: RejectReason): Observable<RejectReason> {
+  public saveOrderRequisitions(payload: RejectReasonwithSystem): Observable<RejectReasonwithSystem> {
     payload.id = payload.id || 0;
     if (payload.id) {
       return this.http.put<RejectReason>('/api/OrderRequisition', payload);
