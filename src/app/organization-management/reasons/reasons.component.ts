@@ -86,7 +86,6 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
     super(store);
     const cancellationReasons = Object.entries(CancellationReasonsMap).map(([key, value]) => ({ id: +key, name: value}));
     this.cancellationReasons = sortByField(cancellationReasons, 'name');
-    this.getOrganizagionData();
     if(this.selectedSystem.isIRP == true && this.selectedSystem.isVMS == false){
       this.selectedTab = ReasonsNavigationTabs.Requisition;
       this.formType = ReasonFormType.RequisitionReason;
@@ -105,6 +104,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
     super.ngOnInit();
     this.subscribeOnSaveReasonSuccess();
     this.canRejectOrClosureReason();
+    this.getOrganizagionData();
   }
 
   selectTab(selectedTab: SelectEventArgs): void {
@@ -145,6 +145,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   saveReason(forceUpsert?: boolean): void {
     if (this.reasonForm.invalid) {
       this.reasonForm.markAllAsTouched();
+      this.reasonForm.markAsDirty();
       this.reasonForm.updateValueAndValidity();
       return;
     }
@@ -157,6 +158,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       allRegionsSelected: this.isAllRegionsSelected,
       allLocationsSelected: this.isAllLocationsSelected,
       forceUpsert: forceUpsert,
+      isVMSIRP: this.showSystem
     });
   }
 
@@ -200,7 +202,6 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         visibleForIRPCandidates: !!reason.visibleForIRPCandidates,
       });
     } else if((this.selectedTab === ReasonsNavigationTabs.Requisition )) {
-
       const reason  = data as Closurevalue;
       this.reasonForm.patchValue({
         id: reason.id,

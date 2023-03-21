@@ -16,5 +16,8 @@ export enum ReasonFormType {
   Unavailability = 'unavailability',
   RequisitionReason = "RequisitionReason",
   ClosureReason = "ClosureReason",
-  CategoryNoteReason = "CategoryNoteReason"
+  CategoryNoteReason = "CategoryNoteReason",
+  ManualInvoiceReason = "ManualInvoiceReason",
+  TerminatedReason = "TerminatedReason",
+  InternalTransferReason = "InternalTransferReason"
 }

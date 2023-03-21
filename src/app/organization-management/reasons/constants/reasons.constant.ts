@@ -67,10 +67,10 @@ export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
   1: ReasonFormType.PenaltyReason,
   2: ReasonFormType.RequisitionReason,
   3: ReasonFormType.ClosureReason,
-  4: ReasonFormType.DefaultReason,
+  4: ReasonFormType.ManualInvoiceReason,
   5: ReasonFormType.Unavailability,
-  6: ReasonFormType.DefaultReason,
-  7: ReasonFormType.DefaultReason,
+  6: ReasonFormType.TerminatedReason,
+  7: ReasonFormType.InternalTransferReason,
   8: ReasonFormType.CategoryNoteReason
 };
 
@@ -207,5 +207,8 @@ export const ReasonDialogConfig: ReasonFormConfigMap = {
   [ReasonFormType.PenaltyReason]: null,
   [ReasonFormType.RequisitionReason]: requisitionDialogConfig,
   [ReasonFormType.ClosureReason]: closureDialogConfig,
-  [ReasonFormType.CategoryNoteReason]: categoryNoteDialogConfig
+  [ReasonFormType.CategoryNoteReason]: categoryNoteDialogConfig,
+  [ReasonFormType.ManualInvoiceReason] : defaultDialogConfig,
+  [ReasonFormType.TerminatedReason] : defaultDialogConfig,
+  [ReasonFormType.InternalTransferReason] : defaultDialogConfig
 };
