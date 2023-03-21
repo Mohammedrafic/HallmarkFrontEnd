@@ -18,10 +18,10 @@ export interface DepartmentAssigned {
   skillType: number;
   skills: Skill[];
   isOriented: boolean;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   isHomeCostCenter: boolean;
-  orientationDate: Date | null;
+  orientationDate: string | null;
   extDepartmentId: string;
 }
 
