@@ -1,6 +1,6 @@
 import { UnavailabilityValue } from '@organization-management/reasons/interfaces';
 import { PenaltyPayload } from "@shared/models/penalty.model";
-import { RejectReason } from "@shared/models/reject-reason.model";
+import { RejectReason, RejectReasonWithRedflag, RejectReasonwithSystem } from "@shared/models/reject-reason.model";
 
 export class GetRejectReasonsByPage {
   static readonly type = '[reject reason] Get Reject reason by Page';
@@ -51,7 +51,7 @@ export class GetClosureReasonsByPage {
 
 export class SaveClosureReasons {
   static readonly type = '[reject reason] Save Closure Reason';
-  constructor(public payload: RejectReason){}
+  constructor(public payload: RejectReasonwithSystem){}
 }
 
 export class SaveClosureReasonsError {
@@ -104,13 +104,18 @@ export class RemoveOrderRequisition {
 
 export class GetOrderRequisitionByPage {
   static readonly type = '[reject reason] Get Order Requisition by Page';
-  constructor(public pageNumber?: number,
-    public pageSize?: number, public orderBy?: string, public lastSelectedBusinessUnitId?: number) { }
+  constructor(
+    public pageNumber?: number,
+    public pageSize?: number,
+    public orderBy?: string,
+    public lastSelectedBusinessUnitId?: number,
+    public excludeOpenPositionReason = false,
+  ) { }
 }
 
 export class SaveOrderRequisition {
   static readonly type = '[reject reason] Save Order Requisition';
-  constructor(public payload: RejectReason){}
+  constructor(public payload: RejectReasonwithSystem){}
 }
 
 export class SaveOrderRequisitionError {
@@ -186,9 +191,60 @@ export class RemoveInternalTransferReasons {
 export class UpdateInternalTransferReasons {
   static readonly type = '[reject reason] Update InternalTransfer Reason';
   constructor(public payload: RejectReason) {
-  } 
+  }
 }
 
 export class UpdateInternalTransferReasonsSuccess {
   static readonly type = '[reject reason] Update Internal Transfer Reason Success';
+}
+
+
+export class GetTerminationReasons {
+  static readonly type = '[reject reason] Get Termination reason by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class SaveTerminationReasons {
+  static readonly type = '[reject reason] Save Termination Reason';
+  constructor(public payload: RejectReason){}
+}
+
+export class RemoveTerminationReasons {
+  static readonly type = '[reject reason] Remove Termination Reason';
+  constructor(public id: number){}
+}
+
+export class UpdateTerminationReasons {
+  static readonly type = '[reject reason] Update Termination Reason';
+  constructor(public payload: RejectReason) {
+  } 
+}
+
+export class UpdateTerminationReasonsSuccess {
+  static readonly type = '[reject reason] Update Termination Reason Success';
+}
+
+export class GetCategoryNoteReasons {
+  static readonly type = '[reject reason] Get CategoryNote reason by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class SaveCategoryNoteReasons {
+  static readonly type = '[reject reason] Save CategoryNote Reason';
+  constructor(public payload: RejectReasonWithRedflag){}
+}
+
+export class RemoveCategoryNoteReasons {
+  static readonly type = '[reject reason] Remove CategoryNote Reason';
+  constructor(public id: number){}
+}
+
+export class UpdateCategoryNoteReasons {
+  static readonly type = '[reject reason] Update CategoryNote Reason';
+  constructor(public payload: RejectReasonWithRedflag) {
+  } 
+}
+
+export class UpdateCategoryNoteReasonsSuccess {
+  static readonly type = '[reject reason] Update CategoryNote Reason Success';
 }

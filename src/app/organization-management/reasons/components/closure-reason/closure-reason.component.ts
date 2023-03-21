@@ -1,10 +1,10 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { ofActionSuccessful, Select } from '@ngxs/store';
+import { ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { Observable, takeWhile } from 'rxjs';
 
 import { UserPermissions } from '@core/enums';
-import { Permission } from '@core/interface';
+import { OrginazationModuleSettings, Permission } from '@core/interface';
 import { ReasonsComponent } from '@organization-management/reasons/models/reasons-component.class';
 import {
   GetClosureReasonsByPage,
@@ -26,6 +26,7 @@ export class ClosureReasonComponent extends ReasonsComponent implements OnInit,O
   @Select(RejectReasonState.closureReasonsPage)
   public reasons$: Observable<RejectReasonPage>;
   public readonly userPermissions = UserPermissions;
+  @Input() showSystem: boolean;
 
   protected getData(): void {
     this.store.dispatch(new GetClosureReasonsByPage(this.currentPage, this.pageSize, this.orderBy));

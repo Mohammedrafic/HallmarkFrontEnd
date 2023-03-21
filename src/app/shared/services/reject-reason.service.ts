@@ -65,7 +65,7 @@ export class RejectReasonService {
   public removeClosureReason(id: number): Observable<void> {
     return this.http.delete<void>(`/api/orderclosurereasons`, { params : { ReasonId: id }});
   }
-  
+
   /**
    * Get closure reasons by page number
    * @param pageNumber
@@ -117,12 +117,19 @@ export class RejectReasonService {
     return this.http.put<void>('/api/ManualInvoiceReasons', payload);
   }
 
-  private getCloseReasonsParams(pageNumber?: number, pageSize?: number, orderBy?: string, getAll?: boolean): HttpParams {
+  private getCloseReasonsParams(
+    pageNumber?: number,
+    pageSize?: number,
+    orderBy?: string,
+    getAll?: boolean,
+    excludeOpenPositionReason?: boolean,
+  ): HttpParams {
     let params = {};
     if (pageNumber) params = {...params, pageNumber};
     if (pageSize) params = {...params, pageSize};
     if (orderBy) params = {...params, orderBy};
     if (getAll) params = {...params, getAll};
+    if (excludeOpenPositionReason) params = {...params, excludeOpenPositionReason};
 
     return <HttpParams>params;
   }
@@ -134,24 +141,21 @@ export class RejectReasonService {
   public removeOrderRequisition(id: number): Observable<void> {
     return this.http.delete<void>(`/api/OrderRequisition/${id}`);
   }
-  
-  /**
-   * Get order requisitions by page number
-   * @param pageNumber
-   * @param pageSize
-   * @param orderBy
-   */
-  public getOrderRequisitionsByPage(pageNumber?: number, pageSize?: number, orderBy?: string,
-    lastSelectedBusinessUnitId?: number): Observable<RejectReasonPage> {
-    const params = this.getCloseReasonsParams(pageNumber, pageSize, orderBy);
+
+  public getOrderRequisitionsByPage(
+    pageNumber?: number,
+    pageSize?: number,
+    orderBy?: string,
+    lastSelectedBusinessUnitId?: number,
+    excludeOpenPositionReason?: boolean,
+  ): Observable<RejectReasonPage> {
+    const params = this.getCloseReasonsParams(pageNumber, pageSize, orderBy, false, excludeOpenPositionReason);
     let headers = {};
     if (lastSelectedBusinessUnitId) {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
     }
 
-    return this.http.post<RejectReasonPage>(`/api/OrderRequisition/all`,
-      { params }, { headers }
-    );
+    return this.http.post<RejectReasonPage>(`/api/OrderRequisition/all`, params , { headers });
   }
 
   /**
@@ -221,5 +225,38 @@ export class RejectReasonService {
   public updateInternalTransferReason(payload: RejectReason): Observable<void> {
     return this.http.put<void>('/api/InternalTransferRecruitmentReasons', payload);
   }
+
+  public getTerminationReason(pageNumber: number, pageSize: number): Observable<RejectReasonPage> {
+    return this.http.get<RejectReasonPage>(`/api/TerminatedReason?PageNumber=${pageNumber}&PageSize=${pageSize}`);
+  }
+
+  public saveTerminationReason(payload: {reason: string}): Observable<RejectReason> {
+    return this.http.post<RejectReason>('/api/TerminatedReason', payload);
+  }
+
+  public removeTerminationReason(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/TerminatedReason?reasonId=${id}`);
+  }
+
+  public updateTerminationReason(payload: RejectReason): Observable<void> {
+    return this.http.put<void>('/api/TerminatedReason', payload);
+  }
+
+  public getCategoryNoteReason(pageNumber: number, pageSize: number): Observable<RejectReasonPage> {
+    return this.http.get<RejectReasonPage>(`/api/CategoryReason?PageNumber=${pageNumber}&PageSize=${pageSize}`);
+  }
+
+  public saveCategoryNoteReason(payload: {reason: string}): Observable<RejectReason> {
+    return this.http.post<RejectReason>('/api/CategoryReason', payload);
+  }
+
+  public removeCategoryNoteReason(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/CategoryReason?reasonId=${id}`);
+  }
+
+  public updateCategoryNoteReason(payload: RejectReason): Observable<void> {
+    return this.http.put<void>('/api/CategoryReason', payload);
+  }
+
 
 }

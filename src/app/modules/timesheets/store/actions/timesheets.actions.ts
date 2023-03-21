@@ -6,8 +6,10 @@ import { DataSourceItem, FileForUpload } from '@core/interface';
 import { RecordFields, TIMESHEETS_ACTIONS, TimesheetsTableFiltersColumns } from '../../enums';
 import { Attachment, Timesheet, TimesheetAttachments, TimesheetsFilterState } from '../../interface';
 import { RowNode } from '@ag-grid-community/core';
+import { ExportPayload } from '@shared/models/export.model';
 
 export namespace Timesheets {
+  
   export class GetAll {
     static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEETS;
   }
@@ -188,6 +190,14 @@ export namespace Timesheets {
     static readonly type = TIMESHEETS_ACTIONS.BULK_APPROVE;
 
     constructor(public readonly selectedTimesheets: RowNode[]) {
+    }
+  }
+  export class ExportTimesheets {
+    static readonly type = TIMESHEETS_ACTIONS.EXPORT_TIMESHEETS;
+
+    constructor(
+      public readonly payload: ExportPayload
+    ) {
     }
   }
 }

@@ -26,6 +26,7 @@ export class DepartmentsService {
   private baseUrl = '/api/EmployeeAssignedDepartment';
 
   public employeeWorkCommitmentId: number;
+  public showAllDepartments = false;
 
   public constructor(
     private http: HttpClient,
@@ -47,6 +48,7 @@ export class DepartmentsService {
       pageNumber: GRID_CONFIG.initialPage,
       pageSize: GRID_CONFIG.initialRowsPerPage,
       employeeId: this.candidatesService.employeeId,
+      ...(!this.showAllDepartments && { employeeWorkCommitmentId: this.employeeWorkCommitmentId }),
       ...(filters && filters),
     };
 
@@ -59,7 +61,11 @@ export class DepartmentsService {
   }
 
   public deleteAssignedDepartments(departmentIds: number[] | null): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/delete`, { ids: departmentIds }).pipe(
+    const params = {
+      ids: departmentIds,
+      employeeWorkCommitmentId: this.showAllDepartments ? null : this.employeeWorkCommitmentId
+    }
+    return this.http.post<void>(`${this.baseUrl}/delete`, params).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));
         return EMPTY;
@@ -71,7 +77,7 @@ export class DepartmentsService {
     formData: DepartmentPayload,
     departmentIds: number[] | null
   ): Observable<DepartmentPayload> {
-    const payload = DepartmentHelper.editDepartmentPayload(formData, departmentIds, this.employeeWorkCommitmentId);
+    const payload = DepartmentHelper.editDepartmentPayload(formData, departmentIds, this.candidatesService.employeeId!);
     return this.editDepartmnet(payload).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));

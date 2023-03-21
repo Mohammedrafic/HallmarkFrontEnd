@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
-import { isObjectsEqual } from '@core/helpers';
+import { DateTimeHelper, isObjectsEqual } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 import { FilterColumnConfig } from '../constants/department-filter.constant';
 import { AssignDepartmentFormState, DepartmentAssigned, DepartmentFiltersColumns, EditDepartmentFormState } from '../departments.model';
@@ -90,11 +90,11 @@ export class DepartmentFormService {
       regionId: regionId,
       locationId: locationId,
       departmentId: departmentId,
-      startDate: startDate,
-      endDate: endDate,
+      startDate: DateTimeHelper.convertDateToUtc(startDate),
+      endDate: endDate && DateTimeHelper.convertDateToUtc(endDate),
       isOriented: isOriented,
       isHomeCostCenter: isHomeCostCenter,
-      orientationDate: orientationDate
+      orientationDate: orientationDate && DateTimeHelper.convertDateToUtc(orientationDate)
     })
   }
 

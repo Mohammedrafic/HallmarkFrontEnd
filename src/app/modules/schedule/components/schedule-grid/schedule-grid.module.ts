@@ -10,6 +10,7 @@ import { DateWeekService } from '@core/services';
 import { DateWeekPickerModule } from '@shared/components/date-week-picker';
 import { SharedModule } from '@shared/shared.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { DoubleClickModule } from '@shared/directives/double-click/double-click.module';
 
 import { CalendarDateSlotModule } from '../../pipes/calendar-date-slot/calendar-date-slot.module';
 import { CandidateCardModule } from '../candidate-card/candidate-card.module';
@@ -39,6 +40,7 @@ const icons = {
     CalendarTooltipSlotModule,
     PeriodPickerModule,
     TooltipContainerModule,
+    DoubleClickModule,
   ],
   exports: [ScheduleGridComponent],
   providers: [DateWeekService],

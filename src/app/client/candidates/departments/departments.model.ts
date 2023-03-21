@@ -18,10 +18,10 @@ export interface DepartmentAssigned {
   skillType: number;
   skills: Skill[];
   isOriented: boolean;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   isHomeCostCenter: boolean;
-  orientationDate: Date | null;
+  orientationDate: string | null;
   extDepartmentId: string;
 }
 
@@ -69,6 +69,7 @@ export interface DepartmentFilterState {
   departmentsIds: number[];
   skillIds: number[];
   oriented: boolean;
+  employeeWorkCommitmentId: number;
 }
 export interface EditDepartmentFormState {
   [EditDepartmentFields.START_DATE]: Date;
@@ -91,7 +92,7 @@ export interface AssignDepartmentHierarchy {
 
 export interface DepartmentPayload {
   forceUpdate: boolean;
-  employeeWorkCommitmentId: number;
+  employeeWorkCommitmentId?: number;
   isOriented: boolean;
   startDate: string;
   endDate?: string;
@@ -99,6 +100,13 @@ export interface DepartmentPayload {
   orientationDate?: string;
   ids?: number[] | null;
   departmentId?: number;
+  employeeId?: number;
+}
+
+export interface DepartmentConditions {
+  showAllDepartments: boolean;
+  disableBulkButton: boolean;
+  noActiveWC: boolean;
 }
 
 export interface DateRanges {

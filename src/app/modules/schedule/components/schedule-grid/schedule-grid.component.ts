@@ -5,7 +5,6 @@ import {
   ElementRef,
   EventEmitter,
   Input,
-  NgZone,
   OnChanges,
   OnInit,
   Output,
@@ -14,7 +13,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import Timeout = NodeJS.Timeout;
 
 import { Select, Store } from '@ngxs/store';
 import { AutoCompleteComponent } from '@syncfusion/ej2-angular-dropdowns/src/auto-complete/autocomplete.component';
@@ -27,7 +25,6 @@ import { filter } from 'rxjs/operators';
 import { DatesRangeType } from '@shared/enums';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
-import { OutsideZone } from '@core/decorators';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { ScheduleApiService } from '../../services';
@@ -83,11 +80,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   candidateNameFields: FieldSettingsModel = { text: 'fullName' };
 
-  preventCellSingleClick = false;
-
   isEmployee = false;
-
-  private cellClickTimer: Timeout;
 
   private itemsPerPage = 30;
 
@@ -98,7 +91,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     private weekService: DateWeekService,
     private scheduleApiService: ScheduleApiService,
     private cdr: ChangeDetectorRef,
-    private readonly ngZone: NgZone,
   ) {
     super();
   }
@@ -130,24 +122,15 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     }
   }
 
-  @OutsideZone
   handleCellSingleClick(date: string, candidate: ScheduleInt.ScheduleCandidate, cellDate?: ScheduleDateItem): void {
-    // TODO: refactor, move to directive
     if(!cellDate?.isDisabled) {
-      this.preventCellSingleClick = false;
-      this.cellClickTimer = setTimeout(() => {
-        if (!this.preventCellSingleClick) {
-          this.selectDateSlot(date, candidate);
-          this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot, cellDate));
-        }
-      }, 250);
+      this.selectDateSlot(date, candidate);
+      this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot, cellDate));
     }
   }
 
   handleCellDblClick(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
     if(this.getSelectionAvailable()) {
-      this.preventCellSingleClick = true;
-      clearTimeout(this.cellClickTimer);
       this.selectedCandidatesSlot.clear();
       this.selectDateSlot(date, candidate);
       this.scheduleCell.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
@@ -163,8 +146,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     if(!cellDate?.isDisabled) {
       const dateStringLength = 10;
       const formattedDateSting = schedule.date.substring(0, dateStringLength);
-      this.preventCellSingleClick = true;
-      clearTimeout(this.cellClickTimer);
+
       this.selectedCandidatesSlot.clear();
       this.selectDateSlot(formattedDateSting, candidate);
       this.editCell.emit({ candidate, schedule });
@@ -195,6 +177,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   autoSelectCandidate(candidate: ScheduleInt.ScheduleCandidate | null): void {
     this.selectCandidate.emit(candidate);
+  }
+
+  clearSelectedCandidatesSlot(): void {
+    this.selectedCandidatesSlot.clear();
+    this.cdr.markForCheck();
   }
 
   private startOrgIdWatching(): void {

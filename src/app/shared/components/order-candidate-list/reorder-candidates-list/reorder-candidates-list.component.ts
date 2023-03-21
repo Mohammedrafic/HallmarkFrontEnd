@@ -23,6 +23,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
+import { OrderStatus } from '@shared/enums/order-management';
 
 enum ReorderCandidateStatuses {
   BillRatePending = 44,
@@ -49,6 +50,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   public candidateJob: OrderCandidateJob;
   public agencyActionsAllowed: boolean;
   public isFeatureIrpEnabled = false;
+  public readonly orderStatus = OrderStatus;
   public isCandidatePayRateVisible: boolean;
   public readonly cancelledStatusName = ReorderCandidateStatuses[ReorderCandidateStatuses.Cancelled];
   public readonly systemType = OrderManagementIRPSystemId;

@@ -520,6 +520,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
+
   public getalerttitle(): void {
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
 	  this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
@@ -627,7 +628,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.clearSelection(this.gridWithChildRow);
   }
 
-
   public onAddReorderClose(): void {
     if (
       this.activeTab === OrganizationOrderManagementTabs.AllOrders ||
@@ -669,10 +669,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
     this.filters.pageSize = this.pageSize;
     this.isIncomplete = false;
-
+    
     if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      this.filters = {}; // TODO remove and implement IRP filters
-
       this.filters.orderBy = this.orderBy;
       this.filters.pageNumber = this.currentPage;
       this.filters.pageSize = this.pageSize;
@@ -734,12 +732,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public showFilters(): void {
-    if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      // TODO new filters for IRP system
-    } else {
-      this.store.dispatch(new ShowFilterDialog(true));
-      setTimeout(() => { this.orderStatusFilter?.refresh(); this.cd$.next(true); }, 300);
-    }
+    //if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
+    // TODO new filters for IRP system
+    this.store.dispatch(new ShowFilterDialog(true));
+    setTimeout(() => { this.orderStatusFilter?.refresh(); this.cd$.next(true); }, 300);
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -784,8 +780,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       poNumberIds: this.filters.poNumberIds || null,
       contactEmails: Array.isArray(this.filters.contactEmails) ? this.filters.contactEmails[0] : this.filters.contactEmails || null,
       orderId: this.filters.orderId || null,
+      irpOnly: this.filters.irpOnly || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+  }
+
+  private resetTabs(): void {
+    this.activeIRPTabIndex = OrderManagementIRPTabsIndex.AllOrders;
+    this.activeTab = OrganizationOrderManagementTabs.AllOrders;
   }
 
   private clearFilters(): void {
@@ -1176,11 +1178,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.cd$.next(true);
   }
 
-  buttonGroupChange(selectedBtn: ButtonModel) {
+  changeSystem(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
 
-
+    this.resetTabs();
     this.clearFilters();
     this.initMenuItems();
     this.initGridColumns();
@@ -1391,9 +1393,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
         this.clearFilters();
       }
+
       if (!this.previousSelectedOrderId) {
         this.pageSubject.next(1);
       }
+
       this.store.dispatch(new GetAssignedSkillsByOrganization());
 
       this.orderManagementService.setPreviousOrganizationId(id);
@@ -1552,6 +1556,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         valueField: 'poNumber',
         valueId: 'id',
       },
+      irpOnly: {
+        type: ControlTypes.Checkbox,
+        valueType: ValueType.Text,
+        checkBoxTitle: 'IRP Only',
+      }
     };
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe(() => {
       this.onFilterApply();
@@ -2106,8 +2115,23 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.isOrgVMSEnabled = !!isVMCEnabled;
 
       this.setPreviousSelectedSystem();
-      this.activeSystem = this.previousSelectedSystemId
-        ?? DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
+      }
+
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && this.isOrgVMSEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
+      }
+
+      if (!this.previousSelectedSystemId) {
+        this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+      }
+
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem);
       this.initMenuItems();
       this.initGridColumns();

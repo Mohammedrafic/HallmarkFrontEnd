@@ -5,11 +5,16 @@ export enum ReasonsNavigationTabs {
   Closure,
   ManualInvoice,
   Unavailability,
-  InternalTransfer
+  Termination,
+  InternalTransfer,
+  CategoryNote
 }
 
 export enum ReasonFormType {
   DefaultReason = 'defaultReason',
   PenaltyReason = 'penaltyReason',
   Unavailability = 'unavailability',
+  RequisitionReason = "RequisitionReason",
+  ClosureReason = "ClosureReason",
+  CategoryNoteReason = "CategoryNoteReason"
 }

@@ -62,6 +62,6 @@ export class BaseFormControlDirective
   }
 
   private setDisableState(isDisabled: boolean): void {
-    this.getControl()[isDisabled ? 'disable' : 'enable']();
+    this.getControl()?.[isDisabled ? 'disable' : 'enable']();
   }
 }

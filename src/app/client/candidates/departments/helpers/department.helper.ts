@@ -5,17 +5,19 @@ export class DepartmentHelper {
   static editDepartmentPayload(
     formData: DepartmentPayload,
     departmentIds: number[] | null,
-    employeeWorkCommitmentId: number
+    employeeId: number
   ): DepartmentPayload {
     return {
-      ...createDepartmentPayload(formData, employeeWorkCommitmentId),
+      ...createDepartmentPayload(formData),
       ids: departmentIds,
+      employeeId: employeeId,
     };
   }
 
   static newDepartmentPayload(formData: DepartmentPayload, employeeWorkCommitmentId: number): DepartmentPayload {
     return {
-      ...createDepartmentPayload(formData, employeeWorkCommitmentId),
+      ...createDepartmentPayload(formData),
+      employeeWorkCommitmentId: employeeWorkCommitmentId,
     };
   }
 
@@ -24,11 +26,10 @@ export class DepartmentHelper {
   }
 }
 
-function createDepartmentPayload(formData: DepartmentPayload, employeeWorkCommitmentId: number): DepartmentPayload {
+function createDepartmentPayload(formData: DepartmentPayload): DepartmentPayload {
   const { departmentId, startDate, endDate, isOriented, isHomeCostCenter, orientationDate } = formData;
   return {
     forceUpdate: false,
-    employeeWorkCommitmentId: employeeWorkCommitmentId,
     isOriented: !!isOriented,
     startDate: startDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(startDate)),
     endDate: endDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(endDate)),
