@@ -60,6 +60,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
 
   public resetEditDepartmentForm(): void {
     this.formGroup.reset();
+    this.resetOrientationDateControl(false);
     this.initFormConfig(false);
     this.cdr.markForCheck();
   }
@@ -72,15 +73,13 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
 
   private initFormConfig(isOriented: boolean): void {
     this.filtersFormConfig = EditDepartmentsFormConfig(isOriented);
-    this.cdr.markForCheck();
   }
 
   public toggleHandler(event: boolean, field: EditDepartmentFields): void {
     if (field === EditDepartmentFields.IS_ORIENTED) {
       this.initFormConfig(event);
       this.formGroup.markAsDirty();
-      const orientationDateControl = this.formGroup.get(EditDepartmentFields.ORIENTATION_DATE);
-      this.departmentFormService.addRemoveValidator(orientationDateControl, event);
+      this.resetOrientationDateControl(event);
     }
   }
 
@@ -116,5 +115,10 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
       okButtonLabel: 'Yes',
       okButtonClass: 'ok-button',
     });
+  }
+
+  private resetOrientationDateControl(isOriented: boolean): void {
+    const orientationDateControl = this.formGroup.get(EditDepartmentFields.ORIENTATION_DATE);
+    this.departmentFormService.addRemoveValidator(orientationDateControl, isOriented);
   }
 }

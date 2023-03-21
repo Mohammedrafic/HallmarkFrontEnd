@@ -33,7 +33,7 @@ import {
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
   formatDate,
-  NO_ACTIVE_WORK_COMMITMETS,
+  NO_ACTIVE,
   RECORD_DELETE,
 } from '@shared/constants';
 import { columnDef } from '@client/candidates/departments/grid/column-def.constant';
@@ -82,7 +82,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public departmentHierarchy: OrganizationRegion[] = [];
   public filtersAmount: number = 0;
   public assignDepTooltipMsg = ALL_DEPARTMENTS_SELECTED;
-  public toggleTooltipMsg = NO_ACTIVE_WORK_COMMITMETS;
+  public toggleTooltipMsg = NO_ACTIVE;
   public conditions: DepartmentConditions = {
     showAllDepartments: false,
     noActiveWC: false,
@@ -137,6 +137,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
         .pipe(filter(Boolean), take(1))
         .subscribe(() => {
           this.assignDepartment?.assignDepartmentForm.reset();
+          this.editDepartments?.formGroup.reset();
           this.showSideDialog(false);
         });
     } else {
