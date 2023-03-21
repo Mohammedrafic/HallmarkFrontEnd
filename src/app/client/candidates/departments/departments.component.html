@@ -13,14 +13,14 @@
   <app-tooltip-container
     action-button
     position="TopCenter"
-    [showToolTip]="conditions.disableAllToggle"
+    [showToolTip]="conditions.noActiveWC"
     [message]="toggleTooltipMsg"
   >
     <app-toggle
       action-button
       label="All"
       [value]="conditions.showAllDepartments"
-      [disabled]="conditions.disableAllToggle"
+      [disabled]="conditions.noActiveWC"
       (checked)="showHideActiveDepartments($event)"
     ></app-toggle>
   </app-tooltip-container>

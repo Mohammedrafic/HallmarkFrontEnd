@@ -84,7 +84,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public toggleTooltipMsg = NO_ACTIVE_WORK_COMMITMETS;
   public conditions: DepartmentConditions = {
     showAllDepartments: false,
-    disableAllToggle: false,
+    noActiveWC: false,
     disableBulkButton: false,
   };
 
@@ -205,7 +205,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
         switchMap(() => this.candidatesService.getEmployeeWorkCommitments()),
         switchMap((commitment) => {
           this.conditions.showAllDepartments = !(commitment && commitment.id);
-          this.conditions.disableAllToggle = this.conditions.showAllDepartments;
+          this.conditions.noActiveWC = this.conditions.showAllDepartments;
           this.departmentsService.showAllDepartments = this.conditions.showAllDepartments;
           return this.departmentsService.getDepartmentsAssigned();
         }),

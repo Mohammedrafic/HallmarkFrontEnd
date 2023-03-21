@@ -105,8 +105,8 @@ export interface DepartmentPayload {
 
 export interface DepartmentConditions {
   showAllDepartments: boolean;
-  disableAllToggle: boolean;
   disableBulkButton: boolean;
+  noActiveWC: boolean;
 }
 
 export interface DateRanges {
