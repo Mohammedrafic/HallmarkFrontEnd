@@ -671,8 +671,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.isIncomplete = false;
     
     if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      this.filters = {}; // TODO remove and implement IRP filters
-
       this.filters.orderBy = this.orderBy;
       this.filters.pageNumber = this.currentPage;
       this.filters.pageSize = this.pageSize;
@@ -734,12 +732,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public showFilters(): void {
-    if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      // TODO new filters for IRP system
-    } else {
-      this.store.dispatch(new ShowFilterDialog(true));
-      setTimeout(() => { this.orderStatusFilter?.refresh(); this.cd$.next(true); }, 300);
-    }
+    //if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
+    // TODO new filters for IRP system
+    this.store.dispatch(new ShowFilterDialog(true));
+    setTimeout(() => { this.orderStatusFilter?.refresh(); this.cd$.next(true); }, 300);
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -784,8 +780,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       poNumberIds: this.filters.poNumberIds || null,
       contactEmails: Array.isArray(this.filters.contactEmails) ? this.filters.contactEmails[0] : this.filters.contactEmails || null,
       orderId: this.filters.orderId || null,
+      irpOnly: this.filters.irpOnly || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+  }
+
+  private resetTabs(): void {
+    this.activeIRPTabIndex = OrderManagementIRPTabsIndex.AllOrders;
+    this.activeTab = OrganizationOrderManagementTabs.AllOrders;
   }
 
   private clearFilters(): void {
@@ -1180,6 +1182,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.activeSystem = selectedBtn.id;
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
 
+    this.resetTabs();
     this.clearFilters();
     this.initMenuItems();
     this.initGridColumns();
@@ -1553,6 +1556,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         valueField: 'poNumber',
         valueId: 'id',
       },
+      irpOnly: {
+        type: ControlTypes.Checkbox,
+        valueType: ValueType.Text,
+        checkBoxTitle: 'IRP Only',
+      }
     };
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe(() => {
       this.onFilterApply();
