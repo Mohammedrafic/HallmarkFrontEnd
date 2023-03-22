@@ -43,7 +43,7 @@ import {
 } from '@shared/constants';
 import { OrderCredentialsService } from "@client/order-management/services";
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
-import { DateTimeHelper, GenerateLocationDepartmentOverlapMessage } from '@core/helpers';
+import { DateTimeHelper, GenerateLocationDepartmentOverlapMessage, IsStartEndDateOverlapWithInactivePeriod } from '@core/helpers';
 import { formatDate } from '@angular/common';
 import { FieldName } from '@client/order-management/enums';
 import { collectInvalidFieldsFromForm } from '@client/order-management/helpers';
@@ -326,14 +326,19 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private checkInactiveLocationDepartmentOverlap(order: CreateOrderDto, documents: Blob[]): void {
     if (this.orderDetailsFormComponent.selectedLocation && this.orderDetailsFormComponent.selectedDepartment && (order.orderType !== OrderType.OpenPerDiem)) {
       const jobEndDate = order.jobEndDate;
+      const jobStartDate = order.jobStartDate;
       const locationInactiveDate = this.orderDetailsFormComponent.selectedLocation.inactiveDate ?
         new Date(DateTimeHelper.formatDateUTC(this.orderDetailsFormComponent.selectedLocation.inactiveDate, 'MM/dd/yyyy')) : null;
+      const locationReactivateDate = this.orderDetailsFormComponent.selectedLocation.reactivateDate ?
+        new Date(DateTimeHelper.formatDateUTC(this.orderDetailsFormComponent.selectedLocation.reactivateDate, 'MM/dd/yyyy')) : null;
       const departmentInactiveDate = this.orderDetailsFormComponent.selectedDepartment.inactiveDate ?
         new Date(DateTimeHelper.formatDateUTC(this.orderDetailsFormComponent.selectedDepartment.inactiveDate, 'MM/dd/yyyy')) : null;
+      const departmentReactivateDate = this.orderDetailsFormComponent.selectedDepartment.reactivateDate ?
+        new Date(DateTimeHelper.formatDateUTC(this.orderDetailsFormComponent.selectedDepartment.reactivateDate, 'MM/dd/yyyy')) : null;
         locationInactiveDate && locationInactiveDate.setHours(0, 0, 0, 0);
         departmentInactiveDate && departmentInactiveDate.setHours(0, 0, 0, 0);
-      const isLocationOverlaps = !!locationInactiveDate && DateTimeHelper.isDateBefore(locationInactiveDate, jobEndDate);
-      const isDepartmentOverlaps = !!departmentInactiveDate && DateTimeHelper.isDateBefore(departmentInactiveDate, jobEndDate);
+      const isLocationOverlaps = IsStartEndDateOverlapWithInactivePeriod(locationInactiveDate, locationReactivateDate, jobStartDate, jobEndDate); 
+      const isDepartmentOverlaps = IsStartEndDateOverlapWithInactivePeriod(departmentInactiveDate, departmentReactivateDate, jobStartDate, jobEndDate);
       const isLocationDepartmentDateSame = this.orderDetailsFormComponent.selectedLocation.inactiveDate === this.orderDetailsFormComponent.selectedDepartment.inactiveDate;
       if (isLocationOverlaps || isDepartmentOverlaps) {
         this.showConfirmLocationDepartmentOverlap(order, documents, GenerateLocationDepartmentOverlapMessage(isLocationOverlaps, isDepartmentOverlaps, isLocationDepartmentDateSame, locationInactiveDate as Date, departmentInactiveDate as Date));

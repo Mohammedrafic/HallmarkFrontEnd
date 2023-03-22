@@ -1,0 +1,61 @@
+@import "colors";
+
+:host {
+  display: contents;
+}
+
+.table-row {
+  .candidate-cell {
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
+    border-bottom: none;
+  }
+
+  .table-cell{
+    margin: 0;
+    padding: 0;
+    transition: all .2s linear;
+
+    .date-slot {
+      height: 150px;
+      border: 0.5px solid $secondary-dark-blue-45;
+      cursor: pointer;
+
+      &.selected {
+        border: 0.5px solid $primary-active-blue;
+      }
+
+      &:hover {
+        border-color: $primary-active-blue-10;
+        transition: all .2s linear;
+      }
+
+      .day {
+        font-weight: 400;
+        font-size: 12px;
+        padding: 4px;
+      }
+    }
+  }
+
+  .disabled-cell {
+    background-color: $secondary-dark-blue-50;
+    height: 150px;
+  }
+}
+
+.fixed {
+  position: sticky;
+  z-index: 10;
+  background: $white;
+
+  &--top {
+    top: 0;
+    z-index: 20;
+  }
+
+  &--left {
+    left: 0;
+  }
+}

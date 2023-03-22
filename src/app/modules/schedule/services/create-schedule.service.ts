@@ -126,7 +126,7 @@ export class CreateScheduleService {
   ): ScheduleInt.EmployeeScheduledDay[] {
     return scheduleItems.map((item: CreateScheduleItem) => {
       const scheduledDays: ScheduleInt.ScheduledDay[] = item.selectedDates.map((date: Date) => {
-        const dateValue: string =  DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date));
+        const dateValue: string = DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(date));
 
         return {
           schedulesToOverrideIds: this.getScheduleToOverrideIds(item.candidateId, dateValue, startTime, endTime),
@@ -143,9 +143,12 @@ export class CreateScheduleService {
 
   getEmployeeBookedDays(scheduleItems: CreateScheduleItem[]): EmployeeBookingDay[] {
     return scheduleItems.map((item: CreateScheduleItem) => {
-      const bookedDays = item.selectedDates.map((date: Date) =>
-        DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)));
+      const bookedDays = item.selectedDates.map((date: Date) => {
+        const initDate = new Date(date.setHours(0, 0, 0));
 
+        return DateTimeHelper.toUtcFormat(initDate);
+      });
+        
       return {
         employeeId: item.candidateId,
         bookedDays,

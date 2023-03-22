@@ -9,6 +9,7 @@ import { BookingError, ScheduleBookingErrors, ScheduleItem } from '../interface'
 import { DateTimeHelper } from '@core/helpers';
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
 import { RECORD_ADDED, RECORDS_ADDED } from '@shared/constants';
+import { WeekList } from '../constants';
 
 export const GetScheduleDayWithEarliestTime = (schedules: ScheduleInt.ScheduleItem[]): ScheduleItem => {
   if(schedules.length >= 2) {
@@ -21,10 +22,9 @@ export const GetScheduleDayWithEarliestTime = (schedules: ScheduleInt.ScheduleIt
 };
 
 export const CreateScheduleDateItems = (dateValue: string): DateItem => {
-  const date = new Date(dateValue);
-
+  const date = new Date(`${dateValue}T00:00:00`);
   return {
-    dateValue: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+    dateValue: DateTimeHelper.toUtcFormat(date),
     id: null,
     date,
   };
@@ -212,3 +212,13 @@ export const GetShiftTimeControlsValue =
 
     return { startTime, endTime };
   };
+
+export const GetMonthRange = (initDay: number): string[] => {
+  const daysInWeek = WeekList;
+  const startingDayIndex = initDay % 7;
+
+  return  [
+    ...daysInWeek.slice(startingDayIndex),
+    ...daysInWeek.slice(0, startingDayIndex),
+  ];
+};

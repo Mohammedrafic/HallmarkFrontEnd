@@ -146,6 +146,14 @@ th, td {
     min-width: 112px;
   }
 
+  &.month-date {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 13px;
+    color: $secondary-dark-blue-15;
+  }
+
   &.candidates-head-cell {
     z-index: 30;
     width: 240px;

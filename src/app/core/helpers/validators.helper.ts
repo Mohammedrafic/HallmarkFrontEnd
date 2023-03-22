@@ -1,6 +1,7 @@
 import { formatDate } from '@angular/common';
 import { AbstractControl, FormGroup, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { EmailValidation } from '@core/constants';
+import { DateTimeHelper } from './date-time.helper';
 
 export const DateRangeValidator: ValidatorFn = ((control: AbstractControl): ValidationErrors | null => {
   const timeIn = control.get('timeIn')?.value;
@@ -65,6 +66,14 @@ export const MultiEmailValidator = (control: AbstractControl): ValidationErrors 
 
   return invalidEmailList?.length ? { invalidEmails: invalidEmailList } : null;
 };
+
+export const IsStartEndDateOverlapWithInactivePeriod = (inactiveDate: Date | null, reactivateDate: Date | null, startDate: Date, endDate: Date): boolean => {
+  if (reactivateDate) {
+    return (!!inactiveDate && DateTimeHelper.isDateBefore(inactiveDate, endDate)) && 
+           (!!reactivateDate && DateTimeHelper.isDateBefore(startDate, reactivateDate));
+  }
+  return (!!inactiveDate && DateTimeHelper.isDateBefore(inactiveDate, endDate));
+}
 
 export const GenerateLocationDepartmentOverlapMessage = (isLocationOverlaps: boolean, isDepartmentOverlaps: boolean, isLocationDepartmentDateSame: boolean, locationInactiveDate: Date, departmentInactiveDate: Date): string => {
   let message = '';

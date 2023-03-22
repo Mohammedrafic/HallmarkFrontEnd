@@ -6,7 +6,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { ValueType } from '@syncfusion/ej2-angular-grids';
 import { ChipItem } from '@shared/components/inline-chips';
 import { ScheduleOrderType, ScheduleType } from '../enums';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 export interface ScheduleCandidate {
   id: number;
@@ -108,6 +108,13 @@ export interface ScheduleCardConfig {
   showTitleToolTip?: boolean;
 }
 
+export interface ScheduleMonthCardConfig {
+  title: string;
+  titleColor: string;
+  timeColor: string;
+  showTitleToolTip?: boolean;
+}
+
 export interface ScheduleFilterItem {
   type: ControlTypes,
   dataSource: DropdownOption[],
@@ -152,4 +159,21 @@ export interface EmployeesFilters {
   startDate: string | Date;
   endDate: string | Date;
   departmentsIds: number[];
+}
+
+export interface DatesByWeekday {
+  dateSlot: string;
+  active: boolean;
+}
+
+export interface CardClickEvent {
+  date: string,
+  candidate: ScheduleCandidate,
+  cellDate?: ScheduleDateItem
+}
+
+export interface CellClickEvent {
+  schedule: ScheduleDateItem,
+  candidate: ScheduleCandidate,
+  cellDate?: ScheduleDateItem
 }

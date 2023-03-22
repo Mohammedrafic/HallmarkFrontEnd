@@ -30,9 +30,10 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { ScheduleApiService } from '../../services';
 import { UserState } from '../../../../store/user.state';
 import { ScheduleGridAdapter } from '../../adapters';
-import { DatesPeriods } from '../../constants';
+import { DatesPeriods, MonthPeriod } from '../../constants';
 import * as ScheduleInt from '../../interface';
-import { ScheduleCandidatesPage, ScheduleDateItem } from '../../interface';
+import { CardClickEvent, CellClickEvent, ScheduleCandidatesPage, ScheduleDateItem } from '../../interface';
+import { GetMonthRange } from '../../helpers';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -65,9 +66,13 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   activePeriod = DatesRangeType.TwoWeeks;
 
+  monthPeriod = DatesRangeType.Month;
+
   weekPeriod: [Date, Date] = [DateTimeHelper.getCurrentDateWithoutOffset(), DateTimeHelper.getCurrentDateWithoutOffset()];
 
   datesRanges: string[] = DateTimeHelper.getDatesBetween();
+
+  monthRangeDays: string[] = [];
 
   selectedCandidatesSlot: Map<number, ScheduleInt.ScheduleDateSlot>
   = new Map<number, ScheduleInt.ScheduleDateSlot>();
@@ -176,12 +181,31 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   autoSelectCandidate(candidate: ScheduleInt.ScheduleCandidate | null): void {
+    this.emitSelectedCandidate(candidate);
+  }
+
+  emitSelectedCandidate(candidate: ScheduleInt.ScheduleCandidate | null): void {
+    this.datesPeriods = candidate ? [...DatesPeriods, ...MonthPeriod] : DatesPeriods;
+    this.activePeriod = this.datesPeriods.includes(MonthPeriod[0]) ? DatesRangeType.Month : DatesRangeType.TwoWeeks;
     this.selectCandidate.emit(candidate);
+    this.cdr.markForCheck();
   }
 
   clearSelectedCandidatesSlot(): void {
     this.selectedCandidatesSlot.clear();
     this.cdr.markForCheck();
+  }
+
+  singleMonthClick({date, candidate, cellDate }: CardClickEvent): void {
+    this.handleCellSingleClick(date, candidate, cellDate);
+  }
+
+  doubleMonthCardClick({ schedule, candidate, cellDate }: CellClickEvent): void {
+    this.handleScheduleCardDblClick(schedule,candidate, cellDate);
+  }
+
+  doubleMonthCellClick({date, candidate}: CardClickEvent): void {
+    this.handleCellDblClick(date, candidate);
   }
 
   private startOrgIdWatching(): void {
@@ -197,7 +221,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       }),
       switchMap(() => {
         this.checkOrgPreferences();
-
         return this.watchForRangeChange();
       }),
       takeUntil(this.componentDestroy()),
@@ -207,6 +230,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   private checkOrgPreferences(): void {
     const preferences = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences;
     this.orgFirstDayOfWeek = preferences?.weekStartsOn as number;
+    this.monthRangeDays = GetMonthRange(this.orgFirstDayOfWeek ?? 0);
 
     this.cdr.markForCheck();
   }

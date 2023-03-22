@@ -1,5 +1,5 @@
 import { ScheduleType } from 'src/app/modules/schedule/enums';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 export interface DateItem {
   date: Date | string;

@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { catchError, filter, take, takeUntil } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, skip, take, takeUntil } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
@@ -37,6 +37,8 @@ import { CustomFormGroup } from '@core/interface';
 import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
+import { DurationService } from '@shared/services/duration.service';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -73,7 +75,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     private orderCandidateApiService: OrderCandidateApiService,
     private cdr: ChangeDetectorRef,
     private store: Store,
-    private orderManagementService: OrderManagementService
+    private orderManagementService: OrderManagementService,
+    private durationService: DurationService,
   ) {
     super();
   }
@@ -81,6 +84,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   ngOnInit(): void {
     this.dialogConfig = CandidateDialogConfig();
     this.candidateForm = this.editIrpCandidateService.createCandidateForm();
+    this.watchForActualDateValues();
   }
 
   public closeModal(): void {
@@ -133,9 +137,32 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       const statusConfigField = GetConfigField(this.dialogConfig, StatusField);
       statusConfigField.dataSource = [...candidateDetails.availableStatuses ?? []];
 
-      this.candidateForm.patchValue(candidateDetails);
+      this.candidateForm.patchValue(candidateDetails,{emitEvent: false, onlySelf: true});
       this.disableCandidateControls();
       this.cdr.markForCheck();
+    });
+  }
+
+  private watchForActualDateValues(): void {
+    this.candidateForm.get('actualStartDate')?.valueChanges.pipe(
+      filter((value: string) => {
+        return !!value && this.candidateModelState.order.orderType === OrderType.Traveler;
+      }),
+      skip(1),
+      distinctUntilChanged(),
+      takeUntil(this.componentDestroy()),
+    ).subscribe((value: string) => {
+      const actualStartDate = new Date(value);
+      const jobStartDate = this.candidateModelState.order.jobStartDate;
+      const jobEndDate = this.candidateModelState.order.jobEndDate;
+      const actualEndDate = this.durationService.getEndDate(
+        this.candidateModelState.order.duration,
+        actualStartDate, {
+          jobStartDate,
+          jobEndDate,
+        });
+
+      this.candidateForm.get('actualEndDate')?.patchValue(actualEndDate,{emitEvent: false, onlySelf: true});
     });
   }
 

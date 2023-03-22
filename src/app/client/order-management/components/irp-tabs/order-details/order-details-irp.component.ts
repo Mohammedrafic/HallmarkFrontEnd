@@ -80,7 +80,7 @@ import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.mod
 import {
   OrderDetailsIrpService,
 } from '@client/order-management/components/irp-tabs/services/order-details-irp.service';
-import { ButtonType, IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { ButtonType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 import { ORDER_CONTACT_DETAIL_TITLES, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
@@ -99,7 +99,7 @@ import {
 import { OrganizationStructureService, SettingsViewService } from '@shared/services';
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { OrderType } from '@shared/enums/order-type';
+import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-order-details-irp',
