@@ -68,20 +68,12 @@
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.Candidate_Applied_In_Last_N_Days"
                               [isDarkTheme]="isDarkTheme"></app-candidate-chart>
-          <div *ngIf="!isAgencyUser">
-            <app-org-widget  *ngSwitchCase="widgetTypeEnum.ORG"    
-            [chartData]="widgetsData?.[widgetTypeEnum.ORG]"
-            [isLoading]="isLoading"
-            [description]="widgetDescriptionEnum.ORG"
-            [isDarkTheme]="isDarkTheme"></app-org-widget>
-          </div>
-          <div *ngIf="isAgencyUser">
-            <app-org-widget *ngSwitchCase="widgetTypeEnum.ORG"    
-            [chartData]="widgetsData?.[widgetTypeEnum.ORG]"
-            [isLoading]="isLoading"
-            [description]="widgetDescriptionEnum.AGENCY_DESCRIPTION"
-            [isDarkTheme]="isDarkTheme"></app-org-widget>
-          </div>
+                              
+                              <app-org-widget *ngSwitchCase="widgetTypeEnum.ORG"    
+                              [chartData]="widgetsData?.[widgetTypeEnum.ORG]"
+                              [isLoading]="isLoading"
+                              [description]="isAgencyUser ? widgetDescriptionEnum.AGENCY_DESCRIPTION : widgetDescriptionEnum.ORG"
+                              [isDarkTheme]="isDarkTheme"></app-org-widget>        
           
           <app-agencyposition-widget *ngSwitchCase="widgetTypeEnum.AGENCY_POSITION_COUNT"    
                               [chartData]="widgetsData?.[widgetTypeEnum.AGENCY_POSITION_COUNT]"
