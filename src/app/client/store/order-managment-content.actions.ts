@@ -275,7 +275,7 @@ export class ApproveOrder {
 
 export class GetOrderFilterDataSources {
   static readonly type = '[order management] Get Order Filter Data Sources';
-  constructor() {}
+  constructor(public isIRP?: boolean) {}
 }
 
 export class GetHistoricalData {

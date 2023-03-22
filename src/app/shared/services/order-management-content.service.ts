@@ -419,8 +419,12 @@ export class OrderManagementContentService {
   /**
    * Get order filter data sources
    */
-  public getOrderFilterDataSources(): Observable<OrderFilterDataSource> {
-    return this.http.get<OrderFilterDataSource>('/api/OrdersFilteringOptions/organization').pipe(
+  public getOrderFilterDataSources(isIRP: boolean = false): Observable<OrderFilterDataSource> {
+    let url = '/api/OrdersFilteringOptions/organization';
+    if (isIRP) {
+      url += '/irp'
+    }
+    return this.http.get<OrderFilterDataSource>(url).pipe(
       map((data) => {
         const sortedFields: Record<keyof OrderFilterDataSource, string> = {
           candidateStatuses: 'statusText',
