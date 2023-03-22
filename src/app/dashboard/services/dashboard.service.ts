@@ -58,6 +58,8 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { CandidateStatusDto } from '@admin/analytics/models/common-report.model';
 import { OrgDetailsInfoModel } from '../models/org-details-info.model';
 import { AgencyPositionModel } from '../models/agency-position.model';
+import { MasterCommitmentsPage } from '@shared/models/commitment.model';
+import { GetWorkCommitment } from '../widgets/rn-utilization-widget/rn-utilization.model';
 
 @Injectable()
 export class DashboardService {
@@ -84,6 +86,7 @@ export class DashboardService {
     [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
     [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters),
     [WidgetTypeEnum.AGENCY_POSITION_COUNT] : (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
+    [WidgetTypeEnum.RN_UTILIZATION] : (filters: DashboartFilterDto) => this.getRNUtilizations(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -338,6 +341,13 @@ export class DashboardService {
     )
   }
 
+  private getRNUtilizations(filter: DashboartFilterDto) : Observable<AgencyPositionModel[]> {
+    return this.httpClient.post<AgencyPositionModel[]>(`${this.baseUrl}/getOpenAndInprogressOpenPositions`, { ...filter }).pipe(
+      map((data)=> data)
+    )
+  }
+
+ 
   private getActivePositionWidgetData(filter: DashboartFilterDto): Observable<AccumulationChartModel> {
     return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { granulateInProgress: true, ...filter }).pipe(
       map(({ orderStatusesDetails }: ActivePositionsDto) => {
@@ -454,4 +464,7 @@ export class DashboardService {
       );
   }
 
+  public getAllMasterCommitments(): Observable<GetWorkCommitment[]> {
+    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
+  }
 }

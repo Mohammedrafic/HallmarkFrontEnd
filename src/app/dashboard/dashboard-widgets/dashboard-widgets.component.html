@@ -80,6 +80,9 @@
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.AGENCY_POSITION_COUNT"
                               [isDarkTheme]="isDarkTheme"></app-agencyposition-widget>
+             <app-rn-utilization-widget *ngSwitchCase="widgetTypeEnum.RN_UTILIZATION" [isLoading]="isLoading"
+            [description]="widgetDescriptionEnum.RN_UTILIZATION_DESCRIPTION"></app-rn-utilization-widget>
+         
         </ng-template>
       </e-panel>
     </e-panels>

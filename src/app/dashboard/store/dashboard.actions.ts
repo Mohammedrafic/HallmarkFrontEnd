@@ -51,3 +51,8 @@ export class ToggleQuickOrderDialog {
   static readonly type = `${dashboardStatePrefix} Toggle Quick Order Dialog`;
   constructor(public readonly isOpen: boolean ) {}
 }
+
+export class GetAllCommitmentByPage {
+  static readonly type = `${dashboardStatePrefix} Get Commitment by Page`;
+  constructor() { }
+}

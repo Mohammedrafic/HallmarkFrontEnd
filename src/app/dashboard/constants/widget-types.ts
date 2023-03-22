@@ -18,5 +18,6 @@ export const widgetTypes: Record<string, WidgetTypeEnum> = {
   17: WidgetTypeEnum.LTA_ORDER_ENDING,
   18: WidgetTypeEnum.Candidate_Applied_In_Last_N_Days,
   19: WidgetTypeEnum.ORG,
-  20: WidgetTypeEnum.AGENCY_POSITION_COUNT
+  20: WidgetTypeEnum.AGENCY_POSITION_COUNT,
+  21: WidgetTypeEnum.RN_UTILIZATION,
 };

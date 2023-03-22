@@ -37,5 +37,8 @@
     <div *ngIf="agency_count" class="app-widget-wrapper__agency_count">
       <ng-container [ngTemplateOutlet]="agency_count"></ng-container>
     </div>
+    <div *ngIf="RNUtilizationChart" class="app-widget-wrapper__RNUtilization-chart">
+      <ng-container [ngTemplateOutlet]="RNUtilizationChart"></ng-container>
+    </div>
   </div> 
 </ng-template>

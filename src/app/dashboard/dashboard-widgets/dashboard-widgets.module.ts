@@ -17,6 +17,7 @@ import { OrgWidgetModule } from '../widgets/org-widget/org-widget.module';
 import { AgencypositionWidgetModule } from '../widgets/agencyposition-widget/agencyposition-widget.module';
 import { UserState } from '../../store/user.state';
 import { CandidateChartModule } from '../widgets/candidate-chart/candidate-chart.module';
+import { RnUtilizationWidgetModule } from '../widgets/rn-utilization-widget/rn-utilization-widget.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -36,6 +37,7 @@ import { CandidateChartModule } from '../widgets/candidate-chart/candidate-chart
     CandidateChartModule,
     OrgWidgetModule,
     AgencypositionWidgetModule,
+    RnUtilizationWidgetModule,
     NgxsModule.forFeature([ UserState])
   ]
 })
