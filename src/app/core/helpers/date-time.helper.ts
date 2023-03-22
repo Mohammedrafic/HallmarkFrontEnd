@@ -32,7 +32,7 @@ export class DateTimeHelper {
 
   public static convertDateToUtc(date: string): Date {
     const init = new Date(date);
-    const offset = init.getTimezoneOffset() * 60 * 1000;
+    const offset = Math.abs(init.getTimezoneOffset() * 60 * 1000);
     const day = new Date(init.setUTCDate(init.getUTCDate()) + offset);
 
     return day;
@@ -51,6 +51,7 @@ export class DateTimeHelper {
     ).toISOString();
   }
 
+  //Use this function with cautions. it needs to be removed.
   public static setInitHours(data: string): string {
     const date = new Date(this.convertDateToUtc(data));
     date.setHours(0, 0, 0);

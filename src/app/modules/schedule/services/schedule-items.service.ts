@@ -23,10 +23,11 @@ export class ScheduleItemsService {
     scheduleType: ScheduleItemType
   ): CreateScheduleItem[] {
     return scheduleSelectedSlots.candidates.map((candidate: ScheduleInt.ScheduleCandidate) => {
+
       return  {
         candidateName: `${candidate.lastName}, ${candidate.firstName}`,
         candidateId: candidate.id,
-        selectedDates: candidate.dates.map((date: string) => new Date(date)),
+        selectedDates: candidate.dates.map((date: string) => new Date(`${date}T00:00:00`)),
         dateItems: this.getDateItems(candidate.dates, candidate.id, scheduleType, candidate.orderType),
       };
     });
@@ -55,12 +56,13 @@ export class ScheduleItemsService {
 
     dates.forEach((dateValue: string) => {
       const daySchedules: ScheduleInt.ScheduleItem[] = this.createScheduleService.getDaySchedules(candidateId, dateValue);
+
       if (daySchedules.length) {
         const scheduleDayWithEarliestTime = GetScheduleDayWithEarliestTime(daySchedules);
-        const date = new Date(dateValue);
+        const date = new Date(`${dateValue}T00:00:00`);
 
         scheduleDateItems.push({
-          dateValue: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+          dateValue: DateTimeHelper.toUtcFormat(date),
           tooltipContent: CreateBookTooltip(daySchedules) as string,
           scheduleType: scheduleDayWithEarliestTime.scheduleType,
           orderType,

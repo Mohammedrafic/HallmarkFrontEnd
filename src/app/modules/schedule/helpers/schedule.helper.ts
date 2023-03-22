@@ -22,10 +22,9 @@ export const GetScheduleDayWithEarliestTime = (schedules: ScheduleInt.ScheduleIt
 };
 
 export const CreateScheduleDateItems = (dateValue: string): DateItem => {
-  const date = new Date(dateValue);
-
+  const date = new Date(`${dateValue}T00:00:00`);
   return {
-    dateValue: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+    dateValue: DateTimeHelper.toUtcFormat(date),
     id: null,
     date,
   };
