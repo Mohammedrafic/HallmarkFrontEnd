@@ -398,6 +398,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/vendor-activity',
     },
+    87: {
+      // Staff Schedule By Shift Report
+      icon: '',
+      route: '/analytics/staffschedulebyshift-irp',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -589,6 +594,11 @@ export const MENU_CONFIG: any = {
       // Vendor Activity Report
       icon: '',
       route: '/analytics/vendor-activity',
+    },
+    87: {
+      // Staff Schedule By Shift Report
+      icon: '',
+      route: '/analytics/staffschedulebyshift-irp',
     },
   },
 
@@ -952,6 +962,11 @@ export const MENU_CONFIG: any = {
       // DNR Details
       icon: 'users',
       route: 'client/dnr-details',
+    },
+    87: {
+      // Staff Schedule By Shift Report
+      icon: '',
+      route: '/analytics/staffschedulebyshift-irp',
     },
   },
 
