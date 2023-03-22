@@ -23,7 +23,8 @@
     <div class="bell-button" (click)="bellIconClicked()">
       <i-feather name="bell"></i-feather>
 
-      <span class="bell-button__badge">{{ alerts?.length }}</span>
+      <span class="bell-button__badge" *ngIf="alerts?.length<99">{{alerts?.length}}</span>
+      <span class="bell-button__badge" *ngIf="alerts?.length==99">99+</span>
     </div>
 
     <div class="devider" *ngIf="!(isMobile$ | async) && (userChatConfig$ | async)"></div>
