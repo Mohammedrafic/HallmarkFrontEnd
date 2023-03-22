@@ -1,35 +1,34 @@
 <form class="department-form">
   <ng-container *ngIf="true">
-    <app-dropdown
+    <app-multiselect-dropdown
       [formGroupInstance]="assignDepartmentForm"
       [fields]="departmentFields"
       [dataSource]="dataSource.regions"
       [required]="true"
-      [hideBorder]="false"
-      controlName="regionId"
+      controlName="regionIds"
       id="region"
       label="Region"
-    ></app-dropdown>
-    <app-dropdown
+    ></app-multiselect-dropdown>
+    <app-multiselect-dropdown
       [formGroupInstance]="assignDepartmentForm"
       [fields]="departmentFields"
       [dataSource]="dataSource.locations"
       [required]="true"
-      [hideBorder]="false"
-      controlName="locationId"
+      [sortOrder]="sortOrder"
+      controlName="locationIds"
       id="location"
       label="Location"
-    ></app-dropdown>
-    <app-dropdown
+    ></app-multiselect-dropdown>
+    <app-multiselect-dropdown
       [formGroupInstance]="assignDepartmentForm"
       [fields]="departmentFields"
       [dataSource]="dataSource.departments"
       [required]="true"
-      [hideBorder]="false"
-      controlName="departmentId"
+      [sortOrder]="sortOrder"
+      controlName="departmentIds"
       id="department"
       label="Department"
-    ></app-dropdown>
+    ></app-multiselect-dropdown>
   </ng-container>
 
   <div class="date-fields">
