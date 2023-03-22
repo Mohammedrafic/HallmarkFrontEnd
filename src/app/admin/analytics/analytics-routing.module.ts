@@ -41,6 +41,7 @@ import { AccrualReportComponent } from './accrual-report/accrual-report.componen
 import { DailyOrderStatusComponent } from './daily-order-status/daily-order-status.component';
 import { CandidateStatusComponent } from './candidate-status/candidate-status.component';
 import { VendorActivityComponent } from './vendor-activity/vendor-activity.component';
+import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-schedule-by-shift.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '', pathMatch: 'full' },
@@ -317,6 +318,13 @@ const routes: Routes = [
       {
         path: 'vendor-activity',
         component: VendorActivityComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'staffschedulebyshift-irp',
+        component: StaffScheduleByShiftComponent,
         data: {
           isOrganizationArea: true,
         }

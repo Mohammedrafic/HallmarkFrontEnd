@@ -54,6 +54,7 @@ import { AccrualReportComponent } from './accrual-report/accrual-report.componen
 import { DailyOrderStatusComponent } from './daily-order-status/daily-order-status.component';
 import { CandidateStatusComponent } from './candidate-status/candidate-status.component';
 import { VendorActivityComponent } from './vendor-activity/vendor-activity.component';
+import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-schedule-by-shift.component';
 
 
 @NgModule({
@@ -99,7 +100,8 @@ import { VendorActivityComponent } from './vendor-activity/vendor-activity.compo
     AccrualReportComponent,
     DailyOrderStatusComponent,
     CandidateStatusComponent,
-    VendorActivityComponent],
+    VendorActivityComponent,
+    StaffScheduleByShiftComponent],
   exports: [
     CandidateListComponent
   ],
