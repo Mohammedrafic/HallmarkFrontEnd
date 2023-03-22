@@ -136,6 +136,33 @@ export const defaultDialogConfig: ReasonFormConfig[]  = [
   },
 ];
 
+export const InternalDialogConfig: ReasonFormConfig[]  = [
+  {
+    field: 'reason',
+    title: 'Reason',
+    required: true,
+    fieldType: FieldType.Input,
+  },
+];
+
+export const TerminatedDialogConfig: ReasonFormConfig[]  = [
+  {
+    field: 'reason',
+    title: 'Reason',
+    required: true,
+    fieldType: FieldType.Input,
+  },
+];
+
+export const ManualInvoiceDialogConfig: ReasonFormConfig[]  = [
+  {
+    field: 'reason',
+    title: 'Reason',
+    required: true,
+    fieldType: FieldType.Input,
+  },
+];
+
 export const categoryNoteDialogConfig: ReasonFormConfig[]  = [
   {
     field: 'reason',
@@ -208,7 +235,7 @@ export const ReasonDialogConfig: ReasonFormConfigMap = {
   [ReasonFormType.RequisitionReason]: requisitionDialogConfig,
   [ReasonFormType.ClosureReason]: closureDialogConfig,
   [ReasonFormType.CategoryNoteReason]: categoryNoteDialogConfig,
-  [ReasonFormType.ManualInvoiceReason] : defaultDialogConfig,
-  [ReasonFormType.TerminatedReason] : defaultDialogConfig,
-  [ReasonFormType.InternalTransferReason] : defaultDialogConfig
+  [ReasonFormType.ManualInvoiceReason] : ManualInvoiceDialogConfig,
+  [ReasonFormType.TerminatedReason] : TerminatedDialogConfig,
+  [ReasonFormType.InternalTransferReason] : InternalDialogConfig
 };
