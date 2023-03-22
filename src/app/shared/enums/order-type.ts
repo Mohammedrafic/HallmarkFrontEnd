@@ -28,3 +28,8 @@ export const IrpOrderTypes = [
   { id: OrderType.ReOrder,name: 'Re-Order' },
   { id: OrderType.Traveler, name: 'LTA' },
 ];
+
+export const FilterIrpOrderTypes = [
+  { id: OrderType.ReOrder, name: 'Per Diem' },
+  { id: OrderType.Traveler, name: 'LTA' },
+];

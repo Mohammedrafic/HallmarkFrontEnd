@@ -734,9 +734,10 @@
       <div
         class="input-container"
         *ngIf="
-          activeTab !== OrganizationOrderManagementTabs.ReOrders &&
+          (!isActiveSystemIRP && activeTab !== OrganizationOrderManagementTabs.ReOrders &&
           activeTab !== OrganizationOrderManagementTabs.PerDiem &&
-          activeTab !== OrganizationOrderManagementTabs.PermPlacement
+          activeTab !== OrganizationOrderManagementTabs.PermPlacement) ||
+          (isActiveSystemIRP && activeIRPTabIndex === OrderManagementIRPTabsIndex.AllOrders)
         "
       >
         <label>Order Type</label>
@@ -754,7 +755,8 @@
           </ejs-multiselect>
         </div>
       </div>
-      <div class="input-container">
+      <div class="input-container"
+           *ngIf="!isActiveSystemIRP || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
         <label>Order Status</label>
         <div class="input-group multiselect">
           <ejs-multiselect
