@@ -1,0 +1,121 @@
+@import "colors";
+
+.widget {
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+  height: 100%;
+  text-align: center;
+
+  &__title {
+    padding-bottom: 4%;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    align-items: center;
+
+    @media screen and (max-width: 600px) {
+      padding-bottom: 3px;
+    }
+  }
+
+  &__type {
+    font-size: 14px;
+    color: $secondary-dark-blue-20;
+    margin-right: -12px;
+    margin-right: 4px;
+    cursor: default;
+
+    @media screen and (max-width: 1550px) {
+      font-size: 12px;
+    }
+  }
+}
+
+  .app-widget-wrapper {
+    &__tooltip {
+      text-align: right;
+      float: right;
+      width: 100%
+    }
+  }
+
+.orgcount {
+    text-align: right;
+    width: -webkit-fill-available;
+    width: -moz-available;
+}
+.orgname {
+    text-align: left;
+    white-space: nowrap;
+    color: #3E7FFF;
+    cursor: pointer;
+    font-size: 13px;
+    width: max-content;
+}
+.widget__type {
+    display: flex;
+    justify-content: space-between;
+}
+.widget{
+    padding: 10px 0px 0px 0px !important;
+    width:100%;
+}
+.widget__type p {
+    margin: 5px 0px;
+}
+.app-widget-wrapper__header{
+    padding-bottom: 5px;
+}
+.e-input-group {
+    border: 1px solid $secondary-dark-blue-40 !important;
+    border-radius: 8px;
+}
+.input-sec {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 10px;
+}
+
+.input-sec span {
+    width: 45%;
+    height: auto;
+}
+p.hours-rn {
+    padding: 6px 0px;
+    display: block;
+    background: #ccc;
+    width: 90%;
+    border-radius: 10px;
+    margin: auto;
+    text-align: center;
+    margin: 16px 10px ;
+}
+
+
+.e-input.widgeticon
+{
+  width: 50px;
+  border:1px solid #3E7FFF;
+  border-radius: 5px;
+}
+
+.datepicker {
+  margin-top: 10px;
+}
+
+.dropdown {
+  margin-top: 10px;
+}
+.e-input-group.e-control-wrapper {
+  border: 1px solid $secondary-dark-blue-40 !important;
+  border-radius: 8px;
+
+ 
+}
+input.e-input-filter.e-input {
+  height: 24px;
+  font-size: 14px;
+  color: $secondary-dark-blue-15;
+}
