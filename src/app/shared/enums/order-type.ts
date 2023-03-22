@@ -6,6 +6,11 @@ export enum OrderType {
   ReOrder = 10,
 }
 
+export enum IrpOrderType {
+  LongTermAssignment = 3,
+  PerDiem = 10
+}
+
 export const OrderTypeTitlesMap = new Map([
   [OrderType.Traveler, 'Traveler'],
   [OrderType.OpenPerDiem, 'Per Diem'],
@@ -18,7 +23,7 @@ export const OrderTypeOptions = [
   { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
   { id: OrderType.OpenPerDiem, name: 'Open Per Diem' },
   { id: OrderType.PermPlacement, name: 'Perm. Placement' },
-  { id: OrderType.Traveler, name: 'Traveler' }  
+  { id: OrderType.Traveler, name: 'Traveler' }
 ];
 
 export const IrpOrderTypes = [

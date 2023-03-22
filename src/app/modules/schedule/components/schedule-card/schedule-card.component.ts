@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 import { GetScheduleCardConfig } from '../../constants';
 import { CardTitle } from '../../helpers';
 import { ScheduleCardConfig, ScheduleDateItem, ScheduleItem } from '../../interface';
 import { ScheduleCardTooltips } from './schedule-card.interface';
-import { ScheduleCardService } from './schedule-card.service';
+import { ScheduleCardService } from '../../services';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-schedule-card',

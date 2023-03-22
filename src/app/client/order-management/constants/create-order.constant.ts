@@ -3,7 +3,7 @@ import { ButtonModel } from '@shared/models/buttons-group.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { JobClassification } from '@shared/enums/job-classification';
 import { Plus } from 'angular-feather/icons';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 export const GridIcons = {
   Plus,

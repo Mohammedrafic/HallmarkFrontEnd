@@ -1,5 +1,5 @@
 import { IrpTabs, OrderSystem } from '@client/order-management/enums';
-import { ButtonType, IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { ButtonType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 import { FieldType } from '@core/enums';
 import { SystemType } from "@shared/enums/system-type.enum";
 import { Region } from '@shared/models/region.model';
@@ -10,6 +10,7 @@ import { RejectReason } from '@shared/models/reject-reason.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { OrganizationRegion } from '@shared/models/organization.model';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 export interface TabsConfig {
   id: number;

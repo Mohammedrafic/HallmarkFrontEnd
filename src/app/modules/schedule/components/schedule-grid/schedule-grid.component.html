@@ -32,7 +32,8 @@
 <!--      </button>-->
     </div>
     <div class="right">
-      <app-tooltip-container [showToolTip]="!hasViewPermission">
+      <ng-container *ngIf="activePeriod !== monthPeriod; else monthDatePicker">
+        <app-tooltip-container [showToolTip]="!hasViewPermission">
         <app-date-week-picker
           [initDates]="weekPeriod"
           [rangeType]="activePeriod"
@@ -40,8 +41,17 @@
           [overrideInitDates]="true"
           [disabled]="!hasViewPermission"
         ></app-date-week-picker>
-      </app-tooltip-container>
+        </app-tooltip-container>
+      </ng-container>
 
+      <ng-template #monthDatePicker>
+        <app-tooltip-container [showToolTip]="!hasViewPermission">
+          <app-month-date-picker
+            [firstDayOfWeek]="orgFirstDayOfWeek"
+            [disabled]="!hasViewPermission"
+          ></app-month-date-picker>
+        </app-tooltip-container>
+      </ng-template>
       <app-tooltip-container [showToolTip]="!hasViewPermission">
         <div class="date-periods">
           <div *ngFor="let datePeriod of datesPeriods; trackBy: trackByPeriods"
@@ -61,21 +71,32 @@
       <thead>
         <tr>
           <th class="table-title candidates-head-cell fixed fixed--left fixed--top">{{ scheduleData?.totalCount || 0 }} Candidates</th>
-          <th
-            *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
-            class="table-title date fixed fixed--top"
-          >
-            {{ dateHead | date: 'EEEE MM/dd' }}
-          </th>
+          <ng-container *ngIf="activePeriod !== monthPeriod; else monthRange">
+            <th
+              *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
+              class="table-title date fixed fixed--top"
+            >
+              {{ dateHead | date: 'EEEE MM/dd' }}
+            </th>
+          </ng-container>
+
+          <ng-template #monthRange>
+            <th
+              *ngFor="let day of monthRangeDays; trackBy: trackByDatesRange"
+              class="table-title date month-date fixed fixed--top">
+              {{day}}
+            </th>
+          </ng-template>
         </tr>
       </thead>
       <tbody>
+      <ng-container *ngIf="activePeriod !== monthPeriod; else monthView">
         <tr *ngFor="let scheduleItem of scheduleData?.items; trackBy: trackByScheduleData" class="table-row">
           <td class="table-cell candidates-cell fixed fixed--left">
             <app-candidate-card
               [candidate]="scheduleItem"
               [selectedFilters]="selectedFilters"
-              (click)="selectCandidate.emit(scheduleItem.candidate)"
+              (click)="emitSelectedCandidate(scheduleItem.candidate)"
             ></app-candidate-card>
           </td>
           <ng-container *ngFor="let dateSlot of datesRanges; trackBy: trackByDatesRange">
@@ -112,6 +133,20 @@
             </ng-template>
           </ng-container>
         </tr>
+      </ng-container>
+
+      <ng-template #monthView>
+          <app-month-view-grid
+            [scheduleData]="scheduleData"
+            [selectedFilters]="selectedFilters"
+            [datesRange]="datesRanges"
+            (handleSelectCandidate)="emitSelectedCandidate($event)"
+            (handleMonthSingleClick)="singleMonthClick($event)"
+            (handleMonthDoubleCardClick)="doubleMonthCardClick($event)"
+            (handleMonthDoubleCellClick)="doubleMonthCellClick($event)"
+            [selectedCandidatesSlot]="selectedCandidatesSlot"
+          ></app-month-view-grid>
+      </ng-template>
       </tbody>
     </table>
     <ng-template #emptyTable>

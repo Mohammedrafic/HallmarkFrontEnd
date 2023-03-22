@@ -9,7 +9,7 @@ import { CreateScheduleService } from './create-schedule.service';
 import { CreateBookTooltip, CreateScheduleDateItems, CreateTooltip, GetScheduleDayWithEarliestTime } from '../helpers';
 import { ScheduleBookingErrors } from '../interface';
 import { ScheduleItemType } from '../constants';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 @Injectable()
 export class ScheduleItemsService {

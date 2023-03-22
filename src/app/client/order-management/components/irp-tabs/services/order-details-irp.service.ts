@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ONLY_NUMBER } from '@shared/constants';
 import { Duration } from '@shared/enums/durations';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 import { jobDistributionValidator } from '@client/order-management/components/irp-tabs/order-details/validators';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 @Injectable()
 export class OrderDetailsIrpService {

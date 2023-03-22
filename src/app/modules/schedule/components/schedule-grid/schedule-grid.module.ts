@@ -18,6 +18,8 @@ import { ScheduleCardModule } from '../schedule-card/schedule-card.module';
 import { ScheduleGridComponent } from './schedule-grid.component';
 import { CalendarTooltipSlotModule } from '../../pipes/calendar-tooltip-slot/calendar-tooltip-slot.module';
 import { PeriodPickerModule } from '@shared/components/period-picker';
+import { MonthViewGridModule } from '../month-view-grid/month-view-grid.module';
+import { MonthDatePickerModule } from '@shared/components/month-date-picker/month-date-picker.module';
 
 const icons = {
   Search,
@@ -27,21 +29,23 @@ const icons = {
   declarations: [
     ScheduleGridComponent,
   ],
-  imports: [
-    CommonModule,
-    FeatherModule.pick(icons),
-    SharedModule,
-    ButtonModule,
-    DateWeekPickerModule,
-    CandidateCardModule,
-    ScheduleCardModule,
-    CalendarDateSlotModule,
-    AutoCompleteModule,
-    CalendarTooltipSlotModule,
-    PeriodPickerModule,
-    TooltipContainerModule,
-    DoubleClickModule,
-  ],
+    imports: [
+        CommonModule,
+        FeatherModule.pick(icons),
+        SharedModule,
+        ButtonModule,
+        DateWeekPickerModule,
+        CandidateCardModule,
+        ScheduleCardModule,
+        CalendarDateSlotModule,
+        AutoCompleteModule,
+        CalendarTooltipSlotModule,
+        PeriodPickerModule,
+        TooltipContainerModule,
+        MonthViewGridModule,
+        MonthDatePickerModule,
+        DoubleClickModule,
+    ],
   exports: [ScheduleGridComponent],
   providers: [DateWeekService],
 })

@@ -1,0 +1,23 @@
+<div class="month-picker-container">
+  <button
+    ejs-button cssClass="e-outline"
+    (click)="prevMonth()"
+    [disabled]="disabled">
+    <i-feather name="chevron-left" class="icon"></i-feather>
+  </button>
+  <ejs-datepicker
+    class="datepicker datepicker--custom"
+    [start]="depthSetting"
+    [enabled]="!disabled"
+    [formControl]="dateControl"
+    [depth]="depthSetting"
+    [format]="'MMMM'"
+  ></ejs-datepicker>
+  <button
+    ejs-button
+    cssClass="e-outline"
+    (click)="nextMonth()"
+    [disabled]="disabled">
+    <i-feather name="chevron-right" class="icon"></i-feather>
+  </button>
+</div>
