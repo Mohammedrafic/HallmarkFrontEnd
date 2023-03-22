@@ -41,6 +41,9 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CustomFormGroup } from '@core/interface';
 import { departmentName } from '../helpers/department.helper';
+import { findSelectedItems } from '@core/helpers';
+import { mapperSelectedItems } from '@shared/components/tiers-dialog/helper';
+import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 
 @Component({
   selector: 'app-assign-department',
@@ -66,6 +69,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   public readonly departmentFields = OptionFields;
   public departmentId?: number | null = null;
   public isOriented$: Subject<boolean> = new Subject();
+  public sortOrder: SortOrder = SortOrder.ASCENDING;
 
   public constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -127,7 +131,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   }
 
   private disableControls(): void {
-    const controlNames = ['regionId', 'locationId', 'departmentId'];
+    const controlNames = ['regionIds', 'locationIds', 'departmentIds'];
     this.departmentFormService.disableControls(this.assignDepartmentForm, controlNames);
   }
 
@@ -166,21 +170,21 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
 
   private watchForControlsValueChanges(): void {
     this.assignDepartmentForm
-      .get('regionId')
+      .get('regionIds')
       ?.valueChanges.pipe(
         filter(() => !this.departmentId),
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
       .subscribe((value) => {
+        const selectedRegions: OrganizationRegion[] = value?.length ? findSelectedItems(value, this.departmentHierarchy) : [];
+        this.dataSource.locations = mapperSelectedItems(selectedRegions, 'locations');
         this.departmentFormService.resetControls(this.assignDepartmentForm, ['locationId', 'departmentId']);
-        const selectedRegion = (this.dataSource.regions as OrganizationRegion[]).find((region) => region.id === value);
-        this.dataSource.locations = selectedRegion?.locations ?? [];
         this.cdr.markForCheck();
       });
 
     this.assignDepartmentForm
-      .get('locationId')
+      .get('locationIds')
       ?.valueChanges.pipe(
         filter(() => !this.departmentId),
         distinctUntilChanged(),
@@ -188,10 +192,8 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       )
       .subscribe((value) => {
         this.departmentFormService.resetControls(this.assignDepartmentForm, ['departmentId']);
-        const selectedLocation = (this.dataSource.locations as OrganizationLocation[]).find(
-          (location) => location.id === value
-        );
-        const departments = selectedLocation?.departments ?? [];
+        const selectedLocations: OrganizationLocation[] = value?.length ? findSelectedItems(value, this.dataSource.locations) : [];
+        const departments = mapperSelectedItems(selectedLocations, 'departments') as OrganizationDepartment[];
         this.dataSource.departments = departments.map((department) => ({
           ...department,
           name: departmentName(department.name, department.extDepartmentId ?? ''),
@@ -200,7 +202,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       });
 
     this.assignDepartmentForm
-      .get('departmentId')
+      .get('departmentIds')
       ?.valueChanges.pipe(
         filter(() => !this.departmentId),
         distinctUntilChanged(),

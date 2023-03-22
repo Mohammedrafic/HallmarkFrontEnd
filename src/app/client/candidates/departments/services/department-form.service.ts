@@ -13,9 +13,9 @@ export class DepartmentFormService {
 
   public createAssignDepartmentForm(): CustomFormGroup<AssignDepartmentFormState> {
     return this.formBuilder.group({
-      regionId: [null, [Validators.required]],
-      locationId: [null, [Validators.required]],
-      departmentId: [null, [Validators.required]],
+      regionIds: [null, [Validators.required]],
+      locationIds: [null, [Validators.required]],
+      departmentIds: [null, [Validators.required]],
       startDate: [new Date(), [Validators.required]],
       endDate: [null],
       isOriented: [null],
@@ -87,9 +87,9 @@ export class DepartmentFormService {
   public patchForm(formGroup: FormGroup, formData: DepartmentAssigned): void {
     const { regionId, locationId, departmentId, startDate, endDate, isOriented, isHomeCostCenter, orientationDate } = formData;
     formGroup.patchValue({
-      regionId: regionId,
-      locationId: locationId,
-      departmentId: departmentId,
+      regionIds: [regionId],
+      locationIds: [locationId],
+      departmentIds: [departmentId],
       startDate: DateTimeHelper.convertDateToUtc(startDate),
       endDate: endDate && DateTimeHelper.convertDateToUtc(endDate),
       isOriented: isOriented,
