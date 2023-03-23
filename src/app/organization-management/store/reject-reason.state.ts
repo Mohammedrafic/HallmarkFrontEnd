@@ -16,7 +16,7 @@ import {
   UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess,
   GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty,
   SavePenaltySuccess, SavePenaltyError, RemovePenalty, ShowOverridePenaltyDialog, GetUnavailabilityReasons,
-  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess, GetTerminationReasons, SaveTerminationReasons, RemoveTerminationReasons, UpdateTerminationReasons, UpdateTerminationReasonsSuccess, GetCategoryNoteReasons, SaveCategoryNoteReasons, RemoveCategoryNoteReasons, UpdateCategoryNoteReasons, UpdateCategoryNoteReasonsSuccess,
+  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess, GetTerminationReasons, SaveTerminationReasons, RemoveTerminationReasons, UpdateTerminationReasons, UpdateTerminationReasonsSuccess, GetCategoryNoteReasons, SaveCategoryNoteReasons, RemoveCategoryNoteReasons, UpdateCategoryNoteReasons, UpdateCategoryNoteReasonsSuccess, SaveTerminatedReasonError, UpdateInternalTransferReasonsError, UpdateCategoryNoteReasonsError,
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
 import { RejectReason, RejectReasonPage, RejectReasonwithSystem, UnavailabilityReasons } from "@shared/models/reject-reason.model";
@@ -491,6 +491,7 @@ export class RejectReasonState {
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {
+        dispatch(new UpdateInternalTransferReasonsError())
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
@@ -503,7 +504,7 @@ export class RejectReasonState {
   ): Observable<void> {
     return this.rejectReasonService.removeInternalTransferReason(id).pipe(
       tap(() => {
-        dispatch(new UpdateInternalTransferReasonsSuccess());
+        dispatch(new UpdateInternalTransferReasonsError());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
       })
     );  }
@@ -519,6 +520,7 @@ export class RejectReasonState {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       }),
       catchError((error: HttpErrorResponse) => {
+        dispatch(new UpdateInternalTransferReasonsError())
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
@@ -547,11 +549,12 @@ export class RejectReasonState {
   ): Observable<RejectReason | void> {
     return this.rejectReasonService.saveTerminationReason(payload).pipe(
       tap(payload => {
-        dispatch(new UpdateTerminationReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        dispatch(new UpdateTerminationReasonsSuccess());
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveTerminatedReasonError());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
@@ -564,7 +567,7 @@ export class RejectReasonState {
   ): Observable<void> {
     return this.rejectReasonService.removeTerminationReason(id).pipe(
       tap(() => {
-        dispatch(new UpdateTerminationReasonsSuccess());
+        dispatch(new SaveTerminatedReasonError());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
       })
     );  }
@@ -580,6 +583,7 @@ export class RejectReasonState {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       }),
       catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveTerminatedReasonError());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
@@ -613,6 +617,7 @@ export class RejectReasonState {
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {
+        dispatch(new UpdateCategoryNoteReasonsError());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
@@ -641,6 +646,7 @@ export class RejectReasonState {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       }),
       catchError((error: HttpErrorResponse) => {
+        dispatch(new UpdateCategoryNoteReasonsError());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
