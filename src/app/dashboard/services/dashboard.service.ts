@@ -341,10 +341,8 @@ export class DashboardService {
     )
   }
 
-  private getRNUtilizations(filter: DashboartFilterDto) : Observable<AgencyPositionModel[]> {
-    return this.httpClient.post<AgencyPositionModel[]>(`${this.baseUrl}/getOpenAndInprogressOpenPositions`, { ...filter }).pipe(
-      map((data)=> data)
-    )
+  private getRNUtilizations(filter: DashboartFilterDto) : Observable<GetWorkCommitment[]> {
+    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
   }
 
  
