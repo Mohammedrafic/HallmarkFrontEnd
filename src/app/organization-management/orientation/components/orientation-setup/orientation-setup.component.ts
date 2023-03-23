@@ -304,8 +304,8 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       this.orientationForm.markAllAsTouched();
     } else {
       const data = this.orientationForm.getRawValue();
-      data.startDate = DateTimeHelper.toUtcFormat(data.startDate)
-      data.endDate = data.endDate ? DateTimeHelper.toUtcFormat(data.endDate) : data.endDate;
+      data.startDate = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(data.startDate));
+      data.endDate = data.endDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(data.endDate)) : data.endDate;
       this.orientationService.saveOrientationConfiguration(data).subscribe({
         next: () => {
           this.store.dispatch(new ShowToast(MessageTypes.Success, data.orientationConfigurationId ? RECORD_MODIFIED : RECORD_ADDED));
