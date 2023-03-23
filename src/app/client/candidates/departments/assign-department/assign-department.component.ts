@@ -70,6 +70,12 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   public departmentId?: number | null = null;
   public isOriented$: Subject<boolean> = new Subject();
   public sortOrder: SortOrder = SortOrder.ASCENDING;
+  public disableToggles: boolean = false;
+  public allRecords: Record<string, boolean> = {
+    regionIds: false,
+    locationIds: false,
+    departmentIds: false,
+  };
 
   public constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -91,6 +97,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['departmentHierarchy']?.currentValue) {
       this.dataSource.regions = this.departmentHierarchy;
+      this.disableToggles = !this.dataSource.regions.length;
     }
   }
 
@@ -101,6 +108,54 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
 
   public toggleChecked(): void {
     this.assignDepartmentForm.markAsDirty();
+  }
+
+  public allRegionsChange(event: boolean): void {
+    this.toggleChecked();
+    this.allRecords['regionIds'] = event;
+    const regionsControl = this.assignDepartmentForm.get('regionIds');
+    if (this.allRecords['regionIds']) {
+      this.dataSource.locations = mapperSelectedItems(this.departmentHierarchy, 'locations');
+      regionsControl?.setValue(null, { emitEvent: false });
+      regionsControl?.disable();
+    } else {
+      regionsControl?.enable();
+      this.dataSource.locations = [];
+      this.dataSource.departments = [];
+      this.allRecords['locationIds'] = false;
+      this.allRecords['departmentIds'] = false;
+      const controlNames = ['locationIds', 'departmentIds'];
+      this.departmentFormService.enableControls(this.assignDepartmentForm, controlNames);
+      this.departmentFormService.resetControls(this.assignDepartmentForm, controlNames);
+    }
+  }
+
+  public allLocationsChange(event: boolean): void {
+    this.toggleChecked();
+    this.allRecords['locationIds'] = event;
+    if (this.allRecords['locationIds']) {
+      this.dataSource.departments = mapperSelectedItems(this.dataSource.locations, 'departments');
+      const locationControl = this.assignDepartmentForm.get('locationIds');
+      locationControl?.setValue(null, { emitEvent: false });
+      locationControl?.disable();
+    } else {
+      this.dataSource.departments = [];
+      this.allRecords['departmentIds'] = false;
+      this.departmentFormService.enableControls(this.assignDepartmentForm, ['locationIds', 'departmentIds']);
+      this.departmentFormService.resetControls(this.assignDepartmentForm, ['departmentIds']);
+    }
+  }
+
+  public allDepartmentsChange(event: boolean): void {
+    this.toggleChecked();
+    this.allRecords['departmentIds'] = event;
+    const departmentControl = this.assignDepartmentForm.get('departmentIds');
+    if (this.allRecords['departmentIds']) {
+      departmentControl?.setValue(null, { emitEvent: false });
+      departmentControl?.disable();
+    } else {
+      departmentControl?.enable();
+    }
   }
 
   private initForm(): void {
@@ -177,9 +232,11 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         takeUntil(this.destroy$)
       )
       .subscribe((value) => {
-        const selectedRegions: OrganizationRegion[] = value?.length ? findSelectedItems(value, this.departmentHierarchy) : [];
+        const selectedRegions: OrganizationRegion[] = value?.length
+          ? findSelectedItems(value, this.departmentHierarchy)
+          : [];
         this.dataSource.locations = mapperSelectedItems(selectedRegions, 'locations');
-        this.departmentFormService.resetControls(this.assignDepartmentForm, ['locationId', 'departmentId']);
+        this.departmentFormService.resetControls(this.assignDepartmentForm, ['locationIds', 'departmentIds']);
         this.cdr.markForCheck();
       });
 
@@ -191,8 +248,10 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         takeUntil(this.destroy$)
       )
       .subscribe((value) => {
-        this.departmentFormService.resetControls(this.assignDepartmentForm, ['departmentId']);
-        const selectedLocations: OrganizationLocation[] = value?.length ? findSelectedItems(value, this.dataSource.locations) : [];
+        this.departmentFormService.resetControls(this.assignDepartmentForm, ['departmentIds']);
+        const selectedLocations: OrganizationLocation[] = value?.length
+          ? findSelectedItems(value, this.dataSource.locations)
+          : [];
         const departments = mapperSelectedItems(selectedLocations, 'departments') as OrganizationDepartment[];
         this.dataSource.departments = departments.map((department) => ({
           ...department,
@@ -215,6 +274,9 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     this.assignDepartmentForm.reset();
     this.assignDepartmentForm.enable();
     this.assignDepartmentForm.get('startDate')?.setValue(new Date());
+    this.allRecords['regionIds'] = false;
+    this.allRecords['locationIds'] = false;
+    this.allRecords['departmentIds'] = false;
     this.isOriented$.next(false);
     this.departmentId = null;
     this.cdr.markForCheck();
