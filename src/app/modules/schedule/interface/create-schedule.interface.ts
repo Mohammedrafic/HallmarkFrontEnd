@@ -70,6 +70,7 @@ export interface ScheduleBook {
   departmentId: number | string;
   skillId: number | null;
   employeeBookedDays: EmployeeBookingDay[];
+  createOrder: boolean;
 }
 
 export interface BookingError {

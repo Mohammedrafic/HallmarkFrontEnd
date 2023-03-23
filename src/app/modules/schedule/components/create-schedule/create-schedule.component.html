@@ -105,3 +105,10 @@
     </div>
   </ng-template>
 </ejs-dialog>
+
+<app-replacement-order-dialog
+  *ngIf="replacementOrderDialogOpen"
+  [replacementOrderData]="replacementOrderDialogData"
+  (destroyDialog)="closeReplacementOrderDialog()"
+  (createOrder)="saveBooking($event)"
+></app-replacement-order-dialog>

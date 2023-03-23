@@ -8,6 +8,7 @@ import {
   Input,
   OnInit,
   Output,
+  TrackByFunction,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
@@ -48,6 +49,7 @@ import {
   ScheduledShiftFormConfig,
   ScheduledUnavailabilityFormConfig,
 } from './edit-schedule.constants';
+import { ShiftTab } from './edit-schedule.interface';
 import * as EditSchedule from './edit-schedule.interface';
 import { EditScheduleService } from './edit-schedule.service';
 
@@ -75,16 +77,18 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   readonly dropDownFields = { text: 'text', value: 'value' };
   readonly scheduleFormSourcesMap: EditSchedule.EditScheduleFormSource = EditScheduleSourcesMap;
   readonly createPerDiemOrderControl: FormControl = new FormControl(false);
+  readonly scheduleType = ScheduleType;
 
   scheduleForm: CustomFormGroup<EditSchedule.ScheduledShiftForm>;
   scheduleFormConfig: EditSchedule.EditScheduleFormConfig = ScheduledShiftFormConfig;
   shiftTabs: EditSchedule.ShiftTab[] = [];
   scheduledItem: ScheduledItem;
+  selectedDaySchedule: ScheduleItem;
+  trackByTabs: TrackByFunction<ShiftTab> = (_: number, tab: ShiftTab) => tab.id;
 
   private readonly customShiftId = -1;
   private scheduleShifts: ScheduleShift[] = [];
   private scheduleFilterStructure: ScheduleFilterStructure;
-  private selectedDaySchedule: ScheduleItem;
   private hasInitData = false;
   private subscriptions: Record<string, Subscription | null> = {
     shiftId: null,

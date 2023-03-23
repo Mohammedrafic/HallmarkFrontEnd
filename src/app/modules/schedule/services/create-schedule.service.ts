@@ -15,7 +15,6 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { UserState } from 'src/app/store/user.state';
 import { CreateScheduleItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
-import { ScheduleItemsComponent } from '../components/schedule-items/schedule-items.component';
 import { EmployeeBookingDay, ScheduleBookingErrors, ScheduleTypeRadioButton } from '../interface';
 
 @Injectable()
@@ -87,13 +86,13 @@ export class CreateScheduleService {
 
   createAvailabilityUnavailability(
     scheduleForm: FormGroup,
-    scheduleItemsComponent: ScheduleItemsComponent,
+    scheduleItems: CreateScheduleItem[],
     scheduleType: number,
     customShiftId: number
   ): ScheduleInt.Schedule {
     const { shiftId, startTime, endTime, unavailabilityReasonId = null } = scheduleForm.getRawValue();
     return  {
-      employeeScheduledDays: this.getEmployeeScheduledDays(scheduleItemsComponent.scheduleItems),
+      employeeScheduledDays: this.getEmployeeScheduledDays(scheduleItems),
       scheduleType,
       startTime: getTime(startTime),
       endTime: getTime(endTime),
@@ -104,18 +103,19 @@ export class CreateScheduleService {
 
   createBooking(
     scheduleForm: FormGroup,
-    scheduleItemsComponent: ScheduleItemsComponent,
+    scheduleItems: CreateScheduleItem[],
     customShiftId: number
   ): ScheduleInt.ScheduleBook {
     const { departmentId,skillId, shiftId, startTime, endTime } = scheduleForm.getRawValue();
 
     return  {
-      employeeBookedDays: this.getEmployeeBookedDays(scheduleItemsComponent.scheduleItems),
+      employeeBookedDays: this.getEmployeeBookedDays(scheduleItems),
       departmentId: departmentId,
       skillId: skillId,
       shiftId: shiftId !== customShiftId ? shiftId : null,
       startTime: getTime(startTime),
       endTime: getTime(endTime),
+      createOrder: false,
     };
   }
 

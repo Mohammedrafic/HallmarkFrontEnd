@@ -32,7 +32,7 @@ export class DateTimeHelper {
 
   public static convertDateToUtc(date: string): Date {
     const init = new Date(date);
-    const offset = Math.abs(init.getTimezoneOffset() * 60 * 1000);
+    const offset = init.getTimezoneOffset() * 60 * 1000;
     const day = new Date(init.setUTCDate(init.getUTCDate()) + offset);
 
     return day;
