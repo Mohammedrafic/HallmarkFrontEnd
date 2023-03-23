@@ -34,9 +34,9 @@ export class WorkCommitmentService {
   public createCommitmentForm(): CustomFormGroup<WorkCommitmentForm> {
     return this.formBuilder.group({
       masterWorkCommitmentId: [null, Validators.required],
-      regions: [null, Validators.required],
-      locations: [null, Validators.required],
-      skillIds: [null, Validators.required],
+      regions: [[], Validators.required],
+      locations: [[], Validators.required],
+      skillIds: [[], Validators.required],
       availabilityRequirement: [null],
       schedulePeriod: [null],
       minimumWorkExperience: [null],

@@ -141,7 +141,6 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
 
   private hideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false));
-    this.commitmentForm?.reset();
   }
 
   private createForm(): void {
@@ -269,7 +268,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        this.commitmentForm?.reset();
+        this.commitmentForm?.reset({ regions: [] });
       });
   }
 }
