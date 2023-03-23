@@ -84,6 +84,11 @@ export class GetAlertsForCurrentUser {
   constructor(public payload: any) { }
 }
 
+export class GetAlertsCountForCurrentUser {
+  static readonly type = '[app] Get Alerts Count For Current User';
+  constructor(public payload: any) { }
+}
+
 export class CheckScreen {
   static readonly type = '[app] Check screen';
   constructor() { }
