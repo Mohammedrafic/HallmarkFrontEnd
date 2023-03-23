@@ -9,7 +9,7 @@
     width: 240px;
     min-width: 240px;
     max-width: 240px;
-    border-bottom: none;
+    border-bottom: 0.5px solid $secondary-dark-blue-45;
   }
 
   .table-cell{
@@ -46,7 +46,7 @@
 }
 
 .fixed {
-  position: sticky;
+  position: absolute;
   z-index: 10;
   background: $white;
 
