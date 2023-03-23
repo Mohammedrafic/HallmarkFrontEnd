@@ -6,13 +6,14 @@
     </ng-template>
     <ng-template #RNUtilizationChart>
         <p class="hours-rn">Monthly hours scheduled for RN : <strong>200.30</strong></p>
+        <form [formGroup]="rnUtilizationformgroup">
         <div class="input-sec">
             <span>
                 <div class="input-container calendar">
                     <label>Date</label>
                     <div class="input-group datepicker">
                         <ejs-datepicker id="inactiveDate" class="datepicker" format="MM/dd/yyyy"
-                            placeholder="MM/DD/YYYY" [enableMask]="true"
+                            placeholder="MM/DD/YYYY" [enableMask]="true" formControlName="workDate"
                             [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }">
                         </ejs-datepicker>
                     </div>
@@ -35,7 +36,7 @@
             </span>
         </div>
 
-       
+       </form>  
         
         <div class="widget">
             <span class="widget__type" (mousedown)="defineMousePosition($event)"

@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, ChangeDetectorRef, Inject, OnChanges } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { GlobalWindow } from '@core/tokens';
 import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
@@ -33,8 +34,9 @@ export class RnUtilizationWidgetComponent   implements OnInit {
   public readonly optionFields = DefaultOptionFields;
   public allOption: string = "All";
   public commitmentsPageData$: Observable<GetWorkCommitment[]>;
+  rnUtilizationformgroup: FormGroup;
   
-  constructor(private readonly dashboardService: DashboardService,
+  constructor(private readonly dashboardService: DashboardService, private readonly fb: FormBuilder,
     private actions$: Actions, 
     private cdr: ChangeDetectorRef,
     protected store: Store,
@@ -45,7 +47,16 @@ export class RnUtilizationWidgetComponent   implements OnInit {
       }  }
  
    ngOnInit(): void {
-    this.store.dispatch(new GetAllCommitmentByPage());
+    this.rnUtilizationformgroup=this.fb.group({
+      workDate: [new Date()],
+      workcommitIds: []
+    })
+    this.store.dispatch(new GetAllCommitmentByPage())
+    .pipe()
+    .subscribe((result) => {
+     let Ids=(result.dashboard.commitmentsPage||[]).map((m: { id: number; })=>m.id)
+     this.rnUtilizationformgroup.controls['workcommitIds'].setValue(Ids)
+    });
   }
   public toSourceContent(orgname: string): void {
    
