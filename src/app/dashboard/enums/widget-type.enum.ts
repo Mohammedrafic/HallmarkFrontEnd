@@ -17,4 +17,5 @@ export enum WidgetTypeEnum {
   Candidate_Applied_In_Last_N_Days = 'Candidate_Applied_In_Last_N_Days',
   ORG = 'Organization_Widget',
   AGENCY_POSITION_COUNT = "Position_count_for_Agency",
+  RN_UTILIZATION ="RN_UTILIZATION"
 }

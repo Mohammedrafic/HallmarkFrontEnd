@@ -27,14 +27,14 @@ export class DepartmentHelper {
 }
 
 function createDepartmentPayload(formData: DepartmentPayload): DepartmentPayload {
-  const { departmentId, startDate, endDate, isOriented, isHomeCostCenter, orientationDate } = formData;
+  const { departmentIds, locationIds, regionIds, startDate, endDate, isOriented, isHomeCostCenter, orientationDate } = formData;
   return {
     forceUpdate: false,
     isOriented: !!isOriented,
     startDate: startDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(startDate)),
     endDate: endDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(endDate)),
     orientationDate: orientationDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(orientationDate)),
-    ...(departmentId && { departmentId }),
+    ...(departmentIds && { departmentIds, locationIds, regionIds }),
     ...(isHomeCostCenter && { isHomeCostCenter }),
   };
 }

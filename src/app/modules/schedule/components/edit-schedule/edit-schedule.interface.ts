@@ -5,13 +5,14 @@ import { EditScheduleFormSourceKeys } from './edit-schedule.constants';
 
 export interface ScheduledShift {
   scheduleId: number;
-  departmentId: number;
-  skillId: number;
+  departmentId?: number;
+  skillId?: number;
   shiftId: number;
   date: string;
   startTime: string;
   endTime: string;
   createOrder: boolean;
+  unavailabilityReasonId?: number;
 }
 
 export interface ScheduledShiftForm {
@@ -20,10 +21,11 @@ export interface ScheduledShiftForm {
   startTime: string;
   hours: string;
   endTime: string;
-  regionId: number;
-  locationId: number;
-  departmentId: number;
-  skillId: number;
+  regionId?: number;
+  locationId?: number;
+  departmentId?: number;
+  skillId?: number;
+  unavailabilityReasonId?: number;
 }
 
 export interface EditScheduleFormConfig {

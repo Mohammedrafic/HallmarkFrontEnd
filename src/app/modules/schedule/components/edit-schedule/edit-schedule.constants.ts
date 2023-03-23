@@ -14,7 +14,7 @@ export enum EditScheduleFormSourceKeys {
   Skills = 'skill',
 }
 
-const scheduledShiftFormFields: EditScheduleFormFieldConfig[] = [
+const scheduledAvailabilityFormFields: EditScheduleFormFieldConfig[] = [
   {
     field: 'date',
     title: 'Date',
@@ -52,6 +52,22 @@ const scheduledShiftFormFields: EditScheduleFormFieldConfig[] = [
     required: false,
     readonly: true,
   },
+];
+
+const scheduledUnavailabilityFormFields: EditScheduleFormFieldConfig[] = [
+  ...scheduledAvailabilityFormFields,
+  {
+    field: 'unavailabilityReasonId',
+    title: 'Reason',
+    type: FieldType.Dropdown,
+    gridAreaName: 'reason',
+    required: true,
+    sourceKey: EditScheduleFormSourceKeys.Reasons,
+  },
+];
+
+const scheduledShiftFormFields: EditScheduleFormFieldConfig[] = [
+  ...scheduledAvailabilityFormFields,
   {
     field: 'regionId',
     title: 'Region',
@@ -90,6 +106,16 @@ const scheduledShiftFormFields: EditScheduleFormFieldConfig[] = [
 export const ScheduledShiftFormConfig: EditScheduleFormConfig = {
   formClass: 'scheduled-shift-form',
   formFields: scheduledShiftFormFields,
+};
+
+export const ScheduledAvailabilityFormConfig: EditScheduleFormConfig = {
+  formClass: 'scheduled-availability-form',
+  formFields: scheduledAvailabilityFormFields,
+};
+
+export const ScheduledUnavailabilityFormConfig: EditScheduleFormConfig = {
+  formClass: 'scheduled-unavailability-form',
+  formFields: scheduledUnavailabilityFormFields,
 };
 
 export const EditScheduleSourcesMap: EditScheduleFormSource = {

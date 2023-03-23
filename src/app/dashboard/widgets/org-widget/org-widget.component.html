@@ -34,7 +34,7 @@
     </div>
     <div class="widget" *ngIf="isAgencyUser">
       <span class="widget__type"
-            (mousedown)="defineMousePosition($event)" (click)="toSourceContent('MissingCredentials')">
+            (mousedown)="defineMousePosition($event)">
             <p class="orgname">Credentials Expiring in next 30 days </p><p class="orgcount">{{chartData?.expiringCredentialsCount}}</p>
       </span>
       <span class="widget__type" *ngFor="let missingdata of chartData?.missingTimeSheet"

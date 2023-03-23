@@ -37,10 +37,12 @@
     </ejs-tooltip>
   </div>
   <div class="block">
-    <ejs-tooltip content="Scheduled Hours Per Week 1/Week 2" position="TopCenter" [showTipPointer]="false">
-      <span>{{ candidateData.workHours.join('/') }}</span>
-    </ejs-tooltip>
-    <span class="separator">|</span>
+    <ng-container *ngIf="showScheduledHours">
+      <ejs-tooltip content="Scheduled Hours Per Week 1/Week 2" position="TopCenter" [showTipPointer]="false">
+        <span>{{ candidateData.workHours.join('/') }}</span>
+      </ejs-tooltip>
+      <span class="separator">|</span>
+    </ng-container>
     <ejs-tooltip [content]="candidateData.workCommitmentText" position="TopRight" [showTipPointer]="false">
       <span>
         {{ candidateData.workCommitments && candidateData.workCommitments.length > 1

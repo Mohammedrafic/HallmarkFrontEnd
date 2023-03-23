@@ -26,20 +26,22 @@
         class="stepper"
         (selected)="selectScheduledItem($event.selectedIndex)"
         (created)="setInitData()">
-        <div class="e-tab-header">
-          <div *ngFor="let tab of shiftTabs">
-            <div class="stepper-header">
-              <div class="stepper-title">{{tab.title}}</div>
-              <div class="stepper-sub-title">{{tab.time}}</div>
-            </div>
-          </div>
-        </div>
-        <div class="e-content">
-          <ng-template *ngFor="let tab of shiftTabs"></ng-template>
-        </div>
+        <e-tabitems>
+          <e-tabitem *ngFor="let tab of shiftTabs">
+            <ng-template #headerText>
+              <div class="e-tab-header">
+                <div class="stepper-header">
+                  <div class="stepper-title">{{tab.title}}</div>
+                  <div class="stepper-sub-title">{{tab.time}}</div>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #content></ng-template>
+          </e-tabitem>
+        </e-tabitems>
       </ejs-tab>
       <div class="separator"></div>
-      <div class="form-container">
+      <div class="form-container" *ngIf="scheduleForm">
         <form [formGroup]="scheduleForm" [class]="scheduleFormConfig.formClass">
           <ng-container *ngFor="let control of scheduleFormConfig.formFields">
             <ng-container [ngSwitch]="control.type">
@@ -113,6 +115,12 @@
       <div class="checkbox-container bootstrap">
         <ejs-checkbox [formControl]="createPerDiemOrderControl" label="Create Per Diem Order"></ejs-checkbox>
       </div>
+      <button
+        (click)="deleteSchedule()"
+        cssClass="e-outline remove-schedule"
+        ejs-button>
+        Remove Schedule
+      </button>
     </div>
   </ng-template>
 </ejs-dialog>

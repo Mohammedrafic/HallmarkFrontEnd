@@ -5,10 +5,18 @@ import { DropdownOption } from '@core/interface';
 import { convertMsToTime, getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { ShiftTab } from '../components/edit-schedule/edit-schedule.interface';
 import { ScheduleType } from '../enums';
-import { BookingError, ScheduleBookingErrors, ScheduleItem } from '../interface';
+import {
+  BookingError,
+  ScheduleBookingErrors,
+  ScheduleDateItem,
+  ScheduleItem,
+  ScheduleModel,
+  ScheduleModelPage,
+} from '../interface';
 import { DateTimeHelper } from '@core/helpers';
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
 import { RECORD_ADDED, RECORDS_ADDED } from '@shared/constants';
+import { WeekList } from '../constants';
 
 export const GetScheduleDayWithEarliestTime = (schedules: ScheduleInt.ScheduleItem[]): ScheduleItem => {
   if(schedules.length >= 2) {
@@ -21,10 +29,9 @@ export const GetScheduleDayWithEarliestTime = (schedules: ScheduleInt.ScheduleIt
 };
 
 export const CreateScheduleDateItems = (dateValue: string): DateItem => {
-  const date = new Date(dateValue);
-
+  const date = new Date(`${dateValue}T00:00:00`);
   return {
-    dateValue: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+    dateValue: DateTimeHelper.toUtcFormat(date),
     id: null,
     date,
   };
@@ -71,7 +78,7 @@ export const DisableScheduleControls = (form: FormGroup, controls: string[]): vo
 
 export const CreateScheduleSuccessMessage = (schedule: ScheduleInt.Schedule): string => {
   return schedule.employeeScheduledDays.length === 1
-  && schedule.employeeScheduledDays[0].scheduledDays.length === 1
+  && schedule.employeeScheduledDays[0].dates.length === 1
     ? RECORD_ADDED
     : RECORDS_ADDED;
 };
@@ -212,3 +219,24 @@ export const GetShiftTimeControlsValue =
 
     return { startTime, endTime };
   };
+
+export const GetScheduleDateItem = (
+  candidateId: number,
+  date: string,
+  scheduleData: ScheduleModelPage
+): ScheduleDateItem | undefined => {
+  const dateStringLength = 10;
+
+  return (scheduleData.items.find((item: ScheduleModel) => item.candidate.id === candidateId) as ScheduleModel)
+      .schedule.find((item: ScheduleDateItem) => item.date.substring(0, dateStringLength) === date);
+};
+
+export const GetMonthRange = (initDay: number): string[] => {
+  const daysInWeek = WeekList;
+  const startingDayIndex = initDay % 7;
+
+  return  [
+    ...daysInWeek.slice(startingDayIndex),
+    ...daysInWeek.slice(0, startingDayIndex),
+  ];
+};
