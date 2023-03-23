@@ -222,8 +222,8 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       const reason  = data as CategoryNoteValue;
       this.reasonForm.patchValue({
         id: reason.id,
-        reason: reason.reason,
-        isRedFlagCategory: !!reason.isRedFlagCategory,
+        reason: reason.categoryName,
+        isRedFlagCategory: !!reason.isRedFlag,
         });
     } else {
       this.reasonForm.patchValue({
@@ -261,7 +261,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   private closeSideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false))
     .pipe(
-      delay(500),
+      delay(200),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {

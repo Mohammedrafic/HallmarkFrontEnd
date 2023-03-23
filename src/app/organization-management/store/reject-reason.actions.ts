@@ -198,6 +198,10 @@ export class UpdateInternalTransferReasonsSuccess {
   static readonly type = '[reject reason] Update Internal Transfer Reason Success';
 }
 
+export class UpdateInternalTransferReasonsError {
+  static readonly type = '[reject reason] Update Internal Transfer Reason Error';
+}
+
 
 export class GetTerminationReasons {
   static readonly type = '[reject reason] Get Termination reason by Page';
@@ -224,6 +228,10 @@ export class UpdateTerminationReasonsSuccess {
   static readonly type = '[reject reason] Update Termination Reason Success';
 }
 
+export class SaveTerminatedReasonError {
+  static readonly type = '[reject reason] Save Manual Invoice Reason Error';
+}
+
 export class GetCategoryNoteReasons {
   static readonly type = '[reject reason] Get CategoryNote reason by Page';
   constructor(public pageNumber: number, public pageSize: number) { }
@@ -247,4 +255,8 @@ export class UpdateCategoryNoteReasons {
 
 export class UpdateCategoryNoteReasonsSuccess {
   static readonly type = '[reject reason] Update CategoryNote Reason Success';
+}
+
+export class UpdateCategoryNoteReasonsError {
+  static readonly type = '[reject reason] Save CategoryNote Reason Error';
 }

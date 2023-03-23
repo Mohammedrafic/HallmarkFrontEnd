@@ -20,6 +20,8 @@ export interface CategoryNoteValue {
   id?: number | null;
   reason: string;
   isRedFlagCategory: boolean;
+  categoryName : string;
+  isRedFlag?: boolean;
 }
 
 

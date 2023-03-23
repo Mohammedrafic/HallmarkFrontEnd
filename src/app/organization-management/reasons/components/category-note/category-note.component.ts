@@ -3,7 +3,7 @@ import { ofActionSuccessful, Select } from "@ngxs/store";
 import { Observable, takeWhile } from "rxjs";
 import {
   GetCategoryNoteReasons,
-  RemoveCategoryNoteReasons, UpdateCategoryNoteReasonsSuccess
+  RemoveCategoryNoteReasons, UpdateCategoryNoteReasonsError, UpdateCategoryNoteReasonsSuccess
 } from "@organization-management/store/reject-reason.actions";
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { RejectReasonPage } from "@shared/models/reject-reason.model";
@@ -36,7 +36,7 @@ export class CategoryNoteComponent extends ReasonsComponent implements OnInit,On
 
   protected subscribeOnSaveReasonError(): void {
     this.actions$.pipe(
-      ofActionSuccessful(UpdateCategoryNoteReasonsSuccess),
+      ofActionSuccessful(UpdateCategoryNoteReasonsError),
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.setReasonControlError());
   }

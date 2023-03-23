@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@a
 import { ofActionSuccessful, Select } from "@ngxs/store";
 import { Observable, takeWhile } from "rxjs";
 import {
-  GetInternalTransferReasons, GetTerminationReasons, RemoveInternalTransferReasons, RemoveTerminationReasons, UpdateInternalTransferReasonsSuccess, UpdateTerminationReasonsSuccess,
+  GetInternalTransferReasons, GetTerminationReasons, RemoveInternalTransferReasons, RemoveTerminationReasons, SaveTerminatedReasonError, UpdateInternalTransferReasonsSuccess, UpdateTerminationReasonsSuccess,
 } from "@organization-management/store/reject-reason.actions";
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { RejectReasonPage } from "@shared/models/reject-reason.model";
@@ -30,7 +30,7 @@ export class EmpTerminationComponent extends ReasonsComponent implements OnInit,
 
   protected subscribeOnSaveReasonError(): void {
     this.actions$.pipe(
-      ofActionSuccessful(UpdateTerminationReasonsSuccess),
+      ofActionSuccessful(SaveTerminatedReasonError),
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.setReasonControlError());
   }
