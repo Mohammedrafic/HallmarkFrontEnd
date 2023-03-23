@@ -6,7 +6,7 @@ export const ScheduleCardTypeMap: Map<ScheduleType, ScheduleMonthCardConfig> =
   new Map<ScheduleType, ScheduleMonthCardConfig>()
   .set(ScheduleType.Book, {
       title: '',
-      titleColor: '#4C5673',
+      titleColor: '#000000',
       timeColor: '#060715',
       showTitleToolTip: true,
   }).set(ScheduleType.Unavailability, {

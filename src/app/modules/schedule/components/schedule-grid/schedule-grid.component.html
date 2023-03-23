@@ -70,7 +70,11 @@
     <table *ngIf="scheduleData?.items?.length; else emptyTable">
       <thead>
         <tr>
-          <th class="table-title candidates-head-cell fixed fixed--left fixed--top">{{ scheduleData?.totalCount || 0 }} Candidates</th>
+          <th
+            [class.custom-head-cell]="activePeriod === monthPeriod"
+            class="table-title candidates-head-cell fixed fixed--left fixed--top"
+          >
+            {{ scheduleData?.totalCount || 0 }} Candidates</th>
           <ng-container *ngIf="activePeriod !== monthPeriod; else monthRange">
             <th
               *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
@@ -83,8 +87,8 @@
           <ng-template #monthRange>
             <th
               *ngFor="let day of monthRangeDays; trackBy: trackByDatesRange"
-              class="table-title date month-date fixed fixed--top">
-              {{day}}
+              class="table-title date month-date fixed fixed--top custom-date-th">
+              <span>{{day}}</span>
             </th>
           </ng-template>
         </tr>

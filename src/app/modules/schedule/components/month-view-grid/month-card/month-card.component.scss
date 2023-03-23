@@ -83,6 +83,14 @@
       font-weight: 700;
       line-height: 18px;
     }
+
+    &__type {
+      margin-left: 4px;
+    }
+
+    &__separator {
+      margin: 0 4px;
+    }
   }
 
   ejs-tooltip {

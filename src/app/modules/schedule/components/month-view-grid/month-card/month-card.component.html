@@ -10,9 +10,9 @@
     [style.color]="cardConfig?.timeColor"
   >
     <span class="time__text">{{ firstSchedule.startDate | date: 'HH:mm': 'UTC' }}</span>
-    <span class="time__text">-</span>
+    <span class="time__text time__separator">-</span>
     <span class="time__text">{{ firstSchedule.endDate | date: 'HH:mm': 'UTC' }}</span>
-    <span *ngIf="firstSchedule?.orderMetadata?.orderType === orderType" class="time__text"> L </span>
+    <span *ngIf="firstSchedule?.orderMetadata?.orderType === orderType" class="time__text time__type"> L </span>
     <ejs-tooltip
       *ngIf="firstSchedule.scheduleOrderType"
       [content]="firstSchedule.scheduleOrderType"
