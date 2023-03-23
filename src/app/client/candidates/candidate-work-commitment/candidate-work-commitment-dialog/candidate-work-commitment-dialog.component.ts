@@ -63,7 +63,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public format = '#';
 
   public todayDate = new Date();
-  public lastActiveDate: Date;
+  public lastActiveDate: Date | null;;
   public selectWorkCommitmentStartDate: Date;
   public minimumDate: Date | undefined;
   public maximumDate: Date | undefined;
@@ -122,7 +122,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.candidateWorkCommitmentForm.controls['criticalOrder'].setValue(commitment.criticalOrder);
     this.candidateWorkCommitmentForm.controls['holiday'].setValue(commitment.holiday);
     this.candidateWorkCommitmentForm.controls['comment'].setValue(commitment.comments);
-    this.candidateWorkCommitmentForm.controls['startDate'].setValue(new Date());
+    this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.lastActiveDate);
     this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
   }
 
@@ -292,10 +292,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       .subscribe(() => {
         this.sideDialog.hide();
         this.candidateWorkCommitmentForm.reset();
+        this.lastActiveDate = null;
       });
     } else {
       this.sideDialog.hide();
       this.candidateWorkCommitmentForm.reset();
+      this.lastActiveDate = null;
     }
   }
 
