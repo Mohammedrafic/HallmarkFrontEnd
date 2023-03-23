@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil } from 'rxjs';
@@ -17,10 +17,10 @@ import { ButtonRegionTooltip, ButtonSelectDataTooltip, TabListConfig } from '../
 import { ActiveTabIndex } from '../../enums';
 import * as ScheduleInt from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
-import { ScheduledItem, ScheduleFilterStructure } from '../../interface';
+import { ScheduleCandidate, ScheduleDateItem, ScheduledItem, ScheduleFilterStructure, ScheduleModel } from '../../interface';
 import { OrganizationStructure } from '@shared/models/organization.model';
-import { GetScheduleFilterByEmployees, HasNotDepartment, HasMultipleFilters } from '../../helpers';
-import { ScheduleGridComponent } from './../../components/schedule-grid/schedule-grid.component';
+import { GetScheduleFilterByEmployees, HasNotDepartment, HasMultipleFilters, GetScheduleDateItem } from '../../helpers';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-schedule-container',
@@ -29,8 +29,6 @@ import { ScheduleGridComponent } from './../../components/schedule-grid/schedule
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleContainerComponent extends AbstractPermission implements OnInit {
-  @ViewChild(ScheduleGridComponent) scheduleGrid: ScheduleGridComponent;
-
   tabsListConfig: TabsListConfig[] = TabListConfig;
 
   activeTabIndex: ActiveTabIndex = ActiveTabIndex.Scheduling;
@@ -39,7 +37,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   scheduleData: ScheduleInt.ScheduleModelPage | null;
 
-  scheduledShift: ScheduledItem;
+  scheduledShift: ScheduledItem | null;
 
   appliedFiltersAmount = 0;
 
@@ -139,8 +137,22 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.openScheduleDialog();
   }
 
-  openScheduleDialog(): void {
-    this.setScheduleStructure();
+  openAddEditScheduleDialog(): void {
+    if (!this.scheduleSelectedSlots.candidates.length || !this.scheduleSelectedSlots.dates.length || !this.scheduleData) {
+      return;
+    }
+
+    const schedule = GetScheduleDateItem(
+      this.scheduleSelectedSlots.candidates[0].id,
+      this.scheduleSelectedSlots.dates[0],
+      this.scheduleData,
+    );
+
+    if (this.scheduleSelectedSlots.candidates.length === 1 && this.scheduleSelectedSlots.dates.length === 1 && schedule) {
+      this.editScheduledItem({ candidate: this.scheduleSelectedSlots.candidates[0], schedule });
+    } else {
+      this.openScheduleDialog();
+    }
   }
 
   closeScheduleDialog(): void {
@@ -158,7 +170,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   closeEditScheduleDialog(): void {
     this.editScheduleDialogOpen = false;
-    this.scheduleGrid?.clearSelectedCandidatesSlot();
+    this.scheduledShift = null;
   }
 
   showFilters(): void {
@@ -184,6 +196,10 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.filterService.deleteInlineChip(event);
   }
 
+  private openScheduleDialog(): void {
+    this.setScheduleStructure();
+  }
+
   private openEditScheduleDialog(): void {
     this.editScheduleDialogOpen = true;
   }
@@ -206,6 +222,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
         this.scheduleData = scheduleData;
       }
 
+      this.updateScheduledShift();
       this.totalCount = scheduleData.totalCount;
       this.cdr.detectChanges();
     });
@@ -221,7 +238,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       .subscribe((scheduleData: ScheduleInt.ScheduleModelPage) => {
         this.scheduleData = scheduleData;
         this.totalCount = scheduleData.totalCount;
-
+        this.updateScheduledShift();
         this.cdr.detectChanges();
     });
   }
@@ -258,8 +275,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   private setDateLimitation(): void {
     if (this.scheduleFilters.startDate && this.scheduleFilters.endDate) {
       this.datePickerLimitations = {
-        minDate: new Date(this.scheduleFilters.startDate),
-        maxDate: new  Date(this.scheduleFilters.endDate),
+        minDate: DateTimeHelper.setInitDateHours(new Date(this.scheduleFilters.startDate)),
+        maxDate: DateTimeHelper.setInitDateHours(new  Date(this.scheduleFilters.endDate)),
       };
     }
   }
@@ -320,5 +337,17 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   private setIsEmployee(): void {
     this.isEmployee = this.store.selectSnapshot(UserState.user)?.isEmployee || false;
+  }
+
+  private updateScheduledShift(): void {
+    if (this.scheduledShift) {
+      const scheduledShiftData = this.scheduleData?.items
+        .find((item: ScheduleModel) => item.candidate.id === this.scheduledShift?.candidate?.id);
+      this.scheduledShift = {
+        candidate: scheduledShiftData?.candidate as ScheduleCandidate,
+        schedule: scheduledShiftData?.schedule
+          .find((item: ScheduleDateItem) => item.date === this.scheduledShift?.schedule?.date) as ScheduleDateItem,
+      };
+    }
   }
 }

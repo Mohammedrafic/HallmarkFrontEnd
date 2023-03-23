@@ -30,6 +30,27 @@ export class EditScheduleService {
     }) as CustomFormGroup<ScheduledShiftForm>;
   }
 
+  createScheduledAvailabilityForm(): CustomFormGroup<ScheduledShiftForm> {
+    return this.fb.group({
+      date: [null, Validators.required],
+      shiftId: [null, Validators.required],
+      startTime: [null, Validators.required],
+      endTime: [null, Validators.required],
+      hours: [null],
+    }) as CustomFormGroup<ScheduledShiftForm>;
+  }
+
+  createScheduledUnavailabilityForm(): CustomFormGroup<ScheduledShiftForm> {
+    return this.fb.group({
+      date: [null, Validators.required],
+      unavailabilityReasonId: [null, Validators.required],
+      shiftId: [null, Validators.required],
+      startTime: [null, Validators.required],
+      endTime: [null, Validators.required],
+      hours: [null],
+    }) as CustomFormGroup<ScheduledShiftForm>;
+  }
+
   handleError(error: HttpErrorResponse): Observable<never> {
     this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error) || error.error.detail));
 

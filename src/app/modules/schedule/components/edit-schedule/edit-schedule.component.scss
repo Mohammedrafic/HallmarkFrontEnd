@@ -46,7 +46,42 @@
 
   .checkbox-container {
     padding: 10px 0;
+    margin-right: 34px;
   }
+
+  .remove-schedule {
+    flex-grow: 1;
+    color: $supportive-red !important;
+    border-color: $supportive-red;
+
+    &:hover {
+      background-color: unset !important;
+      border-color: $supportive-red-20 !important;
+      color: $supportive-red-20 !important;;
+    }
+  }
+}
+
+.scheduled-availability-form {
+  display: grid;
+  grid-template-columns:  2.5fr 2.7fr 1.9fr 1.9fr 1.2fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "date date date date date"
+    "shift shift startTime endTime hours";
+}
+
+.scheduled-unavailability-form {
+  display: grid;
+  grid-template-columns:  2.5fr 2.7fr 1.9fr 1.9fr 1.2fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "date reason reason reason reason"
+    "shift shift startTime endTime hours";
 }
 
 .scheduled-shift-form {
@@ -100,4 +135,10 @@
 
 .skill {
   grid-area: skill;
+}
+
+::ng-deep {
+  label {
+    margin-bottom: 0 !important;
+  }
 }

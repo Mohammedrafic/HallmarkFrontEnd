@@ -44,6 +44,7 @@ export interface ScheduleItem {
   location: string;
   department: string;
   unavailabilityReason: string;
+  unavailabilityReasonId: number;
   shiftId: number;
   orderMetadata: {
     orderType: IrpOrderType;

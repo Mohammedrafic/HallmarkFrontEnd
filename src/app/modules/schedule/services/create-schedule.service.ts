@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { EMPTY, Observable, of } from 'rxjs';
 
-import { getTime, getTimeFromDate, setTimeToDate } from '@shared/utils/date-time.utils';
+import { getTime } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
 import { ScheduleItemType } from 'src/app/modules/schedule/constants';
@@ -93,7 +93,7 @@ export class CreateScheduleService {
   ): ScheduleInt.Schedule {
     const { shiftId, startTime, endTime, unavailabilityReasonId = null } = scheduleForm.getRawValue();
     return  {
-      employeeScheduledDays: this.getEmployeeScheduledDays(scheduleItemsComponent.scheduleItems, startTime, endTime),
+      employeeScheduledDays: this.getEmployeeScheduledDays(scheduleItemsComponent.scheduleItems),
       scheduleType,
       startTime: getTime(startTime),
       endTime: getTime(endTime),
@@ -119,24 +119,14 @@ export class CreateScheduleService {
     };
   }
 
-  getEmployeeScheduledDays(
-    scheduleItems: CreateScheduleItem[],
-    startTime: Date,
-    endTime: Date
-  ): ScheduleInt.EmployeeScheduledDay[] {
+  getEmployeeScheduledDays(scheduleItems: CreateScheduleItem[]): ScheduleInt.EmployeeScheduledDay[] {
     return scheduleItems.map((item: CreateScheduleItem) => {
-      const scheduledDays: ScheduleInt.ScheduledDay[] = item.selectedDates.map((date: Date) => {
-        const dateValue: string = DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(date));
-
-        return {
-          schedulesToOverrideIds: this.getScheduleToOverrideIds(item.candidateId, dateValue, startTime, endTime),
-          date: dateValue,
-        };
-      });
+      const dates: string[] = item.selectedDates
+        .map((date: Date) => DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(date)));
 
       return {
         employeeId: item.candidateId,
-        scheduledDays,
+        dates,
       };
     });
   }
@@ -148,7 +138,7 @@ export class CreateScheduleService {
 
         return DateTimeHelper.toUtcFormat(initDate);
       });
-        
+
       return {
         employeeId: item.candidateId,
         bookedDays,
@@ -206,29 +196,5 @@ export class CreateScheduleService {
 
   getFirstAllowedScheduleType(scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>): ScheduleItemType {
     return (scheduleTypes.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
-  }
-
-  private getScheduleToOverrideIds(
-    candidateId: number,
-    dateString: string,
-    startTime: Date,
-    endTime: Date
-  ): number[] | null {
-    const overlappingScheduleIds: number[] = this.getDaySchedules(candidateId, dateString)
-      .filter((daySchedule: ScheduleInt.ScheduleItem) => this.isTimeRangeOverlapping(daySchedule, startTime, endTime))
-      .map((daySchedule: ScheduleInt.ScheduleItem) => daySchedule.id);
-
-    return overlappingScheduleIds.length ? overlappingScheduleIds : null;
-  }
-
-  private isTimeRangeOverlapping(daySchedule: ScheduleInt.ScheduleItem, startTime: Date, endTime: Date): boolean {
-    const dayScheduleStartTimeMs = setTimeToDate(getTimeFromDate(new Date(daySchedule.startDate), true))!.getTime();
-    const dayScheduleEndTimeMs = setTimeToDate(getTimeFromDate(new Date(daySchedule.endDate), true))!.getTime();
-    const shiftStartTimeMs = startTime.getTime();
-    const shiftEndTimeMs = endTime.getTime();
-
-    return (shiftStartTimeMs >= dayScheduleStartTimeMs && shiftEndTimeMs <= dayScheduleEndTimeMs)
-      || (shiftEndTimeMs > dayScheduleStartTimeMs && shiftStartTimeMs < dayScheduleStartTimeMs)
-      || (shiftStartTimeMs < dayScheduleEndTimeMs && shiftEndTimeMs > dayScheduleEndTimeMs);
   }
 }

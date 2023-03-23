@@ -191,11 +191,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.markForCheck();
   }
 
-  clearSelectedCandidatesSlot(): void {
-    this.selectedCandidatesSlot.clear();
-    this.cdr.markForCheck();
-  }
-
   singleMonthClick({date, candidate, cellDate }: CardClickEvent): void {
     this.handleCellSingleClick(date, candidate, cellDate);
   }
