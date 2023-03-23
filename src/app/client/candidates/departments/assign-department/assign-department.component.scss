@@ -19,3 +19,19 @@
     }
   }
 }
+
+.dropdown-wrapper {
+  display: flex;
+  align-items: flex-end;
+
+  .multiselect-dropdown {
+    flex: 1;
+  }
+
+  .switch {
+    display: flex;
+    justify-content: flex-end;
+    width: 20%;
+    padding: 12px 5px;
+  }
+}
