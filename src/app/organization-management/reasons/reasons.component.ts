@@ -261,7 +261,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   private closeSideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false))
     .pipe(
-      delay(200),
+      delay(500),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
