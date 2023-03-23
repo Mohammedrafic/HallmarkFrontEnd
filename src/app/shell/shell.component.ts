@@ -650,6 +650,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         this.getAlertsForUser();
       }
     });
+    this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+    this.alertCountStateModel$.subscribe((alertCountdata) => {
+      this.alertsCount = alertCountdata;
+    });
   }
 
   allAlertDismiss() {
@@ -657,6 +661,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       if (x) {
         this.getAlertsForUser();
       }
+    });
+    this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+    this.alertCountStateModel$.subscribe((alertCountdata) => {
+      this.alertsCount = alertCountdata;
     });
   }
 
