@@ -758,10 +758,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     return this.isActiveSystemIRP && (this.activeIRPTabIndex !== OrderManagementIRPTabsIndex.AllOrders);
   }
 
-  private ifFilteredByOrderStatuses(): boolean {
-    return this.isActiveSystemIRP && (this.activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete);
-  }
-
   private patchFilterForm(): void {
     this.OrderFilterFormGroup.setValue({
       orderPublicId: this.filters.orderPublicId || null,
