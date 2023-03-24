@@ -69,6 +69,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public selectWorkCommitmentStartDate: Date;
   public minimumDate: Date | undefined;
   public maximumDate: Date | undefined;
+  public startDate: Date;
 
 
   constructor(
@@ -88,6 +89,10 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.createForm();
     this.setRegionsLocationsDataSource();
     this.subscribeOnCommitmentDropdownChange();
+  }
+
+  public dateValueChange(event: Date): void {
+    this.startDate = event;
   }
 
   private createForm(): void {
@@ -131,6 +136,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private populateFormWithMasterCommitment(commitment: WorkCommitmentDetails): void {
+    const startDate = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(this.startDate || this.todayDate))
     let regions = this.getCommitmentRegionsFromHierarchy(commitment);
     let locations = this.getCommitmentLocationsFromHierarchy(commitment);
     this.setRegionsDataSource(regions);
@@ -143,7 +149,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.candidateWorkCommitmentForm.controls['criticalOrder'].setValue(commitment.criticalOrder);
     this.candidateWorkCommitmentForm.controls['holiday'].setValue(commitment.holiday);
     this.candidateWorkCommitmentForm.controls['comment'].setValue(commitment.comments);
-    this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.lastActiveDate);
+    this.candidateWorkCommitmentForm.controls['startDate'].setValue(startDate);
     this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
   }
 
@@ -331,12 +337,13 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       const candidateWorkCommitment: CandidateWorkCommitment = this.candidateWorkCommitmentForm.getRawValue();
       candidateWorkCommitment.startDate =
       candidateWorkCommitment.startDate &&
-      DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(candidateWorkCommitment.startDate));
+      DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(this.startDate));
       candidateWorkCommitment.employeeId = this.employeeId;
       this.candidateWorkCommitmentService.saveCandidateWorkCommitment(candidateWorkCommitment).pipe(
         tap(() => {
           this.sideDialog.hide();
           this.candidateWorkCommitmentForm.reset();
+          this.lastActiveDate = null;
           this.store.dispatch(new ShowToast(MessageTypes.Success, !candidateWorkCommitment.id ? RECORD_ADDED : RECORD_MODIFIED));
           this.refreshSubject$.next();
         }),
