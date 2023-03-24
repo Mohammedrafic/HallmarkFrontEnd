@@ -97,9 +97,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   get isBillRatePending(): boolean {
     return (
-      [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard].includes(this.currentCandidateApplicantStatus) &&
-      !this.isAgency
-    );
+      [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard]
+      .includes(this.currentCandidateApplicantStatus) && !this.isAgency);
   }
 
   get isOfferedBillRate(): boolean {
@@ -157,6 +156,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public orderPermissions: CurrentUserPermission[];
 
   private defaultApplicantStatuses: ApplicantStatus[];
+  private statuses: ApplicantStatus[];
 
   constructor(
     private store: Store,
@@ -187,51 +187,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       .subscribe();
   }
 
-  private subscribeForJobStatus(): void {
-    this.jobStatus$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((data) => {
-        if (!data?.length) {
-          this.jobStatusControl.disable();
-        } else {
-          this.jobStatusControl.enable();
-        }
-      });
-  }
+  public savePosition(): void {
+    const statusId = this.jobStatusControl.value;
+    const statuses = this.jobStatus$.getValue();
+    const status = statuses.find((stat) => stat.applicantStatus === statusId);
 
-  private subscribeForOrderPermissions(): void {
-    this.orderPermissions$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((data: CurrentUserPermission[]) => (this.orderPermissions = data) && this.mapPermissions());
-  }
-
-  private getOrderPermissions(orderId: number): void {
-    this.store.dispatch(new GetOrderPermissions(orderId));
-  }
-
-  private mapPermissions(): void {
-    this.canShortlist = false;
-    this.canInterview = false;
-    this.canReject = false;
-    this.canOffer = false;
-    this.canOnboard = false;
-    this.canClose = false;
-    this.orderPermissions.forEach(permission => {
-      this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
-      this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
-      this.canReject = this.canReject || permission.permissionId === PermissionTypes.CanRejectCandidate;
-      this.canOffer = this.canOffer || permission.permissionId === PermissionTypes.CanOfferCandidate;
-      this.canOnboard = this.canOnboard || permission.permissionId === PermissionTypes.CanOnBoardCandidate;
-      this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
-    });
-    this.disableControlsBasedOnPermissions();
-  }
-
-  private disableControlsBasedOnPermissions(): void {
-    if (!this.canReject && !this.canOffer && !this.canOnboard) {
-      this.hourlyRate?.disable();
-    } else {
-      this.hourlyRate?.enable();
+    if (statusId && status) {
+      this.handleOnboardedCandidate(status);
     }
   }
 
@@ -280,7 +242,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }): void {
     if (!!event.itemData) {
       event.itemData?.isEnabled
-        ? this.handleOnboardedCandidate(event)
+        ? this.handleOnboardedCandidate(event.itemData)
         : this.store.dispatch(new ShowToast(MessageTypes.Error, SET_READONLY_STATUS));
     }
   }
@@ -329,6 +291,53 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public onReject(): void {
     this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
+  }
+
+  public updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
+    this.acceptForm.markAllAsTouched();
+    if (!this.acceptForm.errors && this.orderCandidateJob) {
+      const value = this.acceptForm.getRawValue();
+      this.store
+        .dispatch(
+          new UpdateOrganisationCandidateJob({
+            organizationId: this.orderCandidateJob.organizationId,
+            orderId: this.orderCandidateJob.orderId,
+            jobId: this.orderCandidateJob.jobId,
+            skillName: value.skillName,
+            offeredBillRate: this.orderCandidateJob?.offeredBillRate,
+            candidateBillRate: this.orderCandidateJob.candidateBillRate,
+            nextApplicantStatus: {
+              applicantStatus: this.orderCandidateJob.applicantStatus.applicantStatus,
+              statusText: this.orderCandidateJob.applicantStatus.statusText,
+            },
+            billRates: this.getBillRateForUpdate(bill),
+            candidatePayRate: this.orderCandidateJob.candidatePayRate,
+          })
+        )
+        .subscribe(() => {
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+        });
+    }
+  }
+
+  public getBillRateForUpdate(value: BillRate): BillRate[] {
+    let billRates;
+
+    const existingBillRateIndex = this.orderCandidateJob.billRates.findIndex((billRate) => billRate.id === value.id);
+
+    if (existingBillRateIndex > -1) {
+      this.orderCandidateJob.billRates.splice(existingBillRateIndex, 1, value);
+      billRates = this.orderCandidateJob?.billRates;
+    } else {
+      if (typeof value === 'number') {
+        this.orderCandidateJob?.billRates.splice(value, 1);
+        billRates = this.orderCandidateJob?.billRates;
+      } else {
+        billRates = [...(this.orderCandidateJob?.billRates as BillRate[]), value];
+      }
+    }
+
+    return billRates;
   }
 
   private setValueForm({
@@ -415,22 +424,21 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 
-  private handleOnboardedCandidate(event: {
-    itemData: { applicantStatus: ApplicantStatusEnum; statusText: string };
-  }): void {
-    if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
+  private handleOnboardedCandidate(status: ApplicantStatus): void {
+    if (status.applicantStatus === ApplicantStatusEnum.Rejected) {
       this.onReject();
-    } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
+    } else if (status.applicantStatus === ApplicantStatusEnum.Cancelled) {
       this.openCandidateCancellationDialog.next();
     } else {
-      this.updateOrganizationCandidateJob(event.itemData);
+      this.updateOrganizationCandidateJob(status);
     }
   }
 
-  private updateOrganizationCandidateJob(status: { applicantStatus: ApplicantStatusEnum; statusText: string }): void {
+  private updateOrganizationCandidateJob(status: ApplicantStatus): void {
     this.acceptForm.markAllAsTouched();
     if (this.acceptForm.valid && this.orderCandidateJob && status) {
       const value = this.acceptForm.getRawValue();
+
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
@@ -452,49 +460,6 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         )
         .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
     }
-  }
-
-  updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
-    this.acceptForm.markAllAsTouched();
-    if (!this.acceptForm.errors && this.orderCandidateJob) {
-      const value = this.acceptForm.getRawValue();
-      this.store
-        .dispatch(
-          new UpdateOrganisationCandidateJob({
-            organizationId: this.orderCandidateJob.organizationId,
-            orderId: this.orderCandidateJob.orderId,
-            jobId: this.orderCandidateJob.jobId,
-            skillName: value.skillName,
-            offeredBillRate: this.orderCandidateJob?.offeredBillRate,
-            candidateBillRate: this.orderCandidateJob.candidateBillRate,
-            nextApplicantStatus: {
-              applicantStatus: this.orderCandidateJob.applicantStatus.applicantStatus,
-              statusText: this.orderCandidateJob.applicantStatus.statusText,
-            },
-            billRates: this.getBillRateForUpdate(bill),
-            candidatePayRate: this.candidateJob.candidatePayRate,
-          })
-        )
-        .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
-    }
-  }
-
-  getBillRateForUpdate(value: BillRate): BillRate[] {
-    let billRates;
-    const existingBillRateIndex = this.orderCandidateJob.billRates.findIndex((billRate) => billRate.id === value.id);
-    if (existingBillRateIndex > -1) {
-      this.orderCandidateJob.billRates.splice(existingBillRateIndex, 1, value);
-      billRates = this.orderCandidateJob?.billRates;
-    } else {
-      if (typeof value === 'number') {
-        this.orderCandidateJob?.billRates.splice(value, 1);
-        billRates = this.orderCandidateJob?.billRates;
-      } else {
-        billRates = [...(this.orderCandidateJob?.billRates as BillRate[]), value];
-      }
-    }
-
-    return billRates;
   }
 
   private subscribeOnUpdateCandidateJobSucceed(): Observable<void> {
@@ -566,6 +531,14 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       default:
         break;
     }
+
+    const statusesToDisableRate = [CandidatStatus.OnBoard, CandidatStatus.Offboard, CandidatStatus.Cancelled,
+      CandidatStatus.Rejected];
+
+    if (statusesToDisableRate.includes(this.currentCandidateApplicantStatus)) {
+      this.acceptForm.get('hourlyRate')?.disable();
+    }
+
   }
 
   private onUpdateSuccess(): Observable<unknown> {
@@ -581,5 +554,56 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       ofActionSuccessful(CancelOrganizationCandidateJobSuccess),
       tap(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()))
     );
+  }
+
+  private subscribeForJobStatus(): void {
+    this.jobStatus$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data) => {
+        if (!data?.length) {
+          this.jobStatusControl.disable();
+        } else {
+          this.jobStatusControl.enable();
+        }
+      });
+  }
+
+  private subscribeForOrderPermissions(): void {
+    this.orderPermissions$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data: CurrentUserPermission[]) => (this.orderPermissions = data) && this.mapPermissions());
+  }
+
+  private getOrderPermissions(orderId: number): void {
+    this.store.dispatch(new GetOrderPermissions(orderId));
+  }
+
+  private mapPermissions(): void {
+    this.canShortlist = false;
+    this.canInterview = false;
+    this.canReject = false;
+    this.canOffer = false;
+    this.canOnboard = false;
+    this.canClose = false;
+    this.orderPermissions.forEach(permission => {
+      this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
+      this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
+      this.canReject = this.canReject || permission.permissionId === PermissionTypes.CanRejectCandidate;
+      this.canOffer = this.canOffer || permission.permissionId === PermissionTypes.CanOfferCandidate;
+      this.canOnboard = this.canOnboard || permission.permissionId === PermissionTypes.CanOnBoardCandidate;
+      this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
+    });
+    this.disableControlsBasedOnPermissions();
+  }
+
+  private disableControlsBasedOnPermissions(): void {
+    const statusesToDisableRate = [CandidatStatus.OnBoard, CandidatStatus.Offboard, CandidatStatus.Cancelled,
+      CandidatStatus.Rejected];
+
+    if (!this.canReject && !this.canOffer && !this.canOnboard) {
+      this.hourlyRate?.disable();
+    } else if (!statusesToDisableRate.includes(this.currentCandidateApplicantStatus)) {
+      this.hourlyRate?.enable();
+    }
   }
 }
