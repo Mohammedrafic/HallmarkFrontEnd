@@ -51,7 +51,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public workCommitments: WorkCommitmentDataSource[] = [];
   public holidays: { id: number, name: number }[] = [];
   public regions: OrganizationRegion[] = [];
+  public allRegions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
+  public selectedLocations: number[] = [];
   public candidateWorkCommitmentForm: FormGroup;
   public employeeId: number;
   public readonly commitmentFields = {
@@ -108,11 +110,30 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     });
   }
 
-  private populateFormWithMasterCommitment(commitment: WorkCommitmentDetails): void {
+  private getCommitmentRegionsFromHierarchy(commitment: WorkCommitmentDetails): number[] {
     let regions = commitment.workCommitmentOrgHierarchies.map((val) => val.regionId);
     regions = uniq(regions);
+    return regions;
+  }
+
+  private getCommitmentLocationsFromHierarchy(commitment: WorkCommitmentDetails): number[] {
     let locations = commitment.workCommitmentOrgHierarchies.map((val) => val.locationId);
     locations = uniq(locations);
+    return locations;
+  }
+
+  private setRegionsDataSource(regions: number[]): void {
+    this.regions = this.allRegions.filter((region) => regions.indexOf(region.regionId as number) > -1);
+  }
+
+  private setLocationsDataSource(locations: OrganizationLocation[]): void {
+    this.locations = locations.filter((location) => this.selectedLocations.indexOf(location.locationId as number) > -1);
+  }
+
+  private populateFormWithMasterCommitment(commitment: WorkCommitmentDetails): void {
+    let regions = this.getCommitmentRegionsFromHierarchy(commitment);
+    let locations = this.getCommitmentLocationsFromHierarchy(commitment);
+    this.setRegionsDataSource(regions);
     this.candidateWorkCommitmentForm.controls['regionIds'].setValue(regions);
     this.candidateWorkCommitmentForm.controls['locationIds'].setValue(locations);
     this.candidateWorkCommitmentForm.controls['jobCode'].setValue(commitment.jobCode);
@@ -131,9 +152,10 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     setTimeout(() => this.startDatePicker.datepicker.refresh());
   }
 
-  private getWorkCommitmentById(id: number, populateForm = true): void {
+  private getWorkCommitmentById(id: number, candidateCommitment: CandidateWorkCommitment | null = null, populateForm = true): void {
     this.candidateWorkCommitmentService.getWorkCommitmentById(id)
       .subscribe((commitment: WorkCommitmentDetails) => {
+        this.selectedLocations = this.getCommitmentLocationsFromHierarchy(commitment);
         this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
         this.minimumDate = this.lastActiveDate ? this.lastActiveDate : this.selectWorkCommitmentStartDate;
         const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
@@ -141,6 +163,14 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         if (populateForm) {
           this.populateFormWithMasterCommitment(commitment);
         } else {
+          let regions = this.getCommitmentRegionsFromHierarchy(commitment);
+          this.setRegionsDataSource(regions);
+          if (candidateCommitment) {
+            this.candidateWorkCommitmentForm.patchValue(candidateCommitment as {}, { emitEvent: false });
+            this.candidateWorkCommitmentForm.controls['regionIds'].setValue(candidateCommitment.regionIds);
+            this.candidateWorkCommitmentForm.controls['locationIds'].setValue(candidateCommitment.locationIds);
+            this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
+          }
           this.refreshDatepicker();
           this.cd.detectChanges();
         }
@@ -200,14 +230,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   private getCandidateWorkCommitmentById(commitment: CandidateWorkCommitment): void {
     this.candidateWorkCommitmentService.getCandidateWorkCommitmentById(commitment.id as number).subscribe((commitment: CandidateWorkCommitment) => {
       if (commitment.workCommitmentId) {
-        this.getWorkCommitmentById(commitment.workCommitmentId, false);
+        this.getWorkCommitmentById(commitment.workCommitmentId, commitment, false);
       } 
       commitment.startDate = commitment.startDate && DateTimeHelper.convertDateToUtc(commitment.startDate as string);
-      this.candidateWorkCommitmentForm.patchValue(commitment as {}, { emitEvent: false });
-      this.candidateWorkCommitmentForm.controls['regionIds'].setValue(commitment.regionIds);
-      this.candidateWorkCommitmentForm.controls['locationIds'].setValue(commitment.locationIds);
-      this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
-      this.cd.detectChanges();
     });
   }
 
@@ -235,7 +260,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.organizationStructure$
     .pipe(takeUntil(this.destroy$), filter(Boolean))
     .subscribe((structure: OrganizationStructure) => {
-      this.regions = structure.regions;
+      this.allRegions = structure.regions;
     });
     this.candidateWorkCommitmentForm.controls['regionIds'].valueChanges
       .pipe(
@@ -248,14 +273,14 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
           const locations: OrganizationLocation[] = [];
 
           val.forEach((id) =>
-            selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
+            selectedRegions.push(this.allRegions.find((region) => region.id === id) as OrganizationRegion)
           );
           this.locations = [];
           selectedRegions.forEach((region) => {
-            region.locations?.forEach((location) => (location.regionName = region.name));
             locations.push(...region.locations as []);
           });
           this.locations.push(...sortByField(locations, 'name'));
+          this.setLocationsDataSource(this.locations);
         } else {
           this.locations = [];
         }
