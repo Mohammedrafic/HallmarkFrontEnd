@@ -241,7 +241,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
 
   private deleteAssignedDepartments(departmentIds: number[] | null, isBulkAction?: boolean): void {
     const text = isBulkAction ? DELETE_MULTIPLE_RECORDS_TEXT : DELETE_RECORD_TEXT;
-
+    const filters = isBulkAction ? this.filters : null;
     this.confirmService
       .confirm(text, {
         okButtonLabel: 'Delete',
@@ -250,7 +250,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       })
       .pipe(
         filter(Boolean),
-        switchMap(() => this.departmentsService.deleteAssignedDepartments(departmentIds, this.filters, !!isBulkAction)),
+        switchMap(() => this.departmentsService.deleteAssignedDepartments(departmentIds, filters)),
         switchMap(() => this.departmentsService.getDepartmentsAssigned(this.filters)),
         take(1)
       )
