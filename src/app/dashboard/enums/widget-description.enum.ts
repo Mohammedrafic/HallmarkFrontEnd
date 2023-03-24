@@ -22,4 +22,6 @@ export enum WidgetDescriptionEnum {
   AGENCY_POSITION_COUNT = 'Count of Open and In Progress positions by Organizations.',
   AGENCY_DESCRIPTION = 'Agency Widget Description',
   RN_UTILIZATION_DESCRIPTION = 'RN Utilization Widget Description',
+  ALREADY_EXPIRED_CREDS = 'Already_expired_creds',
+  UPCOMING_EXP_CREDS = 'Upcoming_exp_creds'
 }

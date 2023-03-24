@@ -21,4 +21,6 @@ export const widgetTypeToConfigurationMapper: Record<WidgetTypeEnum, PanelModel>
   [WidgetTypeEnum.ORG]: { sizeX: 3, sizeY: 2, maxSizeX: 3, maxSizeY: 2, minSizeX: 3, minSizeY: 2 },
   [WidgetTypeEnum.AGENCY_POSITION_COUNT]: { sizeX: 3, sizeY: 2, maxSizeX: 3, maxSizeY: 2, minSizeX: 3, minSizeY: 2 },
   [WidgetTypeEnum.RN_UTILIZATION]: { sizeX: 3, sizeY: 4, maxSizeX: 3, maxSizeY: 4, minSizeX: 3, minSizeY: 3 },
+  [WidgetTypeEnum.ALREADY_EXPIRED_CREDS]: { sizeX: 3, sizeY: 2, maxSizeX: 3, maxSizeY: 2, minSizeX: 3, minSizeY: 2 },
+  [WidgetTypeEnum.UPCOMING_EXP_CREDS]: { sizeX: 3, sizeY: 2, maxSizeX: 3, maxSizeY: 2, minSizeX: 3, minSizeY: 2 },
 };

@@ -18,6 +18,8 @@ import { AgencypositionWidgetModule } from '../widgets/agencyposition-widget/age
 import { UserState } from '../../store/user.state';
 import { CandidateChartModule } from '../widgets/candidate-chart/candidate-chart.module';
 import { RnUtilizationWidgetModule } from '../widgets/rn-utilization-widget/rn-utilization-widget.module';
+import { AlreadyExpiredCredsModule } from '../widgets/already-expired-creds/already-expired-creds.module';
+import { UpcomingExpCredsModule } from '../widgets/upcoming-exp-creds/upcoming-exp-creds.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -38,6 +40,8 @@ import { RnUtilizationWidgetModule } from '../widgets/rn-utilization-widget/rn-u
     OrgWidgetModule,
     AgencypositionWidgetModule,
     RnUtilizationWidgetModule,
+    AlreadyExpiredCredsModule,
+    UpcomingExpCredsModule,
     NgxsModule.forFeature([ UserState])
   ]
 })

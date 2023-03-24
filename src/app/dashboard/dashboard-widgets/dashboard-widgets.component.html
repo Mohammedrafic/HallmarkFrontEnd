@@ -68,20 +68,29 @@
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.Candidate_Applied_In_Last_N_Days"
                               [isDarkTheme]="isDarkTheme"></app-candidate-chart>
-                              
-                              <app-org-widget *ngSwitchCase="widgetTypeEnum.ORG"    
+          <app-org-widget *ngSwitchCase="widgetTypeEnum.ORG"    
                               [chartData]="widgetsData?.[widgetTypeEnum.ORG]"
                               [isLoading]="isLoading"
                               [description]="isAgencyUser ? widgetDescriptionEnum.AGENCY_DESCRIPTION : widgetDescriptionEnum.ORG"
                               [isDarkTheme]="isDarkTheme"></app-org-widget>        
-          
           <app-agencyposition-widget *ngSwitchCase="widgetTypeEnum.AGENCY_POSITION_COUNT"    
                               [chartData]="widgetsData?.[widgetTypeEnum.AGENCY_POSITION_COUNT]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.AGENCY_POSITION_COUNT"
                               [isDarkTheme]="isDarkTheme"></app-agencyposition-widget>
-             <app-rn-utilization-widget *ngSwitchCase="widgetTypeEnum.RN_UTILIZATION" [isLoading]="isLoading"
-            [description]="widgetDescriptionEnum.RN_UTILIZATION_DESCRIPTION"></app-rn-utilization-widget>
+          <app-rn-utilization-widget *ngSwitchCase="widgetTypeEnum.RN_UTILIZATION" 
+                              [isLoading]="isLoading"
+                              [description]="widgetDescriptionEnum.RN_UTILIZATION_DESCRIPTION"></app-rn-utilization-widget>
+          <app-already-expired-creds *ngSwitchCase="widgetDescriptionEnum.ALREADY_EXPIRED_CREDS"    
+                              [chartData]="widgetsData?.[widgetTypeEnum.ALREADY_EXPIRED_CREDS]"
+                              [isLoading]="isLoading"
+                              [description]="widgetDescriptionEnum.ALREADY_EXPIRED_CREDS"
+                              [isDarkTheme]="isDarkTheme"></app-already-expired-creds>
+          <app-upcoming-exp-creds *ngSwitchCase="widgetDescriptionEnum.UPCOMING_EXP_CREDS"    
+                              [chartData]="widgetsData?.[widgetTypeEnum.UPCOMING_EXP_CREDS]"
+                              [isLoading]="isLoading"
+                              [description]="widgetDescriptionEnum.UPCOMING_EXP_CREDS"
+                              [isDarkTheme]="isDarkTheme"></app-upcoming-exp-creds>
          
         </ng-template>
       </e-panel>

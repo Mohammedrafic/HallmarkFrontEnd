@@ -76,7 +76,7 @@ export class DashboardService {
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboartFilterDto) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
     [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => this.getPositionsByTypes(filters, timeSelection),
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboartFilterDto) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
-    [WidgetTypeEnum.OPEN_POSITIONS]: (filters,) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
+    [WidgetTypeEnum.OPEN_POSITIONS]: (filters) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
     [WidgetTypeEnum.INVOICES]: () => this.getInvocesWidgetData(),
     [WidgetTypeEnum.TASKS]: () => this.getTasksWidgetData(),
     [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
@@ -85,8 +85,10 @@ export class DashboardService {
     [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
     [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
     [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters),
-    [WidgetTypeEnum.AGENCY_POSITION_COUNT] : (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
-    [WidgetTypeEnum.RN_UTILIZATION] : (filters: DashboartFilterDto) => this.getRNUtilizations(filters),
+    [WidgetTypeEnum.AGENCY_POSITION_COUNT]: (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
+    [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => this.getRNUtilizations(filters),
+    [WidgetTypeEnum.ALREADY_EXPIRED_CREDS]: (filters: DashboartFilterDto) => this.getalreadyExpiredCredentials(filters),
+    [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpCredentials(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -100,7 +102,38 @@ export class DashboardService {
           lodashMap((widget: WidgetOptionModel) => find((panel: PanelModel) => panel.id === widget.id, panels)),
           lodashFilter(identity)
         )(widgets) as PanelModel[];
-
+          availablePanels.push({
+            col: 3,
+            id: "Already_expired_creds",
+            maxSizeX: 3,
+            maxSizeY: 2,
+            minSizeX: 3,
+            minSizeY: 2,
+            row: 0,
+            sizeX: 3,
+            sizeY: 2
+          },{
+            col: 3,
+            id: "Upcoming_exp_creds",
+            maxSizeX: 3,
+            maxSizeY: 2,
+            minSizeX: 3,
+            minSizeY: 2,
+            row: 0,
+            sizeX: 3,
+            sizeY: 2
+          })
+          widgets.push({
+            description: "Already Expired Credentials",
+            id: WidgetTypeEnum.ALREADY_EXPIRED_CREDS,
+            title: "Already_expired_creds",
+            widgetType: 22
+          },{
+            description: "Upcoming Credentials Expiring",
+            id: WidgetTypeEnum.UPCOMING_EXP_CREDS,
+            title: "Upcoming_exp_creds",
+            widgetType: 23
+          })
         return { panels: availablePanels, widgets };
       }),
       catchError(() => of({ panels: [], widgets: [] }))
@@ -342,6 +375,14 @@ export class DashboardService {
   }
 
   private getRNUtilizations(filter: DashboartFilterDto) : Observable<GetWorkCommitment[]> {
+    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
+  }
+
+  private getalreadyExpiredCredentials(filter: DashboartFilterDto) : Observable<GetWorkCommitment[]> {
+    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
+  }
+
+  private getupcomingExpCredentials(filter: DashboartFilterDto) : Observable<GetWorkCommitment[]> {
     return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
   }
 

@@ -612,3 +612,21 @@ body.dark .title, body.dark .contact-name {
 .document-grid {
   height: calc(89vh - 164px) !important;
 }
+
+#Already_expired_creds .app-widget-wrapper__header {
+  padding: 0% 3%;
+}
+
+#Already_expired_creds .widget__type {
+  padding: 0% 3%;
+  color: #1a1b2e;
+}
+
+#Upcoming_exp_creds .app-widget-wrapper__header {
+  padding: 0% 3%;
+}
+
+#Upcoming_exp_creds .widget__type {
+  padding: 0% 3%;
+  color: #1a1b2e;
+}
