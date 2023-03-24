@@ -676,8 +676,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters.pageNumber = this.currentPage;
       this.filters.pageSize = this.pageSize;
       if (this.activeIRPTabIndex !== OrderManagementIRPTabsIndex.AllOrders) {
-        this.filters.orderTypes = IRPTabRequestTypeMap.get(this.activeIRPTabIndex) ? [IRPTabRequestTypeMap.get(this.activeIRPTabIndex) as number] : [];
+        this.filters.orderTypes = Number.isInteger(IRPTabRequestTypeMap.get(this.activeIRPTabIndex)) ? [IRPTabRequestTypeMap.get(this.activeIRPTabIndex) as number] : [];
       }
+
+      this.isIncomplete = (this.activeIRPTabIndex === OrderManagementIRPTabsIndex.Incomplete);
 
       this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.IRP);
 
