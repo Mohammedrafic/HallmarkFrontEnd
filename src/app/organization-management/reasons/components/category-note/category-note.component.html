@@ -29,6 +29,12 @@
           </ng-template>
         </e-column>
         <e-column field="categoryName" headerText="Reason" textAlign="Left" width="100%"></e-column>
+        <e-column headerText="Red Flag Category" textAlign="Left" width="100%">
+          <ng-template #template let-data>
+            <div *ngIf="data.isRedFlag">Yes</div>
+            <div *ngIf="!data.isRedFlag">No</div>
+          </ng-template>
+        </e-column>
       </e-columns>
   
       <ng-template #pagerTemplate let-data>
