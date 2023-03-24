@@ -111,7 +111,7 @@
               [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
               appDoubleClick
               (singleClick)="handleCellSingleClick(dateSlot, scheduleItem.candidate, dateSchedule)"
-              (dbClick)="handleScheduleCardDblClick(dateSchedule, scheduleItem.candidate)"
+              (dbClick)="handleScheduleCardDblClick(dateSchedule, scheduleItem.candidate, dateSchedule)"
             >
 
               <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">

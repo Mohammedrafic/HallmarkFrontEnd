@@ -6,6 +6,10 @@ import { Observable } from 'rxjs';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
+import {
+  BookingsOverlapsRequest,
+  BookingsOverlapsResponse,
+} from '../components/replacement-order-dialog/replacement-order.interface';
 import { ScheduleType } from 'src/app/modules/schedule/enums';
 import { ScheduledShift } from '../components/edit-schedule/edit-schedule.interface';
 import * as ScheduleInt from '../interface';
@@ -67,6 +71,10 @@ export class ScheduleApiService {
       type === ScheduleType.Book ? '/api/Schedules/booking/update' : '/api/Schedules/schedule/update',
       scheduledShift
     );
+  }
+
+  checkBookingsOverlaps(request: BookingsOverlapsRequest):Observable<BookingsOverlapsResponse[]> {
+    return this.http.post<BookingsOverlapsResponse[]>('/api/Schedules/bookingsOverlaps', request);
   }
 
   deleteSchedule(id: number, createOrder: boolean):Observable<void> {

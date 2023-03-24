@@ -87,6 +87,10 @@ export class UserService {
     return this.http.get<AlertsModel[]>('/api/Alerts/GetAlertsForUser');
   }
 
+  public getAlertsCountForUser(): Observable<number> {
+    return this.http.get<number>('/api/Alerts/GetAlertsCountForUser');
+  }
+
   public getOrderPermissions(orderId: number): Observable<CurrentUserPermission[]> {
     return this.http.get<CurrentUserPermission[]>('/api/Permissions/orderscope/' + orderId);
   }

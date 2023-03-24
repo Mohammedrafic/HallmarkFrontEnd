@@ -27,6 +27,7 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ShiftsService } from '@shared/services/shift.service';
+import { BookingsOverlapsRequest, BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
 import {
   AvailabilityFormConfig,
   BookFormConfig,
@@ -95,12 +96,15 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   scheduleFormConfig: ScheduleInt.ScheduleFormConfig;
   scheduleType: ScheduleItemType;
   showScheduleForm = true;
+  replacementOrderDialogOpen = false;
+  replacementOrderDialogData: BookingsOverlapsResponse[] = [];
 
   private readonly customShiftId = -1;
   private shiftControlSubscription: Subscription | null;
   private scheduleShifts: ScheduleShift[] = [];
   private scheduleStructureList: ScheduleFilterStructure;
   private firstLoadDialog = true;
+  private scheduleToBook: ScheduleInt.ScheduleBook | null;
 
   constructor(
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
@@ -173,19 +177,45 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
       return;
     }
 
-    switch (true) {
-      case this.scheduleType === ScheduleItemType.Book:
-        this.saveBooking();
-        return;
-      case this.scheduleType === ScheduleItemType.Unavailability:
-        this.saveAvailabilityUnavailability();
-        return;
-      case this.scheduleType === ScheduleItemType.Availability:
-        this.saveAvailabilityUnavailability();
-        return;
-      default:
-        this.saveBooking();
+    if (this.scheduleType === ScheduleItemType.Book) {
+      this.checkBookingsOverlaps();
+    } else {
+      this.saveAvailabilityUnavailability();
     }
+  }
+
+  closeReplacementOrderDialog(): void {
+    this.replacementOrderDialogOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  saveBooking(createOrder: boolean): void {
+    if (!this.scheduleToBook) {
+      return;
+    }
+
+    this.scheduleToBook.createOrder = createOrder;
+    this.scheduleApiService.createBookSchedule(this.scheduleToBook).pipe(
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleErrorMessage(error)),
+      tap((errors: ScheduleBookingErrors[]) => {
+        this.scheduleItemsService.setErrors(errors);
+        return errors;
+      }),
+      filter((errors: ScheduleBookingErrors[]) => {
+        return !errors;
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.scheduleItemsService.setErrors([]);
+      this.handleSuccessSaveDate(CreateBookingSuccessMessage(this.scheduleToBook as ScheduleInt.ScheduleBook));
+      this.scheduleToBook = null;
+    });
+  }
+
+  private openReplacementOrderDialog(replacementOrderDialogData: BookingsOverlapsResponse[]): void {
+    this.replacementOrderDialogData = replacementOrderDialogData;
+    this.replacementOrderDialogOpen = true;
+    this.cdr.markForCheck();
   }
 
   private setHours(
@@ -380,7 +410,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   private saveAvailabilityUnavailability(): void {
     const schedule = this.createScheduleService.createAvailabilityUnavailability(
       this.scheduleForm,
-      this.scheduleItemsComponent,
+      this.scheduleItemsComponent.scheduleItems,
       this.scheduleTypesControl.value,
       this.customShiftId
     );
@@ -396,30 +426,6 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
       });
   }
 
-  private saveBooking(): void {
-    const schedule = this.createScheduleService.createBooking(
-      this.scheduleForm,
-      this.scheduleItemsComponent,
-      this.customShiftId,
-    );
-    const successMessage = CreateBookingSuccessMessage(schedule);
-
-    this.scheduleApiService.createBookSchedule(schedule).pipe(
-      catchError((error: HttpErrorResponse) => this.createScheduleService.handleErrorMessage(error)),
-      tap((errors: ScheduleBookingErrors[]) => {
-        this.scheduleItemsService.setErrors(errors);
-        return errors;
-      }),
-      filter((errors: ScheduleBookingErrors[]) => {
-        return !errors;
-      }),
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.scheduleItemsService.setErrors([]);
-      this.handleSuccessSaveDate(successMessage);
-    });
-  }
-
   private handleSuccessSaveDate(message: string): void {
     this.updateScheduleGrid.emit();
     this.scheduleForm.markAsUntouched();
@@ -432,5 +438,30 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
     this.scheduleType = this.createScheduleService.getFirstAllowedScheduleType(this.scheduleTypes);
     this.scheduleTypesControl.setValue(this.scheduleType);
     this.updateScheduleDialogConfig(this.scheduleType);
+  }
+
+  private checkBookingsOverlaps(): void {
+    this.scheduleToBook = this.createScheduleService.createBooking(
+      this.scheduleForm,
+      this.scheduleItemsComponent.scheduleItems,
+      this.customShiftId,
+    );
+    const request: BookingsOverlapsRequest = {
+      employeeScheduledDays: this.scheduleToBook.employeeBookedDays,
+      shiftId: this.scheduleToBook.shiftId,
+      startTime: this.scheduleToBook.startTime,
+      endTime: this.scheduleToBook.endTime,
+    };
+
+    this.scheduleApiService.checkBookingsOverlaps(request).pipe(
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+      takeUntil(this.componentDestroy())
+    ).subscribe((response: BookingsOverlapsResponse[]) => {
+      if (!response.length && this.scheduleToBook) {
+        this.saveBooking(false);
+      } else {
+        this.openReplacementOrderDialog(response);
+      }
+    });
   }
 }

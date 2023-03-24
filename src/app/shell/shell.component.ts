@@ -1,6 +1,6 @@
 import { DismissAlertDto } from './../shared/models/alerts-template.model';
 import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
-import { GetAlertsForCurrentUser, GetDeviceScreenResolution, ShowCustomSideDialog } from './../store/app.actions';
+import { GetAlertsCountForCurrentUser, GetAlertsForCurrentUser, GetDeviceScreenResolution, ShowCustomSideDialog } from './../store/app.actions';
 import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
 import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
@@ -120,6 +120,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @Select(AppState.getAlertsForCurrentUser)
   alertStateModel$: Observable<GetAlertsForUserStateModel[]>;
 
+  @Select(AppState.getAlertsCountForCurrentUser)
+  alertCountStateModel$: Observable<number>;
+
   @Select(UserState.currentUserPermissions)
   currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
@@ -165,6 +168,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   faTimes = faTimes as IconDefinition;
   faBan = faBan as IconDefinition;
   alerts: any;
+  alertsCount: number;
   private permissions: CurrentUserPermission[] = [];
   canManageOtherUserNotifications: boolean;
   canManageNotificationTemplates: boolean;
@@ -266,9 +270,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       if (user) {
         this.userLogin = user;
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
-        this.store.dispatch(new GetAlertsForCurrentUser({}));
-        this.alertStateModel$.subscribe((alertdata) => {
-          this.alerts = alertdata;
+        this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+        this.alertCountStateModel$.subscribe((alertCountdata) => {
+          this.alertsCount = alertCountdata;
         });
         this.profileData = [
           {
@@ -322,11 +326,11 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @OutsideZone
   private getAlertsPoollingTime(): void {
     setInterval(() => {
-      this.store.dispatch(new GetAlertsForCurrentUser({}));
-      this.alertStateModel$.subscribe((alertdata) => {
-        this.alerts = alertdata;
+      this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+      this.alertCountStateModel$.subscribe((alertCountdata) => {
+        this.alertsCount = alertCountdata;
       });
-    }, 300000
+    }, 200000
     );
 
   }
@@ -620,8 +624,13 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   bellIconClicked() {
-    this.showAlertSidebar = true;
-    this.alertSidebar.show();
+    this.store.dispatch(new GetAlertsForCurrentUser({}));
+    this.alertStateModel$.subscribe((alertdata) => {
+      this.alerts = alertdata;
+      this.showAlertSidebar = true;
+      this.alertSidebar.show();
+    });
+    
   }
 
   alertSideBarCloseClick() {
@@ -641,6 +650,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         this.getAlertsForUser();
       }
     });
+    this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+    this.alertCountStateModel$.subscribe((alertCountdata) => {
+      this.alertsCount = alertCountdata;
+    });
   }
 
   allAlertDismiss() {
@@ -648,6 +661,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       if (x) {
         this.getAlertsForUser();
       }
+    });
+    this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+    this.alertCountStateModel$.subscribe((alertCountdata) => {
+      this.alertsCount = alertCountdata;
     });
   }
 

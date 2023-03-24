@@ -27,7 +27,7 @@
         (selected)="selectScheduledItem($event.selectedIndex)"
         (created)="setInitData()">
         <e-tabitems>
-          <e-tabitem *ngFor="let tab of shiftTabs">
+          <e-tabitem *ngFor="let tab of shiftTabs; trackBy: trackByTabs">
             <ng-template #headerText>
               <div class="e-tab-header">
                 <div class="stepper-header">
@@ -112,7 +112,7 @@
 
   <ng-template #footerTemplate>
     <div class="schedule-footer">
-      <div class="checkbox-container bootstrap">
+      <div class="checkbox-container bootstrap" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
         <ejs-checkbox [formControl]="createPerDiemOrderControl" label="Create Per Diem Order"></ejs-checkbox>
       </div>
       <button

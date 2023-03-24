@@ -20,7 +20,7 @@
           [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateItem.dateSlot)"
           appDoubleClick
           (singleClick)="singleClick(dateItem.dateSlot, scheduleItem.candidate, dateItem.active, dateSchedule)"
-          (dbClick)="doubleCardClick(dateSchedule, scheduleItem.candidate, dateItem.active)"
+          (dbClick)="doubleCardClick(dateSchedule, scheduleItem.candidate, dateItem.active, dateSchedule)"
         >
             <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
               <app-month-card
