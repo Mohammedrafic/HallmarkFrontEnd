@@ -136,7 +136,6 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private populateFormWithMasterCommitment(commitment: WorkCommitmentDetails): void {
-    const startDate = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(this.startDate || this.todayDate))
     let regions = this.getCommitmentRegionsFromHierarchy(commitment);
     let locations = this.getCommitmentLocationsFromHierarchy(commitment);
     this.setRegionsDataSource(regions);
@@ -149,7 +148,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.candidateWorkCommitmentForm.controls['criticalOrder'].setValue(commitment.criticalOrder);
     this.candidateWorkCommitmentForm.controls['holiday'].setValue(commitment.holiday);
     this.candidateWorkCommitmentForm.controls['comment'].setValue(commitment.comments);
-    this.candidateWorkCommitmentForm.controls['startDate'].setValue(startDate);
+    this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.startDate || this.todayDate);
     this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
   }
 
