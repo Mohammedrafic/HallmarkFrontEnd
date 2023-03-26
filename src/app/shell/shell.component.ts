@@ -635,6 +635,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   alertSideBarCloseClick() {
     this.alertSidebar.hide();
+    this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+    this.alertCountStateModel$.subscribe((alertCountdata) => {
+      this.alertsCount = alertCountdata;
+    });
   }
 
   alertSideBarClearAllClick() {
