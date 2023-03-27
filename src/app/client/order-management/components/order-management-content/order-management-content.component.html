@@ -902,7 +902,8 @@
         </div>
       </div>
     </div>
-    <div class="filter-row bootstrap">
+    <div class="filter-row bootstrap"
+    *ngIf="(activeTab !== OrganizationOrderManagementTabs.PerDiem && !isActiveSystemIRP) || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
       <div class="input-container">
         <label>Candidates Count From</label>
         <div class="input-group">
@@ -915,8 +916,7 @@
           <input class="e-input" type="text" maxlength="50" formControlName="candidatesCountTo" />
         </div>
       </div>
-      <div class="input-container number-of-positions" 
-           *ngIf="(activeTab !== OrganizationOrderManagementTabs.PerDiem && !isActiveSystemIRP) || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
+      <div class="input-container number-of-positions">
         <label for="numberOfPositions"># of Positions</label>
         <div class="input-group">
           <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />
