@@ -80,11 +80,15 @@
     display: flex;
   }
   .widget{
-    padding: 10px 0px 0px 0px !important;
+    padding: 0px 0px 0px 0px !important;
   }
   .widget__type p {
     margin: 5px 0px;
   }
   .app-widget-wrapper__header{
     padding-bottom: 5px;
+  }
+  .icon{
+    height: 21px;
+    width: 23px;
   }

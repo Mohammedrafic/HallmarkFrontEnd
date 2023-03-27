@@ -60,6 +60,7 @@ import { OrgDetailsInfoModel } from '../models/org-details-info.model';
 import { AgencyPositionModel } from '../models/agency-position.model';
 import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 import { GetWorkCommitment } from '../widgets/rn-utilization-widget/rn-utilization.model';
+import { ExpiryDetailsModel } from '../models/expiry.model';
 
 @Injectable()
 export class DashboardService {
@@ -88,7 +89,7 @@ export class DashboardService {
     [WidgetTypeEnum.AGENCY_POSITION_COUNT]: (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
     [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => this.getRNUtilizations(filters),
     [WidgetTypeEnum.ALREADY_EXPIRED_CREDS]: (filters: DashboartFilterDto) => this.getalreadyExpiredCredentials(filters),
-    [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpCredentials(filters),
+    [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpiredCredentials(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -102,38 +103,7 @@ export class DashboardService {
           lodashMap((widget: WidgetOptionModel) => find((panel: PanelModel) => panel.id === widget.id, panels)),
           lodashFilter(identity)
         )(widgets) as PanelModel[];
-          availablePanels.push({
-            col: 3,
-            id: "Already_expired_creds",
-            maxSizeX: 3,
-            maxSizeY: 2,
-            minSizeX: 3,
-            minSizeY: 2,
-            row: 0,
-            sizeX: 3,
-            sizeY: 2
-          },{
-            col: 3,
-            id: "Upcoming_exp_creds",
-            maxSizeX: 3,
-            maxSizeY: 2,
-            minSizeX: 3,
-            minSizeY: 2,
-            row: 0,
-            sizeX: 3,
-            sizeY: 2
-          })
-          widgets.push({
-            description: "Already Expired Credentials",
-            id: WidgetTypeEnum.ALREADY_EXPIRED_CREDS,
-            title: "Already_expired_creds",
-            widgetType: 22
-          },{
-            description: "Upcoming Credentials Expiring",
-            id: WidgetTypeEnum.UPCOMING_EXP_CREDS,
-            title: "Upcoming_exp_creds",
-            widgetType: 23
-          })
+
         return { panels: availablePanels, widgets };
       }),
       catchError(() => of({ panels: [], widgets: [] }))
@@ -378,14 +348,13 @@ export class DashboardService {
     return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
   }
 
-  private getalreadyExpiredCredentials(filter: DashboartFilterDto) : Observable<GetWorkCommitment[]> {
-    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
+  private getalreadyExpiredCredentials(filter: DashboartFilterDto) : Observable<ExpiryDetailsModel[]> {
+    return this.httpClient.get<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`);
   }
 
-  private getupcomingExpCredentials(filter: DashboartFilterDto) : Observable<GetWorkCommitment[]> {
-    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
+  private getupcomingExpiredCredentials(filter: DashboartFilterDto) : Observable<ExpiryDetailsModel[]> {
+    return this.httpClient.get<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`);
   }
-
  
   private getActivePositionWidgetData(filter: DashboartFilterDto): Observable<AccumulationChartModel> {
     return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { granulateInProgress: true, ...filter }).pipe(

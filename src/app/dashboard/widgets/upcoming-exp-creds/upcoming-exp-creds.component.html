@@ -6,39 +6,21 @@
       <div class="app-widget-wrapper__tooltip" *ngIf="description.length > 0">
         <ejs-tooltip [content]="description" position='TopCenter'>
           <span class="mytooltip">
-            <i-feather name="info" id="info"
-                       [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
-          </span>
+            <img src="assets/icons/expiryicon1.png"  alt="coll" class="icon" ></span>
         </ejs-tooltip>
       </div>
     
   </ng-template>
   <ng-template #upcoming_exp_creds>
-    <div class="widget">
+    <div class="widget" *ngFor="let data of expirydata">
       <span class="widget__type">
-        <p class="orgname">No. of Employees License Expiring in 30 Days</p><p class="orgcount">51</p>
+        <p class="orgname">{{data.name}}</p><p class="orgcount">{{data.total}}</p>
       </span>
-      <ejs-progressbar #linear4 id='linear4' [type]='type' [maximum]='max' [minimum]='min' [value]='value1'
-        [width]='width' [trackThickness]='trackThickness' [progressColor]="progressColor1" [progressThickness]='progressThickness'
-        [height]='height' [cornerRadius]='cornerRadius2'  [animation]='animation'
+      <ejs-progressbar #upcoming{{data.name}} id=upcoming{{data.name}} [type]='type' [maximum]='max' [minimum]='min' [value]=data.value
+        [width]='width' [trackThickness]='trackThickness' [progressColor]=data.progressColor [progressThickness]='progressThickness'
+        [height]='height'  [animation]='animation'
          (load)='load($event)'>
       </ejs-progressbar>  
-      <span class="widget__type">
-        <p class="orgname">No. of Employees Certificate Expiring in 30 Days</p><p class="orgcount">92</p>
-      </span>
-      <ejs-progressbar #linear5 id='linear5' [type]='type' [maximum]='max' [minimum]='min' [value]='value2'
-        [width]='width' [trackThickness]='trackThickness' [progressColor]="progressColor2" [progressThickness]='progressThickness'
-        [height]='height'  [animation]='animation'
-         (load)='load($event)'>
-      </ejs-progressbar> 
-      <span class="widget__type">
-        <p class="orgname">No. of Employees Checklist Expiring in 30 Days</p><p class="orgcount">79</p>
-      </span>
-      <ejs-progressbar #linear6 id='linear6' [type]='type' [maximum]='max' [minimum]='min' [value]='value3'
-        [width]='width' [trackThickness]='trackThickness' [progressColor]="progressColor3" [progressThickness]='progressThickness'
-        [height]='height'  [animation]='animation'
-         (load)='load($event)'>
-      </ejs-progressbar> 
     </div>
   </ng-template>
   </app-widget-wrapper>
