@@ -33,7 +33,9 @@
           <ng-container [ngSwitch]="field.type">
 
             <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
-              <div class="input-container {{field?.cssClass}}">
+              <div
+              *ngIf="field.field === 'reason' ? candidateForm.get('isClosed')?.value : true"
+              class="input-container {{field?.cssClass}}">
                 <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                 </label>
                 <div class="input-group dropdown">
@@ -49,7 +51,9 @@
             </ng-template>
 
             <ng-template [ngSwitchCase]="FieldTypes.Date">
-              <div class="input-container calendar {{field?.cssClass}}">
+              <div
+              *ngIf="field.field === 'closeDate' ? candidateForm.get('isClosed')?.value : true"
+              class="input-container calendar {{field?.cssClass}}">
                 <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
                 <ejs-datepicker
                   [id]="field.field"
@@ -59,6 +63,18 @@
                   placeholder="MM/DD/YYYY"
                   [formControlName]="field.field"
                 ></ejs-datepicker>
+              </div>
+            </ng-template>
+
+            <ng-template [ngSwitchCase]="FieldTypes.Toggle">
+              <div class="input-container switch {{field?.cssClass}}">
+                <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                </label>
+                <div class="input-group dropdown">
+                  <ejs-switch
+                    [formControlName]="field.field"
+                  ></ejs-switch>
+                </div>
               </div>
             </ng-template>
 

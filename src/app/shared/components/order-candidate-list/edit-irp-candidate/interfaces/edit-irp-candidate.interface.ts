@@ -1,5 +1,5 @@
 import { FieldType } from '@core/enums';
-import { ApplicantStatus } from '@shared/models/order-management.model';
+import { DropdownOption } from '@core/interface';
 
 export interface CandidateField {
   field: string;
@@ -8,11 +8,14 @@ export interface CandidateField {
   required: boolean;
   type: FieldType;
   cssClass: string;
-  dataSource?: ApplicantStatus[];
+  dataSource?: DropdownOption[];
 }
 
 export interface CandidateForm {
   status: number;
   actualStartDate: string;
   actualEndDate: string;
+  isClosed: boolean;
+  reason: number;
+  closeDate: Date;
 }

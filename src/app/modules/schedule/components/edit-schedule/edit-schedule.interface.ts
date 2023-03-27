@@ -57,6 +57,12 @@ export interface EditScheduleFormSource {
 
 export interface ShiftTab {
   title: string;
-  time: string;
+  subTitle: string;
   id: number;
+}
+
+export interface CreateNewScheduleModeConfig {
+  createModeEnabled: boolean;
+  tabSelected: boolean;
+  tabIndex: number;
 }

@@ -92,6 +92,7 @@
               [strictMode]="true"
               [min]="minimumDate"
               [max]="maximumDate"
+              (valueChange)="dateValueChange($event)"
             ></app-datepicker>
             <app-numeric-textbox
               [formGroupInstance]="candidateWorkCommitmentForm"

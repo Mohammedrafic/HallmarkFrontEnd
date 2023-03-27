@@ -1,7 +1,7 @@
 import { positionIdStatuses } from "@agency/candidates/add-edit-candidate/add-edit-candidate.constants";
 import { CandidateAgencyComponent } from '@agency/candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
 import { Location } from '@angular/common';
-import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, ViewChild, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
@@ -22,7 +22,7 @@ import { distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
 import { CandidateGeneralInfoComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { CandidateProfessionalSummaryComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
-import { Candidate, CandidateStateModel, OrderManagementPagerState } from 'src/app/shared/models/candidate.model';
+import { Candidate, OrderManagementPagerState } from 'src/app/shared/models/candidate.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -41,6 +41,7 @@ import { CandidateContactDetailsComponent } from './candidate-contact-details/ca
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { AgencySettingsService } from '@agency/services/agency-settings.service';
 import { DateTimeHelper } from '@core/helpers';
+import { GlobalWindow } from "@core/tokens";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -94,6 +95,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     private agencySettingsService: AgencySettingsService,
     private cd: ChangeDetectorRef,
     private ngZone: NgZone,
+    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
     store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
@@ -378,12 +380,16 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   }
 
   private navigateToCandidates(): void {
-    const location = this.location.getState() as {
+    const locationState = this.location.getState() as {
       orderId: number;
       pageToBack: string;
       isNavigateFromCandidateDetails: boolean;
       orderManagementPagerState?: OrderManagementPagerState | null;
     }; 
+    const navigationStateString = this.globalWindow.localStorage.getItem('navigationState');
+    const navigationState = navigationStateString ? JSON.parse(navigationStateString) : null;
+    const location = navigationState ? Object.assign(locationState, navigationState) : locationState;
+    this.globalWindow.localStorage.removeItem('navigationState');
 
     switch (true) {
       case location.orderId && !location.isNavigateFromCandidateDetails:

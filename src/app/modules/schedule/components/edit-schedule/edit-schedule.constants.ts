@@ -14,108 +14,123 @@ export enum EditScheduleFormSourceKeys {
   Skills = 'skill',
 }
 
-const scheduledAvailabilityFormFields: EditScheduleFormFieldConfig[] = [
-  {
-    field: 'date',
-    title: 'Date',
-    required: true,
-    type: FieldType.Calendar,
-    gridAreaName: 'date',
-  },
-  {
-    field: 'shiftId',
-    title: 'Shift',
-    type: FieldType.Dropdown,
-    gridAreaName: 'shift',
-    required: true,
-    sourceKey: EditScheduleFormSourceKeys.Shifts,
-  },
-  {
-    field: 'startTime',
-    title: 'Start Time',
-    type: FieldType.Time,
-    gridAreaName: 'startTime',
-    required: true,
-  },
-  {
-    field: 'endTime',
-    title: 'End Time',
-    type: FieldType.Time,
-    gridAreaName: 'endTime',
-    required: true,
-  },
-  {
-    field: 'hours',
-    title: 'Hours',
-    type: FieldType.Input,
-    gridAreaName: 'hours',
-    required: false,
-    readonly: true,
-  },
-];
-
-const scheduledUnavailabilityFormFields: EditScheduleFormFieldConfig[] = [
-  ...scheduledAvailabilityFormFields,
-  {
-    field: 'unavailabilityReasonId',
-    title: 'Reason',
-    type: FieldType.Dropdown,
-    gridAreaName: 'reason',
-    required: true,
-    sourceKey: EditScheduleFormSourceKeys.Reasons,
-  },
-];
-
-const scheduledShiftFormFields: EditScheduleFormFieldConfig[] = [
-  ...scheduledAvailabilityFormFields,
-  {
-    field: 'regionId',
-    title: 'Region',
-    type: FieldType.Dropdown,
-    gridAreaName: 'region',
-    required: false,
-    sourceKey: EditScheduleFormSourceKeys.Regions,
-  },
-  {
-    field: 'locationId',
-    title: 'Location',
-    type: FieldType.Dropdown,
-    gridAreaName: 'location',
-    required: false,
-    sourceKey: EditScheduleFormSourceKeys.Locations,
-  },
-  {
-    field: 'departmentId',
-    title: 'Department',
-    type: FieldType.Dropdown,
-    gridAreaName: 'department',
-    required: false,
-    sourceKey: EditScheduleFormSourceKeys.Departments,
-  },
-  {
-    field: 'skillId',
-    title: 'Skill',
-    type: FieldType.Dropdown,
-    gridAreaName: 'skill',
-    required: false,
-    sourceKey: EditScheduleFormSourceKeys.Skills,
-  },
-];
-
-
-export const ScheduledShiftFormConfig: EditScheduleFormConfig = {
-  formClass: 'scheduled-shift-form',
-  formFields: scheduledShiftFormFields,
+const scheduledAvailabilityFormFields = (createMode: boolean): EditScheduleFormFieldConfig[] => {
+  return [
+    {
+      field: 'date',
+      title: 'Date',
+      required: true,
+      type: FieldType.Calendar,
+      readonly: createMode,
+      gridAreaName: 'date',
+    },
+    {
+      field: 'shiftId',
+      title: 'Shift',
+      type: FieldType.Dropdown,
+      gridAreaName: 'shift',
+      required: true,
+      sourceKey: EditScheduleFormSourceKeys.Shifts,
+    },
+    {
+      field: 'startTime',
+      title: 'Start Time',
+      type: FieldType.Time,
+      gridAreaName: 'startTime',
+      required: true,
+    },
+    {
+      field: 'endTime',
+      title: 'End Time',
+      type: FieldType.Time,
+      gridAreaName: 'endTime',
+      required: true,
+    },
+    {
+      field: 'hours',
+      title: 'Hours',
+      type: FieldType.Input,
+      gridAreaName: 'hours',
+      required: false,
+      readonly: true,
+    },
+  ];
 };
 
-export const ScheduledAvailabilityFormConfig: EditScheduleFormConfig = {
-  formClass: 'scheduled-availability-form',
-  formFields: scheduledAvailabilityFormFields,
+const scheduledUnavailabilityFormFields = (createMode: boolean): EditScheduleFormFieldConfig[] => {
+  return [
+    ...scheduledAvailabilityFormFields(createMode),
+    {
+      field: 'unavailabilityReasonId',
+      title: 'Reason',
+      type: FieldType.Dropdown,
+      gridAreaName: 'reason',
+      required: true,
+      sourceKey: EditScheduleFormSourceKeys.Reasons,
+    },
+  ];
 };
 
-export const ScheduledUnavailabilityFormConfig: EditScheduleFormConfig = {
-  formClass: 'scheduled-unavailability-form',
-  formFields: scheduledUnavailabilityFormFields,
+const scheduledShiftFormFields = (filtered: boolean,  createMode: boolean): EditScheduleFormFieldConfig[] => {
+  return [
+    ...scheduledAvailabilityFormFields(createMode),
+    {
+      field: 'regionId',
+      title: 'Region',
+      type: FieldType.Dropdown,
+      gridAreaName: 'region',
+      required: false,
+      readonly: filtered,
+      sourceKey: EditScheduleFormSourceKeys.Regions,
+    },
+    {
+      field: 'locationId',
+      title: 'Location',
+      type: FieldType.Dropdown,
+      gridAreaName: 'location',
+      required: false,
+      readonly: filtered,
+      sourceKey: EditScheduleFormSourceKeys.Locations,
+    },
+    {
+      field: 'departmentId',
+      title: 'Department',
+      type: FieldType.Dropdown,
+      gridAreaName: 'department',
+      required: false,
+      readonly: filtered,
+      sourceKey: EditScheduleFormSourceKeys.Departments,
+    },
+    {
+      field: 'skillId',
+      title: 'Skill',
+      type: FieldType.Dropdown,
+      gridAreaName: 'skill',
+      required: false,
+      sourceKey: EditScheduleFormSourceKeys.Skills,
+    },
+  ];
+};
+
+export const ScheduledShiftFormConfig = (filtered: boolean, createMode: boolean): EditScheduleFormConfig => {
+  return {
+    formClass: 'scheduled-shift-form',
+    formFields: scheduledShiftFormFields(filtered, createMode),
+  };
+};
+
+export const ScheduledAvailabilityFormConfig = (createMode: boolean): EditScheduleFormConfig => {
+  return {
+    formClass: 'scheduled-availability-form',
+    formFields: scheduledAvailabilityFormFields(createMode),
+  };
+};
+
+export const ScheduledUnavailabilityFormConfig = (createMode: boolean): EditScheduleFormConfig => {
+ return {
+   formClass: 'scheduled-unavailability-form',
+   formFields: scheduledUnavailabilityFormFields(createMode),
+ };
 };
 
 export const EditScheduleSourcesMap: EditScheduleFormSource = {

@@ -45,7 +45,6 @@ export class TimesheetGridExportComponent extends AbstractGridConfigurationCompo
   public override customExport(): void {
     this.getDefaultFileName();
     this.fileName = this.defaultFileName;
-    console.log(this.timeSheetColumnsToExport);
     this.store.dispatch(new ShowCustomExportDialog(true));
   }
 

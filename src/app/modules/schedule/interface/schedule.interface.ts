@@ -15,6 +15,7 @@ export interface ScheduleCandidate {
   lastName: string;
   ltaAssignment: LtaAssignment | null;
   skill: string;
+  skillId: number;
   dates: string[];
   orderType: IrpOrderType | null;
   workCommitments: string[] | null;
@@ -177,4 +178,13 @@ export interface CellClickEvent {
   schedule: ScheduleDateItem,
   candidate: ScheduleCandidate,
   cellDate?: ScheduleDateItem
+}
+
+export interface ShiftDropDownsData {
+  filtered: boolean;
+  regionsDataSource?: DropdownOption[];
+  locationsDataSource: DropdownOption[];
+  departmentsDataSource: DropdownOption[];
+  skillsDataSource?: DropdownOption[];
+  selectedSkillId: number | null;
 }

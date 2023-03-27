@@ -13,6 +13,7 @@
       [placeholder]="placeholder"
       [enabled]="enabled"
       [strictMode]="strictMode"
+      (valueChange)="valueChange.emit($event)"
       (blur)="onBlur()"
     >
     </ejs-datepicker>

@@ -60,12 +60,16 @@ export class DepartmentsService {
     );
   }
 
-  public deleteAssignedDepartments(departmentIds: number[] | null, filters: DepartmentFilterState | null, isBulkAction: boolean): Observable<void> {
+  public deleteAssignedDepartments(
+    departmentIds: number[] | null,
+    filters: DepartmentFilterState | null
+  ): Observable<void> {
     const params = {
       ids: departmentIds,
       employeeWorkCommitmentId: this.showAllDepartments ? null : this.employeeWorkCommitmentId,
-      ...(isBulkAction && { ...filters, employeeId: this.candidatesService.employeeId })
-    }
+      employeeId: this.candidatesService.employeeId,
+      ...(filters && filters),
+    };
     return this.http.post<void>(`${this.baseUrl}/delete`, params).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));
@@ -78,7 +82,13 @@ export class DepartmentsService {
     formData: DepartmentPayload,
     departmentIds: number[] | null
   ): Observable<DepartmentPayload> {
-    const payload = DepartmentHelper.editDepartmentPayload(formData, departmentIds, this.candidatesService.employeeId!);
+    const payload = DepartmentHelper.editDepartmentPayload(
+      formData,
+      departmentIds,
+      this.employeeWorkCommitmentId,
+      this.candidatesService.employeeId as number,
+      this.showAllDepartments
+    );
     return this.editDepartmnet(payload).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(errorResponse.error)));

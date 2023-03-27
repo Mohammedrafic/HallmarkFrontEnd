@@ -30,3 +30,9 @@ export interface EditCandidateDialogState {
   candidate: IrpOrderCandidate;
   order: Order;
 }
+
+export interface ClosePositionDto {
+  jobId: number;
+  reasonId: number;
+  closingDate: string;
+}

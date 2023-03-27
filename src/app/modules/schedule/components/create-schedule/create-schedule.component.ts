@@ -85,9 +85,8 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
   @Output() updateScheduleGrid: EventEmitter<void> = new EventEmitter<void>();
 
   readonly targetElement: HTMLBodyElement = this.globalWindow.document.body as HTMLBodyElement;
-  readonly scheduleTypeNumberEnum = ScheduleItemType;
   readonly FieldTypes = FieldType;
-  readonly scheduleTypesControl: FormControl = new FormControl(this.scheduleTypeNumberEnum.Book);
+  readonly scheduleTypesControl: FormControl = new FormControl(ScheduleItemType.Book);
   readonly dropDownFields = { text: 'text', value: 'value' };
   readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = ScheduleSourcesMap;
 

@@ -142,7 +142,7 @@ export const GetCandidateTooltip = (errors: string[]): string => {
 };
 
 export const CardTitle = (scheduleItem: ScheduleItem): string => {
-  if(scheduleItem.orderMetadata.location && scheduleItem.orderMetadata.department) {
+  if(scheduleItem.orderMetadata?.location && scheduleItem.orderMetadata?.department) {
     return `${scheduleItem?.orderMetadata.location.slice(0, 3)}-${scheduleItem?.orderMetadata.department.slice(0, 3)}`;
   } else {
     return '';
@@ -202,7 +202,7 @@ export const GetScheduleTabItems = (daySchedules: ScheduleItem[]): ShiftTab[] =>
       title: schedule.orderMetadata?.orderPublicId
         ? schedule.orderMetadata.orderPublicId
         : scheduleTitleMapper[schedule.scheduleType],
-      time: GetTimeRange(schedule.startDate, schedule.endDate),
+      subTitle: GetTimeRange(schedule.startDate, schedule.endDate),
       id: schedule.id,
     };
   });

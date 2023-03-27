@@ -504,7 +504,7 @@ export class RejectReasonState {
   ): Observable<void> {
     return this.rejectReasonService.removeInternalTransferReason(id).pipe(
       tap(() => {
-        dispatch(new UpdateInternalTransferReasonsError());
+        dispatch(new UpdateInternalTransferReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
       })
     );  }
@@ -567,7 +567,7 @@ export class RejectReasonState {
   ): Observable<void> {
     return this.rejectReasonService.removeTerminationReason(id).pipe(
       tap(() => {
-        dispatch(new SaveTerminatedReasonError());
+        dispatch(new UpdateTerminationReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
       })
     );  }

@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Observable } from 'rxjs';
 
-import { CustomFormGroup } from '@core/interface';
+import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { CandidateForm } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
 import {
   CancelCandidateDto,
@@ -13,6 +13,8 @@ import {
 import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
 import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus } from '@shared/models/order-management.model';
+import { RejectReason } from '@shared/models/reject-reason.model';
 
 @Injectable()
 export class EditIrpCandidateService {
@@ -22,22 +24,25 @@ constructor(
     private orderCandidateApiService: OrderCandidateApiService
   ) {}
 
-  public createCandidateForm(): CustomFormGroup<CandidateForm> {
+  createCandidateForm(): CustomFormGroup<CandidateForm> {
     return this.formBuilder.group({
       status: [null, Validators.required],
       actualStartDate: [null],
       actualEndDate: [null],
+      isClosed: [false],
+      reason: [null],
+      closeDate: [null],
     }) as CustomFormGroup<CandidateForm>;
   }
 
-  public getCandidateAction(
+  getCandidateAction(
     candidateForm: FormGroup,
     state: EditCandidateDialogState
     ): Observable<void> {
     const { status, actualStartDate, actualEndDate } = candidateForm.getRawValue();
 
     if (status) {
-      return this.getActionForStatus(status,state,actualStartDate,actualEndDate);
+      return this.getActionForStatus(status, state, actualStartDate, actualEndDate);
     } else {
       return this.orderCandidateApiService.updateIrpCandidate(
         UpdateCandidateDto(
@@ -48,6 +53,33 @@ constructor(
         )
       );
     }
+  }
+
+  createStatusOptions(statuses: ApplicantStatus[]): DropdownOption[] {
+    return statuses.map((status) => ({
+      text: status.statusText,
+      value: status.applicantStatus,
+    }));
+  }
+
+  createReasonsOptions(reasons: RejectReason[]): DropdownOption[] {
+    return reasons.map((reason) => ({
+      text: reason.reason,
+      value: reason.id as number,
+    }));
+  }
+
+  setValidatorsForClose(form: CustomFormGroup<CandidateForm>): void {
+    form.get('status')?.removeValidators(Validators.required);
+    form.get('status')?.reset();
+    form.get('reason')?.setValidators(Validators.required);
+    form.get('closeDate')?.setValidators(Validators.required);
+  }
+
+  setDefaultValidators(form: CustomFormGroup<CandidateForm>): void {
+    form.get('status')?.setValidators(Validators.required);
+    form.get('reason')?.removeValidators(Validators.required);
+    form.get('closeDate')?.removeValidators(Validators.required);
   }
 
   private getActionForStatus(

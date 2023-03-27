@@ -1,7 +1,7 @@
 import { ClearDeployedCandidateOrderInfo, GetCandidateJob,
   GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob,
   GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
@@ -24,13 +24,13 @@ import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.compo
 import { OfferDeploymentComponent } from './offer-deployment/offer-deployment.component';
 import { OnboardedCandidateComponent } from './onboarded-candidate/onboarded-candidate.component';
 import { OrderType } from '@shared/enums/order-type';
-import { OrderCandidateApiService } from '../order-candidate-api.service';
 import { AppState } from 'src/app/store/app.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { SettingsViewService } from '@shared/services';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
 import { OrderStatus } from '@shared/enums/order-management';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -90,10 +90,10 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     protected override store: Store,
     protected override router: Router,
     private orderCandidateListViewService: OrderCandidateListViewService,
-    private candidateApiService: OrderCandidateApiService,
-    private settingService: SettingsViewService
+    private settingService: SettingsViewService,
+    @Inject(GlobalWindow) protected override readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
-    super(store, router);
+    super(store, router, globalWindow);
     this.setIrpFeatureFlag();
   }
 

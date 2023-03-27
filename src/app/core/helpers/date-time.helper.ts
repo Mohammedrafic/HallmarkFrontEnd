@@ -103,7 +103,7 @@ export class DateTimeHelper {
     if (firstWeekDay) {
       firstDay = new Date(curr.getDate() - firstWeekDay).getTime();
     }
-
+  
     if (currDayNum >= startDayNum) {
       dayDiff = currDayNum - startDayNum;
     } else {
@@ -119,14 +119,12 @@ export class DateTimeHelper {
     const lastDay = firstDay + CalcDaysMs((RangeDaysOptions[rangeOption] - 1));
 
     let last = new Date(lastDay).getTime();
-    let first = firstDay;
 
     if (maxDateExist && lastDay > new Date().getTime() && rangeOption !== DatesRangeType.Day) {
       last = new Date().getTime();
-      first = last - CalcDaysMs(new Date(last).getDay());
     }
 
-    return new Date(isStart ? first : last);
+    return new Date(isStart ? firstDay : last);
   }
 
   public static getDynamicWeekDate(
@@ -151,14 +149,12 @@ export class DateTimeHelper {
     const lastDay = firstDay + CalcDaysMs(RangeDaysOptions[rangeOption] - 1);
 
     let last = new Date(lastDay).getTime();
-    let first = firstDay;
 
     if (lastDay > new Date().getTime() && maxDateExist) {
       last = new Date().getTime();
-      first = last - CalcDaysMs(new Date(last).getDay());
     }
 
-    return new Date(isStart ? first : last);
+    return new Date(isStart ? firstDay : last);
   }
 
   public static getWeekStartEnd(date: string): [Date, Date] {

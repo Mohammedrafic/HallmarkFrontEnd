@@ -104,6 +104,7 @@ export const USER_SUBSCRIPTION_PERMISSION = 'User missing required permissions(C
 export const USER_ALERTS_PERMISSION = 'User missing required permissions(CanViewTemplates)';
 export const MULTI_CLOSE_ORDER = 'Order will be closed in VMS and IRP. Are you sure you want to proceed?';
 export const CLOSE_ORDER_TITLE = 'Close order';
+export const CLOSE_IRP_POSITION = 'Closing position will permanently close it without the ability to reverse the action.';
 export const ALL_DEPARTMENTS_SELECTED = 'You can`t assign Departments manually when "All" is selected';
 export const NO_ACTIVE_WORK_COMMITMET = 'No active Work Commitment';
 export const REASON_WARNING = 'Please select a System for Reason';

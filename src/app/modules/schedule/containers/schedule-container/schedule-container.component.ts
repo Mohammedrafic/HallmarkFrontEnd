@@ -178,6 +178,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   updateScheduleFilter(data: ScheduleInt.ScheduleFiltersData): void {
+    this.scheduleFiltersService.setScheduleFiltersData(data);
     this.chipsData = data.chipsData;
     this.changeFilters(data.filters);
     this.appliedFiltersAmount = data.filteredItems?.length;

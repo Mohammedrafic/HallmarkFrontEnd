@@ -472,9 +472,9 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     let byTimesheetOrInvoiceControl = this.accrualReportForm.get(accrualConstants.formControlNames.InvoiceType) as AbstractControl;
     let byTimesheetOrInvoiceValue = byTimesheetOrInvoiceControl?.value;
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+    regionIds = regionIds.length > 0 ? regionIds.join(",") :  "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
     skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
     skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
 
