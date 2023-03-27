@@ -1598,6 +1598,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         let statuses : any = [];
         let candidateStatuses: FilterStatus[] = [];
         const statusesByDefault = [
+          CandidatStatus['Not Applied'],
           CandidatStatus.Applied,
           CandidatStatus.Shortlisted,
           CandidatStatus.Offered,
