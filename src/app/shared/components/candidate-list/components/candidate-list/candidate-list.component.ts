@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { debounceTime, filter, map, merge, Observable, Subject, switchMap, takeUntil, takeWhile } from 'rxjs';
+import { debounceTime, filter, map, merge, Observable, skip, Subject, switchMap, takeUntil, takeWhile, throttleTime } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -173,6 +173,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.CandidateFilterFormGroup = !this.isIRP ? this.candidateListService.generateVMSCandidateFilterForm() : this.candidateListService.generateIRPCandidateFilterForm();
     this.subscribeOnOrgStructure();
     this.subscribeOnLocationChange();
+    this.syncFilterTagsWithControls();
   }
 
   ngOnDestroy(): void {
@@ -216,7 +217,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFilterClose(): void {
-    this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
+    this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters, false);
     this.filteredItems = this.filterService.generateChips(this.CandidateFilterFormGroup, this.filterColumns);
     this.filteredItems$.next(this.filteredItems.length);
   }
@@ -581,5 +582,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
           takeUntil(this.unsubscribe$)
           ).subscribe();
     }
+  }
+
+  private syncFilterTagsWithControls(): void {
+    this.CandidateFilterFormGroup.valueChanges
+      .pipe(skip(1), debounceTime(300), takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        this.filteredItems = this.filterService.generateChips(this.CandidateFilterFormGroup, this.filterColumns);
+      });
   }
 }
