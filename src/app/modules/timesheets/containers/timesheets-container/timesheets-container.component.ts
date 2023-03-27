@@ -245,6 +245,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       this.bulkApprove(event.items);
     }
   }
+
   public handleExport(event:RowNode[]):void{
     let nodes=event;
     if (nodes.length) {
@@ -255,6 +256,16 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       this.gridSelections.rowNodes = [];    
     }
   }
+
+  public resetTableSelection(): void {
+    this.gridSelections.rowNodes.forEach((node: RowNode) => {
+      node.setSelected(false);
+    });
+
+    this.clearSelections();
+    this.gridSelections.rowNodes = [];
+  }
+  
   private bulkApprove(data: RowNode[]): void {
     this.store.dispatch(new Timesheets.BulkApprove(data));
   }
@@ -441,15 +452,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         .subscribe();
     }
   }
-  
-  public resetTableSelection(): void {
-    this.gridSelections.rowNodes.forEach((node: RowNode) => {
-      node.setSelected(false);
-    });
 
-    this.clearSelections();
-    this.gridSelections.rowNodes = [];
-  }
   private clearSelections(): void {
     this.gridSelections.selectedTimesheetIds = [];
   }

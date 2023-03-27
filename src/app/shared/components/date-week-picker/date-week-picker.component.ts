@@ -94,7 +94,6 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     const dateRange = DateTimeHelper.getRange(weekStart, this.startDate, this.rangeType, this.firstDayOfWeek,
       !!this.maxDate);
 
-    // this.startDateValue = weekStart.toDateString();
     this.changeRange(dateRange, weekStart);
   }
 
@@ -103,7 +102,6 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     const dateRange = DateTimeHelper.getRange(weekStart, this.startDate, this.rangeType, this.firstDayOfWeek,
       !!this.maxDate);
 
-    // this.startDateValue = DateTimeHelper.getWeekStartEnd(dateRange)[0].toDateString();
     this.changeRange(dateRange, weekStart);
   }
 
@@ -175,6 +173,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
         this.firstDayOfWeek,
         !!this.maxDate,
       ).setHours(0, 0, 0);
+
       const lastDay = DateTimeHelper.getWeekDate(
         this.initDates[0],
         false,
@@ -182,6 +181,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
         this.firstDayOfWeek,
         !!this.maxDate,
       ).setHours(0, 0, 0);
+
       const utcStartDate = DateTimeHelper.toUtcFormat(new Date(firstDay));
       const utcLastDate = DateTimeHelper.toUtcFormat(new Date(lastDay));
 
@@ -190,6 +190,8 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
         utcLastDate,
       ]);
     }
+
+
     this.compareDates();
   }
 
@@ -252,11 +254,14 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   private compareDates(): void {
     const compareDate = new Date(this.startDateValue || '');
-    const prevSuggestDate = new Date(compareDate.getTime() - this.weekInMs);
-    const nextSuggestDate = new Date(compareDate.getTime() + this.weekInMs);
 
-    this.isPrevDisabled = this.minDate ? this.minDate > prevSuggestDate : false;
-    this.isNextDisabled = this.maxDate ? this.maxDate < nextSuggestDate : false;
-    this.cdr.detectChanges();
+    if (this.weekInMs) {
+      const prevSuggestDate = new Date(compareDate.getTime() - this.weekInMs);
+      const nextSuggestDate = new Date(compareDate.getTime() + this.weekInMs);
+  
+      this.isPrevDisabled = this.minDate ? this.minDate > prevSuggestDate : false;
+      this.isNextDisabled = this.maxDate ? this.maxDate < nextSuggestDate : false;
+      this.cdr.detectChanges();
+    }
   }
 }
