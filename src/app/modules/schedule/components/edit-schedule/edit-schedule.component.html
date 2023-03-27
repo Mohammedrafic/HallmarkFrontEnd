@@ -24,22 +24,52 @@
 
       <ejs-tab
         class="stepper"
-        (selected)="selectScheduledItem($event.selectedIndex)"
+        (selected)="changeTab($event)"
         (created)="setInitData()">
-        <div class="e-tab-header">
-          <div *ngFor="let tab of shiftTabs">
-            <div class="stepper-header">
-              <div class="stepper-title">{{tab.title}}</div>
-              <div class="stepper-sub-title">{{tab.time}}</div>
-            </div>
-          </div>
-        </div>
-        <div class="e-content">
-          <ng-template *ngFor="let tab of shiftTabs"></ng-template>
-        </div>
+        <e-tabitems>
+          <e-tabitem *ngFor="let tab of shiftTabs; trackBy: trackByTabs">
+            <ng-template #headerText>
+              <div class="e-tab-header">
+                <div class="stepper-header">
+                  <div class="stepper-title">{{tab.title}}</div>
+                  <div class="stepper-sub-title">{{tab.subTitle}}</div>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #content></ng-template>
+          </e-tabitem>
+        </e-tabitems>
       </ejs-tab>
+      <div class="add-new-schedule">
+        <div *ngIf="createModeConfig.createModeEnabled" class="input-container schedule-types">
+          <ng-container *ngFor="let type of scheduleTypes">
+            <div class="input-group radio">
+              <app-tooltip-container [showToolTip]="type.disabled">
+                <ejs-radiobutton
+                  (change)="changeScheduleType($event)"
+                  [formControl]="scheduleTypesControl"
+                  [label]="type.label"
+                  [value]="type.value"
+                  [name]="type.name"
+                  [disabled]="type.disabled"
+                ></ejs-radiobutton>
+              </app-tooltip-container>
+            </div>
+          </ng-container>
+        </div>
+        <div *ngIf="!createModeConfig.createModeEnabled" class="add-btn-container">
+          <button
+            ejs-button
+            cssClass="e-outline"
+            (click)="addNewSchedule()"
+          >
+            <i-feather name="plus" class="icon"></i-feather>
+            <span>Add Schedule</span>
+          </button>
+        </div>
+      </div>
       <div class="separator"></div>
-      <div class="form-container">
+      <div class="form-container" *ngIf="scheduleForm">
         <form [formGroup]="scheduleForm" [class]="scheduleFormConfig.formClass">
           <ng-container *ngFor="let control of scheduleFormConfig.formFields">
             <ng-container [ngSwitch]="control.type">
@@ -52,6 +82,7 @@
                   [min]="datePickerLimitations.minDate"
                   [max]="datePickerLimitations.maxDate"
                   [formGroupInstance]="scheduleForm"
+                  [disabled]="!!control.readonly"
                 ></app-datepicker>
               </ng-template>
               <ng-template [ngSwitchCase]="FieldTypes.Input">
@@ -77,6 +108,7 @@
                     <ejs-dropdownlist
                       [dataSource]="scheduleFormSourcesMap[control.sourceKey]"
                       [fields]="dropDownFields"
+                      [enabled]="!control.readonly"
                       [formControlName]="control.field">
                     </ejs-dropdownlist>
                   </div>
@@ -109,10 +141,23 @@
   </ng-template>
 
   <ng-template #footerTemplate>
-    <div class="schedule-footer">
-      <div class="checkbox-container bootstrap">
+    <div *ngIf="!createModeConfig.createModeEnabled" class="schedule-footer">
+      <div class="checkbox-container bootstrap" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
         <ejs-checkbox [formControl]="createPerDiemOrderControl" label="Create Per Diem Order"></ejs-checkbox>
       </div>
+      <button
+        (click)="deleteSchedule()"
+        cssClass="e-outline remove-schedule"
+        ejs-button>
+        Remove Schedule
+      </button>
     </div>
   </ng-template>
 </ejs-dialog>
+
+<app-replacement-order-dialog
+  *ngIf="replacementOrderDialogOpen"
+  [replacementOrderData]="replacementOrderDialogData"
+  (destroyDialog)="closeReplacementOrderDialog()"
+  (createOrder)="saveNewBooking($event)"
+></app-replacement-order-dialog>

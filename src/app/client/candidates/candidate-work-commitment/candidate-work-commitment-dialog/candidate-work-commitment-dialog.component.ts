@@ -18,7 +18,7 @@ import { addDays } from '@shared/utils/date-time.utils';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { uniq } from 'lodash';
-import { catchError, delay, distinctUntilChanged, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { CandidateWorkCommitment, WorkCommitmentDataSource } from '../models/candidate-work-commitment.model';
@@ -51,7 +51,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public workCommitments: WorkCommitmentDataSource[] = [];
   public holidays: { id: number, name: number }[] = [];
   public regions: OrganizationRegion[] = [];
+  public allRegions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
+  public selectedLocations: number[] = [];
   public candidateWorkCommitmentForm: FormGroup;
   public employeeId: number;
   public readonly commitmentFields = {
@@ -63,11 +65,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public format = '#';
 
   public todayDate = new Date();
-  public lastActiveDate: Date;
+  public lastActiveDate: Date | null;;
   public selectWorkCommitmentStartDate: Date;
-  public minimumDate: Date;
+  public minimumDate: Date | undefined;
+  public maximumDate: Date | undefined;
+  public startDate: Date;
 
-  public useMinimumDate: boolean = false;
 
   constructor(
     private cd: ChangeDetectorRef,
@@ -86,6 +89,10 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.createForm();
     this.setRegionsLocationsDataSource();
     this.subscribeOnCommitmentDropdownChange();
+  }
+
+  public dateValueChange(event: Date): void {
+    this.startDate = event;
   }
 
   private createForm(): void {
@@ -108,11 +115,30 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     });
   }
 
-  private populateFormWithMasterCommitment(commitment: WorkCommitmentDetails): void {
+  private getCommitmentRegionsFromHierarchy(commitment: WorkCommitmentDetails): number[] {
     let regions = commitment.workCommitmentOrgHierarchies.map((val) => val.regionId);
     regions = uniq(regions);
+    return regions;
+  }
+
+  private getCommitmentLocationsFromHierarchy(commitment: WorkCommitmentDetails): number[] {
     let locations = commitment.workCommitmentOrgHierarchies.map((val) => val.locationId);
     locations = uniq(locations);
+    return locations;
+  }
+
+  private setRegionsDataSource(regions: number[]): void {
+    this.regions = this.allRegions.filter((region) => regions.indexOf(region.regionId as number) > -1);
+  }
+
+  private setLocationsDataSource(locations: OrganizationLocation[]): void {
+    this.locations = locations.filter((location) => this.selectedLocations.indexOf(location.locationId as number) > -1);
+  }
+
+  private populateFormWithMasterCommitment(commitment: WorkCommitmentDetails): void {
+    let regions = this.getCommitmentRegionsFromHierarchy(commitment);
+    let locations = this.getCommitmentLocationsFromHierarchy(commitment);
+    this.setRegionsDataSource(regions);
     this.candidateWorkCommitmentForm.controls['regionIds'].setValue(regions);
     this.candidateWorkCommitmentForm.controls['locationIds'].setValue(locations);
     this.candidateWorkCommitmentForm.controls['jobCode'].setValue(commitment.jobCode);
@@ -122,7 +148,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.candidateWorkCommitmentForm.controls['criticalOrder'].setValue(commitment.criticalOrder);
     this.candidateWorkCommitmentForm.controls['holiday'].setValue(commitment.holiday);
     this.candidateWorkCommitmentForm.controls['comment'].setValue(commitment.comments);
-    this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.minimumDate);
+    this.candidateWorkCommitmentForm.controls['startDate'].setValue(this.startDate || this.todayDate);
     this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
   }
 
@@ -131,14 +157,25 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     setTimeout(() => this.startDatePicker.datepicker.refresh());
   }
 
-  private getWorkCommitmentById(id: number, populateForm = true): void {
+  private getWorkCommitmentById(id: number, candidateCommitment: CandidateWorkCommitment | null = null, populateForm = true): void {
     this.candidateWorkCommitmentService.getWorkCommitmentById(id)
       .subscribe((commitment: WorkCommitmentDetails) => {
+        this.selectedLocations = this.getCommitmentLocationsFromHierarchy(commitment);
         this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
-        this.minimumDate = !populateForm || this.lastActiveDate < this.selectWorkCommitmentStartDate ? this.selectWorkCommitmentStartDate : this.lastActiveDate;
+        this.minimumDate = this.lastActiveDate ? this.lastActiveDate : this.selectWorkCommitmentStartDate;
+        const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
+        this.maximumDate = this.minimumDate < commitmentEndDate ? commitmentEndDate : undefined;
         if (populateForm) {
           this.populateFormWithMasterCommitment(commitment);
         } else {
+          let regions = this.getCommitmentRegionsFromHierarchy(commitment);
+          this.setRegionsDataSource(regions);
+          if (candidateCommitment) {
+            this.candidateWorkCommitmentForm.patchValue(candidateCommitment as {}, { emitEvent: false });
+            this.candidateWorkCommitmentForm.controls['regionIds'].setValue(candidateCommitment.regionIds);
+            this.candidateWorkCommitmentForm.controls['locationIds'].setValue(candidateCommitment.locationIds);
+            this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
+          }
           this.refreshDatepicker();
           this.cd.detectChanges();
         }
@@ -150,10 +187,18 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       .pipe(takeUntil(this.destroy$), distinctUntilChanged())
       .subscribe((value) => {
         if (value) {
+          this.resetStartDateField();
           this.enableControls();
           this.getWorkCommitmentById(value);
         }
       });
+  }
+
+  private resetStartDateField(): void {
+    this.candidateWorkCommitmentForm.get('startDate')?.reset();
+    this.maximumDate = undefined;
+    this.minimumDate = undefined;
+    this.cd.markForCheck();
   }
 
   private getActiveWorkCommitment(): void {
@@ -162,15 +207,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         if (activeCommitment) {
           this.lastActiveDate = DateTimeHelper.convertDateToUtc(activeCommitment.startDate as string);
           this.lastActiveDate = addDays(this.lastActiveDate, 1) as Date;
-          this.useMinimumDate = true;
         } else {
-          this.lastActiveDate = this.todayDate;
-          this.useMinimumDate = false;
+          this.minimumDate = undefined;
         }
       });
     } else {
-      this.lastActiveDate = this.todayDate;
-      this.useMinimumDate = false;
+      this.minimumDate = undefined;
     }
   }
 
@@ -193,15 +235,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   private getCandidateWorkCommitmentById(commitment: CandidateWorkCommitment): void {
     this.candidateWorkCommitmentService.getCandidateWorkCommitmentById(commitment.id as number).subscribe((commitment: CandidateWorkCommitment) => {
       if (commitment.workCommitmentId) {
-        this.useMinimumDate = true;
-        this.getWorkCommitmentById(commitment.workCommitmentId, false);
+        this.getWorkCommitmentById(commitment.workCommitmentId, commitment, false);
       } 
       commitment.startDate = commitment.startDate && DateTimeHelper.convertDateToUtc(commitment.startDate as string);
-      this.candidateWorkCommitmentForm.patchValue(commitment as {}, { emitEvent: false });
-      this.candidateWorkCommitmentForm.controls['regionIds'].setValue(commitment.regionIds);
-      this.candidateWorkCommitmentForm.controls['locationIds'].setValue(commitment.locationIds);
-      this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
-      this.cd.detectChanges();
     });
   }
 
@@ -229,7 +265,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.organizationStructure$
     .pipe(takeUntil(this.destroy$), filter(Boolean))
     .subscribe((structure: OrganizationStructure) => {
-      this.regions = structure.regions;
+      this.allRegions = structure.regions;
     });
     this.candidateWorkCommitmentForm.controls['regionIds'].valueChanges
       .pipe(
@@ -242,14 +278,14 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
           const locations: OrganizationLocation[] = [];
 
           val.forEach((id) =>
-            selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
+            selectedRegions.push(this.allRegions.find((region) => region.id === id) as OrganizationRegion)
           );
           this.locations = [];
           selectedRegions.forEach((region) => {
-            region.locations?.forEach((location) => (location.regionName = region.name));
             locations.push(...region.locations as []);
           });
           this.locations.push(...sortByField(locations, 'name'));
+          this.setLocationsDataSource(this.locations);
         } else {
           this.locations = [];
         }
@@ -286,22 +322,27 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       .subscribe(() => {
         this.sideDialog.hide();
         this.candidateWorkCommitmentForm.reset();
+        this.lastActiveDate = null;
       });
     } else {
       this.sideDialog.hide();
       this.candidateWorkCommitmentForm.reset();
+      this.lastActiveDate = null;
     }
   }
 
   public saveCommitment(): void {
     if (this.candidateWorkCommitmentForm.valid) {
       const candidateWorkCommitment: CandidateWorkCommitment = this.candidateWorkCommitmentForm.getRawValue();
-      candidateWorkCommitment.startDate = candidateWorkCommitment.startDate && DateTimeHelper.toUtcFormat(candidateWorkCommitment.startDate);
+      candidateWorkCommitment.startDate =
+      candidateWorkCommitment.startDate &&
+      DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(this.startDate));
       candidateWorkCommitment.employeeId = this.employeeId;
       this.candidateWorkCommitmentService.saveCandidateWorkCommitment(candidateWorkCommitment).pipe(
         tap(() => {
           this.sideDialog.hide();
           this.candidateWorkCommitmentForm.reset();
+          this.lastActiveDate = null;
           this.store.dispatch(new ShowToast(MessageTypes.Success, !candidateWorkCommitment.id ? RECORD_ADDED : RECORD_MODIFIED));
           this.refreshSubject$.next();
         }),

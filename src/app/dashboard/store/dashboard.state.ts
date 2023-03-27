@@ -17,6 +17,7 @@ import {
   GetOrganizationSkills,
   GetAllSkills,
   ToggleQuickOrderDialog,
+  GetAllCommitmentByPage,
 } from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
@@ -27,6 +28,8 @@ import { DASHBOARD_FILTER_STATE, TIME_SELECTION_OF_CHART_LINE } from '@shared/co
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
+import { MasterCommitmentsPage } from '@shared/models/commitment.model';
+import { GetWorkCommitment } from '../widgets/rn-utilization-widget/rn-utilization.model';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
@@ -38,6 +41,8 @@ export interface DashboardStateModel {
   skills: AllOrganizationsSkill[];
   organizationSkills: AssignedSkillsByOrganization[];
   toggleQuickOrderDialog: boolean
+  commitmentsPage: GetWorkCommitment[];
+  isCommitmentLoading: boolean;
 }
 
 @State<DashboardStateModel>({
@@ -52,6 +57,8 @@ export interface DashboardStateModel {
     organizationSkills: [],
     skills: [],
     toggleQuickOrderDialog: false,
+    commitmentsPage: [],
+    isCommitmentLoading: false
   },
 })
 @Injectable()
@@ -104,6 +111,11 @@ export class DashboardState {
   @Selector()
   static toggleQuickOrderDialog(state: DashboardStateModel): DashboardStateModel['toggleQuickOrderDialog'] {
     return state.toggleQuickOrderDialog;
+  }
+
+  @Selector()
+  static commitmentsPage(state: DashboardStateModel): DashboardStateModel['commitmentsPage'] {
+    return state.commitmentsPage;
   }
   public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
 
@@ -188,5 +200,19 @@ export class DashboardState {
   @Action(ToggleQuickOrderDialog)
   private ToggleQuickOrderDialog ({ patchState }: StateContext<DashboardStateModel>, { isOpen }: ToggleQuickOrderDialog): void {
     patchState({ toggleQuickOrderDialog: isOpen })
+  }
+
+  @Action(GetAllCommitmentByPage)
+  GetAllCommitmentByPage(
+    { patchState }: StateContext<DashboardStateModel>,
+    {  }: GetAllCommitmentByPage
+  ): Observable<GetWorkCommitment[]> {
+    //patchState({ isCommitmentLoading: true });
+
+    return this.dashboardService.getAllMasterCommitments().pipe(
+      tap((payload:GetWorkCommitment[]) => {
+        patchState({commitmentsPage: payload});
+      })
+    );
   }
 }

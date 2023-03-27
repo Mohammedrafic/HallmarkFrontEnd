@@ -84,6 +84,11 @@ export class GetAlertsForCurrentUser {
   constructor(public payload: any) { }
 }
 
+export class GetAlertsCountForCurrentUser {
+  static readonly type = '[app] Get Alerts Count For Current User';
+  constructor(public payload: any) { }
+}
+
 export class CheckScreen {
   static readonly type = '[app] Check screen';
   constructor() { }
@@ -115,4 +120,8 @@ export class SetIrpFlag {
 
 export class GetDeviceScreenResolution {
   static readonly type = '[app] Get Device Screen Resolution'
+}
+export class ShowCustomExportDialog {
+  static readonly type = '[app] Set Custom Export Dialog Showing state';
+  constructor(public isDialogShown: boolean) { }
 }

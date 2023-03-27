@@ -894,8 +894,9 @@ export class OrderManagementContentState {
   @Action(GetOrderFilterDataSources)
   GetOrderFilterDataSources({
     patchState,
-  }: StateContext<OrderManagementContentStateModel>): Observable<OrderFilterDataSource> {
-    return this.orderManagementService.getOrderFilterDataSources().pipe(
+  }: StateContext<OrderManagementContentStateModel>,
+  { isIRP }: GetOrderFilterDataSources): Observable<OrderFilterDataSource> {
+    return this.orderManagementService.getOrderFilterDataSources(isIRP).pipe(
       tap((payload) => {
         patchState({ orderFilterDataSources: payload });
         return payload;

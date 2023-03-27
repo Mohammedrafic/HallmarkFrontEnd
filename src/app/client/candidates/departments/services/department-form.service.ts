@@ -1,11 +1,16 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
-import { isObjectsEqual } from '@core/helpers';
+import { DateTimeHelper, isObjectsEqual } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 import { FilterColumnConfig } from '../constants/department-filter.constant';
-import { AssignDepartmentFormState, DepartmentAssigned, DepartmentFiltersColumns, EditDepartmentFormState } from '../departments.model';
+import {
+  AssignDepartmentFormState,
+  DepartmentAssigned,
+  DepartmentFiltersColumns,
+  EditDepartmentFormState,
+} from '../departments.model';
 
 @Injectable()
 export class DepartmentFormService {
@@ -13,13 +18,14 @@ export class DepartmentFormService {
 
   public createAssignDepartmentForm(): CustomFormGroup<AssignDepartmentFormState> {
     return this.formBuilder.group({
-      regionId: [null, [Validators.required]],
-      locationId: [null, [Validators.required]],
-      departmentId: [null, [Validators.required]],
+      regionIds: [null, [Validators.required]],
+      locationIds: [null, [Validators.required]],
+      departmentIds: [null, [Validators.required]],
       startDate: [new Date(), [Validators.required]],
       endDate: [null],
       isOriented: [null],
       isHomeCostCenter: [null],
+      orientationDate: [null],
     }) as CustomFormGroup<AssignDepartmentFormState>;
   }
 
@@ -29,17 +35,17 @@ export class DepartmentFormService {
       locationIds: [null],
       departmentsIds: [null],
       skillIds: [null],
-      oriented: [1],
+      isOriented: [0],
     }) as CustomFormGroup<DepartmentFiltersColumns>;
   }
 
   public createEditForm(): CustomFormGroup<EditDepartmentFormState> {
     return this.formBuilder.group({
-      startDate: [null],
+      startDate: [null, [Validators.required]],
       endDate: [null],
       isOriented: [false],
       isHomeCostCenter: [false],
-      orientedStartDate: [null],
+      orientationDate: [null],
     }) as CustomFormGroup<EditDepartmentFormState>;
   }
 
@@ -51,7 +57,7 @@ export class DepartmentFormService {
         {
           type: filterColumn.type,
           valueType: filterColumn.valueType,
-          dataSource: [],
+          dataSource: filterColumn.dataSource,
           valueField: filterColumn.valueField,
           valueId: filterColumn.valueId,
         },
@@ -75,24 +81,43 @@ export class DepartmentFormService {
   }
 
   public disableControls(formGroup: FormGroup, controlName: string[]): void {
+    this.disEnableControls(formGroup, controlName, false);
+  }
+
+  public enableControls(formGroup: FormGroup, controlName: string[]): void {
+    this.disEnableControls(formGroup, controlName, true);
+  }
+
+  private disEnableControls(formGroup: FormGroup, controlName: string[], enable: boolean) {
     controlName.forEach((name) => {
       const control = formGroup.get(name);
       if (control) {
-        control.disable();
+        control[enable ? 'enable' : 'disable']();
       }
     });
   }
 
   public patchForm(formGroup: FormGroup, formData: DepartmentAssigned): void {
-    const { regionId, locationId, departmentId, startDate, endDate, isOriented, isHomeCostCenter } = formData;
+    const { regionId, locationId, departmentId, startDate, endDate, isOriented, isHomeCostCenter, orientationDate } =
+      formData;
     formGroup.patchValue({
-      regionId: regionId,
-      locationId: locationId,
-      departmentId: departmentId,
-      startDate: startDate,
-      endDate: endDate,
+      regionIds: [regionId],
+      locationIds: [locationId],
+      departmentIds: [departmentId],
+      startDate: DateTimeHelper.convertDateToUtc(startDate),
+      endDate: endDate && DateTimeHelper.convertDateToUtc(endDate),
       isOriented: isOriented,
       isHomeCostCenter: isHomeCostCenter,
-    })
+      orientationDate: orientationDate && DateTimeHelper.convertDateToUtc(orientationDate),
+    });
+  }
+
+  public addRemoveValidator(control: AbstractControl | null, term: boolean): void {
+    if (term) {
+      control?.setValidators([Validators.required]);
+    } else {
+      control?.setValidators([]);
+      control?.reset();
+    }
   }
 }

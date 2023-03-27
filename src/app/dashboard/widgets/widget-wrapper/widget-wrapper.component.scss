@@ -124,3 +124,23 @@ $headerHeight: 19px;
 .app-widget-wrapper__position-chart{
   margin-top: -17px;
 }
+.app-widget-wrapper__agency_count, .app-widget-wrapper__RNUtilization-chart{
+  overflow: auto;
+}
+.app-widget-wrapper__RNUtilization-chart {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.app-widget-wrapper__agency_count, .app-widget-wrapper__AlreadyExpiredCredentials-chart{
+  overflow: auto;
+}
+.app-widget-wrapper__AlreadyExpiredCredentials-chart {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}

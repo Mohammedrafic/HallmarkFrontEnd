@@ -20,6 +20,35 @@
   margin-right: 8px;
 }
 
+.add-new-schedule {
+  margin-bottom: 20px;
+  height: 40px;
+
+  .schedule-types {
+    display: flex;
+    padding: 10px 0;
+    gap: 24px;
+  }
+
+  .add-btn-container {
+    display: flex;
+    padding-right: 10px;
+    justify-content: flex-end;
+
+    i-feather {
+      margin: 0 5px 4px 0;
+    }
+
+    .e-outline {
+      border: none;
+
+      &:hover {
+        border: none;
+      }
+    }
+  }
+}
+
 .separator {
   height: 1px;
   background-color: $secondary-dark-blue-45;
@@ -42,11 +71,47 @@
 
 .schedule-footer {
   display: flex;
-  padding: 14px 26px;
+  padding: 22px 24px;
+  border-top: 1px solid $secondary-dark-blue-45;
 
   .checkbox-container {
     padding: 10px 0;
+    margin-right: 34px;
   }
+
+  .remove-schedule {
+    flex-grow: 1;
+    color: $supportive-red !important;
+    border-color: $supportive-red;
+
+    &:hover {
+      background-color: unset !important;
+      border-color: $supportive-red-20 !important;
+      color: $supportive-red-20 !important;;
+    }
+  }
+}
+
+.scheduled-availability-form {
+  display: grid;
+  grid-template-columns:  2.5fr 2.7fr 1.9fr 1.9fr 1.2fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "date date date date date"
+    "shift shift startTime endTime hours";
+}
+
+.scheduled-unavailability-form {
+  display: grid;
+  grid-template-columns:  2.5fr 2.7fr 1.9fr 1.9fr 1.2fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "date reason reason reason reason"
+    "shift shift startTime endTime hours";
 }
 
 .scheduled-shift-form {
@@ -100,4 +165,19 @@
 
 .skill {
   grid-area: skill;
+}
+
+::ng-deep {
+  label {
+    margin-bottom: 0 !important;
+  }
+
+  .e-tab.stepper > .e-content {
+    padding-top: 12px !important;
+  }
+}
+
+.e-footer-content {
+  padding: 0 !important;
+  border: none !important;
 }

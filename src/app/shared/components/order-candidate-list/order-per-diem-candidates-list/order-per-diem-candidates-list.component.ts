@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
@@ -14,6 +14,7 @@ import { AppState } from 'src/app/store/app.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { SettingsViewService } from '@shared/services';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-order-per-diem-candidates-list',
@@ -37,8 +38,9 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     protected override store: Store,
     protected override router: Router,
     private settingService: SettingsViewService,
+    @Inject(GlobalWindow) protected override readonly globalWindow : WindowProxy & typeof globalThis,
     ) {
-    super(store, router);
+    super(store, router, globalWindow);
     this.setIrpFeatureFlag();
   }
 

@@ -1,0 +1,29 @@
+@import 'colors';
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+
+  h3 {
+    color: $title-black;
+    margin: 8px;
+  }
+
+  &>section {
+    display: flex;
+  }
+
+  button {
+    margin-left: 18px;
+  }
+}
+
+.grid-component {
+  margin-top: 25px;
+  overflow-y: auto;
+}
+
+.reason-form {
+  margin-top: 24px;
+}

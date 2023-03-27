@@ -83,7 +83,7 @@ export const DOCUMENT_UNSHARED_SUCCESS = 'Documents UnShared successfully';
 export const FOLDER_DELETE_SUCCESS = 'Folder deleted successfully';
 export const EMAIL_RESEND_SUCCESS = 'Email was sent successfully';
 export const CANDIDATE_STATUS= 'Selected Candidate status is unavailable';
-export const CandidateSSNRequired= 'SSN of Candidate is mandatory to accept the offer. Please update SSN field on Candidate Profile screen and come back here to accept offer.';
+export const CandidateSSNRequired = 'SSN of Candidate is mandatory to submit candidate application. Once SSN is updated on Candidate Profile screen and come back here to apply.';
 export const CandidateDOBRequired= 'DOB of Candidate is mandatory to accept the offer. Please update DOB of candidate on Candidate Profile screen and come back here to accept offer.';
 export const REGULAR_RATE_UPDATE_SUCCESS = 'Regular Rate on Open and In-Progress Status are updated. Other Positions stays unaffected';
 export const UpdateRegularRatesucceedcount = (count: number) =>
@@ -99,10 +99,12 @@ export const BLOCK_RECORD_SUCCESS = 'Record Blocked';
 export const CANDIDATE_BLOCK='Candidate Blocked';
 export const CANDIDATE_UNBLOCK='Candidate Unblocked';
 export const CANDIDATE_DONOTRETURN ='Candidate cannot be blocked. This Candidate was used in '
-export const ASSIGN_HOME_COST_CENTER = 'Home Cost Center is already assigned, are you sure you want to reassign this department as Home Cost Center department?';
+export const ASSIGN_HOME_COST_CENTER = 'Home Cost Center is already assigned, are you sure you want to reassign this department as Home Cost Center?';
 export const USER_SUBSCRIPTION_PERMISSION = 'User missing required permissions(CanViewSubscriptions)';
 export const USER_ALERTS_PERMISSION = 'User missing required permissions(CanViewTemplates)';
 export const MULTI_CLOSE_ORDER = 'Order will be closed in VMS and IRP. Are you sure you want to proceed?';
 export const CLOSE_ORDER_TITLE = 'Close order';
 export const CLOSE_IRP_POSITION = 'Closing position will permanently close it without the ability to reverse the action.';
-
+export const ALL_DEPARTMENTS_SELECTED = 'You can`t assign Departments manually when "All" is selected';
+export const NO_ACTIVE_WORK_COMMITMET = 'No active Work Commitment';
+export const REASON_WARNING = 'Please select a System for Reason';

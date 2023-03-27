@@ -132,6 +132,23 @@ th, td {
   border: 0.5px solid $secondary-dark-blue-45;
 }
 
+.custom-head-cell {
+  border-right: none;
+}
+
+.custom-date-th {
+  border-top: 1px solid $secondary-dark-blue-45;
+  border-bottom: 1px solid $secondary-dark-blue-45;
+  border-left: none;
+  border-right: none;
+  padding: 0 !important;
+
+  span {
+    padding-left: 16px;
+    border-left: 1px solid $secondary-dark-blue-45;
+  }
+}
+
 .table-title {
   height: 40px;
   padding: 8px;
@@ -144,6 +161,14 @@ th, td {
 
   &.date {
     min-width: 112px;
+  }
+
+  &.month-date {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 13px;
+    color: $secondary-dark-blue-15;
   }
 
   &.candidates-head-cell {

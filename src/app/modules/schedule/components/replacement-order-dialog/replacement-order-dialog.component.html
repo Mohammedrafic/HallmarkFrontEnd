@@ -1,0 +1,40 @@
+<ejs-dialog
+  #destroyableDialog
+  cssClass="override-shift-dialog"
+  isModal="true"
+  visible="false"
+  showCloseIcon="true"
+  width="470px"
+  height="362px"
+  closeOnEscape
+  (close)="closeOnEscape()"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">Create Per Diem Order</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <div>Would you like to create replacement Per Diem Order(s) for following Shifts: </div>
+    <div *ngFor="let item of replacementOrderData; trackBy: trackByEmployeeId">
+      {{item.lastName}}, {{item.firstName}}:
+      <div *ngFor="let book of item.bookings">
+        {{book.shiftDate | date: 'MM/dd/yyy' : 'UTC'}},
+        {{book.startTime | date: 'HH:mm': 'UTC'}} - {{book.endTime | date: 'HH:mm': 'UTC'}},
+        {{book.location}} - {{book.department}}
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <button ejs-button cssClass="e-danger" (click)="remove()">Remove</button>
+      <button ejs-button [isPrimary]="true" (click)="create()">Create Per Diem Order</button>
+    </div>
+  </ng-template>
+</ejs-dialog>

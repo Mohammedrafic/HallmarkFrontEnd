@@ -44,14 +44,9 @@ export interface ScheduleFormSource {
   [ScheduleFormSourceKeys.Skills]: DropdownOption[],
 }
 
-export interface ScheduledDay {
-  date: string;
-  schedulesToOverrideIds: number[] | null;
-}
-
 export interface EmployeeScheduledDay {
   employeeId: number;
-  scheduledDays: ScheduledDay[];
+  dates: string[];
 }
 
 export interface EmployeeBookingDay {
@@ -75,6 +70,7 @@ export interface ScheduleBook {
   departmentId: number | string;
   skillId: number | null;
   employeeBookedDays: EmployeeBookingDay[];
+  createOrder: boolean;
 }
 
 export interface BookingError {

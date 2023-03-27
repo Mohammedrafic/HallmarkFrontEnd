@@ -21,6 +21,7 @@ export class CandidateCardComponent implements OnInit, OnChanges {
     this.candidateData = schedule.candidate;
   }
   @Input() selectedFilters: ScheduleFilters;
+  @Input() showScheduledHours = true;
 
   candidateData: ScheduleCandidate;
   candidateIconName: string;

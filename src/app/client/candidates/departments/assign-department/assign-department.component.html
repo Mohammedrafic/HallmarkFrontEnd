@@ -1,35 +1,71 @@
 <form class="department-form">
   <ng-container *ngIf="true">
-    <app-dropdown
-      [formGroupInstance]="assignDepartmentForm"
-      [fields]="departmentFields"
-      [dataSource]="dataSource.regions"
-      [required]="true"
-      [hideBorder]="false"
-      controlName="regionId"
-      id="region"
-      label="Region"
-    ></app-dropdown>
-    <app-dropdown
-      [formGroupInstance]="assignDepartmentForm"
-      [fields]="departmentFields"
-      [dataSource]="dataSource.locations"
-      [required]="true"
-      [hideBorder]="false"
-      controlName="locationId"
-      id="location"
-      label="Location"
-    ></app-dropdown>
-    <app-dropdown
-      [formGroupInstance]="assignDepartmentForm"
-      [fields]="departmentFields"
-      [dataSource]="dataSource.departments"
-      [required]="true"
-      [hideBorder]="false"
-      controlName="departmentId"
-      id="department"
-      label="Department"
-    ></app-dropdown>
+    <div class="dropdown-wrapper">
+      <app-multiselect-dropdown
+        [formGroupInstance]="assignDepartmentForm"
+        [fields]="departmentFields"
+        [dataSource]="dataSource.regions"
+        [required]="true"
+        controlName="regionIds"
+        id="region"
+        label="Region"
+        class="multiselect-dropdown"
+      ></app-multiselect-dropdown>
+      <div class="switch" *ngIf="!departmentId">
+        <app-toggle
+          id="switch-1"
+          label="All"
+          [value]="this.allRecords['regionIds']"
+          [disabled]="disableToggles"
+          (checked)="allRegionsChange($event)"
+        ></app-toggle>
+      </div>
+    </div>
+    <div class="dropdown-wrapper">
+      <app-multiselect-dropdown
+        [formGroupInstance]="assignDepartmentForm"
+        [fields]="departmentFields"
+        [dataSource]="dataSource.locations"
+        [required]="true"
+        [sortOrder]="sortOrder"
+        controlName="locationIds"
+        id="location"
+        label="Location"
+        class="multiselect-dropdown"
+      ></app-multiselect-dropdown>
+      <div class="switch" *ngIf="!departmentId">
+        <app-toggle
+          id="switch-2"
+          label="All"
+          [value]="this.allRecords['locationIds']"
+          [disabled]="disableToggles"
+          (checked)="allLocationsChange($event)"
+        ></app-toggle>
+      </div>
+    </div>
+    <div class="dropdown-wrapper">
+      <app-multiselect-dropdown
+        [formGroupInstance]="assignDepartmentForm"
+        [fields]="departmentFields"
+        [dataSource]="dataSource.departments"
+        [required]="true"
+        [sortOrder]="sortOrder"
+        controlName="departmentIds"
+        id="department"
+        label="Department"
+        class="multiselect-dropdown"
+      ></app-multiselect-dropdown>
+
+      <div class="switch" *ngIf="!departmentId">
+        <app-toggle
+          id="switch-3"
+          label="All"
+          [value]="this.allRecords['departmentIds']"
+          [disabled]="disableToggles"
+          (checked)="allDepartmentsChange($event)"
+        ></app-toggle>
+      </div>
+    </div>
   </ng-container>
 
   <div class="date-fields">
@@ -57,7 +93,7 @@
       controlName="isOriented"
       label="Oriented"
       [formGroupInstance]="assignDepartmentForm"
-      (checked)="toggleChecked()"
+      (checked)="orientedChecked($event)"
     ></app-toggle>
     <app-toggle
       *ngIf="departmentId"
@@ -67,5 +103,19 @@
       [formGroupInstance]="assignDepartmentForm"
       (checked)="toggleChecked()"
     ></app-toggle>
+  </div>
+
+  <div class="date-fields">
+    <app-datepicker
+      *ngIf="isOriented$ | async as isOriented"
+      [formGroupInstance]="assignDepartmentForm"
+      [required]="isOriented"
+      [min]="dateRanges.min"
+      [max]="dateRanges.max"
+      id="start-date"
+      class="orientation-date"
+      controlName="orientationDate"
+      label="Orientation Date"
+    ></app-datepicker>
   </div>
 </form>

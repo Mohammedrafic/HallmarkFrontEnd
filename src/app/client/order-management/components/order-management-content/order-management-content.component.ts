@@ -115,7 +115,7 @@ import {
   OrderManagementIRPTabsIndex,
   OrganizationOrderManagementTabs,
 } from '@shared/enums/order-management-tabs.enum';
-import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
+import { FilterIrpOrderTypes, OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { SettingsKeys } from '@shared/enums/settings';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import {
@@ -320,6 +320,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public isRowScaleUp = true;
   public isSubrowDisplay = false;
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
+  public OrderManagementIRPTabsIndex = OrderManagementIRPTabsIndex;
   public orderStatus = OrderStatus;
   public reOrderCount$ = new Subject<number>();
   public orderTypes = OrderType;
@@ -520,6 +521,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
+
   public getalerttitle(): void {
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
 	  this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
@@ -627,7 +629,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.clearSelection(this.gridWithChildRow);
   }
 
-
   public onAddReorderClose(): void {
     if (
       this.activeTab === OrganizationOrderManagementTabs.AllOrders ||
@@ -669,18 +670,21 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
     this.filters.pageSize = this.pageSize;
     this.isIncomplete = false;
-
+    
     if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      this.filters = {}; // TODO remove and implement IRP filters
-
       this.filters.orderBy = this.orderBy;
       this.filters.pageNumber = this.currentPage;
       this.filters.pageSize = this.pageSize;
-      this.filters.orderType = IRPTabRequestTypeMap.get(this.activeIRPTabIndex) ?? null;
+      if (this.activeIRPTabIndex !== OrderManagementIRPTabsIndex.AllOrders) {
+        this.filters.orderTypes = Number.isInteger(IRPTabRequestTypeMap.get(this.activeIRPTabIndex)) ? [IRPTabRequestTypeMap.get(this.activeIRPTabIndex) as number] : [];
+      }
+
+      this.isIncomplete = (this.activeIRPTabIndex === OrderManagementIRPTabsIndex.Incomplete);
 
       this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.IRP);
 
-      this.store.dispatch(new GetIRPOrders(this.filters));
+      cleared ? this.store.dispatch(new GetIRPOrders(this.filters)) : this.store.dispatch([new GetOrderFilterDataSources(true)]);
+      
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
       switch (this.activeTab) {
         case OrganizationOrderManagementTabs.AllOrders:
@@ -734,16 +738,24 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public showFilters(): void {
-    if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      // TODO new filters for IRP system
-    } else {
-      this.store.dispatch(new ShowFilterDialog(true));
-      setTimeout(() => { this.orderStatusFilter?.refresh(); this.cd$.next(true); }, 300);
-    }
+    //if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
+    // TODO new filters for IRP system
+    this.store.dispatch(new ShowFilterDialog(true));
+    setTimeout(() => { this.orderStatusFilter?.refresh(); this.cd$.next(true); }, 300);
   }
 
   public onFilterDelete(event: FilteredItem): void {
     this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
+  }
+
+  private ifFilteredByOrderTypeVMS(): boolean {
+    return !this.isActiveSystemIRP && (this.activeTab === OrganizationOrderManagementTabs.PerDiem ||
+           this.activeTab === OrganizationOrderManagementTabs.ReOrders ||
+           this.activeTab === OrganizationOrderManagementTabs.PermPlacement);
+  }
+
+  private ifFilteredByOrderTypeIRP(): boolean {
+    return this.isActiveSystemIRP && (this.activeIRPTabIndex !== OrderManagementIRPTabsIndex.AllOrders);
   }
 
   private patchFilterForm(): void {
@@ -754,9 +766,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       departmentsIds: this.filters.departmentsIds || [],
       skillIds: this.filters.skillIds || [],
       orderTypes:
-        this.activeTab === OrganizationOrderManagementTabs.PerDiem ||
-          this.activeTab === OrganizationOrderManagementTabs.ReOrders ||
-          this.activeTab === OrganizationOrderManagementTabs.PermPlacement
+        this.ifFilteredByOrderTypeVMS() || this.ifFilteredByOrderTypeIRP()
           ? []
           : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
@@ -784,8 +794,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       poNumberIds: this.filters.poNumberIds || null,
       contactEmails: Array.isArray(this.filters.contactEmails) ? this.filters.contactEmails[0] : this.filters.contactEmails || null,
       orderId: this.filters.orderId || null,
+      irpOnly: this.filters.irpOnly || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+  }
+
+  private resetTabs(): void {
+    this.activeIRPTabIndex = OrderManagementIRPTabsIndex.AllOrders;
+    this.activeTab = OrganizationOrderManagementTabs.AllOrders;
   }
 
   private clearFilters(): void {
@@ -869,6 +885,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
+    this.filters.irpOnly = !!this.filters.irpOnly;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.getOrders(true);
     this.store.dispatch(new ShowFilterDialog(false));
@@ -1176,11 +1193,20 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.cd$.next(true);
   }
 
-  buttonGroupChange(selectedBtn: ButtonModel) {
+  private setOrderTypesFilterDataSource(): void {
+    if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
+      this.filterColumns.orderTypes.dataSource = OrderTypeOptions;
+    } else {
+      this.filterColumns.orderTypes.dataSource = FilterIrpOrderTypes;
+    }
+  }
+
+  changeSystem(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
 
-
+    this.setOrderTypesFilterDataSource();
+    this.resetTabs();
     this.clearFilters();
     this.initMenuItems();
     this.initGridColumns();
@@ -1391,9 +1417,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
         this.clearFilters();
       }
+
       if (!this.previousSelectedOrderId) {
         this.pageSubject.next(1);
       }
+
       this.store.dispatch(new GetAssignedSkillsByOrganization());
 
       this.orderManagementService.setPreviousOrganizationId(id);
@@ -1552,6 +1580,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         valueField: 'poNumber',
         valueId: 'id',
       },
+      irpOnly: {
+        type: ControlTypes.Checkbox,
+        valueType: ValueType.Text,
+        checkBoxTitle: 'IRP Only',
+      }
     };
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe(() => {
       this.onFilterApply();
@@ -1565,6 +1598,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         let statuses : any = [];
         let candidateStatuses: FilterStatus[] = [];
         const statusesByDefault = [
+          CandidatStatus['Not Applied'],
           CandidatStatus.Applied,
           CandidatStatus.Shortlisted,
           CandidatStatus.Offered,
@@ -1620,10 +1654,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         }
 
         if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
-          this.clearFilters();
           this.store.dispatch(new GetIRPOrders(this.filters));
         } else {
-            this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
+          this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
         }
         this.cd$.next(true);
         setTimeout(() => {
@@ -2106,9 +2139,25 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.isOrgVMSEnabled = !!isVMCEnabled;
 
       this.setPreviousSelectedSystem();
-      this.activeSystem = this.previousSelectedSystemId
-        ?? DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
+      }
+
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && this.isOrgVMSEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
+      }
+
+      if (!this.previousSelectedSystemId) {
+        this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+      }
+
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem);
+      this.setOrderTypesFilterDataSource();
       this.initMenuItems();
       this.initGridColumns();
       this.getOrders();

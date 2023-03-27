@@ -9,7 +9,7 @@ import { CreateScheduleService } from './create-schedule.service';
 import { CreateBookTooltip, CreateScheduleDateItems, CreateTooltip, GetScheduleDayWithEarliestTime } from '../helpers';
 import { ScheduleBookingErrors } from '../interface';
 import { ScheduleItemType } from '../constants';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 @Injectable()
 export class ScheduleItemsService {
@@ -23,10 +23,11 @@ export class ScheduleItemsService {
     scheduleType: ScheduleItemType
   ): CreateScheduleItem[] {
     return scheduleSelectedSlots.candidates.map((candidate: ScheduleInt.ScheduleCandidate) => {
+
       return  {
         candidateName: `${candidate.lastName}, ${candidate.firstName}`,
         candidateId: candidate.id,
-        selectedDates: candidate.dates.map((date: string) => new Date(date)),
+        selectedDates: candidate.dates.map((date: string) => new Date(`${date}T00:00:00`)),
         dateItems: this.getDateItems(candidate.dates, candidate.id, scheduleType, candidate.orderType),
       };
     });
@@ -55,12 +56,13 @@ export class ScheduleItemsService {
 
     dates.forEach((dateValue: string) => {
       const daySchedules: ScheduleInt.ScheduleItem[] = this.createScheduleService.getDaySchedules(candidateId, dateValue);
+
       if (daySchedules.length) {
         const scheduleDayWithEarliestTime = GetScheduleDayWithEarliestTime(daySchedules);
-        const date = new Date(dateValue);
+        const date = new Date(`${dateValue}T00:00:00`);
 
         scheduleDateItems.push({
-          dateValue: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+          dateValue: DateTimeHelper.toUtcFormat(date),
           tooltipContent: CreateBookTooltip(daySchedules) as string,
           scheduleType: scheduleDayWithEarliestTime.scheduleType,
           orderType,

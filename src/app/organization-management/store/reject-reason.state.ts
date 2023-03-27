@@ -16,10 +16,10 @@ import {
   UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess,
   GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty,
   SavePenaltySuccess, SavePenaltyError, RemovePenalty, ShowOverridePenaltyDialog, GetUnavailabilityReasons,
-  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess,
+  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess, GetTerminationReasons, SaveTerminationReasons, RemoveTerminationReasons, UpdateTerminationReasons, UpdateTerminationReasonsSuccess, GetCategoryNoteReasons, SaveCategoryNoteReasons, RemoveCategoryNoteReasons, UpdateCategoryNoteReasons, UpdateCategoryNoteReasonsSuccess, SaveTerminatedReasonError, UpdateInternalTransferReasonsError, UpdateCategoryNoteReasonsError,
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
-import { RejectReason, RejectReasonPage, UnavailabilityReasons } from "@shared/models/reject-reason.model";
+import { RejectReason, RejectReasonPage, RejectReasonwithSystem, UnavailabilityReasons } from "@shared/models/reject-reason.model";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ShowToast } from "../../store/app.actions";
 import { MessageTypes } from "@shared/enums/message-types";
@@ -38,6 +38,8 @@ export interface RejectReasonStateModel {
   isReasonLoading: boolean;
   unavailabilityReasons: PageOfCollections<UnavailabilityReasons> | null;
   internalTransfer: RejectReasonPage | null;
+  terminationReasons: RejectReasonPage | null;
+  categoryNote: RejectReasonPage | null;
 }
 
 @State<RejectReasonStateModel>({
@@ -50,7 +52,9 @@ export interface RejectReasonStateModel {
     penalties: null,
     isReasonLoading: false,
     unavailabilityReasons: null,
-    internalTransfer: null
+    internalTransfer: null,
+    terminationReasons: null,
+    categoryNote: null
   },
 })
 @Injectable()
@@ -96,6 +100,17 @@ export class RejectReasonState {
   static internalTransfer(state: RejectReasonStateModel) : RejectReasonPage | null {
     return state.internalTransfer;
   }
+
+  @Selector()
+  static terminationReasons(state: RejectReasonStateModel) : RejectReasonPage | null {
+    return state.terminationReasons;
+  }
+
+  @Selector()
+  static categoryNote(state: RejectReasonStateModel) : RejectReasonPage | null {
+    return state.categoryNote;
+  }
+
 
   constructor(private rejectReasonService:RejectReasonService) {}
 
@@ -203,7 +218,7 @@ export class RejectReasonState {
   SaveClosureReasons(
     { dispatch}: StateContext<RejectReasonStateModel>,
     { payload }: SaveClosureReasons
-  ): Observable<RejectReason | void> {
+  ): Observable<RejectReasonwithSystem | void> {
     return this.rejectReasonService.saveClosureReasons(payload).pipe(
       tap(payload => {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
@@ -308,11 +323,17 @@ export class RejectReasonState {
   @Action(GetOrderRequisitionByPage)
   GetOrderRequisitionByPage(
     { patchState }: StateContext<RejectReasonStateModel>,
-    { pageNumber, pageSize, orderBy, lastSelectedBusinessUnitId }: GetOrderRequisitionByPage
+    { pageNumber, pageSize, orderBy, lastSelectedBusinessUnitId, excludeOpenPositionReason }: GetOrderRequisitionByPage
   ): Observable<RejectReasonPage> {
     patchState({ isReasonLoading: true });
 
-    return this.rejectReasonService.getOrderRequisitionsByPage(pageNumber, pageSize, orderBy, lastSelectedBusinessUnitId)
+    return this.rejectReasonService.getOrderRequisitionsByPage(
+      pageNumber,
+      pageSize,
+      orderBy,
+      lastSelectedBusinessUnitId,
+      excludeOpenPositionReason,
+    )
     .pipe(
       tap((payload) => {
         patchState({orderRequisition: payload});
@@ -470,6 +491,7 @@ export class RejectReasonState {
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {
+        dispatch(new UpdateInternalTransferReasonsError())
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
@@ -498,9 +520,137 @@ export class RejectReasonState {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       }),
       catchError((error: HttpErrorResponse) => {
+        dispatch(new UpdateInternalTransferReasonsError())
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
+
+  @Action(GetTerminationReasons)
+  GetTerminationReasons(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    { pageNumber, pageSize }: GetTerminationReasons
+  ): Observable<RejectReasonPage> {
+    patchState({ isReasonLoading: true });
+
+    return this.rejectReasonService.getTerminationReason(pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({terminationReasons: payload});
+        return payload;
+      })
+    );
+  }
+
+
+  @Action(SaveTerminationReasons)
+  SaveTerminationReasons(
+    { dispatch}: StateContext<RejectReasonStateModel>,
+    { payload }: SaveTerminationReasons
+  ): Observable<RejectReason | void> {
+    return this.rejectReasonService.saveTerminationReason(payload).pipe(
+      tap(payload => {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        dispatch(new UpdateTerminationReasonsSuccess());
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveTerminatedReasonError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(RemoveTerminationReasons)
+  RemoveTerminationReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { id }: RemoveTerminationReasons
+  ): Observable<void> {
+    return this.rejectReasonService.removeTerminationReason(id).pipe(
+      tap(() => {
+        dispatch(new UpdateTerminationReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      })
+    );  }
+
+  @Action(UpdateTerminationReasons)
+  UpdateTerminationReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { payload }: UpdateTerminationReasons
+  ): Observable<void> {
+    return this.rejectReasonService.updateTerminationReason(payload).pipe(
+      tap(() => {
+        dispatch(new UpdateTerminationReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveTerminatedReasonError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(GetCategoryNoteReasons)
+  GetCategoryNoteReasons(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    { pageNumber, pageSize }: GetCategoryNoteReasons
+  ): Observable<RejectReasonPage> {
+    patchState({ isReasonLoading: true });
+
+    return this.rejectReasonService.getCategoryNoteReason(pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({categoryNote: payload});
+        return payload;
+      })
+    );
+  }
+
+
+  @Action(SaveCategoryNoteReasons)
+  SaveCategoryNoteReasons(
+    { dispatch}: StateContext<RejectReasonStateModel>,
+    { payload }: SaveCategoryNoteReasons
+  ): Observable<RejectReason | void> {
+    return this.rejectReasonService.saveCategoryNoteReason(payload).pipe(
+      tap(payload => {
+        dispatch(new UpdateCategoryNoteReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new UpdateCategoryNoteReasonsError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(RemoveCategoryNoteReasons)
+  RemoveCategoryNoteReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { id }: RemoveCategoryNoteReasons
+  ): Observable<void> {
+    return this.rejectReasonService.removeCategoryNoteReason(id).pipe(
+      tap(() => {
+        dispatch(new UpdateCategoryNoteReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      })
+    );  }
+
+  @Action(UpdateCategoryNoteReasons)
+  UpdateCategoryNoteReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { payload }: UpdateCategoryNoteReasons
+  ): Observable<void> {
+    return this.rejectReasonService.updateCategoryNoteReason(payload).pipe(
+      tap(() => {
+        dispatch(new UpdateCategoryNoteReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new UpdateCategoryNoteReasonsError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
 }
 

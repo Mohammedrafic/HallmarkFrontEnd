@@ -4,7 +4,9 @@ import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { DepartmentFormFieldConfig, DepartmentFiltersColumns } from '../departments.model';
 import { DepartmentFiltersColumnsEnum } from '../../enums';
 
-export const DepartmentFilterFormConfig = (): ReadonlyArray<DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>> => [
+export const DepartmentFilterFormConfig = (): ReadonlyArray<
+  DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>
+> => [
   {
     type: ControlTypes.Multiselect,
     title: 'Region ',
@@ -36,7 +38,7 @@ export const DepartmentFilterFormConfig = (): ReadonlyArray<DepartmentFormFieldC
     type: ControlTypes.Radio,
     title: 'Oriented',
     field: DepartmentFiltersColumnsEnum.ORIENTED,
-  }
+  },
 ];
 
 const commonColumnData = {
@@ -44,6 +46,7 @@ const commonColumnData = {
   valueType: ValueType.Id,
   valueField: 'name',
   valueId: 'id',
+  dataSource: [],
 };
 
 export const FilterColumnConfig: DepartmentFiltersColumns = {
@@ -51,5 +54,7 @@ export const FilterColumnConfig: DepartmentFiltersColumns = {
   locationIds: commonColumnData,
   departmentsIds: commonColumnData,
   skillIds: { ...commonColumnData, valueField: 'skillDescription' },
-  oriented: { ...commonColumnData, type: ControlTypes.Radio },
+  isOriented: { ...commonColumnData, type: ControlTypes.Radio, dataSource: { 1: 'Oriented', 2: 'Not Oriented' } },
 };
+
+export const OrientedFilterPayload: (boolean | null)[] = [null, true, false];

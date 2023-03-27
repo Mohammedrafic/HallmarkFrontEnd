@@ -1,0 +1,53 @@
+<div
+  [class.inactive-date]="isDateActive"
+  class="card-wrapper"
+>
+  <div class="day">
+    {{currentDate | date: 'd'}}
+  </div>
+  <div
+    class="time"
+    [style.color]="cardConfig?.timeColor"
+  >
+    <span class="time__text">{{ firstSchedule.startDate | date: 'HH:mm': 'UTC' }}</span>
+    <span class="time__text time__separator">-</span>
+    <span class="time__text">{{ firstSchedule.endDate | date: 'HH:mm': 'UTC' }}</span>
+    <span *ngIf="firstSchedule?.orderMetadata?.orderType === orderType" class="time__text time__type"> L </span>
+    <ejs-tooltip
+      *ngIf="firstSchedule.scheduleOrderType"
+      [content]="firstSchedule.scheduleOrderType"
+      position="TopCenter"
+      [showTipPointer]="false"
+    >
+      <span class="time__text">{{ firstSchedule.scheduleOrderType[0] }}</span>
+    </ejs-tooltip>
+  </div>
+  <div class="title-container">
+    <app-tooltip-container
+      [message]="tooltips.orderTooltip"
+      [showToolTip]="!!cardConfig?.showTitleToolTip"
+      position="TopCenter"
+    >
+      <div class="title-text">
+      <span
+        class="text"
+        [style.color]="cardConfig?.titleColor"
+        [class.bordered]="dateSchedule.showWhiteFrame && firstSchedule.scheduleType === scheduleBookType">
+        {{ cardTitle }}
+      </span>
+      </div>
+    </app-tooltip-container>
+    <div class="badge-container">
+      <ejs-tooltip
+        *ngIf="tooltips.additionalTooltip"
+        [content]="tooltips.additionalTooltip"
+        position="TopCenter"
+        [showTipPointer]="false"
+      >
+        <div class="badge">
+          +{{ dateSchedule.daySchedules.length - 1 }}
+        </div>
+      </ejs-tooltip>
+    </div>
+  </div>
+</div>

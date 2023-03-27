@@ -18,34 +18,16 @@ export interface DepartmentAssigned {
   skillType: number;
   skills: Skill[];
   isOriented: boolean;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   isHomeCostCenter: boolean;
+  orientationDate: string | null;
+  extDepartmentId: string;
 }
 
 interface Skill {
   id: number;
   name: string;
-}
-
-export interface EditAssignedDepartment {
-  employeeWorkCommitmentId: number;
-  startDate: Date | string;
-  endDate: Date | string;
-  orientedStartDate?: Date | string;
-  isHomeCostCenter?: boolean;
-  isOriented?: boolean;
-}
-
-export interface AssignNewDepartment {
-  employeeWorkCommitmentId: number;
-  isOriented: number;
-  regionId: number;
-  locationId: number;
-  departmentId: number;
-  startDate: Date | string;
-  endDate?: Date | string;
-  isHomeCostCenter?: boolean;
 }
 
 export interface DepartmentFormFieldConfig<T> {
@@ -58,22 +40,23 @@ export interface DepartmentFormFieldConfig<T> {
   optionFields?: object;
   show?: boolean;
   disabled?: boolean;
+  required?: boolean;
 }
 
 export type DepartmentFiltersColumns = {
   [key in DepartmentFiltersColumnsEnum]: {
     type: ControlTypes;
     valueType: ValueType;
-    dataSource?: DataSourceItem[];
+    dataSource?: DataSourceItem[] | Record<number, string>;
     valueField?: string;
     valueId?: string;
   };
 };
 
 export interface AssignDepartmentFormState {
-  regionId: number;
-  locationId: number;
-  departmentId: number;
+  regionIds: number;
+  locationIds: number;
+  departmentIds: number;
   startDate: Date;
   endDate: Date | null;
   isOriented: boolean;
@@ -86,12 +69,13 @@ export interface DepartmentFilterState {
   departmentsIds: number[];
   skillIds: number[];
   oriented: boolean;
+  employeeWorkCommitmentId: number;
 }
 export interface EditDepartmentFormState {
   [EditDepartmentFields.START_DATE]: Date;
   [EditDepartmentFields.END_DATE]: Date;
   [EditDepartmentFields.IS_ORIENTED]: boolean;
-  [EditDepartmentFields.ORIENTED_START_DATE]?: Date;
+  [EditDepartmentFields.ORIENTATION_DATE]?: Date;
 }
 export interface DepartmentHierarchy {
   organizationId: number;
@@ -106,25 +90,25 @@ export interface AssignDepartmentHierarchy {
   departments: OrganizationDepartment[];
 }
 
-export interface EditDepartmentPayload {
+export interface DepartmentPayload {
   forceUpdate: boolean;
-  isOriented?: true | undefined;
-  isHomeCostCenter?: true | undefined;
-  orientedStartDate?: string | undefined;
-  employeeWorkCommitmentId: number;
-  startDate: string;
-  endDate: string;
-  ids: number[] | null;
-}
-
-export interface NewDepartmentPayload {
-  forceUpdate: boolean;
-  employeeWorkCommitmentId: number;
-  departmentId: number;
+  employeeWorkCommitmentId?: number;
   isOriented: boolean;
   startDate: string;
-  endDate: string | undefined;
+  endDate?: string;
   isHomeCostCenter?: boolean;
+  orientationDate?: string;
+  ids?: number[] | null;
+  departmentIds?: number;
+  locationIds?: number;
+  regionIds?: number;
+  employeeId?: number;
+}
+
+export interface DepartmentConditions {
+  showAllDepartments: boolean;
+  disableBulkButton: boolean;
+  noActiveWC: boolean;
 }
 
 export interface DateRanges {

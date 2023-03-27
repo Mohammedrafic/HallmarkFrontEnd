@@ -20,6 +20,13 @@ export const DatesPeriods: ItemModel[] = [
   },
 ];
 
+export const MonthPeriod: ItemModel[] = [
+  {
+    text: DatePeriodId.Month,
+    id: DatesRangeType.Month,
+  },
+];
+
 export const CandidateIconName = (scheduleCandidate: ScheduleCandidate): string => {
   if (!scheduleCandidate.isOriented) {
     return 'compass';
@@ -46,3 +53,5 @@ export const ScheduleCardTypeMap: Map<ScheduleType, ScheduleCardConfig> = new Ma
 export const GetScheduleCardConfig = (scheduleItem: ScheduleDateItem): ScheduleCardConfig | undefined => {
   return ScheduleCardTypeMap.get(scheduleItem.daySchedules[0]?.scheduleType);
 };
+
+export const WeekList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

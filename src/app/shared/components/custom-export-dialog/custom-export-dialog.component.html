@@ -1,0 +1,59 @@
+<ejs-dialog #exportDialog
+            cssClass="dialog export-dialog"
+            [width]="width"
+            [target]="targetElement"
+            [visible]="false"
+            [isModal]="true"
+            [showCloseIcon]="false"
+            [animationSettings]="{ effect: 'SlideRight' }">
+  <ng-template #header>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">Export</h3>
+          </div>
+          <div class="e-card-content">
+            <button ejs-button
+                    cssClass="e-outline button-cancel"
+                    (click)="onCancel()">
+              Cancel
+            </button>
+            <button ejs-button
+                    type="submit"
+                    [isPrimary]="true"
+                    (click)="onExport()">
+              Export
+            </button>
+          </div>
+        </div>
+      </section>
+    </section>
+  </ng-template>
+  <ng-template #content>
+    <section class="container">
+      <label class="export-label">
+        You may choose columns to export by selecting the column name from the options below.
+      </label>
+      <div class="input-container bootstrap">
+        <label for="fileName">Document Title</label>
+        <div class="input-group">
+          <input class="e-input"
+                 type="text"
+                 name="fileName"
+                 [value]="fileName"
+                 [(ngModel)]="_fileName" />
+        </div>
+      </div>
+      <div class="inline-radio-container purchase-order-by">
+        <ejs-radiobutton label="Excel file" name="fileType" [value]="ExportedFileType.excel" [(ngModel)]="fileType"></ejs-radiobutton>
+        <ejs-radiobutton label="CSV file" name="fileType" [value]="ExportedFileType.csv" [(ngModel)]="fileType"></ejs-radiobutton>
+      </div>
+      <div class="exported-columns">
+        <label>Exported Columns</label>
+        <ejs-chiplist #chipList selection="Multiple" [chips]="columns" (click)="selectChips($event)"></ejs-chiplist>
+      </div>
+    </section>
+  </ng-template>
+  <ng-template #footerTemplate></ng-template>
+</ejs-dialog>

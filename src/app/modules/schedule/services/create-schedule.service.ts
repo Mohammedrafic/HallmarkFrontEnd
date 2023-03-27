@@ -5,7 +5,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { EMPTY, Observable, of } from 'rxjs';
 
-import { getTime, getTimeFromDate, setTimeToDate } from '@shared/utils/date-time.utils';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { FilteredItem } from '@shared/models/filter.model';
+import { Skill } from '@shared/models/skill.model';
+import { getTime } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
 import { ScheduleItemType } from 'src/app/modules/schedule/constants';
@@ -15,8 +18,16 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { UserState } from 'src/app/store/user.state';
 import { CreateScheduleItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
-import { ScheduleItemsComponent } from '../components/schedule-items/schedule-items.component';
-import { EmployeeBookingDay, ScheduleBookingErrors, ScheduleTypeRadioButton } from '../interface';
+import {
+  EmployeeBookingDay,
+  ScheduleBookingErrors,
+  ScheduleFiltersData,
+  ScheduleFilterStructure,
+  ScheduleTypeRadioButton,
+  ShiftDropDownsData,
+} from '../interface';
+import { ScheduleFilterHelper } from '../helpers';
+import { ScheduleFiltersService } from './schedule-filters.service';
 
 @Injectable()
 export class CreateScheduleService {
@@ -34,6 +45,7 @@ export class CreateScheduleService {
   constructor(
     private fb: FormBuilder,
     private store: Store,
+    private scheduleFiltersService:  ScheduleFiltersService,
   ) {}
 
   createUnavailabilityForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
@@ -87,13 +99,13 @@ export class CreateScheduleService {
 
   createAvailabilityUnavailability(
     scheduleForm: FormGroup,
-    scheduleItemsComponent: ScheduleItemsComponent,
+    scheduleItems: CreateScheduleItem[],
     scheduleType: number,
     customShiftId: number
   ): ScheduleInt.Schedule {
     const { shiftId, startTime, endTime, unavailabilityReasonId = null } = scheduleForm.getRawValue();
     return  {
-      employeeScheduledDays: this.getEmployeeScheduledDays(scheduleItemsComponent.scheduleItems, startTime, endTime),
+      employeeScheduledDays: this.getEmployeeScheduledDays(scheduleItems),
       scheduleType,
       startTime: getTime(startTime),
       endTime: getTime(endTime),
@@ -104,47 +116,41 @@ export class CreateScheduleService {
 
   createBooking(
     scheduleForm: FormGroup,
-    scheduleItemsComponent: ScheduleItemsComponent,
+    scheduleItems: CreateScheduleItem[],
     customShiftId: number
   ): ScheduleInt.ScheduleBook {
     const { departmentId,skillId, shiftId, startTime, endTime } = scheduleForm.getRawValue();
 
     return  {
-      employeeBookedDays: this.getEmployeeBookedDays(scheduleItemsComponent.scheduleItems),
+      employeeBookedDays: this.getEmployeeBookedDays(scheduleItems),
       departmentId: departmentId,
       skillId: skillId,
       shiftId: shiftId !== customShiftId ? shiftId : null,
       startTime: getTime(startTime),
       endTime: getTime(endTime),
+      createOrder: false,
     };
   }
 
-  getEmployeeScheduledDays(
-    scheduleItems: CreateScheduleItem[],
-    startTime: Date,
-    endTime: Date
-  ): ScheduleInt.EmployeeScheduledDay[] {
+  getEmployeeScheduledDays(scheduleItems: CreateScheduleItem[]): ScheduleInt.EmployeeScheduledDay[] {
     return scheduleItems.map((item: CreateScheduleItem) => {
-      const scheduledDays: ScheduleInt.ScheduledDay[] = item.selectedDates.map((date: Date) => {
-        const dateValue: string =  DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date));
-
-        return {
-          schedulesToOverrideIds: this.getScheduleToOverrideIds(item.candidateId, dateValue, startTime, endTime),
-          date: dateValue,
-        };
-      });
+      const dates: string[] = item.selectedDates
+        .map((date: Date) => DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(date)));
 
       return {
         employeeId: item.candidateId,
-        scheduledDays,
+        dates,
       };
     });
   }
 
   getEmployeeBookedDays(scheduleItems: CreateScheduleItem[]): EmployeeBookingDay[] {
     return scheduleItems.map((item: CreateScheduleItem) => {
-      const bookedDays = item.selectedDates.map((date: Date) =>
-        DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)));
+      const bookedDays = item.selectedDates.map((date: Date) => {
+        const initDate = new Date(date.setHours(0, 0, 0));
+
+        return DateTimeHelper.toUtcFormat(initDate);
+      });
 
       return {
         employeeId: item.candidateId,
@@ -205,27 +211,44 @@ export class CreateScheduleService {
     return (scheduleTypes.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
   }
 
-  private getScheduleToOverrideIds(
-    candidateId: number,
-    dateString: string,
-    startTime: Date,
-    endTime: Date
-  ): number[] | null {
-    const overlappingScheduleIds: number[] = this.getDaySchedules(candidateId, dateString)
-      .filter((daySchedule: ScheduleInt.ScheduleItem) => this.isTimeRangeOverlapping(daySchedule, startTime, endTime))
-      .map((daySchedule: ScheduleInt.ScheduleItem) => daySchedule.id);
+  getShiftDropDownsData(scheduleFilterStructure: ScheduleFilterStructure): ShiftDropDownsData {
+    const scheduleFiltersData: ScheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
 
-    return overlappingScheduleIds.length ? overlappingScheduleIds : null;
+    if (scheduleFiltersData?.filters?.departmentsIds?.length === 1) {
+      return {
+        filtered: true,
+        selectedSkillId: scheduleFiltersData.filters?.skillIds?.length ? scheduleFiltersData.filters.skillIds[0] : null,
+        regionsDataSource: this.getDataSourceFromFilteredItems('regionIds', scheduleFiltersData.filteredItems),
+        locationsDataSource: this.getDataSourceFromFilteredItems('locationIds', scheduleFiltersData.filteredItems),
+        departmentsDataSource: this.getDataSourceFromFilteredItems('departmentsIds', scheduleFiltersData.filteredItems),
+        skillsDataSource: ScheduleFilterHelper.adaptSkillToOption(
+          this.store.selectSnapshot(OrganizationManagementState.assignedSkillsByOrganization) as Skill[] || []
+        ),
+      };
+    } else {
+      const data: ShiftDropDownsData = {} as ShiftDropDownsData;
+
+      data.filtered = false;
+      data.selectedSkillId = null;
+      data.locationsDataSource = this.scheduleFiltersService
+        .getSelectedLocatinOptions(scheduleFilterStructure, [scheduleFilterStructure.regions[0].id as number]);
+      data.departmentsDataSource = this.scheduleFiltersService
+        .getSelectedDepartmentOptions(scheduleFilterStructure, [data.locationsDataSource[0].value as number]);
+
+      return data;
+    }
   }
 
-  private isTimeRangeOverlapping(daySchedule: ScheduleInt.ScheduleItem, startTime: Date, endTime: Date): boolean {
-    const dayScheduleStartTimeMs = setTimeToDate(getTimeFromDate(new Date(daySchedule.startDate), true))!.getTime();
-    const dayScheduleEndTimeMs = setTimeToDate(getTimeFromDate(new Date(daySchedule.endDate), true))!.getTime();
-    const shiftStartTimeMs = startTime.getTime();
-    const shiftEndTimeMs = endTime.getTime();
+  private getDataSourceFromFilteredItems(column: string, filteredItems: FilteredItem[]): DropdownOption[] {
+    const filteredItem = filteredItems.find((item: FilteredItem) => item.column === column);
 
-    return (shiftStartTimeMs >= dayScheduleStartTimeMs && shiftEndTimeMs <= dayScheduleEndTimeMs)
-      || (shiftEndTimeMs > dayScheduleStartTimeMs && shiftStartTimeMs < dayScheduleStartTimeMs)
-      || (shiftStartTimeMs < dayScheduleEndTimeMs && shiftEndTimeMs > dayScheduleEndTimeMs);
+    if (!filteredItem) {
+      return [];
+    }
+
+    return [{
+      text: filteredItem.text,
+      value: filteredItem.value,
+    }];
   }
 }

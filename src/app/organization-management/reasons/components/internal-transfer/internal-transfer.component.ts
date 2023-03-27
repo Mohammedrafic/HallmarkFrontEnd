@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@a
 import { ofActionSuccessful, Select } from "@ngxs/store";
 import { Observable, takeWhile } from "rxjs";
 import {
-  GetInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasonsSuccess,
+  GetInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasonsError, UpdateInternalTransferReasonsSuccess,
 } from "@organization-management/store/reject-reason.actions";
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { RejectReasonPage } from "@shared/models/reject-reason.model";
@@ -34,7 +34,7 @@ export class InternalTransferComponent extends ReasonsComponent implements OnIni
 
   protected subscribeOnSaveReasonError(): void {
     this.actions$.pipe(
-      ofActionSuccessful(UpdateInternalTransferReasonsSuccess),
+      ofActionSuccessful(UpdateInternalTransferReasonsError),
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.setReasonControlError());
   }

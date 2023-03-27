@@ -8,8 +8,8 @@ import { DropDownListModule } from "@syncfusion/ej2-angular-dropdowns";
 import { DialogModule } from "@syncfusion/ej2-angular-popups";
 
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { ReplacementOrderDialogModule } from '../replacement-order-dialog/replacement-order-dialog.module';
 import { ScheduleItemsModule } from '../schedule-items/schedule-items.module';
-import { CreateScheduleService } from "../../services/create-schedule.service";
 import { CreateScheduleComponent } from "./create-schedule.component";
 
 @NgModule({
@@ -26,8 +26,9 @@ import { CreateScheduleComponent } from "./create-schedule.component";
     TimePickerModule,
     ScheduleItemsModule,
     TooltipContainerModule,
+    ReplacementOrderDialogModule,
   ],
   exports: [CreateScheduleComponent],
-  providers: [CreateScheduleService],
+  providers: [],
 })
 export class CreateScheduleModule { }

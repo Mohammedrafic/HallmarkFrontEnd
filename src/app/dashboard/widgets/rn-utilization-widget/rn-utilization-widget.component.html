@@ -1,0 +1,85 @@
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+    <ng-template #header>
+        <div class="app-accumulation-chart__title">
+            <h3 class="widget-header__title">Nursing Utilization</h3>
+        </div>
+    </ng-template>
+    <ng-template #RNUtilizationChart>
+        <p class="hours-rn">Monthly hours scheduled for RN : <strong>200.30</strong></p>
+        <form [formGroup]="rnUtilizationformgroup">
+        <div class="input-sec">
+            <span>
+                <div class="input-container calendar">
+                    <label>Date</label>
+                    <div class="input-group datepicker">
+                        <ejs-datepicker id="inactiveDate" class="datepicker" format="MM/dd/yyyy"
+                            placeholder="MM/DD/YYYY" [enableMask]="true" formControlName="workDate"
+                            [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }">
+                        </ejs-datepicker>
+                    </div>
+                </div>
+            </span>
+            <span>
+                <div class="dropdown-container">
+                    <label>Work Commitment</label>
+                    <div class="input-group dropdown">
+                        <!-- <ejs-dropdownlist [fields]="optionFields" formControlName="classification"
+                            [allowFiltering]="true" [dataSource]="commitmentsPage$ | async">
+                        </ejs-dropdownlist> -->
+                        <ejs-multiselect #workcommitmentControl id="workcommitmentIds" mode="CheckBox" formControlName="workcommitIds"
+                        placeholder="All" [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true"
+                        [dataSource]="commitmentsPage$ | async" [selectAllText]='allOption'
+                         [showSelectAll]="true" tabindex="2">
+                      </ejs-multiselect>
+                    </div>
+                </div>
+            </span>
+        </div>
+
+       </form>  
+        
+        <div class="widget">
+            <span class="widget__type" (mousedown)="defineMousePosition($event)"
+                (click)="toSourceContent('OrdersforApproval')">
+                <p class="orgname">Target Utilization for RN </p>
+                <!-- <p class="orgcount">{{chartData?.pendingOrders}}</p> -->
+                
+                <input class="e-input widgeticon" type="text"  maxlength="100"
+                 value=" 60%" />
+            </span>
+            <span class="widget__type" (mousedown)="defineMousePosition($event)"
+                (click)="toSourceContent('ManualInvoice')">
+                <p class="orgname">No.of Per Diem RNs <ejs-tooltip [content]="noofPerDiemOrders" position='TopCenter'>
+                        <span class="mytooltip">
+                            <i-feather name="info" id="info"
+                                [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+                        </span>
+                    </ejs-tooltip></p>
+                <p class="orgcount">64</p>
+                <!-- {{chartData?.pendingManualInvoices}} -->
+            </span>
+            <span class="widget__type" (mousedown)="defineMousePosition($event)"
+                (click)="toSourceContent('pendingInvoice')">
+                <p class="orgname">Target Per Diem RN hours <ejs-tooltip [content]="targetPerDiemhrs"
+                        position='TopCenter'>
+                        <span class="mytooltip">
+                            <i-feather name="info" id="info"
+                                [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+                        </span>
+                    </ejs-tooltip></p>
+                <p class="orgcount">218.83</p>
+            </span>
+            <span class="widget__type" (mousedown)="defineMousePosition($event)"
+                (click)="toSourceContent('Pending Timesheet')">
+                <p class="orgname">Actual Per Diem RN hours <ejs-tooltip [content]="actualPerDiemhrs"
+                        position='TopCenter'>
+                        <span class="mytooltip">
+                            <i-feather name="info" id="info"
+                                [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+                        </span>
+                    </ejs-tooltip></p>
+                <p class="orgcount">0.00</p>
+            </span>
+        </div>
+    </ng-template>
+</app-widget-wrapper>

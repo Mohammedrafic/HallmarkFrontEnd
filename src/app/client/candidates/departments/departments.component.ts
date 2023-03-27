@@ -22,15 +22,18 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import {
   DateRanges,
   DepartmentAssigned,
+  DepartmentConditions,
   DepartmentFilterState,
   DepartmentsPage,
 } from '@client/candidates/departments/departments.model';
 import { ShowFilterDialog, ShowSideDialog, ShowToast } from '../../../store/app.actions';
 import {
+  ALL_DEPARTMENTS_SELECTED,
   DELETE_MULTIPLE_RECORDS_TEXT,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
   formatDate,
+  NO_ACTIVE_WORK_COMMITMET,
   RECORD_DELETE,
 } from '@shared/constants';
 import { columnDef } from '@client/candidates/departments/grid/column-def.constant';
@@ -42,9 +45,10 @@ import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { AbstractPermission } from '@shared/helpers/permissions';
-import { CandidateWorkCommitment } from '../candidate-work-commitment/models/candidate-work-commitment.model';
 import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
 import { MessageTypes } from '@shared/enums/message-types';
+import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-departments',
@@ -76,8 +80,14 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public selectedDepartments: number[] | null;
   public departmentHierarchy: OrganizationRegion[] = [];
-  public disableBulkButton: boolean = false;
   public filtersAmount: number = 0;
+  public assignDepTooltipMsg = ALL_DEPARTMENTS_SELECTED;
+  public toggleTooltipMsg = NO_ACTIVE_WORK_COMMITMET;
+  public conditions: DepartmentConditions = {
+    showAllDepartments: false,
+    noActiveWC: false,
+    disableBulkButton: false,
+  };
 
   private filters: DepartmentFilterState | null;
 
@@ -106,7 +116,6 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     this.showSideDialog(true);
     this.dialogData$.next(null);
     this.getAssignedDepartmentHierarchy();
-    this.cdr.markForCheck();
   }
 
   public onSave(): void {
@@ -118,7 +127,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   }
 
   public onCancel(): void {
-    if (this.assignDepartment?.assignDepartmentForm.dirty) {
+    if (this.assignDepartment?.assignDepartmentForm.dirty || this.editDepartments?.formGroup.dirty) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
@@ -128,6 +137,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
         .pipe(filter(Boolean), take(1))
         .subscribe(() => {
           this.assignDepartment?.assignDepartmentForm.reset();
+          this.editDepartments?.formGroup.reset();
           this.showSideDialog(false);
         });
     } else {
@@ -157,7 +167,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       return;
     }
     if (event.type === BulkTypeAction.DELETE) {
-      this.deleteAssignedDepartments(this.selectedDepartments, DELETE_MULTIPLE_RECORDS_TEXT);
+      this.deleteAssignedDepartments(this.selectedDepartments, true);
       return;
     }
   }
@@ -168,6 +178,12 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
 
   public applyFiltersAmount(event: number): void {
     this.filtersAmount = event;
+  }
+
+  public showHideActiveDepartments(event: boolean): void {
+    this.conditions.showAllDepartments = event;
+    this.departmentsService.showAllDepartments = this.conditions.showAllDepartments;
+    this.getDepartmentsWithFilters(this.filters);
   }
 
   private showSideDialog(isOpen: boolean): void {
@@ -188,7 +204,13 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       .getSelectedTab$()
       .pipe(
         filter((tab) => tab === CandidateTabsEnum.Departments),
-        switchMap(() => this.departmentsService.getDepartmentsAssigned()),
+        switchMap(() => this.candidatesService.getEmployeeWorkCommitments()),
+        switchMap((commitment) => {
+          this.conditions.showAllDepartments = !(commitment && commitment.id);
+          this.conditions.noActiveWC = this.conditions.showAllDepartments;
+          this.departmentsService.showAllDepartments = this.conditions.showAllDepartments;
+          return this.departmentsService.getDepartmentsAssigned();
+        }),
         takeUntil(this.componentDestroy())
       )
       .subscribe((departments) => {
@@ -217,7 +239,9 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     this.dialogData$.next(department);
   }
 
-  private deleteAssignedDepartments(departmentIds: number[] | null, text = DELETE_RECORD_TEXT): void {
+  private deleteAssignedDepartments(departmentIds: number[] | null, isBulkAction?: boolean): void {
+    const text = isBulkAction ? DELETE_MULTIPLE_RECORDS_TEXT : DELETE_RECORD_TEXT;
+    const filters = isBulkAction ? this.filters : null;
     this.confirmService
       .confirm(text, {
         okButtonLabel: 'Delete',
@@ -226,7 +250,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       })
       .pipe(
         filter(Boolean),
-        switchMap(() => this.departmentsService.deleteAssignedDepartments(departmentIds)),
+        switchMap(() => this.departmentsService.deleteAssignedDepartments(departmentIds, filters)),
         switchMap(() => this.departmentsService.getDepartmentsAssigned(this.filters)),
         take(1)
       )
@@ -253,7 +277,6 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       .subscribe((employeeWorkCommitment) => {
         this.departmentsService.employeeWorkCommitmentId = employeeWorkCommitment.id!;
         this.setDateRanges(employeeWorkCommitment);
-        this.cdr.markForCheck();
       });
   }
 
@@ -265,7 +288,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
         takeUntil(this.componentDestroy())
       )
       .subscribe((canManageIrpCandidateProfile) => {
-        this.disableBulkButton = !canManageIrpCandidateProfile;
+        this.conditions.disableBulkButton = !canManageIrpCandidateProfile;
         this.initColumnDefinitions(!canManageIrpCandidateProfile);
       });
   }
@@ -279,10 +302,12 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     });
   }
 
-  private setDateRanges(employeeWorkCommitment: CandidateWorkCommitment): void {
+  private setDateRanges(employeeWorkCommitment: CandidateWorkCommitmentShort): void {
     const { startDate, endDate } = employeeWorkCommitment;
-    this.dateRanges.max = endDate ? new Date(endDate) : undefined;
-    this.dateRanges.min = startDate ? new Date(startDate) : undefined;
+
+    this.dateRanges.max = endDate ? DateTimeHelper.convertDateToUtc(endDate) : undefined;
+    this.dateRanges.min = startDate ? DateTimeHelper.convertDateToUtc(startDate) : undefined;
+    this.cdr.markForCheck();
   }
 
   private clearFilterState(): void {

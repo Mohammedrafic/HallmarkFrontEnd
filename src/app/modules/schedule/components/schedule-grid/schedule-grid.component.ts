@@ -5,7 +5,6 @@ import {
   ElementRef,
   EventEmitter,
   Input,
-  NgZone,
   OnChanges,
   OnInit,
   Output,
@@ -14,7 +13,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import Timeout = NodeJS.Timeout;
 
 import { Select, Store } from '@ngxs/store';
 import { AutoCompleteComponent } from '@syncfusion/ej2-angular-dropdowns/src/auto-complete/autocomplete.component';
@@ -27,15 +25,15 @@ import { filter } from 'rxjs/operators';
 import { DatesRangeType } from '@shared/enums';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
-import { OutsideZone } from '@core/decorators';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { ScheduleApiService } from '../../services';
 import { UserState } from '../../../../store/user.state';
 import { ScheduleGridAdapter } from '../../adapters';
-import { DatesPeriods } from '../../constants';
+import { DatesPeriods, MonthPeriod } from '../../constants';
 import * as ScheduleInt from '../../interface';
-import { ScheduleCandidatesPage, ScheduleDateItem } from '../../interface';
+import { CardClickEvent, CellClickEvent, ScheduleCandidatesPage, ScheduleDateItem } from '../../interface';
+import { GetMonthRange } from '../../helpers';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -68,9 +66,13 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   activePeriod = DatesRangeType.TwoWeeks;
 
+  monthPeriod = DatesRangeType.Month;
+
   weekPeriod: [Date, Date] = [DateTimeHelper.getCurrentDateWithoutOffset(), DateTimeHelper.getCurrentDateWithoutOffset()];
 
   datesRanges: string[] = DateTimeHelper.getDatesBetween();
+
+  monthRangeDays: string[] = [];
 
   selectedCandidatesSlot: Map<number, ScheduleInt.ScheduleDateSlot>
   = new Map<number, ScheduleInt.ScheduleDateSlot>();
@@ -83,11 +85,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   candidateNameFields: FieldSettingsModel = { text: 'fullName' };
 
-  preventCellSingleClick = false;
-
   isEmployee = false;
-
-  private cellClickTimer: Timeout;
 
   private itemsPerPage = 30;
 
@@ -98,7 +96,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     private weekService: DateWeekService,
     private scheduleApiService: ScheduleApiService,
     private cdr: ChangeDetectorRef,
-    private readonly ngZone: NgZone,
   ) {
     super();
   }
@@ -130,24 +127,15 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     }
   }
 
-  @OutsideZone
   handleCellSingleClick(date: string, candidate: ScheduleInt.ScheduleCandidate, cellDate?: ScheduleDateItem): void {
-    // TODO: refactor, move to directive
     if(!cellDate?.isDisabled) {
-      this.preventCellSingleClick = false;
-      this.cellClickTimer = setTimeout(() => {
-        if (!this.preventCellSingleClick) {
-          this.selectDateSlot(date, candidate);
-          this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot, cellDate));
-        }
-      }, 250);
+      this.selectDateSlot(date, candidate);
+      this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot, cellDate));
     }
   }
 
   handleCellDblClick(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
     if(this.getSelectionAvailable()) {
-      this.preventCellSingleClick = true;
-      clearTimeout(this.cellClickTimer);
       this.selectedCandidatesSlot.clear();
       this.selectDateSlot(date, candidate);
       this.scheduleCell.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
@@ -163,8 +151,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     if(!cellDate?.isDisabled) {
       const dateStringLength = 10;
       const formattedDateSting = schedule.date.substring(0, dateStringLength);
-      this.preventCellSingleClick = true;
-      clearTimeout(this.cellClickTimer);
+
       this.selectedCandidatesSlot.clear();
       this.selectDateSlot(formattedDateSting, candidate);
       this.editCell.emit({ candidate, schedule });
@@ -194,7 +181,26 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   autoSelectCandidate(candidate: ScheduleInt.ScheduleCandidate | null): void {
+    this.emitSelectedCandidate(candidate);
+  }
+
+  emitSelectedCandidate(candidate: ScheduleInt.ScheduleCandidate | null): void {
+    this.datesPeriods = candidate ? [...DatesPeriods, ...MonthPeriod] : DatesPeriods;
+    this.activePeriod = this.datesPeriods.includes(MonthPeriod[0]) ? DatesRangeType.Month : DatesRangeType.TwoWeeks;
     this.selectCandidate.emit(candidate);
+    this.cdr.markForCheck();
+  }
+
+  singleMonthClick({date, candidate, cellDate }: CardClickEvent): void {
+    this.handleCellSingleClick(date, candidate, cellDate);
+  }
+
+  doubleMonthCardClick({ schedule, candidate, cellDate }: CellClickEvent): void {
+    this.handleScheduleCardDblClick(schedule,candidate, cellDate);
+  }
+
+  doubleMonthCellClick({date, candidate}: CardClickEvent): void {
+    this.handleCellDblClick(date, candidate);
   }
 
   private startOrgIdWatching(): void {
@@ -210,7 +216,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       }),
       switchMap(() => {
         this.checkOrgPreferences();
-
         return this.watchForRangeChange();
       }),
       takeUntil(this.componentDestroy()),
@@ -220,6 +225,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   private checkOrgPreferences(): void {
     const preferences = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences;
     this.orgFirstDayOfWeek = preferences?.weekStartsOn as number;
+    this.monthRangeDays = GetMonthRange(this.orgFirstDayOfWeek ?? 0);
 
     this.cdr.markForCheck();
   }

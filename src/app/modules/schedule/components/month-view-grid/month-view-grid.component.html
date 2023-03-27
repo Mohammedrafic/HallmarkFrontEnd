@@ -1,0 +1,63 @@
+<tr
+  *ngFor="let scheduleItem of scheduleData?.items; trackBy: trackByScheduleData"
+  class="table-row"
+>
+  <td class="table-cell candidate-cell fixed fixed--left">
+    <app-candidate-card
+      [candidate]="scheduleItem"
+      [selectedFilters]="selectedFilters"
+      [showScheduledHours]="false"
+      (click)="handleSelectCandidate.emit(scheduleItem.candidate)"
+    ></app-candidate-card>
+  </td>
+  <ng-container *ngFor="let item of dateList; trackBy: trackByDateList">
+    <td class="table-cell">
+      <ng-container *ngFor="let dateItem of item; trackBy: trackByDateItem">
+        <div
+          *ngIf="dateItem.dateSlot | calendarDateSlot: scheduleItem.schedule as dateSchedule; else emptyCell"
+          class="date-slot"
+          [attr.colspan]="dateSchedule.extendedDays"
+          [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateItem.dateSlot)"
+          appDoubleClick
+          (singleClick)="singleClick(dateItem.dateSlot, scheduleItem.candidate, dateItem.active, dateSchedule)"
+          (dbClick)="doubleCardClick(dateSchedule, scheduleItem.candidate, dateItem.active, dateSchedule)"
+        >
+            <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
+              <app-month-card
+                [dateSchedule]="dateSchedule"
+                [isDateActive]="!dateItem.active"
+                [currentDate]="dateItem.dateSlot"
+              ></app-month-card>
+            </ng-container>
+
+            <ng-template #disabledCell>
+              <ejs-tooltip
+                [content]="dateSchedule | calendarTooltipSlot">
+                <div class="disabled-cell">
+                  <div class="day">
+                    {{dateItem.dateSlot | date: 'd'}}
+                  </div>
+                </div>
+              </ejs-tooltip>
+            </ng-template>
+          </div>
+
+
+        <ng-template #emptyCell>
+          <div
+            [class.disabled-cell]="!dateItem.active"
+            [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateItem.dateSlot)"
+            appDoubleClick
+            (singleClick)="singleClick(dateItem.dateSlot, scheduleItem.candidate, dateItem.active)"
+            (dbClick)="doubleCellClick(dateItem.dateSlot, scheduleItem.candidate, dateItem.active)"
+            class="date-slot empty-cell"
+          >
+            <div class="day">
+              {{dateItem.dateSlot | date: 'd'}}
+            </div>
+          </div>
+        </ng-template>
+      </ng-container>
+    </td>
+  </ng-container>
+</tr>

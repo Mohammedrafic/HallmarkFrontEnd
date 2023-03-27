@@ -190,4 +190,6 @@ export enum UserPermissions {
   //Orientation
   CanViewOrientation = 5201,
   CanEditOrientation = 5202,
+  CanBulkHourlyRateUpdate = 5105,
+
 }

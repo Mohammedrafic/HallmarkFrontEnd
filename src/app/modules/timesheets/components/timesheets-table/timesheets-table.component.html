@@ -6,6 +6,7 @@
   (bulkEventEmitter)="bulkEventEmitter.emit($event)"
   (gridSelectedRow)="selectedRow($event)"
   (sortChanged)="sortHandler.emit($event)"
+  (multiSelectionChanged)="multiSelectionChanged.emit($event)"
   [suppressRowClickSelection]="false"
   [rowSelection]="rowSelection"
   [columnDefinitions]="columnDefinitions"

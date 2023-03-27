@@ -6,7 +6,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { ValueType } from '@syncfusion/ej2-angular-grids';
 import { ChipItem } from '@shared/components/inline-chips';
 import { ScheduleOrderType, ScheduleType } from '../enums';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 export interface ScheduleCandidate {
   id: number;
@@ -15,6 +15,7 @@ export interface ScheduleCandidate {
   lastName: string;
   ltaAssignment: LtaAssignment | null;
   skill: string;
+  skillId: number;
   dates: string[];
   orderType: IrpOrderType | null;
   workCommitments: string[] | null;
@@ -44,6 +45,7 @@ export interface ScheduleItem {
   location: string;
   department: string;
   unavailabilityReason: string;
+  unavailabilityReasonId: number;
   shiftId: number;
   orderMetadata: {
     orderType: IrpOrderType;
@@ -75,9 +77,7 @@ export interface ScheduleDateItem {
   date: string;
   extendedDays: number;
   daySchedules: ScheduleItem[];
-  isInDifferentDepartments: boolean;
-  isHomeCostCenterDepartment: boolean;
-  isDepartmentMatchWithFilter: boolean;
+  showWhiteFrame: boolean;
   employeeStatus: number;
   departmentStartDate: string;
   departmentEndDate: string;
@@ -107,6 +107,13 @@ export interface ScheduleCardConfig {
   iconName: string;
   bgColor?: string;
   iconColor?: string;
+  showTitleToolTip?: boolean;
+}
+
+export interface ScheduleMonthCardConfig {
+  title: string;
+  titleColor: string;
+  timeColor: string;
   showTitleToolTip?: boolean;
 }
 
@@ -154,4 +161,30 @@ export interface EmployeesFilters {
   startDate: string | Date;
   endDate: string | Date;
   departmentsIds: number[];
+}
+
+export interface DatesByWeekday {
+  dateSlot: string;
+  active: boolean;
+}
+
+export interface CardClickEvent {
+  date: string,
+  candidate: ScheduleCandidate,
+  cellDate?: ScheduleDateItem
+}
+
+export interface CellClickEvent {
+  schedule: ScheduleDateItem,
+  candidate: ScheduleCandidate,
+  cellDate?: ScheduleDateItem
+}
+
+export interface ShiftDropDownsData {
+  filtered: boolean;
+  regionsDataSource?: DropdownOption[];
+  locationsDataSource: DropdownOption[];
+  departmentsDataSource: DropdownOption[];
+  skillsDataSource?: DropdownOption[];
+  selectedSkillId: number | null;
 }

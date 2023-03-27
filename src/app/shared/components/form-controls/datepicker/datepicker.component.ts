@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, ViewChild } from '@angular/core';
+import { Component, EventEmitter, forwardRef, Input, Output, ViewChild } from '@angular/core';
 
 import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
 import { FormatObject } from '@syncfusion/ej2-calendars/src/datepicker/datepicker';
@@ -24,4 +24,7 @@ export class DatepickerComponent extends BaseFormControlDirective {
   @Input() min: Date | null | undefined;
   @Input() max: Date | null | undefined;
   @Input() public override placeholder = 'MM/DD/YYYY';
+  @Input() public strictMode: boolean = false;
+
+  @Output() valueChange: EventEmitter<Date> = new EventEmitter();
 }

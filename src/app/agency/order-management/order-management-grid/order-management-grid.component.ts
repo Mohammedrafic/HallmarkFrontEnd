@@ -14,7 +14,7 @@ import {
 import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { FilterOrderStatusText, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { GRID_CONFIG } from '@shared/constants';
 import {
   myAgencyChildColumnsToExport,
@@ -420,7 +420,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private setDefaultStatuses(statuses: number[]): void {
-    const statuse = this.filterColumns.orderStatuses.dataSource;
+    let Status =[FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled];
+    const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText)=>Status.includes(f));
     this.OrderFilterFormGroup.get('orderStatuses')?.setValue((this.orderStatus.length > 0) ? this.orderStatus : statuses);
     this.filters.orderStatuses = (this.orderStatus.length > 0) ? this.orderStatus : statuse;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);

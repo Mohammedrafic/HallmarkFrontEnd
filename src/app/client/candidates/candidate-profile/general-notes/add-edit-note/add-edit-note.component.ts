@@ -8,6 +8,7 @@ import { ShowSideDialog } from '../../../../../store/app.actions';
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
 import { EditGeneralNoteModel, GeneralNotesModel } from '../general-notes.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-add-edit-note',
@@ -45,7 +46,9 @@ export class AddEditNoteComponent extends DestroyableDirective implements OnInit
     if (this.noteForm.invalid) {
       this.noteForm.markAllAsTouched();
     } else {
-      this.generalNotesService.addNote(this.noteForm.value);
+      const value = this.noteForm.value;
+      value.date = value.date ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(value.date)) : value.date;
+      this.generalNotesService.addNote(value);
       this.toggleSideDialog(false);
     }
   }

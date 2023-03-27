@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef, ViewChild, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
-import { Location } from '@angular/common';
+import { DOCUMENT, Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
 import {
@@ -45,6 +45,8 @@ import { PreservedFilters } from '@shared/models/preserved-filters.model';
 import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fields-settings';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
+import * as Interfaces from '../../interface';
+import { ExportDataModel } from '@shared/models/export.model';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -104,8 +106,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public readonly organizationControl: FormControl = new FormControl(null);
   public readonly currentSelectedTableRowIndex: Observable<number> = this.timesheetsService.getSelectedTimesheetRowStream();
   public isAgency: boolean;
+  public businessUnitId?: number;
   routerState:any;
-
+  public gridSelections: Interfaces.TimesheetGridSelections = {
+    selectedTimesheetIds: [],
+    rowNodes: [],
+  };
+  public OrganizationId:number;
   constructor(
     private store: Store,
     private timesheetsService: TimesheetsService,
@@ -113,7 +120,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private route: ActivatedRoute,
     private location: Location,
     private filterService: FilterService,
-    private router: Router
+    private router: Router,
+    @Inject(DOCUMENT) private document: Document,
   ) {
     super();
     store.dispatch([
@@ -127,6 +135,12 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   ngOnInit(): void {
+    this.businessUnitId = JSON.parse((localStorage.getItem('BussinessUnitID') || '0')) as number;
+    if (!this.businessUnitId) {
+      this.businessUnitId = 0;
+    }
+    this.document.defaultView?.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
+
     this.onOrganizationChangedHandler();
     this.startOrganizationWatching();
     this.startFiltersWatching();
@@ -205,7 +219,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public sortHandler(event: string): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ orderBy: event }, this.activeTabIdx !== 0));
+    this.store.dispatch(new Timesheets.UpdateFiltersState({ orderBy: event }, this.activeTabIdx !== 0, false, true));
   }
 
   public changeFiltersAmount(amount: number): void {
@@ -219,7 +233,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
           startDate: range[0],
           endDate: range[1],
         },
-        this.activeTabIdx !== 0
+        this.activeTabIdx !== 0,
+        false,
+        true
       )
     );
   }
@@ -230,11 +246,34 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     }
   }
 
+  public handleExport(event:RowNode[]):void{
+    let nodes=event;
+    if (nodes.length) {
+      this.gridSelections.selectedTimesheetIds = nodes.map((node) => node.data.timesheetId);
+      this.gridSelections.rowNodes = nodes;
+    } else {
+      this.gridSelections.selectedTimesheetIds = [];
+      this.gridSelections.rowNodes = [];    
+    }
+  }
+
+  public resetTableSelection(): void {
+    this.gridSelections.rowNodes.forEach((node: RowNode) => {
+      node.setSelected(false);
+    });
+
+    this.clearSelections();
+    this.gridSelections.rowNodes = [];
+  }
+  
   private bulkApprove(data: RowNode[]): void {
     this.store.dispatch(new Timesheets.BulkApprove(data));
   }
 
   private onOrganizationChangedHandler(): void {
+   this.organizationId$.pipe( takeUntil(this.componentDestroy())).subscribe((value)=>{
+    if(value!=null&&value!=undefined){this.OrganizationId=value}
+    });
     const idStream = this.isAgency ? this.agencyId$ : this.organizationId$;
 
     if (this.filterService.canPreserveFilters()) {
@@ -310,14 +349,14 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         ? preservedOrgIds[0] || this.getOrganizationIdFromState() || res[0].id
         : this.getOrganizationIdFromState() || res[0].id)
 
-            this.store.dispatch(new Timesheets.SelectOrganization(orgId));
-            this.organizationControl.setValue(orgId, { emitEvent: false });    
+            this.store.dispatch(new Timesheets.SelectOrganization((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId));
+            this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });    
 
         if (preservedFilters && this.filterService.canPreserveFilters()) {
           this.store.dispatch([
             new Timesheets.UpdateFiltersState(
               {
-                organizationId: orgId,
+                organizationId: (this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId,
                 regionsIds: [...preservedFilters.regions],
                 locationIds: [...preservedFilters.locations],
                 contactEmails: preservedFilters.contactEmails ? [preservedFilters.contactEmails] : undefined,
@@ -328,7 +367,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
           ]);
         } else {
           this.store.dispatch([
-            new Timesheets.UpdateFiltersState({ organizationId: orgId }, this.activeTabIdx !== 0),
+            new Timesheets.UpdateFiltersState({ organizationId: (this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId }, this.activeTabIdx !== 0),
             new Timesheets.GetFiltersDataSource(),
           ]);
         }
@@ -412,5 +451,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         )
         .subscribe();
     }
+  }
+
+  private clearSelections(): void {
+    this.gridSelections.selectedTimesheetIds = [];
   }
 }

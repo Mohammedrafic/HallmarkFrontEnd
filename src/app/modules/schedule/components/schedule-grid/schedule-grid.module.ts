@@ -10,6 +10,7 @@ import { DateWeekService } from '@core/services';
 import { DateWeekPickerModule } from '@shared/components/date-week-picker';
 import { SharedModule } from '@shared/shared.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { DoubleClickModule } from '@shared/directives/double-click/double-click.module';
 
 import { CalendarDateSlotModule } from '../../pipes/calendar-date-slot/calendar-date-slot.module';
 import { CandidateCardModule } from '../candidate-card/candidate-card.module';
@@ -17,6 +18,8 @@ import { ScheduleCardModule } from '../schedule-card/schedule-card.module';
 import { ScheduleGridComponent } from './schedule-grid.component';
 import { CalendarTooltipSlotModule } from '../../pipes/calendar-tooltip-slot/calendar-tooltip-slot.module';
 import { PeriodPickerModule } from '@shared/components/period-picker';
+import { MonthViewGridModule } from '../month-view-grid/month-view-grid.module';
+import { MonthDatePickerModule } from '@shared/components/month-date-picker/month-date-picker.module';
 
 const icons = {
   Search,
@@ -26,20 +29,23 @@ const icons = {
   declarations: [
     ScheduleGridComponent,
   ],
-  imports: [
-    CommonModule,
-    FeatherModule.pick(icons),
-    SharedModule,
-    ButtonModule,
-    DateWeekPickerModule,
-    CandidateCardModule,
-    ScheduleCardModule,
-    CalendarDateSlotModule,
-    AutoCompleteModule,
-    CalendarTooltipSlotModule,
-    PeriodPickerModule,
-    TooltipContainerModule,
-  ],
+    imports: [
+        CommonModule,
+        FeatherModule.pick(icons),
+        SharedModule,
+        ButtonModule,
+        DateWeekPickerModule,
+        CandidateCardModule,
+        ScheduleCardModule,
+        CalendarDateSlotModule,
+        AutoCompleteModule,
+        CalendarTooltipSlotModule,
+        PeriodPickerModule,
+        TooltipContainerModule,
+        MonthViewGridModule,
+        MonthDatePickerModule,
+        DoubleClickModule,
+    ],
   exports: [ScheduleGridComponent],
   providers: [DateWeekService],
 })

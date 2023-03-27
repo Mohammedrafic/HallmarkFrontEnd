@@ -1,6 +1,6 @@
 import { OrderTypes } from '@client/order-management/interfaces';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 export const OrderTypeList: OrderTypes[] = [
   { id: IrpOrderType.LongTermAssignment, name: 'Long Term Assignment' },

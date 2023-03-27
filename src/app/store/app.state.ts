@@ -16,6 +16,7 @@ import {
   ShouldDisableUserDropDown,
   SetIrpFlag,
   GetDeviceScreenResolution,
+  GetAlertsCountForCurrentUser,
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -33,6 +34,7 @@ export interface AppStateModel {
   isSidebarOpened: boolean;
   isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
   getAlertsForCurrentUser: GetAlertsForUserStateModel[];
+  getAlertsCountForCurrentUser: number;
   isMobileScreen: boolean;
   isTabletScreen: boolean;
   isDekstopScreen: boolean;
@@ -60,6 +62,7 @@ export interface AppStateModel {
       isAgencyArea: false,
     },
     getAlertsForCurrentUser: [],
+    getAlertsCountForCurrentUser:0,
     isMobileScreen: false,
     isTabletScreen: false,
     isDekstopScreen: false,
@@ -115,6 +118,11 @@ export class AppState {
   @Selector()
   static getAlertsForCurrentUser(state: AppStateModel): GetAlertsForUserStateModel[] {
     return state.getAlertsForCurrentUser;
+  }
+
+  @Selector()
+  static getAlertsCountForCurrentUser(state: AppStateModel): number {
+    return state.getAlertsCountForCurrentUser;
   }
 
   @Selector()
@@ -189,6 +197,19 @@ export class AppState {
     return this.userService.getAlertsForUser().pipe(
       tap((payload) => {
         patchState({ getAlertsForCurrentUser: payload });
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetAlertsCountForCurrentUser)
+  GetAlertsCountForCurrentUser(
+    { patchState }: StateContext<AppStateModel>,
+    { payload }: GetAlertsCountForCurrentUser
+  ): Observable<number> {
+    return this.userService.getAlertsCountForUser().pipe(
+      tap((payload) => {
+        patchState({ getAlertsCountForCurrentUser: payload });
         return payload;
       })
     );

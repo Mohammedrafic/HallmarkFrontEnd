@@ -22,8 +22,9 @@ import {
   JobDistributionIrpVms,
   TitleField,
 } from '@client/order-management/components/irp-tabs/order-details/constants';
-import { ButtonType, IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { ButtonType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 export const setDataSource = (fields: OrderFormInput[], fieldName: string, source: DataSourceContainer): void => {
   fields.forEach((fields: OrderFormInput) => {

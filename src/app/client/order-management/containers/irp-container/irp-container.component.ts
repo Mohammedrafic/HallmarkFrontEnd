@@ -28,6 +28,7 @@ import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-irp-container',
@@ -40,7 +41,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   @Input() public selectedOrder: Order;
   @Input() selectedSystem: SelectSystem;
 
-  public tabsConfig: TabsConfig[] = IrpTabConfig;
+  public tabsConfig: TabsConfig[] = IrpTabConfig(true);
   public tabs = IrpTabs;
   public orderCredentials: IOrderCredentialItem[] = [];
 
@@ -62,6 +63,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedOrder']?.currentValue) {
+      this.tabsConfig = IrpTabConfig(this.selectedOrder.orderType !== OrderType.ReOrder);
       this.orderCredentials = [...this.selectedOrder.credentials];
     }
   }
@@ -114,7 +116,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   }
 
   private checkIsCredentialsValid(formState: ListOfKeyForms): void {
-    if(this.orderCredentials?.length) {
+    if(this.orderCredentials?.length || this.selectedOrder?.orderType === OrderType.ReOrder) {
       this.saveOrder(formState);
     } else {
       showMessageForInvalidCredentials();

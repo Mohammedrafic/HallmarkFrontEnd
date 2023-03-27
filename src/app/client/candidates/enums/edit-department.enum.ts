@@ -3,5 +3,5 @@ export enum EditDepartmentFields {
   END_DATE = 'endDate',
   IS_ORIENTED = 'isOriented',
   HOME_COST_CENTER = 'isHomeCostCenter',
-  ORIENTED_START_DATE = 'orientedStartDate',
+  ORIENTATION_DATE = 'orientationDate',
 }

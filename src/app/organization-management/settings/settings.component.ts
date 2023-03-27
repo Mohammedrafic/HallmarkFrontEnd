@@ -342,6 +342,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.organizationSettingsFormGroup.valid &&
         this.isPushStartDateValid() &&
         this.invoiceAutoGeneratingValig()
+        && this.switchedValueForm.valid
       ) {
         this.sendForm();
       } else {
@@ -350,7 +351,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.validateInvoiceGeneratingForm();
       }
     } else {
-      if (this.regionRequiredFormGroup.valid && this.isPushStartDateValid() && this.invoiceAutoGeneratingValig()) {
+      if (this.regionRequiredFormGroup.valid && this.isPushStartDateValid()
+      && this.invoiceAutoGeneratingValig()
+      && this.switchedValueForm.valid) {
         if (this.organizationSettingsFormGroup.valid) {
           this.sendForm();
         } else {

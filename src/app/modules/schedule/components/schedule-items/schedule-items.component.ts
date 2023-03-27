@@ -10,7 +10,7 @@ import { ScheduleType } from '../../enums';
 import { ScheduleBookingErrors, ScheduleSelectedSlots } from '../../interface';
 import { GetCountErrors, ScheduleItemsWithErrors } from '../../helpers';
 import { ScheduleItemType } from '../../constants';
-import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { IrpOrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-schedule-items',

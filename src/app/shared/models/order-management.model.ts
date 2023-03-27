@@ -675,6 +675,7 @@ export class OrderFilter {
   orderType?: number | null;
   contactEmails?: string[] | string;
   orderId?: number | null;
+  irpOnly?: boolean | null;
 }
 
 export class SortModel {

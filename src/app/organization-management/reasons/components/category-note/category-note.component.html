@@ -1,0 +1,87 @@
+<section class="flex-column">
+    <ejs-grid
+      #reasonGrid
+      class="grid-component"
+      [dataSource]="(reasons$ | async)?.items"
+      [allowSorting]="false"
+      [allowResizing]="true"
+      [allowSelection]="false"
+      [resizeSettings]="resizeSettings"
+      [allowPaging]="allowPaging"
+      [enableVirtualization]="true"
+      [pageSettings]="pageSettings"
+      [rowHeight]="rowHeight"
+      [height]="fullScreenGridHeight"
+      (actionBegin)="actionBegin($event)"
+      (dataBound)="gridDataBound(reasonGrid, null)"
+    >
+      <e-columns>
+        <e-column textAlign="Right" width="100">
+          <ng-template #template let-data>
+            <div class="row-tool-buttons">
+              <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+                <span><i-feather name="edit" class="icon"></i-feather></span>
+              </button>
+              <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove(data.id)">
+                <span><i-feather name="trash-2" class="icon"></i-feather></span>
+              </button>
+            </div>
+          </ng-template>
+        </e-column>
+        <e-column field="categoryName" headerText="Reason" textAlign="Left" width="100%"></e-column>
+        <e-column headerText="Red Flag Category" textAlign="Left" width="100%">
+          <ng-template #template let-data>
+            <div *ngIf="data.isRedFlag">Yes</div>
+            <div *ngIf="!data.isRedFlag">No</div>
+          </ng-template>
+        </e-column>
+      </e-columns>
+  
+      <ng-template #pagerTemplate let-data>
+        <div class="e-pagertemplate">
+          <div class="control-section">
+            <div class="content-wrapper">
+              <section class="left-side-pager-controls">
+                <ejs-dropdownlist
+                  id="rowsPerPage"
+                  class="dropdown-no-border"
+                  [allowFiltering]="true"
+                  [dataSource]="rowsPerPageDropDown"
+                  [(value)]="activeRowsPerPageDropDown"
+                  (change)="onRowsDropDownChanged()"
+                >
+                </ejs-dropdownlist>
+                <ejs-numerictextbox
+                  id="goToPage"
+                  class="numeric-input-no-border"
+                  format="#"
+                  placeholder="Go to:"
+                  min="1"
+                  [max]="(reasons$ | async)?.totalCount"
+                  [showSpinButton]="false"
+                  (change)="onGoToClick($event)"
+                >
+                </ejs-numerictextbox>
+                <div class="total-rows">
+                  Total Rows: {{(reasons$ | async)?.totalCount}}
+                </div>
+              </section>
+              <section class="right-side-pager-controls">
+                <ejs-pager
+                  id="gridPager"
+                  #gridPager
+                  [pageSize]="pageSize"
+                  [totalRecordsCount]="(reasons$ | async)?.totalPages"
+                  [enablePagerMessage]="false"
+                  [currentPage]="currentPage"
+                  (click)="onGoToClick($event)"
+                >
+                </ejs-pager>
+              </section>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ejs-grid>
+  </section>
+  

@@ -1,8 +1,18 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
+import { OrganizationStructure } from '@shared/models/organization.model';
+import { Skill } from '@shared/models/skill.model';
+import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
+import {
+  BookingsOverlapsRequest,
+  BookingsOverlapsResponse,
+} from '../components/replacement-order-dialog/replacement-order.interface';
+import { ScheduleType } from 'src/app/modules/schedule/enums';
+import { ScheduledShift } from '../components/edit-schedule/edit-schedule.interface';
+import * as ScheduleInt from '../interface';
 import {
   CandidateSchedules,
   EmployeesFilters,
@@ -11,11 +21,6 @@ import {
   ScheduleCandidatesPage,
   ScheduleFilters,
 } from '../interface';
-import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
-import { OrganizationStructure } from '@shared/models/organization.model';
-import { Skill } from '@shared/models/skill.model';
-import { ScheduledShift } from '../components/edit-schedule/edit-schedule.interface';
-import * as ScheduleInt from '../interface';
 
 @Injectable()
 export class ScheduleApiService {
@@ -61,7 +66,18 @@ export class ScheduleApiService {
       }});
   }
 
-  updateScheduledShift(scheduledShift: ScheduledShift):Observable<void> {
-    return this.http.post<void>('/api/Schedules/booking/update', scheduledShift);
+  updateScheduledShift(scheduledShift: ScheduledShift, type: ScheduleType):Observable<void> {
+    return this.http.post<void>(
+      type === ScheduleType.Book ? '/api/Schedules/booking/update' : '/api/Schedules/schedule/update',
+      scheduledShift
+    );
+  }
+
+  checkBookingsOverlaps(request: BookingsOverlapsRequest):Observable<BookingsOverlapsResponse[]> {
+    return this.http.post<BookingsOverlapsResponse[]>('/api/Schedules/bookingsOverlaps', request);
+  }
+
+  deleteSchedule(id: number, createOrder: boolean):Observable<void> {
+    return this.http.post<void>('/api/Schedules/delete', { id, createOrder });
   }
 }

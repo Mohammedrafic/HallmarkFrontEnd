@@ -2,7 +2,7 @@
   class="button-group system-buttons"
   *ngIf="isIRPFlagEnabled"
   [buttonOptions]="systemGroupConfig"
-  (buttonChange)="buttonGroupChange($event)"
+  (buttonChange)="changeSystem($event)"
 ></app-button-group>
 <app-page-toolbar>
   <ng-container left>
@@ -41,7 +41,7 @@
           <div class="filter-button-content">Templates <i-feather name="clipboard" class="icon"></i-feather></div>
         </button>
         <ng-container
-          *ngIf="!isActiveSystemIRP && !(isContentTabletWidth || isMiddleTabletWidth)"
+          *ngIf="!(isContentTabletWidth || isMiddleTabletWidth)"
           [ngTemplateOutlet]="filterButton"
         ></ng-container>
         <app-tooltip-container
@@ -147,7 +147,6 @@
     ejs-button
     appHideBeforeSyncfusionLoad
     cssClass="e-outline button-filter"
-    [disabled]="isActiveSystemIRP"
     (click)="showFilters()"
   >
     <div class="filter-button-content">
@@ -158,7 +157,7 @@
 </ng-template>
 
 <ng-template #smallMenuButton>
-  <ng-container *ngIf="!isActiveSystemIRP && (isMobile || isTablet)" [ngTemplateOutlet]="filterButton"></ng-container>
+  <ng-container *ngIf="(isMobile || isTablet)" [ngTemplateOutlet]="filterButton"></ng-container>
   <button
     *ngIf="!isActiveSystemIRP"
     ejs-dropdownbutton
@@ -641,7 +640,7 @@
         </div>
       </div>
     </div>
-    <div class="filter-row bootstrap">
+    <div class="bootstrap">
       <div class="input-container">
         <label>Region</label>
         <div class="input-group multiselect">
@@ -658,6 +657,8 @@
           </ejs-multiselect>
         </div>
       </div>
+    </div>
+    <div class="bootstrap">
       <div class="input-container">
         <label>Location</label>
         <div class="input-group multiselect">
@@ -695,6 +696,24 @@
     </div>
     <div class="bootstrap">
       <div class="input-container">
+        <label>Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="skillIds"
+            placeholder="All"
+            [fields]="skillsFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.skillIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap" *ngIf="!isActiveSystemIRP">
+      <div class="input-container">
         <label>Select Agency</label>
         <div class="input-group multiselect">
           <ejs-multiselect
@@ -712,28 +731,13 @@
       </div>
     </div>
     <div class="filter-row bootstrap">
-      <div class="input-container">
-        <label>Skill</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect
-            mode="CheckBox"
-            formControlName="skillIds"
-            placeholder="All"
-            [fields]="skillsFields"
-            [allowFiltering]="true"
-            [showDropDownIcon]="true"
-            [dataSource]="filterColumns.skillIds.dataSource"
-            [changeOnBlur]="!(isMobile || isTablet)"
-          >
-          </ejs-multiselect>
-        </div>
-      </div>
       <div
         class="input-container"
         *ngIf="
-          activeTab !== OrganizationOrderManagementTabs.ReOrders &&
+          (!isActiveSystemIRP && activeTab !== OrganizationOrderManagementTabs.ReOrders &&
           activeTab !== OrganizationOrderManagementTabs.PerDiem &&
-          activeTab !== OrganizationOrderManagementTabs.PermPlacement
+          activeTab !== OrganizationOrderManagementTabs.PermPlacement) ||
+          (isActiveSystemIRP && activeIRPTabIndex === OrderManagementIRPTabsIndex.AllOrders)
         "
       >
         <label>Order Type</label>
@@ -751,9 +755,8 @@
           </ejs-multiselect>
         </div>
       </div>
-    </div>
-    <div class="filter-row bootstrap">
-      <div class="input-container">
+      <div class="input-container"
+           *ngIf="!isActiveSystemIRP || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
         <label>Order Status</label>
         <div class="input-group multiselect">
           <ejs-multiselect
@@ -768,6 +771,15 @@
             [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="filter-row bootstrap"
+         *ngIf="!isActiveSystemIRP || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
+      <div class="input-container">
+        <label>Candidate Name</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
         </div>
       </div>
       <div class="input-container">
@@ -844,7 +856,7 @@
           </ejs-multiselect>
         </div>
       </div>
-      <div class="input-container">
+      <div class="input-container" *ngIf="!isActiveSystemIRP">
         <label>PO #</label>
         <div class="input-group multiselect">
           <ejs-multiselect
@@ -861,7 +873,7 @@
         </div>
       </div>
     </div>
-    <div class="bootstrap">
+    <div class="bootstrap" *ngIf="!isActiveSystemIRP">
       <div class="input-container">
         <label>Job Title</label>
         <div class="input-group">
@@ -869,19 +881,12 @@
         </div>
       </div>
     </div>
-    <div class="bootstrap">
-      <div class="input-container">
-        <label>Candidate Name</label>
-        <div class="input-group">
-          <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
-        </div>
-      </div>
-    </div>
     <div
       class="filter-row bootstrap"
       *ngIf="
         activeTab !== OrganizationOrderManagementTabs.PerDiem &&
-        activeTab !== OrganizationOrderManagementTabs.PermPlacement
+        activeTab !== OrganizationOrderManagementTabs.PermPlacement &&
+        !isActiveSystemIRP
       "
     >
       <div class="input-container">
@@ -910,8 +915,15 @@
           <input class="e-input" type="text" maxlength="50" formControlName="candidatesCountTo" />
         </div>
       </div>
+      <div class="input-container number-of-positions" 
+           *ngIf="(activeTab !== OrganizationOrderManagementTabs.PerDiem && !isActiveSystemIRP) || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
+        <label for="numberOfPositions"># of Positions</label>
+        <div class="input-group">
+          <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />
+        </div>
+      </div>
     </div>
-    <div *ngIf="activeTab === OrganizationOrderManagementTabs.PermPlacement" class="filter-row bootstrap">
+    <div *ngIf="activeTab === OrganizationOrderManagementTabs.PermPlacement && !isActiveSystemIRP" class="filter-row bootstrap">
       <div class="input-container">
         <label>Annual Salary From</label>
         <div class="input-group">
@@ -922,14 +934,6 @@
         <label>Annual Salary To</label>
         <div class="input-group">
           <input class="e-input" type="text" maxlength="50" formControlName="annualSalaryRangeTo" />
-        </div>
-      </div>
-    </div>
-    <div class="bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
-      <div class="input-container">
-        <label for="numberOfPositions"># of Positions</label>
-        <div class="input-group">
-          <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />
         </div>
       </div>
     </div>
@@ -1033,13 +1037,19 @@
         </div>
       </div>
     </div>
-    <div>
+    <div *ngIf="!isActiveSystemIRP">
       <div class="radio-container">
         <label class="radio-label">Internal Agency</label>
         <ejs-radiobutton formControlName="agencyType" label="Yes" name="agencyType" value="1"></ejs-radiobutton>
         <ejs-radiobutton formControlName="agencyType" label="No" name="agencyType" value="2"></ejs-radiobutton>
         <ejs-radiobutton formControlName="agencyType" label="Both" name="agencyType" value="0"></ejs-radiobutton>
       </div>
+    </div>
+    <div *ngIf="isActiveSystemIRP">
+      <ejs-switch class="toggle"
+        formControlName="irpOnly"
+      ></ejs-switch>
+      <span>IRP Only</span>
     </div>
   </form>
 </app-filter-dialog>
@@ -1157,7 +1167,7 @@
 
 <app-update-reg-rate
   #updaterateRow
-  *ngIf="openregrateupdate"
+  *ngIf="userPermission[userPermissions.CanBulkHourlyRateUpdate] && openregrateupdate"
   [orderdatas]="CurrentOrderDatas"
   (reloadItemsListforupdate)="updatePageforbulk()"
 ></app-update-reg-rate>

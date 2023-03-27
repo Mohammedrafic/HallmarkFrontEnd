@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 
 import { DateTimeHelper } from '@core/helpers';
-import { ScheduleType } from '../../enums';
-import { ScheduleItem } from '../../interface';
-import { ScheduleCardTooltips } from './schedule-card.interface';
+import { ScheduleType } from '../enums';
+import { ScheduleItem } from '../interface';
+import { ScheduleCardTooltips } from '../components/schedule-card/schedule-card.interface';
 
 @Injectable()
 export class ScheduleCardService {
