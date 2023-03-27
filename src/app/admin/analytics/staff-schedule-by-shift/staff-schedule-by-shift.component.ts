@@ -1,3 +1,4 @@
+import { EmitType } from '@syncfusion/ej2-base';
 import { formatDate } from '@angular/common';
 import {
   Component,
@@ -10,7 +11,11 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
-import { ClearLogiReportState } from '@organization-management/store/logi-report.action';
+import {
+  ClearLogiReportState,
+  GetCommonReportCandidateSearch,
+  GetStaffScheduleReportFilterOptions,
+} from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -24,9 +29,9 @@ import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { User } from '@shared/models/user.model';
 import { Department, Region, Location, Organisation } from '@shared/models/visibility-settings.model';
 import { FilterService } from '@shared/services/filter.service';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { uniqBy } from 'lodash';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { uniqBy, isBoolean } from 'lodash';
+import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
@@ -34,6 +39,13 @@ import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.a
 import { UserState } from 'src/app/store/user.state';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import { analyticsConstants } from '../constants/analytics.constant';
+import { OutsideZone } from '@core/decorators';
+import {
+  CommonCandidateSearchFilter,
+  CommonReportFilter,
+  SearchCandidate,
+  StaffScheduleReportFilterOptions,
+} from '../models/common-report.model';
 
 @Component({
   selector: 'app-staff-schedule-by-shift',
@@ -54,6 +66,7 @@ export class StaffScheduleByShiftComponent implements OnInit {
   public isResetFilter: boolean = false;
   public isLoadNewFilter: boolean = false;
   public isInitialLoad: boolean = false;
+  private isAlive: boolean = true;
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
@@ -63,12 +76,17 @@ export class StaffScheduleByShiftComponent implements OnInit {
   public departmentsList: Department[] = [];
   public defaultOrganizations: number;
   public paramsData: any = {
-    "OrganizationParam": "",
-    "RegionsParam": "",
-    "LocationsParam": "",
-    "DepartmentsParam": "",
-    "StartDateParam": "",
-    "EndDateParam": ""
+    OrganizationParam: '',
+    RegionsParam: '',
+    LocationsParam: '',
+    DepartmentParam: '',
+    StartDateParam: '',
+    EndDateParam: '',
+    ShiftsParam: '',
+    SkillsParam: '',
+    WorkCommitmentsParam: '',
+    IsLongTermParam: '',
+    EmployeeParam: '',
   };
   public staffScheduleReportForm: FormGroup;
   public reportName: LogiReportFileDetails = {
@@ -78,6 +96,9 @@ export class StaffScheduleByShiftComponent implements OnInit {
   public title: string = 'Staff Schedule By Shift';
   public message: string = '';
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
+  commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
+  remoteWaterMark: string = 'e.g. Andrew Fuller';
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -90,6 +111,9 @@ export class StaffScheduleByShiftComponent implements OnInit {
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
+
+  @Select(LogiReportState.getStaffScheduleReportOptionData)
+  public staffScheduleReportFilterData$: Observable<StaffScheduleReportFilterOptions>;
 
   private unsubscribe$: Subject<void> = new Subject();
   public bussinessControl: AbstractControl;
@@ -104,6 +128,10 @@ export class StaffScheduleByShiftComponent implements OnInit {
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
   departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public allOption: string = 'All';
+  public candidateFilterData: { [key: number]: SearchCandidate }[] = [];
+  candidateSearchData: SearchCandidate[] = [];
+
+  public filterOptionData: StaffScheduleReportFilterOptions;
 
   constructor(
     private store: Store,
@@ -175,6 +203,38 @@ export class StaffScheduleByShiftComponent implements OnInit {
         valueField: 'name',
         valueId: 'id',
       },
+      skillIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      shiftIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      employeeName: {
+        type: ControlTypes.Dropdown,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'fullName',
+        valueId: 'id',
+      },
+      workCommitmentIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      isLongTerm: {
+        type: ControlTypes.Checkbox,
+        valueType: ValueType.Text,
+      },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text },
     };
@@ -195,6 +255,11 @@ export class StaffScheduleByShiftComponent implements OnInit {
       regionIds: new FormControl([]),
       locationIds: new FormControl([]),
       departmentIds: new FormControl([]),
+      skillIds: new FormControl([]),
+      shiftIds: new FormControl([]),
+      workCommitmentIds: new FormControl([]),
+      isLongTerm: false,
+      employeeName: new FormControl([]),
     });
   }
 
@@ -233,7 +298,7 @@ export class StaffScheduleByShiftComponent implements OnInit {
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
-          let departmentsList: Department[] = [];          
+          let departmentsList: Department[] = [];
           orgList.forEach((value) => {
             regionsList.push(...value.regions);
             locationsList = regionsList
@@ -266,13 +331,31 @@ export class StaffScheduleByShiftComponent implements OnInit {
             this.isResetFilter = true;
           }
 
-          if (this.isInitialLoad) {
-            setTimeout(() => { this.SearchReport() }, 3000);
-            this.isInitialLoad = false;
-          }
-          this.changeDetectorRef.detectChanges();
           let businessIdData = [];
           businessIdData.push(data);
+          let filter: CommonReportFilter = {
+            businessUnitIds: businessIdData,
+          };
+          this.store.dispatch(new GetStaffScheduleReportFilterOptions(filter));
+          this.staffScheduleReportFilterData$
+            .pipe(takeWhile(() => this.isAlive))
+            .subscribe((data: StaffScheduleReportFilterOptions | null) => {
+              if (data != null) {
+                this.isAlive = false;
+                this.filterOptionData = data;
+                this.filterColumns.shiftIds.dataSource = data.masterShifts;
+                this.filterColumns.skillIds.dataSource = data.masterSkills;
+                this.filterColumns.workCommitmentIds.dataSource = data.masterWorkCommitments;
+                this.changeDetectorRef.detectChanges();
+
+                if (this.isInitialLoad) {
+                  setTimeout(() => {
+                    this.SearchReport();
+                  }, 3000);
+                  this.isInitialLoad = false;
+                }
+              }
+            });
 
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
@@ -315,16 +398,17 @@ export class StaffScheduleByShiftComponent implements OnInit {
       if (this.regionIdControl.value.length > 0) {
         this.locations = this.locationsList.filter((i) => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
-        this.departments = this.locations
-          .map((obj) => {
-            return obj.departments.filter((department) => department.locationId === obj.id);
-          })
-          .reduce((a, b) => a.concat(b), []);
+        // this.departments = this.locations
+        //   .map((obj) => {
+        //     return obj.departments.filter((department) => department.locationId === obj.id);
+        //   })
+        //   .reduce((a, b) => a.concat(b), []);
       } else {
         this.filterColumns.locationIds.dataSource = [];
         this.staffScheduleReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
         this.staffScheduleReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
+      this.changeDetectorRef.detectChanges();
     });
   }
 
@@ -341,6 +425,7 @@ export class StaffScheduleByShiftComponent implements OnInit {
         this.filterColumns.departmentIds.dataSource = [];
         this.staffScheduleReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
+      this.changeDetectorRef.detectChanges();
     });
     // this.departmentIdControl = this.staffScheduleReportForm.get(
     //   analyticsConstants.formControlNames.DepartmentIds
@@ -386,8 +471,19 @@ export class StaffScheduleByShiftComponent implements OnInit {
   public SearchReport(): void {
     this.filteredItems = [];
 
-    let { businessIds, departmentIds, locationIds, regionIds, startDate, endDate } =
-      this.staffScheduleReportForm.getRawValue();
+    let {
+      businessIds,
+      departmentIds,
+      locationIds,
+      regionIds,
+      startDate,
+      endDate,
+      employeeName,
+      isLongTerm,
+      workCommitmentIds,
+      shiftIds,
+      skillIds,
+    } = this.staffScheduleReportForm.getRawValue();
     if (!this.staffScheduleReportForm.dirty) {
       this.message = 'Default filter selected with all regions, locations and departments.';
     } else {
@@ -395,45 +491,41 @@ export class StaffScheduleByShiftComponent implements OnInit {
       this.message = '';
     }
 
-    locationIds =
-      locationIds.length > 0
-        ? locationIds.join(',')
-        : this.locations?.length > 0
-        ? this.locations.map((x) => x.id).join(',')
-        : [];
-    departmentIds =
-      departmentIds.length > 0
-        ? departmentIds.join(',')
-        : this.departments?.length > 0
-        ? this.departments.map((x) => x.id).join(',')
-        : [];
-
     regionIds =
       regionIds.length > 0
         ? regionIds.join(',')
         : this.regionsList?.length > 0
         ? this.regionsList.map((x) => x.id).join(',')
-        : 'null';
+        : '';
     locationIds =
       locationIds.length > 0
         ? locationIds
         : this.locationsList?.length > 0
         ? this.locationsList.map((x) => x.id).join(',')
-        : 'null';
+        : '';
     departmentIds =
       departmentIds.length > 0
         ? departmentIds
         : this.departmentsList?.length > 0
         ? this.departmentsList.map((x) => x.id).join(',')
-        : 'null';
+        : '';
+    skillIds = skillIds.length > 0 ? skillIds.join(',') : '';
+    shiftIds = shiftIds.length > 0 ? shiftIds.join(',') : '';
+    workCommitmentIds = workCommitmentIds.length > 0 ? workCommitmentIds.join(',') : '';
+    employeeName = employeeName.length > 0 ? employeeName : '';
+
     this.paramsData = {
       OrganizationParam: this.selectedOrganizations?.map((list) => list.organizationId).join(','),
       StartDateParam: formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       EndDateParam: formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      RegionsParam: regionIds.length == 0 ? 'null' : regionIds,
-      LocationsParam: locationIds.length == 0 ? 'null' : locationIds,
-      DepartmentsParam: departmentIds.length == 0 ? 'null' : departmentIds,
-      BusinessUnitIdParamTS: businessIds,
+      RegionsParam: regionIds,
+      LocationsParam: locationIds,
+      DepartmentParam: departmentIds,
+      SkillsParam: skillIds,
+      ShiftsParam: shiftIds,
+      WorkCommitmentsParam: workCommitmentIds,
+      IsLongTermParam: isLongTerm,
+      EmployeeParam: employeeName,      
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -443,6 +535,29 @@ export class StaffScheduleByShiftComponent implements OnInit {
     var today = new Date(Date.now());
     var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
     return lastWeek;
+  }
+
+  public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
+    this.onFilterChild(e);
+  };
+  @OutsideZone
+  private onFilterChild(e: FilteringEventArgs) {
+    if (e.text != '') {
+      let ids = [];
+      ids.push(this.bussinessControl.value);
+      let filter: CommonCandidateSearchFilter = {
+        searchText: e.text,
+        businessUnitIds: ids,
+      };
+      this.filterColumns.dataSource = [];
+      this.store.dispatch(new GetCommonReportCandidateSearch(filter)).subscribe((result) => {
+        this.candidateFilterData = result.LogiReport.searchCandidates;
+        this.candidateSearchData = result.LogiReport.searchCandidates;
+        this.filterColumns.dataSource = this.candidateFilterData;
+        // pass the filter data source to updateData method.
+        e.updateData(this.candidateFilterData);
+      });
+    }
   }
 }
 

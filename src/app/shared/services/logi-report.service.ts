@@ -1,4 +1,4 @@
-import {  CandidateStatusAndReasonFilterOptionsDto, CommonReportFilterOptions, SearchCandidate, SearchCredential} from "@admin/analytics/models/common-report.model";
+import {  CandidateStatusAndReasonFilterOptionsDto, CommonReportFilterOptions, SearchCandidate, SearchCredential, StaffScheduleReportFilterOptions} from "@admin/analytics/models/common-report.model";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { sortByField } from "@shared/helpers/sort-by-field.helper";
@@ -89,4 +89,9 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
     }));
   }
 
+  public getStaffScheduleReportOptions(filter: any): Observable<StaffScheduleReportFilterOptions[]> {
+    return this.http.post<StaffScheduleReportFilterOptions[]>(`/api/LogiReport/staffschedulebyshift/filter`, filter).pipe(map((data) => {
+      return data;
+    }));
+  }
 }

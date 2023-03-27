@@ -45,3 +45,8 @@ export class GetCommonReportCandidateStatusOptions {
   constructor(public filter: CommonReportFilter) { }
 }
 
+export class GetStaffScheduleReportFilterOptions{
+  static readonly type = '[LogiReport] Get Staff Schedule Report Filter Options';
+  constructor(public filter: CommonReportFilter) { }
+}
+
