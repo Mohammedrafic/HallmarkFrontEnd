@@ -915,7 +915,8 @@
           <input class="e-input" type="text" maxlength="50" formControlName="candidatesCountTo" />
         </div>
       </div>
-      <div class="input-container number-of-positions" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem && !isActiveSystemIRP">
+      <div class="input-container number-of-positions" 
+           *ngIf="(activeTab !== OrganizationOrderManagementTabs.PerDiem && !isActiveSystemIRP) || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
         <label for="numberOfPositions"># of Positions</label>
         <div class="input-group">
           <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />
