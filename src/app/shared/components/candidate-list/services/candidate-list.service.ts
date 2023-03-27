@@ -88,7 +88,7 @@ export class CandidateListService {
     });
   }
 
-  public refreshFilters(isIRP: boolean, formGroup: FormGroup, filters: CandidateListFilters, emitEvent = true): void {
+  public refreshFilters(isIRP: boolean, formGroup: FormGroup, filters: CandidateListFilters): void {
     formGroup.setValue(!isIRP ? {
       candidateName: filters.candidateName || '',
       profileStatuses: filters.profileStatuses || [],
@@ -103,6 +103,6 @@ export class CandidateListService {
       primarySkillIds: filters.primarySkillIds || [],
       secondarySkillIds: filters.secondarySkillIds || [],
       hireDate: filters.hireDate || null,
-    }, { emitEvent: emitEvent });
+    });
   }
 }
