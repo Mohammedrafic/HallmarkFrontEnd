@@ -774,7 +774,8 @@
         </div>
       </div>
     </div>
-    <div class="filter-row bootstrap">
+    <div class="filter-row bootstrap"
+         *ngIf="!isActiveSystemIRP || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
       <div class="input-container">
         <label>Candidate Name</label>
         <div class="input-group">
