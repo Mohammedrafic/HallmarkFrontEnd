@@ -14,7 +14,7 @@ import { ScheduleFiltersModule } from './components/schedule-filters/schedule-fi
 import { ScheduleGridModule } from './components/schedule-grid/schedule-grid.module';
 import { ScheduleContainerComponent } from './containers/schedule-container/schedule-container.component';
 import { ScheduleRoutingModule } from './schedule-routing.module';
-import { ScheduleApiService, ScheduleFiltersService } from './services';
+import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from './services';
 
 const icons = { Sliders };
 
@@ -33,6 +33,10 @@ const icons = { Sliders };
     TooltipContainerModule,
     InlineChipsModule,
   ],
-  providers: [ScheduleApiService, ScheduleFiltersService],
+  providers: [
+    ScheduleApiService,
+    ScheduleFiltersService,
+    CreateScheduleService,
+  ],
 })
 export class ScheduleModule {}

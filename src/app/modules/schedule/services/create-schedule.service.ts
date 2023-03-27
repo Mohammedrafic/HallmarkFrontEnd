@@ -5,6 +5,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { EMPTY, Observable, of } from 'rxjs';
 
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { FilteredItem } from '@shared/models/filter.model';
+import { Skill } from '@shared/models/skill.model';
 import { getTime } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
@@ -15,7 +18,16 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { UserState } from 'src/app/store/user.state';
 import { CreateScheduleItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
-import { EmployeeBookingDay, ScheduleBookingErrors, ScheduleTypeRadioButton } from '../interface';
+import {
+  EmployeeBookingDay,
+  ScheduleBookingErrors,
+  ScheduleFiltersData,
+  ScheduleFilterStructure,
+  ScheduleTypeRadioButton,
+  ShiftDropDownsData,
+} from '../interface';
+import { ScheduleFilterHelper } from '../helpers';
+import { ScheduleFiltersService } from './schedule-filters.service';
 
 @Injectable()
 export class CreateScheduleService {
@@ -33,6 +45,7 @@ export class CreateScheduleService {
   constructor(
     private fb: FormBuilder,
     private store: Store,
+    private scheduleFiltersService:  ScheduleFiltersService,
   ) {}
 
   createUnavailabilityForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
@@ -196,5 +209,46 @@ export class CreateScheduleService {
 
   getFirstAllowedScheduleType(scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>): ScheduleItemType {
     return (scheduleTypes.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
+  }
+
+  getShiftDropDownsData(scheduleFilterStructure: ScheduleFilterStructure): ShiftDropDownsData {
+    const scheduleFiltersData: ScheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
+
+    if (scheduleFiltersData?.filters?.departmentsIds?.length === 1) {
+      return {
+        filtered: true,
+        selectedSkillId: scheduleFiltersData.filters?.skillIds?.length ? scheduleFiltersData.filters.skillIds[0] : null,
+        regionsDataSource: this.getDataSourceFromFilteredItems('regionIds', scheduleFiltersData.filteredItems),
+        locationsDataSource: this.getDataSourceFromFilteredItems('locationIds', scheduleFiltersData.filteredItems),
+        departmentsDataSource: this.getDataSourceFromFilteredItems('departmentsIds', scheduleFiltersData.filteredItems),
+        skillsDataSource: ScheduleFilterHelper.adaptSkillToOption(
+          this.store.selectSnapshot(OrganizationManagementState.assignedSkillsByOrganization) as Skill[] || []
+        ),
+      };
+    } else {
+      const data: ShiftDropDownsData = {} as ShiftDropDownsData;
+
+      data.filtered = false;
+      data.selectedSkillId = null;
+      data.locationsDataSource = this.scheduleFiltersService
+        .getSelectedLocatinOptions(scheduleFilterStructure, [scheduleFilterStructure.regions[0].id as number]);
+      data.departmentsDataSource = this.scheduleFiltersService
+        .getSelectedDepartmentOptions(scheduleFilterStructure, [data.locationsDataSource[0].value as number]);
+
+      return data;
+    }
+  }
+
+  private getDataSourceFromFilteredItems(column: string, filteredItems: FilteredItem[]): DropdownOption[] {
+    const filteredItem = filteredItems.find((item: FilteredItem) => item.column === column);
+
+    if (!filteredItem) {
+      return [];
+    }
+
+    return [{
+      text: filteredItem.text,
+      value: filteredItem.value,
+    }];
   }
 }

@@ -1,17 +1,25 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+import { Observable, Subject } from 'rxjs';
+
+import { BaseObservable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
-import { Observable, Subject } from 'rxjs';
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { ScheduleFilterHelper } from '../helpers';
-import { ScheduleFilterItem, ScheduleFiltersConfig, ScheduleFilterStructure } from '../interface';
+import { ScheduleFilterItem, ScheduleFiltersConfig, ScheduleFiltersData, ScheduleFilterStructure } from '../interface';
 
 @Injectable()
 export class ScheduleFiltersService {
   deletedInlineChip: Subject<ChipDeleteEventType> = new Subject();
+
+  private readonly scheduleFiltersData: BaseObservable<ScheduleFiltersData> = new BaseObservable({
+    filters: {},
+    filteredItems: [],
+    chipsData: [],
+  } as ScheduleFiltersData);
 
   constructor(private readonly fb: FormBuilder) {}
 
@@ -78,6 +86,14 @@ export class ScheduleFiltersService {
 
   getDeleteInlineChipStream(): Observable<ChipDeleteEventType> {
     return this.deletedInlineChip.asObservable();
+  }
+
+  getScheduleFiltersData(): ScheduleFiltersData {
+    return this.scheduleFiltersData.get();
+  }
+
+  setScheduleFiltersData(scheduleFiltersData: ScheduleFiltersData): void {
+    this.scheduleFiltersData.set(scheduleFiltersData);
   }
 
   private createChipValue(formValue: number[] | number | string | boolean, configIem: ScheduleFilterItem): string[] {
