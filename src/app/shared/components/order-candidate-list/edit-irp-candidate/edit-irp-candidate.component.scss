@@ -1,4 +1,5 @@
 @import "colors";
+@import "mixins";
 
 .dialog {
   padding: 24px;
@@ -40,9 +41,19 @@
       gap: 10px;
       grid-template-areas:
     "status status"
-    ". .";
+    ". ."
+    "close-switch close-switch"
+    "reason reason"
+    "close-date close-date";
     }
 
     .status { grid-area: status; }
+    .close-switch { grid-area: close-switch; }
+    .reason { grid-area: reason; }
+    .close-date { grid-area: close-date; }
   }
+}
+
+.switch {
+  @include toggle;
 }

@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
-import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
@@ -24,7 +24,7 @@ import { OrderCandidateApiService } from '@shared/components/order-candidate-lis
     DropDownListModule,
     DatePickerModule,
     ReactiveFormsModule,
-
+    SwitchModule,
     FeatherModule.pick(Icon),
   ],
   exports: [

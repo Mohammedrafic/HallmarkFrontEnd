@@ -10,6 +10,7 @@ import { AdaptIrpCandidates } from './order-candidate-list.utils';
 import {
   CancelIrpCandidateDto,
   CandidateDetails,
+  ClosePositionDto,
   CreateIrpCandidateDto,
   UpdateIrpCandidateDto,
 } from '@shared/components/order-candidate-list/interfaces';
@@ -56,5 +57,9 @@ export class OrderCandidateApiService {
     this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
 
     return EMPTY;
+  }
+
+  closeIrpPosition(payload: ClosePositionDto): Observable<void> {
+    return this.http.post<void>('/api/AppliedCandidates/closePosition', payload);
   }
 }

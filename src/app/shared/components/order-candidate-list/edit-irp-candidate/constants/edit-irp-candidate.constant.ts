@@ -8,9 +8,10 @@ export const Icon = {
   X,
 };
 
-export const OptionField: FieldSettingsModel = { text: 'statusText', value: 'applicantStatus' };
+export const OptionField: FieldSettingsModel = { text: 'text', value: 'value' };
 export const CandidateTitle = 'Edit Candidate';
 export const StatusField = 'status';
+export const CloseReasonField = 'reason';
 
 export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
   {
@@ -52,7 +53,8 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     disabled: false,
     required: false,
     type: FieldType.Dropdown,
-    cssClass: 'status',
+    cssClass: 'reason',
+    dataSource: [],
   },
   {
     field: 'closeDate',
@@ -60,6 +62,6 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     disabled: false,
     required: false,
     type: FieldType.Date,
-    cssClass: 'date-field',
+    cssClass: 'close-date',
   },
 ];
