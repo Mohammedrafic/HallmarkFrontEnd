@@ -5,12 +5,15 @@ export class DepartmentHelper {
   static editDepartmentPayload(
     formData: DepartmentPayload,
     departmentIds: number[] | null,
-    employeeId: number
+    employeeWorkCommitmentId: number,
+    employeeId: number,
+    toggleAllOn: boolean,
   ): DepartmentPayload {
     return {
       ...createDepartmentPayload(formData),
       ids: departmentIds,
       employeeId: employeeId,
+      employeeWorkCommitmentId: toggleAllOn ? null : employeeWorkCommitmentId,
     };
   }
 

@@ -92,7 +92,7 @@ export interface AssignDepartmentHierarchy {
 
 export interface DepartmentPayload {
   forceUpdate: boolean;
-  employeeWorkCommitmentId?: number;
+  employeeWorkCommitmentId?: number | null;
   isOriented: boolean;
   startDate: string;
   endDate?: string;
