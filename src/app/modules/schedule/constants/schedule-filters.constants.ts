@@ -1,6 +1,6 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
-import { ScheduleFiltersConfig } from '../interface';
+import { ScheduleFiltersConfig, ScheduleFiltersData } from '../interface';
 
 export const SkillsFieldsOptions = {
   text: 'skillDescription',
@@ -40,4 +40,10 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueId: 'value',
     filterTitle: 'Skill',
   },
+};
+
+export const InitScheduleFiltersData: ScheduleFiltersData = {
+  filters: {},
+  filteredItems: [],
+  chipsData: [],
 };

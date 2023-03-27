@@ -60,3 +60,9 @@ export interface ShiftTab {
   subTitle: string;
   id: number;
 }
+
+export interface CreateNewScheduleModeConfig {
+  createModeEnabled: boolean;
+  tabSelected: boolean;
+  tabIndex: number;
+}

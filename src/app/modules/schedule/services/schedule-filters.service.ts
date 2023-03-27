@@ -8,6 +8,7 @@ import { DropdownOption } from '@core/interface';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
+import { InitScheduleFiltersData } from '../constants';
 import { ScheduleFilterHelper } from '../helpers';
 import { ScheduleFilterItem, ScheduleFiltersConfig, ScheduleFiltersData, ScheduleFilterStructure } from '../interface';
 
@@ -15,11 +16,7 @@ import { ScheduleFilterItem, ScheduleFiltersConfig, ScheduleFiltersData, Schedul
 export class ScheduleFiltersService {
   deletedInlineChip: Subject<ChipDeleteEventType> = new Subject();
 
-  private readonly scheduleFiltersData: BaseObservable<ScheduleFiltersData> = new BaseObservable({
-    filters: {},
-    filteredItems: [],
-    chipsData: [],
-  } as ScheduleFiltersData);
+  private readonly scheduleFiltersData: BaseObservable<ScheduleFiltersData> = new BaseObservable(InitScheduleFiltersData);
 
   constructor(private readonly fb: FormBuilder) {}
 

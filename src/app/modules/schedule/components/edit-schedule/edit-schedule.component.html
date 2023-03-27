@@ -24,7 +24,7 @@
 
       <ejs-tab
         class="stepper"
-        (selected)="handleTabChange($event)"
+        (selected)="changeTab($event)"
         (created)="setInitData()">
         <e-tabitems>
           <e-tabitem *ngFor="let tab of shiftTabs; trackBy: trackByTabs">
@@ -41,7 +41,7 @@
         </e-tabitems>
       </ejs-tab>
       <div class="add-new-schedule">
-        <div *ngIf="createNewSchedule.mode" class="input-container schedule-types">
+        <div *ngIf="createModeConfig.createModeEnabled" class="input-container schedule-types">
           <ng-container *ngFor="let type of scheduleTypes">
             <div class="input-group radio">
               <app-tooltip-container [showToolTip]="type.disabled">
@@ -57,7 +57,7 @@
             </div>
           </ng-container>
         </div>
-        <div *ngIf="!createNewSchedule.mode" class="add-btn-container">
+        <div *ngIf="!createModeConfig.createModeEnabled" class="add-btn-container">
           <button
             ejs-button
             cssClass="e-outline"
@@ -141,7 +141,7 @@
   </ng-template>
 
   <ng-template #footerTemplate>
-    <div *ngIf="!createNewSchedule.mode" class="schedule-footer">
+    <div *ngIf="!createModeConfig.createModeEnabled" class="schedule-footer">
       <div class="checkbox-container bootstrap" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
         <ejs-checkbox [formControl]="createPerDiemOrderControl" label="Create Per Diem Order"></ejs-checkbox>
       </div>

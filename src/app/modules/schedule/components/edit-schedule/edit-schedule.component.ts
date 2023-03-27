@@ -17,7 +17,7 @@ import { Store } from '@ngxs/store';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { catchError, filter, map, Observable, Subscription, switchMap, take, takeUntil, tap, zip } from 'rxjs';
+import { catchError, EMPTY, filter, map, Observable, Subscription, switchMap, take, takeUntil, tap, zip } from 'rxjs';
 
 import { FieldType } from '@core/enums';
 import { DateTimeHelper, DestroyDialog } from '@core/helpers';
@@ -47,6 +47,7 @@ import {
 import {
   Schedule,
   ScheduleBook,
+  ScheduleBookingErrors,
   ScheduledItem,
   ScheduleFilterStructure,
   ScheduleItem,
@@ -60,7 +61,7 @@ import {
   ScheduledShiftFormConfig,
   ScheduledUnavailabilityFormConfig,
 } from './edit-schedule.constants';
-import { ShiftTab } from './edit-schedule.interface';
+import { CreateNewScheduleModeConfig, ShiftTab } from './edit-schedule.interface';
 import * as EditSchedule from './edit-schedule.interface';
 import { EditScheduleService } from './edit-schedule.service';
 
@@ -76,12 +77,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   @Input() datePickerLimitations: DatePickerLimitations;
   @Input() userPermission: Permission = {};
   @Input() set scheduledShift(scheduledItem: ScheduledItem | null) {
-    if (scheduledItem && scheduledItem.schedule) {
-      this.scheduledItem = scheduledItem;
-      this.shiftTabs = GetScheduleTabItems(scheduledItem.schedule.daySchedules);
-      this.selectScheduledItem(0);
-      this.tabs?.select(0);
-    }
+    this.changeScheduledShift(scheduledItem);
   }
 
   @Output() updateScheduleGrid: EventEmitter<void> = new EventEmitter<void>();
@@ -93,8 +89,8 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   readonly createPerDiemOrderControl: FormControl = new FormControl(false);
   readonly scheduleType = ScheduleType;
   readonly scheduleTypesControl: FormControl = new FormControl(ScheduleItemType.Book);
-  readonly createNewSchedule = {
-    mode: false,
+  readonly createModeConfig: CreateNewScheduleModeConfig = {
+    createModeEnabled: false,
     tabSelected: false,
     tabIndex: -1,
   };
@@ -175,22 +171,22 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
       });
   }
 
-  handleTabChange(event: SelectingEventArgs) {
-    if (!event.isInteracted && !this.createNewSchedule.mode) {
+  changeTab(event: SelectingEventArgs): void {
+    if (!event.isInteracted && !this.createModeConfig.createModeEnabled) {
       return;
     }
 
-    if (this.createNewSchedule.mode && !this.createNewSchedule.tabSelected) {
+    if (this.createModeConfig.createModeEnabled && !this.createModeConfig.tabSelected) {
       this.selectNewTab();
       return;
     }
 
-    if (this.createNewSchedule.tabIndex === event.selectedIndex) {
+    if (this.createModeConfig.tabIndex === event.selectedIndex) {
       this.createBookFormForNewTab();
       return;
     }
 
-    if (this.createNewSchedule.tabIndex !== event.selectedIndex && this.createNewSchedule.tabSelected) {
+    if (this.createModeConfig.tabIndex !== event.selectedIndex && this.createModeConfig.tabSelected) {
       this.removeNewTab();
     }
 
@@ -216,7 +212,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     this.scheduleItemType = event.value as unknown as ScheduleItemType;
 
     if (type === ScheduleItemType.Book) {
-      this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.createNewSchedule.mode);
+      this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.createModeConfig.createModeEnabled);
       this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
       this.watchForRegionControls();
 
@@ -227,12 +223,12 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     }
 
     if (type === ScheduleItemType.Unavailability) {
-      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.createNewSchedule.mode);
+      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.createModeConfig.createModeEnabled);
       this.scheduleForm = this.editScheduleService.createScheduledUnavailabilityForm();
     }
 
     if (type === ScheduleItemType.Availability) {
-      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.createNewSchedule.mode);
+      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.createModeConfig.createModeEnabled);
       this.scheduleForm = this.editScheduleService.createScheduledAvailabilityForm();
     }
 
@@ -245,9 +241,9 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   addNewSchedule(): void {
-    this.createNewSchedule.mode = true;
+    this.createModeConfig.createModeEnabled = true;
     this.shiftTabs = [...this.shiftTabs, { id: this.newScheduleId, title: 'New', subTitle: 'Add scheduling' }];
-    this.createNewSchedule.tabIndex = this.shiftTabs.length - 1;
+    this.createModeConfig.tabIndex = this.shiftTabs.length - 1;
   }
 
   closeReplacementOrderDialog(): void {
@@ -261,7 +257,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
       return;
     }
 
-    if (!this.createNewSchedule.mode) {
+    if (!this.createModeConfig.createModeEnabled) {
       this.updateScheduledShift();
       return;
     }
@@ -289,20 +285,12 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   saveNewBooking(createOrder: boolean): void {
-    if (!this.scheduleToBook) {
-      return;
+    if (this.scheduleToBook) {
+      this.scheduleToBook.createOrder = createOrder;
+      this.createBookSchedule()
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe(() => this.handleSuccessAdding());
     }
-
-    this.scheduleToBook.createOrder = createOrder;
-    this.scheduleApiService.createBookSchedule(this.scheduleToBook).pipe(
-      catchError((error: HttpErrorResponse) => this.createScheduleService.handleErrorMessage(error)),
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.updateScheduleGrid.emit();
-      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORDS_ADDED));
-      this.disableCreateNewScheduleMode();
-      this.scheduleToBook = null;
-    });
   }
 
   private setHours(
@@ -446,8 +434,8 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   private selectNewTab(): void {
-    this.createNewSchedule.tabSelected = true;
-    this.tabs.select(this.createNewSchedule.tabIndex);
+    this.createModeConfig.tabSelected = true;
+    this.tabs.select(this.createModeConfig.tabIndex);
   }
 
   private removeNewTab(): void {
@@ -457,7 +445,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
 
   private createBookFormForNewTab(): void {
     this.updateDataSource();
-    this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.createNewSchedule.mode);
+    this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.createModeConfig.createModeEnabled);
     this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
     this.watchForRegionControls();
     this.watchForShiftControl();
@@ -482,20 +470,20 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     this.selectedDaySchedule = this.scheduledItem.schedule.daySchedules[index];
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Book) {
-      this.scheduleFormConfig = ScheduledShiftFormConfig(false, this.createNewSchedule.mode);
+      this.scheduleFormConfig = ScheduledShiftFormConfig(false, this.createModeConfig.createModeEnabled);
       this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
       patchData.regionId = this.selectedDaySchedule.orderMetadata?.regionId;
       this.watchForRegionControls();
     }
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Unavailability) {
-      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.createNewSchedule.mode);
+      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.createModeConfig.createModeEnabled);
       this.scheduleForm = this.editScheduleService.createScheduledUnavailabilityForm();
       patchData.unavailabilityReasonId = this.selectedDaySchedule.unavailabilityReasonId;
     }
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Availability) {
-      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.createNewSchedule.mode);
+      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.createModeConfig.createModeEnabled);
       this.scheduleForm = this.editScheduleService.createScheduledAvailabilityForm();
     }
 
@@ -563,12 +551,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
         catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
         takeUntil(this.componentDestroy())
       )
-      .subscribe(() => {
-        this.disableCreateNewScheduleMode();
-        this.updateScheduleGrid.emit();
-        this.scheduleForm.markAsUntouched();
-        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORDS_ADDED));
-      });
+      .subscribe(() => this.handleSuccessAdding());
   }
 
   private checkBookingsOverlaps(): void {
@@ -594,14 +577,17 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
 
     this.scheduleApiService.checkBookingsOverlaps(request).pipe(
       catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+      switchMap((response: BookingsOverlapsResponse[]) => {
+        if (!response.length && this.scheduleToBook) {
+          return this.createBookSchedule();
+        } else {
+          this.openReplacementOrderDialog(response);
+
+          return EMPTY;
+        }
+      }),
       takeUntil(this.componentDestroy())
-    ).subscribe((response: BookingsOverlapsResponse[]) => {
-      if (!response.length && this.scheduleToBook) {
-        this.saveNewBooking(false);
-      } else {
-        this.openReplacementOrderDialog(response);
-      }
-    });
+    ).subscribe(() => this.handleSuccessAdding());
   }
 
   private openReplacementOrderDialog(replacementOrderDialogData: BookingsOverlapsResponse[]): void {
@@ -611,8 +597,30 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   private disableCreateNewScheduleMode(): void {
-    this.createNewSchedule.mode = false;
-    this.createNewSchedule.tabSelected = false;
-    this.createNewSchedule.tabIndex = this.newScheduleId;
+    this.createModeConfig.createModeEnabled = false;
+    this.createModeConfig.tabSelected = false;
+    this.createModeConfig.tabIndex = this.newScheduleId;
+  }
+
+  private changeScheduledShift(scheduledItem: ScheduledItem | null) {
+    if (scheduledItem && scheduledItem.schedule) {
+      this.scheduledItem = scheduledItem;
+      this.shiftTabs = GetScheduleTabItems(scheduledItem.schedule.daySchedules);
+      this.selectScheduledItem(0);
+      this.tabs?.select(0);
+    }
+  }
+
+  private handleSuccessAdding(): void {
+    this.updateScheduleGrid.emit();
+    this.scheduleToBook = null;
+    this.disableCreateNewScheduleMode();
+    this.store.dispatch(new ShowToast(MessageTypes.Success, RECORDS_ADDED));
+  }
+
+  private createBookSchedule(): Observable<ScheduleBookingErrors[]> {
+    return this.scheduleApiService.createBookSchedule(this.scheduleToBook as ScheduleBook).pipe(
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleErrorMessage(error)),
+    );
   }
 }
