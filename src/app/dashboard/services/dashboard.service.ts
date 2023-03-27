@@ -60,6 +60,7 @@ import { OrgDetailsInfoModel } from '../models/org-details-info.model';
 import { AgencyPositionModel } from '../models/agency-position.model';
 import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 import { GetWorkCommitment } from '../widgets/rn-utilization-widget/rn-utilization.model';
+import { ExpiryDetailsModel } from '../models/expiry.model';
 
 @Injectable()
 export class DashboardService {
@@ -76,7 +77,7 @@ export class DashboardService {
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboartFilterDto) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
     [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => this.getPositionsByTypes(filters, timeSelection),
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboartFilterDto) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
-    [WidgetTypeEnum.OPEN_POSITIONS]: (filters,) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
+    [WidgetTypeEnum.OPEN_POSITIONS]: (filters) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
     [WidgetTypeEnum.INVOICES]: () => this.getInvocesWidgetData(),
     [WidgetTypeEnum.TASKS]: () => this.getTasksWidgetData(),
     [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
@@ -85,8 +86,10 @@ export class DashboardService {
     [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
     [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
     [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters),
-    [WidgetTypeEnum.AGENCY_POSITION_COUNT] : (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
-    [WidgetTypeEnum.RN_UTILIZATION] : (filters: DashboartFilterDto) => this.getRNUtilizations(filters),
+    [WidgetTypeEnum.AGENCY_POSITION_COUNT]: (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
+    [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => this.getRNUtilizations(filters),
+    [WidgetTypeEnum.ALREADY_EXPIRED_CREDS]: (filters: DashboartFilterDto) => this.getalreadyExpiredCredentials(filters),
+    [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpiredCredentials(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -345,6 +348,13 @@ export class DashboardService {
     return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
   }
 
+  private getalreadyExpiredCredentials(filter: DashboartFilterDto) : Observable<ExpiryDetailsModel[]> {
+    return this.httpClient.get<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`);
+  }
+
+  private getupcomingExpiredCredentials(filter: DashboartFilterDto) : Observable<ExpiryDetailsModel[]> {
+    return this.httpClient.get<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`);
+  }
  
   private getActivePositionWidgetData(filter: DashboartFilterDto): Observable<AccumulationChartModel> {
     return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { granulateInProgress: true, ...filter }).pipe(

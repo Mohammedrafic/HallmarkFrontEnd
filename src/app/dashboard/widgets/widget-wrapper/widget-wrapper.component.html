@@ -40,5 +40,11 @@
     <div *ngIf="RNUtilizationChart" class="app-widget-wrapper__RNUtilization-chart">
       <ng-container [ngTemplateOutlet]="RNUtilizationChart"></ng-container>
     </div>
+    <div *ngIf="already_expired_credentials" class="app-widget-wrapper__expired-chart">
+      <ng-container [ngTemplateOutlet]="already_expired_credentials"></ng-container>
+    </div> 
+    <div *ngIf="upcoming_exp_creds" class="app-widget-wrapper__upcoming-chart">
+      <ng-container [ngTemplateOutlet]="upcoming_exp_creds"></ng-container>
+    </div>
   </div> 
 </ng-template>

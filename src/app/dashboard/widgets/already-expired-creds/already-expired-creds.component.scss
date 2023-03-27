@@ -1,0 +1,94 @@
+@import "colors";
+
+.widget {
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+  height: 100%;
+  text-align: center;
+
+  &__title {
+    padding-bottom: 4%;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    align-items: center;
+
+    @media screen and (max-width: 600px) {
+      padding-bottom: 3px;
+    }
+  }
+
+  &__type {
+    font-size: 14px;
+    color: $secondary-dark-blue-20;
+    margin-right: -12px;
+    margin-right: 4px;
+    cursor: default;
+
+    @media screen and (max-width: 1550px) {
+      font-size: 12px;
+    }
+  }
+}
+
+  .app-widget-wrapper {
+    &__tooltip {
+      text-align: right;
+      float: right;
+      width: 100%
+    }
+  }
+  
+  #control-container {
+    padding: 0px !important;
+  }
+  #linear1_Lineartrack, #linear2_Lineartrack, #linear3_Lineartrack, #linear4_Lineartrack {
+    opacity: 1 !important;
+  }
+  .linear-parent {
+    text-align: center;
+    margin-top: 2%;
+  }
+  
+  .linear-button {
+    text-align: center;
+  }
+  
+  .linear-progress {
+    width: 80%;
+    margin: auto;
+    margin-bottom: 3%;
+  }
+  
+  #reLoad {
+    border-radius: 4px;
+    text-transform: capitalize;
+  }
+  .orgcount {
+    text-align: right;
+    width: -webkit-fill-available;
+    width: -moz-available;
+  }
+  .orgname {
+    text-align: left;
+    white-space: nowrap;
+    font-size: 11px;
+    width: max-content;
+  }
+  .widget__type {
+    display: flex;
+  }
+  .widget{
+    padding:  0px 0px 0px 0px !important;
+  }
+  .widget__type p {
+    margin: 5px 0px;
+  }
+  .app-widget-wrapper__header{
+    padding-bottom: 5px;
+  }
+  .icon{
+    height : 25px;
+    width : 25px;
+  }

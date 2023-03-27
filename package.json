@@ -57,6 +57,7 @@
     "@syncfusion/ej2-angular-notifications": "^20.1.47",
     "@syncfusion/ej2-angular-pdfviewer": "^20.1.47",
     "@syncfusion/ej2-angular-popups": "^20.1.47",
+    "@syncfusion/ej2-angular-progressbar": "^21.1.35",
     "@syncfusion/ej2-angular-richtexteditor": "^20.1.47",
     "@syncfusion/ej2-angular-splitbuttons": "^20.1.47",
     "@syncfusion/ej2-layouts": "^20.1.47",

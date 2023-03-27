@@ -21,4 +21,6 @@ export class WidgetWrapperComponent {
   @ContentChild("OrgChart") public readonly OrgChart: TemplateRef<HTMLElement>;
   @ContentChild("agency_count") public readonly agency_count: TemplateRef<HTMLElement>;
   @ContentChild("RNUtilizationChart") public readonly RNUtilizationChart: TemplateRef<HTMLElement>;
+  @ContentChild("already_expired_credentials") public readonly already_expired_credentials: TemplateRef<HTMLElement>;
+  @ContentChild("upcoming_exp_creds") public readonly upcoming_exp_creds: TemplateRef<HTMLElement>;
 }
