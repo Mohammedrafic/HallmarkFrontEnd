@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { debounceTime, filter, map, merge, Observable, skip, Subject, switchMap, takeUntil, takeWhile, throttleTime } from 'rxjs';
+import { debounceTime, filter, map, merge, Observable, skip, Subject, switchMap, takeUntil, takeWhile } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
