@@ -30,7 +30,6 @@ import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import {
   UserAgencyOrganization,
-  UserAgencyOrganizationBusinessUnit,
 } from '@shared/models/user-agency-organization.model';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';

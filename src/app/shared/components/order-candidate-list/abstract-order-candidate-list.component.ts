@@ -56,7 +56,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   protected pageSubject = new Subject<number>();
   protected unsubscribe$: Subject<void> = new Subject();
 
-  constructor(protected override store: Store, protected router: Router) {
+  constructor(protected override store: Store, protected router: Router, protected globalWindow : WindowProxy & typeof globalThis,) {
     super(store);
   }
 
@@ -95,16 +95,18 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
       );
     }
     const pageToBack = this.router.url;
+    const state = {
+      orderId: this.order.orderId,
+      candidateStatus: data.status,
+      pageToBack,
+      orderManagementPagerState: this.orderManagementPagerState,
+      readonly: !this.isAgency,
+      isRedirectFromOrder: true,
+      isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
+    };
+    this.globalWindow.localStorage.setItem('navigationState', JSON.stringify(state));
     this.router.navigate([url, data.candidateId], {
-      state: {
-        orderId: this.order.orderId,
-        candidateStatus: data.status,
-        pageToBack,
-        orderManagementPagerState: this.orderManagementPagerState,
-        readonly: !this.isAgency,
-        isRedirectFromOrder: true,
-        isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
-      },
+      state: state,
     });
     disabledBodyOverflow(false);
   }
