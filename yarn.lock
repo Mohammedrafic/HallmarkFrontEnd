@@ -2171,6 +2171,19 @@
     rxjs-compat "^6.5.4"
     zone.js "^0.10.2"
 
+"@syncfusion/ej2-angular-base@~21.1.35":
+  version "21.1.35"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-base/-/ej2-angular-base-21.1.35.tgz#ff7070ef2eb83ad437a376ebb6ba49a240c63954"
+  integrity sha512-Q98gprB2mFgMizxvPITIAPrUNK7zSCuIhyxHvX+NIepmwtkb7+hHjmcNuJsGemdEBqx7oZI5zYvAEdoq6g6uXw==
+  dependencies:
+    "@syncfusion/ej2-base" "~21.1.35"
+    "@syncfusion/ej2-icons" "~21.1.35"
+    core-js "^3.4.8"
+    reflect-metadata "^0.1.9"
+    rxjs "^6.5.4"
+    rxjs-compat "^6.5.4"
+    zone.js "^0.10.2"
+
 "@syncfusion/ej2-angular-buttons@^20.1.47":
   version "20.1.55"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-buttons/-/ej2-angular-buttons-20.1.55.tgz#dbe574b86f242eda994c27e6b9c8e8ebe393902f"
@@ -2299,6 +2312,16 @@
     "@syncfusion/ej2-base" "~20.1.57"
     "@syncfusion/ej2-popups" "20.1.58"
 
+"@syncfusion/ej2-angular-progressbar@^21.1.35":
+  version "21.1.35"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-progressbar/-/ej2-angular-progressbar-21.1.35.tgz#3a3aa84a63a225028dcd98b56faab1719f0c9ccc"
+  integrity sha512-PBTL3G/0dgKVoVIJcsnqYHO7cQAGIXt6KZl7vGQv/1yfaIvTeVLVLEPUtmmgDLeR+SlnYpJZsGfrTdGV500hWg==
+  dependencies:
+    "@syncfusion/ej2-angular-base" "~21.1.35"
+    "@syncfusion/ej2-base" "~21.1.35"
+    "@syncfusion/ej2-progressbar" "21.1.35"
+    tslib "^2.3.0"
+
 "@syncfusion/ej2-angular-richtexteditor@^20.1.47":
   version "20.2.45"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-richtexteditor/-/ej2-angular-richtexteditor-20.2.45.tgz#a88b9619edaabb865ca3c57e59705da1862905c6"
@@ -2338,6 +2361,13 @@
   integrity sha512-v6POMf2LwuRqo/ZSDON7WlHGIAs0BRaU7AM67IP4IdFr2J5MBwN2lFuw2zHaC7BH7h1AB8kBwRDoQEWuKitfRQ==
   dependencies:
     "@syncfusion/ej2-icons" "~20.3.47"
+
+"@syncfusion/ej2-base@~21.1.35":
+  version "21.1.35"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-base/-/ej2-base-21.1.35.tgz#9cdc8dd77bbfd7656b1658d1da870612c7088be1"
+  integrity sha512-3YhQzBFmCXIwD2lXi0+BVYv4tUBMU+4q3PYQDdk7U+oKyGjT4RitQa5YruDSL2keXnYx4by2EP57qjDsBbbTQA==
+  dependencies:
+    "@syncfusion/ej2-icons" "~21.1.35"
 
 "@syncfusion/ej2-buttons@20.1.55", "@syncfusion/ej2-buttons@~20.1.55":
   version "20.1.55"
@@ -2462,6 +2492,13 @@
   integrity sha512-P9beCUe05feVfc32EWl6T0UdQsyoFmasoAYYhbpodkjdlvyHB+AlEQ5mEzsnmxGlmf5O3kULqSNhX5SPO87MkQ==
   dependencies:
     "@syncfusion/ej2-base" "~20.3.50"
+
+"@syncfusion/ej2-data@~21.1.35":
+  version "21.1.35"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-data/-/ej2-data-21.1.35.tgz#d19b760a8e83817b9d4b793a844e3a9f735a6b41"
+  integrity sha512-GkUbPM3DstFq2Uxi9UbQZA6S0YsuD47axKUP+I3AuUeyapq7Bg+yDsBcMu9RfYwY47Fbhe83ZE0cF6IZPmmPWQ==
+  dependencies:
+    "@syncfusion/ej2-base" "~21.1.35"
 
 "@syncfusion/ej2-documenteditor@20.3.50":
   version "20.3.50"
@@ -2641,6 +2678,11 @@
   version "20.3.47"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-icons/-/ej2-icons-20.3.47.tgz#9223238cccfbeacdb914176e311a132660392e86"
   integrity sha512-5uQEkkyene5mm/o1G7GMSJqmSrFOWFyuJdEIqzZYBzr+7hwlq6P919A/XR3eDBJSIz1wTN65bTQ9SCl4j/us1g==
+
+"@syncfusion/ej2-icons@~21.1.35":
+  version "21.1.35"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-icons/-/ej2-icons-21.1.35.tgz#24bfbb2014cafb9e65ca6f72e60bcb50060d6f96"
+  integrity sha512-PdBgqr8kAarOL/Dgp3i+IHvASWLs6tdDlJXhan8mlemMJqg2lTmbZobHPbhDcO7NO0u4CiK+qJY2mAGNOeeFIg==
 
 "@syncfusion/ej2-inplace-editor@~20.1.55":
   version "20.1.55"
@@ -2866,6 +2908,15 @@
     "@syncfusion/ej2-base" "~20.3.50"
     "@syncfusion/ej2-buttons" "~20.3.50"
 
+"@syncfusion/ej2-progressbar@21.1.35":
+  version "21.1.35"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-progressbar/-/ej2-progressbar-21.1.35.tgz#b83707c27e3b62683eecc8b641f83410ad6564e2"
+  integrity sha512-gv2jbcg/KdxuWU75P4+aG16BgmIzZaolxgrKbV76M08aPkhKx99aYZLg9SJJ/fJDY8PZMNBs7RDe/4gCwws9Yg==
+  dependencies:
+    "@syncfusion/ej2-base" "~21.1.35"
+    "@syncfusion/ej2-data" "~21.1.35"
+    "@syncfusion/ej2-svg-base" "~21.1.35"
+
 "@syncfusion/ej2-richtexteditor@20.2.45":
   version "20.2.45"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-richtexteditor/-/ej2-richtexteditor-20.2.45.tgz#6a0514065ad6dcf3e3ef0b760db561c1fe6fe056"
@@ -2929,6 +2980,13 @@
   integrity sha512-FAu/GCZth+qnH20XJVq9qqrrl1Y98TOK/2b6EBASCXhZg1MWjk+Qy8clRZQFIGZmSHR/IdKZqmbQOpjVzlXWOA==
   dependencies:
     "@syncfusion/ej2-base" "~20.3.47"
+
+"@syncfusion/ej2-svg-base@~21.1.35":
+  version "21.1.35"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-svg-base/-/ej2-svg-base-21.1.35.tgz#11561d9507cc1138f4dd1690b1b21eeb8e46fb65"
+  integrity sha512-5FlrJB3aSInjMtLcFYSGf13cey9wTXfeKADeSJYuLxN/w04p94nP0rKVveWaHQV6D2Fz7tjd/Drx4R9/gW3F+w==
+  dependencies:
+    "@syncfusion/ej2-base" "~21.1.35"
 
 "@tootallnate/once@1":
   version "1.1.2"
