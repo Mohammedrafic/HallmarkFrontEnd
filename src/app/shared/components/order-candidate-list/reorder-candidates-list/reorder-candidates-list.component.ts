@@ -1,5 +1,5 @@
 import { GetCandidateJob, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
@@ -24,6 +24,7 @@ import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderStatus } from '@shared/enums/order-management';
+import { GlobalWindow } from '@core/tokens';
 
 enum ReorderCandidateStatuses {
   BillRatePending = 44,
@@ -67,9 +68,10 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     private settingService: SettingsViewService,
     private cdr: ChangeDetectorRef,
     private orderCandidateApiService: OrderCandidateApiService,
-    private orderManagementService: OrderManagementService
+    private orderManagementService: OrderManagementService,
+    @Inject(GlobalWindow) protected override readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
-    super(store, router);
+    super(store, router, globalWindow);
     this.setIrpFeatureFlag();
   }
 
