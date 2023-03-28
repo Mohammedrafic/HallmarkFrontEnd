@@ -16,7 +16,7 @@ export class AlreadyExpiredCredsComponent  {
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean | false;
   @Input() public description: string;
-  @Input() public chartData: ExpiryDetailsModel | undefined;
+  @Input() public chartData: ExpiryDetailsModel[] | undefined;
   public expirydata:any;
   public getexp:any;
   public type: string = 'Linear';
@@ -49,19 +49,26 @@ export class AlreadyExpiredCredsComponent  {
   }
 
   ngOnChanges():void {
-    const getexp = [];
+    const getExp = [];
     if(this.chartData != undefined || null){
-      this.expirydata = this.chartData;
-      this.expirydata[4].name = "Licenses";
-      this.expirydata[4].progressColor = '#8cb3ff';
-      getexp.push(this.expirydata[4]);
-      this.expirydata[0].name = "Certificates";
-      this.expirydata[0].progressColor = '#e48192';
-      getexp.push(this.expirydata[0]);
-      this.expirydata[2].name = "Checklists";
-      this.expirydata[2].progressColor = '#9b85c6';
-      getexp.push(this.expirydata[2]);
-      this.expirydata = getexp;
+      this.expirydata = this.chartData?.filter(x => x.mode == "EXPIRED");
+
+      const licIndex = this.expirydata.findIndex((x: { typeId: number; }) => x.typeId === 3);
+      this.expirydata[licIndex].name = "Licenses";
+      this.expirydata[licIndex].progressColor = '#8cb3ff';
+      getExp.push(this.expirydata[licIndex]);
+
+      const certIndex = this.expirydata.findIndex((x: { typeId: number; }) => x.typeId === 1);
+      this.expirydata[certIndex].name = "Certificates";
+      this.expirydata[certIndex].progressColor = '#e48192';
+      getExp.push(this.expirydata[certIndex]);
+
+      const chIndex = this.expirydata.findIndex((x: { typeId: number; }) => x.typeId === 2);
+      this.expirydata[chIndex].name = "Checklists";
+      this.expirydata[chIndex].progressColor = '#9b85c6';
+      getExp.push(this.expirydata[chIndex]);
+
+      this.expirydata = getExp;
     }
   }
 }

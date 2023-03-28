@@ -20,6 +20,6 @@ export const widgetTypes: Record<string, WidgetTypeEnum> = {
   19: WidgetTypeEnum.ORG,
   20: WidgetTypeEnum.AGENCY_POSITION_COUNT,
   21: WidgetTypeEnum.RN_UTILIZATION,
-  22: WidgetTypeEnum.ALREADY_EXPIRED_CREDS,
-  23: WidgetTypeEnum.UPCOMING_EXP_CREDS,
+  22: WidgetTypeEnum.UPCOMING_EXP_CREDS,
+  23: WidgetTypeEnum.ALREADY_EXPIRED_CREDS,
 };
