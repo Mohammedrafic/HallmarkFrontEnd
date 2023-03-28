@@ -163,6 +163,10 @@ body.light, body.dark {
       .e-input-group.e-control-wrapper:not(.e-success):not(.e-warning):not(.e-error):not(.e-float-icon-left).e-disabled {
         background-color: $secondary-dark-blue-50;
         border-bottom-color: $grey;
+
+        &:hover {
+          border-color: $secondary-dark-blue-40 !important;
+        }
       }
     }
   }

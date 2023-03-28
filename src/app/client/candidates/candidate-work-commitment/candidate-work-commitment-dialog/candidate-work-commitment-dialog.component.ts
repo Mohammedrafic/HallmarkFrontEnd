@@ -10,6 +10,7 @@ import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED, RECORD_MODIFIE
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { MessageTypes } from '@shared/enums/message-types';
+import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { convertHolidaysToDataSource } from '@shared/helpers/dropdown-options.helper';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
@@ -56,13 +57,15 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public selectedLocations: number[] = [];
   public candidateWorkCommitmentForm: FormGroup;
   public employeeId: number;
+  public sortOrder = SortOrder;
+  public formatPayRate = '#.###';
   public readonly commitmentFields = {
     text: 'name',
     value: 'id',
   };
 
   public readonly numericInputAttributes = { maxLength: '10' };
-  public format = '#';
+  public format = '#.#';
 
   public todayDate = new Date();
   public lastActiveDate: Date | null;;
