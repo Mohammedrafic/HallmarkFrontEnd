@@ -30,7 +30,7 @@ export class ReasonsFormsService {
       this.form = this.fb.group({
         id: [],
         reason: [null, [Validators.required, Validators.maxLength(6), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
-        description: [null, [Validators.maxLength(500), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
+        description: [],
         calculateTowardsWeeklyHours: [false],
         eligibleToBeScheduled: [false],
         visibleForIRPCandidates: [false],
@@ -59,6 +59,24 @@ export class ReasonsFormsService {
         isRedFlagCategory: [false],
       });
     }  else if(formType === ReasonFormType.DefaultReason){
+      this.form = this.fb.group({
+        id: [],
+        reason: ['', [Validators.required, Validators.maxLength(100),
+          Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
+      });
+    } else if(formType === ReasonFormType.TerminatedReason){
+      this.form = this.fb.group({
+        id: [],
+        reason: ['', [Validators.required, Validators.maxLength(100),
+          Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
+      });
+    } else if(formType === ReasonFormType.InternalTransferReason){
+      this.form = this.fb.group({
+        id: [],
+        reason: ['', [Validators.required, Validators.maxLength(100),
+          Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
+      });
+    } else if(formType === ReasonFormType.ManualInvoiceReason){
       this.form = this.fb.group({
         id: [],
         reason: ['', [Validators.required, Validators.maxLength(100),
