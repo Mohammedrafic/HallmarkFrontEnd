@@ -2,7 +2,7 @@ import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -58,7 +58,8 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     private actions: Actions,
     private closeOrderService: CloseOrderService,
     private confirmService: ConfirmService,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private cd: ChangeDetectorRef,
   ) {
     super();
   }
@@ -137,6 +138,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   private getComments(): void {
     let entity;
+    this.comments = [];
     if (this.isPosition) {
       this.commentContainerId = this.candidate.commentContainerId as number;
       entity = this.candidate;
@@ -146,6 +148,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     }
     this.commentsService.getComments(entity.commentContainerId as number, null).subscribe((comments: Comment[]) => {
       this.comments = comments;
+      this.cd.markForCheck();
     });
   }
 
