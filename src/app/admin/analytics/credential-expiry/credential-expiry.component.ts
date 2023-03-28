@@ -374,7 +374,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       "LocationParamCREXP": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentParamCREXP": departmentIds.length == 0 ? "null" : departmentIds,
       "AgencyParamCREXP": this.selectedAgencies.length ==0?"null":this.selectedAgencies?.map((list) => list.agencyId).join(","),
-      "CandidateStatusCREXP": candidateStatuses.length == 0 ? "null" : candidateStatuses?.join(","),
+      "CandidateStatusCREXP": candidateStatuses.length == 0 ? "null" : candidateStatuses,
       "JobIdCREXP": jobId.trim() == "" ? "null" : jobId.trim(),
       "BearerParamCREXP":auth,
       "BusinessUnitIdParamCREXP":window.localStorage.getItem("lastSelectedOrganizationId") == null 
