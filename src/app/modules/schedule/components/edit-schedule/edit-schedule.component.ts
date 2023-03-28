@@ -620,7 +620,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
 
   private createBookSchedule(): Observable<ScheduleBookingErrors[]> {
     return this.scheduleApiService.createBookSchedule(this.scheduleToBook as ScheduleBook).pipe(
-      catchError((error: HttpErrorResponse) => this.createScheduleService.handleErrorMessage(error)),
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
     );
   }
 }
