@@ -55,12 +55,11 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { CandidateStatusDataModel } from '../models/candidate-status-dto.model';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import { CandidateStatusDto } from '@admin/analytics/models/common-report.model';
 import { OrgDetailsInfoModel } from '../models/org-details-info.model';
 import { AgencyPositionModel } from '../models/agency-position.model';
-import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 import { GetWorkCommitment } from '../widgets/rn-utilization-widget/rn-utilization.model';
 import { ExpiryDetailsModel } from '../models/expiry.model';
+import { RnUtilizationModel } from '../models/rnutilization.model';
 
 @Injectable()
 export class DashboardService {
@@ -344,8 +343,10 @@ export class DashboardService {
     )
   }
 
-  private getRNUtilizations(filter: DashboartFilterDto) : Observable<GetWorkCommitment[]> {
-    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
+  private getRNUtilizations(filter: DashboartFilterDto) : Observable<RnUtilizationModel> {
+    return this.httpClient.post<RnUtilizationModel>(`${this.baseUrl}/GetAllCandidateworkschedulehrs`, { ...filter })
+    .pipe(
+      map((data)=> data))
   }
 
   private getalreadyExpiredCredentials(filter: DashboartFilterDto) : Observable<ExpiryDetailsModel[]> {
