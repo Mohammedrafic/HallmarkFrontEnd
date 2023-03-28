@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, distinctUntilChanged, EMPTY, mergeMap, Observable, of, tap } from 'rxjs';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
-import { FormBuilder } from '@angular/forms';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
 import { ShowToast } from '../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -18,7 +17,6 @@ import { CandidatesService } from '../services/candidates.service';
 export class CandidateProfileService {
   constructor(
     private http: HttpClient,
-    private formBuilder: FormBuilder,
     private store: Store,
     private candidateProfileForm: CandidateProfileFormService,
     private candidateService: CandidatesService,
@@ -87,7 +85,8 @@ export class CandidateProfileService {
   }
 
   public getCandidatePhotoById(id: number): Observable<Blob> {
-    return this.http.get(`/api/employee/${id}/photo`, { responseType: 'blob' }).pipe(
+    const salt = (new Date).getTime();
+    return this.http.get(`/api/employee/${id}/photo`, { params: { salt }, responseType: 'blob' }).pipe(
       catchError(() => EMPTY)
     );
   }
