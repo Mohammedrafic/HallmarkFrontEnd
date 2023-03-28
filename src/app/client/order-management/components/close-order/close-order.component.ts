@@ -22,6 +22,7 @@ import { Comment } from '@shared/models/comment.model';
 import { UserState } from 'src/app/store/user.state';
 import { SaveCloseOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { DateTimeHelper } from '@core/helpers';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-close-order',
@@ -31,6 +32,7 @@ import { DateTimeHelper } from '@core/helpers';
 export class CloseOrderComponent extends DestroyableDirective implements OnChanges, OnInit, OnDestroy {
   @Input() public order: Order | OrderManagement;
   @Input() candidate: OrderManagementChild;
+  @Input() currentSystem: OrderManagementIRPSystemId;
   @Output() private closeOrderSuccess: EventEmitter<Order | OrderManagement> = new EventEmitter<
     Order | OrderManagement>();
   @Output() private closePositionSuccess: EventEmitter<OrderManagementChild> = new EventEmitter<OrderManagementChild>();
@@ -43,6 +45,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   public readonly reasonFields: FieldSettingsModel = { text: 'reason', value: 'id' };
   public readonly datepickerMask = { month: 'MM', day: 'DD', year: 'YYYY' };
+  public readonly systemTypes = OrderManagementIRPSystemId;
   public maxDate: Date | null;
 
   public dialogTitleType: string;
@@ -82,6 +85,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     this.initForm();
     this.subscribeOnCloseSideBar();
   }
+
   public override ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();

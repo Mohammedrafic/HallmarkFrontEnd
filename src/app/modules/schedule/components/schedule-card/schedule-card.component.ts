@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
+import { IrpOrderType } from '@shared/enums/order-type';
+import { ScheduleType } from '../../enums';
 import { GetScheduleCardConfig } from '../../constants';
 import { CardTitle } from '../../helpers';
 import { ScheduleCardConfig, ScheduleDateItem, ScheduleItem } from '../../interface';
 import { ScheduleCardTooltips } from './schedule-card.interface';
 import { ScheduleCardService } from '../../services';
-import { IrpOrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-schedule-card',
@@ -14,7 +15,15 @@ import { IrpOrderType } from '@shared/enums/order-type';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleCardComponent implements OnInit {
-  @Input() dateSchedule: ScheduleDateItem;
+  @Input() set scheduleDateItem(scheduleDateItem: ScheduleDateItem) {
+    this.dateSchedule = scheduleDateItem;
+    this.showWhiteFrame = scheduleDateItem.showWhiteFrame && !!scheduleDateItem.daySchedules.length
+      && scheduleDateItem.daySchedules[0].scheduleType === ScheduleType.Book;
+  }
+
+  dateSchedule: ScheduleDateItem;
+
+  showWhiteFrame = false;
 
   firstSchedule: ScheduleItem;
 

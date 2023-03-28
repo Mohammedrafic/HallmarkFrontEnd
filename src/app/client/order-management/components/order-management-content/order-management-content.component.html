@@ -782,7 +782,8 @@
           <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
         </div>
       </div>
-      <div class="input-container">
+      <div class="input-container"
+           *ngIf="!isActiveSystemIRP">
         <label>Candidate Status</label>
         <div class="input-group multiselect">
           <ejs-multiselect
@@ -1185,6 +1186,7 @@
 
 <app-close-order
   [order]="selectedOrder"
+  [currentSystem]="activeSystem"
   [candidate]="selectedCandidate"
   (closeOrderSuccess)="updateOrderDetails($event)"
   (closePositionSuccess)="updatePositionDetails($event)"
