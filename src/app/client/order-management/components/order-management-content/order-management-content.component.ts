@@ -1698,7 +1698,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
     if (!(this.filters.isTemplate || this.isIncomplete)) {
       const statuses = this.filterColumns.orderStatuses.dataSource
-        .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed].includes(status.status))
+        .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed, FilterOrderStatusText.Incomplete].includes(status.status))
         .map((status: FilterStatus) => status.status);
       this.OrderFilterFormGroup.get('orderStatuses')?.setValue((this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses);
       this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
