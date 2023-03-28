@@ -1185,6 +1185,7 @@
 
 <app-close-order
   [order]="selectedOrder"
+  [currentSystem]="activeSystem"
   [candidate]="selectedCandidate"
   (closeOrderSuccess)="updateOrderDetails($event)"
   (closePositionSuccess)="updatePositionDetails($event)"

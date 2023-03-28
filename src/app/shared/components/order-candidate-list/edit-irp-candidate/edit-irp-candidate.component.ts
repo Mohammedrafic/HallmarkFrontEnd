@@ -55,6 +55,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   @Input() set handleOpenModal(modalState: EditCandidateDialogState) {
     if(modalState.isOpen) {
       this.candidateModelState = {...modalState};
+      this.isOnboarded = modalState.candidate.status === CandidatStatus.OnBoard;
       this.candidateDialog.show();
       this.getCandidateDetails();
     }
@@ -69,6 +70,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public candidateForm: CustomFormGroup<CandidateForm>;
   public disableSaveButton = false;
   public dialogConfig: ReadonlyArray<CandidateField>;
+  public isOnboarded = false;
 
   private candidateModelState: EditCandidateDialogState;
 
@@ -162,11 +164,12 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   private getCandidateDetails(): void {
     this.orderCandidateApiService.getIrpCandidateDetails(
-      this.candidateModelState.order.id, this.candidateModelState.candidate.candidateProfileId
-    ).pipe(
+      this.candidateModelState.order.id, this.candidateModelState.candidate.candidateProfileId)
+    .pipe(
         filter(Boolean),
-        takeUntil(this.componentDestroy())
-      ).subscribe((candidateDetails: CandidateDetails) => {
+        takeUntil(this.componentDestroy()),
+    )
+    .subscribe((candidateDetails: CandidateDetails) => {
       const statusConfigField = GetConfigField(this.dialogConfig, StatusField);
       const reasonConfigField = GetConfigField(this.dialogConfig, CloseReasonField);
       const reasons = this.store.selectSnapshot(RejectReasonState.closureReasonsPage)?.items;
