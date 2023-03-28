@@ -118,8 +118,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   public saveCandidate(): void {
-    if(this.candidateForm.valid && !this.candidateForm.get('isClosed')) {
-
+    if(this.candidateForm.valid && !this.candidateForm.get('isClosed')?.value) {
       this.editIrpCandidateService.getCandidateAction(this.candidateForm, this.candidateModelState)
       .pipe(
         catchError((error: HttpErrorResponse) => this.orderCandidateApiService.handleError(error)),
