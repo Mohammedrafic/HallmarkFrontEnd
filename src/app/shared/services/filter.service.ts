@@ -9,7 +9,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilteredUser, User } from '@shared/models/user.model';
 import { isBoolean, isDate, isEmpty, isNumber } from 'lodash';
-import { Observable } from 'rxjs';
+import { debounceTime, map, Observable } from 'rxjs';
 import { SetPreservedFilters, SetPreservedFiltersForTimesheets } from 'src/app/store/preserved-filters.actions';
 
 @Injectable({ providedIn: 'root' })
@@ -162,5 +162,12 @@ export class FilterService {
 
   public getUsersListBySearchTerm(searchTerm: string): Observable<FilteredUser[]> {
     return this.http.get<FilteredUser[]>('/api/UserSearch', { params: { searchTerm } });
+  }
+
+  public syncFilterTagsWithControls<T>(formGroup: FormGroup, filterColumns: T): Observable<FilteredItem[]> {
+    return formGroup.valueChanges.pipe(
+      debounceTime(300),
+      map(() => this.generateChips(formGroup, filterColumns))
+    );
   }
 }
