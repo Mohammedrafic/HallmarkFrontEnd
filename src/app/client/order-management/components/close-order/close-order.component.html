@@ -29,7 +29,7 @@
       format="MM/dd/yyyy"
       placeholder="MM/DD/YYYY"
     ></app-datepicker>
-    <div tabindex="0" class="e-card comments">
+    <div tabindex="0" class="e-card comments" *ngIf="currentSystem === systemTypes.VMS">
       <div class="e-card-content">
         <app-comments
           [comments]="comments"

@@ -30,6 +30,6 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.ORG]: OrgDetailsInfoModel;
   [WidgetTypeEnum.AGENCY_POSITION_COUNT]: AgencyPositionModel;
   [WidgetTypeEnum.RN_UTILIZATION]: RnUtilizationModel;
-  [WidgetTypeEnum.ALREADY_EXPIRED_CREDS] : ExpiryDetailsModel;
-  [WidgetTypeEnum.UPCOMING_EXP_CREDS] : ExpiryDetailsModel;
+  [WidgetTypeEnum.ALREADY_EXPIRED_CREDS] : ExpiryDetailsModel[];
+  [WidgetTypeEnum.UPCOMING_EXP_CREDS] : ExpiryDetailsModel[];
 }

@@ -27,7 +27,7 @@ import { analyticsConstants } from '../constants/analytics.constant';
 import { FilterService } from '@shared/services/filter.service';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
-import { AgencyDto, CandidateStatusDto, CommonReportFilter, CommonReportFilterOptions } from '../models/common-report.model';
+import { AgencyDto, CandidateStatusAndReasonFilterOptionsDto, CandidateStatusDto, CommonReportFilter, CommonReportFilterOptions } from '../models/common-report.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
@@ -131,11 +131,12 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-
+  private fixedCandidateStatusesIncluded: number[] = [1, 2, 3,4,5,8,9,13];
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  selectedCandidateStatuses: CandidateStatusDto[] = [];
+  selectedCandidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
+  candidateStatusesData:CandidateStatusAndReasonFilterOptionsDto[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
     message: string;
   constructor(private store: Store,
@@ -160,12 +161,12 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         if (data != null) {
           this.isAlive = false;
           this.filterOptionsData = data;
-          let notLoadingStatuses :string[]= ['Applied','Shortlisted','Rejected','Bill Rate Pending','Offered Bill Rate','Withdraw','Cancelled','Not Applied'];
+          //let notLoadingStatuses :string[]= ['Applied','Shortlisted','Rejected','Bill Rate Pending','Offered Bill Rate','Offboard','Withdraw','Cancelled','Not Applied'];
           
-          data.candidateStatuses=(data.candidateStatuses||[]).filter(f=>!(notLoadingStatuses).includes(f.statusText)) ;
-            this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
+          this.candidateStatusesData=data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
+            this.filterColumns.candidateStatuses.dataSource =this.candidateStatusesData;
               this.filterColumns.agencyIds.dataSource = data.agencies;
-             this.defaultCandidateStatuses = (data.candidateStatuses||[]).map((list) => list.status);
+             this.defaultCandidateStatuses = (this.candidateStatusesData||[]).map((list) => list.status);
              this.defaultAgencys = data.agencies.map((list) => list.agencyId);
               this.credentialExpiryForm.controls["candidateStatuses"].setValue(this.defaultCandidateStatuses.filter(f=>f !==90));
           if (this.isInitialLoad) {
@@ -286,10 +287,8 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
 
     this.candidateStatusesIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses) as AbstractControl;
     this.candidateStatusesIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedCandidateStatuses=[]
-      if (this.candidateStatusesIdControl.value.length > 0) {
-        let candidateStatusesData = this.filterOptionsData.candidateStatuses;
-        this.selectedCandidateStatuses = candidateStatusesData?.filter((object) => data?.includes(object.status));
+      if (this.candidateStatusesIdControl.value.length > 0) {       
+        this.selectedCandidateStatuses = this.candidateStatusesData?.filter((object) => data?.includes(object.status));
       }
     });
 
@@ -375,7 +374,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       "LocationParamCREXP": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentParamCREXP": departmentIds.length == 0 ? "null" : departmentIds,
       "AgencyParamCREXP": this.selectedAgencies.length ==0?"null":this.selectedAgencies?.map((list) => list.agencyId).join(","),
-      "CandidateStatusCREXP": this.selectedCandidateStatuses.length == 0 ? candidateStatuses : this.selectedCandidateStatuses?.map((list) => list.status).join(","),
+      "CandidateStatusCREXP": candidateStatuses.length == 0 ? "null" : candidateStatuses,
       "JobIdCREXP": jobId.trim() == "" ? "null" : jobId.trim(),
       "BearerParamCREXP":auth,
       "BusinessUnitIdParamCREXP":window.localStorage.getItem("lastSelectedOrganizationId") == null 

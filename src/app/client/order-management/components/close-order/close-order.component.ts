@@ -2,7 +2,7 @@ import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -22,6 +22,7 @@ import { Comment } from '@shared/models/comment.model';
 import { UserState } from 'src/app/store/user.state';
 import { SaveCloseOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { DateTimeHelper } from '@core/helpers';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-close-order',
@@ -31,6 +32,7 @@ import { DateTimeHelper } from '@core/helpers';
 export class CloseOrderComponent extends DestroyableDirective implements OnChanges, OnInit, OnDestroy {
   @Input() public order: Order | OrderManagement;
   @Input() candidate: OrderManagementChild;
+  @Input() currentSystem: OrderManagementIRPSystemId;
   @Output() private closeOrderSuccess: EventEmitter<Order | OrderManagement> = new EventEmitter<
     Order | OrderManagement>();
   @Output() private closePositionSuccess: EventEmitter<OrderManagementChild> = new EventEmitter<OrderManagementChild>();
@@ -43,6 +45,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   public readonly reasonFields: FieldSettingsModel = { text: 'reason', value: 'id' };
   public readonly datepickerMask = { month: 'MM', day: 'DD', year: 'YYYY' };
+  public readonly systemTypes = OrderManagementIRPSystemId;
   public maxDate: Date | null;
 
   public dialogTitleType: string;
@@ -58,7 +61,8 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     private actions: Actions,
     private closeOrderService: CloseOrderService,
     private confirmService: ConfirmService,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private cd: ChangeDetectorRef,
   ) {
     super();
   }
@@ -81,6 +85,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     this.initForm();
     this.subscribeOnCloseSideBar();
   }
+
   public override ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -137,6 +142,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   private getComments(): void {
     let entity;
+    this.comments = [];
     if (this.isPosition) {
       this.commentContainerId = this.candidate.commentContainerId as number;
       entity = this.candidate;
@@ -146,6 +152,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     }
     this.commentsService.getComments(entity.commentContainerId as number, null).subscribe((comments: Comment[]) => {
       this.comments = comments;
+      this.cd.markForCheck();
     });
   }
 

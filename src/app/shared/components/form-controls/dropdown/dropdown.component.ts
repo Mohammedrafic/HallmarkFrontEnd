@@ -4,6 +4,7 @@ import { BaseFormControlDirective } from '@shared/components/form-controls/base-
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
 import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { PopupEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 
 @Component({
   selector: 'app-dropdown',
@@ -19,6 +20,7 @@ export class DropdownComponent extends BaseFormControlDirective {
   @Input() public fields: FieldSettingsModel;
   @Input() public hideBorder = true;
   @Input() public allowFiltering = true;
+  @Input() public sortOrder: SortOrder = SortOrder.NONE;
 
   @Output() public openDropdown: EventEmitter<PopupEventArgs> = new EventEmitter();
 }

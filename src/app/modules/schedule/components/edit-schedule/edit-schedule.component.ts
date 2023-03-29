@@ -13,9 +13,7 @@ import {
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { Store } from '@ngxs/store';
-import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
-import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
+import { Store } from '@ngxs/store';import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { catchError, EMPTY, filter, map, Observable, Subscription, switchMap, take, takeUntil, tap, zip } from 'rxjs';
 
@@ -23,20 +21,20 @@ import { FieldType } from '@core/enums';
 import { DateTimeHelper, DestroyDialog } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
-import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_MODIFIED, RECORDS_ADDED } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { Skill } from '@shared/models/skill.model';
+import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ShiftsService } from '@shared/services/shift.service';
 import { getTime } from '@shared/utils/date-time.utils';
 import { ScheduleFormSourceKeys, ScheduleItemType, ScheduleTypes } from 'src/app/modules/schedule/constants';
 import { ScheduleType } from 'src/app/modules/schedule/enums';
 import { ShowToast } from 'src/app/store/app.actions';
-import { BookingsOverlapsRequest, BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
+import { UserState } from 'src/app/store/user.state';
 import {
   GetScheduleTabItems,
   GetShiftHours,
@@ -54,6 +52,7 @@ import {
   ScheduleTypeRadioButton,
 } from '../../interface';
 import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
+import { BookingsOverlapsRequest, BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
 import {
   EditScheduleFormSourceKeys,
   EditScheduleSourcesMap,
@@ -61,8 +60,8 @@ import {
   ScheduledShiftFormConfig,
   ScheduledUnavailabilityFormConfig,
 } from './edit-schedule.constants';
-import { CreateNewScheduleModeConfig, ShiftTab } from './edit-schedule.interface';
 import * as EditSchedule from './edit-schedule.interface';
+import { CreateNewScheduleModeConfig, ShiftTab } from './edit-schedule.interface';
 import { EditScheduleService } from './edit-schedule.service';
 
 @Component({
@@ -137,6 +136,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
 
   ngOnInit(): void {
     this.watchForCloseStream();
+    this.setScheduleTypes();
   }
 
   closeScheduleDialog(): void {
@@ -205,11 +205,10 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     this.setHours(startTimeDate, endTimeDate);
   }
 
-  changeScheduleType(event: ChangeArgs): void {
-    const type = event.value as unknown as ScheduleItemType;
+  changeScheduleType(type: ScheduleItemType): void {
     const patchData = {} as EditSchedule.ScheduledShiftForm;
 
-    this.scheduleItemType = event.value as unknown as ScheduleItemType;
+    this.scheduleItemType = type;
 
     if (type === ScheduleItemType.Book) {
       this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.createModeConfig.createModeEnabled);
@@ -444,6 +443,13 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   private createBookFormForNewTab(): void {
+    // TODO: temporary solution, will be refactored in the permission story
+    if (this.store.selectSnapshot(UserState.user)?.isEmployee) {
+      this.scheduleTypesControl.setValue(ScheduleItemType.Unavailability);
+      this.changeScheduleType(ScheduleItemType.Unavailability);
+      return;
+    }
+
     this.updateDataSource();
     this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.createModeConfig.createModeEnabled);
     this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
@@ -620,7 +626,13 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
 
   private createBookSchedule(): Observable<ScheduleBookingErrors[]> {
     return this.scheduleApiService.createBookSchedule(this.scheduleToBook as ScheduleBook).pipe(
-      catchError((error: HttpErrorResponse) => this.createScheduleService.handleErrorMessage(error)),
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
     );
+  }
+
+  private setScheduleTypes(): void {
+    if (this.store.selectSnapshot(UserState.user)?.isEmployee) {
+      this.scheduleTypes = ScheduleTypes.filter((type: ScheduleTypeRadioButton) => type.value !== ScheduleItemType.Book);
+    }
   }
 }

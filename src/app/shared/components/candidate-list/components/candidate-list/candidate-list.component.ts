@@ -173,6 +173,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.CandidateFilterFormGroup = !this.isIRP ? this.candidateListService.generateVMSCandidateFilterForm() : this.candidateListService.generateIRPCandidateFilterForm();
     this.subscribeOnOrgStructure();
     this.subscribeOnLocationChange();
+    this.syncFilterTagsWithControls();
   }
 
   ngOnDestroy(): void {
@@ -196,10 +197,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.filters.regionsNames = this.filters.regionsNames || [];
     this.filters.skillsIds = this.filters.skillsIds || [];
     this.filters.candidateName = this.filters.candidateName || null;
-    this.filteredItems = this.filterService.generateChips(this.CandidateFilterFormGroup, this.filterColumns);
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
-    this.filteredItems$.next(this.filteredItems.length);
     this.filterService.setPreservedFIltersGlobal(this.filters);
   }
 
@@ -209,16 +208,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       if (preservedFilters?.regions) {
         this.CandidateFilterFormGroup.get('regionsNames')?.setValue([...preservedFilters.regions]);
         this.filters.regionsNames = [...preservedFilters.regions];
-        this.filteredItems = this.filterService.generateChips(this.CandidateFilterFormGroup, this.filterColumns);
-        this.filteredItems$.next(this.filteredItems.length);
       }
     }
   }
 
   public onFilterClose(): void {
     this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
-    this.filteredItems = this.filterService.generateChips(this.CandidateFilterFormGroup, this.filterColumns);
-    this.filteredItems$.next(this.filteredItems.length);
   }
 
   public showCandidateStatus(status: number): boolean {
@@ -418,7 +413,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
-    this.filteredItems$.next(this.filteredItems.length);
   }
 
   private dispatchInitialIcon(): void {
@@ -581,5 +575,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
           takeUntil(this.unsubscribe$)
           ).subscribe();
     }
+  }
+
+  private syncFilterTagsWithControls(): void {
+    this.filterService
+      .syncFilterTagsWithControls(this.CandidateFilterFormGroup, this.filterColumns)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((filteredItems) => {
+        this.filteredItems = filteredItems;
+        this.filteredItems$.next(this.filteredItems.length);
+      });
   }
 }

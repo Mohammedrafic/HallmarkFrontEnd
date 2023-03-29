@@ -143,6 +143,10 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
     &.e-disabled {
       background-color: $secondary-dark-blue-50 !important;
       color: $secondary-dark-blue-30 !important;
+
+      &:hover {
+        border-color: $secondary-dark-blue-40 !important;
+      }
     }
   }
 }

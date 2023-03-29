@@ -337,7 +337,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       expAsTravelers: new FormControl(''),
       guaranteedWorkWeek: new FormControl('', [Validators.maxLength(200)]),
       offeredStartDate: new FormControl(''),
-      candidatePayRate: new FormControl(null)
+      candidatePayRate: new FormControl(null),
+      clockId: new FormControl(null),
     });
   }
 
@@ -357,6 +358,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       guaranteedWorkWeek: data.guaranteedWorkWeek,
       offeredStartDate: DateTimeHelper.formatDateUTC(data.offeredStartDate || data.order.jobStartDate.toString(), 'MM/dd/yyyy'),
       candidatePayRate: data.candidatePayRate,
+      clockId: data.clockId,
     });
   }
 

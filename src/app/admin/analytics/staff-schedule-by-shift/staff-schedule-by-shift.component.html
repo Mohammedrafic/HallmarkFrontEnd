@@ -58,7 +58,7 @@
             mode="CheckBox"
             formControlName="regionIds"
             appValidateWithMessage
-            placeholder="All"
+            [placeholder]="allOption"
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.regionIds.dataSource"
@@ -94,13 +94,92 @@
             mode="CheckBox"
             formControlName="departmentIds"
             appValidateWithMessage
-            placeholder="All"
+            [placeholder]="allOption"
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.departmentIds.dataSource"
             [fields]="departmentFields"
           >
           </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="group">
+        <div class="input-container bootstrap">
+          <label>Skill</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="skillIds"
+              appValidateWithMessage
+              placeholder="All"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.skillIds.dataSource"
+              [fields]="commonFields"
+            >
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container bootstrap">
+          <label>Scheduled Shifts</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="shiftIds"
+              appValidateWithMessage
+              placeholder="All"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.shiftIds.dataSource"
+              [fields]="commonFields"
+            >
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="group">
+        <div class="input-container bootstrap">
+          <label>Work Commitment</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="workCommitmentIds"
+              appValidateWithMessage
+              placeholder="All"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.workCommitmentIds.dataSource"
+              [fields]="commonFields"
+            >
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container bootstrap">
+          <label></label>
+          <div class="input-group dropdown">
+            <ejs-checkbox formControlName="isLongTerm" label="Is Long Term?"></ejs-checkbox>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
+        <label>Employee Name</label>
+        <div class="input-group dropdown">
+          <ejs-autocomplete
+            formControlName="employeeName"
+            [dataSource]="filterColumns.employeeName.dataSource"
+            filterType="StartsWith"
+            [fields]="candidateNameFields"
+            [autofill]="true"
+            [placeholder]="remoteWaterMark"
+            sortOrder="Ascending"
+            (filtering)="onFiltering($event)"
+          ></ejs-autocomplete>
         </div>
       </div>
     </div>
@@ -139,3 +218,4 @@
     </div>
   </form>
 </app-filter-dialog>
+
