@@ -50,18 +50,18 @@
     </div>
   </div>
   <div class="wrapper">
-      <div class="input-container bootstrap f-grow-2">
-        <label>Department</label>
-        <div class="input-group">
-          <input appValidateWithMessage formControlName="departmentName" class="e-input" type="text" />
-        </div>
+    <div class="input-container bootstrap f-grow-2">
+      <label>Department</label>
+      <div class="input-group">
+        <input appValidateWithMessage formControlName="departmentName" class="e-input" type="text" />
       </div>
-      <div class="input-container bootstrap">
-        <label class="input-group">Clock ID</label>
-        <div>
-          <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" maxlength="50"/>
-        </div>
+    </div>
+    <div class="input-container bootstrap">
+      <label class="input-group">Clock ID</label>
+      <div>
+        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" maxlength="50"/>
       </div>
+    </div>
     <div *ngIf="showHourlyRate">
       <div class="input-container bootstrap">
         <label class="input-group">Offered Bill Rate</label>

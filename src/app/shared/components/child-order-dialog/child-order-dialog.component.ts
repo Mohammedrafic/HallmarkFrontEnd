@@ -867,6 +867,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   private updateOrganisationCandidateJob(): void {
     const value = this.acceptForm.getRawValue();
+
     const candidateJob: AcceptJobDTO = {
       orderId: this.candidateJob?.orderId!,
       organizationId: this.candidateJob?.organizationId!,
@@ -881,6 +882,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         isEnabled: true
       },
     };
+
     this.store.dispatch(new UpdateOrganisationCandidateJob(candidateJob));
   }
 }
