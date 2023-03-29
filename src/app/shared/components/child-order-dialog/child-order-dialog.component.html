@@ -257,8 +257,8 @@
             </e-chips>
           </ejs-chiplist>
         </div>
-        <div class="e-card-content button-container" *ngIf="isOnboard && !isAgency">
-          <div class="input-group dropdown bootstrap input-readonly">
+        <div class="e-card-content button-container" *ngIf="(isOnboard || isCancelled) && !isAgency">
+          <div class="input-group dropdown bootstrap input-readonly" *ngIf="isOnboard">
             <ejs-dropdownlist
               [allowFiltering]="true"
               [fields]="optionFields"

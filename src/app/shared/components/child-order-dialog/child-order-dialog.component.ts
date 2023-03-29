@@ -69,6 +69,7 @@ import { OrderStatusText } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
 import { Comment } from '@shared/models/comment.model';
 import {
+  AcceptJobDTO,
   AgencyOrderManagement,
   Order,
   OrderCandidateJob,
@@ -485,8 +486,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     this.saveEmitter.emit();
   }
 
-
   public onSave(): void {
+    if (this.isCancelled) {
+      this.updateOrganisationCandidateJob();
+      return;
+    }
+
     this.saveHandler({ itemData: this.selectedApplicantStatus });
   }
 
@@ -701,6 +706,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     jobCancellation,
     reOrderDate,
     candidatePayRate,
+    clockId,
   }: OrderCandidateJob) {
 
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
@@ -725,7 +731,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       penaltyCriteria: PenaltiesMap[jobCancellation?.penaltyCriteria || 0],
       rate: jobCancellation?.rate,
       hours: jobCancellation?.hours,
-      candidatePayRate: candidatePayRate
+      candidatePayRate: candidatePayRate,
+      clockId: clockId,
     });
     this.enableFields();
   }
@@ -856,5 +863,24 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.isCandidatePayRateVisible = JSON.parse(CandidatePayRate);
         });
     }
+  }
+
+  private updateOrganisationCandidateJob(): void {
+    const value = this.acceptForm.getRawValue();
+    const candidateJob: AcceptJobDTO = {
+      orderId: this.candidateJob?.orderId!,
+      organizationId: this.candidateJob?.organizationId!,
+      jobId: this.candidateJob?.jobId!,
+      candidateBillRate: value.candidateBillRate,
+      candidatePayRate: value.candidatePayRate,
+      offeredBillRate: value.offeredBillRate,
+      clockId: value.clockId,
+      nextApplicantStatus: {
+        applicantStatus: ApplicantStatus.Cancelled,
+        statusText: "Cancelled",
+        isEnabled: true
+      },
+    };
+    this.store.dispatch(new UpdateOrganisationCandidateJob(candidateJob));
   }
 }
