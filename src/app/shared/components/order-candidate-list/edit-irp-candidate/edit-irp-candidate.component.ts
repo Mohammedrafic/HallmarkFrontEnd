@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
@@ -31,7 +31,7 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
   GetConfigField,
 } from '@shared/components/order-candidate-list/edit-candidate-list.helper';
-import { CandidateDetails, ClosePositionDto, EditCandidateDialogState,
+import { CandidateDetails, ClosePositionDto, EditCandidateDialogState, JobDetailsDto,
 } from '@shared/components/order-candidate-list/interfaces';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -42,6 +42,7 @@ import {
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { DurationService } from '@shared/services/duration.service';
 import { OrderType } from '@shared/enums/order-type';
+import { OrderCandidateJob } from '@shared/models/order-management.model';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -56,7 +57,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     if(modalState.isOpen) {
       this.candidateModelState = {...modalState};
       this.isOnboarded = modalState.candidate.status === CandidatStatus.OnBoard;
-      this.candidateDialog.show();
       this.getCandidateDetails();
     }
   }
@@ -84,11 +84,11 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     private durationService: DurationService,
   ) {
     super();
+    this.dialogConfig = CandidateDialogConfig();
+    this.candidateForm = this.editIrpCandidateService.createCandidateForm();
   }
 
   ngOnInit(): void {
-    this.dialogConfig = CandidateDialogConfig();
-    this.candidateForm = this.editIrpCandidateService.createCandidateForm();
     this.observeCloseControl();
     this.watchForActualDateValues();
   }
@@ -135,7 +135,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         CLOSE_IRP_POSITION,
         {
           title: DELETE_CONFIRM_TITLE,
-          okButtonLabel: 'Leave',
+          okButtonLabel: 'Close',
           okButtonClass: 'delete-button',
         })
         .pipe(
@@ -166,19 +166,43 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.candidateModelState.order.id, this.candidateModelState.candidate.candidateProfileId)
     .pipe(
         filter(Boolean),
+        tap((candidateDetails: CandidateDetails) => {
+          const statusConfigField = GetConfigField(this.dialogConfig, StatusField);
+          const reasonConfigField = GetConfigField(this.dialogConfig, CloseReasonField);
+          const reasons = this.store.selectSnapshot(RejectReasonState.closureReasonsPage)?.items;
+    
+          statusConfigField.dataSource = this.editIrpCandidateService
+          .createStatusOptions([...candidateDetails.availableStatuses ?? []]);
+          reasonConfigField.dataSource = this.editIrpCandidateService.createReasonsOptions(reasons || []);
+          this.candidateForm.patchValue({
+            actualStartDate: DateTimeHelper.convertDateToUtc(candidateDetails.actualStartDate as string),
+            actualEndDate: DateTimeHelper.convertDateToUtc(candidateDetails.actualEndDate as string),
+          }, { emitEvent: false, onlySelf: true });
+        }),
+        switchMap(() => {
+          if (this.candidateModelState.candidate.status === CandidatStatus.Cancelled
+            || this.candidateModelState.candidate.status === CandidatStatus.Offboard) {
+              const jobDto: JobDetailsDto = {
+                OrganizationId: this.candidateModelState.order.organizationId as number,
+                JobId: this.candidateModelState.candidate.candidateJobId,
+              };
+          
+            return this.orderCandidateApiService.getPositionDetails(jobDto)
+            .pipe(
+              tap((job) => {
+                this.setStatusSourceForDisabled(job.applicantStatus);
+                this.setCloseData(job);
+                this.disableDialogControls();
+              })
+            );
+          }
+
+          return of(null);
+        }),
         takeUntil(this.componentDestroy()),
     )
-    .subscribe((candidateDetails: CandidateDetails) => {
-      const statusConfigField = GetConfigField(this.dialogConfig, StatusField);
-      const reasonConfigField = GetConfigField(this.dialogConfig, CloseReasonField);
-      const reasons = this.store.selectSnapshot(RejectReasonState.closureReasonsPage)?.items;
-
-      statusConfigField.dataSource = this.editIrpCandidateService
-      .createStatusOptions([...candidateDetails.availableStatuses ?? []]);
-      reasonConfigField.dataSource = this.editIrpCandidateService.createReasonsOptions(reasons || []);
-      
-      this.candidateForm.patchValue(candidateDetails, { emitEvent: false, onlySelf: true });
-      this.disableCandidateControls();
+    .subscribe(() => {
+      this.candidateDialog.show();
       this.cdr.markForCheck();
     });
   }
@@ -202,18 +226,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           jobEndDate,
         });
 
-      this.candidateForm.get('actualEndDate')?.patchValue(actualEndDate,{emitEvent: false, onlySelf: true});
+      this.candidateForm.get('actualEndDate')?.patchValue(actualEndDate, { emitEvent: false, onlySelf: true });
     });
-  }
-
-  private disableCandidateControls(): void {
-    if(this.candidateModelState.candidate.status === CandidatStatus.Cancelled) {
-      this.candidateForm.disable();
-      this.disableSaveButton = true;
-    } else {
-      this.candidateForm.enable();
-      this.disableSaveButton = false;
-    }
   }
 
   private hideDialog(): void {
@@ -240,5 +254,31 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.candidateForm.updateValueAndValidity();
       this.cdr.markForCheck();
     });
+  }
+
+  private setStatusSourceForDisabled(jobStatus: {
+    applicantStatus: number;
+    statusText: string;
+  }): void {
+    const statusConfig = GetConfigField(this.dialogConfig, StatusField);
+
+    statusConfig.dataSource = [{
+      text: jobStatus.statusText,
+      value: jobStatus.applicantStatus,
+    }];
+  }
+
+  private setCloseData(job: OrderCandidateJob): void {
+    this.candidateForm.patchValue({
+      status: job.applicantStatus.applicantStatus,
+      isClosed: true,
+      reason: job.positionClosureReasonId,
+      closeDate: DateTimeHelper.convertDateToUtc(job.closeDate as string),
+    });
+  }
+
+  private disableDialogControls(): void {
+    this.disableSaveButton = true;
+    this.candidateForm.disable();
   }
 }
