@@ -1,16 +1,15 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, ChangeDetectorRef, Inject, OnChanges } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { CustomFormGroup } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
-import { Actions, Select, Store } from '@ngxs/store';
-import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
-import { Observable } from 'rxjs';
-import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
-import { UserState } from '../../../store/user.state';
+import { Select, Store } from '@ngxs/store';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { RnUtilizationModel } from '../../models/rnutilization.model';
-import { DashboardService } from '../../services/dashboard.service';
 import { GetAllCommitmentByPage } from '../../store/dashboard.actions';
 import { DashboardState } from '../../store/dashboard.state';
-import { DefaultOptionFields } from './rn-utilization.constants';
+import { RnUtilizationFormService } from './rn-utilization-widget-service';
+import { ACTUALPERDIEMHOURS, DefaultOptionFields, MASKPLACEHOLDER, NOOFPERDIEMORDERS, TARGETPERDIEMHOURS } from './rn-utilization.constants';
+import { RnUtilizationForm } from './rn-utilization.interface';
 import { GetWorkCommitment } from './rn-utilization.model';
 
 @Component({
@@ -19,52 +18,57 @@ import { GetWorkCommitment } from './rn-utilization.model';
   styleUrls: ['./rn-utilization-widget.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RnUtilizationWidgetComponent   implements OnInit {
+export class RnUtilizationWidgetComponent implements OnInit {
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean | false;
   @Input() public description: string;
   @Input() public chartData: RnUtilizationModel | undefined;
-  
+
+  private unsubscribe$: Subject<void> = new Subject();
+
   @Select(DashboardState.commitmentsPage)
   public commitmentsPage$: Observable<GetWorkCommitment[]>;
 
-  public noofPerDiemOrders:string=" No. of active RNs as per the Employee Dept. Details screen.";
-  public targetPerDiemhrs:string="(Annual working hours divided by no. of days in current year) * Utilization * No. of active RNs.";
-  public actualPerDiemhrs:string="Actual no. of hours scheduled for RNs in the given date";
+  public noofPerDiemOrders: string = NOOFPERDIEMORDERS;
+  public targetPerDiemhrs: string = TARGETPERDIEMHOURS;
+  public actualPerDiemhrs: string = ACTUALPERDIEMHOURS;
+  public maskPlaceholder: string = MASKPLACEHOLDER;
   public readonly optionFields = DefaultOptionFields;
+  public rnUtilizationform: CustomFormGroup<RnUtilizationForm>;
+
   public allOption: string = "All";
   public commitmentsPageData$: Observable<GetWorkCommitment[]>;
-  rnUtilizationformgroup: FormGroup;
-  
-  constructor(private readonly dashboardService: DashboardService, private readonly fb: FormBuilder,
-    private actions$: Actions, 
+  public rnUtilizationformgroup: FormGroup;
+
+  constructor(private rnUtilizationService: RnUtilizationFormService, private readonly fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     protected store: Store,
-    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis) { 
-      const user = this.store.selectSnapshot(UserState.user);
-      if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
-        
-      }  }
- 
-   ngOnInit(): void {
-    this.rnUtilizationformgroup=this.fb.group({
-      workDate: [new Date()],
-      workcommitIds: []
-    })
-    this.store.dispatch(new GetAllCommitmentByPage())
-    .pipe()
-    .subscribe((result) => {
-     let Ids=(result.dashboard.commitmentsPage||[]).map((m: { id: number; })=>m.id)
-     this.rnUtilizationformgroup.controls['workcommitIds'].setValue(Ids)
-    });
+    @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis) {
+    this.rnUtilizationform = this.rnUtilizationService.getNursingUtilizationForm();
   }
-  public toSourceContent(orgname: string): void {
+
+  ngOnInit(): void {
+    this.getWorkCommitment();
+  }
+
+  public getWorkCommitment() {
+    this.store.dispatch(new GetAllCommitmentByPage())
+      .pipe(takeUntil(this.unsubscribe$),)
+      .subscribe((result) => {
+        let Ids = (result.dashboard.commitmentsPage || []).map((m: { id: number; }) => m.id)
+        this.rnUtilizationform.controls['workcommitIds'].setValue(Ids)
+      });
+  }
+
+  public getNursingPercentage()
+  {
+  }
+  public onWorkcommitmentSelect(event: any) {
    
   }
-  public toTimesheetcontent(orgId : number):void{
-    
+  public onDatechange(event: any)
+  {
+
   }
-  public defineMousePosition($event: MouseEvent): void {
-  
-  }
+
 }
