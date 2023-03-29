@@ -489,10 +489,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public onSave(): void {
     if (this.isCancelled) {
       this.updateOrganisationCandidateJob();
-      return;
+    } else {
+      this.saveHandler({ itemData: this.selectedApplicantStatus });
     }
-
-    this.saveHandler({ itemData: this.selectedApplicantStatus });
   }
 
   public onStatusChange(event: { itemData: ApplicantStatusModel | null }): void {
