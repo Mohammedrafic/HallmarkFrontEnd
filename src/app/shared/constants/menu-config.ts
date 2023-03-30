@@ -403,6 +403,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
     },
+    89: {
+      // Finance Medicare Wage Report
+      icon: '',
+      route: '/analytics/finance-medicare-wage-report',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -967,6 +972,11 @@ export const MENU_CONFIG: any = {
       // Staff Schedule By Shift Report
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
+    },
+    89: {
+      // Finance Medicare Wage Report
+      icon: '',
+      route: '/analytics/finance-medicare-wage-report',
     },
   },
 
