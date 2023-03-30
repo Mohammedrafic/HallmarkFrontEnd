@@ -127,7 +127,7 @@
       <div class="input-container bootstrap f-grow-2">
         <label>SSN<span class="required">*</span></label>
         <div class="input-group">
-          <input appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='000-00-0000' />
+          <input appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" />
         </div>
       </div>
       <div class="input-container"></div>
