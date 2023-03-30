@@ -48,7 +48,7 @@
 .orgname {
     text-align: left;
     white-space: nowrap;
-    color: #3E7FFF;
+    color: $primary-active-blue-10;
     cursor: pointer;
     font-size: 13px;
     width: max-content;
@@ -76,16 +76,17 @@
     justify-content: space-between;
     align-items: center;
     padding-right: 10px;
+    flex-direction: column;
 }
 
 .input-sec span {
-    width: 45%;
+    width: 100%;
     height: auto;
 }
 p.hours-rn {
     padding: 6px 0px;
     display: block;
-    background: #ccc;
+    background: $grey-secondary;
     width: 90%;
     border-radius: 10px;
     margin: auto;
@@ -97,7 +98,7 @@ p.hours-rn {
 .e-input.widgeticon
 {
   width: 50px;
-  border:1px solid #3E7FFF;
+  border:1px solid $primary-active-blue-10;
   border-radius: 5px;
 }
 
@@ -118,4 +119,17 @@ input.e-input-filter.e-input {
   height: 24px;
   font-size: 14px;
   color: $secondary-dark-blue-15;
+}
+.e-multi-select-wrapper.e-down-icon {
+  width: 200px;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+span.e-input-group-icon.e-ddl-icon {
+  width: auto;
+}
+input.e-input.widgeticon:focus {
+  border-width:2px !important;
 }

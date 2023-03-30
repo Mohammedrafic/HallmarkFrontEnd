@@ -34,9 +34,10 @@
             <app-dropdown
               [dataSource]="workCommitments"
               [fields]="commitmentFields"
-              class="control-field"
+              [sortOrder]="sortOrder.ASCENDING"
               [formGroupInstance]="candidateWorkCommitmentForm"
               [hideBorder]="false"
+              class="control-field"
               label="Work Commitment"
               id="workCommitmentId"
               controlName="workCommitmentId"
@@ -74,7 +75,7 @@
           <div class="row">
             <app-input
               [formGroupInstance]="candidateWorkCommitmentForm"
-              maxlength="100"
+              maxlength="20"
               controlName="jobCode"
               class="control control-field"
               id="jobCode"
@@ -97,6 +98,10 @@
             <app-numeric-textbox
               [formGroupInstance]="candidateWorkCommitmentForm"
               [htmlAttributes]="numericInputAttributes"
+              [min]="0"
+              [maxLength]="10"
+              [decimals]="3"
+              [format]="formatPayRate"
               id="payRate"
               class="control-field"
               controlName="payRate"
@@ -107,42 +112,50 @@
           <div class="row">
             <app-numeric-textbox
               [formGroupInstance]="candidateWorkCommitmentForm"
+              [min]="0"
+              [maxLength]="10"
+              [decimals]="1"
+              [format]="format"
               class="control control-field"
               id="availRequirement"
               controlName="availRequirement"
               label="Avail. Requirement (h)"
-              [format]="format"
-              [decimals]="0"
             ></app-numeric-textbox>
             <app-numeric-textbox
               [formGroupInstance]="candidateWorkCommitmentForm"
+              [min]="0"
+              [maxLength]="10"
+              [decimals]="0"
+              [format]="format"
               class="control-field"
               id="schedulePeriod"
               controlName="schedulePeriod"
               label="Schedule Period (weeks)"
-              [format]="format"
-              [decimals]="0"
             ></app-numeric-textbox>
           </div>
 
           <div class="row">
             <app-numeric-textbox
               [formGroupInstance]="candidateWorkCommitmentForm"
+              [min]="0"
+              [format]="format"
+              [maxLength]="10"
+              [decimals]="1"
               class="control control-field"
               id="minWorkExperience"
               controlName="minWorkExperience"
               label="Min. Work Experience"
-              [format]="format"
-              [decimals]="0"
             ></app-numeric-textbox>
             <app-numeric-textbox
               [formGroupInstance]="candidateWorkCommitmentForm"
+              [min]="0"
+              [maxLength]="10"
+              [format]="format"
+              [decimals]="0"
               id="criticalOrder"
               class="control control-field"
               controlName="criticalOrder"
               label="Critical Order"
-              [format]="format"
-              [decimals]="0"
             ></app-numeric-textbox>
             <app-dropdown
               [dataSource]="holidays"
@@ -159,7 +172,7 @@
           <div>
             <app-input
               [formGroupInstance]="candidateWorkCommitmentForm"
-              maxlength="100"
+              maxlength="200"
               controlName="comment"
               id="comment"
               label="Comment"

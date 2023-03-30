@@ -115,7 +115,7 @@
             >
 
               <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
-                <app-schedule-card [dateSchedule]="dateSchedule"></app-schedule-card>
+                <app-schedule-card [scheduleDateItem]="dateSchedule"></app-schedule-card>
               </ng-container>
 
               <ng-template #disabledCell>

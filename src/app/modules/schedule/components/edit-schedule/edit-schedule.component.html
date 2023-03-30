@@ -46,7 +46,7 @@
             <div class="input-group radio">
               <app-tooltip-container [showToolTip]="type.disabled">
                 <ejs-radiobutton
-                  (change)="changeScheduleType($event)"
+                  (change)="changeScheduleType($event.value)"
                   [formControl]="scheduleTypesControl"
                   [label]="type.label"
                   [value]="type.value"

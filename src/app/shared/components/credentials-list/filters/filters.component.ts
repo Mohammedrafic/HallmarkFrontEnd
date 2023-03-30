@@ -36,6 +36,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
 
   @Input() public isCredentialSettings = false;
   @Input() public isMspUser = false;
+  @Input() public totalDataRecords = 0;
 
   @Output() public handleClearFilters: EventEmitter<number> = new EventEmitter();
   @Output() public handleApplyFilters: EventEmitter<void> = new EventEmitter();
@@ -43,7 +44,6 @@ export class FiltersComponent extends Destroyable implements OnInit {
   public optionFields: FieldSettingsModel = OptionFields;
   public credentialsFilters: FormGroup;
   public filteredItems: FilteredItem[] = [];
-  public totalDataRecords: number;
   public filterColumns: FilterColumnsModel;
   public selectedSystem: SelectedSystemsFlag;
   public isIrpFlagEnabled = false;

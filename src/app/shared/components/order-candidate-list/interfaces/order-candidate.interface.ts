@@ -36,3 +36,8 @@ export interface ClosePositionDto {
   reasonId: number;
   closingDate: string;
 }
+
+export interface JobDetailsDto {
+  OrganizationId: number;
+  JobId: number;
+}

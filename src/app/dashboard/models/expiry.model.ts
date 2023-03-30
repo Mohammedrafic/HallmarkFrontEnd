@@ -3,5 +3,6 @@ export interface ExpiryDetailsModel {
     total : number;
     value : number;
     typeId : number;
+    mode: string;
 }
 

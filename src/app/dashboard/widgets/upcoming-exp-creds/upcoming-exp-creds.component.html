@@ -1,26 +1,27 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
     <ng-template #header>
       <div class="app-accumulation-chart__title">
-        <h3 class="widget-header__title">Upcoming Expiring Credentials</h3>
+        <h3 class="widget-header__title">Expiring Credentials <small>in 30 days</small></h3>
       </div>
       <div class="app-widget-wrapper__tooltip" *ngIf="description.length > 0">
         <ejs-tooltip [content]="description" position='TopCenter'>
-          <span class="mytooltip">
-            <img src="assets/icons/expiryicon1.png"  alt="coll" class="icon" ></span>
+          <span class="icon-tooltip">
+            🟡
+          </span>
         </ejs-tooltip>
       </div>
-    
+
   </ng-template>
   <ng-template #upcoming_exp_creds>
     <div class="widget" *ngFor="let data of expirydata">
       <span class="widget__type">
-        <p class="orgname">{{data.name}}</p><p class="orgcount">{{data.total}}</p>
+        <p class="orgname">{{data.name}}</p><p class="orgcount">{{data.value}} / {{data.total}}</p>
       </span>
-      <ejs-progressbar #upcoming{{data.name}} id=upcoming{{data.name}} [type]='type' [maximum]='max' [minimum]='min' [value]=data.value
+      <ejs-progressbar #upcoming{{data.name}} id=upcoming{{data.name}} [type]='type' [maximum]='data.total' [minimum]='min' [value]=data.value
         [width]='width' [trackThickness]='trackThickness' [progressColor]=data.progressColor [progressThickness]='progressThickness'
         [height]='height'  [animation]='animation'
          (load)='load($event)'>
-      </ejs-progressbar>  
+      </ejs-progressbar>
     </div>
   </ng-template>
   </app-widget-wrapper>
