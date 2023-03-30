@@ -30,6 +30,9 @@
       <e-column field="email" headerText="email" width=250>
       </e-column>
       <e-column field="ssn" headerText="ssn" width=250>
+        <ng-template #template let-data>
+          {{ data.ssn != null ? "XXX-XX-" + data.ssn.toString().substr(data.ssn.toString().length - 4):"" }}
+        </ng-template>
       </e-column>
       <e-column field="dnrStatus" headerText="dnrstatus" width=250>
       </e-column>

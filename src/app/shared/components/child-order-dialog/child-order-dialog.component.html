@@ -101,7 +101,7 @@
                 <hr />
                 <section class="candidate">
                   <ng-container [ngSwitch]="selectedTemplate" *ngIf="!order?.extensionFromId; else extensionCandidate">
-                    <ng-container *ngSwitchCase="template.onboarded">
+                    <ng-container *ngSwitchCase="candidateTemplate.onboarded">
                       <app-onboarded-candidate
                         *ngIf="!isReorderType"
                         [candidate]="$any(candidate)"
@@ -120,7 +120,7 @@
                       </section>
                     </ng-container>
 
-                    <ng-container *ngSwitchCase="template.accept">
+                    <ng-container *ngSwitchCase="candidateTemplate.accept">
                       <app-accept-candidate
                         *ngIf="!isReorderType"
                         [candidate]="$any(candidate)"
@@ -137,7 +137,7 @@
                       </section>
                     </ng-container>
 
-                    <ng-container *ngSwitchCase="template.apply">
+                    <ng-container *ngSwitchCase="candidateTemplate.apply">
                       <app-apply-candidate
                         [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
                         [candidate]="$any(candidate)"
@@ -150,7 +150,7 @@
                       </app-apply-candidate>
                     </ng-container>
 
-                    <ng-container *ngSwitchCase="template.offerDeployment">
+                    <ng-container *ngSwitchCase="candidateTemplate.offerDeployment">
                       <app-offer-deployment
                         [candidate]="$any(candidate)"
                         [isTab]="true"
@@ -257,8 +257,8 @@
             </e-chips>
           </ejs-chiplist>
         </div>
-        <div class="e-card-content button-container" *ngIf="isOnboard && !isAgency">
-          <div class="input-group dropdown bootstrap input-readonly">
+        <div class="e-card-content button-container" *ngIf="(isOnboard || isCancelled) && !isAgency">
+          <div class="input-group dropdown bootstrap input-readonly" *ngIf="isOnboard">
             <ejs-dropdownlist
               [allowFiltering]="true"
               [fields]="optionFields"
