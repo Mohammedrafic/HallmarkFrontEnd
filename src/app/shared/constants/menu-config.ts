@@ -408,7 +408,7 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/finance-medicare-wage-report',
     },
-  },
+
     88: {
       // Staff List Report
       icon: '',
