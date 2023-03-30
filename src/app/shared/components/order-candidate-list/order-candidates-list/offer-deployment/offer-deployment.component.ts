@@ -72,8 +72,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
-  @Input() isTab: boolean = false;
-  @Input() isAgency: boolean = false;
+  @Input() isTab = false;
+  @Input() isAgency = false;
   @Input() actionsAllowed: boolean;
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
@@ -373,7 +373,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private subscribeOnInitialData(): void {
-    this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrderCandidateJob) => {
+    this.candidateJobState$
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe((data: OrderCandidateJob) => {
       this.candidateJob = data;
 
       if (data) {

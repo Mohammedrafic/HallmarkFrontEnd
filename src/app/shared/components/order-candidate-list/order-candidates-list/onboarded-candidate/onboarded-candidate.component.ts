@@ -144,7 +144,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   get isCancelled(): boolean {
-    return this.candidateStatus === ApplicantStatusEnum.Cancelled;
+    return this.candidateStatus === ApplicantStatusEnum.Cancelled || this.candidateStatus === ApplicantStatusEnum.Offboard;
   }
 
   get isDeployedCandidate(): boolean {

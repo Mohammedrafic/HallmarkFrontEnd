@@ -74,6 +74,7 @@ import {
   OrderCandidateJob,
   OrderFilter,
   OrderManagementChild,
+  ApplicantStatus as ApplicantStatusModel,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
@@ -92,7 +93,6 @@ import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
-import { ApplicantStatus as ApplicantStatusModel } from '@shared/models/order-management.model';
 import { SettingsViewService } from '@shared/services';
 
 enum Template {
@@ -160,7 +160,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
   public selectedTemplate: Template | null;
-  public template = Template;
+  public candidateTemplate = Template;
   public isAgency: boolean;
   public isOrganization: boolean;
   public selectedOrder$: Observable<Order>;
@@ -242,6 +242,14 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       || !!this.selectedOrder?.orderClosureReason;
   }
 
+  get canReOpen(): boolean {
+    return (
+      this.candidate?.orderStatus !== OrderStatus.Closed &&
+      Boolean(this.candidate?.positionClosureReasonId) &&
+      !this.isAgency
+    );
+  }
+
   constructor(
     private chipsCssClass: ChipsCssClass,
     private router: Router,
@@ -306,24 +314,16 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     this.isAlive = false;
   }
 
-  setCloseOrderButtonState(): void {
+  public setCloseOrderButtonState(): void {
     this.disabledCloseButton =
       !!this.candidate?.positionClosureReasonId ||
       this.candidate.orderStatus !== OrderStatus.Filled ||
       !!this.order?.orderCloseDate;
   }
 
-  closeOrder(order: MergedOrder): void {
+  public closeOrder(order: MergedOrder): void {
     this.store.dispatch(new ShowCloseOrderDialog(true, true));
     this.order = { ...order };
-  }
-
-  get canReOpen(): boolean {
-    return (
-      this.candidate?.orderStatus !== OrderStatus.Closed &&
-      Boolean(this.candidate?.positionClosureReasonId) &&
-      !this.isAgency
-    );
   }
 
   public reOpenPosition(): void {
@@ -397,7 +397,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     }
   }
 
-  getBillRateForUpdate(value: BillRate): BillRate[] {
+  public getBillRateForUpdate(value: BillRate): BillRate[] {
     let billRates;
     const existingBillRateIndex = this.candidateJob?.billRates.findIndex(
       (billRate) => billRate.id === value.id
@@ -485,7 +485,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     this.saveEmitter.emit();
   }
 
-
   public onSave(): void {
     this.saveHandler({ itemData: this.selectedApplicantStatus });
   }
@@ -523,16 +522,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     this.selectedApplicantStatus = null;
   }
 
-  private closeSideDialog(): void {
-    this.tab.select(0);
-    this.sideDialog.hide();
-    this.openEvent.next(null);
-    this.selectedTemplate = null;
-    this.jobStatusControl.reset();
-    this.selectedApplicantStatus = null;
-    this.orderCandidateListViewService.setIsCandidateOpened(false);
-  }
-
   public onMobileMenuSelect({ item: { text } }: MenuEventArgs): void {
     switch (text) {
       case MobileMenuItems.AddExtension:
@@ -548,6 +537,21 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       default:
         break;
     }
+  }
+
+  public clearCandidateJobState(): void {
+    const ClearCandidateJob = this.isAgency ? ClearAgencyCandidateJob : ClearOrganisationCandidateJob;
+    this.store.dispatch(new ClearCandidateJob());
+  }
+
+  private closeSideDialog(): void {
+    this.tab.select(0);
+    this.sideDialog.hide();
+    this.openEvent.next(null);
+    this.selectedTemplate = null;
+    this.jobStatusControl.reset();
+    this.selectedApplicantStatus = null;
+    this.orderCandidateListViewService.setIsCandidateOpened(false);
   }
 
   private saveExtensionChanges(): Observable<boolean> {
@@ -607,12 +611,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           ApplicantStatus.Shortlisted,
           ApplicantStatus.PreOfferCustom,
           ApplicantStatus.Offered,
-          ApplicantStatus.Offboard,
         ];
         const allowedOnboardedStatuses = [
           ApplicantStatus.Accepted,
           ApplicantStatus.OnBoarded,
           ApplicantStatus.Cancelled,
+          ApplicantStatus.Offboard,
         ];
 
         if (allowedOfferDeploymentStatuses.includes(this.candidate.candidateStatus)) {
@@ -809,11 +813,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private clearOrderCandidateList(): void {
     const ClearCandidatesList = this.isAgency ? ClearAgencyOrderCandidatesList : ClearOrderCandidatePage;
     this.store.dispatch(new ClearCandidatesList());
-  }
-
-  public clearCandidateJobState(): void {
-    const ClearCandidateJob = this.isAgency ? ClearAgencyCandidateJob : ClearOrganisationCandidateJob;
-    this.store.dispatch(new ClearCandidateJob());
   }
 
   private showMissingCredentialsWarningMessage(): void {
