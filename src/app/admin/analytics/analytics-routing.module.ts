@@ -1,3 +1,4 @@
+import { StaffListComponent } from './staff-list/staff-list.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { OrganizationInvoicesContainerService } from '../../modules/invoices/services/invoices-container/organization-invoices-container.service';
@@ -325,6 +326,13 @@ const routes: Routes = [
       {
         path: 'staffschedulebyshift-irp',
         component: StaffScheduleByShiftComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'staff-list',
+        component: StaffListComponent,
         data: {
           isOrganizationArea: true,
         }

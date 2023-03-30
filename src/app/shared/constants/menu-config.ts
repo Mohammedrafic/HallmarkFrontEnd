@@ -403,6 +403,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
     },
+    88: {
+      // Staff List Report
+      icon: '',
+      route: '/analytics/staff-list',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -599,6 +604,11 @@ export const MENU_CONFIG: any = {
       // Staff Schedule By Shift Report
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
+    },
+    88: {
+      // Staff List Report
+      icon: '',
+      route: '/analytics/staff-list',
     },
   },
 
@@ -967,6 +977,11 @@ export const MENU_CONFIG: any = {
       // Staff Schedule By Shift Report
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
+    },
+    88: {
+      // Staff List Report
+      icon: '',
+      route: '/analytics/staff-list',
     },
   },
 

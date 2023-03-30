@@ -55,6 +55,7 @@ import { DailyOrderStatusComponent } from './daily-order-status/daily-order-stat
 import { CandidateStatusComponent } from './candidate-status/candidate-status.component';
 import { VendorActivityComponent } from './vendor-activity/vendor-activity.component';
 import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-schedule-by-shift.component';
+import { StaffListComponent } from './staff-list/staff-list.component';
 
 
 @NgModule({
@@ -101,7 +102,8 @@ import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-s
     DailyOrderStatusComponent,
     CandidateStatusComponent,
     VendorActivityComponent,
-    StaffScheduleByShiftComponent],
+    StaffScheduleByShiftComponent,
+    StaffListComponent],
   exports: [
     CandidateListComponent
   ],
