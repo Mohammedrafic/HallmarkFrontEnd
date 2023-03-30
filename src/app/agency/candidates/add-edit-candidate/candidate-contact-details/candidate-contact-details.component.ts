@@ -29,6 +29,41 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.addressFieldsValueChanges();
+   
+    this.formGroup.get('country')?.valueChanges.subscribe((country) => {
+      this.states$.next(country === Country.USA ? UsaStates : CanadaStates);
+      if(this.formGroup.value.country !== country){
+        this.dependentFieldsList.forEach(element => {
+          if(element !== 'country'){
+            this.formGroup.controls[element].setValue('');
+          }
+        });
+        this.formGroup.controls['address2'].setValue('');
+      }      
+    });
+  }
+
+  private setCountryState(): void {
+    const country = this.formGroup.value.country ?? Country.USA;
+    this.states$ = new BehaviorSubject(country === Country.USA ? UsaStates : CanadaStates);
+  }
+
+  static createFormGroup(): FormGroup {
+    return new FormGroup({
+      email: new FormControl(null, [Validators.required, Validators.email, Validators.maxLength(200)]),
+      country: new FormControl(null),
+      state: new FormControl(null),
+      city: new FormControl(null, [Validators.maxLength(20)]),
+      zip: new FormControl(null, [Validators.minLength(5), Validators.maxLength(6), Validators.pattern(ONLY_NUMBER)]),
+      address1: new FormControl(null, [Validators.maxLength(100)]),
+      address2: new FormControl(null, [Validators.maxLength(100)]),
+      phone1: new FormControl(null, [Validators.minLength(10), Validators.pattern(ONLY_NUMBER)]),
+      phone2: new FormControl(null, [Validators.minLength(10), Validators.pattern(ONLY_NUMBER)]),
+    });
+  }
+
+  private addressFieldsValueChanges() :void{
     this.formGroup.valueChanges.subscribe(data=>{
       let dependentValueList = [];
       
@@ -77,37 +112,6 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
           this.formGroup.controls['zip'].markAsTouched();
       }     
       
-    });
-
-    this.formGroup.get('country')?.valueChanges.subscribe((country) => {
-      this.states$.next(country === Country.USA ? UsaStates : CanadaStates);
-      if(this.formGroup.value.country !== country){
-        this.dependentFieldsList.forEach(element => {
-          if(element !== 'country'){
-            this.formGroup.controls[element].setValue('');
-          }
-        });
-        this.formGroup.controls['address2'].setValue('');
-      }      
-    });
-  }
-
-  private setCountryState(): void {
-    const country = this.formGroup.value.country ?? Country.USA;
-    this.states$ = new BehaviorSubject(country === Country.USA ? UsaStates : CanadaStates);
-  }
-
-  static createFormGroup(): FormGroup {
-    return new FormGroup({
-      email: new FormControl(null, [Validators.required, Validators.email, Validators.maxLength(200)]),
-      country: new FormControl(null),
-      state: new FormControl(null),
-      city: new FormControl(null, [Validators.maxLength(20)]),
-      zip: new FormControl(null, [Validators.minLength(5), Validators.maxLength(6), Validators.pattern(ONLY_NUMBER)]),
-      address1: new FormControl(null, [Validators.maxLength(100)]),
-      address2: new FormControl(null, [Validators.maxLength(100)]),
-      phone1: new FormControl(null, [Validators.minLength(10), Validators.pattern(ONLY_NUMBER)]),
-      phone2: new FormControl(null, [Validators.minLength(10), Validators.pattern(ONLY_NUMBER)]),
     });
   }
 }
