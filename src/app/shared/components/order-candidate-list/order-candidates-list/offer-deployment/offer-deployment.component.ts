@@ -253,11 +253,11 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
       this.onReject();
     } else {
-      this.offerCandidate(event.itemData, reloadJob);
+      this.offerCandidate(reloadJob);
     }
   }
 
-  private offerCandidate(applicantStatus: ApplicantStatus | null, reloadJob: boolean): void {
+  private offerCandidate( reloadJob: boolean): void {
     if (!this.formGroup.errors && this.candidateJob) {
       this.shouldChangeCandidateStatus()
         .pipe(take(1))
@@ -276,7 +276,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                   requestComment: this.candidateJob.requestComment,
                   actualStartDate: this.candidateJob.actualStartDate,
                   actualEndDate: this.candidateJob.actualEndDate,
-                  clockId: this.candidateJob.clockId,
+                  clockId: value.clockId,
                   guaranteedWorkWeek: value.guaranteedWorkWeek,
                   offeredStartDate: DateTimeHelper.toUtcFormat(new Date(value.offeredStartDate)),
                   allowDeployWoCredentials: true,

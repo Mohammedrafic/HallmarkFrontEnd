@@ -28,7 +28,7 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
-        <button ejs-button class="save-button" cssClass="e-primary" (click)="onSave()" *ngIf="!isRejected && !isCancelled">
+        <button ejs-button class="save-button" cssClass="e-primary" (click)="onSave()" *ngIf="!isRejected">
           Save
         </button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
