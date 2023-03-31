@@ -95,15 +95,11 @@
           <div class="input-container">
             <label>Zipcode</label>
             <div class="input-group">
-              <ejs-maskedtextbox
-                class="e-input"
-                promptChar="_"
-                mask="00000"
-                appValidateWithMessage
-                formControlName="zip"
-                placeholder=" "
-                maxlength="6"
-              ></ejs-maskedtextbox>
+              <input appValidateWithMessage
+                     formControlName="zip"
+                     class="e-input text-uppercase"
+                     type="text"
+                     placeholder=" "/>
             </div>
           </div>
           <div class="input-container"></div>

@@ -26,4 +26,16 @@
   .f-grow-2 {
     flex-grow: 2;
   }
+
+  .text-uppercase{
+    text-transform: uppercase;
+  }
 }
+  ::ng-deep {
+   app-error-message{    
+        span.error {
+          white-space: nowrap;
+        }
+    }
+     
+  }
