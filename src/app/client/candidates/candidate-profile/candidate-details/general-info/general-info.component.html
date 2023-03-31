@@ -137,8 +137,8 @@
 
     <app-dropdown
       *ngIf="isTerminatedSelected"
-      [dataSource]="terminationReason"
-      [fields]="fieldsSettings"
+      [dataSource]="(reasons$ | async)?.items"
+      [fields]="fieldsSettingsTeminated"
       [formGroupInstance]="candidateForm"
       [hideBorder]="false"
       [required]="true"
