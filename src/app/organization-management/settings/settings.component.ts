@@ -89,6 +89,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public pushStartDateFormGroup: FormGroup;
   public invoiceGeneratingFormGroup: FormGroup;
   public switchedValueForm: FormGroup;
+  public checkboxValueForm: FormGroup;
   public formBuilder: FormBuilder;
 
   public readonly daysOfWeek = Days;
@@ -138,6 +139,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   public dropdownDataSource: OrganizationSettingsDropDownOption[];
   public dropdownFields: FieldSettingsModel = { text: 'value', value: 'key' };
+  public dropdownCheckboxValueDataSource: OrganizationSettingsDropDownOption[] = [{ text: 'Apply', value: 'Apply' }, { text: 'Accept', value: 'Accept' }];
+
 
   public organizationHierarchy: number;
   public organizationHierarchyId: number;
@@ -343,6 +346,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.isPushStartDateValid() &&
         this.invoiceAutoGeneratingValig()
         && this.switchedValueForm.valid
+        && this.checkboxValueForm.valid
       ) {
         this.sendForm();
       } else {
@@ -353,7 +357,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     } else {
       if (this.regionRequiredFormGroup.valid && this.isPushStartDateValid()
       && this.invoiceAutoGeneratingValig()
-      && this.switchedValueForm.valid) {
+        && this.switchedValueForm.valid
+        && this.checkboxValueForm.valid) {
         if (this.organizationSettingsFormGroup.valid) {
           this.sendForm();
         } else {
@@ -496,6 +501,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       case OrganizationSettingControlType.SwitchedValue:
         dynamicValue = JSON.stringify(this.createSwitchValuePayload());
         break;
+      case OrganizationSettingControlType.CheckboxValue:
+        dynamicValue = JSON.stringify(this.createCheckboxValuePayload());
+        break;
       default:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
         break;
@@ -551,6 +559,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.formControlType === OrganizationSettingControlType.SwitchedValue) {
       this.switchedValueForm.get('value')?.addValidators(validators);
       this.observeToggleControl();
+    }
+    if (this.formControlType === OrganizationSettingControlType.CheckboxValue) {
+      this.checkboxValueForm.get('value')?.addValidators(validators);
+      this.observeCheckboxValueToggleControl();
     }
 
     if (validators.length > 0) {
@@ -627,7 +639,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       const valueOptions = this.isParentEdit ? parentData.value : childData.value;
       dynamicValue = { ...JSON.parse(valueOptions), isSwitchedValue: true };
     }
-
+    if (this.formControlType === OrganizationSettingControlType.CheckboxValue) {
+      const valueOptions = this.isParentEdit ? parentData.value : childData.value;
+      dynamicValue = { ...JSON.parse(valueOptions), isCheckboxValue: true };
+    }
 
 
     // TODO: run outside zone
@@ -657,6 +672,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       if (dynamicValue.isSwitchedValue) {
         this.switchedValueForm.setValue({
+          value: dynamicValue.value,
+          isEnabled: dynamicValue.isEnabled,
+        });
+      }
+      if (dynamicValue.isCheckedValue) {
+        this.checkboxValueForm.setValue({
           value: dynamicValue.value,
           isEnabled: dynamicValue.isEnabled,
         });
@@ -715,6 +736,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.pushStartDateFormGroup.reset();
     this.invoiceGeneratingFormGroup.reset();
     this.switchedValueForm.reset();
+    this.checkboxValueForm.reset();
     this.isEdit = false;
     this.isParentEdit = false;
     this.dropdownDataSource = [];
@@ -755,6 +777,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.switchedValueForm = this.formBuilder.group({
       isEnabled: [false],
       value: [null, [Validators.min(1), Validators.max(99)]],
+    });
+    // Remove this validation after be implementation. This is be bug.
+    this.checkboxValueForm = this.formBuilder.group({
+      isEnabled: [false],
+      value: [null],
     });
   }
 
@@ -921,6 +948,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     });
   }
 
+  private createCheckboxValuePayload(): SwitchValuePayload {
+    return ({
+      value: this.checkboxValueForm.get('value')?.value,
+      isEnabled: !!this.checkboxValueForm.get('isEnabled')?.value,
+    });
+  }
+
   private observeToggleControl(): void {
     this.switchedValueForm.get('isEnabled')?.valueChanges
     .pipe(
@@ -934,5 +968,20 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       }
       this.switchedValueForm.get('value')?.updateValueAndValidity();
     });
+  }
+
+  private observeCheckboxValueToggleControl(): void {
+    this.checkboxValueForm.get('isEnabled')?.valueChanges
+      .pipe(
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((value: boolean) => {
+        if (value) {
+          this.checkboxValueForm.get('value')?.addValidators(Validators.required);
+        } else {
+          this.checkboxValueForm.get('value')?.removeValidators(Validators.required);
+        }
+        this.checkboxValueForm.get('value')?.updateValueAndValidity();
+      });
   }
 }
