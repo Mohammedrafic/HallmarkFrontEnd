@@ -107,6 +107,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public candidateJob: OrderCandidateJob | null;
   public today = new Date();
   public candidatStatus = CandidatStatus;
+  public readonly applicantStatus = ApplicantStatusEnum;
   public billRatesData: BillRate[] = [];
   public rejectReasons: RejectReason[] = [];
   public openRejectDialog = new Subject<boolean>();
