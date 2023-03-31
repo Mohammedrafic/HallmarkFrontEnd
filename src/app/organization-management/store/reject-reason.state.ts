@@ -509,6 +509,10 @@ export class RejectReasonState {
       tap(() => {
         dispatch(new UpdateInternalTransferReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new UpdateInternalTransferReasonsError())
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );  }
 
@@ -572,6 +576,10 @@ export class RejectReasonState {
       tap(() => {
         dispatch(new UpdateTerminationReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveTerminatedReasonError())
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );  }
 
