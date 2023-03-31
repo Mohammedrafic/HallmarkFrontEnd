@@ -98,7 +98,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
-    store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
+    store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'clock' }));
   }
 
   override ngOnInit(): void {
