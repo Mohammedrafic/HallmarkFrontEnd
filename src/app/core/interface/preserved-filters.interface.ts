@@ -1,4 +1,4 @@
-export interface PreservedFiltersByPage {
-  state: unknown;
+export interface PreservedFiltersByPage<Type> {
+  state: Type;
   isNotPreserved: boolean;
 }
