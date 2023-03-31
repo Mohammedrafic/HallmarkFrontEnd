@@ -300,9 +300,11 @@ export class StaffListComponent implements OnInit {
             .subscribe((data: StaffScheduleReportFilterOptions | null) => {
               if (data != null) {
                 this.isAlive = false;
+                console.log(data);
                 this.filterOptionData = data;
-                this.filterColumns.skillIds.dataSource = data.masterSkills;
-                this.filterColumns.workCommitmentIds.dataSource = data.masterWorkCommitments;
+                console.log(this.filterOptionData)
+                this.filterColumns.skillIds.dataSource = this.filterOptionData.masterSkills;
+                this.filterColumns.workCommitmentIds.dataSource = this.filterOptionData.masterWorkCommitments;
                 this.changeDetectorRef.detectChanges();
 
                 if (this.isInitialLoad) {

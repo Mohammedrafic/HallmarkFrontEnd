@@ -22,7 +22,7 @@ export interface LogiReportStateModel {
     searchCredentials:SearchCredential[];
     jobDetailSummaryReportFilterOptions: JobDetailSummaryReportFilterOptions | null;
     getCommonReportCandidateStatusOptions: CandidateStatusAndReasonFilterOptionsDto[] | [];
-    getStaffScheduleReportFilterOptions: StaffScheduleReportFilterOptions[] | [];
+    getStaffScheduleReportFilterOptions: StaffScheduleReportFilterOptions | null;
 
 }
 @State<LogiReportStateModel>({
@@ -37,7 +37,7 @@ export interface LogiReportStateModel {
         searchCredentials:[],
         jobDetailSummaryReportFilterOptions: null,
         getCommonReportCandidateStatusOptions :[],
-        getStaffScheduleReportFilterOptions: []
+        getStaffScheduleReportFilterOptions: null
     },
 })
 @Injectable()
@@ -74,7 +74,7 @@ export class LogiReportState {
 
     @Selector()
     static getStaffScheduleReportOptionData(state: LogiReportStateModel):
-    StaffScheduleReportFilterOptions[] | null {
+    StaffScheduleReportFilterOptions | null {
         return state.getStaffScheduleReportFilterOptions;
     }
 
@@ -175,7 +175,7 @@ export class LogiReportState {
   }
 
   @Action(GetStaffScheduleReportFilterOptions)
-  GetStaffScheduleReportFilterOptions({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<StaffScheduleReportFilterOptions[]> {
+  GetStaffScheduleReportFilterOptions({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<StaffScheduleReportFilterOptions> {
     return this.logiReportService.getStaffScheduleReportOptions(filter).pipe(tap((payload: any) => {
       patchState({ getStaffScheduleReportFilterOptions: payload });
       return payload

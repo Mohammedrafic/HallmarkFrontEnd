@@ -89,8 +89,8 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
     }));
   }
 
-  public getStaffScheduleReportOptions(filter: any): Observable<StaffScheduleReportFilterOptions[]> {
-    return this.http.post<StaffScheduleReportFilterOptions[]>(`/api/LogiReport/staffschedulebyshift/filter`, filter).pipe(map((data) => {
+  public getStaffScheduleReportOptions(filter: any): Observable<StaffScheduleReportFilterOptions> {
+    return this.http.post<StaffScheduleReportFilterOptions>(`/api/LogiReport/staffschedulebyshift/filter`, filter).pipe(map((data) => {
       return data;
     }));
   }
