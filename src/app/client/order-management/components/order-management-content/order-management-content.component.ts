@@ -208,7 +208,7 @@ import { SetOrderManagementPagerState } from '@agency/store/candidate.actions';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
-import { ClearPageFilters, GetPreservedFiltersByPage, SavePageFiltersByPageName } from 'src/app/store/preserved-filters.actions';
+import { ClearPageFilters, GetPreservedFiltersByPage, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 
 @Component({
   selector: 'app-order-management-content',
@@ -897,7 +897,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.getOrders(true);
     this.store.dispatch(new ShowFilterDialog(false));
     this.filterService.setPreservedFIlters(this.filters);
-    this.savePageFiltersByPageName(this.activeSystem);
+    this.SaveFiltersByPageName(this.activeSystem);
   }
 
   public onDataBound(): void {
@@ -1220,10 +1220,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.store.dispatch(new GetPreservedFiltersByPage(pageName));
   }
 
-  private savePageFiltersByPageName(activeSystem: OrderManagementIRPSystemId): void {
+  private SaveFiltersByPageName(activeSystem: OrderManagementIRPSystemId): void {
     const pageName = this.getPageName(activeSystem);
     const filters = { ...this.filters, orderTypes: [] }
-    this.store.dispatch(new SavePageFiltersByPageName(pageName, filters));
+    this.store.dispatch(new SaveFiltersByPageName(pageName, filters));
   }
 
   changeSystem(selectedBtn: ButtonModel) {

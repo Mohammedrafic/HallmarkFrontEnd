@@ -6,7 +6,7 @@ import {
   ClearPageFilters,
   GetPreservedFiltersByPage,
   InitPreservedFilters,
-  SavePageFiltersByPageName,
+  SaveFiltersByPageName,
   SetPreservedFilters,
 } from './preserved-filters.actions';
 import { PreservedFilters } from '@shared/models/preserved-filters.model';
@@ -122,10 +122,10 @@ export class PreservedFiltersState {
     );
   }
 
-  @Action(SavePageFiltersByPageName)
-  SavePageFiltersByPageName(
+  @Action(SaveFiltersByPageName)
+  SaveFiltersByPageName(
     { patchState }: StateContext<PreservedFiltersStateModel>,
-    { pageName, filterState }: SavePageFiltersByPageName
+    { pageName, filterState }: SaveFiltersByPageName
   ): Observable<PreservedFiltersByPage<unknown>> {
     return this.preservedFIltersService.saveFiltersByPageName(pageName, filterState);
   }

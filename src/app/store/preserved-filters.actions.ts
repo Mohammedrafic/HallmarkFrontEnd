@@ -19,7 +19,7 @@ export class SetPreservedFiltersForTimesheets {
   constructor(public payload: PreservedFilters) {}
 }
 
-export class SavePageFiltersByPageName {
+export class SaveFiltersByPageName {
   static readonly type = '[preserved filters] Save Page Filters';
   constructor(public pageName: FilterPageName, public filterState: unknown) {}
 }
