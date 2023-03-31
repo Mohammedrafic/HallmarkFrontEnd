@@ -37,8 +37,8 @@ import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, OrderTyp
 })
 export class JobEventComponent implements OnInit, OnDestroy {
   public paramsData: any = {
-    "Organizationid": "",
-    "Userid": ""
+    "@Organizationid": "",
+    "@Userid": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/JobEvent/JobEventReport.wls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/JobEvent/JobEventReport.cat" };
@@ -208,8 +208,8 @@ export class JobEventComponent implements OnInit, OnDestroy {
 
     this.paramsData =
     {
-      "Organizationid": this.selectedOrganizations?.length == 0 ? this.nullValue : this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
-      "Userid": this.user?.id
+      "@Organizationid": this.selectedOrganizations?.length == 0 ? this.nullValue : this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
+      "@Userid": this.user?.id
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
