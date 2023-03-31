@@ -8,7 +8,7 @@ export class BillRatePipe implements PipeTransform {
   transform(rate: number, candidateRate: number, status: number, offeredBillRate: number): string {
     return candidateRate
       ? `${
-          status === ApplicantStatus.OnBoarded ? Number(offeredBillRate).toFixed(2) : Number(candidateRate).toFixed(2)
+          status === ApplicantStatus.Applied ? Number(rate).toFixed(2) : Number(offeredBillRate).toFixed(2)
         }`
       : `${Number(rate).toFixed(2)}`;
   }

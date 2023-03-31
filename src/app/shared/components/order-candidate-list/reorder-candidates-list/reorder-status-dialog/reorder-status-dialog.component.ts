@@ -73,7 +73,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob) {
     if (orderCandidateJob) {
       this.orderCandidateJob = orderCandidateJob;
-      this.currentCandidateApplicantStatus = orderCandidateJob.applicantStatus.applicantStatus;  
+      this.currentCandidateApplicantStatus = orderCandidateJob.applicantStatus.applicantStatus;
       this.setValueForm(orderCandidateJob);
       this.getOrderPermissions(orderCandidateJob.orderId);
     } else {
@@ -108,7 +108,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   get showAccept(): boolean {
     return (
       this.isAgency &&
-      ![CandidatStatus.BillRatePending, CandidatStatus.OnBoard, CandidatStatus.Rejected, CandidatStatus.Cancelled].includes(
+      ![CandidatStatus.BillRatePending, CandidatStatus.OnBoard, CandidatStatus.Rejected].includes(
         this.currentCandidateApplicantStatus
       )
     );
@@ -350,6 +350,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     jobCancellation,
     orderPublicId,
     candidatePayRate,
+    clockId,
   }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     let isBillRatePending: number;
@@ -380,6 +381,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       rate: jobCancellation?.rate,
       hours: jobCancellation?.hours,
       candidatePayRate: candidatePayRate,
+      clockId: clockId,
     });
     this.enableFields();
   }

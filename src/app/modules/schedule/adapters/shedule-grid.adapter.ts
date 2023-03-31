@@ -25,7 +25,7 @@ export class ScheduleGridAdapter {
         return {
           candidate: {
             ...candidate,
-            workHours: foundCandidateSchedule?.workHours || [],
+            workHours: foundCandidateSchedule?.workHours || 0,
           },
           schedule: foundCandidateSchedule?.schedules || [],
           id: GenerateUniqueId(),

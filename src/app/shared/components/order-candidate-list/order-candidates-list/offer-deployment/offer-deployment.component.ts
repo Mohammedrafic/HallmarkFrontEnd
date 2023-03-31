@@ -72,8 +72,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
-  @Input() isTab: boolean = false;
-  @Input() isAgency: boolean = false;
+  @Input() isTab = false;
+  @Input() isAgency = false;
   @Input() actionsAllowed: boolean;
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
@@ -253,11 +253,11 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
       this.onReject();
     } else {
-      this.offerCandidate(event.itemData, reloadJob);
+      this.offerCandidate(reloadJob);
     }
   }
 
-  private offerCandidate(applicantStatus: ApplicantStatus | null, reloadJob: boolean): void {
+  private offerCandidate( reloadJob: boolean): void {
     if (!this.formGroup.errors && this.candidateJob) {
       this.shouldChangeCandidateStatus()
         .pipe(take(1))
@@ -276,7 +276,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                   requestComment: this.candidateJob.requestComment,
                   actualStartDate: this.candidateJob.actualStartDate,
                   actualEndDate: this.candidateJob.actualEndDate,
-                  clockId: this.candidateJob.clockId,
+                  clockId: value.clockId,
                   guaranteedWorkWeek: value.guaranteedWorkWeek,
                   offeredStartDate: DateTimeHelper.toUtcFormat(new Date(value.offeredStartDate)),
                   allowDeployWoCredentials: true,
@@ -373,7 +373,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private subscribeOnInitialData(): void {
-    this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrderCandidateJob) => {
+    this.candidateJobState$
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe((data: OrderCandidateJob) => {
       this.candidateJob = data;
 
       if (data) {
