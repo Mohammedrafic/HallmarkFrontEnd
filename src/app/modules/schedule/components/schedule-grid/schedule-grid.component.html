@@ -74,13 +74,15 @@
             [class.custom-head-cell]="activePeriod === monthPeriod"
             class="table-title candidates-head-cell fixed fixed--left fixed--top"
           >
-            {{ scheduleData?.totalCount || 0 }} Candidates</th>
+            <span>Candidates</span>
+            <span class="e-badge e-badge-success e-badge-pill align-text">{{ scheduleData?.totalCount || 0 }}</span>
+          </th>
           <ng-container *ngIf="activePeriod !== monthPeriod; else monthRange">
             <th
               *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
               class="table-title date fixed fixed--top"
             >
-              {{ dateHead | date: 'EEEE MM/dd' }}
+              {{ dateHead | date: 'E MM/dd' }}
             </th>
           </ng-container>
 

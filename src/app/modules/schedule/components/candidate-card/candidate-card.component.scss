@@ -14,7 +14,7 @@
   width: 100%;
   height: 100%;
   max-width: 238px;
-  padding: 4px 8px 8px;
+  padding: 4px 8px 0;
   cursor: pointer;
   overflow: hidden;
 }
@@ -23,21 +23,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 4px;
 
   &--name {
-    margin-bottom: 10px;
     padding-right: 2px;
     justify-content: space-between;
-  }
-
-  &-id {
-    flex-grow: 2;
-    flex-shrink: 0;
-  }
-
-  &-skill {
-    flex-grow: 1;
-    flex-shrink: 0;
   }
 
   & span {
@@ -52,9 +42,8 @@
       color: $secondary-dark-blue-40;
     }
 
-    &.direction {
-      font-weight: 800;
-      color: $black;
+    &.skill {
+      white-space: nowrap;
     }
   }
 }

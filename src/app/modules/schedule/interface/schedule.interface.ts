@@ -20,7 +20,7 @@ export interface ScheduleCandidate {
   orderType: IrpOrderType | null;
   workCommitments: string[] | null;
   employeeNote: string;
-  workHours: number[];
+  workHours?: number;
   isOriented: boolean;
   fullName?: string;
   workCommitmentText?: string;
@@ -70,7 +70,7 @@ export interface ScheduleModel {
 export interface CandidateSchedules {
   employeeId: number;
   schedules: ScheduleDateItem[];
-  workHours: number[];
+  workHours: number;
 }
 
 export interface ScheduleDateItem {

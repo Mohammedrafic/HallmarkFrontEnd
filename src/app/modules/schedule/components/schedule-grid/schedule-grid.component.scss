@@ -150,25 +150,17 @@ th, td {
 }
 
 .table-title {
-  height: 40px;
-  padding: 8px;
+  padding: 16px;
+  text-transform: uppercase;
+  font-weight: 700;
   font-size: 12px;
-  font-weight: 400;
-  line-height: 18px;
+  line-height: 13px;
+  color: $secondary-dark-blue-15;
   text-align: left;
   white-space: nowrap;
-  color: $black;
 
   &.date {
     min-width: 112px;
-  }
-
-  &.month-date {
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 13px;
-    color: $secondary-dark-blue-15;
   }
 
   &.candidates-head-cell {
@@ -176,11 +168,15 @@ th, td {
     width: 240px;
     min-width: 240px;
     max-width: 240px;
+
+    .e-badge {
+      margin: 0 0 2px 8px;
+    }
   }
 }
 
 .table-row, .table-cell {
-  height: 90px;
+  height: 80px;
 }
 
 .table-cell {
