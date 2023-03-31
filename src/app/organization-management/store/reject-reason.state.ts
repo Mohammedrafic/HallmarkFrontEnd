@@ -575,7 +575,7 @@ export class RejectReasonState {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
       }),
       catchError((error: HttpErrorResponse) => {
-        dispatch(new UpdateTerminationReasonsSuccess())
+        dispatch(new SaveTerminatedReasonError())
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );  }
