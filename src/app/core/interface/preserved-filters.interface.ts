@@ -1,4 +1,4 @@
-export interface PreservedFiltersModel {
+export interface PreservedFiltersByPage {
   state: unknown;
   isNotPreserved: boolean;
 }
