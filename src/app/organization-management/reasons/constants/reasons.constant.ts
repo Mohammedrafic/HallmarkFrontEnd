@@ -181,7 +181,7 @@ export const categoryNoteDialogConfig: ReasonFormConfig[]  = [
 export const requisitionDialogConfig: ReasonFormConfig[]  = [
   {
     field: '',
-    title: 'Select System',
+    title: 'System Configuration',
     fieldType: FieldType.CheckBoxGroup,
     required: true,
     checkBoxes: [
@@ -206,7 +206,7 @@ export const requisitionDialogConfig: ReasonFormConfig[]  = [
 export const closureDialogConfig: ReasonFormConfig[]  = [
   {
     field: '',
-    title: 'Select System',
+    title: 'System Configuration',
     fieldType: FieldType.CheckBoxGroup,
     required: true,
     checkBoxes: [
