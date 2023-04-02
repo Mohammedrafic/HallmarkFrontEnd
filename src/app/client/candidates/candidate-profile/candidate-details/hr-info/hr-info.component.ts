@@ -7,6 +7,12 @@ import {
 } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { ChangeEventArgs } from '@syncfusion/ej2-buttons';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
+import { GetInternalTransferReasons } from '@organization-management/store/reject-reason.actions';
+import { Select, Store } from '@ngxs/store';
+import { RejectReasonPage } from '@shared/models/reject-reason.model';
+import { Observable } from 'rxjs/internal/Observable';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 
 @Component({
   selector: 'app-hr-info',
@@ -17,14 +23,19 @@ export class HrInfoComponent extends AbstractContactDetails implements OnInit {
   public readonly hrInternalTransfersRecruitments = HrInternalTransfersRecruitments;
   public readonly orientationConfigurations = OrientationConfigurations;
   public readonly hrCompanyCodes = HrCompanyCodes;
-
+  currentPage = 1;
+  pageSize = 100;
+  fieldsSettingsInternalTransfer: FieldSettingsModel = { text: 'reason', value: 'id' };
+  @Select(RejectReasonState.internalTransfer)
+  public reasons$: Observable<RejectReasonPage>;
   public get isContractValue(): boolean {
     return this.candidateForm.get('isContract')?.value;
   }
 
   constructor(
     protected override cdr: ChangeDetectorRef,
-    protected override candidateProfileFormService: CandidateProfileFormService
+    protected override candidateProfileFormService: CandidateProfileFormService,
+    private store: Store,
   ) {
     super(cdr, candidateProfileFormService);
   }
@@ -33,6 +44,7 @@ export class HrInfoComponent extends AbstractContactDetails implements OnInit {
     super.ngOnInit();
 
     this.listenContractChanges();
+    this.store.dispatch(new GetInternalTransferReasons( this.currentPage ,this.pageSize));
   }
 
   public listenContractChanges(): void {

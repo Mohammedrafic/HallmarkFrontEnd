@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ONLY_LETTERS, ONLY_NUMBER, ONLY_NUMBER_AND_DOT, ALPHANUMERICS_AND_SYMBOLS, ALPHANUMERIC,  MIN_DIGITS_LENGTH_ONLY_NINE } from '@shared/constants';
+import { ONLY_LETTERS, ONLY_NUMBER, ONLY_NUMBER_AND_DOT, ALPHANUMERICS_AND_SYMBOLS, ALPHANUMERIC,  MIN_DIGITS_LENGTH_ONLY_NINE, ZIPCODE_FORMAT_CANADA } from '@shared/constants';
 
 @Pipe({
   name: 'validationError',
@@ -40,6 +40,9 @@ export class ValidationErrorPipe implements PipeTransform {
         }
         if(this.isWrongValue(MIN_DIGITS_LENGTH_ONLY_NINE, value)){
           return `Min digits entered should be 9`;
+        }
+        if(this.isWrongValue(ZIPCODE_FORMAT_CANADA, value)){
+          return `Invalid zip code format`;
         }
         return '';
       case 'max' in value:
