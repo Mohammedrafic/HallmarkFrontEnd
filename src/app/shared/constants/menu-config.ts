@@ -409,7 +409,7 @@ export const MENU_CONFIG: any = {
       route: '/analytics/finance-medicare-wage-report',
     },
 
-    88: {
+    91: {
       // Staff List Report
       icon: '',
       route: '/analytics/staff-list',
@@ -611,7 +611,7 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
     },
-    88: {
+    91: {
       // Staff List Report
       icon: '',
       route: '/analytics/staff-list',
@@ -989,7 +989,7 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/finance-medicare-wage-report',
     },
-    88: {
+    91: {
       // Staff List Report
       icon: '',
       route: '/analytics/staff-list',

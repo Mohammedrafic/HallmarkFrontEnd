@@ -83,10 +83,13 @@ export class StaffListComponent implements OnInit {
     SkillsParam: '',
     WorkCommitmentsParam: '',
     CandidateParam: '',
+    ShowDepartmentUnassignedParam:''
   };
   public staffListReportForm: FormGroup;
+  RegularReportName: string = '/IRPReports/StaffListReport/StaffList_PageReport.cls'
+  DeptUnassignedReportName: string = '/IRPReports/StaffListReport/StaffList_PageReport2.cls'
   public reportName: LogiReportFileDetails = {
-    name: '/IRPReports/StaffListReport/StaffList_PageReport.cls',
+    name: this.RegularReportName,
   };
   public catelogName: LogiReportFileDetails = { name: '/IRPReports/StaffListReport/StaffListReport.cat' };
   public title: string = 'Staff List';
@@ -300,9 +303,11 @@ export class StaffListComponent implements OnInit {
             .subscribe((data: StaffScheduleReportFilterOptions | null) => {
               if (data != null) {
                 this.isAlive = false;
+                console.log(data);
                 this.filterOptionData = data;
-                this.filterColumns.skillIds.dataSource = data.masterSkills;
-                this.filterColumns.workCommitmentIds.dataSource = data.masterWorkCommitments;
+                console.log(this.filterOptionData)
+                this.filterColumns.skillIds.dataSource = this.filterOptionData.masterSkills;
+                this.filterColumns.workCommitmentIds.dataSource = this.filterOptionData.masterWorkCommitments;
                 this.changeDetectorRef.detectChanges();
 
                 if (this.isInitialLoad) {
@@ -452,11 +457,10 @@ export class StaffListComponent implements OnInit {
       departmentIds,
       locationIds,
       regionIds,
-      startDate,
-      endDate,
       employeeName,
       workCommitmentIds,
       skillIds,
+      showOnlyDepartmentUnassignedCandidates
     } = this.staffListReportForm.getRawValue();
     if (!this.staffListReportForm.dirty) {
       this.message = 'Default filter selected with all regions, locations and departments.';
@@ -486,6 +490,9 @@ export class StaffListComponent implements OnInit {
     skillIds = skillIds.length > 0 ? skillIds.join(',') : '';
     workCommitmentIds = workCommitmentIds.length > 0 ? workCommitmentIds.join(',') : '';
     employeeName = employeeName.length > 0 ? employeeName : '';
+    
+    if(showOnlyDepartmentUnassignedCandidates)
+      this.reportName.name = this.DeptUnassignedReportName; 
 
     this.paramsData = {
       OrganizationParam: this.selectedOrganizations?.map((list) => list.organizationId).join(','),
@@ -495,6 +502,7 @@ export class StaffListComponent implements OnInit {
       SkillsParam: skillIds,
       WorkCommitmentsParam: workCommitmentIds,
       CandidateParam: employeeName,
+      ShowDepartmentUnassignedParam: showOnlyDepartmentUnassignedCandidates
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
