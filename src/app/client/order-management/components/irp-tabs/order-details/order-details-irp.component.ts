@@ -330,8 +330,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
     this.changeDetection.markForCheck();
   }
+
   private getIRPOrderRequisition(orderRequisition:RejectReasonwithSystem[]):RejectReason[]{
-    debugger;
     orderRequisition.forEach(element => {
       if(element.includeInIRP===true){
         this.reason.push(
