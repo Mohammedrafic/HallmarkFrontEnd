@@ -643,6 +643,10 @@ export class RejectReasonState {
       tap(() => {
         dispatch(new UpdateCategoryNoteReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new UpdateCategoryNoteReasonsError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );  }
 
