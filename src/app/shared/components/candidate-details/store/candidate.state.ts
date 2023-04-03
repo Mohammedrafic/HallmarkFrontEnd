@@ -6,7 +6,6 @@ import {
   GetCandidateSkills,
   SelectNavigation,
   SetNavigation,
-  SetPageFilters,
   SetPageNumber,
   SetPageSize
 } from '@shared/components/candidate-details/store/candidate.actions';
@@ -16,7 +15,6 @@ import { CandidateDetailsTabs } from '@shared/enums/candidate-tabs.enum';
 import {
   CandidateDetailsPage,
   CandidatesDetailsRegions,
-  FiltersModal,
   NavigationTabModel
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
@@ -28,8 +26,7 @@ interface CandidateDetailsStateModel {
   pageNumber: number | null;
   pageSize: number | null;
   candidateSkills: MasterSkillByOrganization[];
-  filters: FiltersModal | null;
-  candidateRegions: CandidatesDetailsRegions[];
+  candidateRegions: CandidatesDetailsRegions[] | null;
   isNavigate: boolean | null;
 }
 
@@ -45,17 +42,12 @@ interface CandidateDetailsStateModel {
     pageNumber: null,
     pageSize: null,
     candidateSkills: [],
-    filters: null,
-    candidateRegions: [],
+    candidateRegions: null,
     isNavigate: null,
   },
 })
 @Injectable()
 export class CandidateDetailsState {
-  @Selector()
-  static filtersPage(state: CandidateDetailsStateModel): FiltersModal | null {
-    return state.filters;
-  }
 
   @Selector()
   static candidateDetails(state: CandidateDetailsStateModel): CandidateDetailsPage | null {
@@ -68,7 +60,7 @@ export class CandidateDetailsState {
   }
 
   @Selector()
-  static candidateRegions(state: CandidateDetailsStateModel): CandidatesDetailsRegions[] {
+  static candidateRegions(state: CandidateDetailsStateModel): CandidatesDetailsRegions[] | null {
     return state.candidateRegions;
   }
 
@@ -131,10 +123,6 @@ export class CandidateDetailsState {
     patchState({ pageSize });
   }
 
-  @Action(SetPageFilters)
-  SetPageFilters({ patchState }: StateContext<CandidateDetailsStateModel>, { filters }: SetPageFilters): void {
-    patchState({ filters });
-  }
 
   @Action(GetCandidateRegions)
   GetCandidateRegions({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<CandidatesDetailsRegions[]> {
