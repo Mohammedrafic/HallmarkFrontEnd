@@ -1,4 +1,5 @@
 import { FormGroup } from '@angular/forms';
+import { WeekDays } from '@shared/enums/week-days.enum';
 
 import * as ScheduleInt from '../interface';
 import { DropdownOption } from '@core/interface';
@@ -231,7 +232,7 @@ export const GetScheduleDateItem = (
       .schedule.find((item: ScheduleDateItem) => item.date.substring(0, dateStringLength) === date);
 };
 
-export const GetMonthRange = (initDay: number): string[] => {
+export const GetMonthRange = (initDay: number): WeekDays[] => {
   const daysInWeek = WeekList;
   const startingDayIndex = initDay % 7;
 

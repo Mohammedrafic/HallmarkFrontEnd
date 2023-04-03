@@ -150,9 +150,17 @@ tr {
 }
 
 th, td {
-  border: 1px solid $secondary-dark-blue-45;
-  border-top: none;
-  border-left: none;
+  border-bottom: 1px solid $secondary-dark-blue-40;
+  padding: 0;
+  margin: 0;
+}
+
+td {
+  background-color: $secondary-dark-blue-50;
+}
+
+th {
+  border-top: 1px solid $secondary-dark-blue-45;
 }
 
 .table-title {
@@ -167,13 +175,17 @@ th, td {
 
   &.date {
     min-width: 112px;
-    border-bottom: 1px solid $secondary-dark-blue-45;
     border-left: none;
     border-right: none;
     padding: 0 !important;
 
     span {
       padding-left: 16px;
+    }
+  }
+
+  &.left-border {
+    span {
       border-left: 1px solid $secondary-dark-blue-45;
     }
   }
@@ -199,10 +211,13 @@ th, td {
   padding: 0;
 
   &.selected {
-    border: 1px solid $primary-active-blue;
+    border: 1px solid $primary-active-blue-10;
+    background-color: $primary-active-blue-90;
   }
 
   &.date-slot {
+    margin: 4px;
+    border-radius: 4px;
     cursor: pointer;
 
     &:hover {
@@ -216,7 +231,8 @@ th, td {
     max-width: 240px;
   }
 
-  &.disabled-cell {
+  .disabled-cell {
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
