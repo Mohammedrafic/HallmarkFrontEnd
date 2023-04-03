@@ -176,7 +176,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
             new GetAgencyExtensions(order.items[0].candidateJobId, selectedOrder.id!, selectedOrder.organizationId!)
           );
         }
-        this.cd.markForCheck();
+        this.cd.detectChanges();
       });
     this.extensions$.pipe(takeWhile(() => this.isAlive)).subscribe((extensions) => {
       this.extensions = extensions?.filter((extension: any) => extension.id !== this.order?.id);
@@ -188,6 +188,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
     if (event.isSwiped) {
       event.cancel = true;
     }
+    this.cd.markForCheck();
   }
 
   public onTabCreated(): void {
@@ -203,7 +204,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         this.tab.select(0);
         this.firstActive = true;
       }
-      this.cd.markForCheck();
+      this.cd.detectChanges();
     });
   }
 
@@ -237,6 +238,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
       )
       .subscribe((value) => {
         this.agencyActionsAllowed = value;
+        this.cd.markForCheck();
       });
   }
 
@@ -246,7 +248,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         if (this.openDetailsTab) {
           setTimeout(()=>{
             this.tab.select(0);
-          },100)
+          },100);
         } else {
           this.tab.select(1);
         }
@@ -258,6 +260,8 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         this.sideDialog.hide();
         disabledBodyOverflow(false);
       }
+
+      this.cd.markForCheck();
     });
   }
 }
