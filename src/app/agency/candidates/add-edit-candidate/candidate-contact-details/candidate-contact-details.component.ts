@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
-import { ZIPCODE_FORMAT_CANADA, ONLY_NUMBER } from '@shared/constants';
+import { ONLY_NUMBER } from '@shared/constants';
 
 
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
@@ -13,7 +13,8 @@ import { COUNTRIES } from '@shared/constants/countries-list';
   styleUrls: ['./candidate-contact-details.component.scss'],
 })
 export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
-  @Input() formGroup: FormGroup;
+   @Input() formGroup: FormGroup;
+   @Input() customMaskChar:string
 
   public optionFields = {
     text: 'text',
@@ -55,7 +56,7 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
       country: new FormControl(null),
       state: new FormControl(null),
       city: new FormControl(null, [Validators.maxLength(20)]),
-      zip: new FormControl(null, [Validators.minLength(5), Validators.maxLength(6), Validators.pattern(ONLY_NUMBER)]),
+      zip: new FormControl(null, [Validators.minLength(5)]),
       address1: new FormControl(null, [Validators.maxLength(100)]),
       address2: new FormControl(null, [Validators.maxLength(100)]),
       phone1: new FormControl(null, [Validators.minLength(10), Validators.pattern(ONLY_NUMBER)]),
@@ -100,17 +101,19 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
         }
       }
 
-      if(data['country'] !== null && data['country'] !== ''){
-          this.formGroup.controls['zip'].clearValidators();
-          if(data['country'] === Country.Canada){ 
-              this.formGroup.controls['zip'].addValidators([Validators.required,Validators.minLength(7), Validators.maxLength(7), Validators.pattern(ZIPCODE_FORMAT_CANADA)]);
-          }
-          if(data['country'] === Country.USA){
-              this.formGroup.controls['zip'].addValidators([Validators.required,Validators.minLength(5), Validators.maxLength(6), Validators.pattern(ONLY_NUMBER)]);
-          }
-          this.formGroup.controls['zip'].updateValueAndValidity({emitEvent : false});
-          this.formGroup.controls['zip'].markAsTouched();
-      }     
+       if(data['country'] !== null && data['country'] !== ''){
+        this.formGroup.controls['zip'].clearValidators();
+        if(data['country'] === Country.Canada){ 
+            this.customMaskChar = '>L0L >0L0'; 
+            this.formGroup.controls['zip'].addValidators([Validators.required,Validators.minLength(6)]);
+        }
+        if(data['country'] === Country.USA){
+            this.customMaskChar = '00000';
+            this.formGroup.controls['zip'].addValidators([Validators.required,Validators.minLength(5)]);
+        }
+        this.formGroup.controls['zip'].updateValueAndValidity({emitEvent : false});
+        this.formGroup.controls['zip'].markAsTouched();
+      }   
       
     });
   }

@@ -94,12 +94,8 @@
         <div class="d-flex">
           <div class="input-container">
             <label>Zipcode</label>
-            <div class="input-group">
-              <input appValidateWithMessage
-                     formControlName="zip"
-                     class="e-input text-uppercase"
-                     type="text"
-                     placeholder=" "/>
+            <div class="input-group" *ngIf="customMaskChar != ''">
+              <ejs-maskedtextbox  appValidateWithMessage type="text" mask='{{customMaskChar}}' class="e-input" formControlName="zip"></ejs-maskedtextbox>
             </div>
           </div>
           <div class="input-container"></div>
@@ -125,3 +121,4 @@
     </div>
   </form>
 </div>
+
