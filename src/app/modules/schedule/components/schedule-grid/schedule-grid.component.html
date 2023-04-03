@@ -70,10 +70,7 @@
     <table *ngIf="scheduleData?.items?.length; else emptyTable">
       <thead>
         <tr>
-          <th
-            [class.custom-head-cell]="activePeriod === monthPeriod"
-            class="table-title candidates-head-cell fixed fixed--left fixed--top"
-          >
+          <th class="table-title candidates-head-cell fixed fixed--left fixed--top">
             <span>Candidates</span>
             <span class="e-badge e-badge-success e-badge-pill align-text">{{ scheduleData?.totalCount || 0 }}</span>
           </th>
@@ -82,14 +79,14 @@
               *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
               class="table-title date fixed fixed--top"
             >
-              {{ dateHead | date: 'E MM/dd' }}
+              <span>{{ dateHead | date: 'E MM/dd' }}</span>
             </th>
           </ng-container>
 
           <ng-template #monthRange>
             <th
               *ngFor="let day of monthRangeDays; trackBy: trackByDatesRange"
-              class="table-title date month-date fixed fixed--top custom-date-th">
+              class="table-title date month-date fixed fixed--top">
               <span>{{day}}</span>
             </th>
           </ng-template>
@@ -111,6 +108,7 @@
               class="table-cell date-slot"
               [attr.colspan]="dateSchedule.extendedDays"
               [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
+              weeksEnd [date]="dateSlot"
               appDoubleClick
               (singleClick)="handleCellSingleClick(dateSlot, scheduleItem.candidate, dateSchedule)"
               (dbClick)="handleScheduleCardDblClick(dateSchedule, scheduleItem.candidate, dateSchedule)"
@@ -123,7 +121,9 @@
               <ng-template #disabledCell>
                 <ejs-tooltip
                   [content]="dateSchedule | calendarTooltipSlot">
-                  <div class="table-cell disabled-cell"></div>
+                  <div class="table-cell disabled-cell">
+                    <i-feather name="slash" class="icon"></i-feather>
+                  </div>
                 </ejs-tooltip>
               </ng-template>
             </td>
@@ -132,6 +132,7 @@
               <td
                 class="table-cell date-slot empty-cell"
                 [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
+                weeksEnd [date]="dateSlot"
                 appDoubleClick
                 (singleClick)="handleCellSingleClick(dateSlot, scheduleItem.candidate)"
                 (dbClick)="handleCellDblClick(dateSlot, scheduleItem.candidate)"

@@ -18,6 +18,7 @@
           class="date-slot"
           [attr.colspan]="dateSchedule.extendedDays"
           [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateItem.dateSlot)"
+          weeksEnd [date]="dateItem.dateSlot"
           appDoubleClick
           (singleClick)="singleClick(dateItem.dateSlot, scheduleItem.candidate, dateItem.active, dateSchedule)"
           (dbClick)="doubleCardClick(dateSchedule, scheduleItem.candidate, dateItem.active, dateSchedule)"
@@ -37,6 +38,7 @@
                   <div class="day">
                     {{dateItem.dateSlot | date: 'd'}}
                   </div>
+                  <i-feather name="slash" class="icon"></i-feather>
                 </div>
               </ejs-tooltip>
             </ng-template>
@@ -47,6 +49,7 @@
           <div
             [class.disabled-cell]="!dateItem.active"
             [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateItem.dateSlot)"
+            weeksEnd [date]="dateItem.dateSlot"
             appDoubleClick
             (singleClick)="singleClick(dateItem.dateSlot, scheduleItem.candidate, dateItem.active)"
             (dbClick)="doubleCellClick(dateItem.dateSlot, scheduleItem.candidate, dateItem.active)"
@@ -55,6 +58,7 @@
             <div class="day">
               {{dateItem.dateSlot | date: 'd'}}
             </div>
+            <i-feather *ngIf="!dateItem.active" name="slash" class="icon"></i-feather>
           </div>
         </ng-template>
       </ng-container>
