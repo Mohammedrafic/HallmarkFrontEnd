@@ -9,7 +9,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Order, OrderManagement, OrderManagementChild } from '@shared/models/order-management.model';
 import { ShowCloseOrderDialog } from '../../../../store/app.actions';
 import { OrderType, OrderTypeTitlesMap } from '@shared/enums/order-type';
-import { RejectReasonPage } from '@shared/models/reject-reason.model';
+import { RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import { CloseOrderService } from '@client/order-management/components/close-order/close-order.service';
 import { GetClosureReasonsByPage } from '@organization-management/store/reject-reason.actions';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
@@ -23,6 +23,7 @@ import { UserState } from 'src/app/store/user.state';
 import { SaveCloseOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { DateTimeHelper } from '@core/helpers';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { OrderManagementService } from '../order-management-content/order-management.service';
 
 @Component({
   selector: 'app-close-order',
@@ -53,6 +54,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public closeForm: FormGroup;
   public commentContainerId = 0;
   public comments: Comment[] = [];
+  public closureReasons: RejectReasonwithSystem[];
   private unsubscribe$: Subject<void> = new Subject();
 
   public constructor(
@@ -63,12 +65,14 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private cd: ChangeDetectorRef,
+    private orderManagementService: OrderManagementService,
   ) {
     super();
   }
 
   public ngOnChanges(changes: SimpleChanges) {
     if (!changes['currentValue']) {
+      this.onOrganizationChangedClosureReasons();
       return;
     }
     const {
@@ -118,6 +122,14 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   private onOrganizationChangedClosureReasons(): void {
     this.organizationId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.store.dispatch(new GetClosureReasonsByPage(undefined, undefined, undefined, true));
+      this.closureReasonsPage$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+        if (data != undefined) {
+          if (this.orderManagementService.getOrderManagementSystem() == OrderManagementIRPSystemId.IRP)
+            this.closureReasons = data.items.filter(f => f.includeInIRP == true)
+          if (this.orderManagementService.getOrderManagementSystem() == OrderManagementIRPSystemId.VMS)
+            this.closureReasons = data.items.filter(f => f.includeInVMS == true)
+        }
+      });
     });
   }
 
@@ -178,46 +190,46 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
       this.closePosition(formData);
     } else {
 
-    if (currentOrder.irpOrderMetadata && !currentOrder.isIRPOnly) {
-      this.confirmService.confirm(MULTI_CLOSE_ORDER, {
-        title: CLOSE_ORDER_TITLE,
-        okButtonLabel: 'Close',
-        okButtonClass: 'delete-button',
-      })
-      .pipe(
-        filter((confirm) => !!confirm)
-      )
-      .subscribe(() => {
+      if (currentOrder.irpOrderMetadata && !currentOrder.isIRPOnly) {
+        this.confirmService.confirm(MULTI_CLOSE_ORDER, {
+          title: CLOSE_ORDER_TITLE,
+          okButtonLabel: 'Close',
+          okButtonClass: 'delete-button',
+        })
+          .pipe(
+            filter((confirm) => !!confirm)
+          )
+          .subscribe(() => {
+            this.closeOrder(formData, isIrpOrder);
+          });
+      } else {
         this.closeOrder(formData, isIrpOrder);
-      });
-    } else {
-      this.closeOrder(formData, isIrpOrder);
-    }
-      
+      }
+
     }
   }
 
   private closeOrder(formData: Omit<CloseOrderPayload, 'orderId'>, isIrpOrder: boolean): void {
     this.closeOrderService.closeOrder({ ...formData, orderId: this.order.id }, isIrpOrder)
-    .pipe(
-      takeUntil(this.destroy$)
-    )
-    .subscribe(() => {
-      this.store.dispatch(new SaveCloseOrderSucceeded(this.order));
-      this.closeOrderSuccess.emit(this.order);
-      this.closeDialog();
-    });
+      .pipe(
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.store.dispatch(new SaveCloseOrderSucceeded(this.order));
+        this.closeOrderSuccess.emit(this.order);
+        this.closeDialog();
+      });
   }
 
   private closePosition(formData: ClosePositionPayload): void {
     this.closeOrderService.closePosition({ ...formData, jobId: this.candidate.jobId })
-    .pipe(
-      takeUntil(this.destroy$)
-    )
-    .subscribe(() => {
-      this.closePositionSuccess.emit(this.candidate);
-      this.closeDialog();
-    });
+      .pipe(
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.closePositionSuccess.emit(this.candidate);
+        this.closeDialog();
+      });
   }
 
   private subscribeOnCloseSideBar(): void {
