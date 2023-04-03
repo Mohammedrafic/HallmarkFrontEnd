@@ -43,7 +43,7 @@
               <div class="e-card-content">
                 <form [formGroup]="candidateForm" id="candidateProfile">
                   <app-candidate-general-info [formGroup]="$any(candidateForm.get('generalInfo'))" [isCandidateCreated]="!readonlyMode && (isCandidateCreated$ | async)" [selectedSkills]="fetchedCandidate?.candidateProfileSkills"></app-candidate-general-info>
-                  <app-candidate-contact-details [formGroup]="$any(candidateForm.get('contactDetails'))"></app-candidate-contact-details>
+                  <app-candidate-contact-details [formGroup]="$any(candidateForm.get('contactDetails'))"  [customMaskChar]="customMaskChar"></app-candidate-contact-details>
                   <app-candidate-professional-summary [formGroup]="$any(candidateForm.get('profSummary'))"></app-candidate-professional-summary>
                 </form>
               </div>

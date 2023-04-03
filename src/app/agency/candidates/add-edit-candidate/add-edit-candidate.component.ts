@@ -42,6 +42,7 @@ import { AbstractPermission } from '@shared/helpers/permissions';
 import { AgencySettingsService } from '@agency/services/agency-settings.service';
 import { DateTimeHelper } from '@core/helpers';
 import { GlobalWindow } from "@core/tokens";
+import { Country } from "@shared/enums/states";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -72,6 +73,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   private filesDetails: Blob[] = [];
   private isRemoveLogo: boolean = false;
+  public customMaskChar : string = '';
+
 
   public get isCandidateAssigned(): boolean {
     return !!this.orderId && !!this.candidateStatus;
@@ -136,6 +139,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       this.title = 'Edit';
       this.store.dispatch(new GetCandidateById(parseInt(this.route.snapshot.paramMap.get('id') as string)));
       this.store.dispatch(new GetCandidatePhoto(parseInt(this.route.snapshot.paramMap.get('id') as string)));
+    }else{
+      this.customMaskChar = '00000';
     }
     this.pagePermissions();
     this.subscribeOnCandidateCredentialResponse();
@@ -317,15 +322,20 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       ssn: ssn ? this.getStringSsn(ssn) : null,
       candidateProfileSkills: candidateProfileSkills.map((skill) => skill.id),
     });
+    if(candidateProfileContactDetail?.country === Country.Canada){ 
+      this.customMaskChar = '>L0L >0L0';     
+    }else{
+      this.customMaskChar = '00000';
+    }
     this.candidateForm.get('contactDetails')?.patchValue({
-      country: candidateProfileContactDetail.country,
-      state: candidateProfileContactDetail.state,
-      city: candidateProfileContactDetail.city,
-      zip: candidateProfileContactDetail.zip,
-      address1: candidateProfileContactDetail.address1,
-      address2: candidateProfileContactDetail.address2,
-      phone1: candidateProfileContactDetail.phone1,
-      phone2: candidateProfileContactDetail.phone2,
+      country: candidateProfileContactDetail?.country,
+      state: candidateProfileContactDetail?.state,
+      city: candidateProfileContactDetail?.city,
+      zip: candidateProfileContactDetail?.zip,
+      address1: candidateProfileContactDetail?.address1,
+      address2: candidateProfileContactDetail?.address2,
+      phone1: candidateProfileContactDetail?.phone1,
+      phone2: candidateProfileContactDetail?.phone2,
       email,
     });
     this.candidateForm.get('profSummary')?.patchValue({ professionalSummary });
