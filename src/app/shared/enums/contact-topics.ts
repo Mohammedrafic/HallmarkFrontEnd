@@ -65,5 +65,7 @@ export const Topics = [
     'Message History',
     'Order Check',
     'Overall Status',
-    'Overtime'
+    'Overtime',
+    'Employees',
+    'Employee List'
 ];

@@ -416,7 +416,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private dispatchInitialIcon(): void {
-    this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'clock' }));
   }
 
   private IRPVMSGridHandler(): void {
