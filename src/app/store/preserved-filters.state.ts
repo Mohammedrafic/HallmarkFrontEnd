@@ -6,6 +6,7 @@ import {
   ClearPageFilters,
   GetPreservedFiltersByPage,
   InitPreservedFilters,
+  ResetPageFilters,
   SaveFiltersByPageName,
   SetPreservedFilters,
 } from './preserved-filters.actions';
@@ -140,5 +141,10 @@ export class PreservedFiltersState {
         patchState({ preservedFiltersByPageName: { state: null, isNotPreserved: true, dispatch: false } });
       })
     );
+  }
+
+  @Action(ResetPageFilters)
+  ResetPageFilters({ patchState }: StateContext<PreservedFiltersStateModel>) {
+    patchState({ preservedFiltersByPageName: { state: null, isNotPreserved: true, dispatch: false } });
   }
 }

@@ -33,3 +33,7 @@ export class ClearPageFilters {
   static readonly type = '[preserved filters] Clear Page Filters';
   constructor(public pageName: FilterPageName) {}
 }
+
+export class ResetPageFilters {
+  static readonly type = '[preserved filters] Reset Page Filters';
+}
