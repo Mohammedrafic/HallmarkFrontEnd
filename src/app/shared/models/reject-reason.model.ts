@@ -28,7 +28,7 @@ export type RejectReasonPayload = {
   rejectReasonId: number;
 }
 
-export type RejectReasonPage = PageOfCollections<RejectReason>;
+export type RejectReasonPage = PageOfCollections<RejectReasonwithSystem>;
 
 export interface UnavailabilityReasons {
   id: string;

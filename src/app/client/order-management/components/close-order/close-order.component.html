@@ -11,7 +11,7 @@
           id="reason"
           appValidateWithMessage
           [allowFiltering]="true"
-          [dataSource]="(closureReasonsPage$ | async)?.items"
+          [dataSource]="closureReasons"
           [fields]="reasonFields"
           formControlName="reasonId">
         </ejs-dropdownlist>

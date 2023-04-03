@@ -195,6 +195,10 @@ export class RejectReasonState {
       tap(() => {
         dispatch(new UpdateClosureReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveRejectReasonsError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
