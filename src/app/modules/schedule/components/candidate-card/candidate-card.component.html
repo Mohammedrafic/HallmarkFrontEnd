@@ -25,21 +25,21 @@
     </ejs-tooltip> -->
   </div>
   <div class="block">
-    <ejs-tooltip
+    <ejs-tooltip *ngIf="candidateData.displayId"
       [content]="candidateData.displayId.length > 12 ? 'ID: ' + candidateData.displayId : 'ID'"
       position="TopCenter"
-      [showTipPointer]="false" class="block-id">
+      [showTipPointer]="false">
       <span>{{ candidateData.displayId | textElipsis: 12 }}</span>
     </ejs-tooltip>
-    <span class="separator">|</span>
-    <ejs-tooltip content="Primary Skill" position="TopCenter" [showTipPointer]="false" class="block-skill">
-      <span class="direction">{{ candidateData.skill }}</span>
+    <span *ngIf="candidateData.displayId" class="separator">|</span>
+    <ejs-tooltip content="Primary Skill" position="TopCenter" [showTipPointer]="false">
+      <span class="skill">{{ candidateData.skill }}</span>
     </ejs-tooltip>
   </div>
   <div class="block">
     <ng-container *ngIf="showScheduledHours">
       <ejs-tooltip content="Scheduled Hours Per Week 1/Week 2" position="TopCenter" [showTipPointer]="false">
-        <span>{{ candidateData.workHours.join('/') }}</span>
+        <span>Hrs {{ candidateData.workHours }}</span>
       </ejs-tooltip>
       <span class="separator">|</span>
     </ng-container>

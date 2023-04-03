@@ -193,7 +193,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
   public onTabCreated(): void {
     this.tab.selected.pipe(takeWhile(() => this.isAlive)).subscribe((event: SelectEventArgs) => {
       const visibilityTabIndex = 0;
-      this.tab.refresh();
+
       if (event.selectedIndex !== visibilityTabIndex) {
         this.firstActive = false;
       } else {

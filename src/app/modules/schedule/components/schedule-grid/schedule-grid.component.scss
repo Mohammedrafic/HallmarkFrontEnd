@@ -17,8 +17,8 @@
 
 .grid-header {
   width: 100%;
-  max-height: 63px;
-  padding: 12px 12px 11px;
+  max-height: 64px;
+  padding: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -30,13 +30,13 @@
 
   & .right {
     width: 100%;
-    padding-left: 8px;
-    justify-content: space-between;
+    justify-content: end;
+    gap: 24px;
   }
 
   & .candidate-autocomplete {
-    width: 168px;
-    margin-right: 12px;
+    width: 224px;
+    margin-right: 24px;
 
     & .e-input-group.e-control-wrapper {
       padding: 0;
@@ -69,24 +69,45 @@
   & .date-periods {
     display: flex;
     align-items: center;
-    margin-right: 12px;
 
     & .date-item {
-      padding: 11px 12px;
+      white-space: nowrap;
+      border: 1px solid $primary-active-blue-40;
+      border-left: none;
+      padding: 10px 16px;
       font-size: 14px;
-      font-weight: 400;
+      font-weight: 600;
       line-height: 18px;
-      color: $secondary-dark-blue-10;
+      color: $primary-active-blue-10;
       cursor: pointer;
 
+      &:first-child {
+        border-left: 1px solid $primary-active-blue-40;
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+      }
+
+      &:last-child {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+
       &.active {
-        font-weight: 700;
+        border: 1px solid $primary-active-blue-10;
+        background-color: $primary-active-blue-10;
+        color: $white;
       }
 
       &.disabled {
         cursor: default;
-        color: $secondary-dark-blue-30;
-        font-weight: unset;
+        color: $primary-active-blue-80;
+        border-color: $primary-active-blue-80;
+      }
+
+      &.disabled.active {
+        background-color: $primary-active-blue-70;
+        border-color: $primary-active-blue-70;
+        color: $white;
       }
     }
   }
@@ -129,74 +150,63 @@ tr {
 }
 
 th, td {
-  border: 0.5px solid $secondary-dark-blue-45;
-}
-
-.custom-head-cell {
-  border-right: none;
-}
-
-.custom-date-th {
-  border-top: 1px solid $secondary-dark-blue-45;
-  border-bottom: 1px solid $secondary-dark-blue-45;
+  border: 1px solid $secondary-dark-blue-45;
+  border-top: none;
   border-left: none;
-  border-right: none;
-  padding: 0 !important;
-
-  span {
-    padding-left: 16px;
-    border-left: 1px solid $secondary-dark-blue-45;
-  }
 }
 
 .table-title {
-  height: 40px;
-  padding: 8px;
+  padding: 16px;
+  text-transform: uppercase;
+  font-weight: 700;
   font-size: 12px;
-  font-weight: 400;
-  line-height: 18px;
+  line-height: 13px;
+  color: $secondary-dark-blue-15;
   text-align: left;
   white-space: nowrap;
-  color: $black;
 
   &.date {
     min-width: 112px;
-  }
+    border-bottom: 1px solid $secondary-dark-blue-45;
+    border-left: none;
+    border-right: none;
+    padding: 0 !important;
 
-  &.month-date {
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 13px;
-    color: $secondary-dark-blue-15;
+    span {
+      padding-left: 16px;
+      border-left: 1px solid $secondary-dark-blue-45;
+    }
   }
 
   &.candidates-head-cell {
+    border-right: none;
     z-index: 30;
     width: 240px;
     min-width: 240px;
     max-width: 240px;
+
+    .e-badge {
+      margin: 0 0 2px 8px;
+    }
   }
 }
 
 .table-row, .table-cell {
-  height: 90px;
+  height: 80px;
 }
 
 .table-cell {
   padding: 0;
-  transition: all .2s linear;
 
   &.selected {
-    border: 0.5px solid $primary-active-blue;
+    border: 1px solid $primary-active-blue;
   }
 
   &.date-slot {
     cursor: pointer;
 
     &:hover {
-      border-color: $primary-active-blue-10;
-      transition: all .2s linear;
+      border: 1px solid $primary-active-blue-10;
     }
   }
 
@@ -207,7 +217,11 @@ th, td {
   }
 
   &.disabled-cell {
-    background-color: $secondary-dark-blue-40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $secondary-dark-blue-40;
+    cursor: default;
   }
 }
 
