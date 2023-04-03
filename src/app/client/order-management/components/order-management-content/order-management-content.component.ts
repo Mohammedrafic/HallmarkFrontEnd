@@ -141,7 +141,6 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementChild,
-  OrderManagementFilter,
   OrderManagementPage,
 } from '@shared/models/order-management.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
@@ -264,7 +263,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
 
   @Select(PreservedFiltersState.preservedFiltersByPageName)
-  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<OrderManagementFilter>>;
+  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<OrderFilter>>;
 
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
@@ -1617,7 +1616,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
   }
 
-  private onOrderFilterDataSourcesLoadHandler(preservedFilters: PreservedFiltersByPage<OrderManagementFilter>): Observable<void> {
+  private onOrderFilterDataSourcesLoadHandler(preservedFilters: PreservedFiltersByPage<OrderFilter>): Observable<void> {
     return this.orderFilterDataSources$
       .pipe(throttleTime(100), takeUntil(this.unsubscribe$), filter(Boolean))
       .pipe(switchMap((data: OrderFilterDataSource) => {
@@ -1695,16 +1694,18 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }));
   }
 
-  private adjustFilters(filters: PreservedFiltersByPage<OrderManagementFilter>): void {
+  private adjustFilters(filters: PreservedFiltersByPage<OrderFilter>): void {
     // TODO apply irp preserved filters
     if(filters.isNotPreserved || this.activeSystem === OrderManagementIRPSystemId.IRP || this.orderManagementPagerState) {
       this.setDefaultFilter();
     } else {
-      this.filters = filters.state as OrderFilter;
+      const { state } = filters;
+      this.filters = { ...state, orderStatuses: state?.orderStatuses ? [...state.orderStatuses] : [] };
       this.patchFilterForm();
-      !this.firstOrdersDispatch && this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
+      !this.firstOrdersDispatch && this.getOrders(true);
       this.firstOrdersDispatch = false;
     }
+    this.cd.markForCheck();
   }
 
   private getPreservedContactPerson(contactEmails: string): void {
@@ -1861,12 +1862,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       .subscribe();
   }
 
-  private getPreservedFilters(): Observable<PreservedFiltersByPage<OrderManagementFilter>> {
+  private getPreservedFilters(): Observable<PreservedFiltersByPage<OrderFilter>> {
     return this.preservedFiltersByPageName$.pipe(switchMap((filters) => {
 
       if(!filters.isNotPreserved) {
         this.firstOrdersDispatch = true;
-        this.store.dispatch([new GetOrders(filters.state as OrderManagementFilter, this.isIncomplete)]);
+        this.store.dispatch([new GetOrders(filters.state, this.isIncomplete)]);
       }
       return of(filters);
     }))
