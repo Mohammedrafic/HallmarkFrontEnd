@@ -13,7 +13,6 @@ import { PreservedFilters } from '@shared/models/preserved-filters.model';
 import { PreservedFiltersGlobal } from '@shared/models/preserved-filters.model';
 import { SetPreservedFiltersForTimesheets } from './preserved-filters.actions';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
-import { FilterPageName } from '@core/enums/filter-page-name.enum';
 
 export interface PreservedFiltersStateModel {
   preservedFilters: PreservedFilters | null;
@@ -28,7 +27,7 @@ export interface PreservedFiltersStateModel {
     preservedFilters: null,
     preservedFiltersGlobal: null,
     preservedFiltersTimesheets: null,
-    preservedFiltersByPageName: { state: null, isNotPreserved: true },
+    preservedFiltersByPageName: { state: null, isNotPreserved: true, dispatch: false },
   },
 })
 @Injectable()
@@ -127,14 +126,19 @@ export class PreservedFiltersState {
     { patchState }: StateContext<PreservedFiltersStateModel>,
     { pageName, filterState }: SaveFiltersByPageName
   ): Observable<PreservedFiltersByPage<unknown>> {
-    return this.preservedFIltersService.saveFiltersByPageName(pageName, filterState);
+    return this.preservedFIltersService.saveFiltersByPageName(pageName, filterState).pipe(
+      tap((response) => {
+        patchState({ preservedFiltersByPageName: response });
+      })
+    );
   }
 
   @Action(ClearPageFilters)
-  ClearPageFilters({ patchState , getState }: StateContext<PreservedFiltersStateModel>) {
-    const state = getState().preservedFiltersByPageName;
-    if(state) {
-      patchState({ preservedFiltersByPageName: { state: null, isNotPreserved: true } });
-    }
+  ClearPageFilters({ patchState }: StateContext<PreservedFiltersStateModel>, { pageName }: ClearPageFilters) {
+    return this.preservedFIltersService.clearPageFilters(pageName).pipe(
+      tap(() => {
+        patchState({ preservedFiltersByPageName: { state: null, isNotPreserved: true, dispatch: false } });
+      })
+    );
   }
 }

@@ -31,4 +31,5 @@ export class GetPreservedFiltersByPage {
 
 export class ClearPageFilters {
   static readonly type = '[preserved filters] Clear Page Filters';
+  constructor(public pageName: FilterPageName) {}
 }

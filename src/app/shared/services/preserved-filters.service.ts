@@ -36,13 +36,11 @@ export class PreservedFiltersService {
     const params = {
       pageName,
     };
-    return this.http
-      .get<PreservedFiltersByPage<string>>(`/api/Filters/state`, { params })
-      .pipe(
-        map((data) => {
-          return { ...data, state: JSON.parse(data.state) };
-        })
-      );
+    return this.http.get<PreservedFiltersByPage<string>>(`/api/Filters/state`, { params }).pipe(
+      map((data) => {
+        return { ...data, state: JSON.parse(data.state), dispatch: true };
+      })
+    );
   }
 
   public saveFiltersByPageName(pageName: FilterPageName, filters: unknown): Observable<PreservedFiltersByPage<unknown>> {
@@ -50,6 +48,14 @@ export class PreservedFiltersService {
       state: JSON.stringify(filters),
       pageName,
     };
-    return this.http.put<PreservedFiltersByPage<string>>(`/api/Filters/state`, params);
+    return this.http.put<PreservedFiltersByPage<string>>(`/api/Filters/state`, params).pipe(
+      map((data) => {
+        return { ...data, state: JSON.parse(data.state), dispatch: false };
+      })
+    );
+  }
+
+  public clearPageFilters(pageName: FilterPageName): Observable<unknown> {
+    return this.http.delete(`/api/Filters/state/${pageName}`);
   }
 }
