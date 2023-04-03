@@ -76,7 +76,7 @@ import { ListOfSkills } from '@shared/models/skill.model';
 import { DurationService } from '@shared/services/duration.service';
 import { Duration } from '@shared/enums/durations';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
-import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.model';
+import { RejectReason, RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import {
   OrderDetailsIrpService,
 } from '@client/order-management/components/irp-tabs/services/order-details-irp.service';
@@ -148,6 +148,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private dataSourceContainer: OrderDataSourceContainer = {};
   private selectedSystem: SelectSystem;
   private isTieringLogicLoad = true;
+
+  private reason:RejectReason[]=[];
+  public optionFieldsOrderRequisition: FieldSettingsModel = { text: 'reason', value: 'id' };
 
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   private skills$: Observable<ListOfSkills[]>;
@@ -320,14 +323,28 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     setDataSource(jobDistributionForm.fields, 'agencyId', this.dataSourceContainer.associateAgency as AssociateAgency[]);
 
     const jobDescriptionForm = this.getSelectedFormConfig(JobDescriptionForm);
-    setDataSource(jobDescriptionForm.fields, 'orderRequisitionReasonId', this.dataSourceContainer.reasons as RejectReason[]);
+    setDataSource(jobDescriptionForm.fields, 'orderRequisitionReasonId', this.getIRPOrderRequisition(this.dataSourceContainer.reasons as RejectReasonwithSystem[]));
 
     this.setDataSourceForSpecialProject();
     this.setDataSourceForWorkLocationList();
 
     this.changeDetection.markForCheck();
   }
-
+  private getIRPOrderRequisition(orderRequisition:RejectReasonwithSystem[]):RejectReason[]{
+    debugger;
+    orderRequisition.forEach(element => {
+      if(element.includeInIRP===true){
+        this.reason.push(
+          {
+            id:element.id,
+            reason:element.reason,
+            businessUnitId:element.businessUnitId
+          }
+        )
+      }
+    });
+    return this.reason;
+  }
   private watchForDataSources(): void {
     this.skills$.pipe(
       filter(Boolean),
