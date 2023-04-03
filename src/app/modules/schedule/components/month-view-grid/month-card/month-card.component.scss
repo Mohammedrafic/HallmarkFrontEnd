@@ -20,7 +20,7 @@
 }
 
 .card-wrapper {
-  height: 150px;
+  height: 130px;
 
   .day {
     font-weight: 400;
@@ -98,5 +98,6 @@
 }
 
 .inactive-date {
-  background-color: $secondary-dark-blue-50;
+  opacity: 0.5;
+  cursor: default;
 }

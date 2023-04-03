@@ -27,6 +27,8 @@ export class AcceptFormComponent implements OnChanges{
 
   @Input() isCandidatePayRateVisible: boolean;
 
+  @Input() isReorder: boolean;
+
   public priceUtils = PriceUtils;
 
   public isBlankStatus: boolean;
