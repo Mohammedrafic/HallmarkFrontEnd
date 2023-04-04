@@ -139,7 +139,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   public dropdownDataSource: OrganizationSettingsDropDownOption[];
   public dropdownFields: FieldSettingsModel = { text: 'value', value: 'key' };
-  public dropdownCheckboxValueDataSource: OrganizationSettingsDropDownOption[] = [{ text: 'Apply', value: 'Apply' }, { text: 'Accept', value: 'Accept' }];
+  public dropdownCheckboxValueDataSource: any[] = [{ key: 'Apply', value: 'Apply' }, { key: 'Accept', value: 'Accept' }];
 
 
   public organizationHierarchy: number;

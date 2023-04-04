@@ -433,15 +433,18 @@
             <label class="switch-label">Turned {{ checkboxValueForm.get('isEnabled')?.value ? 'on' : 'off' }}</label>
           </div>
         </div>
-        <label for="numeric">Value<span class="required">*</span></label>
-        <div class="input-group">
-          <ejs-dropdownlist id="dropdown"
-                            [allowFiltering]="false"
-                            [dataSource]="dropdownCheckboxValueDataSource"
-                            [fields]="dropdownFields"
-                            appValidateWithMessage
-                            formControlName="value"></ejs-dropdownlist>
-        </div>
+        <ng-container *ngIf="checkboxValueForm.get('isEnabled')?.value == true">
+          <label for="numeric">Value<span class="required">*</span></label>
+          <div class="input-group">
+            <ejs-dropdownlist id="dropdown"
+                              [allowFiltering]="false"
+                              [dataSource]="dropdownCheckboxValueDataSource"
+                              [fields]="dropdownFields"
+                              appValidateWithMessage
+                              formControlName="value"></ejs-dropdownlist>
+          </div>
+        </ng-container>       
+
       </div>
     </form>
 
