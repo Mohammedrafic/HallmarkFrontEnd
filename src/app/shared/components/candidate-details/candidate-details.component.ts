@@ -214,12 +214,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   private subscribeOnSkills(): Observable<MasterSkillByOrganization[]> {
     return this.candidateSkills$.pipe(
-      tap(
-        (skills: MasterSkillByOrganization[]) =>
-          (this.filterColumns.skillsIds.dataSource = skills.filter(
-            (v, i, a) => a.findIndex((skill) => skill.masterSkillId === v.masterSkillId) === i
-          ))
-      )
+      tap((skills: MasterSkillByOrganization[]) => this.assignSkillDataSource(skills))
     );
   }
 
@@ -331,20 +326,30 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   private adjustFilters(): Observable<PreservedFiltersByPage<FiltersModal>> {
     return this.preservedFiltersByPageName$.pipe(
       switchMap((filters) => {
-        const { isNotPreserved, state, dispatch } = filters;
-        if (!isNotPreserved && dispatch) {
-          this.filters = {
-            orderTypes: state?.orderTypes || [],
-            startDate: state?.startDate,
-            endDate: state?.endDate,
-            skillsIds: (state?.skillsIds && [...state.skillsIds]) || [],
-            regionsIds: (state?.regionsIds && [...state.regionsIds]) || [],
-          };
-
-          this.patchFormValue();
-        }
+        this.handleFilterState(filters);
         return of(filters);
       })
+    );
+  }
+
+  private handleFilterState(filters: PreservedFiltersByPage<FiltersModal>): void {
+    const { isNotPreserved, state, dispatch } = filters;
+    if (!isNotPreserved && dispatch) {
+      this.filters = {
+        orderTypes: state?.orderTypes || [],
+        startDate: state?.startDate,
+        endDate: state?.endDate,
+        skillsIds: (state?.skillsIds && [...state.skillsIds]) || [],
+        regionsIds: (state?.regionsIds && [...state.regionsIds]) || [],
+      };
+
+      this.patchFormValue();
+    }
+  }
+
+  private assignSkillDataSource(skills: MasterSkillByOrganization[]): void {
+    this.filterColumns.skillsIds.dataSource = skills.filter(
+      (value, index, array) => array.findIndex((skill) => skill.masterSkillId === value.masterSkillId) === index
     );
   }
 }

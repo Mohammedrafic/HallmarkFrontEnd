@@ -400,11 +400,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private orderManagementPagerState: OrderManagementPagerState | null;
   public isCondidateTab:boolean=false;
   private firstOrdersDispatch: boolean = false;
-  private get pageName(): FilterPageName {
-    return this.isActiveSystemIRP
-      ? FilterPageName.OrderManagementIRPOrganization
-      : FilterPageName.OrderManagementVMSOrganization;
-  }
 
   constructor(
     protected override store: Store,
@@ -873,7 +868,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public onFilterClearAll(): void {
-    this.store.dispatch(new ClearPageFilters(this.pageName));
+    this.store.dispatch(new ClearPageFilters(this.pageName()));
     this.filterApplied = true;
     this.orderManagementService.selectedOrderAfterRedirect = null;
     this.clearFilters();
@@ -882,35 +877,16 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public onFilterApply(): void {
     if (this.OrderFilterFormGroup.dirty) {
-      this.filterApplied = true;
-      this.filters = this.OrderFilterFormGroup.getRawValue();
-      if (!Array.isArray(this.filters.contactEmails)) {
-        this.filters.contactEmails = this.filters.contactEmails
-          ? [this.filters.contactEmails]
-          : this.filters.contactEmails;
-      }
-      this.filters.candidateName = this.filters.candidateName || null;
-      this.filters.orderPublicId = this.filters.orderPublicId || null;
-      this.filters.billRateFrom = this.filters.billRateFrom || null;
-      this.filters.billRateTo = this.filters.billRateTo || null;
-      this.filters.jobStartDate = this.filters.jobStartDate || null;
-      this.filters.jobEndDate = this.filters.jobEndDate || null;
-      this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
-      this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
-      this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
-      this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
-      this.filters.openPositions = this.filters.openPositions || null;
-      this.filters.irpOnly = !!this.filters.irpOnly;
+      this.refreshFilterState();
+      this.getOrders(true);
+      this.store.dispatch(new ShowFilterDialog(false));
+      this.saveFiltersByPageName();
+      this.OrderFilterFormGroup.markAsPristine();
       this.filteredItems = this.filterService.generateChips(
         this.OrderFilterFormGroup,
         this.filterColumns,
         this.datePipe
       );
-      this.getOrders(true);
-      this.store.dispatch(new ShowFilterDialog(false));
-      this.filterService.setPreservedFIlters(this.filters);
-      this.SaveFiltersByPageName();
-      this.OrderFilterFormGroup.markAsPristine();
     } else {
       this.store.dispatch(new ShowFilterDialog(false));
     }
@@ -1223,15 +1199,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     } else {
       this.filterColumns.orderTypes.dataSource = FilterIrpOrderTypes;
     }
-  }
-
-  private getPreservedFiltersByPage(): void {
-    this.store.dispatch(new GetPreservedFiltersByPage(this.pageName));
-  }
-
-  private SaveFiltersByPageName(): void {
-    const filters = { ...this.filters, orderTypes: [] }
-    this.store.dispatch(new SaveFiltersByPageName(this.pageName, filters));
   }
 
   changeSystem(selectedBtn: ButtonModel) {
@@ -1871,16 +1838,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       .subscribe();
   }
 
-  private getPreservedFilters(): Observable<PreservedFiltersByPage<OrderFilter>> {
-    return this.preservedFiltersByPageName$.pipe(switchMap((filters) => {
-      if(!filters.isNotPreserved && filters.dispatch) {
-        this.firstOrdersDispatch = true;
-        this.store.dispatch([new GetOrders(filters.state, this.isIncomplete)]);
-      }
-      return of(filters);
-    }))
-  }
-
   private onApproveOrderHandler(): void {
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ApproveOrder)).subscribe(() => {
       const [index] = this.gridWithChildRow.getSelectedRowIndexes();
@@ -2341,5 +2298,52 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderManagementPagerState = locationState?.orderManagementPagerState;
     this.pageSize = this.orderManagementPagerState?.pageSize ?? this.pageSize;
     this.cd.markForCheck();
+  }
+
+  private getPreservedFiltersByPage(): void {
+    this.store.dispatch(new GetPreservedFiltersByPage(this.pageName()));
+  }
+
+  private saveFiltersByPageName(): void {
+    const filters = { ...this.filters, orderTypes: [] }
+    this.store.dispatch(new SaveFiltersByPageName(this.pageName(), filters));
+  }
+
+  private getPreservedFilters(): Observable<PreservedFiltersByPage<OrderFilter>> {
+    return this.preservedFiltersByPageName$.pipe(switchMap((filters) => {
+      if(!filters.isNotPreserved && filters.dispatch) {
+        this.firstOrdersDispatch = true;
+        this.store.dispatch([new GetOrders(filters.state, this.isIncomplete)]);
+      }
+      return of(filters);
+    }))
+  }
+
+  private refreshFilterState(): void {
+    this.filterApplied = true;
+    this.filters = this.OrderFilterFormGroup.getRawValue();
+    if (!Array.isArray(this.filters.contactEmails)) {
+      this.filters.contactEmails = this.filters.contactEmails
+        ? [this.filters.contactEmails]
+        : this.filters.contactEmails;
+    }
+    this.filters.candidateName = this.filters.candidateName || null;
+    this.filters.orderPublicId = this.filters.orderPublicId || null;
+    this.filters.billRateFrom = this.filters.billRateFrom || null;
+    this.filters.billRateTo = this.filters.billRateTo || null;
+    this.filters.jobStartDate = this.filters.jobStartDate || null;
+    this.filters.jobEndDate = this.filters.jobEndDate || null;
+    this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
+    this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
+    this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
+    this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
+    this.filters.openPositions = this.filters.openPositions || null;
+    this.filters.irpOnly = !!this.filters.irpOnly;
+  }
+
+  private pageName(): FilterPageName {
+    return this.isActiveSystemIRP
+      ? FilterPageName.OrderManagementIRPOrganization
+      : FilterPageName.OrderManagementVMSOrganization;
   }
 }
