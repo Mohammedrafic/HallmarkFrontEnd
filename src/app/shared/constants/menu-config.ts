@@ -414,6 +414,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/staff-list',
     },
+    90: {
+      // Grant Report
+      icon: '',
+      route: '/analytics/grant-report',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -983,7 +988,7 @@ export const MENU_CONFIG: any = {
       // Staff Schedule By Shift Report
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
-    },
+    },  
     89: {
       // Finance Medicare Wage Report
       icon: '',
@@ -993,6 +998,11 @@ export const MENU_CONFIG: any = {
       // Staff List Report
       icon: '',
       route: '/analytics/staff-list',
+    },
+    90: {
+      // Grant Report
+      icon: '',
+      route: '/analytics/grant-report',
     },
   },
 
