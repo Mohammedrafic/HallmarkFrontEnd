@@ -4,16 +4,7 @@ import { FormControl } from '@angular/forms';
 import { DOCUMENT, Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import {
-  distinctUntilChanged,
-  Observable,
-  switchMap,
-  takeUntil,
-  filter,
-  tap,
-  of,
-  debounceTime,
-} from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime} from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction } from '@core/enums';
@@ -46,7 +37,10 @@ import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fiel
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import * as Interfaces from '../../interface';
-import { ExportDataModel } from '@shared/models/export.model';
+import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
+import { FilterPageName } from '@core/enums/filter-page-name.enum';
+import { ClearPageFilters, GetPreservedFiltersByPage, ResetPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
+import { cloneDeep } from 'lodash';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -93,8 +87,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   @Select(UserState.lastSelectedAgencyId)
   agencyId$: Observable<number>;
 
-  @Select(PreservedFiltersState.preservedFilters)
-  preservedFilters$: Observable<PreservedFilters>;
+  @Select(PreservedFiltersState.preservedFiltersByPageName)
+  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<TimesheetsFilterState>>;
 
   public tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
@@ -128,18 +122,18 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }),
       new Timesheets.ResetFiltersState(),
       new Timesheets.SelectOrganization(0),
-    ]);  
+    ]);
     this.routerState = this.router.getCurrentNavigation()?.extras?.state;
 
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
   }
 
   ngOnInit(): void {
-    this.businessUnitId = JSON.parse((localStorage.getItem('BussinessUnitID') || '0')) as number;
+    this.businessUnitId = JSON.parse(localStorage.getItem('BussinessUnitID') || '0') as number;
     if (!this.businessUnitId) {
       this.businessUnitId = 0;
     }
-    this.document.defaultView?.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
+    this.document.defaultView?.localStorage.setItem('BussinessUnitID', JSON.stringify(''));
 
     this.onOrganizationChangedHandler();
     this.startOrganizationWatching();
@@ -148,35 +142,27 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.initOnRedirect();
   }
 
+  public override ngOnDestroy() {
+    super.ngOnDestroy();
+    this.store.dispatch(new ResetPageFilters());
+  }
+
   public handleChangeTab(tabIndex: number): void {
-    let preservedFilters = null;
-    if (this.filterService.canPreserveFilters()) {
-      preservedFilters = this.isAgency
-        ? this.store.selectSnapshot(PreservedFiltersState.preservedFiltersTimesheets)
-        : this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
-    }
+    const preservedFilters = this.store.selectSnapshot(
+      PreservedFiltersState.preservedFiltersByPageName
+    ) as PreservedFiltersByPage<TimesheetsFilterState>;
     this.activeTabIdx = tabIndex;
-    if (preservedFilters) {
-      this.store.dispatch(
-        new Timesheets.UpdateFiltersState(
-          {
-            statusIds: this.tabConfig[tabIndex].value,
-            regionsIds: [...preservedFilters.regions],
-            locationIds: preservedFilters.locations,
-            contactEmails: preservedFilters.contactEmails ? [preservedFilters.contactEmails] : undefined,
-          },
-          this.activeTabIdx !== 0,
-          false
-        )
-      );
-    } else {
-      this.grid?.gridInstance$?.value.columnApi.resetColumnState();
-      this.store.dispatch(
-        new Timesheets.UpdateFiltersState({
+    this.grid?.gridInstance$?.value.columnApi.resetColumnState();
+    this.store.dispatch(
+      new Timesheets.UpdateFiltersState(
+        {
           statusIds: this.tabConfig[tabIndex].value,
-        }, this.activeTabIdx !== 0, false)
-      );
-    }
+          ...(!preservedFilters.isNotPreserved && preservedFilters.state),
+        },
+        this.activeTabIdx !== 0,
+        true
+      )
+    );
   }
 
   public handleChangePage(pageNumber: number): void {
@@ -192,17 +178,22 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public resetFilters(): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({}, this.activeTabIdx !== 0, this.isAgency));
+    this.store.dispatch([
+      new Timesheets.UpdateFiltersState({}, this.activeTabIdx !== 0, this.isAgency),
+      new ClearPageFilters(this.pageName()),
+    ]);
   }
 
   public updateTableByFilters(filters: TimesheetsFilterState): void {
-    this.store.dispatch(
+    this.store.dispatch([
+      new SaveFiltersByPageName(this.pageName(), filters),
       new Timesheets.UpdateFiltersState(
         {
           ...filters,
         },
         this.activeTabIdx !== 0
       )
+    ]
     );
     this.store.dispatch(new ShowFilterDialog(false));
   }
@@ -253,7 +244,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       this.gridSelections.rowNodes = nodes;
     } else {
       this.gridSelections.selectedTimesheetIds = [];
-      this.gridSelections.rowNodes = [];    
+      this.gridSelections.rowNodes = [];
     }
   }
 
@@ -265,42 +256,28 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.clearSelections();
     this.gridSelections.rowNodes = [];
   }
-  
+
   private bulkApprove(data: RowNode[]): void {
     this.store.dispatch(new Timesheets.BulkApprove(data));
   }
 
   private onOrganizationChangedHandler(): void {
    this.organizationId$.pipe( takeUntil(this.componentDestroy())).subscribe((value)=>{
+    this.store.dispatch(new GetPreservedFiltersByPage(this.pageName()));
     if(value!=null&&value!=undefined){this.OrganizationId=value}
     });
     const idStream = this.isAgency ? this.agencyId$ : this.organizationId$;
 
-    if (this.filterService.canPreserveFilters()) {
-      this.preservedFilters$
-        .pipe(
-          switchMap(() => idStream),
-          debounceTime(600),
-          filter((id) => !!id),
-          distinctUntilChanged(),
-          takeUntil(this.componentDestroy())
-        )
-        .subscribe(() => {
-          this.store.dispatch(new Timesheets.ResetFiltersState());
-          this.initComponentState();
-        });
-    } else {
-      idStream
-        .pipe(
-          debounceTime(600),
-          filter((id) => !!id),
-          takeUntil(this.componentDestroy())
-        )
-        .subscribe(() => {
-          this.store.dispatch(new Timesheets.ResetFiltersState());
-          this.initComponentState();
-        });
-    }
+    idStream
+      .pipe(
+        debounceTime(600),
+        filter((id) => !!id),
+        switchMap(() => this.adjustFilters()),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.initComponentState();
+      });
   }
 
   private startFiltersWatching(): void {
@@ -323,10 +300,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         switchMap((organizationId: number) => {
           this.orgId = organizationId;
           this.filterService.setPreservedFIltersTimesheets({ organizationIds: [organizationId] });
-              return this.store.dispatch([
-                new Timesheets.UpdateFiltersState({ organizationId }, this.activeTabIdx !== 0),
-                new Timesheets.SelectOrganization(organizationId),
-              ]);
+          return this.store.dispatch([
+            new Timesheets.UpdateFiltersState({ organizationId }, this.activeTabIdx !== 0),
+            new Timesheets.SelectOrganization(organizationId),
+          ]);
         }),
         switchMap(() => this.store.dispatch(new Timesheets.GetFiltersDataSource())),
         takeUntil(this.componentDestroy())
@@ -396,36 +373,33 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     });
   }
 
+  private adjustFilters(): Observable<PreservedFiltersByPage<TimesheetsFilterState>> {
+    return this.preservedFiltersByPageName$.pipe(filter(({dispatch}) => dispatch), tap((filters) => {
+      this.filters = filters.state;
+    }))
+  }
+
   private initComponentState(): void {
-    let preservedFilters = null;
-    let preservedFiltersAgency = null;
+    
+      //TODO remove old approach of preserving filters after implementing preserving filters by page on agency timesheets
+      let preservedFilters = null;
+      let preservedFiltersAgency = null;
+      if (this.filterService.canPreserveFilters()) {
+        preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
+        preservedFiltersAgency = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersTimesheets);
+      }
 
-    if (this.filterService.canPreserveFilters()) {
-      preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
-      preservedFiltersAgency = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersTimesheets);
-    }
-
-    this.timesheetsTabs?.programSelection();
-
-    if (this.isAgency) {
-      this.initOrganizationsList(preservedFiltersAgency);
-    } else {
-      /**
-       * TODO: rework needed
-       */
-      if (preservedFilters) {
+      this.timesheetsTabs?.programSelection();
+  
+      if (this.isAgency) {
+        this.initOrganizationsList(preservedFiltersAgency);
+      } else {
+        //TODO get rid cloneDeep
         this.store.dispatch([
-          new Timesheets.UpdateFiltersState({
-            regionsIds: [...preservedFilters.regions],
-            locationIds: [...preservedFilters.locations],
-            contactEmails: preservedFilters.contactEmails ? [preservedFilters.contactEmails] : undefined,
-          }),
+          new Timesheets.UpdateFiltersState(cloneDeep(this.filters)),
           new Timesheets.GetFiltersDataSource(),
         ]);
-      } else {
-        this.store.dispatch([new Timesheets.UpdateFiltersState(), new Timesheets.GetFiltersDataSource()]);
       }
-    }
   }
 
   private initOnRedirect(): void {
@@ -455,5 +429,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private clearSelections(): void {
     this.gridSelections.selectedTimesheetIds = [];
+  }
+
+  private pageName(): FilterPageName {
+    return this.isAgency ? FilterPageName.TimesheetsVMSAgency : FilterPageName.TimesheetsVMSOrganization;
   }
 }
