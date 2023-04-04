@@ -730,7 +730,7 @@ export class OrderManagementContentState {
     return this.orderManagementService.saveIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new ShowToast(MessageTypes.Success,  order.length==1?'Order '+order[0].organizationPrefix?.toString()+'-'+order[0].publicId?.toString()+' has been added':RECORD_ADDED),
           new SaveIrpOrderSucceeded(),
         ]);
           if (documents.length) {
@@ -777,7 +777,7 @@ export class OrderManagementContentState {
                 payload.organizationPrefix,
                 payload.publicId
               )
-            : new ShowToast(MessageTypes.Success, RECORD_ADDED),
+            : new ShowToast(MessageTypes.Success, 'Order '+ payload.organizationPrefix?.toString()+'-'+payload.publicId?.toString()+' has been added'),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
           new SaveLastSelectedOrganizationAgencyId(
