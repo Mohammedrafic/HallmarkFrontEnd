@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, OnInit
 import { FormGroup, FormBuilder } from '@angular/forms';
 
 import type { FieldSettingsModel, PopupEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { takeUntil, distinctUntilChanged } from 'rxjs';
+import { takeUntil, distinctUntilChanged, skip } from 'rxjs';
 
 import { GRID_CONFIG } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -71,7 +71,7 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
   private initPageSizeControlValueChangesListener(): void {
     this.paginationFormGroup
       .get('pageSize')
-      ?.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$))
+      ?.valueChanges.pipe(skip(1), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((pageSize: number) => {
         this.pageSizeChangeEmitter.emit(pageSize);
       });
