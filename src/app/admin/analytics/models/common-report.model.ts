@@ -18,6 +18,7 @@ export class CommonReportFilterOptions {
   jobStatusesAndReasons: JobStatusAndReasonFilterOptionsDto[];
   allCandidateStatusesAndReasons: CandidateStatusAndReasonFilterOptionsDto[];
   allJobStatusesAndReasons: JobStatusAndReasonFilterOptionsDto[];
+  invoiceStatuses:FilterOption[];
 }
 
 export class CandidateStatusAndReasonFilterOptionsDto {
@@ -76,6 +77,11 @@ export class SearchCandidate {
   middleName: string | null;
   lastName: string;
   fullName: string;
+}
+export class FilterOption
+{
+    id:number;
+    name:string;
 }
 export const OrderTypeOptionsForReport = [
   { id: OrderType.ContractToPerm, name: 'Contract To Perm' },

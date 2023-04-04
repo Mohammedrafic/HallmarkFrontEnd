@@ -57,6 +57,7 @@ import { VendorActivityComponent } from './vendor-activity/vendor-activity.compo
 import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-schedule-by-shift.component';
 import { StaffListComponent } from './staff-list/staff-list.component';
 import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-report/finance-medicare-wage-report.component';
+import { GrantReportComponent } from './grant-report/grant-report.component';
 
 
 @NgModule({
@@ -105,7 +106,8 @@ import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-repo
     VendorActivityComponent,
     StaffScheduleByShiftComponent,
     StaffListComponent,
-    FinanceMedicareWageReportComponent],
+    FinanceMedicareWageReportComponent,
+    GrantReportComponent],
   exports: [
     CandidateListComponent
   ],
