@@ -1,3 +1,4 @@
+import { ScheduleApiService } from 'src/app/modules/schedule/services/schedule-api.service';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnalyticsComponent } from './analytics.component';
@@ -124,6 +125,9 @@ import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-repo
     AutoCompleteAllModule,
     RadioButtonModule,
     NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState])
+  ],
+  providers:[
+    ScheduleApiService
   ]
 })
 export class AnalyticsModule { }
