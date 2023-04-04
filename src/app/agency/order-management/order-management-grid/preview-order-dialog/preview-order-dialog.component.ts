@@ -155,7 +155,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
       this.currentOrder = order;
       this.currentOrder && this.getOrderComments();
       this.isClosedOrder = this.currentOrder?.status === OrderStatus.Closed;
-      this.cd.markForCheck();
+      this.cd.detectChanges();
     });
   }
 
@@ -180,7 +180,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
       });
     this.extensions$.pipe(takeWhile(() => this.isAlive)).subscribe((extensions) => {
       this.extensions = extensions?.filter((extension: any) => extension.id !== this.order?.id);
-      this.cd.markForCheck();
+      this.cd.detectChanges();
     });
   }
 
@@ -188,7 +188,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
     if (event.isSwiped) {
       event.cancel = true;
     }
-    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
   public onTabCreated(): void {
@@ -238,7 +238,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
       )
       .subscribe((value) => {
         this.agencyActionsAllowed = value;
-        this.cd.markForCheck();
+        this.cd.detectChanges();
       });
   }
 
@@ -248,6 +248,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         if (this.openDetailsTab) {
           setTimeout(()=>{
             this.tab.select(0);
+            this.cd.detectChanges();
           },100);
         } else {
           this.tab.select(1);
@@ -261,7 +262,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         disabledBodyOverflow(false);
       }
 
-      this.cd.markForCheck();
+      this.cd.detectChanges();
     });
   }
 }
