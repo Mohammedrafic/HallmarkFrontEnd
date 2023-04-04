@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { debounceTime, filter, map, merge, Observable, Subject, switchMap, takeUntil, takeWhile } from 'rxjs';
+import { debounceTime, filter, map, merge, Observable, Subject, switchMap, takeUntil, takeWhile, of, combineLatest } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -55,6 +55,9 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { DateTimeHelper } from '@core/helpers';
+import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
+import { ClearPageFilters, GetPreservedFiltersByPage, ResetPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
+import { FilterPageName } from '@core/enums/filter-page-name.enum';
 
 @Component({
   selector: 'app-candidate-list',
@@ -88,6 +91,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   assignedSkills$: Observable<ListOfSkills[]>;
+
+  @Select(PreservedFiltersState.preservedFiltersByPageName)
+  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;
 
   @Input() filteredItems$: Subject<number>;
   @Input() export$: Subject<ExportedFileType>;
@@ -145,6 +151,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private isAlive = true;
   private activeTab: number;
 
+  get pageName(): FilterPageName {
+    return this.isIRP
+    ? FilterPageName.CandidatesIRPOrganization
+    : FilterPageName.CandidatesVMSOrganization;
+  }
+
   constructor(
     private store: Store,
     private router: Router,
@@ -159,6 +171,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   ngOnInit(): void {
+    this.initCandidateFilterForm();
     this.getRegions();
     this.dispatchInitialIcon();
     this.subscribeOnSaveState();
@@ -170,7 +183,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.setFileName();
     this.filterColumns = !this.isIRP ? filterColumns : IRPFilterColumns;
     this.subscribeOnRegions();
-    this.CandidateFilterFormGroup = !this.isIRP ? this.candidateListService.generateVMSCandidateFilterForm() : this.candidateListService.generateIRPCandidateFilterForm();
     this.subscribeOnOrgStructure();
     this.subscribeOnLocationChange();
     this.syncFilterTagsWithControls();
@@ -180,26 +192,34 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.isAlive = false;
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.store.dispatch(new ResetPageFilters());
   }
 
   public onFilterDelete(event: FilteredItem): void {
     this.filterService.removeValue(event, this.CandidateFilterFormGroup, this.filterColumns);
+    this.CandidateFilterFormGroup.markAsDirty();
   }
 
   public onFilterClearAll(): void {
+    this.store.dispatch(new ClearPageFilters(this.pageName));
     this.clearFilters();
     this.dispatchNewPage();
   }
 
   public onFilterApply(): void {
-    this.filters = this.CandidateFilterFormGroup.getRawValue();
-    this.filters.profileStatuses = this.filters.profileStatuses || [];
-    this.filters.regionsNames = this.filters.regionsNames || [];
-    this.filters.skillsIds = this.filters.skillsIds || [];
-    this.filters.candidateName = this.filters.candidateName || null;
-    this.dispatchNewPage();
-    this.store.dispatch(new ShowFilterDialog(false));
-    this.filterService.setPreservedFIltersGlobal(this.filters);
+    if(this.CandidateFilterFormGroup.dirty) {
+      this.filters = this.CandidateFilterFormGroup.getRawValue();
+      this.filters.profileStatuses = this.filters.profileStatuses || [];
+      this.filters.regionsNames = this.filters.regionsNames || [];
+      this.filters.skillsIds = this.filters.skillsIds || [];
+      this.filters.candidateName = this.filters.candidateName || null;
+      this.store.dispatch(new ShowFilterDialog(false));
+      this.saveFiltersByPageName(this.filters);
+      this.dispatchNewPage();
+      this.CandidateFilterFormGroup.markAsPristine();
+    } else {
+      this.store.dispatch(new ShowFilterDialog(false));
+    }
   }
 
   private setDefaultFilter(): void {
@@ -332,6 +352,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return region;
   }
 
+  private initCandidateFilterForm(): void {
+    this.CandidateFilterFormGroup = !this.isIRP
+      ? this.candidateListService.generateVMSCandidateFilterForm()
+      : this.candidateListService.generateIRPCandidateFilterForm();
+  }
+
   private updateCandidates(): void {
     if (this.isIRP) {
       this.candidates$ = this._IRPCandidates$.pipe(
@@ -428,21 +454,38 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private subscribeOnSaveState(): void {
-    merge(this.lastSelectedAgencyId$, this.lastSelectedOrgId$, this.regions$)
-      .pipe(
-        filter((value) => !!value),
-        debounceTime(600),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe(() => {
-        !this.isAgency && this.IRPVMSGridHandler();
-        this.updateCandidates();
+    combineLatest([this.lastSelectedAgencyId$, this.lastSelectedOrgId$, this.regions$])
+    .pipe(
+      filter((data) => !!data[2]),
+      switchMap((data) => {
+        this.getPreservedFiltersByPage();
+        return of(data)
+      }),
+      switchMap(() => this.adjustFilters()),
+      takeUntil(this.unsubscribe$)
+    )
+    .subscribe(() => {
+      !this.isAgency && this.IRPVMSGridHandler();
+      this.updateCandidates();
+      this.dispatchNewPage();
+      this.store.dispatch([new GetAllSkills()]);
+      this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
+    });
+  }
+
+  private adjustFilters(): Observable<PreservedFiltersByPage<CandidateListFilters>> {
+    return this.preservedFiltersByPageName$.pipe(
+      switchMap((filters) => {
         this.clearFilters();
-        this.setDefaultFilter();
-        this.dispatchNewPage();
-        this.store.dispatch([new GetAllSkills()]);
-        this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
-      });
+        if (!filters.isNotPreserved) {
+          this.filters = { ...filters.state };
+          this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
+        } else {
+          this.setDefaultFilter();
+        }
+        return of(filters);
+      })
+    );
   }
 
   private subscribeOnPageSubject(): void {
@@ -585,5 +628,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.filteredItems = filteredItems;
         this.filteredItems$.next(this.filteredItems.length);
       });
+  }
+
+  private getPreservedFiltersByPage(): void {
+    this.store.dispatch(new GetPreservedFiltersByPage(this.pageName));
+  }
+
+  private saveFiltersByPageName(filters: CandidateListFilters): void {
+    this.store.dispatch(new SaveFiltersByPageName(this.pageName, filters));
   }
 }
