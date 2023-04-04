@@ -159,7 +159,6 @@ export class GrantReportComponent implements OnInit {
       this.store.dispatch(new GetOrganizationsStructureAll(this.user?.id));
     }
 
-    this.SetReportData();
   }
 
   ngOnInit(): void {
@@ -167,28 +166,13 @@ export class GrantReportComponent implements OnInit {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
-      this.grantFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
-        if (data != null) {
-          this.isAlive = true;
-          this.filterOptionsData = data;
-          this.agencyIdControl = this.grantReportForm.get(grantReportConstants.formControlNames.AgencyIds) as AbstractControl;
-          this.filterColumns.agencyIds.dataSource = [];
-          this.filterColumns.agencyIds.dataSource = data?.agencies;
-
-          let agencyIds = data?.agencies;
-          this.filterColumns.agencyIds.dataSource = data?.agencies;
-          this.selectedAgencies = agencyIds;
-          this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
-          this.grantReportForm.get(grantReportConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
-          this.filterColumns.invoiceStatusIds.dataSource=data?.invoiceStatuses;
-          this.defaultInvoiceStausIds=data?.invoiceStatuses.map((list)=>list.Id);
-          this.grantReportForm.get(grantReportConstants.formControlNames.InvoiceStatusIds)?.setValue(this.defaultInvoiceStausIds);
+      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
+        if (data.length > 0) {
+          this.logiReportComponent.SetReportData(data);
         }
       });
-      this.SetReportData();
 
       this.agencyOrganizationId = data;
-      this.isInitialLoad = true;
 
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
@@ -289,6 +273,7 @@ export class GrantReportComponent implements OnInit {
             this.filterColumns.agencyIds.dataSource = [];
 
             if (data != null) {
+              this.isAlive = false;
               this.filterOptionsData = data;
               this.agencyIdControl = this.grantReportForm.get(grantReportConstants.formControlNames.AgencyIds) as AbstractControl;
               let agencyIds = data?.agencies;
@@ -297,7 +282,7 @@ export class GrantReportComponent implements OnInit {
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
               this.grantReportForm.get(grantReportConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
               this.filterColumns.invoiceStatusIds.dataSource=data?.invoiceStatuses;
-              this.defaultInvoiceStausIds=data?.invoiceStatuses.map((list)=>list.Id);
+              this.defaultInvoiceStausIds=data?.invoiceStatuses.map((list)=>list.id);
               this.grantReportForm.get(grantReportConstants.formControlNames.InvoiceStatusIds)?.setValue(this.defaultInvoiceStausIds);
               setTimeout(() => { this.SearchReport() }, 3000);
             }
@@ -392,7 +377,7 @@ export class GrantReportComponent implements OnInit {
       "StartDateGR":  formatDate(startDate, 'MM/dd/yyyy', 'en-US') ,
       "EndDateGR":formatDate(endDate, 'MM/dd/yyyy', 'en-US') ,
       "InvoiceIdGR": invoiceId == null || invoiceId == "" ? "null" : invoiceId,
-      "InvoiceStatusGR": invoiceId == null || invoiceId == "" ? "null" : invoiceId
+      "InvoiceStatusGR": invoiceStatusIds.length == 0 ? "null" : invoiceStatusIds.join(",")
       
 
     };
@@ -488,6 +473,7 @@ export class GrantReportComponent implements OnInit {
     this.grantReportForm.get(grantReportConstants.formControlNames.StartDate)?.setValue(startDate);
     this.grantReportForm.get(grantReportConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.grantReportForm.get(grantReportConstants.formControlNames.InvoiceId)?.setValue(null);
+    this.grantReportForm.get(grantReportConstants.formControlNames.InvoiceStatusIds)?.setValue([]);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];

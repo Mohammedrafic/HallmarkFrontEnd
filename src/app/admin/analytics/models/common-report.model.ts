@@ -80,8 +80,8 @@ export class SearchCandidate {
 }
 export class FilterOption
 {
-    Id:number;
-    Name:string;
+    id:number;
+    name:string;
 }
 export const OrderTypeOptionsForReport = [
   { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
