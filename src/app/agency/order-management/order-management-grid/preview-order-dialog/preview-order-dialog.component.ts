@@ -38,7 +38,6 @@ import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.
   selector: 'app-preview-order-dialog',
   templateUrl: './preview-order-dialog.component.html',
   styleUrls: ['./preview-order-dialog.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewOrderDialogComponent extends AbstractPermission implements OnInit, OnChanges, OnDestroy {
   @Input() order: AgencyOrderManagement;
@@ -103,7 +102,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
 
   constructor(private chipsCssClass: ChipsCssClass,
               protected override store: Store,
-              private cd: ChangeDetectorRef,
               private commentsService: CommentsService,) {
     super(store);
   }
@@ -144,7 +142,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((comments: Comment[]) => {
         this.orderComments = comments;
-        this.cd.markForCheck();
       });
   }
 
@@ -155,7 +152,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
       this.currentOrder = order;
       this.currentOrder && this.getOrderComments();
       this.isClosedOrder = this.currentOrder?.status === OrderStatus.Closed;
-      this.cd.detectChanges();
     });
   }
 
@@ -176,11 +172,9 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
             new GetAgencyExtensions(order.items[0].candidateJobId, selectedOrder.id!, selectedOrder.organizationId!)
           );
         }
-        this.cd.detectChanges();
       });
     this.extensions$.pipe(takeWhile(() => this.isAlive)).subscribe((extensions) => {
       this.extensions = extensions?.filter((extension: any) => extension.id !== this.order?.id);
-      this.cd.detectChanges();
     });
   }
 
@@ -188,7 +182,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
     if (event.isSwiped) {
       event.cancel = true;
     }
-    this.cd.detectChanges();
   }
 
   public onTabCreated(): void {
@@ -204,7 +197,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         this.tab.select(0);
         this.firstActive = true;
       }
-      this.cd.detectChanges();
     });
   }
 
@@ -238,7 +230,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
       )
       .subscribe((value) => {
         this.agencyActionsAllowed = value;
-        this.cd.detectChanges();
       });
   }
 
@@ -248,7 +239,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         if (this.openDetailsTab) {
           setTimeout(()=>{
             this.tab.select(0);
-            this.cd.detectChanges();
           },100);
         } else {
           this.tab.select(1);
@@ -261,8 +251,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         this.sideDialog.hide();
         disabledBodyOverflow(false);
       }
-
-      this.cd.detectChanges();
     });
   }
 }
