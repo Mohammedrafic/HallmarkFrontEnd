@@ -25,7 +25,7 @@ import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { DatePipe, formatDate } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
@@ -430,13 +430,13 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             clockId: value.clockId ? value.clockId : '',
             offeredBillRate: value.offeredBillRate ? PriceUtils.formatNumbers(value.offeredBillRate) : null,
             allow: value.allowDeployCredentials,
-            startDate: value.actualStartDate ? DateTimeHelper.convertDateToUtc(value.actualStartDate)
+            startDate: value.offeredStartDate ? DateTimeHelper.convertDateToUtc(value.offeredStartDate)
             : DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
             endDate: value.actualEndDate ? DateTimeHelper.convertDateToUtc(value.actualEndDate)
             : DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()),
             rejectReason: value.rejectReason,
-            offeredStartDate: DateTimeHelper.formatDateUTC(
-              DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(), 'MM/dd/YYYY'),
+            offeredStartDate: formatDate(DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(),
+            'MM/dd/YYYY', 'en-US'),
             jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
             penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
             rate: value.jobCancellation?.rate,
