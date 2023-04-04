@@ -40,7 +40,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
 
   constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
     super();
-    store.dispatch(new SetHeaderState({ title: 'Candidate List', iconName: 'users' }));
+    store.dispatch(new SetHeaderState({ title: 'Employee List', iconName: 'users' }));
   }
 
   ngOnInit(): void {

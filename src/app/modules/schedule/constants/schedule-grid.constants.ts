@@ -1,6 +1,6 @@
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
-import { DatesRangeType } from '@shared/enums';
+import { DatesRangeType, WeekDays } from '@shared/enums';
 
 import { DatePeriodId, ScheduleType } from '../enums';
 import { ScheduleCandidate, ScheduleCardConfig, ScheduleDateItem } from '../interface';
@@ -54,4 +54,4 @@ export const GetScheduleCardConfig = (scheduleItem: ScheduleDateItem): ScheduleC
   return ScheduleCardTypeMap.get(scheduleItem.daySchedules[0]?.scheduleType);
 };
 
-export const WeekList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const WeekList = [WeekDays.Sun, WeekDays.Mon, WeekDays.Tue, WeekDays.Wed, WeekDays.Thu, WeekDays.Fri, WeekDays.Sat];

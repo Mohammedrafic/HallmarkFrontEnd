@@ -9,12 +9,18 @@
     width: 240px;
     min-width: 240px;
     max-width: 240px;
-    border-bottom: 1px solid $secondary-dark-blue-45;
+    border-bottom: 1px solid $secondary-dark-blue-40;
   }
 
   .table-cell{
     margin: 0;
     padding: 0;
+
+    .date-cell {
+      background-color: $secondary-dark-blue-50;
+      border-bottom: 1px solid $secondary-dark-blue-40;
+      padding: 4px;
+    }
 
     &:nth-child(2) {
       border-left: 1px solid $secondary-dark-blue-45;
@@ -22,13 +28,13 @@
 
     .date-slot {
       height: 130px;
-      border: 1px solid $secondary-dark-blue-45;
-      border-top: none;
-      border-left: none;
       cursor: pointer;
+      border-radius: 4px;
+      border: 1px solid $secondary-dark-blue-50;
 
       &.selected {
-        border: 1px solid $primary-active-blue;
+        border: 1px solid $primary-active-blue-10;
+        background-color: $primary-active-blue-90;
       }
 
       &:hover {
