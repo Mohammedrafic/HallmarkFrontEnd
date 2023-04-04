@@ -43,6 +43,7 @@ import {
   ScheduleFilterHelper,
 } from '../../helpers';
 import {
+  DeleteScheduleRequest,
   Schedule,
   ScheduleBook,
   ScheduleBookingErrors,
@@ -269,7 +270,17 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   deleteSchedule(): void {
-    this.scheduleApiService.deleteSchedule(this.selectedDaySchedule.id, this.createPerDiemOrderControl.value).pipe(
+    const deleteScheduleRequest: DeleteScheduleRequest = {
+      id: this.selectedDaySchedule.id,
+      createOrder: this.createPerDiemOrderControl.value,
+    };
+
+    if (this.selectedDaySchedule.scheduleType !== ScheduleType.Book) {
+      deleteScheduleRequest.startDateTime = this.selectedDaySchedule.startDate;
+      deleteScheduleRequest.endDateTime = this.selectedDaySchedule.endDate;
+    }
+
+    this.scheduleApiService.deleteSchedule(deleteScheduleRequest).pipe(
       catchError((error: HttpErrorResponse) => this.editScheduleService.handleError(error)),
       takeUntil(this.componentDestroy())
     ).subscribe(() => {

@@ -15,6 +15,7 @@ import { ScheduledShift } from '../components/edit-schedule/edit-schedule.interf
 import * as ScheduleInt from '../interface';
 import {
   CandidateSchedules,
+  DeleteScheduleRequest,
   EmployeesFilters,
   Schedule,
   ScheduleBookingErrors,
@@ -77,7 +78,7 @@ export class ScheduleApiService {
     return this.http.post<BookingsOverlapsResponse[]>('/api/Schedules/bookingsOverlaps', request);
   }
 
-  deleteSchedule(id: number, createOrder: boolean):Observable<void> {
-    return this.http.post<void>('/api/Schedules/delete', { id, createOrder });
+  deleteSchedule(deleteScheduleRequest: DeleteScheduleRequest):Observable<void> {
+    return this.http.post<void>('/api/Schedules/delete', deleteScheduleRequest);
   }
 }

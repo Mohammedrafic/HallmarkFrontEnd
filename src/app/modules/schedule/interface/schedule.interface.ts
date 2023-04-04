@@ -188,3 +188,10 @@ export interface ShiftDropDownsData {
   skillsDataSource?: DropdownOption[];
   selectedSkillId: number | null;
 }
+
+export interface DeleteScheduleRequest {
+  id: number;
+  createOrder: boolean;
+  startDateTime?: string;
+  endDateTime?: string;
+}
