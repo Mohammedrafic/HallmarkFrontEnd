@@ -37,4 +37,10 @@ export class CandidateDetailsService {
   public getRegions(): Observable<CandidatesDetailsRegions[]> {
     return this.http.get<CandidatesDetailsRegions[]>('/api/Regions/listByActiveBusinessUnit').pipe(map((data) => sortByField(data, 'name')));
   }
+
+  public assignSkillDataSource(skills: MasterSkillByOrganization[]): MasterSkillByOrganization[] {
+    return skills.filter(
+      (value, index, array) => array.findIndex((skill) => skill.masterSkillId === value.masterSkillId) === index
+    );
+  }
 }

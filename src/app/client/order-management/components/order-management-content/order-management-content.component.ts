@@ -1592,11 +1592,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
   }
 
-  private onOrderFilterDataSourcesLoadHandler(preservedFilters: PreservedFiltersByPage<OrderFilter>): Observable<void> {
-    return this.orderFilterDataSources$
-      .pipe(throttleTime(100), takeUntil(this.unsubscribe$), filter(Boolean))
-      .pipe(switchMap((data: OrderFilterDataSource) => {
-        let statuses : any = [];
+  private onOrderFilterDataSourcesLoadHandler(
+    preservedFilters: PreservedFiltersByPage<OrderFilter>
+  ): Observable<OrderFilterDataSource> {
+    return this.orderFilterDataSources$.pipe(
+      throttleTime(100),
+      filter(Boolean),
+      tap((data: OrderFilterDataSource) => {
+        let statuses: any = [];
         let candidateStatuses: FilterStatus[] = [];
         const statusesByDefault = [
           CandidatStatus['Not Applied'],
@@ -1665,9 +1668,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         setTimeout(() => {
           this.clearstorage();
         }, 5000);
-
-        return of();
-      }));
+      }),
+      takeUntil(this.unsubscribe$)
+    );
   }
 
   private adjustFilters(filters: PreservedFiltersByPage<OrderFilter>): void {
@@ -1821,13 +1824,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       .pipe(
         throttleTime(50),
         filter(Boolean),
-        switchMap((structure: OrganizationStructure) => {
+        tap((structure: OrganizationStructure) => {
           this.orgStructure = structure;
           this.regions = structure.regions;
           this.filterColumns.regionIds.dataSource = this.regions;
           this.getPreservedFiltersByPage();
           this.firstOrdersDispatch = false;
-          return of(structure);
         }),
         //get preserved filters and dispatch orders
         switchMap(() => this.getPreservedFilters()),
@@ -2310,13 +2312,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private getPreservedFilters(): Observable<PreservedFiltersByPage<OrderFilter>> {
-    return this.preservedFiltersByPageName$.pipe(switchMap((filters) => {
-      if(!filters.isNotPreserved && filters.dispatch) {
-        this.firstOrdersDispatch = true;
-        this.store.dispatch([new GetOrders(filters.state, this.isIncomplete)]);
-      }
-      return of(filters);
-    }))
+    return this.preservedFiltersByPageName$.pipe(
+      tap((filters) => {
+        if (!filters.isNotPreserved && filters.dispatch) {
+          this.firstOrdersDispatch = true;
+          this.store.dispatch([new GetOrders(filters.state, this.isIncomplete)]);
+        }
+      })
+    );
   }
 
   private refreshFilterState(): void {

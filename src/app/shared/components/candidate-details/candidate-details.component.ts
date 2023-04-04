@@ -36,6 +36,7 @@ import {
   SaveFiltersByPageName,
 } from 'src/app/store/preserved-filters.actions';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
+import { CandidateDetailsService } from './services/candidate-details.service';
 
 @Component({
   selector: 'app-candidate-details',
@@ -86,7 +87,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     private router: Router,
     private formBuilder: FormBuilder,
     private filterService: FilterService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private candidateService: CandidateDetailsService
   ) {
     super();
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
@@ -214,7 +216,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   private subscribeOnSkills(): Observable<MasterSkillByOrganization[]> {
     return this.candidateSkills$.pipe(
-      tap((skills: MasterSkillByOrganization[]) => this.assignSkillDataSource(skills))
+      tap((skills: MasterSkillByOrganization[]) => {
+        this.filterColumns.skillsIds.dataSource = this.candidateService.assignSkillDataSource(skills);
+      })
     );
   }
 
@@ -289,10 +293,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       .pipe(
         filter((data) => !!data[2]),
         debounceTime(600),
-        switchMap((data) => {
-          this.store.dispatch(new GetPreservedFiltersByPage(FilterPageName.CandidateAssignmentVMSOrganization));
-          return of(data);
-        }),
+        tap(() => this.store.dispatch(new GetPreservedFiltersByPage(FilterPageName.CandidateAssignmentVMSOrganization))),
         switchMap(() => this.adjustFilters()),
         takeUntil(this.destroy$)
       )
@@ -324,12 +325,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private adjustFilters(): Observable<PreservedFiltersByPage<FiltersModal>> {
-    return this.preservedFiltersByPageName$.pipe(
-      switchMap((filters) => {
-        this.handleFilterState(filters);
-        return of(filters);
-      })
-    );
+    return this.preservedFiltersByPageName$.pipe(tap((filters) => this.handleFilterState(filters)));
   }
 
   private handleFilterState(filters: PreservedFiltersByPage<FiltersModal>): void {
@@ -345,11 +341,5 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
       this.patchFormValue();
     }
-  }
-
-  private assignSkillDataSource(skills: MasterSkillByOrganization[]): void {
-    this.filterColumns.skillsIds.dataSource = skills.filter(
-      (value, index, array) => array.findIndex((skill) => skill.masterSkillId === value.masterSkillId) === index
-    );
   }
 }
