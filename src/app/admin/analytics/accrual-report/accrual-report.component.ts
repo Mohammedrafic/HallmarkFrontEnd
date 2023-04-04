@@ -155,7 +155,6 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   selectedDepartments: Department[];
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
-
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   private agencyOrganizationId: number;
@@ -235,10 +234,9 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
           this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
           this.filterColumns.skillIds.dataSource = [];
 
-          let masterSkills = this.filterOptionsData.masterSkills;
           this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
-          let skills = masterSkills.filter((i) => i.skillCategoryId);
-          this.filterColumns.skillIds.dataSource = skills;
+          //let skills = masterSkills.filter((i) => i.skillCategoryId);
+          //this.filterColumns.skillIds.dataSource = skills;
           this.agencyIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds) as AbstractControl;
           this.filterColumns.agencyIds.dataSource = [];
           this.filterColumns.agencyIds.dataSource = data?.agencies;
@@ -362,10 +360,9 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
 
-              let masterSkills = this.filterOptionsData.masterSkills;
-              this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
-              let skills = masterSkills.filter((i) => i.skillCategoryId);
-              this.filterColumns.skillIds.dataSource = skills;
+              //this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
+              //let skills = masterSkills.filter((i) => i.skillCategoryId);
+             // this.filterColumns.skillIds.dataSource = skills;
               this.agencyIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds) as AbstractControl;
               let agencyIds = data?.agencies;
               this.filterColumns.agencyIds.dataSource = data?.agencies;
