@@ -72,11 +72,12 @@
           <div class="input-container f-grow-2">
             <label>SSN</label>
             <div class="input-group">
-              <input appValidateWithMessage
+             <!-- <input appValidateWithMessage
               formControlName="ssn"
               class="e-input"
               type="text"
-              mask='000-00-0000'/>
+              mask='000-00-0000'/> -->
+              <input appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" />
             </div>
           </div>
           <div class="input-container"></div>
