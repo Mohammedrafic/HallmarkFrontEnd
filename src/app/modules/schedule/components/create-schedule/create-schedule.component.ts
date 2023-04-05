@@ -346,7 +346,7 @@ export class CreateScheduleComponent extends DestroyDialog implements OnInit {
       this.scheduleForm.get('departmentId')?.valueChanges.pipe(
         filter(Boolean),
         switchMap((value: number) => {
-          return this.scheduleApiService.getSkillsByEmployees(this.scheduleSelectedSlots.candidates[0].id, value);
+          return this.scheduleApiService.getSkillsByEmployees(value, this.scheduleSelectedSlots.candidates[0].id);
         }),
         takeUntil(this.componentDestroy())
       ).subscribe((skills: Skill[]) => {

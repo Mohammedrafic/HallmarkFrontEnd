@@ -119,7 +119,10 @@
                 (dbClick)="handleScheduleCardDblClick(dateSchedule, scheduleItem.candidate, dateSchedule)"
               >
                 <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
-                  <app-schedule-card [scheduleDateItem]="dateSchedule"></app-schedule-card>
+                  <app-schedule-card
+                    [isSelected]="!!selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
+                    [dateSchedule]="dateSchedule"
+                  ></app-schedule-card>
                 </ng-container>
 
                 <ng-template #disabledCell>

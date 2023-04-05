@@ -204,15 +204,15 @@ th {
 }
 
 .table-row, .table-cell {
-  height: 80px;
+  height: 72px;
 }
 
 .table-cell {
   padding: 0;
+  border: 1px solid $secondary-dark-blue-50;
 
   &.selected {
     border: 1px solid $primary-active-blue-10;
-    background-color: $primary-active-blue-90;
   }
 
   &.date-slot {
@@ -221,7 +221,7 @@ th {
     cursor: pointer;
 
     &:hover {
-      border: 1px solid $primary-active-blue-10;
+      background-color: $primary-active-blue-90;
     }
   }
 

@@ -15,6 +15,7 @@ import { ScheduledShift } from '../components/edit-schedule/edit-schedule.interf
 import * as ScheduleInt from '../interface';
 import {
   CandidateSchedules,
+  DeleteScheduleRequest,
   EmployeesFilters,
   Schedule,
   ScheduleBookingErrors,
@@ -59,11 +60,14 @@ export class ScheduleApiService {
     );
   }
 
-  getSkillsByEmployees(employeeId: number, departmentId: number): Observable<Skill[]> {
-    return this.http.get<Skill[]>('/api/EmployeeFilterOptions/skillsByDepartment', { params: {
-        EmployeeId: employeeId,
-        DepartmentId: departmentId,
-      }});
+  getSkillsByEmployees(departmentId: number, employeeId?: number): Observable<Skill[]> {
+    const byEmployeesId = { employeeId, departmentId };
+    const byDepartmentId = { departmentId };
+
+    return this.http.get<Skill[]>(
+      '/api/EmployeeFilterOptions/skillsByDepartment',
+      { params: employeeId ? byEmployeesId : byDepartmentId }
+    );
   }
 
   updateScheduledShift(scheduledShift: ScheduledShift, type: ScheduleType):Observable<void> {
@@ -77,7 +81,7 @@ export class ScheduleApiService {
     return this.http.post<BookingsOverlapsResponse[]>('/api/Schedules/bookingsOverlaps', request);
   }
 
-  deleteSchedule(id: number, createOrder: boolean):Observable<void> {
-    return this.http.post<void>('/api/Schedules/delete', { id, createOrder });
+  deleteSchedule(deleteScheduleRequest: DeleteScheduleRequest):Observable<void> {
+    return this.http.post<void>('/api/Schedules/delete', deleteScheduleRequest);
   }
 }

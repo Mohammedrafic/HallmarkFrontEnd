@@ -1,47 +1,48 @@
 <div
-  *ngIf="cardConfig"
-  [style.background]="cardConfig.bgColor"
+  *ngIf="bigCardConfig || firstSmallCardConfig"
+  [ngClass]="{ 'selected': isSelected, 'third-event': !!thirdEventColor }"
+  [ngStyle]="{ 'border-color': thirdEventColor }"
   class="card-wrapper"
 >
   <app-tooltip-container
-    [message]="tooltips.orderTooltip"
-    [showToolTip]="!!cardConfig.showTitleToolTip"
+    [message]="allEventsTooltip"
+    [showToolTip]="!!allEventsTooltip"
     position="TopCenter"
   >
-    <div class="title">
-      <i-feather
-        [style.color]="cardConfig.iconColor"
-        [name]="cardIconName"
-        class="icon"
-      ></i-feather>
-      <span [class.bordered]="showWhiteFrame" class="title__text">{{ cardTitle }}</span>
-    </div>
+    <ng-container *ngIf="bigCardConfig; else multipleEventsView">
+      <div class="event-wrapper" [style.border-left-color]="bigCardConfig.color">
+        <div class="time">
+          <span class="time__text">{{ bigCardConfig.startDate | date: 'HH:mm': 'UTC' }}</span>
+          <span class="time__text"> - </span>
+          <span class="time__text">{{ bigCardConfig.endDate | date: 'HH:mm': 'UTC' }}</span>
+          <span *ngIf="bigCardConfig.ltaOrder" class="time__text"> L </span>
+        </div>
+        <div class="title">
+          <span class="title__text">{{ bigCardConfig.title }}</span>
+        </div>
+        <div class="additional-attributes" *ngIf="bigCardConfig.additionalAttributes">
+          <span>{{bigCardConfig.additionalAttributes}}</span>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #multipleEventsView>
+      <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: firstSmallCardConfig }"></ng-container>
+      <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: secondSmallCardConfig }"></ng-container>
+    </ng-template>
   </app-tooltip-container>
-
-  <div class="time">
-    <span class="time__text">{{ firstSchedule.startDate | date: 'HH:mm': 'UTC' }}</span>
-    <span class="time__text">-</span>
-    <span class="time__text">{{ firstSchedule.endDate | date: 'HH:mm': 'UTC' }}</span>
-    <span *ngIf="firstSchedule?.orderMetadata?.orderType === ltaOrder" class="time__text"> L </span>
-    <ejs-tooltip
-      *ngIf="firstSchedule.scheduleOrderType"
-      [content]="firstSchedule.scheduleOrderType"
-      position="TopCenter"
-      [showTipPointer]="false"
-    >
-      <span class="time__text">{{ firstSchedule.scheduleOrderType[0] }}</span>
-    </ejs-tooltip>
-  </div>
-
-  <ejs-tooltip
-    *ngIf="tooltips.additionalTooltip"
-    [content]="tooltips.additionalTooltip"
-    position="TopCenter"
-    [showTipPointer]="false"
-  >
-    <div class="badge">
-      +{{ dateSchedule.daySchedules.length - 1 }}
-    </div>
-  </ejs-tooltip>
-
 </div>
+
+<ng-template #smallCard let-item="item">
+  <div
+    class="event-wrapper small-card"
+    [ngStyle]="{ 'margin-bottom': !!thirdEventColor ? '3px' : '8px' }"
+    [style.border-left-color]="item.color">
+    <span class="time">
+      <span class="time__text">{{ item.startDate | date: 'HH:mm': 'UTC' }}</span>
+      <span *ngIf="item.ltaOrder" class="time__text"> L</span>
+      <span *ngIf="item.shortTitle || item.additionalAttributes" class="time__text"> -</span>
+      <span class="time__short-title"> {{ item.additionalAttributes ? item.additionalAttributes : item.shortTitle }}</span>
+    </span>
+  </div>
+</ng-template>

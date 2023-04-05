@@ -106,6 +106,7 @@ const scheduledShiftFormFields = (filtered: boolean,  createMode: boolean): Edit
       title: 'Skill',
       type: FieldType.Dropdown,
       gridAreaName: 'skill',
+      readonly: filtered,
       required: false,
       sourceKey: EditScheduleFormSourceKeys.Skills,
     },

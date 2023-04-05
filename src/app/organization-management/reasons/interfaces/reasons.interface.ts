@@ -2,6 +2,7 @@ import { FieldType } from '@core/enums';
 import { PenaltyPayload } from '@shared/models/penalty.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ReasonFormType, ReasonsNavigationTabs } from '../enums';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 
 export interface ReasonsFormTypesMap {
   [index: number]: ReasonFormType;
@@ -44,6 +45,7 @@ export interface SaveReasonParams {
   allLocationsSelected?: boolean;
   forceUpsert?: boolean;
   isVMSIRP?: boolean;
+  selectedSystem:SelectedSystemsFlag;
 }
 
 export interface ReasonFormConfig {

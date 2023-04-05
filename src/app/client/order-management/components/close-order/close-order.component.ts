@@ -1,4 +1,4 @@
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { catchError, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
@@ -7,7 +7,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Order, OrderManagement, OrderManagementChild } from '@shared/models/order-management.model';
-import { ShowCloseOrderDialog } from '../../../../store/app.actions';
+import { ShowCloseOrderDialog, ShowToast } from '../../../../store/app.actions';
 import { OrderType, OrderTypeTitlesMap } from '@shared/enums/order-type';
 import { RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import { CloseOrderService } from '@client/order-management/components/close-order/close-order.service';
@@ -24,6 +24,8 @@ import { SaveCloseOrderSucceeded } from '@client/store/order-managment-content.a
 import { DateTimeHelper } from '@core/helpers';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { OrderManagementService } from '../order-management-content/order-management.service';
+import { MessageTypes } from '@shared/enums/message-types';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 @Component({
   selector: 'app-close-order',
@@ -224,7 +226,11 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   private closePosition(formData: ClosePositionPayload): void {
     this.closeOrderService.closePosition({ ...formData, jobId: this.candidate.jobId })
       .pipe(
-        takeUntil(this.destroy$)
+        catchError((err) => {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+          return err;
+        }),
+        takeUntil(this.destroy$),
       )
       .subscribe(() => {
         this.closePositionSuccess.emit(this.candidate);

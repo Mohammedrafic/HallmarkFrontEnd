@@ -158,7 +158,8 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       allRegionsSelected: this.isAllRegionsSelected,
       allLocationsSelected: this.isAllLocationsSelected,
       forceUpsert: forceUpsert,
-      isVMSIRP: this.showSystem
+      isVMSIRP: this.showSystem,
+      selectedSystem:this.selectedSystem
     });
   }
 

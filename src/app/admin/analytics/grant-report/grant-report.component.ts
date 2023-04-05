@@ -1,3 +1,4 @@
+
 import { ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -19,7 +20,7 @@ import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { financeMedicareWageReportConstants, analyticsConstants } from '../constants/analytics.constant';
+import { grantReportConstants, analyticsConstants, InvoiceStatus } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
@@ -32,37 +33,38 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
 
 @Component({
-  selector: 'app-finance-medicare-wage-report',
-  templateUrl: './finance-medicare-wage-report.component.html',
-  styleUrls: ['./finance-medicare-wage-report.component.scss']
+  selector: 'app-grant-report',
+  templateUrl: './grant-report.component.html',
+  styleUrls: ['./grant-report.component.scss'],
 })
-export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
-
+export class GrantReportComponent implements OnInit {
   public paramsData: any = {
 
-    "HostNameFMWR": "",
-    "BearerParamFMWR": "",
-    "BusinessUnitIdParamFMWR": "",
+    "HostNameGR": "",
+    "BearerParamGR": "",
+    "BusinessUnitIdParamGR": "",
 
-    "OrganizationsFMWR": "",
-    "RegionFMWR": "",
-    "LocationFMWR": "",
-    "DepartmentFMWR": "",
-    "AgencyFMWR": "",   
-    "InvoiceStartDateFMWR": "",
-    "InvoiceEndDateFMWR": "",
-    "InvoiceIdFMWR":""
+    "OrganizationsGR": "",
+    "RegionsGR": "",
+    "LocationsGR": "",
+    "DepartmentsGR": "",
+    "AgenciesGR": "",   
+    "StartDateGR": "",
+    "EndDateGR": "",
+    "InvoiceIdGR":"",
+    "InvoiceStatusGR":""
   };
 
 
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinanceMedicareWageReport/FinanceMedicareWageReport.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FinanceMedicareWageReport/FinanceMedicareWageReport.cat" };
-  public title: string = "Finance Medicare Wage Report";
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/GrantReport/GrantReport.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/GrantReport/GrantReport.cat" };
+  public title: string = "Gant Report";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
 
   public allOption: string = "All";
 
+  public invoiceStatusList: InvoiceStatus[] = [];
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -81,7 +83,7 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
   public logiReportData$: Observable<ConfigurationDto[]>;
 
   @Select(LogiReportState.commonReportFilterData)
-  public financialTimeSheetFilterData$: Observable<CommonReportFilterOptions>;
+  public grantFilterData$: Observable<CommonReportFilterOptions>;
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
@@ -107,7 +109,7 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
   public organizationFields = ORGANIZATION_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
   public filterColumns: any;
-  public financeMedicareWageReportForm: FormGroup;
+  public grantReportForm: FormGroup;
   public bussinessControl: AbstractControl;
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
@@ -125,9 +127,8 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
   public defaultDepartments: (number | undefined)[] = [];
-  public defaultSkillCategories: (number | undefined)[] = [];
-  public defaultOrderTypes: (number | undefined)[] = [];
-  public defaultSkills: (number | undefined)[] = [];
+
+  public defaultInvoiceStausIds: (number | undefined)[] = [];
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
@@ -142,9 +143,8 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
-
+  
   constructor(private store: Store,
     private formBuilder: FormBuilder,
     private filterService: FilterService,
@@ -159,7 +159,6 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetOrganizationsStructureAll(this.user?.id));
     }
 
-    this.SetReportData();
   }
 
   ngOnInit(): void {
@@ -173,22 +172,21 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
         }
       });
 
-
       this.agencyOrganizationId = data;
-      this.isInitialLoad = true;
 
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
 
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.BusinessIds)?.enable() : this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.grantReportForm.get(grantReportConstants.formControlNames.BusinessIds)?.enable() : this.grantReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
+  
 
   private initForm(): void {
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
-    this.financeMedicareWageReportForm = this.formBuilder.group(
+    startDate.setDate(startDate.getDate() - 14);
+    this.grantReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
         regionIds: new FormControl([]),
@@ -198,6 +196,7 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
         startDate: new FormControl(startDate, [Validators.required]),
         endDate: new FormControl(new Date(Date.now()), [Validators.required]),
         invoiceId: new FormControl(null),
+        invoiceStatusIds: new FormControl([]),
       }
     );
   }
@@ -208,14 +207,14 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
   }
 
   public onFilterControlValueChangedHandler(): void {
-    this.bussinessControl = this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
+    this.bussinessControl = this.grantReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
     this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data != null && data.length > 0) {
         this.organizations = uniqBy(data, 'organizationId');
         this.filterColumns.businessIds.dataSource = this.organizations;
         this.defaultOrganizations = this.agencyOrganizationId;
-        this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.grantReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
 
 
         this.changeDetectorRef.detectChanges();
@@ -223,10 +222,10 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+      this.grantReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.filterColumns.agencyIds.dataSource = [];
-        this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.AgencyIds)?.setValue([]);
+        this.grantReportForm.get(grantReportConstants.formControlNames.AgencyIds)?.setValue([]);
 
         this.isAlive = true;
         this.previousOrgId = data;
@@ -270,19 +269,21 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
           };
 
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
-          this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+          this.grantFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             this.filterColumns.agencyIds.dataSource = [];
 
             if (data != null) {
               this.isAlive = false;
               this.filterOptionsData = data;
-              this.agencyIdControl = this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.AgencyIds) as AbstractControl;
+              this.agencyIdControl = this.grantReportForm.get(grantReportConstants.formControlNames.AgencyIds) as AbstractControl;
               let agencyIds = data?.agencies;
               this.filterColumns.agencyIds.dataSource = data?.agencies;
               this.selectedAgencies = agencyIds;
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
-              this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
-
+              this.grantReportForm.get(grantReportConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+              this.filterColumns.invoiceStatusIds.dataSource=data?.invoiceStatuses;
+              this.defaultInvoiceStausIds=data?.invoiceStatuses.map((list)=>list.id);
+              this.grantReportForm.get(grantReportConstants.formControlNames.InvoiceStatusIds)?.setValue(this.defaultInvoiceStausIds);
               setTimeout(() => { this.SearchReport() }, 3000);
             }
           });
@@ -291,7 +292,7 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
         }
         else {
           this.isClearAll = false;
-          this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+          this.grantReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }
     });
@@ -300,12 +301,12 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
 
   public onFilterRegionChangedHandler(): void {
 
-    this.regionIdControl = this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
+    this.regionIdControl = this.grantReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = [];
       this.locations = [];
-      this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-      this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.grantReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+      this.grantReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.regionIdControl.value.length > 0) {
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
@@ -315,26 +316,26 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
       }
       else {
         this.filterColumns.locationIds.dataSource = [];
-        this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-        this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+        this.grantReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+        this.grantReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
 
   public onFilterLocationChangedHandler(): void {
-    this.locationIdControl = this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
+    this.locationIdControl = this.grantReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.grantReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.locationIdControl.value.length > 0) {
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
       }
       else {
         this.filterColumns.departmentIds.dataSource = [];
-        this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+        this.grantReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
-    this.departmentIdControl = this.financeMedicareWageReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
+    this.departmentIdControl = this.grantReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
@@ -350,7 +351,7 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
       }
     }
     let { departmentIds,locationIds,
-      regionIds, startDate, endDate, agencyIds, invoiceId } = this.financeMedicareWageReportForm.getRawValue();
+      regionIds, startDate, endDate, agencyIds, invoiceId,invoiceStatusIds } = this.grantReportForm.getRawValue();
     
 
     regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
@@ -360,27 +361,28 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
     this.paramsData =
     {
 
-      "HostNameFMWR": this.baseUrl,
-      "BearerParamFMWR": auth,
-      "BusinessUnitIdParamFMWR": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "HostNameGR": this.baseUrl,
+      "BearerParamGR": auth,
+      "BusinessUnitIdParamGR": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
 
-      "OrganizationsFMWR": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "RegionFMWR": regionIds.length == 0 ? "null" : regionIds,
-      "LocationFMWR": locationIds.length == 0 ? "null" : locationIds,
-      "DepartmentFMWR": departmentIds.length == 0 ? "null" : departmentIds,   
-      "AgencyFMWR": agencyIds.length == 0 ? "null" : agencyIds.join(","),
+      "OrganizationsGR": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "RegionsGR": regionIds.length == 0 ? "null" : regionIds,
+      "LocationsGR": locationIds.length == 0 ? "null" : locationIds,
+      "DepartmentsGR": departmentIds.length == 0 ? "null" : departmentIds,   
+      "AgenciesGR": agencyIds.length == 0 ? "null" : agencyIds.join(","),
       
-      "InvoiceStartDateFMWR":  formatDate(startDate, 'MM/dd/yyyy', 'en-US') ,
-      "InvoiceEndDateFMWR":formatDate(endDate, 'MM/dd/yyyy', 'en-US') ,
-      "InvoiceIdFMWR": invoiceId == null || invoiceId == "" ? "null" : invoiceId
+      "StartDateGR":  formatDate(startDate, 'MM/dd/yyyy', 'en-US') ,
+      "EndDateGR":formatDate(endDate, 'MM/dd/yyyy', 'en-US') ,
+      "InvoiceIdGR": invoiceId == null || invoiceId == "" ? "null" : invoiceId,
+      "InvoiceStatusGR": invoiceStatusIds.length == 0 ? "null" : invoiceStatusIds.join(",")
       
 
     };
-   //this.logiReportComponent.paramsData = this.paramsData;
-   //this.logiReportComponent.RenderReport();
+    this.logiReportComponent.paramsData = this.paramsData;
+    this.logiReportComponent.RenderReport();
   }
 
   private orderFilterColumnsSetup(): void {
@@ -428,6 +430,14 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
         type: ControlTypes.Text,
         valueType: ValueType.Text
       },
+      invoiceStatusIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+    
     
     }
   }
@@ -443,26 +453,27 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
   }
 
   public showFilters(): void {
-    if (this.isResetFilter) {
+    // if (this.isResetFilter) {
       this.onFilterControlValueChangedHandler();
-    }
+    // }
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
   public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.financeMedicareWageReportForm, this.filterColumns);
+    this.filterService.removeValue(event, this.grantReportForm, this.filterColumns);
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
-    this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.LocationIds)?.setValue([]);
-    this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.DepartmentIds)?.setValue([]);    
-    this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.AgencyIds)?.setValue([]);
-    this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.StartDate)?.setValue(startDate);
-    this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
-    this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.InvoiceId)?.setValue(null);
+    this.grantReportForm.get(grantReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+    this.grantReportForm.get(grantReportConstants.formControlNames.LocationIds)?.setValue([]);
+    this.grantReportForm.get(grantReportConstants.formControlNames.DepartmentIds)?.setValue([]);    
+    this.grantReportForm.get(grantReportConstants.formControlNames.AgencyIds)?.setValue([]);
+    this.grantReportForm.get(grantReportConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.grantReportForm.get(grantReportConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.grantReportForm.get(grantReportConstants.formControlNames.InvoiceId)?.setValue(null);
+    this.grantReportForm.get(grantReportConstants.formControlNames.InvoiceStatusIds)?.setValue([]);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
@@ -472,8 +483,8 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
     this.departmentsList = this.masterDepartmentsList;
   }
   public onFilterApply(): void {
-    this.financeMedicareWageReportForm.markAllAsTouched();
-    if (this.financeMedicareWageReportForm?.invalid) {
+    this.grantReportForm.markAllAsTouched();
+    if (this.grantReportForm?.invalid) {
       return;
     }
     this.filteredItems = [];

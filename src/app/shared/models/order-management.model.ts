@@ -767,3 +767,13 @@ export interface IrpCandidatesParams {
   PageNumber: number;
   isAvailable: boolean;
 }
+
+export class CandidateCancellationReason{
+  id: number;
+  name: string;
+}
+
+export class CandidateCancellationReasonFilter{
+  regionId?:number;
+  locationId?:number;
+}

@@ -11,6 +11,7 @@ import {
   ChangeCandidateProfileStatus,
   DeleteIRPCandidate,
   ExportCandidateList,
+  ExportIRPCandidateList,
   GetAllSkills,
   GetCandidatesByPage,
   GetIRPCandidatesByPage,
@@ -92,6 +93,16 @@ export class CandidateListState {
       catchError((error: HttpErrorResponse) => {
         patchState({ isCandidateLoading: false, IRPCandidateList: null });
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(ExportIRPCandidateList)
+  ExportUserListIRP({}: StateContext<CandidateListStateModel>, { payload }: ExportCandidateList): Observable<Blob> {
+    return this.candidateListService.getIRPCandidatesExport(payload).pipe(
+      tap((file: Blob) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
       })
     );
   }
