@@ -39,7 +39,7 @@ import {
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
 import { DatePipe } from '@angular/common';
-import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues } from '@shared/enums/applicant-status.enum';
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
@@ -67,7 +67,7 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateDOBRequired, CandidateSSNRequired, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import { CandidateDOBRequired,CandidatePHONE1Required, CandidateSSNRequired, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { SettingsViewService } from '@shared/services';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { DateTimeHelper } from '@core/helpers';
@@ -140,6 +140,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public applicantStatusEnum = ApplicantStatusEnum;
   public candidateSSNRequired: boolean;
   public candidateDOBRequired: boolean;
+  public candidatePhone1RequiredValue : string = '';
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
     Rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
@@ -301,6 +302,16 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     if (this.candidateDOBRequired) {
       if (!this.form.controls["dob"].value) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateDOBRequired));
+        return;
+      }
+    }
+    
+    if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
+      if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null && this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
+        return;
+      }else{
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
         return;
       }
     }
@@ -544,6 +555,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.candidateJob = value;
     this.candidateSSNRequired = value.candidateSSNRequired;
     this.candidateDOBRequired = value.candidateDOBRequired;
+    if(value.candidatePhone1Required != null){
+      let phone1Configuration = JSON.parse(value.candidatePhone1Required);
+      if(phone1Configuration.isEnabled){
+        this.candidatePhone1RequiredValue = phone1Configuration.value;
+      }
+    }
     if (this.candidateJob) {
       this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
       this.getComments();
