@@ -307,7 +307,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.invoicesFilters$
     .pipe(
       filter(() => !!this.organizationId),
-      distinctUntilChanged((curr, prev) => isObjectsEqual(curr, prev)),
+      distinctUntilChanged((prev, next) => isObjectsEqual(prev, next)),
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);

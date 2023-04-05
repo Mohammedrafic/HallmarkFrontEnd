@@ -9,7 +9,7 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction } from '@core/enums';
 
-import { Destroyable } from '@core/helpers';
+import { Destroyable, isObjectsEqual } from '@core/helpers';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { DataSourceItem } from '@core/interface';
@@ -67,7 +67,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   readonly tabCounts$: Observable<TabCountConfig>;
 
   @Select(TimesheetsState.timesheetsFilters)
-  readonly timesheetsFilters$!: Observable<TimesheetsFilterState>;
+  readonly timesheetsFilters$: Observable<TimesheetsFilterState>;
 
   @Select(TimesheetsState.timesheetsFiltersColumns)
   readonly timesheetsFiltersColumns$: Observable<TimesheetsFilterState>;
@@ -284,6 +284,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.timesheetsFilters$
       .pipe(
         filter(Boolean),
+        distinctUntilChanged((prev, next) =>
+          isObjectsEqual(prev as Record<string, unknown>, next as Record<string, unknown>)
+        ),
         debounceTime(300),
         filter((filters) => (this.isAgency ? !isNaN(filters.organizationId as number) : true)),
         switchMap(() => this.store.dispatch(new Timesheets.GetAll())),
@@ -328,7 +331,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
             this.store.dispatch(new Timesheets.SelectOrganization((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId));
             this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });    
-
+        //TODO remove old approach of preserving filters in scope EIN-13661
         if (preservedFilters && this.filterService.canPreserveFilters()) {
           this.store.dispatch([
             new Timesheets.UpdateFiltersState(
@@ -381,7 +384,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private initComponentState(): void {
     
-      //TODO remove old approach of preserving filters after implementing preserving filters by page on agency timesheets
+      //TODO remove old approach of preserving filters in scope EIN-13661
       let preservedFilters = null;
       let preservedFiltersAgency = null;
       if (this.filterService.canPreserveFilters()) {
@@ -394,10 +397,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       if (this.isAgency) {
         this.initOrganizationsList(preservedFiltersAgency);
       } else {
-        //TODO get rid cloneDeep
         this.store.dispatch([
-          new Timesheets.UpdateFiltersState(cloneDeep(this.filters)),
           new Timesheets.GetFiltersDataSource(),
+          new Timesheets.UpdateFiltersState({ ...this.filters }),
         ]);
       }
   }

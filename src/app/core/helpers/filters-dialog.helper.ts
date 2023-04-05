@@ -85,7 +85,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
     }
   }
 
-  public clearAllFilters(eventEmmit = true, keepPreservedFilters = false): void {
+  public clearAllFilters(eventEmmit = true): void {
     this.formGroup.reset();
     this.filteredItems = [];
     this.appliedFiltersAmount.emit(this.filteredItems.length);
