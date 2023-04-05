@@ -1668,7 +1668,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
         }
         this.cd$.next(true);
-        this.clearstorage();
+        this.clearStorage();
       }),
       takeUntil(this.unsubscribe$)
     );
@@ -2291,7 +2291,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   @OutsideZone
-  private clearstorage(): void {
+  private clearStorage(): void {
     setTimeout(() => {
       this.globalWindow.localStorage.setItem('pendingApprovalOrders', JSON.stringify(''));
       this.orgpendingOrderapproval = '';
