@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { Topics } from '@shared/enums/contact-topics';
@@ -6,32 +6,34 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { User } from '../../../shared/models/user.model';
 import { UserState } from 'src/app/store/user.state';
 import { Observable } from 'rxjs/internal/Observable';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, filter, takeUntil } from 'rxjs';
 import { ContactUs } from '../../../shared/models/contact-us.model';
 import { SaveContactUsForm } from 'src/app/store/contact-us.actions';
 import { ContactusState } from 'src/app/store/contact-us.state';
 import { ShowCustomSideDialog } from 'src/app/store/app.actions';
 import { ContactUsStatus } from '@shared/enums/contact-us-status';
+import { OutsideZone } from '@core/decorators';
 
 
 @Component({
   selector: 'app-contactus',
   templateUrl: './contactus.component.html',
-  styleUrls: ['./contactus.component.scss']
+  styleUrls: ['./contactus.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactusComponent implements OnInit,AfterViewInit {
-
   public topics = Topics;
-  public uploaderErrorMessageElement: HTMLElement;
-  private hasFiles = false;
   public readonly maxFileSize = 2000000; // 2 mb
   public dropElement: HTMLElement;
   public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
-  public disableSaveButton: boolean = false;
+  public disableSaveButton = false;
   public ContactFormGroup: FormGroup;
+
+  private uploaderErrorMessageElement: HTMLElement;
+  private file: any;
+  private files: File[] = [];
+  private hasFiles = false;
   private unsubscribe$: Subject<void> = new Subject();
-  file: any;
-  files: File[] = [];
 
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
 
@@ -41,7 +43,12 @@ export class ContactusComponent implements OnInit,AfterViewInit {
   @Select(ContactusState.contactSupportEntity)
   contact$: Observable<ContactUs>;
 
-  constructor(private store: Store, private fb: FormBuilder) {
+  constructor(
+    private store: Store,
+    private fb: FormBuilder,
+    private cd: ChangeDetectorRef,
+    private ngZone: NgZone,
+  ) {
     this.ContactFormGroup = this.fb.group({
       name: new FormControl(''),
       email: new FormControl(''),
@@ -52,20 +59,11 @@ export class ContactusComponent implements OnInit,AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
-      if (user) {
-        this.ContactFormGroup = this.fb.group({
-          name: new FormControl(user.firstName + ' ' + user.lastName),
-          email: new FormControl(user.email),
-          topic: new FormControl(null, Validators.required),
-          message: new FormControl(''),
-          file: new FormControl(null),
-        });
-        this.ContactFormGroup.controls['name'].disable();
-        this.ContactFormGroup.controls['email'].disable();
+    this.observeUser();
+  }
 
-      }
-    });
+  ngAfterViewInit() {
+    this.getDropElement();
   }
 
   public browse(): void {
@@ -87,18 +85,6 @@ export class ContactusComponent implements OnInit,AfterViewInit {
     }
   }
 
-  private addFilesValidationMessage(file: FileInfo) {
-    requestAnimationFrame(() => {
-      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[0] as HTMLElement;
-      if (this.uploaderErrorMessageElement) {
-        this.uploaderErrorMessageElement.innerText =
-          file.size > this.maxFileSize
-            ? 'The file exceeds the limitation, max allowed 2 MB.'
-            : 'The file should be in pdf, doc, docx, jpg, jpeg, png format.';
-      }
-    });
-  }
-
   public clearFiles(): void {
     this.hasFiles = false;
     this.uploadObj.clearAll();
@@ -108,14 +94,14 @@ export class ContactusComponent implements OnInit,AfterViewInit {
 
   public saveContactUsForm() {
     if (this.ContactFormGroup.controls['topic'].valid) {
-      let contactUs: ContactUs =
+      const contactUs: ContactUs =
       {
         fromMail: this.ContactFormGroup.controls['email'].value,
         subjectMail: this.ContactFormGroup.controls['topic'].value,
         name: this.ContactFormGroup.controls['name'].value,
         bodyMail: this.ContactFormGroup.controls['message'].value,
         status: ContactUsStatus.Pending,
-        selectedFile: this.files[0]
+        selectedFile: this.files[0],
       };
       this.store.dispatch(new SaveContactUsForm(contactUs));
       this.contact$.pipe(takeUntil(this.unsubscribe$)).subscribe((contactUs: ContactUs) => {
@@ -130,14 +116,49 @@ export class ContactusComponent implements OnInit,AfterViewInit {
     this.store.dispatch(new ShowCustomSideDialog(false));
   }
 
+  private addFilesValidationMessage(file: FileInfo) {
+    requestAnimationFrame(() => {
+      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[0] as HTMLElement;
+      if (this.uploaderErrorMessageElement) {
+        this.uploaderErrorMessageElement.innerText =
+          file.size > this.maxFileSize
+            ? 'The file exceeds the limitation, max allowed 2 MB.'
+            : 'The file should be in pdf, doc, docx, jpg, jpeg, png format.';
+      }
+      this.cd.markForCheck();
+    });
+  }
+
   private resetForm() {
     this.ContactFormGroup.controls['message'].setValue('');
     this.ContactFormGroup.controls['topic'].setValue(null);
     this.ContactFormGroup.controls['file'].setValue(null);
     this.clearFiles();
+    this.cd.markForCheck();
   }
 
-  ngAfterViewInit() {
+  private observeUser(): void {
+    this.user$
+    .pipe(
+      filter((user) => !!user),
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((user: User) => {
+      this.ContactFormGroup = this.fb.group({
+        name: new FormControl(user.firstName + ' ' + user.lastName),
+        email: new FormControl(user.email),
+        topic: new FormControl(null, Validators.required),
+        message: new FormControl(''),
+        file: new FormControl(null),
+      });
+      this.ContactFormGroup.controls['name'].disable();
+      this.ContactFormGroup.controls['email'].disable();
+      this.cd.markForCheck();
+    });
+  }
+
+  @OutsideZone
+  private getDropElement(): void {
     setTimeout(() => {
       this.dropElement = document.getElementById('files-droparea') as HTMLElement;
 		}, 3000);

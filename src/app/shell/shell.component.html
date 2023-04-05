@@ -1,6 +1,6 @@
 <div class="header" [class.expanded]="sidebar?.isOpen || false">
   <div class="header-item">
-    <div class="header-item__sidebar-menu" *ngIf="isMobile$ | async" (click)="toggleClick()"></div>
+    <div class="header-item__sidebar-menu" *ngIf="isMobile$ | async" (click)="toggleSidebar()"></div>
     <ng-container *ngIf="headerState$ | async as headerState">
       <i-feather name="{{ headerState?.iconName }}" class="icon"></i-feather>
       <h1 class="header-title">{{ headerState?.title }}</h1>
@@ -60,7 +60,7 @@
     >
       <section class="primary-container">
         <section class="logo-container">
-          <div class="close-btn" *ngIf="sidebar.isOpen && (isMobile$ | async)" (click)="toggleClick()"></div>
+          <div class="close-btn" *ngIf="sidebar.isOpen && (isMobile$ | async)" (click)="toggleSidebar()"></div>
           <div class="logo" *ngIf="sidebar.isOpen"></div>
           <div class="small-logo" *ngIf="!sidebar.isOpen"></div>
         </section>
@@ -91,7 +91,7 @@
               id="template"
               #treevalidate
               [fields]="sideBarMenuField"
-              (nodeClicked)="nodeSelect($event)"
+              (nodeClicked)="toggleSubMenu($event)"
               [fullRowSelect]="true"
               [loadOnDemand]="false"
             >
@@ -102,7 +102,7 @@
                   [analyticTargetType]="'menu'"
                   [analyticEventValue]="data.title"
                   class="icon-container"
-                  (click)="onMenuItemClick(data)"
+                  (click)="selectMenuItem(data)"
                   (mouseenter)="showContextMenu(data, $event)"
                 >
                   <i-feather [name]="data.icon" class="icon"></i-feather>
@@ -155,7 +155,7 @@
           </div>
         </section>
         <section class="collapse" *ngIf="!(isMobile$ | async)">
-          <a class="icon-container" (click)="toggleClick()">
+          <a class="icon-container" (click)="toggleSidebar()">
             <i-feather name="sidebar" class="icon"></i-feather>
             <span class="e-text">Collapse</span>
           </a>
@@ -233,7 +233,7 @@
         </div>
         <div
           class="alert-content alert-title-header-body-color"
-          (click)="GetContentDetails(item.organizationId, item.orderId,item.alertTitle)"
+          (click)="getContentDetails(item.organizationId, item.orderId,item.alertTitle)"
           [innerHTML]="item.content"
         ></div>
         <div class="alert-panel-footer">
