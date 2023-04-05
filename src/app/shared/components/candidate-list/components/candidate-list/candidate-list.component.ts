@@ -629,8 +629,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private pageName(): FilterPageName {
-    return this.isIRP
-    ? FilterPageName.CandidatesIRPOrganization
-    : FilterPageName.CandidatesVMSOrganization;
+    return this.isIRP ? FilterPageName.CandidatesIRPOrganization : FilterPageName.CandidatesVMSOrganization;
   }
 }
