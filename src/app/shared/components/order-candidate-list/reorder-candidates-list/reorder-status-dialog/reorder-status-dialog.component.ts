@@ -29,7 +29,7 @@ import {
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-candidate.constants';
-import { SET_READONLY_STATUS } from '@shared/constants';
+import { CandidatePHONE1Required, SET_READONLY_STATUS } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -74,6 +74,12 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     if (orderCandidateJob) {
       this.orderCandidateJob = orderCandidateJob;
       this.currentCandidateApplicantStatus = orderCandidateJob.applicantStatus.applicantStatus;
+      if(orderCandidateJob.candidatePhone1Required != null){
+        let phone1Configuration = JSON.parse(orderCandidateJob.candidatePhone1Required);
+        if(phone1Configuration.isEnabled){
+          this.candidatePhone1RequiredValue = phone1Configuration.value;
+        }
+      }
       this.setValueForm(orderCandidateJob);
       this.getOrderPermissions(orderCandidateJob.orderId);
     } else {
@@ -157,6 +163,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   private defaultApplicantStatuses: ApplicantStatus[];
   private statuses: ApplicantStatus[];
+  public candidatePhone1RequiredValue : string = '';
+
 
   constructor(
     private store: Store,
@@ -201,6 +209,16 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     if(this.isCandidatePayRateVisible && this.acceptForm.invalid) {
       this.acceptForm.markAllAsTouched();
       return;
+    }
+
+    if(this.candidatePhone1RequiredValue === "Accept"){
+      if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null && this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Accept')));
+        return;
+      }else{
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Accept')));
+        return;
+      }
     }
 
     const value = this.acceptForm.getRawValue();

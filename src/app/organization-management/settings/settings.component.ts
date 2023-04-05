@@ -676,10 +676,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           isEnabled: dynamicValue.isEnabled,
         });
       }
-      if (dynamicValue.isCheckedValue) {
+
+      if (dynamicValue.isCheckboxValue) {
         this.checkboxValueForm.setValue({
-          value: dynamicValue.value,
-          isEnabled: dynamicValue.isEnabled,
+          value: dynamicValue.value ? dynamicValue.value : '',
+          isEnabled: dynamicValue.isEnabled ? dynamicValue.isEnabled : false,
         });
       }
     });

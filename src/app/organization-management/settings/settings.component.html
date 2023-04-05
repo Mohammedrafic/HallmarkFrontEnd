@@ -74,7 +74,7 @@
             <span *ngIf="data.controlType === organizationSettingControlType.Text">{{child.value}}</span>
             <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{child.value | date: 'MM/dd/yyyy'}}</span>
             <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
-              {{ child.parsedValue.value && child.parsedValue.isEnabled ? child.parsedValue.value : 'No' }}
+              {{  child.parsedValue != null && child.parsedValue.value && child.parsedValue.isEnabled ? child.parsedValue.value : 'No' }}
             </span>
           </td>
         </tr>
@@ -121,7 +121,7 @@
           <span *ngIf="data.controlType === organizationSettingControlType.InvoiceAutoGeneration">
             {{ data.parsedValue?.isEnabled ? 'Yes' : 'No'}}</span>
           <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
-            {{ data.parsedValue.value && data.parsedValue.isEnabled ? data.parsedValue.value : 'No' }}
+            {{ data.parsedValue != null && data.parsedValue.value && data.parsedValue.isEnabled ? data.parsedValue.value : 'No' }}
           </span>
         </ng-template>
       </e-column>
@@ -426,7 +426,7 @@
     <form *ngIf="formControlType === organizationSettingControlType.CheckboxValue"
           [formGroup]="checkboxValueForm">
 
-      <div class="input-container bootstrap">
+
         <div class="input-container">
           <div class="input-group switch">
             <ejs-switch id="switcher" class="switch" formControlName="isEnabled"></ejs-switch>
@@ -445,7 +445,7 @@
           </div>
         </ng-container>       
 
-      </div>
+
     </form>
 
     <div [ngSwitch]="formControlType">
