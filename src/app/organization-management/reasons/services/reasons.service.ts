@@ -17,9 +17,9 @@ import { CategoryNoteValue, Closurevalue, SaveReasonParams, UnavailabilityValue 
 export class ReasonsService {
   constructor(
     private store: Store,
-  ) {}
+  ) { }
 
-  addRegionNameForLocations(regions: OrganizationRegion[] ): OrganizationRegion[] {
+  addRegionNameForLocations(regions: OrganizationRegion[]): OrganizationRegion[] {
     return regions.map((region) => {
 
       region.locations = region.locations?.map((location) => {
@@ -35,7 +35,7 @@ export class ReasonsService {
     if (!reason.regionId) {
       return regions.map((region) => region.id) as number[];
     }
-    
+
     return [reason.regionId];
   }
 
@@ -78,8 +78,8 @@ export class ReasonsService {
       }));
     } else if (params.selectedTab === ReasonsNavigationTabs.Closure) {
       const value = params.formValue as Closurevalue;
-      if(params.isVMSIRP){
-        if((value.includeInIRP == false) && (value.includeInVMS == false)){
+      if (params.isVMSIRP) {
+        if ((value.includeInIRP == false) && (value.includeInVMS == false)) {
           this.store.dispatch(new ShowToast(MessageTypes.Error, REASON_WARNING));
         } else {
           this.store.dispatch(new SaveClosureReasons({
@@ -89,18 +89,18 @@ export class ReasonsService {
             includeInIRP: !!value.includeInIRP,
           }));
         }
-       } else {
+      } else {
         this.store.dispatch(new SaveClosureReasons({
           id: value.id || undefined,
           reason: value.reason,
-          includeInVMS: !!value.includeInVMS,
-          includeInIRP: !!value.includeInIRP,
+          includeInVMS: params.selectedSystem.isVMS,
+          includeInIRP: params.selectedSystem.isIRP,
         }));
-        }
-    } else if(params.selectedTab === ReasonsNavigationTabs.Requisition){
+      }
+    } else if (params.selectedTab === ReasonsNavigationTabs.Requisition) {
       const value = params.formValue as Closurevalue;
-      if(params.isVMSIRP){
-        if((value.includeInIRP == false) && (value.includeInVMS == false)){
+      if (params.isVMSIRP) {
+        if ((value.includeInIRP == false) && (value.includeInVMS == false)) {
           this.store.dispatch(new ShowToast(MessageTypes.Error, REASON_WARNING));
         } else {
           this.store.dispatch(new SaveOrderRequisition({
@@ -118,10 +118,10 @@ export class ReasonsService {
           includeInIRP: !!value.includeInIRP,
         }));
       }
-        
-    } else if(params.selectedTab === ReasonsNavigationTabs.CategoryNote){
+
+    } else if (params.selectedTab === ReasonsNavigationTabs.CategoryNote) {
       const value = params.formValue as CategoryNoteValue;
-      if(value.id != undefined || null){
+      if (value.id != undefined || null) {
         this.store.dispatch(new UpdateCategoryNoteReasons({
           id: value.id || undefined,
           reason: value.reason,
@@ -134,9 +134,9 @@ export class ReasonsService {
           isRedFlagCategory: !!value.isRedFlagCategory,
         }));
       }
-    }else {
+    } else {
       const Action = params.editMode ? UpdateReasonsActionsMap[params.selectedTab]
-      : NewReasonsActionsMap[params.selectedTab];
+        : NewReasonsActionsMap[params.selectedTab];
       const payload = params.editMode ? this.createUpdateReasonPayload(params) : this.createNewReasonPayload(params);
       this.store.dispatch(new Action(payload));
     }
