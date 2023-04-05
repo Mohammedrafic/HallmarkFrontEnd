@@ -1,12 +1,12 @@
-import { DismissAlertDto } from './../shared/models/alerts-template.model';
-import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
-import { GetAlertsCountForCurrentUser, GetAlertsForCurrentUser, GetDeviceScreenResolution, ShowCustomSideDialog } from './../store/app.actions';
-import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
-import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, NgZone, OnDestroy,
+  OnInit, ViewChild,
+} from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { OutsideZone } from "@core/decorators";
+
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { faBan, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
-import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import {
   ContextMenuComponent,
   MenuItemModel,
@@ -14,76 +14,46 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { filter, Observable, Subject, takeUntil, distinctUntilChanged, debounceTime, map } from 'rxjs';
+import { Observable, debounceTime, distinctUntilChanged, filter, map, merge, takeUntil } from 'rxjs';
 
+import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
+import { OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
+import { ToggleChatDialog, UnreadMessage } from '@core/actions';
+import { OutsideZone } from "@core/decorators";
+import { Destroyable } from '@core/helpers';
+import { AnalyticsMenuId } from '@shared/constants/menu-config';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { CurrentUserPermission } from '@shared/models/permission.model';
+import { AnalyticsApiService } from '@shared/services/analytics-api.service';
+import { FilterService } from '@shared/services/filter.service';
+import { ResizeContentService } from '@shared/services/resize-main-content.service';
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
 import { Menu, MenuItem } from '../shared/models/menu.model';
 import { User } from '../shared/models/user.model';
 import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
+import { InitPreservedFilters } from '../store/preserved-filters.actions';
 import { GetCurrentUserPermissions, GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
+import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
+import { DismissAlertDto } from './../shared/models/alerts-template.model';
+import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
+import { GetAlertsCountForCurrentUser, GetAlertsForCurrentUser, GetDeviceScreenResolution,
+  ShowCustomSideDialog } from './../store/app.actions';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
-import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
-import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
-import { faBan, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { ToggleChatDialog, UnreadMessage } from '@core/actions';
-
-import { AnalyticsMenuId } from '@shared/constants/menu-config';
-
-import { CurrentUserPermission } from '@shared/models/permission.model';
-import { PermissionTypes } from '@shared/enums/permissions-types.enum';
-import { AnalyticsApiService } from '@shared/services/analytics-api.service';
-import { InitPreservedFilters } from '../store/preserved-filters.actions';
-import { FilterService } from '@shared/services/filter.service';
-import { ResizeContentService } from '@shared/services/resize-main-content.service';
-
-
-
-enum THEME {
-  light = 'light',
-  dark = 'dark',
-}
-enum profileMenuItem {
-  // TODO: edit profile
-  /*edit_profile = 0,*/
-  theme = 1,
-  help = 2,
-  log_out = 3,
-  light_theme = 4,
-  dark_theme = 5,
-  manage_notifications = 6,
-  contact_us = 7,
-}
+import { MenuItemNames } from './shell.constant';
+import { ProfileMenuItem, THEME } from './shell.enum';
 
 @Component({
   selector: 'app-shell',
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
-  enableDock = SIDEBAR_CONFIG.isDock;
-  width = SIDEBAR_CONFIG.width;
-  dockSize = SIDEBAR_CONFIG.dockSize;
-  sideBarType = SIDEBAR_CONFIG.type;
-  alertSidebarWidth = '440px';
-  alertSidebarType = 'auto';
-  alertSidebarPosition = 'Right';
-  showAlertSidebar = false;
-
-  isDarkTheme: boolean;
-  isFirstLoad: boolean;
-  sideBarMenu: MenuItem[];
-  sideBarMenuField: Object;
-  activeMenuItemData: MenuItem;
-  public userLogin: { firstName: string; lastName: string };
-  public addFormButton: HTMLElement;
-  public cancelFormButton: HTMLElement;
-
-  private unsubscribe$: Subject<void> = new Subject();
-
+export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('sidebar') sidebar: SidebarComponent;
   @ViewChild('alertSidebar') alertSidebar: SidebarComponent;
   @ViewChild('treevalidate') tree: TreeViewComponent;
@@ -97,7 +67,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('searchMenuInstance')
   public searchMenuInstance: SearchMenuComponent;
 
-  @ViewChild('mainContainer', { static: true }) private mainContainer: ElementRef<HTMLElement>
+  @ViewChild('mainContainer', { static: true }) private mainContainer: ElementRef<HTMLElement>;
 
   @Select(AppState.isSidebarOpened)
   isSideBarDocked$: Observable<boolean>;
@@ -129,31 +99,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @Select(UserState.userChatConfig)
   userChatConfig$: Observable<boolean>;
 
-  public searchString: string = '';
-  public isClosingSearch: boolean = false;
-  public searchResult: MenuItem[] = [];
-  public isSearching: boolean = false;
-  public isMaximized: boolean = true;
-  public searchHeight: number;
-  public ProfileMenuItemNames = {
-    // TODO: edit profile
-    /* [profileMenuItem.edit_profile]: 'Edit Profile',*/
-    [profileMenuItem.theme]: 'Theme',
-    [profileMenuItem.help]: 'Help',
-    [profileMenuItem.log_out]: 'LogOut',
-    [profileMenuItem.light_theme]: 'Light',
-    [profileMenuItem.dark_theme]: 'Dark',
-    [profileMenuItem.manage_notifications]: 'Manage Notifications',
-    [profileMenuItem.contact_us]: 'Contact Us',
-  };
-  public isUnreadMessages = false;
-  public isContactOpen: boolean = false;
-
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
-  profileDatasource: MenuItemModel[] = [];
-  profileData: MenuItemModel[] = [];
-  private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
   @Select(AppState.isMobileScreen)
   public isMobile$: Observable<boolean>;
@@ -164,18 +111,46 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @Select(AppState.isDekstopScreen)
   public isDekstop$: Observable<boolean>;
 
-
-  faTimes = faTimes as IconDefinition;
-  faBan = faBan as IconDefinition;
-  alerts: any;
-  alertsCount: number;
-  private permissions: CurrentUserPermission[] = [];
-  canManageOtherUserNotifications: boolean;
-  canManageNotificationTemplates: boolean;
-
-  isDialogOpen: boolean = false;
-  public dialogWidth: string;
+  //TODO: primitive type obssesion
+  public searchString = '';
+  public searchResult: MenuItem[] = [];
+  public isSearching = false;
+  public isMaximized = true;
+  public searchHeight: number;
+  public isUnreadMessages = false;
+  public dialogWidth = '800px';
   public contactHeaderTitle = 'Contact Support';
+  public profileDatasource: MenuItemModel[] = [];
+  public enableDock = SIDEBAR_CONFIG.isDock;
+  public width = SIDEBAR_CONFIG.width;
+  public dockSize = SIDEBAR_CONFIG.dockSize;
+  public sideBarType = SIDEBAR_CONFIG.type;
+  public alertSidebarWidth = '440px';
+  public alertSidebarType = 'auto';
+  public alertSidebarPosition = 'Right';
+  public showAlertSidebar = false;
+  public isDarkTheme: boolean;
+  public sideBarMenuField: Object;
+  public faTimes = faTimes as IconDefinition;
+  public alerts: any;
+  public alertsCount: number;
+
+  private isClosingSearch = false;
+  private ProfileMenuItemNames = MenuItemNames;
+  private isContactOpen = false;
+  private profileData: MenuItemModel[] = [];
+  private activeMenuItemData: MenuItem;
+  private isFirstLoad: boolean;
+  private sideBarMenu: MenuItem[];
+  private faBan = faBan as IconDefinition;
+  private userLogin: { firstName: string; lastName: string };
+  private addFormButton: HTMLElement;
+  private cancelFormButton: HTMLElement;
+  private canManageOtherUserNotifications: boolean;
+  private canManageNotificationTemplates: boolean;
+  private isDialogOpen = false;
+  private permissions: CurrentUserPermission[] = [];
+  private orderMenuItems: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
   constructor(
     private store: Store,
@@ -187,15 +162,18 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     private filterService: FilterService,
     private readonly ngZone: NgZone,
     private ResizeContentService: ResizeContentService,
+    private cd: ChangeDetectorRef,
   ) {
+    super();
 
     this.filterService.canPreserveFilters() && store.dispatch(new InitPreservedFilters());
+
     router.events.pipe(filter((event) => event instanceof NavigationEnd), debounceTime(50)).subscribe((data: any) => {
       if (this.tree) {
         const menuItem = this.tree.getTreeData().find((el) => el['route'] === data['url']);
         if (menuItem) {
           if (menuItem['id'] == AnalyticsMenuId) {
-            this.toggleClick();
+            this.toggleSidebar();
           }
           this.tree.selectedNodes = [menuItem['title'] as string];
         }
@@ -206,41 +184,14 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.dialogWidth = '800px';
-    this.subsToOrderAgencyIds();
-    this.isDarkTheme$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDark) => {
-      this.isDarkTheme = isDark;
-      this.setTheme(isDark);
-    });
+    this.observeOrderNavigation();
+    this.observeThemeChange();
     this.initSidebarFields();
     this.getCurrentUserPermissions();
-    this.currentUserPermissions$
-      .pipe(
-        takeUntil(this.unsubscribe$),
-        filter((permissions) => !!permissions.length),
-        map((permissions) => permissions.map((permission) => permission.permissionId))
-      )
-      .subscribe((permissionsIds: number[]) => {
-        this.canManageOtherUserNotifications = this.hasPermission(
-          permissionsIds,
-          PermissionTypes.CanManageNotificationsForOtherUsers
-        );
-        this.canManageNotificationTemplates = this.hasPermission(
-          permissionsIds,
-          PermissionTypes.CanManageNotificationTemplates
-        );
-        this.removeManageNotificationOptionInHeader();
-      });
-
+    this.getPermissions();
     this.getAlertsPoolling();
-
     this.watchForUnreadMessages();
     this.attachElementToResizeObserver();
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
   }
 
   ngAfterViewInit(): void {
@@ -248,129 +199,29 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getAlertsPoollingTime();
   }
 
-  private removeManageNotificationOptionInHeader(): void {
-    if (this.canManageNotificationTemplates == false || this.canManageOtherUserNotifications == false) {
-      const profileManageNotificationId = this.profileData[0].items?.findIndex(
-        (x) => x.id == profileMenuItem.manage_notifications.toString()
-      );
-      if (profileManageNotificationId != undefined && profileManageNotificationId > 0) {
-        this.profileData[0].items?.splice(profileManageNotificationId, 1);
-      }
-    }
-    this.profileDatasource = this.profileData;
-  }
-
-  private getCurrentUserPermissions(): void {
-    this.store.dispatch(new GetCurrentUserPermissions());
-  }
-
-
-  private getAlertsPoolling(): void {
-    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
-      if (user) {
-        this.userLogin = user;
-        this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
-        this.store.dispatch(new GetAlertsCountForCurrentUser({}));
-        this.alertCountStateModel$.subscribe((alertCountdata) => {
-          this.alertsCount = alertCountdata;
-        });
-        this.profileData = [
-          {
-            text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
-            items: [
-              // TODO: edit profile
-              /*{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },*/
-              {
-                text: this.ProfileMenuItemNames[profileMenuItem.manage_notifications],
-                id: profileMenuItem.manage_notifications.toString(),
-                iconCss: 'e-settings e-icons',
-              },
-              {
-                text: this.ProfileMenuItemNames[profileMenuItem.theme],
-                id: profileMenuItem.theme.toString(),
-                iconCss: this.isDarkTheme ? 'e-theme-dark e-icons' : 'e-theme-light e-icons',
-                items: [
-                  {
-                    text: this.ProfileMenuItemNames[profileMenuItem.light_theme],
-                    id: profileMenuItem.light_theme.toString(),
-                  },
-                  {
-                    text: this.ProfileMenuItemNames[profileMenuItem.dark_theme],
-                    id: profileMenuItem.dark_theme.toString(),
-                  },
-                ],
-              },
-              {
-                text: this.ProfileMenuItemNames[profileMenuItem.help],
-                id: profileMenuItem.help.toString(),
-                iconCss: 'e-circle-info e-icons',
-              },
-              {
-                text: this.ProfileMenuItemNames[profileMenuItem.contact_us],
-                id: profileMenuItem.contact_us.toString(),
-                iconCss: 'e-ddb-icons e-contactus',
-              },
-              {
-                text: this.ProfileMenuItemNames[profileMenuItem.log_out],
-                id: profileMenuItem.log_out.toString(),
-                iconCss: 'e-ddb-icons e-logout',
-              },
-            ],
-          },
-        ];
-      }
-    });
-  }
-
-
-  @OutsideZone
-  private getAlertsPoollingTime(): void {
-    setInterval(() => {
-      this.store.dispatch(new GetAlertsCountForCurrentUser({}));
-      this.alertCountStateModel$.subscribe((alertCountdata) => {
-        this.alertsCount = alertCountdata;
-      });
-    }, 200000
-    );
-
-  }
-
-  private hasPermission(permissions: number[], id: number): boolean {
-    return permissions.includes(id);
-  }
-
-  subsToOrderAgencyIds(): void {
-    this.orderManagementAgencyService.selectedOrderAfterRedirect$.subscribe(
-      () => (this.tree.selectedNodes = [this.routers[1]])
-    );
-    this.orderManagementService.selectedOrderAfterRedirect$.subscribe(
-      () => (this.tree.selectedNodes = [this.routers[0]])
-    );
-  }
-
-  onSelectProfileMenu(event: any) {
+  onSelectProfileMenu(event: any): void {
     switch (Number(event.item.properties.id)) {
       // TODO: edit profile
-      //case profileMenuItem.edit_profile:
+      //case ProfileMenuItem.edit_profile:
       //  break;
-      case profileMenuItem.manage_notifications:
+      case ProfileMenuItem.manage_notifications:
         this.manageNotifications();
         break;
-      case profileMenuItem.light_theme:
+      case ProfileMenuItem.light_theme:
         this.isDarkTheme = true;
         this.toggleTheme();
         break;
-      case profileMenuItem.dark_theme:
+      case ProfileMenuItem.dark_theme:
         this.isDarkTheme = false;
         this.toggleTheme();
         break;
-      case profileMenuItem.help:
+      case ProfileMenuItem.help:
         this.onGetHelp();
         break;
-      case profileMenuItem.log_out:
+      case ProfileMenuItem.log_out:
         this.logout();
         break;
-      case profileMenuItem.contact_us:
+      case ProfileMenuItem.contact_us:
         this.contactUs();
         break;
     }
@@ -379,8 +230,17 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
 
-    this.isSideBarDocked$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDocked) => (this.sidebar.isOpen = isDocked));
-    this.isFirstLoad$.pipe(takeUntil(this.unsubscribe$)).subscribe((isFirstLoad) => {
+    this.isSideBarDocked$
+    .pipe(takeUntil(this.componentDestroy()))
+    .subscribe((isDocked) => {
+      this.sidebar.isOpen = isDocked;
+      this.cd.markForCheck();
+    });
+
+
+    this.isFirstLoad$
+    .pipe(takeUntil(this.componentDestroy()))
+    .subscribe((isFirstLoad) => {
       this.isFirstLoad = isFirstLoad;
       if (isFirstLoad) {
         // TODO: Should be decided after Login: CLIENT_SIDEBAR_MENU, ADMIN_SIDEBAR_MENU etc.
@@ -392,78 +252,45 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         //   this.tree.selectedNodes = [activeMenuItem.title];
         // }
       }
+      this.cd.markForCheck();
     });
   }
 
   onAlertSidebarCreated(): void {
     this.sidebar.element.classList.add('e-hidden');
+    this.cd.markForCheck();
   }
 
-  toggleClick(): void {
+  toggleSidebar(): void {
     this.store.dispatch(new ToggleSidebarState(!this.sidebar.isOpen));
     this.tree.collapseAll();
   }
 
-  manageNotifications(): void {
-    this.menu$.pipe(takeUntil(this.unsubscribe$)).subscribe((menu: Menu) => {
-      if (menu.menuItems.length) {
-        const menuItems = menu.menuItems
-          .find((element) => element.id == 6)
-          ?.children.find((e) => e.route == '/alerts/user-subscription');
-        if (menuItems) {
-          this.router.navigate([menuItems.route]);
-        }
-      }
-    });
-  }
-
-  toggleTheme(): void {
-    this.store.dispatch(new ToggleTheme(!this.isDarkTheme));
-  }
-
-  initSidebarFields(): void {
-    this.menu$.pipe(takeUntil(this.unsubscribe$)).subscribe((menu: Menu) => {
-      if (menu.menuItems.length) {
-        this.sideBarMenu = menu.menuItems;
-        if (this.router.url === '/') {
-          this.router.navigate([this.sideBarMenu[0].route]);
-        }
-        this.sideBarMenuField = { dataSource: this.sideBarMenu, id: 'anch', text: 'title', child: 'children' };
-      }
-    });
-  }
-
-  nodeSelect(args: NodeSelectEventArgs): void {
+  toggleSubMenu(args: NodeSelectEventArgs): void {
     if (args.node.classList.contains('e-level-1') && this.sidebar.isOpen) {
       this.tree.collapseAll();
       this.tree.expandAll([args.node]);
       this.tree.expandOn = 'None';
     }
+
     this.hideAnalyticsSubMenuItems();
   }
 
-  onMenuItemClick(menuItem: MenuItem): void {
+  selectMenuItem(menuItem: MenuItem): void {
     this.setSideBarForFirstLoad(menuItem.route as string);
+
     if (menuItem.id == AnalyticsMenuId) {
       this.router.navigate([menuItem.route]);
-    } else {
-      if (!menuItem.children?.length) {
+    } else if (!menuItem.children?.length) {
         this.router.navigate([menuItem.route]).then(() => {
           this.closeSidebarInMobileMode();
         });
-      }
-    }
-  }
-
-  private closeSidebarInMobileMode(): void {
-    const isMobile = this.store.selectSnapshot(AppState.isMobileScreen);
-    if (isMobile) {
-      this.store.dispatch(new ToggleSidebarState(false));
     }
   }
 
   onSubMenuItemClick(event: any): void {
     this.tree.selectedNodes = [this.activeMenuItemData?.anch];
+
     if (event.item) {
       this.setSideBarForFirstLoad(event.item.route);
       this.router.navigate([event.item.route]);
@@ -474,6 +301,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   showContextMenu(data: MenuItem, event: any): void {
     this.contextmenu.items = [];
+
     if (data.id != AnalyticsMenuId && data.children && data.children.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
       const boundingRectangle = event.target.getBoundingClientRect();
@@ -487,16 +315,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       setTimeout(() => this.contextmenu.open(boundingRectangle.top, parseInt(this.dockSize)));
     }
     this.hideAnalyticsSubMenuItems();
-  }
-
-  hideAnalyticsSubMenuItems() {
-    let element = this.tree?.element.querySelector('[data-uid="Analytics"]');
-    element?.querySelectorAll('ul li').forEach((el: any) => {
-      el.style.display = 'none';
-    });
-    element?.querySelectorAll('.e-text-content .e-icons').forEach((el: any) => {
-      el.style.display = 'none';
-    });
   }
 
   onBeforeContextMenuOpen(event: any): void {
@@ -517,10 +335,13 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onContextMenuClose(): void {
-    this.isTablet$.pipe(takeUntil(this.unsubscribe$)).subscribe((isTablet) => {
-      if (!isTablet) {
-        this.contextmenu.items = [];
-      }
+    this.isTablet$
+    .pipe(
+      filter((isTablet) => !isTablet),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      this.contextmenu.items = [];
     });
   }
 
@@ -528,7 +349,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.store.dispatch(new LogoutUser());
   }
 
-  public onGetHelp(): void {
+  onGetHelp(): void {
     const user = this.store.selectSnapshot(UserState.user);
     let url = '';
     if (user?.businessUnitType === BusinessUnitType.Agency) {
@@ -544,32 +365,22 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isUnreadMessages = false;
   }
 
-  private setSideBarForFirstLoad(route: string): void {
-    if (this.isFirstLoad && route !== this.router.url) {
-      this.store.dispatch(new ToggleSidebarState(true));
-      this.store.dispatch(new SetIsFirstLoadState(false));
-    }
-  }
-
-  private setTheme(darkTheme: boolean): void {
-    document.body.classList.remove(darkTheme ? THEME.light : THEME.dark);
-    document.body.classList.add(darkTheme ? THEME.dark : THEME.light);
-  }
-
-  public onSearchMenuClick(): void {
+  onSearchMenuClick(): void {
     this.searchHeight = 100;
     this.isSearching = !this.isSearching;
     if (this.isMaximized) {
       this.searchInput?.nativeElement?.focus();
     }
-    if (!this.sidebar.isOpen) {
-      this.isMaximized = false;
-    } else this.isMaximized = true;
+
+    this.isMaximized = this.sidebar.isOpen;
+    this.cd.markForCheck();
   }
 
-  public handleOnSearchMenuTextKeyUp(event: KeyboardEvent): void {
+  // TODO: make it with fromEvent and debouncetime
+  handleOnSearchMenuTextKeyUp(event: KeyboardEvent): void {
     const { value } = event.target as HTMLInputElement;
-    if (value != '') {
+
+    if (value) {
       this.searchString = value;
       this.searchResult = this.getData(this.searchString.toLowerCase());
     } else {
@@ -578,17 +389,114 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  public onSearchChange(): void {
+  onSearchChange(): void {
     this.searchResult = this.getData(this.searchString.toLowerCase());
   }
 
-  getData(searchText: string) {
+  onSearchFocusOut(): void {
+    this.isClosingSearch = true;
+    this.searchString = '';
+    this.searchResult = [];
+    this.isSearching = false;
+
+    /* Small delay to allow search to close when clicking search icon*/
+    setTimeout(() => {
+      this.isClosingSearch = false;
+    }, 500);
+  }
+
+  bellIconClicked(): void {
+    this.store.dispatch(new GetAlertsForCurrentUser({}));
+
+    this.alertStateModel$
+    .pipe(takeUntil(this.componentDestroy()))
+    .subscribe((alertdata) => {
+      this.alerts = alertdata;
+      this.showAlertSidebar = true;
+      this.alertSidebar.show();
+      this.cd.markForCheck();
+    });
+    
+  }
+
+  alertSideBarCloseClick(): void {
+    this.alertSidebar.hide();
+    this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+
+    this.alertCountStateModel$
+    .pipe(takeUntil(this.componentDestroy()))
+    .subscribe((alertCountdata) => {
+      this.alertsCount = alertCountdata;
+      this.cd.markForCheck();
+    });
+  }
+
+  alertSideBarClearAllClick(): void {
+    this.allAlertDismiss();
+  }
+
+  alertDismiss(id: any): void {
+    const model: DismissAlertDto = {
+      Id: id,
+    };
+
+    this.store.dispatch(new DismissAlert(model)).subscribe((x) => {
+      if (x) {
+        this.getAlertsForUser();
+      }
+    });
+    this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+    this.alertCountStateModel$.subscribe((alertCountdata) => {
+      this.alertsCount = alertCountdata;
+    });
+  }
+
+  contactUs(): void {
+    this.store.dispatch(new ShowCustomSideDialog(true));
+  }
+
+  getContentDetails(businessUnitId?: number,orderId?: number,title?:string): void {
+    if (businessUnitId) {
+        this.alertSideBarCloseClick();
+        window.localStorage.setItem("BussinessUnitID",JSON.stringify(businessUnitId));
+    } 
+    if(orderId){
+      window.localStorage.setItem("OrderId",JSON.stringify(orderId));
+    }
+    if(title){
+     window.localStorage.setItem("alertTitle",JSON.stringify(title)); 
+    }
+  }
+
+  private getAlertsForUser(): void {
+    this.store.dispatch(new GetAlertsForCurrentUser({}));
+    this.alertStateModel$
+    .pipe(takeUntil(this.componentDestroy()))
+    .subscribe((x) => {
+      this.alerts = x;
+      this.cd.markForCheck();
+    });
+  }
+
+  private allAlertDismiss(): void {
+    this.store.dispatch(new DismissAllAlerts()).subscribe((x) => {
+      if (x) {
+        this.getAlertsForUser();
+      }
+    });
+    this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+    this.alertCountStateModel$.subscribe((alertCountdata) => {
+      this.alertsCount = alertCountdata;
+    });
+  }
+
+  private getData(searchText: string): any[] {
     const menuItems = [...this.sideBarMenu];
     const filterMenuItems = menuItems.filter((item: MenuItem) => item.id != AnalyticsMenuId);
     return this.getValueLogic(filterMenuItems && filterMenuItems.length > 0 ? filterMenuItems : menuItems, searchText);
   }
 
-  getValueLogic(data: any, filterText: string) {
+  private getValueLogic(data: any, filterText: string): any[] {
     const arr: any = [];
 
     if (data && Array.isArray(data)) {
@@ -604,72 +512,97 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     return arr;
   }
 
-  public onSearchFocusOut(): void {
-    this.isClosingSearch = true;
-    this.searchString = '';
-    this.searchResult = [];
-    this.isSearching = false;
+  private observeOrderNavigation(): void {
+    const orgOrderStream = this.orderManagementAgencyService.selectedOrderAfterRedirect$
+    .pipe(
+      map(() => [this.orderMenuItems[1]]),
+    );
 
-    /* Small delay to allow search to close when clicking search icon*/
-    setTimeout(() => {
-      this.isClosingSearch = false;
-    }, 500);
-  }
+    const agencyOrderStream = this.orderManagementService.selectedOrderAfterRedirect$
+    .pipe(
+      map(() => [this.orderMenuItems[0]])
+    );
 
-  getAlertsForUser() {
-    this.store.dispatch(new GetAlertsForCurrentUser({}));
-    this.alertStateModel$.subscribe((x) => {
-      this.alerts = x;
+    merge(
+      orgOrderStream,
+      agencyOrderStream,
+    )
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((menuItem: string[]) => {
+      this.tree.selectedNodes = menuItem;
+      this.cd.markForCheck();
     });
   }
 
-  bellIconClicked() {
-    this.store.dispatch(new GetAlertsForCurrentUser({}));
-    this.alertStateModel$.subscribe((alertdata) => {
-      this.alerts = alertdata;
-      this.showAlertSidebar = true;
-      this.alertSidebar.show();
+  private hideAnalyticsSubMenuItems(): void {
+    const element = this.tree?.element.querySelector('[data-uid="Analytics"]');
+    element?.querySelectorAll('ul li').forEach((el: any) => {
+      el.style.display = 'none';
     });
-    
-  }
-
-  alertSideBarCloseClick() {
-    this.alertSidebar.hide();
-    this.store.dispatch(new GetAlertsCountForCurrentUser({}));
-    this.alertCountStateModel$.subscribe((alertCountdata) => {
-      this.alertsCount = alertCountdata;
+    element?.querySelectorAll('.e-text-content .e-icons').forEach((el: any) => {
+      el.style.display = 'none';
     });
   }
 
-  alertSideBarClearAllClick() {
-    this.allAlertDismiss();
-  }
-
-  alertDismiss(id: any) {
-    var model: DismissAlertDto = {
-      Id: id,
-    };
-    this.store.dispatch(new DismissAlert(model)).subscribe((x) => {
-      if (x) {
-        this.getAlertsForUser();
+  private manageNotifications(): void {
+    this.menu$
+    .pipe(takeUntil(this.componentDestroy()))
+    .subscribe((menu: Menu) => {
+      if (menu.menuItems.length) {
+        const menuItems = menu.menuItems
+          .find((element) => element.id == 6)
+          ?.children.find((e) => e.route == '/alerts/user-subscription');
+        if (menuItems) {
+          this.router.navigate([menuItems.route]);
+        }
       }
     });
-    this.store.dispatch(new GetAlertsCountForCurrentUser({}));
-    this.alertCountStateModel$.subscribe((alertCountdata) => {
-      this.alertsCount = alertCountdata;
+  }
+
+  private toggleTheme(): void {
+    this.store.dispatch(new ToggleTheme(!this.isDarkTheme));
+  }
+
+  private initSidebarFields(): void {
+    this.menu$
+    .pipe(
+      filter((menu) => !!menu.menuItems.length),
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe((menu: Menu) => {
+      this.sideBarMenu = menu.menuItems;
+      this.sideBarMenuField = { dataSource: this.sideBarMenu, id: 'anch', text: 'title', child: 'children' };
+
+      if (this.router.url === '/') {
+        this.router.navigate([this.sideBarMenu[0].route]);
+      }
+
+      this.cd.markForCheck();
     });
   }
 
-  allAlertDismiss() {
-    this.store.dispatch(new DismissAllAlerts()).subscribe((x) => {
-      if (x) {
-        this.getAlertsForUser();
-      }
-    });
-    this.store.dispatch(new GetAlertsCountForCurrentUser({}));
-    this.alertCountStateModel$.subscribe((alertCountdata) => {
-      this.alertsCount = alertCountdata;
-    });
+  private closeSidebarInMobileMode(): void {
+    const isMobile = this.store.selectSnapshot(AppState.isMobileScreen);
+
+    if (isMobile) {
+      this.store.dispatch(new ToggleSidebarState(false));
+    }
+
+    this.cd.markForCheck();
+  }
+
+  private setSideBarForFirstLoad(route: string): void {
+    if (this.isFirstLoad && route !== this.router.url) {
+      this.store.dispatch(new ToggleSidebarState(true));
+      this.store.dispatch(new SetIsFirstLoadState(false));
+    }
+  }
+
+  private setTheme(darkTheme: boolean): void {
+    document.body.classList.remove(darkTheme ? THEME.light : THEME.dark);
+    document.body.classList.add(darkTheme ? THEME.dark : THEME.light);
   }
 
   private watchForUnreadMessages(): void {
@@ -679,27 +612,108 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         filter(() => !this.store.snapshot().chat.chatOpen as boolean),
         distinctUntilChanged(),
         debounceTime(1500),
-        takeUntil(this.unsubscribe$)
+        takeUntil(this.componentDestroy())
       )
-      .subscribe((value) => {
+      .subscribe(() => {
         this.isUnreadMessages = true;
+        this.cd.markForCheck();
       });
   }
 
-  contactUs() {
-    this.store.dispatch(new ShowCustomSideDialog(true));
+  private removeManageNotificationOptionInHeader(): void {
+    if (!this.canManageNotificationTemplates || !this.canManageOtherUserNotifications) {
+      const profileManageNotificationId = this.profileData[0].items?.findIndex(
+        (x) => x.id == ProfileMenuItem.manage_notifications.toString()
+      );
+      if (profileManageNotificationId !== undefined && profileManageNotificationId > 0) {
+        this.profileData[0].items?.splice(profileManageNotificationId, 1);
+      }
+    }
+    this.profileDatasource = this.profileData;
   }
-  GetContentDetails(businessUnitId?: number,orderId?: number,title?:string) {
-    if (businessUnitId) {
-        this.alertSideBarCloseClick()
-        window.localStorage.setItem("BussinessUnitID",JSON.stringify(businessUnitId));
-    } 
-    if(orderId){
-      window.localStorage.setItem("OrderId",JSON.stringify(orderId));
-    }
-    if(title){
-     window.localStorage.setItem("alertTitle",JSON.stringify(title)); 
-    }
+
+  private getCurrentUserPermissions(): void {
+    this.store.dispatch(new GetCurrentUserPermissions());
+  }
+
+  // TODO: this.alertCountStateModel$.subscribe - possibly duplicated 3 times.
+  private getAlertsPoolling(): void {
+    this.user$.pipe(takeUntil(this.componentDestroy())).subscribe((user: User) => {
+      if (user) {
+        this.userLogin = user;
+        this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
+        this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+
+        this.alertCountStateModel$
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe((alertCountdata) => {
+          this.alertsCount = alertCountdata;
+          this.cd.markForCheck();
+        });
+        
+        this.profileData = [
+          {
+            text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
+            items: [
+              // TODO: edit profile
+              /*{ text: this.ProfileMenuItemNames[ProfileMenuItem.edit_profile], id: ProfileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },*/
+              {
+                text: this.ProfileMenuItemNames[ProfileMenuItem.manage_notifications],
+                id: ProfileMenuItem.manage_notifications.toString(),
+                iconCss: 'e-settings e-icons',
+              },
+              {
+                text: this.ProfileMenuItemNames[ProfileMenuItem.theme],
+                id: ProfileMenuItem.theme.toString(),
+                iconCss: this.isDarkTheme ? 'e-theme-dark e-icons' : 'e-theme-light e-icons',
+                items: [
+                  {
+                    text: this.ProfileMenuItemNames[ProfileMenuItem.light_theme],
+                    id: ProfileMenuItem.light_theme.toString(),
+                  },
+                  {
+                    text: this.ProfileMenuItemNames[ProfileMenuItem.dark_theme],
+                    id: ProfileMenuItem.dark_theme.toString(),
+                  },
+                ],
+              },
+              {
+                text: this.ProfileMenuItemNames[ProfileMenuItem.help],
+                id: ProfileMenuItem.help.toString(),
+                iconCss: 'e-circle-info e-icons',
+              },
+              {
+                text: this.ProfileMenuItemNames[ProfileMenuItem.contact_us],
+                id: ProfileMenuItem.contact_us.toString(),
+                iconCss: 'e-ddb-icons e-contactus',
+              },
+              {
+                text: this.ProfileMenuItemNames[ProfileMenuItem.log_out],
+                id: ProfileMenuItem.log_out.toString(),
+                iconCss: 'e-ddb-icons e-logout',
+              },
+            ],
+          },
+        ];
+      }
+    });
+  }
+
+  @OutsideZone
+  private getAlertsPoollingTime(): void {
+    setInterval(() => {
+      this.store.dispatch(new GetAlertsCountForCurrentUser({}));
+      this.alertCountStateModel$.subscribe((alertCountdata) => {
+        this.alertsCount = alertCountdata;
+        this.cd.markForCheck();
+      });
+    }, 200000
+    );
+
+  }
+
+  private hasPermission(permissions: number[], id: number): boolean {
+    return permissions.includes(id);
   }
 
   private attachElementToResizeObserver(): void {
@@ -708,5 +722,39 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private getDeviceScreenResolution(): void {
     this.store.dispatch(new GetDeviceScreenResolution());
+  }
+
+  private observeThemeChange(): void {
+    this.isDarkTheme$
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe((isDark) => {
+      this.isDarkTheme = isDark;
+      this.setTheme(isDark);
+      this.cd.markForCheck();
+    });
+  }
+
+  private getPermissions(): void {
+    this.currentUserPermissions$
+    .pipe(
+      takeUntil(this.componentDestroy()),
+      filter((permissions) => !!permissions.length),
+      map((permissions) => permissions.map((permission) => permission.permissionId))
+    )
+    .subscribe((permissionsIds: number[]) => {
+      this.canManageOtherUserNotifications = this.hasPermission(
+        permissionsIds,
+        PermissionTypes.CanManageNotificationsForOtherUsers
+      );
+
+      this.canManageNotificationTemplates = this.hasPermission(
+        permissionsIds,
+        PermissionTypes.CanManageNotificationTemplates
+      );
+
+      this.removeManageNotificationOptionInHeader();
+      this.cd.markForCheck();
+    });
   }
 }
