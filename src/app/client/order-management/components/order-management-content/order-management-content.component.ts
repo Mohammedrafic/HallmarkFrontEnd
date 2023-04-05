@@ -7,6 +7,7 @@ import {
   OnInit,
   ViewChild,
   Inject,
+  NgZone,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
@@ -208,6 +209,7 @@ import { OrderManagementPagerState } from '@shared/models/candidate.model';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { ClearPageFilters, GetPreservedFiltersByPage, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
+import { OutsideZone } from '@core/decorators';
 
 @Component({
   selector: 'app-order-management-content',
@@ -419,6 +421,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private cd: ChangeDetectorRef,
     private breakpointService: BreakpointObserverService,
     private commentsService: CommentsService,
+    private readonly ngZone: NgZone,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
@@ -868,7 +871,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public onFilterClearAll(): void {
-    this.store.dispatch(new ClearPageFilters(this.pageName()));
+    this.store.dispatch(new ClearPageFilters(this.getPageName()));
     this.filterApplied = true;
     this.orderManagementService.selectedOrderAfterRedirect = null;
     this.clearFilters();
@@ -1599,7 +1602,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       throttleTime(100),
       filter(Boolean),
       tap((data: OrderFilterDataSource) => {
-        let statuses: any = [];
+        let statuses: FilterOrderStatus[] = [];
         let candidateStatuses: FilterStatus[] = [];
         const statusesByDefault = [
           CandidatStatus['Not Applied'],
@@ -1665,9 +1668,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
         }
         this.cd$.next(true);
-        setTimeout(() => {
-          this.clearstorage();
-        }, 5000);
+        this.clearstorage();
       }),
       takeUntil(this.unsubscribe$)
     );
@@ -2289,9 +2290,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orgpendingOrderapproval = JSON.parse(localStorage.getItem('pendingApprovalOrders') || '""') as string;
   }
 
-  clearstorage():void{
-    this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
-    this.orgpendingOrderapproval = "";
+  @OutsideZone
+  private clearstorage(): void {
+    setTimeout(() => {
+      this.globalWindow.localStorage.setItem('pendingApprovalOrders', JSON.stringify(''));
+      this.orgpendingOrderapproval = '';
+    }, 5000);
   }
 
   private getLocationState(): void {
@@ -2303,12 +2307,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private getPreservedFiltersByPage(): void {
-    this.store.dispatch(new GetPreservedFiltersByPage(this.pageName()));
+    this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
   }
 
   private saveFiltersByPageName(): void {
     const filters = { ...this.filters, orderTypes: [] }
-    this.store.dispatch(new SaveFiltersByPageName(this.pageName(), filters));
+    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), filters));
   }
 
   private getPreservedFilters(): Observable<PreservedFiltersByPage<OrderFilter>> {
@@ -2344,9 +2348,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filters.irpOnly = !!this.filters.irpOnly;
   }
 
-  private pageName(): FilterPageName {
-    return this.isActiveSystemIRP
-      ? FilterPageName.OrderManagementIRPOrganization
-      : FilterPageName.OrderManagementVMSOrganization;
+  private getPageName(): FilterPageName {
+    if (this.isActiveSystemIRP) {
+      return FilterPageName.OrderManagementIRPOrganization;
+    } else {
+      return FilterPageName.OrderManagementVMSOrganization;
+    }
   }
 }

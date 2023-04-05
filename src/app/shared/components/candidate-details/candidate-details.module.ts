@@ -21,6 +21,7 @@ import { MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { GridClassificationRendererComponent } from './candidate-grid/grid-classification-renderer/grid-classification-renderer.component';
+import { CandidateDetailsApiService } from './services/candidate-details-api.service';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,7 @@ import { GridClassificationRendererComponent } from './candidate-grid/grid-class
     //STORE
     NgxsModule.forFeature([CandidateDetailsState]),
   ],
-  providers: [CandidateDetailsService],
+  providers: [CandidateDetailsApiService, CandidateDetailsService],
     exports: [CandidateDetailsComponent, FiltersComponent],
 })
 export class CandidateDetailsModule {}

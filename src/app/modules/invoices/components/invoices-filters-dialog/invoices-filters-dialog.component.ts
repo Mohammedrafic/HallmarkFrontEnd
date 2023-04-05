@@ -122,7 +122,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   clearAllFilters(eventEmmit = true): void {
-    this.store.dispatch(new ClearPageFilters(this.pageName()));
+    this.store.dispatch(new ClearPageFilters(this.getPageName()));
     this.formGroup.reset();
     this.filteredItems = [];
     this.appliedFiltersAmount.emit(this.filteredItems.length);
@@ -224,7 +224,10 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     const structureStream = this.isAgency ? this.selectedOrgStructure$ : this.organizationStructure$;
 
     structureStream
-      .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      )
       .subscribe((structure: OrganizationStructure) => {
         this.formGroup.reset();
         this.filteredItems = [];
@@ -315,17 +318,20 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.getOrganizationStructure().pipe(
       filter(Boolean),
       switchMap(() => this.preservedFiltersByPageName$),
+      filter(({ dispatch }) => dispatch),
       takeUntil(this.componentDestroy())
-    ).subscribe(({state, dispatch}) => {
-      if(dispatch) {
-        this.invoicesFiltersService.patchFormValue(this.formGroup, state || {});
-        this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
-        this.appliedFiltersAmount.emit(this.filteredItems.length);
-      }
+    ).subscribe(({ state }) => {
+      this.invoicesFiltersService.patchFormValue(this.formGroup, state || {});
+      this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+      this.appliedFiltersAmount.emit(this.filteredItems.length);
     });
   }
 
-  private pageName(): FilterPageName {
-    return this.isAgency ? FilterPageName.InvoicesVMSAgency : FilterPageName.InvoicesVMSOrganization;
+  private getPageName(): FilterPageName {
+    if(this.isAgency) {
+      return FilterPageName.InvoicesVMSAgency;
+    } else {
+      return FilterPageName.InvoicesVMSOrganization;
+    }
   }
 }

@@ -10,7 +10,6 @@ import {
   SetPageSize
 } from '@shared/components/candidate-details/store/candidate.actions';
 import { Observable, tap } from 'rxjs';
-import { CandidateDetailsService } from '@shared/components/candidate-details/services/candidate-details.service';
 import { CandidateDetailsTabs } from '@shared/enums/candidate-tabs.enum';
 import {
   CandidateDetailsPage,
@@ -19,6 +18,7 @@ import {
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { SkillsService } from '@shared/services/skills.service';
+import { CandidateDetailsApiService } from '../services/candidate-details-api.service';
 
 interface CandidateDetailsStateModel {
   candidateDetailsPage: CandidateDetailsPage | null;
@@ -84,14 +84,14 @@ export class CandidateDetailsState {
     return state.candidateSkills;
   }
 
-  constructor(private candidateDetailsService: CandidateDetailsService, private skillsService: SkillsService) {}
+  constructor(private candidateDetailsApiService: CandidateDetailsApiService, private skillsService: SkillsService) {}
 
   @Action(GetCandidateDetailsPage, { cancelUncompleted: true })
   GetCandidateDetailsPage(
     { patchState }: StateContext<CandidateDetailsStateModel>,
     { payload }: GetCandidateDetailsPage
   ): Observable<CandidateDetailsPage> {
-    return this.candidateDetailsService.getCandidateDetails(payload).pipe(
+    return this.candidateDetailsApiService.getCandidateDetails(payload).pipe(
       tap((payload: CandidateDetailsPage) => {
         patchState({ candidateDetailsPage: payload });
         return payload;
@@ -126,7 +126,7 @@ export class CandidateDetailsState {
 
   @Action(GetCandidateRegions)
   GetCandidateRegions({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<CandidatesDetailsRegions[]> {
-    return this.candidateDetailsService.getRegions().pipe(
+    return this.candidateDetailsApiService.getRegions().pipe(
       tap((payload: CandidatesDetailsRegions[]) => {
         patchState({ candidateRegions: payload });
         return payload;

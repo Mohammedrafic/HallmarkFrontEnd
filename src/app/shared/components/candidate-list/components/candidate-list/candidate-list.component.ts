@@ -195,7 +195,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFilterClearAll(): void {
-    this.store.dispatch(new ClearPageFilters(this.pageName()));
+    this.store.dispatch(new ClearPageFilters(this.getPageName()));
     this.clearFilters();
     this.dispatchNewPage();
   }
@@ -621,14 +621,18 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private getPreservedFiltersByPage(): void {
-    this.store.dispatch(new GetPreservedFiltersByPage(this.pageName()));
+    this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
   }
 
   private saveFiltersByPageName(filters: CandidateListFilters): void {
-    this.store.dispatch(new SaveFiltersByPageName(this.pageName(), filters));
+    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), filters));
   }
 
-  private pageName(): FilterPageName {
-    return this.isIRP ? FilterPageName.CandidatesIRPOrganization : FilterPageName.CandidatesVMSOrganization;
+  private getPageName(): FilterPageName {
+    if(this.isIRP) {
+      return FilterPageName.CandidatesIRPOrganization;
+    } else {
+      return FilterPageName.CandidatesVMSOrganization;
+    }
   }
 }

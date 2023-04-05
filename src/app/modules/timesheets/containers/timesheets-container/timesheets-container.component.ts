@@ -7,12 +7,12 @@ import { Select, Store } from '@ngxs/store';
 import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime} from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
-import { DialogAction } from '@core/enums';
+import { DialogAction, FilterPageName } from '@core/enums';
 
 import { Destroyable, isObjectsEqual } from '@core/helpers';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
-import { DataSourceItem } from '@core/interface';
+import { DataSourceItem, PreservedFiltersByPage } from '@core/interface';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import {
@@ -37,10 +37,7 @@ import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fiel
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import * as Interfaces from '../../interface';
-import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
-import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { ClearPageFilters, GetPreservedFiltersByPage, ResetPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
-import { cloneDeep } from 'lodash';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -180,13 +177,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public resetFilters(): void {
     this.store.dispatch([
       new Timesheets.UpdateFiltersState({}, this.activeTabIdx !== 0, this.isAgency),
-      new ClearPageFilters(this.pageName()),
+      new ClearPageFilters(this.getPageName()),
     ]);
   }
 
   public updateTableByFilters(filters: TimesheetsFilterState): void {
     this.store.dispatch([
-      new SaveFiltersByPageName(this.pageName(), filters),
+      new SaveFiltersByPageName(this.getPageName(), filters),
       new Timesheets.UpdateFiltersState(
         {
           ...filters,
@@ -263,7 +260,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private onOrganizationChangedHandler(): void {
    this.organizationId$.pipe( takeUntil(this.componentDestroy())).subscribe((value)=>{
-    this.store.dispatch(new GetPreservedFiltersByPage(this.pageName()));
+    this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
     if(value!=null&&value!=undefined){this.OrganizationId=value}
     });
     const idStream = this.isAgency ? this.agencyId$ : this.organizationId$;
@@ -377,9 +374,12 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private adjustFilters(): Observable<PreservedFiltersByPage<TimesheetsFilterState>> {
-    return this.preservedFiltersByPageName$.pipe(filter(({dispatch}) => dispatch), tap((filters) => {
-      this.filters = filters.state;
-    }))
+    return this.preservedFiltersByPageName$.pipe(
+      filter(({ dispatch }) => dispatch),
+      tap((filters) => {
+        this.filters = filters.state;
+      })
+    );
   }
 
   private initComponentState(): void {
@@ -433,7 +433,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.gridSelections.selectedTimesheetIds = [];
   }
 
-  private pageName(): FilterPageName {
-    return this.isAgency ? FilterPageName.TimesheetsVMSAgency : FilterPageName.TimesheetsVMSOrganization;
+  private getPageName(): FilterPageName {
+    if(this.isAgency) {
+      return FilterPageName.TimesheetsVMSAgency;
+    } else {
+      return FilterPageName.TimesheetsVMSOrganization;
+    }
   }
 }

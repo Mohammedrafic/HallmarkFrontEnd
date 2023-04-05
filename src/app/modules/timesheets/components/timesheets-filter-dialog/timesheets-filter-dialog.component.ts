@@ -5,13 +5,14 @@ import { debounceTime, filter, Observable, switchMap, takeUntil, tap } from 'rxj
 import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
+import { PreservedFiltersByPage } from '@core/interface';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimesheetsModel, TimeSheetsPage } from '../../store/model/timesheets.model';
 import { FilterColumns, TimesheetsFilterState } from '../../interface';
-import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import { UserState } from 'src/app/store/user.state';
 import { Timesheets } from '../../store/actions/timesheets.actions';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { FilteredUser } from '@shared/models/user.model';
 
 @Component({
   selector: 'app-timesheets-filter-dialog',
@@ -65,14 +66,10 @@ export class TimesheetsFilterDialogComponent
           args.updateData([]);
         }),
         debounceTime(300),
+        switchMap((args) => this.getUsersListBySearchTerm(args)),
         takeUntil(this.componentDestroy())
       )
-      .subscribe((args) => {
-        this.filterService.getUsersListBySearchTerm(args.text).subscribe((data) => {
-          this.filterColumns.contactEmails.dataSource = data;
-          args.updateData(data);
-        });
-      });
+      .subscribe();
   }
 
   private applyPreservedFilters(): void {
@@ -81,15 +78,24 @@ export class TimesheetsFilterDialogComponent
         tap(() => this.store.dispatch(new Timesheets.ResetFilterOptions())),
         debounceTime(100),
         switchMap(() => this.filterOptions$),
-        switchMap((options) => this.preservedFiltersByPageName$.pipe(filter(() => !!options))),
+        switchMap((options) => this.preservedFiltersByPageName$.pipe(
+          filter(({ dispatch }) => !!options && dispatch))
+        ),
         takeUntil(this.componentDestroy())
       )
-      .subscribe(({ state, dispatch }) => {
-        if (dispatch) {
-          this.patchFilterForm({ ...state });
-          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
-          this.appliedFiltersAmount.emit(this.filteredItems.length);
-        }
+      .subscribe(({ state }) => {
+        this.patchFilterForm({ ...state });
+        this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
+        this.appliedFiltersAmount.emit(this.filteredItems.length);
       });
+  }
+
+  private getUsersListBySearchTerm(args: FilteringEventArgs): Observable<FilteredUser[]> {
+    return this.filterService.getUsersListBySearchTerm(args.text).pipe(
+      tap((data) => {
+        this.filterColumns.contactEmails.dataSource = data;
+        args.updateData(data);
+      })
+    );
   }
 }

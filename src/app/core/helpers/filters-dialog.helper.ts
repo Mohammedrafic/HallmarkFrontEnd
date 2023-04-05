@@ -19,6 +19,7 @@ import { ActivatedRoute } from '@angular/router';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { FilteredUser } from '@shared/models/user.model';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
+import { FilterColumns } from 'src/app/modules/timesheets/interface';
 
 @Directive()
 export class FiltersDialogHelper<T, F, S> extends Destroyable {
@@ -57,29 +58,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
 
   public applyFilters(): void {
     if (this.formGroup.dirty) {
-      const filters: F = LeftOnlyValidValues(this.formGroup);
-      const preservedFiltersState = this.formGroup.getRawValue();
-      this.updateTableByFilters.emit(filters);
-      this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
-      this.appliedFiltersAmount.emit(this.filteredItems.length);
-
-      const orgs: number[] = [];
-      //TODO remove old approach of preserving filters in scope EIN-13661
-      if (preservedFiltersState.regionsIds) {
-        (this.filterColumns as any).regionsIds?.dataSource?.forEach((val: DataSourceItem) => {
-          if (preservedFiltersState.regionsIds?.includes(val.id)) {
-            orgs.push(val.organizationId as number);
-          }
-        });
-        preservedFiltersState.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
-      }
-
-      if (this.isAgencyArea) {
-        this.filterService.setPreservedFIltersTimesheets(preservedFiltersState, 'regionsIds');
-      } else {
-        this.filterService.setPreservedFIlters(preservedFiltersState, 'regionsIds');
-      }
-      this.formGroup.markAsPristine();
+      this.prepareFilters();
     } else {
       this.store.dispatch(new ShowFilterDialog(false));
     }
@@ -114,8 +93,8 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
     this.store
       .select(stateKey)
       .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
-      .subscribe((filters: T | any) => {
-        const { dataSource } = filters.regionsIds;
+      .subscribe((filters: T) => {
+        const { dataSource } = (filters as unknown as FilterColumns).regionsIds;
         this.orgRegions = dataSource || [];
         this.allRegions = [...this.orgRegions];
         this.filterColumns = filters;
@@ -173,5 +152,31 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
       this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     }
     this.appliedFiltersAmount.emit(this.filteredItems.length);
+  }
+
+  private prepareFilters(): void {
+    const filters: F = LeftOnlyValidValues(this.formGroup);
+    const preservedFiltersState = this.formGroup.getRawValue();
+    this.updateTableByFilters.emit(filters);
+    this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
+    this.appliedFiltersAmount.emit(this.filteredItems.length);
+
+    const orgs: number[] = [];
+    //TODO remove old approach of preserving filters in scope EIN-13661
+    if (preservedFiltersState.regionsIds) {
+      (this.filterColumns as any).regionsIds?.dataSource?.forEach((val: DataSourceItem) => {
+        if (preservedFiltersState.regionsIds?.includes(val.id)) {
+          orgs.push(val.organizationId as number);
+        }
+      });
+      preservedFiltersState.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
+    }
+
+    if (this.isAgencyArea) {
+      this.filterService.setPreservedFIltersTimesheets(preservedFiltersState, 'regionsIds');
+    } else {
+      this.filterService.setPreservedFIlters(preservedFiltersState, 'regionsIds');
+    }
+    this.formGroup.markAsPristine();
   }
 }

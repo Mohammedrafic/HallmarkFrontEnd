@@ -88,7 +88,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     private formBuilder: FormBuilder,
     private filterService: FilterService,
     private datePipe: DatePipe,
-    private candidateService: CandidateDetailsService
+    private candidateService: CandidateDetailsService,
   ) {
     super();
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
