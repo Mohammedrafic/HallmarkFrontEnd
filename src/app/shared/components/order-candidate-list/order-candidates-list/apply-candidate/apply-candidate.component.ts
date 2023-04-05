@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus, CandidatStatus, ConfigurationValues } from '@shared/enums/applicant-status.enum';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { Observable, Subject, takeUntil, of, take, filter } from 'rxjs';
 
@@ -126,12 +126,12 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
 
-      if(this.candidatePhone1RequiredValue === "Apply"){
+      if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
         if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null && this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === null){
-          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Apply')));
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
           return;
         }else{
-          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Apply')));
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
           return;
         }
       }

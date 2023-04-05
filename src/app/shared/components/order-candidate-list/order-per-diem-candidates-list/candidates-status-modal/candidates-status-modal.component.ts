@@ -6,7 +6,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
-import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, ConfigurationValues } from '@shared/enums/applicant-status.enum';
 import { OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import {
@@ -238,12 +238,12 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
           return;
         }
       }
-      if(this.candidatePhone1RequiredValue === "Apply"){
+      if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
         if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null && this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === null){
-          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Apply')));
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
           return;
         }else{
-          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Apply')));
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
           return;
         }
       }
@@ -270,12 +270,12 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
         return;
       }
     }
-    if(this.candidatePhone1RequiredValue === "Accept"){
+    if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
       if(this.orderCandidateJob?.candidateProfile.candidateProfileContactDetail != null && this.orderCandidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null){
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Accept')));
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
         return;
       }else{
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Accept')));
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
         return;
       }
     }

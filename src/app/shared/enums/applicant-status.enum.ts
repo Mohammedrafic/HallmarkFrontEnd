@@ -31,3 +31,8 @@ export enum CandidatStatus {
   Rejected = 100,
   Cancelled = 110,
 }
+
+export enum ConfigurationValues {
+  Accept = "Accept",
+  Apply = "Apply"
+}

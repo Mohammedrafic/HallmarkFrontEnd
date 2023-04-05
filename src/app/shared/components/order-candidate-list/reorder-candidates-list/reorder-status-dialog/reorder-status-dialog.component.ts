@@ -31,7 +31,7 @@ import { OrderCandidateListViewService } from '@shared/components/order-candidat
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-candidate.constants';
 import { CandidatePHONE1Required, SET_READONLY_STATUS } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues } from '@shared/enums/applicant-status.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderType } from '@shared/enums/order-type';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
@@ -211,12 +211,12 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       return;
     }
 
-    if(this.candidatePhone1RequiredValue === "Accept"){
+    if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
       if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null && this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null){
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Accept')));
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
         return;
       }else{
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Accept')));
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
         return;
       }
     }

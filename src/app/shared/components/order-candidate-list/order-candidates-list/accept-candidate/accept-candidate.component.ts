@@ -41,7 +41,7 @@ import {
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
-import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues } from '@shared/enums/applicant-status.enum';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
@@ -217,12 +217,12 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         return;
       }
     }
-    if(this.candidatePhone1RequiredValue === "Accept"){
+    if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
       if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null && this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null){
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Accept')));
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
         return;
       }else{
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Accept')));
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
         return;
       }
     }
@@ -249,12 +249,12 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           return;
         }
       }
-      if(this.candidatePhone1RequiredValue === "Apply"){
+      if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
         if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null && this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null){
-          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Apply')));
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
           return;
         }else{
-          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required('Apply')));
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
           return;
         }
       }
