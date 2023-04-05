@@ -61,11 +61,13 @@ import {
   UploadOrderImportFile,
   UploadOrderImportFileSucceeded,
   UpdateRegRateorder,
-  UpdateRegRateSucceeded
+  UpdateRegRateSucceeded,
+  GetCandidateCancellationReason
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
   ApplicantStatus,
+  CandidateCancellationReason,
   GetPredefinedBillRatesData,
   IrpCandidatesParams,
   IrpOrderCandidate,
@@ -148,6 +150,7 @@ export interface OrderManagementContentStateModel {
   contactDetails: Department | null;
   extensions: any;
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
+  candidateCancellationReasons:CandidateCancellationReason[]|null;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -184,6 +187,7 @@ export interface OrderManagementContentStateModel {
     contactDetails: null,
     extensions: null,
     irpCandidates: null,
+    candidateCancellationReasons:null
   },
 })
 @Injectable()
@@ -349,6 +353,11 @@ export class OrderManagementContentState {
   @Selector()
   static getIrpCandidatesCount(state: OrderManagementContentStateModel): number {
     return state.irpCandidates?.items.length || 0;
+  }
+
+  @Selector()
+  static getCandidateCancellationReasons(state: OrderManagementContentStateModel): CandidateCancellationReason[]|null {
+    return state.candidateCancellationReasons || null;
   }
 
   constructor(
@@ -730,7 +739,7 @@ export class OrderManagementContentState {
     return this.orderManagementService.saveIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new ShowToast(MessageTypes.Success,  order.length==1?'Order '+order[0].organizationPrefix?.toString()+'-'+order[0].publicId?.toString()+' has been added':RECORD_ADDED),
           new SaveIrpOrderSucceeded(),
         ]);
           if (documents.length) {
@@ -777,7 +786,7 @@ export class OrderManagementContentState {
                 payload.organizationPrefix,
                 payload.publicId
               )
-            : new ShowToast(MessageTypes.Success, RECORD_ADDED),
+            : new ShowToast(MessageTypes.Success, 'Order '+ payload.organizationPrefix?.toString()+'-'+payload.publicId?.toString()+' has been added'),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
           new SaveLastSelectedOrganizationAgencyId(
@@ -1057,5 +1066,15 @@ export class OrderManagementContentState {
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Reg rate is not updated'))))
     );
   }
+
+  @Action(GetCandidateCancellationReason)
+  GetCandidateCancellationReason(
+    { patchState } : StateContext<OrderManagementContentStateModel>, { payload } : GetCandidateCancellationReason
+    ) : Observable<CandidateCancellationReason[] |null>{
+      return this.orderManagementService.GetCandidateCancellationReasons(payload).pipe(tap((payload: CandidateCancellationReason[]) => {
+        patchState({ candidateCancellationReasons: payload });
+        return payload
+      }));
+    }
 
 }

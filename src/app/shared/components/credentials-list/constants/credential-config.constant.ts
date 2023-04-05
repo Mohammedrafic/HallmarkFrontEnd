@@ -3,7 +3,7 @@ import { CredentialListConfig } from '@shared/components/credentials-list/interf
 
 export const SystemConfig: CredentialListConfig[] = [
   {
-    title: 'Select System',
+    title: 'System Configuration',
     required: true,
     class: 'system-wrapper',
     fields: [

@@ -333,7 +333,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public openAddDialog(): void {
     this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Open));
-    this.store.dispatch(new Invoices.GetInvoicesReasons(this.organizationControl.value));
+    this.store.dispatch(new Invoices.GetInvoicesReasons(this.organizationControl.value||this.store.selectSnapshot(UserState.lastSelectedOrganizationId)));
   }
 
   public changeFiltersAmount(amount: number): void {

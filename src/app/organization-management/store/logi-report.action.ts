@@ -1,3 +1,4 @@
+import { ScheduleFilters } from './../../modules/schedule/interface/schedule.interface';
 import { CommonReportFilter, CommonCandidateSearchFilter, CommonCredentialSearchFilter } from "@admin/analytics/models/common-report.model";
 import { DepartmentsByLocationsFilter } from "@shared/models/department.model";
 import { LocationsByRegionsFilter } from "@shared/models/location.model";
@@ -48,5 +49,10 @@ export class GetCommonReportCandidateStatusOptions {
 export class GetStaffScheduleReportFilterOptions{
   static readonly type = '[LogiReport] Get Staff Schedule Report Filter Options';
   constructor(public filter: CommonReportFilter) { }
+}
+
+export class GetCandidateSearchFromScheduling {
+  static readonly type = '[LogiReport] Get Candidate Search from scheduling';
+  constructor(public filter: ScheduleFilters) { }
 }
 

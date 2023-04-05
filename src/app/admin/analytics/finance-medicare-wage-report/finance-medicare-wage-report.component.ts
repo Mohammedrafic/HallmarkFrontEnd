@@ -167,23 +167,12 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
-      this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
-        if (data != null) {
-          this.isAlive = true;
-          this.filterOptionsData = data;
-          this.agencyIdControl = this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.AgencyIds) as AbstractControl;
-          this.filterColumns.agencyIds.dataSource = [];
-          this.filterColumns.agencyIds.dataSource = data?.agencies;
-
-          let agencyIds = data?.agencies;
-          this.filterColumns.agencyIds.dataSource = data?.agencies;
-          this.selectedAgencies = agencyIds;
-          this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
-          this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
-
+      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
+        if (data.length > 0) {
+          this.logiReportComponent.SetReportData(data);
         }
       });
-      this.SetReportData();
+
 
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
@@ -285,6 +274,7 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
             this.filterColumns.agencyIds.dataSource = [];
 
             if (data != null) {
+              this.isAlive = false;
               this.filterOptionsData = data;
               this.agencyIdControl = this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.AgencyIds) as AbstractControl;
               let agencyIds = data?.agencies;

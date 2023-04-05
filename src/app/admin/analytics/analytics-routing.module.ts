@@ -44,6 +44,7 @@ import { CandidateStatusComponent } from './candidate-status/candidate-status.co
 import { VendorActivityComponent } from './vendor-activity/vendor-activity.component';
 import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-schedule-by-shift.component';
 import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-report/finance-medicare-wage-report.component';
+import { GrantReportComponent } from './grant-report/grant-report.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '', pathMatch: 'full' },
@@ -341,6 +342,13 @@ const routes: Routes = [
       {
         path: 'finance-medicare-wage-report',
         component: FinanceMedicareWageReportComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'grant-report',
+        component: GrantReportComponent,
         data: {
           isOrganizationArea: true,
         }

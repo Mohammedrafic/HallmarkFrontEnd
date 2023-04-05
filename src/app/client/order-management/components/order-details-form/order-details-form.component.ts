@@ -71,7 +71,7 @@ import { CommentsService } from '@shared/services/comments.service';
 import { SettingsHelper } from '@core/helpers/settings.helper';
 import { SettingsKeys } from '@shared/enums/settings';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
-import { RejectReasonPage } from '@shared/models/reject-reason.model';
+import { RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
 import { distributionSource, ORDER_JOB_DISTRIBUTION } from '@shared/constants/order-job-distribution-list';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
@@ -215,6 +215,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public skills$: Observable<ListOfSkills[]>;
   @Select(RejectReasonState.sortedOrderRequisition)
   public reasons$: Observable<RejectReasonPage>;
+  public reasons:RejectReasonwithSystem[]=[];
   @Select(OrderManagementContentState.associateAgencies)
   public associateAgencies$: Observable<AssociateAgency[]>;
   @Select(OrderManagementContentState.organizationStatesWithKeyCode)
@@ -264,6 +265,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.watchForSelectOrder();
     this.watchForSuggestedDetails();
     this.watchForDepartmentId();
+    this.getVMSOrderRequisition();
   }
 
   public override ngOnDestroy(): void {
@@ -295,6 +297,23 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       this.populateNewOrderForm();
     }
   }
+  public getVMSOrderRequisition()
+  {
+    this.reasons$
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(data => {
+        data.items.forEach(item => {
+          if(item.includeInVMS===true){
+              this.reasons.push({
+              id: item.id,
+              reason:item.reason,
+              businessUnitId:item.businessUnitId
+            });
+          }
+        });
+    });
+  }
+
 
   private getSettings(): void {
     this.store.dispatch(new GetOrganizationSettings());

@@ -1,4 +1,5 @@
 import { FormGroup } from '@angular/forms';
+import { WeekDays } from '@shared/enums/week-days.enum';
 
 import * as ScheduleInt from '../interface';
 import { DropdownOption } from '@core/interface';
@@ -159,14 +160,16 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
   };
 };
 
-export const HasNotDepartment = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
-  return filters.departmentsIds && !filters.departmentsIds.length;
+export const HasNotMandatoryFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
+  return (filters.departmentsIds && !filters.departmentsIds.length)
+    || (filters.skillIds && !filters.skillIds.length);
 };
 
 export const HasMultipleFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
   return filters.regionIds && filters.regionIds.length > 1 ||
     filters.locationIds && filters.locationIds.length > 1 ||
-    filters.departmentsIds && filters.departmentsIds.length > 1;
+    filters.departmentsIds && filters.departmentsIds.length > 1 ||
+    filters.skillIds && filters.skillIds.length > 1;
 };
 
 export const GetShiftHours = (startTimeDate: Date, endTimeDate: Date): string => {
@@ -231,7 +234,7 @@ export const GetScheduleDateItem = (
       .schedule.find((item: ScheduleDateItem) => item.date.substring(0, dateStringLength) === date);
 };
 
-export const GetMonthRange = (initDay: number): string[] => {
+export const GetMonthRange = (initDay: number): WeekDays[] => {
   const daysInWeek = WeekList;
   const startingDayIndex = initDay % 7;
 

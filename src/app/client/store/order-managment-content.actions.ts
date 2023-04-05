@@ -2,6 +2,7 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { CandidateCancellation } from '@shared/models/candidate-cancellation.model';
 import {
   AcceptJobDTO,
+  CandidateCancellationReasonFilter,
   CreateOrderDto,
   EditOrderDto,
   Order,
@@ -381,4 +382,9 @@ export class UpdateRegRateorder {
 export class UpdateRegRateSucceeded {
   static readonly type = '[order management] Update Reg Rate Succeeded';
   constructor(public payload: UpdateRegrateModel) {}
+}
+
+export class GetCandidateCancellationReason{
+  static readonly type ='[order management] Get Candidate Cancellation Reason';
+  constructor(public payload:CandidateCancellationReasonFilter){}
 }

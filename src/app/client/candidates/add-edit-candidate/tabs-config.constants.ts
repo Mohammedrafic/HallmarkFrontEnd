@@ -12,7 +12,7 @@ type TabComponents =
 
 export const tabsConfig: TabsModel<TabComponents>[] = [
   {
-    title: 'Candidate Profile',
+    title: 'Employee Profile',
     subtitle: '',
     isRequired: true,
     disabled: false,

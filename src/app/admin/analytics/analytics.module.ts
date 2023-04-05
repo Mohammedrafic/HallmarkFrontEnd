@@ -1,3 +1,4 @@
+import { ScheduleApiService } from 'src/app/modules/schedule/services/schedule-api.service';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnalyticsComponent } from './analytics.component';
@@ -57,6 +58,7 @@ import { VendorActivityComponent } from './vendor-activity/vendor-activity.compo
 import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-schedule-by-shift.component';
 import { StaffListComponent } from './staff-list/staff-list.component';
 import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-report/finance-medicare-wage-report.component';
+import { GrantReportComponent } from './grant-report/grant-report.component';
 
 
 @NgModule({
@@ -105,7 +107,8 @@ import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-repo
     VendorActivityComponent,
     StaffScheduleByShiftComponent,
     StaffListComponent,
-    FinanceMedicareWageReportComponent],
+    FinanceMedicareWageReportComponent,
+    GrantReportComponent],
   exports: [
     CandidateListComponent
   ],
@@ -124,6 +127,9 @@ import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-repo
     AutoCompleteAllModule,
     RadioButtonModule,
     NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState])
+  ],
+  providers:[
+    ScheduleApiService
   ]
 })
 export class AnalyticsModule { }

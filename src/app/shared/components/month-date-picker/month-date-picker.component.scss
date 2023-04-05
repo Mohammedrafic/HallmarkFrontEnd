@@ -4,6 +4,10 @@
   display: flex;
   justify-content: space-between;
 
+  button {
+    padding: 8px 12px;
+  }
+
   button.e-control.e-btn i-feather {
     margin-left: 0;
   }
@@ -24,12 +28,9 @@
       color: $black!important;
     }
 
-    ejs-datepicker.datepicker .e-input-group.e-control-wrapper.e-date-wrapper.e-non-edit.e-error.e-valid-input {
-      min-width: 215px!important;
-    }
-
     .e-input-group.e-control-wrapper {
-      margin-bottom: 0!important;
+      margin-bottom: 0 !important;
+      min-width: 215px !important;
     }
   }
 }

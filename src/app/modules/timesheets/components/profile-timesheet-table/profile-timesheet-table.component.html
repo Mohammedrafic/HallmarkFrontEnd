@@ -110,7 +110,8 @@
 </section>
 
 <ng-template #btnGroup>
-  <div class="btn-group" *ngIf="currentTab !== tableTypes.Expenses && !isEditOn">
+  <div class="btn-group"
+    *ngIf="currentTab !== tableTypes.Expenses && !isEditOn && timesheetDetails.status !== timesheetStatuses.Incomplete">
     <app-tooltip-container [showToolTip]="!hasApproveRejectPermissions" *ngIf="isRejectBtnEnabled && !actionsDisabled">
       <button
         ejs-button

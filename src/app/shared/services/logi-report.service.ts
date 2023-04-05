@@ -61,7 +61,8 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
       candidateStatusesAndReasons :'statusText',
       jobStatusesAndReasons :'statusText',
       allCandidateStatusesAndReasons :'statusText',
-      allJobStatusesAndReasons :'statusText'
+      allJobStatusesAndReasons :'statusText',
+      invoiceStatuses:'name'
     }
     
     return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof CommonReportFilterOptions])]))
@@ -89,8 +90,8 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
     }));
   }
 
-  public getStaffScheduleReportOptions(filter: any): Observable<StaffScheduleReportFilterOptions[]> {
-    return this.http.post<StaffScheduleReportFilterOptions[]>(`/api/LogiReport/staffschedulebyshift/filter`, filter).pipe(map((data) => {
+  public getStaffScheduleReportOptions(filter: any): Observable<StaffScheduleReportFilterOptions> {
+    return this.http.post<StaffScheduleReportFilterOptions>(`/api/LogiReport/staffschedulebyshift/filter`, filter).pipe(map((data) => {
       return data;
     }));
   }

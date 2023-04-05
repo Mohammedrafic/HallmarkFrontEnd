@@ -70,24 +70,26 @@
     <table *ngIf="scheduleData?.items?.length; else emptyTable">
       <thead>
         <tr>
-          <th
-            [class.custom-head-cell]="activePeriod === monthPeriod"
-            class="table-title candidates-head-cell fixed fixed--left fixed--top"
-          >
-            {{ scheduleData?.totalCount || 0 }} Candidates</th>
+          <th class="table-title candidates-head-cell fixed fixed--left fixed--top">
+            <span>Candidates</span>
+            <span class="e-badge e-badge-success e-badge-pill align-text">{{ scheduleData?.totalCount || 0 }}</span>
+          </th>
           <ng-container *ngIf="activePeriod !== monthPeriod; else monthRange">
             <th
               *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
-              class="table-title date fixed fixed--top"
+              class="table-title date left-border fixed fixed--top"
+              weeksEnd [date]="dateHead"
             >
-              {{ dateHead | date: 'EEEE MM/dd' }}
+              <span>{{ dateHead | date: 'E MM/dd' }}</span>
             </th>
           </ng-container>
 
           <ng-template #monthRange>
             <th
               *ngFor="let day of monthRangeDays; trackBy: trackByDatesRange"
-              class="table-title date month-date fixed fixed--top custom-date-th">
+              class="table-title date left-border month-date fixed fixed--top"
+              weeksEnd [day]="day"
+            >
               <span>{{day}}</span>
             </th>
           </ng-template>
@@ -106,34 +108,45 @@
           <ng-container *ngFor="let dateSlot of datesRanges; trackBy: trackByDatesRange">
             <td
               *ngIf="dateSlot | calendarDateSlot: scheduleItem.schedule as dateSchedule; else emptyCell"
-              class="table-cell date-slot"
               [attr.colspan]="dateSchedule.extendedDays"
-              [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
-              appDoubleClick
-              (singleClick)="handleCellSingleClick(dateSlot, scheduleItem.candidate, dateSchedule)"
-              (dbClick)="handleScheduleCardDblClick(dateSchedule, scheduleItem.candidate, dateSchedule)"
+              weeksEnd [date]="dateSlot"
             >
+              <div
+                class="table-cell date-slot"
+                [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
+                appDoubleClick
+                (singleClick)="handleCellSingleClick(dateSlot, scheduleItem.candidate, dateSchedule)"
+                (dbClick)="handleScheduleCardDblClick(dateSchedule, scheduleItem.candidate, dateSchedule)"
+              >
+                <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
+                  <app-schedule-card
+                    [isSelected]="!!selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
+                    [dateSchedule]="dateSchedule"
+                  ></app-schedule-card>
+                </ng-container>
 
-              <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
-                <app-schedule-card [scheduleDateItem]="dateSchedule"></app-schedule-card>
-              </ng-container>
-
-              <ng-template #disabledCell>
-                <ejs-tooltip
-                  [content]="dateSchedule | calendarTooltipSlot">
-                  <div class="table-cell disabled-cell"></div>
-                </ejs-tooltip>
-              </ng-template>
+                <ng-template #disabledCell>
+                  <ejs-tooltip
+                    [content]="dateSchedule | calendarTooltipSlot">
+                    <div class="disabled-cell">
+                      <i-feather name="slash" class="icon"></i-feather>
+                    </div>
+                  </ejs-tooltip>
+                </ng-template>
+              </div>
             </td>
 
             <ng-template #emptyCell>
-              <td
-                class="table-cell date-slot empty-cell"
-                [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
-                appDoubleClick
-                (singleClick)="handleCellSingleClick(dateSlot, scheduleItem.candidate)"
-                (dbClick)="handleCellDblClick(dateSlot, scheduleItem.candidate)"
-              ></td>
+              <td weeksEnd [date]="dateSlot">
+                <div
+                  class="table-cell date-slot empty-cell"
+                  [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
+                  appDoubleClick
+                  (singleClick)="handleCellSingleClick(dateSlot, scheduleItem.candidate)"
+                  (dbClick)="handleCellDblClick(dateSlot, scheduleItem.candidate)"
+                >
+                </div>
+              </td>
             </ng-template>
           </ng-container>
         </tr>

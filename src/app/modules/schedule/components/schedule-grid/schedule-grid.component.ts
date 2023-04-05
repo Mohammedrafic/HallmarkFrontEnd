@@ -22,7 +22,7 @@ import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, fromEvent, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
-import { DatesRangeType } from '@shared/enums';
+import { DatesRangeType, WeekDays } from '@shared/enums';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
@@ -72,7 +72,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   datesRanges: string[] = DateTimeHelper.getDatesBetween();
 
-  monthRangeDays: string[] = [];
+  monthRangeDays: WeekDays[] = [];
 
   selectedCandidatesSlot: Map<number, ScheduleInt.ScheduleDateSlot>
   = new Map<number, ScheduleInt.ScheduleDateSlot>();
@@ -102,7 +102,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   trackByPeriods: TrackByFunction<ItemModel> = (_: number, period: ItemModel) => period.text;
 
-  trackByDatesRange: TrackByFunction<string> = (_: number, date: string) => date;
+  trackByDatesRange: TrackByFunction<WeekDays> = (_: number, date: WeekDays) => date;
 
   trackByScheduleData: TrackByFunction<ScheduleInt.ScheduleModel> = (_: number,
     scheduleData: ScheduleInt.ScheduleModel) => scheduleData.id;

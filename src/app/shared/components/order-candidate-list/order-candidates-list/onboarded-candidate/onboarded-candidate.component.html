@@ -227,7 +227,7 @@
                       <input formControlName="rejectReason" class="e-input" type="text" readonly/>
                     </div>
                 </div>
-                <div *ngIf="isCancelled">
+                <div *ngIf="candidate.candidateStatus === applicantStatus.Cancelled">
                   <div class="input-container bootstrap">
                     <label class="input-group">Reason</label>
                     <div class="input-group input-readonly">
@@ -319,6 +319,7 @@
   [openEvent]="openCandidateCancellationDialog"
   [orderType]="candidateJob?.order?.orderType"
   [candidateJob]="candidateJob"
+  [candidateCancellation]="candidateCancellationReasons"
   (submitCandidateCancellation)="cancelCandidate($event)"
   (cancelCandidateCancellation)="resetStatusesFormControl()"
 ></app-candidate-cancellation-dialog>
