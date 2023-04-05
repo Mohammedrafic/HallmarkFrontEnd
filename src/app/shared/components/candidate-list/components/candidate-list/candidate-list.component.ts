@@ -30,6 +30,7 @@ import {
   ChangeCandidateProfileStatus,
   DeleteIRPCandidate,
   ExportCandidateList,
+  ExportIRPCandidateList,
   GetCandidatesByPage,
   GetIRPCandidatesByPage,
   GetRegionList
@@ -300,26 +301,31 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.store.dispatch(
-      new ExportCandidateList({
-        filterQuery: {
-          profileStatuses: this.filters.profileStatuses!,
-          regionsNames: this.filters.regionsNames!,
-          skillsIds: this.filters.skillsIds!,
-          includeDeployedCandidates: this.includeDeployedCandidates,
-          candidateProfileIds: this.selectedItems.length
-            ? this.selectedItems.map((val) => val.candidateProfileId)
-            : null,
+    const requestBody = {
+      filterQuery: {
+        profileStatuses: this.filters.profileStatuses!,
+        regionsNames: this.filters.regionsNames!,
+        skillsIds: this.filters.skillsIds!,
+        includeDeployedCandidates: this.includeDeployedCandidates,
+        candidateProfileIds: this.selectedItems.length
+          ? this.selectedItems.map((val) => val.candidateProfileId)
+          : null,
+        orderBy: '',
+      },
+      exportFileType: fileType,
+      properties: options
+        ? options.columns.map((val: ExportColumn) => val.column)
+        : this.columnsToExport.map((val: ExportColumn) => val.column),
+      filename: options?.fileName || this.defaultFileName,
+    };
+    let exportRequest;
+    if (this.isIRP) {
+      exportRequest = new ExportIRPCandidateList(requestBody);
+    } else {
+      exportRequest = new ExportCandidateList(requestBody);
+    }
 
-          orderBy: '',
-        },
-        exportFileType: fileType,
-        properties: options
-          ? options.columns.map((val: ExportColumn) => val.column)
-          : this.columnsToExport.map((val: ExportColumn) => val.column),
-        filename: options?.fileName || this.defaultFileName,
-      })
-    );
+    this.store.dispatch(exportRequest);
     this.clearSelection(this.grid);
   }
 
