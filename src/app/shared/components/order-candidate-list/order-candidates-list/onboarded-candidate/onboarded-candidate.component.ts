@@ -23,7 +23,7 @@ import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe, formatDate } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -31,6 +31,7 @@ import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
+  GetCandidateCancellationReason,
   GetRejectReasonsForOrganisation,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
@@ -86,6 +87,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Select(UserState.orderPermissions)
   orderPermissions$: Observable<CurrentUserPermission[]>;
 
+  @Select(OrderManagementContentState.getCandidateCancellationReasons)
+  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
+
   @Output() closeModalEvent = new EventEmitter<never>();
 
   @Input() candidate: OrderCandidatesList;
@@ -127,6 +131,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canClose = false;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public payRateSetting = CandidatePayRateSettings;
+  public candidateCancellationReasons: CandidateCancellationReason[] | null;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -445,6 +450,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           });
           this.switchFormState();
           this.configureCandidatePayRateField();
+          this.subscribeCandidateCancellationReasons();
         }
         this.changeDetectorRef.markForCheck();
     });
@@ -631,5 +637,21 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
+  }
+
+  private subscribeCandidateCancellationReasons() {
+    if (this.candidateJob) {
+      let payload: CandidateCancellationReasonFilter = {
+        locationId: this.candidateJob?.order.locationId,
+        regionId: this.candidateJob?.order.regionId
+      };
+      this.store.dispatch(new GetCandidateCancellationReason(payload));
+      this.candidateCancellationReasons$
+        .pipe().subscribe((value) => {
+          console.log(value);
+          this.candidateCancellationReasons =value;
+        });
+
+    }
   }
 }

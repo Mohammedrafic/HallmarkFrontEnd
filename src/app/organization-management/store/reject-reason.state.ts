@@ -416,6 +416,9 @@ export class RejectReasonState {
       tap(() => {
         dispatch(new SavePenaltySuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
