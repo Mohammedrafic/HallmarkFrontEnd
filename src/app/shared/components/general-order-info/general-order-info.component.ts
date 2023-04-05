@@ -19,7 +19,7 @@ enum Active {
 export class GeneralOrderInfoComponent {
   @Input() orderInformation: Order;
 
-  @Input() system: OrderManagementIRPSystemId;
+  @Input() system: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
 
   public orderType: typeof OrderType = OrderType;
 
