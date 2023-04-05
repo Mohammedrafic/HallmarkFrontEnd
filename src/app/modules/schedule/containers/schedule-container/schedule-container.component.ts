@@ -4,6 +4,7 @@ import { Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
+import { MessageTypes } from '@shared/enums/message-types';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { Permission } from '@core/interface';
 import { REQUIRED_PERMISSIONS } from '@shared/constants';
@@ -11,15 +12,20 @@ import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { UserState } from 'src/app/store/user.state';
-import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
+import { SetHeaderState, ShowFilterDialog, ShowToast } from '../../../../store/app.actions';
 import { ScheduleGridAdapter } from '../../adapters';
-import { ButtonRegionTooltip, ButtonSelectDataTooltip, TabListConfig } from '../../constants';
+import { ButtonRegionTooltip, ButtonSelectDataTooltip, FilterErrorMessage, TabListConfig } from '../../constants';
 import { ActiveTabIndex } from '../../enums';
 import * as ScheduleInt from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { ScheduleCandidate, ScheduleDateItem, ScheduledItem, ScheduleFilterStructure, ScheduleModel } from '../../interface';
 import { OrganizationStructure } from '@shared/models/organization.model';
-import { GetScheduleFilterByEmployees, HasNotDepartment, HasMultipleFilters, GetScheduleDateItem } from '../../helpers';
+import {
+  GetScheduleFilterByEmployees,
+  HasMultipleFilters,
+  GetScheduleDateItem,
+  HasNotMandatoryFilters,
+} from '../../helpers';
 import { DateTimeHelper } from '@core/helpers';
 
 @Component({
@@ -126,10 +132,12 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   scheduleCell(cells: ScheduleInt.ScheduleSelectedSlots): void {
-    if (!this.hasSchedulePermission
+    if (
+      !this.hasSchedulePermission
       || HasMultipleFilters(this.scheduleFilters)
-      || HasNotDepartment(this.scheduleFilters)
+      || HasNotMandatoryFilters(this.scheduleFilters)
     ) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, FilterErrorMessage));
       return;
     }
 
@@ -160,7 +168,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   editScheduledItem(scheduledItem: ScheduledItem): void {
-    if (HasMultipleFilters(this.scheduleFilters) || HasNotDepartment(this.scheduleFilters)) {
+    if (HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, FilterErrorMessage));
       return;
     }
 
@@ -296,7 +305,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       return;
     }
 
-    if (HasMultipleFilters(this.scheduleFilters) || HasNotDepartment(this.scheduleFilters)) {
+    if (HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) {
       this.scheduleButtonTooltip = ButtonRegionTooltip;
     } else if (!this.scheduleSelectedSlots?.dates?.length) {
       this.scheduleButtonTooltip = ButtonSelectDataTooltip;

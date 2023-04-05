@@ -60,11 +60,14 @@ export class ScheduleApiService {
     );
   }
 
-  getSkillsByEmployees(employeeId: number, departmentId: number): Observable<Skill[]> {
-    return this.http.get<Skill[]>('/api/EmployeeFilterOptions/skillsByDepartment', { params: {
-        EmployeeId: employeeId,
-        DepartmentId: departmentId,
-      }});
+  getSkillsByEmployees(departmentId: number, employeeId?: number): Observable<Skill[]> {
+    const byEmployeesId = { employeeId, departmentId };
+    const byDepartmentId = { departmentId };
+
+    return this.http.get<Skill[]>(
+      '/api/EmployeeFilterOptions/skillsByDepartment',
+      { params: employeeId ? byEmployeesId : byDepartmentId }
+    );
   }
 
   updateScheduledShift(scheduledShift: ScheduledShift, type: ScheduleType):Observable<void> {

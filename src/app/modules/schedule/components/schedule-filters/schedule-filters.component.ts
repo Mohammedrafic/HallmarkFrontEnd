@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
-import { filter, Observable, takeUntil } from 'rxjs';
+import { filter, Observable, switchMap, takeUntil } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
-import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -18,7 +17,7 @@ import { UserState } from 'src/app/store/user.state';
 import { ScheduleFiltersColumns } from '../../constants';
 import { ScheduleFilterHelper } from '../../helpers';
 import { ScheduleFilters, ScheduleFiltersData, ScheduleFilterStructure } from '../../interface';
-import { ScheduleFiltersService } from '../../services';
+import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -76,6 +75,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     private filterService: FilterService,
     private cdr: ChangeDetectorRef,
     private scheduleFiltersService: ScheduleFiltersService,
+    private scheduleApiService: ScheduleApiService,
     private organizationStructureService: OrganizationStructureService,
   ) {
     super();
@@ -83,7 +83,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   public ngOnInit(): void {
     this.getOrganizationStructure();
-    this.getSkills();
     this.watchForControls();
     this.observeInlineChipDeleteEvent();
   }
@@ -133,22 +132,8 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
           this.clearAllFilters();
         }
 
-        this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: this.activeSystem } }));
         this.filterStructure = this.scheduleFiltersService.createFilterStructure(regions);
         this.filterColumns.regionIds.dataSource = ScheduleFilterHelper.adaptRegionToOption(this.filterStructure.regions);
-        this.cdr.markForCheck();
-      });
-  }
-
-  private getSkills(): void {
-    this.skills$
-      .pipe(
-        filter(Boolean),
-        map((skills) => ScheduleFilterHelper.adaptSkillToOption(skills)),
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe((skills) => {
-        this.filterColumns.skillIds.dataSource = skills;
         this.cdr.markForCheck();
       });
   }
@@ -186,6 +171,29 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         this.cdr.markForCheck();
       });
 
+    this.scheduleFilterFormGroup.get('departmentsIds')?.valueChanges
+      .pipe(
+        filter((departmentsIds: number[]) => {
+          if (!departmentsIds.length) {
+            this.resetSkillFilters();
+          }
+
+          return !!departmentsIds.length;
+        }),
+        switchMap((departmentsIds: number[]) => this.scheduleApiService.getSkillsByEmployees(departmentsIds[0])),
+        takeUntil(this.componentDestroy())
+      ).subscribe((skills: Skill[]) => {
+        const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
+
+        this.filterColumns.skillIds.dataSource = skillOption;
+        this.scheduleFilterFormGroup.get('skillIds')?.patchValue(
+          [skillOption[0]?.value],
+          { emitEvent: false, onlySelf: true }
+        );
+
+        this.cdr.markForCheck();
+      });
+
     this.scheduleFilterFormGroup.valueChanges
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe(() => {
@@ -202,7 +210,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       if (event === null) {
         this.clearAllFilters();
         return;
-      } 
+      }
 
       const itemToDelete = this.filteredItems.find((item) => item.column === event.field && item.text === event.value);
       const controlValue = this.scheduleFilterFormGroup.get(event.field)?.value;
@@ -214,7 +222,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         } else {
           updatedValue = '';
         }
-        
+
         this.scheduleFilterFormGroup.get(event.field)?.patchValue(updatedValue);
         this.setFilters();
       }
@@ -233,5 +241,11 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       filteredItems: this.filteredItems,
       chipsData: chips,
     });
+  }
+
+  private resetSkillFilters(): void {
+    this.filterColumns.skillIds.dataSource = [];
+    this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
+    this.scheduleFilterFormGroup.get('skillIds')?.setValue(null);
   }
 }
