@@ -92,7 +92,10 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   protected initFiltersColumns(stateKey: (state: S) => T): void {
     this.store
       .select(stateKey)
-      .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      )
       .subscribe((filters: T) => {
         const { dataSource } = (filters as unknown as FilterColumns).regionsIds;
         this.orgRegions = dataSource || [];

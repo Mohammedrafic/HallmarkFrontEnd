@@ -206,7 +206,10 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   private initFiltersColumns(): void {
     this.store
       .select(InvoicesState.invoiceFiltersColumns)
-      .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      )
       .subscribe((filters: InvoiceFilterColumns) => {
         this.filterColumns = { ...filters };
         this.filterColumns.regionIds.dataSource = this.regions;
