@@ -94,4 +94,11 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
       return data;
     }));
   }
+  /**
+   * Get the Staff list Candidate Search
+   * @return SearchCandidate
+   */
+ public getStaffListCandidateSearch(filter:any): Observable<SearchCandidate[]> {
+  return this.http.post<SearchCandidate[]>(`/api/LogiReport/stafflist/candidatesearch`,filter);
+}
 }

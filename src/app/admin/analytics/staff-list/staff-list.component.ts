@@ -1,3 +1,4 @@
+import { GetStaffListReportCandidateSearch } from './../../../organization-management/store/logi-report.action';
 import { EmitType } from '@syncfusion/ej2-base';
 import {
   Component,
@@ -532,7 +533,7 @@ export class StaffListComponent implements OnInit {
         businessUnitIds: ids,
       };
       this.filterColumns.dataSource = [];
-      this.store.dispatch(new GetCommonReportCandidateSearch(filter)).subscribe((result) => {
+      this.store.dispatch(new GetStaffListReportCandidateSearch(filter)).subscribe((result) => {
         this.candidateFilterData = result.LogiReport.searchCandidates;
         this.candidateSearchData = result.LogiReport.searchCandidates;
         this.filterColumns.dataSource = this.candidateFilterData;
