@@ -8,6 +8,8 @@ import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
   ApplicantStatus,
+  CandidateCancellationReason,
+  CandidateCancellationReasonFilter,
   CreateOrderDto,
   EditOrderDto,
   IrpCandidatesParams,
@@ -534,5 +536,9 @@ export class OrderManagementContentService {
         orderFieldsConfig[order.orderType].includes(key) ? value : null,
       ])
     );
+  }
+
+  public GetCandidateCancellationReasons(filter: CandidateCancellationReasonFilter): Observable<CandidateCancellationReason[]> {
+    return this.http.post<CandidateCancellationReason[]>(`/api/CandidateCancellationSettings/getCandidateCancellationReason`, filter);
   }
 }
