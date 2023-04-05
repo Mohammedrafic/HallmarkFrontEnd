@@ -423,6 +423,10 @@ export class StaffListComponent implements OnInit {
     this.staffListReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
     this.staffListReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.staffListReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.staffListReportForm.get('skillIds')?.setValue([]);
+    this.staffListReportForm.get('workCommitmentIds')?.setValue([]);
+    this.staffListReportForm.get('employeeName')?.setValue('');
+    this.staffListReportForm.get('showOnlyDepartmentUnassignedCandidates')?.setValue(false);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
