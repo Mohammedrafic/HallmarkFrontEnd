@@ -886,7 +886,8 @@ export class OrderManagementContentState {
     return this.orderManagementService.cancelCandidateJob(payload).pipe(
       tap(() => {
         dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new CancelOrganizationCandidateJobSuccess()]);
-      })
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error,getAllErrors(error.error))))
     );
   }
 
