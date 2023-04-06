@@ -1,20 +1,38 @@
 <section class="container">
-  <ejs-tab
-    (selected)="selectTab($event)"
-    [heightAdjustMode]="'Fill'"
-  >
+  <section class="org-controls-container">
+    <div>
+      <button *ngIf="selectedTab === orientationTab.HistoricalData"
+              ejs-dropdownbutton
+              appHideBeforeSyncfusionLoad
+              [items]="exportOptions"
+              (select)="exportSelected($event)"
+              id="exportButton"
+              cssClass="e-outline button-export"
+            >
+              <div class="button-export-container">
+                Export <i-feather name="upload" class="icon"></i-feather>
+              </div>
+            </button>
+    </div>
+  </section>
+  <ejs-tab (selected)="selectTab($event)" [heightAdjustMode]="'Fill'">
     <e-tabitems>
       <e-tabitem>
-        <ng-template #headerText><div>Orientation Setup</div></ng-template>
+        <ng-template #headerText>
+          <div>Orientation Setup</div>
+        </ng-template>
         <ng-template #content>
           <app-orientation-setup [isActive]="selectedTab === orientationTab.Setup"></app-orientation-setup>
         </ng-template>
       </e-tabitem>
 
       <e-tabitem>
-        <ng-template #headerText><div>Historical Data</div></ng-template>
+        <ng-template #headerText>
+          <div>Historical Data</div>
+        </ng-template>
         <ng-template #content>
-          <app-orientation-historical-data [isActive]="selectedTab === orientationTab.HistoricalData"></app-orientation-historical-data>
+          <app-orientation-historical-data [isActive]="selectedTab === orientationTab.HistoricalData"
+            [export$]="exportOrientation$"></app-orientation-historical-data>
         </ng-template>
       </e-tabitem>
     </e-tabitems>

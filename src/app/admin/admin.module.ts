@@ -65,6 +65,7 @@ import { CommitmentComponent } from './master-data/commitment/commitment.compone
 import { GridModule as AppGridModule } from '@shared/components/grid/grid.module';
 import { CommitmentGridActionRendererComponent } from './master-data/commitment/grid-action-renderer/grid-action-renderer.component';
 import { MasterCommitmentState } from './store/commitment.state';
+import { OrientationService } from '@organization-management/orientation/services/orientation.service';
 
 const sidebarIcons = {
   Download,
@@ -151,6 +152,7 @@ const sidebarIcons = {
     PageService,
     AddEditOrganizationService,
     MasterSkillsService,
+    OrientationService
   ],
 })
 export class AdminModule { }

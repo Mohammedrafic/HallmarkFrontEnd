@@ -12,6 +12,7 @@ import { OrganizationService } from '@shared/services/organization.service';
 import {
   ExportCredentialTypes,
   ExportOrganizations,
+  ExportOrientation,
   ExportSkillCategories,
   ExportSkills,
   GetAllSkills,
@@ -61,6 +62,7 @@ import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { UserOrganizationsAgenciesChanged } from 'src/app/store/user.actions';
 import { HttpErrorResponse } from '@angular/common/http';
 import { COUNTRIES } from '@shared/constants/countries-list';
+import { OrientationService } from '@organization-management/orientation/services/orientation.service';
 
 interface DropdownOption {
   id: number;
@@ -204,7 +206,8 @@ export class AdminState {
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
     private categoriesService: CategoriesService,
-    private credentialsService: CredentialsService
+    private credentialsService: CredentialsService,
+    private orientationService : OrientationService
   ) {
   }
 
@@ -469,6 +472,14 @@ export class AdminState {
   GetOrganizationDataSources({ patchState }: StateContext<AdminStateModel>): Observable<OrganizationDataSource> {
     return this.organizationService.getOrganizationDataSources().pipe(tap(data => {
       patchState({ organizationDataSources: data });
+    }));
+  };
+
+  @Action(ExportOrientation)
+  ExportOrientations({ }: StateContext<AdminStateModel>, { payload }: ExportOrientation): Observable<any> {
+    return this.orientationService.getExport(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
     }));
   };
 }
