@@ -67,10 +67,11 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateDOBRequired,CandidatePHONE1Required, CandidateSSNRequired, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import { CandidateADDRESSRequired, CandidateDOBRequired,CandidatePHONE1Required, CandidateSSNRequired, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { SettingsViewService } from '@shared/services';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { DateTimeHelper } from '@core/helpers';
+import { CommonHelper } from '@shared/helpers/common.helper';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -141,6 +142,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public candidateSSNRequired: boolean;
   public candidateDOBRequired: boolean;
   public candidatePhone1RequiredValue : string = '';
+  public candidateAddressRequiredValue : string = '';
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
     Rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
@@ -307,9 +309,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
     
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null && this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null){
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
-        return;
+      if(this.candidateJob?.candidateProfileContactDetails != null){ 
+          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null 
+              || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
+                this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
+                return;
+            }
       }else{
         this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
         return;
@@ -319,6 +324,18 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     if (this.isAgency && this.isCandidatePayRateVisible && this.isOffered && this.form.get('candidatePayRate')?.invalid) {
       this.form.markAllAsTouched();
       return;
+    }
+
+    if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
+      if(this.candidateJob?.candidateProfileContactDetails != null){ 
+          if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
+              this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
+              return;
+          }
+      }else{
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
+        return;
+      }
     }
 
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
@@ -559,6 +576,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       let phone1Configuration = JSON.parse(value.candidatePhone1Required);
       if(phone1Configuration.isEnabled){
         this.candidatePhone1RequiredValue = phone1Configuration.value;
+      }
+    }
+    if(value.candidateAddressRequired != null){
+      let addressConfiguration = JSON.parse(value.candidateAddressRequired);
+      if(addressConfiguration.isEnabled){
+        this.candidateAddressRequiredValue = addressConfiguration.value;
       }
     }
     if (this.candidateJob) {

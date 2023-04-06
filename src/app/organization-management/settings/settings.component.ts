@@ -60,7 +60,7 @@ import { SettingsDataAdapter } from './helpers/settings-data.adapter';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { SideMenuService } from '@shared/components/side-menu/services';
 import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
-import { OrganizationSettingKeys } from '@shared/constants';
+import { OrganizationSettingKeys, OrganizationSettings } from '@shared/constants';
 import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
 import { AutoGenerationPayload, SwitchValuePayload } from './settings.interface';
 
@@ -155,6 +155,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public hasPermissions: Record<string, boolean> = {};
   public settingsAppliedToPermissions: string[] = SettingsAppliedToPermissions;
   public disabledSettings = DisabledSettingsByDefault;
+  public dataSource: any;
+  public regularLocalRatesToggleMessage:boolean = false;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -252,6 +254,19 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
+  formatCheckboxValue(data:any){
+    if(data.value === null){
+      return 'No';
+    }else{
+      if(JSON.parse(data.value).isEnabled){
+        return 'Yes'
+      }else{
+        return 'No';
+      }      
+    }
+
+  }
+
   public onOverrideButtonClick(data: any): void {
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
@@ -276,6 +291,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.addActiveCssClass(event);
     this.isEdit = true;
     this.setOrganizationSettingKey = parentRecord.settingKey;
+    this.regularLocalRatesToggleMessage = false;
+    if(OrganizationSettings.MandateCandidateAddress  === parentRecord.settingKey  &&
+      this.dataSource.find((data:any)=> data.settingKey === OrganizationSettings.EnableRegularLocalRates).value == 'true'){
+        this.regularLocalRatesToggleMessage = true;
+    }
     this.formControlType = parentRecord.controlType;
     this.disableDepForInvoiceGeneration();
     this.setFormValidation(parentRecord);
@@ -435,6 +455,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       const adaptedData = SettingsDataAdapter.adaptSettings(data);
       this.gridDataSource = this.getRowsPerPage(adaptedData, this.currentPagerPage);
       this.totalDataRecords = adaptedData.length;
+      this.dataSource = adaptedData;
     });
   }
 

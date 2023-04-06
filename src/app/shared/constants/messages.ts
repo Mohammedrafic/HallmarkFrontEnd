@@ -86,6 +86,7 @@ export const CANDIDATE_STATUS= 'Selected Candidate status is unavailable';
 export const CandidateSSNRequired = 'SSN of Candidate is mandatory to submit candidate application. Once SSN is updated on Candidate Profile screen and come back here to apply.';
 export const CandidateDOBRequired= 'DOB of Candidate is mandatory to accept the offer. Please update DOB of candidate on Candidate Profile screen and come back here to accept offer.';
 export const CandidatePHONE1Required = (place:any) => 'Phone 1 of the Candidate is mandatory to '+place+' the position.';
+export const CandidateADDRESSRequired = (place:any) => 'Address 1, Country, State, City and Zipcode of the Candidate in the Candidate profile are mandatory to '+place+' the position.';
 export const REGULAR_RATE_UPDATE_SUCCESS = 'Regular Rate on Open and In-Progress Status are updated. Other Positions stays unaffected';
 export const UpdateRegularRatesucceedcount = (count: number) =>
   ` ${count} Order(s) affected , ` + REGULAR_RATE_UPDATE_SUCCESS;

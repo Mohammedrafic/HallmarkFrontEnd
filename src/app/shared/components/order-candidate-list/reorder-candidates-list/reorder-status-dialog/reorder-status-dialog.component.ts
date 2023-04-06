@@ -29,7 +29,7 @@ import {
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-candidate.constants';
-import { CandidatePHONE1Required, SET_READONLY_STATUS } from '@shared/constants';
+import { CandidateADDRESSRequired, CandidatePHONE1Required, SET_READONLY_STATUS } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues } from '@shared/enums/applicant-status.enum';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -49,6 +49,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { AcceptFormComponent } from './accept-form/accept-form.component';
+import { CommonHelper } from '@shared/helpers/common.helper';
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -78,6 +79,12 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         let phone1Configuration = JSON.parse(orderCandidateJob.candidatePhone1Required);
         if(phone1Configuration.isEnabled){
           this.candidatePhone1RequiredValue = phone1Configuration.value;
+        }
+      }
+      if(orderCandidateJob.candidateAddressRequired != null){
+        let addressConfiguration = JSON.parse(orderCandidateJob.candidateAddressRequired);
+        if(addressConfiguration.isEnabled){
+          this.candidateAddressRequiredValue = addressConfiguration.value;
         }
       }
       this.setValueForm(orderCandidateJob);
@@ -164,6 +171,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   private defaultApplicantStatuses: ApplicantStatus[];
   private statuses: ApplicantStatus[];
   public candidatePhone1RequiredValue : string = '';
+  public candidateAddressRequiredValue : string = '';
 
 
   constructor(
@@ -212,11 +220,26 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     }
 
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null && this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null){
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
-        return;
+      if(this.candidateJob?.candidateProfileContactDetails != null){
+        if(this.candidateJob?.candidateProfileContactDetails.phone1 === null 
+            || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
+              this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
+              return;
+        }
       }else{
-        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
+          return;
+        }
+    }
+
+    if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
+      if(this.candidateJob?.candidateProfileContactDetails != null){ 
+          if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
+              this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
+              return;
+          }
+      }else{
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
         return;
       }
     }

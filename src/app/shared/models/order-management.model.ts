@@ -538,7 +538,6 @@ export type AcceptJobDTO = {
 export type CandidateProfile = {
   agencyId: number;
   candidateAgencyStatus: number;
-  candidateProfileContactDetail: CandidateProfileContactDetail;
   candidateProfileSkills: Array<string>;
   classification: number;
   createdAt: string;
@@ -603,6 +602,7 @@ export type OrderCandidateJob = {
   candidatePayRate: string | null;
   candidatePhone1Required:any;
   candidateAddressRequired:any;
+  candidateProfileContactDetails: CandidateProfileContactDetail;
 };
 
 export type CandidatesBasicInfo = {
