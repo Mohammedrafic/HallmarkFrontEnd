@@ -1,8 +1,15 @@
 import {
-  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, NgZone, OnDestroy,
-  OnInit, ViewChild,
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterEvent, Event } from '@angular/router';
 
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faBan, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -31,18 +38,24 @@ import { AnalyticsApiService } from '@shared/services/analytics-api.service';
 import { FilterService } from '@shared/services/filter.service';
 import { ResizeContentService } from '@shared/services/resize-main-content.service';
 import { AppState } from 'src/app/store/app.state';
-import { SIDEBAR_CONFIG } from '../client/client.config';
-import { Menu, MenuItem } from '../shared/models/menu.model';
-import { User } from '../shared/models/user.model';
-import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
+import { SIDEBAR_CONFIG } from '@client/client.config';
+import { Menu, MenuItem } from '@shared/models/menu.model';
+import { User } from '@shared/models/user.model';
 import { InitPreservedFilters } from '../store/preserved-filters.actions';
 import { GetCurrentUserPermissions, GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
-import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
-import { DismissAlertDto } from './../shared/models/alerts-template.model';
-import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
-import { GetAlertsCountForCurrentUser, GetAlertsForCurrentUser, GetDeviceScreenResolution,
-  ShowCustomSideDialog } from './../store/app.actions';
+import { DismissAlert, DismissAllAlerts } from '@admin/store/alerts.actions';
+import { DismissAlertDto } from '@shared/models/alerts-template.model';
+import { GetAlertsForUserStateModel } from '@shared/models/get-alerts-for-user-state-model';
+import {
+  GetAlertsCountForCurrentUser,
+  GetAlertsForCurrentUser,
+  GetDeviceScreenResolution,
+  ShowCustomSideDialog,
+  SetIsFirstLoadState,
+  ToggleSidebarState,
+  ToggleTheme,
+} from '../store/app.actions';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { MenuItemNames } from './shell.constant';
 import { ProfileMenuItem, THEME } from './shell.enum';
@@ -134,6 +147,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   public faTimes = faTimes as IconDefinition;
   public alerts: any;
   public alertsCount: number;
+  public isToggleButtonDisable = false;
 
   private isClosingSearch = false;
   private ProfileMenuItemNames = MenuItemNames;
@@ -192,6 +206,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.getAlertsPoolling();
     this.watchForUnreadMessages();
     this.attachElementToResizeObserver();
+    this.watchForRouterEvents();
   }
 
   ngAfterViewInit(): void {
@@ -416,7 +431,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       this.alertSidebar.show();
       this.cd.markForCheck();
     });
-    
+
   }
 
   alertSideBarCloseClick(): void {
@@ -459,12 +474,12 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     if (businessUnitId) {
         this.alertSideBarCloseClick();
         window.localStorage.setItem("BussinessUnitID",JSON.stringify(businessUnitId));
-    } 
+    }
     if(orderId){
       window.localStorage.setItem("OrderId",JSON.stringify(orderId));
     }
     if(title){
-     window.localStorage.setItem("alertTitle",JSON.stringify(title)); 
+     window.localStorage.setItem("alertTitle",JSON.stringify(title));
     }
   }
 
@@ -650,7 +665,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
           this.alertsCount = alertCountdata;
           this.cd.markForCheck();
         });
-        
+
         this.profileData = [
           {
             text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
@@ -755,6 +770,27 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
       this.removeManageNotificationOptionInHeader();
       this.cd.markForCheck();
+    });
+  }
+
+  private watchForRouterEvents(): void {
+    const scheduleUrl = '/client/scheduling';
+
+    if(this.router.url === scheduleUrl) {
+      this.isToggleButtonDisable = true;
+    }
+
+    this.router.events.pipe(
+      filter((routeEvent: Event): routeEvent is RouterEvent => routeEvent instanceof NavigationEnd),
+      takeUntil(this.componentDestroy()),
+    ).subscribe((routeEvent: RouterEvent) => {
+      if(routeEvent.url === scheduleUrl) {
+        this.store.dispatch(new ToggleSidebarState(!this.sidebar.isOpen));
+        this.tree.collapseAll();
+        this.isToggleButtonDisable = true;
+      } else {
+        this.isToggleButtonDisable = false;
+      }
     });
   }
 }

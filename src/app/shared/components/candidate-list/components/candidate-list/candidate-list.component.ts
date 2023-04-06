@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { debounceTime, filter, map, merge, Observable, Subject, switchMap, takeUntil, takeWhile, of, combineLatest } from 'rxjs';
+import { debounceTime, filter, map, merge, Observable, Subject, switchMap, takeUntil, takeWhile, combineLatest, tap } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -152,12 +152,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private isAlive = true;
   private activeTab: number;
 
-  get pageName(): FilterPageName {
-    return this.isIRP
-    ? FilterPageName.CandidatesIRPOrganization
-    : FilterPageName.CandidatesVMSOrganization;
-  }
-
   constructor(
     private store: Store,
     private router: Router,
@@ -202,7 +196,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFilterClearAll(): void {
-    this.store.dispatch(new ClearPageFilters(this.pageName));
+    this.store.dispatch(new ClearPageFilters(this.getPageName()));
     this.clearFilters();
     this.dispatchNewPage();
   }
@@ -463,10 +457,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     combineLatest([this.lastSelectedAgencyId$, this.lastSelectedOrgId$, this.regions$])
     .pipe(
       filter((data) => !!data[2]),
-      switchMap((data) => {
-        this.getPreservedFiltersByPage();
-        return of(data)
-      }),
+      tap(() => this.getPreservedFiltersByPage()),
       switchMap(() => this.adjustFilters()),
       takeUntil(this.unsubscribe$)
     )
@@ -481,7 +472,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private adjustFilters(): Observable<PreservedFiltersByPage<CandidateListFilters>> {
     return this.preservedFiltersByPageName$.pipe(
-      switchMap((filters) => {
+      tap((filters) => {
         this.clearFilters();
         if (!filters.isNotPreserved) {
           this.filters = { ...filters.state };
@@ -489,7 +480,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         } else {
           this.setDefaultFilter();
         }
-        return of(filters);
       })
     );
   }
@@ -637,10 +627,18 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private getPreservedFiltersByPage(): void {
-    this.store.dispatch(new GetPreservedFiltersByPage(this.pageName));
+    this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
   }
 
   private saveFiltersByPageName(filters: CandidateListFilters): void {
-    this.store.dispatch(new SaveFiltersByPageName(this.pageName, filters));
+    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), filters));
+  }
+
+  private getPageName(): FilterPageName {
+    if(this.isIRP) {
+      return FilterPageName.CandidatesIRPOrganization;
+    } else {
+      return FilterPageName.CandidatesVMSOrganization;
+    }
   }
 }

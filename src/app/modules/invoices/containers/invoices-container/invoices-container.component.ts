@@ -9,8 +9,9 @@ import { combineLatest, distinctUntilChanged, filter, map, Observable, switchMap
 
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
 import { OutsideZone } from '@core/decorators';
-import { DialogAction } from '@core/enums';
-import { DataSourceItem } from '@core/interface';
+import { DialogAction, FilterPageName } from '@core/enums';
+import { DataSourceItem, PreservedFiltersByPage } from '@core/interface';
+import { isObjectsEqual } from '@core/helpers';
 import {
   RejectReasonInputDialogComponent,
 } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
@@ -37,6 +38,8 @@ import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { GridReadyEventModel } from '@shared/components/grid/models';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { GetPreservedFiltersByPage, ResetPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 
 @Component({
   selector: 'app-invoices-container',
@@ -77,6 +80,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   @Select(UserState.lastSelectedAgencyId)
   public readonly agencyId$: Observable<number>;
+
+  @Select(PreservedFiltersState.preservedFiltersByPageName)
+  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<Interfaces.InvoicesFilterState>>;
 
   public selectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab = 0;
 
@@ -153,6 +159,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   private gridInstance: GridReadyEventModel;
 
+  private filterState: Interfaces.InvoicesFilterState = {};
+
   constructor(
     private cdr: ChangeDetectorRef,
     private invoicesService: InvoicesService,
@@ -210,12 +218,18 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchAgencyId();
     this.watchForOpenPayment();
     this.watchForSavePaymentAction();
+    this.watchForPreservedFilters();
   }
 
   ngAfterViewInit(): void {
     if (this.organizationId) {
       this.invoicesTableTabsComponent.preselectTab(this.selectedTabIdx);
     }
+  }
+
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.store.dispatch(new ResetPageFilters());
   }
 
   public watchAgencyId(): void {
@@ -273,6 +287,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       takeUntil(this.componentDestroy()),
     )
     .subscribe((id) => {
+      this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
       this.organizationId = id;
       this.store.dispatch(new Invoices.SelectOrganization(id));
       this.resetFilters();
@@ -284,6 +299,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.invoicesFilters$
     .pipe(
       filter(() => !!this.organizationId),
+      distinctUntilChanged((prev, next) => isObjectsEqual(prev, next)),
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
@@ -361,6 +377,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public updateTableByFilters(filters: Interfaces.InvoicesFilterState): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({ ...filters }));
+    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), { ...filters }));
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
@@ -405,17 +422,15 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public changePage(pageNumber: number): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({
+      ...this.filterState,
       pageNumber,
     }, true));
   }
 
   public changePageSize(pageSize: number): void {
-    const filterstate = this.store.selectSnapshot(InvoicesState.invoicesFilters);
-    if (filterstate?.pageSize === pageSize) {
-      return;
-    }
     const useFilterState = !!this.navigatedInvoiceId;
     this.store.dispatch(new Invoices.UpdateFiltersState({
+      ...this.filterState,
       pageSize,
     }, useFilterState));
     this.previousSelectedTabIdx = this.selectedTabIdx;
@@ -651,5 +666,24 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         this.cdr.markForCheck();
       });
     }
+  }
+
+  private getPageName(): FilterPageName {
+    if(this.isAgency) {
+      return FilterPageName.InvoicesVMSAgency;
+    } else {
+      return FilterPageName.InvoicesVMSOrganization;
+    }
+  }
+
+  private watchForPreservedFilters(): void {
+    this.preservedFiltersByPageName$.pipe(
+      filter(({ dispatch }) => dispatch),
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe(({ state }) => {
+      this.filterState = state || {};
+      this.store.dispatch(new Invoices.UpdateFiltersState(state));
+    });
   }
 }

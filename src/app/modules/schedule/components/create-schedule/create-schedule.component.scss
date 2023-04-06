@@ -1,7 +1,7 @@
 @import "colors";
 @import "mixins";
 
-.dialog-container {
+.sidebar-container {
   box-sizing: border-box;
   display: flex;
   flex-flow: column;
@@ -9,9 +9,8 @@
   height: calc(100% - 1px);
 }
 
-.dialog-header,
+.sidebar-header,
 .schedule-types,
-.separator,
 .form-container {
   flex: 0 1 auto;
 }
@@ -20,25 +19,35 @@ app-schedule-items {
   flex: 1 1 auto;
 }
 
-.dialog-header {
+.sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 40px;
 
   .title {
-    @include dialog-title;
+    h3 {
+      @include dialog-title;
+    }
   }
-}
 
-.button-cancel {
-  margin-right: 8px;
-}
+  .controls {
+    display: flex;
+    gap: 28px;
+    align-items: center;
 
-.separator {
-  height: 1px;
-  background-color: $secondary-dark-blue-45;
-  margin: 28px 0;
+    .close {
+      background: none;
+      padding: 0;
+      margin: 0;
+      border: none;
+      cursor: pointer;
+
+      i-feather {
+        color: $primary-active-blue-10;
+      }
+    }
+  }
 }
 
 .form-container {
@@ -47,12 +56,77 @@ app-schedule-items {
   .validation-icon {
     display: none !important;
   }
+
+  .time-area {
+    display: none;
+  }
+
+  .show-time-area {
+    display: block;
+  }
+}
+
+.schedule-types:has(.e-control.e-radio:checked) {
+  border: 1px solid $primary-active-blue-40;
 }
 
 .schedule-types {
   display: flex;
-  gap: 24px;
-  margin-bottom: 8px;
+  justify-content: space-around;
+  border: 1px solid $primary-active-blue-10;
+  border-radius: 8px;
+  margin-bottom: 24px;
+
+  .input-group:first-child {
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    border: none;
+  }
+
+  .input-group:last-child {
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  .input-group {
+    width: 100%;
+    text-align: center;
+    border-left: 1px solid $primary-active-blue-10;
+  }
+
+  .input-group:has(.e-control.e-radio:checked) {
+    background-color: $primary-active-blue-10;
+
+    .e-control.e-radio:checked + label {
+      .e-label {
+        color: $white !important;
+      }
+    }
+  }
+
+  .input-group:has(.e-control.e-radio:disabled) {
+    opacity: 0.5;
+  }
+
+  ejs-radiobutton .e-control.e-radio + label {
+    min-width: 130px;
+
+    .e-label {
+      color: $primary-active-blue-10 !important;
+      padding: 10px 0 !important;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+    }
+
+    &::before {
+      display: none !important;
+    }
+
+    &::after {
+      display: none !important;
+    }
+  }
 }
 
 .input-container .input-group.input-readonly {
@@ -65,28 +139,41 @@ app-schedule-items {
 
 .availability-form {
   display: grid;
-  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.7fr;
+  grid-template-columns: 1.5fr 0.3fr 0.3fr 0.9fr 0.7fr;
   grid-template-rows: 1fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
-    "shift startTime startTime endTime hours";
+    "shift shift shift shift hours";
 }
 
 .unavailability-form {
   display: grid;
-  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.7fr;
+  grid-template-columns: 1.5fr 0.3fr 0.3fr 0.9fr 0.7fr;
   grid-template-rows: 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
     "reason reason reason reason reason"
-    "shift startTime startTime endTime hours";
+    "shift shift shift shift hours";
 }
 
 .book-form {
   display: grid;
-  grid-template-columns: 1.7fr 0.3fr 0.5fr 0.9fr 0.7fr;
+  grid-template-columns: 1.5fr 0.3fr 0.3fr 0.9fr 0.7fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  gap: 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "shift shift shift shift hours"
+    "region region location location location"
+    "department department department department department"
+    "skill skill skill skill skill";
+}
+
+.book-time-form {
+  display: grid;
+  grid-template-columns: 1.3fr 0.4fr 0.4fr 0.9fr 0.7fr;
   grid-template-rows: 1fr 1fr 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
@@ -95,6 +182,26 @@ app-schedule-items {
     "region region location location location"
     "department department department department department"
     "skill skill skill skill skill";
+}
+.availability-time-form {
+  display: grid;
+  grid-template-columns: 1.3fr 0.4fr 0.4fr 0.9fr 0.7fr;
+  grid-template-rows: 1fr;
+  gap: 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "shift startTime startTime endTime hours";
+}
+
+.unavailability-time-form {
+  display: grid;
+  grid-template-columns: 1.3fr 0.4fr 0.4fr 0.9fr 0.7fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "reason reason reason reason reason"
+    "shift startTime startTime endTime hours";
 }
 
 .reason {

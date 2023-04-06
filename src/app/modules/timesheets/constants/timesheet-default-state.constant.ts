@@ -47,4 +47,5 @@ export const DefaultTimesheetState: TimesheetsModel = {
   timesheetDetails: null,
   organizations: [],
   selectedOrganizationId: 0,
+  filterOptions: null,
 };

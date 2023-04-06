@@ -6,7 +6,6 @@ import { map } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { SystemType } from '@shared/enums/system-type.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
@@ -51,8 +50,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     locations: [],
     departments: [],
   };
-
-  private activeSystem: SystemType = SystemType.IRP;
 
   get selectedSkillsNumber(): number {
     return this.scheduleFilterFormGroup.get('skillIds')?.value?.length || 0;
@@ -174,7 +171,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterFormGroup.get('departmentsIds')?.valueChanges
       .pipe(
         filter((departmentsIds: number[]) => {
-          if (!departmentsIds.length) {
+          if (!departmentsIds?.length) {
             this.resetSkillFilters();
           }
 

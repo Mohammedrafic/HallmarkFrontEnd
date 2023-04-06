@@ -200,4 +200,8 @@ export namespace Timesheets {
     ) {
     }
   }
+
+  export class ResetFilterOptions {
+    static readonly type = TIMESHEETS_ACTIONS.RESET_FILTER_OPTIONS;
+  }
 }
