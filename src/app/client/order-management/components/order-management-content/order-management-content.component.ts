@@ -696,7 +696,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
       switch (this.activeTab) {
         case OrganizationOrderManagementTabs.AllOrders:
-          this.filters.orderTypes = [];
           this.filters.isTemplate = false;
           this.filters.includeReOrders = true;
           this.hasOrderAllOrdersId();
@@ -887,14 +886,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public onFilterApply(): void {
     if (this.OrderFilterFormGroup.dirty) {
       this.refreshFilterState();
+      this.saveFiltersByPageName();
       this.getOrders(true);
       this.store.dispatch(new ShowFilterDialog(false));
-      this.saveFiltersByPageName();
       this.OrderFilterFormGroup.markAsPristine();
       this.filteredItems = this.filterService.generateChips(
         this.OrderFilterFormGroup,
         this.filterColumns,
-        this.datePipe
       );
     } else {
       this.store.dispatch(new ShowFilterDialog(false));
@@ -2312,8 +2310,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private saveFiltersByPageName(): void {
     if(this.isActiveSystemIRP) { return } //TODO remove the condition in scope [EIN-12382][IRP][Improvement] Preserving filters across IRP;
-    const filters = { ...this.filters, orderTypes: [] }
-    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), filters));
+    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), { ...this.filters }));
   }
 
   private getPreservedFilters(): Observable<PreservedFiltersByPage<OrderFilter>> {
@@ -2346,6 +2343,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
+    this.filters.orderTypes = this.filters.orderTypes || [];
     this.filters.irpOnly = !!this.filters.irpOnly;
   }
 
