@@ -438,15 +438,11 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             clockId: value.clockId ? value.clockId : '',
             offeredBillRate: value.offeredBillRate ? PriceUtils.formatNumbers(value.offeredBillRate) : null,
             allow: value.allowDeployCredentials,
-            startDate: value.offeredStartDate ? DateTimeHelper.convertDateToUtc(value.offeredStartDate)
-            : DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
-            endDate: value.offeredStartDate
-              ? this.getRecalculateActualEndDate(
-                  DateTimeHelper.convertDateToUtc(value.offeredStartDate),
-                  value.order.duration,
-                  value.actualStartDate,
-                  value.actualEndDate
-                )
+            startDate: value.actualStartDate
+              ? DateTimeHelper.convertDateToUtc(value.actualStartDate)
+              : DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
+            endDate: value.actualEndDate
+              ? DateTimeHelper.convertDateToUtc(value.actualEndDate)
               : DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()),
             rejectReason: value.rejectReason,
             offeredStartDate: formatDate(DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(),
