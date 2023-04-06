@@ -210,6 +210,7 @@ import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interf
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { ClearPageFilters, GetPreservedFiltersByPage, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 import { OutsideZone } from '@core/decorators';
+import { GetFilterFormConfig } from '@client/order-management/constants/filter-form-config.constant';
 
 @Component({
   selector: 'app-order-management-content',
@@ -1685,7 +1686,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if((isNotPreserved && dispatch) || this.activeSystem === OrderManagementIRPSystemId.IRP || this.orderManagementPagerState) { 
       this.setDefaultFilter();
     } else {
-      this.filters = { ...state, orderStatuses: state?.orderStatuses ? [...state.orderStatuses] : [] };
+      const filterState = { ...state, orderStatuses: state?.orderStatuses ? [...state.orderStatuses] : [] };
+      const filterFormConfig = GetFilterFormConfig(this.activeTab);
+      this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
       this.patchFilterForm(!!this.filters?.contactEmails);
       this.populatePreservedContactPerson();
       !this.firstOrdersDispatch && this.getOrders(true);
