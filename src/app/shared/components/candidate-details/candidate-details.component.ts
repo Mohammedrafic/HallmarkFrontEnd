@@ -28,15 +28,15 @@ import { toCorrectTimezoneFormat } from '../../utils/date-time.utils';
 import { GRID_CONFIG } from '@shared/constants';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { Router } from '@angular/router';
-import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import {
   ClearPageFilters,
   GetPreservedFiltersByPage,
   ResetPageFilters,
   SaveFiltersByPageName,
 } from 'src/app/store/preserved-filters.actions';
-import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { CandidateDetailsService } from './services/candidate-details.service';
+import { PreservedFiltersByPage } from '@core/interface';
+import { FilterPageName } from '@core/enums';
 
 @Component({
   selector: 'app-candidate-details',
@@ -80,8 +80,11 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   public pageNumber = GRID_CONFIG.initialPage;
   public pageSize = GRID_CONFIG.initialRowsPerPage;
-  private selectedTab: number | null;
   public CandidateStatus: number;
+
+  private selectedTab: number | null;
+  private isAgency = false;
+
   constructor(
     private store: Store,
     private router: Router,
@@ -93,6 +96,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     super();
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
     this.CandidateStatus = routerState?.['orderStatus'];
+    this.isAgency = this.router.url.includes('agency');
   }
 
   ngOnInit(): void {
@@ -123,7 +127,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   public onFilterClearAll(): void {
     this.clearFilters();
-    this.store.dispatch(new ClearPageFilters(FilterPageName.CandidateAssignmentVMSOrganization));
+    this.store.dispatch(new ClearPageFilters(this.getPageName()));
     this.updatePage();
   }
 
@@ -150,7 +154,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         this.filters.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
       }
 
-      this.store.dispatch(new SaveFiltersByPageName(FilterPageName.CandidateAssignmentVMSOrganization, this.filters));
+      this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), this.filters));
       this.filtersForm.markAsPristine();
     } else {
       this.store.dispatch(new ShowFilterDialog(false));
@@ -293,7 +297,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       .pipe(
         filter((data) => !!data[2]),
         debounceTime(600),
-        tap(() => this.store.dispatch(new GetPreservedFiltersByPage(FilterPageName.CandidateAssignmentVMSOrganization))),
+        tap(() => this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()))),
         switchMap(() => this.adjustFilters()),
         takeUntil(this.destroy$)
       )
@@ -325,7 +329,10 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private adjustFilters(): Observable<PreservedFiltersByPage<FiltersModal>> {
-    return this.preservedFiltersByPageName$.pipe(tap((filters) => this.handleFilterState(filters)));
+    return this.preservedFiltersByPageName$.pipe(
+      debounceTime(100),
+      tap((filters) => this.handleFilterState(filters))
+    );
   }
 
   private handleFilterState(filters: PreservedFiltersByPage<FiltersModal>): void {
@@ -340,6 +347,14 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       };
 
       this.patchFormValue();
+    }
+  }
+
+  private getPageName(): FilterPageName {
+    if (this.isAgency) {
+      return FilterPageName.CandidateAssignmentVMSAgency;
+    } else {
+      return FilterPageName.CandidateAssignmentVMSOrganization;
     }
   }
 }
