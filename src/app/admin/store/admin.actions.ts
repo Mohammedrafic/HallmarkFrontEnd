@@ -200,3 +200,8 @@ export class GetOrganizationDataSources {
   static readonly type = '[admin] Get Organization Filtering Options';
   constructor() { }
 }
+
+export class ExportOrientation {
+  static readonly type = '[admin] Export Orientation list';
+  constructor(public payload: ExportPayload) { }
+}
