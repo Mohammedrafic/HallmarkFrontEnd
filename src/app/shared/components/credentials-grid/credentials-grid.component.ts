@@ -222,7 +222,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     private ngZone: NgZone,
   ) {
     super();
-    this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'clock' }));
     this.candidateProfileId = Number(this.route.snapshot.paramMap.get('id'));
   }
 
