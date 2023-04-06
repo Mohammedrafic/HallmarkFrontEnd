@@ -6,7 +6,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
-import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, ConfigurationValues } from '@shared/enums/applicant-status.enum';
 import { OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import {
@@ -34,7 +34,7 @@ import { Comment } from '@shared/models/comment.model';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateDOBRequired, CandidateSSNRequired } from '@shared/constants';
+import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required } from '@shared/constants';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -149,6 +149,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
   public candidateSSNRequired :boolean;
   public candidateDOBRequired :boolean;
+  public candidatePhone1RequiredValue : string = '';
 
   constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService, private cd: ChangeDetectorRef) {}
 
@@ -237,7 +238,15 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
           return;
         }
       }
-
+      if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
+        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null && this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === null){
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
+          return;
+        }else{
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
+          return;
+        }
+      }
       this.store
         .dispatch(
           new ApplyOrderApplicants({
@@ -258,6 +267,15 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
     if(this.candidateDOBRequired){
       if(!this.form.controls["dob"].value){
         this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateDOBRequired));
+        return;
+      }
+    }
+    if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
+      if(this.orderCandidateJob?.candidateProfile.candidateProfileContactDetail != null && this.orderCandidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
+        return;
+      }else{
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
         return;
       }
     }
@@ -382,6 +400,13 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
     });
     this.candidateDOBRequired=orderCandidateJob.candidateDOBRequired;
     this.candidateSSNRequired=orderCandidateJob.candidateSSNRequired; 
+    if(orderCandidateJob.candidatePhone1Required != null){
+      let phone1Configuration = JSON.parse(orderCandidateJob.candidatePhone1Required);
+      if(phone1Configuration.isEnabled){
+        this.candidatePhone1RequiredValue = phone1Configuration.value;
+      }
+    }
+    
     this.cd.detectChanges();
   }
 
@@ -410,6 +435,12 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: OrderApplicantsInitialData) => {
         if (data) {
+          if(data.candidatePhone1Required != null){
+            let phone1Configuration = JSON.parse(data.candidatePhone1Required);
+            if(phone1Configuration.isEnabled){
+              this.candidatePhone1RequiredValue = phone1Configuration.value;
+            }
+          }
           this.orderApplicantsInitialData = data;
           this.form?.patchValue({
             jobId: data.orderId,

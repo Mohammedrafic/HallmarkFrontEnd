@@ -43,6 +43,7 @@ import {
   ScheduleFilterHelper,
 } from '../../helpers';
 import {
+  DeleteScheduleRequest,
   Schedule,
   ScheduleBook,
   ScheduleBookingErrors,
@@ -269,7 +270,17 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   deleteSchedule(): void {
-    this.scheduleApiService.deleteSchedule(this.selectedDaySchedule.id, this.createPerDiemOrderControl.value).pipe(
+    const deleteScheduleRequest: DeleteScheduleRequest = {
+      id: this.selectedDaySchedule.id,
+      createOrder: this.createPerDiemOrderControl.value,
+    };
+
+    if (this.selectedDaySchedule.scheduleType !== ScheduleType.Book) {
+      deleteScheduleRequest.startDateTime = this.selectedDaySchedule.startDate;
+      deleteScheduleRequest.endDateTime = this.selectedDaySchedule.endDate;
+    }
+
+    this.scheduleApiService.deleteSchedule(deleteScheduleRequest).pipe(
       catchError((error: HttpErrorResponse) => this.editScheduleService.handleError(error)),
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
@@ -376,7 +387,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     this.unsubscribe('departmentId');
     this.subscriptions['departmentId'] = this.scheduleForm.get('departmentId')?.valueChanges.pipe(
       filter(Boolean),
-      switchMap((value: number) => this.scheduleApiService.getSkillsByEmployees(this.scheduledItem.candidate.id, value)),
+      switchMap((value: number) => this.scheduleApiService.getSkillsByEmployees(value, this.scheduledItem.candidate.id)),
       takeUntil(this.componentDestroy())
     ).subscribe((skills: Skill[]) => {
       const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);

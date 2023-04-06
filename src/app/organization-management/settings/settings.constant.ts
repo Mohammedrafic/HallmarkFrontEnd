@@ -53,5 +53,7 @@ export const DisabledSettingsByDefault = [
   'NoOfDaysAllowedForTimesheetEdit',
   'EnableChat',
   'CandidateAppliedInLastNDays',
-  'CandidatePayRate'
+  'CandidatePayRate',
+  'MandateCandidateAddress',
+  'MandateCandidatePhone1'
 ];

@@ -20,11 +20,6 @@ export class SetPageSize {
   constructor(public pageSize: number) {}
 }
 
-export class SetPageFilters {
-  static readonly type = '[candidate details] Set Page Filters';
-  constructor(public filters: FiltersModal | null) {}
-}
-
 export class GetCandidateRegions {
   static readonly type = '[candidate details] Get Candidate Regions';
   constructor() {}

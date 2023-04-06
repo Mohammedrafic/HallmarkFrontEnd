@@ -61,7 +61,8 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
       candidateStatusesAndReasons :'statusText',
       jobStatusesAndReasons :'statusText',
       allCandidateStatusesAndReasons :'statusText',
-      allJobStatusesAndReasons :'statusText'
+      allJobStatusesAndReasons :'statusText',
+      invoiceStatuses:'name'
     }
     
     return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof CommonReportFilterOptions])]))

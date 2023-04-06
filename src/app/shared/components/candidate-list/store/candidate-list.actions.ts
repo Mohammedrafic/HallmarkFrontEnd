@@ -11,6 +11,11 @@ export class GetIRPCandidatesByPage {
   constructor(public payload: CandidateListRequest) {}
 }
 
+export class ExportIRPCandidateList {
+  static readonly type = '[candidate list] Export IRP Candidate (Employee) List';
+  constructor(public payload: CandidateListExport) {}
+}
+
 export class GetAllSkills {
   static readonly type = '[candidate-list] Get All Skills';
 }

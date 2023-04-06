@@ -1,3 +1,5 @@
+import { CandidateProfileContactDetail } from "./candidate.model";
+
 export type OrderApplicantsInitialData = {
   candidateId: number;
   orderId: number;
@@ -18,6 +20,9 @@ export type OrderApplicantsInitialData = {
   canApplyCandidatesToOrder: boolean;
   ssn: number;
   candidateSSNRequired: boolean;
+  candidateProfileContactDetails:CandidateProfileContactDetail;
+  candidatePhone1Required:any;
+  candidateAddressRequired:any;
 }
 
 export type OrderApplicantsApplyData = {

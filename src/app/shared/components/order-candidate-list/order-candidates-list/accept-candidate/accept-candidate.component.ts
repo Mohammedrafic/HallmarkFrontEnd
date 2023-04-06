@@ -22,6 +22,7 @@ import {
   DELETE_CONFIRM_TITLE,
   deployedCandidateMessage,
   DEPLOYED_CANDIDATE,
+  CandidatePHONE1Required,
 } from '@shared/constants';
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { RejectReason } from '@shared/models/reject-reason.model';
@@ -40,7 +41,7 @@ import {
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
-import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues } from '@shared/enums/applicant-status.enum';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
@@ -94,6 +95,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public candidateSSNRequired: boolean;
   public candidateDOBRequired: boolean;
   public payRateSetting = CandidatePayRateSettings;
+  public candidatePhone1RequiredValue : string = '';
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
@@ -215,7 +217,15 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         return;
       }
     }
-    
+    if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
+      if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null && this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null){
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
+        return;
+      }else{
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
+        return;
+      }
+    }
 
     if (this.candidatePayRateRequired && this.form.get('candidatePayRate')?.invalid) {
       this.form.markAllAsTouched();
@@ -236,6 +246,15 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       if (this.candidateSSNRequired) {
         if (!this.form.controls["ssn"].value) {
           this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
+          return;
+        }
+      }
+      if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
+        if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null && this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null){
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
+          return;
+        }else{
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
           return;
         }
       }
@@ -370,6 +389,12 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       if (value) {
         this.candidateSSNRequired = value.candidateSSNRequired;
         this.candidateDOBRequired = value.candidateDOBRequired;
+        if(value.candidatePhone1Required != null){
+          let phone1Configuration = JSON.parse(value.candidatePhone1Required);
+          if(phone1Configuration.isEnabled){
+            this.candidatePhone1RequiredValue = phone1Configuration.value;
+          }
+        }
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
         this.billRatesData = [...value.billRates];
