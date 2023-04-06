@@ -149,7 +149,10 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.reasonForm.updateValueAndValidity();
       return;
     }
-    
+    if(this.selectedSystem.isIRP && !this.selectedSystem.isVMS && this.selectedTab == 0){
+      this.selectedTab = 2;
+      this.formType = ReasonFormType.RequisitionReason;
+    }
     this.reasonsService.saveReason({
       selectedTab: this.selectedTab,
       editMode: this.isEdit,
