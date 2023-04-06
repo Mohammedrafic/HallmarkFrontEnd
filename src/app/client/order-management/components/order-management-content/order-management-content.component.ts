@@ -7,6 +7,7 @@ import {
   OnInit,
   ViewChild,
   Inject,
+  NgZone,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
@@ -208,6 +209,7 @@ import { OrderManagementPagerState } from '@shared/models/candidate.model';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { ClearPageFilters, GetPreservedFiltersByPage, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
+import { OutsideZone } from '@core/decorators';
 
 @Component({
   selector: 'app-order-management-content',
@@ -419,6 +421,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private cd: ChangeDetectorRef,
     private breakpointService: BreakpointObserverService,
     private commentsService: CommentsService,
+    private readonly ngZone: NgZone,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
@@ -868,7 +871,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public onFilterClearAll(): void {
-    this.store.dispatch(new ClearPageFilters(this.pageName()));
+    this.store.dispatch(new ClearPageFilters(this.getPageName()));
     this.filterApplied = true;
     this.orderManagementService.selectedOrderAfterRedirect = null;
     this.clearFilters();
@@ -1592,11 +1595,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
   }
 
-  private onOrderFilterDataSourcesLoadHandler(preservedFilters: PreservedFiltersByPage<OrderFilter>): Observable<void> {
-    return this.orderFilterDataSources$
-      .pipe(throttleTime(100), takeUntil(this.unsubscribe$), filter(Boolean))
-      .pipe(switchMap((data: OrderFilterDataSource) => {
-        let statuses : any = [];
+  private onOrderFilterDataSourcesLoadHandler(
+    preservedFilters: PreservedFiltersByPage<OrderFilter>
+  ): Observable<OrderFilterDataSource> {
+    return this.orderFilterDataSources$.pipe(
+      throttleTime(100),
+      filter(Boolean),
+      tap((data: OrderFilterDataSource) => {
+        let statuses: FilterOrderStatus[] = [];
         let candidateStatuses: FilterStatus[] = [];
         const statusesByDefault = [
           CandidatStatus['Not Applied'],
@@ -1662,12 +1668,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
         }
         this.cd$.next(true);
-        setTimeout(() => {
-          this.clearstorage();
-        }, 5000);
-
-        return of();
-      }));
+        this.clearStorage();
+      }),
+      takeUntil(this.unsubscribe$)
+    );
   }
 
   private adjustFilters(filters: PreservedFiltersByPage<OrderFilter>): void {
@@ -1821,13 +1825,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       .pipe(
         throttleTime(50),
         filter(Boolean),
-        switchMap((structure: OrganizationStructure) => {
+        tap((structure: OrganizationStructure) => {
           this.orgStructure = structure;
           this.regions = structure.regions;
           this.filterColumns.regionIds.dataSource = this.regions;
           this.getPreservedFiltersByPage();
           this.firstOrdersDispatch = false;
-          return of(structure);
         }),
         //get preserved filters and dispatch orders
         switchMap(() => this.getPreservedFilters()),
@@ -2287,9 +2290,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orgpendingOrderapproval = JSON.parse(localStorage.getItem('pendingApprovalOrders') || '""') as string;
   }
 
-  clearstorage():void{
-    this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(""));
-    this.orgpendingOrderapproval = "";
+  @OutsideZone
+  private clearStorage(): void {
+    setTimeout(() => {
+      this.globalWindow.localStorage.setItem('pendingApprovalOrders', JSON.stringify(''));
+      this.orgpendingOrderapproval = '';
+    }, 5000);
   }
 
   private getLocationState(): void {
@@ -2301,22 +2307,23 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private getPreservedFiltersByPage(): void {
-    this.store.dispatch(new GetPreservedFiltersByPage(this.pageName()));
+    this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
   }
 
   private saveFiltersByPageName(): void {
     const filters = { ...this.filters, orderTypes: [] }
-    this.store.dispatch(new SaveFiltersByPageName(this.pageName(), filters));
+    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), filters));
   }
 
   private getPreservedFilters(): Observable<PreservedFiltersByPage<OrderFilter>> {
-    return this.preservedFiltersByPageName$.pipe(switchMap((filters) => {
-      if(!filters.isNotPreserved && filters.dispatch) {
-        this.firstOrdersDispatch = true;
-        this.store.dispatch([new GetOrders(filters.state, this.isIncomplete)]);
-      }
-      return of(filters);
-    }))
+    return this.preservedFiltersByPageName$.pipe(
+      tap((filters) => {
+        if (!filters.isNotPreserved && filters.dispatch) {
+          this.firstOrdersDispatch = true;
+          this.store.dispatch([new GetOrders(filters.state, this.isIncomplete)]);
+        }
+      })
+    );
   }
 
   private refreshFilterState(): void {
@@ -2341,9 +2348,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filters.irpOnly = !!this.filters.irpOnly;
   }
 
-  private pageName(): FilterPageName {
-    return this.isActiveSystemIRP
-      ? FilterPageName.OrderManagementIRPOrganization
-      : FilterPageName.OrderManagementVMSOrganization;
+  private getPageName(): FilterPageName {
+    if (this.isActiveSystemIRP) {
+      return FilterPageName.OrderManagementIRPOrganization;
+    } else {
+      return FilterPageName.OrderManagementVMSOrganization;
+    }
   }
 }

@@ -62,7 +62,11 @@ export class OrganizationManagementComponent extends AbstractPermission implemen
   }
 
   private watchForIRP(): void {
-    this.organization$.pipe(filter(Boolean), takeUntil(this.componentDestroy())).subscribe((organization) => {
+    this.organization$.pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe((organization) => {
       this.isIRPForOrganizationEnabled = organization.preferences.isIRPEnabled!;
       this.setMenuConfig();
     });

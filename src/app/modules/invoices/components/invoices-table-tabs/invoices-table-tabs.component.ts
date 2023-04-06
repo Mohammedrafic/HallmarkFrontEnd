@@ -110,7 +110,10 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
 
   private showTab(index: number): void {
     this.tabsComponentCreated$
-      .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      )
       .subscribe(() => {
         this.tabComponent.hideTab(index, false);
         this.asyncRefresh();

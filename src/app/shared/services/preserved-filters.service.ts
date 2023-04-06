@@ -38,7 +38,7 @@ export class PreservedFiltersService {
     };
     return this.http.get<PreservedFiltersByPage<string>>(`/api/Filters/state`, { params }).pipe(
       map((data) => {
-        return { ...data, state: JSON.parse(data.state), dispatch: true };
+        return { ...data, state: JSON.parse(data.state || 'null'), dispatch: true };
       })
     );
   }
@@ -50,7 +50,7 @@ export class PreservedFiltersService {
     };
     return this.http.put<PreservedFiltersByPage<string>>(`/api/Filters/state`, params).pipe(
       map((data) => {
-        return { ...data, state: JSON.parse(data.state), dispatch: false };
+        return { ...data, state: JSON.parse(data.state || 'null'), dispatch: false };
       })
     );
   }

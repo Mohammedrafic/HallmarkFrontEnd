@@ -6,7 +6,7 @@ import {
   Attachment,
   CandidateHoursAndMilesData, CandidateInfo, FilterColumns,
   TabCountConfig, Timesheet, TimesheetAttachments, TimesheetDetailsModel, TimesheetInvoice,
-  TimesheetRecordsDto, TimesheetsFilterState,
+  TimesheetRecordsDto, TimesheetsFilterState, TimesheetsFilteringOptions,
 } from '../../interface';
 
 
@@ -42,4 +42,5 @@ export interface TimesheetsModel {
   timesheetDetails: TimesheetDetailsModel | null;
   organizations: DataSourceItem[];
   selectedOrganizationId: number;
+  filterOptions: TimesheetsFilteringOptions | null;
 }

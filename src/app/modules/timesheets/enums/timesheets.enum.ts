@@ -27,7 +27,8 @@ export enum TIMESHEETS_ACTIONS {
   PREVIEW_ATTACHMENT = '[timesheets] PREVIEW ATTACHMENT',
   DOWNLOAD_ATTACHMENT = '[timesheets] DOWNLOAD Attachment',
   DELETE_ATTACHMENT = '[timesheets] DELETE Attachment',
-  EXPORT_TIMESHEETS='[timesheets] Export TIMESHEETS'
+  EXPORT_TIMESHEETS='[timesheets] Export TIMESHEETS',
+  RESET_FILTER_OPTIONS ='[timesheets] Reset Filter Options TIMESHEETS'
 }
 
 export enum TimesheetDetailsActions {

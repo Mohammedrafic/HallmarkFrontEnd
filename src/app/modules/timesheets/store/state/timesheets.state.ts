@@ -85,6 +85,11 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
+  static filterOptions(state: TimesheetsModel): TimesheetsFilteringOptions | null {
+    return state.filterOptions;
+  }
+
+  @Selector([TimesheetsState])
   static isTimesheetOpen(state: TimesheetsModel): boolean {
     return state.isTimeSheetOpen;
   }
@@ -555,7 +560,7 @@ export class TimesheetsState {
 
   @Action(Timesheets.GetFiltersDataSource)
   GetFiltersDataSource(
-    { setState, getState, dispatch }: StateContext<TimesheetsModel>): Observable<TimesheetsFilteringOptions | void> {
+    { setState, getState, dispatch, patchState }: StateContext<TimesheetsModel>): Observable<TimesheetsFilteringOptions | void> {
     const selectedOrganizationId = getState().selectedOrganizationId;
 
     return this.timesheetsApiService.getFiltersDataSource(selectedOrganizationId).pipe(
@@ -568,11 +573,17 @@ export class TimesheetsState {
             return acc;
           }, {})),
         }));
+        patchState({filterOptions: res});
       }),
       catchError((err: HttpErrorResponse) => dispatch(
         new ShowToast(MessageTypes.Error, getAllErrors(err.error)),
       )),
     );
+  }
+
+  @Action(Timesheets.ResetFilterOptions)
+  SetFilterColumnDataSource({ patchState }: StateContext<TimesheetsModel>): TimesheetsModel {
+    return patchState({ filterOptions: null });
   }
 
   @Action(Timesheets.SetFiltersDataSource)
