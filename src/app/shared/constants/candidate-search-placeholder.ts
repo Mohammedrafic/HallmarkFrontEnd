@@ -1,1 +1,1 @@
-export const CandidateSearchPlaceholder = 'Search by Employee Name';
+export const CandidateSearchPlaceholder = 'Search by Candidate Name';
