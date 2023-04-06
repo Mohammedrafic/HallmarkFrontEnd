@@ -9,7 +9,7 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction, FilterPageName } from '@core/enums';
 
-import { Destroyable, isObjectsEqual } from '@core/helpers';
+import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { DataSourceItem, PreservedFiltersByPage } from '@core/interface';
@@ -32,7 +32,6 @@ import { AppState } from '../../../../store/app.state';
 import { TimesheetsTabsComponent } from '../../components/timesheets-tabs/timesheets-tabs.component';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { FilterService } from '@shared/services/filter.service';
-import { PreservedFilters } from '@shared/models/preserved-filters.model';
 import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fields-settings';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
@@ -148,13 +147,14 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     const preservedFilters = this.store.selectSnapshot(
       PreservedFiltersState.preservedFiltersByPageName
     ) as PreservedFiltersByPage<TimesheetsFilterState>;
+    const filters = !preservedFilters.isNotPreserved ? preservedFilters.state : {}
     this.activeTabIdx = tabIndex;
     this.grid?.gridInstance$?.value.columnApi.resetColumnState();
     this.store.dispatch(
       new Timesheets.UpdateFiltersState(
         {
           statusIds: this.tabConfig[tabIndex].value,
-          ...(!preservedFilters.isNotPreserved && preservedFilters.state),
+          ...filters
         },
         this.activeTabIdx !== 0,
         true
@@ -281,9 +281,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.timesheetsFilters$
       .pipe(
         filter(Boolean),
-        distinctUntilChanged((prev, next) =>
-          isObjectsEqual(prev as Record<string, unknown>, next as Record<string, unknown>)
-        ),
         debounceTime(300),
         filter((filters) => (this.isAgency ? !isNaN(filters.organizationId as number) : true)),
         switchMap(() => this.store.dispatch(new Timesheets.GetAll())),
@@ -311,7 +308,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       .subscribe();
   }
 
-  private initOrganizationsList(preservedFilters: PreservedFilters | null): void {
+  private initOrganizationsList(): void {
     this.store
       .dispatch(new Timesheets.GetOrganizations())
       .pipe(
@@ -319,35 +316,20 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         takeUntil(this.componentDestroy())
       )
       .subscribe((res) => {
-        const preservedOrgIds = preservedFilters?.organizations || [];
+        const orgId = this.routerState?.["condition"] === "setOrg"
+          ? this.routerState?.["orderStatus"]
+          : this.getOrganizationIdFromState() || res[0].id;
 
-        const orgId = this.routerState?.["condition"] === "setOrg" ? this.routerState?.["orderStatus"] :
-        (this.filterService.canPreserveFilters()
-        ? preservedOrgIds[0] || this.getOrganizationIdFromState() || res[0].id
-        : this.getOrganizationIdFromState() || res[0].id)
+        this.store.dispatch(new Timesheets.SelectOrganization((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId));
+        this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });    
 
-            this.store.dispatch(new Timesheets.SelectOrganization((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId));
-            this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });    
-        //TODO remove old approach of preserving filters in scope EIN-13661
-        if (preservedFilters && this.filterService.canPreserveFilters()) {
-          this.store.dispatch([
-            new Timesheets.UpdateFiltersState(
-              {
-                organizationId: (this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId,
-                regionsIds: [...preservedFilters.regions],
-                locationIds: [...preservedFilters.locations],
-                contactEmails: preservedFilters.contactEmails ? [preservedFilters.contactEmails] : undefined,
-              },
-              this.activeTabIdx !== 0
-            ),
-            new Timesheets.GetFiltersDataSource(),
-          ]);
-        } else {
-          this.store.dispatch([
-            new Timesheets.UpdateFiltersState({ organizationId: (this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId }, this.activeTabIdx !== 0),
-            new Timesheets.GetFiltersDataSource(),
-          ]);
-        }
+        this.store.dispatch([
+           new Timesheets.UpdateFiltersState(
+            { organizationId: this.isAgency && (this.businessUnitId ?? 0) > 0 ? this.businessUnitId : orgId },
+            this.activeTabIdx !== 0
+          ),
+          new Timesheets.GetFiltersDataSource(),
+        ]);
       });
   }
 
@@ -383,25 +365,15 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private initComponentState(): void {
-    
-      //TODO remove old approach of preserving filters in scope EIN-13661
-      let preservedFilters = null;
-      let preservedFiltersAgency = null;
-      if (this.filterService.canPreserveFilters()) {
-        preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
-        preservedFiltersAgency = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersTimesheets);
-      }
-
-      this.timesheetsTabs?.programSelection();
-  
-      if (this.isAgency) {
-        this.initOrganizationsList(preservedFiltersAgency);
-      } else {
-        this.store.dispatch([
-          new Timesheets.GetFiltersDataSource(),
-          new Timesheets.UpdateFiltersState({ ...this.filters }),
-        ]);
-      }
+    this.timesheetsTabs?.programSelection();
+    if (this.isAgency) {
+      this.initOrganizationsList();
+    } else {
+      this.store.dispatch([
+        new Timesheets.GetFiltersDataSource(),
+        new Timesheets.UpdateFiltersState({ ...this.filters }),
+      ]);
+    }
   }
 
   private initOnRedirect(): void {
