@@ -27,7 +27,7 @@ const CommonFields: CommonFormConfig[] = [
   { field: 'skillIds' },
 ];
 
-export const AllOrdersFilterFormConfig: CommonFormConfig[] = [
+const AllOrdersFilterFormConfig: CommonFormConfig[] = [
   ...CommonFields,
   { field: 'orderPublicId' },
   { field: 'orderTypes' },

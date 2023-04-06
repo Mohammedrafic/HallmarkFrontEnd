@@ -402,7 +402,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private alertTitle:string;
   private orderManagementPagerState: OrderManagementPagerState | null;
   public isCondidateTab:boolean=false;
-  private firstOrdersDispatch: boolean = false;
+
+  private get contactEmails(): string | null {
+    if(Array.isArray(this.filters?.contactEmails)) {
+      return this.filters?.contactEmails[0];
+    } else {
+      return this.filters?.contactEmails || null;
+    }
+  }
 
   constructor(
     protected override store: Store,
@@ -801,7 +808,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       projectTypeIds: this.filters.projectTypeIds || null,
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
-      contactEmails: Array.isArray(this.filters.contactEmails) ? this.filters.contactEmails[0] : this.filters.contactEmails || null,
+      contactEmails: this.contactEmails,
       orderId: this.filters.orderId || null,
       irpOnly: this.filters.irpOnly || null,
     });
@@ -1668,7 +1675,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         if (isIRP) {
           this.store.dispatch(new GetIRPOrders(this.filters));
         }
-        if(!isIRP && preservedFilters.isNotPreserved) {
+        if(!isIRP && preservedFilters.isNotPreserved && preservedFilters.dispatch) {
           this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
         }
         this.cd$.next(true);
@@ -1689,8 +1696,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
       this.patchFilterForm(!!this.filters?.contactEmails);
       this.populatePreservedContactPerson();
-      !this.firstOrdersDispatch && this.getOrders(true);
-      this.firstOrdersDispatch = false;
+      this.getOrders(true);
     }
     this.cd.markForCheck();
   }
@@ -1702,17 +1708,25 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private getPreservedContactPerson(contactEmails: string): void {
-    this.filterService.getUsersListBySearchTerm(contactEmails).subscribe((data) => {
-      this.filteredUsers = this.filterColumns.contactEmails.dataSource = data;
-      this.OrderFilterFormGroup.get('contactEmails')?.setValue(this.filters.contactEmails);
-      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-    });
+    this.filterService
+      .getUsersListBySearchTerm(contactEmails)
+      .pipe(take(1))
+      .subscribe((data) => {
+        this.filteredUsers = this.filterColumns.contactEmails.dataSource = data;
+        this.OrderFilterFormGroup.get('contactEmails')?.setValue(this.contactEmails);
+        this.filteredItems = this.filterService.generateChips(
+          this.OrderFilterFormGroup,
+          this.filterColumns,
+          this.datePipe
+        );
+      });
   }
 
   private setDefaultFilter(): void {
-    if(this.orderManagementPagerState?.filters) { // apply preserved filters by redirecting back from the candidate profile
+    if (this.orderManagementPagerState?.filters) { // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
-      this.patchFilterForm();
+      this.patchFilterForm(!!this.filters?.contactEmails);
+      this.populatePreservedContactPerson();
       return;
     }
 
@@ -1828,7 +1842,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.regions = structure.regions;
           this.filterColumns.regionIds.dataSource = this.regions;
           this.getPreservedFiltersByPage();
-          this.firstOrdersDispatch = false;
         }),
         //get preserved filters and dispatch orders
         switchMap(() => this.getPreservedFilters()),
@@ -2317,8 +2330,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     return this.preservedFiltersByPageName$.pipe(
       tap((filters) => {
         if (!filters.isNotPreserved && filters.dispatch) {
-          this.firstOrdersDispatch = true;
-          this.store.dispatch([new GetOrders(filters.state, this.isIncomplete)]);
+          this.filters = { ...filters.state };
+          this.getOrders(true);
         }
       })
     );

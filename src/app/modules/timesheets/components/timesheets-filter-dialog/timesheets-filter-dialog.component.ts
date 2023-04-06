@@ -85,6 +85,8 @@ export class TimesheetsFilterDialogComponent
       )
       .subscribe(({ state }) => {
         this.patchFilterForm({ ...state });
+        const contactEmails = Array.isArray(state.contactEmails) ? state.contactEmails[0] : null;
+        this.getPreservedContactPerson(contactEmails);
         this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
         this.appliedFiltersAmount.emit(this.filteredItems.length);
       });
