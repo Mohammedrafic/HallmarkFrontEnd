@@ -44,6 +44,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'DateOfBirthRequiredToAcceptPosition',
   'SetDefaultCommentsScopeToExternal',
   'CandidatePayRate',
+  'MandateCandidateAddress',
+  'MandateCandidatePhone1'
 ];
 
 export const DisabledSettingsByDefault = [
