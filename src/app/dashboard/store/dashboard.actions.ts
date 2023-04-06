@@ -2,6 +2,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import type { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { DashboardFiltersModel } from '../models/dashboard-filters.model';
+import { NursingWidget } from '../models/rn-utilization.model';
 
 const dashboardStatePrefix: string = '[dashboard]';
 
@@ -55,4 +56,14 @@ export class ToggleQuickOrderDialog {
 export class GetAllCommitmentByPage {
   static readonly type = `${dashboardStatePrefix} Get Commitment by Page`;
   constructor() { }
+}
+
+export class GetSkilldata {
+  static readonly type = `${dashboardStatePrefix} Get Skill by Page`;
+  constructor() { }
+}
+
+export class FilterNursingWidget {
+  static readonly type =  `${dashboardStatePrefix} Get Filter by Page`;
+  constructor(public payload:NursingWidget) {}
 }

@@ -14,7 +14,7 @@
                     <div class="input-group datepicker">
                         <ejs-datepicker id="inactiveDate" class="datepicker" format="MM/dd/yyyy"
                             placeholder="MM/DD/YYYY" [enableMask]="true" formControlName="workDate"
-                            [maskPlaceholder]="maskPlaceholder" (change)= "onDatechange($event)">
+                            [maskPlaceholder]="maskPlaceholder" (change)= "onDataChange($event)">
                         </ejs-datepicker>
                     </div>
                 </div>
@@ -23,11 +23,30 @@
                 <div class="dropdown-container">
                     <label>Work Commitment</label>
                     <div class="input-group dropdown">
-                        <ejs-multiselect #workcommitmentControl id="workcommitmentIds" mode="CheckBox" formControlName="workcommitIds"
-                        placeholder="All" [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true"
-                        [dataSource]="commitmentsPage$ | async" [selectAllText]='allOption'
-                         [showSelectAll]="true" tabindex="2" (select)="onWorkcommitmentSelect($event)" >
-                      </ejs-multiselect>
+                      <app-multiselect-dropdown
+                        [formGroupInstance]="workcommitIds"
+                        [fields]="optionFields"
+                        [dataSource]="commitmentsPage$ | async"
+                        [showSelectAll]="true"
+                        controlName="workcommitId"
+                        selectAllText="All"
+                    ></app-multiselect-dropdown>
+                    </div>
+                </div>
+            </span>
+            <span>
+                <div class="dropdown-container">
+                    <label>Skills</label>
+                    <div class="input-group dropdown">
+                        <app-multiselect-dropdown
+                            [formGroupInstance]="SkillIds"
+                            [fields]="optionFields"
+                            [dataSource]="nursingSkill$ | async"
+                            [showSelectAll]="true"
+                            controlName="skill"
+                            placeholder="Skills"
+                            selectAllText="All"
+                        ></app-multiselect-dropdown>
                     </div>
                 </div>
             </span>
@@ -38,8 +57,11 @@
         <div class="widget">
             <span class="widget__type">
                 <p class="orgname">Target Utilization for Nursing </p>
+                <div class="targetcount">
                 <input class="e-input widgeticon" type="text" maxlength="100" id="targetutilizationId"
-                 value="60" (input)="getNursingPercentage()" />
+                 value="{{targetutilization}}" (input)="onDataChangefortarget($event)"/>
+                 <p>%</p>
+                </div>
             </span>
             <span class="widget__type">
                 <p class="orgname">No.of Per Diem Nursing <ejs-tooltip [content]="noofPerDiemOrders" position='TopCenter'>
@@ -48,17 +70,17 @@
                                 [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
                         </span>
                     </ejs-tooltip></p>
-                <p class="orgcount">{{chartData?.noOfPerdiemNursing}}</p>
+                <p class="orgcount">{{nursingCountdata?.noOfPerdiemNursing}}</p>
             </span>
             <span class="widget__type">
                 <p class="orgname">Target Per Diem Nursing hours <ejs-tooltip [content]="targetPerDiemhrs"
                         position='TopCenter'>
                         <span class="mytooltip">
-                            <i-feather name="info" id="info"
+                         <i-feather name="info" id="info"
                                 [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
                         </span>
                     </ejs-tooltip></p>
-                <p class="orgcount">{{chartData?.targetPerdiemNursingHours}}</p>
+                <p class="orgcount">{{nursingCountdata?.targetPerdiemNursingHours}}</p>
             </span>
             <span class="widget__type">
                 <p class="orgname">Actual Per Diem Nursing hours <ejs-tooltip [content]="actualPerDiemhrs"
@@ -68,7 +90,7 @@
                                 [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
                         </span>
                     </ejs-tooltip></p>
-                <p class="orgcount">{{chartData?.perdayTotalHoursSchedule}}</p>
+                <p class="orgcount">{{nursingCountdata?.perdayTotalHoursSchedule}}</p>
             </span>
         </div>
     </ng-template>
