@@ -767,7 +767,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     return this.isActiveSystemIRP && (this.activeIRPTabIndex !== OrderManagementIRPTabsIndex.AllOrders);
   }
 
-  private patchFilterForm(): void {
+  private patchFilterForm(prepopulate = false): void {
     this.OrderFilterFormGroup.setValue({
       orderPublicId: this.filters.orderPublicId || null,
       regionIds: this.filters.regionIds || [],
@@ -805,7 +805,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       orderId: this.filters.orderId || null,
       irpOnly: this.filters.irpOnly || null,
     });
-    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+
+    if(!prepopulate) {
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    }
   }
 
   private resetTabs(): void {
@@ -1601,7 +1604,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     preservedFilters: PreservedFiltersByPage<OrderFilter>
   ): Observable<OrderFilterDataSource> {
     return this.orderFilterDataSources$.pipe(
-      throttleTime(100),
+      debounceTime(100),
       filter(Boolean),
       tap((data: OrderFilterDataSource) => {
         let statuses: FilterOrderStatus[] = [];
@@ -1679,20 +1682,28 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private adjustFilters(filters: PreservedFiltersByPage<OrderFilter>): void {
     // TODO apply irp preserved filters
     const { isNotPreserved, dispatch, state } = filters;
-    if((isNotPreserved && dispatch) || this.activeSystem === OrderManagementIRPSystemId.IRP || this.orderManagementPagerState) {
+    if((isNotPreserved && dispatch) || this.activeSystem === OrderManagementIRPSystemId.IRP || this.orderManagementPagerState) { 
       this.setDefaultFilter();
     } else {
       this.filters = { ...state, orderStatuses: state?.orderStatuses ? [...state.orderStatuses] : [] };
-      this.patchFilterForm();
+      this.patchFilterForm(!!this.filters?.contactEmails);
+      this.populatePreservedContactPerson();
       !this.firstOrdersDispatch && this.getOrders(true);
       this.firstOrdersDispatch = false;
     }
     this.cd.markForCheck();
   }
 
+  private populatePreservedContactPerson(): void {
+    if (this.filters?.contactEmails && this.activeTab !== OrganizationOrderManagementTabs.OrderTemplates) {
+      this.getPreservedContactPerson(this.filters.contactEmails as string);
+    }
+  }
+
   private getPreservedContactPerson(contactEmails: string): void {
     this.filterService.getUsersListBySearchTerm(contactEmails).subscribe((data) => {
       this.filteredUsers = this.filterColumns.contactEmails.dataSource = data;
+      this.OrderFilterFormGroup.get('contactEmails')?.setValue(this.filters.contactEmails);
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     });
   }
@@ -1704,22 +1715,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       return;
     }
 
-    if (this.filterService.canPreserveFilters()) {
-      const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
-      if (preservedFilters?.regions) {
-        this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
-        this.filters.regionIds = [...preservedFilters.regions];
-        if (preservedFilters?.locations) {
-          this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
-          this.filters.locationIds = [...preservedFilters.locations];
-        }
-      }
-      if (preservedFilters?.contactEmails && this.activeTab !== OrganizationOrderManagementTabs.OrderTemplates) {
-        this.getPreservedContactPerson(preservedFilters.contactEmails);
-        this.OrderFilterFormGroup.get('contactEmails')?.setValue(preservedFilters.contactEmails);
-        this.filters.contactEmails = [preservedFilters.contactEmails];
-      }
-    }
     if (!(this.filters.isTemplate || this.isIncomplete)) {
       const statuses = this.filterColumns.orderStatuses.dataSource
         .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed, FilterOrderStatusText.Incomplete].includes(status.status))
