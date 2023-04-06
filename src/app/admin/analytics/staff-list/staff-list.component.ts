@@ -1,3 +1,4 @@
+import { GetStaffListReportCandidateSearch } from './../../../organization-management/store/logi-report.action';
 import { EmitType } from '@syncfusion/ej2-base';
 import {
   Component,
@@ -423,6 +424,10 @@ export class StaffListComponent implements OnInit {
     this.staffListReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
     this.staffListReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.staffListReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.staffListReportForm.get('skillIds')?.setValue([]);
+    this.staffListReportForm.get('workCommitmentIds')?.setValue([]);
+    this.staffListReportForm.get('employeeName')?.setValue('');
+    this.staffListReportForm.get('showOnlyDepartmentUnassignedCandidates')?.setValue(false);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
@@ -528,7 +533,7 @@ export class StaffListComponent implements OnInit {
         businessUnitIds: ids,
       };
       this.filterColumns.dataSource = [];
-      this.store.dispatch(new GetCommonReportCandidateSearch(filter)).subscribe((result) => {
+      this.store.dispatch(new GetStaffListReportCandidateSearch(filter)).subscribe((result) => {
         this.candidateFilterData = result.LogiReport.searchCandidates;
         this.candidateSearchData = result.LogiReport.searchCandidates;
         this.filterColumns.dataSource = this.candidateFilterData;
