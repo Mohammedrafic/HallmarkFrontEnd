@@ -18,9 +18,7 @@
           class="date-slot"
           [attr.colspan]="dateSchedule.extendedDays"
           [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateItem.dateSlot)"
-          appDoubleClick
-          (singleClick)="singleClick(dateItem.dateSlot, scheduleItem.candidate, dateItem.active, dateSchedule)"
-          (dbClick)="doubleCardClick(dateSchedule, scheduleItem.candidate, dateItem.active, dateSchedule)"
+          (click)="selectDateSlot(dateItem.dateSlot, scheduleItem.candidate, dateItem.active, dateSchedule)"
         >
             <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
               <app-month-card
@@ -49,9 +47,7 @@
           <div
             [class.disabled-cell]="!dateItem.active"
             [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateItem.dateSlot)"
-            appDoubleClick
-            (singleClick)="singleClick(dateItem.dateSlot, scheduleItem.candidate, dateItem.active)"
-            (dbClick)="doubleCellClick(dateItem.dateSlot, scheduleItem.candidate, dateItem.active)"
+            (click)="selectDateSlot(dateItem.dateSlot, scheduleItem.candidate, dateItem.active)"
             class="date-slot empty-cell"
           >
             <div class="day">

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { EMPTY, Observable, of } from 'rxjs';
+import { EMPTY, Observable, of, Subject } from 'rxjs';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -28,9 +28,11 @@ import {
 } from '../interface';
 import { ScheduleFilterHelper } from '../helpers';
 import { ScheduleFiltersService } from './schedule-filters.service';
+import { ScheduleClassesList, ScheduleCustomClassesList } from '../components/create-schedule';
 
 @Injectable()
 export class CreateScheduleService {
+  public closeSideBarEvent: Subject<boolean> = new Subject<boolean>();
 
   private scheduleModels: ScheduleInt.ScheduleModel[] = [];
 
@@ -211,6 +213,21 @@ export class CreateScheduleService {
     return (scheduleTypes.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
   }
 
+  updateScheduleFormClass = (className: string, isCustom: boolean): string => {
+    const formClassName = className.split('-');
+
+    if(formClassName.includes('book')) {
+      return isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Book] : ScheduleClassesList[ScheduleItemType.Book];
+    } else if(formClassName.includes('availability')) {
+      return isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Availability] : ScheduleClassesList[ScheduleItemType.Availability];
+    } else {
+      return isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Unavailability] : ScheduleClassesList[ScheduleItemType.Unavailability];
+    }
+  };
+
   getShiftDropDownsData(scheduleFilterStructure: ScheduleFilterStructure): ShiftDropDownsData {
     const scheduleFiltersData: ScheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
 
@@ -237,6 +254,12 @@ export class CreateScheduleService {
 
       return data;
     }
+  }
+
+  resetScheduleTimeControls(scheduleForm: FormGroup, controlsList: string[]): void {
+    controlsList.forEach((control: string) => {
+      scheduleForm.get(control)?.reset();
+    });
   }
 
   private getDataSourceFromFilteredItems(column: string, filteredItems: FilteredItem[]): DropdownOption[] {

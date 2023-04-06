@@ -871,7 +871,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public onFilterClearAll(): void {
-    this.store.dispatch(new ClearPageFilters(this.getPageName()));
+    if(!this.isActiveSystemIRP) {  //TODO remove the condition in scope [EIN-12382][IRP][Improvement] Preserving filters across IRP;
+      this.store.dispatch(new ClearPageFilters(this.getPageName()));
+    }
     this.filterApplied = true;
     this.orderManagementService.selectedOrderAfterRedirect = null;
     this.clearFilters();
@@ -2311,6 +2313,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private saveFiltersByPageName(): void {
+    if(this.isActiveSystemIRP) { return } //TODO remove the condition in scope [EIN-12382][IRP][Improvement] Preserving filters across IRP;
     const filters = { ...this.filters, orderTypes: [] }
     this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), filters));
   }
