@@ -58,6 +58,7 @@ const availabilityFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
     title: 'Start Time',
     type: FieldType.Time,
     gridAreaName: 'startTime',
+    show: false,
     required: true,
   },
   {
@@ -65,11 +66,12 @@ const availabilityFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
     title: 'End Time',
     type: FieldType.Time,
     gridAreaName: 'endTime',
+    show: false,
     required: true,
   },
   {
     field: 'hours',
-    title: 'Hours',
+    title: 'Hrs',
     type: FieldType.Input,
     gridAreaName: 'hours',
     required: false,
@@ -148,3 +150,11 @@ export const ScheduleSourcesMap: ScheduleInt.ScheduleFormSource = {
   [ScheduleFormSourceKeys.Departments]: [],
   [ScheduleFormSourceKeys.Skills]: [],
 };
+
+export const ScheduleCircleType = {
+  [ScheduleType.Book]: 'book-circle',
+  [ScheduleType.Availability]: 'availability-circle',
+  [ScheduleType.Unavailability]: 'unavailability-circle',
+};
+
+export const PermissionRequired = 'Separate permission right is required';

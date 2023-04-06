@@ -23,6 +23,7 @@ export interface ScheduleFormFieldConfig {
   readonly?: boolean;
   maxLen?: number;
   pattern?: string;
+  show?: boolean;
   inputType?: InputAttrType;
   sourceKey?: ScheduleFormSourceKeys
 }
