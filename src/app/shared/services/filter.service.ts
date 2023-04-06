@@ -170,4 +170,20 @@ export class FilterService {
       map(() => this.generateChips(formGroup, filterColumns))
     );
   }
+
+  public composeFilterState<T extends { field: string }, S extends object>(formConfig: T[], state: S): S {
+    const filter = formConfig.reduce((acc, item) => {
+      const field = item.field as keyof S;
+      const value = state?.[field];
+      if (!!value) {
+        acc = {
+          ...acc,
+          [field]: value,
+        };
+      }
+      return acc;
+    }, {});
+
+    return filter as S;
+  }
 }
