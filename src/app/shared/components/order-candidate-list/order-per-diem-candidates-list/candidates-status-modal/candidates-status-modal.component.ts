@@ -254,8 +254,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       }
 
       if(this.candidateAddressRequiredValue === ConfigurationValues.Apply){
-        if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null){ 
-            if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfile.candidateProfileContactDetail)){
+        if(this.candidateJob?.candidateProfileContactDetails != null){ 
+            if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
                 this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Apply)));
                 return;
             }
@@ -288,9 +288,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       }
     }
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
-      if(this.orderCandidateJob?.candidateProfile.candidateProfileContactDetail != null){
-          if(this.orderCandidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null 
-              || this.orderCandidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === ''){
+      if(this.orderCandidateJob?.candidateProfileContactDetails != null){
+          if(this.orderCandidateJob?.candidateProfileContactDetails.phone1 === null 
+              || this.orderCandidateJob?.candidateProfileContactDetails.phone1 === ''){
             this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
             return;
           }
@@ -307,8 +307,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
     }
 
     if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
-      if(this.orderCandidateJob?.candidateProfile.candidateProfileContactDetail != null){ 
-          if(CommonHelper.candidateAddressCheck(this.orderCandidateJob?.candidateProfile.candidateProfileContactDetail)){
+      if(this.orderCandidateJob?.candidateProfileContactDetails != null){ 
+          if(CommonHelper.candidateAddressCheck(this.orderCandidateJob?.candidateProfileContactDetails)){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
               return;
           }

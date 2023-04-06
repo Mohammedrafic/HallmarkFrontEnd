@@ -221,9 +221,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null){ 
-          if(this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null 
-              || this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === ''){
+      if(this.candidateJob?.candidateProfileContactDetails != null){ 
+          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null 
+              || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
             this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
             return;
           }
@@ -234,8 +234,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null){ 
-          if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfile?.candidateProfileContactDetail)){
+      if(this.candidateJob?.candidateProfileContactDetails != null){ 
+          if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
               return;
           }
@@ -268,9 +268,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
       if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
-        if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null){ 
-          if(this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === null 
-            || this.candidateJob?.candidateProfile.candidateProfileContactDetail.phone1 === ''){
+        if(this.candidateJob?.candidateProfileContactDetails != null){ 
+          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null 
+            || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
             this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
             return;
           }
@@ -281,8 +281,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       }
 
       if(this.candidateAddressRequiredValue === ConfigurationValues.Apply){
-        if(this.candidateJob?.candidateProfile.candidateProfileContactDetail != null){ 
-            if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfile?.candidateProfileContactDetail)){
+        if(this.candidateJob?.candidateProfileContactDetails != null){ 
+            if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
                 this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Apply)));
                 return;
             }
