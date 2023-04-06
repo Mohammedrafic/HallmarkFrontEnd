@@ -22,7 +22,6 @@ import { placeholderDate } from '@shared/constants/placeholder-date';
 import { formatDate } from '@shared/constants/format-date';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { datepickerMask } from '@shared/constants/datepicker-mask';
-import { FilterOrderStatus, FilterStatus } from '@shared/models/order-management.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 
