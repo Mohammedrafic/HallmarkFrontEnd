@@ -123,6 +123,9 @@
           <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
             {{ data.parsedValue != null && data.parsedValue.value && data.parsedValue.isEnabled ? data.parsedValue.value : 'No' }}
           </span>
+          <span *ngIf="data.controlType === organizationSettingControlType.CheckboxValue">
+           {{ formatCheckboxValue(data) }} 
+          </span>
         </ng-template>
       </e-column>
     </e-columns>
@@ -426,6 +429,11 @@
     <form *ngIf="formControlType === organizationSettingControlType.CheckboxValue"
           [formGroup]="checkboxValueForm">
 
+          <ng-container *ngIf="!checkboxValueForm.get('isEnabled')?.value && regularLocalRatesToggleMessage">
+            <div class="toggle-message">
+              Candidate Contact Details is mandatory as Enable Regular Local Rates flag is turned on.
+            </div>
+          </ng-container>
 
         <div class="input-container">
           <div class="input-group switch">

@@ -43,6 +43,22 @@ export class Candidate {
   }
 }
 
+export class CandidateAddress{
+  address1: string;
+  state: string | null;
+  city: string;
+  country: number | null;
+  zip: string;
+  constructor(address: CandidateAddress) {    
+    this.address1 = address.address1;
+    this.state = address.state || null;
+    this.city = address.city;
+    this.country = address.country || null;
+    this.zip = address.zip;
+  }
+}
+
+
 export class CandidateProfileContactDetail {
   id?: number;
   candidateProfileId: number;
