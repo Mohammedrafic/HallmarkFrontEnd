@@ -454,9 +454,14 @@ export class StaffScheduleByShiftComponent implements OnInit {
     let lastday = new Date(startDate.setDate(last));
     startDate = firstday;
     let endDate = lastday;
-    this.staffScheduleReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+    this.staffScheduleReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.staffScheduleReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.staffScheduleReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.staffScheduleReportForm.get('skillIds')?.setValue([]);
+    this.staffScheduleReportForm.get('shiftIds')?.setValue([]);
+    this.staffScheduleReportForm.get('workCommitmentIds')?.setValue([]);
+    this.staffScheduleReportForm.get('employeeName')?.setValue([]);
+    this.staffScheduleReportForm.get('isLongTerm')?.setValue(false);
     this.staffScheduleReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.staffScheduleReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(endDate);
     this.filteredItems = [];

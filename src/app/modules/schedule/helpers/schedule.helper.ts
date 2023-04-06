@@ -193,6 +193,20 @@ export const MapToDropdownOptions = (items: { name: string; id: number }[]): Dro
   });
 };
 
+export const MapShiftToDropdownOptions = (items: { startTime: string; endTime: string; id: number }[]): DropdownOption[] => {
+  return items.map(item => {
+    return {
+      text: `${FormatShiftHours(item.startTime)} - ${FormatShiftHours(item.endTime)}`,
+      value: item.id,
+    };
+  });
+};
+
+export const FormatShiftHours = (time: string): string => {
+  const [hours, minutes] = time.split(':');
+  return `${hours}:${minutes}`;
+};
+
 export const GetScheduleTabItems = (daySchedules: ScheduleItem[]): ShiftTab[] => {
   const scheduleTitleMapper: Record<ScheduleType, string> = {
     [ScheduleType.Book]: 'Booked',

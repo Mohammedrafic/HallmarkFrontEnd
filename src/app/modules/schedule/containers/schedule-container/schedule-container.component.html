@@ -1,86 +1,83 @@
-<div class="control-container">
-  <div class="control-group ">
-    <app-tabs-list
-        class="table-tabs irp"
-        [tabConfig]="tabsListConfig"
-        (changeTab)="changeTab($event)"
-      >
-      </app-tabs-list>
-      <div>
-        <app-tooltip-container *ngIf="activeTabIndex === tabIndex.Scheduling" [showToolTip]="!hasViewPermission">
-          <button
-            *ngIf="!isEmployee"
-            ejs-button
-            appHideBeforeSyncfusionLoad
-            cssClass="e-outline button-filter"
-            [disabled]="!hasViewPermission"
-            (click)="showFilters()"
-          >
-            <div class="filter-button-content">
+<div
+  class="schedule-wrapper"
+  [ngClass]="sideBarSettings.isOpen ? 'open-sidebar' : 'close-sidebar'"
+>
+  <div class="left-bar">
+    <div class="control-container">
+      <div class="control-group ">
+        <app-tabs-list
+          class="table-tabs irp"
+          [tabConfig]="tabsListConfig"
+          (changeTab)="changeTab($event)"
+        >
+        </app-tabs-list>
+        <div>
+          <app-tooltip-container *ngIf="activeTabIndex === tabIndex.Scheduling" [showToolTip]="!hasViewPermission">
+            <button
+              *ngIf="!isEmployee"
+              ejs-button
+              appHideBeforeSyncfusionLoad
+              cssClass="e-outline button-filter"
+              [disabled]="!hasViewPermission"
+              (click)="showFilters()"
+            >
+              <div class="filter-button-content">
             <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-pill align-text">
               {{ appliedFiltersAmount }}
             </span>
-              <span class="filter-button-text">Filters</span> <i-feather name="sliders" class="icon"></i-feather>
-            </div>
-          </button>
-        </app-tooltip-container>
-        <app-tooltip-container
-          *ngIf="activeTabIndex === tabIndex.Scheduling"
-          [showToolTip]="!!scheduleButtonTooltip"
-          [message]="scheduleButtonTooltip"
-        >
-          <button
-            ejs-button
-            appHideBeforeSyncfusionLoad
-            cssClass="e-primary"
-            [disabled]="!!scheduleButtonTooltip"
-            (click)="openAddEditScheduleDialog()"
-          >
-            Schedule
-          </button>
-        </app-tooltip-container>
+                <span class="filter-button-text">Filters</span> <i-feather name="sliders" class="icon"></i-feather>
+              </div>
+            </button>
+          </app-tooltip-container>
+        </div>
       </div>
+      <div class="control-group block">
+        <app-inline-chips [setChips]="chipsData" (filterChipDelted)="deleteFilterItem($event)"></app-inline-chips>
+      </div>
+    </div>
+    <div class="content">
+      <ng-container *ngIf="activeTabIndex === tabIndex.Scheduling">
+        <app-schedule-grid
+          [hasViewPermission]="hasViewPermission"
+          [hasSchedulePermission]="hasSchedulePermission"
+          [initScheduleDate]="scheduleData"
+          [selectedFilters]="scheduleFilters"
+          (changeFilter)="changeFilters($event)"
+          (loadMoreData)="loadMoreData($event)"
+          (selectedCells)="setSelectedCells($event)"
+          (editCell)="editScheduledItem($event)"
+          (selectCandidate)="selectCandidate($event)"
+        ></app-schedule-grid>
+      </ng-container>
+      <ng-container *ngIf="activeTabIndex === tabIndex.Analytics">
+      </ng-container>
+    </div>
   </div>
-  <div class="control-group block">
-    <app-inline-chips [setChips]="chipsData" (filterChipDelted)="deleteFilterItem($event)"></app-inline-chips>
-  </div>
-</div>
+  <div class="right-bar">
+    <div class="schedule-bar">
+      <ng-container *ngIf="sideBarSettings.isEditMode; else createSideBar">
+        edit
+      </ng-container>
 
-<div class="content">
-  <ng-container *ngIf="activeTabIndex === tabIndex.Scheduling">
-    <app-schedule-grid
-      [hasViewPermission]="hasViewPermission"
-      [scheduleData]="scheduleData"
-      [selectedFilters]="scheduleFilters"
-      (changeFilter)="changeFilters($event)"
-      (loadMoreData)="loadMoreData($event)"
-      (selectedCells)="selectCells($event)"
-      (scheduleCell)="scheduleCell($event)"
-      (editCell)="editScheduledItem($event)"
-      (selectCandidate)="selectCandidate($event)"
-    ></app-schedule-grid>
-  </ng-container>
-  <ng-container *ngIf="activeTabIndex === tabIndex.Analytics">
-  </ng-container>
+      <ng-template #createSideBar>
+        <app-create-schedule
+          *ngIf="sideBarSettings.isOpen"
+          [datePickerLimitations]="datePickerLimitations"
+          [scheduleSelectedSlots]="scheduleSelectedSlots"
+          [selectedScheduleFilters]="scheduleFilters"
+          [scheduleFilterData]="filters.filterColumns"
+          [scheduleData]="scheduleData"
+          [userPermission]="userPermission"
+        ></app-create-schedule>
+      </ng-template>
+    </div>
+  </div>
 </div>
 
 <app-schedule-filters #filters [count]="totalCount" (updateScheduleFilter)="updateScheduleFilter($event)"></app-schedule-filters>
 
-<app-create-schedule
-  *ngIf="createScheduleDialogOpen"
-  [datePickerLimitations]="datePickerLimitations"
-  [scheduleSelectedSlots]="scheduleSelectedSlots"
-  [scheduleStructure]="scheduleStructure"
-  [selectedScheduleFilters]="scheduleFilters"
-  [scheduleFilterData]="filters.filterColumns"
-  [scheduleData]="scheduleData"
-  [userPermission]="userPermission"
-  (destroyDialog)="closeScheduleDialog()"
-  (updateScheduleGrid)="updateScheduleGrid()"
-></app-create-schedule>
-
 <app-edit-schedule
-  *ngIf="editScheduleDialogOpen"
+  *ngIf="sideBarSettings.isEditMode"
   [datePickerLimitations]="datePickerLimitations"
   [scheduledShift]="scheduledShift"
   [userPermission]="userPermission"

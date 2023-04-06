@@ -1,14 +1,20 @@
 import { Injectable } from '@angular/core';
 
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 
 import { SaveCategoryNoteReasons, SaveClosureReasons, SaveOrderRequisition, SavePenalty, SaveUnavailabilityReason, UpdateCategoryNoteReasons, UpdateClosureReasonsSuccess } from '@organization-management/store/reject-reason.actions';
+import { SelectedSystems } from '@shared/components/credentials-list/constants';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { REASON_WARNING } from '@shared/constants';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { MessageTypes } from '@shared/enums/message-types';
-import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { Organization, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { Penalty, PenaltyPayload } from '@shared/models/penalty.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
+import { filter, Observable, takeUntil } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
+import { UserState } from 'src/app/store/user.state';
 import { NewReasonsActionsMap, UpdateReasonsActionsMap } from '../constants';
 import { ReasonsNavigationTabs } from '../enums';
 import { CategoryNoteValue, Closurevalue, SaveReasonParams, UnavailabilityValue } from '../interfaces';
@@ -18,6 +24,11 @@ export class ReasonsService {
   constructor(
     private store: Store,
   ) { }
+  
+  @Select(OrganizationManagementState.organization)
+  public readonly organization$: Observable<Organization>;
+  protected componentDestroy: () => Observable<unknown>;
+  public selectedSystem: SelectedSystemsFlag = SelectedSystems;
 
   addRegionNameForLocations(regions: OrganizationRegion[]): OrganizationRegion[] {
     return regions.map((region) => {
@@ -56,6 +67,7 @@ export class ReasonsService {
   }
 
   saveReason(params: SaveReasonParams): void {
+    this.getOrganizagionData();
     if (params.selectedTab === ReasonsNavigationTabs.Penalties) {
       const value = params.formValue as PenaltyPayload;
 
@@ -77,7 +89,14 @@ export class ReasonsService {
         visibleForIRPCandidates: !!value.visibleForIRPCandidates,
       }));
     } else if (params.selectedTab === ReasonsNavigationTabs.Closure) {
-      const value = params.formValue as Closurevalue;
+      var value = params.formValue as Closurevalue;
+      var reasonvalue = {
+        id : null,
+        includeInIRP : this.selectedSystem.isIRP,
+        includeInVMS : this.selectedSystem.isVMS,
+        reason : params.formValue.reason
+      };
+      ((this.selectedSystem.isIRP && this.selectedSystem.isVMS) ? "" : value = reasonvalue as Closurevalue);
       if (params.isVMSIRP) {
         if ((value.includeInIRP == false) && (value.includeInVMS == false)) {
           this.store.dispatch(new ShowToast(MessageTypes.Error, REASON_WARNING));
@@ -98,7 +117,14 @@ export class ReasonsService {
         }));
       }
     } else if (params.selectedTab === ReasonsNavigationTabs.Requisition) {
-      const value = params.formValue as Closurevalue;
+      var value = params.formValue as Closurevalue;
+      var reasonvalue = {
+        id : null,
+        includeInIRP : this.selectedSystem.isIRP,
+        includeInVMS : this.selectedSystem.isVMS,
+        reason : params.formValue.reason
+      };
+      ((this.selectedSystem.isIRP && this.selectedSystem.isVMS) ? "" : value = reasonvalue as Closurevalue);
       if (params.isVMSIRP) {
         if ((value.includeInIRP == false) && (value.includeInVMS == false)) {
           this.store.dispatch(new ShowToast(MessageTypes.Error, REASON_WARNING));
@@ -150,5 +176,19 @@ export class ReasonsService {
 
   private createUpdateReasonPayload(params: SaveReasonParams): RejectReason {
     return params.formValue as RejectReason;
+  }
+
+  private getOrganizagionData(): void {
+    this.organization$
+    .pipe(
+      filter(Boolean)
+    )
+    .subscribe((organization : Organization) => {
+      const isOrgUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
+      this.selectedSystem = {
+        isIRP: !!organization.preferences.isIRPEnabled,
+        isVMS: !!organization.preferences.isVMCEnabled,
+      };
+    });
   }
 }

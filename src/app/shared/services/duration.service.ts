@@ -6,13 +6,23 @@ import { Duration } from '@shared/enums/durations';
   providedIn: 'root',
 })
 export class DurationService {
-  private otherDurationHandler(jobStartDateValue: Date, orderDates: { jobStartDate: Date, jobEndDate: Date }): Date {
-    const durationInDays = DateTimeHelper.getDateDiffInDays(new Date(orderDates.jobStartDate), new Date(orderDates.jobEndDate));
+  private otherDurationHandler(
+    jobStartDateValue: Date,
+    orderDates: { jobStartDate: Date | string, jobEndDate: Date | string }
+  ): Date {
+    const durationInDays = DateTimeHelper.getDateDiffInDays(
+      new Date(orderDates.jobStartDate),
+      new Date(orderDates.jobEndDate)
+    );
 
     return new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + durationInDays));
   }
 
-  public getEndDate(duration: Duration, jobStartDate: Date, orderDates?: { jobStartDate: Date, jobEndDate: Date }): Date {
+  public getEndDate(
+    duration: Duration,
+    jobStartDate: Date,
+    orderDates?: { jobStartDate: Date | string, jobEndDate: Date | string }
+  ): Date {
     const jobStartDateValue = new Date(jobStartDate.getTime());
 
     switch (duration) {

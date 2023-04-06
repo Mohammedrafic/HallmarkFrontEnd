@@ -10,7 +10,6 @@ import { DateWeekService } from '@core/services';
 import { DateWeekPickerModule } from '@shared/components/date-week-picker';
 import { SharedModule } from '@shared/shared.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
-import { DoubleClickModule } from '@shared/directives/double-click/double-click.module';
 
 import { WeeksEndModule } from '../../directives/weeks-end/weeks-end.module';
 import { CalendarDateSlotModule } from '../../pipes/calendar-date-slot/calendar-date-slot.module';
@@ -21,6 +20,7 @@ import { CalendarTooltipSlotModule } from '../../pipes/calendar-tooltip-slot/cal
 import { PeriodPickerModule } from '@shared/components/period-picker';
 import { MonthViewGridModule } from '../month-view-grid/month-view-grid.module';
 import { MonthDatePickerModule } from '@shared/components/month-date-picker/month-date-picker.module';
+import { ScheduleGridService } from './schedule-grid.service';
 
 const icons = {
   Search,
@@ -46,10 +46,9 @@ const icons = {
         TooltipContainerModule,
         MonthViewGridModule,
         MonthDatePickerModule,
-        DoubleClickModule,
         WeeksEndModule,
     ],
   exports: [ScheduleGridComponent],
-  providers: [DateWeekService],
+  providers: [DateWeekService, ScheduleGridService],
 })
 export class ScheduleGridModule { }

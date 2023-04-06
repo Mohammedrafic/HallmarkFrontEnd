@@ -1,20 +1,26 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ExportOrientation } from '@admin/store/admin.actions';
+import { DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { TakeUntilDestroy } from '@core/decorators';
 import { DateTimeHelper } from '@core/helpers';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { OrientationTab } from '@organization-management/orientation/enums/orientation-type.enum';
 import { OrientationConfiguration, OrientationConfigurationFilters, OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
 import { OrientationService } from '@organization-management/orientation/services/orientation.service';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SETUPS_ACTIVATED } from '@shared/constants';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { filter, Observable, takeUntil } from 'rxjs';
-import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { ShowExportDialog, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
+import { MasterOrientationExportCols } from '../orientation-grid/orientation-grid.constants';
 
 @Component({
   selector: 'app-orientation-historical-data',
@@ -25,17 +31,21 @@ import { UserState } from 'src/app/store/user.state';
 @TakeUntilDestroy
 export class OrientationHistoricalDataComponent extends AbstractPermissionGrid implements OnInit {
   @Input() public isActive: boolean;
-  
+  @ViewChild('grid')
+  public grid: GridComponent;
   public readonly orientationTab = OrientationTab;
   public dataSource: OrientationConfigurationPage;
   public filters: OrientationConfigurationFilters = { pageNumber: 1, pageSize: this.pageSize };
   public disableControls: boolean = false;
   public orientationForm: FormGroup = this.orientationService.generateHistoricalDataForm();
   public bulkActionConfig: BulkActionConfig = { activate: true };
-
+  public fileName: string;
+  public defaultFileName: string;
+  public columnsToExport: ExportColumn[] = MasterOrientationExportCols;
+  @Input() export$: Subject<ExportedFileType>;
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;
-
+  private unsubscribe$: Subject<void> = new Subject();
   protected componentDestroy: () => Observable<unknown>;
   
   constructor(
@@ -43,12 +53,18 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
     private cd: ChangeDetectorRef,
     private orientationService: OrientationService,
     private confirmService: ConfirmService,
+    private datePipe: DatePipe,
+    private actions$: Actions,
   ) {
     super(store);
     this.watchForOrgChange();
     this.watchForSettingState();
+    this.watchForExportDialog();
   }
 
+  override ngOnInit(): void {
+    this.watchForDefaultExport();
+  }
   private watchForSettingState(): void {
     this.orientationService.checkIfSettingOff()
       .pipe(
@@ -106,7 +122,49 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
     }
   }
 
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+       this.store.dispatch(new ExportOrientation(new ExportPayload(
+      fileType,
+      { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset())  },
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
+      options?.fileName || this.defaultFileName
+    )));
+    this.clearSelection(this.grid);
+  }
+
+  public closeExport(): void {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  private watchForDefaultExport(): void {
+    this.export$.pipe(
+      takeUntil(this.unsubscribe$),
+    ).subscribe((event: ExportedFileType) => {
+      this.defaultFileName = 'Historical Data' + this.generateDateTime(this.datePipe);
+      this.defaultExport(event);
+    });
+  }
   
+ 
+  private watchForExportDialog(): void {
+    this.actions$.pipe(
+      ofActionDispatched(ShowExportDialog),
+      filter((value) => value.isDialogShown),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.defaultFileName = 'Historical Data' + this.generateDateTime(this.datePipe);
+      this.fileName = this.defaultFileName;
+    });
+  }
+
+
   public saveRecord(): void {
     if (this.orientationForm.invalid) {
       this.orientationForm.markAllAsTouched();

@@ -56,3 +56,8 @@ export class GetCandidateSearchFromScheduling {
   constructor(public filter: ScheduleFilters) { }
 }
 
+export class GetStaffListReportCandidateSearch{
+  static readonly type = '[LogiReport] Get Staff List Candidate Search';
+  constructor(public filter: CommonCandidateSearchFilter) { }
+}
+

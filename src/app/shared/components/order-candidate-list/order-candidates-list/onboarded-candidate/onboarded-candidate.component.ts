@@ -324,13 +324,16 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     }
   }
 
-  public onStartDateChange(event: ChangedEventArgs): void {
-    const actualStartDate = new Date(event.value!);
-    const actualEndDate = this.durationService.getEndDate(this.orderDuration, actualStartDate, { jobStartDate: this.order.jobStartDate, jobEndDate: this.order.jobEndDate });
-
-    this.form.patchValue({
-      endDate: actualEndDate,
-    });
+  public changeActualEndDate(date: Date | null): void {
+    if (date) {
+      const endDate: Date = this.getRecalculateActualEndDate(
+        date,
+        this.orderDuration,
+        this.order.jobStartDate,
+        this.order.jobEndDate
+      );
+      this.form.patchValue({ endDate });
+    }
   }
 
   getBillRateForUpdate(value: BillRate): BillRate[] {
@@ -435,10 +438,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             clockId: value.clockId ? value.clockId : '',
             offeredBillRate: value.offeredBillRate ? PriceUtils.formatNumbers(value.offeredBillRate) : null,
             allow: value.allowDeployCredentials,
-            startDate: value.offeredStartDate ? DateTimeHelper.convertDateToUtc(value.offeredStartDate)
-            : DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
-            endDate: value.actualEndDate ? DateTimeHelper.convertDateToUtc(value.actualEndDate)
-            : DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()),
+            startDate: value.actualStartDate
+              ? DateTimeHelper.convertDateToUtc(value.actualStartDate)
+              : DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
+            endDate: value.actualEndDate
+              ? DateTimeHelper.convertDateToUtc(value.actualEndDate)
+              : DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()),
             rejectReason: value.rejectReason,
             offeredStartDate: formatDate(DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(),
             'MM/dd/YYYY', 'en-US'),
@@ -653,5 +658,21 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         });
 
     }
+  }
+
+  private getRecalculateActualEndDate(
+    startDate: Date,
+    orderDuration: Duration,
+    jobStartDate: Date | string,
+    jobEndDate: Date | string
+  ): Date {
+    return this.durationService.getEndDate(
+      orderDuration,
+      startDate,
+      {
+        jobStartDate,
+        jobEndDate,
+      }
+    );
   }
 }

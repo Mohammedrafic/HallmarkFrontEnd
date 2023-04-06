@@ -11,7 +11,7 @@ import { LogiReportService } from "@shared/services/logi-report.service";
 import { filter, Observable, tap } from "rxjs";
 import { JobDetailSummaryReportFilterOptions } from "../../admin/analytics/models/jobdetail-summary.model";
 import { AssociateAgencyDto } from "../../shared/models/logi-report-file";
-import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions, GetCommonReportCredentialSearch, GetCommonReportCandidateStatusOptions, GetStaffScheduleReportFilterOptions, GetCandidateSearchFromScheduling} from "./logi-report.action";
+import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions, GetCommonReportCredentialSearch, GetCommonReportCandidateStatusOptions, GetStaffScheduleReportFilterOptions, GetCandidateSearchFromScheduling, GetStaffListReportCandidateSearch} from "./logi-report.action";
 import { ScheduleCandidate, ScheduleCandidatesPage } from 'src/app/modules/schedule/interface/schedule.interface';
 
 export interface LogiReportStateModel {
@@ -198,6 +198,14 @@ export class LogiReportState {
     return this.scheduleApiService.getScheduleEmployees(filter).pipe(tap((payload: any) => {      
       patchState({ getEmployeesSearchFromScheduling: payload });
       return payload
+    }));
+  }
+
+  @Action(GetStaffListReportCandidateSearch)
+  GetStaffListReportCandidateSearch({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<SearchCandidate[]> {
+    return this.logiReportService.getStaffListCandidateSearch(filter).pipe(tap((payload: any) => {           
+        patchState({ searchCandidates: payload });
+        return payload           
     }));
   }
 }

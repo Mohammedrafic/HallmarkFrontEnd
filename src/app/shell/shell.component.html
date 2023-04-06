@@ -155,10 +155,13 @@
           </div>
         </section>
         <section class="collapse" *ngIf="!(isMobile$ | async)">
-          <a class="icon-container" (click)="toggleSidebar()">
+          <button
+            [disabled]="isToggleButtonDisable"
+            class="icon-container collapse-button"
+            (click)="toggleSidebar()" >
             <i-feather name="sidebar" class="icon"></i-feather>
             <span class="e-text">Collapse</span>
-          </a>
+          </button>
         </section>
       </aside>
     </ejs-sidebar>

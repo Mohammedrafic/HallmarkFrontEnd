@@ -197,3 +197,18 @@ export interface DeleteScheduleRequest {
   startDateTime?: string;
   endDateTime?: string;
 }
+
+export interface SideBarSettings {
+  isOpen: boolean;
+  isEditMode: boolean;
+}
+
+export interface SelectedCells {
+  cells: ScheduleSelectedSlots;
+  sideBarState?: boolean;
+}
+
+export interface RemovedSlot {
+  date: string | null;
+  candidate: ScheduleCandidate;
+}
