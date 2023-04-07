@@ -49,6 +49,7 @@ import {
   RejectCandidateJob,
   SetOrdersTab,
   UpdateAgencyCandidateJob,
+  ClearOrganizationStructure,
 } from './order-management.actions';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { OrderFilteringOptionsService } from '@shared/services/order-filtering-options.service';
@@ -396,6 +397,13 @@ export class OrderManagementState {
       .getOrganizationsStructure(organizationIds)
       .pipe(tap((payload) => patchState({ organizationStructure: payload })));
   }
+
+  @Action(ClearOrganizationStructure)
+    ClearOrganizationStructure(
+      { patchState }: StateContext<OrderManagementModel>
+    ): OrderManagementModel {
+      return patchState({organizationStructure: []})
+    }
 
   @Action(ExportAgencyOrders)
   ExportAgencyOrders({}: StateContext<OrderManagementModel>, { payload, tab }: ExportAgencyOrders): Observable<any> {

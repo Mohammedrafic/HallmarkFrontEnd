@@ -78,13 +78,15 @@ export class TimesheetsFilterDialogComponent
         tap(() => this.store.dispatch(new Timesheets.ResetFilterOptions())),
         debounceTime(100),
         switchMap(() => this.filterOptions$),
-        switchMap((options) => this.preservedFiltersByPageName$.pipe(
-          filter(({ dispatch }) => !!options && dispatch))
-        ),
+        filter((options) => !!options),
+        switchMap(() => this.preservedFiltersByPageName$),
+        filter(({ dispatch }) => dispatch),
         takeUntil(this.componentDestroy())
       )
       .subscribe(({ state }) => {
         this.patchFilterForm({ ...state });
+        const contactEmails = Array.isArray(state.contactEmails) ? state.contactEmails[0] : null;
+        this.getPreservedContactPerson(contactEmails);
         this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
         this.appliedFiltersAmount.emit(this.filteredItems.length);
       });

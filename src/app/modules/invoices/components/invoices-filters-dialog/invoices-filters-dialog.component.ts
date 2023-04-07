@@ -14,10 +14,11 @@ import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
 import { combineLatest, debounceTime, Observable, takeUntil, switchMap } from 'rxjs';
-import { distinctUntilChanged, filter, map } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, take } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
-import { CustomFormGroup, DataSourceItem } from '@core/interface';
+import { FilterPageName } from '@core/enums';
+import { CustomFormGroup, DataSourceItem, PreservedFiltersByPage } from '@core/interface';
 import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/filters-helper.constant';
 import { PageOfCollections } from '@shared/models/page.model';
 import { FilterService } from '@shared/services/filter.service';
@@ -37,9 +38,7 @@ import { InvoicesAgencyTabId, InvoicesOrgTabId, InvoicesTableFiltersColumns } fr
 import { InvoiceFiltersAdapter } from '../../adapters';
 import { InvoicesModel } from '../../store/invoices.model';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import { ClearPageFilters } from 'src/app/store/preserved-filters.actions';
-import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 
 @Component({
@@ -108,7 +107,6 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.startFormGroupWatching();
     this.initFiltersColumns();
     this.watchForOrganizationStructure();
-    this.applyPreservedFilters();
   }
 
   ngOnChanges(): void {
@@ -214,6 +212,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
         this.filterColumns = { ...filters };
         this.filterColumns.regionIds.dataSource = this.regions;
         this.initFormConfig();
+        this.applyPreservedFilters();
         this.cdr.detectChanges();
       });
   }
@@ -224,9 +223,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   private watchForOrganizationStructure(): void {
-    const structureStream = this.isAgency ? this.selectedOrgStructure$ : this.organizationStructure$;
-
-    structureStream
+    this.getOrganizationStructure()
       .pipe(
         filter(Boolean),
         takeUntil(this.componentDestroy())
@@ -318,20 +315,25 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   private applyPreservedFilters(): void {
-    this.getOrganizationStructure().pipe(
-      filter(Boolean),
-      switchMap(() => this.preservedFiltersByPageName$),
-      filter(({ dispatch }) => dispatch),
-      takeUntil(this.componentDestroy())
-    ).subscribe(({ state }) => {
-      this.invoicesFiltersService.patchFormValue(this.formGroup, state || {});
-      this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
-      this.appliedFiltersAmount.emit(this.filteredItems.length);
-    });
+    this.getOrganizationStructure()
+      .pipe(
+        filter(Boolean),
+        debounceTime(150),
+        switchMap(() => this.preservedFiltersByPageName$),
+        filter(({ dispatch }) => dispatch),
+        take(1)
+      )
+      .subscribe(({ state }) => {
+        const filter = this.filterService.composeFilterState(this.filtersFormConfig, state);
+        this.formGroup.reset();
+        this.invoicesFiltersService.patchFormValue(this.formGroup, filter);
+        this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+        this.appliedFiltersAmount.emit(this.filteredItems.length);
+      });
   }
 
   private getPageName(): FilterPageName {
-    if(this.isAgency) {
+    if (this.isAgency) {
       return FilterPageName.InvoicesVMSAgency;
     } else {
       return FilterPageName.InvoicesVMSOrganization;

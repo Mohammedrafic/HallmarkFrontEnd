@@ -635,8 +635,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private getPageName(): FilterPageName {
-    if(this.isIRP) {
+    if (this.isIRP) {
       return FilterPageName.CandidatesIRPOrganization;
+    }
+    if (this.isAgency) {
+      return FilterPageName.CandidatesVMSAgency;
     } else {
       return FilterPageName.CandidatesVMSOrganization;
     }
