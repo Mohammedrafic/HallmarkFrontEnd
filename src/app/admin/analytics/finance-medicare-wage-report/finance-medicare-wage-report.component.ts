@@ -39,11 +39,9 @@ import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
 export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
 
   public paramsData: any = {
-
     "HostNameFMWR": "",
     "BearerParamFMWR": "",
     "BusinessUnitIdParamFMWR": "",
-
     "OrganizationsFMWR": "",
     "RegionFMWR": "",
     "LocationFMWR": "",
@@ -366,21 +364,17 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-
       "OrganizationsFMWR": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       "RegionFMWR": regionIds.length == 0 ? "null" : regionIds,
       "LocationFMWR": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentFMWR": departmentIds.length == 0 ? "null" : departmentIds,   
-      "AgencyFMWR": agencyIds.length == 0 ? "null" : agencyIds.join(","),
-      
+      "AgencyFMWR": agencyIds.length == 0 ? "null" : agencyIds.join(","),      
       "InvoiceStartDateFMWR":  formatDate(startDate, 'MM/dd/yyyy', 'en-US') ,
       "InvoiceEndDateFMWR":formatDate(endDate, 'MM/dd/yyyy', 'en-US') ,
-      "InvoiceIdFMWR": invoiceId == null || invoiceId == "" ? "null" : invoiceId
-      
-
+      "InvoiceIdFMWR": invoiceId == null || invoiceId == "" ? "null" : invoiceId 
     };
-   //this.logiReportComponent.paramsData = this.paramsData;
-   //this.logiReportComponent.RenderReport();
+   this.logiReportComponent.paramsData = this.paramsData;
+   this.logiReportComponent.RenderReport();
   }
 
   private orderFilterColumnsSetup(): void {
