@@ -1,6 +1,6 @@
 @import 'colors';
 
-$cell-height: 126px;
+$cell-height: 125px;
 
 :host {
   display: contents;
@@ -21,6 +21,7 @@ $cell-height: 126px;
     .date-cell {
       background-color: $secondary-dark-blue-50;
       border-bottom: 1px solid $secondary-dark-blue-40;
+      height: $cell-height;
       padding: 4px;
     }
 
@@ -29,7 +30,7 @@ $cell-height: 126px;
     }
 
     .date-slot {
-      height: $cell-height;
+      height: 100%;
       cursor: pointer;
       border-radius: 4px;
       border: 1px solid $secondary-dark-blue-50;
@@ -52,7 +53,7 @@ $cell-height: 126px;
   }
 
   .disabled-cell {
-    height: $cell-height;
+    height: 100%;
     position: relative;
     cursor: default !important;
 
