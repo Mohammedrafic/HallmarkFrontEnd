@@ -414,6 +414,11 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
       createOrder: this.createPerDiemOrderControl.value,
     };
 
+    if (this.selectedDaySchedule.scheduleType !== ScheduleType.Book) {
+      schedule.initialStartTime = this.selectedDaySchedule.startDate;
+      schedule.initialEndTime = this.selectedDaySchedule.endDate;
+    }
+
     this.scheduleApiService.updateScheduledShift(schedule, this.selectedDaySchedule.scheduleType).pipe(
       catchError((error: HttpErrorResponse) => this.editScheduleService.handleError(error)),
       takeUntil(this.componentDestroy())
