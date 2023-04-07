@@ -58,7 +58,7 @@ export class GrantReportComponent implements OnInit {
 
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/GrantReport/GrantReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/GrantReport/GrantReport.cat" };
-  public title: string = "Gant Report";
+  public title: string = "Grant Report";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
 
