@@ -363,9 +363,8 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private setWCStartDate(): void {
-    const employeeHireDate = DateTimeHelper.convertDateToUtc(this.candidateService.hireDate);
-
     if (!this.lastActiveDate) {
+      const employeeHireDate = DateTimeHelper.convertDateToUtc(this.candidateService.hireDate);
       const isHireDateLessWCStartDate = DateTimeHelper.isDateBefore(
         employeeHireDate,
         this.selectWorkCommitmentStartDate

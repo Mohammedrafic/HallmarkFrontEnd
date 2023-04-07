@@ -185,6 +185,6 @@ export class FilterService {
       return acc;
     }, {} as S);
 
-    return filter as S;
+    return filter;
   }
 }
