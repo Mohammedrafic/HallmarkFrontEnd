@@ -28,18 +28,18 @@ export const ScheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> =
     permission: UserPermissions.CanAddShift,
   },
   {
-    label: ScheduleType.Unavailability,
-    value: ScheduleItemType.Unavailability,
-    name: 'scheduleType',
-    disabled: false,
-    permission: UserPermissions.CanAddUnavailability,
-  },
-  {
     label: ScheduleType.Availability,
     value: ScheduleItemType.Availability,
     name: 'scheduleType',
     disabled: false,
     permission: UserPermissions.CanAddAvailability,
+  },
+  {
+    label: ScheduleType.Unavailability,
+    value: ScheduleItemType.Unavailability,
+    name: 'scheduleType',
+    disabled: false,
+    permission: UserPermissions.CanAddUnavailability,
   },
 ];
 
