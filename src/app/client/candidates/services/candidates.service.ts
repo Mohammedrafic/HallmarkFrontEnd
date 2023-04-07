@@ -13,6 +13,7 @@ export class CandidatesService {
   private activeEmployeeWorkCommitment$: Subject<CandidateWorkCommitmentShort> = new Subject<CandidateWorkCommitmentShort>();
 
   public employeeId: number | null;
+  public hireDate: string;
   public constructor(private httpClient: HttpClient) {}
 
   public getSelectedTab$(): Observable<CandidateTabsEnum> {

@@ -38,6 +38,7 @@ export class CandidateProfileService {
         } else {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
+        this.candidateService.hireDate = candidateDateInUTC.hireDate;
         this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
       }),
       catchError((errorResponse: HttpErrorResponse) => {

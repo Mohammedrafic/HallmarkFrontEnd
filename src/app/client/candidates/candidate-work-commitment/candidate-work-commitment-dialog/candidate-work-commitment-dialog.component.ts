@@ -24,6 +24,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { CandidateWorkCommitment, WorkCommitmentDataSource } from '../models/candidate-work-commitment.model';
 import { CandidateWorkCommitmentService } from '../services/candidate-work-commitment.service';
+import { CandidatesService } from '@client/candidates/services/candidates.service';
 
 @Component({
   selector: 'app-candidate-work-commitment-dialog',
@@ -81,6 +82,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     private candidateWorkCommitmentService: CandidateWorkCommitmentService,
     private store: Store,
     private confirmService: ConfirmService,
+    private candidateService: CandidatesService,
     private ngZone: NgZone,
   ) {
     super();
@@ -168,6 +170,8 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         this.minimumDate = this.lastActiveDate ? this.lastActiveDate : this.selectWorkCommitmentStartDate;
         const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
         this.maximumDate = this.minimumDate < commitmentEndDate ? commitmentEndDate : undefined;
+        this.setWCStartDate();
+
         if (populateForm) {
           this.populateFormWithMasterCommitment(commitment);
         } else {
@@ -355,6 +359,19 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       ).subscribe();
     } else {
       this.candidateWorkCommitmentForm.markAllAsTouched();
+    }
+  }
+
+  private setWCStartDate(): void {
+    const employeeHireDate = DateTimeHelper.convertDateToUtc(this.candidateService.hireDate);
+
+    if (!this.lastActiveDate) {
+      const isHireDateLessWCStartDate = DateTimeHelper.isDateBefore(
+        employeeHireDate,
+        this.selectWorkCommitmentStartDate
+      );
+
+      this.startDate = isHireDateLessWCStartDate ? this.todayDate : employeeHireDate;
     }
   }
 }
