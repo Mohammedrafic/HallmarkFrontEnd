@@ -39,7 +39,7 @@ import { GridReadyEventModel } from '@shared/components/grid/models';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { GetPreservedFiltersByPage, ResetPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
+import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 
 @Component({
   selector: 'app-invoices-container',
@@ -229,7 +229,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public override ngOnDestroy(): void {
     super.ngOnDestroy();
-    this.store.dispatch(new ResetPageFilters());
+    this.store.dispatch(new PreservedFilters.ResetPageFilters());
   }
 
   public watchAgencyId(): void {
@@ -287,7 +287,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       takeUntil(this.componentDestroy()),
     )
     .subscribe((id) => {
-      this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
+      this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
       this.organizationId = id;
       this.store.dispatch(new Invoices.SelectOrganization(id));
       this.resetFilters();
@@ -377,7 +377,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public updateTableByFilters(filters: Interfaces.InvoicesFilterState): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({ ...filters }));
-    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), { ...filters }));
+    this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(), { ...filters }));
     this.store.dispatch(new ShowFilterDialog(false));
   }
 

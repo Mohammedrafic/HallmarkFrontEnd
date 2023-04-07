@@ -1,5 +1,20 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { FormBuilder, FormGroup } from '@angular/forms';
+
+
 import { Select, Store } from '@ngxs/store';
+import {
+  combineLatest,
+  filter,
+  Observable,
+  takeUntil,
+  tap,
+  switchMap,
+  debounceTime,
+  skip } from 'rxjs';
+
 import { SetHeaderState, ShowFilterDialog } from '../../../store/app.actions';
 import {
   GetCandidateDetailsPage,
@@ -7,12 +22,9 @@ import {
   GetCandidateSkills,
 } from '@shared/components/candidate-details/store/candidate.actions';
 import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
-import { combineLatest, filter, Observable, takeUntil, tap, switchMap, of, debounceTime, skip } from 'rxjs';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { FilterService } from '@shared/services/filter.service';
 import { FilteredItem } from '@shared/models/filter.model';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { DatePipe } from '@angular/common';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import {
   CandidateDetailsPage,
@@ -27,13 +39,7 @@ import { OrderTypeOptionsForCandidates } from '@shared/components/candidate-deta
 import { toCorrectTimezoneFormat } from '../../utils/date-time.utils';
 import { GRID_CONFIG } from '@shared/constants';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { Router } from '@angular/router';
-import {
-  ClearPageFilters,
-  GetPreservedFiltersByPage,
-  ResetPageFilters,
-  SaveFiltersByPageName,
-} from 'src/app/store/preserved-filters.actions';
+import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { CandidateDetailsService } from './services/candidate-details.service';
 import { PreservedFiltersByPage } from '@core/interface';
 import { FilterPageName } from '@core/enums';
@@ -122,12 +128,12 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   public override ngOnDestroy(): void {
     super.ngOnDestroy();
-    this.store.dispatch(new ResetPageFilters());
+    this.store.dispatch(new PreservedFilters.ResetPageFilters());
   }
 
   public onFilterClearAll(): void {
     this.clearFilters();
-    this.store.dispatch(new ClearPageFilters(this.getPageName()));
+    this.store.dispatch(new PreservedFilters.ClearPageFilters(this.getPageName()));
     this.updatePage();
   }
 
@@ -154,7 +160,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         this.filters.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
       }
 
-      this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), this.filters));
+      this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(), this.filters));
       this.filtersForm.markAsPristine();
     } else {
       this.store.dispatch(new ShowFilterDialog(false));
@@ -227,7 +233,11 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private subscribeOnCandidatePage(): Observable<CandidateDetailsPage> {
-    return this.candidates$.pipe(tap((page: CandidateDetailsPage) => (this.candidatesPage = page)));
+    return this.candidates$.pipe(
+      tap((page: CandidateDetailsPage) => {
+        this.candidatesPage = page;
+      })
+    );
   }
 
   private createFilterForm(): void {
@@ -297,8 +307,10 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       .pipe(
         filter((data) => !!data[2]),
         debounceTime(600),
-        tap(() => this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()))),
-        switchMap(() => this.adjustFilters()),
+        tap(() => { this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName())); }),
+        switchMap(() => this.preservedFiltersByPageName$),
+        debounceTime(100),
+        tap((filters) => { this.handleFilterState(filters); }),
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
@@ -326,13 +338,6 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       regionsIds: this.filters?.regionsIds || [],
     });
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
-  }
-
-  private adjustFilters(): Observable<PreservedFiltersByPage<FiltersModal>> {
-    return this.preservedFiltersByPageName$.pipe(
-      debounceTime(100),
-      tap((filters) => this.handleFilterState(filters))
-    );
   }
 
   private handleFilterState(filters: PreservedFiltersByPage<FiltersModal>): void {

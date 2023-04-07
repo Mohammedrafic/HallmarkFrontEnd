@@ -78,9 +78,9 @@ export class TimesheetsFilterDialogComponent
         tap(() => this.store.dispatch(new Timesheets.ResetFilterOptions())),
         debounceTime(100),
         switchMap(() => this.filterOptions$),
-        switchMap((options) => this.preservedFiltersByPageName$.pipe(
-          filter(({ dispatch }) => !!options && dispatch))
-        ),
+        filter((options) => !!options),
+        switchMap(() => this.preservedFiltersByPageName$),
+        filter(({ dispatch }) => dispatch),
         takeUntil(this.componentDestroy())
       )
       .subscribe(({ state }) => {

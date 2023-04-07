@@ -17,7 +17,8 @@ import { combineLatest, debounceTime, Observable, takeUntil, switchMap } from 'r
 import { distinctUntilChanged, filter, map, take } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
-import { CustomFormGroup, DataSourceItem } from '@core/interface';
+import { FilterPageName } from '@core/enums';
+import { CustomFormGroup, DataSourceItem, PreservedFiltersByPage } from '@core/interface';
 import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/filters-helper.constant';
 import { PageOfCollections } from '@shared/models/page.model';
 import { FilterService } from '@shared/services/filter.service';
@@ -37,9 +38,7 @@ import { InvoicesAgencyTabId, InvoicesOrgTabId, InvoicesTableFiltersColumns } fr
 import { InvoiceFiltersAdapter } from '../../adapters';
 import { InvoicesModel } from '../../store/invoices.model';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import { ClearPageFilters } from 'src/app/store/preserved-filters.actions';
-import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 
 @Component({

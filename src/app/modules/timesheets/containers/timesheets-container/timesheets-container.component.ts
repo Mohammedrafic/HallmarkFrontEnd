@@ -36,7 +36,7 @@ import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fiel
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import * as Interfaces from '../../interface';
-import { ClearPageFilters, GetPreservedFiltersByPage, ResetPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
+import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -140,7 +140,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public override ngOnDestroy() {
     super.ngOnDestroy();
-    this.store.dispatch(new ResetPageFilters());
+    this.store.dispatch(new PreservedFilters.ResetPageFilters());
   }
 
   public handleChangeTab(tabIndex: number): void {
@@ -177,13 +177,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public resetFilters(): void {
     this.store.dispatch([
       new Timesheets.UpdateFiltersState({}, this.activeTabIdx !== 0, this.isAgency),
-      new ClearPageFilters(this.getPageName()),
+      new PreservedFilters.ClearPageFilters(this.getPageName()),
     ]);
   }
 
   public updateTableByFilters(filters: TimesheetsFilterState): void {
     this.store.dispatch([
-      new SaveFiltersByPageName(this.getPageName(), filters),
+      new PreservedFilters.SaveFiltersByPageName(this.getPageName(), filters),
       new Timesheets.UpdateFiltersState(
         {
           ...filters,
@@ -260,7 +260,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private onOrganizationChangedHandler(): void {
    this.organizationId$.pipe( takeUntil(this.componentDestroy())).subscribe((value)=>{
-    this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
+    this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
     if(value!=null&&value!=undefined){this.OrganizationId=value}
     });
     const idStream = this.isAgency ? this.agencyId$ : this.organizationId$;
@@ -269,7 +269,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       .pipe(
         debounceTime(600),
         filter((id) => !!id),
-        switchMap(() => this.adjustFilters()),
+        switchMap(() => this.preservedFiltersByPageName$),
+        filter(({ dispatch }) => dispatch),
+        tap((filters) => {
+          this.filters = filters.state;
+        }),
         takeUntil(this.componentDestroy())
       )
       .subscribe(() => {
@@ -353,15 +357,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       });
       this.cd.detectChanges();
     });
-  }
-
-  private adjustFilters(): Observable<PreservedFiltersByPage<TimesheetsFilterState>> {
-    return this.preservedFiltersByPageName$.pipe(
-      filter(({ dispatch }) => dispatch),
-      tap((filters) => {
-        this.filters = filters.state;
-      })
-    );
   }
 
   private initComponentState(): void {
