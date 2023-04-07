@@ -262,7 +262,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         this.selectedCandidatesSlot.delete(candidate.id);
         this.selectedCells.emit({
           cells: ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot),
-          sideBarState: false,
+          sideBarState: !!this.selectedCandidatesSlot.size,
         });
       }
 

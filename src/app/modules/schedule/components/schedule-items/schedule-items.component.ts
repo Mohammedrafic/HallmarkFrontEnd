@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 
 import { filter, takeUntil } from 'rxjs';
 
-import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { Destroyable } from '@core/helpers';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
 import { DateItem, CreateScheduleItem } from './schedule-items.interface';
