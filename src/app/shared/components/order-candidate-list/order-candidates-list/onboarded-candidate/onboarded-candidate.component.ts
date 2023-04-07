@@ -453,10 +453,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             hours: value.jobCancellation?.hours,
             candidatePayRate: value.candidatePayRate,
           });
+
           this.switchFormState();
           this.configureCandidatePayRateField();
           this.subscribeCandidateCancellationReasons();
         }
+
         this.changeDetectorRef.markForCheck();
     });
   }
@@ -504,7 +506,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private subscribeOnGetStatus(): void {
-    this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
+    this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$))
+    .subscribe((data: ApplicantStatus[]) => {
       this.nextApplicantStatuses = data;
 
       if (!data.length) {
@@ -512,11 +515,16 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       } else {
         this.jobStatusControl.enable();
       }
+
       this.changeDetectorRef.markForCheck();
     });
+
     this.orderPermissions$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: CurrentUserPermission[]) => (this.orderPermissions = data) && this.mapPermissions());
+      .subscribe((data: CurrentUserPermission[]) => {
+        this.orderPermissions = data;
+        this.mapPermissions();
+      });
   }
 
   private getOrderPermissions(orderId: number): void {
@@ -572,6 +580,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     } else {
       this.form.controls['allow'].enable();
     }
+
+    this.disableDatesForClosedPostition();
   }
 
   private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {
@@ -583,6 +593,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.onReject();
     }
   }
+
   private createForm(): void {
     this.form = new FormGroup({
       jobId: new FormControl(''),
@@ -674,5 +685,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         jobEndDate,
       }
     );
+  }
+
+  private disableDatesForClosedPostition(): void {
+    if (this.candidateJob?.closeDate) {
+      this.form.get('startDate')?.disable();
+      this.form.get('endDate')?.disable();
+    }
   }
 }
