@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { ONLY_NUMBER } from '@shared/constants';
 
 
@@ -12,7 +12,7 @@ import { COUNTRIES } from '@shared/constants/countries-list';
   templateUrl: './candidate-contact-details.component.html',
   styleUrls: ['./candidate-contact-details.component.scss'],
 })
-export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
+export class CandidateContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
    @Input() formGroup: FormGroup;
    @Input() customMaskChar:string
 
@@ -23,7 +23,7 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
   public countries = COUNTRIES;
   public states$: BehaviorSubject<Array<string>>;
   public dependentFieldsList = ['country', 'state', 'city','zip','address1'];
-
+  private unsubscribe$: Subject<void> = new Subject();
 
   ngOnInit(): void {
     this.setCountryState();
@@ -32,7 +32,9 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.addressFieldsValueChanges();
    
-    this.formGroup.get('country')?.valueChanges.subscribe((country) => {
+    this.formGroup.get('country')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+    ).subscribe((country) => {
       this.states$.next(country === Country.USA ? UsaStates : CanadaStates);
       if(this.formGroup.value.country !== country){
         this.dependentFieldsList.forEach(element => {
@@ -65,7 +67,10 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
   }
 
   private addressFieldsValueChanges() :void{
-    this.formGroup.valueChanges.subscribe(data=>{
+    this.formGroup.valueChanges.pipe(
+          takeUntil(this.unsubscribe$),
+        ).subscribe((data:any)=>{
+
       let dependentValueList = [];
       
       Object.keys(data).forEach(ele=>{                
@@ -117,4 +122,10 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
       
     });
   }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
 }

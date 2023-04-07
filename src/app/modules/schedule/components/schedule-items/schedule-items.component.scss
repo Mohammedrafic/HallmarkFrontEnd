@@ -106,6 +106,24 @@
       font-size: 12px;
       color: $black;
 
+      .circle {
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
+      }
+
+      .book-circle {
+        background-color: $pure-black;
+      }
+
+      .availability-circle {
+        background-color: $supportive-green-10;
+      }
+
+      .unavailability-circle {
+        background-color: $supportive-red;
+      }
+
       .schedule-type {
         font-weight: 700;
       }

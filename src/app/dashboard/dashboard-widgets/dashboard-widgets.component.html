@@ -78,7 +78,8 @@
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.AGENCY_POSITION_COUNT"
                               [isDarkTheme]="isDarkTheme"></app-agencyposition-widget>
-                              <app-rn-utilization-widget *ngSwitchCase="widgetTypeEnum.RN_UTILIZATION" [isLoading]="isLoading"
+          <app-rn-utilization-widget *ngSwitchCase="widgetTypeEnum.RN_UTILIZATION" 
+                                [isLoading]="isLoading"
                                 [chartData]="widgetsData?.[widgetTypeEnum.RN_UTILIZATION]"
                                 [description]="widgetDescriptionEnum.RN_UTILIZATION_DESCRIPTION"
                                 [isDarkTheme]="isDarkTheme"></app-rn-utilization-widget>

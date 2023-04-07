@@ -1,3 +1,4 @@
+import { GetStaffListReportCandidateSearch } from './../../../organization-management/store/logi-report.action';
 import { EmitType } from '@syncfusion/ej2-base';
 import {
   Component,
@@ -402,7 +403,7 @@ export class StaffListComponent implements OnInit {
       departmentIds: new FormControl([]),
       skillIds: new FormControl([]),
       workCommitmentIds: new FormControl([]),
-      employeeName: new FormControl([]),
+      employeeName: new FormControl(''),
       showOnlyDepartmentUnassignedCandidates: false,
     });
   }
@@ -423,6 +424,10 @@ export class StaffListComponent implements OnInit {
     this.staffListReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
     this.staffListReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.staffListReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.staffListReportForm.get('skillIds')?.setValue([]);
+    this.staffListReportForm.get('workCommitmentIds')?.setValue([]);
+    this.staffListReportForm.get('employeeName')?.setValue('');
+    this.staffListReportForm.get('showOnlyDepartmentUnassignedCandidates')?.setValue(false);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
@@ -489,10 +494,11 @@ export class StaffListComponent implements OnInit {
         : '';
     skillIds = skillIds.length > 0 ? skillIds.join(',') : '';
     workCommitmentIds = workCommitmentIds.length > 0 ? workCommitmentIds.join(',') : '';
-    employeeName = employeeName.length > 0 ? employeeName : '';
+    let employeeId = employeeName != null && employeeName != '' ? parseInt(employeeName) : 0;    
     
     if(showOnlyDepartmentUnassignedCandidates)
       this.reportName.name = this.DeptUnassignedReportName; 
+    else this.reportName.name = this.RegularReportName; 
 
     this.paramsData = {
       OrganizationParam: this.selectedOrganizations?.map((list) => list.organizationId).join(','),
@@ -501,7 +507,7 @@ export class StaffListComponent implements OnInit {
       DepartmentsParam: departmentIds,
       SkillsParam: skillIds,
       WorkCommitmentsParam: workCommitmentIds,
-      CandidateParam: employeeName,
+      CandidateParam: employeeId,
       ShowDepartmentUnassignedParam: showOnlyDepartmentUnassignedCandidates
     };
     this.logiReportComponent.paramsData = this.paramsData;
@@ -527,7 +533,7 @@ export class StaffListComponent implements OnInit {
         businessUnitIds: ids,
       };
       this.filterColumns.dataSource = [];
-      this.store.dispatch(new GetCommonReportCandidateSearch(filter)).subscribe((result) => {
+      this.store.dispatch(new GetStaffListReportCandidateSearch(filter)).subscribe((result) => {
         this.candidateFilterData = result.LogiReport.searchCandidates;
         this.candidateSearchData = result.LogiReport.searchCandidates;
         this.filterColumns.dataSource = this.candidateFilterData;

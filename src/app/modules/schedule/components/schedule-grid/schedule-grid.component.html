@@ -114,12 +114,13 @@
               <div
                 class="table-cell date-slot"
                 [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
-                appDoubleClick
-                (singleClick)="handleCellSingleClick(dateSlot, scheduleItem.candidate, dateSchedule)"
-                (dbClick)="handleScheduleCardDblClick(dateSchedule, scheduleItem.candidate, dateSchedule)"
+                (click)="selectCellSlots(dateSlot,scheduleItem.candidate, dateSchedule)"
               >
                 <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
-                  <app-schedule-card [scheduleDateItem]="dateSchedule"></app-schedule-card>
+                  <app-schedule-card
+                    [isSelected]="!!selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
+                    [dateSchedule]="dateSchedule"
+                  ></app-schedule-card>
                 </ng-container>
 
                 <ng-template #disabledCell>
@@ -138,9 +139,7 @@
                 <div
                   class="table-cell date-slot empty-cell"
                   [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
-                  appDoubleClick
-                  (singleClick)="handleCellSingleClick(dateSlot, scheduleItem.candidate)"
-                  (dbClick)="handleCellDblClick(dateSlot, scheduleItem.candidate)"
+                  (click)="selectCellSlots(dateSlot, scheduleItem.candidate)"
                 >
                 </div>
               </td>
@@ -155,9 +154,7 @@
             [selectedFilters]="selectedFilters"
             [datesRange]="datesRanges"
             (handleSelectCandidate)="emitSelectedCandidate($event)"
-            (handleMonthSingleClick)="singleMonthClick($event)"
-            (handleMonthDoubleCardClick)="doubleMonthCardClick($event)"
-            (handleMonthDoubleCellClick)="doubleMonthCellClick($event)"
+            (monthClick)="handleMonthClick($event)"
             [selectedCandidatesSlot]="selectedCandidatesSlot"
           ></app-month-view-grid>
       </ng-template>

@@ -1,25 +1,31 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { filter, Observable, switchMap, takeUntil } from 'rxjs';
+import { Observable, switchMap, takeUntil } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
+import { MessageTypes } from '@shared/enums/message-types';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { Permission } from '@core/interface';
-import { REQUIRED_PERMISSIONS } from '@shared/constants';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { UserState } from 'src/app/store/user.state';
-import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
+import { SetHeaderState, ShowFilterDialog, ShowToast } from '../../../../store/app.actions';
 import { ScheduleGridAdapter } from '../../adapters';
-import { ButtonRegionTooltip, ButtonSelectDataTooltip, TabListConfig } from '../../constants';
+import { FilterErrorMessage, TabListConfig } from '../../constants';
 import { ActiveTabIndex } from '../../enums';
 import * as ScheduleInt from '../../interface';
-import { ScheduleApiService, ScheduleFiltersService } from '../../services';
-import { ScheduleCandidate, ScheduleDateItem, ScheduledItem, ScheduleFilterStructure, ScheduleModel } from '../../interface';
-import { OrganizationStructure } from '@shared/models/organization.model';
-import { GetScheduleFilterByEmployees, HasNotDepartment, HasMultipleFilters, GetScheduleDateItem } from '../../helpers';
+import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
+import {
+  ScheduleCandidate,
+  ScheduleDateItem,
+  ScheduledItem,
+  ScheduleModel,
+  SelectedCells,
+  SideBarSettings,
+} from '../../interface';
+import { GetScheduleFilterByEmployees, HasNotMandatoryFilters, HasMultipleFilters } from '../../helpers';
 import { DateTimeHelper } from '@core/helpers';
 
 @Component({
@@ -45,17 +51,11 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   scheduleFilters: ScheduleInt.ScheduleFilters = {};
 
-  createScheduleDialogOpen = false;
-
-  editScheduleDialogOpen = false;
-
   scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
 
   datePickerLimitations: DatePickerLimitations;
 
   chipsData: ChipItem[];
-
-  scheduleButtonTooltip: string;
 
   hasViewPermission = false;
 
@@ -63,10 +63,9 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   isEmployee = false;
 
-  scheduleStructure: ScheduleFilterStructure = {
-    regions: [],
-    locations: [],
-    departments: [],
+  sideBarSettings: SideBarSettings = {
+    isOpen: false,
+    isEditMode: false,
   };
 
   private selectedCandidate: ScheduleInt.ScheduleCandidate | null;
@@ -77,6 +76,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     private scheduleApiService: ScheduleApiService,
     private filterService: ScheduleFiltersService,
     private scheduleFiltersService: ScheduleFiltersService,
+    private createScheduleService: CreateScheduleService,
   ) {
     super(store);
 
@@ -87,6 +87,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     super.ngOnInit();
     this.watchForPermissions();
     this.setIsEmployee();
+    this.watchForCloseSideBarAction();
   }
 
   changeTab(tabIndex: ActiveTabIndex): void {
@@ -120,56 +121,45 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     });
   }
 
-  selectCells(cells: ScheduleInt.ScheduleSelectedSlots): void {
+ selectCells(cells: ScheduleInt.ScheduleSelectedSlots, closeBar= true): void {
+   if ((HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) && cells.dates.length) {
+     this.store.dispatch(new ShowToast(MessageTypes.Error, FilterErrorMessage));
+     return;
+   }
+
     this.scheduleSelectedSlots = cells;
-    this.setScheduleButtonTooltip();
+
+   if(cells.dates.length && closeBar) {
+     this.setSideBarSettings(true,false);
+   } else if(!cells.dates.length && !closeBar) {
+     this.setSideBarSettings(true,false);
+   } else {
+     this.setSideBarSettings(false,false);
+   }
+
+    this.cdr.markForCheck();
   }
 
-  scheduleCell(cells: ScheduleInt.ScheduleSelectedSlots): void {
-    if (!this.hasSchedulePermission
-      || HasMultipleFilters(this.scheduleFilters)
-      || HasNotDepartment(this.scheduleFilters)
-    ) {
-      return;
-    }
-
-    this.selectCells(cells);
-    this.openScheduleDialog();
-  }
-
-  openAddEditScheduleDialog(): void {
-    if (!this.scheduleSelectedSlots.candidates.length || !this.scheduleSelectedSlots.dates.length || !this.scheduleData) {
-      return;
-    }
-
-    const schedule = GetScheduleDateItem(
-      this.scheduleSelectedSlots.candidates[0].id,
-      this.scheduleSelectedSlots.dates[0],
-      this.scheduleData,
-    );
-
-    if (this.scheduleSelectedSlots.candidates.length === 1 && this.scheduleSelectedSlots.dates.length === 1 && schedule) {
-      this.editScheduledItem({ candidate: this.scheduleSelectedSlots.candidates[0], schedule });
-    } else {
-      this.openScheduleDialog();
-    }
-  }
-
-  closeScheduleDialog(): void {
-    this.createScheduleDialogOpen = false;
+  setSelectedCells(selectedCells: SelectedCells): void {
+    const {cells, sideBarState} = selectedCells;
+    this.selectCells(cells, sideBarState);
   }
 
   editScheduledItem(scheduledItem: ScheduledItem): void {
-    if (HasMultipleFilters(this.scheduleFilters) || HasNotDepartment(this.scheduleFilters)) {
+    if (HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, FilterErrorMessage));
       return;
     }
 
+    this.setSideBarSettings(true,true);
     this.scheduledShift = scheduledItem;
-    this.openEditScheduleDialog();
+
+    this.cdr.markForCheck();
   }
 
+  //todo: remove after edit implementation
   closeEditScheduleDialog(): void {
-    this.editScheduleDialogOpen = false;
+    this.setSideBarSettings(false,false);
     this.scheduledShift = null;
   }
 
@@ -182,7 +172,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.chipsData = data.chipsData;
     this.changeFilters(data.filters);
     this.appliedFiltersAmount = data.filteredItems?.length;
-    this.setScheduleButtonTooltip();
   }
 
   selectCandidate(selectedCandidate: ScheduleInt.ScheduleCandidate | null): void {
@@ -195,14 +184,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   deleteFilterItem(event: ChipDeleteEventType): void {
     this.filterService.deleteInlineChip(event);
-  }
-
-  private openScheduleDialog(): void {
-    this.setScheduleStructure();
-  }
-
-  private openEditScheduleDialog(): void {
-    this.editScheduleDialogOpen = true;
   }
 
   private initScheduleData(isLoadMore = false): void {
@@ -258,6 +239,27 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     }
   }
 
+  private watchForCloseSideBarAction(): void {
+    this.createScheduleService.closeSideBarEvent.pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe((value: boolean) => {
+      if(value) {
+        this.selectCells({
+          candidates: [],
+          dates: [],
+        });
+        this.setSideBarSettings(false,false);
+      } else {
+        this.setDateLimitation();
+        this.detectWhatDataNeeds();
+        this.selectCells({
+          candidates: [],
+          dates: [],
+        }, false);
+      }
+    });
+  }
+
   private getSchedulesByEmployeesIds(
     candidates: ScheduleInt.ScheduleCandidatesPage,
   ): Observable<ScheduleInt.ScheduleModelPage> {
@@ -289,41 +291,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       || !!this.scheduleFilters.locationIds?.length;
   }
 
-  private setScheduleButtonTooltip(): void {
-    if (!this.hasSchedulePermission) {
-      this.scheduleButtonTooltip = REQUIRED_PERMISSIONS;
-
-      return;
-    }
-
-    if (HasMultipleFilters(this.scheduleFilters) || HasNotDepartment(this.scheduleFilters)) {
-      this.scheduleButtonTooltip = ButtonRegionTooltip;
-    } else if (!this.scheduleSelectedSlots?.dates?.length) {
-      this.scheduleButtonTooltip = ButtonSelectDataTooltip;
-    } else {
-      this.scheduleButtonTooltip = '';
-    }
-  }
-
-
-  private setScheduleStructure(): void {
-    if(!this.scheduleFilters.locationIds?.length && !this.scheduleFilters.regionIds?.length) {
-      this.scheduleApiService.getEmployeesStructure(this.scheduleSelectedSlots.candidates[0].id).pipe(
-        filter(Boolean),
-        map((structure: OrganizationStructure) => {
-          return this.scheduleFiltersService.createFilterStructure(structure.regions);
-        }),
-        takeUntil(this.componentDestroy()),
-      ).subscribe((structure: ScheduleFilterStructure) => {
-        this.scheduleStructure = { ...structure };
-        this.createScheduleDialogOpen = true;
-        this.cdr.markForCheck();
-      });
-    } else {
-      this.createScheduleDialogOpen = true;
-    }
-  }
-
   private watchForPermissions(): void {
     this.getPermissionStream()
       .pipe(takeUntil(this.componentDestroy()))
@@ -332,7 +299,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
           || permissions[this.userPermissions.CanAddUnavailability]
           || permissions[this.userPermissions.CanAddShift];
         this.hasViewPermission = permissions[this.userPermissions.CanViewSchedule] || this.hasSchedulePermission;
-        this.setScheduleButtonTooltip();
       });
   }
 
@@ -350,5 +316,12 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
           .find((item: ScheduleDateItem) => item.date === this.scheduledShift?.schedule?.date) as ScheduleDateItem,
       };
     }
+  }
+
+  private setSideBarSettings(isOpen: boolean, isEditMode: boolean): void {
+    this.sideBarSettings = {
+      isOpen,
+      isEditMode,
+    };
   }
 }

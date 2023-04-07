@@ -11,6 +11,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { IrpPrimarySkill } from './skill.model';
+import { CandidateProfileContactDetail } from './candidate.model';
 /**
  * TODO: rework classes with interfaces.
  */
@@ -537,7 +538,6 @@ export type AcceptJobDTO = {
 export type CandidateProfile = {
   agencyId: number;
   candidateAgencyStatus: number;
-  candidateProfileContactDetail: string;
   candidateProfileSkills: Array<string>;
   classification: number;
   createdAt: string;
@@ -600,6 +600,9 @@ export type OrderCandidateJob = {
   candidateSSNRequired:boolean;
   candidateDOBRequired:boolean;
   candidatePayRate: string | null;
+  candidatePhone1Required:any;
+  candidateAddressRequired:any;
+  candidateProfileContactDetails: CandidateProfileContactDetail;
 };
 
 export type CandidatesBasicInfo = {
@@ -763,4 +766,14 @@ export interface IrpCandidatesParams {
   PageSize: number;
   PageNumber: number;
   isAvailable: boolean;
+}
+
+export class CandidateCancellationReason{
+  id: number;
+  name: string;
+}
+
+export class CandidateCancellationReasonFilter{
+  regionId?:number;
+  locationId?:number;
 }

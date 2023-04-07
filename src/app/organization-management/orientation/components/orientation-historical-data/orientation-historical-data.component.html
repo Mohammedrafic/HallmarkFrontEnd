@@ -13,7 +13,11 @@
     [bulkActionConfig]="bulkActionConfig">
   </app-orientation-grid>
 </section>
+<app-export-dialog *ngIf="isActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
+  (export)="export($event)"></app-export-dialog>
 
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
+  (export)="export($event)"></app-export-dialog>
 <app-side-dialog
   *ngIf="isActive"
   header="Activate Setup"

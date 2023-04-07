@@ -71,65 +71,24 @@
     border: 1px solid $secondary-dark-blue-40 !important;
     border-radius: 8px;
 }
-.input-sec {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-right: 10px;
-    flex-direction: column;
-}
 
-.input-sec span {
-    width: 100%;
-    height: auto;
+form{
+  width : 100%;
 }
-p.hours-rn {
-    padding: 6px 0px;
-    display: block;
-    background: $grey-secondary;
-    width: 90%;
-    border-radius: 10px;
-    margin: auto;
-    text-align: center;
-    margin: 16px 10px ;
+.widgeticon {
+  text-align: right;
+  font-weight: 500 !important;
+  width: 16% !important;
+  border-bottom: 1px solid white !important;
 }
-
-
-.e-input.widgeticon
-{
-  width: 50px;
-  border:1px solid $primary-active-blue-10;
-  border-radius: 5px;
+.hours-rn{
+  background: gainsboro;
+  padding: 4px 2px;
+  border-radius: 20px;
+  width: 100%;
+  text-align: center;
 }
-
-.datepicker {
-  margin-top: 10px;
-}
-
-.dropdown {
-  margin-top: 10px;
-}
-.e-input-group.e-control-wrapper {
-  border: 1px solid $secondary-dark-blue-40 !important;
-  border-radius: 8px;
-
- 
-}
-input.e-input-filter.e-input {
-  height: 24px;
-  font-size: 14px;
-  color: $secondary-dark-blue-15;
-}
-.e-multi-select-wrapper.e-down-icon {
-  width: 200px;
-  height: 40px;
+.targetcount {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-span.e-input-group-icon.e-ddl-icon {
-  width: auto;
-}
-input.e-input.widgeticon:focus {
-  border-width:2px !important;
+  justify-content: right;
 }

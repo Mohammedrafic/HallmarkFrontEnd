@@ -28,11 +28,12 @@
       </ejs-tooltip>
     </ng-template>
 
-    <app-icon-multi-date-picker
+    <!--Todo: uncomment in future implementation -->
+    <!--<app-icon-multi-date-picker
       [datePickerLimitations]="datePickerLimitations"
       [dates]="item.selectedDates"
       (appliedDates)="updateDateItems($event, item.candidateId)"
-    ></app-icon-multi-date-picker>
+    ></app-icon-multi-date-picker>-->
 
     <ng-container *ngFor="let dateItem of item.dateItems; trackBy: trackByDate">
       <ng-container *ngIf="dateItem.tooltipContent">
@@ -56,9 +57,7 @@
 
 <ng-template #dateTemplate let-dateItem="dateItem" let-item="item">
   <div class="date" [class.date-errors]="dateItem.hasError">
-    <i-feather *ngIf="dateItem.scheduleType === scheduleType.Availability" name="clock" class="icon"></i-feather>
-    <i-feather *ngIf="dateItem.scheduleType === scheduleType.Unavailability" name="alert-triangle" class="icon"></i-feather>
-    <i-feather *ngIf="dateItem.scheduleType === scheduleType.Book" name="briefcase" class="icon"></i-feather>
+    <div class="circle {{scheduleCircleType[dateItem.scheduleType]}}" *ngIf="dateItem.scheduleType"></div>
     <span>{{dateItem.date | date: "MM/dd/yyyy"}}
 <!--      TODO: will be implemented in scope of EIN-12052-->
 <!--      <span class="schedule-type" *ngIf="dateItem.scheduleType === scheduleType.Book && dateItem.orderType === ltaOrder">L</span>-->

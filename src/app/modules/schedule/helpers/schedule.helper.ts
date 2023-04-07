@@ -160,14 +160,16 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
   };
 };
 
-export const HasNotDepartment = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
-  return filters.departmentsIds && !filters.departmentsIds.length;
+export const HasNotMandatoryFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
+  return (filters.departmentsIds && !filters.departmentsIds.length)
+    || (filters.skillIds && !filters.skillIds.length);
 };
 
 export const HasMultipleFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
   return filters.regionIds && filters.regionIds.length > 1 ||
     filters.locationIds && filters.locationIds.length > 1 ||
-    filters.departmentsIds && filters.departmentsIds.length > 1;
+    filters.departmentsIds && filters.departmentsIds.length > 1 ||
+    filters.skillIds && filters.skillIds.length > 1;
 };
 
 export const GetShiftHours = (startTimeDate: Date, endTimeDate: Date): string => {
@@ -189,6 +191,20 @@ export const MapToDropdownOptions = (items: { name: string; id: number }[]): Dro
       value: item.id,
     };
   });
+};
+
+export const MapShiftToDropdownOptions = (items: { startTime: string; endTime: string; id: number }[]): DropdownOption[] => {
+  return items.map(item => {
+    return {
+      text: `${FormatShiftHours(item.startTime)} - ${FormatShiftHours(item.endTime)}`,
+      value: item.id,
+    };
+  });
+};
+
+export const FormatShiftHours = (time: string): string => {
+  const [hours, minutes] = time.split(':');
+  return `${hours}:${minutes}`;
 };
 
 export const GetScheduleTabItems = (daySchedules: ScheduleItem[]): ShiftTab[] => {

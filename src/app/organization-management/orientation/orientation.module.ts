@@ -7,7 +7,7 @@ import { GridModule } from '@shared/components/grid/grid.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { SharedModule } from '@shared/shared.module';
 import { ButtonModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
-import { DropDownListAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListAllModule, DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { GridAllModule, PagerAllModule } from '@syncfusion/ej2-angular-grids';
 import { NumericTextBoxAllModule, TextBoxAllModule } from '@syncfusion/ej2-angular-inputs';
 import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
@@ -30,6 +30,7 @@ import { JoinPipeModule } from '@shared/pipes/join.pipe';
 import { MultiplePipeModule } from '@shared/pipes/multiple.pipe';
 import { SkillCategoryRendererComponent } from './components/orientation-grid/skill-category-renderer/skill-category.component';
 import { HistoricalDataActionRendererComponent } from './components/orientation-grid/historical-data-action-renderer/historical-data-action-renderer.component';
+import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 
 const icons = {
   Edit,
@@ -40,7 +41,7 @@ const icons = {
 @NgModule({
   imports: [
     CommonModule,
-    DropDownListAllModule,
+    DropDownButtonModule,
     GridAllModule,
     NumericTextBoxAllModule,
     PagerAllModule,

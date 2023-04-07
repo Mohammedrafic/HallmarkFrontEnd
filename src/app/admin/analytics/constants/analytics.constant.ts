@@ -117,6 +117,19 @@ export const financeMedicareWageReportConstants = {
     InvoiceId: 'invoiceId'
   }
 }
+export const grantReportConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',    
+    AgencyIds: 'agencyIds',
+    StartDate: 'startDate',
+    EndDate: 'endDate',
+    InvoiceId: 'invoiceId',
+    InvoiceStatusIds: 'invoiceStatusIds'
+  }
+}
 export const accrualReportTypesList : { name: string; id: number }[] = [
   { name: 'Invoice date range', id: 0 },
   { name: 'Timesheet date range', id: 1 }

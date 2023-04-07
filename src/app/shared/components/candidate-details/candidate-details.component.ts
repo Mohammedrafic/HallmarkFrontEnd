@@ -5,11 +5,9 @@ import {
   GetCandidateDetailsPage,
   GetCandidateRegions,
   GetCandidateSkills,
-  SetNavigation,
-  SetPageFilters
 } from '@shared/components/candidate-details/store/candidate.actions';
 import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
-import { combineLatest, filter, Observable, takeUntil, tap, debounceTime, take } from 'rxjs';
+import { combineLatest, filter, Observable, takeUntil, tap, switchMap, of, debounceTime, skip } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FilterService } from '@shared/services/filter.service';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -21,7 +19,7 @@ import {
   CandidatesDetailsRegions,
   FilterColumnsModel,
   FiltersModal,
-  NavigationTabModel
+  NavigationTabModel,
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { UserState } from '../../../store/user.state';
@@ -29,8 +27,16 @@ import { OrderTypeOptionsForCandidates } from '@shared/components/candidate-deta
 import { toCorrectTimezoneFormat } from '../../utils/date-time.utils';
 import { GRID_CONFIG } from '@shared/constants';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { PreservedFilters } from '@shared/models/preserved-filters.model';
 import { Router } from '@angular/router';
+import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
+import {
+  ClearPageFilters,
+  GetPreservedFiltersByPage,
+  ResetPageFilters,
+  SaveFiltersByPageName,
+} from 'src/app/store/preserved-filters.actions';
+import { FilterPageName } from '@core/enums/filter-page-name.enum';
+import { CandidateDetailsService } from './services/candidate-details.service';
 
 @Component({
   selector: 'app-candidate-details',
@@ -53,9 +59,6 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   @Select(CandidateDetailsState.candidateDetails)
   public candidates$: Observable<CandidateDetailsPage>;
 
-  @Select(CandidateDetailsState.filtersPage)
-  public filtersPage$: Observable<FiltersModal>;
-
   @Select(CandidateDetailsState.candidateRegions)
   public candidateRegions$: Observable<CandidatesDetailsRegions[]>;
 
@@ -65,8 +68,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   @Select(UserState.lastSelectedOrganizationId)
   lastSelectedOrganizationId$: Observable<number>;
 
-  @Select(PreservedFiltersState.preservedFilters)
-  preservedFilters$: Observable<PreservedFilters>;
+  @Select(PreservedFiltersState.preservedFiltersByPageName)
+  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<FiltersModal>>;
 
   public filtersForm: FormGroup;
   public filters: FiltersModal | null;
@@ -78,24 +81,22 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   public pageNumber = GRID_CONFIG.initialPage;
   public pageSize = GRID_CONFIG.initialRowsPerPage;
   private selectedTab: number | null;
-  private filterApplied = false;
   public CandidateStatus: number;
   constructor(
     private store: Store,
     private router: Router,
     private formBuilder: FormBuilder,
     private filterService: FilterService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private candidateService: CandidateDetailsService,
   ) {
     super();
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
-    this.CandidateStatus = (routerState?.['orderStatus']);
+    this.CandidateStatus = routerState?.['orderStatus'];
   }
 
   ngOnInit(): void {
-    if (this.filterService.canPreserveFilters()) {
-      this.store.dispatch(new GetCandidateRegions());
-    }
+    this.store.dispatch([new GetCandidateRegions(), new GetCandidateSkills()]);
     this.setHeaderName();
     this.createFilterForm();
     this.initFilterColumns();
@@ -107,7 +108,6 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       this.subscribeOnTabChange(),
       this.subscribeOnSkills(),
       this.subscribeOnRegions(),
-      this.subscribeOnFiltersPage(),
       this.subscribeOnCandidatePage(),
     ])
       .pipe(takeUntil(this.destroy$))
@@ -116,60 +116,57 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     this.subscribeOnAgencyOrganizationChanges();
   }
 
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.store.dispatch(new ResetPageFilters());
+  }
+
   public onFilterClearAll(): void {
-    this.filterApplied = true;
     this.clearFilters();
-    this.store.dispatch(new SetPageFilters(this.filters));
+    this.store.dispatch(new ClearPageFilters(FilterPageName.CandidateAssignmentVMSOrganization));
     this.updatePage();
   }
 
   public onFilterApply(): void {
-    this.filterApplied = true;
-    const formData = this.filtersForm.getRawValue();
-    const { startDate, endDate } = formData;
-    this.filters = {
-      ...formData,
-      startDate: toCorrectTimezoneFormat(startDate),
-      endDate: toCorrectTimezoneFormat(endDate),
-    };
+    if (this.filtersForm.dirty) {
+      const formData = this.filtersForm.getRawValue();
+      const { startDate, endDate } = formData;
+      this.filters = {
+        ...formData,
+        startDate: toCorrectTimezoneFormat(startDate),
+        endDate: toCorrectTimezoneFormat(endDate),
+      };
 
-    this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
-    this.updatePage();
-    this.store.dispatch(new SetPageFilters(this.filters));
-    this.store.dispatch(new ShowFilterDialog(false));
-    const orgs: number[] = [];
-    if (this.filters?.regionsIds) {
-      this.filterColumns.regionsIds.dataSource?.forEach((val) => {
-        if (this.filters?.regionsIds?.includes(val.id)) {
-          orgs.push(val.organizationId);
-        }
-      });
-      this.filters.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
+      this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
+      this.updatePage();
+      this.store.dispatch(new ShowFilterDialog(false));
+      const orgs: number[] = [];
+      if (this.filters?.regionsIds) {
+        this.filterColumns.regionsIds.dataSource?.forEach((val) => {
+          if (this.filters?.regionsIds?.includes(val.id)) {
+            orgs.push(val.organizationId);
+          }
+        });
+        this.filters.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
+      }
+
+      this.store.dispatch(new SaveFiltersByPageName(FilterPageName.CandidateAssignmentVMSOrganization, this.filters));
+      this.filtersForm.markAsPristine();
+    } else {
+      this.store.dispatch(new ShowFilterDialog(false));
     }
-
-    this.filterService.setPreservedFIlters(this.filters, 'regionsIds');
   }
 
   public onFilterDelete(event: FilteredItem): void {
     this.filterService.removeValue(event, this.filtersForm, this.filterColumns);
+    this.filtersForm.markAsDirty();
   }
 
   public onFilterClose(): void {
-    this.filtersForm.setValue({
-      orderTypes: this.filters?.orderTypes || [],
-      startDate: this.filters?.startDate || null,
-      endDate: this.filters?.endDate || null,
-      skillsIds: this.filters?.skillsIds || [],
-      regionsIds: this.filters?.regionsIds || [],
-    });
-    this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
+    this.patchFormValue();
   }
 
   public showFilters(): void {
-    this.store.dispatch(new GetCandidateSkills());
-    if (!this.filterService.canPreserveFilters()) {
-      this.store.dispatch(new GetCandidateRegions());
-    }
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
@@ -183,7 +180,6 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       tap((currentPage: number) => {
         this.pageNumber = currentPage;
         this.setActiveTab();
-        this.updateFilters();
         this.updatePage();
       })
     );
@@ -191,11 +187,11 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   private subscribeOnPageSizeChange(): Observable<number> {
     return this.pageSize$.pipe(
+      skip(1),
       filter((currentSize: number) => !!currentSize),
       tap((currentSize: number) => {
         this.pageSize = currentSize;
         this.setActiveTab();
-        this.updateFilters();
         this.updatePage();
       })
     );
@@ -203,32 +199,13 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   private subscribeOnTabChange(): Observable<NavigationTabModel> {
     return this.candidateTab$.pipe(
+      skip(1),
       filter(({ active }: NavigationTabModel) => active === 0 || !!active),
       tap((selectedTab: NavigationTabModel) => {
         this.selectedTab = selectedTab.active;
-        if (this.isNavigationFromAnotherPage()) {
-          this.updateFilters();
-          this.store.dispatch(new SetNavigation(false));
-        } else {
-          this.clearFilters();
-          this.filterApplied = false;
-          if (this.filterService.canPreserveFilters()) {
-            this.setPreservedFilters();
-          }
-        }
-        this.store.dispatch(new SetNavigation(false));
-        this.updatePage();
+        !this.isNavigationFromAnotherPage() && this.updatePage();
       })
     );
-  }
-
-  private updateFilters(): void {
-    const filters = this.store.selectSnapshot(CandidateDetailsState.filtersPage);
-    if (filters && !!filters) {
-      this.filters = filters;
-      this.filtersForm.setValue(filters);
-      this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
-    }
   }
 
   private subscribeOnRegions(): Observable<CandidatesDetailsRegions[]> {
@@ -239,21 +216,14 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   private subscribeOnSkills(): Observable<MasterSkillByOrganization[]> {
     return this.candidateSkills$.pipe(
-      tap((skills: MasterSkillByOrganization[]) => (this.filterColumns.skillsIds.dataSource = skills.filter((v, i, a) => a.findIndex(skill => (skill.masterSkillId === v.masterSkillId)) === i)))
-    );
-  }
-
-  private subscribeOnFiltersPage(): Observable<FiltersModal> {
-    return this.filtersPage$.pipe(
-      filter((filters: FiltersModal) => !!filters),
-      tap((filters: FiltersModal) => (this.filters = filters))
+      tap((skills: MasterSkillByOrganization[]) => {
+        this.filterColumns.skillsIds.dataSource = this.candidateService.assignSkillDataSource(skills);
+      })
     );
   }
 
   private subscribeOnCandidatePage(): Observable<CandidateDetailsPage> {
-    return this.candidates$.pipe(tap((page: CandidateDetailsPage) => (this.candidatesPage = page
-    )));
-
+    return this.candidates$.pipe(tap((page: CandidateDetailsPage) => (this.candidatesPage = page)));
   }
 
   private createFilterForm(): void {
@@ -305,7 +275,6 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     this.filteredItems = [];
     this.filters = null;
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
-    this.store.dispatch(new SetPageFilters(this.filters));
   }
 
   private isNavigationFromAnotherPage(): boolean | null {
@@ -320,39 +289,17 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private subscribeOnAgencyOrganizationChanges(): void {
-    if (this.filterService.canPreserveFilters()) {
-      combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$, this.preservedFilters$.pipe(filter(Boolean), take(1)), this.candidateRegions$])
-        .pipe(takeUntil(this.destroy$), debounceTime(600))
-        .subscribe(() => {
-          if (!this.isNavigationFromAnotherPage()) {
-            this.clearFilters();
-            this.setPreservedFilters();
-            this.updatePage();
-          }
-        });
-    } else {
-      combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$])
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(() => {
-          if (!this.isNavigationFromAnotherPage()) {
-            this.clearFilters();
-            this.updatePage();
-          }
-        });
-    }
-  }
-
-  private setPreservedFilters(): void {
-    const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
-    if (preservedFilters?.regions) {
-      this.filtersForm.get('regionsIds')?.setValue([...preservedFilters.regions]);
-      if (this.filters) {
-        this.filters.regionsIds = [...preservedFilters.regions];
-      } else {
-        this.filters = this.filtersForm.getRawValue();
-      }
-    }
-    this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
+    combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$, this.candidateRegions$])
+      .pipe(
+        filter((data) => !!data[2]),
+        debounceTime(600),
+        tap(() => this.store.dispatch(new GetPreservedFiltersByPage(FilterPageName.CandidateAssignmentVMSOrganization))),
+        switchMap(() => this.adjustFilters()),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.updatePage();
+      });
   }
 
   private updatePage(): void {
@@ -364,5 +311,35 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         ...this.filters,
       })
     );
+  }
+
+  private patchFormValue(): void {
+    this.filtersForm.setValue({
+      orderTypes: this.filters?.orderTypes || [],
+      startDate: this.filters?.startDate || null,
+      endDate: this.filters?.endDate || null,
+      skillsIds: this.filters?.skillsIds || [],
+      regionsIds: this.filters?.regionsIds || [],
+    });
+    this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
+  }
+
+  private adjustFilters(): Observable<PreservedFiltersByPage<FiltersModal>> {
+    return this.preservedFiltersByPageName$.pipe(tap((filters) => this.handleFilterState(filters)));
+  }
+
+  private handleFilterState(filters: PreservedFiltersByPage<FiltersModal>): void {
+    const { isNotPreserved, state, dispatch } = filters;
+    if (!isNotPreserved && dispatch) {
+      this.filters = {
+        orderTypes: state?.orderTypes || [],
+        startDate: state?.startDate,
+        endDate: state?.endDate,
+        skillsIds: (state?.skillsIds && [...state.skillsIds]) || [],
+        regionsIds: (state?.regionsIds && [...state.regionsIds]) || [],
+      };
+
+      this.patchFormValue();
+    }
   }
 }

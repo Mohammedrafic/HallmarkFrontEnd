@@ -297,6 +297,15 @@
   }
 
   .collapse {
+    .collapse-button {
+      width: 100%;
+      background: none;
+      border: none;
+      color: $white;
+      font-size: 14px;
+      padding: 0;
+    }
+
     .icon-container {
       cursor: pointer;
     }

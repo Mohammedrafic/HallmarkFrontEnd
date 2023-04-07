@@ -48,3 +48,10 @@ export enum OrganizationalHierarchy {
   Location = 3,
   Department = 4,
 }
+
+
+export enum OrganizationSettings{
+  MandateCandidateAddress = "MandateCandidateAddress",
+  MandateCandidatePhone1 = "MandateCandidatePhone1",
+  EnableRegularLocalRates = "EnableRegularLocalRates"
+}

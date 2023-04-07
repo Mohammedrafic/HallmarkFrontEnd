@@ -12,7 +12,6 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
 import { CalendarTooltipSlotModule } from '../../pipes/calendar-tooltip-slot/calendar-tooltip-slot.module';
 import { SharedModule } from '@shared/shared.module';
 import { MonthCardComponent } from './month-card/month-card.component';
-import { DoubleClickModule } from '@shared/directives/double-click/double-click.module';
 
 @NgModule({
   exports: [MonthViewGridComponent],
@@ -27,7 +26,6 @@ import { DoubleClickModule } from '@shared/directives/double-click/double-click.
     TooltipContainerModule,
     CalendarTooltipSlotModule,
     SharedModule,
-    DoubleClickModule,
     WeeksEndModule,
     FeatherModule.pick({ Slash }),
   ],

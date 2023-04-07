@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus, CandidatStatus, ConfigurationValues } from '@shared/enums/applicant-status.enum';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { Observable, Subject, takeUntil, of, take, filter } from 'rxjs';
 
@@ -16,11 +16,12 @@ import PriceUtils from '@shared/utils/price.utils';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CandidateSSNRequired, deployedCandidateMessage, DEPLOYED_CANDIDATE, REQUIRED_PERMISSIONS, SubmissionsLimitReached } from '@shared/constants';
+import { CandidateSSNRequired,CandidatePHONE1Required,CandidateADDRESSRequired, deployedCandidateMessage, DEPLOYED_CANDIDATE, REQUIRED_PERMISSIONS, SubmissionsLimitReached } from '@shared/constants';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
 import { MessageTypes } from '../../../../enums/message-types';
 import { ShowToast } from '../../../../../store/app.actions';
+import { CommonHelper } from '@shared/helpers/common.helper';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -68,6 +69,9 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   private unsubscribe$: Subject<void> = new Subject();
   private candidateId: number;
+  public candidatePhone1RequiredValue : string = '';
+  public candidateAddressRequiredValue : string = '';
+  private orderApplicantsInitialData: OrderApplicantsInitialData | null;
 
   get candidateStatus(): ApplicantStatus {
     return this.candidate.status || (this.candidate.candidateStatus as any);
@@ -120,6 +124,31 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       if (this.candidateSSNRequired) {
         if (!this.formGroup.controls["ssn"].value) {
           this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateSSNRequired));
+          return;
+        }
+      }
+
+      if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
+        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){ 
+            if(this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === null 
+                  || this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === ''){
+                this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
+                return;
+            }
+        }else{
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
+          return;
+        }
+      }
+
+      if(this.candidateAddressRequiredValue === ConfigurationValues.Apply){
+        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){ 
+            if(CommonHelper.candidateAddressCheck(this.orderApplicantsInitialData?.candidateProfileContactDetails)){
+                this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Apply)));
+                return;
+            }
+        }else{
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Apply)));
           return;
         }
       }
@@ -228,6 +257,19 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         takeUntil(this.unsubscribe$),
         )
       .subscribe((data: OrderApplicantsInitialData) => {
+          if(data.candidatePhone1Required != null){
+            let phone1Configuration = JSON.parse(data.candidatePhone1Required);
+            if(phone1Configuration.isEnabled){
+              this.candidatePhone1RequiredValue = phone1Configuration.value;
+            }
+          }
+          if(data.candidateAddressRequired != null){
+            let addressConfiguration = JSON.parse(data.candidateAddressRequired);
+            if(addressConfiguration.isEnabled){
+              this.candidateAddressRequiredValue = addressConfiguration.value;
+            }
+          }
+        this.orderApplicantsInitialData = data;
         this.candidateSSNRequired = data.candidateSSNRequired;
         this.organizationId = data.organizationId;
         this.candidateId = data.candidateId;

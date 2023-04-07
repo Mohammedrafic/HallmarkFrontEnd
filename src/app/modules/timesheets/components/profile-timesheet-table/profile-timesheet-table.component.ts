@@ -154,6 +154,12 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     return { 'background-color': 'inherit'};
   };
 
+  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
+
+  public mobileEditMenuActions = [{ text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Save }];
+
+  public readonly timesheetStatuses = TimesheetStatus;
+
   private records: TimesheetRecordsDto;
 
   private isChangesSaved = true;
@@ -169,10 +175,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private isStatusColAvaliable = false;
 
   private readonly componentStateChanged$: Subject<ComponentStateChangedEvent> = new Subject();
-
-  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
-
-  public mobileEditMenuActions = [{ text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Save }];
 
   private resizeObserver: ResizeObserverModel;
 
@@ -600,8 +602,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private orgCanSubmitTimesheet(): boolean {
     const isOrgAndTimesheetTab = !this.isAgency && this.currentTab === RecordFields.Time;
+
     const isStatusPass = this.timesheetDetails.status === TimesheetStatus.Missing
-      || this.timesheetDetails.status === TimesheetStatus.Incomplete
       || this.timesheetDetails.status === TimesheetStatus.Rejected;
 
     return isOrgAndTimesheetTab && this.timesheetDetails.canEditTimesheet && isStatusPass;

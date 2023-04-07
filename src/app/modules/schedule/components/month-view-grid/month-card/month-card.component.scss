@@ -20,78 +20,53 @@
 }
 
 .card-wrapper {
-  height: 130px;
+  width: 100%;
+  height: 100%;
   background-color: $white;
   border-radius: 4px;
 
-  .day {
-    font-weight: 400;
-    font-size: 12px;
-    padding: 4px;
+  &.selected, &:hover {
+    background-color: $primary-active-blue-90;
   }
 
-  .title-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 4px;
+  &.third-event {
+    border-bottom: 4px solid;
+    border-radius: 4px;
+  }
 
-    .title-text {
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-
-      .text {
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 18px;
-        text-align: left;
-        color: $secondary-dark-blue-15;
-        text-transform: uppercase;
-
-        &.bordered {
-          padding: 1px 8px;
-          border: 1px solid $secondary-dark-blue-40;
-          border-radius: 16px;
-          background: $secondary-dark-blue-50;
-          font-size: 12px;
-          color: $black;
-        }
-      }
-    }
-
-    .badge {
-      padding: 0 4px;
-      border: 1px solid $white;
-      border-radius: 13px;
-      font-size: 11px;
-      font-weight: 700;
-      line-height: 16px;
-      display: inline-flex;
-      background: $primary-active-blue-10;
-      color: $white;
+  ::ng-deep {
+    .tooltip-container {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
   }
+
+  .title {
+    .title__text {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18px;
+      text-align: left;
+      text-transform: uppercase;
+    }
+  }
+
 
   .time {
-    display: flex;
-    align-items: center;
-    margin-top: 8px;
-    padding: 0 4px;
+    font-size: 12px;
+    line-height: 18px;
+    white-space: nowrap;
 
     &__text {
-      font-size: 12px;
       font-weight: 700;
-      line-height: 18px;
     }
+  }
 
-    &__type {
-      margin-left: 4px;
-    }
-
-    &__separator {
-      margin: 0 4px;
-    }
+  .additional-attributes {
+    line-height: 18px;
+    font-size: 12px;
+    white-space: nowrap;
   }
 
   ejs-tooltip {
@@ -102,4 +77,34 @@
 .inactive-date {
   opacity: 0.5;
   cursor: default;
+}
+
+.big-card {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  padding: 7px 8px;
+  background: inherit;
+  border: 1px solid $secondary-dark-blue-50;
+  border-left: 4px solid;
+  color: $black;
+
+  .day {
+    padding: unset;
+  }
+}
+
+.small-card {
+  border-radius: 4px;
+  background: inherit;
+  border: 1px solid $secondary-dark-blue-50;
+  border-left: 4px solid;
+  color: $black;
+  padding: 2px 8px;
+}
+
+.day {
+  font-weight: 400;
+  font-size: 12px;
+  padding: 8px 12px 2px;
 }

@@ -1,3 +1,4 @@
+import { ScheduleCandidate, ScheduleCandidatesPage, ScheduleFilters } from 'src/app/modules/schedule/interface/schedule.interface';
 import { EmitType } from '@syncfusion/ej2-base';
 import { formatDate } from '@angular/common';
 import {
@@ -13,6 +14,7 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from
 import { Select, Store } from '@ngxs/store';
 import {
   ClearLogiReportState,
+  GetCandidateSearchFromScheduling,
   GetCommonReportCandidateSearch,
   GetStaffScheduleReportFilterOptions,
 } from '@organization-management/store/logi-report.action';
@@ -115,6 +117,9 @@ export class StaffScheduleByShiftComponent implements OnInit {
   @Select(LogiReportState.getStaffScheduleReportOptionData)
   public staffScheduleReportFilterData$: Observable<StaffScheduleReportFilterOptions>;
 
+  @Select(LogiReportState.getEmployeesSearchFromScheduling)
+  public employeesSearchFromScheduling$: Observable<ScheduleCandidatesPage>;
+
   private unsubscribe$: Subject<void> = new Subject();
   public bussinessControl: AbstractControl;
   public regionIdControl: AbstractControl;
@@ -128,8 +133,8 @@ export class StaffScheduleByShiftComponent implements OnInit {
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
   departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public allOption: string = 'All';
-  public candidateFilterData: { [key: number]: SearchCandidate }[] = [];
-  candidateSearchData: SearchCandidate[] = [];
+  public candidateFilterData: { [key: number]: ScheduleCandidate }[] = [];
+  candidateSearchData: ScheduleCandidate[] = [];
 
   public filterOptionData: StaffScheduleReportFilterOptions;
 
@@ -343,7 +348,12 @@ export class StaffScheduleByShiftComponent implements OnInit {
               if (data != null) {
                 this.isAlive = false;
                 this.filterOptionData = data;
-                this.filterColumns.shiftIds.dataSource = data.masterShifts;
+                this.filterColumns.shiftIds.dataSource = [];
+                this.filterColumns.skillIds.dataSource = [];
+                this.filterColumns.workCommitmentIds.dataSource = [];
+                this.filterColumns.shiftIds.dataSource = [
+                  { name: 'Custom', id: -1 },
+                  ...data.masterShifts ];
                 this.filterColumns.skillIds.dataSource = data.masterSkills;
                 this.filterColumns.workCommitmentIds.dataSource = data.masterWorkCommitments;
                 this.changeDetectorRef.detectChanges();
@@ -444,9 +454,14 @@ export class StaffScheduleByShiftComponent implements OnInit {
     let lastday = new Date(startDate.setDate(last));
     startDate = firstday;
     let endDate = lastday;
-    this.staffScheduleReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+    this.staffScheduleReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.staffScheduleReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.staffScheduleReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.staffScheduleReportForm.get('skillIds')?.setValue([]);
+    this.staffScheduleReportForm.get('shiftIds')?.setValue([]);
+    this.staffScheduleReportForm.get('workCommitmentIds')?.setValue([]);
+    this.staffScheduleReportForm.get('employeeName')?.setValue([]);
+    this.staffScheduleReportForm.get('isLongTerm')?.setValue(false);
     this.staffScheduleReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.staffScheduleReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(endDate);
     this.filteredItems = [];
@@ -511,9 +526,9 @@ export class StaffScheduleByShiftComponent implements OnInit {
         : '';
     skillIds = skillIds.length > 0 ? skillIds.join(',') : '';
     shiftIds = shiftIds.length > 0 ? shiftIds.join(',') : '';
-    workCommitmentIds = workCommitmentIds.length > 0 ? workCommitmentIds.join(',') : '';
-    employeeName = employeeName.length > 0 ? employeeName : '';
-
+    workCommitmentIds = workCommitmentIds.length > 0 ? workCommitmentIds.join(',') : '';    
+    let employeeId = employeeName != undefined || employeeName != null || employeeName !='' ? parseInt(employeeName) : 0;    
+    
     this.paramsData = {
       OrganizationParam: this.selectedOrganizations?.map((list) => list.organizationId).join(','),
       StartDateParam: formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
@@ -525,7 +540,7 @@ export class StaffScheduleByShiftComponent implements OnInit {
       ShiftsParam: shiftIds,
       WorkCommitmentsParam: workCommitmentIds,
       IsLongTermParam: isLongTerm,
-      EmployeeParam: employeeName,      
+      EmployeeParam: employeeId,      
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -543,17 +558,23 @@ export class StaffScheduleByShiftComponent implements OnInit {
   @OutsideZone
   private onFilterChild(e: FilteringEventArgs) {
     if (e.text != '') {
-      let ids = [];
-      ids.push(this.bussinessControl.value);
-      let filter: CommonCandidateSearchFilter = {
-        searchText: e.text,
-        businessUnitIds: ids,
+      // let ids = [];
+      // ids.push(this.bussinessControl.value);
+      let filter: ScheduleFilters = {
+        firstLastNameOrId: e.text,
+        startDate: this.staffScheduleReportForm.get('startDate')?.value,
+        endDate: this.staffScheduleReportForm.get('endDate')?.value,        
       };
       this.filterColumns.dataSource = [];
-      this.store.dispatch(new GetCommonReportCandidateSearch(filter)).subscribe((result) => {
-        this.candidateFilterData = result.LogiReport.searchCandidates;
-        this.candidateSearchData = result.LogiReport.searchCandidates;
-        this.filterColumns.dataSource = this.candidateFilterData;
+      this.store.dispatch(new GetCandidateSearchFromScheduling(filter));
+      this.employeesSearchFromScheduling$.subscribe((result) => {            
+        var candidates = result.items?.map((candidate: ScheduleCandidate) => ({
+          ...candidate,
+          fullName: `${candidate.lastName} ${candidate.firstName}`,
+        }))
+        this.candidateFilterData = candidates;
+        this.candidateSearchData = candidates;
+        this.filterColumns.employeeName.dataSource = this.candidateFilterData;
         // pass the filter data source to updateData method.
         e.updateData(this.candidateFilterData);
       });

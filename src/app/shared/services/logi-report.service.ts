@@ -61,7 +61,8 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
       candidateStatusesAndReasons :'statusText',
       jobStatusesAndReasons :'statusText',
       allCandidateStatusesAndReasons :'statusText',
-      allJobStatusesAndReasons :'statusText'
+      allJobStatusesAndReasons :'statusText',
+      invoiceStatuses:'name'
     }
     
     return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof CommonReportFilterOptions])]))
@@ -94,4 +95,11 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
       return data;
     }));
   }
+  /**
+   * Get the Staff list Candidate Search
+   * @return SearchCandidate
+   */
+ public getStaffListCandidateSearch(filter:any): Observable<SearchCandidate[]> {
+  return this.http.post<SearchCandidate[]>(`/api/LogiReport/stafflist/candidatesearch`,filter);
+}
 }

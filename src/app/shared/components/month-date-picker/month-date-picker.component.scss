@@ -4,6 +4,10 @@
   display: flex;
   justify-content: space-between;
 
+  button {
+    padding: 8px 12px;
+  }
+
   button.e-control.e-btn i-feather {
     margin-left: 0;
   }

@@ -192,7 +192,7 @@
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                         formControlName="startDate"
-                        (change)="onStartDateChange($event)"
+                        (change)="changeActualEndDate($event.value)"
                       >
                       </ejs-datepicker>
                     </div>
@@ -319,6 +319,7 @@
   [openEvent]="openCandidateCancellationDialog"
   [orderType]="candidateJob?.order?.orderType"
   [candidateJob]="candidateJob"
+  [candidateCancellation]="candidateCancellationReasons"
   (submitCandidateCancellation)="cancelCandidate($event)"
   (cancelCandidateCancellation)="resetStatusesFormControl()"
 ></app-candidate-cancellation-dialog>
