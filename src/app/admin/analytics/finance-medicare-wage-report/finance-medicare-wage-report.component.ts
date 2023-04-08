@@ -185,7 +185,7 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
 
   private initForm(): void {
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
+    startDate.setDate(startDate.getDate() - 14);
     this.financeMedicareWageReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
@@ -449,7 +449,7 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
   public onFilterClearAll(): void {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
+    startDate.setDate(startDate.getDate() - 14);
     this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
     this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.LocationIds)?.setValue([]);
     this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.DepartmentIds)?.setValue([]);    
