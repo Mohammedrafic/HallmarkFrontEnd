@@ -103,7 +103,7 @@ export class DateTimeHelper {
     if (firstWeekDay) {
       firstDay = new Date(curr.getDate() - firstWeekDay).getTime();
     }
-  
+
     if (currDayNum >= startDayNum) {
       dayDiff = currDayNum - startDayNum;
     } else {
@@ -203,7 +203,11 @@ export class DateTimeHelper {
 
     const result = [];
 
-    for(let curDate = new Date(startDate); curDate <= new Date(endDate); curDate.setDate(curDate.getDate()+1)) {
+    for(
+      let curDate = DateTimeHelper.setInitDateHours(startDate);
+      curDate <= DateTimeHelper.setInitDateHours(new Date(endDate));
+      curDate.setDate(curDate.getDate()+1)
+    ) {
       result.push(formatDate(curDate,'yyyy-MM-dd', 'en-US'));
     }
 
