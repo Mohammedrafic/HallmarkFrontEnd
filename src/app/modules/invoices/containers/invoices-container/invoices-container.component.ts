@@ -408,12 +408,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public updateTableByFilters(filters: Interfaces.InvoicesFilterState): void {
-    const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersByPageName) as
-      PreservedFiltersByPage<Interfaces.InvoicesFilterState>;
     this.store.dispatch(new Invoices.UpdateFiltersState({ ...filters }));
     this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(
       this.getPageName(),
-      { ...preservedFilters.state, ...filters }),
+      { ...filters }),
     );
     this.store.dispatch(new ShowFilterDialog(false));
   }
