@@ -677,7 +677,6 @@ export class OrderFilter {
   poNumberIds?: number | null;
   orderType?: number | null;
   contactEmails?: string[] | string;
-  orderId?: number | null;
   irpOnly?: boolean | null;
 }
 

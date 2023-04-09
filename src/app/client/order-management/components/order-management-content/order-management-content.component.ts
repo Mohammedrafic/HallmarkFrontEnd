@@ -809,7 +809,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
       contactEmails: this.contactEmails,
-      orderId: this.filters.orderId || null,
       irpOnly: this.filters.irpOnly || null,
     });
 

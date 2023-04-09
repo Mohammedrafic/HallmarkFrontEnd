@@ -21,6 +21,7 @@ export const GetFilterFormConfig = (tab: OrganizationOrderManagementTabs): Commo
 };
 
 const CommonFields: CommonFormConfig[] = [
+  { field: 'orderPublicId' },
   { field: 'regionIds' },
   { field: 'locationIds' },
   { field: 'departmentsIds' },
@@ -29,7 +30,6 @@ const CommonFields: CommonFormConfig[] = [
 
 const AllOrdersFilterFormConfig: CommonFormConfig[] = [
   ...CommonFields,
-  { field: 'orderPublicId' },
   { field: 'orderTypes' },
   { field: 'jobTitle' },
   { field: 'billRateFrom' },
@@ -38,8 +38,6 @@ const AllOrdersFilterFormConfig: CommonFormConfig[] = [
   { field: 'jobStartDate' },
   { field: 'jobEndDate' },
   { field: 'orderStatuses' },
-  { field: 'annualSalaryRangeFrom' },
-  { field: 'annualSalaryRangeTo' },
   { field: 'candidateStatuses' },
   { field: 'candidatesCountFrom' },
   { field: 'candidatesCountTo' },
@@ -55,13 +53,11 @@ const AllOrdersFilterFormConfig: CommonFormConfig[] = [
   { field: 'projectNameIds' },
   { field: 'poNumberIds' },
   { field: 'contactEmails' },
-  { field: 'orderId' },
   { field: 'irpOnly' },
 ];
 
 const PerdiemFormConfig: CommonFormConfig[] = [
   ...CommonFields,
-  { field: 'orderPublicId' },
   { field: 'agencyIds' },
   { field: 'orderStatuses' },
   { field: 'candidateName' },
@@ -80,7 +76,6 @@ const PerdiemFormConfig: CommonFormConfig[] = [
 
 const PermPlacementFormConfig: CommonFormConfig[] = [
   ...CommonFields,
-  { field: 'orderPublicId' },
   { field: 'orderStatuses' },
   { field: 'candidateName' },
   { field: 'contactEmails' },
@@ -103,7 +98,6 @@ const PermPlacementFormConfig: CommonFormConfig[] = [
 
 const ReorderFormConfig: CommonFormConfig[] = [
   ...CommonFields,
-  { field: 'orderPublicId' },
   { field: 'agencyIds' },
   { field: 'orderStatuses' },
   { field: 'candidateName' },
@@ -128,7 +122,6 @@ const ReorderFormConfig: CommonFormConfig[] = [
 
 const IncompleteFilterFormConfig: CommonFormConfig[] = [
   ...CommonFields,
-  { field: 'orderPublicId' },
   { field: 'agencyIds' },
   { field: 'orderTypes' },
   { field: 'orderStatuses' },
@@ -153,4 +146,4 @@ const IncompleteFilterFormConfig: CommonFormConfig[] = [
   { field: 'agencyType' },
 ];
 
-const TemplatesFilterFormConfig: CommonFormConfig[] = [...CommonFields, { field: 'orderId' }];
+const TemplatesFilterFormConfig: CommonFormConfig[] = [...CommonFields];
