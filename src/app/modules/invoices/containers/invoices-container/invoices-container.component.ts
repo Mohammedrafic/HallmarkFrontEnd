@@ -56,6 +56,7 @@ import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
+import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 
 @Component({
   selector: 'app-invoices-container',
@@ -307,10 +308,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       takeUntil(this.componentDestroy()),
     )
     .subscribe((id) => {
+      this.clearStructure();
+      this.store.dispatch(new PreservedFilters.ResetPageFilters());
       this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
       this.organizationId = id;
       this.store.dispatch(new Invoices.SelectOrganization(id));
-      this.resetFilters();
+      this.resetFilters(true);
       this.navigatedInvoiceId = null;
       this.navigatedOrgId = null;
       this.getGroupingOptions();
@@ -363,7 +366,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.setGridConfig();
 
     this.tabConfig = this.invoicesContainerService.getTabConfig(tabIdx);
-    this.resetFilters();
+    this.resetFilters(true);
     this.cdr.markForCheck();
   }
 
@@ -376,15 +379,25 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.appliedFiltersAmount = amount;
   }
 
-  public resetFilters(): void {
+  public resetFilters(keepFilters = false): void {
     this.gridInstance?.columnApi.resetColumnState();
+    let filters = {};
+
+    if (keepFilters) {
+      const preservedFilters = this.store.selectSnapshot(
+        PreservedFiltersState.preservedFiltersByPageName) as
+        PreservedFiltersByPage<Interfaces.InvoicesFilterState>;
+      this.populateFilterForm(preservedFilters);
+      filters = this.filterState;
+    }
+
     this.store.dispatch(
       new Invoices.UpdateFiltersState({
         pageNumber: GRID_CONFIG.initialPage,
         pageSize: GRID_CONFIG.initialRowsPerPage,
         orderBy: '',
-        ...this.navigatedInvoiceId !== null ? { invoiceIds: [this.navigatedInvoiceId] } : {},
-        ...this.isAgency && this.navigatedOrgId ? { organizationId: this.navigatedOrgId } : {},
+        ...this.navigatedInvoiceId !== null ? { invoiceIds: [this.navigatedInvoiceId] } : filters,
+        ...this.isAgency && this.navigatedOrgId ? { organizationId: this.navigatedOrgId } : filters,
       })
     );
     this.cdr.markForCheck();
@@ -717,5 +730,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     const filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency);
     this.filterState = this.filterService.composeFilterState(filtersFormConfig, filters.state);
     this.populateFilterForm$.next({ ...filters, state: { ...this.filterState } });
+  }
+
+  public clearStructure(): void {
+    if(this.isAgency) {
+      this.store.dispatch(new Invoices.ClearOrganizationStructure());
+    } else {
+      this.store.dispatch(new ClearOrganizationStructure());
+    }
   }
 }

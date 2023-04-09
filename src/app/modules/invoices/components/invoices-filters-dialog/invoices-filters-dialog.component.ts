@@ -218,8 +218,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
         this.initFormConfig();
       }),
       switchMap(() => this.getOrganizationStructure()),
-      filter((structure) => !!structure),
-      switchMap(() => this.populateFilterForm$),
+      switchMap((structure) => this.populateFilterForm$.pipe(filter(() => !!structure))),
       filter((filters) => !!filters),
       tap((filters) => {
         this.applyPreservedFilters(filters?.state || {});
