@@ -18,6 +18,7 @@ import {
   takeUntil,
   tap,
   BehaviorSubject,
+  skip,
 } from 'rxjs';
 
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
@@ -318,6 +319,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.invoicesFilters$
       .pipe(
         filter(() => !!this.organizationId),
+        skip(1),
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {
         this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
@@ -376,18 +378,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public resetFilters(): void {
     this.gridInstance?.columnApi.resetColumnState();
-    const preservedFilters = this.store.selectSnapshot(
-      PreservedFiltersState.preservedFiltersByPageName) as
-      PreservedFiltersByPage<Interfaces.InvoicesFilterState>;
-
-    this.populateFilterForm(preservedFilters);
     this.store.dispatch(
       new Invoices.UpdateFiltersState({
         pageNumber: GRID_CONFIG.initialPage,
         pageSize: GRID_CONFIG.initialRowsPerPage,
         orderBy: '',
-        ...this.navigatedInvoiceId !== null ? { invoiceIds: [this.navigatedInvoiceId] } : this.filterState,
-        ...this.isAgency && this.navigatedOrgId ? { organizationId: this.navigatedOrgId } : this.filterState,
+        ...this.navigatedInvoiceId !== null ? { invoiceIds: [this.navigatedInvoiceId] } : {},
+        ...this.isAgency && this.navigatedOrgId ? { organizationId: this.navigatedOrgId } : {},
       })
     );
     this.cdr.markForCheck();
@@ -708,6 +705,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       takeUntil(this.componentDestroy())
     )
       .subscribe((filters) => {
+        if (filters.dispatch) {
+          this.store.dispatch(new Invoices.UpdateFiltersState({ ...filters.state }));
+        }
+
         this.populateFilterForm(filters);
       });
   }
