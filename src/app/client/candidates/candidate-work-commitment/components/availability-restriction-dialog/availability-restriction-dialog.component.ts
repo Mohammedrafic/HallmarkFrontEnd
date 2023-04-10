@@ -30,7 +30,7 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
   }
 
   public trackByFn = (_: number,
-    item: AvailabilityFormFieldConfig<AvailabilityFilterColumns, typeof Days>) => item.field;
+    item: AvailabilityFormFieldConfig<AvailabilityFilterColumns>) => item.field;
 
   public ngOnInit(): void {
     this.initForm();

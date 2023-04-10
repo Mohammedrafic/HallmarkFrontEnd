@@ -9,7 +9,6 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
 import {
@@ -70,7 +69,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   public departmentId?: number | null = null;
   public isOriented$: Subject<boolean> = new Subject();
   public sortOrder: SortOrder = SortOrder.ASCENDING;
-  public disableToggles: boolean = false;
+  public disableToggles = false;
   public allRecords: Record<string, boolean> = {
     regionIds: false,
     locationIds: false,

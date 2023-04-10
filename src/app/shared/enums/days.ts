@@ -5,5 +5,5 @@ export const Days = [
   { id: 3, text: 'Wednesday' },
   { id: 4, text: 'Thursday' },
   { id: 5, text: 'Friday' },
-  { id: 6, text: 'Saturday' }
+  { id: 6, text: 'Saturday' },
 ];
