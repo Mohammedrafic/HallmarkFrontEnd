@@ -52,8 +52,8 @@ export const GetScheduleEventConfig = (scheduleItem: ScheduleDateItem, eventInde
   }
 
   if (event.scheduleType === ScheduleType.Unavailability) {
-    config.title = 'UNAVAIL';
-    config.shortTitle = 'UNAV';
+    config.title = event.unavailabilityReason;
+    config.shortTitle = event.unavailabilityReason;
     config.color = '#FF5858' ;
   }
 

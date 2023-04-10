@@ -5,7 +5,7 @@ import { ScheduleDateItem, ScheduleEventConfig } from '../interface';
 import { ScheduleCardService } from '../services';
 
 @Directive()
-export abstract class AbstractScheduleCardComponent implements OnInit {
+export abstract class ScheduleCard implements OnInit {
   @Input() isSelected = false;
   @Input() dateSchedule: ScheduleDateItem ;
 
