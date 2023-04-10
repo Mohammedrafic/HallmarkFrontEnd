@@ -12,8 +12,8 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { catchError, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { CandidateWorkCommitment, CandidateWorkCommitmentsPage } from '../models/candidate-work-commitment.model';
-import { CandidateWorkCommitmentService } from '../services/candidate-work-commitment.service';
+import { CandidateWorkCommitment, CandidateWorkCommitmentsPage } from '../../models/candidate-work-commitment.model';
+import { CandidateWorkCommitmentService } from '../../services/candidate-work-commitment.service';
 import { CandidateWorkCommitmentColumnDef } from './candidate-work-commitment-grid.constants';
 
 @Component({
