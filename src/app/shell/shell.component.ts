@@ -1,7 +1,5 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   ElementRef,
   NgZone,
@@ -64,7 +62,6 @@ import { ProfileMenuItem, THEME } from './shell.enum';
   selector: 'app-shell',
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('sidebar') sidebar: SidebarComponent;
@@ -176,7 +173,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     private filterService: FilterService,
     private readonly ngZone: NgZone,
     private ResizeContentService: ResizeContentService,
-    private cd: ChangeDetectorRef,
   ) {
     super();
 
@@ -249,7 +245,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe((isDocked) => {
       this.sidebar.isOpen = isDocked;
-      this.cd.markForCheck();
     });
 
 
@@ -267,13 +262,11 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         //   this.tree.selectedNodes = [activeMenuItem.title];
         // }
       }
-      this.cd.markForCheck();
     });
   }
 
   onAlertSidebarCreated(): void {
     this.sidebar.element.classList.add('e-hidden');
-    this.cd.markForCheck();
   }
 
   toggleSidebar(): void {
@@ -388,7 +381,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     }
 
     this.isMaximized = this.sidebar.isOpen;
-    this.cd.markForCheck();
   }
 
   // TODO: make it with fromEvent and debouncetime
@@ -429,7 +421,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       this.alerts = alertdata;
       this.showAlertSidebar = true;
       this.alertSidebar.show();
-      this.cd.markForCheck();
     });
 
   }
@@ -442,7 +433,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe((alertCountdata) => {
       this.alertsCount = alertCountdata;
-      this.cd.markForCheck();
     });
   }
 
@@ -489,7 +479,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe((x) => {
       this.alerts = x;
-      this.cd.markForCheck();
     });
   }
 
@@ -547,7 +536,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     )
     .subscribe((menuItem: string[]) => {
       this.tree.selectedNodes = menuItem;
-      this.cd.markForCheck();
     });
   }
 
@@ -594,7 +582,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         this.router.navigate([this.sideBarMenu[0].route]);
       }
 
-      this.cd.markForCheck();
     });
   }
 
@@ -604,8 +591,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     if (isMobile) {
       this.store.dispatch(new ToggleSidebarState(false));
     }
-
-    this.cd.markForCheck();
   }
 
   private setSideBarForFirstLoad(route: string): void {
@@ -631,7 +616,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       )
       .subscribe(() => {
         this.isUnreadMessages = true;
-        this.cd.markForCheck();
       });
   }
 
@@ -663,7 +647,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         .pipe(takeUntil(this.componentDestroy()))
         .subscribe((alertCountdata) => {
           this.alertsCount = alertCountdata;
-          this.cd.markForCheck();
         });
 
         this.profileData = [
@@ -720,7 +703,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       this.store.dispatch(new GetAlertsCountForCurrentUser({}));
       this.alertCountStateModel$.subscribe((alertCountdata) => {
         this.alertsCount = alertCountdata;
-        this.cd.markForCheck();
       });
     }, 200000
     );
@@ -746,7 +728,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     ).subscribe((isDark) => {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);
-      this.cd.markForCheck();
     });
   }
 
@@ -769,7 +750,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       );
 
       this.removeManageNotificationOptionInHeader();
-      this.cd.markForCheck();
     });
   }
 

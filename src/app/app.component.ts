@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
@@ -11,7 +11,6 @@ import { SetUserPermissions } from "./store/user.actions";
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   public isIframe = false;
@@ -20,14 +19,12 @@ export class AppComponent implements OnInit {
     private router: Router,
     private store: Store,
     private b2CAuthService: B2CAuthService,
-    private cd: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
     this.store.dispatch([new CheckScreen()]);
 
     this.isIframe = window !== window.parent && !window.opener;
-    this.cd.markForCheck();
 
     this.b2CAuthService.interactionStatusNone().subscribe();
 
