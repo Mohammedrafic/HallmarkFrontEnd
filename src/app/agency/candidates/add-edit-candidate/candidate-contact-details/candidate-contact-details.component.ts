@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, distinctUntilChanged, pairwise, startWith, takeUntil } from 'rxjs';
 import { ONLY_NUMBER } from '@shared/constants';
 
 
@@ -33,17 +33,19 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit, 
     this.addressFieldsValueChanges();
    
     this.formGroup.get('country')?.valueChanges.pipe(
-      takeUntil(this.unsubscribe$),
-    ).subscribe((country) => {
-      this.states$.next(country === Country.USA ? UsaStates : CanadaStates);
-      if(this.formGroup.value.country !== country){
-        this.dependentFieldsList.forEach(element => {
-          if(element !== 'country'){
-            this.formGroup.controls[element].setValue('');
-          }
+      distinctUntilChanged(),takeUntil(this.unsubscribe$),startWith(null), pairwise()
+    ).subscribe(([prev, next]: [any, any]) => {
+      this.states$.next(next === Country.USA ? UsaStates : CanadaStates);
+      if(prev === null){
+        this.dependentFieldsList.filter(ele => ele != 'country' && ele != 'address1').forEach(element => {
+          this.formGroup.controls[element].setValue(null);
         });
-        this.formGroup.controls['address2'].setValue('');
-      }      
+      }else{
+        this.dependentFieldsList.filter(ele => ele != 'country').forEach(element => {
+          this.formGroup.controls[element].setValue(null);
+        });
+        this.formGroup.controls['address2'].setValue(null);
+      }
     });
   }
 
