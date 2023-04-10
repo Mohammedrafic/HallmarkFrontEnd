@@ -4,7 +4,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { FeatherModule } from 'angular-feather';
 import { ButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
-import { DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 
@@ -30,6 +29,7 @@ import { AvailabilityRestrictionDialogComponent } from
   './components/availability-restriction-dialog/availability-restriction-dialog.component';
 import { AvailabilityApiService } from './services/availability-api.service';
 import { AvailabilityHelperService } from './services/availability-helper.service';
+import { TimepickerModule } from '@shared/components/form-controls/timepicker/timepicker.module';
 
 @NgModule({
   declarations: [
@@ -45,7 +45,7 @@ import { AvailabilityHelperService } from './services/availability-helper.servic
     CommonModule,
     InputModule,
     DatepickerModule,
-    DateTimePickerModule,
+    TimepickerModule,
     DropdownModule,
     MultiselectDropdownModule,
     SwitchModule,
