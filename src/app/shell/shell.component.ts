@@ -57,6 +57,7 @@ import {
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { MenuItemNames } from './shell.constant';
 import { ProfileMenuItem, THEME } from './shell.enum';
+import { UserService } from '@shared/services/user.service';
 
 @Component({
   selector: 'app-shell',
@@ -162,6 +163,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   private isDialogOpen = false;
   private permissions: CurrentUserPermission[] = [];
   private orderMenuItems: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
+  private irpVmsHelpSiteUrl = 'https://eiiohelp.einsteinii.org/';
 
   constructor(
     private store: Store,
@@ -173,6 +175,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     private filterService: FilterService,
     private readonly ngZone: NgZone,
     private ResizeContentService: ResizeContentService,
+    private userService: UserService,
   ) {
     super();
 
@@ -203,6 +206,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.watchForUnreadMessages();
     this.attachElementToResizeObserver();
     this.watchForRouterEvents();
+    this.getSiteHelpUrl();
   }
 
   ngAfterViewInit(): void {
@@ -363,7 +367,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     if (user?.businessUnitType === BusinessUnitType.Agency) {
       url = 'https://eiiahelp.einsteinii.org/';
     } else {
-      url = 'https://eiiohelp.einsteinii.org/';
+      url = this.irpVmsHelpSiteUrl;
     }
     window.open(url, '_blank');
   }
@@ -756,7 +760,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   private watchForRouterEvents(): void {
     const scheduleUrl = '/client/scheduling';
 
-    if(this.router.url === scheduleUrl) {
+    if (this.router.url === scheduleUrl) {
       this.isToggleButtonDisable = true;
     }
 
@@ -764,7 +768,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       filter((routeEvent: Event): routeEvent is RouterEvent => routeEvent instanceof NavigationEnd),
       takeUntil(this.componentDestroy()),
     ).subscribe((routeEvent: RouterEvent) => {
-      if(routeEvent.url === scheduleUrl) {
+      if (routeEvent.url === scheduleUrl) {
         this.store.dispatch(new ToggleSidebarState(!this.sidebar.isOpen));
         this.tree.collapseAll();
         this.isToggleButtonDisable = true;
@@ -772,5 +776,14 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         this.isToggleButtonDisable = false;
       }
     });
+  }
+
+  private getSiteHelpUrl(): void {
+    this.userService
+      .getHelpSiteUrl()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((url: string) => {
+        this.irpVmsHelpSiteUrl = url;
+      });
   }
 }
