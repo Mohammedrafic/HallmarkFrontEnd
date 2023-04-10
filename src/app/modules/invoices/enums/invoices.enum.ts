@@ -30,6 +30,7 @@ export enum INVOICES_ACTIONS {
   DeleteManualInvoice = '[invoices] Delete manual invoice',
   GetOrganizations = '[invoices] Get organizations',
   GetOrganizationStructure = '[invoices] Get organization structure',
+  ClearOrganizationStructure = '[invoices] Clear organization structure',
   SelectOrganization = '[invoices] Select another organization',
   ClearManInvoiceAttachments = '[invoices] clear manual invoice attachments',
   ApproveInvoice = '[invoices] Approve Invoice',

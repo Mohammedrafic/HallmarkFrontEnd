@@ -189,6 +189,7 @@ import {
 import { OrderManagementIrpGridHelper, OrderManagementIrpSubrowHelper } from '@client/order-management/helpers';
 import {
   DetectActiveSystem,
+  GetFilterFormConfig,
   IRPTabRequestTypeMap,
   IRPTabsConfig,
   SystemGroupConfig,
@@ -210,7 +211,6 @@ import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interf
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { ClearPageFilters, GetPreservedFiltersByPage, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 import { OutsideZone } from '@core/decorators';
-import { GetFilterFormConfig } from '@client/order-management/constants/filter-form-config.constant';
 
 @Component({
   selector: 'app-order-management-content',
@@ -809,7 +809,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
       contactEmails: this.contactEmails,
-      orderId: this.filters.orderId || null,
       irpOnly: this.filters.irpOnly || null,
     });
 
