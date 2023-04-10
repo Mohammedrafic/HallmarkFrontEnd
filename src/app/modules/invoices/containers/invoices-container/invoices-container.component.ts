@@ -726,7 +726,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   private populateFilterForm(filters: PreservedFiltersByPage<Interfaces.InvoicesFilterState>): void {
     const filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency);
-    this.filterState = this.filterService.composeFilterState(filtersFormConfig, filters.state);
+    this.filterState = this.filterService.composeFilterState(
+      filtersFormConfig,
+      filters.state as Record<string, unknown>
+    );
     this.populateFilterForm$.next({ ...filters, state: { ...this.filterState } });
   }
 
