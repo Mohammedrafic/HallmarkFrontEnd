@@ -36,11 +36,10 @@ import {
   CardClickEvent,
   RemovedSlot,
   ScheduleCandidatesPage,
-  ScheduleDateItem,
   ScheduleModel,
   SelectedCells,
 } from '../../interface';
-import { GetMonthRange } from '../../helpers';
+import { GetMonthRange, GetScheduledShift } from '../../helpers';
 import { ScheduleGridService } from './schedule-grid.service';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -212,10 +211,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     );
 
     if(isEditSideBar) {
-      this.editCell.emit({
-        candidate,
-        schedule: schedule as ScheduleDateItem,
-      });
+      this.editCell.emit(GetScheduledShift(
+        this.scheduleData as ScheduleInt.ScheduleModelPage,
+        candidate.id,
+        this.scheduleGridService.getFirstSelectedDate(this.selectedCandidatesSlot),
+      ));
     } else {
       this.selectedCells.emit({
         cells: ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot, schedule),

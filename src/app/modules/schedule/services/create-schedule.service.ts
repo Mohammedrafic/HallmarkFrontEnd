@@ -5,9 +5,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { EMPTY, Observable, of, Subject } from 'rxjs';
 
-import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { FilteredItem } from '@shared/models/filter.model';
-import { Skill } from '@shared/models/skill.model';
 import { getTime } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
@@ -26,7 +24,6 @@ import {
   ScheduleTypeRadioButton,
   ShiftDropDownsData,
 } from '../interface';
-import { ScheduleFilterHelper } from '../helpers';
 import { ScheduleFiltersService } from './schedule-filters.service';
 import { ScheduleClassesList, ScheduleCustomClassesList } from '../components/create-schedule';
 
@@ -238,9 +235,7 @@ export class CreateScheduleService {
         regionsDataSource: this.getDataSourceFromFilteredItems('regionIds', scheduleFiltersData.filteredItems),
         locationsDataSource: this.getDataSourceFromFilteredItems('locationIds', scheduleFiltersData.filteredItems),
         departmentsDataSource: this.getDataSourceFromFilteredItems('departmentsIds', scheduleFiltersData.filteredItems),
-        skillsDataSource: ScheduleFilterHelper.adaptSkillToOption(
-          this.store.selectSnapshot(OrganizationManagementState.assignedSkillsByOrganization) as Skill[] || []
-        ),
+        skillsDataSource: this.getDataSourceFromFilteredItems('skillIds', scheduleFiltersData.filteredItems),
       };
     } else {
       const data: ShiftDropDownsData = {} as ShiftDropDownsData;
