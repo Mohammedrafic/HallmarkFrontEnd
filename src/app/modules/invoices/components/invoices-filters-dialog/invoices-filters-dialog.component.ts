@@ -324,7 +324,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
         take(1)
       )
       .subscribe(({ state }) => {
-        const filter = this.filterService.composeFilterState(this.filtersFormConfig, state);
+        const filter = this.filterService.composeFilterState(this.filtersFormConfig, state as Record<string, unknown>);
         this.formGroup.reset();
         this.invoicesFiltersService.patchFormValue(this.formGroup, filter);
         this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
