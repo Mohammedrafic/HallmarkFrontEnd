@@ -89,7 +89,9 @@ export class TimesheetsFilterDialogComponent
         filter(({ dispatch }) => dispatch),
         takeUntil(this.componentDestroy())
       )
-      .subscribe(({ state }) => this.applyPreservedFilters(state));
+      .subscribe(({ state }) => {
+        this.applyPreservedFilters(state);
+      });
   }
 
   private getUsersListBySearchTerm(args: FilteringEventArgs): Observable<FilteredUser[]> {
@@ -105,15 +107,11 @@ export class TimesheetsFilterDialogComponent
     this.activeTab$.pipe(
       switchMap(() => this.preservedFiltersByPageName$),
       filter(({ state }) => !!state?.statusIds?.length),
-      map(({ state }) => {
-        const filterState = this.activeTabIdx !== 0
-          ? { ...state, statusIds: [] }
-          : state;
-
-        return filterState;
-      }),
+      map(({ state }) => this.filterPreservedFilters(state)),
       takeUntil(this.componentDestroy())
-    ).subscribe((state) => this.applyPreservedFilters(state));
+    ).subscribe((state) => { 
+      this.applyPreservedFilters(state);
+    });
   }
 
   private applyPreservedFilters(filters: TimesheetsFilterState): void {
