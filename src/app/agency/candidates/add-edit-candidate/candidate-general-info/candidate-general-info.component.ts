@@ -102,7 +102,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
       profileStatus: new FormControl(2, [Validators.required]),
       candidateAgencyStatus: new FormControl(2, [Validators.required]),
       candidateProfileRegions: new FormControl(null, [Validators.required]),
-      ssn: new FormControl(''), //,[ssnValidator()]
+      ssn: new FormControl(''),
     });
   }
 
