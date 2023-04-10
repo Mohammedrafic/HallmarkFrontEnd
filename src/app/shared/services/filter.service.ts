@@ -172,19 +172,19 @@ export class FilterService {
     );
   }
 
-  public composeFilterState<T extends CommonFormConfig, S extends object>(formConfig: T[], state: S): S {
+  public composeFilterState<T extends CommonFormConfig, S extends Record<string, unknown>>(
+    formConfig: T[],
+    state: S
+  ): S {
     const filter = formConfig.reduce((acc, item) => {
       const field = item.field as keyof S;
       const value = state?.[field];
       if (!!value) {
-        acc = {
-          ...acc,
-          [field]: value,
-        };
+        acc[field] = value;
       }
       return acc;
-    }, {});
+    }, {} as S);
 
-    return filter as S;
+    return filter;
   }
 }

@@ -5,7 +5,7 @@ import { ScheduleDateItem, ScheduleEventConfig } from '../interface';
 import { ScheduleCardService } from '../services';
 
 @Directive()
-export abstract class AbstractScheduleCardComponent implements OnInit {
+export abstract class ScheduleCard implements OnInit {
   @Input() isSelected = false;
   @Input() dateSchedule: ScheduleDateItem ;
 
@@ -40,8 +40,6 @@ export abstract class AbstractScheduleCardComponent implements OnInit {
   }
 
   private createTooltips(): void {
-    if (this.dateSchedule.daySchedules.length > 1) {
-      this.allEventsTooltip = this.scheduleCardService.createAllEventsTooltip(this.dateSchedule.daySchedules);
-    }
+    this.allEventsTooltip = this.scheduleCardService.createAllEventsTooltip(this.dateSchedule.daySchedules);
   }
 }

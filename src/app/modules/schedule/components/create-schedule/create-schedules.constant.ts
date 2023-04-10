@@ -8,7 +8,17 @@ export const Icons = {
 
 export const StartTimeField = 'startTime';
 export const EndTimeField = 'endTime';
-
+export const ToggleControls = ['critical','onCall','charge', 'preceptor'];
+export const ScheduleControlsToReset = [
+  'shiftId',
+  'startTime',
+  'endTime',
+  'hours',
+  'critical',
+  'onCall',
+  'charge',
+  'preceptor'
+];
 export const ScheduleClassesList = {
   [ScheduleItemType.Book]: 'book-form',
   [ScheduleItemType.Availability]: 'availability-form',

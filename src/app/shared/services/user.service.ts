@@ -94,4 +94,8 @@ export class UserService {
   public getOrderPermissions(orderId: number): Observable<CurrentUserPermission[]> {
     return this.http.get<CurrentUserPermission[]>('/api/Permissions/orderscope/' + orderId);
   }
+
+  public getHelpSiteUrl(): Observable<string> {
+    return this.http.get<string>('/api/Help/link');
+  }
 }

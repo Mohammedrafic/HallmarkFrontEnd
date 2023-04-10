@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleCha
 
 import { ScheduleCandidate, ScheduleFilters, ScheduleModel } from '../../interface';
 import { CandidateIconName } from '../../constants';
-import { GetCandidateTypeTooltip } from './candidate-card.helper';
+import { CreateTooltipForOrientation, GetCandidateTypeTooltip } from './candidate-card.helper';
 
 @Component({
   selector: 'app-candidate-card',
@@ -29,8 +29,9 @@ export class CandidateCardComponent implements OnInit, OnChanges {
   candidateTypeTooltip: string;
 
   ngOnInit(): void {
-    this.iconTooltipMessage = this.candidateData.isOriented ? this.candidateData.employeeNote : 'Not Oriented';
-    this.candidateIconName = CandidateIconName(this.candidateData);
+    this.candidateIconName = CandidateIconName(this.candidateData, this.selectedFilters);
+    this.iconTooltipMessage = this.candidateIconName === 'compass' ?
+      CreateTooltipForOrientation(this.candidateData) : this.candidateData.employeeNote;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

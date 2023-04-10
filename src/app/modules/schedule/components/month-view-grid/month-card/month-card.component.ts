@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 
-import { AbstractScheduleCardComponent } from '../../abstract-schedule-card.component';
+import { ScheduleCard } from '../../../helpers/schedule-card.helper';
 
 @Component({
   selector: 'app-month-card',
@@ -8,7 +8,7 @@ import { AbstractScheduleCardComponent } from '../../abstract-schedule-card.comp
   styleUrls: ['./month-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MonthCardComponent extends AbstractScheduleCardComponent {
+export class MonthCardComponent extends ScheduleCard {
   @Input() isDateActive: boolean;
   @Input() currentDate: string;
 }

@@ -50,7 +50,7 @@
       <span class="time__text">{{ item.endDate | date: 'HH:mm': 'UTC' }}</span>
       <span *ngIf="item.ltaOrder" class="time__text"> L</span>
       <span *ngIf="item.additionalAttributes"> |</span>
-      <span *ngIf="item.additionalAttributes"> {{ item.additionalAttributes}}</span>
+      <span *ngIf="item.additionalAttributes" class="time__attributes"> {{ item.additionalAttributes}}</span>
     </div>
     <div class="title">
       <span class="title__text"> {{ item.title }}</span>

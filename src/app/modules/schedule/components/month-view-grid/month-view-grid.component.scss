@@ -19,9 +19,11 @@ $cell-height: 125px;
     padding: 0;
 
     .date-cell {
+      position: relative;
       background-color: $secondary-dark-blue-50;
       border-bottom: 1px solid $secondary-dark-blue-40;
       height: $cell-height;
+      min-width: 150px;
       padding: 4px;
     }
 
@@ -30,7 +32,9 @@ $cell-height: 125px;
     }
 
     .date-slot {
-      height: 100%;
+      position: absolute;
+      height: calc(100% - 8px);
+      width: calc(100% - 8px);
       cursor: pointer;
       border-radius: 4px;
       border: 1px solid $secondary-dark-blue-50;

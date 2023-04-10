@@ -80,6 +80,7 @@ import {
   SaveFiltersByPageName,
 } from 'src/app/store/preserved-filters.actions';
 import { OrganizationStructure } from '@shared/models/organization.model';
+import { GetAgencyFilterFormConfig } from './constants';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -390,9 +391,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       PreservedFiltersState.preservedFiltersByPageName
     ) as PreservedFiltersByPage<AgencyOrderFilters>;
       
-    if (!preservedFiltes.isNotPreserved && preservedFiltes.dispatch) {
+    if (!preservedFiltes.isNotPreserved) {
       const { state } = preservedFiltes;
-      this.filters = { ...state, orderStatuses: [...state.orderStatuses as number[]]};
+      const filterState = { ...state, orderStatuses: [...state.orderStatuses as number[]] };
+      const filterFormConfig = GetAgencyFilterFormConfig(this.selectedTab);
+      this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
       this.patchFilterForm(!!this.filters?.regionIds?.length);
       this.prepopulateFilterFormStructure();
       this.dispatchNewPage();

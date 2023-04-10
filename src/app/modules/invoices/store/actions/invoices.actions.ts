@@ -157,6 +157,10 @@ export namespace Invoices {
     ) {}
   }
 
+  export class ClearOrganizationStructure {
+    static readonly type = INVOICES_ACTIONS.ClearOrganizationStructure;
+  }
+
   export class SelectOrganization {
     static readonly type = INVOICES_ACTIONS.SelectOrganization;
 
