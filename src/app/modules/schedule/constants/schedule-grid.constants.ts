@@ -2,9 +2,9 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 
 import { DatesRangeType, WeekDays } from '@shared/enums';
 import { IrpOrderType } from '@shared/enums/order-type';
-import { CardTitle } from '../helpers';
+import { CardTitle, CreateScheduleAttributes, HasMultipleFilters } from '../helpers';
 import { DatePeriodId, ScheduleType } from '../enums';
-import { ScheduleCandidate, ScheduleDateItem, ScheduleEventConfig } from '../interface';
+import { ScheduleCandidate, ScheduleDateItem, ScheduleEventConfig, ScheduleFilters } from '../interface';
 
 export const DatesPeriods: ItemModel[] = [
   {
@@ -28,8 +28,8 @@ export const MonthPeriod: ItemModel[] = [
   },
 ];
 
-export const CandidateIconName = (scheduleCandidate: ScheduleCandidate): string => {
-  if (!scheduleCandidate.isOriented) {
+export const CandidateIconName = (scheduleCandidate: ScheduleCandidate, filters: ScheduleFilters): string => {
+  if (!HasMultipleFilters(filters)) {
     return 'compass';
   }
 
@@ -46,7 +46,7 @@ export const GetScheduleEventConfig = (scheduleItem: ScheduleDateItem, eventInde
 
   if (event.scheduleType === ScheduleType.Book) {
     config.title = CardTitle(event);
-    config.additionalAttributes = ''; // TODO: additional attributes should be here
+    config.additionalAttributes = event.attributes ? CreateScheduleAttributes(event.attributes) : '';
     config.color = event.floated ? '#518CFF' : '#060715';
     config.ltaOrder = event.orderMetadata?.orderType === IrpOrderType.LongTermAssignment;
   }

@@ -570,6 +570,12 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       .subscribe(() => this.handleSuccessAdding());
   }
 
+  //todo: remove hardcoded value
+  // orientated,
+  // critical,
+  // onCall,
+  // charge,
+  // preceptor,
   private checkBookingsOverlaps(): void {
     const { departmentId,skillId, shiftId, startTime, endTime, date } = this.scheduleForm.getRawValue();
     this.scheduleToBook = {
@@ -583,6 +589,11 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       startTime: getTime(startTime),
       endTime: getTime(endTime),
       createOrder: false,
+      orientated: false,
+      critical: false,
+      onCall: false,
+      charge: false,
+      preceptor: false,
     };
     const request: BookingsOverlapsRequest = {
       employeeScheduledDays: this.scheduleToBook.employeeBookedDays,

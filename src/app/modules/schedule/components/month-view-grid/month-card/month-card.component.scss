@@ -57,6 +57,12 @@
     font-size: 12px;
     line-height: 18px;
     white-space: nowrap;
+    position: relative;
+
+    &__attributes {
+      position: absolute;
+      margin-left: 2px;
+    }
 
     &__text {
       font-weight: 700;

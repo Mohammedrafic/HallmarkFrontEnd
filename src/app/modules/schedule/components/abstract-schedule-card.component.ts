@@ -40,8 +40,6 @@ export abstract class AbstractScheduleCardComponent implements OnInit {
   }
 
   private createTooltips(): void {
-    if (this.dateSchedule.daySchedules.length > 1) {
-      this.allEventsTooltip = this.scheduleCardService.createAllEventsTooltip(this.dateSchedule.daySchedules);
-    }
+    this.allEventsTooltip = this.scheduleCardService.createAllEventsTooltip(this.dateSchedule.daySchedules);
   }
 }

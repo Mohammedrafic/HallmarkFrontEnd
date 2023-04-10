@@ -5,7 +5,7 @@ import * as ScheduleInt from '../interface';
 import { DropdownOption } from '@core/interface';
 import { convertMsToTime, getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { ShiftTab } from '../components/edit-schedule/edit-schedule.interface';
-import { ScheduleType } from '../enums';
+import { ScheduleAttributeKeys, ScheduleType } from '../enums';
 import {
   BookingError,
   ScheduleBookingErrors,
@@ -13,6 +13,7 @@ import {
   ScheduleDateItem,
   ScheduledItem,
   ScheduleItem,
+  ScheduleItemAttributes,
   ScheduleModel,
   ScheduleModelPage,
 } from '../interface';
@@ -258,6 +259,40 @@ export const GetMonthRange = (initDay: number): WeekDays[] => {
     ...daysInWeek.slice(startingDayIndex),
     ...daysInWeek.slice(0, startingDayIndex),
   ];
+};
+
+export const CreateScheduleAttributes = (attributes: ScheduleItemAttributes, isTooltip = false): string => {
+  if(attributes.orientated) {
+    return ScheduleAttributeKeys.ORI;
+  }
+
+  return CreateAttributesList(attributes, isTooltip);
+};
+
+export const CreateAttributesList = (attributes: ScheduleItemAttributes, isTooltip = false): string => {
+  const attributesList = [];
+
+  if(attributes.critical){
+    attributesList.push(ScheduleAttributeKeys.CRT);
+  }
+
+  if(attributes.onCall) {
+    attributesList.push(ScheduleAttributeKeys.OC);
+  }
+
+  if(attributes.charge) {
+    attributesList.push(ScheduleAttributeKeys.CHG);
+  }
+
+  if(attributes.preceptor) {
+    attributesList.push(ScheduleAttributeKeys.PRC);
+  }
+
+  if (attributesList.length > 2 && !isTooltip) {
+    attributesList.splice(2);
+  }
+
+  return attributesList.length ? attributesList.join(',') : '';
 };
 
 export const GetScheduledShift = (

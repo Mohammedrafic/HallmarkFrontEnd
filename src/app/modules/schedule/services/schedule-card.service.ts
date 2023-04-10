@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { DateTimeHelper } from '@core/helpers';
 import { ScheduleType } from '../enums';
 import { ScheduleItem } from '../interface';
+import { CreateScheduleAttributes } from '../helpers';
 
 @Injectable()
 export class ScheduleCardService {
@@ -21,11 +22,13 @@ export class ScheduleCardService {
 
         if (isBooking && orderIDText) {
           return `${ startTime } - ${ endTime } | ${orderIDText}`
-            + ` | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department }`;
+            + ` | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department }`
+            + ` | ${CreateScheduleAttributes(item.attributes, true)}`;
         }
 
         if (isBooking) {
-          return `${ startTime } - ${ endTime } | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department }`;
+          return `${ startTime } - ${ endTime } | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department }`
+            + ` | ${CreateScheduleAttributes(item.attributes, true)}`;
         }
 
         if (isAvailability) {

@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
 import { EMPTY, Observable, of, Subject } from 'rxjs';
@@ -18,14 +18,15 @@ import { CreateScheduleItem } from '../components/schedule-items/schedule-items.
 import * as ScheduleInt from '../interface';
 import {
   EmployeeBookingDay,
-  ScheduleBookingErrors,
+  ScheduleBookingErrors, ScheduleCandidate,
   ScheduleFiltersData,
-  ScheduleFilterStructure,
+  ScheduleFilterStructure, ScheduleForm, ScheduleFormConfig, ScheduleFormFieldConfig, ScheduleSelectedSlots,
   ScheduleTypeRadioButton,
   ShiftDropDownsData,
 } from '../interface';
 import { ScheduleFiltersService } from './schedule-filters.service';
-import { ScheduleClassesList, ScheduleCustomClassesList } from '../components/create-schedule';
+import { ScheduleClassesList, ScheduleCustomClassesList, ToggleControls } from '../components/create-schedule';
+import { ScheduleShift } from '@shared/models/schedule-shift.model';
 
 @Injectable()
 export class CreateScheduleService {
@@ -72,6 +73,11 @@ export class CreateScheduleService {
       startTime: [null, Validators.required],
       endTime: [null, Validators.required],
       hours: [null],
+      orientated: [false],
+      critical: [false],
+      onCall: [false],
+      charge: [false],
+      preceptor: [false],
       regionId: [null],
       locationId: [null],
       departmentId: [null],
@@ -118,7 +124,18 @@ export class CreateScheduleService {
     scheduleItems: CreateScheduleItem[],
     customShiftId: number
   ): ScheduleInt.ScheduleBook {
-    const { departmentId,skillId, shiftId, startTime, endTime } = scheduleForm.getRawValue();
+    const {
+      departmentId,
+      skillId,
+      shiftId,
+      startTime,
+      endTime,
+      orientated,
+      critical,
+      onCall,
+      charge ,
+      preceptor,
+    } = scheduleForm.getRawValue();
 
     return  {
       employeeBookedDays: this.getEmployeeBookedDays(scheduleItems),
@@ -128,6 +145,11 @@ export class CreateScheduleService {
       startTime: getTime(startTime),
       endTime: getTime(endTime),
       createOrder: false,
+      orientated,
+      critical,
+      onCall,
+      charge,
+      preceptor,
     };
   }
 
@@ -156,6 +178,43 @@ export class CreateScheduleService {
         bookedDays,
       };
     });
+  }
+
+  public hideToggleControls(config: ScheduleFormConfig, value: boolean): void {
+    config.formFields
+      .filter((configField: ScheduleFormFieldConfig) => {
+        return ToggleControls.includes(configField.field);
+      }).forEach((configField: ScheduleFormFieldConfig) => {
+        configField.show = value;
+    });
+  }
+
+  public setOrientationControlValue(
+    selectedSlots: ScheduleSelectedSlots,
+    form: CustomFormGroup<ScheduleForm>,
+  ): void {
+    const candidates = selectedSlots.candidates;
+    const control = form?.get('orientated') as AbstractControl;
+
+    if(candidates.length === 1 && form) {
+      this.orientationForSingleCandidate(control,candidates);
+    } else if(candidates.length > 1){
+      this.orientationForMultiCandidates(control,candidates);
+    }
+  }
+
+  public setOnCallControlValue(
+    form: CustomFormGroup<ScheduleForm>,
+    shiftId: number,
+    shiftsList: ScheduleShift[]
+  ): void {
+    const onCallControl = form.get('onCall');
+
+    if(onCallControl) {
+      const selectedShift = shiftsList.find((shift: ScheduleShift) => shift.id === shiftId);
+
+      onCallControl.patchValue(selectedShift ? selectedShift.onCall : false);
+    }
   }
 
   getDaySchedules(candidateId: number, dateString: string): ScheduleInt.ScheduleItem[] {
@@ -251,7 +310,7 @@ export class CreateScheduleService {
     }
   }
 
-  resetScheduleTimeControls(scheduleForm: FormGroup, controlsList: string[]): void {
+  resetScheduleControls(scheduleForm: FormGroup, controlsList: string[]): void {
     controlsList.forEach((control: string) => {
       scheduleForm.get(control)?.reset();
     });
@@ -268,5 +327,28 @@ export class CreateScheduleService {
       text: filteredItem.text,
       value: filteredItem.value,
     }];
+  }
+
+  private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]):void {
+    const hasCandidateWithoutOrientation = candidates.filter((candidate: ScheduleCandidate) => {
+      return !candidate.isOriented;
+    });
+
+    if(hasCandidateWithoutOrientation.length) {
+      control?.patchValue(true);
+      control?.disable();
+    } else {
+      control?.enable();
+    }
+  }
+
+  private orientationForSingleCandidate(control: AbstractControl, candidates: ScheduleCandidate[]): void {
+    control?.patchValue(!candidates[0].isOriented);
+
+    if(!candidates[0].isOriented) {
+      control?.disable();
+    } else {
+      control?.enable();
+    }
   }
 }

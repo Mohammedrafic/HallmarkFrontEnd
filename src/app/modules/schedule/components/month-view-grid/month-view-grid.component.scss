@@ -23,6 +23,7 @@ $cell-height: 125px;
       background-color: $secondary-dark-blue-50;
       border-bottom: 1px solid $secondary-dark-blue-40;
       height: $cell-height;
+      min-width: 150px;
       padding: 4px;
     }
 
