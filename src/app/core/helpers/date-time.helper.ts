@@ -200,11 +200,12 @@ export class DateTimeHelper {
   public static getDatesBetween(sDate: Date | string | null = null, eDate: Date | string | null = null): string[] {
     const startDate = sDate || new Date();
     const endDate = eDate || new Date().setDate(new Date().getDate() + 14); // default 14 days - 2 week view
-    const formattedEndDate = DateTimeHelper.setInitDateHours(new Date(endDate));
+    const formattedEndDate = DateTimeHelper.convertDateToUtc(endDate as string);
 
     const result = [];
 
-    for(let curDate = DateTimeHelper.setInitDateHours(startDate);
+    for(
+      let curDate = DateTimeHelper.convertDateToUtc(startDate as string);
       curDate <= formattedEndDate;
       curDate.setDate(curDate.getDate() + 1)
     ) {
