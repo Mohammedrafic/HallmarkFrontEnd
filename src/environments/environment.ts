@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  host: 'https://dev.einstein2.com/einsteinapi',
+ //host: 'https://qa.einstein2.com/einsteinapi',
+  host:'http://localhost:5120'
 };
 
 /*
