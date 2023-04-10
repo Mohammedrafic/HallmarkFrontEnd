@@ -323,7 +323,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     setDataSource(jobDistributionForm.fields, 'agencyId', this.dataSourceContainer.associateAgency as AssociateAgency[]);
 
     const jobDescriptionForm = this.getSelectedFormConfig(JobDescriptionForm);
-    setDataSource(jobDescriptionForm.fields, 'orderRequisitionReasonId', this.getIRPOrderRequisition(this.dataSourceContainer.reasons as RejectReasonwithSystem[]));
+    
+    if (this.dataSourceContainer.reasons != undefined) {
+      setDataSource(jobDescriptionForm.fields, 'orderRequisitionReasonId', this.getIRPOrderRequisition(this.dataSourceContainer.reasons as RejectReasonwithSystem[]));
+      }
 
     this.setDataSourceForSpecialProject();
     this.setDataSourceForWorkLocationList();
