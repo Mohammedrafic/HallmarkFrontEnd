@@ -81,6 +81,34 @@
       <ejs-switch id="switcher" (change)="onSwitcher($event);" [checked]="isBlock"></ejs-switch>
       <label for="switcher" class="switch-text">{{isBlock?'Unblock':'Block'}}</label>
     </div>
+
+    <div class="form-elemet">
+      <div class="group">
+        <div class="input-container bootstrap">
+          <label>Candidate Name<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-autocomplete formControlName="candidateProfileId" [dataSource]="CandidateNames" filterType='StartsWith'
+              [fields]='candidateNameFields' [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending'
+              (filtering)='onFiltering($event)'></ejs-autocomplete>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="input-container">
+      <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="candidateEmail" id="email"
+        label="Email"></app-input>
+    </div>
+    <div class="d-flex">
+      <div class="input-container bootstrap f-grow-2">
+        <label>SSN<span class="required">*</span></label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" />
+        </div>
+      </div>
+      <div class="input-container"></div>
+    </div>
+
+
     <div class="input-container bootstrap">
       <label>Organization<span class="required">*</span></label>
       <div class="input-group">
@@ -90,6 +118,7 @@
         </ejs-dropdownlist>
       </div>
     </div>
+    
     <div class="form-elemet">
       <div class="group">
         <div class="input-container calendar">
@@ -114,34 +143,10 @@
       </div>
     </div>
 
-    <div class="form-elemet">
-      <div class="group">
-        <div class="input-container bootstrap">
-          <label>Candidate Name<span class="required">*</span></label>
-          <div class="input-group dropdown">
-            <ejs-autocomplete formControlName="candidateProfileId" [dataSource]="CandidateNames" filterType='StartsWith'
-              [fields]='candidateNameFields' [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending'
-              (filtering)='onFiltering($event)'></ejs-autocomplete>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="d-flex">
-      <div class="input-container bootstrap f-grow-2">
-        <label>SSN<span class="required">*</span></label>
-        <div class="input-group">
-          <input appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" />
-        </div>
-      </div>
-      <div class="input-container"></div>
-    </div>
-    <div class="input-container">
-      <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="candidateEmail" id="email"
-        label="Email"></app-input>
-    </div>
+
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Comments</label>
+        <label>Comment</label>
         <div class="input-group">
           <textarea class="e-input" type="text" rows="3" maxlength="3000" appValidateWithMessage name="dnrComment"
             formControlName="dnrComment" tabindex="9"></textarea>

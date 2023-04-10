@@ -50,7 +50,7 @@ export class DonotReturnState {
   GetAllOrganization({ patchState }: StateContext<DoNotReturnStateModel>,
     { }: DoNotReturn.GetAllOrganization): Observable<UserAgencyOrganization> {
     return this.DonotreturnService.allOrganizations().pipe(tap((data) => {
-      patchState({ allOrganizations: data.businessUnits });
+      patchState({ allOrganizations: data.businessUnits.sort((a, b) => (a.name as string).localeCompare(b.name as string)) });
       return data;
     }));
   }
