@@ -1,6 +1,7 @@
 import { DateTimeHelper } from '@core/helpers';
 import { IrpOrderCandidate, IrpOrderCandidateDto } from '@shared/models/order-management.model';
 import { PageOfCollections } from '@shared/models/page.model';
+import { getOrientationDate } from '@shared/components/order-candidate-list/edit-candidate-list.helper';
 
 export const getCandidatePositionId = (organizationPrefix: string, publicId: number, positionId: number): string => {
   if (organizationPrefix) {
@@ -28,6 +29,7 @@ export const AdaptIrpCandidates = (
         ...candidate,
         lastShiftTime: candidate.lastShiftFrom ? `${lastTimeFrom} - ${lastTimeTo}` : '',
         nextShiftTime: candidate.nextShiftFrom ? `${nextTimeFrom} - ${nextTimeTo}` : '',
+        departmentOrientationDate: getOrientationDate(candidate.departmentOrientationDate),
       };
 
       return irpCandidate;

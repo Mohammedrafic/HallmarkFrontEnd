@@ -758,6 +758,8 @@ export interface IrpOrderCandidateDto {
   weeklyHoursSchedule: number;
   weekOvertime: number;
   payRate: number;
+  organizationOrientationDate: string | null;
+  departmentOrientationDate: string | null;
 }
 
 export type IrpOrderCandidate = IrpOrderCandidateDto & IrpCandidateShiftTime;
