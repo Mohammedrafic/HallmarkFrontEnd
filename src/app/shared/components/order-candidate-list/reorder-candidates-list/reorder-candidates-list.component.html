@@ -139,7 +139,6 @@
     (pageSizeChangeEmitter)="gridPerPageChanged($event)"
   ></app-grid-pagination>
   </ng-container>
-
   <ng-template #irpCandiadtes>
     <ejs-grid
       #orderCandidatesGrid
@@ -157,7 +156,7 @@
       [height]="300"
     >
       <e-columns>
-        <e-column textAlign="Right" width="120">
+        <e-column textAlign="Right" width="140">
           <ng-template #template let-data>
             <div class="row-tool-buttons">
               <div
@@ -180,7 +179,7 @@
                 ejs-button
                 cssClass="e-flat primary-icon-button custom-button"
                 [class.btn-icon__disabled]="selectedOrder.irpOrderMetadata?.status === orderStatus.Closed
-                || data?.status === onboardedCandidate"
+                || data?.status === onboardedCandidate || !data.isOriented"
                 (click)="changeIrpCandidateStatus(data)"
               >
                 <span class="edit-button"><i-feather name="calendar" class="icon"></i-feather></span>
@@ -188,12 +187,15 @@
             </div>
           </ng-template>
         </e-column>
-        <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
+        <e-column field="firstName" headerText="Name" textAlign="Left" width="170">
           <ng-template #template let-data>
             <div class="link" (click)="onViewNavigation(data)">
               {{ data.lastName }}, {{ data.firstName }}
               <ng-container *ngIf="!data.isOriented">
-                <ejs-tooltip content="Not oriented" position="TopRight">
+                <ejs-tooltip
+                  [content]="data.departmentOrientationDate"
+                  position="TopRight"
+                >
                   <i-feather name="compass" class="icon"></i-feather>
                 </ejs-tooltip>
               </ng-container>

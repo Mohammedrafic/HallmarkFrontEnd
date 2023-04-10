@@ -69,11 +69,6 @@ export class InvoicesFiltersService {
     }) as CustomFormGroup<InvoiceFilterColumns>;
   }
 
-  patchFormValue<Type>(formGroup: FormGroup, formValues: Type): void {
-    Object.entries(formGroup.controls).forEach(([field, control]) => {
-      control.setValue(formValues[field as keyof Type] || null);
-    });
-  }
 
   setupValidators(formGroup: FormGroup): void {
     formGroup.get('amountFrom')?.addValidators([intervalMinValidator(formGroup, 'amountTo', true)]);

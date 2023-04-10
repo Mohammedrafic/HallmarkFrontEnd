@@ -11,6 +11,7 @@ import {
   TabNavigationComponent,
 } from '@client/order-management/components/order-management-content/tab-navigation/tab-navigation.component';
 import { Router } from '@angular/router';
+import { ClearOrganizationStructure } from '@agency/store/order-management.actions';
 
 @Component({
   selector: 'app-order-management',
@@ -53,6 +54,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   public onTabChanged(selectedTab: AgencyOrderManagementTabs): void {
     this.search?.clear();
     this.selectedTab = selectedTab;
+    this.store.dispatch(new ClearOrganizationStructure());
   }
 
   public showFilters(): void {

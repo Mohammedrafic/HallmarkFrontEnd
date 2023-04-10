@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from "@angular/forms";
 
 import { FeatherModule } from 'angular-feather';
-import { ButtonModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { TimePickerModule } from "@syncfusion/ej2-angular-calendars";
 import { DropDownListModule } from "@syncfusion/ej2-angular-dropdowns";
 import { DialogModule } from "@syncfusion/ej2-angular-popups";
@@ -29,6 +29,7 @@ import { Icons } from './create-schedules.constant';
     ScheduleItemsModule,
     TooltipContainerModule,
     ReplacementOrderDialogModule,
+    SwitchModule,
     FeatherModule.pick(Icons),
   ],
   exports: [CreateScheduleComponent],

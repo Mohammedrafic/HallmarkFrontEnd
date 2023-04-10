@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 
 import { Select } from '@ngxs/store';
-import { debounceTime, filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { debounceTime, filter, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
@@ -22,8 +22,7 @@ import { FilteredUser } from '@shared/models/user.model';
 })
 export class TimesheetsFilterDialogComponent
   extends FiltersDialogHelper<FilterColumns, TimesheetsFilterState, TimesheetsModel>
-  implements OnInit, OnChanges
-{
+  implements OnInit, OnChanges {
   @Select(TimesheetsState.timesheets)
   readonly timesheets$: Observable<TimeSheetsPage>;
   @Select(TimesheetsState.filterOptions)
@@ -37,19 +36,26 @@ export class TimesheetsFilterDialogComponent
 
   public showStatuses = true;
 
+  private activeTab$: Subject<void> = new Subject();
+
   ngOnInit(): void {
     this.initFormGroup();
     this.initFiltersColumns(TimesheetsState.timesheetsFiltersColumns);
     this.startRegionsWatching();
     this.startLocationsWatching();
     this.subscribeOnUserSearch();
-    this.applyPreservedFilters();
+    this.watchForPreservedFilters();
+    this.watchForSwitchTabs();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['orgId'] && !changes['orgId'].firstChange) {
       this.showStatuses = this.activeTabIdx === 0;
       this.clearAllFilters(false);
+    }
+    if (changes['activeTabIdx'] && !changes['activeTabIdx'].firstChange) {
+      this.activeTab$.next();
+      this.showStatuses = this.activeTabIdx === 0;
     }
   }
 
@@ -72,21 +78,19 @@ export class TimesheetsFilterDialogComponent
       .subscribe();
   }
 
-  private applyPreservedFilters(): void {
+  private watchForPreservedFilters(): void {
     this.organizationId$
       .pipe(
         tap(() => this.store.dispatch(new Timesheets.ResetFilterOptions())),
         debounceTime(100),
         switchMap(() => this.filterOptions$),
-        switchMap((options) => this.preservedFiltersByPageName$.pipe(
-          filter(({ dispatch }) => !!options && dispatch))
-        ),
+        filter((options) => !!options),
+        switchMap(() => this.preservedFiltersByPageName$),
+        filter(({ dispatch }) => dispatch),
         takeUntil(this.componentDestroy())
       )
       .subscribe(({ state }) => {
-        this.patchFilterForm({ ...state });
-        this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
-        this.appliedFiltersAmount.emit(this.filteredItems.length);
+        this.applyPreservedFilters(state);
       });
   }
 
@@ -97,5 +101,24 @@ export class TimesheetsFilterDialogComponent
         args.updateData(data);
       })
     );
+  }
+
+  private watchForSwitchTabs(): void {
+    this.activeTab$.pipe(
+      switchMap(() => this.preservedFiltersByPageName$),
+      filter(({ state }) => !!state?.statusIds?.length),
+      map(({ state }) => this.filterPreservedFilters(state)),
+      takeUntil(this.componentDestroy())
+    ).subscribe((state) => { 
+      this.applyPreservedFilters(state);
+    });
+  }
+
+  private applyPreservedFilters(filters: TimesheetsFilterState): void {
+    this.patchFilterForm({ ...filters });
+    const contactEmails = Array.isArray(filters?.contactEmails) ? filters.contactEmails[0] : null;
+    this.getPreservedContactPerson(contactEmails);
+    this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
+    this.appliedFiltersAmount.emit(this.filteredItems.length);
   }
 }

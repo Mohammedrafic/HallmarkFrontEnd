@@ -28,3 +28,11 @@ export enum ScheduleOrderType {
   Traveler = 'Traveler',
   ReOrder = 'ReOrder',
 }
+
+export enum ScheduleAttributeKeys {
+ ORI = 'ORI',
+ CRT = 'CRT',
+ OC = 'OC',
+ CHG = 'CHG',
+ PRC= 'PRC',
+}

@@ -28,18 +28,18 @@ export const ScheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> =
     permission: UserPermissions.CanAddShift,
   },
   {
-    label: ScheduleType.Unavailability,
-    value: ScheduleItemType.Unavailability,
-    name: 'scheduleType',
-    disabled: false,
-    permission: UserPermissions.CanAddUnavailability,
-  },
-  {
     label: ScheduleType.Availability,
     value: ScheduleItemType.Availability,
     name: 'scheduleType',
     disabled: false,
     permission: UserPermissions.CanAddAvailability,
+  },
+  {
+    label: ScheduleType.Unavailability,
+    value: ScheduleItemType.Unavailability,
+    name: 'scheduleType',
+    disabled: false,
+    permission: UserPermissions.CanAddUnavailability,
   },
 ];
 
@@ -91,8 +91,52 @@ const unavailabilityFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
   ...availabilityFormFields,
 ];
 
+const bookingToggleForm: ScheduleInt.ScheduleFormFieldConfig[] = [
+  {
+    field: 'orientated',
+    title: 'ORI',
+    type: FieldType.Toggle,
+    gridAreaName: 'toggle1',
+    required: false,
+    show: true,
+  },
+  {
+    field: 'critical',
+    title: 'CRT',
+    type: FieldType.Toggle,
+    gridAreaName: 'toggle2',
+    required: false,
+    show: true,
+  },
+  {
+    field: 'onCall',
+    title: 'OC',
+    type: FieldType.Toggle,
+    gridAreaName: 'toggle3',
+    required: false,
+    show: true,
+  },
+  {
+    field: 'charge',
+    title: 'CHG',
+    type: FieldType.Toggle,
+    gridAreaName: 'toggle4',
+    required: false,
+    show: true,
+  },
+  {
+    field: 'preceptor',
+    title: 'PRC',
+    type: FieldType.Toggle,
+    gridAreaName: 'toggle5',
+    required: false,
+    show: true,
+  },
+];
+
 const bookFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
   ...availabilityFormFields,
+  ...bookingToggleForm,
   {
     field: 'regionId',
     title: 'Region',

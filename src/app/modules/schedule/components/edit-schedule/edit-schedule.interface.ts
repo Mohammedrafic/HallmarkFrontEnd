@@ -13,6 +13,8 @@ export interface ScheduledShift {
   endTime: string;
   createOrder: boolean;
   unavailabilityReasonId?: number;
+  initialStartTime?: string;
+  initialEndTime?: string;
 }
 
 export interface ScheduledShiftForm {
