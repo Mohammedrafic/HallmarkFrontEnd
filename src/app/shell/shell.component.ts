@@ -768,9 +768,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       filter((routeEvent: Event): routeEvent is RouterEvent => routeEvent instanceof NavigationEnd),
       takeUntil(this.componentDestroy()),
     ).subscribe((routeEvent: RouterEvent) => {
-      if (routeEvent.url === scheduleUrl) {
-        this.store.dispatch(new ToggleSidebarState(!this.sidebar.isOpen));
+      if(routeEvent.url === scheduleUrl) {
         this.tree.collapseAll();
+        this.store.dispatch(new ToggleSidebarState(false));
+        
         this.isToggleButtonDisable = true;
       } else {
         this.isToggleButtonDisable = false;

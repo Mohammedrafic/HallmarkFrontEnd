@@ -46,7 +46,7 @@ import {
   ScheduleFormFieldConfig,
 } from '../../interface';
 import { ScheduleItemsComponent } from '../schedule-items/schedule-items.component';
-import { ScheduleApiService, ScheduleFiltersService, CreateScheduleService } from '../../services';
+import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
 import {
   CreateBookingSuccessMessage,
   CreateScheduleSuccessMessage,
@@ -65,7 +65,12 @@ import { OrganizationStructure } from '@shared/models/organization.model';
 import { EditScheduleFormSourceKeys } from '../edit-schedule/edit-schedule.constants';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { OutsideZone } from '@core/decorators';
-import { EndTimeField, ScheduleControlsToReset, StartTimeField } from './create-schedules.constant';
+import {
+  EndTimeField,
+  ScheduleControlsToReset,
+  ScheduleCustomClassesList,
+  StartTimeField,
+} from './create-schedules.constant';
 
 @Component({
   selector: 'app-create-schedule',
@@ -411,6 +416,11 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   private closeSideBar(): void {
     this.createScheduleService.closeSideBarEvent.next(true);
     this.scheduleItemsService.setErrors([]);
+    this.showShiftTimeFields(false);
+    this.scheduleFormConfig.formClass = this.createScheduleService.updateScheduleFormClass(
+      ScheduleCustomClassesList[ScheduleItemType.Book],
+      false
+    );
   }
 
   private saveAvailabilityUnavailability(): void {
