@@ -1,0 +1,15 @@
+<app-grid [gridTitle]="gridTitle" [rowData]="[]" [columnDefinitions]="columnDef" [rowSelection]="rowSelection"
+  [totalRecordsCount]="0" [pageSize]="5" [currentPage]="pageNumber"
+  [customRowsPerPageDropDownObject]="customRowsPerPageDropDownObject" [disableRowsPerPageDropdown]="true"
+  (navigateToPageEmitter)="handleChangePage($event)">
+  <button action-button class="add-action" cssClass="e-action-button" ejs-button (click)="addRestriction()"
+    [disabled]="false">
+    <i-feather name="plus" class="icon"></i-feather>
+    Add Restriction
+  </button>
+</app-grid>
+
+<app-availability-restriction-dialog
+  [dialogSubject$]="dialogSubject$"
+>
+</app-availability-restriction-dialog>

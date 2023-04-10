@@ -4,5 +4,14 @@
 }
 
 .candidate-work-commitment-tab {
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  row-gap: 80px;
+  height: auto;
+  position: relative;
+
+  .grid {
+    position: relative;
+    height: 287px;
+  }
 }
