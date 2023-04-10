@@ -82,7 +82,7 @@
     <div class="form-elemet">
       <div class="group">
         <div class="input-container bootstrap">
-          <label>Agency<span class="required">*</span></label>
+          <label>Agency Name<span class="required">*</span></label>
           <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="agencyIds" placeholder="All" appValidateWithMessage
                              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="this.filterColumns.agencyIds.dataSource"
@@ -98,7 +98,7 @@
     <div class="form-elemet">
       <div class="group">
         <div class="input-container calendar">
-          <label>Start Date<span class="required">*</span></label>
+          <label>Invoice Generated From<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                             appValidateWithMessage formControlName="startDate">
@@ -106,7 +106,7 @@
           </div>
         </div>
         <div class="input-container calendar">
-          <label>End Date<span class="required">*</span></label>
+          <label>Invoice Generated To<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                             appValidateWithMessage formControlName="endDate"

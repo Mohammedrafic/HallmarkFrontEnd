@@ -13,12 +13,13 @@ import {
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { Store } from '@ngxs/store';import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
+import { Store } from '@ngxs/store';
+import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { catchError, EMPTY, filter, map, Observable, Subscription, switchMap, take, takeUntil, tap, zip } from 'rxjs';
 
 import { FieldType } from '@core/enums';
-import { DateTimeHelper, DestroyDialog } from '@core/helpers';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
@@ -71,7 +72,7 @@ import { EditScheduleService } from './edit-schedule.service';
   styleUrls: ['./edit-schedule.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditScheduleComponent extends DestroyDialog implements OnInit {
+export class EditScheduleComponent extends Destroyable implements OnInit {
   @ViewChild(TabComponent) tabs: TabComponent;
 
   @Input() datePickerLimitations: DatePickerLimitations;
@@ -136,11 +137,10 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   ngOnInit(): void {
-    this.watchForCloseStream();
     this.setScheduleTypes();
   }
 
-  closeScheduleDialog(): void {
+  closeSchedule(): void {
     if (this.scheduleForm?.touched) {
       this.confirmService.confirm(
         CANCEL_CONFIRM_TEXT,
@@ -154,12 +154,10 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
           filter(Boolean),
         )
         .subscribe(() => {
-          this.closeDialog();
-          this.hasInitData = false;
+          this.closeSideBar();
         });
     } else {
-      this.closeDialog();
-      this.hasInitData = false;
+      this.closeSideBar();
     }
   }
 
@@ -285,7 +283,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
       if (this.scheduledItem.schedule.daySchedules.length === 1) {
-        this.closeDialog();
+        this.closeSideBar();
       }
 
       this.updateScheduleGrid.emit();
@@ -390,11 +388,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
       switchMap((value: number) => this.scheduleApiService.getSkillsByEmployees(value, this.scheduledItem.candidate.id)),
       takeUntil(this.componentDestroy())
     ).subscribe((skills: Skill[]) => {
-      const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
-      this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = skillOption;
-      this.scheduleForm?.patchValue({
-        skillId: this.selectedDaySchedule?.orderMetadata?.primarySkillId || skillOption[0]?.value,
-      });
+      this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
       this.cdr.markForCheck();
     }) || null;
   }
@@ -424,7 +418,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
       if (this.scheduledItem.schedule.daySchedules.length === 1) {
-        this.closeDialog();
+        this.closeSideBar();
       }
 
       this.updateScheduleGrid.emit();
@@ -650,5 +644,10 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     if (this.store.selectSnapshot(UserState.user)?.isEmployee) {
       this.scheduleTypes = ScheduleTypes.filter((type: ScheduleTypeRadioButton) => type.value !== ScheduleItemType.Book);
     }
+  }
+
+  private closeSideBar(): void {
+    this.hasInitData = false;
+    this.createScheduleService.closeSideBarEvent.next(true);
   }
 }

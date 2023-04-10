@@ -29,6 +29,10 @@ export class ScheduleGridService {
       slotsWithDate.includes(`${selectedDateList[0]}T00:00:00+00:00`);
   }
 
+  public getFirstSelectedDate(selectedCandidatesSlot: Map<number, ScheduleDateSlot>): string {
+    return `${this.getSelectedListDates(selectedCandidatesSlot)[0]}T00:00:00+00:00`;
+  }
+
   private getSelectedListDates(selectedCandidatesSlot: Map<number, ScheduleDateSlot>): string[] {
     return [...selectedCandidatesSlot].flatMap((slot: [number, ScheduleDateSlot]) => {
       return [...slot[1].dates];

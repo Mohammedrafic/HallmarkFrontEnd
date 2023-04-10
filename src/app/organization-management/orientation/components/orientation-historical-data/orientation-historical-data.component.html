@@ -6,8 +6,8 @@
     (pageChange)="pageChange($event)"
     (onEdit)="openDialog($event)"
     [dataSource]="dataSource"
-    [skillCategories]="[]"
-    [regions]="[]"
+    [skillCategories]="(allSkillsCategories$ | async)?.items"
+    [regions]="regions"
     [disableControls]="disableControls || !userPermission[userPermissions.CanEditOrientation]"
     [orientationTab]="orientationTab.HistoricalData"
     [bulkActionConfig]="bulkActionConfig">

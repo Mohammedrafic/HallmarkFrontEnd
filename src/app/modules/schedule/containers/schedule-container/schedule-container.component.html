@@ -56,7 +56,13 @@
   <div class="right-bar">
     <div class="schedule-bar">
       <ng-container *ngIf="sideBarSettings.isEditMode; else createSideBar">
-        edit
+        <app-edit-schedule
+          *ngIf="sideBarSettings.isOpen"
+          [datePickerLimitations]="datePickerLimitations"
+          [scheduledShift]="scheduledShift"
+          [userPermission]="userPermission"
+          (updateScheduleGrid)="updateScheduleGrid(false)"
+        ></app-edit-schedule>
       </ng-container>
 
       <ng-template #createSideBar>
@@ -75,12 +81,3 @@
 </div>
 
 <app-schedule-filters #filters [count]="totalCount" (updateScheduleFilter)="updateScheduleFilter($event)"></app-schedule-filters>
-
-<app-edit-schedule
-  *ngIf="sideBarSettings.isEditMode"
-  [datePickerLimitations]="datePickerLimitations"
-  [scheduledShift]="scheduledShift"
-  [userPermission]="userPermission"
-  (destroyDialog)="closeEditScheduleDialog()"
-  (updateScheduleGrid)="updateScheduleGrid()"
-></app-edit-schedule>

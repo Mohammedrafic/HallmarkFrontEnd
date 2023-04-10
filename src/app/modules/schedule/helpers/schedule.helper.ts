@@ -9,7 +9,9 @@ import { ScheduleType } from '../enums';
 import {
   BookingError,
   ScheduleBookingErrors,
+  ScheduleCandidate,
   ScheduleDateItem,
+  ScheduledItem,
   ScheduleItem,
   ScheduleModel,
   ScheduleModelPage,
@@ -256,4 +258,17 @@ export const GetMonthRange = (initDay: number): WeekDays[] => {
     ...daysInWeek.slice(startingDayIndex),
     ...daysInWeek.slice(0, startingDayIndex),
   ];
+};
+
+export const GetScheduledShift = (
+  scheduleData: ScheduleInt.ScheduleModelPage,
+  candidateId: number,
+  date: string
+): ScheduledItem => {
+  const scheduledShiftData = scheduleData?.items.find((item: ScheduleModel) => item.candidate.id === candidateId);
+
+  return  {
+    candidate: scheduledShiftData?.candidate as ScheduleCandidate,
+    schedule: scheduledShiftData?.schedule.find((item: ScheduleDateItem) => item.date === date) as ScheduleDateItem,
+  };
 };

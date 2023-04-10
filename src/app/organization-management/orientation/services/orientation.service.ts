@@ -72,9 +72,11 @@ export class OrientationService {
   }
 
   public getHistoricalOrientationConfigs(filters: OrientationConfigurationFilters): Observable<OrientationConfigurationPage> {
-    return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/historical/configurations/list', filters)
+    if(filters.regionIds || filters.skillCategoryIds){
+      return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/historical/filter', filters)
+    }
+    return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/historical/configurations/list', filters)  
   }
-
 
   public getExport(filters: ExportPayload): Observable<Blob> {
     if (filters) {
@@ -83,8 +85,6 @@ export class OrientationService {
     return this.http.post(`/api/OrientationSettings/export`, filters, { responseType: 'blob' });
   }
   
-
-
   public saveOrientationConfiguration(params: OrientationConfigurationDTO): Observable<void> {
     if (params.orientationConfigurationId) {
       return this.http.put<void>('/api/OrientationSettings/configurations/' + params.orientationConfigurationId, params);

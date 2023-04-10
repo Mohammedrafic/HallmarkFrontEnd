@@ -8,12 +8,16 @@ import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { OrientationTab } from '@organization-management/orientation/enums/orientation-type.enum';
 import { OrientationConfiguration, OrientationConfigurationFilters, OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
 import { OrientationService } from '@organization-management/orientation/services/orientation.service';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SETUPS_ACTIVATED } from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { SkillCategoriesPage } from '@shared/models/skill-category.model';
+import { Skill } from '@shared/models/skill.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -33,6 +37,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   @Input() public isActive: boolean;
   @ViewChild('grid')
   public grid: GridComponent;
+  public regions: OrganizationRegion[] = [];
   public readonly orientationTab = OrientationTab;
   public dataSource: OrientationConfigurationPage;
   public filters: OrientationConfigurationFilters = { pageNumber: 1, pageSize: this.pageSize };
@@ -47,6 +52,15 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   public readonly organizationId$: Observable<number>;
   private unsubscribe$: Subject<void> = new Subject();
   protected componentDestroy: () => Observable<unknown>;
+
+  @Select(UserState.organizationStructure)
+  public readonly organizationStructure$: Observable<OrganizationStructure>;
+
+  @Select(OrganizationManagementState.allSkillsCategories)
+  public readonly allSkillsCategories$: Observable<SkillCategoriesPage | null>;
+
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
+  public readonly skills$: Observable<Skill[]>;
   
   constructor(
     protected override store: Store,
@@ -60,6 +74,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
     this.watchForOrgChange();
     this.watchForSettingState();
     this.watchForExportDialog();
+    this.watchForOrgStructure();
   }
 
   override ngOnInit(): void {
@@ -90,6 +105,17 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
       this.dataSource = data;
       this.cd.markForCheck();
     });
+  }
+
+  private watchForOrgStructure(): void {
+    this.organizationStructure$
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe((structure: OrganizationStructure) => {
+        this.regions = structure.regions;
+      });
   }
 
   private populateForm(data: number[]): void {
