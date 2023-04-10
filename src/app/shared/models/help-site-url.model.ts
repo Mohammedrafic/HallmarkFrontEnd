@@ -1,3 +1,3 @@
-export interface HelpSileUrl {
+export interface HelpSiteUrl {
   url: string;
 }
