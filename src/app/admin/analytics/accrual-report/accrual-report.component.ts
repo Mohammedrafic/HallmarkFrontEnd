@@ -14,16 +14,16 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { 
-  GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, 
-  GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState 
-  } from '@organization-management/store/logi-report.action';
+import {
+  GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData,
+  GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState
+} from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { accrualConstants,  analyticsConstants } from '../constants/analytics.constant';
+import { accrualConstants, analyticsConstants } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
@@ -41,7 +41,7 @@ import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
   templateUrl: './accrual-report.component.html',
   styleUrls: ['./accrual-report.component.scss']
 })
-export class AccrualReportComponent implements OnInit,OnDestroy {
+export class AccrualReportComponent implements OnInit, OnDestroy {
 
   public paramsData: any = {
 
@@ -52,7 +52,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     "HostNameAD": "",
     "BearerParamAD": "",
     "BusinessUnitIdParamAD": "",
-  
+
     "HostNameAF": "",
     "BearerParamAF": "",
     "BusinessUnitIdParamAF": "",
@@ -102,7 +102,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   };
 
 
-  public reportName: LogiReportFileDetails =  { name: "/JsonApiReports/NewAccrualReport/NewAccrualReport.cls" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/NewAccrualReport/NewAccrualReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/NewAccrualReport/NewAccrualReport.cat" };
   public title: string = "Accrual Reports";
   public message: string = "";
@@ -113,8 +113,8 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedRegions: Region[];  
-  
+  selectedRegions: Region[];
+
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
@@ -194,7 +194,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   public baseUrl: string = '';
   public user: User | null;
   public filterOptionsData: CommonReportFilterOptions;
-  public candidateFilterData :{ [key: number]: SearchCandidate; }[] = [];
+  public candidateFilterData: { [key: number]: SearchCandidate; }[] = [];
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
@@ -223,7 +223,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   }
 
   ngOnInit(): void {
-   
+
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
@@ -235,8 +235,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
           this.filterColumns.skillIds.dataSource = [];
 
           this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
-          //let skills = masterSkills.filter((i) => i.skillCategoryId);
-          //this.filterColumns.skillIds.dataSource = skills;
+
           this.agencyIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds) as AbstractControl;
           this.filterColumns.agencyIds.dataSource = [];
           this.filterColumns.agencyIds.dataSource = data?.agencies;
@@ -250,7 +249,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
         }
       });
       this.SetReportData();
-     
+
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
 
@@ -275,8 +274,8 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
         skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
         candidateName: new FormControl(null),
-        agencyIds : new FormControl([],[Validators.required]),
-        orderId : new FormControl(null),
+        agencyIds: new FormControl([], [Validators.required]),
+        orderId: new FormControl(null),
         invoiceType: new FormControl('0'),
         startDate: new FormControl(startDate, [Validators.required]),
         endDate: new FormControl(new Date(Date.now()), [Validators.required]),
@@ -309,7 +308,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.filterColumns.agencyIds.dataSource = [];
         this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds)?.setValue([]);
-       
+
         this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
@@ -354,22 +353,20 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             this.filterColumns.agencyIds.dataSource = [];
-            
+
             if (data != null) {
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
 
-              //this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
-              //let skills = masterSkills.filter((i) => i.skillCategoryId);
-             // this.filterColumns.skillIds.dataSource = skills;
+
               this.agencyIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds) as AbstractControl;
               let agencyIds = data?.agencies;
               this.filterColumns.agencyIds.dataSource = data?.agencies;
               this.selectedAgencies = agencyIds;
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
               this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
-         
+
               setTimeout(() => { this.SearchReport() }, 3000);
             }
           });
@@ -435,8 +432,10 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
         this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
         let skills = masterSkills.filter((i) => data?.includes(i.skillCategoryId));
         this.filterColumns.skillIds.dataSource = skills;
+        this.accrualReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(skills.map((list) => list.id));
       }
       else {
+        this.filterColumns.skillIds.dataSource = [];
         this.accrualReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
       }
     });
@@ -456,7 +455,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     });
   }
 
-  public SearchReport(): void {   
+  public SearchReport(): void {
     this.filteredItems = [];
     let auth = "Bearer ";
     for (let x = 0; x < window.localStorage.length; x++) {
@@ -464,12 +463,12 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let {candidateName,departmentIds,orderId,locationIds,
-      regionIds,skillCategoryIds,skillIds,startDate, endDate,agencyIds } = this.accrualReportForm.getRawValue();
+    let { candidateName, departmentIds, orderId, locationIds,
+      regionIds, skillCategoryIds, skillIds, startDate, endDate, agencyIds } = this.accrualReportForm.getRawValue();
     let byTimesheetOrInvoiceControl = this.accrualReportForm.get(accrualConstants.formControlNames.InvoiceType) as AbstractControl;
     let byTimesheetOrInvoiceValue = byTimesheetOrInvoiceControl?.value;
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",") :  "null";
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
     locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
     skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
@@ -492,13 +491,13 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       "DepartmentAS": departmentIds.length == 0 ? "null" : departmentIds,
       "SkillCategoryAC": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
       "SkillAS": skillIds.length == 0 ? "null" : skillIds,
-      "AgencyAS":            agencyIds.length==0?"null":agencyIds.join(","),
-      "Candidate" :          candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
-      "OrderIdAS":           orderId ==null ? "null" : orderId,
-      "TimesheetStartDate":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
-      "TimesheetEndDate"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '12/31/9999', 'en-US'),
-      "InvoiceStartDate"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '01/01/1900', 'en-US'),
-      "InvoiceEndDate"    :  byTimesheetOrInvoiceValue=='1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
+      "AgencyAS": agencyIds.length == 0 ? "null" : agencyIds.join(","),
+      "Candidate": candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
+      "OrderIdAS": orderId == null ? "null" : orderId,
+      "TimesheetStartDate": byTimesheetOrInvoiceValue == '0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
+      "TimesheetEndDate": byTimesheetOrInvoiceValue == '0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '12/31/9999', 'en-US'),
+      "InvoiceStartDate": byTimesheetOrInvoiceValue == '1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
+      "InvoiceEndDate": byTimesheetOrInvoiceValue == '1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '12/31/9999', 'en-US'),
 
       "HostNameAD": this.baseUrl,
       "BearerParamAD": auth,
@@ -512,13 +511,13 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       "DepartmentAD": departmentIds.length == 0 ? "null" : departmentIds,
       "SkillCategoryAD": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
       "SkillAD": skillIds.length == 0 ? "null" : skillIds,
-      "AgencyAD":           agencyIds.length==0?"null":agencyIds.join(","),
-      "CandidateAD" :       candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
-      "OrderIdAD":          orderId ==null ? "null" : orderId,
-      "TimesheetStartDateAD":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
-      "TimesheetEndDateAD"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
-      "InvoiceStartDateAD"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '01/01/1900', 'en-US'),
-      "InvoiceEndDateAD"    :  byTimesheetOrInvoiceValue=='1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
+      "AgencyAD": agencyIds.length == 0 ? "null" : agencyIds.join(","),
+      "CandidateAD": candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
+      "OrderIdAD": orderId == null ? "null" : orderId,
+      "TimesheetStartDateAD": byTimesheetOrInvoiceValue == '0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
+      "TimesheetEndDateAD": byTimesheetOrInvoiceValue == '0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '12/31/9999', 'en-US'),
+      "InvoiceStartDateAD": byTimesheetOrInvoiceValue == '1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
+      "InvoiceEndDateAD": byTimesheetOrInvoiceValue == '1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '12/31/9999', 'en-US'),
 
       "HostNameAF": this.baseUrl,
       "BearerParamAF": auth,
@@ -533,14 +532,14 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       "DepartmentAF": departmentIds.length == 0 ? "null" : departmentIds,
       "SkillCategoryAF": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
       "SkillAF": skillIds.length == 0 ? "null" : skillIds,
-      "AgencyAF":               agencyIds.length==0?"null":agencyIds.join(","),
-      "CandidateAF" :           candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
-      "OrderIdAF":              orderId ==null ? "null" : orderId,
-      "TimesheetStartDateAF":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
-      "TimesheetEndDateAF"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
-      "InvoiceStartDateAF"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '01/01/1900', 'en-US'),
-      "InvoiceEndDateAF"    :  byTimesheetOrInvoiceValue=='1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
-      
+      "AgencyAF": agencyIds.length == 0 ? "null" : agencyIds.join(","),
+      "CandidateAF": candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
+      "OrderIdAF": orderId == null ? "null" : orderId,
+      "TimesheetStartDateAF": byTimesheetOrInvoiceValue == '0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
+      "TimesheetEndDateAF": byTimesheetOrInvoiceValue == '0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '12/31/9999', 'en-US'),
+      "InvoiceStartDateAF": byTimesheetOrInvoiceValue == '1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
+      "InvoiceEndDateAF": byTimesheetOrInvoiceValue == '1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '12/31/9999', 'en-US'),
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -631,7 +630,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       //   valueField: 'statusText',
       //   valueId: 'id',
       // },
-      
+
       // accrualReportTypes: {
       //   type: ControlTypes.Dropdown,
       //   valueType: ValueType.Id,
@@ -654,7 +653,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
 
   public showFilters(): void {
     if (this.isResetFilter) {
-    this.onFilterControlValueChangedHandler();
+      this.onFilterControlValueChangedHandler();
     }
     this.store.dispatch(new ShowFilterDialog(true));
   }
@@ -700,30 +699,29 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     this.store.dispatch([new ShowToast(MessageTypes.Error, error)]);
     return;
   }
-  
+
   public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
     this.onFilterChild(e);
   }
 
   @OutsideZone
-  private onFilterChild(e: FilteringEventArgs)
-  {
+  private onFilterChild(e: FilteringEventArgs) {
     if (e.text != '') {
-      let ids=[];
+      let ids = [];
       ids.push(this.bussinessControl.value);
       let filter: CommonCandidateSearchFilter = {
         searchText: e.text,
-        businessUnitIds:ids
+        businessUnitIds: ids
       };
       this.filterColumns.dataSource = [];
       this.store.dispatch(new GetCommonReportCandidateSearch(filter))
         .subscribe((result) => {
           this.candidateFilterData = result.LogiReport.searchCandidates;
-          this.candidateSearchData=result.LogiReport.searchCandidates;
-          this.filterColumns.dataSource=this.candidateFilterData;
+          this.candidateSearchData = result.LogiReport.searchCandidates;
+          this.filterColumns.dataSource = this.candidateFilterData;
           e.updateData(this.candidateFilterData);
         });
-     
+
     }
   }
 }
