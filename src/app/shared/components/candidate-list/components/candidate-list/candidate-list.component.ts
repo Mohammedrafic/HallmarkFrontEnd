@@ -409,11 +409,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       candidates &&
       candidates.map((candidate: IRPCandidate) => {
         if (candidate.employeeSkills?.length > 2) {
-          const [first, second] = candidate.employeeSkills;
-          candidate = {
-            ...candidate,
-            employeeSkills: [first, second, '...'],
-          };
+          // const [first, second] = candidate.employeeSkills;
+          // candidate = {
+          //   ...candidate,
+          //   employeeSkills: [first, second, '...'],
+          // };
         }
 
         return candidate;
