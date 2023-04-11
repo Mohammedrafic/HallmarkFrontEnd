@@ -6,7 +6,7 @@ import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 
 @Injectable()
-export class AvailabilityHelperService {
+export class AvailabilityService {
   
   public createAvailabilityForm(): CustomFormGroup<AvailabilityRestrictionFormState> {
     return new FormGroup({

@@ -20,7 +20,7 @@ import { AvailRestrictDialogData, AvailabilityFormFieldConfig, AvailabilityRestr
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, formatTime } from '@shared/constants';
 import { AvailabilityFilterColumns } from '../../enums';
-import { AvailabilityHelperService } from '../../services/availability-helper.service';
+import { AvailabilityService } from '../../services/availability.service';
 
 @Component({
   selector: 'app-availability-restriction-dialog',
@@ -43,7 +43,7 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
   public format = formatTime;
 
   constructor(
-    private readonly availabilityHelpService: AvailabilityHelperService,
+    private readonly availabilityService: AvailabilityService,
     private readonly confirmService: ConfirmService,
     private readonly cdr: ChangeDetectorRef,
   ) {
@@ -61,7 +61,7 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
   public submitForm(): void {
     if (this.formGroup.valid) {
       const formData = this.formGroup.getRawValue();
-      const payload = this.availabilityHelpService.createRestrictionPayload(formData, this.employeeId);
+      const payload = this.availabilityService.createRestrictionPayload(formData, this.employeeId);
       this.saveAvailabilityRestriction.emit(payload);
     } else {
       this.formGroup.markAllAsTouched();
@@ -75,7 +75,7 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
   }
 
   private initForm(): void {
-    this.formGroup = this.availabilityHelpService.createAvailabilityForm();
+    this.formGroup = this.availabilityService.createAvailabilityForm();
   }
 
   private openCloseDialog(): void {

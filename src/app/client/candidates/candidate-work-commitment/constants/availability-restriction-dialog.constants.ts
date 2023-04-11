@@ -1,8 +1,8 @@
-import { AvailabilityFilterColumns } from "../enums";
-import { AvailabilityFormFieldConfig } from "../interfaces";
-import { ControlTypes } from "@shared/enums/control-types.enum";
-import { filterOptionFields } from "@core/constants/filters-helper.constant";
-import { DaysDropdownDataSource } from "@core/constants/days-week.constant";
+import { AvailabilityFilterColumns } from '../enums';
+import { AvailabilityFormFieldConfig } from '../interfaces';
+import { ControlTypes } from '@shared/enums/control-types.enum';
+import { filterOptionFields } from '@core/constants/filters-helper.constant';
+import { DaysDropdownDataSource } from '@core/constants/days-week.constant';
 
 export const DepartmentFilterFormConfig = (): ReadonlyArray<
   AvailabilityFormFieldConfig<AvailabilityFilterColumns>

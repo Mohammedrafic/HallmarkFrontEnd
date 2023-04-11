@@ -28,7 +28,7 @@ import { AvailabilityRestrictionComponent } from './components/availability-rest
 import { AvailabilityRestrictionDialogComponent } from
   './components/availability-restriction-dialog/availability-restriction-dialog.component';
 import { AvailabilityApiService } from './services/availability-api.service';
-import { AvailabilityHelperService } from './services/availability-helper.service';
+import { AvailabilityService } from './services/availability.service';
 import { TimepickerModule } from '@shared/components/form-controls/timepicker/timepicker.module';
 
 @NgModule({
@@ -62,7 +62,7 @@ import { TimepickerModule } from '@shared/components/form-controls/timepicker/ti
   providers: [
     CandidateWorkCommitmentService,
     AvailabilityApiService,
-    AvailabilityHelperService,
+    AvailabilityService,
   ],
 })
 export class CandidateWorkCommitmentModule { }
