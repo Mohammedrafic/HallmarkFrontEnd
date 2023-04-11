@@ -27,6 +27,7 @@ export type IRPCandidate = {
   employeeStatus: string;
   primarySkillName: string;
   employeeSkills: string[];
+  employeeWorkCommitments:string;
   hireDate: string;
   orgOrientation: string;
 }

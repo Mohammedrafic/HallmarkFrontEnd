@@ -22,18 +22,28 @@ import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, fromEvent, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
-import { DatesRangeType } from '@shared/enums';
+import { DatesRangeType, WeekDays } from '@shared/enums';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { ScheduleApiService } from '../../services';
+import { CreateScheduleService, ScheduleApiService } from '../../services';
 import { UserState } from '../../../../store/user.state';
 import { ScheduleGridAdapter } from '../../adapters';
-import { DatesPeriods, MonthPeriod } from '../../constants';
+import { DatesPeriods, MonthPeriod, PermissionRequired } from '../../constants';
 import * as ScheduleInt from '../../interface';
-import { CardClickEvent, CellClickEvent, ScheduleCandidatesPage, ScheduleDateItem } from '../../interface';
-import { GetMonthRange } from '../../helpers';
+import {
+  CardClickEvent,
+  RemovedSlot,
+  ScheduleCandidatesPage,
+  ScheduleModel,
+  SelectedCells,
+} from '../../interface';
+import { GetMonthRange, GetScheduledShift } from '../../helpers';
+import { ScheduleGridService } from './schedule-grid.service';
+import { ShowToast } from '../../../../store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ScheduleItemsService } from '../../services/schedule-items.service';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -48,21 +58,31 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
   @ViewChild('autoCompleteSearch') autoCompleteSearch: AutoCompleteComponent;
 
-  @Input() scheduleData: ScheduleInt.ScheduleModelPage | null;
+  @Input() set initScheduleDate(scheduleData: ScheduleInt.ScheduleModelPage | null) {
+    this.scheduleData = scheduleData;
+    if(scheduleData) {
+      this.scheduleSlotsWithDate = this.scheduleGridService.getSlotsWithDate(scheduleData);
+    }
+
+    this.cdr.markForCheck();
+  }
+
   @Input() selectedFilters: ScheduleInt.ScheduleFilters;
   @Input() hasViewPermission = false;
+  @Input() hasSchedulePermission = false;
 
   @Output() changeFilter: EventEmitter<ScheduleInt.ScheduleFilters> = new EventEmitter<ScheduleInt.ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
-  @Output() selectedCells: EventEmitter<ScheduleInt.ScheduleSelectedSlots>
-    = new EventEmitter<ScheduleInt.ScheduleSelectedSlots>();
-  @Output() scheduleCell: EventEmitter<ScheduleInt.ScheduleSelectedSlots>
-    = new EventEmitter<ScheduleInt.ScheduleSelectedSlots>();
+  @Output() selectedCells: EventEmitter<SelectedCells> = new EventEmitter<SelectedCells>();
   @Output() selectCandidate: EventEmitter<ScheduleInt.ScheduleCandidate | null>
     = new EventEmitter<ScheduleInt.ScheduleCandidate | null>();
   @Output() editCell: EventEmitter<ScheduleInt.ScheduledItem> = new EventEmitter<ScheduleInt.ScheduledItem>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
+
+  scheduleData: ScheduleInt.ScheduleModelPage | null;
+
+  scheduleSlotsWithDate: string[];
 
   activePeriod = DatesRangeType.TwoWeeks;
 
@@ -72,7 +92,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   datesRanges: string[] = DateTimeHelper.getDatesBetween();
 
-  monthRangeDays: string[] = [];
+  monthRangeDays: WeekDays[] = [];
 
   selectedCandidatesSlot: Map<number, ScheduleInt.ScheduleDateSlot>
   = new Map<number, ScheduleInt.ScheduleDateSlot>();
@@ -96,13 +116,16 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     private weekService: DateWeekService,
     private scheduleApiService: ScheduleApiService,
     private cdr: ChangeDetectorRef,
+    private createScheduleService: CreateScheduleService,
+    private scheduleGridService: ScheduleGridService,
+    private scheduleItemsService: ScheduleItemsService,
   ) {
     super();
   }
 
   trackByPeriods: TrackByFunction<ItemModel> = (_: number, period: ItemModel) => period.text;
 
-  trackByDatesRange: TrackByFunction<string> = (_: number, date: string) => date;
+  trackByDatesRange: TrackByFunction<WeekDays> = (_: number, date: WeekDays) => date;
 
   trackByScheduleData: TrackByFunction<ScheduleInt.ScheduleModel> = (_: number,
     scheduleData: ScheduleInt.ScheduleModel) => scheduleData.id;
@@ -111,6 +134,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.startOrgIdWatching();
     this.watchForScroll();
     this.watchForCandidateSearch();
+    this.watchForSideBarAction();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -127,34 +151,18 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     }
   }
 
-  handleCellSingleClick(date: string, candidate: ScheduleInt.ScheduleCandidate, cellDate?: ScheduleDateItem): void {
-    if(!cellDate?.isDisabled) {
-      this.selectDateSlot(date, candidate);
-      this.selectedCells.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot, cellDate));
-    }
-  }
-
-  handleCellDblClick(date: string, candidate: ScheduleInt.ScheduleCandidate): void {
-    if(this.getSelectionAvailable()) {
-      this.selectedCandidatesSlot.clear();
-      this.selectDateSlot(date, candidate);
-      this.scheduleCell.emit(ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot));
-      this.cdr.detectChanges();
-    }
-  }
-
-  handleScheduleCardDblClick(
-    schedule: ScheduleInt.ScheduleDateItem,
+  selectCellSlots(
+    date: string,
     candidate: ScheduleInt.ScheduleCandidate,
-    cellDate?: ScheduleDateItem
-  ): void {
-    if(!cellDate?.isDisabled) {
-      const dateStringLength = 10;
-      const formattedDateSting = schedule.date.substring(0, dateStringLength);
+    schedule?: ScheduleInt.ScheduleDateItem): void {
+    if(!this.hasSchedulePermission) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, PermissionRequired));
+      return;
+    }
 
-      this.selectedCandidatesSlot.clear();
-      this.selectDateSlot(formattedDateSting, candidate);
-      this.editCell.emit({ candidate, schedule });
+    if(!schedule?.isDisabled) {
+      this.selectDateSlot(date, candidate);
+      this.processCellSelection(candidate, schedule);
     }
   }
 
@@ -191,16 +199,28 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.markForCheck();
   }
 
-  singleMonthClick({date, candidate, cellDate }: CardClickEvent): void {
-    this.handleCellSingleClick(date, candidate, cellDate);
+  handleMonthClick({date, candidate, cellDate }: CardClickEvent): void {
+    this.selectCellSlots(date, candidate, cellDate);
   }
 
-  doubleMonthCardClick({ schedule, candidate, cellDate }: CellClickEvent): void {
-    this.handleScheduleCardDblClick(schedule,candidate, cellDate);
-  }
+  private processCellSelection(candidate: ScheduleInt.ScheduleCandidate, schedule?: ScheduleInt.ScheduleDateItem): void {
+    const isEditSideBar = this.scheduleGridService.shouldShowEditSideBar(
+      this.selectedCandidatesSlot,
+      this.scheduleData?.items as ScheduleModel[],
+      candidate.id
+    );
 
-  doubleMonthCellClick({date, candidate}: CardClickEvent): void {
-    this.handleCellDblClick(date, candidate);
+    if(isEditSideBar) {
+      this.editCell.emit(GetScheduledShift(
+        this.scheduleData as ScheduleInt.ScheduleModelPage,
+        candidate.id,
+        this.scheduleGridService.getFirstSelectedDate(this.selectedCandidatesSlot),
+      ));
+    } else {
+      this.selectedCells.emit({
+        cells: ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot, schedule),
+      });
+    }
   }
 
   private startOrgIdWatching(): void {
@@ -220,6 +240,34 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       }),
       takeUntil(this.componentDestroy()),
     ).subscribe();
+  }
+
+  private watchForSideBarAction(): void {
+    this.createScheduleService.closeSideBarEvent.pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() => {
+      this.selectedCandidatesSlot = new Map<number, ScheduleInt.ScheduleDateSlot>();
+      this.cdr.markForCheck();
+    });
+
+    this.scheduleItemsService.removeCandidateItem.pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe((slot: RemovedSlot) => {
+      const {date, candidate} = slot;
+
+      if(slot.date) {
+        this.selectCellSlots(date as string,candidate);
+        this.selectedCells.emit({cells: ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot)});
+      } else {
+        this.selectedCandidatesSlot.delete(candidate.id);
+        this.selectedCells.emit({
+          cells: ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot),
+          sideBarState: !!this.selectedCandidatesSlot.size,
+        });
+      }
+
+      this.selectedCandidatesSlot = new Map(this.selectedCandidatesSlot);
+    });
   }
 
   private checkOrgPreferences(): void {
@@ -287,17 +335,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       )),
       takeUntil(this.componentDestroy()),
     ).subscribe();
-  }
-
-  private getSelectionAvailable(): boolean {
-    if(this.scheduleData &&
-      this.scheduleData?.items.length === 1) {
-      return true;
-    } else {
-      return !!(this.scheduleData &&
-        this.scheduleData?.items.length > 1 &&
-        this.selectedFilters.departmentsIds?.length === 1);
-    }
   }
 
   private filterByEmployee(): void {

@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import { distinctUntilChanged, Observable } from 'rxjs';
+import { distinctUntilChanged, Observable, Subject } from 'rxjs';
 
 import { BaseObservable, DateTimeHelper, isObjectsEqual } from '@core/helpers';
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
 import { CreateScheduleService } from './create-schedule.service';
 import { CreateBookTooltip, CreateScheduleDateItems, CreateTooltip, GetScheduleDayWithEarliestTime } from '../helpers';
-import { ScheduleBookingErrors } from '../interface';
+import { RemovedSlot, ScheduleBookingErrors, ScheduleCandidate } from '../interface';
 import { ScheduleItemType } from '../constants';
 import { IrpOrderType } from '@shared/enums/order-type';
 
@@ -15,6 +15,7 @@ import { IrpOrderType } from '@shared/enums/order-type';
 export class ScheduleItemsService {
   private readonly itemsErrorStore: BaseObservable<ScheduleBookingErrors[]> =
     new BaseObservable([] as ScheduleBookingErrors[]);
+  public removeCandidateItem: Subject<RemovedSlot> = new Subject<RemovedSlot>();
 
   constructor(private createScheduleService: CreateScheduleService) {}
 
@@ -88,6 +89,12 @@ export class ScheduleItemsService {
     if(errors) {
       this.itemsErrorStore.set(errors);
     }
+  }
+
+  getSelectedCandidate(candidates: ScheduleCandidate[], candidateId: number): ScheduleCandidate {
+    return candidates.find((candidate: ScheduleCandidate) => {
+      return candidate.id === candidateId;
+    }) as ScheduleCandidate;
   }
 
   getErrorsStream(): Observable<ScheduleBookingErrors[]> {

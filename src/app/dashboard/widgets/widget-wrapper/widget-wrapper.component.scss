@@ -125,14 +125,16 @@ $headerHeight: 19px;
   margin-top: -17px;
 }
 .app-widget-wrapper__agency_count, .app-widget-wrapper__RNUtilization-chart{
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y : auto;
 }
 .app-widget-wrapper__RNUtilization-chart {
   display: flex !important;
   flex-direction: column;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
+  height: inherit;
 }
 .app-widget-wrapper__agency_count, .app-widget-wrapper__AlreadyExpiredCredentials-chart{
   overflow: auto;

@@ -18,6 +18,8 @@ import {
   GetAllSkills,
   ToggleQuickOrderDialog,
   GetAllCommitmentByPage,
+  GetSkilldata,
+  FilterNursingWidget,
 } from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
@@ -29,7 +31,7 @@ import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 import { MasterCommitmentsPage } from '@shared/models/commitment.model';
-import { GetWorkCommitment } from '../widgets/rn-utilization-widget/rn-utilization.model';
+import { GetNursingWidgetData, GetWorkCommitment, NursingWidget } from '../models/rn-utilization.model';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
@@ -43,6 +45,8 @@ export interface DashboardStateModel {
   toggleQuickOrderDialog: boolean
   commitmentsPage: GetWorkCommitment[];
   isCommitmentLoading: boolean;
+  nursingSkill: GetWorkCommitment[];
+  nursingCount: GetNursingWidgetData | null;
 }
 
 @State<DashboardStateModel>({
@@ -58,7 +62,9 @@ export interface DashboardStateModel {
     skills: [],
     toggleQuickOrderDialog: false,
     commitmentsPage: [],
-    isCommitmentLoading: false
+    isCommitmentLoading: false,
+    nursingSkill: [],
+    nursingCount : null
   },
 })
 @Injectable()
@@ -117,6 +123,17 @@ export class DashboardState {
   static commitmentsPage(state: DashboardStateModel): DashboardStateModel['commitmentsPage'] {
     return state.commitmentsPage;
   }
+
+  @Selector()
+  static nursingSkill(state: DashboardStateModel): DashboardStateModel['nursingSkill'] {
+    return state.nursingSkill;
+  }
+
+  @Selector()
+  static nursingCount(state: DashboardStateModel): DashboardStateModel['nursingCount'] {
+    return state.nursingCount;
+  }
+
   public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
 
   @Action(GetDashboardData)
@@ -215,4 +232,29 @@ export class DashboardState {
       })
     );
   }
+
+  @Action(GetSkilldata)
+  GetSkilldata(
+    { patchState }: StateContext<DashboardStateModel>,
+    {  }: GetSkilldata
+  ): Observable<GetWorkCommitment[]> {
+    return this.dashboardService.getSkills().pipe(
+      tap((payload:GetWorkCommitment[]) => {
+        patchState({nursingSkill: payload});
+      })
+    );
+  }
+
+  @Action(FilterNursingWidget)
+  FilterNursingWidget(
+    { patchState } : StateContext<DashboardStateModel>,
+    { payload } : FilterNursingWidget
+  ) : Observable<GetNursingWidgetData> {
+    return this.dashboardService.filterNursingWidget(payload).pipe(
+      tap((payload : GetNursingWidgetData) => {
+        patchState({nursingCount : payload});
+      }),
+    )
+  }
+  
 }

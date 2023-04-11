@@ -1,19 +1,53 @@
-.control-container {
-  display: flex;
-  flex-direction: column;
-  padding-top: 30px;
-  padding-bottom: 10px;
-}
+@import "colors";
 
-.control-group {
-  display: flex;
-  justify-content: space-between;
+.open-sidebar {
+  .left-bar {
+    width: 100%;
+    overflow-x: auto;
+  }
 
-  &.block {
+  .right-bar {
+    min-width: 435px;
+    max-width: 435px;
     display: block;
   }
 }
 
-.button-filter {
-  margin-right: 12px;
+.close-sidebar {
+  .left-bar {
+    width: 100%;
+  }
+
+  .right-bar {
+    width: 0%;
+    display: none;
+  }
+}
+
+.schedule-wrapper {
+  display: flex;
+  justify-content: space-between;
+  gap: 21px;
+
+  .control-container {
+    display: flex;
+    flex-direction: column;
+    padding-top: 30px;
+    padding-bottom: 10px;
+  }
+
+  .control-group {
+    display: flex;
+    justify-content: space-between;
+
+    &.block {
+      display: block;
+    }
+  }
+
+  .schedule-bar {
+    background-color: $white;
+    height: calc(100vh - 80px);
+    margin-right: -25px;
+  }
 }

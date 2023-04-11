@@ -12,7 +12,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
 import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
-import {GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
+import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { GetCommonReportFilterOptions, GetLogiReportData, GetCommonReportCandidateSearch, ClearLogiReportState } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
@@ -52,7 +52,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     "CandidateStatusJDSR": "",
     "JobStatusJDSR": "",
     "JobIdJDSR": "",
-    "AgencysJDSR":"",
+    "AgencysJDSR": "",
     "BearerParamJDSR": "",
     "BusinessUnitIdParamJDSR": "",
     "HostName": "",
@@ -147,7 +147,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public candidateFilterData: { [key: number]: SearchCandidate; }[] = [];
   public isLoadNewFilter: boolean = false;
   private isAlive = true;
-  private previousOrgId: number = 0;  
+  private previousOrgId: number = 0;
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
@@ -172,8 +172,8 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {      
-    this.orderFilterColumnsSetup();
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.orderFilterColumnsSetup();
       this.store.dispatch(new ClearLogiReportState());
       //this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
@@ -241,7 +241,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
-          let departmentsList: Department[] = [];       
+          let departmentsList: Department[] = [];
           orgList.forEach((value) => {
             regionsList.push(...value.regions);
             locationsList = regionsList.map(obj => {
@@ -278,7 +278,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
                 if (item.statusText !== 'Incomplete'
                   && item.statusText !== 'PreOpen'
                   && item.statusText !== 'Open'
-                   && item.statusText !== 'Accepted' 
+                  && item.statusText !== 'Accepted'
                   && item.statusText !== 'Pending') {
                   return item;
                 }
@@ -309,7 +309,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
         }
       }
     });
-    
+
     this.regionIdControl = this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = [];
@@ -317,9 +317,9 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
       this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.regionIdControl.value.length > 0) {
-      
+
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
-        this.filterColumns.locationIds.dataSource = this.locations;        
+        this.filterColumns.locationIds.dataSource = this.locations;
         this.departments = this.locations.map(obj => {
           return obj.departments.filter(department => department.locationId === obj.id);
         }).reduce((a, b) => a.concat(b), []);
@@ -331,12 +331,12 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       }
     });
     this.locationIdControl = this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
-    this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {      
+    this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-      if (this.locationIdControl.value.length > 0) {        
+      if (this.locationIdControl.value.length > 0) {
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
-       
+
       }
       else {
         this.filterColumns.departmentIds.dataSource = [];
@@ -359,6 +359,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
         this.changeDetectorRef.detectChanges();
       }
       else {
+        this.filterColumns.skillIds.dataSource = [];
         this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
       }
     });
@@ -380,10 +381,10 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
 
   }
 
-  
+
 
   public SearchReport(): void {
-   
+
     this.filteredItems = [];
     let auth = "Bearer ";
     for (let x = 0; x < window.localStorage.length; x++) {
@@ -392,13 +393,13 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       }
     }
     let { businessIds, candidateName, candidateStatuses, departmentIds, jobId, jobStatuses, locationIds,
-      regionIds, skillCategoryIds,agencyIds, skillIds, startDate, endDate } = this.jobDetailSummaryReportForm.getRawValue();
-      if (!this.jobDetailSummaryReportForm.dirty) {
-        this.message = "Default filter selected with all regions, locations and departments for last and next 30 days.";
-      }
-      else {
-        this.isResetFilter = false;
-        this.message = ""
+      regionIds, skillCategoryIds, agencyIds, skillIds, startDate, endDate } = this.jobDetailSummaryReportForm.getRawValue();
+    if (!this.jobDetailSummaryReportForm.dirty) {
+      this.message = "Default filter selected with all regions, locations and departments for last and next 30 days.";
+    }
+    else {
+      this.isResetFilter = false;
+      this.message = ""
     }
     locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
@@ -414,12 +415,12 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       "RegionParamJDSR": regionIds.length == 0 ? "null" : regionIds,
       "LocationParamJDSR": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentParamJDSR": departmentIds.length == 0 ? "null" : departmentIds,
-      "SkillCategoryParamJDSR": skillCategoryIds?.length>0? skillCategoryIds?.join(","):'null',
-      "SkillParamJDSR": skillIds?.length>0? skillIds?.join(","):"null",
-      "CandidateNameJDSR": candidateName == null||candidateName=="" ? 'null' : candidateName.toString(),
+      "SkillCategoryParamJDSR": skillCategoryIds?.length > 0 ? skillCategoryIds?.join(",") : 'null',
+      "SkillParamJDSR": skillIds?.length > 0 ? skillIds?.join(",") : "null",
+      "CandidateNameJDSR": candidateName == null || candidateName == "" ? 'null' : candidateName.toString(),
       "CandidateStatusJDSR": candidateStatuses?.length > 0 ? candidateStatuses.join(",") : 'null',
       "JobStatusJDSR": jobStatuses?.length > 0 ? jobStatuses.join(",") : 'null',
-      "JobIdJDSR": jobId == null || jobId=="" ?  'null':jobId,
+      "JobIdJDSR": jobId == null || jobId == "" ? 'null' : jobId,
       "AgencysJDSR": agencyIds?.length > 0 ? agencyIds.join(",") : 'null',
       "BearerParamJDSR": auth,
       "BusinessUnitIdParamJDSR": businessIds,
@@ -577,11 +578,11 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   @OutsideZone
   private onFilterChild(e: FilteringEventArgs) {
     if (e.text != '') {
-      let ids=[];
+      let ids = [];
       ids.push(this.bussinessControl.value);
       let filter: CommonCandidateSearchFilter = {
         searchText: e.text,
-        businessUnitIds:ids
+        businessUnitIds: ids
       };
       this.filterColumns.dataSource = [];
       this.store.dispatch(new GetCommonReportCandidateSearch(filter))

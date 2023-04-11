@@ -2,67 +2,58 @@ import { Injectable } from '@angular/core';
 
 import { DateTimeHelper } from '@core/helpers';
 import { ScheduleType } from '../enums';
-import { ScheduleItem } from '../interface';
-import { ScheduleCardTooltips } from '../components/schedule-card/schedule-card.interface';
+import { ScheduleItem, ScheduleItemAttributes } from '../interface';
+import { CreateScheduleAttributes } from '../helpers';
 
 @Injectable()
 export class ScheduleCardService {
-  createAdditionalTooltip(schedule: ScheduleItem[]): ScheduleCardTooltips {
-    const firstSchedule = schedule[0];
-    const itemsForTooltips = schedule.slice(1);
-    const orderIDText = firstSchedule.orderMetadata?.orderPublicId;
-    let overlapTooltip = '';
-    let orderText: string;
-
-    if (orderIDText) {
-      orderText = `OrderID-${orderIDText}`;
-    } else {
-      orderText = `ShiftID-${firstSchedule.id}`;
-    }
-
-    const baseTooltip = `${orderText} ${ firstSchedule.orderMetadata?.location }`
-    + ` ${ firstSchedule.orderMetadata?.department }`;
-
-    if (itemsForTooltips.length) {
-      const tooltips = this.createTooltipItems(itemsForTooltips, firstSchedule);
-      overlapTooltip = `<pre class="schedule-custom-tooltip-container">${tooltips.join('<br>')}</pre>`;
-    }
-
-    return ({
-      orderTooltip: baseTooltip,
-      additionalTooltip: overlapTooltip,
-    });
+  createAllEventsTooltip(schedule: ScheduleItem[]): string {
+    return `<pre class="schedule-custom-tooltip-container">${this.createTooltipItems(schedule).join('<br>')}</pre>`;
   }
 
-  private createTooltipItems(items: ScheduleItem[], firstSchedule: ScheduleItem): string[] {
+  private createTooltipItems(items: ScheduleItem[]): string[] {
       return items.map((item) => {
         const isUnavailability = item.scheduleType === ScheduleType.Unavailability;
         const isAvailability = item.scheduleType === ScheduleType.Availability;
+        const isBooking = item.scheduleType === ScheduleType.Book;
         const orderIDText = item.orderMetadata?.orderPublicId;
-        let message = '';
-        let orderText: string;
-
-        if (orderIDText) {
-          orderText = `OrderID-${orderIDText}`;
-        } else {
-          orderText = `ShiftID-${firstSchedule.id}`;
-        }
-
         const startTime = DateTimeHelper.formatDateUTC(item.startDate, 'HH:mm');
         const endTime = DateTimeHelper.formatDateUTC(item.endDate, 'HH:mm');
 
-        if (item.orderMetadata?.department === firstSchedule.orderMetadata?.department && !isUnavailability) {
-          message = `${ startTime } - ${ endTime }`;
-        } else if (isUnavailability) {
-          message = `${ startTime } - ${ endTime } ${item.unavailabilityReason}`;
-        } else if (isAvailability) {
-          message = `Availability ${ startTime } - ${ endTime }`;
-        } else {
-          message = `${orderText} ${ item.orderMetadata?.location }`
-          + ` ${ item.orderMetadata?.department }, ${ startTime } - ${ endTime }`;
+        if (isBooking && orderIDText) {
+          const attributesText = this.createAttributesTooltipText(item.attributes);
+
+          return `${ startTime } - ${ endTime } | ${orderIDText}`
+            + ` | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department }`
+            + `${attributesText}`;
         }
 
-        return message;
+        if (isBooking) {
+          const attributesText = this.createAttributesTooltipText(item.attributes);
+
+          return `${ startTime } - ${ endTime } | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department }`
+            + `${attributesText}`;
+        }
+
+        if (isAvailability) {
+          return `${ startTime } - ${ endTime } | Available`;
+        }
+
+        if (isUnavailability) {
+          return `${ startTime } - ${ endTime } | Unavailable | ${item.unavailabilityReason}`;
+        }
+
+        return '';
       });
+  }
+
+  private createAttributesTooltipText(attributes: ScheduleItemAttributes): string {
+    const attributesList = CreateScheduleAttributes(attributes, true);
+    
+    if(attributesList.length) {
+      return ` | ${attributesList}`;
+    } else {
+      return '';
+    }
   }
 }

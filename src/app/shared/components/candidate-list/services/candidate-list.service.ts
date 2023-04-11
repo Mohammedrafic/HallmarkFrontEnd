@@ -29,6 +29,15 @@ export class CandidateListService {
     return this.http.post<IRPCandidateList>('/api/Employee/GetAll', payload);
   }
 
+    /**
+   * Get IRP candidates (Employees)
+   * @return list of IRP candidates in specific format
+   */
+     public getIRPCandidatesExport(payload: ExportPayload): Observable<Blob> {
+      return this.http.post<Blob>('/api/Employee/Export', payload);
+    }
+
+
   /**
    * Delete IRP candidate by id
    * @return list of IRP candidates
@@ -83,7 +92,7 @@ export class CandidateListService {
       locationIds: new FormControl([]),
       departmentIds: new FormControl([]),
       primarySkillIds: new FormControl([]),
-      secondarySkillIds: new FormControl([]), 
+      secondarySkillIds: new FormControl([]),
       hireDate: new FormControl(null),
       credStartDate: new FormControl(null),
       credEndDate: new FormControl(null),

@@ -2,14 +2,13 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 
 import { filter, takeUntil } from 'rxjs';
 
-import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { Destroyable } from '@core/helpers';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
 import { DateItem, CreateScheduleItem } from './schedule-items.interface';
-import { ScheduleType } from '../../enums';
-import { ScheduleBookingErrors, ScheduleSelectedSlots } from '../../interface';
+import { ScheduleBookingErrors, ScheduleCandidate, ScheduleSelectedSlots } from '../../interface';
 import { GetCountErrors, ScheduleItemsWithErrors } from '../../helpers';
-import { ScheduleItemType } from '../../constants';
+import { ScheduleCircleType, ScheduleItemType } from '../../constants';
 import { IrpOrderType } from '@shared/enums/order-type';
 
 @Component({
@@ -27,20 +26,19 @@ export class ScheduleItemsComponent extends Destroyable implements OnInit {
   }
 
   @Input() set scheduleSelectedSlots(scheduleSelectedSlots: ScheduleSelectedSlots) {
-    if (scheduleSelectedSlots.candidates.length) {
-      this.setScheduleItems(scheduleSelectedSlots);
-    }
+    this.setScheduleItems(scheduleSelectedSlots);
   }
+
   @Output() isEmpty: EventEmitter<void> = new EventEmitter<void>();
 
   scheduleItems: CreateScheduleItem[] = [];
   itemsErrorCounter: number;
   ltaOrder: IrpOrderType = IrpOrderType.LongTermAssignment;
 
-  readonly scheduleType = ScheduleType;
+  readonly scheduleCircleType: Record<string, string> = ScheduleCircleType;
   selectedType: ScheduleItemType = ScheduleItemType.Book;
 
-  private scheduleSelectedSlot: ScheduleSelectedSlots;
+  public scheduleSelectedSlot: ScheduleSelectedSlots;
 
   constructor(
     private scheduleItemsService: ScheduleItemsService,
@@ -62,7 +60,13 @@ export class ScheduleItemsComponent extends Destroyable implements OnInit {
   }
 
   removeScheduleItem(candidateId: number): void {
+    const selectedCandidate =
+      this.scheduleItemsService.getSelectedCandidate(this.scheduleSelectedSlot.candidates, candidateId);
     this.scheduleItems = this.scheduleItems.filter((item: CreateScheduleItem) => item.candidateId !== candidateId);
+    this.scheduleItemsService.removeCandidateItem.next({
+      date: null,
+      candidate: selectedCandidate as ScheduleCandidate,
+    });
 
     if (!this.scheduleItems.length) {
       this.isEmpty.emit();
@@ -83,13 +87,24 @@ export class ScheduleItemsComponent extends Destroyable implements OnInit {
     }
 
     scheduleItem.selectedDates = this.scheduleItemsService.getSelectedDates(scheduleItem);
+    this.setRemovedItem(dateValue, candidateId);
 
     if (!scheduleItem.dateItems.length) {
       this.removeScheduleItem(candidateId);
     }
   }
 
-  updateDateItems(dates: Date[], candidateId: number): void {
+  private setRemovedItem(dateValue: string, candidateId: number): void {
+    const formatDate = dateValue.split('T');
+    const selectedCandidate =
+      this.scheduleItemsService.getSelectedCandidate(this.scheduleSelectedSlot.candidates, candidateId);
+    this.scheduleItemsService.removeCandidateItem.next({
+      date: formatDate[0],
+      candidate: selectedCandidate as ScheduleCandidate,
+    });
+  }
+  /*todo: uncomment in future implementation -->*/
+  /*updateDateItems(dates: Date[], candidateId: number): void {
     const scheduleItem = this.scheduleItems.find((item: CreateScheduleItem) => item.candidateId === candidateId);
 
     if (!scheduleItem) {
@@ -106,7 +121,7 @@ export class ScheduleItemsComponent extends Destroyable implements OnInit {
       dates.map((date: Date) => DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date))),
       candidateId
     );
-  }
+  }*/
 
   private setScheduleType(value: ScheduleItemType): void {
     this.selectedType = value;

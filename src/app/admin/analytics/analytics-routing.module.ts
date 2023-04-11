@@ -1,3 +1,4 @@
+import { StaffListComponent } from './staff-list/staff-list.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { OrganizationInvoicesContainerService } from '../../modules/invoices/services/invoices-container/organization-invoices-container.service';
@@ -42,6 +43,8 @@ import { DailyOrderStatusComponent } from './daily-order-status/daily-order-stat
 import { CandidateStatusComponent } from './candidate-status/candidate-status.component';
 import { VendorActivityComponent } from './vendor-activity/vendor-activity.component';
 import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-schedule-by-shift.component';
+import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-report/finance-medicare-wage-report.component';
+import { GrantReportComponent } from './grant-report/grant-report.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '', pathMatch: 'full' },
@@ -325,6 +328,27 @@ const routes: Routes = [
       {
         path: 'staffschedulebyshift-irp',
         component: StaffScheduleByShiftComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'staff-list',
+        component: StaffListComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'finance-medicare-wage-report',
+        component: FinanceMedicareWageReportComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'grant-report',
+        component: GrantReportComponent,
         data: {
           isOrganizationArea: true,
         }

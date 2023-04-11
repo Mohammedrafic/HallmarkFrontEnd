@@ -20,7 +20,7 @@ import { getAgencyNameList } from '@shared/components/general-reorder-info/gener
 export class GeneralReorderInfoComponent extends DestroyableDirective implements OnChanges {
   @Input() public orderInformation: Order;
 
-  @Input() system: OrderManagementIRPSystemId;
+  @Input() system: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
 
   @Select(AppState.isOrganizationAgencyArea)
   public isOrganizationOrAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;

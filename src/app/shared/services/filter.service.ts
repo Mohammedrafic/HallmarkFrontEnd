@@ -6,6 +6,7 @@ import { DropdownOption } from '@core/interface';
 import { Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { CommonFormConfig } from '@shared/models/common-form-config.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilteredUser, User } from '@shared/models/user.model';
 import { isBoolean, isDate, isEmpty, isNumber } from 'lodash';
@@ -169,5 +170,21 @@ export class FilterService {
       debounceTime(300),
       map(() => this.generateChips(formGroup, filterColumns))
     );
+  }
+
+  public composeFilterState<T extends CommonFormConfig, S extends Record<string, unknown>>(
+    formConfig: T[],
+    state: S
+  ): S {
+    const filter = formConfig.reduce((acc, item) => {
+      const field = item.field as keyof S;
+      const value = state?.[field];
+      if (!!value) {
+        acc[field] = value;
+      }
+      return acc;
+    }, {} as S);
+
+    return filter;
   }
 }

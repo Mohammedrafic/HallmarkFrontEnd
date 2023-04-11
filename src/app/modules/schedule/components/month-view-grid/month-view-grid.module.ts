@@ -1,6 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { FeatherModule } from 'angular-feather';
+import { Slash } from 'angular-feather/icons';
+
+import { WeeksEndModule } from '../../directives/weeks-end/weeks-end.module';
 import { MonthViewGridComponent } from './month-view-grid.component';
 import { CandidateCardModule } from '../candidate-card/candidate-card.module';
 import { CalendarDateSlotModule } from '../../pipes/calendar-date-slot/calendar-date-slot.module';
@@ -8,7 +12,6 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
 import { CalendarTooltipSlotModule } from '../../pipes/calendar-tooltip-slot/calendar-tooltip-slot.module';
 import { SharedModule } from '@shared/shared.module';
 import { MonthCardComponent } from './month-card/month-card.component';
-import { DoubleClickModule } from '@shared/directives/double-click/double-click.module';
 
 @NgModule({
   exports: [MonthViewGridComponent],
@@ -23,7 +26,8 @@ import { DoubleClickModule } from '@shared/directives/double-click/double-click.
     TooltipContainerModule,
     CalendarTooltipSlotModule,
     SharedModule,
-    DoubleClickModule,
+    WeeksEndModule,
+    FeatherModule.pick({ Slash }),
   ],
 })
 export class MonthViewGridModule { }

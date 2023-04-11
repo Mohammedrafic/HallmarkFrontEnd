@@ -1,1 +1,14 @@
-<p>job-event works!</p>
+<section class="flex-column">
+  <section class="toolbar">
+    <section class="toolbar-header">
+      <div class="toolbar-header-div">
+        {{title }}
+      </div>
+    </section>
+  </section>
+</section>
+<section class="Job-event-section">
+  <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName"
+                   [reportType]="reportType"></app-logi-report>
+  <router-outlet></router-outlet>
+</section>

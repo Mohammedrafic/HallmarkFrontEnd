@@ -11,5 +11,4 @@ export const TabListConfig: TabsListConfig[] = [
   // },
 ];
 
-export const ButtonRegionTooltip = 'Select a single Region-Location-Department to Schedule';
-export const ButtonSelectDataTooltip = 'Select at least one date to Schedule';
+export const FilterErrorMessage = 'Filter to a single department and skill to start scheduling';

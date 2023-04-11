@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -39,9 +39,14 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
+  constructor(
+    private store: Store,
+    private router: Router,
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+  ) {
     super();
-    store.dispatch(new SetHeaderState({ title: 'Candidate List', iconName: 'users' }));
+    store.dispatch(new SetHeaderState({ title: 'Employee List', iconName: 'users' }));
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
     this.credStartDate = routerState?.['startDate'];
     this.credEndDate = routerState?.['endDate'];
@@ -104,6 +109,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
 
     this.isIRP = !!isIRPEnabled && this.store.selectSnapshot(AppState.isIrpFlagEnabled);
     this.preferencesLoaded = true;
+    this.cdr.markForCheck();
   }
 
   public addIRPCandidate(): void {

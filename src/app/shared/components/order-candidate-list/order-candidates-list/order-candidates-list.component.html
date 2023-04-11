@@ -2,7 +2,7 @@
   <ng-container *ngIf="system !== systemType.IRP || !isFeatureIrpEnabled || isAgency; else irpTableHeader">
     <div class="e-gridcustomheader">
       <div class="title">
-        <h3>Candidates List</h3>
+        <h3>Employees List</h3>
       </div>
       <div class="grid-toolbar">
         <app-search
@@ -29,7 +29,7 @@
   <ng-template #irpTableHeader>
     <div class="e-gridcustomheader">
       <div class="title">
-        <h3>Candidates</h3>
+        <h3>Employees</h3>
       </div>
       <div class="input-container">
         <div class="input-group switch">
@@ -185,7 +185,6 @@
 
   </ejs-grid>
   </ng-container>
-
   <ng-container *ngIf="system === systemType.IRP && selectedOrder.orderType === orderTypes.Traveler
     && isFeatureIrpEnabled && !isAgency">
     <ejs-grid
@@ -204,7 +203,7 @@
       [height]="300"
     >
       <e-columns>
-        <e-column textAlign="Right" width="160">
+        <e-column textAlign="Right" width="140">
           <ng-template #template let-data>
             <div class="row-tool-buttons">
               <div
@@ -226,11 +225,10 @@
               </ejs-tooltip>
               </div>
               <div
+                [class.btn-icon__disabled]="!data.isOriented"
                 ejs-button
                 (click)="openEditCandidateModal(data)"
                 cssClass="e-flat primary-icon-button custom-button"
-                [class.btn-icon__disabled]="selectedOrder?.irpOrderMetadata?.status === orderStatus.Closed
-                || data.status === applicantStatus.Offboard"
               >
                 <ejs-tooltip id="tooltip" content="Edit" position="TopCenter">
                   <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
@@ -239,15 +237,17 @@
             </div>
           </ng-template>
         </e-column>
-        <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
+        <e-column field="firstName" headerText="Name" textAlign="Left" width="170">
           <ng-template #template let-data>
             <div class="link" (click)="onViewNavigation(data)">
               {{ data.lastName }}, {{ data.firstName }}
-              <!-- <ng-container *ngIf="data.deployedCandidateInfo && data.statusName !== 'Onboard'">
-                <ejs-tooltip content="Not oriented" position="TopRight">
+              <ng-container *ngIf="!data.isOriented">
+                <ejs-tooltip
+                  [content]="data.departmentOrientationDate"
+                  position="TopRight">
                   <i-feather name="compass" class="icon"></i-feather>
                 </ejs-tooltip>
-              </ng-container> -->
+              </ng-container>
             </div>
           </ng-template>
         </e-column>

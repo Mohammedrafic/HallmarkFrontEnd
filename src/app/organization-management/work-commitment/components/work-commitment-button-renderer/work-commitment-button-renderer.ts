@@ -43,7 +43,10 @@ export class WorkCommitmentButtonRenderer extends AbstractPermission {
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      )
       .subscribe(() => {
         this.store.dispatch(new WorkCommitment.DeleteCommitment(this.cellValue.data.workCommitmentId));
       });

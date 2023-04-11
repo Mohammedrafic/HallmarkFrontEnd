@@ -1,3 +1,4 @@
+import { ScheduleApiService } from 'src/app/modules/schedule/services/schedule-api.service';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnalyticsComponent } from './analytics.component';
@@ -55,6 +56,9 @@ import { DailyOrderStatusComponent } from './daily-order-status/daily-order-stat
 import { CandidateStatusComponent } from './candidate-status/candidate-status.component';
 import { VendorActivityComponent } from './vendor-activity/vendor-activity.component';
 import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-schedule-by-shift.component';
+import { StaffListComponent } from './staff-list/staff-list.component';
+import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-report/finance-medicare-wage-report.component';
+import { GrantReportComponent } from './grant-report/grant-report.component';
 
 
 @NgModule({
@@ -101,7 +105,10 @@ import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-s
     DailyOrderStatusComponent,
     CandidateStatusComponent,
     VendorActivityComponent,
-    StaffScheduleByShiftComponent],
+    StaffScheduleByShiftComponent,
+    StaffListComponent,
+    FinanceMedicareWageReportComponent,
+    GrantReportComponent],
   exports: [
     CandidateListComponent
   ],
@@ -120,6 +127,9 @@ import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-s
     AutoCompleteAllModule,
     RadioButtonModule,
     NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState])
+  ],
+  providers:[
+    ScheduleApiService
   ]
 })
 export class AnalyticsModule { }

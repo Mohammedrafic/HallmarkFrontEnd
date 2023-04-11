@@ -6,6 +6,7 @@ import { Store } from '@ngxs/store';
 import { CHANGES_SAVED } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { MessageTypes } from '@shared/enums/message-types';
+import { ExportPayload } from '@shared/models/export.model';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { BehaviorSubject, Observable,Subject,tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
@@ -71,9 +72,19 @@ export class OrientationService {
   }
 
   public getHistoricalOrientationConfigs(filters: OrientationConfigurationFilters): Observable<OrientationConfigurationPage> {
-    return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/historical/configurations/list', filters)
+    if(filters.regionIds || filters.skillCategoryIds){
+      return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/historical/filter', filters)
+    }
+    return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/historical/configurations/list', filters)  
   }
 
+  public getExport(filters: ExportPayload): Observable<Blob> {
+    if (filters) {
+      return this.http.post(`/api/OrientationSettings/export`, filters, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/OrientationSettings/export`, filters, { responseType: 'blob' });
+  }
+  
   public saveOrientationConfiguration(params: OrientationConfigurationDTO): Observable<void> {
     if (params.orientationConfigurationId) {
       return this.http.put<void>('/api/OrientationSettings/configurations/' + params.orientationConfigurationId, params);

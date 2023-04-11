@@ -403,6 +403,22 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
     },
+    89: {
+      // Finance Medicare Wage Report
+      icon: '',
+      route: '/analytics/finance-medicare-wage-report',
+    },
+
+    91: {
+      // Staff List Report
+      icon: '',
+      route: '/analytics/staff-list',
+    },
+    90: {
+      // Grant Report
+      icon: '',
+      route: '/analytics/grant-report',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -599,6 +615,11 @@ export const MENU_CONFIG: any = {
       // Staff Schedule By Shift Report
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
+    },
+    91: {
+      // Staff List Report
+      icon: '',
+      route: '/analytics/staff-list',
     },
   },
 
@@ -967,6 +988,21 @@ export const MENU_CONFIG: any = {
       // Staff Schedule By Shift Report
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
+    },  
+    89: {
+      // Finance Medicare Wage Report
+      icon: '',
+      route: '/analytics/finance-medicare-wage-report',
+    },
+    91: {
+      // Staff List Report
+      icon: '',
+      route: '/analytics/staff-list',
+    },
+    90: {
+      // Grant Report
+      icon: '',
+      route: '/analytics/grant-report',
     },
   },
 

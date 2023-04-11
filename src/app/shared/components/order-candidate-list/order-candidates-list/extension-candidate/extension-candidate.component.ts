@@ -39,7 +39,7 @@ import {
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
 import { DatePipe } from '@angular/common';
-import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues } from '@shared/enums/applicant-status.enum';
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
@@ -67,10 +67,11 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateDOBRequired, CandidateSSNRequired, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import { CandidateADDRESSRequired, CandidateDOBRequired,CandidatePHONE1Required, CandidateSSNRequired, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { SettingsViewService } from '@shared/services';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { DateTimeHelper } from '@core/helpers';
+import { CommonHelper } from '@shared/helpers/common.helper';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -140,6 +141,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public applicantStatusEnum = ApplicantStatusEnum;
   public candidateSSNRequired: boolean;
   public candidateDOBRequired: boolean;
+  public candidatePhone1RequiredValue : string = '';
+  public candidateAddressRequiredValue : string = '';
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
     Rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
@@ -177,6 +180,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   get isOffered(): boolean {
     return this.candidate?.status === ApplicantStatusEnum.Offered;
+  }
+
+  get isOffboard(): boolean {
+    return this.candidate?.status === ApplicantStatusEnum.Offboard;
   }
 
   constructor(
@@ -304,10 +311,35 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         return;
       }
     }
+    
+    if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
+      if(this.candidateJob?.candidateProfileContactDetails != null){ 
+          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null 
+              || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
+                this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
+                return;
+            }
+      }else{
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
+        return;
+      }
+    }
 
     if (this.isAgency && this.isCandidatePayRateVisible && this.isOffered && this.form.get('candidatePayRate')?.invalid) {
       this.form.markAllAsTouched();
       return;
+    }
+
+    if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
+      if(this.candidateJob?.candidateProfileContactDetails != null){ 
+          if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
+              this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
+              return;
+          }
+      }else{
+        this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
+        return;
+      }
     }
 
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
@@ -453,6 +485,16 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     if (!this.canOnboard) {
       this.form?.controls['allowDeployCredentials']?.disable();
     }
+
+    if (this.isOffboard) {
+      this.form?.get('guaranteedWorkWeek')?.disable();
+      this.form?.get('allowDeployCredentials')?.disable();
+      this.form?.get('comments')?.disable();
+      this.form?.get('allowDeployCredentials')?.disable();
+      this.form?.get('actualStartDate')?.disable();
+      this.form?.get('actualEndDate')?.disable();
+      this.form?.get('offeredBillRate')?.disable();
+    }
   }
 
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
@@ -544,6 +586,18 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.candidateJob = value;
     this.candidateSSNRequired = value.candidateSSNRequired;
     this.candidateDOBRequired = value.candidateDOBRequired;
+    if(value.candidatePhone1Required != null){
+      let phone1Configuration = JSON.parse(value.candidatePhone1Required);
+      if(phone1Configuration.isEnabled){
+        this.candidatePhone1RequiredValue = phone1Configuration.value;
+      }
+    }
+    if(value.candidateAddressRequired != null){
+      let addressConfiguration = JSON.parse(value.candidateAddressRequired);
+      if(addressConfiguration.isEnabled){
+        this.candidateAddressRequiredValue = addressConfiguration.value;
+      }
+    }
     if (this.candidateJob) {
       this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
       this.getComments();

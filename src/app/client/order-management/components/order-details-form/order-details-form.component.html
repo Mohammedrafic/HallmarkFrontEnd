@@ -222,10 +222,8 @@
                       <div class="input-group">
                         <input
                           class="e-input"
-                          type="text"
                           formControlName="openPositions"
                           appValidateWithMessage
-                          maxlength="10"
                         />
                       </div>
                     </div>
@@ -576,7 +574,7 @@
                       appValidateWithMessage
                       (change)="onRequisitionChange($event)"
                       [allowFiltering]="true"
-                      [dataSource]="(reasons$ | async)?.items"
+                      [dataSource]="reasons"
                       [fields]="reasonForRequisitionFields"
                     >
                     </ejs-dropdownlist>

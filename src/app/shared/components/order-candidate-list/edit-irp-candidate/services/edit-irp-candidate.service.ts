@@ -71,13 +71,14 @@ constructor(
 
   setValidatorsForClose(form: CustomFormGroup<CandidateForm>): void {
     form.get('status')?.removeValidators(Validators.required);
-    form.get('status')?.reset();
+    form.get('status')?.updateValueAndValidity();
     form.get('reason')?.setValidators(Validators.required);
     form.get('closeDate')?.setValidators(Validators.required);
   }
 
   setDefaultValidators(form: CustomFormGroup<CandidateForm>): void {
     form.get('status')?.setValidators(Validators.required);
+    form.get('status')?.updateValueAndValidity();
     form.get('reason')?.removeValidators(Validators.required);
     form.get('closeDate')?.removeValidators(Validators.required);
   }

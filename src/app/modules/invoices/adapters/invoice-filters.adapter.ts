@@ -33,10 +33,6 @@ export class InvoiceFiltersAdapter {
       filters.formattedInvoiceIds = [formGroup.getRawValue().formattedInvoiceIds];
     }
 
-    if (filters.orderIds) {
-      filters.orderIds = [formGroup.getRawValue().orderIds];
-    }
-
     return filters;
   }
 

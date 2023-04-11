@@ -1,15 +1,19 @@
 import { FormGroup } from '@angular/forms';
+import { WeekDays } from '@shared/enums/week-days.enum';
 
 import * as ScheduleInt from '../interface';
 import { DropdownOption } from '@core/interface';
 import { convertMsToTime, getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { ShiftTab } from '../components/edit-schedule/edit-schedule.interface';
-import { ScheduleType } from '../enums';
+import { ScheduleAttributeKeys, ScheduleType } from '../enums';
 import {
   BookingError,
   ScheduleBookingErrors,
+  ScheduleCandidate,
   ScheduleDateItem,
+  ScheduledItem,
   ScheduleItem,
+  ScheduleItemAttributes,
   ScheduleModel,
   ScheduleModelPage,
 } from '../interface';
@@ -159,14 +163,16 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
   };
 };
 
-export const HasNotDepartment = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
-  return filters.departmentsIds && !filters.departmentsIds.length;
+export const HasNotMandatoryFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
+  return (filters.departmentsIds && !filters.departmentsIds.length)
+    || (filters.skillIds && !filters.skillIds.length);
 };
 
 export const HasMultipleFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
   return filters.regionIds && filters.regionIds.length > 1 ||
     filters.locationIds && filters.locationIds.length > 1 ||
-    filters.departmentsIds && filters.departmentsIds.length > 1;
+    filters.departmentsIds && filters.departmentsIds.length > 1 ||
+    filters.skillIds && filters.skillIds.length > 1;
 };
 
 export const GetShiftHours = (startTimeDate: Date, endTimeDate: Date): string => {
@@ -188,6 +194,20 @@ export const MapToDropdownOptions = (items: { name: string; id: number }[]): Dro
       value: item.id,
     };
   });
+};
+
+export const MapShiftToDropdownOptions = (items: { startTime: string; endTime: string; id: number }[]): DropdownOption[] => {
+  return items.map(item => {
+    return {
+      text: `${FormatShiftHours(item.startTime)} - ${FormatShiftHours(item.endTime)}`,
+      value: item.id,
+    };
+  });
+};
+
+export const FormatShiftHours = (time: string): string => {
+  const [hours, minutes] = time.split(':');
+  return `${hours}:${minutes}`;
 };
 
 export const GetScheduleTabItems = (daySchedules: ScheduleItem[]): ShiftTab[] => {
@@ -231,7 +251,7 @@ export const GetScheduleDateItem = (
       .schedule.find((item: ScheduleDateItem) => item.date.substring(0, dateStringLength) === date);
 };
 
-export const GetMonthRange = (initDay: number): string[] => {
+export const GetMonthRange = (initDay: number): WeekDays[] => {
   const daysInWeek = WeekList;
   const startingDayIndex = initDay % 7;
 
@@ -239,4 +259,51 @@ export const GetMonthRange = (initDay: number): string[] => {
     ...daysInWeek.slice(startingDayIndex),
     ...daysInWeek.slice(0, startingDayIndex),
   ];
+};
+
+export const CreateScheduleAttributes = (attributes: ScheduleItemAttributes, isTooltip = false): string => {
+  if(attributes.orientated) {
+    return ScheduleAttributeKeys.ORI;
+  }
+
+  return CreateAttributesList(attributes, isTooltip);
+};
+
+export const CreateAttributesList = (attributes: ScheduleItemAttributes, isTooltip = false): string => {
+  const attributesList = [];
+
+  if(attributes.critical){
+    attributesList.push(ScheduleAttributeKeys.CRT);
+  }
+
+  if(attributes.onCall) {
+    attributesList.push(ScheduleAttributeKeys.OC);
+  }
+
+  if(attributes.charge) {
+    attributesList.push(ScheduleAttributeKeys.CHG);
+  }
+
+  if(attributes.preceptor) {
+    attributesList.push(ScheduleAttributeKeys.PRC);
+  }
+
+  if (attributesList.length > 2 && !isTooltip) {
+    attributesList.splice(2);
+  }
+
+  return attributesList.length ? attributesList.join(',') : '';
+};
+
+export const GetScheduledShift = (
+  scheduleData: ScheduleInt.ScheduleModelPage,
+  candidateId: number,
+  date: string
+): ScheduledItem => {
+  const scheduledShiftData = scheduleData?.items.find((item: ScheduleModel) => item.candidate.id === candidateId);
+
+  return  {
+    candidate: scheduledShiftData?.candidate as ScheduleCandidate,
+    schedule: scheduledShiftData?.schedule.find((item: ScheduleDateItem) => item.date === date) as ScheduleDateItem,
+  };
 };

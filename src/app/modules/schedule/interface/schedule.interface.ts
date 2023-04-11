@@ -16,11 +16,12 @@ export interface ScheduleCandidate {
   ltaAssignment: LtaAssignment | null;
   skill: string;
   skillId: number;
+  orientationDate: string;
   dates: string[];
   orderType: IrpOrderType | null;
   workCommitments: string[] | null;
   employeeNote: string;
-  workHours: number[];
+  workHours?: number;
   isOriented: boolean;
   fullName?: string;
   workCommitmentText?: string;
@@ -47,6 +48,8 @@ export interface ScheduleItem {
   unavailabilityReason: string;
   unavailabilityReasonId: number;
   shiftId: number;
+  floated: boolean;
+  attributes: ScheduleItemAttributes;
   orderMetadata: {
     orderType: IrpOrderType;
     location: string;
@@ -61,6 +64,14 @@ export interface ScheduleItem {
   }
 }
 
+export interface ScheduleItemAttributes {
+  charge: boolean;
+  critical: boolean;
+  onCall: boolean;
+  orientated: boolean;
+  preceptor: boolean;
+}
+
 export interface ScheduleModel {
   candidate: ScheduleCandidate;
   schedule: ScheduleDateItem[];
@@ -70,14 +81,13 @@ export interface ScheduleModel {
 export interface CandidateSchedules {
   employeeId: number;
   schedules: ScheduleDateItem[];
-  workHours: number[];
+  workHours: number;
 }
 
 export interface ScheduleDateItem {
   date: string;
   extendedDays: number;
   daySchedules: ScheduleItem[];
-  showWhiteFrame: boolean;
   employeeStatus: number;
   departmentStartDate: string;
   departmentEndDate: string;
@@ -102,12 +112,14 @@ export interface ScheduleSelectedSlots {
 export type ScheduleCandidatesPage = PageOfCollections<ScheduleCandidate>;
 export type ScheduleModelPage = PageOfCollections<ScheduleModel>;
 
-export interface ScheduleCardConfig {
+export interface ScheduleEventConfig {
   title: string;
-  iconName: string;
-  bgColor?: string;
-  iconColor?: string;
-  showTitleToolTip?: boolean;
+  color: string;
+  startDate: string;
+  endDate: string;
+  shortTitle?: string;
+  ltaOrder?: boolean;
+  additionalAttributes?: string;
 }
 
 export interface ScheduleMonthCardConfig {
@@ -187,4 +199,26 @@ export interface ShiftDropDownsData {
   departmentsDataSource: DropdownOption[];
   skillsDataSource?: DropdownOption[];
   selectedSkillId: number | null;
+}
+
+export interface DeleteScheduleRequest {
+  id: number;
+  createOrder: boolean;
+  startDateTime?: string;
+  endDateTime?: string;
+}
+
+export interface SideBarSettings {
+  isOpen: boolean;
+  isEditMode: boolean;
+}
+
+export interface SelectedCells {
+  cells: ScheduleSelectedSlots;
+  sideBarState?: boolean;
+}
+
+export interface RemovedSlot {
+  date: string | null;
+  candidate: ScheduleCandidate;
 }

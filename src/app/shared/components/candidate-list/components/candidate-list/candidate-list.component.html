@@ -1,19 +1,8 @@
-<ejs-grid #grid
-          [dataSource]="(candidates$ | async)?.items"
-          [allowSelection]="true"
-          [allowPaging]="allowPaging"
-          [pageSettings]="pageSettings"
-          [height]="fullScreenGridHeight"
-          [rowHeight]="rowHeight"
-          [enableVirtualization]="true"
-          [resizeSettings]="resizeSettings"
-          [allowSorting]="allowSorting"
-          [allowResizing]="allowResizing"
-          (dataBound)="dataBound()"
-          [selectionSettings]="selectionOptions"
-          (rowSelected)="rowSelected($event, grid)"
-          (rowDeselected)="rowDeselected($event, grid)"
->
+<ejs-grid #grid [dataSource]="(candidates$ | async)?.items" [allowSelection]="true" [allowPaging]="allowPaging"
+  [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight" [enableVirtualization]="true"
+  [resizeSettings]="resizeSettings" [allowSorting]="allowSorting" [allowResizing]="allowResizing"
+  (dataBound)="dataBound()" [selectionSettings]="selectionOptions" (rowSelected)="rowSelected($event, grid)"
+  (rowDeselected)="rowDeselected($event, grid)">
   <e-columns>
     <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
     <e-column textAlign="Right" width="80" *ngIf="isAgency">
@@ -22,7 +11,9 @@
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
             <span><i-feather name="edit" class="icon"></i-feather></span>
           </button>
-          <button ejs-button [disabled]="!agencyActionsAllowed || data.candidateStatus === candidateStatus.Onboard || !userPermission[userPermissions.CanEditCandidateProfile]" cssClass="e-flat secondary-icon-button enabled-button"  (click)="onRemove(data.candidateProfileId)">
+          <button ejs-button
+            [disabled]="!agencyActionsAllowed || data.candidateStatus === candidateStatus.Onboard || !userPermission[userPermissions.CanEditCandidateProfile]"
+            cssClass="e-flat secondary-icon-button enabled-button" (click)="onRemove(data.candidateProfileId)">
             <span><i-feather name="trash-2" class="icon"></i-feather></span>
           </button>
         </div>
@@ -34,7 +25,8 @@
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
             <span><i-feather name="edit" class="icon"></i-feather></span>
           </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button enabled-button" [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id)">
+          <button ejs-button cssClass="e-flat secondary-icon-button enabled-button"
+            [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id)">
             <span><i-feather name="trash-2" class="icon"></i-feather></span>
           </button>
           <ejs-tooltip *ngIf="data.hasRedFlag" [content]="data.redFlagDescription" position="TopCenter">
@@ -70,7 +62,7 @@
           <ejs-chiplist class="events-off">
             <e-chips>
               <e-chip [text]="statusEnum[data.profileStatus] || employeeStatusEnum[data.employeeStatusId]"
-                      [cssClass]="getChipCssClass(statusEnum[data.profileStatus] || data.employeeStatus)">
+                [cssClass]="getChipCssClass(statusEnum[data.profileStatus] || data.employeeStatus)">
               </e-chip>
             </e-chips>
           </ejs-chiplist>
@@ -80,21 +72,42 @@
     <e-column headerText="Primary Skill" field="primarySkillName" [visible]="false" width=200></e-column>
     <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200>
       <ng-template #template let-data>
-        <div *ngFor="let skill of (data.candidateProfileSkills || data.employeeSkills)">{{skill.skillDescription || skill}}</div>
+        <!-- <div  *ngFor="let skill of (data.candidateProfileSkills || data.employeeSkills)">{{skill.skillDescription || skill}}</div>  -->
+        <ng-container *ngIf="data.employeeSkills?.length === 2 || data.employeeSkills?.length === 1">
+          <span *ngFor="let skill of data.employeeSkills; let i = index" class="skill-name">
+            {{skill }}
+            <span class="skill-name" *ngIf="i !== data.employeeSkills.length - 1">, </span>
+          </span>
+        </ng-container>
+        <ng-container *ngIf="data.employeeSkills?.length >= 2">
+          <ejs-tooltip content="{{ data.employeeSkills.join(', ') }}" target="#skillName">
+            <span id="skillName" class="skill-name">Multiple Skils</span>
+          </ejs-tooltip>
+        </ng-container>
       </ng-template>
     </e-column>
     <e-column headerText="Location" field="locationName" [visible]="false" width=200></e-column>
     <e-column headerText="DEpartment" field="departmentName" [visible]="false" width=200></e-column>
+    <e-column headerText="WorkCommitment" field="employeeWorkCommitments" width=200>
+      <ng-template #template let-data>
+        <ng-container *ngIf="data.employeeWorkCommitments">
+          {{data.employeeWorkCommitments}}
+        </ng-container>
+        <ng-container *ngIf="!data.employeeWorkCommitments">
+          No Work Commitments
+        </ng-container>
+      </ng-template>
+    </e-column>
     <e-column headerText="Hire Date" field="hireDate" textAlign="Left" [visible]="false" width=200>
       <ng-template #template let-data>
         {{data.hireDate | date: 'MM/dd/yyy': 'UTC'}}
       </ng-template>
     </e-column>
-    <e-column headerText="Org. Orientation" field="orgOrientation" textAlign="Left" [visible]="false" width=200>
+    <!-- <e-column headerText="Org. Orientation" field="orgOrientation" textAlign="Left"  [visible]="false" width=200>
       <ng-template #template let-data>
         {{data.orgOrientation | date: 'MM/dd/yyy': 'UTC'}}
       </ng-template>
-    </e-column>
+    </e-column> -->
     <e-column textAlign="Left" field="lastAssignmentEndDate" headerText="Current Assignment End Date">
       <ng-template #template let-data>
         {{data.lastAssignmentEndDate | date: 'MM/dd/yyy': 'UTC'}}
@@ -105,7 +118,8 @@
         <div class="status-cell" *ngIf="showCandidateStatus(data.candidateStatus)">
           <ejs-chiplist>
             <e-chips>
-              <e-chip [text]="data.candidateStatus | candidateStatusName" [cssClass]="data.candidateStatus | candidateStatusName | chipsCssClass"></e-chip>
+              <e-chip [text]="data.candidateStatus | candidateStatusName"
+                [cssClass]="data.candidateStatus | candidateStatusName | chipsCssClass"></e-chip>
             </e-chips>
           </ejs-chiplist>
         </div>
@@ -113,7 +127,8 @@
     </e-column>
     <e-column headerText="Region" field="candidateProfileRegions">
       <ng-template #template let-data>
-        <div *ngFor="let region of data.candidateProfileRegions; trackBy: regionTrackBy">{{ region.regionDescription || region }}</div>
+        <div *ngFor="let region of data.candidateProfileRegions; trackBy: regionTrackBy">{{ region.regionDescription ||
+          region }}</div>
       </ng-template>
     </e-column>
   </e-columns>
@@ -122,34 +137,21 @@
       <div class="control-section">
         <div class="content-wrapper">
           <section class="left-side-pager-controls">
-            <ejs-dropdownlist id="rowsPerPage"
-                              class="dropdown-no-border"
-                              [allowFiltering]="true"
-                              [dataSource]="rowsPerPageDropDown"
-                              [(value)]="activeRowsPerPageDropDown"
-                              (change)="onRowsDropDownChanged()">
+            <ejs-dropdownlist id="rowsPerPage" class="dropdown-no-border" [allowFiltering]="true"
+              [dataSource]="rowsPerPageDropDown" [(value)]="activeRowsPerPageDropDown"
+              (change)="onRowsDropDownChanged()">
             </ejs-dropdownlist>
-            <ejs-numerictextbox id="goToPage"
-                                class="numeric-input-no-border"
-                                format="#"
-                                placeholder="Go to:"
-                                min="1"
-                                [max]="(candidates$ | async)?.totalPages"
-                                [showSpinButton]="false"
-                                (change)="onGoToClick($event)">
+            <ejs-numerictextbox id="goToPage" class="numeric-input-no-border" format="#" placeholder="Go to:" min="1"
+              [max]="(candidates$ | async)?.totalPages" [showSpinButton]="false" (change)="onGoToClick($event)">
             </ejs-numerictextbox>
             <div class="total-rows">
               Total Rows: {{(candidates$ | async)?.totalCount}}
             </div>
           </section>
           <section class="right-side-pager-controls">
-            <ejs-pager id="gridPager"
-                       #gridPager
-                       [pageSize]="pageSize"
-                       [totalRecordsCount]="(candidates$ | async)?.totalCount"
-                       [enablePagerMessage]="false"
-                       [currentPage]="currentPage"
-                       (click)="onGoToClick($event)">
+            <ejs-pager id="gridPager" #gridPager [pageSize]="pageSize"
+              [totalRecordsCount]="(candidates$ | async)?.totalCount" [enablePagerMessage]="false"
+              [currentPage]="currentPage" (click)="onGoToClick($event)">
             </ejs-pager>
           </section>
         </div>
@@ -158,19 +160,14 @@
   </ng-template>
 </ejs-grid>
 
-<app-filter-dialog
-  [items]="filteredItems"
-  [count]="(candidates$ | async)?.totalCount"
-  (deleteFilter)="onFilterDelete($event)"
-  (clearAllFiltersClicked)="onFilterClearAll()"
-  (applyFilterClicked)="onFilterApply()"
-  (closeDialogClicked)="onFilterClose()"
->
+<app-filter-dialog [items]="filteredItems" [count]="(candidates$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form [formGroup]="CandidateFilterFormGroup">
     <ng-container *ngIf="!isIRP && CandidateFilterFormGroup">
       <div class="bootstrap">
         <div class="input-container">
-          <label>Candidate Name</label>
+          <label>Employee Name</label>
           <div class="input-group">
             <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
           </div>
@@ -180,16 +177,9 @@
         <div class="input-container">
           <label>Region</label>
           <div class="input-group multiselect">
-            <ejs-multiselect
-              #regionMultiselect
-              mode="CheckBox"
-              formControlName="regionsNames"
-              placeholder="All"
-              [fields]="regionFields"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              [dataSource]="filterColumns.regionsNames?.dataSource"
-            >
+            <ejs-multiselect #regionMultiselect mode="CheckBox" formControlName="regionsNames" placeholder="All"
+              [fields]="regionFields" [allowFiltering]="true" [showDropDownIcon]="true"
+              [dataSource]="filterColumns.regionsNames?.dataSource">
             </ejs-multiselect>
           </div>
         </div>
@@ -198,15 +188,8 @@
         <div class="input-container">
           <label>Skill</label>
           <div class="input-group multiselect">
-            <ejs-multiselect
-              mode="CheckBox"
-              formControlName="skillsIds"
-              placeholder="All"
-              [fields]="optionFields"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              [dataSource]="filterColumns.skillsIds?.dataSource"
-            >
+            <ejs-multiselect mode="CheckBox" formControlName="skillsIds" placeholder="All" [fields]="optionFields"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillsIds?.dataSource">
             </ejs-multiselect>
           </div>
         </div>
@@ -215,15 +198,9 @@
         <div class="input-container">
           <label>Profile Status</label>
           <div class="input-group multiselect">
-            <ejs-multiselect
-              mode="CheckBox"
-              formControlName="profileStatuses"
-              placeholder="All"
-              [fields]="optionFields"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              [dataSource]="filterColumns.profileStatuses?.dataSource"
-            >
+            <ejs-multiselect mode="CheckBox" formControlName="profileStatuses" placeholder="All" [fields]="optionFields"
+              [allowFiltering]="true" [showDropDownIcon]="true"
+              [dataSource]="filterColumns.profileStatuses?.dataSource">
             </ejs-multiselect>
           </div>
         </div>
@@ -232,13 +209,13 @@
     <ng-container *ngIf="isIRP && CandidateFilterFormGroup">
       <div class="bootstrap row">
         <div class="input-container candidate-id">
-          <label>Candidate ID</label>
+          <label>Employee ID</label>
           <div class="input-group">
             <input class="e-input" type="text" maxlength="10" formControlName="candidateId" />
           </div>
         </div>
         <div class="input-container candidate-name">
-          <label>Candidate Name</label>
+          <label>Employee Name</label>
           <div class="input-group">
             <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
           </div>
@@ -248,88 +225,51 @@
         <div class="input-container">
           <label>Profile Status</label>
           <div class="input-group multiselect">
-            <ejs-multiselect
-              mode="CheckBox"
-              formControlName="profileStatuses"
-              placeholder="All"
-              [fields]="optionFields"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              [dataSource]="filterColumns.profileStatuses?.dataSource"
-            >
+            <ejs-multiselect mode="CheckBox" formControlName="profileStatuses" placeholder="All" [fields]="optionFields"
+              [allowFiltering]="true" [showDropDownIcon]="true"
+              [dataSource]="filterColumns.profileStatuses?.dataSource">
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container">
           <label>Location</label>
           <div class="input-group multiselect">
-            <ejs-multiselect
-              mode="CheckBox"
-              formControlName="locationIds"
-              placeholder="All"
-              [fields]="optionFields"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              [dataSource]="filterColumns.locationIds?.dataSource"
-            >
+            <ejs-multiselect mode="CheckBox" formControlName="locationIds" placeholder="All" [fields]="optionFields"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.locationIds?.dataSource">
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container">
           <label>Department</label>
           <div class="input-group multiselect">
-            <ejs-multiselect
-              mode="CheckBox"
-              formControlName="departmentIds"
-              placeholder="All"
-              [fields]="optionFields"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              [dataSource]="filterColumns.departmentIds?.dataSource"
-            >
+            <ejs-multiselect mode="CheckBox" formControlName="departmentIds" placeholder="All" [fields]="optionFields"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds?.dataSource">
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container">
           <label>Primary Skill</label>
           <div class="input-group multiselect">
-            <ejs-multiselect
-              mode="CheckBox"
-              formControlName="primarySkillIds"
-              placeholder="All"
-              [fields]="optionFields"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              [dataSource]="filterColumns.primarySkillIds?.dataSource"
-            >
+            <ejs-multiselect mode="CheckBox" formControlName="primarySkillIds" placeholder="All" [fields]="optionFields"
+              [allowFiltering]="true" [showDropDownIcon]="true"
+              [dataSource]="filterColumns.primarySkillIds?.dataSource">
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container">
           <label>Secondary Skill</label>
           <div class="input-group multiselect">
-            <ejs-multiselect
-              mode="CheckBox"
-              formControlName="secondarySkillIds"
-              placeholder="All"
-              [fields]="optionFields"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              [dataSource]="filterColumns.secondarySkillIds?.dataSource"
-            >
+            <ejs-multiselect mode="CheckBox" formControlName="secondarySkillIds" placeholder="All"
+              [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true"
+              [dataSource]="filterColumns.secondarySkillIds?.dataSource">
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container calendar">
           <label>Hire Date</label>
           <div class="input-group datepicker">
-            <ejs-datepicker
-              class="datepicker"
-              format="MM/dd/yyyy"
-              placeholder="MM/DD/YYYY"
-              [enableMask]="true"
-              [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
-              formControlName="hireDate">
+            <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" [enableMask]="true"
+              [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }" formControlName="hireDate">
             </ejs-datepicker>
           </div>
         </div>
@@ -380,4 +320,5 @@
   </form>
 </app-filter-dialog>
 
-<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
+  (export)="export($event)"></app-export-dialog>

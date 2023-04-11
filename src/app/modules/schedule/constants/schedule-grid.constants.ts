@@ -1,9 +1,10 @@
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
-import { DatesRangeType } from '@shared/enums';
-
+import { DatesRangeType, WeekDays } from '@shared/enums';
+import { IrpOrderType } from '@shared/enums/order-type';
+import { CardTitle, CreateScheduleAttributes, HasMultipleFilters } from '../helpers';
 import { DatePeriodId, ScheduleType } from '../enums';
-import { ScheduleCandidate, ScheduleCardConfig, ScheduleDateItem } from '../interface';
+import { ScheduleCandidate, ScheduleDateItem, ScheduleEventConfig, ScheduleFilters } from '../interface';
 
 export const DatesPeriods: ItemModel[] = [
   {
@@ -27,8 +28,8 @@ export const MonthPeriod: ItemModel[] = [
   },
 ];
 
-export const CandidateIconName = (scheduleCandidate: ScheduleCandidate): string => {
-  if (!scheduleCandidate.isOriented) {
+export const CandidateIconName = (scheduleCandidate: ScheduleCandidate, filters: ScheduleFilters): string => {
+  if (!HasMultipleFilters(filters)) {
     return 'compass';
   }
 
@@ -39,19 +40,30 @@ export const CandidateIconName = (scheduleCandidate: ScheduleCandidate): string 
   return '';
 };
 
-export const ScheduleCardTypeMap: Map<ScheduleType, ScheduleCardConfig> = new Map<ScheduleType, ScheduleCardConfig>()
-  .set(ScheduleType.Book, {
-    bgColor: '#C5D9FF',
-    title: '',
-    iconName: 'calendar',
-    iconColor: '#3E7FFF',
-    showTitleToolTip: true,
-  })
-  .set(ScheduleType.Unavailability, { bgColor: '#EAECF2', title: '', iconName: 'alert-triangle', iconColor: '#FF5858' })
-  .set(ScheduleType.Availability, { bgColor: '#D1EACE', title: 'Available', iconName: 'clock', iconColor: '#70B16E' });
+export const GetScheduleEventConfig = (scheduleItem: ScheduleDateItem, eventIndex: number): ScheduleEventConfig => {
+  const event = scheduleItem.daySchedules[eventIndex];
+  const config = { startDate: event.startDate, endDate: event.endDate } as ScheduleEventConfig;
 
-export const GetScheduleCardConfig = (scheduleItem: ScheduleDateItem): ScheduleCardConfig | undefined => {
-  return ScheduleCardTypeMap.get(scheduleItem.daySchedules[0]?.scheduleType);
+  if (event.scheduleType === ScheduleType.Book) {
+    config.title = CardTitle(event);
+    config.additionalAttributes = event.attributes ? CreateScheduleAttributes(event.attributes) : '';
+    config.color = event.floated ? '#518CFF' : '#060715';
+    config.ltaOrder = event.orderMetadata?.orderType === IrpOrderType.LongTermAssignment;
+  }
+
+  if (event.scheduleType === ScheduleType.Unavailability) {
+    config.title = event.unavailabilityReason;
+    config.shortTitle = event.unavailabilityReason;
+    config.color = '#FF5858' ;
+  }
+
+  if (event.scheduleType === ScheduleType.Availability) {
+    config.title = 'AVAIL';
+    config.shortTitle = 'AV';
+    config.color = '#5AA658' ;
+  }
+
+  return config;
 };
 
-export const WeekList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const WeekList = [WeekDays.Sun, WeekDays.Mon, WeekDays.Tue, WeekDays.Wed, WeekDays.Thu, WeekDays.Fri, WeekDays.Sat];

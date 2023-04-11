@@ -27,6 +27,11 @@ export class EditScheduleService {
       locationId: [null],
       departmentId: [null],
       skillId: [null],
+      orientated: [false],
+      critical: [false],
+      onCall: [false],
+      charge: [false],
+      preceptor: [false],
     }) as CustomFormGroup<ScheduledShiftForm>;
   }
 

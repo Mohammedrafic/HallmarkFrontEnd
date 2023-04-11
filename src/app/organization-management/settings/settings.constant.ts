@@ -44,6 +44,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'DateOfBirthRequiredToAcceptPosition',
   'SetDefaultCommentsScopeToExternal',
   'CandidatePayRate',
+  'MandateCandidateAddress',
+  'MandateCandidatePhone1'
 ];
 
 export const DisabledSettingsByDefault = [
@@ -53,5 +55,7 @@ export const DisabledSettingsByDefault = [
   'NoOfDaysAllowedForTimesheetEdit',
   'EnableChat',
   'CandidateAppliedInLastNDays',
-  'CandidatePayRate'
+  'CandidatePayRate',
+  'MandateCandidateAddress',
+  'MandateCandidatePhone1'
 ];

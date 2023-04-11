@@ -27,3 +27,11 @@
     flex-grow: 2;
   }
 }
+  ::ng-deep {
+   app-error-message{    
+        span.error {
+          white-space: nowrap;
+        }
+    }
+     
+  }

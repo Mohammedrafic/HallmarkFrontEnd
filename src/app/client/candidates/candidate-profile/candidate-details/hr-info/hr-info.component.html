@@ -12,8 +12,8 @@
     ></app-dropdown>
 
     <app-dropdown
-      [dataSource]="hrInternalTransfersRecruitments"
-      [fields]="fieldsSettings"
+      [dataSource]="(reasons$ | async)?.items"
+      [fields]="fieldsSettingsInternalTransfer"
       [formGroupInstance]="candidateForm"
       [hideBorder]="false"
       placeholder="Select"

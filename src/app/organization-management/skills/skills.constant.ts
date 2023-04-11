@@ -115,7 +115,7 @@ export const VmsSkillsDialogConfig: SkillsFormConfig[] = [
 export const IrpSkillsDialogConfig: SkillsFormConfig[] = [
   {
     field: '',
-    title: 'Select System',
+    title: 'System Configuration',
     fieldType: FieldType.CheckBoxGroup,
     required: true,
     checkBoxes: [

@@ -23,7 +23,7 @@ import { DestroyableDirective } from "@shared/directives/destroyable.directive";
 import { JobCancellationReason, PenaltyCriteria } from "@shared/enums/candidate-cancellation";
 import { OrderType } from "@shared/enums/order-type";
 import { JobCancellation } from "@shared/models/candidate-cancellation.model";
-import { OrderCandidateJob } from '@shared/models/order-management.model';
+import { CandidateCancellationReason, OrderCandidateJob } from '@shared/models/order-management.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { Penalty } from '@shared/models/penalty.model';
 
@@ -44,10 +44,15 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   @Input() openEvent: Subject<void>;
 
   @Input() set orderType(value: OrderType | undefined) {
-    this.reasons = value === OrderType.ReOrder ? reOrderReasonsDataSource : travelReasonsDataSource;
+    //this.reasons = value === OrderType.ReOrder ? reOrderReasonsDataSource : travelReasonsDataSource;
   };
-
+  
   @Input() candidateJob: OrderCandidateJob | null;
+
+  @Input() set candidateCancellation(value:CandidateCancellationReason[] |null){
+    this.reasons =value;
+  }
+
 
   @Output() submitCandidateCancellation = new EventEmitter<JobCancellation>();
   @Output() cancelCandidateCancellation = new EventEmitter<void>();
@@ -61,7 +66,13 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     text: 'text',
     value: 'value',
   };
-  public reasons: DataSourceObject<JobCancellationReason>[];
+  
+  public ReasonOptionFields = {
+    text: 'name',
+    value: 'id',
+  };
+
+  public reasons: CandidateCancellationReason[]|null;
   public readonly penalties: DataSourceObject<PenaltyCriteria>[] = penaltiesDataSource;
 
   private predefinedPenalties: Penalty | null;

@@ -7,6 +7,7 @@ import { BusinessUnitType } from '../enums/business-unit-type';
 import { Menu } from '../models/menu.model';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import { AlertsModel } from '@shared/models/alerts-model';
+import { HelpSiteUrl } from '@shared/models/help-site-url.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -93,5 +94,9 @@ export class UserService {
 
   public getOrderPermissions(orderId: number): Observable<CurrentUserPermission[]> {
     return this.http.get<CurrentUserPermission[]>('/api/Permissions/orderscope/' + orderId);
+  }
+
+  public getHelpSiteUrl(): Observable<HelpSiteUrl> {
+    return this.http.get<HelpSiteUrl>('/api/Help/link');
   }
 }

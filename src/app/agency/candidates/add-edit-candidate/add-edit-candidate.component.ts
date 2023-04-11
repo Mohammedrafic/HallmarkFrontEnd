@@ -42,6 +42,7 @@ import { AbstractPermission } from '@shared/helpers/permissions';
 import { AgencySettingsService } from '@agency/services/agency-settings.service';
 import { DateTimeHelper } from '@core/helpers';
 import { GlobalWindow } from "@core/tokens";
+import { Country } from "@shared/enums/states";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -72,6 +73,10 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   private filesDetails: Blob[] = [];
   private isRemoveLogo: boolean = false;
+  public customMaskChar : string = '';
+  public maskSSNPattern: string = '000-00-0000';
+  public maskedSSN: string = '';
+
 
   public get isCandidateAssigned(): boolean {
     return !!this.orderId && !!this.candidateStatus;
@@ -98,7 +103,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
-    store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
+    store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'clock' }));
   }
 
   override ngOnInit(): void {
@@ -136,6 +141,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       this.title = 'Edit';
       this.store.dispatch(new GetCandidateById(parseInt(this.route.snapshot.paramMap.get('id') as string)));
       this.store.dispatch(new GetCandidatePhoto(parseInt(this.route.snapshot.paramMap.get('id') as string)));
+    }else{
+      this.customMaskChar = '00000';
     }
     this.pagePermissions();
     this.subscribeOnCandidateCredentialResponse();
@@ -218,7 +225,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
           candidateAgencyStatus: CreatedCandidateStatus.Active,
         });
       }
-
+      if(this.maskedSSN != ""){
+        candidate.ssn = parseInt(this.maskedSSN);
+      }
       this.store.dispatch(new SaveCandidate(candidate));
     } else {
       this.candidateForm.markAllAsTouched();
@@ -317,15 +326,20 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       ssn: ssn ? this.getStringSsn(ssn) : null,
       candidateProfileSkills: candidateProfileSkills.map((skill) => skill.id),
     });
+    if(candidateProfileContactDetail?.country === Country.Canada){ 
+      this.customMaskChar = '>L0L >0L0';     
+    }else{
+      this.customMaskChar = '00000';
+    }
     this.candidateForm.get('contactDetails')?.patchValue({
-      country: candidateProfileContactDetail.country,
-      state: candidateProfileContactDetail.state,
-      city: candidateProfileContactDetail.city,
-      zip: candidateProfileContactDetail.zip,
-      address1: candidateProfileContactDetail.address1,
-      address2: candidateProfileContactDetail.address2,
-      phone1: candidateProfileContactDetail.phone1,
-      phone2: candidateProfileContactDetail.phone2,
+      country: candidateProfileContactDetail?.country,
+      state: candidateProfileContactDetail?.state,
+      city: candidateProfileContactDetail?.city,
+      zip: candidateProfileContactDetail?.zip,
+      address1: candidateProfileContactDetail?.address1,
+      address2: candidateProfileContactDetail?.address2,
+      phone1: candidateProfileContactDetail?.phone1,
+      phone2: candidateProfileContactDetail?.phone2,
       email,
     });
     this.candidateForm.get('profSummary')?.patchValue({ professionalSummary });
@@ -410,7 +424,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   private getStringSsn(ssn: any): string {
     const stringSsn = String(ssn);
     if (stringSsn.length >= 9) {
-      return stringSsn;
+      this.maskSSNPattern = "AAA-AA-0000";;
+      this.maskedSSN= stringSsn;
+      return "XXX-XX-" + stringSsn.slice(-4);
     } else {
       return this.getStringSsn(`0${ssn}`);
     }
@@ -456,5 +472,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
           this.orderOrPositionTitle = 'Order';
         }
       });
+  }
+
+  updatedSSNValue(val:string): void {
+    this.maskedSSN = val;
   }
 }

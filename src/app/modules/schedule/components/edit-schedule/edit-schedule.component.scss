@@ -1,77 +1,100 @@
-@import "colors";
-@import "mixins";
+@import 'colors';
+@import 'mixins';
 
-.dialog-container {
-  padding: 24px;
+.sidebar-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.dialog-header {
+.sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  padding: 24px 24px 16px;
 
   .title {
     @include dialog-title;
   }
-}
 
-.button-cancel {
-  margin-right: 8px;
-}
-
-.add-new-schedule {
-  margin-bottom: 20px;
-  height: 40px;
-
-  .schedule-types {
+  .controls {
     display: flex;
-    padding: 10px 0;
-    gap: 24px;
-  }
+    gap: 28px;
+    align-items: center;
 
-  .add-btn-container {
-    display: flex;
-    padding-right: 10px;
-    justify-content: flex-end;
-
-    i-feather {
-      margin: 0 5px 4px 0;
-    }
-
-    .e-outline {
+    .close {
+      background: none;
+      padding: 0;
+      margin: 0;
       border: none;
+      cursor: pointer;
 
-      &:hover {
-        border: none;
+      i-feather {
+        color: $primary-active-blue-10;
       }
     }
   }
 }
 
-.separator {
-  height: 1px;
-  background-color: $secondary-dark-blue-45;
-  margin: 0 0 28px 0;
-}
+.sidebar-content {
+  padding: 24px;
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 
-.form-container {
-  .validation-icon {
-    display: none !important;
+  .add-new-schedule {
+    margin-bottom: 20px;
+    height: 40px;
+
+    .schedule-types {
+      display: flex;
+      padding: 10px 0;
+      gap: 24px;
+    }
+
+    .add-btn-container {
+      display: flex;
+      padding-right: 10px;
+      justify-content: flex-end;
+
+      i-feather {
+        margin: 0 5px 4px 0;
+      }
+
+      .e-outline {
+        border: none;
+
+        &:hover {
+          border: none;
+        }
+      }
+    }
+  }
+
+  .separator {
+    height: 1px;
+    background-color: $secondary-dark-blue-45;
+    margin: 0 0 28px 0;
+  }
+
+  .form-container {
+    .validation-icon {
+      display: none !important;
+    }
+  }
+
+  .input-container .input-group.input-readonly {
+    .e-input[readonly] {
+      background-color: $secondary-dark-blue-50;
+      color: $secondary-dark-blue-30;
+      border: 1px solid $secondary-dark-blue-40 !important;
+    }
   }
 }
 
-.input-container .input-group.input-readonly {
-  .e-input[readonly] {
-    background-color: $secondary-dark-blue-50;
-    color: $secondary-dark-blue-30;
-    border: 1px solid $secondary-dark-blue-40 !important;
-  }
-}
-
-.schedule-footer {
+.sidebar-footer {
   display: flex;
-  padding: 22px 24px;
+  padding: 24px;
   border-top: 1px solid $secondary-dark-blue-45;
 
   .checkbox-container {
@@ -94,37 +117,78 @@
 
 .scheduled-availability-form {
   display: grid;
-  grid-template-columns:  2.5fr 2.7fr 1.9fr 1.9fr 1.2fr;
+  grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
   grid-template-rows: 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
-    "date date date date date"
-    "shift shift startTime endTime hours";
+    "date date date date"
+    "shift shift shift hours";
+}
+
+.custom-scheduled-availability-form {
+  grid-template-areas:
+    "date date date date"
+    "shift startTime endTime hours"
 }
 
 .scheduled-unavailability-form {
   display: grid;
-  grid-template-columns:  2.5fr 2.7fr 1.9fr 1.9fr 1.2fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
+  grid-template-rows: 1fr 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
-    "date reason reason reason reason"
-    "shift shift startTime endTime hours";
+    "date date date date"
+    "shift shift shift hours"
+    "reason reason reason reason";
+}
+
+.custom-scheduled-unavailability-form {
+  grid-template-areas:
+    "date date date date"
+    "shift startTime endTime hours"
+    "reason reason reason reason";
 }
 
 .scheduled-shift-form {
   display: grid;
-  grid-template-columns:  2.5fr 2.7fr 1.9fr 1.9fr 1.2fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
+  grid-template-rows: 1fr 1fr 0.4fr 1fr 1fr 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
-    "date date date date date"
-    "shift shift startTime endTime hours"
-    "region region location location location"
-    "department department skill skill skill";
+    "date date date date"
+    "shift shift shift hours"
+    "switch-wrap switch-wrap switch-wrap switch-wrap"
+    "region region region region"
+    "location location location location"
+    "department department department department"
+    "skill skill skill skill";
+}
+
+.custom-scheduled-shift-form {
+  grid-template-areas:
+    "date date date date"
+    "shift startTime endTime hours"
+    "switch-wrap switch-wrap switch-wrap switch-wrap"
+    "region region region region"
+    "location location location location"
+    "department department department department"
+    "skill skill skill skill";
+}
+
+.switch-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas:
+    "toggle1 toggle2 toggle3 toggle4 toggle5";
+  grid-area: switch-wrap;
+}
+
+.e-switch-wrapper.e-wrapper {
+  margin-right: 8px;
 }
 
 .date {
@@ -175,9 +239,13 @@
   .e-tab.stepper > .e-content {
     padding-top: 12px !important;
   }
-}
 
-.e-footer-content {
-  padding: 0 !important;
-  border: none !important;
+  // temporary solution
+  .stepper {
+    overflow: auto;
+
+    .e-tab-header::before {
+      display: none;
+    }
+  }
 }

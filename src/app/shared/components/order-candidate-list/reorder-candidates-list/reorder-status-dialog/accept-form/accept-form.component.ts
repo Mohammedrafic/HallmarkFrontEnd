@@ -27,6 +27,8 @@ export class AcceptFormComponent implements OnChanges{
 
   @Input() isCandidatePayRateVisible: boolean;
 
+  @Input() isReorder: boolean;
+
   public priceUtils = PriceUtils;
 
   public isBlankStatus: boolean;
@@ -92,6 +94,7 @@ export class AcceptFormComponent implements OnChanges{
       penaltyCriteria: new FormControl({ value: '', disabled: true }),
       rate: new FormControl({ value: '', disabled: true }),
       hours: new FormControl({ value: '', disabled: true }),
+      clockId: new FormControl({value: '', disabled: false}),
       candidatePayRate: new FormControl({ value: null, disabled: true }, [Validators.required]),
     });
   }

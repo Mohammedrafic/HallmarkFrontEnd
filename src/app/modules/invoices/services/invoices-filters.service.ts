@@ -69,6 +69,7 @@ export class InvoicesFiltersService {
     }) as CustomFormGroup<InvoiceFilterColumns>;
   }
 
+
   setupValidators(formGroup: FormGroup): void {
     formGroup.get('amountFrom')?.addValidators([intervalMinValidator(formGroup, 'amountTo', true)]);
     formGroup.get('amountTo')?.addValidators([intervalMaxValidator(formGroup, 'amountFrom', true)]);

@@ -18,7 +18,7 @@ export class DoNotReturnFormService {
       regionIds:['',[Validators.required]],
       locations: [''],
       locationIds: ['', [Validators.required]],
-      ssn: ['', [Validators.required, Validators.minLength(9), Validators.pattern(ONLY_NUMBER)]],
+      ssn: ['', [Validators.required, Validators.minLength(9)]],
       candidateEmail: ['',[Validators.email, Validators.maxLength(200)]],
       dnrComment: [''],
       dnrRequestedBy: [''],
@@ -30,7 +30,7 @@ export class DoNotReturnFormService {
   createDoNotreturnFilterForm(): CustomFormGroup<DoNotReturnFilterForm> {
     return this.fb.group({
       candidatename: [''],
-      ssn: [0, [Validators.pattern(ONLY_NUMBER)]],
+      ssn: [''],
     }) as CustomFormGroup<DoNotReturnFilterForm>;
   }
 

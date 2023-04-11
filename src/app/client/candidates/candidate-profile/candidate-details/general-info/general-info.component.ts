@@ -4,10 +4,14 @@ import { ProfileStatuses, ProfileStatusesEnum, TerminationReasons } from '@clien
 import { Validators } from '@angular/forms';
 import { JobClassifications } from '@client/order-management/constants';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { distinctUntilChanged, Observable, takeUntil } from 'rxjs';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
+import { RejectReasonPage } from '@shared/models/reject-reason.model';
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { GetTerminationReasons } from '@organization-management/store/reject-reason.actions';
 
 @Component({
   selector: 'app-general-info',
@@ -18,7 +22,11 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
 export class GeneralInfoComponent extends AbstractContactDetails implements OnInit, OnDestroy {
   public isOnHoldSelected: boolean;
   public isTerminatedSelected: boolean;
-
+  fieldsSettingsTeminated: FieldSettingsModel = { text: 'reason', value: 'id' };
+  currentPage = 1;
+  pageSize = 100;
+  @Select(RejectReasonState.terminationReasons)
+  public reasons$: Observable<RejectReasonPage>;
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   public skills$: Observable<ListOfSkills[]>;
   public primarySkillsDataSource: ListOfSkills[] = [];
@@ -32,7 +40,8 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
 
   constructor(
     protected override cdr: ChangeDetectorRef,
-    protected override candidateProfileFormService: CandidateProfileFormService
+    protected override candidateProfileFormService: CandidateProfileFormService,
+    private store: Store
   ) {
     super(cdr, candidateProfileFormService);
   }
@@ -42,6 +51,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.listenProfileStatusChanges();
     this.listenSkillsChanges();
     this.subscribeOnSkills();
+    this.store.dispatch(new GetTerminationReasons( this.currentPage ,this.pageSize));
   }
 
   public override ngOnDestroy(): void {

@@ -13,12 +13,13 @@ import {
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { Store } from '@ngxs/store';import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
+import { Store } from '@ngxs/store';
+import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { catchError, EMPTY, filter, map, Observable, Subscription, switchMap, take, takeUntil, tap, zip } from 'rxjs';
 
 import { FieldType } from '@core/enums';
-import { DateTimeHelper, DestroyDialog } from '@core/helpers';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
@@ -39,15 +40,18 @@ import {
   GetScheduleTabItems,
   GetShiftHours,
   GetShiftTimeControlsValue,
+  MapShiftToDropdownOptions,
   MapToDropdownOptions,
   ScheduleFilterHelper,
 } from '../../helpers';
 import {
+  DeleteScheduleRequest,
   Schedule,
   ScheduleBook,
   ScheduleBookingErrors,
   ScheduledItem,
   ScheduleFilterStructure,
+  ScheduleFormConfig,
   ScheduleItem,
   ScheduleTypeRadioButton,
 } from '../../interface';
@@ -61,7 +65,7 @@ import {
   ScheduledUnavailabilityFormConfig,
 } from './edit-schedule.constants';
 import * as EditSchedule from './edit-schedule.interface';
-import { CreateNewScheduleModeConfig, ShiftTab } from './edit-schedule.interface';
+import { CreateNewScheduleModeConfig, EditScheduleFormFieldConfig, ShiftTab } from './edit-schedule.interface';
 import { EditScheduleService } from './edit-schedule.service';
 
 @Component({
@@ -70,7 +74,7 @@ import { EditScheduleService } from './edit-schedule.service';
   styleUrls: ['./edit-schedule.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditScheduleComponent extends DestroyDialog implements OnInit {
+export class EditScheduleComponent extends Destroyable implements OnInit {
   @ViewChild(TabComponent) tabs: TabComponent;
 
   @Input() datePickerLimitations: DatePickerLimitations;
@@ -118,6 +122,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     regionId: null,
     locationId: null,
     departmentId: null,
+    orientated: null,
   };
 
   constructor(
@@ -135,11 +140,10 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   ngOnInit(): void {
-    this.watchForCloseStream();
     this.setScheduleTypes();
   }
 
-  closeScheduleDialog(): void {
+  closeSchedule(): void {
     if (this.scheduleForm?.touched) {
       this.confirmService.confirm(
         CANCEL_CONFIRM_TEXT,
@@ -153,12 +157,10 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
           filter(Boolean),
         )
         .subscribe(() => {
-          this.closeDialog();
-          this.hasInitData = false;
+          this.closeSideBar();
         });
     } else {
-      this.closeDialog();
-      this.hasInitData = false;
+      this.closeSideBar();
     }
   }
 
@@ -236,6 +238,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     patchData.date = DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date);
 
     this.scheduleForm.patchValue(patchData);
+    this.checkCandidateIsOrientedField();
     this.cdr.markForCheck();
   }
 
@@ -269,12 +272,22 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   deleteSchedule(): void {
-    this.scheduleApiService.deleteSchedule(this.selectedDaySchedule.id, this.createPerDiemOrderControl.value).pipe(
+    const deleteScheduleRequest: DeleteScheduleRequest = {
+      id: this.selectedDaySchedule.id,
+      createOrder: this.createPerDiemOrderControl.value,
+    };
+
+    if (this.selectedDaySchedule.scheduleType !== ScheduleType.Book) {
+      deleteScheduleRequest.startDateTime = this.selectedDaySchedule.startDate;
+      deleteScheduleRequest.endDateTime = this.selectedDaySchedule.endDate;
+    }
+
+    this.scheduleApiService.deleteSchedule(deleteScheduleRequest).pipe(
       catchError((error: HttpErrorResponse) => this.editScheduleService.handleError(error)),
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
       if (this.scheduledItem.schedule.daySchedules.length === 1) {
-        this.closeDialog();
+        this.closeSideBar();
       }
 
       this.updateScheduleGrid.emit();
@@ -318,7 +331,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     return this.shiftsService.getAllShifts().pipe(
       catchError((error: HttpErrorResponse) => this.editScheduleService.handleError(error)),
       tap((shifts: ScheduleShift[]) => this.scheduleShifts = shifts),
-      map((shifts: ScheduleShift[]) => MapToDropdownOptions(shifts)),
+      map((shifts: ScheduleShift[]) => MapShiftToDropdownOptions(shifts)),
       tap(((shifts: DropdownOption[]) => {
         this.scheduleFormSourcesMap[EditScheduleFormSourceKeys.Shifts] = [
           { text: 'Custom', value: this.customShiftId },
@@ -342,6 +355,10 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     this.unsubscribe('shiftId');
     this.subscriptions['shiftId'] = this.scheduleForm.get('shiftId')?.valueChanges
       .pipe(
+        tap((shiftId: number) => {
+          this.createScheduleService.setOnCallControlValue(this.scheduleForm, shiftId, this.scheduleShifts);
+          this.updateScheduleFormConfig(shiftId === this.customShiftId);
+        }),
         map((shiftId: number) => this.scheduleShifts.find((shift: ScheduleShift) => shift.id === shiftId)),
         filter(Boolean),
         takeUntil(this.componentDestroy()),
@@ -376,21 +393,30 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     this.unsubscribe('departmentId');
     this.subscriptions['departmentId'] = this.scheduleForm.get('departmentId')?.valueChanges.pipe(
       filter(Boolean),
-      switchMap((value: number) => this.scheduleApiService.getSkillsByEmployees(this.scheduledItem.candidate.id, value)),
+      switchMap((value: number) => this.scheduleApiService.getSkillsByEmployees(value, this.scheduledItem.candidate.id)),
       takeUntil(this.componentDestroy())
     ).subscribe((skills: Skill[]) => {
       const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
+      const skillId = this.selectedDaySchedule?.orderMetadata?.primarySkillId && !this.createModeConfig.createModeEnabled
+        ? this.selectedDaySchedule?.orderMetadata?.primarySkillId
+        : skillOption[0]?.value;
       this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = skillOption;
-      this.scheduleForm?.patchValue({
-        skillId: this.selectedDaySchedule?.orderMetadata?.primarySkillId || skillOption[0]?.value,
-      });
+      this.scheduleForm?.patchValue({ skillId });
+      this.cdr.markForCheck();
+    }) || null;
+
+    this.unsubscribe('orientated');
+    this.subscriptions['orientated'] = this.scheduleForm.get('orientated')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((value: boolean) => {
+      this.createScheduleService.hideToggleControls(this.scheduleFormConfig as ScheduleFormConfig, !value);
       this.cdr.markForCheck();
     }) || null;
   }
 
   private updateScheduledShift(): void {
-    const { departmentId, skillId, shiftId, startTime, endTime, date, unavailabilityReasonId } =
-      this.scheduleForm.getRawValue();
+    const { departmentId, skillId, shiftId, startTime, endTime, date,
+      unavailabilityReasonId, orientated, critical, onCall, charge, preceptor } = this.scheduleForm.getRawValue();
     const schedule: EditSchedule.ScheduledShift = {
       scheduleId: this.selectedDaySchedule.id,
       unavailabilityReasonId,
@@ -401,16 +427,22 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
       startTime: getTime(startTime),
       endTime: getTime(endTime),
       createOrder: this.createPerDiemOrderControl.value,
+      orientated,
+      critical,
+      onCall,
+      charge,
+      preceptor,
     };
+
+    if (this.selectedDaySchedule.scheduleType !== ScheduleType.Book) {
+      schedule.initialStartTime = this.selectedDaySchedule.startDate;
+      schedule.initialEndTime = this.selectedDaySchedule.endDate;
+    }
 
     this.scheduleApiService.updateScheduledShift(schedule, this.selectedDaySchedule.scheduleType).pipe(
       catchError((error: HttpErrorResponse) => this.editScheduleService.handleError(error)),
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
-      if (this.scheduledItem.schedule.daySchedules.length === 1) {
-        this.closeDialog();
-      }
-
       this.updateScheduleGrid.emit();
       this.scheduleForm.markAsUntouched();
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
@@ -463,6 +495,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
       skillId: this.getSkillId(),
       date: DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date),
     });
+    this.checkCandidateIsOrientedField();
     this.cdr.markForCheck();
   }
 
@@ -479,6 +512,11 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
       this.scheduleFormConfig = ScheduledShiftFormConfig(false, this.createModeConfig.createModeEnabled);
       this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
       patchData.regionId = this.selectedDaySchedule.orderMetadata?.regionId;
+      patchData.orientated = this.selectedDaySchedule.attributes.orientated;
+      patchData.critical = this.selectedDaySchedule.attributes.critical;
+      patchData.onCall = this.selectedDaySchedule.attributes.onCall;
+      patchData.charge = this.selectedDaySchedule.attributes.charge;
+      patchData.preceptor = this.selectedDaySchedule.attributes.preceptor;
       this.watchForRegionControls();
     }
 
@@ -502,6 +540,7 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
     }
 
     this.scheduleForm.patchValue(patchData);
+    this.checkCandidateIsOrientedField();
     this.cdr.markForCheck();
   }
 
@@ -561,7 +600,8 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   }
 
   private checkBookingsOverlaps(): void {
-    const { departmentId,skillId, shiftId, startTime, endTime, date } = this.scheduleForm.getRawValue();
+    const { departmentId, skillId, shiftId, startTime, endTime, date, orientated, critical, onCall, charge, preceptor }
+      = this.scheduleForm.getRawValue();
     this.scheduleToBook = {
       employeeBookedDays: [{
         employeeId: this.scheduledItem.candidate.id,
@@ -573,6 +613,11 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
       startTime: getTime(startTime),
       endTime: getTime(endTime),
       createOrder: false,
+      orientated,
+      critical,
+      onCall,
+      charge,
+      preceptor,
     };
     const request: BookingsOverlapsRequest = {
       employeeScheduledDays: this.scheduleToBook.employeeBookedDays,
@@ -633,6 +678,57 @@ export class EditScheduleComponent extends DestroyDialog implements OnInit {
   private setScheduleTypes(): void {
     if (this.store.selectSnapshot(UserState.user)?.isEmployee) {
       this.scheduleTypes = ScheduleTypes.filter((type: ScheduleTypeRadioButton) => type.value !== ScheduleItemType.Book);
+    }
+  }
+
+  private closeSideBar(): void {
+    this.hasInitData = false;
+    this.createScheduleService.closeSideBarEvent.next(true);
+  }
+
+  private updateScheduleFormConfig(isCustomShift: boolean): void {
+    let selectedType: ScheduleItemType | ScheduleType;
+    let type: typeof ScheduleItemType | typeof ScheduleType;
+
+    if (this.createModeConfig.createModeEnabled) {
+      type = ScheduleItemType;
+      selectedType = this.scheduleItemType;
+    } else {
+      type = ScheduleType;
+      selectedType = this.selectedDaySchedule.scheduleType;
+    }
+
+    this.showShiftTimeFields(isCustomShift);
+
+    if (selectedType === type.Book) {
+      this.scheduleFormConfig.formClass = isCustomShift
+        ? 'scheduled-shift-form custom-scheduled-shift-form'
+        : 'scheduled-shift-form';
+    } else if (selectedType === type.Unavailability) {
+      this.scheduleFormConfig.formClass = isCustomShift
+        ? 'scheduled-unavailability-form custom-scheduled-unavailability-form'
+        : 'scheduled-unavailability-form';
+    } else if (selectedType === type.Availability) {
+      this.scheduleFormConfig.formClass = isCustomShift
+        ? 'scheduled-availability-form custom-scheduled-availability-form'
+        : 'scheduled-availability-form';
+    }
+
+    this.cdr.markForCheck();
+  }
+
+  private showShiftTimeFields(show: boolean): void {
+    this.scheduleFormConfig.formFields.forEach((item: EditScheduleFormFieldConfig) => {
+      if (item.field === 'startTime' || item.field === 'endTime') {
+        item.show = show;
+      }
+    });
+  }
+
+  private checkCandidateIsOrientedField(): void {
+    if (!this.scheduledItem.candidate.isOriented && (this)) {
+      this.scheduleForm.get('orientated')?.setValue(true);
+      this.scheduleForm.get('orientated')?.disable();
     }
   }
 }

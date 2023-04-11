@@ -1,5 +1,8 @@
 import { Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { DatePipe, Location } from '@angular/common';
+import { Router } from '@angular/router';
+
 import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
@@ -38,7 +41,6 @@ import {
   GetAgencyOrdersPage,
   GetOrderById,
   ReloadOrderCandidatesLists,
-  GetOrganizationStructure,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import {
@@ -50,7 +52,6 @@ import {
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { DatePipe, Location } from '@angular/common';
 import { UserState } from 'src/app/store/user.state';
 import { isArray, isUndefined } from 'lodash';
 import { FilterService } from '@shared/services/filter.service';
@@ -68,9 +69,18 @@ import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { GetIrpOrderCandidates } from '@client/store/order-managment-content.actions';
 import { BreakpointObserverService } from '@core/services';
 import { GlobalWindow } from '@core/tokens';
-import { Router } from '@angular/router';
+import { FilterPageName } from '@core/enums';
+import { PreservedFiltersByPage } from '@core/interface';
 import { SetOrderManagementPagerState } from '@agency/store/candidate.actions';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
+import {
+  ClearPageFilters,
+  GetPreservedFiltersByPage,
+  ResetPageFilters,
+  SaveFiltersByPageName,
+} from 'src/app/store/preserved-filters.actions';
+import { OrganizationStructure } from '@shared/models/organization.model';
+import { GetAgencyFilterFormConfig } from './constants';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -85,7 +95,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() onExportClicked$: Subject<any>;
   @Input() search$: Subject<string>;
   @Input() public orderStatus: string[];
-
 
   @Output() selectTab = new EventEmitter<number>();
   @Input() public Organizations: number[];
@@ -107,6 +116,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Select(OrderManagementState.ordersTab)
   ordersTab$: Observable<AgencyOrderManagementTabs>;
 
+  @Select(OrderManagementState.organizationStructure)
+  private readonly organizationStructure$: Observable<OrganizationStructure[]>;
+
   public wrapSettings: TextWrapSettingsModel = GRID_CONFIG.wordWrapSettings;
   public allowWrap = GRID_CONFIG.isWordWrappingEnabled;
   public selectionOptions: SelectionSettingsModel = {
@@ -115,7 +127,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
   };
-
 
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
@@ -213,9 +224,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onCommentRead();
     this.listenRedirectFromPerDiem();
     this.listenRedirectFromReOrder();
+    this.getPreservedFiltersByPageName();
   }
 
   ngOnDestroy(): void {
+    this.store.dispatch(new ResetPageFilters());
     this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
     this.isAlive = false;
     this.unsubscribe$.next();
@@ -287,7 +300,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onDataBound(): void {
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
-       this.currentPage = this.orderManagementPagerState?.page ?? this.currentPage;
+      this.currentPage = this.orderManagementPagerState?.page ?? this.currentPage;
       const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
         this.previousSelectedOrderId
       );
@@ -366,71 +379,77 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public setDefaultFilters(statuses: number[]): void {
-    if(this.orderManagementPagerState?.filters ) { // apply preserved filters by redirecting back from the candidate profile
+    if (this.orderManagementPagerState?.filters) { // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
-      this.patchFilterForm();
+      this.patchFilterForm(!!this.filters?.regionIds?.length);
+      this.prepopulateFilterFormStructure();
       this.dispatchNewPage();
       return;
     }
-    
-    if (this.filterService.canPreserveFilters()) {
-      const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
-      if(this.Organizations.length > 0){
-        this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
-        this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
-        this.actions$.pipe(ofActionSuccessful(GetOrganizationStructure), take(1)).subscribe(() => {
-          if (preservedFilters?.regions) {
-            this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
-            this.filters.regionIds = [...preservedFilters.regions];
-            if (preservedFilters?.locations) {
-              this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
-              this.filters.locationIds = [...preservedFilters.locations];
-            }
-          }
-          this.setDefaultStatuses(statuses);
-        });
-      } else {
-        if (preservedFilters?.organizations?.length) {
-            this.OrderFilterFormGroup.get('organizationIds')?.setValue(preservedFilters.organizations);
-            this.filters.organizationIds = preservedFilters.organizations;
-            this.actions$.pipe(ofActionSuccessful(GetOrganizationStructure), take(1)).subscribe(() => {
-              if (preservedFilters?.regions) {
-                this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
-                this.filters.regionIds = [...preservedFilters.regions];
-                if (preservedFilters?.locations) {
-                  this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
-                  this.filters.locationIds = [...preservedFilters.locations];
-                }
-              }
-              this.setDefaultStatuses(statuses);
-            });
-        } else {
-          this.setDefaultStatuses(statuses);
-        }
-      }
+
+    const preservedFiltes = this.store.selectSnapshot(
+      PreservedFiltersState.preservedFiltersByPageName
+    ) as PreservedFiltersByPage<AgencyOrderFilters>;
+      
+    if (!preservedFiltes.isNotPreserved) {
+      const { state } = preservedFiltes;
+      const filterState = { ...state, orderStatuses: [...state.orderStatuses as number[]] };
+      const filterFormConfig = GetAgencyFilterFormConfig(this.selectedTab);
+      this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
+      this.patchFilterForm(!!this.filters?.regionIds?.length);
+      this.prepopulateFilterFormStructure();
+      this.dispatchNewPage();
+      return;
+    }
+
+    const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
+    if (this.redirectFromPerDiem || selectedOrderAfterRedirect) {
+      this.redirectFromPerDiem = false;
+      selectedOrderAfterRedirect && this.selectedTab && this.dispatchNewPage();
     } else {
-      const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
-      if (this.redirectFromPerDiem || selectedOrderAfterRedirect) {
-        this.redirectFromPerDiem = false;
-        selectedOrderAfterRedirect && this.selectedTab && this.dispatchNewPage();
-      } else {
-        this.setDefaultStatuses(statuses);
-      }
+      this.setDefaultStatuses(statuses, preservedFiltes.dispatch);
     }
   }
 
-  private setDefaultStatuses(statuses: number[]): void {
-    let Status =[FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled];
-    const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText)=>Status.includes(f));
-    this.OrderFilterFormGroup.get('orderStatuses')?.setValue((this.orderStatus.length > 0) ? this.orderStatus : statuses);
-    this.filters.orderStatuses = (this.orderStatus.length > 0) ? this.orderStatus : statuse;
-    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-    for(let i=0;i<this.filteredItems.length;i++){
-      if(this.filteredItems[i].text == undefined){
-        this.filteredItems[i].text = this.filteredItems[i].value;
+  private prepopulateFilterFormStructure(): void {
+    this.organizationStructure$
+      .pipe(
+        debounceTime(100),
+        filter((data) => !!data?.length),
+        take(1)
+      )
+      .subscribe(() => {
+        if (this.filters.regionIds) {
+          this.OrderFilterFormGroup.get('regionIds')?.setValue([...this.filters.regionIds]);
+        }
+        if (this.filters.locationIds) {
+          this.OrderFilterFormGroup.get('locationIds')?.setValue([...this.filters.locationIds]);
+        }
+        if (this.filters.departmentsIds) {
+          this.OrderFilterFormGroup.get('departmentsIds')?.setValue([...this.filters.departmentsIds]);
+        }
+
+        this.generateFilterChips();
+      });
+  }
+
+  private setDefaultStatuses(statuses: number[], setDefaultFilters: boolean): void {
+    if (setDefaultFilters) {
+      let Status = [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled];
+      const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText) =>
+        Status.includes(f)
+      );
+      this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
+      this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+      for (let i = 0; i < this.filteredItems.length; i++) {
+        if (this.filteredItems[i].text == undefined) {
+          this.filteredItems[i].text = this.filteredItems[i].value;
+        }
       }
+      this.filteredItems$.next(this.filteredItems.length);
     }
-    this.filteredItems$.next(this.filteredItems.length);
+
     this.dispatchNewPage();
   }
 
@@ -677,6 +696,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public onFilterDelete(event: FilteredItem): void {
     this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
+    this.OrderFilterFormGroup.markAsDirty();
   }
 
   private clearFilters(): void {
@@ -689,12 +709,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.filteredItems$.next(this.filteredItems.length);
   }
 
-  private patchFilterForm(): void {
+  private patchFilterForm(prepopulate = false): void {
     this.OrderFilterFormGroup.setValue({
       orderPublicId: this.filters.orderPublicId || null,
-      regionIds: this.filters.regionIds || [],
-      locationIds: this.filters.locationIds || [],
-      departmentsIds: this.filters.departmentsIds || [],
+      regionIds: (!prepopulate && this.filters.regionIds) || [],
+      locationIds: (!prepopulate && this.filters.locationIds) || [],
+      departmentsIds: (!prepopulate && this.filters.departmentsIds) || [],
       skillIds: this.filters.skillIds || [],
       orderTypes:
         this.selectedTab === AgencyOrderManagementTabs.PerDiem ||
@@ -725,13 +745,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       poNumberIds: this.filters.poNumberIds || null,
     });
 
-    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-    for(let i=0;i<this.filteredItems.length;i++){
-      if(this.filteredItems[i].text == undefined){
-        this.filteredItems[i].text = this.filteredItems[i].value;
-      }
+    if(!prepopulate) {
+      this.generateFilterChips();
     }
-    this.filteredItems$.next(this.filteredItems.length);
   }
 
   private checkSelectedChildrenItem(): void {
@@ -771,28 +787,34 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public onFilterClearAll(): void {
     this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
+    this.store.dispatch(new ClearPageFilters(this.getPageName()));
     this.clearFilters();
     this.dispatchNewPage();
   }
 
   public onFilterApply(): void {
-    this.filters = this.OrderFilterFormGroup.getRawValue();
-    this.filters.orderPublicId = this.filters.orderPublicId?.toUpperCase() || null;
-    this.filters.billRateFrom = this.filters.billRateFrom || null;
-    this.filters.billRateTo = this.filters.billRateTo || null;
-    this.filters.jobStartDate = this.filters.jobStartDate || null;
-    this.filters.jobEndDate = this.filters.jobEndDate || null;
-    this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
-    this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
-    this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
-    this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
-    this.filters.openPositions = this.filters.openPositions || null;
-    this.filters.regionIds = this.filters.regionIds || [];
-    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
-    this.dispatchNewPage();
-    this.store.dispatch(new ShowFilterDialog(false));
-    this.filteredItems$.next(this.filteredItems.length);
-    this.filterService.setPreservedFIlters(this.filters);
+    if (this.OrderFilterFormGroup.dirty) {
+      this.filters = this.OrderFilterFormGroup.getRawValue();
+      this.filters.orderPublicId = this.filters.orderPublicId?.toUpperCase() || null;
+      this.filters.billRateFrom = this.filters.billRateFrom || null;
+      this.filters.billRateTo = this.filters.billRateTo || null;
+      this.filters.jobStartDate = this.filters.jobStartDate || null;
+      this.filters.jobEndDate = this.filters.jobEndDate || null;
+      this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
+      this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
+      this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
+      this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
+      this.filters.openPositions = this.filters.openPositions || null;
+      this.filters.regionIds = this.filters.regionIds || [];
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+      this.dispatchNewPage();
+      this.store.dispatch(new ShowFilterDialog(false));
+      this.filteredItems$.next(this.filteredItems.length);
+      this.saveFiltersByPageName();
+      this.OrderFilterFormGroup.markAsPristine();
+    } else {
+      this.store.dispatch(new ShowFilterDialog(false));
+    }
   }
   // End - Filter
 
@@ -883,6 +905,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.openPreview.next(false);
         this.openCandidat.next(false);
         this.clearFilters();
+        this.getPreservedFiltersByPageName();
         this.store.dispatch(new GetAgencyFilterOptions());
       });
   }
@@ -956,5 +979,28 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.previousSelectedOrderId = locationState.orderId;
     this.orderManagementPagerState = locationState?.orderManagementPagerState;
     this.pageSize = this.orderManagementPagerState?.pageSize ?? this.pageSize;
+  }
+
+  private getPageName(): FilterPageName {
+    return FilterPageName.OrderManagementVMSAgency;
+  }
+
+  private generateFilterChips(): void {
+    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    for (let i = 0; i < this.filteredItems.length; i++) {
+      if (this.filteredItems[i].text == undefined) {
+        this.filteredItems[i].text = this.filteredItems[i].value;
+      }
+    }
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  private saveFiltersByPageName(): void {
+    const filters = { ...this.filters, orderTypes: [] };
+    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), filters));
+  }
+
+  private getPreservedFiltersByPageName(): void {
+    this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
   }
 }

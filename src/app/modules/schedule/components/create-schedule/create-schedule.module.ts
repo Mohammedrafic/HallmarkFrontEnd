@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from "@angular/forms";
 
-import { ButtonModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { FeatherModule } from 'angular-feather';
+import { ButtonModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { TimePickerModule } from "@syncfusion/ej2-angular-calendars";
 import { DropDownListModule } from "@syncfusion/ej2-angular-dropdowns";
 import { DialogModule } from "@syncfusion/ej2-angular-popups";
@@ -11,6 +12,7 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
 import { ReplacementOrderDialogModule } from '../replacement-order-dialog/replacement-order-dialog.module';
 import { ScheduleItemsModule } from '../schedule-items/schedule-items.module';
 import { CreateScheduleComponent } from "./create-schedule.component";
+import { Icons } from './create-schedules.constant';
 
 @NgModule({
   declarations: [
@@ -27,8 +29,9 @@ import { CreateScheduleComponent } from "./create-schedule.component";
     ScheduleItemsModule,
     TooltipContainerModule,
     ReplacementOrderDialogModule,
+    SwitchModule,
+    FeatherModule.pick(Icons),
   ],
   exports: [CreateScheduleComponent],
-  providers: [],
 })
 export class CreateScheduleModule { }

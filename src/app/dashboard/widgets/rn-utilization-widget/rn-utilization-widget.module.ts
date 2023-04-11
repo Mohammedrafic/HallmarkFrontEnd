@@ -9,6 +9,7 @@ import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DropDownListModule, MultiSelectAllModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
 import { ReactiveFormsModule } from '@angular/forms';
+import { RnUtilizationFormService } from './rn-utilization-widget-service';
 
 
 
@@ -16,6 +17,7 @@ import { ReactiveFormsModule } from '@angular/forms';
   imports: [WidgetWrapperModule,CommonModule,MultiSelectModule,MultiSelectAllModule,MultiselectDropdownModule,DropDownListModule,DatePickerModule,TooltipModule,ReactiveFormsModule,FeatherModule.pick({ Info })],
    exports: [RnUtilizationWidgetComponent],
     declarations: [RnUtilizationWidgetComponent],
+    providers:[RnUtilizationFormService]
 })
 export class RnUtilizationWidgetModule { }
 
