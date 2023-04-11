@@ -3,9 +3,9 @@
   [rowData]="availabilityRestrictions"
   [columnDefinitions]="columnDef"
   [rowSelection]="rowSelection"
-  [totalRecordsCount]="totalCount"
-  [pageSize]="pageSize"
-  [currentPage]="pageNumber"
+  [totalRecordsCount]="pagingData.totalCount"
+  [pageSize]="pagingData.pageSize"
+  [currentPage]="pagingData.pageNumber"
   [customRowsPerPageDropDownObject]="customRowsPerPageDropDownObject"
   [disableRowsPerPageDropdown]="true"
   (navigateToPageEmitter)="handleChangePage($event)">

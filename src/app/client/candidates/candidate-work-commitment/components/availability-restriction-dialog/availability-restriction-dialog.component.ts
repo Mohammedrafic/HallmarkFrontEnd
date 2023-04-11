@@ -71,7 +71,7 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
   }
 
   public closeDialog(): void {
-    this.handleCloseDirtyForm();
+    this.confirmCloseDialog();
   }
 
   private initForm(): void {
@@ -79,16 +79,18 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
   }
 
   private openCloseDialog(): void {
-    this.dialogSubject$.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
-      if (data.isOpen) {
-        this.sideDialog.show();
-        this.editAvailabilityRestriction(data.data);
-      } else {
-        this.closeSideDialog();
-      }
+    this.dialogSubject$
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((data) => {
+        if (data.isOpen) {
+          this.sideDialog.show();
+          this.editAvailabilityRestriction(data.data);
+        } else {
+          this.closeSideDialog();
+        }
 
-      this.cdr.markForCheck();
-    });
+        this.cdr.markForCheck();
+      });
   }
 
   private editAvailabilityRestriction(data?: AvailabilityRestriction): void {
@@ -105,7 +107,7 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
     }
   }
 
-  private handleCloseDirtyForm(): void {
+  private confirmCloseDialog(): void {
     if (this.formGroup.dirty) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {

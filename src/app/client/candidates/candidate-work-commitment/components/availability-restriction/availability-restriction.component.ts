@@ -26,15 +26,17 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
     }
   }
 
-  public pageNumber = 1;
-  public pageSize = 5;
-  public totalCount = 0;
   public columnDef: ColumnDefinitionModel[];
   public rowSelection = undefined;
   public gridTitle = 'Availability Restriction';
   public customRowsPerPageDropDownObject = PagerConfig;
   public employeeId: number;
   public availabilityRestrictions: AvailabilityRestriction[] = [];
+  public pagingData = {
+    pageNumber: 1,
+    pageSize: 5,
+    totalCount: 0,
+  };
   public readonly dialogSubject$: Subject<AvailRestrictDialogData> = new Subject();
 
   constructor(
@@ -54,8 +56,8 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
   }
 
   public handleChangePage(pageNumber: number): void {
-    if (pageNumber && this.pageNumber !== pageNumber) {
-      this.pageNumber = pageNumber;
+    if (pageNumber && this.pagingData.pageNumber !== pageNumber) {
+      this.pagingData.pageNumber = pageNumber;
       this.getAvailabilityRestrictions();
     }
   }
@@ -64,7 +66,7 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
     this.availabilityApiService.saveAvailabilityRestriction(event)
       .pipe(
         switchMap(() => {
-          return this.availabilityApiService.getAvailabilityRestrictions(this.employeeId, this.pageNumber);
+          return this.availabilityApiService.getAvailabilityRestrictions(this.employeeId, this.pagingData.pageNumber);
         }),
         tap((data) => {
           this.extractData(data);
@@ -78,7 +80,7 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
   }
 
   private getAvailabilityRestrictions(): void {
-    this.availabilityApiService.getAvailabilityRestrictions(this.employeeId, this.pageNumber)
+    this.availabilityApiService.getAvailabilityRestrictions(this.employeeId, this.pagingData.pageNumber)
       .pipe(take(1))
       .subscribe((data) => {
         this.extractData(data);
@@ -99,7 +101,7 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
 
   public extractData(data: PageOfCollections<AvailabilityRestriction>): void {
     this.availabilityRestrictions = data.items;
-    this.totalCount = data.totalCount;
+    this.pagingData.totalCount = data.totalCount;
   }
 
   private deleteRestriction(id: number): void {
@@ -111,7 +113,9 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
       }).pipe(
         filter((confirm) => !!confirm),
         switchMap(() => this.availabilityApiService.deleteAvailabilityRestriction(id)),
-        switchMap(() => this.availabilityApiService.getAvailabilityRestrictions(this.employeeId, this.pageNumber)),
+        switchMap(() => {
+          return this.availabilityApiService.getAvailabilityRestrictions(this.employeeId, this.pagingData.pageNumber);
+        }),
         take(1)
       )
       .subscribe((data) => {
