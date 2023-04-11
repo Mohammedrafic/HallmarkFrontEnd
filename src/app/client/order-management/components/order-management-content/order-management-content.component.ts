@@ -209,7 +209,7 @@ import { SetOrderManagementPagerState } from '@agency/store/candidate.actions';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
-import { ClearPageFilters, GetPreservedFiltersByPage, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
+import { ClearPageFilters, GetPreservedFiltersByPage, ResetPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 import { OutsideZone } from '@core/decorators';
 
 @Component({
@@ -532,6 +532,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   ngOnDestroy(): void {
     this.orderManagementService.selectedOrderAfterRedirect = null;
+    this.store.dispatch(new ResetPageFilters());
     this.store.dispatch(new ClearSelectedOrder());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -1840,6 +1841,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.orgStructure = structure;
           this.regions = structure.regions;
           this.filterColumns.regionIds.dataSource = this.regions;
+          this.store.dispatch(new ResetPageFilters());
           this.getPreservedFiltersByPage();
         }),
         //get preserved filters and dispatch orders
@@ -2047,16 +2049,20 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private listenRedirectFromReOrder(): void {
     this.orderManagementService.orderPerDiemId$
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        debounceTime(50)
+      )
       .subscribe((data: { id: number; prefix: string }) => {
         this.orderPerDiemId = data.id;
         this.prefix = data.prefix;
         this.clearFilters();
         this.redirectFromPerdiem = true;
-        this.filters.orderPublicId = this.prefix + '-' + this.orderId;
-        this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
+        this.filters.orderPublicId = this.prefix + '-' + this.orderPerDiemId;
+        this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderPerDiemId);
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
         this.getOrders(true);
+        this.cd.markForCheck();
       });
   }
 
