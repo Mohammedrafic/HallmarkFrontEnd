@@ -70,7 +70,7 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
         tap((data) => {
           this.dataSampling(data);
         }),
-        takeUntil(this.componentDestroy())
+        take(1)
       )
       .subscribe(() => {
         this.dialogSubject$.next({ isOpen: false });

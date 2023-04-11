@@ -16,13 +16,13 @@ import { Subject, takeUntil, take, filter } from 'rxjs';
 
 
 import { ControlTypes } from '@shared/enums/control-types.enum';
-import { AvailabilityFilterColumns } from '../../enums/availability-filter-columns.enum';
-import { AvailabilityHelperService } from '../../services/availability-helper.service';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DepartmentFilterFormConfig } from '../../constants';
 import { AvailRestrictDialogData, AvailabilityFormFieldConfig, AvailabilityRestriction } from '../../interfaces';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, formatTime } from '@shared/constants';
+import { AvailabilityFilterColumns } from '../../enums';
+import { AvailabilityHelperService } from '../../services/availability-helper.service';
 
 @Component({
   selector: 'app-availability-restriction-dialog',
@@ -102,6 +102,8 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
         startTime: DateTimeHelper.convertDateToUtc(data.startTime),
         endTime: DateTimeHelper.convertDateToUtc(data.endTime),
       });
+    } else {
+      this.title = 'Add';
     }
   }
 
