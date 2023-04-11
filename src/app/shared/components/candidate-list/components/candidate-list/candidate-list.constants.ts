@@ -32,8 +32,8 @@ export const filterColumns: CandidateListFiltersColumn = {
     valueType: ValueType.Id,
     dataSource: [
       {id : 1, name : "Licenses"}, 
-      {id : 2, name : "CheckLists"}, 
-      {id : 3, name : "Credentials"}   
+      {id : 2, name : "Certificates"}, 
+      {id : 3, name : "Checklists"}   
     ],
     valueField: 'name',
     valueId: 'id',
@@ -83,8 +83,8 @@ export const IRPFilterColumns: CandidateListFiltersColumn = {
     valueType: ValueType.Id,
     dataSource: [
       {id : 1, name : "Licenses"}, 
-      {id : 2, name : "CheckLists"}, 
-      {id : 3, name : "Credentials"} 
+      {id : 2, name : "Certificates"}, 
+      {id : 3, name : "Checklists"} 
     ],
     valueField: 'name',
     valueId: 'id',
@@ -153,6 +153,10 @@ export const VMSCandidates = [
     visible: false,
   },
   {
+    fieldName: 'credType',
+    visible: false,
+  },
+  {
     fieldName: 'orgOrientation',
     visible: false,
   },
@@ -213,6 +217,10 @@ export const IRPCandidates = [
   },
   {
     fieldName: 'credEndDate',
+    visible: false,
+  },
+  {
+    fieldName: 'credType',
     visible: false,
   },
   {
