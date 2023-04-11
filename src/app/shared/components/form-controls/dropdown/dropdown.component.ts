@@ -5,6 +5,7 @@ import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base
 import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { PopupEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
+import { DropdownOption } from '@core/interface';
 
 @Component({
   selector: 'app-dropdown',
@@ -17,7 +18,7 @@ import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 })
 export class DropdownComponent extends BaseFormControlDirective {
   @Input() public dataSource: unknown | null | undefined;
-  @Input() public fields: FieldSettingsModel;
+  @Input() public fields: FieldSettingsModel | DropdownOption;
   @Input() public hideBorder = true;
   @Input() public allowFiltering = true;
   @Input() public sortOrder: SortOrder = SortOrder.NONE;

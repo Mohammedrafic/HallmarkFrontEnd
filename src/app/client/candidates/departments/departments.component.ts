@@ -29,6 +29,8 @@ import {
 import { ShowFilterDialog, ShowSideDialog, ShowToast } from '../../../store/app.actions';
 import {
   ALL_DEPARTMENTS_SELECTED,
+  DELETE_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
   DELETE_MULTIPLE_RECORDS_TEXT,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
@@ -39,7 +41,6 @@ import {
 import { columnDef } from '@client/candidates/departments/grid/column-def.constant';
 import { AssignDepartmentComponent } from './assign-department/assign-department.component';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';

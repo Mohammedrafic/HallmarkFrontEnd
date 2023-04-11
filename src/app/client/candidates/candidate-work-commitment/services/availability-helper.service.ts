@@ -1,16 +1,28 @@
 import { Injectable } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AvailabilityFilterColumns } from '../enums/availability-filter-columns.enum';
+import { AvailabilityRestriction, AvailabilityRestrictionFormState } from '../interfaces';
+import { DateTimeHelper } from '@core/helpers';
+import { CustomFormGroup } from '@core/interface';
 
 @Injectable()
 export class AvailabilityHelperService {
   
-  public createAvailabilityForm(): FormGroup {
+  public createAvailabilityForm(): CustomFormGroup<AvailabilityRestrictionFormState> {
     return new FormGroup({
-      [AvailabilityFilterColumns.START_DAY]: new FormControl(null),
-      [AvailabilityFilterColumns.END_DAY]: new FormControl(null),
-      [AvailabilityFilterColumns.START_TIME]: new FormControl(null),
-      [AvailabilityFilterColumns.END_TIME]: new FormControl(null),
-    });
+      [AvailabilityFilterColumns.START_DAY]: new FormControl(null, [Validators.required]),
+      [AvailabilityFilterColumns.END_DAY]: new FormControl(null, [Validators.required]),
+      [AvailabilityFilterColumns.START_TIME]: new FormControl(null, [Validators.required]),
+      [AvailabilityFilterColumns.END_TIME]: new FormControl(null, [Validators.required]),
+    }) as CustomFormGroup<AvailabilityRestrictionFormState>;
+  }
+
+  public createRestrictionPayload(formData: AvailabilityRestrictionFormState, employeeId: number): AvailabilityRestriction {
+    return {
+      ...formData,
+      candidateProfileId: employeeId,
+      startTime: DateTimeHelper.toUtcFormat(formData.startTime),
+      endTime: DateTimeHelper.toUtcFormat(formData.endTime),
+    };
   }
 }

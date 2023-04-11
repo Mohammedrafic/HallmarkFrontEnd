@@ -4,11 +4,14 @@ import { ValueFormatterParams } from "@ag-grid-community/core";
 
 import { CandidateCommitmentGridActionRendererComponent } from
   "../components/candidate-work-commitment-grid/grid-action-renderer/grid-action-renderer.component";
-import { formatDate as formatDateString } from '@shared/constants/format-date';
+import { formatTime } from '@shared/constants/format-date';
+import { AvailabilityRestriction } from "../interfaces";
+import { AvailabilityFilterColumns } from "../enums";
+import { daysOfWeek } from "@core/constants/days-week.constant";
 
 export const AvailabilityRestrictionColumnDef = (
-  editCallback: (value: unknown) => void,
-  deleteCallback: (value: unknown) => void,
+  editCallback: (value: AvailabilityRestriction) => void,
+  deleteCallback: (value: number) => void,
 ) => ([
   {
     field: '',
@@ -16,37 +19,41 @@ export const AvailabilityRestrictionColumnDef = (
     cellRenderer: CandidateCommitmentGridActionRendererComponent,
     maxWidth: 100,
     cellRendererParams: {
-      edit: (value: unknown) => {
+      edit: (value: AvailabilityRestriction) => {
         editCallback(value);
       },
-      delete: (value: unknown) => {
-        deleteCallback(value);
+      delete: (value: AvailabilityRestriction) => {
+        if (value.id) {
+          deleteCallback(value.id);
+        }
       },
     },
   },
   {
-    field: 'startDay',
+    field: AvailabilityFilterColumns.START_DAY,
     headerName: 'Start Day',
-    maxWidth: 140,
+    width: 160,
+    valueFormatter: (params: ValueFormatterParams) => daysOfWeek[params.value],
   },
   {
-    field: 'startTime',
+    field: AvailabilityFilterColumns.START_TIME,
     headerName: 'Start Time',
-    maxWidth: 140,
+    width: 160,
     valueFormatter: (params: ValueFormatterParams) =>
-      params.value && formatDate(params.value, formatDateString, 'en-US', 'UTC'),
+      params.value && formatDate(params.value, formatTime, 'en-US', 'UTC'),
   },
   {
-    field: 'endDay',
+    field: AvailabilityFilterColumns.END_DAY,
     headerName: 'End Day',
-    maxWidth: 140,
+    width: 160,
+    valueFormatter: (params: ValueFormatterParams) => daysOfWeek[params.value],
   },
 
   {
-    field: 'endTime',
+    field: AvailabilityFilterColumns.END_TIME,
     headerName: 'End Time',
-    maxWidth: 140,
+    width: 160,
     valueFormatter: (params: ValueFormatterParams) =>
-      params.value && formatDate(params.value, formatDateString, 'en-US', 'UTC'),
+      params.value && formatDate(params.value, formatTime, 'en-US', 'UTC'),
   },
 ]);
