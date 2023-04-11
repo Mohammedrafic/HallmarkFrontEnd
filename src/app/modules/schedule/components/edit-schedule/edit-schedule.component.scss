@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px;
+  padding: 24px 24px 16px;
 
   .title {
     @include dialog-title;
@@ -123,7 +123,13 @@
   grid-auto-flow: row;
   grid-template-areas:
     "date date date date"
-    "shift startTime endTime hours";
+    "shift shift shift hours";
+}
+
+.custom-scheduled-availability-form {
+  grid-template-areas:
+    "date date date date"
+    "shift startTime endTime hours"
 }
 
 .scheduled-unavailability-form {
@@ -134,6 +140,13 @@
   grid-auto-flow: row;
   grid-template-areas:
     "date date date date"
+    "shift shift shift hours"
+    "reason reason reason reason";
+}
+
+.custom-scheduled-unavailability-form {
+  grid-template-areas:
+    "date date date date"
     "shift startTime endTime hours"
     "reason reason reason reason";
 }
@@ -141,16 +154,41 @@
 .scheduled-shift-form {
   display: grid;
   grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 0.4fr 1fr 1fr 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
     "date date date date"
-    "shift startTime endTime hours"
+    "shift shift shift hours"
+    "switch-wrap switch-wrap switch-wrap switch-wrap"
     "region region region region"
     "location location location location"
     "department department department department"
     "skill skill skill skill";
+}
+
+.custom-scheduled-shift-form {
+  grid-template-areas:
+    "date date date date"
+    "shift startTime endTime hours"
+    "switch-wrap switch-wrap switch-wrap switch-wrap"
+    "region region region region"
+    "location location location location"
+    "department department department department"
+    "skill skill skill skill";
+}
+
+.switch-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas:
+    "toggle1 toggle2 toggle3 toggle4 toggle5";
+  grid-area: switch-wrap;
+}
+
+.e-switch-wrapper.e-wrapper {
+  margin-right: 8px;
 }
 
 .date {
@@ -200,5 +238,14 @@
 
   .e-tab.stepper > .e-content {
     padding-top: 12px !important;
+  }
+
+  // temporary solution
+  .stepper {
+    overflow: auto;
+
+    .e-tab-header::before {
+      display: none;
+    }
   }
 }

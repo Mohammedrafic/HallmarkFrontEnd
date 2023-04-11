@@ -38,6 +38,7 @@ const scheduledAvailabilityFormFields = (createMode: boolean): EditScheduleFormF
       type: FieldType.Time,
       gridAreaName: 'startTime',
       required: true,
+      show: false,
     },
     {
       field: 'endTime',
@@ -45,6 +46,7 @@ const scheduledAvailabilityFormFields = (createMode: boolean): EditScheduleFormF
       type: FieldType.Time,
       gridAreaName: 'endTime',
       required: true,
+      show: false,
     },
     {
       field: 'hours',
@@ -74,6 +76,46 @@ const scheduledUnavailabilityFormFields = (createMode: boolean): EditScheduleFor
 const scheduledShiftFormFields = (filtered: boolean,  createMode: boolean): EditScheduleFormFieldConfig[] => {
   return [
     ...scheduledAvailabilityFormFields(createMode),
+    {
+      field: 'orientated',
+      title: 'ORI',
+      type: FieldType.Toggle,
+      gridAreaName: 'toggle1',
+      required: false,
+      show: true,
+    },
+    {
+      field: 'critical',
+      title: 'CRT',
+      type: FieldType.Toggle,
+      gridAreaName: 'toggle2',
+      required: false,
+      show: true,
+    },
+    {
+      field: 'onCall',
+      title: 'OC',
+      type: FieldType.Toggle,
+      gridAreaName: 'toggle3',
+      required: false,
+      show: true,
+    },
+    {
+      field: 'charge',
+      title: 'CHG',
+      type: FieldType.Toggle,
+      gridAreaName: 'toggle4',
+      required: false,
+      show: true,
+    },
+    {
+      field: 'preceptor',
+      title: 'PRC',
+      type: FieldType.Toggle,
+      gridAreaName: 'toggle5',
+      required: false,
+      show: true,
+    },
     {
       field: 'regionId',
       title: 'Region',

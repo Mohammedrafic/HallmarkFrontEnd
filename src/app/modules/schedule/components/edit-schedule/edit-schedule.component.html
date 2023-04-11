@@ -67,6 +67,14 @@
       <form [formGroup]="scheduleForm" [class]="scheduleFormConfig.formClass">
         <ng-container *ngFor="let control of scheduleFormConfig.formFields">
           <ng-container [ngSwitch]="control.type">
+            <ng-template [ngSwitchCase]="FieldTypes.Toggle">
+              <div class="switch-wrap">
+                <div *ngIf="control.show" class="input-group" [ngStyle]="{'grid-area': control.gridAreaName}">
+                  <ejs-switch class="switch" [formControlName]="control.field"></ejs-switch>
+                  <label class="switch-label">{{control.title}}</label>
+                </div>
+              </div>
+            </ng-template>
             <ng-template [ngSwitchCase]="FieldTypes.Calendar">
               <app-datepicker
                 class="input-container bootstrap"
@@ -109,7 +117,9 @@
               </div>
             </ng-template>
             <ng-template [ngSwitchCase]="FieldTypes.Time">
-              <div class="input-container bootstrap" [ngStyle]="{'grid-area': control.gridAreaName}">
+              <div
+                class="input-container bootstrap"
+                [ngStyle]="{'grid-area': control.gridAreaName, 'display': control.show ? 'block' : 'none'}">
                 <label [for]="control.field">{{ control.title }} <span *ngIf="control.required" class="required">*</span>
                 </label>
                 <div class="input-group">
