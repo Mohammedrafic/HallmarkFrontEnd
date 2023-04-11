@@ -41,9 +41,9 @@ import { DetectFormConfigBySelectedType } from '../../constants';
 import { InvoicesAgencyTabId, InvoicesOrgTabId, InvoicesTableFiltersColumns } from '../../enums';
 import { InvoiceFiltersAdapter } from '../../adapters';
 import { InvoicesModel } from '../../store/invoices.model';
-import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { ClearPageFilters } from 'src/app/store/preserved-filters.actions';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
+import { GetOrganizationStructure } from 'src/app/store/user.actions';
 
 @Component({
   selector: 'app-invoices-filters-dialog',
@@ -66,9 +66,6 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
 
   @Select(InvoicesState.selectedOrgId)
   private readonly orgId$: Observable<number>;
-
-  @Select(PreservedFiltersState.preservedFiltersByPageName)
-  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<InvoicesFilterState>>;
 
   @Select(InvoicesState.invoiceFiltersColumns)
   private readonly invoiceFiltersColumns$: Observable<InvoiceFilterColumns>;
@@ -115,6 +112,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.watchForControlsValueChanges();
     this.setFormGroupValidators();
     this.startFormGroupWatching();
+    this.store.dispatch(new GetOrganizationStructure());
   }
 
   ngOnChanges(): void {
@@ -218,7 +216,9 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
         this.initFormConfig();
       }),
       switchMap(() => this.getOrganizationStructure()),
-      switchMap((structure) => this.populateFilterForm$.pipe(filter(() => !!structure))),
+      filter((structure) => !!structure),
+      debounceTime(200),
+      switchMap(() => this.populateFilterForm$),
       filter((filters) => !!filters),
       tap((filters) => {
         this.applyPreservedFilters(filters?.state || {});
