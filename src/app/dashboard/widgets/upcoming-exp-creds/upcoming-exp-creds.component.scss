@@ -75,6 +75,7 @@
     white-space: nowrap;
     font-size: 13px;
     width: max-content;
+    cursor: pointer;
   }
   .widget__type {
     display: flex;
@@ -91,4 +92,7 @@
   .icon{
     height: 21px;
     width: 23px;
+  }
+  p.orgname:hover {
+    text-decoration: underline;
   }

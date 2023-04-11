@@ -34,6 +34,17 @@ export class UpcomingExpCredsComponent {
               public filterservice : FilterService) {
               }
 
+
+  redirect_to_candidate(name : string):void {
+
+    var d = new Date();
+    var endDate = new Date(d.setMonth(d.getMonth() + 1));
+
+    const startDate = new Date();
+
+    this.dashboardService.redirect_to_credentials("/client/candidates",startDate, endDate);
+  }
+
   public load(args: ILoadedEventArgs): void {
     let selectedTheme: string = location.hash.split('/')[1];
     selectedTheme = selectedTheme ? selectedTheme : 'Material';

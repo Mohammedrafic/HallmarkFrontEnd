@@ -93,6 +93,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   assignedSkills$: Observable<ListOfSkills[]>;
 
+  @Input() public credEndDate: string;
+  @Input() public credStartDate: string;
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;
 
@@ -117,6 +119,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     regionsNames: [],
     skillsIds: [],
     tab: 0,
+    expiry : {},
+    credEndDate : null,
+    credStartDate : null
   };
   public CandidateFilterFormGroup: FormGroup;
   public filterColumns: CandidateListFiltersColumn;
@@ -202,6 +207,30 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFilterApply(): void {
+    this.filters = this.CandidateFilterFormGroup.getRawValue();
+    const expiry = {
+      type : this.filters.credType,
+      startDate : this.filters.credStartDate,
+      endDate : this.filters.credEndDate
+    }
+    this.filters.profileStatuses = this.filters.profileStatuses || [];
+    this.filters.regionsNames = this.filters.regionsNames || [];
+    this.filters.skillsIds = this.filters.skillsIds || [];
+    this.filters.candidateName = this.filters.candidateName || null;
+    this.filters.expiry = expiry;
+   
+    this.dispatchNewPage();
+    this.store.dispatch(new ShowFilterDialog(false));
+    this.filterService.setPreservedFIltersGlobal(this.filters);
+  }
+
+  private setDefaultFilter(): void {
+    if (this.filterService.canPreserveFilters() && !this.isIRP) {
+      const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersGlobal);
+      if (preservedFilters?.regions) {
+        this.CandidateFilterFormGroup.get('regionsNames')?.setValue([...preservedFilters.regions]);
+        this.filters.regionsNames = [...preservedFilters.regions];
+      }
     if(this.CandidateFilterFormGroup.dirty) {
       this.filters = this.CandidateFilterFormGroup.getRawValue();
       this.filters.profileStatuses = this.filters.profileStatuses || [];
@@ -215,6 +244,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     } else {
       this.store.dispatch(new ShowFilterDialog(false));
     }
+  }
   }
 
 
@@ -315,6 +345,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public dispatchNewPage(): void {
+    if(this.credStartDate != undefined){
+      this.filters.credStartDate = DateTimeHelper.toUtcFormat(this.credStartDate);
+      this.filters.credEndDate = DateTimeHelper.toUtcFormat(this.credEndDate);
+    }
     const candidateListRequest: CandidateListRequest = {
       orderBy: '',
       pageNumber: this.currentPage,
@@ -331,12 +365,18 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       primarySkillIds: this.filters.primarySkillIds!,
       secondarySkillIds: this.filters.secondarySkillIds!,
       hireDate: this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
+      expiry : {
+        type : this.filters.credType,
+        credStartDate : this.filters.credStartDate,
+        credEndDate : this.filters.credEndDate
+      }
     };
     this.store.dispatch(
       this.isIRP
         ? new GetIRPCandidatesByPage(candidateListRequest)
         : new GetCandidatesByPage(candidateListRequest)
     );
+    this.onFilterClose();
   }
 
   public regionTrackBy(index: number, region: string): string {
