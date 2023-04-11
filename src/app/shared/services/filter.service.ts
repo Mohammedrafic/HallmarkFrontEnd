@@ -179,7 +179,7 @@ export class FilterService {
     const filter = formConfig.reduce((acc, item) => {
       const field = item.field as keyof S;
       const value = state?.[field];
-      if (!!value) {
+      if (value) {
         acc[field] = value;
       }
       return acc;

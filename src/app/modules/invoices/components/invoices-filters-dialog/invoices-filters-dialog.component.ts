@@ -112,7 +112,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.watchForControlsValueChanges();
     this.setFormGroupValidators();
     this.startFormGroupWatching();
-    this.store.dispatch(new GetOrganizationStructure());
+    this.getAgencyOrgStructure();
   }
 
   ngOnChanges(): void {
@@ -217,15 +217,14 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       }),
       switchMap(() => this.getOrganizationStructure()),
       filter((structure) => !!structure),
-      debounceTime(200),
       switchMap(() => this.populateFilterForm$),
       filter((filters) => !!filters),
-      tap((filters) => {
-        this.applyPreservedFilters(filters?.state || {});
-      }),
+      debounceTime(200),
+
       takeUntil(this.componentDestroy())
     )
-      .subscribe(() => {
+      .subscribe((filters) => {
+        this.applyPreservedFilters(filters?.state || {});
         this.cdr.detectChanges();
       });
   }
@@ -328,11 +327,20 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   private applyPreservedFilters(filters: InvoicesFilterState): void {
-    const filterState = this.filterService.composeFilterState(this.filtersFormConfig, filters as Record<string, unknown>);
+    const filteredStructure = this.invoicesFiltersService.filterStructure(
+      filters,
+      this.regions as { id: number }[],
+      this.isAgency
+    );
+    
+    const filterState = this.filterService.composeFilterState(
+      this.filtersFormConfig,
+      filteredStructure as Record<string, unknown>
+    );
 
     this.formGroup.reset();
     this.formGroup.patchValue({
-      ...filterState,
+      ...JSON.parse(JSON.stringify(filterState)),
     });
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
@@ -343,6 +351,12 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       return FilterPageName.InvoicesVMSAgency;
     } else {
       return FilterPageName.InvoicesVMSOrganization;
+    }
+  }
+
+  private getAgencyOrgStructure(): void {
+    if (!this.isAgency) {
+      this.store.dispatch(new GetOrganizationStructure());
     }
   }
 }

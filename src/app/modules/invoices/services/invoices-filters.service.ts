@@ -27,7 +27,7 @@ import { filter, Observable } from 'rxjs';
 @Injectable()
 export class InvoicesFiltersService {
   private readonly slectedTabIndex = new BaseObservable<number | null>(null);
-  
+
   constructor(private fb: FormBuilder) {
   }
 
@@ -149,10 +149,33 @@ export class InvoicesFiltersService {
 
   getSelectedTabStream(): Observable<number | null> {
     return this.slectedTabIndex.getStream()
-    .pipe(filter((id) => id !== null));
+      .pipe(filter((id) => id !== null));
   }
 
   setTabIndex(id: number): void {
     this.slectedTabIndex.set(id);
+  }
+
+  filterStructure<T, R extends { id: number }>(filters: T, regions: R[], isAgency: boolean): T {
+    if (!isAgency) { return filters; }
+
+    const selectedRegionIds = (filters['regionIds' as keyof T] as unknown as number[] | undefined);
+    let hasCommonValues = true;
+
+    if (selectedRegionIds?.length) {
+      const allRegionIds = regions.map((region) => region.id) as number[];
+      hasCommonValues = selectedRegionIds.some((id) => allRegionIds.includes(id));
+    }
+
+    const filterData = hasCommonValues
+      ? filters
+      : {
+        ...filters,
+        regionIds: [],
+        locationIds: [],
+        departmentIds: [],
+      };
+
+    return filterData;
   }
 }
