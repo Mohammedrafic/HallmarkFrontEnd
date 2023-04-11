@@ -145,11 +145,11 @@ export class CreateScheduleService {
       startTime: getTime(startTime),
       endTime: getTime(endTime),
       createOrder: false,
-      orientated,
-      critical,
-      onCall,
-      charge,
-      preceptor,
+      orientated: orientated || false,
+      critical: critical || false,
+      onCall: onCall || false,
+      charge: charge || false,
+      preceptor: preceptor || false,
     };
   }
 

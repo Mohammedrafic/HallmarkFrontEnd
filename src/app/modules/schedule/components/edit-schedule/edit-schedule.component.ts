@@ -427,11 +427,11 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       startTime: getTime(startTime),
       endTime: getTime(endTime),
       createOrder: this.createPerDiemOrderControl.value,
-      orientated,
-      critical,
-      onCall,
-      charge,
-      preceptor,
+      orientated: orientated || false,
+      critical: critical || false,
+      onCall: onCall || false,
+      charge: charge || false,
+      preceptor: preceptor || false,
     };
 
     if (this.selectedDaySchedule.scheduleType !== ScheduleType.Book) {
@@ -613,11 +613,11 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       startTime: getTime(startTime),
       endTime: getTime(endTime),
       createOrder: false,
-      orientated,
-      critical,
-      onCall,
-      charge,
-      preceptor,
+      orientated: orientated || false,
+      critical: critical || false,
+      onCall: onCall || false,
+      charge: charge || false,
+      preceptor: preceptor || false,
     };
     const request: BookingsOverlapsRequest = {
       employeeScheduledDays: this.scheduleToBook.employeeBookedDays,
