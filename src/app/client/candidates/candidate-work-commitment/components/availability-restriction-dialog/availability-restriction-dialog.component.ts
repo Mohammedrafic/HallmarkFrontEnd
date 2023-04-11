@@ -1,14 +1,28 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild } from '@angular/core';
-import { DepartmentFilterFormConfig } from '../../constants/availability-restriction-dialog.constants';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  Input,
+  ViewChild,
+  Output,
+  EventEmitter,
+  ChangeDetectorRef,
+} from '@angular/core';
+import { FormGroup } from '@angular/forms';
+
+
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { Subject, takeUntil, take, filter } from 'rxjs';
+
+
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { AvailabilityFilterColumns } from '../../enums/availability-filter-columns.enum';
-import { AvailabilityFormFieldConfig } from '../../interfaces/availability-restriction.interface';
-import { FormGroup } from '@angular/forms';
 import { AvailabilityHelperService } from '../../services/availability-helper.service';
-import { Subject, takeUntil } from 'rxjs';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Destroyable } from '@core/helpers';
-import { Days } from '@shared/enums/days';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { DepartmentFilterFormConfig } from '../../constants';
+import { AvailabilityFormFieldConfig, AvailabilityRestriction } from '../../interfaces';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, formatTime } from '@shared/constants';
 
 @Component({
   selector: 'app-availability-restriction-dialog',
@@ -19,13 +33,22 @@ import { Days } from '@shared/enums/days';
 export class AvailabilityRestrictionDialogComponent extends Destroyable implements OnInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
-  @Input() public dialogSubject$: Subject<{ isOpen: boolean, isEdit: boolean, data?: unknown }>;
+  @Input() public dialogSubject$: Subject<{ isOpen: boolean, data?: AvailabilityRestriction }>;
+  @Input() public employeeId: number;
+
+  @Output() public saveAvailabilityRestriction: EventEmitter<AvailabilityRestriction> = new EventEmitter();
 
   public formGroup: FormGroup;
   public filtersFormConfig = DepartmentFilterFormConfig();
   public controlTypes = ControlTypes;
+  public title = 'Add';
+  public format = formatTime;
 
-  constructor(private readonly availHelpService: AvailabilityHelperService) {
+  constructor(
+    private readonly availabilityHelpService: AvailabilityHelperService,
+    private readonly confirmService: ConfirmService,
+    private readonly cdr: ChangeDetectorRef,
+  ) {
     super();
   }
 
@@ -34,31 +57,75 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
 
   public ngOnInit(): void {
     this.initForm();
-    this.operCloseDialog();
+    this.openCloseDialog();
   }
 
-  public saveAvailabilityRestriction(): void {
-    console.error('Save');
-    
+  public submitForm(): void {
+    if (this.formGroup.valid) {
+      const formData = this.formGroup.getRawValue();
+      const payload = this.availabilityHelpService.createRestrictionPayload(formData, this.employeeId);
+      this.saveAvailabilityRestriction.emit(payload);
+    } else {
+      this.formGroup.markAllAsTouched();
+    }
+
+    this.cdr.markForCheck();
   }
 
   public closeDialog(): void {
-    this.sideDialog.hide();
+    this.handleCloseDirtyForm();
   }
 
   private initForm(): void {
-    this.formGroup = this.availHelpService.createAvailabilityForm();
+    this.formGroup = this.availabilityHelpService.createAvailabilityForm();
   }
 
-  private operCloseDialog(): void {
+  private openCloseDialog(): void {
     this.dialogSubject$.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
-      console.error(data);
-      if(data.isOpen) {
+      if (data.isOpen) {
         this.sideDialog.show();
+        this.editAvailabilityRestriction(data.data);
       } else {
-        this.sideDialog.hide();
+        this.closeSideDialog();
       }
-      
+
+      this.cdr.markForCheck();
     });
+  }
+
+  private editAvailabilityRestriction(data?: AvailabilityRestriction): void {
+    if (data) {
+      this.title = 'Edit';
+
+      this.formGroup.patchValue({
+        ...data,
+        startTime: DateTimeHelper.convertDateToUtc(data.startTime),
+        endTime: DateTimeHelper.convertDateToUtc(data.endTime),
+      });
+    }
+  }
+
+  private handleCloseDirtyForm(): void {
+    if (this.formGroup.dirty) {
+      this.confirmService
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(
+          filter(Boolean),
+          take(1)
+        ).subscribe(() => {
+          this.closeSideDialog();
+        });
+    } else {
+      this.closeSideDialog();
+    }
+  }
+
+  private closeSideDialog(): void {
+    this.sideDialog.hide();
+    this.formGroup.reset();
   }
 }
