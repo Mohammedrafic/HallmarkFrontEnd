@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, ChangeDetectorRef } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { Subject, takeUntil, take, switchMap, tap, filter } from 'rxjs';
+import { Subject, take, switchMap, tap, filter } from 'rxjs';
 
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { AbstractPermission } from '@shared/helpers/permissions';
@@ -15,7 +15,6 @@ import { PageOfCollections } from '@shared/models/page.model';
 @Component({
   selector: 'app-availability-restriction',
   templateUrl: './availability-restriction.component.html',
-  styleUrls: ['./availability-restriction.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AvailabilityRestrictionComponent extends AbstractPermission implements OnInit {
@@ -68,7 +67,7 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
           return this.availabilityApiService.getAvailabilityRestrictions(this.employeeId, this.pageNumber);
         }),
         tap((data) => {
-          this.dataSampling(data);
+          this.extractData(data);
         }),
         take(1)
       )
@@ -82,7 +81,7 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
     this.availabilityApiService.getAvailabilityRestrictions(this.employeeId, this.pageNumber)
       .pipe(take(1))
       .subscribe((data) => {
-        this.dataSampling(data);
+        this.extractData(data);
         this.cdr.markForCheck();
       });
   }
@@ -98,7 +97,7 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
     this.dialogSubject$.next({ isOpen: true, data: availabilityRestriction });
   }
 
-  public dataSampling(data: PageOfCollections<AvailabilityRestriction>): void {
+  public extractData(data: PageOfCollections<AvailabilityRestriction>): void {
     this.availabilityRestrictions = data.items;
     this.totalCount = data.totalCount;
   }
@@ -113,12 +112,10 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
         filter((confirm) => !!confirm),
         switchMap(() => this.availabilityApiService.deleteAvailabilityRestriction(id)),
         switchMap(() => this.availabilityApiService.getAvailabilityRestrictions(this.employeeId, this.pageNumber)),
-        tap((data) => {
-          this.dataSampling(data);
-        }),
         take(1)
       )
-      .subscribe(() => {
+      .subscribe((data) => {
+        this.extractData(data);
         this.dialogSubject$.next({ isOpen: false });
         this.cdr.markForCheck();
       });

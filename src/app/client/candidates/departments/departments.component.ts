@@ -81,7 +81,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public selectedDepartments: number[] | null;
   public departmentHierarchy: OrganizationRegion[] = [];
-  public filtersAmount: number = 0;
+  public filtersAmount = 0;
   public assignDepTooltipMsg = ALL_DEPARTMENTS_SELECTED;
   public toggleTooltipMsg = NO_ACTIVE_WORK_COMMITMET;
   public conditions: DepartmentConditions = {

@@ -10,10 +10,8 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Subject, takeUntil, take, filter } from 'rxjs';
-
 
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
