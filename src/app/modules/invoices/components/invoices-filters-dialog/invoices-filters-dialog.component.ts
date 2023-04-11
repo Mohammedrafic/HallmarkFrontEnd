@@ -328,10 +328,11 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   private applyPreservedFilters(filters: InvoicesFilterState): void {
-    this.filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency);
+    const filterState = this.filterService.composeFilterState(this.filtersFormConfig, filters as Record<string, unknown>);
+
     this.formGroup.reset();
     this.formGroup.patchValue({
-      ...filters,
+      ...filterState,
     });
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);

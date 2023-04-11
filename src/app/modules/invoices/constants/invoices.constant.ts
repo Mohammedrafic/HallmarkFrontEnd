@@ -175,7 +175,7 @@ export const ManualInvoicesFiltersFormConfig = (isAgency: boolean): InvoiceFilte
   {
     type: ControlTypes.Text,
     title: 'Candidate Name',
-    field: InvoicesTableFiltersColumns.CandidateName,
+    field: InvoicesTableFiltersColumns.SearchTerm,
   },
   {
     type: ControlTypes.Text,
@@ -357,8 +357,8 @@ export const PendingInvoicesFiltersFormConfig = (): InvoiceFilterFieldConfig[] =
   },
   {
     type: ControlTypes.Text,
-    title: 'Order ID/Position ID',
-    field: InvoicesTableFiltersColumns.OrderIds,
+    title: 'Order ID',
+    field: InvoicesTableFiltersColumns.OrderId,
   },
   {
     type: ControlTypes.Multiselect,
@@ -367,7 +367,7 @@ export const PendingInvoicesFiltersFormConfig = (): InvoiceFilterFieldConfig[] =
   },
   {
     type: ControlTypes.Text,
-    title: 'Candidate',
+    title: 'Candidate Name',
     field: InvoicesTableFiltersColumns.SearchTerm,
   },
   {
