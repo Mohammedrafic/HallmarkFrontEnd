@@ -1,0 +1,58 @@
+<section class="flex-column">
+  <section class="toolbar">
+    <div>
+      <h3>Pay Rate</h3>
+    </div>
+    <div>
+      <button ejs-button cssClass="e-outline button-filter" (click)="filter()">
+        <div class="filter-button-content">
+          <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-pill align-text">{{
+            filteredItems
+          }}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditSettingsBillRates]">
+        <button
+          [disabled]="!userPermission[userPermissions.CanEditSettingsBillRates]"
+          ejs-button
+          id="importButton"
+          cssClass="e-outline button-import"
+          (click)="onImportDataClick()"
+        >
+          Import <i-feather name="download" class="icon"></i-feather>
+        </button>
+      </app-tooltip-container>
+      <button
+        ejs-dropdownbutton
+        [items]="exportOptions"
+        (select)="exportSelected($event)"
+        cssClass="e-outline button-export"
+      >
+        <div class="button-export-container">Export <i-feather name="upload" class="icon"></i-feather></div>
+      </button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!canAddBillRate">
+        <button
+          ejs-button [isPrimary]="true"
+          (click)="addBillRateSetupRecord()"
+          [disabled]="!canAddBillRate"
+        >
+          Add Record
+        </button>
+      </app-tooltip-container>
+  </div>
+</section>
+<app-payrate-setup
+  [filteredItems$]="filteredItems$"
+  [export$]="exportMap"
+  [isActive]="isBillRateSetupTabActive"
+  [importDialogEvent]="importDialogEvent"
+  [userPermission]="userPermission"
+>
+</app-payrate-setup>
+
+</section>

@@ -1,0 +1,76 @@
+@import 'colors.scss';
+
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+
+  h3 {
+    color: $title-black;
+    margin: 8px;
+  }
+
+  &>section {
+    display: flex;
+  }
+
+  button {
+    margin-left: 18px;
+  }
+}
+
+.grid-component {
+  margin-top: 25px;
+  overflow-y: auto;
+}
+
+.grid {
+  margin-top: 20px;
+
+  .grid-checkbox {
+    pointer-events: none;
+  }
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.holidays-form-dialog {
+  &.form-container {
+    margin-top: 20px;
+  }
+
+  .timepicker-field {
+    width: 60%;
+  }
+}
+
+.location-option-container {
+  display: inline-block;
+  position: relative;
+  height: 60px;
+  text-indent: 0;
+
+  .region-name {
+    font-size: 12px;
+    color: $secondary-dark-blue-20;
+    position: absolute;
+    left: 0;
+    top: 20px;
+  }
+}
+
+.error {
+  font-size: 12px;
+  font-weight: normal;
+  line-height: normal;
+  color: $supportive-red;
+}
+
+
