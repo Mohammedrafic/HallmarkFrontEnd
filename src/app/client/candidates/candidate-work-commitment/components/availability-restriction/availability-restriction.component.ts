@@ -5,7 +5,7 @@ import { Subject, takeUntil, take, switchMap, tap, filter } from 'rxjs';
 
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { AbstractPermission } from '@shared/helpers/permissions';
-import { AvailabilityRestriction } from '../../interfaces';
+import { AvailRestrictDialogData, AvailabilityRestriction } from '../../interfaces';
 import { AvailabilityApiService } from '../../services/availability-api.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
@@ -27,16 +27,16 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
     }
   }
 
-  public columnDef: ColumnDefinitionModel[];
-  public rowSelection = undefined;
   public pageNumber = 1;
   public pageSize = 5;
+  public totalCount = 0;
+  public columnDef: ColumnDefinitionModel[];
+  public rowSelection = undefined;
   public gridTitle = 'Availability Restriction';
   public customRowsPerPageDropDownObject = PagerConfig;
   public employeeId: number;
   public availabilityRestrictions: AvailabilityRestriction[] = [];
-  public totalCount = 0;
-  public readonly dialogSubject$: Subject<{ isOpen: boolean, data?: AvailabilityRestriction }> = new Subject();
+  public readonly dialogSubject$: Subject<AvailRestrictDialogData> = new Subject();
 
   constructor(
     protected override store: Store,

@@ -20,7 +20,7 @@ import { AvailabilityFilterColumns } from '../../enums/availability-filter-colum
 import { AvailabilityHelperService } from '../../services/availability-helper.service';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DepartmentFilterFormConfig } from '../../constants';
-import { AvailabilityFormFieldConfig, AvailabilityRestriction } from '../../interfaces';
+import { AvailRestrictDialogData, AvailabilityFormFieldConfig, AvailabilityRestriction } from '../../interfaces';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, formatTime } from '@shared/constants';
 
@@ -33,7 +33,7 @@ import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, formatTime } from '@shared/c
 export class AvailabilityRestrictionDialogComponent extends Destroyable implements OnInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
-  @Input() public dialogSubject$: Subject<{ isOpen: boolean, data?: AvailabilityRestriction }>;
+  @Input() public dialogSubject$: Subject<AvailRestrictDialogData>;
   @Input() public employeeId: number;
 
   @Output() public saveAvailabilityRestriction: EventEmitter<AvailabilityRestriction> = new EventEmitter();

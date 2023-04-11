@@ -27,3 +27,8 @@ export interface AvailabilityRestrictionFormState {
   [AvailabilityFilterColumns.START_TIME]: string;
   [AvailabilityFilterColumns.END_TIME]: string;
 }
+
+export interface AvailRestrictDialogData {
+  isOpen: boolean,
+  data?: AvailabilityRestriction,
+}
