@@ -26,6 +26,18 @@ export const filterColumns: CandidateListFiltersColumn = {
     valueId: 'id',
   },
   candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+  expiry: {},
+  credType : {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [
+      {id : 1, name : "Licenses"}, 
+      {id : 2, name : "CheckLists"}, 
+      {id : 3, name : "Credentials"}   
+    ],
+    valueField: 'name',
+    valueId: 'id',
+  }
 };
 
 export const IRPFilterColumns: CandidateListFiltersColumn = {
@@ -66,7 +78,21 @@ export const IRPFilterColumns: CandidateListFiltersColumn = {
     valueField: 'name',
     valueId: 'id',
   },
+  credType: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [
+      {id : 1, name : "Licenses"}, 
+      {id : 2, name : "CheckLists"}, 
+      {id : 3, name : "Credentials"} 
+    ],
+    valueField: 'name',
+    valueId: 'id',
+  },
   hireDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+  credStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+  credEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+  expiry : {}
 };
 
 export const VMSCandidates = [
@@ -116,6 +142,14 @@ export const VMSCandidates = [
   },
   {
     fieldName: 'hireDate',
+    visible: false,
+  },
+  {
+    fieldName: 'credStartDate',
+    visible: false,
+  },
+  {
+    fieldName: 'credEndDate',
     visible: false,
   },
   {
@@ -172,6 +206,14 @@ export const IRPCandidates = [
   {
     fieldName: 'hireDate',
     visible: true,
+  },
+  {
+    fieldName: 'credStartDate',
+    visible: false,
+  },
+  {
+    fieldName: 'credEndDate',
+    visible: false,
   },
   {
     fieldName: 'orgOrientation',

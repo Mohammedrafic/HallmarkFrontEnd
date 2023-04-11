@@ -384,6 +384,9 @@ export class DashboardService {
   public redirectToUrlWithAgencyposition(url: string,orderStatus? :number,condition? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,condition: condition} });
   }
+  public redirect_to_credentials(url : string, startDate? : Date, endDate? : Date, type? : number) : void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , startDate: startDate,endDate: endDate, type : type} });
+  }
   private getTasksWidgetData(): Observable<string> {
     return of('temporary-collapsed-widget-tasks');
   }

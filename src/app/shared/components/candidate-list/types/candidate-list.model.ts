@@ -47,6 +47,10 @@ export interface CandidateListRequest {
   primarySkillIds?: number[];
   secondarySkillIds?: number[]; 
   hireDate?: string | null;
+  credStartDate?: string | null;
+  credEndDate?: string | null;
+  credType? : number[];
+  expiry? : {}
 }
 
 export type CandidateListFilters = {
@@ -61,6 +65,10 @@ export type CandidateListFilters = {
   primarySkillIds?: number[];
   secondarySkillIds?: number[]; 
   hireDate?: string | null;
+  credStartDate?: string | null;
+  credEndDate?: string | null;
+  credType? : number[];
+  expiry? : any;
 };
 
 export interface FilterColumn {
@@ -87,6 +95,10 @@ export interface CandidateListFiltersColumn {
   primarySkillIds?: FilterColumn;
   secondarySkillIds?: FilterColumn;
   hireDate?: CandidateNameFilterColumn;
+  credStartDate?: CandidateNameFilterColumn;
+  credEndDate?: CandidateNameFilterColumn;
+  credType? : FilterColumn;
+  expiry : {};
 }
 
 export type CandidateListExport = {
