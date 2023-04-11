@@ -25,7 +25,7 @@ import { CredentialsModule } from './credentials/credentials.module';
     TabsModule,
     SharedModule,
     DepartmentsModule,
-    CredentialsModule
+    CredentialsModule,
   ],
   providers: [CandidatesService],
 })

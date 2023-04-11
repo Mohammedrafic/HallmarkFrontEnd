@@ -1,8 +1,8 @@
 import { ValueFormatterParams } from '@ag-grid-community/core';
 import { formatDate } from '@angular/common';
-import { CandidateWorkCommitment } from '../models/candidate-work-commitment.model';
 import { CandidateCommitmentGridActionRendererComponent } from './grid-action-renderer/grid-action-renderer.component';
 import { formatDate as formatDateString } from '@shared/constants/format-date';
+import { CandidateWorkCommitment } from '../../models/candidate-work-commitment.model';
 
 export const CandidateWorkCommitmentColumnDef = (
     editCallback: (value: CandidateWorkCommitment) => void,

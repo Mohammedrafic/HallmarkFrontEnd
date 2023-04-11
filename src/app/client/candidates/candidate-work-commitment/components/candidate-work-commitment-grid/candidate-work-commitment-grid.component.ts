@@ -12,9 +12,10 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { catchError, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { CandidateWorkCommitment, CandidateWorkCommitmentsPage } from '../models/candidate-work-commitment.model';
-import { CandidateWorkCommitmentService } from '../services/candidate-work-commitment.service';
+import { CandidateWorkCommitment, CandidateWorkCommitmentsPage } from '../../models/candidate-work-commitment.model';
+import { CandidateWorkCommitmentService } from '../../services/candidate-work-commitment.service';
 import { CandidateWorkCommitmentColumnDef } from './candidate-work-commitment-grid.constants';
+import { PagerConfig } from '../../constants/pager-grid-config.constants';
 
 @Component({
   selector: 'app-candidate-work-commitment-grid',
@@ -38,7 +39,7 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
   public employeeId: number;
   public columnDef: ColumnDefinitionModel[];
   public rowSelection = undefined;
-  public customRowsPerPageDropDownObject = [ { text: '5 Rows', value: 5 } ];
+  public customRowsPerPageDropDownObject = PagerConfig;
   public pageNumber: number = 1;
   public pageSize: number = 5;
   public candidateWorkCommitmentsPage: CandidateWorkCommitmentsPage;
