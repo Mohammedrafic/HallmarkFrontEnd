@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 24px 16px;
+  padding: 24px 24px 6px;
 
   .title {
     @include dialog-title;
@@ -41,6 +41,46 @@
   flex-grow: 1;
   overflow-y: auto;
   overflow-x: hidden;
+
+  .events-wrapper {
+    display: flex;
+    overflow: auto;
+    padding: 16px 0;
+
+    .event {
+      min-width: 86px;
+      height: 36px;
+      padding: 16px;
+      margin-right: 9px;
+      border-radius: 12px;
+      background-color: $white;
+      border: 1px solid $secondary-dark-blue-45;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+
+      .event-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: $secondary-dark-blue-10;
+      }
+
+      .event-sub-title {
+        font-size: 12px;
+        color: $secondary-dark-blue-15;
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &.selected {
+        background-color: $primary-active-blue-10;
+
+        .event-title, .event-sub-title {
+          color: $white;
+        }
+      }
+    }
+  }
 
   .add-new-schedule {
     margin-bottom: 20px;
@@ -234,18 +274,5 @@
 ::ng-deep {
   label {
     margin-bottom: 0 !important;
-  }
-
-  .e-tab.stepper > .e-content {
-    padding-top: 12px !important;
-  }
-
-  // temporary solution
-  .stepper {
-    overflow: auto;
-
-    .e-tab-header::before {
-      display: none;
-    }
   }
 }

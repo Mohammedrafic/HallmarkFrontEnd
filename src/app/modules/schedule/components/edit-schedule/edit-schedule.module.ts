@@ -5,7 +5,6 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { ButtonModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { TimePickerModule } from "@syncfusion/ej2-angular-calendars";
 import { DropDownListModule } from "@syncfusion/ej2-angular-dropdowns";
-import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DialogModule } from "@syncfusion/ej2-angular-popups";
 import { FeatherModule } from 'angular-feather';
 import { Plus } from 'angular-feather/icons';
@@ -32,7 +31,6 @@ import { EditScheduleComponent } from './edit-schedule.component';
     TooltipContainerModule,
     DatepickerModule,
     CheckBoxModule,
-    TabAllModule,
     SwitchModule,
     ReplacementOrderDialogModule,
     FeatherModule.pick({ Plus }),

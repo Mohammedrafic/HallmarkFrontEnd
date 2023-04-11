@@ -16,26 +16,19 @@
   </div>
 
   <div class="sidebar-content">
-    <ejs-tab
-      class="stepper"
-      (selected)="changeTab($event)"
-      (created)="setInitData()">
-      <e-tabitems>
-        <e-tabitem *ngFor="let tab of shiftTabs; trackBy: trackByTabs">
-          <ng-template #headerText>
-            <div class="e-tab-header">
-              <div class="stepper-header">
-                <div class="stepper-title">{{tab.title}}</div>
-                <div class="stepper-sub-title">{{tab.subTitle}}</div>
-              </div>
-            </div>
-          </ng-template>
-          <ng-template #content></ng-template>
-        </e-tabitem>
-      </e-tabitems>
-    </ejs-tab>
+    <div class="events-wrapper" *ngIf="selectedDaySchedule">
+      <div
+        class="event"
+        *ngFor="let tab of shiftTabs; trackBy: trackByTabs"
+        [class.selected]="selectedDayScheduleId === tab.id"
+        (click)="changeTab(tab.id)"
+      >
+        <div class="event-title">{{tab.title}}</div>
+        <div class="event-sub-title">{{tab.subTitle}}</div>
+      </div>
+    </div>
     <div class="add-new-schedule">
-      <div *ngIf="createModeConfig.createModeEnabled" class="input-container schedule-types">
+      <div *ngIf="selectedDayScheduleId === newScheduleId" class="input-container schedule-types">
         <ng-container *ngFor="let type of scheduleTypes">
           <div class="input-group radio">
             <app-tooltip-container [showToolTip]="type.disabled">
@@ -51,7 +44,7 @@
           </div>
         </ng-container>
       </div>
-      <div *ngIf="!createModeConfig.createModeEnabled" class="add-btn-container">
+      <div *ngIf="selectedDayScheduleId !== newScheduleId" class="add-btn-container">
         <button
           ejs-button
           cssClass="e-outline"
@@ -143,7 +136,7 @@
     </div>
   </div>
 
-  <div *ngIf="!createModeConfig.createModeEnabled" class="sidebar-footer">
+  <div *ngIf="selectedDayScheduleId !== newScheduleId" class="sidebar-footer">
     <div class="checkbox-container bootstrap" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
       <ejs-checkbox [formControl]="createPerDiemOrderControl" label="Create Per Diem Order"></ejs-checkbox>
     </div>
