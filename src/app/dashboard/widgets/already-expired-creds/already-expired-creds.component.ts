@@ -59,7 +59,16 @@ export class AlreadyExpiredCredsComponent  {
     const yesterdayTimeStamp = timeStamp - 24*60*60*1000;
     const yesterdayDate = new Date(yesterdayTimeStamp);
 
-    this.dashboardService.redirect_to_credentials("/client/candidates",startDate, yesterdayDate);
+    var type;
+    if(name == "Licenses"){
+      type = 1;
+    } else if(name == "Certificates"){
+      type = 2;
+    } else {
+      type = 3;
+    }
+
+    this.dashboardService.redirect_to_credentials("/client/candidates",startDate, yesterdayDate, type);
   }
 
   ngOnChanges():void {

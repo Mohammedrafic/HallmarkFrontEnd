@@ -95,6 +95,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   @Input() public credEndDate: string;
   @Input() public credStartDate: string;
+  @Input() public credType: number;
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;
 
@@ -121,7 +122,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     tab: 0,
     expiry : {},
     credEndDate : null,
-    credStartDate : null
+    credStartDate : null,
+    credType : []
   };
   public CandidateFilterFormGroup: FormGroup;
   public filterColumns: CandidateListFiltersColumn;
@@ -346,6 +348,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public dispatchNewPage(): void {
     if(this.credStartDate != undefined){
+      this.filters.credType = [this.credType];
       this.filters.credStartDate = DateTimeHelper.toUtcFormat(this.credStartDate);
       this.filters.credEndDate = DateTimeHelper.toUtcFormat(this.credEndDate);
     }
