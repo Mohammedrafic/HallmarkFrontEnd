@@ -254,8 +254,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       }
 
       if(this.candidateAddressRequiredValue === ConfigurationValues.Apply){
-        if(this.candidateJob?.candidateProfileContactDetails != null){ 
-            if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
+        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){ 
+            if(CommonHelper.candidateAddressCheck(this.orderApplicantsInitialData?.candidateProfileContactDetails)){
                 this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Apply)));
                 return;
             }
