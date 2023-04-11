@@ -123,6 +123,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     locationId: null,
     departmentId: null,
     orientated: null,
+    date: null,
   };
 
   constructor(
@@ -410,6 +411,14 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((value: boolean) => {
       this.createScheduleService.hideToggleControls(this.scheduleFormConfig as ScheduleFormConfig, !value);
+      this.cdr.markForCheck();
+    }) || null;
+
+    this.unsubscribe('date');
+    this.subscriptions['date'] = this.scheduleForm.get('date')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.checkCandidateIsOrientedField();
       this.cdr.markForCheck();
     }) || null;
   }
@@ -726,9 +735,18 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   }
 
   private checkCandidateIsOrientedField(): void {
-    if (!this.scheduledItem.candidate.isOriented && (this)) {
+    const { date } = this.scheduleForm.getRawValue();
+    const updatedCandidate = {
+      ...this.scheduledItem.candidate,
+      dates: [DateTimeHelper.toUtcFormat(date)],
+    };
+    const isCandidateOriented = this.createScheduleService.getCandidateOrientation(updatedCandidate);
+
+    if (!isCandidateOriented) {
       this.scheduleForm.get('orientated')?.setValue(true);
       this.scheduleForm.get('orientated')?.disable();
+    } else {
+      this.scheduleForm.get('orientated')?.enable();
     }
   }
 }

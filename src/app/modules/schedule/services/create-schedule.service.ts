@@ -310,6 +310,16 @@ export class CreateScheduleService {
     }
   }
 
+  getCandidateOrientation(candidate: ScheduleCandidate): boolean {
+    return candidate.dates.every((date: string) => {
+      if(candidate.orientationDate) {
+        return DateTimeHelper.convertDateToUtc(date) >= DateTimeHelper.convertDateToUtc(candidate.orientationDate);
+      } else {
+        return false;
+      }
+    });
+  }
+
   resetScheduleControls(scheduleForm: FormGroup, controlsList: string[]): void {
     controlsList.forEach((control: string) => {
       scheduleForm.get(control)?.reset();
@@ -329,23 +339,26 @@ export class CreateScheduleService {
     }];
   }
 
-  private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]):void {
-    const hasCandidateWithoutOrientation = candidates.filter((candidate: ScheduleCandidate) => {
-      return !candidate.isOriented;
-    });
+  private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]): void {
+    const isCandidatesOriented = candidates.map((candidate: ScheduleCandidate) => {
+      return this.getCandidateOrientation(candidate);
+    }).every((orientation: boolean) => orientation);
 
-    if(hasCandidateWithoutOrientation.length) {
+    if(!isCandidatesOriented) {
       control?.patchValue(true);
       control?.disable();
     } else {
       control?.enable();
+      control?.patchValue(false);
     }
   }
 
   private orientationForSingleCandidate(control: AbstractControl, candidates: ScheduleCandidate[]): void {
-    control?.patchValue(!candidates[0].isOriented);
+    const isCandidateOriented = this.getCandidateOrientation(candidates[0]);
 
-    if(!candidates[0].isOriented) {
+    control?.patchValue(!isCandidateOriented);
+
+    if(!isCandidateOriented) {
       control?.disable();
     } else {
       control?.enable();

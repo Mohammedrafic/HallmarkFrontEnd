@@ -3,7 +3,7 @@ import { formatDate } from '@angular/common';
 import { LtaAssignment, ScheduleCandidate } from '../../interface';
 
 export const CreateTooltipForOrientation = (candidate: ScheduleCandidate): string => {
-  if(candidate.isOriented) {
+  if(candidate.orientationDate) {
     return `Oriented from ${formatDate(candidate.orientationDate, 'MM/dd/yyyy', 'en-US')}`;
   } else {
     return 'Not Oriented';
