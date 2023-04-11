@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { DateTimeHelper } from '@core/helpers';
 import { ScheduleType } from '../enums';
-import { ScheduleItem } from '../interface';
+import { ScheduleItem, ScheduleItemAttributes } from '../interface';
 import { CreateScheduleAttributes } from '../helpers';
 
 @Injectable()
@@ -21,14 +21,18 @@ export class ScheduleCardService {
         const endTime = DateTimeHelper.formatDateUTC(item.endDate, 'HH:mm');
 
         if (isBooking && orderIDText) {
+          const attributesText = this.createAttributesTooltipText(item.attributes);
+
           return `${ startTime } - ${ endTime } | ${orderIDText}`
             + ` | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department }`
-            + ` | ${CreateScheduleAttributes(item.attributes, true)}`;
+            + `${attributesText}`;
         }
 
         if (isBooking) {
+          const attributesText = this.createAttributesTooltipText(item.attributes);
+
           return `${ startTime } - ${ endTime } | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department }`
-            + ` | ${CreateScheduleAttributes(item.attributes, true)}`;
+            + `${attributesText}`;
         }
 
         if (isAvailability) {
@@ -41,5 +45,15 @@ export class ScheduleCardService {
 
         return '';
       });
+  }
+
+  private createAttributesTooltipText(attributes: ScheduleItemAttributes): string {
+    const attributesList = CreateScheduleAttributes(attributes, true);
+    
+    if(attributesList.length) {
+      return ` | ${attributesList}`;
+    } else {
+      return '';
+    }
   }
 }

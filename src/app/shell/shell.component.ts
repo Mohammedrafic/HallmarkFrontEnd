@@ -783,7 +783,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.userService
       .getHelpSiteUrl()
       .pipe(takeUntil(this.componentDestroy()))
-      .subscribe((url: string) => {
+      .subscribe(({ url }) => {
         this.irpVmsHelpSiteUrl = url;
       });
   }
