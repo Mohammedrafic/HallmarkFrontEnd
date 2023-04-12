@@ -90,8 +90,8 @@ export const IRPFilterColumns: CandidateListFiltersColumn = {
     valueId: 'id',
   },
   hireDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-  credStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-  credEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+  startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+  endDate: { type: ControlTypes.Date, valueType: ValueType.Text },
   expiry : {}
 };
 
@@ -145,11 +145,11 @@ export const VMSCandidates = [
     visible: false,
   },
   {
-    fieldName: 'credStartDate',
+    fieldName: 'startDate',
     visible: false,
   },
   {
-    fieldName: 'credEndDate',
+    fieldName: 'endDate',
     visible: false,
   },
   {
@@ -212,11 +212,11 @@ export const IRPCandidates = [
     visible: true,
   },
   {
-    fieldName: 'credStartDate',
+    fieldName: 'startDate',
     visible: false,
   },
   {
-    fieldName: 'credEndDate',
+    fieldName: 'endDate',
     visible: false,
   },
   {

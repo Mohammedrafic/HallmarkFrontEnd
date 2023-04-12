@@ -292,13 +292,12 @@
           <label>Credential Start Date</label>
           <div class="input-group datepicker">
             <ejs-datepicker
-              [value]='credStartDate'
               class="datepicker"
               format="MM/dd/yyyy"
               placeholder="MM/DD/YYYY"
               [enableMask]="true"
               [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
-              formControlName="credStartDate">
+              formControlName="startDate">
             </ejs-datepicker>
           </div>
         </div>
@@ -311,7 +310,7 @@
               placeholder="MM/DD/YYYY"
               [enableMask]="true"
               [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
-              formControlName="credEndDate">
+              formControlName="endDate">
             </ejs-datepicker>
           </div>
         </div>
