@@ -169,11 +169,13 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   ): void {
     this.candidateWorkCommitmentService.getWorkCommitmentById(id)
       .subscribe((commitment: WorkCommitmentDetails) => {
+        const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
+
         this.selectedLocations = this.getCommitmentLocationsFromHierarchy(commitment);
         this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
-        this.minimumDate = this.lastActiveDate ? this.lastActiveDate : this.selectWorkCommitmentStartDate;
-        const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
-        this.maximumDate = this.minimumDate < commitmentEndDate ? commitmentEndDate : undefined;
+        this.minimumDate = this.setMinimumDate();
+        this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
+
         this.setWCStartDate();
 
         if (populateForm) {
@@ -387,5 +389,16 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
       this.startDate = isHireDateLessWCStartDate ? this.todayDate : startDate;
     }
+  }
+
+  private setMinimumDate(): Date {
+    let minimumDate = this.selectWorkCommitmentStartDate;
+    if (this.lastActiveDate) {
+      minimumDate =
+        DateTimeHelper.isDateBefore(this.lastActiveDate, this.selectWorkCommitmentStartDate)
+          ? this.selectWorkCommitmentStartDate
+          : this.lastActiveDate;
+    }
+    return minimumDate;
   }
 }
