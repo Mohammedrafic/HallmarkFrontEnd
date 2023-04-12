@@ -48,3 +48,45 @@ const isOrderDateMatchedWithFilter = (
 const getDateTime = (date: string): number => {
   return new Date(date).setHours(0, 0, 0);
 };
+
+export const PrepareCandidate = (candidate: ScheduleCandidate): ScheduleCandidate => {
+  const updatedCandidate = {
+    ...candidate,
+    skill: CreateSkillText(candidate.skill),
+  };
+
+  if(candidate.workCommitments) {
+    updatedCandidate.workCommitment = CreateWorkCommitmentText(candidate.workCommitments);
+    updatedCandidate.workCommitmentText = CreateWorkCommitments(candidate.workCommitments);
+  }
+
+  return updatedCandidate;
+};
+
+export const CreateSkillText = (skill: string): string => {
+  const skillText = skill.trim();
+
+  if(skillText.length > 18) {
+    return `${skillText.slice(0,18)}...`;
+  } else {
+    return skillText;
+  }
+};
+
+export const CreateWorkCommitments = (workCommitments: string[]): string => {
+  if (workCommitments.length) {
+    return  'Work Commitment: ' + workCommitments.join(', ');
+  } else {
+    return 'Work Commitment';
+  }
+};
+
+export const CreateWorkCommitmentText = (commitments: string[]) => {
+  const updateWorkCommitments = commitments.join(', ').trim();
+
+  if(updateWorkCommitments.length > 37) {
+    return `${updateWorkCommitments.slice(0,37)}...`;
+  } else {
+    return updateWorkCommitments;
+  }
+};

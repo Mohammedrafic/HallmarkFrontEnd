@@ -20,6 +20,7 @@ export interface ScheduleCandidate {
   dates: string[];
   orderType: IrpOrderType | null;
   workCommitments: string[] | null;
+  workCommitment: string;
   employeeNote: string;
   workHours?: number;
   isOriented: boolean;

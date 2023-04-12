@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleCha
 
 import { ScheduleCandidate, ScheduleFilters, ScheduleModel } from '../../interface';
 import { CandidateIconName } from '../../constants';
-import { CreateTooltipForOrientation, GetCandidateTypeTooltip } from './candidate-card.helper';
+import { CreateTooltipForOrientation, GetCandidateTypeTooltip, PrepareCandidate } from './candidate-card.helper';
 
 @Component({
   selector: 'app-candidate-card',
@@ -12,14 +12,9 @@ import { CreateTooltipForOrientation, GetCandidateTypeTooltip } from './candidat
 })
 export class CandidateCardComponent implements OnInit, OnChanges {
   @Input() set candidate(schedule: ScheduleModel) {
-    if (schedule.candidate.workCommitments && schedule.candidate.workCommitments.length) {
-      schedule.candidate.workCommitmentText = 'Work Commitment: ' + schedule.candidate.workCommitments.join(', ');
-    } else {
-      schedule.candidate.workCommitmentText = 'Work Commitment';
-    }
-
-    this.candidateData = schedule.candidate;
+    this.candidateData = PrepareCandidate(schedule.candidate);
   }
+  
   @Input() selectedFilters: ScheduleFilters;
   @Input() showScheduledHours = true;
 
