@@ -11,6 +11,7 @@ import { OrderManagementComponent } from './order-management/order-management.co
 import { PendingChangesGuard } from '@shared/guards/pending-changes.guard';
 import { CandidateDetailsComponent } from '@shared/components/candidate-details/candidate-details.component';
 import { AssociateListComponent } from '@shared/components/associate-list/associate-list.component';
+import { AgencyReportsComponent } from './reports/reports.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -117,6 +118,14 @@ const routes: Routes = [
         path: 'order-management',
         component: OrderManagementComponent,
         data: {
+          isAgencyArea: true,
+        },
+      },
+      {
+        path: 'reports',
+        loadChildren: () => import('../agency/reports/reports.module').then((m) => m.AgencyReportsModule),
+        data: {
+          isOrganizationArea: false,
           isAgencyArea: true,
         },
       },

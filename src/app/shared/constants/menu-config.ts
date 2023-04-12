@@ -121,7 +121,11 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: 'agency/invoices',
     },
-    26: reportsMenuItemConfiguration,
+    26: {
+      // Reports
+      icon: 'pie-chart',
+      route: 'agency/reports/financial-timesheet-report',
+    }, 
     28: {
       // Associated Organizations
       icon: 'clock',
@@ -524,7 +528,11 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: 'agency/invoices',
     },
-    26: reportsMenuItemConfiguration,
+    26: {
+      // Reports
+      icon: 'pie-chart',
+      route: 'agency/reports/financial-timesheet-report',
+    }, 
     27: {
       // Settings
       icon: '',
@@ -1130,7 +1138,11 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: 'agency/invoices',
     },
-    26: reportsMenuItemConfiguration,
+   26: {
+      // Reports
+      icon: 'pie-chart',
+     route: 'agency/reports/financial-timesheet-report',
+    }, 
     27: {
       // Settings
       icon: 'user',
