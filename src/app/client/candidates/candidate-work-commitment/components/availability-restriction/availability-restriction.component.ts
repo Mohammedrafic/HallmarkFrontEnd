@@ -78,9 +78,9 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
         take(1)
       )
       .subscribe(() => {
-        const MESSAGE = event.id ? RECORD_MODIFIED : RECORD_ADDED;
+        const toastMessage = event.id ? RECORD_MODIFIED : RECORD_ADDED;
 
-        this.store.dispatch(new ShowToast(MessageTypes.Success, MESSAGE));
+        this.store.dispatch(new ShowToast(MessageTypes.Success, toastMessage));
         this.dialogSubject$.next({ isOpen: false });
         this.cdr.markForCheck();
       });

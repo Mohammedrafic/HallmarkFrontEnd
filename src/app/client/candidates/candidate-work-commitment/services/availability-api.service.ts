@@ -40,9 +40,9 @@ export class AvailabilityApiService {
   public saveAvailabilityRestriction(avalRestriction: AvailabilityRestriction): Observable<AvailabilityRestriction> {
     if (avalRestriction.id) {
       return this.updateAvailabilityRestriction(avalRestriction);
-    } else {
-      return this.createAvailabilityRestriction(avalRestriction);
-    }
+    } 
+      
+    return this.createAvailabilityRestriction(avalRestriction);
   }
 
   public deleteAvailabilityRestriction(id: number): Observable<void> {
