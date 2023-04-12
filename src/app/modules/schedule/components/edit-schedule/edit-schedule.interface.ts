@@ -35,7 +35,7 @@ export interface ScheduledShiftForm {
   unavailabilityReasonId?: number;
   orientated?: boolean,
   critical?: boolean,
-  onCall?: boolean,
+  oncall?: boolean,
   charge?: boolean,
   preceptor?: boolean,
 }

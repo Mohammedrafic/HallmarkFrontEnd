@@ -16,15 +16,15 @@
   </div>
 
   <div class="sidebar-content">
-    <div class="events-wrapper" *ngIf="selectedDaySchedule">
+    <div #tabs class="tabs-wrapper" *ngIf="selectedDaySchedule">
       <div
-        class="event"
+        class="tab"
         *ngFor="let tab of shiftTabs; trackBy: trackByTabs"
         [class.selected]="selectedDayScheduleId === tab.id"
         (click)="changeTab(tab.id)"
       >
-        <div class="event-title">{{tab.title}}</div>
-        <div class="event-sub-title">{{tab.subTitle}}</div>
+        <div class="tab__title">{{tab.title}}</div>
+        <div class="tab__sub-title">{{tab.subTitle}}</div>
       </div>
     </div>
     <div class="add-new-schedule">

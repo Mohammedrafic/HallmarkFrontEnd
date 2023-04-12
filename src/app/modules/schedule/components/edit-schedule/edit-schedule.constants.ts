@@ -93,7 +93,7 @@ const scheduledShiftFormFields = (filtered: boolean,  createMode: boolean): Edit
       show: true,
     },
     {
-      field: 'onCall',
+      field: 'oncall',
       title: 'OC',
       type: FieldType.Toggle,
       gridAreaName: 'toggle3',
