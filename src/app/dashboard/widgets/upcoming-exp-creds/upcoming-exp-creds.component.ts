@@ -38,8 +38,7 @@ export class UpcomingExpCredsComponent {
   redirect_to_candidate(name : string):void {
 
     var d = new Date();
-    var endDate = new Date(d.setMonth(d.getMonth() + 1));
-
+    var endDate = new Date(Date.now() + 29 * 24 * 60 * 60 * 1000)  
     const startDate = new Date();
 
     var type;
