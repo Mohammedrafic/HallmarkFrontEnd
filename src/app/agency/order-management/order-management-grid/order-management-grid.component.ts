@@ -393,7 +393,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       
     if (!preservedFiltes.isNotPreserved) {
       const { state } = preservedFiltes;
-      const filterState = { ...state, orderStatuses: [...state.orderStatuses as number[]] };
+      const orderStatuses = Array.isArray(state.orderStatuses) ? [...state.orderStatuses] : [];
+      const filterState = { ...state, orderStatuses };
       const filterFormConfig = GetAgencyFilterFormConfig(this.selectedTab);
       this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
       this.patchFilterForm(!!this.filters?.regionIds?.length);
