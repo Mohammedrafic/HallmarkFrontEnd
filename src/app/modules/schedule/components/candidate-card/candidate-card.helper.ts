@@ -2,12 +2,27 @@ import { formatDate } from '@angular/common';
 
 import { LtaAssignment, ScheduleCandidate } from '../../interface';
 
-export const CreateTooltipForOrientation = (candidate: ScheduleCandidate): string => {
-  if(candidate.orientationDate) {
+export const CreateTooltipForOrientation = (candidate: ScheduleCandidate, startDate: string): string => {
+  const candidateOrientation = isCandidateOriented(startDate, candidate.orientationDate);
+
+  if(candidate.orientationDate && candidateOrientation) {
+    return '';
+  } else if(candidate.orientationDate && !candidateOrientation) {
     return `Oriented from ${formatDate(candidate.orientationDate, 'MM/dd/yyyy', 'en-US')}`;
-  } else {
-    return 'Not Oriented';
   }
+
+  return 'Not Oriented';
+};
+
+export const isCandidateOriented = (startDate: string , orientationDate: string | null) => {
+  if(orientationDate) {
+    const startDateWithoutTime = startDate.split('T');
+    const orientationDateWithoutTime = orientationDate?.split('T');
+
+    return new Date(startDateWithoutTime[0]) > new Date(orientationDateWithoutTime[0]);
+  }
+
+  return false;
 };
 
 export const GetCandidateTypeTooltip = (
@@ -68,17 +83,17 @@ export const CreateSkillText = (skill: string): string => {
 
   if(skillText.length > 18) {
     return `${skillText.slice(0,18)}...`;
-  } else {
-    return skillText;
   }
+
+  return skillText;
 };
 
 export const CreateWorkCommitments = (workCommitments: string[]): string => {
   if (workCommitments.length) {
     return  'Work Commitment: ' + workCommitments.join(', ');
-  } else {
-    return 'Work Commitment';
   }
+
+  return 'Work Commitment';
 };
 
 export const CreateWorkCommitmentText = (commitments: string[]) => {
@@ -86,7 +101,7 @@ export const CreateWorkCommitmentText = (commitments: string[]) => {
 
   if(updateWorkCommitments.length > 37) {
     return `${updateWorkCommitments.slice(0,37)}...`;
-  } else {
-    return updateWorkCommitments;
   }
+
+  return updateWorkCommitments;
 };

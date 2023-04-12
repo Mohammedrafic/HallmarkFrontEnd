@@ -12,7 +12,7 @@
       <p class="order-type">L</p>
     </ejs-tooltip>
     <ejs-tooltip
-      *ngIf="candidateIconName"
+      *ngIf="candidateIconName && iconTooltipMessage.length"
       [content]="iconTooltipMessage"
       position="TopCenter"
       [showTipPointer]="false"
