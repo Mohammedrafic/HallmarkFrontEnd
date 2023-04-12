@@ -38,11 +38,19 @@ export class UpcomingExpCredsComponent {
   redirect_to_candidate(name : string):void {
 
     var d = new Date();
-    var endDate = new Date(d.setMonth(d.getMonth() + 1));
-
+    var endDate = new Date(Date.now() + 29 * 24 * 60 * 60 * 1000)  
     const startDate = new Date();
 
-    this.dashboardService.redirect_to_credentials("/client/candidates",startDate, endDate);
+    var type;
+    if(name == "Licenses"){
+      type = 1;
+    } else if(name == "Certificates"){
+      type = 2;
+    } else {
+      type = 3;
+    }
+
+    this.dashboardService.redirect_to_credentials("/client/candidates",startDate, endDate, type);
   }
 
   public load(args: ILoadedEventArgs): void {

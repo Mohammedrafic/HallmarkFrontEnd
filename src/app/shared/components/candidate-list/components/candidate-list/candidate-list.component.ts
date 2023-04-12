@@ -121,8 +121,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     skillsIds: [],
     tab: 0,
     expiry : {},
-    credEndDate : null,
-    credStartDate : null,
+    endDate : null,
+    startDate : null,
     credType : []
   };
   public CandidateFilterFormGroup: FormGroup;
@@ -212,8 +212,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.filters = this.CandidateFilterFormGroup.getRawValue();
     const expiry = {
       type : this.filters.credType,
-      startDate : this.filters.credStartDate,
-      endDate : this.filters.credEndDate
+      startDate : this.filters.startDate,
+      endDate : this.filters.endDate
     }
     this.filters.profileStatuses = this.filters.profileStatuses || [];
     this.filters.regionsNames = this.filters.regionsNames || [];
@@ -347,11 +347,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public dispatchNewPage(): void {
-    if(this.credStartDate != undefined){
-      this.filters.credType = [this.credType];
-      this.filters.credStartDate = DateTimeHelper.toUtcFormat(this.credStartDate);
-      this.filters.credEndDate = DateTimeHelper.toUtcFormat(this.credEndDate);
-    }
+    
     const candidateListRequest: CandidateListRequest = {
       orderBy: '',
       pageNumber: this.currentPage,
@@ -370,8 +366,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       hireDate: this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
       expiry : {
         type : this.filters.credType,
-        credStartDate : this.filters.credStartDate,
-        credEndDate : this.filters.credEndDate
+        startDate : this.filters.startDate,
+        endDate : this.filters.endDate
       }
     };
     this.store.dispatch(
@@ -497,6 +493,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       filter(({ dispatch }) => dispatch),
       tap((filters) => {
         this.filters = { ...filters.state };
+        if(this.credStartDate != undefined){
+          this.filters.startDate = DateTimeHelper.toUtcFormat(this.credStartDate);
+        }
+        if(this.credEndDate != undefined){
+          this.filters.endDate = DateTimeHelper.toUtcFormat(this.credEndDate);
+        }
+        if(this.credType != null){
+          this.filters.credType = [this.credType];
+        }
         this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
       }),
       takeUntil(this.unsubscribe$)

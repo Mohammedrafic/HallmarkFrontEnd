@@ -94,8 +94,8 @@ export class CandidateListService {
       primarySkillIds: new FormControl([]),
       secondarySkillIds: new FormControl([]),
       hireDate: new FormControl(null),
-      credStartDate: new FormControl(null),
-      credEndDate: new FormControl(null),
+      startDate: new FormControl(null),
+      endDate: new FormControl(null),
       credType : new FormControl([])
     }); 
   }
@@ -115,8 +115,8 @@ export class CandidateListService {
       primarySkillIds: filters.primarySkillIds || [],
       secondarySkillIds: filters.secondarySkillIds || [],
       hireDate: filters.hireDate || null,
-      credStartDate: filters.credStartDate || null,
-      credEndDate: filters.credEndDate || null,
+      startDate: filters.startDate || null,
+      endDate: filters.endDate || null,
       credType: filters.credType || []
     });
   }
