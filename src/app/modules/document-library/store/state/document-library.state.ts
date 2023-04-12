@@ -1,4 +1,4 @@
-import { GetDocumentsByCognitiveSearch, GetSharedDocumentInformation } from './../actions/document-library.actions';
+import { ClearLocationsAndRegions, GetDocumentsByCognitiveSearch, GetSharedDocumentInformation } from './../actions/document-library.actions';
 import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
@@ -420,5 +420,11 @@ export class DocumentLibraryState {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
+  }
+
+  
+  @Action(ClearLocationsAndRegions)
+  ClearOrganizationStructure({ patchState }: StateContext<DocumentLibraryStateModel>) : DocumentLibraryStateModel {
+    return patchState({ locations: null,regions:null });
   }
 }

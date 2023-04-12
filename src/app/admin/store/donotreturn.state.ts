@@ -113,6 +113,7 @@ export class DonotReturnState {
     patchState({ donotloadings: true });
     return this.DonotreturnService.getDonotreturn(pageNumber, pageSize, filters).pipe(
       tap((payload) => {
+        payload.items.sort((a, b) => (a.firstName as string).localeCompare(b.firstName as string)) 
         patchState({ donotloadings: false, donotreturnpage: payload });
         return payload;
       })

@@ -8,7 +8,6 @@
 
 
     <e-columns>
-      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
@@ -34,14 +33,14 @@
           {{ data.ssn != null ? "XXX-XX-" + data.ssn.toString().substr(data.ssn.toString().length - 4):"" }}
         </ng-template>
       </e-column>
-      <e-column field="dnrStatus" headerText="dnrstatus" width=250>
+      <e-column field="dnrStatus" headerText="Current Status" width=250>
       </e-column>
-      <e-column field="dnrDate" headerText="dnrDate" width=250>
+      <e-column field="dnrDate" headerText="Date Blocked" width=250>
         <ng-template #template let-data>
-          {{ data.dnrDate | date: "MM/dd/yyyy HH:mm":"utc": "en-US" }}
+          {{ data.dnrDate | date: "MM/dd/yyyy":"utc": "en-US" }}
         </ng-template>
       </e-column>
-      <e-column field="dnrComment" headerText="dnrComment" width=250>
+      <e-column field="dnrComment" headerText="Reason for Blocking" width=250>
       </e-column>
 
     </e-columns>
@@ -78,8 +77,18 @@
   header="{{ isEdit ? 'Edit' : 'Add' }} Do Not Return">
   <form [formGroup]="doNotReturnFormGroup" class="donotreturn-form">
     <div class="input-container bootstrap" *ngIf="isEdit">
-      <ejs-switch id="switcher" (change)="onSwitcher($event);" [checked]="isBlock"></ejs-switch>
+      <ejs-switch id="switcher" (change)="onSwitcher($event);" [checked]="!isBlock"></ejs-switch>
       <label for="switcher" class="switch-text">{{isBlock?'Unblock':'Block'}}</label>
+    </div>
+    
+    <div class="input-container bootstrap">
+      <label>Organization<span class="required">*</span></label>
+      <div class="input-group">
+        <ejs-dropdownlist appValidateWithMessage formControlName="businessUnitId" [fields]="optionFields"
+          [allowFiltering]="true" [dataSource]="allOrganizations$ | async"
+          (select)="onOrganizationDropDownChanged($event)">
+        </ejs-dropdownlist>
+      </div>
     </div>
 
     <div class="form-elemet">
@@ -109,15 +118,7 @@
     </div>
 
 
-    <div class="input-container bootstrap">
-      <label>Organization<span class="required">*</span></label>
-      <div class="input-group">
-        <ejs-dropdownlist appValidateWithMessage formControlName="businessUnitId" [fields]="optionFields"
-          [allowFiltering]="true" [dataSource]="allOrganizations$ | async"
-          (select)="onOrganizationDropDownChanged($event)">
-        </ejs-dropdownlist>
-      </div>
-    </div>
+
     
     <div class="form-elemet">
       <div class="group">
@@ -146,7 +147,7 @@
 
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Comment</label>
+        <label>Reason for blocking</label>
         <div class="input-group">
           <textarea class="e-input" type="text" rows="3" maxlength="3000" appValidateWithMessage name="dnrComment"
             formControlName="dnrComment" tabindex="9"></textarea>
