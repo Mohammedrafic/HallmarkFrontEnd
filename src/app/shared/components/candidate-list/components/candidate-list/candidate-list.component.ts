@@ -348,9 +348,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public dispatchNewPage(): void {
     if(this.credStartDate != undefined){
-      this.filters.credType = [this.credType];
       this.filters.credStartDate = DateTimeHelper.toUtcFormat(this.credStartDate);
+    }
+    if(this.credEndDate != undefined){
       this.filters.credEndDate = DateTimeHelper.toUtcFormat(this.credEndDate);
+    }
+    if(this.credType != null){
+      this.filters.credType = [this.credType];
     }
     const candidateListRequest: CandidateListRequest = {
       orderBy: '',
