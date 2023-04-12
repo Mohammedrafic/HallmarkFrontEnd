@@ -1,30 +1,49 @@
-<div class="candidate-row" [class.selected]="selected" >
-  <ng-container *ngFor="let cell of colDefs; trackBy:trackByField">
+<ng-container>
+  <div
+    *ngIf="vmsPosition; else irpPositionTemplate"
+    class="candidate-row vms"
+    [class.selected]="selected"
+    (click)="emitOpenPosition()">
+    <ng-container *ngTemplateOutlet="positionDetails"></ng-container>
+  </div>
+
+  <ng-template #irpPositionTemplate>
     <div
-      class="custom-cell"
-      [ngStyle]="{
-           width: cell?.width + 'px',
-           'min-width': cell.minWidth + 'px',
-           'max-width': cell.maxWidth + 'px'
-      }"
-    >
-      <ng-container
-        *ngIf="cell.field !== 'candidateStatus' && cell.field !== 'orderStatus'; else statusCell"
-      >
-        <p class="custom-cell__value">{{ candidate[cell?.field || ''] }}</p>
-        <h3 class="custom-cell__title">{{ cell?.headerName }}</h3>
-      </ng-container>
-      <ng-template #statusCell>
-        <ng-container *ngIf="candidate[cell?.field || ''] as cellValue">
-          <div [class]="cell?.cellClass">
-            <ejs-chiplist>
-              <e-chips>
-                <e-chip [text]="cellValue" [cssClass]="(cellValue | chipsCssClass)"></e-chip>
-              </e-chips>
-            </ejs-chiplist>
-          </div>
-        </ng-container>
-      </ng-template>
+      class="candidate-row"
+      [class.selected]="selected">
+      <ng-container *ngTemplateOutlet="positionDetails"></ng-container>
     </div>
-  </ng-container>
-</div>
+  </ng-template>
+
+  <ng-template #positionDetails>
+    <ng-container *ngFor="let cell of colDefs; trackBy:trackByField">
+      <div
+        class="custom-cell"
+        [ngStyle]="{
+             width: cell?.width + 'px',
+             'min-width': cell.minWidth + 'px',
+             'max-width': cell.maxWidth + 'px'
+        }"
+      >
+        <ng-container
+          *ngIf="cell.field !== 'candidateStatus' && cell.field !== 'orderStatus'; else statusCell"
+        >
+          <p class="custom-cell__value">{{ candidate[cell?.field || ''] }}</p>
+          <h3 class="custom-cell__title">{{ cell?.headerName }}</h3>
+        </ng-container>
+        <ng-template #statusCell>
+          <ng-container *ngIf="candidate[cell?.field || ''] as cellValue">
+            <div [class]="cell?.cellClass">
+              <ejs-chiplist>
+                <e-chips>
+                  <e-chip [text]="cellValue" [cssClass]="(cellValue | chipsCssClass)"></e-chip>
+                </e-chips>
+              </ejs-chiplist>
+            </div>
+          </ng-container>
+        </ng-template>
+      </div>
+    </ng-container>
+  </ng-template>
+    
+</ng-container>
