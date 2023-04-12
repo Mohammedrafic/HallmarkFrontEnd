@@ -7,6 +7,7 @@ import { EditGeneralNoteModel, GeneralNotesModel } from './general-notes.model';
 import { NavigationWrapperService } from '@shared/services/navigation-wrapper.service';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import isEqual from 'lodash/fp/isEqual';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable()
 export class GeneralNotesService {
@@ -66,5 +67,10 @@ export class GeneralNotesService {
     const newValue = this.notes$.getValue();
     const oldValue = this.candidateProfileFormService.candidateForm.get('generalNotes')?.value;
     return !isEqual(newValue, oldValue);
+  }
+
+  public getExport(filters: ExportPayload): Observable<Blob> {
+   
+    return this.http.post(`/api/employee/export/GeneralNote`, filters, { responseType: 'blob' });
   }
 }

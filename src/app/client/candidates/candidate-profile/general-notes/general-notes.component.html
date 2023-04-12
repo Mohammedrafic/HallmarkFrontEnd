@@ -1,28 +1,22 @@
-<app-grid
-  gridTitle="General Notes"
-  [rowData]="generalNotes$ | async"
-  [columnDefinitions]="columnDef"
-  [rowSelection]="rowSelection"
-  [totalRecordsCount]="(generalNotes$ | async)?.length!"
->
-  <button
-    action-button
-    cssClass="e-action-button"
-    ejs-button
-    [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageIrpCandidateProfile]"
-    (click)="addNote()"
-  >
+<app-grid gridTitle="General Notes" [rowData]="generalNotes$ | async" [columnDefinitions]="columnDef"
+  [rowSelection]="rowSelection" [totalRecordsCount]="(generalNotes$ | async)?.length!">
+  <button ejs-dropdownbutton action-button  [items]="exportOptions" (select)="exportSelected($event)"
+    id="exportButton" cssClass="e-outline button-export">
+    <div class="button-export-container">
+      Export <i-feather name="upload" class="icon"></i-feather>
+    </div>
+  </button>
+  <button action-button cssClass="e-action-button" ejs-button
+    [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageIrpCandidateProfile]" (click)="addNote()">
     <i-feather name="plus" class="icon"></i-feather>
     Add Note
   </button>
 </app-grid>
-
-<app-side-dialog
-  *ngIf="(selectedTab$ | async) === candidateTabsEnum.CandidateProfile"
-  [header]="sideDialogTitle$ | async"
-  (formCancelClicked)="onCancel()"
-  (formSaveClicked)="onSave()"
-  [targetElement]="targetElement"
->
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
+  (export)="export($event)"></app-export-dialog>
+  
+<app-side-dialog *ngIf="(selectedTab$ | async) === candidateTabsEnum.CandidateProfile"
+  [header]="sideDialogTitle$ | async" (formCancelClicked)="onCancel()" (formSaveClicked)="onSave()"
+  [targetElement]="targetElement">
   <app-add-edit-note #addEditNoteComponent></app-add-edit-note>
 </app-side-dialog>
