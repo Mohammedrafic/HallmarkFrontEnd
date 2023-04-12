@@ -419,6 +419,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/grant-report',
     },
+    92: {
+      // Scheduled Hours Report
+      icon: '',
+      route: '/analytics/scheduled-hours',
+    }
   },
 
   [BusinessUnitType.MSP]: {
@@ -621,6 +626,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/staff-list',
     },
+    92: {
+      // Scheduled Hours Report
+      icon: '',
+      route: '/analytics/scheduled-hours',
+    }
   },
 
   [BusinessUnitType.Organization]: {
@@ -1004,6 +1014,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/grant-report',
     },
+    92: {
+      // Scheduled Hours Report
+      icon: '',
+      route: '/analytics/scheduled-hours',
+    }
   },
 
   [BusinessUnitType.Agency]: {

@@ -1,3 +1,4 @@
+import { ScheduledHoursComponent } from './scheduled-hours/scheduled-hours.component';
 import { StaffListComponent } from './staff-list/staff-list.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
@@ -349,6 +350,13 @@ const routes: Routes = [
       {
         path: 'grant-report',
         component: GrantReportComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'scheduled-hours',
+        component: ScheduledHoursComponent,
         data: {
           isOrganizationArea: true,
         }
