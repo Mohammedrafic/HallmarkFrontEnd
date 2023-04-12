@@ -94,7 +94,6 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   readonly createPerDiemOrderControl: FormControl = new FormControl(false);
   readonly scheduleType = ScheduleType;
   readonly scheduleTypesControl: FormControl = new FormControl(ScheduleItemType.Book);
-  readonly newScheduleId = -1;
 
   scheduleForm: CustomFormGroup<EditSchedule.ScheduledShiftForm>;
   scheduleFormConfig: EditSchedule.EditScheduleFormConfig = ScheduledShiftFormConfig(false, false);
@@ -103,12 +102,14 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   scheduledItem: ScheduledItem;
   scheduleItemType = ScheduleItemType.Book;
   selectedDaySchedule: ScheduleItem;
-  selectedDayScheduleId: number;
+  selectedDayScheduleIndex: number;
+  newScheduleIndex: number;
   trackByTabs: TrackByFunction<ShiftTab> = (_: number, tab: ShiftTab) => tab.id;
   replacementOrderDialogOpen = false;
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
 
   private readonly customShiftId = -1;
+  private readonly newScheduleId = -1;
   private filtered = false;
   private filteredSkillId: number | null;
   private scheduleShifts: ScheduleShift[] = [];
@@ -174,15 +175,15 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       });
   }
 
-  changeTab(id: number): void {
-    const schedule = this.scheduledItem.schedule.daySchedules.find(item => item.id === id);
+  changeTab(scheduleIndex: number): void {
+    const schedule = this.scheduledItem.schedule.daySchedules[scheduleIndex];
 
-    if (this.selectedDayScheduleId === this.newScheduleId && id !== this.newScheduleId) {
+    if (this.selectedDayScheduleIndex === this.newScheduleIndex && scheduleIndex !== this.newScheduleIndex) {
       this.removeNewTab();
     }
 
     if (schedule) {
-      this.selectScheduledItem(schedule);
+      this.selectScheduledItem(schedule, scheduleIndex);
     }
   }
 
@@ -234,7 +235,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   addNewSchedule(): void {
     this.shiftTabs = [...this.shiftTabs, { id: this.newScheduleId, title: 'New', subTitle: 'Add scheduling' }];
-    this.selectedDayScheduleId = this.newScheduleId;
+    this.newScheduleIndex = this.shiftTabs.length - 1;
+    this.selectedDayScheduleIndex = this.newScheduleIndex;
     this.createBookFormForNewTab();
     this.scrollToNewScheduleTab();
   }
@@ -491,7 +493,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.cdr.markForCheck();
   }
 
-  private selectScheduledItem(schedule: ScheduleItem): void {
+  private selectScheduledItem(schedule: ScheduleItem, scheduleIndex = 0): void {
     const patchData = {} as EditSchedule.ScheduledShiftForm;
 
     if (!this.hasInitData) {
@@ -499,7 +501,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     this.selectedDaySchedule = schedule;
-    this.selectedDayScheduleId = schedule.id;
+    this.selectedDayScheduleIndex = scheduleIndex;
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Book) {
       this.scheduleFormConfig = ScheduledShiftFormConfig(false, this.isCreateMode());
@@ -727,7 +729,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   }
 
   private isCreateMode(): boolean {
-    return this.selectedDayScheduleId === this.newScheduleId;
+    return this.selectedDayScheduleIndex === this.newScheduleIndex;
   }
 
   @OutsideZone

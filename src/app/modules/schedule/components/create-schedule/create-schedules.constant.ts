@@ -8,7 +8,7 @@ export const Icons = {
 
 export const StartTimeField = 'startTime';
 export const EndTimeField = 'endTime';
-export const ToggleControls = ['critical','onCall','charge', 'preceptor'];
+export const ToggleControls = ['critical', 'onCall', 'charge', 'preceptor', 'oncall'];
 export const ScheduleControlsToReset = [
   'shiftId',
   'startTime',
