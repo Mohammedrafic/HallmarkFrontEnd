@@ -28,7 +28,7 @@
       </div>
     </div>
     <div class="add-new-schedule">
-      <div *ngIf="selectedDayScheduleIndex === newScheduleIndex" class="input-container schedule-types">
+      <div *ngIf="isCreateMode" class="input-container schedule-types">
         <ng-container *ngFor="let type of scheduleTypes">
           <div class="input-group radio">
             <app-tooltip-container [showToolTip]="type.disabled">
@@ -44,7 +44,7 @@
           </div>
         </ng-container>
       </div>
-      <div *ngIf="selectedDayScheduleIndex !== newScheduleIndex" class="add-btn-container">
+      <div *ngIf="!isCreateMode" class="add-btn-container">
         <button
           ejs-button
           cssClass="e-outline"
@@ -136,7 +136,7 @@
     </div>
   </div>
 
-  <div *ngIf="selectedDayScheduleIndex !== newScheduleIndex" class="sidebar-footer">
+  <div *ngIf="!isCreateMode" class="sidebar-footer">
     <div class="checkbox-container bootstrap" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
       <ejs-checkbox [formControl]="createPerDiemOrderControl" label="Create Per Diem Order"></ejs-checkbox>
     </div>

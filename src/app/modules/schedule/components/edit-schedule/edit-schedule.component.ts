@@ -104,6 +104,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   selectedDaySchedule: ScheduleItem;
   selectedDayScheduleIndex: number;
   newScheduleIndex: number;
+  isCreateMode = false;
   trackByTabs: TrackByFunction<ShiftTab> = (_: number, tab: ShiftTab) => tab.id;
   replacementOrderDialogOpen = false;
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
@@ -205,7 +206,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.scheduleItemType = type;
 
     if (type === ScheduleItemType.Book) {
-      this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.isCreateMode());
+      this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
       this.watchForRegionControls();
 
@@ -216,12 +217,12 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     if (type === ScheduleItemType.Unavailability) {
-      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.isCreateMode());
+      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledUnavailabilityForm();
     }
 
     if (type === ScheduleItemType.Availability) {
-      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.isCreateMode());
+      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledAvailabilityForm();
     }
 
@@ -237,6 +238,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.shiftTabs = [...this.shiftTabs, { id: this.newScheduleId, title: 'New', subTitle: 'Add scheduling' }];
     this.newScheduleIndex = this.shiftTabs.length - 1;
     this.selectedDayScheduleIndex = this.newScheduleIndex;
+    this.isCreateMode = true;
     this.createBookFormForNewTab();
     this.scrollToNewScheduleTab();
   }
@@ -252,7 +254,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       return;
     }
 
-    if (!this.isCreateMode()) {
+    if (!this.isCreateMode) {
       this.updateScheduledShift();
       return;
     }
@@ -390,7 +392,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((skills: Skill[]) => {
       const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
-      const skillId = this.selectedDaySchedule?.orderMetadata?.primarySkillId && !this.isCreateMode()
+      const skillId = this.selectedDaySchedule?.orderMetadata?.primarySkillId && !this.isCreateMode
         ? this.selectedDaySchedule?.orderMetadata?.primarySkillId
         : skillOption[0]?.value;
       this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = skillOption;
@@ -467,6 +469,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private removeNewTab(): void {
     this.shiftTabs = GetScheduleTabItems(this.scheduledItem.schedule.daySchedules);
+    this.isCreateMode = false;
   }
 
   private createBookFormForNewTab(): void {
@@ -478,7 +481,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     this.updateDataSource();
-    this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.isCreateMode());
+    this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.isCreateMode);
     this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
     this.watchForRegionControls();
     this.watchForShiftControl();
@@ -504,7 +507,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.selectedDayScheduleIndex = scheduleIndex;
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Book) {
-      this.scheduleFormConfig = ScheduledShiftFormConfig(false, this.isCreateMode());
+      this.scheduleFormConfig = ScheduledShiftFormConfig(false, this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
       patchData.regionId = this.selectedDaySchedule.orderMetadata?.regionId;
       patchData.orientated = this.selectedDaySchedule.attributes.orientated;
@@ -516,13 +519,13 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Unavailability) {
-      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.isCreateMode());
+      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledUnavailabilityForm();
       patchData.unavailabilityReasonId = this.selectedDaySchedule.unavailabilityReasonId;
     }
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Availability) {
-      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.isCreateMode());
+      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledAvailabilityForm();
     }
 
@@ -677,7 +680,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     let selectedType: ScheduleItemType | ScheduleType;
     let type: typeof ScheduleItemType | typeof ScheduleType;
 
-    if (this.isCreateMode()) {
+    if (this.isCreateMode) {
       type = ScheduleItemType;
       selectedType = this.scheduleItemType;
     } else {
@@ -726,10 +729,6 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     } else {
       this.scheduleForm.get('orientated')?.enable();
     }
-  }
-
-  private isCreateMode(): boolean {
-    return this.selectedDayScheduleIndex === this.newScheduleIndex;
   }
 
   @OutsideZone
