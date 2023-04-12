@@ -269,20 +269,29 @@ export class CreateScheduleService {
     return (scheduleTypes.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
   }
 
-  updateScheduleFormClass = (className: string, isCustom: boolean): string => {
-    const formClassName = className.split('-');
+  updateScheduleFormClass(scheduleType: ScheduleItemType, isCustom: boolean): string {
+    let className = ScheduleClassesList[ScheduleItemType.Book];
 
-    if(formClassName.includes('book')) {
-      return isCustom ?
-        ScheduleCustomClassesList[ScheduleItemType.Book] : ScheduleClassesList[ScheduleItemType.Book];
-    } else if(formClassName.includes('availability')) {
-      return isCustom ?
-        ScheduleCustomClassesList[ScheduleItemType.Availability] : ScheduleClassesList[ScheduleItemType.Availability];
-    } else {
-      return isCustom ?
-        ScheduleCustomClassesList[ScheduleItemType.Unavailability] : ScheduleClassesList[ScheduleItemType.Unavailability];
+    if (scheduleType === ScheduleItemType.Book) {
+      className = isCustom
+        ? ScheduleCustomClassesList[ScheduleItemType.Book]
+        : ScheduleClassesList[ScheduleItemType.Book];
     }
-  };
+
+    if (scheduleType === ScheduleItemType.Availability) {
+      className = isCustom
+        ? ScheduleCustomClassesList[ScheduleItemType.Availability]
+        : ScheduleClassesList[ScheduleItemType.Availability];
+    }
+
+    if (scheduleType === ScheduleItemType.Unavailability){
+      className = isCustom
+        ? ScheduleCustomClassesList[ScheduleItemType.Unavailability]
+        : ScheduleClassesList[ScheduleItemType.Unavailability];
+    }
+
+    return className;
+  }
 
   getShiftDropDownsData(scheduleFilterStructure: ScheduleFilterStructure): ShiftDropDownsData {
     const scheduleFiltersData: ScheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
