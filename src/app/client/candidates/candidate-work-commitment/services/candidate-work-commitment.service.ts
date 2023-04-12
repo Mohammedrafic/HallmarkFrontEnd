@@ -3,7 +3,11 @@ import { Injectable } from '@angular/core';
 import { WorkCommitmentDetails } from '@organization-management/work-commitment/interfaces';
 import { HolidaysPage } from '@shared/models/holiday.model';
 import { map, Observable } from 'rxjs';
-import { CandidateWorkCommitment, CandidateWorkCommitmentsPage, WorkCommitmentDataSource } from '../models/candidate-work-commitment.model';
+import {
+  CandidateWorkCommitment,
+  CandidateWorkCommitmentsPage,
+  WorkCommitmentDataSource,
+} from '../models/candidate-work-commitment.model';
 
 @Injectable()
 export class CandidateWorkCommitmentService {

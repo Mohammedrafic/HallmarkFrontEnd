@@ -41,6 +41,9 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
   public controlTypes = ControlTypes;
   public title = 'Add';
   public format = formatTime;
+  public placeholder = formatTime.toUpperCase();
+  public restrictionId: number | null = null;
+  public readonly timepickerMask = { hour: 'HH', minute: 'MM' };
 
   constructor(
     private readonly availabilityService: AvailabilityService,
@@ -56,12 +59,18 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
   public ngOnInit(): void {
     this.initForm();
     this.openCloseDialog();
+    this.watchForFormGroupChanges();
   }
 
   public submitForm(): void {
     if (this.formGroup.valid) {
       const formData = this.formGroup.getRawValue();
-      const payload = this.availabilityService.createRestrictionPayload(formData, this.employeeId);
+      const payload = this.availabilityService.createRestrictionPayload(
+        formData,
+        this.employeeId,
+        this.restrictionId,
+      );
+
       this.saveAvailabilityRestriction.emit(payload);
     } else {
       this.formGroup.markAllAsTouched();
@@ -96,6 +105,7 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
   private editAvailabilityRestriction(data?: AvailabilityRestriction): void {
     if (data) {
       this.title = 'Edit';
+      this.restrictionId = data.id as number;
 
       this.formGroup.patchValue({
         ...data,
@@ -104,6 +114,7 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
       });
     } else {
       this.title = 'Add';
+      this.restrictionId = null;
     }
   }
 
@@ -129,5 +140,13 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
   private closeSideDialog(): void {
     this.sideDialog.hide();
     this.formGroup.reset();
+  }
+
+  private watchForFormGroupChanges(): void {
+    this.formGroup.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.cdr.markForCheck();
+    });
   }
 }

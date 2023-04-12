@@ -16,6 +16,7 @@ import { CandidateWorkCommitment, CandidateWorkCommitmentsPage } from '../../mod
 import { CandidateWorkCommitmentService } from '../../services/candidate-work-commitment.service';
 import { CandidateWorkCommitmentColumnDef } from './candidate-work-commitment-grid.constants';
 import { PagerConfig } from '../../constants/pager-grid-config.constants';
+import { CandidatesService } from '@client/candidates/services/candidates.service';
 
 @Component({
   selector: 'app-candidate-work-commitment-grid',
@@ -32,7 +33,7 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
       this.dispatchNewPage();
     }
   }
-  
+
   @Select(UserState.userPermission)
   currentUserPermissions$: Observable<Permission>;
 
@@ -40,8 +41,8 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
   public columnDef: ColumnDefinitionModel[];
   public rowSelection = undefined;
   public customRowsPerPageDropDownObject = PagerConfig;
-  public pageNumber: number = 1;
-  public pageSize: number = 5;
+  public pageNumber = 1;
+  public pageSize = 5;
   public candidateWorkCommitmentsPage: CandidateWorkCommitmentsPage;
 
   public readonly userPermissions = UserPermissions;
@@ -51,11 +52,16 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
     private candidateWorkCommitmentService: CandidateWorkCommitmentService,
     private store: Store,
     private confirmService: ConfirmService,
+    private candidateSevice: CandidatesService,
   ) {
     super();
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
-    this.columnDef = CandidateWorkCommitmentColumnDef(this.editCommitment.bind(this), this.deleteCommitment.bind(this), todayDate);
+    this.columnDef = CandidateWorkCommitmentColumnDef(
+      this.editCommitment.bind(this),
+      this.deleteCommitment.bind(this),
+      todayDate
+    );
   }
 
   public ngOnInit(): void {
@@ -63,7 +69,11 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
   }
 
   private dispatchNewPage(): void {
-    this.candidateWorkCommitmentService.getCandidateWorkCommitmentByPage(this.pageNumber, this.pageSize, this.employeeId).subscribe((page) => {
+    this.candidateWorkCommitmentService.getCandidateWorkCommitmentByPage(
+      this.pageNumber,
+      this.pageSize,
+      this.employeeId
+    ).subscribe((page) => {
       this.candidateWorkCommitmentsPage = page;
       this.cd.markForCheck();
     });
@@ -80,7 +90,7 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
   }
 
   public handleChangePage(pageNumber: number): void {
-    if(pageNumber && this.pageNumber !== pageNumber) {
+    if (pageNumber && this.pageNumber !== pageNumber) {
       this.pageNumber = pageNumber;
       this.dispatchNewPage();
     }
@@ -93,6 +103,9 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
   private deleteCommitmentHandler(commitment: CandidateWorkCommitment): void {
     this.candidateWorkCommitmentService.deleteCandidateWorkCommitmentById(commitment.id as number).pipe(
       tap(() => {
+        const numberPageRecords = this.candidateWorkCommitmentsPage?.items?.length || 0;
+        this.pageNumber = this.candidateSevice.getGridPageNumber(numberPageRecords, this.pageNumber);
+
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
         this.refreshSubject$.next();
       }),
@@ -104,16 +117,16 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
 
   public deleteCommitment(commitment: CandidateWorkCommitment): void {
     this.confirmService
-    .confirm(DELETE_RECORD_TEXT, {
-      title: DELETE_RECORD_TITLE,
-      okButtonLabel: 'Delete',
-      okButtonClass: 'delete-button',
-    }).pipe(
-      filter(Boolean),
-      takeUntil(this.destroy$),
-    )
-    .subscribe(() => {
-      this.deleteCommitmentHandler(commitment);
-    });
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button',
+      }).pipe(
+        filter(Boolean),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(() => {
+        this.deleteCommitmentHandler(commitment);
+      });
   }
 }

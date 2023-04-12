@@ -11,7 +11,7 @@
     <section class="header-container">
       <div class="e-card-header">
         <div class="e-card-header-caption">
-          <h3 class="e-card-title"> {{ title }} Avail.Restriction</h3>
+          <h3 class="e-card-title"> {{ title }} Avail. Restriction</h3>
         </div>
         <div  class="e-card-content">
           <button
@@ -38,8 +38,10 @@
                 [controlName]="fieldConfig.field"
                 [label]="fieldConfig.title"
                 [required]="true"
-                [placeholder]="format"
+                [placeholder]="placeholder"
                 [format]="format"
+                [maskPlaceholder]="timepickerMask"
+                [enableMask]="true"
               ></app-timepicker>
             </ng-container>
       
