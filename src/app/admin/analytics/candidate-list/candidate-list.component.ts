@@ -58,7 +58,7 @@ export class CandidateListComponent implements OnInit, OnDestroy {
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateList/CandidateList.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateList/CandidateList.cat" };
-  public title: string = "Employee List";
+  public title: string = "Candidate List";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
   public message: string = "";
