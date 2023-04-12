@@ -36,6 +36,24 @@
     <form [formGroup]="scheduleForm" [class]="scheduleFormConfig.formClass">
       <ng-container *ngFor="let control of scheduleFormConfig.formFields">
         <ng-container [ngSwitch]="control.type">
+          <ng-template [ngSwitchCase]="FieldTypes.Toggle">
+            <div class="switch-wrap">
+              <div
+                *ngIf="control.show"
+                class="input-group"
+                [ngStyle]="{'grid-area': control.gridAreaName}"
+              >
+                <ejs-switch
+                  class="switch"
+                  [formControlName]="control.field"
+                ></ejs-switch>
+                <label class="switch-label">
+                  {{control.title}}
+                  <span *ngIf="control.required" class="required">*</span>
+                </label>
+              </div>
+            </div>
+          </ng-template>
           <ng-template [ngSwitchCase]="FieldTypes.Input">
             <div class="input-container bootstrap" [ngStyle]="{'grid-area': control.gridAreaName}">
               <label [for]="control.field">{{ control.title }} <span *ngIf="control.required" class="required">*</span></label>

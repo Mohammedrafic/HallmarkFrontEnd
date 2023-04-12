@@ -106,12 +106,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   }
 
   public closeFilterDialog(): void {
-    this.scheduleFilterFormGroup.setValue({
-      regionIds: this.filters.regionIds || [],
-      locationIds: this.filters.locationIds || [],
-      departmentsIds: this.filters.departmentsIds || [],
-      skillIds: this.filters.skillIds || [],
-    });
     this.scheduleFilterFormGroup.markAsUntouched();
   }
 

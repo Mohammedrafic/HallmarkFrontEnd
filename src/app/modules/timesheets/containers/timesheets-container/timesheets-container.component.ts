@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { DOCUMENT, Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime} from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction, FilterPageName } from '@core/enums';
@@ -144,17 +144,20 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public handleChangeTab(tabIndex: number): void {
+    this.activeTabIdx = tabIndex;
+
     const preservedFilters = this.store.selectSnapshot(
       PreservedFiltersState.preservedFiltersByPageName
     ) as PreservedFiltersByPage<TimesheetsFilterState>;
-    const filters = !preservedFilters.isNotPreserved ? preservedFilters.state : {}
-    this.activeTabIdx = tabIndex;
+    const filters = !preservedFilters.isNotPreserved ? preservedFilters.state : {};
+    const statusIds = this.activeTabIdx === 0 ? filters.statusIds : this.tabConfig[tabIndex].value;
     this.grid?.gridInstance$?.value.columnApi.resetColumnState();
+
     this.store.dispatch(
       new Timesheets.UpdateFiltersState(
         {
-          statusIds: this.tabConfig[tabIndex].value,
-          ...filters
+          ...filters,
+          statusIds,
         },
         this.activeTabIdx !== 0,
         true
@@ -189,7 +192,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
           ...filters,
         },
         this.activeTabIdx !== 0
-      )
+      ),
     ]
     );
     this.store.dispatch(new ShowFilterDialog(false));
@@ -229,13 +232,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public handleBulkEvent(event: BulkActionDataModel): void {
-    if(event.type === BulkTypeAction.APPROVE) {
+    if (event.type === BulkTypeAction.APPROVE) {
       this.bulkApprove(event.items);
     }
   }
 
-  public handleExport(event:RowNode[]):void{
-    let nodes=event;
+  public handleExport(event: RowNode[]): void {
+    const nodes = event;
     if (nodes.length) {
       this.gridSelections.selectedTimesheetIds = nodes.map((node) => node.data.timesheetId);
       this.gridSelections.rowNodes = nodes;
@@ -328,8 +331,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });    
 
         this.store.dispatch([
-           new Timesheets.UpdateFiltersState(
-            { organizationId: this.isAgency && (this.businessUnitId ?? 0) > 0 ? this.businessUnitId : orgId },
+          new Timesheets.UpdateFiltersState(
+            {
+              organizationId: this.isAgency && (this.businessUnitId ?? 0) > 0 ? this.businessUnitId : orgId,
+              ...this.filters,
+            },
             this.activeTabIdx !== 0
           ),
           new Timesheets.GetFiltersDataSource(),
@@ -401,7 +407,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private getPageName(): FilterPageName {
-    if(this.isAgency) {
+    if (this.isAgency) {
       return FilterPageName.TimesheetsVMSAgency;
     } else {
       return FilterPageName.TimesheetsVMSOrganization;

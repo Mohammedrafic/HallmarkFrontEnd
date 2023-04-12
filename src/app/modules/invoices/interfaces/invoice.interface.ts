@@ -82,7 +82,7 @@ export interface InvoicesFilterState {
   dueDateTo?: string;
   paidDateFrom?: string;
   paidDateTo?: string;
-  orderIds?: string[];
+  orderId?: string;
   timesheetType?: number;
   regionIds?: number[];
   locationIds?: number[];

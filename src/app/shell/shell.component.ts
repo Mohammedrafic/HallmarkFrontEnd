@@ -1,7 +1,5 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   ElementRef,
   NgZone,
@@ -59,12 +57,12 @@ import {
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { MenuItemNames } from './shell.constant';
 import { ProfileMenuItem, THEME } from './shell.enum';
+import { UserService } from '@shared/services/user.service';
 
 @Component({
   selector: 'app-shell',
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('sidebar') sidebar: SidebarComponent;
@@ -165,6 +163,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   private isDialogOpen = false;
   private permissions: CurrentUserPermission[] = [];
   private orderMenuItems: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
+  private irpVmsHelpSiteUrl = 'https://eiiohelp.einsteinii.org/';
 
   constructor(
     private store: Store,
@@ -176,7 +175,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     private filterService: FilterService,
     private readonly ngZone: NgZone,
     private ResizeContentService: ResizeContentService,
-    private cd: ChangeDetectorRef,
+    private userService: UserService,
   ) {
     super();
 
@@ -207,6 +206,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.watchForUnreadMessages();
     this.attachElementToResizeObserver();
     this.watchForRouterEvents();
+    this.getSiteHelpUrl();
   }
 
   ngAfterViewInit(): void {
@@ -249,7 +249,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe((isDocked) => {
       this.sidebar.isOpen = isDocked;
-      this.cd.markForCheck();
     });
 
 
@@ -267,13 +266,11 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         //   this.tree.selectedNodes = [activeMenuItem.title];
         // }
       }
-      this.cd.markForCheck();
     });
   }
 
   onAlertSidebarCreated(): void {
     this.sidebar.element.classList.add('e-hidden');
-    this.cd.markForCheck();
   }
 
   toggleSidebar(): void {
@@ -370,7 +367,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     if (user?.businessUnitType === BusinessUnitType.Agency) {
       url = 'https://eiiahelp.einsteinii.org/';
     } else {
-      url = 'https://eiiohelp.einsteinii.org/';
+      url = this.irpVmsHelpSiteUrl;
     }
     window.open(url, '_blank');
   }
@@ -388,7 +385,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     }
 
     this.isMaximized = this.sidebar.isOpen;
-    this.cd.markForCheck();
   }
 
   // TODO: make it with fromEvent and debouncetime
@@ -429,7 +425,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       this.alerts = alertdata;
       this.showAlertSidebar = true;
       this.alertSidebar.show();
-      this.cd.markForCheck();
     });
 
   }
@@ -442,7 +437,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe((alertCountdata) => {
       this.alertsCount = alertCountdata;
-      this.cd.markForCheck();
     });
   }
 
@@ -489,7 +483,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe((x) => {
       this.alerts = x;
-      this.cd.markForCheck();
     });
   }
 
@@ -547,7 +540,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     )
     .subscribe((menuItem: string[]) => {
       this.tree.selectedNodes = menuItem;
-      this.cd.markForCheck();
     });
   }
 
@@ -594,7 +586,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         this.router.navigate([this.sideBarMenu[0].route]);
       }
 
-      this.cd.markForCheck();
     });
   }
 
@@ -604,8 +595,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     if (isMobile) {
       this.store.dispatch(new ToggleSidebarState(false));
     }
-
-    this.cd.markForCheck();
   }
 
   private setSideBarForFirstLoad(route: string): void {
@@ -631,7 +620,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       )
       .subscribe(() => {
         this.isUnreadMessages = true;
-        this.cd.markForCheck();
       });
   }
 
@@ -663,7 +651,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         .pipe(takeUntil(this.componentDestroy()))
         .subscribe((alertCountdata) => {
           this.alertsCount = alertCountdata;
-          this.cd.markForCheck();
         });
 
         this.profileData = [
@@ -720,7 +707,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       this.store.dispatch(new GetAlertsCountForCurrentUser({}));
       this.alertCountStateModel$.subscribe((alertCountdata) => {
         this.alertsCount = alertCountdata;
-        this.cd.markForCheck();
       });
     }, 200000
     );
@@ -746,7 +732,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     ).subscribe((isDark) => {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);
-      this.cd.markForCheck();
     });
   }
 
@@ -769,14 +754,13 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       );
 
       this.removeManageNotificationOptionInHeader();
-      this.cd.markForCheck();
     });
   }
 
   private watchForRouterEvents(): void {
     const scheduleUrl = '/client/scheduling';
 
-    if(this.router.url === scheduleUrl) {
+    if (this.router.url === scheduleUrl) {
       this.isToggleButtonDisable = true;
     }
 
@@ -785,12 +769,22 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       takeUntil(this.componentDestroy()),
     ).subscribe((routeEvent: RouterEvent) => {
       if(routeEvent.url === scheduleUrl) {
-        this.store.dispatch(new ToggleSidebarState(!this.sidebar.isOpen));
         this.tree.collapseAll();
+        this.store.dispatch(new ToggleSidebarState(false));
+        
         this.isToggleButtonDisable = true;
       } else {
         this.isToggleButtonDisable = false;
       }
     });
+  }
+
+  private getSiteHelpUrl(): void {
+    this.userService
+      .getHelpSiteUrl()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(({ url }) => {
+        this.irpVmsHelpSiteUrl = url;
+      });
   }
 }

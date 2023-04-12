@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild ,OnDestroy, ChangeDetectorRef, Inject} from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, ChangeDetectorRef, Inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
-import { Region,Location ,Department} from '@shared/models/visibility-settings.model';
+import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
@@ -23,7 +23,7 @@ import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto,OrderTypeOptionsForReport } from '../models/common-report.model';
+import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto, OrderTypeOptionsForReport } from '../models/common-report.model';
 import { User } from '@shared/models/user.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
@@ -37,8 +37,8 @@ import { DateTime } from '@syncfusion/ej2-angular-charts';
   templateUrl: './candidate-journey.component.html',
   styleUrls: ['./candidate-journey.component.scss']
 })
-export class CandidateJourneyComponent implements OnInit ,OnDestroy{
-  
+export class CandidateJourneyComponent implements OnInit, OnDestroy {
+
   public paramsData: any = {
     "OrganizationParamCJR": "",
     "StartDateParamCJR": "",
@@ -55,14 +55,14 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
     "BearerParamCJR": "",
     "BusinessUnitIdParamCJR": "",
     "HostName": "",
-    "TodayCJR":""
+    "TodayCJR": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateJourney/CandidateJourney.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateJourney/CandidateJourney.cat" };  
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateJourney/CandidateJourney.cat" };
   public message: string = "";
   public title: string = "Candidate Journey";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
-  public allOption:string="All";
+  public allOption: string = "All";
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -85,11 +85,11 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
-  private agencyOrganizationId:number;
+  private agencyOrganizationId: number;
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
-  selectedOrganizations: Organisation[]=[];
+  selectedOrganizations: Organisation[] = [];
 
   @Select(LogiReportState.commonReportFilterData)
   public candidateJourneyFilterData$: Observable<CommonReportFilterOptions>;
@@ -106,10 +106,10 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   public locations: Location[] = [];
   public departments: Department[] = [];
   public organizations: Organisation[] = [];
-  public defaultOrganizations:number;
-  public defaultRegions:(number|undefined)[] =[];
-  public defaultLocations:(number|undefined)[]=[];
-  public defaultDepartments:(number|undefined)[]=[];
+  public defaultOrganizations: number;
+  public defaultRegions: (number | undefined)[] = [];
+  public defaultLocations: (number | undefined)[] = [];
+  public defaultDepartments: (number | undefined)[] = [];
   public defaultSkillCategories: (number | undefined)[] = [];
   public defaultOrderTypes: (number | undefined)[] = [];
   public defaultSkills: (number | undefined)[] = [];
@@ -117,26 +117,26 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   public locationsList: Location[] = [];
   public departmentsList: Department[] = [];
   public today = new Date();
-  public filteredItems: FilteredItem[] = [];  
+  public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
   public isInitialLoad: boolean = false;
-  public user: User | null;  
+  public user: User | null;
   public organizationFields = ORGANIZATION_DATA_FIELDS;
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   selectedSkillCategories: SkillCategoryDto[];
-  selectedSkills: MasterSkillDto[];  
+  selectedSkills: MasterSkillDto[];
   public baseUrl: string = '';
   private dateFormat = 'MM/dd/yyyy';
   private culture = 'en-US';
   private nullValue = "null";
-  private joinString = ",";  
-  private fixedJobStatusesIncluded:number[]=[3,4,7,8];
-  private fixedCandidateStatusesIncluded:number[]=[1,2,3,4,5,7,10,11,12,13];
+  private joinString = ",";
+  private fixedJobStatusesIncluded: number[] = [3, 4, 7, 8];
+  private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5, 7, 10, 11, 12, 13];
   private orderTypesList = OrderTypeOptionsForReport.filter(i => i.id != 1);
 
   public masterRegionsList: Region[] = [];
@@ -150,23 +150,23 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   skillIdControl: AbstractControl;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
-    private filterService: FilterService,    
+    private filterService: FilterService,
     private changeDetectorRef: ChangeDetectorRef,
-     @Inject(APP_SETTINGS) private appSettings: AppSettings) {
-      this.baseUrl = this.appSettings.host.replace("https://", "").replace("http://", "");
-      this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
-      this.initForm();
-      this.user = this.store.selectSnapshot(UserState.user);
-      if (this.user?.id != null) {
-        this.store.dispatch(new GetOrganizationsStructureAll(this.user?.id));
-      }
-  
+    @Inject(APP_SETTINGS) private appSettings: AppSettings) {
+    this.baseUrl = this.appSettings.host.replace("https://", "").replace("http://", "");
+    this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
+    this.initForm();
+    this.user = this.store.selectSnapshot(UserState.user);
+    if (this.user?.id != null) {
+      this.store.dispatch(new GetOrganizationsStructureAll(this.user?.id));
+    }
+
   }
 
   ngOnInit(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => {  
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
-      this.orderFilterColumnsSetup();      
+      this.orderFilterColumnsSetup();
       //this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
@@ -198,12 +198,12 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),
-        skillCategoryIds:new FormControl([]),
-        skillIds:new FormControl([]),
-        orderTypes:new FormControl([]),
-        jobStatuses:new FormControl([]),
-        candidateStatuses:new FormControl([]),
-        jobId:new FormControl(null)
+        skillCategoryIds: new FormControl([]),
+        skillIds: new FormControl([]),
+        orderTypes: new FormControl([]),
+        jobStatuses: new FormControl([]),
+        candidateStatuses: new FormControl([]),
+        jobId: new FormControl(null)
       }
     );
   }
@@ -271,8 +271,8 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
 
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.candidateJourneyFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
-            if (data != null) {           
-              this.isAlive = false;
+            if (data != null) {
+              this.isAlive = true;
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
@@ -345,8 +345,10 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
         this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
         let skills = masterSkills.filter((i) => data?.includes(i.skillCategoryId));
         this.filterColumns.skillIds.dataSource = skills;
+        this.candidateJourneyForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(skills.map((list) => list.id));
       }
       else {
+        this.filterColumns.skillIds.dataSource = [];
         this.candidateJourneyForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
       }
     });
@@ -368,7 +370,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   }
 
   public SearchReport(): void {
-    
+
 
     this.filteredItems = [];
     let auth = "Bearer ";
@@ -377,8 +379,8 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { businessIds,  candidateStatuses, departmentIds, jobId, 
-      jobStatuses, locationIds, orderTypes,regionIds, skillCategoryIds, skillIds, startDate, endDate } 
+    let { businessIds, candidateStatuses, departmentIds, jobId,
+      jobStatuses, locationIds, orderTypes, regionIds, skillCategoryIds, skillIds, startDate, endDate }
       = this.candidateJourneyForm.getRawValue();
     if (!this.candidateJourneyForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 30 days";
@@ -391,8 +393,8 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
     // locationIds = locationIds.length > 0 ? locationIds.join(",") : [];
     // departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : 'null';
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",")  : "null";
-    locationIds = locationIds.length > 0 ? locationIds.join(",")  : "null";
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
     skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
     skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
@@ -400,9 +402,9 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
 
     this.paramsData =
     {
-      "OrganizationParamCJR":this.selectedOrganizations?.length==0?this.nullValue: this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
+      "OrganizationParamCJR": this.selectedOrganizations?.length == 0 ? this.nullValue : this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
       "StartDateParamCJR": formatDate(startDate, this.dateFormat, this.culture),
-      "EndDateParamCJR":endDate==null?"01/01/0001": formatDate(endDate, this.dateFormat, this.culture),
+      "EndDateParamCJR": endDate == null ? "01/01/0001" : formatDate(endDate, this.dateFormat, this.culture),
       "RegionParamCJR": regionIds.length == 0 ? "null" : regionIds,
       "LocationParamCJR": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentParamCJR": departmentIds.length == 0 ? "null" : departmentIds,
@@ -418,11 +420,11 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "TodayCJR":formatDate(new Date(),this.dateFormat,this.culture)
+      "TodayCJR": formatDate(new Date(), this.dateFormat, this.culture)
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
-  }  
+  }
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
       businessIds: {
@@ -501,18 +503,17 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
         type: ControlTypes.Text,
         valueType: ValueType.Text
       }
-     
+
     }
   }
-  private SetReportData(){
+  private SetReportData() {
     const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
-      if(logiReportData!=null&&logiReportData.length==0)
-      {
-        this.store.dispatch(new GetLogiReportData());
-      }
-      else{
-        this.logiReportComponent?.SetReportData(logiReportData);
-      }
+    if (logiReportData != null && logiReportData.length == 0) {
+      this.store.dispatch(new GetLogiReportData());
+    }
+    else {
+      this.logiReportComponent?.SetReportData(logiReportData);
+    }
   }
   public showFilters(): void {
     if (this.isResetFilter) {

@@ -74,6 +74,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   private filesDetails: Blob[] = [];
   private isRemoveLogo: boolean = false;
   public customMaskChar : string = '';
+  public maskSSNPattern: string = '000-00-0000';
+  public maskedSSN: string = '';
 
 
   public get isCandidateAssigned(): boolean {
@@ -101,7 +103,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
-    store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'clock' }));
+    store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
   }
 
   override ngOnInit(): void {
@@ -223,7 +225,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
           candidateAgencyStatus: CreatedCandidateStatus.Active,
         });
       }
-
+      if(this.maskedSSN != ""){
+        candidate.ssn = parseInt(this.maskedSSN);
+      }
       this.store.dispatch(new SaveCandidate(candidate));
     } else {
       this.candidateForm.markAllAsTouched();
@@ -420,7 +424,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   private getStringSsn(ssn: any): string {
     const stringSsn = String(ssn);
     if (stringSsn.length >= 9) {
-      return stringSsn;
+      this.maskSSNPattern = "AAA-AA-0000";;
+      this.maskedSSN= stringSsn;
+      return "XXX-XX-" + stringSsn.slice(-4);
     } else {
       return this.getStringSsn(`0${ssn}`);
     }
@@ -466,5 +472,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
           this.orderOrPositionTitle = 'Order';
         }
       });
+  }
+
+  updatedSSNValue(val:string): void {
+    this.maskedSSN = val;
   }
 }

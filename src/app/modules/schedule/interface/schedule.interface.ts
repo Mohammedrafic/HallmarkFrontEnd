@@ -16,9 +16,11 @@ export interface ScheduleCandidate {
   ltaAssignment: LtaAssignment | null;
   skill: string;
   skillId: number;
+  orientationDate: string;
   dates: string[];
   orderType: IrpOrderType | null;
   workCommitments: string[] | null;
+  workCommitment: string;
   employeeNote: string;
   workHours?: number;
   isOriented: boolean;
@@ -48,6 +50,7 @@ export interface ScheduleItem {
   unavailabilityReasonId: number;
   shiftId: number;
   floated: boolean;
+  attributes: ScheduleItemAttributes;
   orderMetadata: {
     orderType: IrpOrderType;
     location: string;
@@ -60,6 +63,14 @@ export interface ScheduleItem {
     locationId: number;
     departmentId: number;
   }
+}
+
+export interface ScheduleItemAttributes {
+  charge: boolean;
+  critical: boolean;
+  onCall: boolean;
+  orientated: boolean;
+  preceptor: boolean;
 }
 
 export interface ScheduleModel {

@@ -58,7 +58,7 @@ export class GrantReportComponent implements OnInit {
 
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/GrantReport/GrantReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/GrantReport/GrantReport.cat" };
-  public title: string = "Gant Report";
+  public title: string = "Grant Report";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
 
@@ -273,7 +273,7 @@ export class GrantReportComponent implements OnInit {
             this.filterColumns.agencyIds.dataSource = [];
 
             if (data != null) {
-              this.isAlive = false;
+              this.isAlive = true;
               this.filterOptionsData = data;
               this.agencyIdControl = this.grantReportForm.get(grantReportConstants.formControlNames.AgencyIds) as AbstractControl;
               let agencyIds = data?.agencies;

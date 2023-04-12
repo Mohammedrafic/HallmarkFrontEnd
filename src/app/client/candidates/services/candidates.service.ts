@@ -14,7 +14,8 @@ export class CandidatesService {
   private employeeHireDate: string;
 
   public employeeId: number | null;
-  public constructor(private httpClient: HttpClient) {}
+  
+  public constructor(private httpClient: HttpClient) { }
 
   public getSelectedTab$(): Observable<CandidateTabsEnum> {
     return this.selectedTab$.asObservable();
@@ -60,5 +61,13 @@ export class CandidatesService {
 
   public getEmployeeHireDate(): string {
     return this.employeeHireDate;
+  }
+
+  public getGridPageNumber(items: number, pageNumber: number): number {
+    if (items === 1 && pageNumber > 1) {
+      return pageNumber - 1;
+    }
+
+    return pageNumber;
   }
 }

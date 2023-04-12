@@ -47,6 +47,10 @@ export class GetOrganizationStructure {
   constructor() { }
 }
 
+export class ClearOrganizationStructure {
+  static readonly type = '[user] Clear Organization Structure Of Current User';
+}
+
 export class LastSelectedOrganisationAgency {
   static readonly type = '[user] Last Selected Organization Agency';
   constructor(public payload: string) { }

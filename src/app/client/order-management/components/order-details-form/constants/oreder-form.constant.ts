@@ -69,6 +69,7 @@ export const GeneralInformationControlsConfig = [
     validators: [
       Validators.required,
       ...ValidatorsListForNumber,
+      Validators.min(1),
     ],
   },
   {

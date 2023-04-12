@@ -70,13 +70,13 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  
+
 
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  
+
 
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
@@ -104,7 +104,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  
+
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
   @Select(UserState.lastSelectedOrganizationId)
@@ -280,7 +280,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             if (data != null) {
-              this.isAlive = false;
+              this.isAlive = true;
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
@@ -353,8 +353,10 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
         let skills = masterSkills.filter((i) => data?.includes(i.skillCategoryId));
         this.filterColumns.skillIds.dataSource = skills;
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(skills.map((list) => list.id));
       }
       else {
+        this.filterColumns.skillIds.dataSource = [];
         this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
       }
     });
@@ -564,11 +566,11 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
 
 
   public onFilterApply(): void {
-   
-      this.financialTimesheetReportForm.markAllAsTouched();
-      if (this.financialTimesheetReportForm?.invalid) {
-        return;
-      }
+
+    this.financialTimesheetReportForm.markAllAsTouched();
+    if (this.financialTimesheetReportForm?.invalid) {
+      return;
+    }
     this.filteredItems = [];
     this.SearchReport();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -584,7 +586,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   }
 
   public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
-    this.onFilterChild(e); 
+    this.onFilterChild(e);
   }
   @OutsideZone
   private onFilterChild(e: FilteringEventArgs) {

@@ -46,7 +46,7 @@ import {
   ScheduleFormFieldConfig,
 } from '../../interface';
 import { ScheduleItemsComponent } from '../schedule-items/schedule-items.component';
-import { ScheduleApiService, ScheduleFiltersService, CreateScheduleService } from '../../services';
+import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
 import {
   CreateBookingSuccessMessage,
   CreateScheduleSuccessMessage,
@@ -65,7 +65,12 @@ import { OrganizationStructure } from '@shared/models/organization.model';
 import { EditScheduleFormSourceKeys } from '../edit-schedule/edit-schedule.constants';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { OutsideZone } from '@core/decorators';
-import { EndTimeField, StartTimeField } from './create-schedules.constant';
+import {
+  EndTimeField,
+  ScheduleControlsToReset,
+  ScheduleCustomClassesList,
+  StartTimeField,
+} from './create-schedules.constant';
 
 @Component({
   selector: 'app-create-schedule',
@@ -130,10 +135,14 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    const candidates = changes['scheduleSelectedSlots']?.currentValue.candidates.length;
+    const candidates = changes['scheduleSelectedSlots']?.currentValue.candidates;
 
-    if(candidates && !this.showScheduleForm){
+    if(candidates?.length && !this.showScheduleForm){
       this.showScheduleForm = true;
+    }
+
+    if(candidates && candidates?.length >= 1) {
+      this.createScheduleService.setOrientationControlValue(this.scheduleSelectedSlots, this.scheduleForm);
     }
   }
 
@@ -164,7 +173,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     this.updateScheduleDialogConfig(event.value as unknown as ScheduleItemType);
     this.showShiftTimeFields(false);
     this.scheduleFormConfig.formClass =
-      this.createScheduleService.updateScheduleFormClass(this.scheduleFormConfig.formClass, false);
+      this.createScheduleService.updateScheduleFormClass(this.scheduleType, false);
     this.cdr.markForCheck();
   }
 
@@ -249,6 +258,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
         this.scheduleFormConfig = BookFormConfig;
         this.scheduleForm = this.createScheduleService.createBookForm();
         this.watchForControls();
+        this.createScheduleService.setOrientationControlValue(this.scheduleSelectedSlots, this.scheduleForm);
         this.patchBookForm();
         this.patchBookForSingleCandidate();
         break;
@@ -273,7 +283,14 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
 
     this.shiftControlSubscription = this.scheduleForm.get('shiftId')?.valueChanges
       .pipe(
-       map((shiftId: number) => this.updateConfigWithShiftTime(shiftId)),
+        tap((shiftId: number) => {
+          this.createScheduleService.setOnCallControlValue(
+            this.scheduleForm,
+            shiftId,
+            this.scheduleShifts
+          );
+        }),
+        map((shiftId: number) => this.updateConfigWithShiftTime(shiftId)),
         filter(Boolean),
         takeUntil(this.componentDestroy()),
       ).subscribe((shift: ScheduleShift) => {
@@ -286,14 +303,14 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     if(shiftId === this.customShiftId) {
       this.showShiftTimeFields(true);
       this.scheduleFormConfig.formClass =
-        this.createScheduleService.updateScheduleFormClass(this.scheduleFormConfig.formClass, true);
+        this.createScheduleService.updateScheduleFormClass(this.scheduleType, true);
 
       this.cdr.markForCheck();
       return;
     } else {
       this.showShiftTimeFields(false);
       this.scheduleFormConfig.formClass =
-        this.createScheduleService.updateScheduleFormClass(this.scheduleFormConfig.formClass, false);
+        this.createScheduleService.updateScheduleFormClass(this.scheduleType, false);
 
       this.cdr.markForCheck();
       return this.scheduleShifts.find((shift: ScheduleShift) => shift.id === shiftId);
@@ -360,6 +377,13 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
         this.cdr.markForCheck();
       });
     }
+
+    this.scheduleForm.get('orientated')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((value: boolean) => {
+      this.createScheduleService.hideToggleControls(this.scheduleFormConfig, !value);
+      this.cdr.markForCheck();
+    });
   }
 
   private patchBookForSingleCandidate(): void {
@@ -392,6 +416,8 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   private closeSideBar(): void {
     this.createScheduleService.closeSideBarEvent.next(true);
     this.scheduleItemsService.setErrors([]);
+    this.showShiftTimeFields(false);
+    this.scheduleFormConfig.formClass = this.createScheduleService.updateScheduleFormClass(this.scheduleType, false);
   }
 
   private saveAvailabilityUnavailability(): void {
@@ -414,7 +440,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   private handleSuccessSaveDate(message: string): void {
-    this.createScheduleService.resetScheduleTimeControls(this.scheduleForm, ['shiftId','startTime','endTime','hours']);
+    this.createScheduleService.resetScheduleControls(this.scheduleForm, ScheduleControlsToReset);
     this.createScheduleService.closeSideBarEvent.next(false);
     this.scheduleForm.markAsUntouched();
     this.store.dispatch(new ShowToast(MessageTypes.Success, message));

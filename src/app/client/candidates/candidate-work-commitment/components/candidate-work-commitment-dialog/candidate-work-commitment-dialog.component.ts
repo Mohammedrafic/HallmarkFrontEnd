@@ -22,8 +22,8 @@ import { uniq } from 'lodash';
 import { catchError, distinctUntilChanged, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { CandidateWorkCommitment, WorkCommitmentDataSource } from '../models/candidate-work-commitment.model';
-import { CandidateWorkCommitmentService } from '../services/candidate-work-commitment.service';
+import { CandidateWorkCommitment, WorkCommitmentDataSource } from '../../models/candidate-work-commitment.model';
+import { CandidateWorkCommitmentService } from '../../services/candidate-work-commitment.service';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 
 @Component({
@@ -69,7 +69,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public format = '#.#';
 
   public todayDate = new Date();
-  public lastActiveDate: Date | null;;
+  public lastActiveDate: Date | null;
   public selectWorkCommitmentStartDate: Date;
   public minimumDate: Date | undefined;
   public maximumDate: Date | undefined;

@@ -314,7 +314,6 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     });
   }
 
-
   private getSettings(): void {
     this.store.dispatch(new GetOrganizationSettings());
   }

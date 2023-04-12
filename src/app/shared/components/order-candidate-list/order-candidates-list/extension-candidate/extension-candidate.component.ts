@@ -182,6 +182,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     return this.candidate?.status === ApplicantStatusEnum.Offered;
   }
 
+  get isOffboard(): boolean {
+    return this.candidate?.status === ApplicantStatusEnum.Offboard;
+  }
+
   constructor(
     private store: Store,
     private action$: Actions,
@@ -480,6 +484,16 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
     if (!this.canOnboard) {
       this.form?.controls['allowDeployCredentials']?.disable();
+    }
+
+    if (this.isOffboard) {
+      this.form?.get('guaranteedWorkWeek')?.disable();
+      this.form?.get('allowDeployCredentials')?.disable();
+      this.form?.get('comments')?.disable();
+      this.form?.get('allowDeployCredentials')?.disable();
+      this.form?.get('actualStartDate')?.disable();
+      this.form?.get('actualEndDate')?.disable();
+      this.form?.get('offeredBillRate')?.disable();
     }
   }
 

@@ -94,7 +94,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public showHoursControl: boolean = false;
   public showPercentage: boolean = false;
   public candidatePayRateRequired: boolean;
-  public candidateSSNRequired: boolean;
+  public candidateSSNRequired: boolean=false;
   public candidateDOBRequired: boolean;
   public payRateSetting = CandidatePayRateSettings;
   public candidatePhone1RequiredValue : string = '';

@@ -34,6 +34,25 @@ export class UpcomingExpCredsComponent {
               public filterservice : FilterService) {
               }
 
+
+  redirect_to_candidate(name : string):void {
+
+    var d = new Date();
+    var endDate = new Date(Date.now() + 29 * 24 * 60 * 60 * 1000)  
+    const startDate = new Date();
+
+    var type;
+    if(name == "Licenses"){
+      type = 1;
+    } else if(name == "Certificates"){
+      type = 2;
+    } else {
+      type = 3;
+    }
+
+    this.dashboardService.redirect_to_credentials("/client/candidates",startDate, endDate, type);
+  }
+
   public load(args: ILoadedEventArgs): void {
     let selectedTheme: string = location.hash.split('/')[1];
     selectedTheme = selectedTheme ? selectedTheme : 'Material';

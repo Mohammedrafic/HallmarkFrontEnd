@@ -677,7 +677,6 @@ export class OrderFilter {
   poNumberIds?: number | null;
   orderType?: number | null;
   contactEmails?: string[] | string;
-  orderId?: number | null;
   irpOnly?: boolean | null;
 }
 
@@ -758,6 +757,8 @@ export interface IrpOrderCandidateDto {
   weeklyHoursSchedule: number;
   weekOvertime: number;
   payRate: number;
+  organizationOrientationDate: string | null;
+  departmentOrientationDate: string | null;
 }
 
 export type IrpOrderCandidate = IrpOrderCandidateDto & IrpCandidateShiftTime;

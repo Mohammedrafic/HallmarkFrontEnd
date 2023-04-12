@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Directive, EventEmitter, Inject, Input, Output, View
 
 import { Store } from '@ngxs/store';
 import { Subject, takeUntil } from 'rxjs';
-import { filter , take} from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -93,8 +93,16 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
         this.formGroup.controls['contactEmails'].setValue(contactEmails || '', { emitEvent: false });
         this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
         this.appliedFiltersAmount.emit(this.filteredItems.length);
-      })
+      });
     }
+  }
+
+  public filterPreservedFilters(state: F): F {
+    const filterState = this.activeTabIdx !== 0
+      ? { ...state, statusIds: [] }
+      : state;
+
+    return filterState;
   }
 
   protected initFormGroup(): void {
