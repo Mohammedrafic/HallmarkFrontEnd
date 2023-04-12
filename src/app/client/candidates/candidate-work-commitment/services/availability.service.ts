@@ -17,9 +17,14 @@ export class AvailabilityService {
     }) as CustomFormGroup<AvailabilityRestrictionFormState>;
   }
 
-  public createRestrictionPayload(formData: AvailabilityRestrictionFormState, employeeId: number): AvailabilityRestriction {
+  public createRestrictionPayload(
+    formData: AvailabilityRestrictionFormState,
+    employeeId: number,
+    restrictionId: number | null,
+  ): AvailabilityRestriction {
     return {
       ...formData,
+      id: restrictionId,
       candidateProfileId: employeeId,
       startTime: DateTimeHelper.toUtcFormat(formData.startTime),
       endTime: DateTimeHelper.toUtcFormat(formData.endTime),

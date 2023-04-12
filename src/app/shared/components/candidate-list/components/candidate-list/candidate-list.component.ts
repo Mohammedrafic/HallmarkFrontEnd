@@ -93,6 +93,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   assignedSkills$: Observable<ListOfSkills[]>;
 
+  @Input() public credEndDate: string;
+  @Input() public credStartDate: string;
+  @Input() public credType: number;
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;
 
@@ -117,6 +120,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     regionsNames: [],
     skillsIds: [],
     tab: 0,
+    expiry : {},
+    endDate : null,
+    startDate : null,
+    credType : []
   };
   public CandidateFilterFormGroup: FormGroup;
   public filterColumns: CandidateListFiltersColumn;
@@ -202,6 +209,30 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFilterApply(): void {
+    this.filters = this.CandidateFilterFormGroup.getRawValue();
+    const expiry = {
+      type : this.filters.credType,
+      startDate : this.filters.startDate,
+      endDate : this.filters.endDate
+    }
+    this.filters.profileStatuses = this.filters.profileStatuses || [];
+    this.filters.regionsNames = this.filters.regionsNames || [];
+    this.filters.skillsIds = this.filters.skillsIds || [];
+    this.filters.candidateName = this.filters.candidateName || null;
+    this.filters.expiry = expiry;
+   
+    this.dispatchNewPage();
+    this.store.dispatch(new ShowFilterDialog(false));
+    this.filterService.setPreservedFIltersGlobal(this.filters);
+  }
+
+  private setDefaultFilter(): void {
+    if (this.filterService.canPreserveFilters() && !this.isIRP) {
+      const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersGlobal);
+      if (preservedFilters?.regions) {
+        this.CandidateFilterFormGroup.get('regionsNames')?.setValue([...preservedFilters.regions]);
+        this.filters.regionsNames = [...preservedFilters.regions];
+      }
     if(this.CandidateFilterFormGroup.dirty) {
       this.filters = this.CandidateFilterFormGroup.getRawValue();
       this.filters.profileStatuses = this.filters.profileStatuses || [];
@@ -215,6 +246,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     } else {
       this.store.dispatch(new ShowFilterDialog(false));
     }
+  }
   }
 
 
@@ -315,6 +347,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public dispatchNewPage(): void {
+    
     const candidateListRequest: CandidateListRequest = {
       orderBy: '',
       pageNumber: this.currentPage,
@@ -331,12 +364,18 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       primarySkillIds: this.filters.primarySkillIds!,
       secondarySkillIds: this.filters.secondarySkillIds!,
       hireDate: this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
+      expiry : {
+        type : this.filters.credType,
+        startDate : this.filters.startDate,
+        endDate : this.filters.endDate
+      }
     };
     this.store.dispatch(
       this.isIRP
         ? new GetIRPCandidatesByPage(candidateListRequest)
         : new GetCandidatesByPage(candidateListRequest)
     );
+    this.onFilterClose();
   }
 
   public regionTrackBy(index: number, region: string): string {
@@ -433,8 +472,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private dispatchInitialIcon(): void {
-    this.store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'clock' }));
+    !this.isIRP ? this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' })) : this.store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'clock' }))
   }
+  
 
   private IRPVMSGridHandler(): void {
     if (this.isIRP) {
@@ -454,6 +494,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       filter(({ dispatch }) => dispatch),
       tap((filters) => {
         this.filters = { ...filters.state };
+        if(this.credStartDate != undefined){
+          this.filters.startDate = DateTimeHelper.toUtcFormat(this.credStartDate);
+        }
+        if(this.credEndDate != undefined){
+          this.filters.endDate = DateTimeHelper.toUtcFormat(this.credEndDate);
+        }
+        if(this.credType != null){
+          this.filters.credType = [this.credType];
+        }
         this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
       }),
       takeUntil(this.unsubscribe$)

@@ -3,9 +3,11 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   Inject,
   Input,
+  NgZone,
   OnInit,
   Output,
   TrackByFunction,
@@ -15,15 +17,15 @@ import { FormControl } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
-import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { catchError, EMPTY, filter, map, Observable, Subscription, switchMap, take, takeUntil, tap, zip } from 'rxjs';
 
+import { OutsideZone } from '@core/decorators';
 import { FieldType } from '@core/enums';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_MODIFIED, RECORDS_ADDED } from '@shared/constants';
+import { DELETE_CONFIRM_TITLE, RECORD_MODIFIED, RECORDS_ADDED, UNSAVED_TABS_TEXT } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
@@ -65,7 +67,7 @@ import {
   ScheduledUnavailabilityFormConfig,
 } from './edit-schedule.constants';
 import * as EditSchedule from './edit-schedule.interface';
-import { CreateNewScheduleModeConfig, EditScheduleFormFieldConfig, ShiftTab } from './edit-schedule.interface';
+import { EditScheduleFormFieldConfig, ShiftTab } from './edit-schedule.interface';
 import { EditScheduleService } from './edit-schedule.service';
 
 @Component({
@@ -75,7 +77,7 @@ import { EditScheduleService } from './edit-schedule.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditScheduleComponent extends Destroyable implements OnInit {
-  @ViewChild(TabComponent) tabs: TabComponent;
+  @ViewChild('tabs') private tabs: ElementRef;
 
   @Input() datePickerLimitations: DatePickerLimitations;
   @Input() userPermission: Permission = {};
@@ -92,11 +94,6 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   readonly createPerDiemOrderControl: FormControl = new FormControl(false);
   readonly scheduleType = ScheduleType;
   readonly scheduleTypesControl: FormControl = new FormControl(ScheduleItemType.Book);
-  readonly createModeConfig: CreateNewScheduleModeConfig = {
-    createModeEnabled: false,
-    tabSelected: false,
-    tabIndex: -1,
-  };
 
   scheduleForm: CustomFormGroup<EditSchedule.ScheduledShiftForm>;
   scheduleFormConfig: EditSchedule.EditScheduleFormConfig = ScheduledShiftFormConfig(false, false);
@@ -105,6 +102,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   scheduledItem: ScheduledItem;
   scheduleItemType = ScheduleItemType.Book;
   selectedDaySchedule: ScheduleItem;
+  selectedDayScheduleIndex: number;
+  newScheduleIndex: number;
+  isCreateMode = false;
   trackByTabs: TrackByFunction<ShiftTab> = (_: number, tab: ShiftTab) => tab.id;
   replacementOrderDialogOpen = false;
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
@@ -123,10 +123,12 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     locationId: null,
     departmentId: null,
     orientated: null,
+    date: null,
   };
 
   constructor(
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
+    private readonly ngZone: NgZone,
     private editScheduleService: EditScheduleService,
     private createScheduleService: CreateScheduleService,
     private scheduleApiService: ScheduleApiService,
@@ -141,12 +143,13 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   ngOnInit(): void {
     this.setScheduleTypes();
+    this.setInitData();
   }
 
   closeSchedule(): void {
     if (this.scheduleForm?.touched) {
       this.confirmService.confirm(
-        CANCEL_CONFIRM_TEXT,
+        UNSAVED_TABS_TEXT,
         {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
@@ -169,30 +172,20 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.hasInitData = true;
-        this.selectScheduledItem(0);
+        this.selectScheduledItem(this.scheduledItem.schedule.daySchedules[0]);
       });
   }
 
-  changeTab(event: SelectingEventArgs): void {
-    if (!event.isInteracted && !this.createModeConfig.createModeEnabled) {
-      return;
-    }
+  changeTab(scheduleIndex: number): void {
+    const schedule = this.scheduledItem.schedule.daySchedules[scheduleIndex];
 
-    if (this.createModeConfig.createModeEnabled && !this.createModeConfig.tabSelected) {
-      this.selectNewTab();
-      return;
-    }
-
-    if (this.createModeConfig.tabIndex === event.selectedIndex) {
-      this.createBookFormForNewTab();
-      return;
-    }
-
-    if (this.createModeConfig.tabIndex !== event.selectedIndex && this.createModeConfig.tabSelected) {
+    if (this.selectedDayScheduleIndex === this.newScheduleIndex && scheduleIndex !== this.newScheduleIndex) {
       this.removeNewTab();
     }
 
-    this.selectScheduledItem(event.selectedIndex);
+    if (schedule) {
+      this.selectScheduledItem(schedule, scheduleIndex);
+    }
   }
 
   changeTimeControls(event: ChangeEventArgs, field: string): void {
@@ -213,7 +206,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.scheduleItemType = type;
 
     if (type === ScheduleItemType.Book) {
-      this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.createModeConfig.createModeEnabled);
+      this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
       this.watchForRegionControls();
 
@@ -224,12 +217,12 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     if (type === ScheduleItemType.Unavailability) {
-      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.createModeConfig.createModeEnabled);
+      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledUnavailabilityForm();
     }
 
     if (type === ScheduleItemType.Availability) {
-      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.createModeConfig.createModeEnabled);
+      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledAvailabilityForm();
     }
 
@@ -238,14 +231,16 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     patchData.date = DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date);
 
     this.scheduleForm.patchValue(patchData);
-    this.checkCandidateIsOrientedField();
     this.cdr.markForCheck();
   }
 
   addNewSchedule(): void {
-    this.createModeConfig.createModeEnabled = true;
     this.shiftTabs = [...this.shiftTabs, { id: this.newScheduleId, title: 'New', subTitle: 'Add scheduling' }];
-    this.createModeConfig.tabIndex = this.shiftTabs.length - 1;
+    this.newScheduleIndex = this.shiftTabs.length - 1;
+    this.selectedDayScheduleIndex = this.newScheduleIndex;
+    this.isCreateMode = true;
+    this.createBookFormForNewTab();
+    this.scrollToNewScheduleTab();
   }
 
   closeReplacementOrderDialog(): void {
@@ -259,7 +254,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       return;
     }
 
-    if (!this.createModeConfig.createModeEnabled) {
+    if (!this.isCreateMode) {
       this.updateScheduledShift();
       return;
     }
@@ -397,7 +392,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((skills: Skill[]) => {
       const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
-      const skillId = this.selectedDaySchedule?.orderMetadata?.primarySkillId && !this.createModeConfig.createModeEnabled
+      const skillId = this.selectedDaySchedule?.orderMetadata?.primarySkillId && !this.isCreateMode
         ? this.selectedDaySchedule?.orderMetadata?.primarySkillId
         : skillOption[0]?.value;
       this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = skillOption;
@@ -412,11 +407,19 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       this.createScheduleService.hideToggleControls(this.scheduleFormConfig as ScheduleFormConfig, !value);
       this.cdr.markForCheck();
     }) || null;
+
+    this.unsubscribe('date');
+    this.subscriptions['date'] = this.scheduleForm.get('date')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.checkCandidateIsOrientedField();
+      this.cdr.markForCheck();
+    }) || null;
   }
 
   private updateScheduledShift(): void {
     const { departmentId, skillId, shiftId, startTime, endTime, date,
-      unavailabilityReasonId, orientated, critical, onCall, charge, preceptor } = this.scheduleForm.getRawValue();
+      unavailabilityReasonId, orientated, critical, oncall, charge, preceptor } = this.scheduleForm.getRawValue();
     const schedule: EditSchedule.ScheduledShift = {
       scheduleId: this.selectedDaySchedule.id,
       unavailabilityReasonId,
@@ -429,7 +432,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       createOrder: this.createPerDiemOrderControl.value,
       orientated: orientated || false,
       critical: critical || false,
-      onCall: onCall || false,
+      onCall: oncall || false,
       charge: charge || false,
       preceptor: preceptor || false,
     };
@@ -464,14 +467,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
   }
 
-  private selectNewTab(): void {
-    this.createModeConfig.tabSelected = true;
-    this.tabs.select(this.createModeConfig.tabIndex);
-  }
-
   private removeNewTab(): void {
-    this.disableCreateNewScheduleMode();
     this.shiftTabs = GetScheduleTabItems(this.scheduledItem.schedule.daySchedules);
+    this.isCreateMode = false;
   }
 
   private createBookFormForNewTab(): void {
@@ -483,7 +481,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     this.updateDataSource();
-    this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.createModeConfig.createModeEnabled);
+    this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.isCreateMode);
     this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
     this.watchForRegionControls();
     this.watchForShiftControl();
@@ -495,39 +493,39 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       skillId: this.getSkillId(),
       date: DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date),
     });
-    this.checkCandidateIsOrientedField();
     this.cdr.markForCheck();
   }
 
-  private selectScheduledItem(index: number): void {
+  private selectScheduledItem(schedule: ScheduleItem, scheduleIndex = 0): void {
     const patchData = {} as EditSchedule.ScheduledShiftForm;
 
     if (!this.hasInitData) {
       return;
     }
 
-    this.selectedDaySchedule = this.scheduledItem.schedule.daySchedules[index];
+    this.selectedDaySchedule = schedule;
+    this.selectedDayScheduleIndex = scheduleIndex;
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Book) {
-      this.scheduleFormConfig = ScheduledShiftFormConfig(false, this.createModeConfig.createModeEnabled);
+      this.scheduleFormConfig = ScheduledShiftFormConfig(false, this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
       patchData.regionId = this.selectedDaySchedule.orderMetadata?.regionId;
       patchData.orientated = this.selectedDaySchedule.attributes.orientated;
       patchData.critical = this.selectedDaySchedule.attributes.critical;
-      patchData.onCall = this.selectedDaySchedule.attributes.onCall;
+      patchData.oncall = this.selectedDaySchedule.attributes.onCall;
       patchData.charge = this.selectedDaySchedule.attributes.charge;
       patchData.preceptor = this.selectedDaySchedule.attributes.preceptor;
       this.watchForRegionControls();
     }
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Unavailability) {
-      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.createModeConfig.createModeEnabled);
+      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledUnavailabilityForm();
       patchData.unavailabilityReasonId = this.selectedDaySchedule.unavailabilityReasonId;
     }
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Availability) {
-      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.createModeConfig.createModeEnabled);
+      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.isCreateMode);
       this.scheduleForm = this.editScheduleService.createScheduledAvailabilityForm();
     }
 
@@ -540,7 +538,6 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     this.scheduleForm.patchValue(patchData);
-    this.checkCandidateIsOrientedField();
     this.cdr.markForCheck();
   }
 
@@ -600,7 +597,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   }
 
   private checkBookingsOverlaps(): void {
-    const { departmentId, skillId, shiftId, startTime, endTime, date, orientated, critical, onCall, charge, preceptor }
+    const { departmentId, skillId, shiftId, startTime, endTime, date, orientated, critical, oncall, charge, preceptor }
       = this.scheduleForm.getRawValue();
     this.scheduleToBook = {
       employeeBookedDays: [{
@@ -615,7 +612,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       createOrder: false,
       orientated: orientated || false,
       critical: critical || false,
-      onCall: onCall || false,
+      onCall: oncall || false,
       charge: charge || false,
       preceptor: preceptor || false,
     };
@@ -647,25 +644,17 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.cdr.markForCheck();
   }
 
-  private disableCreateNewScheduleMode(): void {
-    this.createModeConfig.createModeEnabled = false;
-    this.createModeConfig.tabSelected = false;
-    this.createModeConfig.tabIndex = this.newScheduleId;
-  }
-
   private changeScheduledShift(scheduledItem: ScheduledItem | null) {
     if (scheduledItem && scheduledItem.schedule) {
       this.scheduledItem = scheduledItem;
       this.shiftTabs = GetScheduleTabItems(scheduledItem.schedule.daySchedules);
-      this.selectScheduledItem(0);
-      this.tabs?.select(0);
+      this.selectScheduledItem(this.scheduledItem.schedule.daySchedules[0]);
     }
   }
 
   private handleSuccessAdding(): void {
     this.updateScheduleGrid.emit();
     this.scheduleToBook = null;
-    this.disableCreateNewScheduleMode();
     this.store.dispatch(new ShowToast(MessageTypes.Success, RECORDS_ADDED));
   }
 
@@ -683,6 +672,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private closeSideBar(): void {
     this.hasInitData = false;
+    this.scheduleForm?.markAsUntouched();
     this.createScheduleService.closeSideBarEvent.next(true);
   }
 
@@ -690,7 +680,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     let selectedType: ScheduleItemType | ScheduleType;
     let type: typeof ScheduleItemType | typeof ScheduleType;
 
-    if (this.createModeConfig.createModeEnabled) {
+    if (this.isCreateMode) {
       type = ScheduleItemType;
       selectedType = this.scheduleItemType;
     } else {
@@ -726,9 +716,23 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   }
 
   private checkCandidateIsOrientedField(): void {
-    if (!this.scheduledItem.candidate.isOriented && (this)) {
+    const { date } = this.scheduleForm.getRawValue();
+    const updatedCandidate = {
+      ...this.scheduledItem.candidate,
+      dates: [DateTimeHelper.toUtcFormat(date)],
+    };
+    const isCandidateOriented = this.createScheduleService.getCandidateOrientation(updatedCandidate);
+
+    if (!isCandidateOriented) {
       this.scheduleForm.get('orientated')?.setValue(true);
       this.scheduleForm.get('orientated')?.disable();
+    } else {
+      this.scheduleForm.get('orientated')?.enable();
     }
+  }
+
+  @OutsideZone
+  private scrollToNewScheduleTab() {
+    setTimeout(() => this.tabs.nativeElement.scrollLeft = this.tabs.nativeElement.offsetLeft);
   }
 }

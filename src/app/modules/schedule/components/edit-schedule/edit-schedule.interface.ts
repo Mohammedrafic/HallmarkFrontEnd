@@ -35,7 +35,7 @@ export interface ScheduledShiftForm {
   unavailabilityReasonId?: number;
   orientated?: boolean,
   critical?: boolean,
-  onCall?: boolean,
+  oncall?: boolean,
   charge?: boolean,
   preceptor?: boolean,
 }
@@ -72,10 +72,4 @@ export interface ShiftTab {
   title: string;
   subTitle: string;
   id: number;
-}
-
-export interface CreateNewScheduleModeConfig {
-  createModeEnabled: boolean;
-  tabSelected: boolean;
-  tabIndex: number;
 }

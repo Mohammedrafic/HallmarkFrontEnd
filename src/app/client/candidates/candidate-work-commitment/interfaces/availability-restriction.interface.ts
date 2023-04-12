@@ -13,7 +13,7 @@ export interface AvailabilityFormFieldConfig<T> {
 }
 
 export interface AvailabilityRestriction {
-  id?: number;
+  id: number | null;
   candidateProfileId: number;
   startDayOfWeek: number;
   endDayOfWeek: number;

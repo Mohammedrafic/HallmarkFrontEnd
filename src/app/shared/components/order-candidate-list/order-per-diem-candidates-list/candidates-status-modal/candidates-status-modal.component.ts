@@ -148,7 +148,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
 
   private unsubscribe$: Subject<void> = new Subject();
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
-  public candidateSSNRequired :boolean;
+  public candidateSSNRequired :boolean=false;
   public candidateDOBRequired :boolean;
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
@@ -484,12 +484,16 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
               this.candidateAddressRequiredValue = addressConfiguration.value;
             }
           }
+          if (data.candidateSSNRequired != null) {
+            this.candidateSSNRequired = data.candidateSSNRequired;
+          }
           this.orderApplicantsInitialData = data;
           this.form?.patchValue({
             jobId: data.orderId,
             locationName: data.locationName,
             department: data.departmentName,
             skill: data.skill,
+            ssn: data.ssn
           });
         }
         this.cd.detectChanges();

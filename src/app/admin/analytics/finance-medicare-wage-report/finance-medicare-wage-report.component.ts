@@ -272,7 +272,7 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
             this.filterColumns.agencyIds.dataSource = [];
 
             if (data != null) {
-              this.isAlive = false;
+              this.isAlive = true;
               this.filterOptionsData = data;
               this.agencyIdControl = this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.AgencyIds) as AbstractControl;
               let agencyIds = data?.agencies;

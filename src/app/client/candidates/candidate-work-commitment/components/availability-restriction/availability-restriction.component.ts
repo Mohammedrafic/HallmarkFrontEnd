@@ -8,9 +8,12 @@ import { AbstractPermission } from '@shared/helpers/permissions';
 import { AvailRestrictDialogData, AvailabilityRestriction } from '../../interfaces';
 import { AvailabilityApiService } from '../../services/availability-api.service';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants';
 import { AvailabilityRestrictionColumnDef, PagerConfig } from '../../constants';
 import { PageOfCollections } from '@shared/models/page.model';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { CandidatesService } from '@client/candidates/services/candidates.service';
 
 @Component({
   selector: 'app-availability-restriction',
@@ -43,6 +46,7 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
     protected override store: Store,
     private readonly availabilityApiService: AvailabilityApiService,
     private readonly confirmService: ConfirmService,
+    private readonly candidateService: CandidatesService,
     private readonly cdr: ChangeDetectorRef,
   ) { super(store); }
 
@@ -74,6 +78,9 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
         take(1)
       )
       .subscribe(() => {
+        const MESSAGE = event.id ? RECORD_MODIFIED : RECORD_ADDED;
+
+        this.store.dispatch(new ShowToast(MessageTypes.Success, MESSAGE));
         this.dialogSubject$.next({ isOpen: false });
         this.cdr.markForCheck();
       });
@@ -114,6 +121,11 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
         filter((confirm) => !!confirm),
         switchMap(() => this.availabilityApiService.deleteAvailabilityRestriction(id)),
         switchMap(() => {
+          this.pagingData.pageNumber = this.candidateService.getGridPageNumber(
+            this.availabilityRestrictions.length,
+            this.pagingData.pageNumber,
+          );
+
           return this.availabilityApiService.getAvailabilityRestrictions(this.employeeId, this.pagingData.pageNumber);
         }),
         take(1)
@@ -121,6 +133,7 @@ export class AvailabilityRestrictionComponent extends AbstractPermission impleme
       .subscribe((data) => {
         this.extractData(data);
         this.dialogSubject$.next({ isOpen: false });
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
         this.cdr.markForCheck();
       });
   }

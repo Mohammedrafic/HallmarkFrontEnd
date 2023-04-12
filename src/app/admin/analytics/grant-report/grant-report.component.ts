@@ -273,7 +273,7 @@ export class GrantReportComponent implements OnInit {
             this.filterColumns.agencyIds.dataSource = [];
 
             if (data != null) {
-              this.isAlive = false;
+              this.isAlive = true;
               this.filterOptionsData = data;
               this.agencyIdControl = this.grantReportForm.get(grantReportConstants.formControlNames.AgencyIds) as AbstractControl;
               let agencyIds = data?.agencies;

@@ -273,6 +273,47 @@
             </ejs-datepicker>
           </div>
         </div>
+        <div class="input-container">
+          <label>Credential Type</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="credType"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.credType?.dataSource"
+            >
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container calendar">
+          <label>Credential Start Date</label>
+          <div class="input-group datepicker">
+            <ejs-datepicker
+              class="datepicker"
+              format="MM/dd/yyyy"
+              placeholder="MM/DD/YYYY"
+              [enableMask]="true"
+              [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+              formControlName="startDate">
+            </ejs-datepicker>
+          </div>
+        </div>
+        <div class="input-container calendar">
+          <label>Credential End Date</label>
+          <div class="input-group datepicker">
+            <ejs-datepicker
+              class="datepicker"
+              format="MM/dd/yyyy"
+              placeholder="MM/DD/YYYY"
+              [enableMask]="true"
+              [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+              formControlName="endDate">
+            </ejs-datepicker>
+          </div>
+        </div>
       </div>
     </ng-container>
   </form>

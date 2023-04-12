@@ -234,7 +234,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
     if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
       if(this.orderCandidateJob?.candidateProfileContactDetails != null){ 
-          if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
+          if(CommonHelper.candidateAddressCheck(this.orderCandidateJob?.candidateProfileContactDetails)){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
               return;
           }
