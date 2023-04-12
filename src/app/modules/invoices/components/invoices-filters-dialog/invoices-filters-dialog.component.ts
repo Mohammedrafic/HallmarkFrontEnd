@@ -327,9 +327,9 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   private applyPreservedFilters(filters: InvoicesFilterState): void {
-    const filteredStructure = this.invoicesFiltersService.filterStructure(
+    const filteredStructure = this.invoicesFiltersService.compareStructureWithFilter(
       filters,
-      this.regions as { id: number }[],
+      this.regions,
       this.isAgency
     );
     
