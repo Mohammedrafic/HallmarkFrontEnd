@@ -1,0 +1,29 @@
+<app-grid
+  [gridTitle]="gridTitle"
+  [rowData]="availabilityRestrictions"
+  [columnDefinitions]="columnDef"
+  [rowSelection]="rowSelection"
+  [totalRecordsCount]="pagingData.totalCount"
+  [pageSize]="pagingData.pageSize"
+  [currentPage]="pagingData.pageNumber"
+  [customRowsPerPageDropDownObject]="customRowsPerPageDropDownObject"
+  [disableRowsPerPageDropdown]="true"
+  (navigateToPageEmitter)="handleChangePage($event)">
+
+  <button 
+    action-button
+    class="add-action"
+    cssClass="e-action-button"
+    ejs-button (click)="addRestriction()"
+    [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
+  >
+    <i-feather name="plus" class="icon"></i-feather>
+    Add Restriction
+  </button>
+</app-grid>
+
+<app-availability-restriction-dialog 
+  [dialogSubject$]="dialogSubject$"
+  [employeeId]="employeeId"
+  (saveAvailabilityRestriction)="saveAvailabilityRestriction($event)">
+</app-availability-restriction-dialog>

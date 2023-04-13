@@ -83,12 +83,12 @@
                                 [chartData]="widgetsData?.[widgetTypeEnum.RN_UTILIZATION]"
                                 [description]="widgetDescriptionEnum.RN_UTILIZATION_DESCRIPTION"
                                 [isDarkTheme]="isDarkTheme"></app-rn-utilization-widget>
-          <app-already-expired-creds *ngSwitchCase="widgetTypeEnum.ALREADY_EXPIRED_CREDS"    
+          <app-already-expired-creds *ngSwitchCase="widgetTypeEnum.ALREADY_EXPIRED_CREDS" class="exp_creds"   
                               [chartData]="widgetsData?.[widgetTypeEnum.ALREADY_EXPIRED_CREDS]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.ALREADY_EXPIRED_CREDS"
                               [isDarkTheme]="isDarkTheme"></app-already-expired-creds>
-          <app-upcoming-exp-creds *ngSwitchCase="widgetTypeEnum.UPCOMING_EXP_CREDS"
+          <app-upcoming-exp-creds *ngSwitchCase="widgetTypeEnum.UPCOMING_EXP_CREDS" class="exp_creds"  
                               [chartData]="widgetsData?.[widgetTypeEnum.UPCOMING_EXP_CREDS]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.UPCOMING_EXP_CREDS"

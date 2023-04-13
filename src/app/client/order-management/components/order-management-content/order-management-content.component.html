@@ -208,7 +208,7 @@
       (actionBegin)="actionBegin($event)"
       [selectionSettings]="selectionOptions"
       [textWrapSettings]="wrapSettings"
-      [enableVirtualization]="true"
+      [enableVirtualization]="false"
       (rowSelected)="onRowClick($event)"
       (rowDeselected)="onRowDeselect($event, gridWithChildRow)"
       (dataBound)="onDataBound()"
@@ -588,8 +588,8 @@
               [candidatePosition]="child"
               [selected]="
                 selectedCandidate?.selected?.order === data.id &&
-                selectedCandidate?.selected.positionId === child.positionId
-              "
+                selectedCandidate?.selected.positionId === child.positionId"
+                (openPosition)="onOpenCandidateDialog($event, data, i)"
             ></app-order-management-subrow-candidate-position>
           </ng-container>
 

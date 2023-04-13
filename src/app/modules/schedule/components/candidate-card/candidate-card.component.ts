@@ -1,8 +1,19 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 
+import { take } from 'rxjs';
+
+import { DateWeekService } from '@core/services';
 import { ScheduleCandidate, ScheduleFilters, ScheduleModel } from '../../interface';
 import { CandidateIconName } from '../../constants';
-import { CreateTooltipForOrientation, GetCandidateTypeTooltip } from './candidate-card.helper';
+import { CreateTooltipForOrientation, GetCandidateTypeTooltip, PrepareCandidate } from './candidate-card.helper';
 
 @Component({
   selector: 'app-candidate-card',
@@ -12,14 +23,9 @@ import { CreateTooltipForOrientation, GetCandidateTypeTooltip } from './candidat
 })
 export class CandidateCardComponent implements OnInit, OnChanges {
   @Input() set candidate(schedule: ScheduleModel) {
-    if (schedule.candidate.workCommitments && schedule.candidate.workCommitments.length) {
-      schedule.candidate.workCommitmentText = 'Work Commitment: ' + schedule.candidate.workCommitments.join(', ');
-    } else {
-      schedule.candidate.workCommitmentText = 'Work Commitment';
-    }
-
-    this.candidateData = schedule.candidate;
+    this.candidateData = PrepareCandidate(schedule.candidate);
   }
+
   @Input() selectedFilters: ScheduleFilters;
   @Input() showScheduledHours = true;
 
@@ -27,11 +33,30 @@ export class CandidateCardComponent implements OnInit, OnChanges {
   candidateIconName: string;
   iconTooltipMessage = '';
   candidateTypeTooltip: string;
+  startDate: string;
+
+  constructor(
+    private dateWeekService:DateWeekService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
+    this.watchForDateRangeChanges();
+
     this.candidateIconName = CandidateIconName(this.candidateData, this.selectedFilters);
     this.iconTooltipMessage = this.candidateIconName === 'compass' ?
-      CreateTooltipForOrientation(this.candidateData) : this.candidateData.employeeNote;
+      CreateTooltipForOrientation(this.candidateData, this.startDate) : this.candidateData.employeeNote;
+
+  }
+
+  private watchForDateRangeChanges(): void {
+    this.dateWeekService.getRangeStream().pipe(
+      take(1),
+    ).subscribe((range: string[]) => {
+      const [startDate] = range;
+      this.startDate = startDate;
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -4,6 +4,7 @@ import { GlobalWindow } from '@core/tokens';
 import { FilterService } from '@shared/services/filter.service';
 import { ProgressBar, AnimationModel, ILoadedEventArgs,ProgressTheme } from '@syncfusion/ej2-progressbar';
 import { ExpiryDetailsModel } from '../../models/expiry.model';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -30,6 +31,7 @@ export class AlreadyExpiredCredsComponent  {
   public animation: AnimationModel = { enable: true, duration: 2000, delay: 0 };
 
   constructor(private readonly dashboardService: DashboardService,
+              private router : Router,
               @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
               public filterservice : FilterService) {
               }
@@ -46,6 +48,27 @@ export class AlreadyExpiredCredsComponent  {
            args.progressBar.labelStyle.color = '#000000';
            args.progressBar.trackColor = '#969696';
        }
+  }
+
+  redirect_to_candidate(name : string):void {
+
+    var d = new Date();
+    var startDate = new Date(d.setMonth(d.getMonth() - 1));
+
+    const timeStamp = new Date().getTime();
+    const yesterdayTimeStamp = timeStamp - 24*60*60*1000;
+    const yesterdayDate = new Date(yesterdayTimeStamp);
+
+    var type;
+    if(name == "Licenses"){
+      type = 1;
+    } else if(name == "Certificates"){
+      type = 2;
+    } else {
+      type = 3;
+    }
+
+    this.dashboardService.redirect_to_credentials("/client/candidates",startDate, yesterdayDate, type);
   }
 
   ngOnChanges():void {

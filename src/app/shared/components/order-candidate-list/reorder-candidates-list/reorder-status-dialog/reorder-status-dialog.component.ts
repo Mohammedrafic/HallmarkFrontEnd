@@ -220,9 +220,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     }
 
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfileContactDetails != null){
-        if(this.candidateJob?.candidateProfileContactDetails.phone1 === null 
-            || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
+      if(this.orderCandidateJob?.candidateProfileContactDetails != null){
+        if(this.orderCandidateJob?.candidateProfileContactDetails.phone1 === null 
+            || this.orderCandidateJob?.candidateProfileContactDetails.phone1 === ''){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
               return;
         }
@@ -233,8 +233,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     }
 
     if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfileContactDetails != null){ 
-          if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
+      if(this.orderCandidateJob?.candidateProfileContactDetails != null){ 
+          if(CommonHelper.candidateAddressCheck(this.orderCandidateJob?.candidateProfileContactDetails)){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
               return;
           }

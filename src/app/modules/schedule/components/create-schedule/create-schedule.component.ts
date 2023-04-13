@@ -173,7 +173,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     this.updateScheduleDialogConfig(event.value as unknown as ScheduleItemType);
     this.showShiftTimeFields(false);
     this.scheduleFormConfig.formClass =
-      this.createScheduleService.updateScheduleFormClass(this.scheduleFormConfig.formClass, false);
+      this.createScheduleService.updateScheduleFormClass(this.scheduleType, false);
     this.cdr.markForCheck();
   }
 
@@ -303,14 +303,14 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     if(shiftId === this.customShiftId) {
       this.showShiftTimeFields(true);
       this.scheduleFormConfig.formClass =
-        this.createScheduleService.updateScheduleFormClass(this.scheduleFormConfig.formClass, true);
+        this.createScheduleService.updateScheduleFormClass(this.scheduleType, true);
 
       this.cdr.markForCheck();
       return;
     } else {
       this.showShiftTimeFields(false);
       this.scheduleFormConfig.formClass =
-        this.createScheduleService.updateScheduleFormClass(this.scheduleFormConfig.formClass, false);
+        this.createScheduleService.updateScheduleFormClass(this.scheduleType, false);
 
       this.cdr.markForCheck();
       return this.scheduleShifts.find((shift: ScheduleShift) => shift.id === shiftId);
@@ -417,10 +417,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     this.createScheduleService.closeSideBarEvent.next(true);
     this.scheduleItemsService.setErrors([]);
     this.showShiftTimeFields(false);
-    this.scheduleFormConfig.formClass = this.createScheduleService.updateScheduleFormClass(
-      ScheduleCustomClassesList[ScheduleItemType.Book],
-      false
-    );
+    this.scheduleFormConfig.formClass = this.createScheduleService.updateScheduleFormClass(this.scheduleType, false);
   }
 
   private saveAvailabilityUnavailability(): void {

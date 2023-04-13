@@ -94,7 +94,10 @@ export class CandidateListService {
       primarySkillIds: new FormControl([]),
       secondarySkillIds: new FormControl([]),
       hireDate: new FormControl(null),
-    });
+      startDate: new FormControl(null),
+      endDate: new FormControl(null),
+      credType : new FormControl([])
+    }); 
   }
 
   public refreshFilters(isIRP: boolean, formGroup: FormGroup, filters: CandidateListFilters): void {
@@ -112,6 +115,9 @@ export class CandidateListService {
       primarySkillIds: filters.primarySkillIds || [],
       secondarySkillIds: filters.secondarySkillIds || [],
       hireDate: filters.hireDate || null,
+      startDate: filters.startDate || null,
+      endDate: filters.endDate || null,
+      credType: filters.credType || []
     });
   }
 }

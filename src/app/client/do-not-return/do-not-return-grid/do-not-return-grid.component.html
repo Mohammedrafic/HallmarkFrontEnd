@@ -2,7 +2,7 @@
   <ejs-grid #grid [dataSource]="(donotreturnpage$ | async)?.items" [allowPaging]="allowPaging"
     [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight"
     [resizeSettings]="resizeSettings" [allowSorting]="allowSorting" [allowResizing]="allowResizing"
-    [enableVirtualization]="true" (rowSelected)="rowSelected($event, grid)"
+    [enableVirtualization]="false" (rowSelected)="rowSelected($event, grid)"
     (rowDeselected)="rowDeselected($event, grid)" (dataBound)="gridDataBound(grid)" (actionBegin)="actionBegin($event)"
     [selectionSettings]="selectionSettings">
 

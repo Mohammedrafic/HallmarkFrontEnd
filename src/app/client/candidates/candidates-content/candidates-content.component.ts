@@ -29,7 +29,9 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   public preferencesLoaded = false;
   public readonly tabConfig: TabConfig[] = TAB_CANDIDATES;
   public readonly userPermissions = UserPermissions;
-
+  public credEndDate : any;
+  public credStartDate :  any;
+  public credType : any;
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
 
@@ -46,6 +48,10 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   ) {
     super();
     store.dispatch(new SetHeaderState({ title: 'Employee List', iconName: 'users' }));
+    const routerState = this.router.getCurrentNavigation()?.extras?.state;
+    this.credStartDate = routerState?.['startDate'];
+    this.credEndDate = routerState?.['endDate'];
+    this.credType = routerState?.['type'];
   }
 
   ngOnInit(): void {

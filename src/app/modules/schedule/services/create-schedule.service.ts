@@ -145,11 +145,11 @@ export class CreateScheduleService {
       startTime: getTime(startTime),
       endTime: getTime(endTime),
       createOrder: false,
-      orientated,
-      critical,
-      onCall,
-      charge,
-      preceptor,
+      orientated: orientated || false,
+      critical: critical || false,
+      onCall: onCall || false,
+      charge: charge || false,
+      preceptor: preceptor || false,
     };
   }
 
@@ -269,20 +269,29 @@ export class CreateScheduleService {
     return (scheduleTypes.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
   }
 
-  updateScheduleFormClass = (className: string, isCustom: boolean): string => {
-    const formClassName = className.split('-');
+  updateScheduleFormClass(scheduleType: ScheduleItemType, isCustom: boolean): string {
+    let className = ScheduleClassesList[ScheduleItemType.Book];
 
-    if(formClassName.includes('book')) {
-      return isCustom ?
-        ScheduleCustomClassesList[ScheduleItemType.Book] : ScheduleClassesList[ScheduleItemType.Book];
-    } else if(formClassName.includes('availability')) {
-      return isCustom ?
-        ScheduleCustomClassesList[ScheduleItemType.Availability] : ScheduleClassesList[ScheduleItemType.Availability];
-    } else {
-      return isCustom ?
-        ScheduleCustomClassesList[ScheduleItemType.Unavailability] : ScheduleClassesList[ScheduleItemType.Unavailability];
+    if (scheduleType === ScheduleItemType.Book) {
+      className = isCustom
+        ? ScheduleCustomClassesList[ScheduleItemType.Book]
+        : ScheduleClassesList[ScheduleItemType.Book];
     }
-  };
+
+    if (scheduleType === ScheduleItemType.Availability) {
+      className = isCustom
+        ? ScheduleCustomClassesList[ScheduleItemType.Availability]
+        : ScheduleClassesList[ScheduleItemType.Availability];
+    }
+
+    if (scheduleType === ScheduleItemType.Unavailability){
+      className = isCustom
+        ? ScheduleCustomClassesList[ScheduleItemType.Unavailability]
+        : ScheduleClassesList[ScheduleItemType.Unavailability];
+    }
+
+    return className;
+  }
 
   getShiftDropDownsData(scheduleFilterStructure: ScheduleFilterStructure): ShiftDropDownsData {
     const scheduleFiltersData: ScheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
@@ -310,6 +319,16 @@ export class CreateScheduleService {
     }
   }
 
+  getCandidateOrientation(candidate: ScheduleCandidate): boolean {
+    return candidate.dates.every((date: string) => {
+      if(candidate.orientationDate) {
+        return DateTimeHelper.convertDateToUtc(date) >= DateTimeHelper.convertDateToUtc(candidate.orientationDate);
+      } else {
+        return false;
+      }
+    });
+  }
+
   resetScheduleControls(scheduleForm: FormGroup, controlsList: string[]): void {
     controlsList.forEach((control: string) => {
       scheduleForm.get(control)?.reset();
@@ -329,23 +348,26 @@ export class CreateScheduleService {
     }];
   }
 
-  private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]):void {
-    const hasCandidateWithoutOrientation = candidates.filter((candidate: ScheduleCandidate) => {
-      return !candidate.isOriented;
-    });
+  private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]): void {
+    const isCandidatesOriented = candidates.map((candidate: ScheduleCandidate) => {
+      return this.getCandidateOrientation(candidate);
+    }).every((orientation: boolean) => orientation);
 
-    if(hasCandidateWithoutOrientation.length) {
+    if(!isCandidatesOriented) {
       control?.patchValue(true);
       control?.disable();
     } else {
       control?.enable();
+      control?.patchValue(false);
     }
   }
 
   private orientationForSingleCandidate(control: AbstractControl, candidates: ScheduleCandidate[]): void {
-    control?.patchValue(!candidates[0].isOriented);
+    const isCandidateOriented = this.getCandidateOrientation(candidates[0]);
 
-    if(!candidates[0].isOriented) {
+    control?.patchValue(!isCandidateOriented);
+
+    if(!isCandidateOriented) {
       control?.disable();
     } else {
       control?.enable();

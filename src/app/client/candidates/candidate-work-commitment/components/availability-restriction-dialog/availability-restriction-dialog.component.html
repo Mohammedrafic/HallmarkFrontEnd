@@ -1,0 +1,65 @@
+<ejs-dialog
+  #sideDialog
+  cssClass="dialog"
+  [width]="'528px'"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+<ng-template #content>
+  <section class="container">
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title"> {{ title }} Avail. Restriction</h3>
+        </div>
+        <div  class="e-card-content">
+          <button
+            ejs-button
+            cssClass="e-outline button-cancel"
+            (click)="closeDialog()"
+          >Cancel</button>
+          <button
+            ejs-button
+            type="submit"
+            [isPrimary]="true"
+            (click)="submitForm()"
+          >Save</button>
+        </div>
+      </div>
+    </section>
+    <section>
+      <form class="availablity-form">
+        <ng-container *ngFor="let fieldConfig of filtersFormConfig; trackBy: trackByFn">
+          <ng-container [ngSwitch]="fieldConfig.type">
+            <ng-container *ngSwitchCase="controlTypes.Date">
+              <app-timepicker
+                [formGroupInstance]="formGroup"
+                [controlName]="fieldConfig.field"
+                [label]="fieldConfig.title"
+                [required]="true"
+                [placeholder]="placeholder"
+                [format]="format"
+                [maskPlaceholder]="timepickerMask"
+                [enableMask]="true"
+              ></app-timepicker>
+            </ng-container>
+      
+            <ng-container *ngSwitchCase="controlTypes.Dropdown">
+              <app-dropdown
+                [formGroupInstance]="formGroup"
+                [label]="fieldConfig.title"
+                [fields]="fieldConfig.optionFields!"
+                [dataSource]="fieldConfig.dataSource"
+                [hideBorder]="false"
+                [required]="true"
+                [controlName]="fieldConfig.field"
+              ></app-dropdown>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </form>
+    </section>
+  </section>
+</ng-template>
+</ejs-dialog>
