@@ -25,7 +25,7 @@ import {
   SelectedCells,
   SideBarSettings,
 } from '../../interface';
-import { GetScheduleFilterByEmployees, HasNotMandatoryFilters, HasMultipleFilters } from '../../helpers';
+import { GetScheduleFilterByEmployees, HasNotMandatoryFilters, HasMultipleFilters, GetScheduledShift } from '../../helpers';
 import { DateTimeHelper } from '@core/helpers';
 
 @Component({
@@ -112,13 +112,13 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.updateScheduleGrid();
   }
 
-  updateScheduleGrid(): void {
+  updateScheduleGrid(resetCells = true): void {
     this.detectWhatDataNeeds();
     this.setDateLimitation();
-    this.selectCells({
-      candidates: [],
-      dates: [],
-    });
+
+    if (resetCells) {
+      this.selectCells({ candidates: [], dates: [] });
+    }
   }
 
  selectCells(cells: ScheduleInt.ScheduleSelectedSlots, closeBar= true): void {
@@ -143,6 +143,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   setSelectedCells(selectedCells: SelectedCells): void {
     const {cells, sideBarState} = selectedCells;
     this.selectCells(cells, sideBarState);
+    this.scheduledShift = null;
   }
 
   editScheduledItem(scheduledItem: ScheduledItem): void {
@@ -155,12 +156,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.scheduledShift = scheduledItem;
 
     this.cdr.markForCheck();
-  }
-
-  //todo: remove after edit implementation
-  closeEditScheduleDialog(): void {
-    this.setSideBarSettings(false,false);
-    this.scheduledShift = null;
   }
 
   showFilters(): void {
@@ -257,6 +252,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
           dates: [],
         }, false);
       }
+
+      this.scheduledShift = null;
     });
   }
 
@@ -307,14 +304,12 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   private updateScheduledShift(): void {
-    if (this.scheduledShift) {
-      const scheduledShiftData = this.scheduleData?.items
-        .find((item: ScheduleModel) => item.candidate.id === this.scheduledShift?.candidate?.id);
-      this.scheduledShift = {
-        candidate: scheduledShiftData?.candidate as ScheduleCandidate,
-        schedule: scheduledShiftData?.schedule
-          .find((item: ScheduleDateItem) => item.date === this.scheduledShift?.schedule?.date) as ScheduleDateItem,
-      };
+    if (this.scheduledShift && this.scheduleData) {
+      this.scheduledShift = GetScheduledShift(
+        this.scheduleData,
+        this.scheduledShift?.candidate?.id,
+        this.scheduledShift?.schedule?.date
+      );
     }
   }
 

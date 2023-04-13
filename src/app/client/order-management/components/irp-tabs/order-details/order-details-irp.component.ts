@@ -76,7 +76,7 @@ import { ListOfSkills } from '@shared/models/skill.model';
 import { DurationService } from '@shared/services/duration.service';
 import { Duration } from '@shared/enums/durations';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
-import { RejectReason, RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
+import { OrderRequisitionReason, RejectReason, RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import {
   OrderDetailsIrpService,
 } from '@client/order-management/components/irp-tabs/services/order-details-irp.service';
@@ -149,8 +149,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private selectedSystem: SelectSystem;
   private isTieringLogicLoad = true;
 
-  private reason:RejectReason[]=[];
-  public optionFieldsOrderRequisition: FieldSettingsModel = { text: 'reason', value: 'id' };
+  private reason:OrderRequisitionReason[]=[];
 
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   private skills$: Observable<ListOfSkills[]>;
@@ -323,7 +322,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     setDataSource(jobDistributionForm.fields, 'agencyId', this.dataSourceContainer.associateAgency as AssociateAgency[]);
 
     const jobDescriptionForm = this.getSelectedFormConfig(JobDescriptionForm);
-    setDataSource(jobDescriptionForm.fields, 'orderRequisitionReasonId', this.getIRPOrderRequisition(this.dataSourceContainer.reasons as RejectReasonwithSystem[]));
+    
+    if (this.dataSourceContainer.reasons != undefined) {
+      setDataSource(jobDescriptionForm.fields, 'orderRequisitionReasonId', this.getIRPOrderRequisition(this.dataSourceContainer.reasons as RejectReasonwithSystem[]));
+      }
 
     this.setDataSourceForSpecialProject();
     this.setDataSourceForWorkLocationList();
@@ -331,18 +333,20 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.changeDetection.markForCheck();
   }
 
-  private getIRPOrderRequisition(orderRequisition:RejectReasonwithSystem[]):RejectReason[]{
-    orderRequisition.forEach(element => {
-      if(element.includeInIRP===true){
-        this.reason.push(
-          {
-            id:element.id,
-            reason:element.reason,
-            businessUnitId:element.businessUnitId
-          }
-        )
-      }
-    });
+  private getIRPOrderRequisition(orderRequisition:RejectReasonwithSystem[]):OrderRequisitionReason[]{
+    if(orderRequisition.length>0){
+      orderRequisition.forEach(element => {
+        if(element.includeInIRP===true){
+          this.reason.push(
+            {
+              id:element.id,
+              name:element.reason,
+              businessUnitId:element.businessUnitId
+            }
+          )
+        }
+      });
+    }
     return this.reason;
   }
   private watchForDataSources(): void {

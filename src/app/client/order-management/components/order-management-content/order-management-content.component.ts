@@ -189,6 +189,7 @@ import {
 import { OrderManagementIrpGridHelper, OrderManagementIrpSubrowHelper } from '@client/order-management/helpers';
 import {
   DetectActiveSystem,
+  GetFilterFormConfig,
   IRPTabRequestTypeMap,
   IRPTabsConfig,
   SystemGroupConfig,
@@ -208,7 +209,7 @@ import { SetOrderManagementPagerState } from '@agency/store/candidate.actions';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
-import { ClearPageFilters, GetPreservedFiltersByPage, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
+import { ClearPageFilters, GetPreservedFiltersByPage, ResetPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 import { OutsideZone } from '@core/decorators';
 
 @Component({
@@ -401,7 +402,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private alertTitle:string;
   private orderManagementPagerState: OrderManagementPagerState | null;
   public isCondidateTab:boolean=false;
-  private firstOrdersDispatch: boolean = false;
+
+  private get contactEmails(): string | null {
+    if(Array.isArray(this.filters?.contactEmails)) {
+      return this.filters?.contactEmails[0];
+    } else {
+      return this.filters?.contactEmails || null;
+    }
+  }
 
   constructor(
     protected override store: Store,
@@ -524,6 +532,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   ngOnDestroy(): void {
     this.orderManagementService.selectedOrderAfterRedirect = null;
+    this.store.dispatch(new ResetPageFilters());
     this.store.dispatch(new ClearSelectedOrder());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -695,7 +704,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
       switch (this.activeTab) {
         case OrganizationOrderManagementTabs.AllOrders:
-          this.filters.orderTypes = [];
           this.filters.isTemplate = false;
           this.filters.includeReOrders = true;
           this.hasOrderAllOrdersId();
@@ -767,7 +775,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     return this.isActiveSystemIRP && (this.activeIRPTabIndex !== OrderManagementIRPTabsIndex.AllOrders);
   }
 
-  private patchFilterForm(): void {
+  private patchFilterForm(prepopulate = false): void {
     this.OrderFilterFormGroup.setValue({
       orderPublicId: this.filters.orderPublicId || null,
       regionIds: this.filters.regionIds || [],
@@ -801,11 +809,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       projectTypeIds: this.filters.projectTypeIds || null,
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
-      contactEmails: Array.isArray(this.filters.contactEmails) ? this.filters.contactEmails[0] : this.filters.contactEmails || null,
-      orderId: this.filters.orderId || null,
+      contactEmails: this.contactEmails,
       irpOnly: this.filters.irpOnly || null,
     });
-    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+
+    if(!prepopulate) {
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    }
   }
 
   private resetTabs(): void {
@@ -883,14 +893,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public onFilterApply(): void {
     if (this.OrderFilterFormGroup.dirty) {
       this.refreshFilterState();
+      this.saveFiltersByPageName();
       this.getOrders(true);
       this.store.dispatch(new ShowFilterDialog(false));
-      this.saveFiltersByPageName();
       this.OrderFilterFormGroup.markAsPristine();
       this.filteredItems = this.filterService.generateChips(
         this.OrderFilterFormGroup,
         this.filterColumns,
-        this.datePipe
       );
     } else {
       this.store.dispatch(new ShowFilterDialog(false));
@@ -1601,7 +1610,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     preservedFilters: PreservedFiltersByPage<OrderFilter>
   ): Observable<OrderFilterDataSource> {
     return this.orderFilterDataSources$.pipe(
-      throttleTime(100),
+      debounceTime(100),
       filter(Boolean),
       tap((data: OrderFilterDataSource) => {
         let statuses: FilterOrderStatus[] = [];
@@ -1666,7 +1675,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         if (isIRP) {
           this.store.dispatch(new GetIRPOrders(this.filters));
         }
-        if(!isIRP && preservedFilters.isNotPreserved) {
+        if(!isIRP && preservedFilters.isNotPreserved && preservedFilters.dispatch) {
           this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
         }
         this.cd$.next(true);
@@ -1679,47 +1688,48 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private adjustFilters(filters: PreservedFiltersByPage<OrderFilter>): void {
     // TODO apply irp preserved filters
     const { isNotPreserved, dispatch, state } = filters;
-    if((isNotPreserved && dispatch) || this.activeSystem === OrderManagementIRPSystemId.IRP || this.orderManagementPagerState) {
+    if((isNotPreserved && dispatch) || this.activeSystem === OrderManagementIRPSystemId.IRP || this.orderManagementPagerState) { 
       this.setDefaultFilter();
     } else {
-      this.filters = { ...state, orderStatuses: state?.orderStatuses ? [...state.orderStatuses] : [] };
-      this.patchFilterForm();
-      !this.firstOrdersDispatch && this.getOrders(true);
-      this.firstOrdersDispatch = false;
+      const filterState = { ...state, orderStatuses: state?.orderStatuses ? [...state.orderStatuses] : [] };
+      const filterFormConfig = GetFilterFormConfig(this.activeTab);
+      this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
+      this.patchFilterForm(!!this.filters?.contactEmails);
+      this.populatePreservedContactPerson();
+      this.getOrders(true);
     }
     this.cd.markForCheck();
   }
 
+  private populatePreservedContactPerson(): void {
+    if (this.filters?.contactEmails && this.activeTab !== OrganizationOrderManagementTabs.OrderTemplates) {
+      this.getPreservedContactPerson(this.filters.contactEmails as string);
+    }
+  }
+
   private getPreservedContactPerson(contactEmails: string): void {
-    this.filterService.getUsersListBySearchTerm(contactEmails).subscribe((data) => {
-      this.filteredUsers = this.filterColumns.contactEmails.dataSource = data;
-      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-    });
+    this.filterService
+      .getUsersListBySearchTerm(contactEmails)
+      .pipe(take(1))
+      .subscribe((data) => {
+        this.filteredUsers = this.filterColumns.contactEmails.dataSource = data;
+        this.OrderFilterFormGroup.get('contactEmails')?.setValue(this.contactEmails);
+        this.filteredItems = this.filterService.generateChips(
+          this.OrderFilterFormGroup,
+          this.filterColumns,
+          this.datePipe
+        );
+      });
   }
 
   private setDefaultFilter(): void {
-    if(this.orderManagementPagerState?.filters) { // apply preserved filters by redirecting back from the candidate profile
+    if (this.orderManagementPagerState?.filters) { // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
-      this.patchFilterForm();
+      this.patchFilterForm(!!this.filters?.contactEmails);
+      this.populatePreservedContactPerson();
       return;
     }
 
-    if (this.filterService.canPreserveFilters()) {
-      const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
-      if (preservedFilters?.regions) {
-        this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
-        this.filters.regionIds = [...preservedFilters.regions];
-        if (preservedFilters?.locations) {
-          this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
-          this.filters.locationIds = [...preservedFilters.locations];
-        }
-      }
-      if (preservedFilters?.contactEmails && this.activeTab !== OrganizationOrderManagementTabs.OrderTemplates) {
-        this.getPreservedContactPerson(preservedFilters.contactEmails);
-        this.OrderFilterFormGroup.get('contactEmails')?.setValue(preservedFilters.contactEmails);
-        this.filters.contactEmails = [preservedFilters.contactEmails];
-      }
-    }
     if (!(this.filters.isTemplate || this.isIncomplete)) {
       const statuses = this.filterColumns.orderStatuses.dataSource
         .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed, FilterOrderStatusText.Incomplete].includes(status.status))
@@ -1831,8 +1841,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.orgStructure = structure;
           this.regions = structure.regions;
           this.filterColumns.regionIds.dataSource = this.regions;
+          this.store.dispatch(new ResetPageFilters());
           this.getPreservedFiltersByPage();
-          this.firstOrdersDispatch = false;
         }),
         //get preserved filters and dispatch orders
         switchMap(() => this.getPreservedFilters()),
@@ -2039,16 +2049,20 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private listenRedirectFromReOrder(): void {
     this.orderManagementService.orderPerDiemId$
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        debounceTime(50)
+      )
       .subscribe((data: { id: number; prefix: string }) => {
         this.orderPerDiemId = data.id;
         this.prefix = data.prefix;
         this.clearFilters();
         this.redirectFromPerdiem = true;
-        this.filters.orderPublicId = this.prefix + '-' + this.orderId;
-        this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
+        this.filters.orderPublicId = this.prefix + '-' + this.orderPerDiemId;
+        this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderPerDiemId);
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
         this.getOrders(true);
+        this.cd.markForCheck();
       });
   }
 
@@ -2314,16 +2328,15 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private saveFiltersByPageName(): void {
     if(this.isActiveSystemIRP) { return } //TODO remove the condition in scope [EIN-12382][IRP][Improvement] Preserving filters across IRP;
-    const filters = { ...this.filters, orderTypes: [] }
-    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), filters));
+    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), { ...this.filters }));
   }
 
   private getPreservedFilters(): Observable<PreservedFiltersByPage<OrderFilter>> {
     return this.preservedFiltersByPageName$.pipe(
       tap((filters) => {
         if (!filters.isNotPreserved && filters.dispatch) {
-          this.firstOrdersDispatch = true;
-          this.store.dispatch([new GetOrders(filters.state, this.isIncomplete)]);
+          this.filters = { ...filters.state };
+          this.getOrders(true);
         }
       })
     );
@@ -2348,6 +2361,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
+    this.filters.orderTypes = this.filters.orderTypes || [];
     this.filters.irpOnly = !!this.filters.irpOnly;
   }
 

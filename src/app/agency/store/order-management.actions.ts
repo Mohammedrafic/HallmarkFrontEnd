@@ -131,3 +131,7 @@ export class ClearDeployedCandidateOrderInfo {
 export class ClearAgencyOrderCandidatesList {
   static readonly type = '[agency order management] Clear Agency Order Candidates List';
 }
+
+export class ClearOrganizationStructure {
+  static readonly type = '[agency order management] Clear Organization Structure';
+}

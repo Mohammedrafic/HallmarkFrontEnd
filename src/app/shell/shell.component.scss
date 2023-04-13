@@ -304,6 +304,10 @@
       color: $white;
       font-size: 14px;
       padding: 0;
+
+      &:disabled {
+        cursor: default;
+      }
     }
 
     .icon-container {

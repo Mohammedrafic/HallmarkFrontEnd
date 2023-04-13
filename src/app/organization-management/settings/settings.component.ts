@@ -456,6 +456,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.gridDataSource = this.getRowsPerPage(adaptedData, this.currentPagerPage);
       this.totalDataRecords = adaptedData.length;
       this.dataSource = adaptedData;
+      this.grid?.refresh();
     });
   }
 

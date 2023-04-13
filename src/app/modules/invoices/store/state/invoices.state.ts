@@ -505,6 +505,11 @@ export class InvoicesState {
     );
   }
 
+  @Action(Invoices.ClearOrganizationStructure)
+  ClearOrganizationStructure({ patchState }: StateContext<InvoicesModel>): InvoicesModel {
+    return patchState({ organizationStructure: null });
+  }
+
   @Action(Invoices.SelectOrganization)
   SelectOrganization(
     { patchState }: StateContext<InvoicesModel>,

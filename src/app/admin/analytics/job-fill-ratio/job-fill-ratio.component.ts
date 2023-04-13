@@ -14,16 +14,16 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { 
-  GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, 
-  GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState 
-  } from '@organization-management/store/logi-report.action';
+import {
+  GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData,
+  GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState
+} from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { accrualConstants,  analyticsConstants } from '../constants/analytics.constant';
+import { accrualConstants, analyticsConstants } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
@@ -50,12 +50,12 @@ export class JobFillRatioComponent implements OnInit {
     "BearerParamFRL": "",
     "BusinessUnitIdParamFRL": "",
     "OrganizationsFRL": "",
-    "regionFRL":   "",
-    "locationFRL":  "",
-    "departmentFRL":  "",
-    "skillCategoryFRL":    "",
-    "skillFRL":   "",
-    "startDateFRL":   "",
+    "regionFRL": "",
+    "locationFRL": "",
+    "departmentFRL": "",
+    "skillCategoryFRL": "",
+    "skillFRL": "",
+    "startDateFRL": "",
     "endDateFRL": "",
 
     "HostNameS": "",
@@ -73,9 +73,9 @@ export class JobFillRatioComponent implements OnInit {
   };
 
 
-  public reportName: LogiReportFileDetails =  { name: "/JsonApiReports/FillRatioByLocation/FillRatioByLocation.cls" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FillRatioByLocation/FillRatioByLocation.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FillRatioByLocation/FillRatioByLocation.cat" };
-  
+
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
 
@@ -84,12 +84,12 @@ export class JobFillRatioComponent implements OnInit {
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  
+
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  
+
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
   isDepartmentsDropDownEnabled: boolean = false;
@@ -100,7 +100,7 @@ export class JobFillRatioComponent implements OnInit {
 
   @Select(LogiReportState.commonReportFilterData)
   public financialTimeSheetFilterData$: Observable<CommonReportFilterOptions>;
-  
+
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
   selectedOrganizations: Organisation[];
@@ -108,7 +108,7 @@ export class JobFillRatioComponent implements OnInit {
 
 
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  
+
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
 
@@ -127,7 +127,7 @@ export class JobFillRatioComponent implements OnInit {
   public departmentIdControl: AbstractControl;
   public skillCategoryIdControl: AbstractControl;
   public skillIdControl: AbstractControl;
- 
+
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
@@ -177,7 +177,7 @@ export class JobFillRatioComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   
+
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
@@ -192,11 +192,11 @@ export class JobFillRatioComponent implements OnInit {
           this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
           let skills = masterSkills.filter((i) => i.skillCategoryId);
           this.filterColumns.skillIds.dataSource = skills;
-         
+
           if (this.isInitialLoad) {
-                  setTimeout(()=>{this.SearchReport();},3000)
-                  this.isInitialLoad = false;
-              }
+            setTimeout(() => { this.SearchReport(); }, 3000)
+            this.isInitialLoad = false;
+          }
 
         }
       });
@@ -261,7 +261,7 @@ export class JobFillRatioComponent implements OnInit {
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
-          let departmentsList: Department[] = [];         
+          let departmentsList: Department[] = [];
           orgList.forEach((value) => {
             regionsList.push(...value.regions);
             locationsList = regionsList.map(obj => {
@@ -293,7 +293,7 @@ export class JobFillRatioComponent implements OnInit {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          setTimeout(()=>{ this.SearchReport()},3000);
+          setTimeout(() => { this.SearchReport() }, 3000);
         }
         else {
           this.isClearAll = false;
@@ -302,7 +302,7 @@ export class JobFillRatioComponent implements OnInit {
       }
     });
   }
-    
+
   public onFilterRegionChangedHandler(): void {
     this.regionIdControl = this.fillRatioReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -325,12 +325,12 @@ export class JobFillRatioComponent implements OnInit {
       }
     });
   }
-    
+
   public onFilterLocationChangedHandler(): void {
     this.locationIdControl = this.fillRatioReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.fillRatioReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-     
+
       if (this.locationIdControl.value.length > 0) {
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
@@ -340,7 +340,7 @@ export class JobFillRatioComponent implements OnInit {
         this.fillRatioReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
-   this.departmentIdControl = this.fillRatioReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
+    this.departmentIdControl = this.fillRatioReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
@@ -354,8 +354,10 @@ export class JobFillRatioComponent implements OnInit {
         this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
         let skills = masterSkills.filter((i) => data?.includes(i.skillCategoryId));
         this.filterColumns.skillIds.dataSource = skills;
+        this.fillRatioReportForm.get(accrualConstants.formControlNames.SkillIds)?.setValue(skills.map((list) => list.id));
       }
       else {
+        this.filterColumns.skillIds.dataSource = [];
         this.fillRatioReportForm.get(accrualConstants.formControlNames.SkillIds)?.setValue([]);
       }
     });
@@ -368,7 +370,7 @@ export class JobFillRatioComponent implements OnInit {
     });
   }
 
-  public SearchReport(): void {   
+  public SearchReport(): void {
     this.filteredItems = [];
     let auth = "Bearer ";
     for (let x = 0; x < window.localStorage.length; x++) {
@@ -376,8 +378,8 @@ export class JobFillRatioComponent implements OnInit {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let {departmentIds,locationIds,
-      regionIds,skillCategoryIds,skillIds,startDate, endDate } = this.fillRatioReportForm.getRawValue();
+    let { departmentIds, locationIds,
+      regionIds, skillCategoryIds, skillIds, startDate, endDate } = this.fillRatioReportForm.getRawValue();
 
     if (!this.fillRatioReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
@@ -387,16 +389,16 @@ export class JobFillRatioComponent implements OnInit {
       this.message = ""
     }
 
-      locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length  > 0 ? this.locations.map(x=> x.id).join(",") : []); 
-      departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length  > 0 ? this.departments.map(x=> x.id).join(",") : []); 
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
 
-      regionIds =        regionIds.length > 0 ? regionIds.join(",") :  this.regionsList?.length >0 ? this.regionsList.map(x=> x.id).join(","): "null"; 
-      locationIds =      locationIds.length > 0 ? locationIds  : this.locationsList?.length>0? this.locationsList.map(x=> x.id).join(",") :"null"; 
-      departmentIds =    departmentIds.length > 0 ? departmentIds : this.departmentsList?.length>0?  this.departmentsList.map(x=> x.id).join(",") :"null"; 
-      skillCategoryIds = skillCategoryIds.length > 0 ?skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; })=> x.id).join(",") : "null"; 
-      skillIds =         skillIds.length > 0 ?skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; })=> x.id).join(","):"null"; 
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+    skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
+    skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
 
-      
+
     this.paramsData =
     {
 
@@ -406,13 +408,13 @@ export class JobFillRatioComponent implements OnInit {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "OrganizationsFRL":    this.selectedOrganizations.length == 0? "null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "regionFRL":            regionIds.length==0? "null" : regionIds,
-      "locationFRL":          locationIds.length==0?"null" : locationIds,
-      "departmentFRL":        departmentIds.length==0?"null" :  departmentIds,
-      "skillCategoryFRL":     skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
-      "skillFRL":             skillIds.length == 0 ? "null" : skillIds,
-      "startDateFRL":   formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "OrganizationsFRL": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "regionFRL": regionIds.length == 0 ? "null" : regionIds,
+      "locationFRL": locationIds.length == 0 ? "null" : locationIds,
+      "departmentFRL": departmentIds.length == 0 ? "null" : departmentIds,
+      "skillCategoryFRL": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
+      "skillFRL": skillIds.length == 0 ? "null" : skillIds,
+      "startDateFRL": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "endDateFRL": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
 
       "HostNameS": this.baseUrl,
@@ -422,9 +424,9 @@ export class JobFillRatioComponent implements OnInit {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "OrganizationsFRLS": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "regionFRLS": regionIds.length==0? "null" : regionIds,
-      "locationFRLS": locationIds.length==0?"null" : locationIds,
-      "departmentFRLS": departmentIds.length==0?"null" :  departmentIds,
+      "regionFRLS": regionIds.length == 0 ? "null" : regionIds,
+      "locationFRLS": locationIds.length == 0 ? "null" : locationIds,
+      "departmentFRLS": departmentIds.length == 0 ? "null" : departmentIds,
       "skillCategoryFRLS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
       "skillFRLS": skillIds.length == 0 ? "null" : skillIds,
       "startDateFRLS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
@@ -493,7 +495,7 @@ export class JobFillRatioComponent implements OnInit {
 
   public showFilters(): void {
     if (this.isResetFilter) {
-    this.onFilterControlValueChangedHandler();
+      this.onFilterControlValueChangedHandler();
     }
     this.store.dispatch(new ShowFilterDialog(true));
   }
@@ -512,8 +514,8 @@ export class JobFillRatioComponent implements OnInit {
     this.fillRatioReportForm.get(accrualConstants.formControlNames.StartDate)?.setValue(startDate);
     this.fillRatioReportForm.get(accrualConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.filteredItems = [];
-    this.locations =[];
-    this.departments =[];
+    this.locations = [];
+    this.departments = [];
     this.regionsList = this.masterRegionsList;
     this.locationsList = this.masterLocationsList;
     this.departmentsList = this.masterDepartmentsList;

@@ -185,7 +185,6 @@
 
   </ejs-grid>
   </ng-container>
-
   <ng-container *ngIf="system === systemType.IRP && selectedOrder.orderType === orderTypes.Traveler
     && isFeatureIrpEnabled && !isAgency">
     <ejs-grid
@@ -204,7 +203,7 @@
       [height]="300"
     >
       <e-columns>
-        <e-column textAlign="Right" width="160">
+        <e-column textAlign="Right" width="140">
           <ng-template #template let-data>
             <div class="row-tool-buttons">
               <div
@@ -221,11 +220,12 @@
                 [class.btn-icon__disabled]="selectedOrder?.irpOrderMetadata?.status === orderStatus.Closed
                 || data.status === applicantStatus.Offboard"
               >
-              <ejs-tooltip id="tooltip" content="Notify" position="TopCenter"> 
+              <ejs-tooltip id="tooltip" content="Notify" position="TopCenter">
                 <span class="edit-button"><i-feather name="mail" class="icon"></i-feather></span>
               </ejs-tooltip>
               </div>
               <div
+                [class.btn-icon__disabled]="!data.isOriented"
                 ejs-button
                 (click)="openEditCandidateModal(data)"
                 cssClass="e-flat primary-icon-button custom-button"
@@ -237,15 +237,17 @@
             </div>
           </ng-template>
         </e-column>
-        <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
+        <e-column field="firstName" headerText="Name" textAlign="Left" width="170">
           <ng-template #template let-data>
             <div class="link" (click)="onViewNavigation(data)">
               {{ data.lastName }}, {{ data.firstName }}
-              <!-- <ng-container *ngIf="data.deployedCandidateInfo && data.statusName !== 'Onboard'">
-                <ejs-tooltip content="Not oriented" position="TopRight">
+              <ng-container *ngIf="!data.isOriented">
+                <ejs-tooltip
+                  [content]="data.departmentOrientationDate"
+                  position="TopRight">
                   <i-feather name="compass" class="icon"></i-feather>
                 </ejs-tooltip>
-              </ng-container> -->
+              </ng-container>
             </div>
           </ng-template>
         </e-column>

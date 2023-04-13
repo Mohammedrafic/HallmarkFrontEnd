@@ -637,3 +637,7 @@ body.dark .title, body.dark .contact-name {
 .payrate .e-gridcontent {
   height: 100% !important;
 }
+.exp_creds .app-widget-wrapper__projection-wrapper {
+  overflow-y: auto;
+  overflow-x: hidden;
+}

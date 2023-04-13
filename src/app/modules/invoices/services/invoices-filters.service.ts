@@ -8,6 +8,7 @@ import { endDateValidator, startDateValidator } from '@shared/validators/date.va
 import {
   InvoiceFilterColumns,
   InvoiceManualPendingRecordsFilteringOptions,
+  InvoicesFilterState,
   InvoicesFilteringOptions,
   InvoicesPendingInvoiceRecordsFilteringOptions,
 } from '../interfaces';
@@ -23,11 +24,12 @@ import {
 } from '../constants';
 import { BaseObservable } from '@core/helpers';
 import { filter, Observable } from 'rxjs';
+import { OrganizationRegion } from '@shared/models/organization.model';
 
 @Injectable()
 export class InvoicesFiltersService {
   private readonly slectedTabIndex = new BaseObservable<number | null>(null);
-  
+
   constructor(private fb: FormBuilder) {
   }
 
@@ -69,11 +71,6 @@ export class InvoicesFiltersService {
     }) as CustomFormGroup<InvoiceFilterColumns>;
   }
 
-  patchFormValue<Type>(formGroup: FormGroup, formValues: Type): void {
-    Object.entries(formGroup.controls).forEach(([field, control]) => {
-      control.setValue(formValues[field as keyof Type] || null);
-    });
-  }
 
   setupValidators(formGroup: FormGroup): void {
     formGroup.get('amountFrom')?.addValidators([intervalMinValidator(formGroup, 'amountTo', true)]);
@@ -154,10 +151,37 @@ export class InvoicesFiltersService {
 
   getSelectedTabStream(): Observable<number | null> {
     return this.slectedTabIndex.getStream()
-    .pipe(filter((id) => id !== null));
+      .pipe(filter((id) => id !== null));
   }
 
   setTabIndex(id: number): void {
     this.slectedTabIndex.set(id);
+  }
+
+  compareStructureWithFilter(
+    filters: InvoicesFilterState,
+    regions: OrganizationRegion[],
+    isAgency: boolean
+  ): InvoicesFilterState {
+    if (!isAgency) { return filters; }
+
+    const selectedRegionIds = filters.regionIds;
+    let hasCommonValues = true;
+
+    if (selectedRegionIds?.length) {
+      const allRegionIds = regions.map((region) => region.id);
+      hasCommonValues = selectedRegionIds.some((id) => allRegionIds.includes(id));
+    }
+
+    const filterData = hasCommonValues
+      ? filters
+      : {
+        ...filters,
+        regionIds: [],
+        locationIds: [],
+        departmentIds: [],
+      };
+
+    return filterData;
   }
 }

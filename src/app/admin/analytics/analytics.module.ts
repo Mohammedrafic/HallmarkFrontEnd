@@ -59,6 +59,7 @@ import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-s
 import { StaffListComponent } from './staff-list/staff-list.component';
 import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-report/finance-medicare-wage-report.component';
 import { GrantReportComponent } from './grant-report/grant-report.component';
+import { ScheduledHoursComponent } from './scheduled-hours/scheduled-hours.component';
 
 
 @NgModule({
@@ -108,7 +109,8 @@ import { GrantReportComponent } from './grant-report/grant-report.component';
     StaffScheduleByShiftComponent,
     StaffListComponent,
     FinanceMedicareWageReportComponent,
-    GrantReportComponent],
+    GrantReportComponent,
+    ScheduledHoursComponent],
   exports: [
     CandidateListComponent
   ],

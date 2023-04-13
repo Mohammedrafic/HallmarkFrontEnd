@@ -73,13 +73,13 @@ export class VendorActivityComponent implements OnInit {
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
- 
+
 
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  
+
 
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
@@ -219,11 +219,11 @@ export class VendorActivityComponent implements OnInit {
   private initForm(): void {
     let today = new Date(Date.now());
 
-    today.setDate(1); 
+    today.setDate(1);
     let year = today.getMonth() == 0 ? today.getFullYear() - 1 : today.getFullYear();
-    let month = today.getMonth() == 0 ? 11 : today.getMonth()-1;
-    let startDate = new Date(year, month , 1);
-    let endDate = new Date(year, month+1, 0);
+    let month = today.getMonth() == 0 ? 11 : today.getMonth() - 1;
+    let startDate = new Date(year, month, 1);
+    let endDate = new Date(year, month + 1, 0);
 
     this.VendorActivityReportForm = this.formBuilder.group(
       {
@@ -362,8 +362,10 @@ export class VendorActivityComponent implements OnInit {
         this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
         let skills = masterSkills.filter((i) => data?.includes(i.skillCategoryId));
         this.filterColumns.skillIds.dataSource = skills;
+        this.VendorActivityReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(skills.map((list) => list.id));
       }
       else {
+        this.filterColumns.skillIds.dataSource = [];
         this.VendorActivityReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
       }
     });
@@ -393,7 +395,7 @@ export class VendorActivityComponent implements OnInit {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { departmentIds, locationIds, 
+    let { departmentIds, locationIds,
       regionIds, skillCategoryIds, skillIds, startDate, endDate, agencyIds } = this.VendorActivityReportForm.getRawValue();
 
     if (!this.VendorActivityReportForm.dirty) {
@@ -518,7 +520,7 @@ export class VendorActivityComponent implements OnInit {
 
     today.setDate(1);
     let year = today.getMonth() == 0 ? today.getFullYear() - 1 : today.getFullYear();
-    let month = today.getMonth() == 0 ? 11 : today.getMonth()-1;
+    let month = today.getMonth() == 0 ? 11 : today.getMonth() - 1;
     let startDate = new Date(year, month, 1);
     let endDate = new Date(year, month + 1, 0);
 
@@ -539,9 +541,9 @@ export class VendorActivityComponent implements OnInit {
   }
 
   public onFilterApply(): void {
-      this.VendorActivityReportForm.markAllAsTouched();
-      if (this.VendorActivityReportForm?.invalid) {
-        return;
+    this.VendorActivityReportForm.markAllAsTouched();
+    if (this.VendorActivityReportForm?.invalid) {
+      return;
     }
     this.filteredItems = [];
     this.SearchReport();

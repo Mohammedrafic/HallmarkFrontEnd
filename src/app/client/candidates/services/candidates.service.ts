@@ -11,9 +11,11 @@ export class CandidatesService {
   );
   private candidateName$: Subject<string> = new Subject<string>();
   private activeEmployeeWorkCommitment$: Subject<CandidateWorkCommitmentShort> = new Subject<CandidateWorkCommitmentShort>();
+  private employeeHireDate: string;
 
   public employeeId: number | null;
-  public constructor(private httpClient: HttpClient) {}
+  
+  public constructor(private httpClient: HttpClient) { }
 
   public getSelectedTab$(): Observable<CandidateTabsEnum> {
     return this.selectedTab$.asObservable();
@@ -51,5 +53,21 @@ export class CandidatesService {
           return activeWorkCommitment;
         })
       );
+  }
+
+  public setEmployeeHireDate(hireDate: string): void {
+    this.employeeHireDate = hireDate;
+  }
+
+  public getEmployeeHireDate(): string {
+    return this.employeeHireDate;
+  }
+
+  public getGridPageNumber(items: number, pageNumber: number): number {
+    if (items === 1 && pageNumber > 1) {
+      return pageNumber - 1;
+    }
+
+    return pageNumber;
   }
 }

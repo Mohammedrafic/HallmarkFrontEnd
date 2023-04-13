@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { AbstractScheduleCardComponent } from '../abstract-schedule-card.component';
+import { ScheduleCard } from '../../helpers/schedule-card.helper';
 
 @Component({
   selector: 'app-schedule-card',
@@ -8,4 +8,4 @@ import { AbstractScheduleCardComponent } from '../abstract-schedule-card.compone
   styleUrls: ['./schedule-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ScheduleCardComponent extends AbstractScheduleCardComponent {}
+export class ScheduleCardComponent extends ScheduleCard {}

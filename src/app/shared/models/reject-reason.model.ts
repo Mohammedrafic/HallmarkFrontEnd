@@ -1,5 +1,11 @@
 import { PageOfCollections } from "@shared/models/page.model";
 
+export type OrderRequisitionReason = {
+  id?: number;
+  name: string;
+  businessUnitId?: number;
+}
+
 export type RejectReason = {
   id?: number;
   reason: string;

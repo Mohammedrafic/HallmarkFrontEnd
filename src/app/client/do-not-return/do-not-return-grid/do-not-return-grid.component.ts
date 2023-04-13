@@ -75,6 +75,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   public IsSwitcher: boolean = false;
   public maskSSNPattern: string = '000-00-0000';
   public maskedSSN: string = '';
+  public maskedFilterSSN: string = '';
+  public filterSSNPattern: string = '000-00-0000';
 
   filterSelectedBusinesUnitId: number | null;
 
@@ -173,6 +175,24 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
         this.maskedSSN = ssnValue;
       }
     });
+    this.doNotReturnFilterForm.get('ssn')?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((ssnValue: any) => {
+      if(ssnValue!= '' && ssnValue!= null && ssnValue.indexOf('XXX-XX') == -1){
+        this.maskedFilterSSN = ssnValue;
+      }
+    });
+  }
+
+  public onFilterSSNBlur(): void {
+    if(this.maskedFilterSSN != null && this.maskedFilterSSN.length > 0 && this.maskedFilterSSN.length >= 9){
+      this.filterSSNPattern = "AAA-AA-0000";
+      this.doNotReturnFilterForm.get('ssn')?.setValue("XXX-XX-" + this.maskedFilterSSN.slice(-4)); 
+    }
+   
+  }
+
+  public onFilterSSNFocus(): void {
+      this.filterSSNPattern = "000-00-0000";
+      this.doNotReturnFilterForm.get('ssn')?.setValue(this.maskedFilterSSN); 
   }
 
   public onSSNBlur(): void {
@@ -579,6 +599,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
+    this.maskedFilterSSN = '';
+    this.filterSSNPattern = '000-00-0000';
     this.getDoNotReturn();
     this.filteredItems$.next(this.filteredItems.length);
     this.store.dispatch(new ShowFilterDialog(false));
@@ -586,6 +608,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
   public onFilterApply(): void {
     this.filters = this.doNotReturnFilterForm.getRawValue();
+    this.filters.ssn = parseInt(this.maskedFilterSSN);
     this.filteredItems = this.filterService.generateChips(this.doNotReturnFilterForm, this.filterColumns);
     this.getDoNotReturn();
     this.store.dispatch(new ShowFilterDialog(false));

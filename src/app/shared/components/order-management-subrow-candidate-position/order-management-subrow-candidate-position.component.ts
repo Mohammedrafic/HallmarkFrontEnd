@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { ColDef } from '@ag-grid-community/core';
 
@@ -12,6 +12,8 @@ import {
 import {
   OrderManagementChildCandidate,
 } from '@shared/components/order-management-subrow-candidate-position/subrow-candidate-position.interface';
+import { OrderManagementIrpCandidateSystem,
+} from '../grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.enum';
 
 @Component({
   selector: 'app-order-management-subrow-candidate-position',
@@ -21,15 +23,23 @@ import {
 })
 export class OrderManagementSubrowCandidatePositionComponent {
   @Input() public selected: boolean;
-  @Input() set candidatePosition(candidates: OrderManagementChild) {
-    this.candidate = SubrowCandidatePositionAdapter.prepareTableData(candidates);
-    this.colDefs = OrderManagementSubGridCells(candidates.system as number);
+  @Input() set candidatePosition(candidate: OrderManagementChild) {
+    this.vmsPosition = candidate.system === OrderManagementIrpCandidateSystem.VMS;
+    this.initJobData = candidate;
+    this.candidate = SubrowCandidatePositionAdapter.prepareTableData(candidate);
+    this.colDefs = OrderManagementSubGridCells(candidate.system as number);
     this.cd.markForCheck();
   }
+
+  @Output() openPosition: EventEmitter<OrderManagementChild> = new EventEmitter();
 
   public colDefs: ColDef[] = [];
   //todo: remove any
   public candidate: OrderManagementChildCandidate | any;
+
+  public vmsPosition = false;
+
+  private initJobData: OrderManagementChild;
 
   constructor(
     private cd: ChangeDetectorRef
@@ -37,5 +47,9 @@ export class OrderManagementSubrowCandidatePositionComponent {
 
   public trackByField(index: number, config: ColDef): string {
     return config.field as string;
+  }
+
+  public emitOpenPosition(): void {
+    this.openPosition.emit(this.initJobData);
   }
 }

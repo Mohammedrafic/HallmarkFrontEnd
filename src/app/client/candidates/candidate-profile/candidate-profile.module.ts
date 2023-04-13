@@ -22,6 +22,9 @@ import { GeneralNotesGridCategoryRendererComponent } from './general-notes/gener
 import { CandidateProfileService } from '@client/candidates/candidate-profile/candidate-profile.service';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
+import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { NgxsModule } from '@ngxs/store';
+import { GeneralNoteState } from './general-notes/general-notes.state';
 
 @NgModule({
   declarations: [
@@ -40,6 +43,7 @@ import { GeneralNotesService } from '@client/candidates/candidate-profile/genera
     InputModule,
     DatepickerModule,
     DropdownModule,
+    DropDownButtonModule,
     MultiselectDropdownModule,
     SwitchModule,
     TextareaModule,
@@ -49,6 +53,8 @@ import { GeneralNotesService } from '@client/candidates/candidate-profile/genera
     ButtonModule,
     SharedModule,
     DropDownListModule,
+    //STORE
+    NgxsModule.forFeature([GeneralNoteState]),
   ],
   providers: [
     CandidateProfileService,

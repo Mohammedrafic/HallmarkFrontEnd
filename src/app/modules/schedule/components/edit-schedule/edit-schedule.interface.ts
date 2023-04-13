@@ -13,6 +13,13 @@ export interface ScheduledShift {
   endTime: string;
   createOrder: boolean;
   unavailabilityReasonId?: number;
+  initialStartTime?: string;
+  initialEndTime?: string;
+  orientated?: boolean;
+  critical?: boolean;
+  onCall?: boolean;
+  charge?: boolean;
+  preceptor?: boolean;
 }
 
 export interface ScheduledShiftForm {
@@ -26,6 +33,11 @@ export interface ScheduledShiftForm {
   departmentId?: number;
   skillId?: number;
   unavailabilityReasonId?: number;
+  orientated?: boolean,
+  critical?: boolean,
+  oncall?: boolean,
+  charge?: boolean,
+  preceptor?: boolean,
 }
 
 export interface EditScheduleFormConfig {
@@ -43,7 +55,8 @@ export interface EditScheduleFormFieldConfig {
   maxLen?: number;
   pattern?: string;
   inputType?: InputAttrType;
-  sourceKey?: EditScheduleFormSourceKeys
+  sourceKey?: EditScheduleFormSourceKeys;
+  show?: boolean;
 }
 
 export interface EditScheduleFormSource {
@@ -59,10 +72,4 @@ export interface ShiftTab {
   title: string;
   subTitle: string;
   id: number;
-}
-
-export interface CreateNewScheduleModeConfig {
-  createModeEnabled: boolean;
-  tabSelected: boolean;
-  tabIndex: number;
 }

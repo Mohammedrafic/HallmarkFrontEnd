@@ -71,7 +71,11 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
   private initPageSizeControlValueChangesListener(): void {
     this.paginationFormGroup
       .get('pageSize')
-      ?.valueChanges.pipe(skip(1), distinctUntilChanged(), takeUntil(this.destroy$))
+      ?.valueChanges.pipe(
+        skip(1),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$),
+      )
       .subscribe((pageSize: number) => {
         this.pageSizeChangeEmitter.emit(pageSize);
       });

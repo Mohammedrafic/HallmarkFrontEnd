@@ -10,7 +10,6 @@ import { MENU_CONFIG } from '@shared/constants';
 import {
   AGENCY_ID_STORAGE_KEY,
   LAST_SELECTED_BUSINESS_UNIT_TYPE,
-  LogiReportJsLoaded,
   ORG_ID_STORAGE_KEY,
   USER_STORAGE_KEY
 } from '@shared/constants/local-storage-keys';
@@ -19,6 +18,7 @@ import { ChildMenuItem, Menu, MenuItem } from '@shared/models/menu.model';
 import { User, UsersAssignedToRole } from '@shared/models/user.model';
 import { UserService } from '@shared/services/user.service';
 import {
+  ClearOrganizationStructure,
   GetCurrentUserPermissions,
   GetOrderPermissions,
   GetOrganizationStructure, GetOrgTierStructure,
@@ -334,6 +334,11 @@ export class UserState {
         return patchState({ organizationStructure: structure });
       })
     );
+  }
+
+  @Action(ClearOrganizationStructure)
+  ClearOrganizationStructure({ patchState }: StateContext<UserStateModel>) : UserStateModel {
+    return patchState({ organizationStructure: null });
   }
 
   @Action(LastSelectedOrganisationAgency)

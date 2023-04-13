@@ -1,4 +1,5 @@
 import { FormGroup } from '@angular/forms';
+import { formatDate } from '@angular/common';
 
 import { CreateIrpCandidateDto, UpdateIrpCandidateDto } from '@shared/components/order-candidate-list/interfaces';
 import { DateTimeHelper } from '@core/helpers';
@@ -41,4 +42,9 @@ export const DisableControls = (controlList: string[], form: FormGroup): void =>
   controlList.forEach((control: string) => {
     form.get(control)?.disable();
   });
+};
+
+export const getOrientationDate = (departmentDate: string | null): string => {
+  return departmentDate ?
+    `Oriented from ${formatDate(departmentDate, 'MM/dd/yyyy', 'en-US')}` : 'Not oriented';
 };

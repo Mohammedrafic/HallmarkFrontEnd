@@ -14,7 +14,7 @@ export class BaseFormControlDirective
   @Input() public formGroupInstance: FormGroup;
   @Input() public id: string;
   @Input() public label: string;
-  @Input() public tabindex: number = 0;
+  @Input() public tabindex = 0;
   @Input() public placeholder: string;
   @Input() public required: boolean;
   @Input() public disabled = false;

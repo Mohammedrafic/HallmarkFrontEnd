@@ -11,9 +11,8 @@
     >
       <p class="order-type">L</p>
     </ejs-tooltip>
-    <!-- TODO: uncomment for feature implementation -->
-    <!--<ejs-tooltip
-      *ngIf="candidateIconName"
+    <ejs-tooltip
+      *ngIf="candidateIconName && iconTooltipMessage.length"
       [content]="iconTooltipMessage"
       position="TopCenter"
       [showTipPointer]="false"
@@ -22,7 +21,7 @@
         [name]="candidateIconName"
         class="icon"
       ></i-feather>
-    </ejs-tooltip> -->
+    </ejs-tooltip>
   </div>
   <div class="block">
     <ejs-tooltip *ngIf="candidateData.displayId"
@@ -46,7 +45,7 @@
     <ejs-tooltip [content]="candidateData.workCommitmentText" position="TopRight" [showTipPointer]="false">
       <span>
         {{ candidateData.workCommitments && candidateData.workCommitments.length > 1
-          ? 'Multiple' : candidateData.workCommitments?.[0] }}</span>
+          ? 'Multiple' : candidateData.workCommitment }}</span>
     </ejs-tooltip>
   </div>
 </div>

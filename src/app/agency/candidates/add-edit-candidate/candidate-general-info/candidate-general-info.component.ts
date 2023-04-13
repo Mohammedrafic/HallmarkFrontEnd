@@ -1,8 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { filter, Observable, takeUntil } from 'rxjs';
+import { delay, distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { CheckBoxSelectionService } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -26,6 +26,7 @@ import { ssnValidator } from '../../../../shared/validators/ssn.validator';
 export class CandidateGeneralInfoComponent extends DestroyableDirective implements OnInit {
   @Input() formGroup: FormGroup;
   @Input() selectedSkills: JobDistributionMasterSkills[] | undefined;
+  @Output() changedSSN = new EventEmitter<string>();
 
   @Input() set isCandidateCreated(value: boolean | null) {
     this.enableStatusFields = value as boolean;
@@ -46,6 +47,9 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   public readonly optionFields = DefaultOptionFields;
   public readonly skillsFields = SkillFields;
   public readonly classifications = Classifications;
+  
+  @Input() maskSSNPattern: string = '000-00-0000';
+  @Input() maskedSSN: string = '';
 
   constructor(private store: Store,
               private candidateGeneralInfoService: CandidateGeneralInfoService) {
@@ -55,6 +59,36 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   ngOnInit(): void {
     this.getCandidateSkills();
     this.store.dispatch([new GetAllSkills(), new GetRegionList()]);
+    this.formGroup.get('ssn')?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((ssnValue: any) => {
+      if(ssnValue != null &&  ssnValue.indexOf('XXX-XX') == -1){
+        this.maskedSSN = ssnValue;
+      }
+    });
+  }
+
+  
+  public onSSNBlur(): void {
+    if(this.maskedSSN != null &&  this.maskedSSN.trim().length > 0 && this.maskedSSN.trim().length >= 9){
+      this.maskSSNPattern = "AAA-AA-0000";
+      if(this.formGroup.controls['ssn'].valid){
+        this.formGroup.controls['ssn'].clearValidators();
+        this.formGroup.controls['ssn'].updateValueAndValidity({emitEvent : false});
+        this.formGroup.controls['ssn'].markAsTouched();
+        this.formGroup.get('ssn')?.setValue("XXX-XX-" + this.maskedSSN.slice(-4)); 
+        this.changedSSN.emit(this.maskedSSN);
+      }
+    }else{
+      this.changedSSN.emit('');
+    }
+   
+  }
+
+  public onSSNFocus(): void {
+      this.maskSSNPattern = "000-00-0000";
+      this.formGroup.get('ssn')?.setValue(this.maskedSSN); 
+      this.formGroup.controls['ssn'].addValidators([ssnValidator()]);
+      this.formGroup.controls['ssn'].updateValueAndValidity({emitEvent : false});
+      this.formGroup.controls['ssn']?.markAsTouched();     
   }
 
   static createFormGroup(): FormGroup {
@@ -68,7 +102,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
       profileStatus: new FormControl(2, [Validators.required]),
       candidateAgencyStatus: new FormControl(2, [Validators.required]),
       candidateProfileRegions: new FormControl(null, [Validators.required]),
-      ssn: new FormControl('', [ssnValidator()]),
+      ssn: new FormControl(''),
     });
   }
 

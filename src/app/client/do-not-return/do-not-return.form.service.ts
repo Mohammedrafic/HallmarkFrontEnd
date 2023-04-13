@@ -30,7 +30,7 @@ export class DoNotReturnFormService {
   createDoNotreturnFilterForm(): CustomFormGroup<DoNotReturnFilterForm> {
     return this.fb.group({
       candidatename: [''],
-      ssn: [0, [Validators.pattern(ONLY_NUMBER)]],
+      ssn: [''],
     }) as CustomFormGroup<DoNotReturnFilterForm>;
   }
 
