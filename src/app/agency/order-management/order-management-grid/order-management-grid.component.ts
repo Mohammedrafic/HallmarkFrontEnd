@@ -397,12 +397,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const filterState = { ...state, orderStatuses };
       const filterFormConfig = GetAgencyFilterFormConfig(this.selectedTab);
       this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
+      if(this.Organizations != null){
+        this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.Organizations]);
+        this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
+      }
       this.patchFilterForm(!!this.filters?.regionIds?.length);
       this.prepopulateFilterFormStructure();
       this.dispatchNewPage();
       return;
     }
-
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     if (this.redirectFromPerDiem || selectedOrderAfterRedirect) {
       this.redirectFromPerDiem = false;
@@ -429,8 +432,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         if (this.filters.departmentsIds) {
           this.OrderFilterFormGroup.get('departmentsIds')?.setValue([...this.filters.departmentsIds]);
         }
-
+        if(this.Organizations.length > 0){
+          this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
+          this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
+        } 
         this.generateFilterChips();
+        this.dispatchNewPage();
       });
   }
 
@@ -449,8 +456,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         }
       }
       this.filteredItems$.next(this.filteredItems.length);
-    }
-
+    } 
+    if(this.Organizations.length > 0){
+      this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
+      this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
+    } 
+    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.dispatchNewPage();
   }
 
@@ -830,6 +841,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
         this.filteredItems$.next(this.filteredItems.length);
+        // if(this.Organizations != null){
+        //   this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.Organizations]);
+        // }
         this.dispatchNewPage();
       });
   }
@@ -844,6 +858,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.clearFilters();
         this.filters.orderPublicId = this.prefix + '-' + this.orderId;
         this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
+        if(this.Organizations != null){
+          this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.Organizations]);
+        }
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
         this.filteredItems$.next(this.filteredItems.length);
         this.dispatchNewPage();
