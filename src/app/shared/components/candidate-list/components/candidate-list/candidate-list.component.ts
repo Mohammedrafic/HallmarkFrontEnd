@@ -1,7 +1,19 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { debounceTime, filter, map, merge, Observable, Subject, switchMap, takeUntil, takeWhile, combineLatest, tap } from 'rxjs';
+import {
+  debounceTime, 
+  filter, 
+  map, 
+  Observable, 
+  Subject, 
+  switchMap, 
+  takeUntil, 
+  takeWhile, 
+  tap, 
+  distinctUntilChanged,
+} from 'rxjs';
 import { FormGroup } from '@angular/forms';
-import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
+import { AbstractGridConfigurationComponent } 
+  from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { CandidatesStatusText, CandidateStatus, EmployeeStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -55,9 +67,9 @@ import { DepartmentHelper } from '@client/candidates/departments/helpers/departm
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { SystemType } from '@shared/enums/system-type.enum';
-import { DateTimeHelper } from '@core/helpers';
+import { DateTimeHelper, isPrimitiveArraysEqual } from '@core/helpers';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
-import { ClearPageFilters, GetPreservedFiltersByPage, ResetPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
+import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
 
 @Component({
@@ -93,21 +105,21 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   assignedSkills$: Observable<ListOfSkills[]>;
 
-  @Input() public credEndDate: string;
-  @Input() public credStartDate: string;
-  @Input() public credType: number;
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;
 
-  @Input() filteredItems$: Subject<number>;
-  @Input() export$: Subject<ExportedFileType>;
-  @Input() search$: Subject<string>;
-  @Input() includeDeployedCandidates$: Subject<boolean>;
-  @Input() isAgency: boolean;
-  @Input() agencyActionsAllowed: boolean;
-  @Input() userPermission: Permission;
-  @Input() isIRP: boolean;
-  @Input() set tab(tabIndex: number) {
+  @Input() public credEndDate: string;
+  @Input() public credStartDate: string;
+  @Input() public credType: number;
+  @Input() public filteredItems$: Subject<number>;
+  @Input() public export$: Subject<ExportedFileType>;
+  @Input() public search$: Subject<string>;
+  @Input() public includeDeployedCandidates$: Subject<boolean>;
+  @Input() public isAgency: boolean;
+  @Input() public agencyActionsAllowed: boolean;
+  @Input() public userPermission: Permission;
+  @Input() public isIRP: boolean;
+  @Input() public set tab(tabIndex: number) {
     if (!isNil(tabIndex)) {
       this.activeTab = tabIndex;
       this.dispatchNewPage();
@@ -194,7 +206,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.isAlive = false;
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-    this.store.dispatch(new ResetPageFilters());
+    this.store.dispatch(new PreservedFilters.ResetPageFilters());
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -203,7 +215,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFilterClearAll(): void {
-    this.store.dispatch(new ClearPageFilters(this.getPageName()));
+    this.store.dispatch(new PreservedFilters.ClearPageFilters(this.getPageName()));
     this.clearFilters();
     this.dispatchNewPage();
   }
@@ -220,7 +232,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.filters.skillsIds = this.filters.skillsIds || [];
     this.filters.candidateName = this.filters.candidateName || null;
     this.filters.expiry = expiry;
-   
+
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
     this.filterService.setPreservedFIltersGlobal(this.filters);
@@ -233,20 +245,20 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.CandidateFilterFormGroup.get('regionsNames')?.setValue([...preservedFilters.regions]);
         this.filters.regionsNames = [...preservedFilters.regions];
       }
-    if(this.CandidateFilterFormGroup.dirty) {
-      this.filters = this.CandidateFilterFormGroup.getRawValue();
-      this.filters.profileStatuses = this.filters.profileStatuses || [];
-      this.filters.regionsNames = this.filters.regionsNames || [];
-      this.filters.skillsIds = this.filters.skillsIds || [];
-      this.filters.candidateName = this.filters.candidateName || null;
-      this.store.dispatch(new ShowFilterDialog(false));
-      this.saveFiltersByPageName(this.filters);
-      this.dispatchNewPage();
-      this.CandidateFilterFormGroup.markAsPristine();
-    } else {
-      this.store.dispatch(new ShowFilterDialog(false));
+      if (this.CandidateFilterFormGroup.dirty) {
+        this.filters = this.CandidateFilterFormGroup.getRawValue();
+        this.filters.profileStatuses = this.filters.profileStatuses || [];
+        this.filters.regionsNames = this.filters.regionsNames || [];
+        this.filters.skillsIds = this.filters.skillsIds || [];
+        this.filters.candidateName = this.filters.candidateName || null;
+        this.store.dispatch(new ShowFilterDialog(false));
+        this.saveFiltersByPageName(this.filters);
+        this.dispatchNewPage();
+        this.CandidateFilterFormGroup.markAsPristine();
+      } else {
+        this.store.dispatch(new ShowFilterDialog(false));
+      }
     }
-  }
   }
 
 
@@ -347,7 +359,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public dispatchNewPage(): void {
-    
+
     const candidateListRequest: CandidateListRequest = {
       orderBy: '',
       pageNumber: this.currentPage,
@@ -474,7 +486,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private dispatchInitialIcon(): void {
     !this.isIRP ? this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' })) : this.store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'clock' }))
   }
-  
+
 
   private IRPVMSGridHandler(): void {
     if (this.isIRP) {
@@ -485,15 +497,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private subscribeOnSaveState(): void {
-    combineLatest([this.lastSelectedAgencyId$, this.lastSelectedOrgId$, this.regions$])
-    .pipe(
-      filter((data) => !!data[2]),
-      debounceTime(600),
-      tap(() => { this.getPreservedFiltersByPage() }),
+    this.getLatSelectedBusinessUnitId().pipe(
+      switchMap(() => this.regions$),
+      distinctUntilChanged((prev, next) => isPrimitiveArraysEqual(prev, next)),
+      tap(() => { this.getPreservedFiltersByPage(); }),
       switchMap(() => this.preservedFiltersByPageName$),
       filter(({ dispatch }) => dispatch),
       tap((filters) => {
         this.filters = { ...filters.state };
+
         if(this.credStartDate != undefined){
           this.filters.startDate = DateTimeHelper.toUtcFormat(this.credStartDate);
         }
@@ -503,17 +515,18 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         if(this.credType != null){
           this.filters.credType = [this.credType];
         }
+
         this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
       }),
       takeUntil(this.unsubscribe$)
     )
-    .subscribe(() => {
-      !this.isAgency && this.IRPVMSGridHandler();
-      this.updateCandidates();
-      this.dispatchNewPage();
-      this.store.dispatch([new GetAllSkills()]);
-      this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
-    });
+      .subscribe(() => {
+        !this.isAgency && this.IRPVMSGridHandler();
+        this.updateCandidates();
+        this.dispatchNewPage();
+        this.store.dispatch([new GetAllSkills()]);
+        this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
+      });
   }
 
 
@@ -637,16 +650,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private getRegions(): void {
-    if (this.filterService.canPreserveFilters()) {
-      this.store.dispatch(new GetRegionList());
-    } else {
-      merge(this.lastSelectedAgencyId$, this.lastSelectedOrgId$)
+
+      this.getLatSelectedBusinessUnitId()
         .pipe(
           filter(Boolean),
           switchMap(() => this.store.dispatch(new GetRegionList())),
           takeUntil(this.unsubscribe$)
-          ).subscribe();
-    }
+        ).subscribe();
   }
 
   private syncFilterTagsWithControls(): void {
@@ -660,11 +670,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private getPreservedFiltersByPage(): void {
-    this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
+    this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
   }
 
   private saveFiltersByPageName(filters: CandidateListFilters): void {
-    this.store.dispatch(new SaveFiltersByPageName(this.getPageName(), filters));
+    this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(), filters));
   }
 
   private getPageName(): FilterPageName {
@@ -676,5 +686,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     } else {
       return FilterPageName.CandidatesVMSOrganization;
     }
+  }
+
+  private getLatSelectedBusinessUnitId(): Observable<number> {
+    const businessUnitId$ = this.isAgency ? this.lastSelectedAgencyId$ : this.lastSelectedOrgId$;
+    return businessUnitId$;
   }
 }
