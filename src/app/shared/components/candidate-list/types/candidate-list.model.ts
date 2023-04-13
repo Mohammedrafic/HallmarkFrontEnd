@@ -107,11 +107,6 @@ export interface CandidateListFiltersColumn {
   startDate?: CandidateNameFilterColumn;
   endDate?: CandidateNameFilterColumn;
   credType? : FilterColumn;
-  expiry : {
-    startDate?: string | null;
-    endDate?: string | null;
-    type: number[];
-  };
 }
 
 export type CandidateListExport = {
