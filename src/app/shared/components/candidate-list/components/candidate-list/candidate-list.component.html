@@ -88,13 +88,13 @@
     </e-column>
     <e-column headerText="Location" field="locationName" [visible]="false" width=200></e-column>
     <e-column headerText="DEpartment" field="departmentName" [visible]="false" width=200></e-column>
-    <e-column headerText="WorkCommitment" field="employeeWorkCommitments" width=200>
+    <e-column headerText="Work Commitment" field="employeeWorkCommitments" width=200>
       <ng-template #template let-data>
         <ng-container *ngIf="data.employeeWorkCommitments">
           {{data.employeeWorkCommitments}}
         </ng-container>
         <ng-container *ngIf="!data.employeeWorkCommitments">
-          No Work Commitments
+          No Work Commitment
         </ng-container>
       </ng-template>
     </e-column>
