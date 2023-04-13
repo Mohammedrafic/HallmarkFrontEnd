@@ -138,6 +138,14 @@ export class StaffScheduleByShiftComponent implements OnInit {
 
   public filterOptionData: StaffScheduleReportFilterOptions;
 
+  get startDateControl(): AbstractControl { 
+    return this.staffScheduleReportForm.get('startDate') as AbstractControl; 
+  }
+
+  get endDateControl(): AbstractControl { 
+    return this.staffScheduleReportForm.get('endDate') as AbstractControl; 
+  }
+
   constructor(
     private store: Store,
     private formBuilder: FormBuilder,
