@@ -221,46 +221,29 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFilterApply(): void {
-    this.filters = this.CandidateFilterFormGroup.getRawValue();
-    const expiry = {
-      type : this.filters.credType,
-      startDate : this.filters.startDate,
-      endDate : this.filters.endDate
-    }
-    this.filters.profileStatuses = this.filters.profileStatuses || [];
-    this.filters.regionsNames = this.filters.regionsNames || [];
-    this.filters.skillsIds = this.filters.skillsIds || [];
-    this.filters.candidateName = this.filters.candidateName || null;
-    this.filters.expiry = expiry;
-
-    this.dispatchNewPage();
-    this.store.dispatch(new ShowFilterDialog(false));
-    this.filterService.setPreservedFIltersGlobal(this.filters);
-  }
-
-  private setDefaultFilter(): void {
-    if (this.filterService.canPreserveFilters() && !this.isIRP) {
-      const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersGlobal);
-      if (preservedFilters?.regions) {
-        this.CandidateFilterFormGroup.get('regionsNames')?.setValue([...preservedFilters.regions]);
-        this.filters.regionsNames = [...preservedFilters.regions];
+    if (this.CandidateFilterFormGroup.dirty) {
+      this.filters = this.CandidateFilterFormGroup.getRawValue();
+      
+      const expiry = {
+        type : this.filters.credType,
+        startDate : this.filters.startDate,
+        endDate : this.filters.endDate
       }
-      if (this.CandidateFilterFormGroup.dirty) {
-        this.filters = this.CandidateFilterFormGroup.getRawValue();
-        this.filters.profileStatuses = this.filters.profileStatuses || [];
-        this.filters.regionsNames = this.filters.regionsNames || [];
-        this.filters.skillsIds = this.filters.skillsIds || [];
-        this.filters.candidateName = this.filters.candidateName || null;
-        this.store.dispatch(new ShowFilterDialog(false));
-        this.saveFiltersByPageName(this.filters);
-        this.dispatchNewPage();
-        this.CandidateFilterFormGroup.markAsPristine();
-      } else {
-        this.store.dispatch(new ShowFilterDialog(false));
-      }
+
+      this.filters.profileStatuses = this.filters.profileStatuses || [];
+      this.filters.regionsNames = this.filters.regionsNames || [];
+      this.filters.skillsIds = this.filters.skillsIds || [];
+      this.filters.candidateName = this.filters.candidateName || null;
+      this.filters.expiry = expiry;
+
+      this.saveFiltersByPageName(this.filters);
+      this.dispatchNewPage();
+      this.store.dispatch(new ShowFilterDialog(false));
+      this.CandidateFilterFormGroup.markAsPristine();
+    } else {
+      this.store.dispatch(new ShowFilterDialog(false));
     }
   }
-
 
   public onFilterClose(): void {
     this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
@@ -504,7 +487,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       switchMap(() => this.preservedFiltersByPageName$),
       filter(({ dispatch }) => dispatch),
       tap((filters) => {
-        this.filters = { ...filters.state };
+
+        if (!filters.isNotPreserved) {
+          this.filters = { ...filters.state };
+          this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
+        } 
 
         if(this.credStartDate != undefined){
           this.filters.startDate = DateTimeHelper.toUtcFormat(this.credStartDate);
