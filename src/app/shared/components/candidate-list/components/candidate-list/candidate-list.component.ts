@@ -480,7 +480,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private subscribeOnSaveState(): void {
-    this.getLatSelectedBusinessUnitId().pipe(
+    this.getLastSelectedBusinessUnitId().pipe(
       switchMap(() => this.regions$),
       distinctUntilChanged((prev, next) => isPrimitiveArraysEqual(prev, next)),
       tap(() => { this.getPreservedFiltersByPage(); }),
@@ -638,7 +638,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private getRegions(): void {
 
-      this.getLatSelectedBusinessUnitId()
+      this.getLastSelectedBusinessUnitId()
         .pipe(
           filter(Boolean),
           switchMap(() => this.store.dispatch(new GetRegionList())),
@@ -675,7 +675,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     }
   }
 
-  private getLatSelectedBusinessUnitId(): Observable<number> {
+  private getLastSelectedBusinessUnitId(): Observable<number> {
     const businessUnitId$ = this.isAgency ? this.lastSelectedAgencyId$ : this.lastSelectedOrgId$;
     return businessUnitId$;
   }
