@@ -522,13 +522,13 @@ export class StaffScheduleByShiftComponent implements OnInit {
         : '';
     locationIds =
       locationIds.length > 0
-        ? locationIds
+        ? locationIds.join(',')
         : this.locationsList?.length > 0
         ? this.locationsList.map((x) => x.id).join(',')
         : '';
     departmentIds =
       departmentIds.length > 0
-        ? departmentIds
+        ? departmentIds.join(',')
         : this.departmentsList?.length > 0
         ? this.departmentsList.map((x) => x.id).join(',')
         : '';
