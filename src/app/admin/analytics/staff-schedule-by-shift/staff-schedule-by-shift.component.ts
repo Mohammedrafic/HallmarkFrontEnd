@@ -578,7 +578,7 @@ export class StaffScheduleByShiftComponent implements OnInit {
       this.employeesSearchFromScheduling$.subscribe((result) => {            
         var candidates = result.items?.map((candidate: ScheduleCandidate) => ({
           ...candidate,
-          fullName: `${candidate.lastName} ${candidate.firstName}`,
+          fullName: `${candidate.firstName} ${candidate.lastName}`,
         }))
         this.candidateFilterData = candidates;
         this.candidateSearchData = candidates;
