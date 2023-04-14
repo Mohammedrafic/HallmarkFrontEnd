@@ -107,18 +107,20 @@ export const isPrimitiveArraysEqual = (arr1: unknown[], arr2: unknown[], strictE
   let arrayA = arr1;
   let arrayB = arr2;
 
-  if (arrayA === arrayB) return true;
-  if (!arrayA || !arrayB) return false;
-  if (arrayA.length !== arrayA.length) return false;
+  if (!Array.isArray(arrayA) || !Array.isArray(arrayB)) {
+    return false;
+  }
+  if (arrayA === arrayB) {
+    return true;
+  }
+  if (arrayA.length !== arrayA.length) {
+    return false;
+  }
 
   if (strictEquality) {
     arrayA = sortBy(arrayA);
     arrayB = sortBy(arrayB);
   }
 
-  for (let i = 0; i < arrayA.length; ++i) {
-    if (arrayA[i] !== arrayB[i]) return false;
-  }
-
-  return true;
+  return arrayA.every((val: unknown, index: number) => val === arrayB[index]);
 };
