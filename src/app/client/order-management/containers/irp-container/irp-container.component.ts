@@ -45,6 +45,8 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public tabs = IrpTabs;
   public orderCredentials: IOrderCredentialItem[] = [];
 
+  private selectedOrderType: OrderType;
+
   constructor(
     private orderCredentialsService: OrderCredentialsService,
     private irpStateService: IrpContainerStateService,
@@ -76,6 +78,11 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
   public deleteOrderCredential(credential: IOrderCredentialItem): void {
     this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
+  }
+
+  public changeTabConfig(orderType: OrderType): void {
+    this.tabsConfig = IrpTabConfig(orderType !== OrderType.ReOrder);
+    this.selectedOrderType = orderType;
   }
 
   private watchForSucceededSaveOrder(): void {
@@ -114,9 +121,12 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       this.checkIsCredentialsValid(formState);
     }
   }
-
+ 
   private checkIsCredentialsValid(formState: ListOfKeyForms): void {
-    if(this.orderCredentials?.length || this.selectedOrder?.orderType === OrderType.ReOrder) {
+    const credentialsValid = this.orderCredentials?.length || this.selectedOrder?.orderType === OrderType.ReOrder
+    || this.selectedOrderType === OrderType.ReOrder;
+
+    if(credentialsValid) {
       this.saveOrder(formState);
     } else {
       showMessageForInvalidCredentials();
