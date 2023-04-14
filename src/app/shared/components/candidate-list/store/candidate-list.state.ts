@@ -57,8 +57,9 @@ export class CandidateListState {
 
   @Selector()
   static listOfRegions(state: CandidateListStateModel): string[] | null {
-    return state.listOfRegions
+    return state.listOfRegions;
   }
+
   constructor(private candidateListService: CandidateListService) {}
 
   @Action(GetCandidatesByPage, { cancelUncompleted: true })
@@ -136,9 +137,9 @@ export class CandidateListState {
   GetRegionList({patchState}: StateContext<CandidateListStateModel>): Observable<string[]> {
     return this.candidateListService.getRegions().pipe(tap((data)=> {
       patchState({
-        listOfRegions: data
-      })
-    }))
+        listOfRegions: data,
+      });
+    }));
   }
 
   @Action(DeleteIRPCandidate)
