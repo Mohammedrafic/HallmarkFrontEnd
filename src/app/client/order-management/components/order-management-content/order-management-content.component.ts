@@ -528,6 +528,20 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.OnUpdateRegrateSucceededHandler();
     this.subscribeOnUserSearch();
     this.watchForUpdateCandidate();
+   
+  let isIrpEnabled=  JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
+  if(isIrpEnabled==true){
+    this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
+    this.activeSystem = OrderManagementIRPSystemId.IRP;
+    this.getPreservedFiltersByPage();
+    this.orderManagementService.setOrderManagementSystem(this.activeSystem);
+    this.setOrderTypesFilterDataSource();
+    this.clearFilters();
+    this.initMenuItems();
+    this.initGridColumns();
+    this.getOrders();
+  }
+   
   }
 
   ngOnDestroy(): void {

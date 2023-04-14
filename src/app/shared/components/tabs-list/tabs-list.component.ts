@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
+  Inject,
   Input,
   NgZone,
   Output,
@@ -13,6 +14,8 @@ import { OutsideZone } from '@core/decorators';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { TabConfig } from '@client/candidates/interface';
+import { OrderManagementIRPTabsIndex } from '@shared/enums/order-management-tabs.enum';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-tabs-list',
@@ -29,7 +32,8 @@ export class TabsListComponent implements AfterViewInit {
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
 
-  constructor(private readonly ngZone: NgZone) {}
+  constructor(private readonly ngZone: NgZone,  
+  @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,) {}
 
   public ngAfterViewInit(): void {
     this.asyncRefresh();
@@ -47,6 +51,19 @@ export class TabsListComponent implements AfterViewInit {
   private asyncRefresh(): void {
     setTimeout(() => {
       this.tab.refreshActiveTabBorder();
+      this.navigatingTab();
     });
+  }
+
+  @OutsideZone
+  private navigatingTab():void{
+    setTimeout(() => {
+      let isIrpEnabled=  JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
+      if(isIrpEnabled==true){
+        this.globalWindow.localStorage.setItem("ISIrpEnabled", JSON.stringify(""));
+        this.changeTab.emit(OrderManagementIRPTabsIndex.Lta)
+        this.tab.selectedItem = OrderManagementIRPTabsIndex.Lta;
+      }
+    }, 1000);
   }
 }
