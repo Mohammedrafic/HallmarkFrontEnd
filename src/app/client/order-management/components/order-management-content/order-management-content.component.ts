@@ -1619,38 +1619,16 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
   }
 
-  private onOrderFilterDataSourcesLoadHandler(): Observable<OrderFilterDataSource> {
-    return this.orderFilterDataSources$.pipe(
-      debounceTime(100),
-      filter(Boolean),
-      tap((data: OrderFilterDataSource) => {
-        this.getapprovalorder();
-        this.setupDefaultStatuses(data);
+  private adjustFilters(): void {
+    const filterState = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersByPageName) as
+    PreservedFiltersByPage<OrderFilter>;
 
-        if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
-          const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersByPageName) as
-            PreservedFiltersByPage<OrderFilter>;
-          this.adjustFilters(preservedFilters);
-        } else {
-          this.redirectFromPerdiem = false;
-        }
-        this.cd$.next(true);
-        this.clearStorage();
-      }),
-      takeUntil(this.unsubscribe$)
-    );
-  }
-
-  private adjustFilters(filters: PreservedFiltersByPage<OrderFilter>): void {
-    // TODO refactoring need
-    const { isNotPreserved, dispatch } = filters;
-    if((isNotPreserved && dispatch) || this.orderManagementPagerState) { 
+    if ((filterState.isNotPreserved) || this.orderManagementPagerState) {
       this.setDefaultFilter();
     } else {
       this.patchFilterForm(!!this.filters?.contactEmails);
       this.populatePreservedContactPerson();
     }
-    this.cd.markForCheck();
   }
 
   private populatePreservedContactPerson(): void {
@@ -1671,6 +1649,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.filterColumns,
           this.datePipe
         );
+
+        this.cd.markForCheck();
       });
   }
 
@@ -1787,8 +1767,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private onOrganizationStructureDataLoadHandler(): void {
     this.organizationStructure$
       .pipe(
-        throttleTime(50),
-        filter(Boolean),
+        debounceTime(50),
+        filter((structure) => !!structure),
         tap((structure: OrganizationStructure) => {
           this.orgStructure = structure;
           this.regions = structure.regions;
@@ -1804,10 +1784,23 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.dispatchOrders(!isNotPreserved);
         }),
         //get filter data source
-        switchMap(() => this.onOrderFilterDataSourcesLoadHandler()),
+        switchMap(() => this.orderFilterDataSources$),
+        filter((datasource) => !!datasource),
         takeUntil(this.unsubscribe$)
       )
-      .subscribe();
+      .subscribe((data: OrderFilterDataSource) => {
+        this.getapprovalorder();
+        this.setupDefaultStatuses(data);
+
+        if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
+          this.adjustFilters();
+        } else {
+          this.redirectFromPerdiem = false;
+        }
+
+        this.cd$.next(true);
+        this.clearStorage();
+      });
   }
 
   private onApproveOrderHandler(): void {
