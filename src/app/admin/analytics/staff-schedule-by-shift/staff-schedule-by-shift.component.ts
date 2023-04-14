@@ -479,6 +479,8 @@ export class StaffScheduleByShiftComponent implements OnInit {
     this.regionsList = this.masterRegionsList;
     this.locationsList = this.masterLocationsList;
     this.departmentsList = this.masterDepartmentsList;
+
+    this.changeDetectorRef.detectChanges();
   }
 
   public onFilterApply(): void {
