@@ -1,4 +1,5 @@
 import { FieldType } from "@core/enums";
+import { ScheduleType } from 'src/app/modules/schedule/enums';
 import {
   EditScheduleFormConfig,
   EditScheduleFormFieldConfig,
@@ -50,7 +51,7 @@ const scheduledAvailabilityFormFields = (createMode: boolean): EditScheduleFormF
     },
     {
       field: 'hours',
-      title: 'Hours',
+      title: 'Hrs',
       type: FieldType.Input,
       gridAreaName: 'hours',
       required: false,
@@ -183,4 +184,10 @@ export const EditScheduleSourcesMap: EditScheduleFormSource = {
   [EditScheduleFormSourceKeys.Locations]: [],
   [EditScheduleFormSourceKeys.Departments]: [],
   [EditScheduleFormSourceKeys.Skills]: [],
+};
+
+export const RemoveButtonTitleMap = {
+  [ScheduleType.Book]: 'Booking',
+  [ScheduleType.Availability]: 'Availability',
+  [ScheduleType.Unavailability]: 'Unavailability',
 };

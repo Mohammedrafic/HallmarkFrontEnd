@@ -2,8 +2,10 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  EventEmitter,
   Input,
   OnInit,
+  Output,
   TrackByFunction,
 } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
@@ -117,6 +119,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     }
   }
 
+  @Output() orderTypeChanged: EventEmitter<OrderType> = new EventEmitter(); 
+
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
@@ -192,6 +196,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForSaveAction();
     this.watchForSelectOrder();
     this.watchForOrganizationStructure();
+    this.observeOrderType();
   }
 
   public addFields(config: OrderFormsArrayConfig): void {
@@ -324,7 +329,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     const jobDescriptionForm = this.getSelectedFormConfig(JobDescriptionForm);
     
     if (this.dataSourceContainer.reasons != undefined) {
-      setDataSource(jobDescriptionForm.fields, 'orderRequisitionReasonId', this.getIRPOrderRequisition(this.dataSourceContainer.reasons as RejectReasonwithSystem[]));
+      setDataSource(jobDescriptionForm.fields, 'orderRequisitionReasonId',
+      this.getIRPOrderRequisition(this.dataSourceContainer.reasons as RejectReasonwithSystem[]));
       }
 
     this.setDataSourceForSpecialProject();
@@ -732,5 +738,15 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.jobDistributionForm.get('jobDistribution')?.patchValue(this.selectedOrder.jobDistributionValue);
       this.isTieringLogicLoad = false;
     }
+  }
+
+  private observeOrderType(): void {
+    this.orderTypeForm.get('orderType')?.valueChanges
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((orderType) => {
+      this.orderTypeChanged.emit(orderType);
+    });
   }
 }
