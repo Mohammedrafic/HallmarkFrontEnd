@@ -33,9 +33,9 @@ export type IRPCandidate = {
 }
 
 export interface CandidateListRequest {
-  orderBy: string;
-  pageNumber: number;
-  pageSize: number;
+  orderBy?: string;
+  pageNumber?: number;
+  pageSize?: number;
   profileStatuses: CandidateStatus[];
   skillsIds: number[];
   regionsNames: string[];
@@ -46,12 +46,16 @@ export interface CandidateListRequest {
   locationIds?: number[];
   departmentIds?: number[];
   primarySkillIds?: number[];
-  secondarySkillIds?: number[]; 
+  secondarySkillIds?: number[];
   hireDate?: string | null;
   startDate?: string | null;
   endDate?: string | null;
   credType? : number[];
-  expiry? : {}
+  expiry? : {
+    startDate?: string | null;
+    endDate?: string | null;
+    type: number[] | null;
+  };
 }
 
 export type CandidateListFilters = {
@@ -64,12 +68,16 @@ export type CandidateListFilters = {
   locationIds?: number[];
   departmentIds?: number[];
   primarySkillIds?: number[];
-  secondarySkillIds?: number[]; 
+  secondarySkillIds?: number[];
   hireDate?: string | null;
   startDate?: string | null;
   endDate?: string | null;
   credType? : number[];
-  expiry? : any;
+  expiry? : {
+    startDate?: string | null;
+    endDate?: string | null;
+    type: number[];
+  };
 };
 
 export interface FilterColumn {
@@ -99,18 +107,10 @@ export interface CandidateListFiltersColumn {
   startDate?: CandidateNameFilterColumn;
   endDate?: CandidateNameFilterColumn;
   credType? : FilterColumn;
-  expiry : {};
 }
 
 export type CandidateListExport = {
-  filterQuery: {
-    orderBy: string;
-    profileStatuses: CandidateStatus[];
-    skillsIds: number[];
-    regionsNames: string[];
-    includeDeployedCandidates: boolean;
-    candidateProfileIds: any[] | null;
-  };
+  filterQuery: CandidateListRequest;
   exportFileType: ExportedFileType;
   properties: string[];
   filename: string;

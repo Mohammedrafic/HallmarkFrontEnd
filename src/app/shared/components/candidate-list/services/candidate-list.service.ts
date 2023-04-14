@@ -33,8 +33,8 @@ export class CandidateListService {
    * Get IRP candidates (Employees)
    * @return list of IRP candidates in specific format
    */
-     public getIRPCandidatesExport(payload: ExportPayload): Observable<Blob> {
-      return this.http.post<Blob>('/api/Employee/Export', payload);
+     public exportIrp(payload: ExportPayload): Observable<Blob> {
+      return this.http.post('/api/Employee/Export', payload, { responseType: 'blob' });
     }
 
 
@@ -97,7 +97,7 @@ export class CandidateListService {
       startDate: new FormControl(null),
       endDate: new FormControl(null),
       credType : new FormControl([])
-    }); 
+    });
   }
 
   public refreshFilters(isIRP: boolean, formGroup: FormGroup, filters: CandidateListFilters): void {

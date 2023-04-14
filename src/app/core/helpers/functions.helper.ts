@@ -1,4 +1,5 @@
 import { HttpParams } from '@angular/common/http';
+import { sortBy } from '@shared/helpers/sort-array.helper';
 
 import { findItemById } from '../helpers';
 import { ParamsFromObject } from '../interface';
@@ -100,4 +101,26 @@ export const isObjectsEqual = (obj1: Record<string, unknown>, obj2: Record<strin
     }
     return true;
   });
+};
+
+export const isPrimitiveArraysEqual = (arr1: unknown[], arr2: unknown[], strictEquality = false): boolean => {
+  let arrayA = arr1;
+  let arrayB = arr2;
+
+  if (!Array.isArray(arrayA) || !Array.isArray(arrayB)) {
+    return false;
+  }
+  if (arrayA === arrayB) {
+    return true;
+  }
+  if (arrayA.length !== arrayA.length) {
+    return false;
+  }
+
+  if (strictEquality) {
+    arrayA = sortBy(arrayA);
+    arrayB = sortBy(arrayB);
+  }
+
+  return arrayA.every((val: unknown, index: number) => val === arrayB[index]);
 };

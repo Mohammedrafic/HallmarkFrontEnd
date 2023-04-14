@@ -140,11 +140,11 @@
     <div class="checkbox-container bootstrap" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
       <ejs-checkbox [formControl]="createPerDiemOrderControl" label="Create Per Diem Order"></ejs-checkbox>
     </div>
-    <button
+    <button *ngIf="selectedDaySchedule"
       (click)="deleteSchedule()"
       cssClass="e-outline remove-schedule"
       ejs-button>
-      Remove Schedule
+      Remove {{ removeButtonTitleMap[selectedDaySchedule.scheduleType] }}
     </button>
   </div>
 </div>

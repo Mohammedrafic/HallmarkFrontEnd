@@ -60,8 +60,8 @@ export class CandidateProfileFormService {
         contractEndDate: [null, [Validators.required]],
         address1: [null, [Validators.maxLength(100)]],
         country: [null, [Validators.required]],
-        state: [null, [Validators.required]],
-        city: [null, [Validators.required, Validators.maxLength(20)]],
+        state: [null ],
+        city: [null],
         zipCode: [null],
         personalEmail: [
           null,

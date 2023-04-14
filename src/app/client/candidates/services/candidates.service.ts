@@ -14,6 +14,7 @@ export class CandidatesService {
   private employeeHireDate: string;
 
   public employeeId: number | null;
+  
   public constructor(private httpClient: HttpClient) { }
 
   public getSelectedTab$(): Observable<CandidateTabsEnum> {

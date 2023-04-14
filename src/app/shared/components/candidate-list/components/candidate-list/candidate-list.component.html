@@ -1,5 +1,5 @@
 <ejs-grid #grid [dataSource]="(candidates$ | async)?.items" [allowSelection]="true" [allowPaging]="allowPaging"
-  [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight" [enableVirtualization]="true"
+  [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight" [enableVirtualization]="false"
   [resizeSettings]="resizeSettings" [allowSorting]="allowSorting" [allowResizing]="allowResizing"
   (dataBound)="dataBound()" [selectionSettings]="selectionOptions" (rowSelected)="rowSelected($event, grid)"
   (rowDeselected)="rowDeselected($event, grid)">
@@ -88,13 +88,13 @@
     </e-column>
     <e-column headerText="Location" field="locationName" [visible]="false" width=200></e-column>
     <e-column headerText="DEpartment" field="departmentName" [visible]="false" width=200></e-column>
-    <e-column headerText="WorkCommitment" field="employeeWorkCommitments" width=200>
+    <e-column headerText="Work Commitment" field="employeeWorkCommitments" width=200>
       <ng-template #template let-data>
         <ng-container *ngIf="data.employeeWorkCommitments">
           {{data.employeeWorkCommitments}}
         </ng-container>
         <ng-container *ngIf="!data.employeeWorkCommitments">
-          No Work Commitments
+          No Work Commitment
         </ng-container>
       </ng-template>
     </e-column>
@@ -319,5 +319,5 @@
   </form>
 </app-filter-dialog>
 
-<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
+<app-export-dialog [columns]="isIRP ? columnsToExportIrp : columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
   (export)="export($event)"></app-export-dialog>
