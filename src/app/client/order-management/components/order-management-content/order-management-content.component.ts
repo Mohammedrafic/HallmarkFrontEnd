@@ -188,10 +188,15 @@ import {
 } from './order-management-content.constants';
 import { OrderManagementIrpGridHelper, OrderManagementIrpSubrowHelper } from '@client/order-management/helpers';
 import {
+  AllOrdersDefaultStatuses,
   DetectActiveSystem,
   GetFilterFormConfig,
   IRPTabRequestTypeMap,
   IRPTabsConfig,
+  PerDiemDefaultStatuses,
+  ReorderCandidateStatuses,
+  ReorderDefaultStatuses,
+  StatusesByDefault,
   SystemGroupConfig,
   ThreeDotsMenuOptions,
 } from '@client/order-management/constants';
@@ -1613,58 +1618,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       debounceTime(100),
       filter(Boolean),
       tap((data: OrderFilterDataSource) => {
-        let statuses: FilterOrderStatus[] = [];
-        let candidateStatuses: FilterStatus[] = [];
-        const statusesByDefault = [
-          CandidatStatus['Not Applied'],
-          CandidatStatus.Applied,
-          CandidatStatus.Shortlisted,
-          CandidatStatus.Offered,
-          CandidatStatus.Accepted,
-          CandidatStatus.OnBoard,
-          CandidatStatus.Withdraw,
-          CandidatStatus.Offboard,
-          CandidatStatus.Rejected,
-          CandidatStatus.Cancelled,
-        ];
         this.getapprovalorder();
-        if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
-          statuses = data.orderStatuses.filter((status) =>
-            [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled, FilterOrderStatusText.Closed].includes(status.status)
-          );
-          candidateStatuses = data.candidateStatuses.filter((status) =>
-            [
-              CandidatesStatusText['Bill Rate Pending'],
-              CandidatesStatusText['Offered Bill Rate'],
-              CandidatesStatusText.Onboard,
-              CandidatesStatusText.Rejected,
-              CandidatStatus.Cancelled,
-            ].includes(status.status)
-          );
-        } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
-          statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
-            ![FilterOrderStatusText.Filled, FilterOrderStatusText['In Progress']].includes(status.status)
-          );
-          candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
-        } else if(this.orgpendingOrderapproval === LocalStorageStatus.OrdersforApproval) {
-          if(this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
-            statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
-              ![FilterOrderStatusText.Filled, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Closed, FilterOrderStatusText.Open, CandidateStatus.Incomplete].includes(status.status)
-            );
-            candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
-          }
-        } else if(this.orgpendingOrderapproval === LocalStorageStatus.Ordercountzero){
-          if(this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
-            statuses = [{"status" : FilterOrderStatusText.NoRecordsFound, "statusText" : FilterOrderStatusText.NoRecordsFound}]
-            candidateStatuses = [];
-          }
-        } else {
-          statuses = data.orderStatuses;
-          candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
-        }
-        this.filterColumns.orderStatuses.dataSource = statuses;
-        this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
-        this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
+        this.setupDefaultStatuses(data);
+
         if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
           this.adjustFilters(preservedFilters);
         } else {
@@ -2371,5 +2327,43 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     } else {
       return FilterPageName.OrderManagementVMSOrganization;
     }
+  }
+
+  private setupDefaultStatuses(data: OrderFilterDataSource): void {
+    let statuses: FilterOrderStatus[] = [];
+    let candidateStatuses: FilterStatus[] = [];
+    if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
+      statuses = data.orderStatuses.filter((status) => ReorderDefaultStatuses.includes(status.status));
+      candidateStatuses = data.candidateStatuses.filter((status) => ReorderCandidateStatuses.includes(status.status));
+    } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
+      statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
+        !PerDiemDefaultStatuses.includes(status.status)
+      );
+      candidateStatuses = data.candidateStatuses.filter((status) => StatusesByDefault.includes(status.status));
+    } else if (this.orgpendingOrderapproval === LocalStorageStatus.OrdersforApproval) {
+      if (this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
+        statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
+          !AllOrdersDefaultStatuses.includes(status.status)
+        );
+        candidateStatuses = data.candidateStatuses.filter((status) => StatusesByDefault.includes(status.status));
+      }
+    } else if (this.orgpendingOrderapproval === LocalStorageStatus.Ordercountzero) {
+      if (this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
+        statuses = [
+          {
+            status: FilterOrderStatusText.NoRecordsFound,
+            statusText: FilterOrderStatusText.NoRecordsFound,
+          },
+        ];
+        candidateStatuses = [];
+      }
+    } else {
+      statuses = data.orderStatuses;
+      candidateStatuses = data.candidateStatuses.filter((status) => StatusesByDefault.includes(status.status));
+    }
+
+    this.filterColumns.orderStatuses.dataSource = statuses;
+    this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
+    this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
   }
 }
