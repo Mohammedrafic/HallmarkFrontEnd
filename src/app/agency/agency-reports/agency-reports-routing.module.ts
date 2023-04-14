@@ -2,10 +2,9 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { FinancialTimesheetReportComponent } from "./financial-timesheet-report/financial-timesheet-report.component";
-import { AgencyReportsComponent } from "./reports.component";
+import { AgencyReportsComponent } from "./agency-reports.component";
 
-const routes: Routes = [
-  { path: '', redirectTo: '', pathMatch: 'full' },
+const routes: Routes = [ 
   {
     path: '',
     component: AgencyReportsComponent,

@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AgencyReportsComponent } from '../reports/reports.component';
+import { AgencyReportsComponent } from '../agency-reports/agency-reports.component';
 import { FinancialTimesheetReportComponent } from './financial-timesheet-report/financial-timesheet-report.component';
-import { SideMenuModule } from '../../shared/components/side-menu/side-menu.module';
-import { RouterModule } from '@angular/router';
+import { AgencyReportsRoutingModule } from './agency-reports-routing.module';
+import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
 
 
 @NgModule({
@@ -12,9 +12,9 @@ import { RouterModule } from '@angular/router';
     FinancialTimesheetReportComponent
   ],
   imports: [
-    CommonModule,
+    CommonModule,   
     SideMenuModule,
-    RouterModule
+    AgencyReportsRoutingModule,
   ]
 })
 export class AgencyReportsModule { }

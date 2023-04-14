@@ -1,6 +1,7 @@
 <section class="container" style="display: flex; height: 100%;">
-  <app-side-menu [config]="sideMenuConfig" *ngIf="isLoad"></app-side-menu>
+  <app-side-menu [config]="sideMenuConfig"></app-side-menu>
   <section class="grid" style="width: calc(100% - 231px);">
     <router-outlet></router-outlet>
   </section>
 </section>
+
