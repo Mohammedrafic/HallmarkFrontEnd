@@ -30,6 +30,7 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { CandidateListState } from '../../store/candidate-list.state';
 import {
   CandidateList,
+  CandidateListExport,
   CandidateListFilters,
   CandidateListFiltersColumn,
   CandidateListRequest,
@@ -132,7 +133,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     regionsNames: [],
     skillsIds: [],
     tab: 0,
-    expiry : {},
+    expiry : {
+      endDate : undefined,
+      startDate : undefined,
+      type : [],
+    },
     endDate : null,
     startDate : null,
     credType : []
@@ -152,6 +157,16 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     { text: 'Skills', column: 'Skill' },
     { text: 'Current Assignment End Date', column: 'CurrentAssignmentEndDate' },
     { text: 'Region', column: 'Region' },
+  ];
+  public columnsToExportIrp: ExportColumn[] = [
+    { text: 'Id', column: 'Id' },
+    { text: 'Name', column: 'Name' },
+    { text: 'Profile Status', column: 'Status' },
+    { text: 'Skills', column: 'Skills' },
+    { text: 'Location', column: 'Location' },
+    { text: 'Department', column: 'Department' },
+    { text: 'Work Commitment', column: 'WorkCommitment' },
+    { text: 'Hire Date', column: 'HireDate' },
   ];
   public exportUsers$ = new Subject<ExportedFileType>();
   public defaultFileName: string;
@@ -223,18 +238,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public onFilterApply(): void {
     if (this.CandidateFilterFormGroup.dirty) {
       this.filters = this.CandidateFilterFormGroup.getRawValue();
-      
-      const expiry = {
-        type : this.filters.credType,
-        startDate : this.filters.startDate,
-        endDate : this.filters.endDate
-      }
-
       this.filters.profileStatuses = this.filters.profileStatuses || [];
       this.filters.regionsNames = this.filters.regionsNames || [];
       this.filters.skillsIds = this.filters.skillsIds || [];
       this.filters.candidateName = this.filters.candidateName || null;
-      this.filters.expiry = expiry;
+      this.filters.expiry = {
+        type : this.filters.credType || [],
+        startDate : this.filters.startDate || null,
+        endDate : this.filters.endDate || null,
+      };
 
       this.saveFiltersByPageName(this.filters);
       this.dispatchNewPage();
@@ -313,21 +325,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    const requestBody = {
-      filterQuery: {
-        profileStatuses: this.filters.profileStatuses!,
-        regionsNames: this.filters.regionsNames!,
-        skillsIds: this.filters.skillsIds!,
-        includeDeployedCandidates: this.includeDeployedCandidates,
-        candidateProfileIds: this.selectedItems.length
-          ? this.selectedItems.map((val) => val.candidateProfileId)
-          : null,
-        orderBy: '',
-      },
+    const columnMap = this.isIRP ? this.columnsToExportIrp : this.columnsToExport;
+    const requestBody: CandidateListExport = {
+      filterQuery: this.getFilterValues(),
       exportFileType: fileType,
       properties: options
         ? options.columns.map((val: ExportColumn) => val.column)
-        : this.columnsToExport.map((val: ExportColumn) => val.column),
+        : columnMap.map((val: ExportColumn) => val.column),
       filename: options?.fileName || this.defaultFileName,
     };
     let exportRequest;
@@ -344,26 +348,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public dispatchNewPage(): void {
 
     const candidateListRequest: CandidateListRequest = {
-      orderBy: '',
+      ...this.getFilterValues(),
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
-      profileStatuses: this.filters.profileStatuses!,
-      skillsIds: this.filters.skillsIds!,
-      regionsNames: this.filters.regionsNames!,
-      candidateName: this.filters.candidateName!,
-      tab: this.activeTab ?? 0,
-      includeDeployedCandidates: this.includeDeployedCandidates,
-      candidateId: this.filters.candidateId!,
-      locationIds: this.filters.locationIds!,
-      departmentIds: this.filters.departmentIds!,
-      primarySkillIds: this.filters.primarySkillIds!,
-      secondarySkillIds: this.filters.secondarySkillIds!,
-      hireDate: this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
-      expiry : {
-        type : this.filters.credType,
-        startDate : this.filters.startDate,
-        endDate : this.filters.endDate
-      }
+      orderBy: this.orderBy,
     };
     this.store.dispatch(
       this.isIRP
@@ -403,6 +391,30 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         })
       );
     }
+  }
+
+  private getFilterValues(): CandidateListRequest {
+    const filter: CandidateListRequest = {
+      profileStatuses: this.filters.profileStatuses!,
+      skillsIds: this.filters.skillsIds!,
+      regionsNames: this.filters.regionsNames!,
+      tab: this.activeTab ?? 0,
+      candidateName: this.filters.candidateName!,
+      candidateId: this.filters.candidateId!,
+      locationIds: this.filters.locationIds!,
+      departmentIds: this.filters.departmentIds!,
+      primarySkillIds: this.filters.primarySkillIds!,
+      secondarySkillIds: this.filters.secondarySkillIds!,
+      hireDate: this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
+      includeDeployedCandidates: this.includeDeployedCandidates,
+      expiry : {
+        type : this.filters.credType!,
+        startDate : this.filters.startDate!,
+        endDate : this.filters.endDate!,
+      },
+      orderBy: this.orderBy,
+    };
+    return filter;
   }
 
   private addSkillRegionEllipsis(candidates: CandidateRow[]): CandidateRow[] {
@@ -467,7 +479,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private dispatchInitialIcon(): void {
-    !this.isIRP ? this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' })) : this.store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'clock' }))
+    this.store.dispatch(new SetHeaderState({ title: this.isIRP ? 'Employees' : 'Candidates', iconName: 'clock' }));
   }
 
 
@@ -589,13 +601,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         takeUntil(this.unsubscribe$)
       )
       .subscribe((event: ExportedFileType) => {
-        this.defaultFileName = `Candidates ${this.generateDateTime(this.datePipe)}`;
+        const type = this.isIRP ? 'Employees' : 'Candidates';
+        this.defaultFileName = `${type} ${this.generateDateTime(this.datePipe)}`;
         this.defaultExport(event);
       });
   }
 
   private setFileName(): void {
-    this.fileName = `Candidates ${this.generateDateTime(this.datePipe)}`;
+    const type = this.isIRP ? 'Employees' : 'Candidates';
+    this.fileName = `${type} ${this.generateDateTime(this.datePipe)}`;
   }
 
   private subscribeOnOrgStructure(): void {

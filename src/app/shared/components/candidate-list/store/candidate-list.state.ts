@@ -100,7 +100,7 @@ export class CandidateListState {
 
   @Action(ExportIRPCandidateList)
   ExportUserListIRP({}: StateContext<CandidateListStateModel>, { payload }: ExportCandidateList): Observable<Blob> {
-    return this.candidateListService.getIRPCandidatesExport(payload).pipe(
+    return this.candidateListService.exportIrp(payload).pipe(
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);

@@ -26,14 +26,13 @@ export const filterColumns: CandidateListFiltersColumn = {
     valueId: 'id',
   },
   candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
-  expiry: {},
   credType : {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
     dataSource: [
-      {id : 1, name : "Licenses"}, 
-      {id : 2, name : "Certificates"}, 
-      {id : 3, name : "Checklists"}   
+      {id : 1, name : "Licenses"},
+      {id : 2, name : "Certificates"},
+      {id : 3, name : "Checklists"}
     ],
     valueField: 'name',
     valueId: 'id',
@@ -82,9 +81,9 @@ export const IRPFilterColumns: CandidateListFiltersColumn = {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
     dataSource: [
-      {id : 1, name : "Licenses"}, 
-      {id : 2, name : "Certificates"}, 
-      {id : 3, name : "Checklists"} 
+      {id : 1, name : "Licenses"},
+      {id : 2, name : "Certificates"},
+      {id : 3, name : "Checklists"}
     ],
     valueField: 'name',
     valueId: 'id',
@@ -92,7 +91,6 @@ export const IRPFilterColumns: CandidateListFiltersColumn = {
   hireDate: { type: ControlTypes.Date, valueType: ValueType.Text },
   startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
   endDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-  expiry : {}
 };
 
 export const VMSCandidates = [

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
-import { filter, Observable, switchMap, takeUntil } from 'rxjs';
+import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
@@ -133,63 +133,50 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterFormGroup.get('regionIds')?.valueChanges
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((selectedRegionIds: number[]) => {
-        this.scheduleFilterFormGroup.get('locationIds')?.patchValue([], { emitEvent: false, onlySelf: true});
-
-        if (selectedRegionIds?.length) {
-          this.filterColumns.locationIds.dataSource = this.scheduleFiltersService
-          .getSelectedLocatinOptions(this.filterStructure, selectedRegionIds);
-        } else {
-          this.filterColumns.locationIds.dataSource = [];
-          this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
-        }
-
-        this.cdr.markForCheck();
+        this.scheduleFilterFormGroup.get('locationIds')?.patchValue([]);
+        this.filterColumns.locationIds.dataSource = selectedRegionIds?.length
+          ? this.scheduleFiltersService.getSelectedLocatinOptions(this.filterStructure, selectedRegionIds)
+          : [];
+        this.setFilteredItems();
       });
 
     this.scheduleFilterFormGroup.get('locationIds')?.valueChanges
       .pipe(takeUntil(this.componentDestroy()))
-      .subscribe((slectedLocationIds: number[]) => {
-        this.scheduleFilterFormGroup.get('departmentsIds')?.patchValue([], { emitEvent: false, onlySelf: true});
-
-        if (slectedLocationIds?.length) {
-          this.filterColumns.departmentsIds.dataSource = this.scheduleFiltersService
-          .getSelectedDepartmentOptions(this.filterStructure, slectedLocationIds);
-        } else {
-          this.filterColumns.departmentsIds.dataSource = [];
-          this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
-        }
-
-        this.cdr.markForCheck();
+      .subscribe((selectedLocationIds: number[]) => {
+        this.scheduleFilterFormGroup.get('departmentsIds')?.patchValue([]);
+        this.filterColumns.departmentsIds.dataSource = selectedLocationIds?.length
+          ? this.scheduleFiltersService.getSelectedDepartmentOptions(this.filterStructure, selectedLocationIds)
+          : [];
+        this.setFilteredItems();
       });
 
     this.scheduleFilterFormGroup.get('departmentsIds')?.valueChanges
       .pipe(
-        filter((departmentsIds: number[]) => {
+        tap((departmentsIds: number[]) => {
           if (!departmentsIds?.length) {
             this.resetSkillFilters();
+            this.setFilteredItems();
           }
-
-          return !!departmentsIds.length;
         }),
+        filter((departmentsIds: number[]) => !!departmentsIds?.length),
         switchMap((departmentsIds: number[]) => this.scheduleApiService.getSkillsByEmployees(departmentsIds[0])),
+        filter((skills: Skill[]) => !!skills.length),
         takeUntil(this.componentDestroy())
       ).subscribe((skills: Skill[]) => {
-        const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
+        if (skills.length) {
+          const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
+          this.filterColumns.skillIds.dataSource = skillOption;
+          this.scheduleFilterFormGroup.get('skillIds')?.patchValue([skillOption[0]?.value]);
+        } else {
+          this.resetSkillFilters();
+        }
 
-        this.filterColumns.skillIds.dataSource = skillOption;
-        this.scheduleFilterFormGroup.get('skillIds')?.patchValue(
-          [skillOption[0]?.value],
-          { emitEvent: false, onlySelf: true }
-        );
-
-        this.cdr.markForCheck();
+        this.setFilteredItems();
       });
 
-    this.scheduleFilterFormGroup.valueChanges
+    this.scheduleFilterFormGroup.get('skillIds')?.valueChanges
     .pipe(takeUntil(this.componentDestroy()))
-    .subscribe(() => {
-      this.cdr.markForCheck();
-    });
+    .subscribe(() => this.setFilteredItems());
   }
 
   private observeInlineChipDeleteEvent(): void {
@@ -236,7 +223,11 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   private resetSkillFilters(): void {
     this.filterColumns.skillIds.dataSource = [];
+    this.scheduleFilterFormGroup.get('skillIds')?.setValue([]);
+  }
+
+  private setFilteredItems(): void {
     this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
-    this.scheduleFilterFormGroup.get('skillIds')?.setValue(null);
+    this.cdr.markForCheck();
   }
 }

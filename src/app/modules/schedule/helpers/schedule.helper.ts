@@ -212,7 +212,7 @@ export const FormatShiftHours = (time: string): string => {
 
 export const GetScheduleTabItems = (daySchedules: ScheduleItem[]): ShiftTab[] => {
   const scheduleTitleMapper: Record<ScheduleType, string> = {
-    [ScheduleType.Book]: 'Booked',
+    [ScheduleType.Book]: 'Booking',
     [ScheduleType.Unavailability]: 'Unavailable',
     [ScheduleType.Availability]: 'Available',
   };
