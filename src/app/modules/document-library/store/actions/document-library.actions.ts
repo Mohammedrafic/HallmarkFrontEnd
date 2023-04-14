@@ -156,6 +156,3 @@ export class GetDocumentsByCognitiveSearch {
   constructor(public keyword: string, public businessUnitType: any, public businessUnitId?: any, public folderId?: any) { }
 }
 
-export class ClearLocationsAndRegions {
-  static readonly type = '[documentsLibrary] Clear List Of Locations and Regions';
-}

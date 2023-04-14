@@ -77,8 +77,8 @@
   header="{{ isEdit ? 'Edit' : 'Add' }} Do Not Return">
   <form [formGroup]="doNotReturnFormGroup" class="donotreturn-form">
     <div class="input-container bootstrap" *ngIf="isEdit">
-      <ejs-switch id="switcher" (change)="onSwitcher($event);" [checked]="!isBlock"></ejs-switch>
-      <label for="switcher" class="switch-text">{{isBlock?'Unblock':'Block'}}</label>
+      <ejs-switch id="switcher" (change)="onSwitcher($event);" formControlName="dnrStatus" [checked]="!isBlock"></ejs-switch>
+      <label for="switcher" class="switch-text">{{isBlock?'Unblocked':'Blocked'}}</label>
     </div>
     
     <div class="input-container bootstrap">
@@ -104,14 +104,14 @@
       </div>
     </div>
     <div class="input-container">
-      <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="candidateEmail" id="email"
+      <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="candidateEmail" id="email"  [disable]="true"
         label="Email"></app-input>
     </div>
     <div class="d-flex">
       <div class="input-container bootstrap f-grow-2">
         <label>SSN<span class="required">*</span></label>
         <div class="input-group">
-          <input appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" />
+          <input  appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" [attr.disabled]="true" />
         </div>
       </div>
       <div class="input-container"></div>
@@ -128,7 +128,7 @@
             <ejs-multiselect #regionIdsControl id="regionIds" mode="CheckBox" formControlName="regionIds"
               placeholder="All" [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true"
               appValidateWithMessage [dataSource]="regions$ | async" [selectAllText]='allOption'
-              (select)="onRegionSelect($event)" [showSelectAll]="true" tabindex="2">
+              [showSelectAll]="true" tabindex="2">
             </ejs-multiselect>
           </div>
         </div>
@@ -147,10 +147,10 @@
 
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Reason for blocking</label>
+        <label>Reason for blocking <span class="required">*</span></label>
         <div class="input-group">
-          <textarea class="e-input" type="text" rows="3" maxlength="3000" appValidateWithMessage name="dnrComment"
-            formControlName="dnrComment" tabindex="9"></textarea>
+          <ejs-textbox class="e-input" type="text" maxlength="3000" appValidateWithMessage name="dnrComment"
+          formControlName="dnrComment" [multiline]="true"></ejs-textbox>
         </div>
       </div>
     </div>

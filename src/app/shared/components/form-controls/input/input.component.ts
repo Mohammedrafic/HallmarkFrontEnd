@@ -9,6 +9,7 @@ import { BaseFormControlDirective } from '@shared/components/form-controls/base-
 })
 export class InputComponent extends BaseFormControlDirective {
   @Input() public maxlength: number | string;
+  @Input() public disable: boolean | null;
   @Input() public mask: string;
   @Input() public override placeholder: string = '';
 }
