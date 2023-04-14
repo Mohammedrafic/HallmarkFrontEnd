@@ -77,11 +77,11 @@
   header="{{ isEdit ? 'Edit' : 'Add' }} Do Not Return">
   <form [formGroup]="doNotReturnFormGroup" class="donotreturn-form">
     <div class="input-container bootstrap" *ngIf="isEdit">
-      <ejs-switch id="switcher" (change)="onSwitcher($event);" formControlName="dnrStatus" [checked]="!isBlock"></ejs-switch>
-      <label for="switcher" class="switch-text">{{isBlock?'Unblocked':'Blocked'}}</label>
+      <ejs-switch id="switcher" (change)="onSwitcher($event);" formControlName="dnrStatus" [checked]="isBlock"></ejs-switch>
+      <label for="switcher" class="switch-text">{{isBlock?'Blocked':'Unblocked'}}</label>
     </div>
     
-    <div class="input-container bootstrap">
+    <div class="input-container bootstrap" [hidden]="allOrganizations.length == 1">
       <label>Organization<span class="required">*</span></label>
       <div class="input-group">
         <ejs-dropdownlist appValidateWithMessage formControlName="businessUnitId" [fields]="optionFields"
