@@ -1,26 +1,18 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { FormBuilder } from "@angular/forms";
-import { CustomFormGroup } from "@core/interface";
-import { Observable } from "rxjs";
-import { RnUtilizationForm } from "./rn-utilization.interface";
+import { Injectable } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { CustomFormGroup } from '@core/interface';
+import { RnUtilizationForm } from './rn-utilization.interface';
 
 @Injectable()
 export class RnUtilizationFormService {
+  constructor(private fb: FormBuilder) {}
 
-    constructor(
-        private fb: FormBuilder,
-        private http : HttpClient
-    ) { }
-
-    getNursingUtilizationForm(): CustomFormGroup<RnUtilizationForm> {
-        return this.fb.group({
-            workDate: [new Date()],
-            workcommitIds: [],
-            skill: []
-        }) as CustomFormGroup<RnUtilizationForm>;
-    }
-
-    
-
+  getNursingUtilizationForm(): CustomFormGroup<RnUtilizationForm> {
+    return this.fb.group({
+      workDate: [new Date(), Validators.required],
+      workCommitment: [null, Validators.required],
+      skills: [null, Validators.required],
+      targetUtilization: [60, Validators.required],
+    }) as CustomFormGroup<RnUtilizationForm>;
+  }
 }
