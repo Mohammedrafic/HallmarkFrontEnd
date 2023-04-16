@@ -83,7 +83,6 @@ export class RnUtilizationWidgetComponent implements OnInit {
 
   ngOnInit(): void {
     this.getLookups().subscribe(() => {
-      console.log('fire');
       this.setupChangeListeners();
       this.cdr.detectChanges();
       this.rnUtilizationForm.updateValueAndValidity();
