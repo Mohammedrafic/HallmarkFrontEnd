@@ -81,7 +81,7 @@
         </ng-container>
         <ng-container *ngIf="data.employeeSkills?.length >= 2">
           <ejs-tooltip content="{{ data.employeeSkills.join(', ') }}" target="#skillName">
-            <span id="skillName" class="skill-name">Multiple Skils</span>
+            <span id="skillName" class="skill-name">Multiple Skills</span>
           </ejs-tooltip>
         </ng-container>
       </ng-template>
@@ -167,8 +167,7 @@
     <ng-container *ngIf="!isIRP && CandidateFilterFormGroup">
       <div class="bootstrap">
         <div class="input-container">
-          <label *ngIf="isIRP">Employee Name</label>
-          <label *ngIf="!isIRP">Candidate Name</label>
+          <label>Employee Name</label>
           <div class="input-group">
             <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
           </div>
