@@ -13,7 +13,7 @@ import {
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { ExportPayload } from '@shared/models/export.model';
-import { OrderManagementIRPSystemId, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { OrderManagementIRPSystemId, OrderManagementIRPTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { ImportedOrder, OrderImportResult } from '@shared/models/imported-order.model';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
@@ -291,6 +291,11 @@ export class ClearHistoricalData {
 export class ExportOrders {
   static readonly type = '[order management] Export Organization list';
   constructor(public payload: ExportPayload, public tab: OrganizationOrderManagementTabs) {}
+}
+
+export class ExportIRPOrders {
+  static readonly type = '[order management] Export IRPOrders list';
+  constructor(public payload: ExportPayload,public tab: OrderManagementIRPTabs)  {}
 }
 
 export class ClearSuggestions {
