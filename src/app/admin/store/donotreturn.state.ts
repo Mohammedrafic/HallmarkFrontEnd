@@ -92,7 +92,7 @@ export class DonotReturnState {
     { organizationId }: DoNotReturn.GetLocationByOrgId): Observable<GetLocationByOrganization[]> {
     return this.DonotreturnService.getLocationsByOrganizationId(organizationId).pipe(
       tap((payload) => {
-        patchState({ locations: payload });
+        patchState({ locations: payload.sort((a, b) => (a.Name as string).localeCompare(b.Name as string)) });
         return payload;
       })
     );

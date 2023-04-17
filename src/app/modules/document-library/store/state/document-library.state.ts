@@ -343,10 +343,10 @@ export class DocumentLibraryState {
   GetRegionsByOrganizations({ patchState }: StateContext<DocumentLibraryStateModel>, { filter }: any): Observable<Region[]> {
     return this.documentLibraryService.getRegionsByOrganizationId(filter).pipe(tap((payload: any) => {
       if ("items" in payload) {
-        patchState({ regions: payload.items });
+        patchState({ regions: payload.items.sort((a:any, b:any) => (a.name as string).localeCompare(b.name as string)) });
         return payload.items;
       } else {
-        patchState({ regions: payload });
+        patchState({ regions: payload.sort((a:any, b:any) => (a.name as string).localeCompare(b.name as string)) });
         return payload
       }
     }));
@@ -356,10 +356,10 @@ export class DocumentLibraryState {
   GetLocationsByRegions({ patchState }: StateContext<DocumentLibraryStateModel>, { filter }: any): Observable<Location[]> {
     return this.documentLibraryService.getLocationsByOrganizationId(filter).pipe(tap((payload: any) => {
       if ("items" in payload) {
-        patchState({ locations: payload.items });
+        patchState({ locations: payload.items.sort((a:any, b:any) => (a.name as string).localeCompare(b.name as string)) });
         return payload.items;
       } else {
-        patchState({ locations: payload });
+        patchState({ locations: payload.sort((a:any, b:any) => (a.name as string).localeCompare(b.name as string)) });
         return payload
       }
     }));
