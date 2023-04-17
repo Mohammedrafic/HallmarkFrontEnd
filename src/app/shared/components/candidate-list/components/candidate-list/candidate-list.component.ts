@@ -245,8 +245,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       this.filters.candidateName = this.filters.candidateName || null;
       this.filters.expiry = {
         type : this.filters.credType || [],
-        startDate : this.filters.startDate || null,
-        endDate : this.filters.endDate || null,
+        startDate : this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
+        endDate : this.filters.endDate  ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
       };
 
       this.saveFiltersByPageName(this.filters);
@@ -410,8 +410,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       includeDeployedCandidates: this.includeDeployedCandidates,
       expiry : {
         type : this.filters.credType!,
-        startDate : this.filters.startDate!,
-        endDate : this.filters.endDate!,
+        startDate : this.filters.startDate! ? DateTimeHelper.toUtcFormat(this.filters.startDate!) : null,
+        endDate : this.filters.endDate! ? DateTimeHelper.toUtcFormat(this.filters.endDate!) : null,
       },
       orderBy: this.orderBy,
     };
