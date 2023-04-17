@@ -309,6 +309,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(null); 
           }
         }
+      }else{
+        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(null);
       }
    });
 

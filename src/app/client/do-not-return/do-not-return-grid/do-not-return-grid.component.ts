@@ -216,6 +216,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
               this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue(null); 
             }
           }
+        }else{
+          this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue(null);
         }
      });
 
