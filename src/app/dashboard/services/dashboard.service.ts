@@ -59,7 +59,7 @@ import { OrgDetailsInfoModel } from '../models/org-details-info.model';
 import { AgencyPositionModel } from '../models/agency-position.model';
 import { ExpiryDetailsModel } from '../models/expiry.model';
 import { RnUtilizationModel } from '../models/rnutilization.model';
-import { GetNursingWidgetData, GetWorkCommitment, NursingWidget } from '../models/rn-utilization.model';
+import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetWorkCommitment } from '../models/rn-utilization.model';
 
 @Injectable()
 export class DashboardService {
@@ -179,7 +179,7 @@ export class DashboardService {
     filters: DashboartFilterDto
   ): Observable<CandidatesByStateWidgetAggregatedDataModel> {
     return forkJoin({ mapData: this.mapData$, applicantsByRegion: this.getApplicantsByPositions(filters) }).pipe(
-      map((data: ApplicantsByRegionDataModel) => {      
+      map((data: ApplicantsByRegionDataModel) => {
         return this.getFormattedPostionsByStatesWidgetAggregatedData(data);
       })
     );
@@ -292,7 +292,7 @@ export class DashboardService {
     return { ...timeRanges };
   }
 
-  
+
   private getFirstLastWeekDay(startDate: Date): ITimeSlice {
     const today = new Date();
     const dateFrom = DateTimeHelper.toUtcFormat(new Date(startDate.setDate(startDate.getDate() - startDate.getDay())));
@@ -318,7 +318,7 @@ export class DashboardService {
       return this.getWeeksTimeRanges(5);
     } else {
       return this.getMonthTimeRanges(5);
-    }  
+    }
   }
 
   private getOrderPositionWidgetData(filter: DashboartFilterDto, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
@@ -356,7 +356,7 @@ export class DashboardService {
   private getupcomingExpiredCredentials(filter: DashboartFilterDto) : Observable<ExpiryDetailsModel[]> {
     return this.httpClient.get<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`);
   }
- 
+
   private getActivePositionWidgetData(filter: DashboartFilterDto): Observable<AccumulationChartModel> {
     return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { granulateInProgress: true, ...filter }).pipe(
       map(({ orderStatusesDetails }: ActivePositionsDto) => {
@@ -467,11 +467,12 @@ export class DashboardService {
       .get<AssignedSkillsByOrganization[]>('/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit', { headers })
       .pipe(map((data) => sortByField(data, 'skillDescription')));
   }
+
   private getCandidateAppliedInLastNDays(filter: DashboartFilterDto, orderStatus: ApplicantStatus): Observable<CandidateStatusDataModel> {
     return this.httpClient
       .post<CandidateStatusDataModel>(`${this.baseUrl}/CandidateAppliedInLastNDays`, { orderStatuses: [orderStatus], ...filter })
       .pipe(map(data=>data
-     
+
       )
       );
   }
@@ -482,7 +483,8 @@ export class DashboardService {
   public getSkills(): Observable<GetWorkCommitment[]> {
     return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllNursingSkills`);
   }
-  public filterNursingWidget(data : any): Observable<GetNursingWidgetData> {
-    return this.httpClient.post<GetNursingWidgetData>(`${this.baseUrl}/GetNursingUtilizationByFilters`, data);
+
+  public filterNursingWidget(data : GetNursingUtilizationbyByFilters): Observable<GetNursingWidgetData> {
+    return this.httpClient.post<GetNursingWidgetData>(`${this.baseUrl}/get-nursing-utilization-by-filters`, data);
   }
 }

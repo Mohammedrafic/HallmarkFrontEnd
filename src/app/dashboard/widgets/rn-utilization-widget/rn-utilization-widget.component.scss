@@ -33,6 +33,7 @@
 }
 
   .app-widget-wrapper {
+
     &__tooltip {
       text-align: right;
       float: right;
@@ -54,12 +55,15 @@
     width: max-content;
 }
 .widget__type {
+    height: 32px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 .widget{
     padding: 10px 0px 0px 0px !important;
     width:100%;
+    height: unset;
 }
 .widget__type p {
     margin: 5px 0px;
@@ -74,12 +78,13 @@
 
 form{
   width : 100%;
+  flex: auto;
 }
 .widgeticon {
   text-align: right;
   font-weight: 500 !important;
   width: 16% !important;
-  border-bottom: 1px solid white !important;
+  border-bottom: 1px solid gray !important;
 }
 .hours-rn{
   background: gainsboro;
@@ -87,8 +92,15 @@ form{
   border-radius: 20px;
   width: 100%;
   text-align: center;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 0;
 }
 .targetcount {
   display: flex;
   justify-content: right;
+}
+
+[hidden] {
+  display: none !important;
 }

@@ -62,7 +62,8 @@ import {
   UploadOrderImportFileSucceeded,
   UpdateRegRateorder,
   UpdateRegRateSucceeded,
-  GetCandidateCancellationReason
+  GetCandidateCancellationReason,
+  ExportIRPOrders
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -946,6 +947,16 @@ export class OrderManagementContentState {
     );
   }
 
+  @Action(ExportIRPOrders)
+  ExportIRPOrders({}: StateContext<OrderManagementContentStateModel>, { payload, tab}: ExportIRPOrders): Observable<any> {
+    return this.orderManagementService.irpexport(payload,tab).pipe(
+      tap((file) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
+  }
+  
   @Action(DuplicateOrder)
   DuplicateOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,

@@ -1,4 +1,3 @@
-import { ExportOrientation } from '@admin/store/admin.actions';
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
@@ -25,6 +24,8 @@ import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ShowExportDialog, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { MasterOrientationExportCols } from '../orientation-grid/orientation-grid.constants';
+import { GridApi, RowNode } from '@ag-grid-community/core';
+import { ExportOrientation } from './orientation.action';
 
 @Component({
   selector: 'app-orientation-historical-data',
@@ -47,6 +48,8 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   public fileName: string;
   public defaultFileName: string;
   public columnsToExport: ExportColumn[] = MasterOrientationExportCols;
+  private gridApi: GridApi;
+  public selectedRowDatas : any[]=[]
   @Input() export$: Subject<ExportedFileType>;
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;
@@ -156,14 +159,23 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
        this.store.dispatch(new ExportOrientation(new ExportPayload(
       fileType,
-      { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset())  },
-      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
+      { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) ,
+        ids: this.selectedRowDatas.length ? this.selectedRowDatas.map((val) => val[this.idFieldName]) : null, },
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column)
+      ,null,
       options?.fileName || this.defaultFileName
     )));
     this.clearSelection(this.grid);
   }
-
+  public handleExport(event: RowNode[]): void {
+    const nodes = event;
+    this.selectedRowDatas=[]
+    if (nodes.length) {
+      nodes.forEach(element => {
+        this.selectedRowDatas.push(element.data);
+      });
+    } 
+  }
   public closeExport(): void {
     this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));

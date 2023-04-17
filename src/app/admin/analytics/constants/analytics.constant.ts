@@ -117,6 +117,25 @@ export const financeMedicareWageReportConstants = {
     InvoiceId: 'invoiceId'
   }
 }
+
+export const JobeventConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    SkillCategoryIds: 'skillCategoryIds',
+    SkillIds: 'skillIds',
+    orderTypes: 'orderTypes',
+    jobStatuses:'jobStatuses',
+    CandidateName: 'candidateName',
+    candidateStatuses:'candidateStatuses',
+    AgencyIds: 'agencyIds',
+    jobId: 'jobId',
+    StartDate: 'startDate',
+    EndDate: 'endDate'
+  }
+}
 export const grantReportConstants = {
   formControlNames: {
     BusinessIds: 'businessIds',

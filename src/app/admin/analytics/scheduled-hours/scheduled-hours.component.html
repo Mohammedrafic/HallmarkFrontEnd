@@ -190,6 +190,12 @@
             >
             </ejs-datepicker>
           </div>
+          <div *ngIf="startDateControl.invalid"
+            class="alert alert-danger">
+            <div *ngIf="startDateControl.errors?.['required']">
+              Select Start Date
+            </div>
+          </div> 
         </div>
         <div class="input-container calendar">
           <label>End Date<span class="required">*</span></label>
@@ -204,6 +210,12 @@
               [min]="scheduledHoursReportForm.controls['startDate'].value"
             >
             </ejs-datepicker>
+          </div>
+          <div *ngIf="endDateControl.invalid"
+            class="alert alert-danger">
+            <div *ngIf="endDateControl.errors?.['required']">
+              Select End Date
+            </div>
           </div>
         </div>
       </div>

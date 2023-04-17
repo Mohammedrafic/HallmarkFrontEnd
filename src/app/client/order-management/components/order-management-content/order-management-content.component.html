@@ -78,6 +78,11 @@
           <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
         </button>
 
+        <button *ngIf="isActiveSystemIRP" ejs-dropdownbutton appHideBeforeSyncfusionLoad [items]="exportOptions" (select)="exportSelected($event)"
+          id="importButton" cssClass="e-outline button-export">
+          <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
+        </button>
+        
         <ng-container
           *ngIf="!isActiveSystemIRP && (isContentSmallDesktop || isMiddleTabletWidth)"
           [ngTemplateOutlet]="smallMenuButton"

@@ -118,6 +118,14 @@ export class ScheduledHoursComponent implements OnInit {
 
   public filterOptionData: StaffScheduleReportFilterOptions;
 
+  get startDateControl(): AbstractControl { 
+    return this.scheduledHoursReportForm.get('startDate') as AbstractControl; 
+  }
+
+  get endDateControl(): AbstractControl { 
+    return this.scheduledHoursReportForm.get('endDate') as AbstractControl; 
+  }
+
   constructor(
     private store: Store,
     private formBuilder: FormBuilder,
@@ -424,6 +432,8 @@ export class ScheduledHoursComponent implements OnInit {
     this.regionsList = this.masterRegionsList;
     this.locationsList = this.masterLocationsList;
     this.departmentsList = this.masterDepartmentsList;
+    
+    this.changeDetectorRef.detectChanges();
   }
 
   public showFilters(): void {
