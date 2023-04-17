@@ -141,6 +141,75 @@ export const permPlacementColumnsToExport: ExportColumn[] = [
   { text: 'Annual Salary To', column: 'AnnualSalaryTo' },
 ];
 
+export const irpAllOrdersColumnsToExport: ExportColumn[] = [
+  { text: 'Order ID', column: 'OrganizationPrefix' },
+  { text: 'Status', column: 'Status' },
+  { text: 'Critical', column: 'CriticalOrder' },
+  { text: 'Type', column: 'OrderTypeText' },
+  { text: 'Skill', column: 'SkillName' },
+  { text: 'Avail pos', column: 'NumberOfPositions' },
+  { text: 'Region', column: 'RegionName' },
+  { text: 'Location', column: 'LocationName' },
+  { text: 'Department', column: 'DepartmentName' },
+  { text: 'Start Date', column: 'StartDate' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Shift', column: 'Shift' },
+  { text: 'Irp Candid', column: 'IRPCandidatesCount' },
+  { text: 'VMS Candid', column: 'VMSCandidatesCount' },
+  { text: 'Creation date', column: 'CreationDate' },
+];
+
+export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
+  { text: 'Order ID', column: 'OrganizationPrefix' },
+  { text: 'Status', column: 'Status' },
+  { text: 'Critical', column: 'CriticalOrder' },
+  { text: 'Skill', column: 'SkillName' },
+  { text: 'Avail pos', column: 'NumberOfPositions' },
+  { text: 'Region', column: 'RegionName' },
+  { text: 'Location', column: 'LocationName' },
+  { text: 'Department', column: 'DepartmentName' },
+  { text: 'Job Date', column: 'JobDate' },
+  { text: 'Shift', column: 'Shift' },
+  { text: 'Irp Candid', column: 'IRPCandidatesCount' },
+  { text: 'VMS Candid', column: 'VMSCandidatesCount' },
+  { text: 'Creation date', column: 'CreationDate' },
+];
+
+export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
+  { text: 'Order ID', column: 'OrganizationPrefix' },
+  { text: 'Status', column: 'Status' },
+  { text: 'Critical', column: 'CriticalOrder' },
+  { text: 'Skill', column: 'SkillName' },
+  { text: 'Avail pos', column: 'NumberOfPositions' },
+  { text: 'Region', column: 'RegionName' },
+  { text: 'Location', column: 'LocationName' },
+  { text: 'Department', column: 'DepartmentName' },
+  { text: 'Start Date', column: 'StartDate' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Shift', column: 'Shift' },
+  { text: 'Irp Candid', column: 'IRPCandidatesCount' },
+  { text: 'VMS Candid', column: 'VMSCandidatesCount' },
+  { text: 'Creation date', column: 'CreationDate' },
+];
+
+export const irpIncompleteOrdersColumnsToExport: ExportColumn[] = [
+  { text: 'Order ID', column: 'OrganizationPrefix' },
+  { text: 'Status', column: 'Status' },
+  { text: 'Critical', column: 'CriticalOrder' },
+  { text: 'Type', column: 'OrderTypeText' },
+  { text: 'Skill', column: 'SkillName' },
+  { text: 'Avail pos', column: 'NumberOfPositions' },
+  { text: 'Region', column: 'RegionName' },
+  { text: 'Location', column: 'LocationName' },
+  { text: 'Department', column: 'DepartmentName' },
+  { text: 'Start Date', column: 'StartDate' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Shift', column: 'Shift' },
+  { text: 'Irp Candid', column: 'IRPCandidatesCount' },
+  { text: 'VMS Candid', column: 'VMSCandidatesCount' },
+  { text: 'Creation date', column: 'CreationDate' },
+];
+
 export const ReOrdersColumnsConfig = [
   {
     fieldName: 'reOrderFromId',
