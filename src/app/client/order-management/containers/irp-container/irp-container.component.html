@@ -12,6 +12,7 @@
           <app-order-details-irp
             *ngSwitchCase="tabs.Details"
             [system]="selectedSystem"
+            (orderTypeChanged)="changeTabConfig($event)"
           ></app-order-details-irp>
           <app-order-credentials
             *ngSwitchCase="tabs.Credential"

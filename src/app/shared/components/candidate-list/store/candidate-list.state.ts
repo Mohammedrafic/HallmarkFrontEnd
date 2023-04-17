@@ -57,8 +57,9 @@ export class CandidateListState {
 
   @Selector()
   static listOfRegions(state: CandidateListStateModel): string[] | null {
-    return state.listOfRegions
+    return state.listOfRegions;
   }
+
   constructor(private candidateListService: CandidateListService) {}
 
   @Action(GetCandidatesByPage, { cancelUncompleted: true })
@@ -99,7 +100,7 @@ export class CandidateListState {
 
   @Action(ExportIRPCandidateList)
   ExportUserListIRP({}: StateContext<CandidateListStateModel>, { payload }: ExportCandidateList): Observable<Blob> {
-    return this.candidateListService.getIRPCandidatesExport(payload).pipe(
+    return this.candidateListService.exportIrp(payload).pipe(
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
@@ -136,9 +137,9 @@ export class CandidateListState {
   GetRegionList({patchState}: StateContext<CandidateListStateModel>): Observable<string[]> {
     return this.candidateListService.getRegions().pipe(tap((data)=> {
       patchState({
-        listOfRegions: data
-      })
-    }))
+        listOfRegions: data,
+      });
+    }));
   }
 
   @Action(DeleteIRPCandidate)

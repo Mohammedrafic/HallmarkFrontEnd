@@ -50,7 +50,7 @@ export class DonotReturnState {
   GetAllOrganization({ patchState }: StateContext<DoNotReturnStateModel>,
     { }: DoNotReturn.GetAllOrganization): Observable<UserAgencyOrganization> {
     return this.DonotreturnService.allOrganizations().pipe(tap((data) => {
-      patchState({ allOrganizations: data.businessUnits });
+      patchState({ allOrganizations: data.businessUnits.sort((a, b) => (a.name as string).localeCompare(b.name as string)) });
       return data;
     }));
   }
@@ -109,9 +109,9 @@ export class DonotReturnState {
   }
 
   @Action(DoNotReturn.DonotreturnByPage)
-  DonotreturnByPage({ patchState }: StateContext<DoNotReturnStateModel>, { pageNumber, pageSize, filters }: DoNotReturn.DonotreturnByPage): Observable<DoNotReturnsPage> {
+  DonotreturnByPage({ patchState }: StateContext<DoNotReturnStateModel>, { pageNumber, pageSize, filters, sortBy }: DoNotReturn.DonotreturnByPage): Observable<DoNotReturnsPage> {
     patchState({ donotloadings: true });
-    return this.DonotreturnService.getDonotreturn(pageNumber, pageSize, filters).pipe(
+    return this.DonotreturnService.getDonotreturn(pageNumber, pageSize, filters, sortBy).pipe(
       tap((payload) => {
         patchState({ donotloadings: false, donotreturnpage: payload });
         return payload;

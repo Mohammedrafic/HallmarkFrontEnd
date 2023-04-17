@@ -23,6 +23,10 @@ import { GeneralNoteExportFilters } from './general-notes.model';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { ActivatedRoute } from '@angular/router';
 import { ExportGeneralNote } from './general-notes.action';
+import { CandidateProfileFormService } from '../candidate-profile-form.service';
+import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
+import { SystemType } from '@shared/enums/system-type.enum';
+import { CandidateProfileService } from '../candidate-profile.service';
 
 @Component({
   selector: 'app-general-notes',
@@ -78,26 +82,28 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
   public categories: CategoryModel[];
   public selectedTab$: Observable<CandidateTabsEnum>;
   public targetElement: HTMLElement | null = this.document.body;
-  public filters: GeneralNoteExportFilters ={
+  public filters: GeneralNoteExportFilters = {
     pageNumber: 1, pageSize: 100,
     candidateId: 0
   };
-public fileName:string;
-public defaultFileName:string;
-private unsubscribe$ :Subject<void> = new Subject();
+  public fileName: string;
+  public defaultFileName: string;
+  private unsubscribe$: Subject<void> = new Subject();
 
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
   public exportOrientation$ = new Subject<ExportedFileType>();
   public columnsToExport: ExportColumn[] = GeneralNoteExportCols;
-  
+
   public constructor(
     @Inject(DOCUMENT) private document: Document,
     private datePipe: DatePipe,
     protected override store: Store,
     private generalNotesService: GeneralNotesService,
     private candidatesService: CandidatesService,
-    private actions$:Actions,
+    private actions$: Actions,
     private route: ActivatedRoute,
+    private candidateProfileFormService: CandidateProfileFormService,
+    private candidateProfileService: CandidateProfileService,
   ) {
     super(store);
     this.watchForExportDialog();
@@ -109,7 +115,7 @@ private unsubscribe$ :Subject<void> = new Subject();
     this.watchForDefaultExport();
   }
 
- public ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     //this.ngOnDestroy();
     this.generalNotesService.resetNoteList();
   }
@@ -126,6 +132,21 @@ private unsubscribe$ :Subject<void> = new Subject();
 
   public onSave() {
     this.addEditNoteComponent.saveNote();
+    if (this.route.snapshot.paramMap.get('id')||this.candidatesService.employeeId||0) {
+      this.candidateProfileFormService.triggerSaveEvent();
+      this.candidatesService.changeTab(CandidateTabsEnum.CandidateProfile);
+        this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } })).pipe(takeUntil(this.destroy$)).subscribe(() => {
+          this.candidateProfileService
+            .getCandidateById(parseInt(this.route.snapshot.paramMap.get('id') || '0')||this.candidatesService.employeeId||0)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((candidate) => {
+              this.candidateProfileFormService.populateCandidateForm(candidate);
+              this.candidatesService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
+              this.candidatesService.setEmployeeHireDate(candidate.hireDate);
+              this.generalNotesService.notes$.next(candidate.generalNotes);
+            });
+          });
+     }
   }
 
   private getFormattedDateWithFormat(date: string, format: string): string {
@@ -157,46 +178,46 @@ private unsubscribe$ :Subject<void> = new Subject();
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-   this.exportOrientation$.next(fileType);
-    if (this.route.snapshot.paramMap.get('id')) {
+    this.exportOrientation$.next(fileType);
+    if (this.route.snapshot.paramMap.get('id')||this.candidatesService.employeeId||0) {
 
-      this.filters.candidateId =parseInt(this.route.snapshot.paramMap.get('id')||'0')    
-    this.store.dispatch(new ExportGeneralNote(new ExportPayload(
-      fileType,
-      { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset())  },
-      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
-      options?.fileName || this.defaultFileName
- )));
-}
-}
+      this.filters.candidateId = parseInt(this.route.snapshot.paramMap.get('id') || '0')||this.candidatesService.employeeId||0
+      this.store.dispatch(new ExportGeneralNote(new ExportPayload(
+        fileType,
+        { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
+        options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+        this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
+        options?.fileName || this.defaultFileName
+      )));
+    }
+  }
 
-public closeExport(): void {
- this.fileName = '';
- this.store.dispatch(new ShowExportDialog(false));
-}
+  public closeExport(): void {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
 
-private watchForDefaultExport(): void {
- this.exportOrientation$.pipe(
-   takeUntil(this.unsubscribe$),
- ).subscribe((event: ExportedFileType) => {
-   this.defaultFileName = 'General Note' + this.generateDateTime(this.datePipe);
- });
-}
+  private watchForDefaultExport(): void {
+    this.exportOrientation$.pipe(
+      takeUntil(this.unsubscribe$),
+    ).subscribe((event: ExportedFileType) => {
+      this.defaultFileName = 'General Note' + this.generateDateTime(this.datePipe);
+    });
+  }
 
 
-private watchForExportDialog(): void {
- this.actions$.pipe(
-   ofActionDispatched(ShowExportDialog),
-   filter((value) => value.isDialogShown),
-   takeUntil(this.unsubscribe$),
- ).subscribe(() => {
-   this.defaultFileName = 'General Note' + this.generateDateTime(this.datePipe);
-   this.fileName = this.defaultFileName;
- });
-}
-public export(event: ExportOptions): void {
-  this.closeExport();
-  this.defaultExport(event.fileType, event);
-}
+  private watchForExportDialog(): void {
+    this.actions$.pipe(
+      ofActionDispatched(ShowExportDialog),
+      filter((value) => value.isDialogShown),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.defaultFileName = 'General Note' + this.generateDateTime(this.datePipe);
+      this.fileName = this.defaultFileName;
+    });
+  }
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
 }

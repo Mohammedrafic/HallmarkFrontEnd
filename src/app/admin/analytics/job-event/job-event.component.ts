@@ -37,9 +37,9 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
-import { analyticsConstants } from '../constants/analytics.constant';
 import { OutsideZone } from '@core/decorators';
 import { Skill } from '../../../shared/models/skill.model';
+import { JobeventConstants, analyticsConstants } from '../constants/analytics.constant';
 
 @Component({
   selector: 'app-job-event',
@@ -210,14 +210,14 @@ export class JobEventComponent implements OnInit, OnDestroy {
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
 
-      this.jobeventForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
+      //this.jobeventForm.get(JobeventConstants.formControlNames.AccrualReportTypes)?.setValue(1);
 
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
       this.onFilterSkillCategoryChangedHandler();
 
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.jobeventForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.jobeventForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.jobeventForm.get(JobeventConstants.formControlNames.BusinessIds)?.enable() : this.jobeventForm.get(JobeventConstants.formControlNames.BusinessIds)?.disable();
     });
   }
 
@@ -246,24 +246,25 @@ export class JobEventComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.isAlive = false;
   }
 
 
   public onFilterControlValueChangedHandler(): void {
-    this.bussinessControl = this.jobeventForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
+    this.bussinessControl = this.jobeventForm.get(JobeventConstants.formControlNames.BusinessIds) as AbstractControl;
 
     this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data != null && data.length > 0) {
         this.organizations = uniqBy(data, 'organizationId');
         this.filterColumns.businessIds.dataSource = this.organizations;
         this.defaultOrganizations = this.agencyOrganizationId;
-        this.jobeventForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.jobeventForm.get(JobeventConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
         this.changeDetectorRef.detectChanges();
       }
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.jobeventForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+      this.jobeventForm.get(JobeventConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.isAlive = true;
         this.previousOrgId = data;
@@ -315,14 +316,14 @@ export class JobEventComponent implements OnInit, OnDestroy {
               //this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons;
               this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
               this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons.filter(i => this.fixedJobStatusesIncluded.includes(i.status));
-              this.jobeventForm.get(analyticsConstants.formControlNames.JobStatuses)?.setValue(this.defaultjobStatuses);
+              this.jobeventForm.get(JobeventConstants.formControlNames.jobStatuses)?.setValue(this.defaultjobStatuses);
               
 
               //this.filterColumns.skillIds.dataSource = data.masterSkills;
 
               this.filterColumns.agencyIds.dataSource = data.agencies;
               this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
-              this.jobeventForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+              this.jobeventForm.get(JobeventConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
               //this.defaultOrderTypes = this.orderTypesList.map((list) => list.id);
               setTimeout(() => { this.SearchReport() }, 3000);
             }
@@ -332,7 +333,7 @@ export class JobEventComponent implements OnInit, OnDestroy {
         }
         else {
           this.isClearAll = false;
-          this.jobeventForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+          this.jobeventForm.get(JobeventConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }
     });
@@ -341,12 +342,12 @@ export class JobEventComponent implements OnInit, OnDestroy {
 
   public onFilterRegionChangedHandler(): void {
 
-    this.regionIdControl = this.jobeventForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
+    this.regionIdControl = this.jobeventForm.get(JobeventConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = [];
       this.locations = [];
-      this.jobeventForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-      this.jobeventForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.jobeventForm.get(JobeventConstants.formControlNames.LocationIds)?.setValue([]);
+      this.jobeventForm.get(JobeventConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.regionIdControl.value.length > 0) {
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
@@ -356,30 +357,30 @@ export class JobEventComponent implements OnInit, OnDestroy {
       }
       else {
         this.filterColumns.locationIds.dataSource = [];
-        this.jobeventForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-        this.jobeventForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+        this.jobeventForm.get(JobeventConstants.formControlNames.LocationIds)?.setValue([]);
+        this.jobeventForm.get(JobeventConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
 
   public onFilterLocationChangedHandler(): void {
-    this.locationIdControl = this.jobeventForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
+    this.locationIdControl = this.jobeventForm.get(JobeventConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.jobeventForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.jobeventForm.get(JobeventConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.locationIdControl.value.length > 0) {
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
       }
       else {
         this.filterColumns.departmentIds.dataSource = [];
-        this.jobeventForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+        this.jobeventForm.get(JobeventConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
-    this.departmentIdControl = this.jobeventForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
+    this.departmentIdControl = this.jobeventForm.get(JobeventConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
-    this.agencyIdControl = this.jobeventForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
+    this.agencyIdControl = this.jobeventForm.get(JobeventConstants.formControlNames.AgencyIds) as AbstractControl;
     this.agencyIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.agencyIdControl.value.length > 0) {
         let agencyData = this.filterOptionsData.agencies;
@@ -391,7 +392,7 @@ export class JobEventComponent implements OnInit, OnDestroy {
   public onFilterSkillCategoryChangedHandler(): void {
     this.skillIds = [];
     
-    this.skillCategoryIdControl = this.jobeventForm.get(analyticsConstants.formControlNames.SkillCategoryIds) as AbstractControl;
+    this.skillCategoryIdControl = this.jobeventForm.get(JobeventConstants.formControlNames.SkillCategoryIds) as AbstractControl;
     this.skillCategoryIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.skillCategoryIdControl.value.length > 0) {
         
@@ -402,10 +403,10 @@ export class JobEventComponent implements OnInit, OnDestroy {
       }
       else {
         this.filterColumns.skillIds.dataSource = [];
-        this.jobeventForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
+        this.jobeventForm.get(JobeventConstants.formControlNames.SkillIds)?.setValue([]);
       }
     });
-    this.skillIdControl = this.jobeventForm.get(analyticsConstants.formControlNames.SkillIds) as AbstractControl;
+    this.skillIdControl = this.jobeventForm.get(JobeventConstants.formControlNames.SkillIds) as AbstractControl;
     this.skillIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.skillIdControl.value.length > 0) {
         let masterSkills = this.filterOptionsData.masterSkills;
@@ -582,19 +583,19 @@ export class JobEventComponent implements OnInit, OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 30);
-    this.jobeventForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
-    this.jobeventForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-    this.jobeventForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-    this.jobeventForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue([]);
-    this.jobeventForm.get(analyticsConstants.formControlNames.CandidateName)?.setValue(null);
-    this.jobeventForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue([]);
-    this.jobeventForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
-    this.jobeventForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
-    this.jobeventForm.get(analyticsConstants.formControlNames.OrderTypes)?.reset();
-    this.jobeventForm.get(analyticsConstants.formControlNames.JobStatuses)?.setValue([]);
-    this.jobeventForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
-    this.jobeventForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
-    this.jobeventForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
+    this.jobeventForm.get(JobeventConstants.formControlNames.RegionIds)?.setValue([]);
+    this.jobeventForm.get(JobeventConstants.formControlNames.LocationIds)?.setValue([]);
+    this.jobeventForm.get(JobeventConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.jobeventForm.get(JobeventConstants.formControlNames.AgencyIds)?.setValue([]);
+    this.jobeventForm.get(JobeventConstants.formControlNames.CandidateName)?.setValue(null);
+    this.jobeventForm.get(JobeventConstants.formControlNames.SkillCategoryIds)?.setValue([]);
+    this.jobeventForm.get(JobeventConstants.formControlNames.SkillIds)?.setValue([]);
+    this.jobeventForm.get(JobeventConstants.formControlNames.candidateStatuses)?.setValue([]);
+    this.jobeventForm.get(JobeventConstants.formControlNames.orderTypes)?.reset();
+    this.jobeventForm.get(JobeventConstants.formControlNames.jobStatuses)?.setValue([]);
+    this.jobeventForm.get(JobeventConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.jobeventForm.get(JobeventConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.jobeventForm.get(JobeventConstants.formControlNames.jobId)?.setValue([]);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];

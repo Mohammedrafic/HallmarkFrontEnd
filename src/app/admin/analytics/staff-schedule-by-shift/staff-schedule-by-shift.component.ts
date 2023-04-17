@@ -138,6 +138,14 @@ export class StaffScheduleByShiftComponent implements OnInit {
 
   public filterOptionData: StaffScheduleReportFilterOptions;
 
+  get startDateControl(): AbstractControl { 
+    return this.staffScheduleReportForm.get('startDate') as AbstractControl; 
+  }
+
+  get endDateControl(): AbstractControl { 
+    return this.staffScheduleReportForm.get('endDate') as AbstractControl; 
+  }
+
   constructor(
     private store: Store,
     private formBuilder: FormBuilder,
@@ -514,13 +522,13 @@ export class StaffScheduleByShiftComponent implements OnInit {
         : '';
     locationIds =
       locationIds.length > 0
-        ? locationIds
+        ? locationIds.join(',')
         : this.locationsList?.length > 0
         ? this.locationsList.map((x) => x.id).join(',')
         : '';
     departmentIds =
       departmentIds.length > 0
-        ? departmentIds
+        ? departmentIds.join(',')
         : this.departmentsList?.length > 0
         ? this.departmentsList.map((x) => x.id).join(',')
         : '';

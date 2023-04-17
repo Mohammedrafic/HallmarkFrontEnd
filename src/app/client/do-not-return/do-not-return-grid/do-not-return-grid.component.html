@@ -2,13 +2,12 @@
   <ejs-grid #grid [dataSource]="(donotreturnpage$ | async)?.items" [allowPaging]="allowPaging"
     [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight"
     [resizeSettings]="resizeSettings" [allowSorting]="allowSorting" [allowResizing]="allowResizing"
-    [enableVirtualization]="true" (rowSelected)="rowSelected($event, grid)"
+    [enableVirtualization]="false" (rowSelected)="rowSelected($event, grid)"
     (rowDeselected)="rowDeselected($event, grid)" (dataBound)="gridDataBound(grid)" (actionBegin)="actionBegin($event)"
     [selectionSettings]="selectionSettings">
 
 
     <e-columns>
-      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
@@ -34,14 +33,14 @@
           {{ data.ssn != null ? "XXX-XX-" + data.ssn.toString().substr(data.ssn.toString().length - 4):"" }}
         </ng-template>
       </e-column>
-      <e-column field="dnrStatus" headerText="dnrstatus" width=250>
+      <e-column field="dnrStatus" headerText="Current Status" width=250>
       </e-column>
-      <e-column field="dnrDate" headerText="dnrDate" width=250>
+      <e-column field="dnrDate" headerText="Date Blocked" width=250>
         <ng-template #template let-data>
-          {{ data.dnrDate | date: "MM/dd/yyyy HH:mm":"utc": "en-US" }}
+          {{ data.dnrDate | date: "MM/dd/yyyy":"utc": "en-US" }}
         </ng-template>
       </e-column>
-      <e-column field="dnrComment" headerText="dnrComment" width=250>
+      <e-column field="dnrComment" headerText="Reason for Blocking" width=250>
       </e-column>
 
     </e-columns>
@@ -78,39 +77,17 @@
   header="{{ isEdit ? 'Edit' : 'Add' }} Do Not Return">
   <form [formGroup]="doNotReturnFormGroup" class="donotreturn-form">
     <div class="input-container bootstrap" *ngIf="isEdit">
-      <ejs-switch id="switcher" (change)="onSwitcher($event);" [checked]="isBlock"></ejs-switch>
-      <label for="switcher" class="switch-text">{{isBlock?'Unblock':'Block'}}</label>
+      <ejs-switch id="switcher" (change)="onSwitcher($event);" formControlName="dnrStatus" [checked]="isBlock"></ejs-switch>
+      <label for="switcher" class="switch-text">{{isBlock?'Blocked':'Unblocked'}}</label>
     </div>
-    <div class="input-container bootstrap">
+    
+    <div class="input-container bootstrap" [hidden]="allOrganizations.length == 1">
       <label>Organization<span class="required">*</span></label>
       <div class="input-group">
         <ejs-dropdownlist appValidateWithMessage formControlName="businessUnitId" [fields]="optionFields"
           [allowFiltering]="true" [dataSource]="allOrganizations$ | async"
           (select)="onOrganizationDropDownChanged($event)">
         </ejs-dropdownlist>
-      </div>
-    </div>
-    <div class="form-elemet">
-      <div class="group">
-        <div class="input-container calendar">
-          <label for="regionIds">Region <span class="required">*</span></label>
-          <div class="input-group bootstrap">
-            <ejs-multiselect #regionIdsControl id="regionIds" mode="CheckBox" formControlName="regionIds"
-              placeholder="All" [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true"
-              appValidateWithMessage [dataSource]="regions$ | async" [selectAllText]='allOption'
-              (select)="onRegionSelect($event)" [showSelectAll]="true" tabindex="2">
-            </ejs-multiselect>
-          </div>
-        </div>
-        <div class="input-container">
-          <label for="locationIds">Location <span class="required">*</span></label>
-          <div class="input-group bootstrap">
-            <ejs-multiselect id="locationIds" mode="CheckBox" formControlName="locationIds" placeholder="All"
-              [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true" appValidateWithMessage
-              [dataSource]="locations$ | async" [selectAllText]='allOption' [showSelectAll]="true" tabindex="3">
-            </ejs-multiselect>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -126,25 +103,54 @@
         </div>
       </div>
     </div>
+    <div class="input-container">
+      <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="candidateEmail" id="email"  [disable]="true"
+        label="Email"></app-input>
+    </div>
     <div class="d-flex">
       <div class="input-container bootstrap f-grow-2">
         <label>SSN<span class="required">*</span></label>
         <div class="input-group">
-          <input appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" />
+          <input  appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" [attr.disabled]="true" />
         </div>
       </div>
       <div class="input-container"></div>
     </div>
-    <div class="input-container">
-      <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="candidateEmail" id="email"
-        label="Email"></app-input>
+
+
+
+    
+    <div class="form-elemet">
+      <div class="group">
+        <div class="input-container calendar">
+          <label for="regionIds">Region <span class="required">*</span></label>
+          <div class="input-group bootstrap">
+            <ejs-multiselect #regionIdsControl id="regionIds" mode="CheckBox" formControlName="regionIds"
+              placeholder="All" [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true"
+              appValidateWithMessage [dataSource]="regions$ | async" [selectAllText]='allOption'
+              [showSelectAll]="true" tabindex="2">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container">
+          <label for="locationIds">Location <span class="required">*</span></label>
+          <div class="input-group bootstrap">
+            <ejs-multiselect id="locationIds" mode="CheckBox" formControlName="locationIds" placeholder="All"
+              [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true" appValidateWithMessage
+              [dataSource]="locations$ | async" [selectAllText]='allOption' [showSelectAll]="true" tabindex="3">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
     </div>
+
+
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Comments</label>
+        <label>Reason for blocking <span class="required">*</span></label>
         <div class="input-group">
-          <textarea class="e-input" type="text" rows="3" maxlength="3000" appValidateWithMessage name="dnrComment"
-            formControlName="dnrComment" tabindex="9"></textarea>
+          <ejs-textbox class="e-input" type="text" maxlength="3000" appValidateWithMessage name="dnrComment"
+          formControlName="dnrComment" [multiline]="true"></ejs-textbox>
         </div>
       </div>
     </div>

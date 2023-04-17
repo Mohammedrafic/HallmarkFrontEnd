@@ -62,6 +62,7 @@ import { BookingsOverlapsRequest, BookingsOverlapsResponse } from '../replacemen
 import {
   EditScheduleFormSourceKeys,
   EditScheduleSourcesMap,
+  RemoveButtonTitleMap,
   ScheduledAvailabilityFormConfig,
   ScheduledShiftFormConfig,
   ScheduledUnavailabilityFormConfig,
@@ -93,6 +94,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   readonly scheduleFormSourcesMap: EditSchedule.EditScheduleFormSource = EditScheduleSourcesMap;
   readonly createPerDiemOrderControl: FormControl = new FormControl(false);
   readonly scheduleType = ScheduleType;
+  readonly removeButtonTitleMap = RemoveButtonTitleMap;
   readonly scheduleTypesControl: FormControl = new FormControl(ScheduleItemType.Book);
 
   scheduleForm: CustomFormGroup<EditSchedule.ScheduledShiftForm>;
@@ -646,6 +648,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private changeScheduledShift(scheduledItem: ScheduledItem | null) {
     if (scheduledItem && scheduledItem.schedule) {
+      this.isCreateMode = false;
       this.scheduledItem = scheduledItem;
       this.shiftTabs = GetScheduleTabItems(scheduledItem.schedule.daySchedules);
       this.selectScheduledItem(this.scheduledItem.schedule.daySchedules[0]);

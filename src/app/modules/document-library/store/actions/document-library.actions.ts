@@ -155,3 +155,4 @@ export class GetDocumentsByCognitiveSearch {
   static readonly type = '[documentsLibrary] Get documents by CognitiveSearch';
   constructor(public keyword: string, public businessUnitType: any, public businessUnitId?: any, public folderId?: any) { }
 }
+
