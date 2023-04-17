@@ -1,0 +1,554 @@
+<section class="container payrate">
+    <ejs-grid
+      class="grid grid-component"
+      #grid
+      [dataSource]="(payRatesPage$ | async)?.items"
+      [allowPaging]="allowPaging"
+      [pageSettings]="pageSettings"
+      [height]="fullScreenGridHeight"
+      [enableVirtualization]="true"
+      [rowHeight]="rowHeight"
+      [resizeSettings]="resizeSettings"
+      [allowSorting]="allowSorting"
+      [allowResizing]="allowResizing"
+      (rowSelected)="rowSelected($event, grid)"
+      (rowDeselected)="rowDeselected($event, grid)"
+      (dataBound)="gridDataBound(grid)"
+      [selectionSettings]="selectionSettings"
+    >
+      <e-columns>
+        <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+        <e-column textAlign="Right" width="100">
+          <ng-template #template let-data>
+            <div class="row-tool-buttons" (click)="stopPropagation($event)">
+              <button
+                ejs-button
+                cssClass="e-flat primary-icon-button"
+                (click)="onEditRecordButtonClick(data, $event)"
+                [disabled]="!userPermission[userPermissions.CanEditSettingsBillRates]"
+              >
+                <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+              </button>
+              <button
+                ejs-button
+                cssClass="e-flat secondary-icon-button"
+                (click)="onRemoveRecordButtonClick(data, $event)"
+                [disabled]="!userPermission[userPermissions.CanDeleteSettingsBillRates]"
+              >
+                <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
+              </button>
+            </div>
+          </ng-template>
+        </e-column>
+        <e-column field="regionName" headerText="REGION" width="150">
+          <ng-template #template let-data>
+            <span *ngIf="data.regionId">{{ data.regionName }}</span>
+            <span *ngIf="!data.regionId">All</span>
+          </ng-template>
+        </e-column>
+        <e-column field="locationName" headerText="LOCATION" width="180">
+          <ng-template #template let-data>
+            <span *ngIf="data.locationId">{{ data.locationName }}</span>
+            <span *ngIf="!data.locationId">All</span>
+          </ng-template>
+        </e-column>
+        <e-column field="departmentName" headerText="DEPARTMENT" width="180">
+          <ng-template #template let-data>
+            <span *ngIf="data.departmentId">{{ data.departmentName }}</span>
+            <span *ngIf="!data.departmentId">All</span>
+          </ng-template>
+        </e-column>
+        <e-column field="skillName" headerText="SKILL" width="170">
+          <ng-template #template let-data>
+            <span *ngIf="data.skillId">{{ data.skillName }}</span>
+            <span *ngIf="!data.skillId">All</span>
+          </ng-template>
+        </e-column>
+        <e-column field="orderTypes" headerText="ORDER TYPE" width="180">
+          <ng-template #template let-data>
+            <span *ngFor="let orderTypeId of data.orderTypes; let i = index"
+              >{{ orderTypeId | PayorderTypeName }}
+              <span *ngIf="i !== data.orderTypes.length - 1">, </span>
+            </span>
+            <span *ngIf="data.orderTypes.length === 0">All</span>
+          </ng-template>
+        </e-column>
+        <e-column field="payRateTitle" headerText="PAY RATE TITLE" width="180"></e-column>
+        <e-column field="payRateCategory" headerText="PAY RATE CATEGORY" width="200">
+          <ng-template #template let-data>
+            <span *ngIf="data.payRateCategory == 1">Regular</span>
+          </ng-template>
+        </e-column>
+        <e-column field="payType" headerText="PAY RATE TYPE" width="200">
+          <ng-template #template let-data>
+            <span *ngIf="data.payType == 1">Fixed</span>
+          </ng-template>
+        </e-column>
+        <e-column field="effectiveDate" headerText="EFFECTIVE DATE" width="180">
+          <ng-template #template let-data>
+            <span>{{ data.effectiveDate | date: 'MM/dd/yyy':'UTC' }}</span>
+          </ng-template>
+        </e-column>
+      </e-columns>
+      <ng-template #pagerTemplate let-data>
+        <div class="e-pagertemplate">
+          <div class="control-section">
+            <div class="content-wrapper">
+              <section class="left-side-pager-controls">
+                <ejs-dropdownlist
+                  id="rowsPerPage"
+                  class="dropdown-no-border"
+                  [allowFiltering]="true"
+                  [dataSource]="rowsPerPageDropDown"
+                  [(value)]="activeRowsPerPageDropDown"
+                  (change)="onRowsDropDownChanged()"
+                >
+                </ejs-dropdownlist>
+                <ejs-numerictextbox
+                  id="goToPage"
+                  class="numeric-input-no-border"
+                  format="#"
+                  [validateDecimalOnType]="validateDecimalOnType"
+                  [decimals]="decimals"
+                  placeholder="Go to:"
+                  min="1"
+                  [max]="(payRatesPage$ | async)?.totalPages"
+                  [showSpinButton]="false"
+                  (change)="onGoToClick($event)"
+                >
+                </ejs-numerictextbox>
+                <div class="total-rows">
+                  Total Rows: {{(payRatesPage$ | async)?.totalCount}}
+                </div>
+              </section>
+              <section class="right-side-pager-controls">
+                <ejs-pager
+                  id="gridPager"
+                  #gridPager
+                  [pageSize]="pageSize"
+                  [totalRecordsCount]="(payRatesPage$ | async)?.totalCount"
+                  [enablePagerMessage]="false"
+                  [currentPage]="currentPage"
+                  (click)="onGoToClick($event)"
+                >
+                </ejs-pager>
+              </section>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ejs-grid>
+  
+    <app-export-dialog
+      [columns]="columnsToExport"
+      [fileName]="fileName"
+      (cancel)="closeExport()"
+      (export)="export($event)"
+    ></app-export-dialog>
+  
+    <app-side-dialog
+      (formCancelClicked)="onFormCancelClick()"
+      (formSaveClicked)="onFormSaveClick()"
+      [header]="dialogHeader + ' Record'"
+      [width]="'536px'"
+    >
+      <form class="form-container" id="addEditRecordForm" [formGroup]="PayRatesFormGroup">
+        <div class="group">
+          <div class="input-container dropdown">
+            <label for="region">Region <span class="required">*</span></label>
+            <div class="dropdown-wrapper">
+              <div class="input-group dropdown bootstrap">
+                <ejs-multiselect
+                  id="region"
+                  #regionDropdown
+                  appValidateWithMessage
+                  mode="CheckBox"
+                  [dataSource]="orgRegions"
+                  [fields]="fields"
+                  [allowFiltering]="true"
+                  [showDropDownIcon]="true"
+                  formControlName="regionIds"
+                >
+                </ejs-multiselect>
+              </div>
+              <div class="switch">
+                <ejs-switch
+                  name="allRegions"
+                  [checked]="allRegionsSelected"
+                  (change)="allRegionsChange($event)"
+                  label="All"
+                ></ejs-switch>
+                <label for="allRegions" class="switch-text">All</label>
+              </div>
+            </div>
+          </div>
+  
+          <div class="input-container dropdown">
+            <label for="location">Location <span class="required">*</span></label>
+            <div class="dropdown-wrapper">
+              <div class="input-group dropdown bootstrap">
+                <ejs-multiselect
+                  id="location"
+                  #locationDropdown
+                  appValidateWithMessage
+                  mode="CheckBox"
+                  [dataSource]="locations"
+                  [fields]="fields"
+                  [allowFiltering]="true"
+                  [showDropDownIcon]="true"
+                  formControlName="locationIds"
+                >
+                </ejs-multiselect>
+              </div>
+              <div class="switch">
+                <ejs-switch
+                  name="allLocations"
+                  [checked]="allLocationsSelected"
+                  (change)="allLocationsChange($event)"
+                  label="All"
+                ></ejs-switch>
+                <label for="allLocations" class="switch-text">All</label>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="group">
+          <div class="input-container dropdown">
+            <label for="department">Department <span class="required">*</span></label>
+            <div class="dropdown-wrapper">
+              <div class="input-group dropdown bootstrap">
+                <ejs-multiselect
+                  id="department"
+                  #departmentDropdown
+                  appValidateWithMessage
+                  mode="CheckBox"
+                  [dataSource]="departments"
+                  [fields]="fields"
+                  [allowFiltering]="true"
+                  [showDropDownIcon]="true"
+                  formControlName="departmentIds"
+                  maximumSelectionLength="50000"
+                  [query]="query"
+                  (filtering)="onDepartmentsFiltering($event)"
+                >
+                </ejs-multiselect>
+              </div>
+              <div class="switch">
+                <ejs-switch
+                  name="allDepartments"
+                  [checked]="allDepartmentsSelected"
+                  (change)="allDepartmentsChange($event)"
+                  label="All"
+                ></ejs-switch>
+                <label for="allDepartments" class="switch-text">All</label>
+              </div>
+            </div>
+            <div *ngIf="departments && departments.length > maxDepartmentsLength">
+              Narrow down locations/regions or use input search for departments.
+            </div>
+          </div>
+          <div class="input-container dropdown">
+            <label for="skill">Skill <span class="required">*</span></label>
+            <div class="input-group dropdown bootstrap">
+              <ejs-multiselect
+                id="skill"
+                appValidateWithMessage
+                selectAllText="Select All"
+                mode="CheckBox"
+                [dataSource]="allSkills"
+                [fields]="skillsFields"
+                [showSelectAll]="true"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                formControlName="skillIds"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+        <div class="group">
+          <div class="input-container dropdown">
+            <label for="workcommitment">Work Commitment <span class="required">*</span></label>
+            <div class="input-group dropdown bootstrap">
+              <ejs-multiselect
+                id="workcommitment"
+                appValidateWithMessage
+                selectAllText="Select All"
+                mode="CheckBox"
+                [dataSource]="commitmentsPage$ | async"
+                [fields]="optionFields"
+                [showSelectAll]="true"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                formControlName="WorkCommitmentIds"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container dropdown">
+            <label for="orderType">Order Type <span class="required">*</span></label>
+            <div class="input-group dropdown bootstrap">
+              <ejs-multiselect
+                id="orderType"
+                appValidateWithMessage
+                selectAllText="Select All"
+                mode="CheckBox"
+                [dataSource]="orderTypes"
+                [fields]="orderTypesFields"
+                [showSelectAll]="true"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                formControlName="orderTypeIds"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+          <div class="group">
+          <div class="input-container form-dropdown">
+            <label for="billRatesTitle">Pay Rates Title <span class="required">*</span></label>
+            <div class="input-group dropdown bootstrap">
+              <ejs-dropdownlist
+                id="billRatesTitle"
+                appValidateWithMessage
+                [allowFiltering]="true"
+                [dataSource]="PayRateTitleOption"
+                [fields]="fields"
+                formControlName="payRateTitleId"
+              >
+              </ejs-dropdownlist>
+            </div>
+          </div>
+          <div class="input-container">
+            <label for="payRatesCategory">Pay Rates Category</label>
+            <div class="input-group bootstrap">
+              <input
+                id="payRatesCategory"
+                class="e-input e-disabled"
+                type="text"
+                placeholder="Regular"
+                formControlName="payRatesCategory"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="group">
+          <div class="input-container">
+            <label for="payType">Pay Rates Type <span class="required">*</span></label>
+            <div class="input-group dropdown bootstrap">
+              <ejs-dropdownlist
+                id="billRatesTitle"
+                appValidateWithMessage
+                [allowFiltering]="true"
+                [dataSource]="payRateTypesOptions"
+                [fields]="fields"
+                formControlName="payType"
+              >
+              </ejs-dropdownlist>
+            </div>
+          </div>
+          <div class="input-container calendar">
+            <label for="effectiveDate">Effective Date <span class="required">*</span></label>
+            <div class="input-group datepicker">
+              <ejs-datepicker
+                id="effectiveDate"
+                class="datepicker"
+                [format]="formatDate"
+                [placeholder]="placeholderDate"
+                [enableMask]="true"
+                [maskPlaceholder]="datepickerMask"
+                formControlName="effectiveDate"
+              >
+              </ejs-datepicker>
+            </div>
+          </div>
+        </div>
+        <div class="group">
+          <div class="input-container bootstrap">
+            <label>Multiplier <span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-numerictextbox
+                class="numeric-input"
+                appValidateWithMessage
+                min="0"
+                maxlength="10"
+                formControlName="amountMultiplier"
+                [validateDecimalOnType]="validateDecimalOnType"
+                [showSpinButton]="false"
+                [format]="format"
+                [decimals]="decimals"
+              >
+              </ejs-numerictextbox>
+            </div>
+          </div>
+          <div class="input-container">
+
+          </div>
+          <div>
+          </div>
+        </div>
+     </form>
+    </app-side-dialog>
+  
+    <app-filter-dialog
+      [items]="filteredItems"
+      [count]="(payRatesPage$ | async)?.totalCount"
+      (deleteFilter)="onFilterDelete($event)"
+      (clearAllFiltersClicked)="onFilterClearAll()"
+      (applyFilterClicked)="onFilterApply()"
+      (closeDialogClicked)="onFilterClose()"
+    >
+      <form class="bootstrap" [formGroup]="billRateFilterFormGroup">
+        <div class="filter-row">
+          <div class="input-container">
+            <label>Region</label>
+            <div class="input-group multiselect">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="regionIds"
+                placeholder="All"
+                [fields]="fields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.regionIds.dataSource"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container">
+            <label>Location</label>
+            <div class="input-group multiselect">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="locationIds"
+                placeholder="All"
+                [fields]="fields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.locationIds.dataSource"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div class="input-container">
+            <label>Department</label>
+            <div class="input-group multiselect">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="departmentIds"
+                placeholder="All"
+                [fields]="fields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.departmentIds.dataSource"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container">
+            <label>Skill</label>
+            <div class="input-group multiselect">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="skillIds"
+                placeholder="All"
+                [fields]="skillsFields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.skillIds.dataSource"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div class="input-container">
+            <label>Order Type</label>
+            <div class="input-group multiselect">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="orderTypes"
+                placeholder="All"
+                [fields]="orderTypesFields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.orderTypes.dataSource"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container">
+            <label>Pay Rate Category</label>
+            <div class="input-group multiselect">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="payRatesCategory"
+                placeholder="All"
+                [fields]="orderTypesFields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.payRatesCategory.dataSource"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div class="input-container">
+            <label>Pay Rate Type</label>
+            <div class="input-group multiselect">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="payType"
+                placeholder="All"
+                [fields]="fields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.payTypes.dataSource"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container">
+            <label>Pay Rate Title</label>
+            <div class="input-group multiselect">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="PayRateTitleOption"
+                placeholder="All"
+                [fields]="fields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.PayRateTitleOption.dataSource"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div class="input-container calendar">
+            <label for="effectiveDate">Effective Date</label>
+            <div class="input-group datepicker">
+              <ejs-datepicker
+                id="effectiveDate"
+                class="datepicker"
+                [format]="formatDate"
+                [placeholder]="placeholderDate"
+                [enableMask]="true"
+                [maskPlaceholder]="datepickerMask"
+                formControlName="effectiveDate"
+              >
+              </ejs-datepicker>
+            </div>
+          </div>
+          <div class="input-container">
+
+          </div>
+        </div>
+      </form>
+    </app-filter-dialog>
+  </section>
+  
