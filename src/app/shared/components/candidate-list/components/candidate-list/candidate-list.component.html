@@ -297,6 +297,7 @@
               placeholder="MM/DD/YYYY"
               [enableMask]="true"
               [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+              [max]="CandidateFilterFormGroup.controls['endDate'].value"
               formControlName="startDate">
             </ejs-datepicker>
           </div>
@@ -310,6 +311,7 @@
               placeholder="MM/DD/YYYY"
               [enableMask]="true"
               [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+              [min]="CandidateFilterFormGroup.controls['startDate'].value"
               formControlName="endDate">
             </ejs-datepicker>
           </div>
