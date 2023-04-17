@@ -1,18 +1,18 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
-  debounceTime, 
-  filter, 
-  map, 
-  Observable, 
-  Subject, 
-  switchMap, 
-  takeUntil, 
-  takeWhile, 
-  tap, 
+  debounceTime,
+  filter,
+  map,
+  Observable,
+  Subject,
+  switchMap,
+  takeUntil,
+  takeWhile,
+  tap,
   distinctUntilChanged,
 } from 'rxjs';
 import { FormGroup } from '@angular/forms';
-import { AbstractGridConfigurationComponent } 
+import { AbstractGridConfigurationComponent }
   from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { CandidatesStatusText, CandidateStatus, EmployeeStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
@@ -162,7 +162,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     { text: 'Id', column: 'Id' },
     { text: 'Name', column: 'Name' },
     { text: 'Profile Status', column: 'Status' },
-    { text: 'Skills', column: 'Skills' },
+    { text: 'Primary Skill', column: 'PrimarySkill' },
+    { text: 'Secondary Skill', column: 'SecondarySkill' },
     { text: 'Location', column: 'Location' },
     { text: 'Department', column: 'Department' },
     { text: 'Work Commitment', column: 'WorkCommitment' },
@@ -503,7 +504,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         if (!filters.isNotPreserved) {
           this.filters = { ...filters.state };
           this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
-        } 
+        }
 
         if(this.credStartDate != undefined){
           this.filters.startDate = DateTimeHelper.toUtcFormat(this.credStartDate);
