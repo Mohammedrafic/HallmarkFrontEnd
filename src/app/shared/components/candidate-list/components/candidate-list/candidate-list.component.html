@@ -167,7 +167,8 @@
     <ng-container *ngIf="!isIRP && CandidateFilterFormGroup">
       <div class="bootstrap">
         <div class="input-container">
-          <label>Employee Name</label>
+          <label *ngIf="isIRP">Employee Name</label>
+          <label *ngIf="!isIRP">Candidate Name</label>
           <div class="input-group">
             <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
           </div>
