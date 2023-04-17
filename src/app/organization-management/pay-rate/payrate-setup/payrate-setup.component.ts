@@ -151,7 +151,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     { text: 'Pay Rate Category', column: 'PayRateCategory' },
     { text: 'Pay Rate Type', column: 'PayRateType' },
     { text: 'Effective Date', column: 'EffectiveDate' },
-    { text: 'Pay Rate Value (Rate/Times)', column: 'PayRateValue' },
+    { text: 'Work Commitment', column: 'WorkCommitments' },
   ];
   public fileName: string;
   public defaultFileName: string;
@@ -295,7 +295,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
 
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
-      console.log(page);
       this.currentPage = page;
       this.filters.pageNumber = page;
       this.store.dispatch(new GetPayRates(this.filters));
