@@ -19,6 +19,7 @@ import { AlertsComponent } from './alerts/alerts.component';
 import { MasterCredentialsComponent } from './master-data/master-credentials/master-credentials.component';
 import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
 import { CommitmentComponent } from './master-data/commitment/commitment.component';
+import { OrgInterfaceComponent } from './org-interface/org-interface.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -52,6 +53,10 @@ const routes: Routes = [
           import('../organization-management/organization-management.module').then((m) => m.OrganizationManagementModule),
         //     canLoad: [ AdminGuard ],
         //     canActivate: [ AdminGuard ]
+      },
+      {
+        path: 'orginterfaces',
+        component : OrgInterfaceComponent
       },
       {
         path: 'master-data',
