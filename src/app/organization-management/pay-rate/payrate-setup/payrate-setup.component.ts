@@ -378,11 +378,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const isActive = changes['isActive'];
-
-    if (isActive?.currentValue && !isActive.isFirstChange()) {
       this.loadData();
-    }
   }
 
   ngOnDestroy(): void {

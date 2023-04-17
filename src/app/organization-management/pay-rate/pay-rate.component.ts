@@ -33,8 +33,9 @@ export class PayRateComponent extends AbstractPermissionGrid implements OnInit {
   }
 
   public override defaultExport(fileType: ExportedFileType): void {
-    (this.exportMap as Subject<ExportedFileType>).next(fileType);
-  }
+    this.exportMap.next(fileType);
+  } 
+
 
   public override customExport(): void {
     this.store.dispatch(new ShowExportDialog(true));
