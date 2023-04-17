@@ -200,5 +200,7 @@ export class DoNotReturnSearchCandidate{
   middleName:string|null;
   lastName:string;
   fullName:string;
+  email:string|null;
+  ssn:string|null;
 }
 

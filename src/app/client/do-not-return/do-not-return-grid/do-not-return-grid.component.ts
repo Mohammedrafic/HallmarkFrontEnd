@@ -3,12 +3,12 @@ import { DonotReturnState } from '@admin/store/donotreturn.state';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserPermissions } from '@core/enums';
 import { CustomFormGroup, Permission } from '@core/interface';
-import { debounceTime, delay, distinctUntilChanged, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, debounceTime, delay, distinctUntilChanged, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import {
   DonoreturnAddedit, DoNotReturnsPage,
-  AllOrganization, DoNotReturnCandidateSearchFilter, DoNotReturnCandidateListSearchFilter, DoNotReturnSearchCandidate, DonoreturnFilter
+  AllOrganization, DoNotReturnCandidateSearchFilter, DoNotReturnCandidateListSearchFilter, DoNotReturnSearchCandidate, DonoreturnFilter, Donotreturn
 } from '@shared/models/donotreturn.model';
 import { DoNotReturn } from '@admin/store/donotreturn.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -31,13 +31,14 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { doNotReturnFilterConfig, MasterDNRExportCols, WATERMARK } from '../donotreturn-grid.constants';
 import { DatePipe } from '@angular/common';
 import { FilterService } from '@shared/services/filter.service';
-import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
+import { UserAgencyOrganization, UserAgencyOrganizationBusinessUnit } from '@shared/models/user-agency-organization.model';
 
 import { LocationsByRegionsFilter ,regionFilter} from 'src/app/modules/document-library/store/model/document-library.model';
 import { DocumentLibraryState } from 'src/app/modules/document-library/store/state/document-library.state';
 import { Region } from '@shared/models/region.model';
 import { GetLocationsByRegions, GetRegionsByOrganizations } from 'src/app/modules/document-library/store/actions/document-library.actions';
 import { Candidatests, FormControlNames } from '../enums/dnotreturn.enum';
+import { sortBy } from 'lodash';
 
 @Component({
   selector: 'app-do-not-return-grid',
@@ -55,7 +56,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   public customAttributes: object;
   public doNotReturnForm: FormGroup;
   public isEdit: boolean = false;
-  public isBlock: boolean;
+  public isBlock: boolean = true;
   public orgid:number;
   public status:string;
   public doNotReturnFormGroup: CustomFormGroup<DoNotReturnForm>;
@@ -95,7 +96,11 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   private selectedOrganization: AllOrganization;
-  
+  public organizationRegionIds$: Subject<any> = new Subject();
+  public gridApi: any;
+  private gridColumnApi: any;
+  allOrganizations : UserAgencyOrganizationBusinessUnit[] = []
+  sortByField : number = 1;
 
   @Input() isActive = false;
   @Input() public isMobile: boolean;
@@ -151,18 +156,35 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
+    this.sortByField = 1;
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DoNotReturn.SaveDonotReturnSucceeded)).subscribe(() => {
       this.doNotReturnFormGroup.reset();
-      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters)]);
+      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
     });
-    this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters)]);
+    this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters)]);
+      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DoNotReturn.UpdateDonotReturnSucceeded)).subscribe(() => {
       this.doNotReturnFormGroup.reset();
-      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters)]);
+      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
+    });
+    this.actions$.pipe(ofActionDispatched(ShowSideDialog), takeUntil(this.unsubscribe$)).subscribe((payload) => {
+      if (payload.isDialogShown) {
+        if(this.allOrganizations != null && this.allOrganizations.length > 0 && JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0'))  as number != 0 ){      
+          this.selectedOrganization = this.allOrganizations.find((ele:any)=> ele.id == localStorage.getItem('lastSelectedOrganizationId')) as AllOrganization;
+          this.orgid=this.selectedOrganization.id;
+          this.loadRegionsAndLocations(this.selectedOrganization.id);
+          this.doNotReturnFormGroup.get(FormControlNames.BusinessUnitId)?.setValue(this.selectedOrganization.id);
+          let locationFilter: LocationsByRegionsFilter = {
+            getAll: true,
+            businessUnitId: this.selectedOrganization.id,
+            orderBy:'Name'
+          };
+          this.store.dispatch(new GetLocationsByRegions(locationFilter));
+        }
+     }
     });
     this.getDoNotReturn();
     this.GetAllOrganization();
@@ -170,15 +192,74 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.watchForDefaultExport();
     this.store.dispatch(new GetOrganizationDataSources());
     this.getOrganizationList();
-    this.doNotReturnFormGroup.get('ssn')?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((ssnValue: any) => {
+    this.doNotReturnFormGroup.get('ssn')?.valueChanges.pipe(delay(500),distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((ssnValue: any) => {
       if(ssnValue!= '' && ssnValue!= null && ssnValue.indexOf('XXX-XX') == -1){
         this.maskedSSN = ssnValue;
       }
     });
+
+    this.organizationRegionIds$.pipe(delay(500),distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+     });
+
+    this.allOrganizations$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      if(data != null && data.length > 0){
+        this.allOrganizations = data;
+      }
+     });
+
+     this.locations$.pipe(takeUntil(this.unsubscribe$)).subscribe((locations: any) => {
+        if(locations != null && locations.length > 0){
+          const selectedLoactions = this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.value;
+          if (selectedLoactions != null && selectedLoactions.length > 0) {
+            let difference = locations.filter((x:any) => selectedLoactions.includes(x.id));
+            if(difference.length === 0){
+              this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue(null); 
+            }
+          }
+        }
+     });
+
     this.doNotReturnFilterForm.get('ssn')?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((ssnValue: any) => {
       if(ssnValue!= '' && ssnValue!= null && ssnValue.indexOf('XXX-XX') == -1){
         this.maskedFilterSSN = ssnValue;
       }
+    });
+    this.doNotReturnFormGroup.get('candidateProfileId')?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((CandidateProfileId: any) => {
+      if(CandidateProfileId!= '' && CandidateProfileId!= null ){
+        if(this.CandidateNames.length > 0){
+            let selectedCandidate : DoNotReturnSearchCandidate | undefined = this.CandidateNames.find(data=> data.id == CandidateProfileId || data.fullName == CandidateProfileId)
+            this.doNotReturnFormGroup.get('candidateEmail')?.setValue(selectedCandidate?.email);
+            if(selectedCandidate?.ssn != null){
+              this.maskedSSN = selectedCandidate?.ssn.toString();
+              this.onSSNBlur();
+            }
+        }        
+      }
+    });
+
+    this.doNotReturnFormGroup.get(FormControlNames.RegionIds)?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      if(this.selectedOrganization != null && this.selectedOrganization.id != null){
+          if(data != null && data?.length > 0) {
+            let locationFilter: LocationsByRegionsFilter = {
+              ids: data,
+              getAll: true,
+              businessUnitId: this.selectedOrganization.id,
+              orderBy:'Name'
+            };
+            this.store.dispatch(new GetLocationsByRegions(locationFilter));
+            this.changeDetectorRef.markForCheck();
+          }
+          else{
+            let locationFilter: LocationsByRegionsFilter = {
+              getAll: true,
+              businessUnitId: this.selectedOrganization.id,
+              orderBy:'Name'
+            };
+            this.store.dispatch(new GetLocationsByRegions(locationFilter));
+            this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue(null); 
+          }
+      }
+      
     });
   }
 
@@ -231,7 +312,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
   private getDoNotReturn(): void {
-    this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters)]);
+    this.selectedOrganization = {} as AllOrganization;
+    this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
   }
 
   private GetAllOrganization(): void {
@@ -242,10 +324,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     return this.doNotReturnForm.get('organizationIds')?.value?.length || 0;
   }
 
-  // public createForm(): void {
-  //   //this.doNotReturnFormGroup = new FormGroup({})
-  //   // this.addRemoveFormcontrols();
-  // }
 
   public addRemoveFormcontrols() {
       this.doNotReturnFormGroup.addControl(FormControlNames.BusinessUnitId, new FormControl('', []));
@@ -257,54 +335,16 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
 
-  public onRegionSelect(event: any) {
-    this.regionIdControl = this.doNotReturnFormGroup.get(FormControlNames.RegionIds) as AbstractControl;
-    this.regionIdControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-      if (this.regionIdControl?.value?.length > 0) {
-        let locationFilter: LocationsByRegionsFilter = {
-          ids: data,
-          getAll: true,
-          businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
-          orderBy:'Name'
-        };
-        this.store.dispatch(new GetLocationsByRegions(locationFilter));
-        this.changeDetectorRef.markForCheck();
-      }
-      else{
-        let locationFilter: LocationsByRegionsFilter = {
-          ids: data,
-          getAll: true,
-          businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
-        };
-        this.store.dispatch(new GetLocationsByRegions(locationFilter));
-        this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue([]); 
-      }
-    });
-  }
-
   public loadRegionsAndLocations(selectedBusinessUnitId: number) {
    // this.createForm();
       this.regionIdControl = this.doNotReturnFormGroup.get(FormControlNames.RegionIds) as AbstractControl;
       let regionFilter: regionFilter = {
         businessUnitId: selectedBusinessUnitId,
         getAll: true,
-        ids: [selectedBusinessUnitId]
+        ids: [selectedBusinessUnitId],
+        orderBy:'Name'
       };
-      this.store.dispatch(new GetRegionsByOrganizations(regionFilter)).pipe(delay(500)).subscribe(()=>
-      {
-        this.regionIdControl?.valueChanges.pipe(delay(500)).subscribe((data: any) => {
-          if (this.regionIdControl?.value?.length > 0) {
-            let locationFilter: LocationsByRegionsFilter = {
-              ids: data,
-              getAll: true,
-              businessUnitId: selectedBusinessUnitId,
-              orderBy:'Name'
-            };
-            this.store.dispatch(new GetLocationsByRegions(locationFilter));
-            this.changeDetectorRef.markForCheck();
-          }
-        });
-      });
+      this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
       this.changeDetectorRef.markForCheck();
   }
   
@@ -361,50 +401,18 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.blockunblockcandidate$.next(event.checked);
    this.isBlock= event.checked;
    this.status=this.isBlock?Candidatests.UnBlock:Candidatests.Block;
-   //this.isBlock=false;
-  //  if (this.doNotReturnFormGroup.valid) {
-  //   const donotreturn: DonoreturnAddedit ={
-  //    businessUnitId:this.doNotReturnFormGroup.get("businessUnitId")?.value,
-  //    regionLocationMappings: this.setDictionaryRegionMappings(),
-  //    id: this.doNotReturnFormGroup.get("id")?.value,
-  //    locationId:"",
-  //    regionId:"",
-  //    candidateProfileId:this.doNotReturnFormGroup.get("candidateProfileId")?.value,
-  //    dnrRequestedBy:this.doNotReturnFormGroup.get("dnrRequestedBy")?.value,
-  //    dnrStatus: this.IsSwitcher? Candidatests.UnBlock:Candidatests.Block,
-  //    ssn:this.doNotReturnFormGroup.get("ssn")?.value,
-  //    dnrComment:this.doNotReturnFormGroup.get("dnrComment")?.value,
-  //    status:this.IsSwitcher?Candidatests.UnBlock:Candidatests.Block,
-  //    candidateEmail: this.doNotReturnFormGroup.controls['candidateEmail'].value,
-  //   } 
-  //   this.store.dispatch(new DoNotReturn.SaveDonotreturn(new DonoreturnAddedit(
-  //    donotreturn
-  //    )));
-  //    this.doNotReturnFormGroup.reset();
-  //    this.store.dispatch([new ShowSideDialog(false), new SetDirtyState(false)]);
-  //    this.removeActiveCssClass();
-  //    setTimeout(() => {
-  //      this.getDoNotReturn();
-  //    }, 5000)
-  //  } else {
-  //    this.doNotReturnFormGroup.markAllAsTouched();
-  //  }
-  // this.isEdit=false;
   }
 
   
   @OutsideZone
   public editDonotReturn(data: DonoreturnAddedit, event: any) {
     this.isEdit=true;
-    // if (data.businessUnitId) {
-    //  this.loadRegionsAndLocations(data.businessUnitId);
-    // }
     if (data.dnrStatus == Candidatests.Block) {
-      this.isBlock = false;
+      this.isBlock = true;
     }
     else
     {
-      this.isBlock=true;
+      this.isBlock=false;
     }
     this.addActiveCssClass(event);
     this.getEditBasedValues(data, event);
@@ -412,11 +420,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
   getEditBasedValues(data: DonoreturnAddedit, event: any) {
-    // this.store.dispatch(new DoNotReturn.GetLocationByOrgId(data.businessUnitId))
-    //   .pipe(takeUntil(this.unsubscribe$))
-    //   .subscribe((result) => {
-    //   });
-   // this.regionIdControl = this.doNotReturnFormGroup.get(FormControlNames.RegionIds) as AbstractControl;
+   this.selectedOrganization.id = data?.businessUnitId;
       let regionFilter: regionFilter = {
         businessUnitId: data.businessUnitId,
         getAll: true,
@@ -426,8 +430,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       {
         
       });
-      // this.regionIdControl?.valueChanges.pipe(delay(500)).subscribe((result: any) => {
-      //   if (this.regionIdControl?.value?.length > 0) {
           let locationFilter: LocationsByRegionsFilter = {
             ids: (data.regionId.split(',')).map(m => parseInt(m)),
             getAll: true,
@@ -450,40 +452,30 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
               dnrComment: data.dnrComment,
               ssn: data.ssn != null ?  "XXX-XX-" + this.maskedSSN.slice(-4): "",
               dnrRequestedBy: data.dnrRequestedBy,
-              dnrStatus: data.dnrStatus,
+              dnrStatus: data.dnrStatus == Candidatests.Block ? true : false,
             }) 
           });
 
-          // setTimeout(() =>
-         
-          // , 5000);
-
-          
-       // }
-      //});
-      //this.changeDetectorRef.markForCheck();
-
-    let filter: DoNotReturnCandidateListSearchFilter = {
-      candidateProfileId: data.candidateProfileId
-    };
-    this.store.dispatch(new DoNotReturn.GetDoNotReturnCandidateListSearch(filter))
-      .pipe(delay(500))
-      .subscribe((result) => {
-        this.CandidateNames = result.donotreturn.searchCandidates
-        this.store.dispatch(new ShowSideDialog(true))
-        this.changeDetectorRef.markForCheck();
-      });
-      // setTimeout(() =>
-     
-      // , 3000);      
+      let filter: DoNotReturnCandidateListSearchFilter = {
+        candidateProfileId: data.candidateProfileId
+      };
+      this.store.dispatch(new DoNotReturn.GetDoNotReturnCandidateListSearch(filter))
+        .pipe(delay(500))
+        .subscribe((result) => {
+          this.CandidateNames = result.donotreturn.searchCandidates
+          this.store.dispatch(new ShowSideDialog(true))
+          this.changeDetectorRef.markForCheck();
+        });
+   
   }
 
   public onOrganizationDropDownChanged(event: ChangeEventArgs): void {
     this.selectedOrganization = event.itemData as AllOrganization;
     this.orgid=this.selectedOrganization.id;
     if (this.selectedOrganization.id) {
-      this.loadRegionsAndLocations(this.selectedOrganization.id);
+       this.loadRegionsAndLocations(this.selectedOrganization.id);
     }
+    this.doNotReturnFormGroup.get(FormControlNames.RegionIds)?.setValue([]);
   }
 
   @OutsideZone
@@ -510,6 +502,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   @OutsideZone
   public saveDonotReturn(): void {
     if (this.doNotReturnFormGroup.valid) {
+      this.sortByField = 2;
      const donotreturn: DonoreturnAddedit ={
       businessUnitId:this.doNotReturnFormGroup.get("businessUnitId")?.value,
       regionLocationMappings: this.setDictionaryRegionMappings(),
@@ -518,10 +511,10 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       regionId:"",
       candidateProfileId:this.doNotReturnFormGroup.get("candidateProfileId")?.value,
       dnrRequestedBy:this.doNotReturnFormGroup.get("dnrRequestedBy")?.value,
-      dnrStatus: this.isBlock? this.status: Candidatests.Block,
+      dnrStatus: this.isBlock? Candidatests.Block: Candidatests.UnBlock,
       ssn:this.maskedSSN != '' ? this.maskedSSN : this.doNotReturnFormGroup.get("ssn")?.value,
       dnrComment:this.doNotReturnFormGroup.get("dnrComment")?.value,
-      status: this.isBlock? this.status: Candidatests.Block,
+      status: this.isBlock? Candidatests.Block: Candidatests.UnBlock,
       candidateEmail: this.doNotReturnFormGroup.controls['candidateEmail'].value,
      } 
      this.store.dispatch(new DoNotReturn.SaveDonotreturn(new DonoreturnAddedit(
@@ -537,7 +530,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.doNotReturnFormGroup.markAllAsTouched();
     }
     this.isEdit=false;
-    this.isBlock=false;
+    this.isBlock=true;
     this.maskSSNPattern = '000-00-0000';
     this.maskedSSN = '';
   }
@@ -558,6 +551,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
           this.removeActiveCssClass();
           this.maskSSNPattern = '000-00-0000';
           this.maskedSSN = '';
+          this.sortByField = 1;
         });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
@@ -595,6 +589,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
   public onFilterClearAll(): void {
+    this.sortByField = 1;
     this.doNotReturnFilterForm.reset();
     this.filteredItems = [];
     this.currentPage = 1;
@@ -607,6 +602,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
   public onFilterApply(): void {
+    this.sortByField = 1;
     this.filters = this.doNotReturnFilterForm.getRawValue();
     this.filters.ssn = parseInt(this.maskedFilterSSN);
     this.filteredItems = this.filterService.generateChips(this.doNotReturnFilterForm, this.filterColumns);
@@ -647,9 +643,9 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       };
       this.CandidateNames = [];
       this.store.dispatch(new DoNotReturn.GetDoNotReturnCandidateSearch(filter))
-        .pipe(takeUntil(this.unsubscribe$),)
+        .pipe(delay(500),distinctUntilChanged(),takeUntil(this.unsubscribe$),)
         .subscribe((result) => {
-          this.CandidateNames = result.donotreturn.searchCandidates
+          this.CandidateNames = result.donotreturn.searchCandidates;
           e.updateData(result.donotreturn.searchCandidates);
         });
     }
