@@ -1,4 +1,4 @@
-<section class="flex-column">
+<section class="container">
   <section class="toolbar">
     <div>
       <h3>Pay Rate</h3>
@@ -12,19 +12,6 @@
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <app-tooltip-container
-        [message]="toolTipMessage"
-        [showToolTip]="!userPermission[userPermissions.CanEditSettingsBillRates]">
-        <button
-          [disabled]="!userPermission[userPermissions.CanEditSettingsBillRates]"
-          ejs-button
-          id="importButton"
-          cssClass="e-outline button-import"
-          (click)="onImportDataClick()"
-        >
-          Import <i-feather name="download" class="icon"></i-feather>
-        </button>
-      </app-tooltip-container>
       <button
         ejs-dropdownbutton
         [items]="exportOptions"
@@ -33,15 +20,12 @@
       >
         <div class="button-export-container">Export <i-feather name="upload" class="icon"></i-feather></div>
       </button>
-      <app-tooltip-container
-        [message]="toolTipMessage"
-        [showToolTip]="!canAddBillRate">
+      <app-tooltip-container>
         <button
           ejs-button [isPrimary]="true"
-          (click)="addBillRateSetupRecord()"
-          [disabled]="!canAddBillRate"
+          (click)="addPayRateSetupRecord()"
         >
-          Add Record
+          {{addPayRateBtnText}}
         </button>
       </app-tooltip-container>
   </div>
@@ -49,8 +33,6 @@
 <app-payrate-setup
   [filteredItems$]="filteredItems$"
   [export$]="exportMap"
-  [isActive]="isBillRateSetupTabActive"
-  [importDialogEvent]="importDialogEvent"
   [userPermission]="userPermission"
 >
 </app-payrate-setup>

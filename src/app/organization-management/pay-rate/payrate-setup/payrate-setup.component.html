@@ -2,7 +2,7 @@
     <ejs-grid
       class="grid grid-component"
       #grid
-      [dataSource]="(billRatesPage$ | async)?.items"
+      [dataSource]="(payRatesPage$ | async)?.items"
       [allowPaging]="allowPaging"
       [pageSettings]="pageSettings"
       [height]="fullScreenGridHeight"
@@ -58,43 +58,35 @@
             <span *ngIf="!data.departmentId">All</span>
           </ng-template>
         </e-column>
-        <e-column field="skills" headerText="SKILL" width="170">
+        <e-column field="skillName" headerText="SKILL" width="170">
           <ng-template #template let-data>
-            <span *ngFor="let skill of data.skills; let i = index"
-              >{{ skill.name }}
-              <span *ngIf="i !== data.skills.length - 1">, </span>
-            </span>
-            <span *ngIf="data.skills.length === 0">All</span>
+            <span *ngIf="data.skillId">{{ data.skillName }}</span>
+            <span *ngIf="!data.skillId">All</span>
           </ng-template>
         </e-column>
         <e-column field="orderTypes" headerText="ORDER TYPE" width="180">
           <ng-template #template let-data>
             <span *ngFor="let orderTypeId of data.orderTypes; let i = index"
-              >{{ orderTypeId | orderTypeName }}
+              >{{ orderTypeId | PayorderTypeName }}
               <span *ngIf="i !== data.orderTypes.length - 1">, </span>
             </span>
             <span *ngIf="data.orderTypes.length === 0">All</span>
           </ng-template>
         </e-column>
-        <e-column field="billRateTitle" headerText="BILL RATE TITLE" width="180"></e-column>
-        <e-column field="billRateCategory" headerText="BILL RATE CATEGORY" width="200">
+        <e-column field="payRateTitle" headerText="PAY RATE TITLE" width="180"></e-column>
+        <e-column field="payRateCategory" headerText="PAY RATE CATEGORY" width="200">
           <ng-template #template let-data>
-            <span>{{ billRateCategory[data.billRateCategory] }}</span>
+            <span *ngIf="data.payRateCategory == 1">Regular</span>
           </ng-template>
         </e-column>
-        <e-column field="billRateType" headerText="BILL RATE TYPE" width="200">
+        <e-column field="payType" headerText="PAY RATE TYPE" width="200">
           <ng-template #template let-data>
-            <span>{{ billRateType[data.billType] }}</span>
+            <span *ngIf="data.payType == 1">Fixed</span>
           </ng-template>
         </e-column>
         <e-column field="effectiveDate" headerText="EFFECTIVE DATE" width="180">
           <ng-template #template let-data>
             <span>{{ data.effectiveDate | date: 'MM/dd/yyy':'UTC' }}</span>
-          </ng-template>
-        </e-column>
-        <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" textAlign="Right" headerTextAlign="Right" width="250">
-          <ng-template #template let-data>
-            <span>{{ data.rateHour | rateHourPipe: data.billRateConfigId:data.billRateType:billRatesOptions }}</span>
           </ng-template>
         </e-column>
       </e-columns>
@@ -120,13 +112,13 @@
                   [decimals]="decimals"
                   placeholder="Go to:"
                   min="1"
-                  [max]="(billRatesPage$ | async)?.totalPages"
+                  [max]="(payRatesPage$ | async)?.totalPages"
                   [showSpinButton]="false"
                   (change)="onGoToClick($event)"
                 >
                 </ejs-numerictextbox>
                 <div class="total-rows">
-                  Total Rows: {{(billRatesPage$ | async)?.totalCount}}
+                  Total Rows: {{(payRatesPage$ | async)?.totalCount}}
                 </div>
               </section>
               <section class="right-side-pager-controls">
@@ -134,7 +126,7 @@
                   id="gridPager"
                   #gridPager
                   [pageSize]="pageSize"
-                  [totalRecordsCount]="(billRatesPage$ | async)?.totalCount"
+                  [totalRecordsCount]="(payRatesPage$ | async)?.totalCount"
                   [enablePagerMessage]="false"
                   [currentPage]="currentPage"
                   (click)="onGoToClick($event)"
@@ -148,7 +140,6 @@
     </ejs-grid>
   
     <app-export-dialog
-      *ngIf="isActive"
       [columns]="columnsToExport"
       [fileName]="fileName"
       (cancel)="closeExport()"
@@ -156,14 +147,12 @@
     ></app-export-dialog>
   
     <app-side-dialog
-      [disableSaveButton]="!userPermission[userPermissions.CanEditSettingsBillRates]"
       (formCancelClicked)="onFormCancelClick()"
       (formSaveClicked)="onFormSaveClick()"
       [header]="dialogHeader + ' Record'"
       [width]="'536px'"
-      *ngIf="isActive"
     >
-      <form class="form-container" id="addEditRecordForm" [formGroup]="billRatesFormGroup">
+      <form class="form-container" id="addEditRecordForm" [formGroup]="PayRatesFormGroup">
         <div class="group">
           <div class="input-container dropdown">
             <label for="region">Region <span class="required">*</span></label>
@@ -259,7 +248,6 @@
               Narrow down locations/regions or use input search for departments.
             </div>
           </div>
-  
           <div class="input-container dropdown">
             <label for="skill">Skill <span class="required">*</span></label>
             <div class="input-group dropdown bootstrap">
@@ -268,7 +256,7 @@
                 appValidateWithMessage
                 selectAllText="Select All"
                 mode="CheckBox"
-                [dataSource]="skills$ | async"
+                [dataSource]="allSkills"
                 [fields]="skillsFields"
                 [showSelectAll]="true"
                 [allowFiltering]="true"
@@ -279,23 +267,25 @@
             </div>
           </div>
         </div>
-  
         <div class="group">
-          <div class="input-container form-dropdown">
-            <label for="billRatesTitle">Bill Rates Title <span class="required">*</span></label>
+          <div class="input-container dropdown">
+            <label for="workcommitment">Work Commitment <span class="required">*</span></label>
             <div class="input-group dropdown bootstrap">
-              <ejs-dropdownlist
-                id="billRatesTitle"
+              <ejs-multiselect
+                id="workcommitment"
                 appValidateWithMessage
+                selectAllText="Select All"
+                mode="CheckBox"
+                [dataSource]="commitmentsPage$ | async"
+                [fields]="optionFields"
+                [showSelectAll]="true"
                 [allowFiltering]="true"
-                [dataSource]="billRatesOptions$ | async"
-                [fields]="billRateTitleFields"
-                formControlName="billRateTitleId"
+                [showDropDownIcon]="true"
+                formControlName="WorkCommitmentIds"
               >
-              </ejs-dropdownlist>
+              </ejs-multiselect>
             </div>
           </div>
-  
           <div class="input-container dropdown">
             <label for="orderType">Order Type <span class="required">*</span></label>
             <div class="input-group dropdown bootstrap">
@@ -315,62 +305,49 @@
             </div>
           </div>
         </div>
-  
-        <div class="group">
-          <div class="input-container">
-            <label for="billRatesCategory">Bill Rates Category</label>
-            <div class="input-group bootstrap">
-              <input
-                id="billRatesCategory"
-                class="e-input e-disabled"
-                type="text"
-                placeholder="Regular/Local"
-                formControlName="billRatesCategory"
-              />
-            </div>
-          </div>
-  
-          <div class="input-container">
-            <label for="billRatesType">Bill Rates Type <span class="required">*</span></label>
+          <div class="group">
+          <div class="input-container form-dropdown">
+            <label for="billRatesTitle">Pay Rates Title <span class="required">*</span></label>
             <div class="input-group dropdown bootstrap">
               <ejs-dropdownlist
                 id="billRatesTitle"
                 appValidateWithMessage
                 [allowFiltering]="true"
-                [dataSource]="billRateTypesOptions"
+                [dataSource]="PayRateTitleOption"
                 [fields]="fields"
-                formControlName="billRatesType"
+                formControlName="payRateTitleId"
               >
               </ejs-dropdownlist>
             </div>
           </div>
-        </div>
-  
-        <div class="group">
-          <div class="input-container bootstrap" *ngIf="!hideFilds.has('billRateValueRateTimes')">
-            <label *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier"
-              >Multiplier <span class="required">*</span></label
-            >
-            <label *ngIf="selectedBillRateUnit === BillRateUnitList.Currency"
-              >Amount <span class="required">*</span></label
-            >
-            <label *ngIf="selectedBillRateUnit === BillRateUnitList.Hours">Hours <span class="required">*</span></label>
-            <div class="input-group">
-              <ejs-numerictextbox
-                class="numeric-input"
-                appValidateWithMessage
-                min="0"
-                maxlength="10"
-                formControlName="billRateValueRateTimes"
-                [validateDecimalOnType]="validateDecimalOnType"
-                [showSpinButton]="false"
-                [format]="format"
-                [decimals]="decimals"
-              >
-              </ejs-numerictextbox>
+          <div class="input-container">
+            <label for="payRatesCategory">Pay Rates Category</label>
+            <div class="input-group bootstrap">
+              <input
+                id="payRatesCategory"
+                class="e-input e-disabled"
+                type="text"
+                placeholder="Regular"
+                formControlName="payRatesCategory"
+              />
             </div>
           </div>
-  
+        </div>
+        <div class="group">
+          <div class="input-container">
+            <label for="payType">Pay Rates Type <span class="required">*</span></label>
+            <div class="input-group dropdown bootstrap">
+              <ejs-dropdownlist
+                id="billRatesTitle"
+                appValidateWithMessage
+                [allowFiltering]="true"
+                [dataSource]="payRateTypesOptions"
+                [fields]="fields"
+                formControlName="payType"
+              >
+              </ejs-dropdownlist>
+            </div>
+          </div>
           <div class="input-container calendar">
             <label for="effectiveDate">Effective Date <span class="required">*</span></label>
             <div class="input-group datepicker">
@@ -387,12 +364,36 @@
             </div>
           </div>
         </div>
+        <div class="group">
+          <div class="input-container bootstrap">
+            <label>Multiplier <span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-numerictextbox
+                class="numeric-input"
+                appValidateWithMessage
+                min="0"
+                maxlength="10"
+                formControlName="amountMultiplier"
+                [validateDecimalOnType]="validateDecimalOnType"
+                [showSpinButton]="false"
+                [format]="format"
+                [decimals]="decimals"
+              >
+              </ejs-numerictextbox>
+            </div>
+          </div>
+          <div class="input-container">
+
+          </div>
+          <div>
+          </div>
+        </div>
      </form>
     </app-side-dialog>
   
     <app-filter-dialog
       [items]="filteredItems"
-      [count]="(billRatesPage$ | async)?.totalCount"
+      [count]="(payRatesPage$ | async)?.totalCount"
       (deleteFilter)="onFilterDelete($event)"
       (clearAllFiltersClicked)="onFilterClearAll()"
       (applyFilterClicked)="onFilterApply()"
@@ -463,48 +464,33 @@
             </div>
           </div>
         </div>
-        <div class="input-container">
-          <label>Order Type</label>
-          <div class="input-group multiselect">
-            <ejs-multiselect
-              mode="CheckBox"
-              formControlName="orderTypes"
-              placeholder="All"
-              [fields]="orderTypesFields"
-              [allowFiltering]="true"
-              [showDropDownIcon]="true"
-              [dataSource]="filterColumns.orderTypes.dataSource"
-            >
-            </ejs-multiselect>
-          </div>
-        </div>
         <div class="filter-row">
           <div class="input-container">
-            <label>Bill Rate Category</label>
+            <label>Order Type</label>
             <div class="input-group multiselect">
               <ejs-multiselect
                 mode="CheckBox"
-                formControlName="billRateCategories"
+                formControlName="orderTypes"
                 placeholder="All"
                 [fields]="orderTypesFields"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"
-                [dataSource]="filterColumns.billRateCategories.dataSource"
+                [dataSource]="filterColumns.orderTypes.dataSource"
               >
               </ejs-multiselect>
             </div>
           </div>
           <div class="input-container">
-            <label>Bill Rate Type</label>
+            <label>Pay Rate Category</label>
             <div class="input-group multiselect">
               <ejs-multiselect
                 mode="CheckBox"
-                formControlName="billRateTypes"
+                formControlName="payRatesCategory"
                 placeholder="All"
                 [fields]="orderTypesFields"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"
-                [dataSource]="filterColumns.billRateTypes.dataSource"
+                [dataSource]="filterColumns.payRatesCategory.dataSource"
               >
               </ejs-multiselect>
             </div>
@@ -512,20 +498,37 @@
         </div>
         <div class="filter-row">
           <div class="input-container">
-            <label>Bill Rate Title</label>
+            <label>Pay Rate Type</label>
             <div class="input-group multiselect">
               <ejs-multiselect
                 mode="CheckBox"
-                formControlName="billRateConfigIds"
+                formControlName="payType"
                 placeholder="All"
-                [fields]="billRateTitleFields"
+                [fields]="fields"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"
-                [dataSource]="filterColumns.billRateConfigIds.dataSource"
+                [dataSource]="filterColumns.payTypes.dataSource"
               >
               </ejs-multiselect>
             </div>
           </div>
+          <div class="input-container">
+            <label>Pay Rate Title</label>
+            <div class="input-group multiselect">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="PayRateTitleOption"
+                placeholder="All"
+                [fields]="fields"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.PayRateTitleOption.dataSource"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+        <div class="filter-row">
           <div class="input-container calendar">
             <label for="effectiveDate">Effective Date</label>
             <div class="input-group datepicker">
@@ -541,10 +544,11 @@
               </ejs-datepicker>
             </div>
           </div>
+          <div class="input-container">
+
+          </div>
         </div>
       </form>
     </app-filter-dialog>
-  
-    <app-import-bill-rates [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-bill-rates>
   </section>
   
