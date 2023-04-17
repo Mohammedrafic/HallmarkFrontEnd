@@ -31,6 +31,8 @@ import { MultiplePipeModule } from '@shared/pipes/multiple.pipe';
 import { SkillCategoryRendererComponent } from './components/orientation-grid/skill-category-renderer/skill-category.component';
 import { HistoricalDataActionRendererComponent } from './components/orientation-grid/historical-data-action-renderer/historical-data-action-renderer.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { NgxsModule } from '@ngxs/store';
+import { OrientationState } from './components/orientation-historical-data/orientation.state';
 
 const icons = {
   Edit,
@@ -63,6 +65,7 @@ const icons = {
     DatepickerModule,
     MultiplePipeModule,
     JoinPipeModule,
+    NgxsModule.forFeature([OrientationState]),
   ],
   declarations: [
     OrientationComponent,

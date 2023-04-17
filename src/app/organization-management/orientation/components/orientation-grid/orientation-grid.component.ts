@@ -1,3 +1,4 @@
+import { RowNode } from '@ag-grid-community/core';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { TakeUntilDestroy } from '@core/decorators';
@@ -63,7 +64,9 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   @Output() public openDialog = new EventEmitter();
   @Output() public onEdit = new EventEmitter();
   @Output() public onDelete = new EventEmitter();
-
+  @Output() public multiSelectionChanged: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
+  @Output() readonly orientationRowSelected: EventEmitter<any> =
+    new EventEmitter<any>();
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
   public readonly orientationTabEnum = OrientationTab;
 
@@ -202,7 +205,9 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
         this.cd.markForCheck();
       });
   }
-
+  public selectedRow(event: any): void {
+    this.orientationRowSelected.emit(event);
+  }
   private gridDefHandler(): void {
     if (this.orientationTab === OrientationTab.Setup) {
       this.columnDef = OrientationColumnDef(this.edit.bind(this), this.delete.bind(this), this.gridActionsParams);
