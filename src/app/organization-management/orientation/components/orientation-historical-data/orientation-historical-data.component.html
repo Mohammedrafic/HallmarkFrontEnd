@@ -10,6 +10,7 @@
     [regions]="regions"
     [disableControls]="disableControls || !userPermission[userPermissions.CanEditOrientation]"
     [orientationTab]="orientationTab.HistoricalData"
+    (multiSelectionChanged)="handleExport($event)"
     [bulkActionConfig]="bulkActionConfig">
   </app-orientation-grid>
 </section>

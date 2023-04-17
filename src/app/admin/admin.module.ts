@@ -151,8 +151,7 @@ const sidebarIcons = {
     ResizeService,
     PageService,
     AddEditOrganizationService,
-    MasterSkillsService,
-    OrientationService
+    MasterSkillsService
   ],
 })
 export class AdminModule { }
