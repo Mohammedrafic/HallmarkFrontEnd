@@ -6,7 +6,6 @@ import {
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { DatePipe } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import {
@@ -50,6 +49,7 @@ import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { AcceptFormComponent } from './accept-form/accept-form.component';
 import { CommonHelper } from '@shared/helpers/common.helper';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -178,7 +178,6 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     private store: Store,
     private actions$: Actions,
     private orderCandidateListViewService: OrderCandidateListViewService,
-    private datePipe: DatePipe,
     private cdr: ChangeDetectorRef,
   ) {
     super();
@@ -247,16 +246,25 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     const value = this.acceptForm.getRawValue();
     const applicantStatus: ApplicantStatus = this.getNewApplicantStatus();
 
-    const actualDate =
-      applicantStatus.applicantStatus === CandidatStatus.OnBoard
-        ? {
-            actualStartDate: this.orderCandidateJob.reOrderDate,
-            actualEndDate: this.orderCandidateJob.reOrderDate,
-          }
-        : {
-            actualStartDate: this.orderCandidateJob.actualStartDate,
-            actualEndDate: this.orderCandidateJob.actualEndDate,
-          };
+    let actualDate;
+
+    if (this.orderCandidateJob.order.orderType !== OrderType.ReOrder
+      && applicantStatus.applicantStatus === CandidatStatus.OnBoard) {
+        actualDate = {
+          actualStartDate: this.orderCandidateJob.reOrderDate,
+          actualEndDate: this.orderCandidateJob.reOrderDate,
+        };
+    } else if (this.orderCandidateJob.order.orderType !== OrderType.ReOrder) {
+      actualDate = {
+          actualStartDate: this.orderCandidateJob.actualStartDate,
+          actualEndDate: this.orderCandidateJob.actualEndDate,
+      };
+    } else {
+      actualDate = this.setCorrectActualDates(
+        this.orderCandidateJob.reOrderDate as string,
+        value.shiftStartTime,
+        value.shiftEndTime);
+    }
 
     this.store.dispatch(
       new UpdateAgencyCandidateJob({
@@ -411,9 +419,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: this.datePipe.transform(reOrderDate, 'MM/dd/yyyy', 'utc'),
-      shiftStartTime,
-      shiftEndTime,
+      orderOpenDate: DateTimeHelper.formatDateUTC(reOrderDate as string, 'MM/dd/yyyy'),
+      shiftStartTime: DateTimeHelper.convertDateToUtc(shiftStartTime.toString()),
+      shiftEndTime: DateTimeHelper.convertDateToUtc(shiftEndTime.toString()),
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
       rejectReason,
@@ -481,6 +489,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.acceptForm.markAllAsTouched();
     if (this.acceptForm.valid && this.orderCandidateJob && status) {
       const value = this.acceptForm.getRawValue();
+      const actualDates = this.setCorrectActualDates(
+        this.orderCandidateJob.reOrderDate as string,
+        value.shiftStartTime,
+        value.shiftEndTime);
 
       this.store
         .dispatch(
@@ -492,8 +504,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
             offeredBillRate: value.hourlyRate,
             candidateBillRate: value.candidateBillRate,
             billRates: this.orderCandidateJob.billRates,
-            actualStartDate: value.shiftStartTime,
-            actualEndDate: value.shiftEndTime,
+            ...actualDates,
             candidatePayRate: value.candidatePayRate,
             nextApplicantStatus: {
               applicantStatus: status.applicantStatus,
@@ -648,5 +659,23 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     } else if (!statusesToDisableRate.includes(this.currentCandidateApplicantStatus)) {
       this.hourlyRate?.enable();
     }
+  }
+
+  private setCorrectActualDates(initDate: string, shiftStartTime: Date, shiftEndTime: Date) {
+    if (shiftStartTime > shiftEndTime) {
+      const formatedInitDate = DateTimeHelper.toUtcFormat(initDate);
+      const endDate = new Date(new Date(new Date(formatedInitDate).setDate(new Date(formatedInitDate)
+      .getDate() + 1)).setHours(0, 0, 0));
+
+      return {
+        actualStartDate: DateTimeHelper.toUtcFormat(initDate),
+        actualEndDate: DateTimeHelper.toUtcFormat(endDate),
+      };
+    }
+
+    return {
+      actualStartDate: DateTimeHelper.toUtcFormat(initDate),
+      actualEndDate: DateTimeHelper.toUtcFormat(initDate),
+    };
   }
 }

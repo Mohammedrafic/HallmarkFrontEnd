@@ -479,6 +479,8 @@ export class StaffScheduleByShiftComponent implements OnInit {
     this.regionsList = this.masterRegionsList;
     this.locationsList = this.masterLocationsList;
     this.departmentsList = this.masterDepartmentsList;
+
+    this.changeDetectorRef.detectChanges();
   }
 
   public onFilterApply(): void {
@@ -522,13 +524,13 @@ export class StaffScheduleByShiftComponent implements OnInit {
         : '';
     locationIds =
       locationIds.length > 0
-        ? locationIds
+        ? locationIds.join(',')
         : this.locationsList?.length > 0
         ? this.locationsList.map((x) => x.id).join(',')
         : '';
     departmentIds =
       departmentIds.length > 0
-        ? departmentIds
+        ? departmentIds.join(',')
         : this.departmentsList?.length > 0
         ? this.departmentsList.map((x) => x.id).join(',')
         : '';
@@ -578,7 +580,7 @@ export class StaffScheduleByShiftComponent implements OnInit {
       this.employeesSearchFromScheduling$.subscribe((result) => {            
         var candidates = result.items?.map((candidate: ScheduleCandidate) => ({
           ...candidate,
-          fullName: `${candidate.lastName} ${candidate.firstName}`,
+          fullName: `${candidate.firstName} ${candidate.lastName}`,
         }))
         this.candidateFilterData = candidates;
         this.candidateSearchData = candidates;

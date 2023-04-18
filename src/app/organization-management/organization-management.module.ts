@@ -140,6 +140,9 @@ import { SingleMultipleSkillPipe } from './departments/single-multiple-skill.pip
 import { JoinPipeModule } from '@shared/pipes/join.pipe';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { OrientationModule } from './orientation/orientation.module';
+import { PayRateComponent } from './pay-rate/pay-rate.component';
+import { PayrateSetupComponent } from './pay-rate/payrate-setup/payrate-setup.component';
+import { PayRatesState } from './store/pay-rates.state';
 
 const sidebarIcons = {
   Download,
@@ -204,6 +207,8 @@ const sidebarIcons = {
     GridActionRendererComponent,
     AssignSkillComponent,
     SingleMultipleSkillPipe,
+    PayRateComponent,
+    PayrateSetupComponent,
   ],
   imports: [
     CommonModule,
@@ -264,6 +269,7 @@ const sidebarIcons = {
       TiersState,
       SkillsState,
       WorkCommitmentState,
+      PayRatesState
     ]),
     ImportDialogContentModule,
     TreeViewModule,

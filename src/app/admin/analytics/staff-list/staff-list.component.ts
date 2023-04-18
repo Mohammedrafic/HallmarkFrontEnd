@@ -486,12 +486,16 @@ export class StaffListComponent implements OnInit {
           ? this.locationsList.filter((i) => regionIds?.includes(i.regionId)).map((i) => i.id)
           : this.locationsList.map((i) => i.id));
 
-    departmentIds =
+    let departments =
       departmentIds.length > 0
         ? departmentIds
-        : this.departmentsList?.length > 0
-        ? this.departmentsList.map((x) => x.id).join(',')
-        : '';
+        : (locationIds.length > 0 
+          ? this.departmentsList.filter((i) => locationIds?.includes(i.locationId)).map((i) => i.id)
+          : this.departmentsList.map((i) => i.id));
+
+    if(locationIds.length == 0)
+        departments.push(0);
+
     skillIds = skillIds.length > 0 ? skillIds.join(',') : '';
     workCommitmentIds = workCommitmentIds.length > 0 ? workCommitmentIds.join(',') : '';
     let employeeId = employeeName != null && employeeName != '' ? parseInt(employeeName) : 0;    
@@ -504,7 +508,7 @@ export class StaffListComponent implements OnInit {
       OrganizationParam: this.selectedOrganizations?.map((list) => list.organizationId).join(','),
       RegionsParam: regions,
       LocationsParam: locations,
-      DepartmentsParam: departmentIds,
+      DepartmentsParam: departments,
       SkillsParam: skillIds,
       WorkCommitmentsParam: workCommitmentIds,
       CandidateParam: employeeId,

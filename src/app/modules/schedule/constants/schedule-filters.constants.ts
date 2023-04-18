@@ -1,4 +1,5 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { OrganizationStructure } from '@shared/models/organization.model';
 
 import { ScheduleFiltersConfig, ScheduleFiltersData } from '../interface';
 
@@ -46,4 +47,10 @@ export const InitScheduleFiltersData: ScheduleFiltersData = {
   filters: {},
   filteredItems: [],
   chipsData: [],
+};
+
+export const InitEmployeeOrganizationStructure: OrganizationStructure = {
+  organizationId: 0,
+  organizationName: '',
+  regions: [],
 };

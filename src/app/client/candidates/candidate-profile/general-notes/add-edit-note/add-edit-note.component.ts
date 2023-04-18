@@ -9,6 +9,9 @@ import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base
 import { EditGeneralNoteModel, GeneralNotesModel } from '../general-notes.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DateTimeHelper } from '@core/helpers';
+import { UserState } from 'src/app/store/user.state';
+import { ActivatedRoute } from '@angular/router';
+import { CandidatesService } from '@client/candidates/services/candidates.service';
 
 @Component({
   selector: 'app-add-edit-note',
@@ -24,7 +27,9 @@ export class AddEditNoteComponent extends DestroyableDirective implements OnInit
   constructor(
     private formBuilder: FormBuilder,
     private generalNotesService: GeneralNotesService,
-    private store: Store
+    private store: Store,
+    private route: ActivatedRoute,
+    private candidatesService: CandidatesService,
   ) {
     super();
   }
@@ -39,6 +44,7 @@ export class AddEditNoteComponent extends DestroyableDirective implements OnInit
       date: [note?.date ?? null, [Validators.required]],
       categoryId: [note?.categoryId ?? null, [Validators.required]],
       note: [note?.note ?? null, [Validators.maxLength(250)]],
+      createdByName:[]
     });
   }
 
@@ -46,6 +52,10 @@ export class AddEditNoteComponent extends DestroyableDirective implements OnInit
     if (this.noteForm.invalid) {
       this.noteForm.markAllAsTouched();
     } else {
+      const user= this.store.selectSnapshot(UserState.user);
+      if(!this.route.snapshot.paramMap.get('id')||this.candidatesService.employeeId||0){
+        this.noteForm.get("createdByName")?.setValue(user?.lastName+", "+user?.firstName);
+      }       
       const value = this.noteForm.value;
       value.date = value.date ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(value.date)) : value.date;
       this.generalNotesService.addNote(value);

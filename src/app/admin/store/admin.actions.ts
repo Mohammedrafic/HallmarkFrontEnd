@@ -201,7 +201,4 @@ export class GetOrganizationDataSources {
   constructor() { }
 }
 
-export class ExportOrientation {
-  static readonly type = '[admin] Export Orientation list';
-  constructor(public payload: ExportPayload) { }
-}
+

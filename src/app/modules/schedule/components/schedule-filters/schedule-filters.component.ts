@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, skip } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -51,6 +51,8 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     departments: [],
   };
 
+  private autoApplyFilters = false;
+
   get selectedSkillsNumber(): number {
     return this.scheduleFilterFormGroup.get('skillIds')?.value?.length || 0;
   }
@@ -79,7 +81,8 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.getOrganizationStructure();
+    this.watchForOrganizationStructure();
+    this.watchForEmployeeOrganizationStructure();
     this.watchForControls();
     this.observeInlineChipDeleteEvent();
   }
@@ -109,22 +112,32 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterFormGroup.markAsUntouched();
   }
 
-  private getOrganizationStructure(): void {
+  private watchForOrganizationStructure(): void {
     this.organizationStructure$
       .pipe(
         filter(Boolean),
         map((structure: OrganizationStructure) =>
-          this.organizationStructureService.getOrgStructureForIrp(structure.regions)
-        ),
+          this.organizationStructureService.getOrgStructureForIrp(structure.regions)),
+        map((regions: OrganizationRegion[]) =>
+          this.scheduleFiltersService.createFilterStructure(regions)),
         takeUntil(this.componentDestroy()),
       )
-      .subscribe((regions: OrganizationRegion[]) => {
-        if (this.filteredItems.length) {
-          this.clearAllFilters();
-        }
+      .subscribe((structure: ScheduleFilterStructure) => {
+        this.setFilterStructure(structure);
+        this.cdr.markForCheck();
+      });
+  }
 
-        this.filterStructure = this.scheduleFiltersService.createFilterStructure(regions);
-        this.filterColumns.regionIds.dataSource = ScheduleFilterHelper.adaptRegionToOption(this.filterStructure.regions);
+  private watchForEmployeeOrganizationStructure(): void {
+    this.scheduleFiltersService.getEmployeeOrganizationStructureStream()
+      .pipe(
+        skip(1), // skip init value
+        map((structure: OrganizationStructure) => this.scheduleFiltersService.createFilterStructure(structure.regions)),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe((structure: ScheduleFilterStructure) => {
+        this.setFilterStructure(structure);
+        this.preSelectHomeCostCenterFilters();
         this.cdr.markForCheck();
       });
   }
@@ -156,6 +169,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
           if (!departmentsIds?.length) {
             this.resetSkillFilters();
             this.setFilteredItems();
+            this.applyHomeCostCenterFilters();
           }
         }),
         filter((departmentsIds: number[]) => !!departmentsIds?.length),
@@ -172,6 +186,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         }
 
         this.setFilteredItems();
+        this.applyHomeCostCenterFilters();
       });
 
     this.scheduleFilterFormGroup.get('skillIds')?.valueChanges
@@ -207,17 +222,17 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     });
   }
 
-  private setFilters(): void {
+  private setFilters(skipDataUpdate = false): void {
     this.filters = this.scheduleFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
-    const chips = this.scheduleFiltersService.createChipsData(this.scheduleFilterFormGroup.getRawValue(),
-
-    this.filterColumns);
+    const chips = this.scheduleFiltersService
+      .createChipsData(this.scheduleFilterFormGroup.getRawValue(), this.filterColumns);
 
     this.updateScheduleFilter.emit({
       filters: this.filters,
       filteredItems: this.filteredItems,
       chipsData: chips,
+      skipDataUpdate,
     });
   }
 
@@ -229,5 +244,38 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   private setFilteredItems(): void {
     this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
     this.cdr.markForCheck();
+  }
+
+  private setFilterStructure(structure: ScheduleFilterStructure): void {
+    if (this.filteredItems.length) {
+      this.clearAllFilters();
+    }
+
+    this.filterStructure = structure;
+    this.filterColumns.regionIds.dataSource = ScheduleFilterHelper.adaptRegionToOption(this.filterStructure.regions);
+  }
+
+  private preSelectHomeCostCenterFilters(): void {
+    const regionId = this.filterStructure.regions[0].id as number;
+
+    this.autoApplyFilters = true;
+
+    this.filterColumns.locationIds.dataSource = this.scheduleFiltersService
+      .getSelectedLocatinOptions(this.filterStructure, [regionId]);
+    this.filterColumns.departmentsIds.dataSource = this.scheduleFiltersService
+      .getSelectedDepartmentOptions(this.filterStructure, [this.filterColumns.locationIds.dataSource[0].value as number]);
+
+    this.scheduleFilterFormGroup?.get('regionIds')?.patchValue([regionId], { emitEvent: false, onlySelf: true });
+    this.scheduleFilterFormGroup?.get('locationIds')?.patchValue(
+      [this.filterColumns.locationIds.dataSource[0]?.value], { emitEvent: false, onlySelf: true });
+    this.scheduleFilterFormGroup?.get('departmentsIds')?.patchValue(
+      [this.filterColumns.departmentsIds.dataSource[0]?.value]);
+  }
+
+  private applyHomeCostCenterFilters(): void {
+    if (this.autoApplyFilters) {
+      this.autoApplyFilters = false;
+      this.setFilters(true);
+    }
   }
 }

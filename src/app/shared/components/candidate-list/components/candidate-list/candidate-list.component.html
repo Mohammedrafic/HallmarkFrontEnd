@@ -81,7 +81,7 @@
         </ng-container>
         <ng-container *ngIf="data.employeeSkills?.length >= 2">
           <ejs-tooltip content="{{ data.employeeSkills.join(', ') }}" target="#skillName">
-            <span id="skillName" class="skill-name">Multiple Skils</span>
+            <span id="skillName" class="skill-name">Multiple Skills</span>
           </ejs-tooltip>
         </ng-container>
       </ng-template>
@@ -297,6 +297,7 @@
               placeholder="MM/DD/YYYY"
               [enableMask]="true"
               [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+              [max]="CandidateFilterFormGroup.controls['endDate'].value"
               formControlName="startDate">
             </ejs-datepicker>
           </div>
@@ -310,6 +311,7 @@
               placeholder="MM/DD/YYYY"
               [enableMask]="true"
               [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+              [min]="CandidateFilterFormGroup.controls['startDate'].value"
               formControlName="endDate">
             </ejs-datepicker>
           </div>

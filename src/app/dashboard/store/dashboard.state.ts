@@ -31,7 +31,7 @@ import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 import { MasterCommitmentsPage } from '@shared/models/commitment.model';
-import { GetNursingWidgetData, GetWorkCommitment, NursingWidget } from '../models/rn-utilization.model';
+import { GetNursingWidgetData, GetWorkCommitment } from '../models/rn-utilization.model';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
@@ -256,5 +256,5 @@ export class DashboardState {
       }),
     )
   }
-  
+
 }

@@ -270,7 +270,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   deleteSchedule(): void {
     const deleteScheduleRequest: DeleteScheduleRequest = {
-      id: this.selectedDaySchedule.id,
+      ids: [this.selectedDaySchedule.id],
       createOrder: this.createPerDiemOrderControl.value,
     };
 

@@ -1,97 +1,131 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
-    <ng-template #header>
-        <div class="app-accumulation-chart__title">
-            <h3 class="widget-header__title">Nursing Utilization</h3>
+  <ng-template #header>
+    <div class="app-accumulation-chart__title">
+      <h3 class="widget-header__title">Nursing Utilization</h3>
+    </div>
+  </ng-template>
+  <ng-template #RNUtilizationChart>
+    <form [formGroup]="rnUtilizationForm">
+      <p class="hours-rn">
+        Monthly hours scheduled for Nursing : <strong>{{ (nursingCount$ | async)?.monthlyTotalHoursSchedule }}</strong>
+      </p>
+      <div class="input-sec" [hidden]="!editMode">
+        <span>
+          <div class="input-container calendar">
+            <label>Date</label>
+            <div class="input-group datepicker">
+              <ejs-datepicker
+                id="inactiveDate"
+                class="datepicker"
+                format="MM/dd/yyyy"
+                placeholder="MM/DD/YYYY"
+                [enableMask]="true"
+                formControlName="workDate"
+                [maskPlaceholder]="maskPlaceholder"
+              >
+              </ejs-datepicker>
+            </div>
+          </div>
+        </span>
+        <span>
+          <div class="dropdown-container">
+            <label>Work Commitment</label>
+            <div class="input-group dropdown">
+              <app-multiselect-dropdown
+                [formGroupInstance]="rnUtilizationForm"
+                [fields]="optionFields"
+                [dataSource]="commitmentsPage$ | async"
+                [showSelectAll]="true"
+                controlName="workCommitment"
+                selectAllText="All"
+              ></app-multiselect-dropdown>
+            </div>
+          </div>
+        </span>
+        <span>
+          <div class="dropdown-container">
+            <label>Skills</label>
+            <div class="input-group dropdown">
+              <app-multiselect-dropdown
+                [formGroupInstance]="rnUtilizationForm"
+                [fields]="optionFields"
+                [dataSource]="nursingSkill$ | async"
+                [showSelectAll]="true"
+                controlName="skills"
+                placeholder="Skills"
+                selectAllText="All"
+              ></app-multiselect-dropdown>
+            </div>
+          </div>
+        </span>
+      </div>
+      <div class="widget">
+        <div class="widget__type" [hidden]="editMode">
+          <p class="orgname" (click)="editMode = !editMode">Skill(s)</p>
+          <p class="orgcount">{{ this.skillsText }}</p>
         </div>
-    </ng-template>
-    <ng-template #RNUtilizationChart>
-        <p class="hours-rn">Monthly hours scheduled for Nursing : <strong>{{chartData?.monthlyTotalHoursSchedule}}</strong></p>
-        <form [formGroup]="rnUtilizationform">
-        <div class="input-sec">
-            <span>
-                <div class="input-container calendar">
-                    <label>Date</label>
-                    <div class="input-group datepicker">
-                        <ejs-datepicker id="inactiveDate" class="datepicker" format="MM/dd/yyyy"
-                            placeholder="MM/DD/YYYY" [enableMask]="true" formControlName="workDate"
-                            [maskPlaceholder]="maskPlaceholder" (change)= "onDataChange($event)">
-                        </ejs-datepicker>
-                    </div>
-                </div>
-            </span>
-            <span>
-                <div class="dropdown-container">
-                    <label>Work Commitment</label>
-                    <div class="input-group dropdown">
-                      <app-multiselect-dropdown
-                        [formGroupInstance]="workcommitIds"
-                        [fields]="optionFields"
-                        [dataSource]="commitmentsPage$ | async"
-                        [showSelectAll]="true"
-                        controlName="workcommitId"
-                        selectAllText="All"
-                    ></app-multiselect-dropdown>
-                    </div>
-                </div>
-            </span>
-            <span>
-                <div class="dropdown-container">
-                    <label>Skills</label>
-                    <div class="input-group dropdown">
-                        <app-multiselect-dropdown
-                            [formGroupInstance]="SkillIds"
-                            [fields]="optionFields"
-                            [dataSource]="nursingSkill$ | async"
-                            [showSelectAll]="true"
-                            controlName="skill"
-                            placeholder="Skills"
-                            selectAllText="All"
-                        ></app-multiselect-dropdown>
-                    </div>
-                </div>
-            </span>
+        <div class="widget__type" [hidden]="editMode">
+          <p class="orgname" (click)="editMode = !editMode">Work Commitment(s)</p>
+          <p class="orgcount">{{ this.workCommitmentText }}</p>
+        </div>
+        <div class="widget__type" [hidden]="editMode">
+          <p class="orgname" (click)="editMode = !editMode">Date</p>
+          <p class="orgcount">{{ this.dateText }}</p>
         </div>
 
-       </form>  
-        
-        <div class="widget">
-            <span class="widget__type">
-                <p class="orgname">Target Utilization for Nursing </p>
-                <div class="targetcount">
-                <input class="e-input widgeticon" type="text" maxlength="100" id="targetutilizationId"
-                 value="{{targetutilization}}" (input)="onDataChangefortarget($event)"/>
-                 <p>%</p>
-                </div>
-            </span>
-            <span class="widget__type">
-                <p class="orgname">No.of Per Diem Nursing <ejs-tooltip [content]="noofPerDiemOrders" position='TopCenter'>
-                        <span class="mytooltip">
-                            <i-feather name="info" id="info"
-                                [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
-                        </span>
-                    </ejs-tooltip></p>
-                <p class="orgcount">{{nursingCountdata?.noOfPerdiemNursing}}</p>
-            </span>
-            <span class="widget__type">
-                <p class="orgname">Target Per Diem Nursing hours <ejs-tooltip [content]="targetPerDiemhrs"
-                        position='TopCenter'>
-                        <span class="mytooltip">
-                         <i-feather name="info" id="info"
-                                [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
-                        </span>
-                    </ejs-tooltip></p>
-                <p class="orgcount">{{nursingCountdata?.targetPerdiemNursingHours}}</p>
-            </span>
-            <span class="widget__type">
-                <p class="orgname">Actual Per Diem Nursing hours <ejs-tooltip [content]="actualPerDiemhrs"
-                        position='TopCenter'>
-                        <span class="mytooltip">
-                            <i-feather name="info" id="info"
-                                [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
-                        </span>
-                    </ejs-tooltip></p>
-                <p class="orgcount">{{nursingCountdata?.perdayTotalHoursSchedule}}</p>
-            </span>
-        </div>
-    </ng-template>
+        <span class="widget__type">
+          <p class="orgname" (click)="editMode = !editMode">Target Utilization for Nursing</p>
+          <div class="targetcount">
+            <input class="e-input widgeticon" type="text" maxlength="100" formControlName="targetUtilization" />
+            <p>%</p>
+          </div>
+        </span>
+        <span class="widget__type">
+          <p class="orgname" (click)="editMode = !editMode">
+            No.of Per Diem Nursing
+            <ejs-tooltip [content]="noofPerDiemOrders" position="TopCenter">
+              <span class="mytooltip">
+                <i-feather
+                  name="info"
+                  id="info"
+                  [ngClass]="{ 'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme }"
+                ></i-feather>
+              </span>
+            </ejs-tooltip>
+          </p>
+          <p class="orgcount">{{ (nursingCount$ | async)?.noOfPerdiemNursing }}</p>
+        </span>
+        <span class="widget__type">
+          <p class="orgname" (click)="editMode = !editMode">
+            Target Per Diem Nursing hours
+            <ejs-tooltip [content]="targetPerDiemhrs" position="TopCenter">
+              <span class="mytooltip">
+                <i-feather
+                  name="info"
+                  id="info"
+                  [ngClass]="{ 'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme }"
+                ></i-feather>
+              </span>
+            </ejs-tooltip>
+          </p>
+          <p class="orgcount">{{ (nursingCount$ | async)?.targetPerdiemNursingHours }}</p>
+        </span>
+        <span class="widget__type">
+          <p class="orgname" (click)="editMode = !editMode">
+            Actual Per Diem Nursing hours
+            <ejs-tooltip [content]="actualPerDiemhrs" position="TopCenter">
+              <span class="mytooltip">
+                <i-feather
+                  name="info"
+                  id="info"
+                  [ngClass]="{ 'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme }"
+                ></i-feather>
+              </span>
+            </ejs-tooltip>
+          </p>
+          <p class="orgcount">{{ (nursingCount$ | async)?.perdayTotalHoursSchedule }}</p>
+        </span>
+      </div>
+    </form>
+  </ng-template>
 </app-widget-wrapper>

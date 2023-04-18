@@ -6,9 +6,14 @@ import { Observable, Subject } from 'rxjs';
 import { BaseObservable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import {
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
-import { InitScheduleFiltersData } from '../constants';
+import { InitEmployeeOrganizationStructure, InitScheduleFiltersData } from '../constants';
 import { ScheduleFilterHelper } from '../helpers';
 import { ScheduleFilterItem, ScheduleFiltersConfig, ScheduleFiltersData, ScheduleFilterStructure } from '../interface';
 
@@ -17,6 +22,8 @@ export class ScheduleFiltersService {
   deletedInlineChip: Subject<ChipDeleteEventType> = new Subject();
 
   private readonly scheduleFiltersData: BaseObservable<ScheduleFiltersData> = new BaseObservable(InitScheduleFiltersData);
+  private readonly employeeOrganizationStructure: BaseObservable<OrganizationStructure>
+    = new BaseObservable(InitEmployeeOrganizationStructure);
 
   constructor(private readonly fb: FormBuilder) {}
 
@@ -91,6 +98,18 @@ export class ScheduleFiltersService {
 
   setScheduleFiltersData(scheduleFiltersData: ScheduleFiltersData): void {
     this.scheduleFiltersData.set(scheduleFiltersData);
+  }
+
+  getEmployeeOrganizationStructure(): OrganizationStructure {
+    return this.employeeOrganizationStructure.get();
+  }
+
+  getEmployeeOrganizationStructureStream(): Observable<OrganizationStructure> {
+    return this.employeeOrganizationStructure.getStream();
+  }
+
+  setEmployeeOrganizationStructure(employeeOrganizationStructure: OrganizationStructure): void {
+    this.employeeOrganizationStructure.set(employeeOrganizationStructure);
   }
 
   private createChipValue(formValue: number[] | number | string | boolean, configIem: ScheduleFilterItem): string[] {

@@ -71,6 +71,7 @@ import {
   DeleteOrderSucceeded,
   DuplicateOrder,
   DuplicateOrderSuccess,
+  ExportIRPOrders,
   ExportOrders,
   GetAgencyOrderCandidatesList,
   GetAvailableSteps,
@@ -111,6 +112,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { OrderStatus } from '@shared/enums/order-management';
 import {
   OrderManagementIRPSystemId,
+  OrderManagementIRPTabs,
   OrderManagementIRPTabsIndex,
   OrganizationOrderManagementTabs,
 } from '@shared/enums/order-management-tabs.enum';
@@ -168,6 +170,10 @@ import {
   allOrdersChildColumnsToExport,
   AllOrdersColumnsConfig,
   allOrdersColumnsToExport,
+  irpAllOrdersColumnsToExport,
+  irpIncompleteOrdersColumnsToExport,
+  irpLTAOrdersColumnsToExport,
+  irpPerDiemOrdersColumnsToExport,
   MoreMenuType,
   orderTemplateColumnsConfig,
   perDiemChildColumnsToExport,
@@ -332,7 +338,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public canCreateOrder: boolean;
   public canCloseOrder: boolean;
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
-
+  public activeIRPtabs : OrderManagementIRPTabs
+  =OrderManagementIRPTabs.AllOrders;
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public activeTab: OrganizationOrderManagementTabs
     = OrganizationOrderManagementTabs.AllOrders;
@@ -527,6 +534,20 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.OnUpdateRegrateSucceededHandler();
     this.subscribeOnUserSearch();
     this.watchForUpdateCandidate();
+   
+  let isIrpEnabled=  JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
+  if(isIrpEnabled==true){
+    this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
+    this.activeSystem = OrderManagementIRPSystemId.IRP;
+    this.getPreservedFiltersByPage();
+    this.orderManagementService.setOrderManagementSystem(this.activeSystem);
+    this.setOrderTypesFilterDataSource();
+    this.clearFilters();
+    this.initMenuItems();
+    this.initGridColumns();
+    this.getOrders();
+  }
+   
   }
 
   ngOnDestroy(): void {
@@ -588,6 +609,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public override customExport(): void {
     if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
       // TODO new export for IRP system
+      this.defaultFileName = `Organization Management/${this.activeIRPtabs} ` + this.generateDateTime(this.datePipe);
+      this.fileName = this.defaultFileName;
+      this.store.dispatch(new ShowExportDialog(true));
     } else {
       this.defaultFileName = `Organization Management/${this.activeTab} ` + this.generateDateTime(this.datePipe);
       this.fileName = this.defaultFileName;
@@ -611,7 +635,24 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      // TODO new export for IRP system
+      this.defaultFileName = `Organization Management/${this.activeIRPtabs} ` + this.generateDateTime(this.datePipe);
+      this.store.dispatch(
+        new ExportIRPOrders(
+          new ExportPayload(
+            fileType,
+            {
+              ...this.filters,
+              offset: Math.abs(new Date().getTimezoneOffset()),
+              ids: this.gridApi.getSelectedRows().length ? this.gridApi.getSelectedRows().map((val) => val[this.idFieldName]) : null,
+            },
+            options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
+            null,
+            options?.fileName || this.defaultFileName
+          ),
+          this.activeIRPtabs
+        )
+      );
+      this.clearSelection(this.gridWithChildRow);
     } else {
       this.defaultFileName = `Organization Management/${this.activeTab} ` + this.generateDateTime(this.datePipe);
       this.store.dispatch(
@@ -693,11 +734,28 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if (this.activeIRPTabIndex !== OrderManagementIRPTabsIndex.AllOrders) {
         this.filters.orderTypes = Number.isInteger(IRPTabRequestTypeMap.get(this.activeIRPTabIndex)) ? [IRPTabRequestTypeMap.get(this.activeIRPTabIndex) as number] : [];
       }
-
+      if(this.activeIRPTabIndex == OrderManagementIRPTabsIndex.AllOrders)
+      {
+        this.activeIRPtabs=OrderManagementIRPTabs.AllOrders
+      this.columnsToExport =irpAllOrdersColumnsToExport;
+      }
+      if(this.activeIRPTabIndex == OrderManagementIRPTabsIndex.Lta)
+      {
+        this.activeIRPtabs=OrderManagementIRPTabs.LTA
+        this.columnsToExport =irpLTAOrdersColumnsToExport;
+      }
+      if(this.activeIRPTabIndex == OrderManagementIRPTabsIndex.Incomplete)
+      {
+        this.activeIRPtabs=OrderManagementIRPTabs.Incomplete
+        this.columnsToExport =irpIncompleteOrdersColumnsToExport;
+      }
+      if(this.activeIRPTabIndex == OrderManagementIRPTabsIndex.PerDiem)
+      {
+        this.activeIRPtabs=OrderManagementIRPTabs.PerDiem
+        this.columnsToExport =irpPerDiemOrdersColumnsToExport;
+      }
       this.isIncomplete = (this.activeIRPTabIndex === OrderManagementIRPTabsIndex.Incomplete);
-
       this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.IRP);
-
       cleared ? this.store.dispatch(new GetIRPOrders(this.filters)) : this.store.dispatch([new GetOrderFilterDataSources(true)]);
 
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {

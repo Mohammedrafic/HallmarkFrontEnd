@@ -33,7 +33,7 @@ import { BillRate } from '@shared/models/bill-rate.model';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { HistoricalEvent } from '@shared/models';
 import { ExportPayload } from '@shared/models/export.model';
-import { AgencyOrderManagementTabs, OrderManagementIRPSystemId, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { AgencyOrderManagementTabs, OrderManagementIRPSystemId, OrderManagementIRPTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper } from '@core/helpers';
 import { orderFieldsConfig } from '@client/order-management/components/add-edit-order/order-fields';
@@ -465,6 +465,11 @@ export class OrderManagementContentService {
       default:
         return this.http.post(`/api/Orders/export`, payload, { responseType: 'blob' });
     }
+  }
+/**
+   * Export IRP Orders list*/
+  public irpexport(payload: ExportPayload, tab: OrderManagementIRPTabs): Observable<any> {
+    return this.http.post(`/api/IRPOrders/export`, payload, { responseType: 'blob' });
   }
 
   /**

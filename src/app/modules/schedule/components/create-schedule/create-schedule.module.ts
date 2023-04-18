@@ -6,7 +6,7 @@ import { FeatherModule } from 'angular-feather';
 import { ButtonModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { TimePickerModule } from "@syncfusion/ej2-angular-calendars";
 import { DropDownListModule } from "@syncfusion/ej2-angular-dropdowns";
-import { DialogModule } from "@syncfusion/ej2-angular-popups";
+import { DialogModule, TooltipModule } from "@syncfusion/ej2-angular-popups";
 
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { ReplacementOrderDialogModule } from '../replacement-order-dialog/replacement-order-dialog.module';
@@ -30,6 +30,7 @@ import { Icons } from './create-schedules.constant';
     TooltipContainerModule,
     ReplacementOrderDialogModule,
     SwitchModule,
+    TooltipModule,
     FeatherModule.pick(Icons),
   ],
   exports: [CreateScheduleComponent],
