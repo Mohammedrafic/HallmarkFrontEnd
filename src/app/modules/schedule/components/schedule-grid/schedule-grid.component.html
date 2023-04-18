@@ -78,18 +78,19 @@
             <th
               *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
               class="table-title date left-border fixed fixed--top"
-              weeksEnd [date]="dateHead"
+              weeksEnd [date]="dateHead.dateText"
+              [weekStartDay]="orgFirstDayOfWeek"
+              [selectedPeriod]="activePeriod"
+              [noBorder]="dateHead.noBorder" 
             >
-              <span>{{ dateHead | date: 'E MM/dd' }}</span>
+              <span>{{ dateHead.dateText | date: 'E MM/dd' }}</span>
             </th>
           </ng-container>
 
           <ng-template #monthRange>
             <th
-              *ngFor="let day of monthRangeDays; trackBy: trackByDatesRange"
-              class="table-title date left-border month-date fixed fixed--top"
-              weeksEnd [day]="day"
-            >
+              *ngFor="let day of monthRangeDays; ; trackBy: trackByweekDays"
+              class="table-title date left-border month-date fixed fixed--top">
               <span>{{day}}</span>
             </th>
           </ng-template>
@@ -107,18 +108,20 @@
           </td>
           <ng-container *ngFor="let dateSlot of datesRanges; trackBy: trackByDatesRange">
             <td
-              *ngIf="dateSlot | calendarDateSlot: scheduleItem.schedule as dateSchedule; else emptyCell"
+              *ngIf="dateSlot.dateText| calendarDateSlot: scheduleItem.schedule as dateSchedule; else emptyCell"
               [attr.colspan]="dateSchedule.extendedDays"
-              weeksEnd [date]="dateSlot"
-            >
+              weeksEnd [date]="dateSlot.dateText"
+              [weekStartDay]="orgFirstDayOfWeek"
+              [noBorder]="dateSlot.noBorder"
+              [selectedPeriod]="activePeriod">
               <div
                 class="table-cell date-slot"
-                [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
-                (click)="selectCellSlots(dateSlot,scheduleItem.candidate, dateSchedule)"
+                [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot.dateText)"
+                (click)="selectCellSlots(dateSlot.dateText, scheduleItem.candidate, dateSchedule)"
               >
                 <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
                   <app-schedule-card
-                    [isSelected]="!!selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
+                    [isSelected]="!!selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot.dateText)"
                     [dateSchedule]="dateSchedule"
                   ></app-schedule-card>
                 </ng-container>
@@ -135,11 +138,14 @@
             </td>
 
             <ng-template #emptyCell>
-              <td weeksEnd [date]="dateSlot">
+              <td weeksEnd [date]="dateSlot.dateText"
+                [weekStartDay]="orgFirstDayOfWeek"
+                [selectedPeriod]="activePeriod"
+                [noBorder]="dateSlot.noBorder">
                 <div
                   class="table-cell date-slot empty-cell"
-                  [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot)"
-                  (click)="selectCellSlots(dateSlot, scheduleItem.candidate)"
+                  [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot.dateText)"
+                  (click)="selectCellSlots(dateSlot.dateText, scheduleItem.candidate)"
                 >
                 </div>
               </td>

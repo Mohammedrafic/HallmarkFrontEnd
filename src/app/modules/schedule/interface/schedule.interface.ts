@@ -237,3 +237,9 @@ export interface RemovedSlot {
   date: string | null;
   candidate: ScheduleCandidate;
 }
+
+
+export interface DateRangeOption {
+  dateText: string;
+  noBorder: boolean;
+}

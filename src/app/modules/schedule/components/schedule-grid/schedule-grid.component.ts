@@ -90,7 +90,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   weekPeriod: [Date, Date] = [DateTimeHelper.getCurrentDateWithoutOffset(), DateTimeHelper.getCurrentDateWithoutOffset()];
 
-  datesRanges: string[] = DateTimeHelper.getDatesBetween();
+  datesRanges: ScheduleInt.DateRangeOption[] = this.scheduleItemsService
+  .createRangeOptions(DateTimeHelper.getDatesBetween());
 
   monthRangeDays: WeekDays[] = [];
 
@@ -125,7 +126,10 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   trackByPeriods: TrackByFunction<ItemModel> = (_: number, period: ItemModel) => period.text;
 
-  trackByDatesRange: TrackByFunction<WeekDays> = (_: number, date: WeekDays) => date;
+  trackByDatesRange: TrackByFunction<ScheduleInt.DateRangeOption> =
+   (_: number, date: ScheduleInt.DateRangeOption) => date.dateText;
+
+  trackByweekDays: TrackByFunction<WeekDays> = (_: number, date: WeekDays) => date;
 
   trackByScheduleData: TrackByFunction<ScheduleInt.ScheduleModel> = (_: number,
     scheduleData: ScheduleInt.ScheduleModel) => scheduleData.id;
@@ -288,11 +292,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       debounceTime(200),
       filter(([startDate, endDate]: [string, string]) => !!startDate && !!endDate),
       tap(([startDate, endDate]: [string, string]) => {
-        this.datesRanges = DateTimeHelper.getDatesBetween(startDate, endDate);
+        this.datesRanges = this.scheduleItemsService.createRangeOptions(DateTimeHelper.getDatesBetween(startDate, endDate));
         this.changeFilter.emit({ startDate, endDate });
         this.scrollArea.nativeElement.scrollTo(0, 0);
 
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }),
     );
   }
