@@ -300,6 +300,19 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       }
     });
     
+    this.locations$.pipe(takeUntil(this.unsubscribe$)).subscribe((locations: any) => {
+      if(locations != null && locations.length > 0){
+        const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
+        if (selectedLoactions != null && selectedLoactions.length > 0) {
+          let difference = locations.filter((x:any) => selectedLoactions.includes(x.id));
+          if(difference.length === 0){
+            this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(null); 
+          }
+        }
+      }else{
+        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(null);
+      }
+   });
 
     this.action$.pipe(ofActionDispatched(GetDocumentsSelectedNode), takeUntil(this.unsubscribe$)).subscribe((payload) => {
       this.selectedNodeText = '';

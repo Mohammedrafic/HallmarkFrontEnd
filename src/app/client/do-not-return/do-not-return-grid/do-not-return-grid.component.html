@@ -37,7 +37,7 @@
       </e-column>
       <e-column field="dnrDate" headerText="Date Blocked" width=250>
         <ng-template #template let-data>
-          {{ data.dnrDate | date: "MM/dd/yyyy":"utc": "en-US" }}
+          {{ data.dnrDate | date: "MM/dd/yyyy" }}
         </ng-template>
       </e-column>
       <e-column field="dnrComment" headerText="Reason for Blocking" width=250>

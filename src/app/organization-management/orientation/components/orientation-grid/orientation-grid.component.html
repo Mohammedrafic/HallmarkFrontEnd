@@ -6,6 +6,8 @@
   [totalRecordsCount]="dataSource?.totalCount || 0"
   [pageSize]="filters.pageSize"
   [currentPage]="filters.pageNumber"
+  (gridSelectedRow)="selectedRow($event)"
+  (multiSelectionChanged)="multiSelectionChanged.emit($event)"
   (navigateToPageEmitter)="handleChangePage($event)"
   (pageSizeChangeEmitter)="handleChangePageSize($event)"
   (bulkEventEmitter)="handleBulkEvent($event)"

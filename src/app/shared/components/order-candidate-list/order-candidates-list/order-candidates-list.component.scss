@@ -7,6 +7,11 @@
     color: $primary-active-blue-10;
     font-weight: 700;
     font-size: 14px;
+
+    i-feather {
+      cursor: pointer;
+      color: $supportive-red;
+    }
   }
 
   .progress-bar {

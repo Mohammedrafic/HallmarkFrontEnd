@@ -85,6 +85,8 @@ export class OrientationService {
     return this.http.post(`/api/OrientationSettings/export`, filters, { responseType: 'blob' });
   }
   
+
+  
   public saveOrientationConfiguration(params: OrientationConfigurationDTO): Observable<void> {
     if (params.orientationConfigurationId) {
       return this.http.put<void>('/api/OrientationSettings/configurations/' + params.orientationConfigurationId, params);

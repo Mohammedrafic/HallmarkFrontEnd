@@ -12,6 +12,7 @@ import { DepartmentsComponent } from './departments/departments.component';
 import { HolidaysComponent } from './holidays/holidays.component';
 import { LocationsComponent } from './locations/locations.component';
 import { OrganizationManagementComponent } from './organization-management.component';
+import { PayRateComponent } from './pay-rate/pay-rate.component';
 import { RegionsComponent } from './regions/regions.component';
 import { SettingsComponent } from './settings/settings.component';
 import { ShiftsComponent } from './shifts/shifts.component';
@@ -158,6 +159,13 @@ const routes: Routes = [
       {
         path: 'workcommitment',
         component: WorkCommitmentComponent,
+        data: {
+          isOrganizationArea: true,
+        },
+      },
+      {
+        path: 'pay-rate',
+        component: PayRateComponent,
         data: {
           isOrganizationArea: true,
         },
