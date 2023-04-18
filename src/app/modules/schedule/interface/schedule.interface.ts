@@ -175,6 +175,7 @@ export interface ScheduleFiltersData {
   filters: ScheduleFilters;
   filteredItems: FilteredItem[];
   chipsData: ChipItem[],
+  skipDataUpdate?: boolean;
 }
 
 export interface ScheduleFilterStructure {

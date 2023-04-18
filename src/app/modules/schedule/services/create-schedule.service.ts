@@ -86,10 +86,6 @@ export class CreateScheduleService {
       onCall: [false],
       charge: [false],
       preceptor: [false],
-      regionId: [null],
-      locationId: [null],
-      departmentId: [null],
-      skillId: [null],
     }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
   }
 
@@ -130,11 +126,11 @@ export class CreateScheduleService {
   createBooking(
     scheduleForm: FormGroup,
     scheduleItems: CreateScheduleItem[],
-    customShiftId: number
+    customShiftId: number,
+    skillIds: number[],
+    departmentIds: number[],
   ): ScheduleInt.ScheduleBook {
     const {
-      departmentId,
-      skillId,
       shiftId,
       startTime,
       endTime,
@@ -147,8 +143,8 @@ export class CreateScheduleService {
 
     return  {
       employeeBookedDays: this.getEmployeeBookedDays(scheduleItems),
-      departmentId: departmentId,
-      skillId: skillId,
+      departmentId: departmentIds[0],
+      skillId: skillIds[0],
       shiftId: shiftId !== customShiftId ? shiftId : null,
       startTime: getTime(startTime),
       endTime: getTime(endTime),
