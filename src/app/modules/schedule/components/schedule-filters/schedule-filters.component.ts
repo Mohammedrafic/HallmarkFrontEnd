@@ -5,6 +5,7 @@ import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { map, skip } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
+import { FilterPageName } from '@core/enums';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
@@ -17,6 +18,7 @@ import { ScheduleFiltersColumns } from '../../constants';
 import { ScheduleFilterHelper } from '../../helpers';
 import { ScheduleFilters, ScheduleFiltersData, ScheduleFilterStructure } from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
+import { ClearPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -43,7 +45,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   public readonly optionFields = { text: 'text', value: 'value' };
 
-  private filters: ScheduleFilters = {} ;
+  private filters: ScheduleFilters = {};
 
   private filterStructure: ScheduleFilterStructure = {
     regions: [],
@@ -85,6 +87,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.watchForEmployeeOrganizationStructure();
     this.watchForControls();
     this.observeInlineChipDeleteEvent();
+    this.applyPreservedFilters();
   }
 
   public deleteFilter(event: FilteredItem): void {
@@ -92,17 +95,24 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.cdr.markForCheck();
   }
 
-  public clearAllFilters(): void {
+  public clearAllFilters(clearPreservedFilters = true): void {
     this.scheduleFilterFormGroup.reset();
     this.filters = this.scheduleFilterFormGroup.getRawValue();
     this.filteredItems = [];
     this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems, chipsData: [] });
+
+    if (clearPreservedFilters) {
+      this.store.dispatch(new ClearPageFilters(FilterPageName.SchedullerOrganization));
+    }
   }
 
   public applyFilter(): void {
     if (this.scheduleFilterFormGroup.valid) {
       this.setFilters();
-      this.store.dispatch(new ShowFilterDialog(false));
+      this.store.dispatch([
+        new ShowFilterDialog(false),
+        new SaveFiltersByPageName(FilterPageName.SchedullerOrganization, this.filters),
+      ]);
     } else {
       this.scheduleFilterFormGroup.markAllAsTouched();
     }
@@ -248,7 +258,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   private setFilterStructure(structure: ScheduleFilterStructure): void {
     if (this.filteredItems.length) {
-      this.clearAllFilters();
+      this.clearAllFilters(false);
     }
 
     this.filterStructure = structure;
@@ -277,5 +287,19 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       this.autoApplyFilters = false;
       this.setFilters(true);
     }
+  }
+
+  private applyPreservedFilters(): void {
+    this.organizationStructure$.pipe(
+      filter((structure) => !!structure),
+      switchMap(() => this.scheduleFiltersService.getPreservedFiltersDataStream()),
+      filter((filters) => !!filters),
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe((preservFilters) => {
+      this.filters = preservFilters || {};
+      this.scheduleFilterFormGroup.patchValue({ ...this.filters });
+      this.setFilters();
+    });
   }
 }

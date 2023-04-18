@@ -15,13 +15,21 @@ import {
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { InitEmployeeOrganizationStructure, InitScheduleFiltersData } from '../constants';
 import { ScheduleFilterHelper } from '../helpers';
-import { ScheduleFilterItem, ScheduleFiltersConfig, ScheduleFiltersData, ScheduleFilterStructure } from '../interface';
+import {
+  ScheduleFilterItem,
+  ScheduleFilters,
+  ScheduleFiltersConfig,
+  ScheduleFiltersData,
+  ScheduleFilterStructure,
+} from '../interface';
 
 @Injectable()
 export class ScheduleFiltersService {
   deletedInlineChip: Subject<ChipDeleteEventType> = new Subject();
 
   private readonly scheduleFiltersData: BaseObservable<ScheduleFiltersData> = new BaseObservable(InitScheduleFiltersData);
+  private readonly schedulePreservedFiltersData: BaseObservable<ScheduleFilters | null>
+    = new BaseObservable<ScheduleFilters | null>(null);
   private readonly employeeOrganizationStructure: BaseObservable<OrganizationStructure>
     = new BaseObservable(InitEmployeeOrganizationStructure);
 
@@ -110,6 +118,14 @@ export class ScheduleFiltersService {
 
   setEmployeeOrganizationStructure(employeeOrganizationStructure: OrganizationStructure): void {
     this.employeeOrganizationStructure.set(employeeOrganizationStructure);
+  }
+
+  setPreservedFiltersDataStream(scheduleFiltersData: ScheduleFilters): void {
+    this.schedulePreservedFiltersData.set(scheduleFiltersData);
+  }
+
+  getPreservedFiltersDataStream(): Observable<ScheduleFilters | null> {
+    return this.schedulePreservedFiltersData.getStream();
   }
 
   private createChipValue(formValue: number[] | number | string | boolean, configIem: ScheduleFilterItem): string[] {

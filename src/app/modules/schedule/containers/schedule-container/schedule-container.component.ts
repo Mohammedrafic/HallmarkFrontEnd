@@ -22,6 +22,7 @@ import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } fro
 import { ScheduledItem, SelectedCells, SideBarSettings } from '../../interface';
 import { GetScheduleFilterByEmployees, HasNotMandatoryFilters, HasMultipleFilters, GetScheduledShift } from '../../helpers';
 import { DateTimeHelper } from '@core/helpers';
+import { ResetPageFilters } from 'src/app/store/preserved-filters.actions';
 
 @Component({
   selector: 'app-schedule-container',
@@ -83,6 +84,11 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.watchForPermissions();
     this.setIsEmployee();
     this.watchForCloseSideBarAction();
+  }
+
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.store.dispatch(new ResetPageFilters());
   }
 
   changeTab(tabIndex: ActiveTabIndex): void {
