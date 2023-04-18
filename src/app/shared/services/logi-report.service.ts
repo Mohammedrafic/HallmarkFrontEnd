@@ -7,7 +7,9 @@ import { DepartmentsPage } from "@shared/models/department.model";
 import { LocationsPage } from "@shared/models/location.model";
 import { regionsPage } from "@shared/models/region.model";
 import { map, Observable } from "rxjs";
+import { DataSourceItem } from "../../core/interface/common.interface";
 import { AssociateAgencyDto } from "../models/logi-report-file";
+import { OrganizationStructure } from "../models/organization.model";
 
 @Injectable({ providedIn: 'root' })
 export class LogiReportService {
@@ -101,5 +103,19 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
    */
  public getStaffListCandidateSearch(filter:any): Observable<SearchCandidate[]> {
   return this.http.post<SearchCandidate[]>(`/api/LogiReport/stafflist/candidatesearch`,filter);
-}
+  }
+  /**
+  * TODO: remove this with shared service
+  */
+  public getOrganizations(): Observable<DataSourceItem[]> {
+    return this.http.get<DataSourceItem[]>(`/api/Agency/partneredorganizations`);
+  }
+
+  /**
+   * Get regions-locations-departments for selected organizations
+   */
+  public getOrganizationsStructure(organizationIds: number[]): Observable<OrganizationStructure[]> {
+    return this.http.get<OrganizationStructure[]>(`/api/Organizations/structure/partnered`, { params: { organizationIds } });
+  }
+
 }
