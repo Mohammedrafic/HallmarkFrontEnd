@@ -37,12 +37,7 @@ import {
   UnavailabilityFormConfig,
 } from '../../constants';
 import * as ScheduleInt from '../../interface';
-import {
-  DeleteScheduleRequest,
-  ScheduleBook,
-  ScheduleBookingErrors,
-  ScheduleFormFieldConfig,
-} from '../../interface';
+import { DeleteScheduleRequest, ScheduleBook, ScheduleBookingErrors, ScheduleFormFieldConfig } from '../../interface';
 import { ScheduleItemsComponent } from '../schedule-items/schedule-items.component';
 import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
 import {
@@ -65,6 +60,7 @@ import {
   ScheduleControlsToReset,
   StartTimeField,
 } from './create-schedules.constant';
+import { ScheduleType } from '../../enums';
 
 @Component({
   selector: 'app-create-schedule',
@@ -161,6 +157,16 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       ids: this.createScheduleService.getIdsRemovedDates(this.scheduleSelectedSlots.candidates),
       createOrder: createPerDiem,
     };
+    const selectedDays = this.scheduleSelectedSlots.candidates[0]?.days;
+
+    if(
+      this.scheduleSelectedSlots.candidates.length === 1 &&
+      selectedDays?.length === 1 &&
+      selectedDays[0]?.scheduleType !== ScheduleType.Book
+    ) {
+      deleteScheduleRequest.startDateTime = selectedDays[0].startTime;
+      deleteScheduleRequest.endDateTime = selectedDays[0].endTime;
+    }
 
     this.scheduleApiService.deleteSchedule(deleteScheduleRequest).pipe(
       catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
