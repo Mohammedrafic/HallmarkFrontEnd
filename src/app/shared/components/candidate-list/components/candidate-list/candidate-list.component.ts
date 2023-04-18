@@ -346,7 +346,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.clearSelection(this.grid);
   }
 
-  public dispatchNewPage(firstDispach = false): void {
+  public dispatchNewPage(firstDispatch = false): void {
 
     const candidateListRequest: CandidateListRequest = {
       ...this.getFilterValues(),
@@ -360,7 +360,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         : new GetCandidatesByPage(candidateListRequest)
     );
 
-    if (!firstDispach) {
+    if (!firstDispatch) {
       this.onFilterClose();
     }
   }
