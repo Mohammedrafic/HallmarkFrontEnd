@@ -6,6 +6,7 @@ export const Icons = {
   X,
 };
 
+export const RemoveButtonToolTip = 'Remove all Schedules';
 export const StartTimeField = 'startTime';
 export const EndTimeField = 'endTime';
 export const ToggleControls = ['critical', 'onCall', 'charge', 'preceptor', 'oncall'];

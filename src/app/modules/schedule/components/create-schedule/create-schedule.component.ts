@@ -39,6 +39,7 @@ import {
 } from '../../constants';
 import * as ScheduleInt from '../../interface';
 import {
+  DeleteScheduleRequest,
   ScheduleBook,
   ScheduleBookingErrors,
   ScheduleFiltersConfig,
@@ -63,12 +64,12 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { EditScheduleFormSourceKeys } from '../edit-schedule/edit-schedule.constants';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_MODIFIED } from '@shared/constants';
 import { OutsideZone } from '@core/decorators';
 import {
   EndTimeField,
+  RemoveButtonToolTip,
   ScheduleControlsToReset,
-  ScheduleCustomClassesList,
   StartTimeField,
 } from './create-schedules.constant';
 
@@ -98,6 +99,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   readonly scheduleTypesControl: FormControl = new FormControl(ScheduleItemType.Book);
   readonly dropDownFields = { text: 'text', value: 'value' };
   readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = ScheduleSourcesMap;
+  readonly removeBtnTooltip: string = RemoveButtonToolTip;
 
   scheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = ScheduleTypes;
   scheduleForm: CustomFormGroup<ScheduleInt.ScheduleForm>;
@@ -106,6 +108,8 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   replacementOrderDialogOpen = false;
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
   showScheduleForm = true;
+  showRemoveButton = false;
+  removeReplacementMode = false;
 
   private readonly customShiftId = -1;
   private shiftControlSubscription: Subscription | null;
@@ -143,7 +147,38 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
 
     if(candidates && candidates?.length >= 1) {
       this.createScheduleService.setOrientationControlValue(this.scheduleSelectedSlots, this.scheduleForm);
+      this.showRemoveButton = this.createScheduleService.hasSelectedSlotsWithDate(candidates);
     }
+  }
+
+  removeSchedules(): void {
+    const hasBookDate = this.createScheduleService.hasBookingDate(this.scheduleSelectedSlots.candidates);
+
+    if(hasBookDate) {
+      this.replacementOrderDialogOpen = true;
+      this.removeReplacementMode = true;
+
+      this.replacementOrderDialogData = this.createScheduleService.prepareCandidateReplacementDates(
+        this.scheduleSelectedSlots.candidates
+      );
+    } else {
+      this.deleteSchedule();
+    }
+  }
+
+  deleteSchedule(createPerDiem = false): void {
+    const deleteScheduleRequest: DeleteScheduleRequest = {
+      ids: this.createScheduleService.getIdsRemovedDates(this.scheduleSelectedSlots.candidates),
+      createOrder: createPerDiem,
+    };
+
+    this.scheduleApiService.deleteSchedule(deleteScheduleRequest).pipe(
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.createScheduleService.closeSideBarEvent.next(false);
+      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+    });
   }
 
   closeSchedule(): void {

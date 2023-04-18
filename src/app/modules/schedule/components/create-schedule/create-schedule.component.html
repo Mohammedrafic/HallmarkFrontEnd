@@ -4,6 +4,19 @@
       <h3>Schedule</h3>
     </div>
     <div class="controls">
+      <ejs-tooltip
+        *ngIf="showRemoveButton"
+        [showTipPointer]="false"
+        [content]="removeBtnTooltip"
+        position="TopCenter">
+        <button
+          ejs-button
+          class="remove-button"
+          (click)="removeSchedules()"
+        >
+          <span><i-feather name="trash-2" class="icon"></i-feather></span>
+        </button>
+      </ejs-tooltip>
       <button
         [disabled]="!scheduleSelectedSlots.candidates.length"
         (click)="saveSchedule()"
@@ -119,6 +132,8 @@
 <app-replacement-order-dialog
   *ngIf="replacementOrderDialogOpen"
   [replacementOrderData]="replacementOrderDialogData"
+  [isRemoveMode]="removeReplacementMode"
   (destroyDialog)="closeReplacementOrderDialog()"
+  (removeOrder)="deleteSchedule($event)"
   (createOrder)="saveNewBooking($event)"
 ></app-replacement-order-dialog>

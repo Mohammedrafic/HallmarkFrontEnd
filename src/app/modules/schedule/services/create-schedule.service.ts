@@ -18,15 +18,23 @@ import { CreateScheduleItem } from '../components/schedule-items/schedule-items.
 import * as ScheduleInt from '../interface';
 import {
   EmployeeBookingDay,
-  ScheduleBookingErrors, ScheduleCandidate,
+  ScheduleBookingErrors,
+  ScheduleCandidate,
+  ScheduleDay,
   ScheduleFiltersData,
-  ScheduleFilterStructure, ScheduleForm, ScheduleFormConfig, ScheduleFormFieldConfig, ScheduleSelectedSlots,
+  ScheduleFilterStructure,
+  ScheduleForm,
+  ScheduleFormConfig,
+  ScheduleFormFieldConfig,
+  ScheduleSelectedSlots,
   ScheduleTypeRadioButton,
   ShiftDropDownsData,
 } from '../interface';
 import { ScheduleFiltersService } from './schedule-filters.service';
 import { ScheduleClassesList, ScheduleCustomClassesList, ToggleControls } from '../components/create-schedule';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
+import { ScheduleType } from '../enums';
+import { BookingsOverlapsResponse } from '../components/replacement-order-dialog/replacement-order.interface';
 
 @Injectable()
 export class CreateScheduleService {
@@ -329,9 +337,45 @@ export class CreateScheduleService {
     });
   }
 
+  hasBookingDate(candidates: ScheduleCandidate[]): boolean {
+    return candidates.map((candidate: ScheduleCandidate) => {
+        return candidate.days?.some((day: ScheduleDay) => {
+          return day.scheduleType === ScheduleType.Book;
+        });
+      }).some((isBookingDate: boolean) => isBookingDate);
+  }
+
+  prepareCandidateReplacementDates(candidates: ScheduleCandidate[]): BookingsOverlapsResponse[] {
+    return candidates.filter((candidate: ScheduleCandidate) => {
+      return candidate.days?.length;
+    }).map((candidate: ScheduleCandidate) => {
+      return {
+        bookings: this.getDaysWithBooking(candidate.days),
+        employeeId: candidate.id,
+        firstName: candidate.firstName,
+        lastName: candidate.lastName,
+      } as BookingsOverlapsResponse;
+    });
+  }
+
   resetScheduleControls(scheduleForm: FormGroup, controlsList: string[]): void {
     controlsList.forEach((control: string) => {
       scheduleForm.get(control)?.reset();
+    });
+  }
+
+  getIdsRemovedDates(candidates: ScheduleCandidate[]): number[] {
+    return candidates.filter((candidate: ScheduleCandidate) => candidate.days?.length)
+      .map((candidate: ScheduleCandidate) => {
+        return candidate.days.map((day: ScheduleDay) => {
+          return day.id;
+        });
+      }).flat();
+  }
+
+  hasSelectedSlotsWithDate(candidates: ScheduleCandidate[]): boolean {
+    return candidates.some((candidate: ScheduleCandidate) => {
+      return candidate.days?.length;
     });
   }
 
@@ -360,6 +404,10 @@ export class CreateScheduleService {
       control?.enable();
       control?.patchValue(false);
     }
+  }
+
+  private getDaysWithBooking(days: ScheduleDay[]): ScheduleDay[] {
+    return days.filter((day: ScheduleDay) => day.scheduleType === ScheduleType.Book);
   }
 
   private orientationForSingleCandidate(control: AbstractControl, candidates: ScheduleCandidate[]): void {

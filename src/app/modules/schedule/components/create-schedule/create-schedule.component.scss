@@ -33,7 +33,7 @@ app-schedule-items {
 
   .controls {
     display: flex;
-    gap: 28px;
+    gap: 20px;
     align-items: center;
 
     .close {
@@ -45,6 +45,22 @@ app-schedule-items {
 
       i-feather {
         color: $primary-active-blue-10;
+      }
+    }
+
+    .remove-button {
+      border: 1px solid $supportive-red;
+      background: none;
+      padding: 8px;
+
+      i-feather {
+        color:  $supportive-red;
+        margin-left: 0;
+      }
+
+      &:hover,
+      &:active {
+        opacity: 0.8;
       }
     }
   }

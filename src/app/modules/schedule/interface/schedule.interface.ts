@@ -8,6 +8,17 @@ import { ChipItem } from '@shared/components/inline-chips';
 import { ScheduleOrderType, ScheduleType } from '../enums';
 import { IrpOrderType } from '@shared/enums/order-type';
 
+export interface ScheduleDay {
+  id: number;
+  type: IrpOrderType | null;
+  department: string | null;
+  location: string | null;
+  endTime: string;
+  shiftDate: string;
+  startTime: string;
+  scheduleType: ScheduleType
+}
+
 export interface ScheduleCandidate {
   id: number;
   displayId: string;
@@ -21,6 +32,7 @@ export interface ScheduleCandidate {
   orderType: IrpOrderType | null;
   workCommitments: string[] | null;
   workCommitment: string;
+  days: ScheduleDay[];
   employeeNote: string;
   workHours?: number;
   isOriented: boolean;
@@ -43,6 +55,7 @@ export interface ScheduleItem {
   endDate: string;
   scheduleType: ScheduleType;
   orderId: number;
+  employeeId: number;
   scheduleOrderType: ScheduleOrderType;
   location: string;
   department: string;
@@ -203,7 +216,7 @@ export interface ShiftDropDownsData {
 }
 
 export interface DeleteScheduleRequest {
-  id: number;
+  ids: number[];
   createOrder: boolean;
   startDateTime?: string;
   endDateTime?: string;
