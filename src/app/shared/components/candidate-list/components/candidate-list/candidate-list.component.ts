@@ -346,7 +346,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.clearSelection(this.grid);
   }
 
-  public dispatchNewPage(): void {
+  public dispatchNewPage(firstDispach = false): void {
 
     const candidateListRequest: CandidateListRequest = {
       ...this.getFilterValues(),
@@ -359,7 +359,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         ? new GetIRPCandidatesByPage(candidateListRequest)
         : new GetCandidatesByPage(candidateListRequest)
     );
-    this.onFilterClose();
+
+    if (!firstDispach) {
+      this.onFilterClose();
+    }
   }
 
   public regionTrackBy(index: number, region: string): string {
@@ -494,16 +497,19 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private subscribeOnSaveState(): void {
     this.getLastSelectedBusinessUnitId().pipe(
-      switchMap(() => this.regions$),
-      distinctUntilChanged((prev, next) => areArraysEqual(prev, next)),
-      tap(() => { this.getPreservedFiltersByPage(); }),
+      tap(() => {
+        this.store.dispatch([
+          new GetAllSkills(),
+          new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }),
+        ]);
+        this.getPreservedFiltersByPage();
+      }),
       switchMap(() => this.preservedFiltersByPageName$),
       filter(({ dispatch }) => dispatch),
       tap((filters) => {
 
         if (!filters.isNotPreserved) {
           this.filters = { ...filters.state };
-          this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
         }
 
         if(this.credStartDate != undefined){
@@ -516,16 +522,19 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
           this.filters.credType = [this.credType];
         }
 
-        this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
+        this.dispatchNewPage(true);
       }),
+
+      switchMap(() => this.getStructure()),
+      filter((structure) => !!structure),
+      switchMap(() => this.skills$),
+      filter((skills) => !!skills),
       takeUntil(this.unsubscribe$)
     )
       .subscribe(() => {
         !this.isAgency && this.IRPVMSGridHandler();
         this.updateCandidates();
-        this.dispatchNewPage();
-        this.store.dispatch([new GetAllSkills()]);
-        this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
+        this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
       });
   }
 
@@ -653,12 +662,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private getRegions(): void {
 
-      this.getLastSelectedBusinessUnitId()
-        .pipe(
-          filter(Boolean),
-          switchMap(() => this.store.dispatch(new GetRegionList())),
-          takeUntil(this.unsubscribe$)
-        ).subscribe();
+    this.getLastSelectedBusinessUnitId()
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.store.dispatch(new GetRegionList())),
+        takeUntil(this.unsubscribe$)
+      ).subscribe();
   }
 
   private syncFilterTagsWithControls(): void {
@@ -693,5 +702,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private getLastSelectedBusinessUnitId(): Observable<number> {
     const businessUnitId$ = this.isAgency ? this.lastSelectedAgencyId$ : this.lastSelectedOrgId$;
     return businessUnitId$;
+  }
+
+  private getStructure(): Observable<OrganizationStructure> | Observable<string[]> {
+    const structure$ = this.isAgency ? this.regions$ : this.organizationStructure$;
+    return structure$;
   }
 }
