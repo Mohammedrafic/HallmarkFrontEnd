@@ -57,6 +57,11 @@ export class PreservedFiltersState {
     return state.preservedFiltersByPageName;
   }
 
+  @Selector()
+  static preservedFiltersState(state: PreservedFiltersStateModel): unknown {
+    return state.preservedFiltersByPageName.state;
+  }
+
   //TODO remove after implementing preserving filters by page
   @Action(InitPreservedFilters)
   InitPreservedFilters({ patchState }: StateContext<PreservedFiltersStateModel>): Observable<{ state: string }> {

@@ -68,7 +68,7 @@ import { DepartmentHelper } from '@client/candidates/departments/helpers/departm
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { SystemType } from '@shared/enums/system-type.enum';
-import { DateTimeHelper, isPrimitiveArraysEqual } from '@core/helpers';
+import { DateTimeHelper, areArraysEqual } from '@core/helpers';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
@@ -495,7 +495,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private subscribeOnSaveState(): void {
     this.getLastSelectedBusinessUnitId().pipe(
       switchMap(() => this.regions$),
-      distinctUntilChanged((prev, next) => isPrimitiveArraysEqual(prev, next)),
+      distinctUntilChanged((prev, next) => areArraysEqual(prev, next)),
       tap(() => { this.getPreservedFiltersByPage(); }),
       switchMap(() => this.preservedFiltersByPageName$),
       filter(({ dispatch }) => dispatch),

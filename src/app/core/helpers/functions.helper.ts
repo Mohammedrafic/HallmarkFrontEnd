@@ -103,7 +103,7 @@ export const isObjectsEqual = (obj1: Record<string, unknown>, obj2: Record<strin
   });
 };
 
-export const isPrimitiveArraysEqual = (arr1: unknown[], arr2: unknown[], strictEquality = false): boolean => {
+export const areArraysEqual = (arr1: unknown[], arr2: unknown[], strictEquality = false): boolean => {
   let arrayA = arr1;
   let arrayB = arr2;
 
@@ -113,7 +113,7 @@ export const isPrimitiveArraysEqual = (arr1: unknown[], arr2: unknown[], strictE
   if (arrayA === arrayB) {
     return true;
   }
-  if (arrayA.length !== arrayA.length) {
+  if (arrayA.length !== arrayB.length) {
     return false;
   }
 
