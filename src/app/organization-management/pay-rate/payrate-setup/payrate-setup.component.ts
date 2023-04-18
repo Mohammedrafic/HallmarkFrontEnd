@@ -24,6 +24,7 @@ import {
   DeletePayRatesById,
   ExportPayRateSetup,
   GetPayRates,
+  GetSkillsbyDepartment,
   SaveUpdatePayRate,
   SaveUpdatePayRateSucceed,
   ShowConfirmationPopUp
@@ -88,20 +89,21 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   public locations: OrganizationLocation[] = [];
 
   public departments: OrganizationDepartment[] = [];
+  public skills : [] = [];
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   public readonly userPermissions = UserPermissions;
 
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   skills$: Observable<ListOfSkills[]>;
 
-  skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
-  public allSkills: ListOfSkills[] = [];
-
   @Select(PayRatesState.payRatesPage)
   payRatesPage$: Observable<PayRateSetupPage>;
 
   @Select(DashboardState.commitmentsPage)
   public commitmentsPage$: Observable<GetWorkCommitment[]>;
+
+  @Select(PayRatesState.skillbydepartment)
+  skillbydepartment$: Observable<any>;
 
   public readonly optionFields = DefaultOptionFields;
 
@@ -288,7 +290,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
     this.skills$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
       if (skills && skills.length > 0) {
-        this.allSkills = skills;
         this.filterColumns.skillIds.dataSource = skills;
       }
     });
@@ -304,6 +305,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
 
     this.regionChangedHandler();
     this.locationChangedHandler();
+    this.departmentChangedHandler();
 
     this.billRateFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
@@ -328,6 +330,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     });
 
     this.billRateFilterFormGroup.get('locationIds')?.valueChanges.subscribe((locationIds: number[]) => {
+      console.log(locationIds);
       if (locationIds && locationIds.length > 0) {
         this.filterColumns.departmentIds.dataSource = [];
         const departments: OrganizationDepartment[] = [];
@@ -432,6 +435,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   }
 
   public onDepartmentsFiltering(e: FilteringEventArgs): void {
+    console.log(e);
     const char = e.text.length + 1;
     let query: Query = new Query();
     query =
@@ -517,9 +521,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         departmentIds: this.allDepartmentsSelected
           ? []
           : this.PayRatesFormGroup.controls['departmentIds'].value,
-        skillIds: this.PayRatesFormGroup.controls['skillIds'].value.length === this.allSkills.length
-          ? [] 
-          : this.PayRatesFormGroup.controls['skillIds'].value,
+        skillIds: this.PayRatesFormGroup.controls['skillIds'].value,
         payRateConfigId: this.PayRatesFormGroup.controls['payRateTitleId'].value,
         orderTypes: this.PayRatesFormGroup.controls['orderTypeIds'].value.length === this.orderTypes.length
           ? [] 
@@ -732,6 +734,33 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       });
   }
 
+
+  private departmentChangedHandler(): void {
+    this.PayRatesFormGroup
+      .get('departmentIds')
+      ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
+      .subscribe((departmentIds: number[]) => {
+        console.log(departmentIds);
+        this.store.dispatch(new GetSkillsbyDepartment(departmentIds));
+        this.skillbydepartment$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
+          console.log(skills);
+        });
+    
+    
+        // if (departmentIds && departmentIds.length > 0) {
+        //   const skills: [] = [];
+        //   departmentIds.forEach((id) => {
+        //     const selectedLocation = this.locations.find((location) => location.id === id);
+        //     // departments.push(...(selectedLocation?.departments as []));
+        //   });
+        //   this.departments = sortByField(skills, 'name');
+        // }
+
+        // this.PayRatesFormGroup.controls['skillIds'].setValue(null);
+        this.cd.markForCheck();
+      });
+  }
+
   private setupFormValues(data: PayRateSetup): void {
     this.allRegionsChange({ checked: !data.regionId });
     this.allLocationsChange({ checked: !data.locationId });
@@ -766,7 +795,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     }
 
     if (!data.skillId) {
-      this.PayRatesFormGroup.controls['skillIds'].setValue(this.allSkills.map((skill: ListOfSkills) => skill.id));
+      this.PayRatesFormGroup.controls['skillIds'].setValue(null);
     } else {
       this.PayRatesFormGroup.controls['skillIds'].setValue([data.skillId]);
     }
