@@ -23,7 +23,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialParams } from '@shared/models/candidate-credential.model';
 import { FilterService } from '@shared/services/filter.service';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from '../../../../../store/app.actions';
+import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowToast } from '../../../../../store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
 import { SelectionSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
@@ -54,7 +54,7 @@ import { ExportColumn, ExportOptions } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { isNil } from 'lodash';
-import { optionFields, regionFields } from '@shared/constants';
+import { ERROR_START_LESS_END_DATE, optionFields, regionFields } from '@shared/constants';
 import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
 import { filterColumns, IRPCandidates, IRPFilterColumns, VMSCandidates } from './candidate-list.constants';
 import { Permission } from '@core/interface';
@@ -68,10 +68,11 @@ import { DepartmentHelper } from '@client/candidates/departments/helpers/departm
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { SystemType } from '@shared/enums/system-type.enum';
-import { DateTimeHelper, isPrimitiveArraysEqual } from '@core/helpers';
+import { DateTimeHelper, areArraysEqual } from '@core/helpers';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-candidate-list',
@@ -237,24 +238,28 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFilterApply(): void {
-    if (this.CandidateFilterFormGroup.dirty) {
-      this.filters = this.CandidateFilterFormGroup.getRawValue();
-      this.filters.profileStatuses = this.filters.profileStatuses || [];
-      this.filters.regionsNames = this.filters.regionsNames || [];
-      this.filters.skillsIds = this.filters.skillsIds || [];
-      this.filters.candidateName = this.filters.candidateName || null;
-      this.filters.expiry = {
-        type : this.filters.credType || [],
-        startDate : this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
-        endDate : this.filters.endDate  ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
-      };
+    if(new Date(this.CandidateFilterFormGroup.get("endDate")?.value) >= new Date(this.CandidateFilterFormGroup.get("startDate")?.value)){
+      if (this.CandidateFilterFormGroup.dirty) {
+        this.filters = this.CandidateFilterFormGroup.getRawValue();
+        this.filters.profileStatuses = this.filters.profileStatuses || [];
+        this.filters.regionsNames = this.filters.regionsNames || [];
+        this.filters.skillsIds = this.filters.skillsIds || [];
+        this.filters.candidateName = this.filters.candidateName || null;
+        this.filters.expiry = {
+          type : this.filters.credType || [],
+          startDate : this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
+          endDate : this.filters.endDate  ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
+        };
 
-      this.saveFiltersByPageName(this.filters);
-      this.dispatchNewPage();
-      this.store.dispatch(new ShowFilterDialog(false));
-      this.CandidateFilterFormGroup.markAsPristine();
+        this.saveFiltersByPageName(this.filters);
+        this.dispatchNewPage();
+        this.store.dispatch(new ShowFilterDialog(false));
+        this.CandidateFilterFormGroup.markAsPristine();
+      } else {
+        this.store.dispatch(new ShowFilterDialog(false));
+      }
     } else {
-      this.store.dispatch(new ShowFilterDialog(false));
+      this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_START_LESS_END_DATE));
     }
   }
 
@@ -346,7 +351,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.clearSelection(this.grid);
   }
 
-  public dispatchNewPage(): void {
+  public dispatchNewPage(firstDispatch = false): void {
 
     const candidateListRequest: CandidateListRequest = {
       ...this.getFilterValues(),
@@ -359,7 +364,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         ? new GetIRPCandidatesByPage(candidateListRequest)
         : new GetCandidatesByPage(candidateListRequest)
     );
-    this.onFilterClose();
+
+    if (!firstDispatch) {
+      this.onFilterClose();
+    }
   }
 
   public regionTrackBy(index: number, region: string): string {
@@ -494,16 +502,19 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private subscribeOnSaveState(): void {
     this.getLastSelectedBusinessUnitId().pipe(
-      switchMap(() => this.regions$),
-      distinctUntilChanged((prev, next) => isPrimitiveArraysEqual(prev, next)),
-      tap(() => { this.getPreservedFiltersByPage(); }),
+      tap(() => {
+        this.store.dispatch([
+          new GetAllSkills(),
+          new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }),
+        ]);
+        this.getPreservedFiltersByPage();
+      }),
       switchMap(() => this.preservedFiltersByPageName$),
       filter(({ dispatch }) => dispatch),
       tap((filters) => {
 
         if (!filters.isNotPreserved) {
           this.filters = { ...filters.state };
-          this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
         }
 
         if(this.credStartDate != undefined){
@@ -516,16 +527,19 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
           this.filters.credType = [this.credType];
         }
 
-        this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
+        this.dispatchNewPage(true);
       }),
+
+      switchMap(() => this.getStructure()),
+      filter((structure) => !!structure),
+      switchMap(() => this.skills$),
+      filter((skills) => !!skills),
       takeUntil(this.unsubscribe$)
     )
       .subscribe(() => {
         !this.isAgency && this.IRPVMSGridHandler();
         this.updateCandidates();
-        this.dispatchNewPage();
-        this.store.dispatch([new GetAllSkills()]);
-        this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
+        this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
       });
   }
 
@@ -653,12 +667,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private getRegions(): void {
 
-      this.getLastSelectedBusinessUnitId()
-        .pipe(
-          filter(Boolean),
-          switchMap(() => this.store.dispatch(new GetRegionList())),
-          takeUntil(this.unsubscribe$)
-        ).subscribe();
+    this.getLastSelectedBusinessUnitId()
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.store.dispatch(new GetRegionList())),
+        takeUntil(this.unsubscribe$)
+      ).subscribe();
   }
 
   private syncFilterTagsWithControls(): void {
@@ -693,5 +707,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private getLastSelectedBusinessUnitId(): Observable<number> {
     const businessUnitId$ = this.isAgency ? this.lastSelectedAgencyId$ : this.lastSelectedOrgId$;
     return businessUnitId$;
+  }
+
+  private getStructure(): Observable<OrganizationStructure> | Observable<string[]> {
+    const structure$ = this.isAgency ? this.regions$ : this.organizationStructure$;
+    return structure$;
   }
 }

@@ -86,7 +86,7 @@ export class DashboardService {
     [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
     [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters),
     [WidgetTypeEnum.AGENCY_POSITION_COUNT]: (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
-    [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => this.getRNUtilizations(filters),
+    [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => of(null), //Empty loader. Data is loaded in the component due to load order for lookups
     [WidgetTypeEnum.ALREADY_EXPIRED_CREDS]: (filters: DashboartFilterDto) => this.getalreadyExpiredCredentials(filters),
     [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpiredCredentials(filters),
   };
@@ -341,12 +341,6 @@ export class DashboardService {
     return this.httpClient.post<AgencyPositionModel[]>(`${this.baseUrl}/getOpenAndInprogressOpenPositions`, { ...filter }).pipe(
       map((data)=> data)
     )
-  }
-
-  private getRNUtilizations(filter: DashboartFilterDto) : Observable<RnUtilizationModel> {
-    return this.httpClient.post<RnUtilizationModel>(`${this.baseUrl}/GetAllCandidateworkschedulehrs`, { ...filter })
-    .pipe(
-      map((data)=> data))
   }
 
   private getalreadyExpiredCredentials(filter: DashboartFilterDto) : Observable<ExpiryDetailsModel[]> {

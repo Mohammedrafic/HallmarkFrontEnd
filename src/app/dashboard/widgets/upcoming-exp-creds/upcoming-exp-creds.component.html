@@ -17,7 +17,7 @@
       <span class="widget__type">
         <p class="orgname" (click)="redirect_to_candidate(data.name)">{{data.name}}</p><p class="orgcount">{{data.value}} / {{data.total}}</p>
       </span>
-      <ejs-progressbar #upcoming{{data.name}} id=upcoming{{data.name}} [type]='type' [maximum]='data.total' [minimum]='min' [value]=data.value
+      <ejs-progressbar #upcoming{{data.name}} id=upcoming{{data.name}} [type]='type' [maximum]='data.total' [minimum]='min' [value]=data.value cornerRadius='Round'
         [width]='width' [trackThickness]='trackThickness' [progressColor]=data.progressColor [progressThickness]='progressThickness'
         [height]='height'  [animation]='animation'
          (load)='load($event)'>

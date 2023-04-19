@@ -10,11 +10,12 @@ import { DropDownListModule, MultiSelectAllModule, MultiSelectModule } from '@sy
 import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RnUtilizationFormService } from './rn-utilization-widget-service';
+import { ProgressBarAllModule } from '@syncfusion/ej2-angular-progressbar';
 
 
 
 @NgModule({
-  imports: [WidgetWrapperModule,CommonModule,MultiSelectModule,MultiSelectAllModule,MultiselectDropdownModule,DropDownListModule,DatePickerModule,TooltipModule,ReactiveFormsModule,FeatherModule.pick({ Info })],
+  imports: [ProgressBarAllModule, WidgetWrapperModule,CommonModule,MultiSelectModule,MultiSelectAllModule,MultiselectDropdownModule,DropDownListModule,DatePickerModule,TooltipModule,ReactiveFormsModule,FeatherModule.pick({ Info })],
    exports: [RnUtilizationWidgetComponent],
     declarations: [RnUtilizationWidgetComponent],
     providers:[RnUtilizationFormService]

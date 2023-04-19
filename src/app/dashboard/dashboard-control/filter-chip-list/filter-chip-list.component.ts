@@ -38,8 +38,8 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
   private filteredItems: FilteredItem[];
   private resizeObserver: ResizeObserverModel;
 
-  public isCollapsed: boolean = false;
-  public showMoreLessBtn: boolean = false;
+  public isCollapsed = false;
+  public showMoreLessBtn = false;
   public chipList: (string | FilteredItem)[] = [];
 
   constructor(private readonly store: Store, private readonly cdr: ChangeDetectorRef) {
@@ -71,7 +71,6 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
 
   public deleteChip(event: DeleteEventArgs): void {
     const filteredItem = event.data as FilteredItem;
-    this.cdr.markForCheck();
 
     if (filteredItem.column === FilterColumnTypeEnum.ORGANIZATION) {
       this.filteredItems = this.filteredItems.filter((item) => item.organizationId !== filteredItem.organizationId);
@@ -84,7 +83,9 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
     } else {
       this.filteredItems = this.filteredItems.filter((filterItem: FilteredItem) => !isEqual(filterItem, filteredItem));
     }
+
     this.store.dispatch(new SetFilteredItems(this.filteredItems));
+    this.cdr.markForCheck();
   }
 
   public onClearFilters(): void {
@@ -92,6 +93,7 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
   }
 
   public override ngOnDestroy(): void {
+    super.ngOnDestroy();
     this.resizeObserver?.detach();
   }
 }

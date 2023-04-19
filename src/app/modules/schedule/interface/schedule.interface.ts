@@ -1,3 +1,4 @@
+import { FieldType } from '@core/enums';
 import { DropdownOption } from '@core/interface';
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -5,6 +6,7 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from
 import { PageOfCollections } from '@shared/models/page.model';
 import { ValueType } from '@syncfusion/ej2-angular-grids';
 import { ChipItem } from '@shared/components/inline-chips';
+import { ScheduleFilterFormSourceKeys } from '../constants';
 import { ScheduleOrderType, ScheduleType } from '../enums';
 import { IrpOrderType } from '@shared/enums/order-type';
 
@@ -165,16 +167,30 @@ export interface ScheduleFilters {
 }
 
 export interface ScheduleFiltersConfig {
-  regionIds: ScheduleFilterItem;
-  locationIds: ScheduleFilterItem;
-  departmentsIds: ScheduleFilterItem;
-  skillIds: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.Regions]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.Locations]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.Departments]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.Skills]: ScheduleFilterItem;
+}
+
+export interface ScheduleFilterFormFieldConfig {
+  field: string;
+  title: string;
+  type: FieldType;
+  required: boolean;
+  sourceKey: ScheduleFilterFormSourceKeys;
+}
+
+export interface ScheduleFilterFormConfig {
+  formClass: string;
+  formFields: ScheduleFilterFormFieldConfig[];
 }
 
 export interface ScheduleFiltersData {
   filters: ScheduleFilters;
   filteredItems: FilteredItem[];
   chipsData: ChipItem[],
+  skipDataUpdate?: boolean;
 }
 
 export interface ScheduleFilterStructure {
@@ -235,4 +251,10 @@ export interface SelectedCells {
 export interface RemovedSlot {
   date: string | null;
   candidate: ScheduleCandidate;
+}
+
+
+export interface DateRangeOption {
+  dateText: string;
+  noBorder: boolean;
 }

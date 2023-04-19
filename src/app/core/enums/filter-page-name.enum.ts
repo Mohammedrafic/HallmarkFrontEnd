@@ -19,5 +19,5 @@ export enum FilterPageName {
   InvoicesVMSOrganization = 17,
   InvoicesVMSAgency = 18,
   InvoicesIRPOrganization = 19,
-  InvoicesIRPAgency = 20,
+  SchedullerOrganization = 20,
 }

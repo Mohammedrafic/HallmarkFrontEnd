@@ -236,8 +236,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
             map((candidates: CandidateModel[]) => {
               return candidates.filter((candidate: CandidateModel) => candidateIds.includes(candidate.candidateId))
             }),
-            map(this.getAgenciesBelongToCandidates)
-            )
+            map(this.getAgenciesBelongToCandidates))
         }),
         takeUntil(this.destroy$)
       )
@@ -290,7 +289,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private areTimesEquals(time1: Date, time2: Date): boolean {
-    return getTimeFromDate(time1) === getTimeFromDate(time2);
+    return DateTimeHelper.toUtcFormat(time1) === DateTimeHelper.toUtcFormat(time2);
   }
 
   private saveReorder(): void {

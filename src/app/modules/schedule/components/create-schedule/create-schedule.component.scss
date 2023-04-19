@@ -177,29 +177,23 @@ app-schedule-items {
 .book-form {
   display: grid;
   grid-template-columns: 1.5fr 0.3fr 0.3fr 0.9fr 0.7fr;
-  grid-template-rows: 1fr 0.4fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 0.4fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
     "shift shift shift shift hours"
-    "switch-wrap switch-wrap switch-wrap switch-wrap switch-wrap"
-    "region region location location location"
-    "department department department department department"
-    "skill skill skill skill skill";
+    "switch-wrap switch-wrap switch-wrap switch-wrap switch-wrap";
 }
 
 .book-time-form {
   display: grid;
   grid-template-columns: 1.3fr 0.4fr 0.4fr 0.9fr 0.7fr;
-  grid-template-rows: 1fr 0.4fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 0.4fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
     "shift startTime startTime endTime hours"
-    "switch-wrap switch-wrap switch-wrap switch-wrap switch-wrap"
-    "region region location location location"
-    "department department department department department"
-    "skill skill skill skill skill";
+    "switch-wrap switch-wrap switch-wrap switch-wrap switch-wrap";
 }
 
 .availability-time-form {
@@ -254,20 +248,4 @@ app-schedule-items {
 
 .hours {
   grid-area: hours;
-}
-
-.region {
-  grid-area: region;
-}
-
-.location {
-  grid-area: location;
-}
-
-.department {
-  grid-area: department;
-}
-
-.skill {
-  grid-area: skill;
 }

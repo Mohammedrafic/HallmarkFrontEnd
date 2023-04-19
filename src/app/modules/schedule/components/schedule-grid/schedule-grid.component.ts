@@ -25,9 +25,11 @@ import { filter } from 'rxjs/operators';
 import { DatesRangeType, WeekDays } from '@shared/enums';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
+import { PreservedFiltersByPage } from '@core/interface';
+import { FilterPageName } from '@core/enums';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { CreateScheduleService, ScheduleApiService } from '../../services';
+import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { UserState } from '../../../../store/user.state';
 import { ScheduleGridAdapter } from '../../adapters';
 import { DatesPeriods, MonthPeriod, PermissionRequired } from '../../constants';
@@ -44,6 +46,9 @@ import { ScheduleGridService } from './schedule-grid.service';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
+import { GetPreservedFiltersByPage, ResetPageFilters } from 'src/app/store/preserved-filters.actions';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -54,6 +59,9 @@ import { ScheduleItemsService } from '../../services/schedule-items.service';
 export class ScheduleGridComponent extends Destroyable implements OnInit, OnChanges {
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
+
+  @Select(PreservedFiltersState.preservedFiltersByPageName)
+  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<ScheduleInt.ScheduleFilters>>;
 
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
   @ViewChild('autoCompleteSearch') autoCompleteSearch: AutoCompleteComponent;
@@ -90,7 +98,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   weekPeriod: [Date, Date] = [DateTimeHelper.getCurrentDateWithoutOffset(), DateTimeHelper.getCurrentDateWithoutOffset()];
 
-  datesRanges: string[] = DateTimeHelper.getDatesBetween();
+  datesRanges: ScheduleInt.DateRangeOption[] = this.scheduleItemsService
+  .createRangeOptions(DateTimeHelper.getDatesBetween());
 
   monthRangeDays: WeekDays[] = [];
 
@@ -119,13 +128,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     private createScheduleService: CreateScheduleService,
     private scheduleGridService: ScheduleGridService,
     private scheduleItemsService: ScheduleItemsService,
+    private scheduleFiltersService: ScheduleFiltersService,
   ) {
     super();
   }
 
   trackByPeriods: TrackByFunction<ItemModel> = (_: number, period: ItemModel) => period.text;
 
-  trackByDatesRange: TrackByFunction<WeekDays> = (_: number, date: WeekDays) => date;
+  trackByDatesRange: TrackByFunction<ScheduleInt.DateRangeOption> =
+   (_: number, date: ScheduleInt.DateRangeOption) => date.dateText;
+
+  trackByweekDays: TrackByFunction<WeekDays> = (_: number, date: WeekDays) => date;
 
   trackByScheduleData: TrackByFunction<ScheduleInt.ScheduleModel> = (_: number,
     scheduleData: ScheduleInt.ScheduleModel) => scheduleData.id;
@@ -135,6 +148,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.watchForScroll();
     this.watchForCandidateSearch();
     this.watchForSideBarAction();
+    this.watchForPreservedFilters();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -288,11 +302,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       debounceTime(200),
       filter(([startDate, endDate]: [string, string]) => !!startDate && !!endDate),
       tap(([startDate, endDate]: [string, string]) => {
-        this.datesRanges = DateTimeHelper.getDatesBetween(startDate, endDate);
+        this.datesRanges = this.scheduleItemsService.createRangeOptions(DateTimeHelper.getDatesBetween(startDate, endDate));
         this.changeFilter.emit({ startDate, endDate });
         this.scrollArea.nativeElement.scrollTo(0, 0);
 
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }),
     );
   }
@@ -359,5 +373,27 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
           this.autoSelectCandidate(page.items[0]);
         });
     }
+  }
+
+  private watchForPreservedFilters(): void {
+    this.organizationId$.pipe(
+      filter((id) => !!id),
+      tap(() => {
+        this.store.dispatch([
+          new ClearOrganizationStructure(),
+          new ResetPageFilters(),
+          new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
+        ]);
+      }),
+      switchMap(() => this.preservedFiltersByPageName$),
+      filter(({ dispatch }) => dispatch),
+      takeUntil(this.componentDestroy()),
+    ).subscribe((filters) => {
+      this.setPreservedFiltersDataSource(filters.state || {});
+    });
+  }
+
+  private setPreservedFiltersDataSource(filters: ScheduleInt.ScheduleFilters): void {
+    this.scheduleFiltersService.setPreservedFiltersDataStream({ ...filters });
   }
 }

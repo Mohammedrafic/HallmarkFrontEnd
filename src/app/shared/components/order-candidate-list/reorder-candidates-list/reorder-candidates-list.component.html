@@ -189,16 +189,18 @@
         </e-column>
         <e-column field="firstName" headerText="Name" textAlign="Left" width="170">
           <ng-template #template let-data>
-            <div class="link" (click)="onViewNavigation(data)">
-              {{ data.lastName }}, {{ data.firstName }}
-              <ng-container *ngIf="!data.isOriented">
-                <ejs-tooltip
-                  [content]="data.departmentOrientationDate"
-                  position="TopRight"
-                >
-                  <i-feather name="compass" class="icon"></i-feather>
-                </ejs-tooltip>
-              </ng-container>
+            <div class="candidate-link" (click)="onViewNavigation(data)">
+              <div class="link-name">{{ data.lastName }}, {{ data.firstName }}</div>
+              <div>
+                <ng-container *ngIf="!data.isOriented">
+                  <ejs-tooltip
+                    [content]="data.departmentOrientationDate"
+                    position="TopRight"
+                  >
+                    <i-feather name="compass" class="icon"></i-feather>
+                  </ejs-tooltip>
+                </ng-container>
+              </div>
             </div>
           </ng-template>
         </e-column>

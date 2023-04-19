@@ -167,7 +167,8 @@
     <ng-container *ngIf="!isIRP && CandidateFilterFormGroup">
       <div class="bootstrap">
         <div class="input-container">
-          <label>Employee Name</label>
+          <label *ngIf="isIRP">Employee Name</label>
+          <label *ngIf="!isIRP">Candidate Name</label>
           <div class="input-group">
             <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
           </div>
@@ -297,7 +298,6 @@
               placeholder="MM/DD/YYYY"
               [enableMask]="true"
               [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
-              [max]="CandidateFilterFormGroup.controls['endDate'].value"
               formControlName="startDate">
             </ejs-datepicker>
           </div>
@@ -311,7 +311,6 @@
               placeholder="MM/DD/YYYY"
               [enableMask]="true"
               [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
-              [min]="CandidateFilterFormGroup.controls['startDate'].value"
               formControlName="endDate">
             </ejs-datepicker>
           </div>

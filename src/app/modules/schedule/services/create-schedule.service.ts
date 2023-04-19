@@ -5,7 +5,6 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Store } from '@ngxs/store';
 import { EMPTY, Observable, of, Subject } from 'rxjs';
 
-import { FilteredItem } from '@shared/models/filter.model';
 import { getTime } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
@@ -21,14 +20,11 @@ import {
   ScheduleBookingErrors,
   ScheduleCandidate,
   ScheduleDay,
-  ScheduleFiltersData,
-  ScheduleFilterStructure,
   ScheduleForm,
   ScheduleFormConfig,
   ScheduleFormFieldConfig,
   ScheduleSelectedSlots,
   ScheduleTypeRadioButton,
-  ShiftDropDownsData,
 } from '../interface';
 import { ScheduleFiltersService } from './schedule-filters.service';
 import { ScheduleClassesList, ScheduleCustomClassesList, ToggleControls } from '../components/create-schedule';
@@ -86,10 +82,6 @@ export class CreateScheduleService {
       onCall: [false],
       charge: [false],
       preceptor: [false],
-      regionId: [null],
-      locationId: [null],
-      departmentId: [null],
-      skillId: [null],
     }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
   }
 
@@ -130,11 +122,11 @@ export class CreateScheduleService {
   createBooking(
     scheduleForm: FormGroup,
     scheduleItems: CreateScheduleItem[],
-    customShiftId: number
+    customShiftId: number,
+    skillIds: number[],
+    departmentIds: number[],
   ): ScheduleInt.ScheduleBook {
     const {
-      departmentId,
-      skillId,
       shiftId,
       startTime,
       endTime,
@@ -147,8 +139,8 @@ export class CreateScheduleService {
 
     return  {
       employeeBookedDays: this.getEmployeeBookedDays(scheduleItems),
-      departmentId: departmentId,
-      skillId: skillId,
+      departmentId: departmentIds[0],
+      skillId: skillIds[0],
       shiftId: shiftId !== customShiftId ? shiftId : null,
       startTime: getTime(startTime),
       endTime: getTime(endTime),
@@ -301,32 +293,6 @@ export class CreateScheduleService {
     return className;
   }
 
-  getShiftDropDownsData(scheduleFilterStructure: ScheduleFilterStructure): ShiftDropDownsData {
-    const scheduleFiltersData: ScheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
-
-    if (scheduleFiltersData?.filters?.departmentsIds?.length === 1) {
-      return {
-        filtered: true,
-        selectedSkillId: scheduleFiltersData.filters?.skillIds?.length ? scheduleFiltersData.filters.skillIds[0] : null,
-        regionsDataSource: this.getDataSourceFromFilteredItems('regionIds', scheduleFiltersData.filteredItems),
-        locationsDataSource: this.getDataSourceFromFilteredItems('locationIds', scheduleFiltersData.filteredItems),
-        departmentsDataSource: this.getDataSourceFromFilteredItems('departmentsIds', scheduleFiltersData.filteredItems),
-        skillsDataSource: this.getDataSourceFromFilteredItems('skillIds', scheduleFiltersData.filteredItems),
-      };
-    } else {
-      const data: ShiftDropDownsData = {} as ShiftDropDownsData;
-
-      data.filtered = false;
-      data.selectedSkillId = null;
-      data.locationsDataSource = this.scheduleFiltersService
-        .getSelectedLocatinOptions(scheduleFilterStructure, [scheduleFilterStructure.regions[0].id as number]);
-      data.departmentsDataSource = this.scheduleFiltersService
-        .getSelectedDepartmentOptions(scheduleFilterStructure, [data.locationsDataSource[0].value as number]);
-
-      return data;
-    }
-  }
-
   getCandidateOrientation(candidate: ScheduleCandidate): boolean {
     return candidate.dates.every((date: string) => {
       if(candidate.orientationDate) {
@@ -377,19 +343,6 @@ export class CreateScheduleService {
     return candidates.some((candidate: ScheduleCandidate) => {
       return candidate.days?.length;
     });
-  }
-
-  private getDataSourceFromFilteredItems(column: string, filteredItems: FilteredItem[]): DropdownOption[] {
-    const filteredItem = filteredItems.find((item: FilteredItem) => item.column === column);
-
-    if (!filteredItem) {
-      return [];
-    }
-
-    return [{
-      text: filteredItem.text,
-      value: filteredItem.value,
-    }];
   }
 
   private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]): void {

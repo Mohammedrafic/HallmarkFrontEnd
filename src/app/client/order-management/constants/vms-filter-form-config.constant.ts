@@ -1,7 +1,7 @@
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { CommonFormConfig } from '@shared/models/common-form-config.model';
 
-export const GetFilterFormConfig = (tab: OrganizationOrderManagementTabs): CommonFormConfig[] => {
+export const GetVMSFilterFormConfig = (tab: OrganizationOrderManagementTabs): CommonFormConfig[] => {
   switch (tab) {
     case OrganizationOrderManagementTabs.AllOrders:
       return AllOrdersFilterFormConfig;
@@ -53,7 +53,6 @@ const AllOrdersFilterFormConfig: CommonFormConfig[] = [
   { field: 'projectNameIds' },
   { field: 'poNumberIds' },
   { field: 'contactEmails' },
-  { field: 'irpOnly' },
 ];
 
 const PerdiemFormConfig: CommonFormConfig[] = [

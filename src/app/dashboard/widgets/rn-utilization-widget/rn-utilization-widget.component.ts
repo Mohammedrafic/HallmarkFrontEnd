@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectorRef, Inject } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef, Inject, ViewChild, ViewChildren } from '@angular/core';
 import { CustomFormGroup } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
 import { Select, StateContext, Store } from '@ngxs/store';
@@ -36,7 +36,7 @@ import {
   GetNursingWidgetData,
   GetWorkCommitment,
 } from '../../models/rn-utilization.model';
-import _ from 'lodash';
+import { ProgressBar } from '@syncfusion/ej2-angular-progressbar';
 
 @Component({
   selector: 'app-rn-utilization-widget',
@@ -49,15 +49,18 @@ export class RnUtilizationWidgetComponent implements OnInit {
   @Input() description: string;
   @Input() chartData: RnUtilizationModel | undefined;
 
+  @ViewChildren("progressBar")
+  public pb: ProgressBar[];
+
   @Select(DashboardState.commitmentsPage)
   commitmentsPage$: Observable<GetWorkCommitment[]>;
-  workcommitmentvalue: number[];
-  skillDatavalue: number[];
   @Select(DashboardState.nursingSkill)
   nursingSkill$: Observable<GetWorkCommitment[]>;
   @Select(DashboardState.nursingCount)
   nursingCount$: Observable<GetNursingWidgetData>;
 
+  workcommitmentvalue: number[];
+  skillDatavalue: number[];
   noofPerDiemOrders: string = NOOFPERDIEMORDERS;
   targetPerDiemhrs: string = TARGETPERDIEMHOURS;
   actualPerDiemhrs: string = ACTUALPERDIEMHOURS;
@@ -71,10 +74,14 @@ export class RnUtilizationWidgetComponent implements OnInit {
   skillsText = 'All';
   workCommitmentText = 'All';
   dateText = new Date().toLocaleDateString();
+  kpiColor: string;
+  showProgressBar: boolean;
+  percent: number;
 
   constructor(
     private rnUtilizationService: RnUtilizationFormService,
     private cdr: ChangeDetectorRef,
+    private changeDetector : ChangeDetectorRef,
     protected store: Store,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis
   ) {
@@ -128,10 +135,10 @@ export class RnUtilizationWidgetComponent implements OnInit {
         tap(([value, skillsList, workCommitmentList]) => {
           this.skillsText =
             skillsList.length == value.skills.length
-            ? `${this.allOption} (${value.skills.length})` : value.skills.length.toString();
+              ? `${this.allOption} (${value.skills.length})` : value.skills.length.toString();
           this.workCommitmentText =
             workCommitmentList.length == value.workCommitment.length
-            ? `${this.allOption} (${value.workCommitment.length})` : value.workCommitment.length.toString();
+              ? `${this.allOption} (${value.workCommitment.length})` : value.workCommitment.length.toString();
           this.dateText = value.workDate.toLocaleDateString();
         }),
         switchMap(([value]) => {
@@ -145,6 +152,38 @@ export class RnUtilizationWidgetComponent implements OnInit {
           return this.store.dispatch(new FilterNursingWidget(data));
         })
       )
+      .subscribe();
+
+    this.nursingCount$.pipe(
+      filter((result) => result != null),
+      tap((result) => {
+        if (result.noOfPerdiemNursing === 0) {
+          //Keep disabled fornow. does not work as intended.
+          this.showProgressBar = false;
+          return;
+        } else {
+          this.showProgressBar = true;
+          this.changeDetector.detectChanges();
+        }
+        this.percent = (result.perdayTotalHoursSchedule / result.targetPerdiemNursingHours) * 100;
+        //get hex color based on percentage between red and green
+        if (this.percent < 30) {
+          //red
+          this.kpiColor = '#ff0000';
+        }
+        else if (this.percent > 60) {
+          //orange
+          this.kpiColor = '#ff8000';
+        } else {
+          //green
+          this.kpiColor = '#00ff00';
+        }
+
+        // this.pb[0].refresh()
+        console.log('percent', this.percent, 'color', this.kpiColor)
+      }),
+      takeUntil(this.unsubscribe$),
+    )
       .subscribe();
   }
 }
