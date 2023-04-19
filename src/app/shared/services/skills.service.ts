@@ -129,9 +129,13 @@ export class SkillsService {
     return this.http.put<number[]>(`/api/AssignedSkills/assignSkills`, treeValue);
   }
 
-  public getAssignedSkillsByOrganization(params?: SkillParams): Observable<AssignedSkillsByOrganization[]> {
+  public getSortedAssignedSkillsByOrganization(params?: SkillParams): Observable<AssignedSkillsByOrganization[]> {
     return this.http.get<AssignedSkillsByOrganization[]>('/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit', params)
       .pipe(map((data) => sortByField(data, 'skillDescription')));
+  }
+
+  public getAssignedSkillsByOrganization(params: SkillParams): Observable<AssignedSkillsByOrganization[]> {
+    return this.http.get<AssignedSkillsByOrganization[]>('/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit', params);
   }
 
   public getAllMasterSkillList(): Observable<MasterSkill[]> {

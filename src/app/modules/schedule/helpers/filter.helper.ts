@@ -1,6 +1,6 @@
 import { DropdownOption } from '@core/interface';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
-import { Skill } from '@shared/models/skill.model';
+import { AssignedSkillsByOrganization, Skill } from '@shared/models/skill.model';
 
 export class ScheduleFilterHelper {
   static adaptRegionToOption(regions: OrganizationRegion[]): DropdownOption[] {
@@ -21,5 +21,9 @@ export class ScheduleFilterHelper {
 
   static adaptMasterSkillToOption(skills: Skill[]): DropdownOption[] {
     return skills.map((skill) => ({ text: skill.name, value: skill.id })) as DropdownOption[];
+  }
+
+  static adaptOrganizationSkillToOption(skills: AssignedSkillsByOrganization[]): DropdownOption[] {
+    return skills.map((skill) => ({ text: skill.skillDescription, value: skill.id })) as DropdownOption[];
   }
 }

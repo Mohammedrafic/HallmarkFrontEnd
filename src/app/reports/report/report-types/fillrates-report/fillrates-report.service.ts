@@ -44,7 +44,7 @@ export class FillratesReportService {
   ) {}
 
   public getAssignedSkills(): Observable<AssignedSkillsByOrganization[]> {
-    return this.skillsService.getAssignedSkillsByOrganization();
+    return this.skillsService.getSortedAssignedSkillsByOrganization();
   }
 
   public getApplicantsStatuses(): Observable<ApplicantStatus[]> {
