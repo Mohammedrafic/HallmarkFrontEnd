@@ -235,3 +235,10 @@
 .f-grow-2 {
   flex-grow: 2;
 }
+
+.e-readonly {
+  background: #f7f8fc !important;
+}
+.e-input[readonly] {
+  background: #f7f8fc !important;
+}
