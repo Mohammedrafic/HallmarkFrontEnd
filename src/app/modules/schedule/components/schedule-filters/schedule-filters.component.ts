@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
-import { map, skip } from 'rxjs/operators';
+import { distinctUntilChanged, map, skip } from 'rxjs/operators';
 
-import { Destroyable } from '@core/helpers';
+import { Destroyable, isObjectsEqual } from '@core/helpers';
 import { FilterPageName } from '@core/enums';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -291,9 +291,10 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   private applyPreservedFilters(): void {
     this.organizationStructure$.pipe(
-      filter((structure) => !!structure),
-      switchMap(() => this.scheduleFiltersService.getPreservedFiltersDataStream()),
-      filter((filters) => !!filters),
+      switchMap((structure) => this.scheduleFiltersService.getPreservedFiltersDataStream().pipe(
+        filter(() => !!structure),
+      )),
+      distinctUntilChanged((prev, next) => isObjectsEqual(prev as Record<string, unknown>, next as Record<string, unknown>)),
       takeUntil(this.componentDestroy())
     )
     .subscribe((preservFilters) => {
