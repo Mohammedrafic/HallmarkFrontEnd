@@ -1,4 +1,5 @@
 import { AlertChannel } from "@admin/alerts/alerts.enum";
+import { CommonReportFilter } from "@admin/analytics/models/common-report.model";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { AddAlertsTemplateRequest, AlertsTemplateFilters, AlertTriggerDto, DismissAlertDto, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
 import { GroupEmailFilters, SendGroupEmailRequest } from "@shared/models/group-email.model";
@@ -174,4 +175,30 @@ export class GetGroupEmailCandidates {
 export class Toaster{
   static readonly type = "User Subscription CatchError";
   constructor(){}
+}
+
+export class GetGroupEmailDepartmentSkills {
+  static readonly type = '[groupemail] Get Group Email department skills';
+  constructor(
+    public departmentIds: string,
+    public businessUnitId: number
+  ) { }
+}
+
+export class GetGroupEmailEmployees {
+  static readonly type = '[groupemail] Get Group Email employees by criteria';
+  constructor(
+    public businessUnitId: number,    
+    public regions: string,
+    public locations: string,
+    public departments: string,
+    public skills: string,
+    public workCommitments: string,
+    public orientationComplete: boolean
+  ) { }
+}
+
+export class GetStaffScheduleReportFilterOptions{
+  static readonly type = '[LogiReport] Get Staff Schedule Report Filter Options';
+  constructor(public filter: CommonReportFilter) { }
 }

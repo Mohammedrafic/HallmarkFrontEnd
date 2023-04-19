@@ -1,7 +1,9 @@
+import { LogiReportService } from './../../shared/services/logi-report.service';
 import {
   AgencyDto,
   CandidateStatusAndReasonFilterOptionsDto,
   MasterSkillDto,
+  StaffScheduleReportFilterOptions,
 } from './../analytics/models/common-report.model';
 import { Injectable } from '@angular/core';
 import { UserSubscriptionPage, UserSubscriptionRequest } from '@shared/models/user-subscription.model';
@@ -20,10 +22,13 @@ import {
   GetGroupEmailById,
   GetGroupEmailCandidates,
   GetGroupEmailCandidateStatuses,
+  GetGroupEmailDepartmentSkills,
+  GetGroupEmailEmployees,
   GetGroupEmailInternalUsers,
   GetGroupEmailRoles,
   GetGroupEmailSkills,
   GetGroupMailByBusinessUnitIdPage,
+  GetStaffScheduleReportFilterOptions,
   GetTemplateByAlertId,
   GetUserSubscriptionPage,
   SaveTemplateByAlertId,
@@ -71,10 +76,13 @@ interface AlertsStateModel {
   groupEmailUserData: User;
   groupEmailAgencyData: AgencyDto;
   groupEmailSkillsData: MasterSkillDto;
+  groupEmailDeptSkillsData: MasterSkillDto;
   groupEmailCandidateStatusData: CandidateStatusAndReasonFilterOptionsDto;
   groupEmailCandidateData: User;
+  groupEmailEmployeeData: User;
   documentPreviewDetail : DownloadDocumentDetail;
   documentDownloadDetail : DownloadDocumentDetail;
+  getStaffScheduleReportFilterOptions: StaffScheduleReportFilterOptions | null;
 }
 
 @Injectable()
@@ -132,6 +140,10 @@ export class AlertsState {
     return state.groupEmailSkillsData;
   }
   @Selector()
+  static GetGroupEmailDeptSkills(state: AlertsStateModel): MasterSkillDto {
+    return state.groupEmailDeptSkillsData;
+  }
+  @Selector()
   static GetGroupEmailCandidateStatuses(state: AlertsStateModel): CandidateStatusAndReasonFilterOptionsDto {
     return state.groupEmailCandidateStatusData;
   }
@@ -139,16 +151,29 @@ export class AlertsState {
   static GetGroupEmailCandidates(state: AlertsStateModel): User {
     return state.groupEmailCandidateData;
   }
+  
+  @Selector()
+  static GetGroupEmailEmployees(state: AlertsStateModel): User {
+    return state.groupEmailEmployeeData;
+  }
+
   @Selector()
   static documentDownloadDetail(state: AlertsStateModel): DownloadDocumentDetail | null {
     return state.documentDownloadDetail;
+  }
+
+  @Selector()
+  static getStaffScheduleReportOptionData(state: AlertsStateModel):
+  StaffScheduleReportFilterOptions | null {
+    return state.getStaffScheduleReportFilterOptions;
   }
 
 
   constructor(
     private businessUnitService: BusinessUnitService,
     private alertsService: AlertsService,
-    private groupEmailService: GroupEmailService
+    private groupEmailService: GroupEmailService,
+    private logiReportService: LogiReportService
   ) {}
 
   @Action(GetUserSubscriptionPage)
@@ -456,6 +481,56 @@ export class AlertsState {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
+  }
+
+  @Action(GetGroupEmailDepartmentSkills)
+  GetGroupEmailDepartmentSkills(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    { departmentIds, businessUnitId }: GetGroupEmailDepartmentSkills
+  ): Observable<MasterSkillDto | void> {
+    return this.groupEmailService.GetGroupEmailDepartmentSkills(departmentIds, businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ groupEmailDeptSkillsData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailEmployees)
+  GetGroupEmailEmployees(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    {
+      businessUnitId,
+      regions,
+      locations,
+      departments,
+      skills,
+      workCommitments,
+      orientationComplete      
+    }: GetGroupEmailEmployees
+  ): Observable<User | void> {
+    return this.groupEmailService
+      .GetGroupEmailEmployees(businessUnitId, regions, locations, departments, skills, workCommitments, orientationComplete)
+      .pipe(
+        tap((payload) => {
+          patchState({ groupEmailEmployeeData: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
+  }
+
+  @Action(GetStaffScheduleReportFilterOptions)
+  GetStaffScheduleReportFilterOptions({ patchState }: StateContext<AlertsStateModel>, { filter }: any): Observable<StaffScheduleReportFilterOptions> {
+    return this.logiReportService.getStaffScheduleReportOptions(filter).pipe(tap((payload: any) => {
+      patchState({ getStaffScheduleReportFilterOptions: payload });
+      return payload
+    }));
   }
 
 }
