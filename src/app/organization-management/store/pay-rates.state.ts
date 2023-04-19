@@ -10,6 +10,7 @@ import {
   SaveUpdatePayRate,
   SaveUpdatePayRateSucceed,
   GetPayRates,
+  GetSkillsbyDepartment,
 } from '@organization-management/store/pay-rates.action';
 import { PayRateService } from '@shared/services/pay-rates.service';
 import {
@@ -26,13 +27,15 @@ import { DateTimeHelper } from '@core/helpers';
 import { PayRateSetup, PayRateSetupPage } from '@shared/models/pay-rate.model';
 
 export interface PayRateStateModel {
-  payRatesPage: PayRateSetupPage | null
+  payRatesPage: PayRateSetupPage | null,
+  skillbydepartment: any
 }
 
 @State<PayRateStateModel>({
   name: 'payrates',
   defaults: {
-    payRatesPage: null
+    payRatesPage: null,
+    skillbydepartment: []
   }
 })
 @Injectable()
@@ -40,6 +43,9 @@ export class PayRatesState {
 
   @Selector()
   static payRatesPage(state: PayRateStateModel): PayRateSetupPage | null { return state.payRatesPage; }
+
+  @Selector()
+  static skillbydepartment(state: PayRateStateModel): any | null { return state.skillbydepartment; }
 
   constructor(private payRateService: PayRateService) {}
 
@@ -102,5 +108,12 @@ export class PayRatesState {
     }));
   };
 
+  @Action(GetSkillsbyDepartment)
+  GetSkillsbyDepartment({ patchState }: StateContext<PayRateStateModel>, { payload }: GetSkillsbyDepartment): Observable<any> {
+    return this.payRateService.getskillsbyDepartment(payload).pipe(tap((payload) => {
+      patchState({ skillbydepartment : payload });
+      return payload;
+    }));
+  }
  
 }
