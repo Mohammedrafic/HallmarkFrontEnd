@@ -5,7 +5,7 @@ import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { distinctUntilChanged, map, skip } from 'rxjs/operators';
 
 import { Destroyable, isObjectsEqual } from '@core/helpers';
-import { FilterPageName } from '@core/enums';
+import { FieldType, FilterPageName } from '@core/enums';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
@@ -14,7 +14,7 @@ import { OrganizationStructureService } from '@shared/services';
 import { FilterService } from '@shared/services/filter.service';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { ScheduleFiltersColumns } from '../../constants';
+import { ScheduleFilterFormGroupConfig, ScheduleFiltersColumns } from '../../constants';
 import { ScheduleFilterHelper } from '../../helpers';
 import { ScheduleFilters, ScheduleFiltersData, ScheduleFilterStructure } from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
@@ -45,6 +45,10 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   public readonly optionFields = { text: 'text', value: 'value' };
 
+  public readonly formConfig = ScheduleFilterFormGroupConfig;
+
+  public readonly fieldTypes = FieldType;
+
   private filters: ScheduleFilters = {};
 
   private filterStructure: ScheduleFilterStructure = {
@@ -54,22 +58,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   };
 
   private autoApplyFilters = false;
-
-  get selectedSkillsNumber(): number {
-    return this.scheduleFilterFormGroup.get('skillIds')?.value?.length || 0;
-  }
-
-  get selectedRegionsNumber(): number {
-    return this.scheduleFilterFormGroup.get('regionIds')?.value?.length || 0;
-  }
-
-  get selectedLocationsNumber(): number {
-    return this.scheduleFilterFormGroup.get('locationIds')?.value?.length || 0;
-  }
-
-  get selectedDepartmentsNumber(): number {
-    return this.scheduleFilterFormGroup.get('departmentsIds')?.value?.length || 0;
-  }
 
   constructor(
     private store: Store,
