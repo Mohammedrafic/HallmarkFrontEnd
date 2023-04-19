@@ -32,6 +32,8 @@ import {
   GetAllUsersPage,
   ResendWelcomeEmail,
   ImportUsers,
+  GetOrgInterfacePage,
+  GetLogInterfacePage,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -50,6 +52,8 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from
 import { TimeZoneModel } from '@shared/models/location.model';
 import { GetUSCanadaTimeZoneIds } from './security.actions';
 import { NodatimeService } from '@shared/services/nodatime.service';
+import { LogInterface, LogInterfacePage, OrgInterface, OrgInterfacePage } from '@shared/models/org-interface.model';
+import { OrgInterfaceService } from '../services/org-interface.service';
 
 const BUSINNESS_DATA_DEFAULT_VALUE = { id: 0, name: 'All' };
 const BUSINNESS_DATA_HALLMARK_VALUE = { id: 0, name: 'Hallmark' };
@@ -67,6 +71,8 @@ interface SecurityStateModel {
   copyRoleData: Role[];
   organizations: Organisation[];
   timeZones: TimeZoneModel[] | null;
+  orgInterfacePage: OrgInterfacePage | null;
+  logInterfacePage: LogInterfacePage | null;
 }
 
 @State<SecurityStateModel>({
@@ -84,6 +90,8 @@ interface SecurityStateModel {
     copyRoleData: [],
     organizations: [],
     timeZones: [],
+    orgInterfacePage: null,
+    logInterfacePage: null,
   },
 })
 @Injectable()
@@ -135,6 +143,26 @@ export class SecurityState {
   @Selector()
   static copyRoleData(state: SecurityStateModel): Role[] {
     return state.copyRoleData;
+  }
+
+  @Selector()
+  static orgInterfaceGridData(state: SecurityStateModel): OrgInterface[] {
+    return state.orgInterfacePage?.items || [];
+  }
+
+  @Selector()
+  static orgInterfacePage(state: SecurityStateModel): OrgInterfacePage | null {
+    return state.orgInterfacePage;
+  }
+
+  @Selector()
+  static logInterfaceGridData(state: SecurityStateModel): LogInterface[] {
+    return state.logInterfacePage?.items || [];
+  }
+
+  @Selector()
+  static logInterfacePage(state: SecurityStateModel): LogInterfacePage | null {
+    return state.logInterfacePage;
   }
 
   static getPermissionsForCopyById(id: number) {
@@ -198,7 +226,8 @@ export class SecurityState {
     private businessUnitService: BusinessUnitService,
     private roleService: RolesService,
     private userService: UsersService,
-    private nodatimeService: NodatimeService
+    private nodatimeService: NodatimeService,  
+    private orgInterfaceService: OrgInterfaceService
   ) {}
 
   @Action(GetBusinessByUnitType)
@@ -536,5 +565,42 @@ export class SecurityState {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }),
     );
+  }
+
+
+  @Action(GetOrgInterfacePage)
+  GetOrgInterfacePage(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { organizationId,  pageNumber, pageSize }: GetOrgInterfacePage
+  ): Observable<OrgInterfacePage | void> {
+    return this.orgInterfaceService
+      .getOrgInterfacePage(organizationId, pageNumber, pageSize)
+      .pipe(
+        tap((payload) => {
+          patchState({ orgInterfacePage: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
+  }
+
+  @Action(GetLogInterfacePage)
+  GetLogInterfacePage(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { organizationId,  pageNumber, pageSize }: GetLogInterfacePage
+  ): Observable<LogInterfacePage | void> {
+    return this.orgInterfaceService
+      .getLogInterfacePage(organizationId, pageNumber, pageSize)
+      .pipe(
+        tap((payload) => {
+          patchState({ logInterfacePage: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
   }
 }

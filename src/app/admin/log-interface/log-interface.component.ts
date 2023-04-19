@@ -10,26 +10,24 @@ import { ButtonRendererComponent } from '@shared/components/button/button-render
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { GRID_CONFIG } from '@shared/constants';
-import { GetOrgInterfacePage } from 'src/app/security/store/security.actions';
+import { GetLogInterfacePage } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
-import { OrgInterface, OrgInterfacePage } from '@shared/models/org-interface.model';
-import { ToggleSwitchComponent } from '@admin/alerts/toggle-switch/toggle-switch.component';
+import { LogInterface, LogInterfacePage } from '@shared/models/org-interface.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
 
 @Component({
-  selector: 'app-org-interface',
-  templateUrl: './org-interface.component.html',
-  styleUrls: ['./org-interface.component.scss'],
+  selector: 'app-log-interface',
+  templateUrl: './log-interface.component.html',
+  styleUrls: ['./log-interface.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent implements OnInit {
+export class LogInterfaceComponent extends AbstractGridConfigurationComponent implements OnInit {
 
+  @Select(SecurityState.logInterfaceGridData)
+  private _logInterfaceData$: Observable<LogInterface[]>;
 
-  @Select(SecurityState.orgInterfaceGridData)
-  private _orgInterfaceData$: Observable<OrgInterface[]>;
-
-  @Select(SecurityState.orgInterfacePage)
-  public orgInterfacePage$: Observable<OrgInterfacePage>;
+  @Select(SecurityState.logInterfacePage)
+  public logInterfacePage$: Observable<LogInterfacePage>;
 
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
@@ -51,7 +49,7 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
   paginationPageSize: number;
   maxBlocksInCache: any;
   sideBar = SideBarConfig;
-  itemList: Array<OrgInterface> | undefined;
+  itemList: Array<LogInterface> | undefined;
 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
@@ -62,7 +60,7 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
 
   constructor(private store: Store,) {
     super();
-    this.store.dispatch(new SetHeaderState({ title: 'Organization Interfaces', iconName: 'file-text' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Interface Log Summary', iconName: 'file-text' }));
     var self = this;
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
@@ -92,189 +90,89 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
         filter: false,
       },
       {
-        headerName: 'Organization Name',
+        headerName: 'configurationId',
+        field: 'configurationId',
+        minWidth: 250,
+  //      hide: true,
+        filter: false,
+      },
+      {
+        headerName: 'organizationId',
         field: 'organizationId',
+        minWidth: 250,
         hide: true,
         filter: false,
       },
       {
-        headerName: 'Name',
-        field: 'etlprocessName',
+        headerName: 'runId',
+        field: 'runId',
         minWidth: 250,
         filter: 'agTextColumnFilter',
       },
       {
-        headerName: 'Description',
-        field: 'description',
+        headerName: 'Input File Name',
+        field: 'originalFileName',
         minWidth: 250,
         filter: 'agTextColumnFilter',
       },
       {
-        headerName: 'File Name Pattern',
-        field: 'fileNamePattern',
-        minWidth: 200,
+        headerName: 'Processed Date',
+        field: 'processDate',
+        minWidth: 175,
+        filter: 'agTextColumnFilter',
+        cellRenderer: (params:any) => {
+          return params.data.processDate ? (new Date(params.data.processDate)).toLocaleDateString() : '';
+        }
+      },
+      {
+        headerName: 'status',
+        field: 'status',
+        minWidth: 250,
         filter: 'agTextColumnFilter',
       },
       {
-        headerName: 'File Type',
-        field: 'fileExtension',
-        minWidth: 150,
-        filter: 'agTextColumnFilter',
-      },
-      {
-        headerName: 'Has Header',
-        field: 'hasHeader',
-        cellRenderer: ToggleSwitchComponent,
-        cellRendererParams: {
-          label: 'hasHeader'
-        },
-        valueGetter: (params: { data: { hasHeader: boolean } }) => { 
-          return params.data.hasHeader 
-        },
-        suppressMovable: true,
-        minWidth: 150,
-        filter: 'agSetColumnFilter',
-        sortable: false,
-      },
-      {
-        headerName: 'Column Delimiter',
-        field: 'ColumnDelimiter',
-        width: 50,
+        headerName: 'Total Count',
+        field: 'totalRows',
+        minWidth: 175,
         filter: false,
         sortable: false,
       },
       {
-        headerName: 'Import All Files In the Folder',
-        field: 'importAllFilesIntheFolder',
-        cellRenderer: ToggleSwitchComponent,
-        cellRendererParams: {
-          label: 'importAllFilesIntheFolder'
-        },
-        valueGetter: (params: { data: { importAllFilesIntheFolder: boolean } }) => { 
-          return params.data.importAllFilesIntheFolder 
-        },
-        suppressMovable: true,
-        minWidth: 250,
+        headerName: 'Created Records',
+        field: 'insertedRecord',
+        minWidth: 175,
+        filter: false,
+      },
+      {
+        headerName: 'Updated Records',
+        field: 'updatedRecord',
+        minWidth: 175,
         filter: false,
         sortable: false,
       },
       {
-        headerName: 'Process Same File Again',
-        field: 'processSameFileAgain',
-        cellRenderer: ToggleSwitchComponent,
-        cellRendererParams: {
-          label: 'processSameFileAgain'
-        },
-        valueGetter: (params: { data: { processSameFileAgain: boolean } }) => { 
-          return params.data.processSameFileAgain 
-        },
-        suppressMovable: true,
-        minWidth: 200,
+        headerName: 'Error Records',
+        field: 'failedRecord',
+        minWidth: 175,
         filter: false,
         sortable: false,
+        cellStyle: params => {
+          return {color: 'red'};
+        }
       },
       {
-        headerName: 'Folder',
-        field: 'inputFileFolder',
-        minWidth: 100,
-        filter: false,
-      },
-      {
-        headerName: 'Email Notification',
-        field: 'emailNotification',
-        cellRenderer: ToggleSwitchComponent,
-        cellRendererParams: {
-          label: 'emailNotification'
-        },
-        valueGetter: (params: { data: { emailNotification: boolean } }) => { 
-          return params.data.emailNotification 
-        },
-        suppressMovable: true,
-        minWidth: 200,
+        headerName: 'Skipped Records',
+        field: 'skippedRecord',
+        minWidth: 175,
         filter: false,
         sortable: false,
-      },
-      {
-        headerName: 'Subject',
-        field: 'sendMailSubject',
-        minWidth: 300,
-        filter: false,
-        sortable: false,
-      },
-      {
-        headerName: 'Success To',
-        field: 'emailRecipientsSuccess',
-        minWidth: 300,
-        filter: false,
-        sortable: false,
-      },
-      {
-        headerName: 'Success CC',
-        field: 'emailRecipientsCc',
-        minWidth: 300,
-        filter: false,
-        sortable: false,
-      },
-      {
-        headerName: 'Success BCC',
-        field: 'emailRecipientsBcc',
-        minWidth: 300,
-        filter: false,
-        sortable: false,
-      }, {
-        headerName: 'Failure To',
-        field: 'emailRecipientsError',
-        minWidth: 300,
-        filter: false,
-        sortable: false,
-      },
-     /* {
-        headerName: 'Technical To',
-        field: 'NotifyTo',
-        width: 100,
-        filter: false,
-        sortable: false,
-      },
-      {
-        headerName: 'Technical Cc',
-        field: 'EmailRecipientsCc',
-        width: 100,
-        filter: false,
-        sortable: false,
-      },
-      {
-        headerName: 'Technical Bcc',
-        field: 'EmailRecipientsBcc',
-        width: 100,
-        filter: false,
-        sortable: false,
-      },*/
-      {
-        headerName: 'Region Specific',
-        field: 'RegionSpecific',
-        minWidth: 250,
-        filter: false,
-        sortable: false,
-      },
-      {
-        headerName: 'Clean Import',
-        field: 'CleanImport',
-        minWidth: 250,
-        filter: false,
-        sortable: false,
-      },
-      {
-        headerName: 'Retention Period In Days',
-        field: 'RetentionPeriodInDays',
-        minWidth: 250,
-        filter: false,
-        sortable: false,
-      },
+      },    
     ];
    }
 
   ngOnInit(): void {
   }
+
 
   public onEdit(data: any): void {
     // this.editRoleEvent.emit(data.rowData);
@@ -283,6 +181,7 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
   onGridReady(params: any) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
+    params.api.showLoadingOverlay();
     var datasource = this.createServerSideDatasource();
      params.api.setServerSideDatasource(datasource);
   }
@@ -297,12 +196,11 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
             pageNumber: params.request.endRow / self.paginationPageSize,
             pageSize: self.paginationPageSize,
           };
-
           self.dispatchNewPage(postData);
-          self.orgInterfacePage$.pipe().subscribe((data: any) => {
+          self.logInterfacePage$.pipe().subscribe((data: any) => {
             self.itemList = data?.items;
             self.totalRecordsCount = data?.totalCount;
-
+            
             if (!self.itemList || !self.itemList.length) {
               self.gridApi.showNoRowsOverlay();
             } else {
@@ -316,7 +214,8 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
   }
   
   public dispatchNewPage(postData:any): void {
-    this.store.dispatch(new GetOrgInterfacePage(193,postData.currentPage,postData.pageSize));
+    console.log('lastSelectedOrganizationId ==>',localStorage.getItem('lastSelectedOrganizationId'));
+    this.store.dispatch(new GetLogInterfacePage(JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0'))  as number,postData.currentPage,postData.pageSize));
   }
 
   onPageSizeChanged(event: any) {
@@ -332,5 +231,6 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
        this.gridApi.setServerSideDatasource(datasource);
     }
   }
+
 
 }

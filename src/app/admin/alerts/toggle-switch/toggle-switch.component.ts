@@ -15,6 +15,7 @@ export class ToggleSwitchComponent implements ICellRendererAngularComp {
   private isEmailEnabled:string='isEmailEnabled';
   private isSMSEnabled:string='isSMSEnabled';
   private isOnScreenEnabled:string='isOnScreenEnabled';
+  public disableFlag:boolean =false;
   agInit(params: any): void {
     this.params = params;
     this.SetData();
@@ -29,6 +30,9 @@ export class ToggleSwitchComponent implements ICellRendererAngularComp {
     }
     else if (this.params.column.colId == this.isOnScreenEnabled) {
       this.toggleYesOrNo = this.params.data[this.isOnScreenEnabled];
+    }else{
+      this.disableFlag = true;
+      this.toggleYesOrNo = this.params.value;
     }
   }
   refresh(): boolean {

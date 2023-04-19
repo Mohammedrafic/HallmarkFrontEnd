@@ -20,6 +20,7 @@ import { MasterCredentialsComponent } from './master-data/master-credentials/mas
 import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
 import { CommitmentComponent } from './master-data/commitment/commitment.component';
 import { OrgInterfaceComponent } from './org-interface/org-interface.component';
+import { LogInterfaceComponent } from './log-interface/log-interface.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -57,6 +58,10 @@ const routes: Routes = [
       {
         path: 'orginterfaces',
         component : OrgInterfaceComponent
+      },
+      {
+        path: 'loginterfaces',
+        component : LogInterfaceComponent
       },
       {
         path: 'master-data',

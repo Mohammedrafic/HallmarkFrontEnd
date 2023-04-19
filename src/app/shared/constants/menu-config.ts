@@ -423,6 +423,16 @@ export const MENU_CONFIG: any = {
       // Scheduled Hours Report
       icon: '',
       route: '/analytics/scheduled-hours',
+    },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
     }
   },
 
@@ -630,6 +640,16 @@ export const MENU_CONFIG: any = {
       // Scheduled Hours Report
       icon: '',
       route: '/analytics/scheduled-hours',
+    },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
     }
   },
 
@@ -1018,6 +1038,16 @@ export const MENU_CONFIG: any = {
       // Scheduled Hours Report
       icon: '',
       route: '/analytics/scheduled-hours',
+    },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
     }
   },
 

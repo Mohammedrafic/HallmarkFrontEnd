@@ -68,6 +68,7 @@ import { MasterCommitmentState } from './store/commitment.state';
 import { OrientationService } from '@organization-management/orientation/services/orientation.service';
 import { OrgInterfaceComponent } from './org-interface/org-interface.component';
 import { AgGridModule } from '@ag-grid-community/angular';
+import { LogInterfaceComponent } from './log-interface/log-interface.component';
 
 const sidebarIcons = {
   Download,
@@ -103,7 +104,8 @@ const sidebarIcons = {
     OrganizationProfileComponent,
     CommitmentComponent,
     CommitmentGridActionRendererComponent,
-    OrgInterfaceComponent
+    OrgInterfaceComponent,
+    LogInterfaceComponent
   ],
   imports: [
     CommonModule,
