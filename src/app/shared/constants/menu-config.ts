@@ -1288,6 +1288,16 @@ export const MENU_CONFIG: any = {
       icon: 'file',
       route: '/documents/document-library',
     },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
+    },
     95: {
       // VMS Invoice Report Beta
       icon: '',
