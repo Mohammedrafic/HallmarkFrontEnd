@@ -276,7 +276,7 @@
                 appValidateWithMessage
                 selectAllText="Select All"
                 mode="CheckBox"
-                [dataSource]="commitmentsPage$ | async"
+                [dataSource]="(commitmentsPage$ | async)?.items"
                 [fields]="optionFields"
                 [showSelectAll]="true"
                 [allowFiltering]="true"
