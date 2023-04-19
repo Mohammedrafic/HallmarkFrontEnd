@@ -33,6 +33,7 @@ import { TimepickerModule } from '@shared/components/form-controls/timepicker/ti
 import { PayRateHistoryComponent } from './components/pay-rate-history/pay-rate-history.component';
 import { PayRateHistoryDialogComponent } from './components/pay-rate-history-dialog/pay-rate-history-dialog.component';
 import { PayRateService } from './services/pay-rate.service';
+import { PayRateApiService } from './services/pay-rate-api.service';
 
 @NgModule({
   declarations: [
@@ -68,6 +69,7 @@ import { PayRateService } from './services/pay-rate.service';
     CandidateWorkCommitmentService,
     AvailabilityApiService,
     AvailabilityService,
+    PayRateApiService,
     PayRateService,
   ],
 })
