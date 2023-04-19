@@ -316,7 +316,7 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
   }
   
   public dispatchNewPage(postData:any): void {
-    this.store.dispatch(new GetOrgInterfacePage(193,postData.currentPage,postData.pageSize));
+    this.store.dispatch(new GetOrgInterfacePage(JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0'))  as number,postData.currentPage,postData.pageSize));
   }
 
   onPageSizeChanged(event: any) {

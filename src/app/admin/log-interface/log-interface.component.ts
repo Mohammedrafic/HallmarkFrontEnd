@@ -214,7 +214,6 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   }
   
   public dispatchNewPage(postData:any): void {
-    console.log('lastSelectedOrganizationId ==>',localStorage.getItem('lastSelectedOrganizationId'));
     this.store.dispatch(new GetLogInterfacePage(JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0'))  as number,postData.currentPage,postData.pageSize));
   }
 
