@@ -743,7 +743,8 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         console.log(departmentIds);
         this.store.dispatch(new GetSkillsbyDepartment(departmentIds));
         this.skillbydepartment$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
-          console.log(skills);
+          this.skills = skills;
+          this.PayRatesFormGroup.controls['skillIds'].setValue(this.skills);
         });
     
     
