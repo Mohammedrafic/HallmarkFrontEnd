@@ -1,0 +1,27 @@
+<app-grid
+  [gridTitle]="gridTitle"
+  [rowData]="payRateHistory"
+  [columnDefinitions]="columnDef"
+  [totalRecordsCount]="pagingData.totalCount"
+  [pageSize]="pagingData.pageSize"
+  [currentPage]="pagingData.pageNumber"
+  [customRowsPerPageDropDownObject]="customRowsPerPageDropDownObject"
+  [disableRowsPerPageDropdown]="true"
+  (navigateToPageEmitter)="handleChangePage($event)">
+
+  <button 
+    action-button
+    class="add-action"
+    cssClass="e-action-button"
+    ejs-button (click)="addPayRate()"
+    
+  >
+    <i-feather name="plus" class="icon"></i-feather>
+    Add Pay rate
+  </button>
+</app-grid>
+
+<app-pay-rate-history-dialog
+  [dialogSubject$]="dialogSubject$"
+  [formGroup]="formGroup"
+></app-pay-rate-history-dialog>
