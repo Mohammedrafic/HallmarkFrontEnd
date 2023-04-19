@@ -232,7 +232,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       if(ssnValue!= '' && ssnValue!= null && ssnValue.indexOf('XXX-XX') == -1){
         this.maskedFilterSSN = ssnValue;
       }
-    });
+    });       
     this.doNotReturnFormGroup.get('candidateProfileId')?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((CandidateProfileId: any) => {
       if(CandidateProfileId!= '' && CandidateProfileId!= null ){
         if(this.CandidateNames.length > 0){
@@ -489,7 +489,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     if (this.selectedOrganization.id) {
        this.loadRegionsAndLocations(this.selectedOrganization.id);
     }
-    this.doNotReturnFormGroup.get(FormControlNames.RegionIds)?.setValue([]);
+    this.doNotReturnFormGroup.reset();
+    this.doNotReturnFormGroup.get(FormControlNames.BusinessUnitId)?.setValue(this.selectedOrganization.id);
   }
 
   @OutsideZone

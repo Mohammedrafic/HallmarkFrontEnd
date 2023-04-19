@@ -84,7 +84,7 @@
     <div class="input-container bootstrap" [hidden]="allOrganizations.length == 1">
       <label>Organization<span class="required">*</span></label>
       <div class="input-group">
-        <ejs-dropdownlist appValidateWithMessage formControlName="businessUnitId" [fields]="optionFields"
+        <ejs-dropdownlist appValidateWithMessage [readonly]="isEdit" formControlName="businessUnitId" [fields]="optionFields"
           [allowFiltering]="true" [dataSource]="allOrganizations$ | async"
           (select)="onOrganizationDropDownChanged($event)">
         </ejs-dropdownlist>
