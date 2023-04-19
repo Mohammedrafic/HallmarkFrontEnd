@@ -44,6 +44,7 @@
     text-align: right;
     width: -webkit-fill-available;
     width: -moz-available;
+    width : 10%;
 }
 .orgname {
     text-align: left;
@@ -52,9 +53,14 @@
     cursor: pointer;
     font-size: 13px;
     width: max-content;
+    width: 90%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 .widget__type {
     display: flex;
+    width: 100%;
 }
 .widget{
     padding: 10px 0px 0px 0px !important;
@@ -64,4 +70,8 @@
 }
 .app-widget-wrapper__header{
     padding-bottom: 5px;
+}
+ejs-tooltip {
+  display: flex;
+    width: 100%;
 }

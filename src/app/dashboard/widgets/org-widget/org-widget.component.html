@@ -48,8 +48,10 @@
       </span>
       <span class="widget__type" *ngFor="let missingdata of chartData?.missingTimeSheet"
         (mousedown)="defineMousePosition($event)" (click)="toTimesheetcontent(missingdata.organizationId)">
-        <p class="orgname">Timesheet missing - {{missingdata?.organizationName}}</p>
-        <p class="orgcount">{{missingdata?.count}}</p>
+        <ejs-tooltip [content]="missingdata?.organizationName" position="TopCenter">
+          <p class="orgname">Timesheet missing - {{missingdata?.organizationName}}</p>
+          <p class="orgcount">{{missingdata?.count}}</p>
+        </ejs-tooltip>
       </span>
     </div>
   </ng-template>
