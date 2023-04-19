@@ -66,6 +66,9 @@ import { GridModule as AppGridModule } from '@shared/components/grid/grid.module
 import { CommitmentGridActionRendererComponent } from './master-data/commitment/grid-action-renderer/grid-action-renderer.component';
 import { MasterCommitmentState } from './store/commitment.state';
 import { OrientationService } from '@organization-management/orientation/services/orientation.service';
+import { OrgInterfaceComponent } from './org-interface/org-interface.component';
+import { AgGridModule } from '@ag-grid-community/angular';
+import { LogInterfaceComponent } from './log-interface/log-interface.component';
 
 const sidebarIcons = {
   Download,
@@ -100,7 +103,9 @@ const sidebarIcons = {
     ManualInvoiceReasonsComponent,
     OrganizationProfileComponent,
     CommitmentComponent,
-    CommitmentGridActionRendererComponent
+    CommitmentGridActionRendererComponent,
+    OrgInterfaceComponent,
+    LogInterfaceComponent
   ],
   imports: [
     CommonModule,
@@ -135,6 +140,7 @@ const sidebarIcons = {
     TooltipContainerModule,
     CredentialListModule,
     AppGridModule,
+    AgGridModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     //STORE
