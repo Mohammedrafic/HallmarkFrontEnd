@@ -25,9 +25,11 @@ import { filter } from 'rxjs/operators';
 import { DatesRangeType, WeekDays } from '@shared/enums';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
+import { PreservedFiltersByPage } from '@core/interface';
+import { FilterPageName } from '@core/enums';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { CreateScheduleService, ScheduleApiService } from '../../services';
+import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { UserState } from '../../../../store/user.state';
 import { ScheduleGridAdapter } from '../../adapters';
 import { DatesPeriods, MonthPeriod, PermissionRequired } from '../../constants';
@@ -44,6 +46,8 @@ import { ScheduleGridService } from './schedule-grid.service';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
+import { GetPreservedFiltersByPage } from 'src/app/store/preserved-filters.actions';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -54,6 +58,9 @@ import { ScheduleItemsService } from '../../services/schedule-items.service';
 export class ScheduleGridComponent extends Destroyable implements OnInit, OnChanges {
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
+
+  @Select(PreservedFiltersState.preservedFiltersByPageName)
+  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<ScheduleInt.ScheduleFilters>>;
 
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
   @ViewChild('autoCompleteSearch') autoCompleteSearch: AutoCompleteComponent;
@@ -120,6 +127,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     private createScheduleService: CreateScheduleService,
     private scheduleGridService: ScheduleGridService,
     private scheduleItemsService: ScheduleItemsService,
+    private scheduleFiltersService: ScheduleFiltersService,
   ) {
     super();
   }
@@ -241,7 +249,14 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         }
       }),
       switchMap((businessUnitId: number) => {
-        return this.store.dispatch(new GetOrganizationById(businessUnitId));
+        return this.store.dispatch([
+          new GetOrganizationById(businessUnitId),
+          new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
+        ]);
+      }),
+      switchMap(() => this.preservedFiltersByPageName$),
+      tap((filters) => {
+        this.setPreservedFiltersDataSource(filters);
       }),
       switchMap(() => {
         this.checkOrgPreferences();
@@ -362,6 +377,12 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         .subscribe((page: ScheduleCandidatesPage) => {
           this.autoSelectCandidate(page.items[0]);
         });
+    }
+  }
+
+  private setPreservedFiltersDataSource(filters: PreservedFiltersByPage<ScheduleInt.ScheduleFilters>): void {
+    if (!filters.isNotPreserved && filters.dispatch) {
+      this.scheduleFiltersService.setPreservedFiltersDataStream({ ...filters.state });
     }
   }
 }
