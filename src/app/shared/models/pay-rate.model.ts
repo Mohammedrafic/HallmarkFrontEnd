@@ -77,7 +77,7 @@ export class PayRateFilters {
   departmentIds?: number[];
   skillIds?: number[];
   orderTypes?: number[];
-  payRateConfigIds?: string[];
+  payRateConfigId?: string[];
   payRatesCategory?: string[];
   payTypes?: string[];
   effectiveDate?: string | null;

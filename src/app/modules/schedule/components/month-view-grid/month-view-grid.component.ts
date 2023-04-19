@@ -24,9 +24,10 @@ export class MonthViewGridComponent {
   @Input() selectedFilters: ScheduleInt.ScheduleFilters;
   @Input() selectedCandidatesSlot: Map<number, ScheduleInt.ScheduleDateSlot>;
 
-  @Input() set datesRange(range: string[]) {
+  @Input() set datesRange(range: ScheduleInt.DateRangeOption[]) {
     const selectedMonth = this.monthPickerService.getSelectedMonth();
-    this.dateList = GetGroupedDatesByWeekday(range, selectedMonth);
+    const ranges: string[] = range.map((option) => option.dateText);
+    this.dateList = GetGroupedDatesByWeekday(ranges, selectedMonth);
 
     this.cdr.markForCheck();
   }

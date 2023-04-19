@@ -43,6 +43,8 @@
 .orgcount {
     text-align: right;
     width: -webkit-fill-available;
+    width: -moz-available;
+    width : 10%;
 }
 .orgname {
     text-align: left;
@@ -51,6 +53,10 @@
     cursor: pointer;
     font-size: 13px;
     width: max-content;
+    width: 90%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 .widget__type {
     display: flex;

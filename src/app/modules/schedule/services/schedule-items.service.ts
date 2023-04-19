@@ -107,6 +107,13 @@ export class ScheduleItemsService {
       );
   }
 
+  createRangeOptions(range: string[]): ScheduleInt.DateRangeOption[] {
+    return range.map((option, index) => ({
+      dateText: option,
+      noBorder: index === 0 || index === range.length - 1,
+    }));
+  }
+
   private getScheduleDateItem(daySchedule: ScheduleInt.ScheduleItem, dateString: string): DateItem {
     const date = new Date(dateString);
 

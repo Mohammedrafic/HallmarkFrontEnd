@@ -1,29 +1,41 @@
-import { Directive, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, Input, OnChanges, Renderer2 } from '@angular/core';
 
-import { WeekDays } from '@shared/enums';
+import { DatesRangeType } from '@shared/enums';
 
 @Directive({
   selector: '[weeksEnd]',
 })
-export class WeeksEndDirective implements OnInit {
+export class WeeksEndDirective implements OnChanges {
   @Input() date: string;
-  @Input() day: WeekDays;
+  @Input() weekStartDay: number;
+  @Input() selectedPeriod: DatesRangeType;
+  @Input() noBorder = true;
 
-  constructor(private element: ElementRef,
-              private renderer: Renderer2) {}
+  constructor(
+    private element: ElementRef,
+    private renderer: Renderer2,
+  ) {}
 
-  ngOnInit(): void {
-    const saturday = 6;
-    const sunday = 0;
-    const dayIndex = new Date(`${this.date}T00:00:00`).getDay();
+  ngOnChanges(): void {
+    if (this.date && this.selectedPeriod === DatesRangeType.TwoWeeks && !this.noBorder) {
+      const dayIndex = new Date(`${this.date}T00:00:00`).getDay();
+      
+      this.setBorderStyle(dayIndex);
+    }
 
-    if (this.day && this.day === WeekDays.Sat || dayIndex === saturday) {
-      this.addRightBorder();
+    if (this.noBorder) {
+      this.renderer.removeStyle(this.element.nativeElement, 'border-right');
+    }
+  }
+
+  private setBorderStyle(dayIndex: number): void {
+    if (dayIndex === this.weekStartDay) {
+      this.addLeftBorder();
       return;
     }
 
-    if (this.day && this.day === WeekDays.Sun || dayIndex === sunday) {
-      this.addLeftBorder();
+    if (dayIndex === this.weekStartDay - 1) {
+      this.addRightBorder();
       return;
     }
   }

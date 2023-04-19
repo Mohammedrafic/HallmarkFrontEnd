@@ -137,38 +137,6 @@ const bookingToggleForm: ScheduleInt.ScheduleFormFieldConfig[] = [
 const bookFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
   ...availabilityFormFields,
   ...bookingToggleForm,
-  {
-    field: 'regionId',
-    title: 'Region',
-    type: FieldType.Dropdown,
-    gridAreaName: 'region',
-    required: false,
-    sourceKey: ScheduleFormSourceKeys.Regions,
-  },
-  {
-    field: 'locationId',
-    title: 'Location',
-    type: FieldType.Dropdown,
-    gridAreaName: 'location',
-    required: false,
-    sourceKey: ScheduleFormSourceKeys.Locations,
-  },
-  {
-    field: 'departmentId',
-    title: 'Department',
-    type: FieldType.Dropdown,
-    gridAreaName: 'department',
-    required: false,
-    sourceKey: ScheduleFormSourceKeys.Departments,
-  },
-  {
-    field: 'skillId',
-    title: 'Skill',
-    type: FieldType.Dropdown,
-    gridAreaName: 'skill',
-    required: false,
-    sourceKey: ScheduleFormSourceKeys.Skills,
-  },
 ];
 
 export const AvailabilityFormConfig: ScheduleInt.ScheduleFormConfig = {

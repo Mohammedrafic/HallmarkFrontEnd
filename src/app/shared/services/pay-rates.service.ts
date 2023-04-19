@@ -35,4 +35,8 @@ export class PayRateService {
   public getPayRatesImportTemplate(errorRecords: ImportedPayRate[]): Observable<any> {
     return this.http.post('/api/PayRates/template', errorRecords, { responseType: 'blob' });
   }
+
+  public getskillsbyDepartment(id: number[]): Observable<any> {
+    return this.http.post('/api/PayRates/skillsByDepartment', {departmentIds : id});
+  }
 }

@@ -7,9 +7,11 @@ import { map, take } from 'rxjs/operators';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { Permission } from '@core/interface';
+import { OrganizationStructure } from '@shared/models/organization.model';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from '../../../../store/app.actions';
 import { ScheduleGridAdapter } from '../../adapters';
@@ -17,16 +19,10 @@ import { FilterErrorMessage, TabListConfig } from '../../constants';
 import { ActiveTabIndex } from '../../enums';
 import * as ScheduleInt from '../../interface';
 import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
-import {
-  ScheduleCandidate,
-  ScheduleDateItem,
-  ScheduledItem,
-  ScheduleModel,
-  SelectedCells,
-  SideBarSettings,
-} from '../../interface';
+import { ScheduledItem, SelectedCells, SideBarSettings } from '../../interface';
 import { GetScheduleFilterByEmployees, HasNotMandatoryFilters, HasMultipleFilters, GetScheduledShift } from '../../helpers';
 import { DateTimeHelper } from '@core/helpers';
+import { ResetPageFilters } from 'src/app/store/preserved-filters.actions';
 
 @Component({
   selector: 'app-schedule-container',
@@ -90,6 +86,11 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.watchForCloseSideBarAction();
   }
 
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.store.dispatch(new ResetPageFilters());
+  }
+
   changeTab(tabIndex: ActiveTabIndex): void {
     this.activeTabIndex = tabIndex;
   }
@@ -100,7 +101,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.initScheduleData(true);
   }
 
-  changeFilters(filters: ScheduleInt.ScheduleFilters): void {
+  changeFilters(filters: ScheduleInt.ScheduleFilters, skipDataUpdate = false): void {
     //TODO: make filters as plain arrays number;
     this.scheduleFilters = {
       ...this.scheduleFilters,
@@ -109,7 +110,9 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       pageSize: 30,
     };
 
-    this.updateScheduleGrid();
+    if (!skipDataUpdate) {
+      this.updateScheduleGrid();
+    }
   }
 
   updateScheduleGrid(resetCells = true): void {
@@ -165,15 +168,22 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   updateScheduleFilter(data: ScheduleInt.ScheduleFiltersData): void {
     this.scheduleFiltersService.setScheduleFiltersData(data);
     this.chipsData = data.chipsData;
-    this.changeFilters(data.filters);
+    this.changeFilters(data.filters, data.skipDataUpdate);
     this.appliedFiltersAmount = data.filteredItems?.length;
   }
 
   selectCandidate(selectedCandidate: ScheduleInt.ScheduleCandidate | null): void {
     this.selectedCandidate = selectedCandidate;
-    if (!selectedCandidate) {
+
+    if (selectedCandidate) {
+      this.getEmployeeOrganizationStructure(selectedCandidate.id);
+    } else {
+      this.store.dispatch(new GetOrganizationStructure());
       this.scheduleFilters.firstLastNameOrId = '';
+      this.scheduleFilters.regionIds = [];
+      this.scheduleFilters.locationIds = [];
     }
+
     this.detectWhatDataNeeds();
   }
 
@@ -318,5 +328,13 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       isOpen,
       isEditMode,
     };
+  }
+
+  private getEmployeeOrganizationStructure(employeeId: number): void {
+    this.scheduleApiService.getEmployeesStructure(employeeId)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((employeeOrganizationStructure: OrganizationStructure) => {
+        this.scheduleFiltersService.setEmployeeOrganizationStructure(employeeOrganizationStructure);
+      });
   }
 }

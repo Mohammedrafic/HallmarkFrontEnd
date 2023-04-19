@@ -1,3 +1,4 @@
+import { FieldType } from '@core/enums';
 import { DropdownOption } from '@core/interface';
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -5,8 +6,20 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from
 import { PageOfCollections } from '@shared/models/page.model';
 import { ValueType } from '@syncfusion/ej2-angular-grids';
 import { ChipItem } from '@shared/components/inline-chips';
+import { ScheduleFilterFormSourceKeys } from '../constants';
 import { ScheduleOrderType, ScheduleType } from '../enums';
 import { IrpOrderType } from '@shared/enums/order-type';
+
+export interface ScheduleDay {
+  id: number;
+  type: IrpOrderType | null;
+  department: string | null;
+  location: string | null;
+  endTime: string;
+  shiftDate: string;
+  startTime: string;
+  scheduleType: ScheduleType
+}
 
 export interface ScheduleCandidate {
   id: number;
@@ -21,6 +34,7 @@ export interface ScheduleCandidate {
   orderType: IrpOrderType | null;
   workCommitments: string[] | null;
   workCommitment: string;
+  days: ScheduleDay[];
   employeeNote: string;
   workHours?: number;
   isOriented: boolean;
@@ -43,6 +57,7 @@ export interface ScheduleItem {
   endDate: string;
   scheduleType: ScheduleType;
   orderId: number;
+  employeeId: number;
   scheduleOrderType: ScheduleOrderType;
   location: string;
   department: string;
@@ -152,16 +167,30 @@ export interface ScheduleFilters {
 }
 
 export interface ScheduleFiltersConfig {
-  regionIds: ScheduleFilterItem;
-  locationIds: ScheduleFilterItem;
-  departmentsIds: ScheduleFilterItem;
-  skillIds: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.Regions]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.Locations]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.Departments]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.Skills]: ScheduleFilterItem;
+}
+
+export interface ScheduleFilterFormFieldConfig {
+  field: string;
+  title: string;
+  type: FieldType;
+  required: boolean;
+  sourceKey: ScheduleFilterFormSourceKeys;
+}
+
+export interface ScheduleFilterFormConfig {
+  formClass: string;
+  formFields: ScheduleFilterFormFieldConfig[];
 }
 
 export interface ScheduleFiltersData {
   filters: ScheduleFilters;
   filteredItems: FilteredItem[];
   chipsData: ChipItem[],
+  skipDataUpdate?: boolean;
 }
 
 export interface ScheduleFilterStructure {
@@ -203,7 +232,7 @@ export interface ShiftDropDownsData {
 }
 
 export interface DeleteScheduleRequest {
-  id: number;
+  ids: number[];
   createOrder: boolean;
   startDateTime?: string;
   endDateTime?: string;
@@ -222,4 +251,10 @@ export interface SelectedCells {
 export interface RemovedSlot {
   date: string | null;
   candidate: ScheduleCandidate;
+}
+
+
+export interface DateRangeOption {
+  dateText: string;
+  noBorder: boolean;
 }
