@@ -73,7 +73,7 @@
                               [isLoading]="isLoading"
                               [description]="isAgencyUser ? widgetDescriptionEnum.AGENCY_DESCRIPTION : widgetDescriptionEnum.ORG"
                               [isDarkTheme]="isDarkTheme"></app-org-widget>
-          <app-agencyposition-widget *ngSwitchCase="widgetTypeEnum.AGENCY_POSITION_COUNT && isAgencyUser"
+          <app-agencyposition-widget *ngSwitchCase="isAgencyUser ? widgetTypeEnum.AGENCY_POSITION_COUNT : -1"
                               [chartData]="widgetsData?.[widgetTypeEnum.AGENCY_POSITION_COUNT]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.AGENCY_POSITION_COUNT"
