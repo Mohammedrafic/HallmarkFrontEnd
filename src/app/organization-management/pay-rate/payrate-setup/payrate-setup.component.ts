@@ -59,7 +59,6 @@ import { MasterCommitmentState } from '@admin/store/commitment.state';
 import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 import { GetCommitmentByPage } from '@admin/store/commitment.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { Console } from 'console';
 
 @TakeUntilDestroy
 @Component({
@@ -343,11 +342,15 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       if (departmentIds && departmentIds.length > 0) {
         this.store.dispatch(new GetSkillsbyDepartment(departmentIds));
         this.skillbydepartment$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
-          this.skills = skills;
-          this.PayRatesFormGroup.controls['skillIds'].setValue(this.skills);
+          if(skills && skills.length > 0){
+            this.filterColumns.skillIds.dataSource = sortByField(skills, "name");
+          } else {
+            this.filterColumns.skillIds.dataSource = [];
+            this.payRateFilterFormGroup.get("skillIds")?.setValue(null);
+          }
+          this.cd.markForCheck();
         });
       }
-      this.cd.markForCheck();
     });
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUpdatePayRateSucceed)).subscribe(() => {
@@ -431,13 +434,19 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     if (this.allDepartmentsSelected) {
       departmentsControl.setValue(null);
       departmentsControl.disable();
+      this.deptId = [];
       for(let i=0; i<this.departments.length; i++){
         this.deptId.push(this.departments[i].id);
       }
       this.store.dispatch(new GetSkillsbyDepartment(this.deptId));
       this.skillbydepartment$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
-        this.skills = skills;
-        this.PayRatesFormGroup.controls['skillIds'].setValue(this.skills);
+        if(skills && skills.length > 0){
+          this.skills = sortByField(skills, "name");
+        } else {
+          this.skills = [];
+          this.PayRatesFormGroup.get("skillIds")?.setValue(null);
+        }
+        this.cd.markForCheck();
       });
 
     } else {
@@ -743,13 +752,18 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       .get('departmentIds')
       ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
       .subscribe((departmentIds: number[]) => {
-        this.store.dispatch(new GetSkillsbyDepartment(departmentIds));
-        this.skillbydepartment$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
-          this.skills = skills;
-          this.PayRatesFormGroup.controls['skillIds'].setValue(this.skills);
-        });
-  
-        this.cd.markForCheck();
+        if(departmentIds && departmentIds.length > 0){
+          this.store.dispatch(new GetSkillsbyDepartment(departmentIds));
+          this.skillbydepartment$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
+            if(skills && skills.length > 0){
+              this.skills = sortByField(skills, "name");
+            } else {
+              this.skills = [];
+              this.PayRatesFormGroup.get("skillIds")?.setValue(null);
+            }
+            this.cd.markForCheck();
+          });  
+        }
       });
   }
 
