@@ -43,11 +43,11 @@ export class UpcomingExpCredsComponent {
 
     var type;
     if(name == "Licenses"){
-      type = 1;
-    } else if(name == "Certificates"){
-      type = 2;
-    } else {
       type = 3;
+    } else if(name == "Certificates"){
+      type = 1;
+    } else {
+      type = 2;
     }
 
     this.dashboardService.redirect_to_credentials("/client/candidates",startDate, endDate, type);
