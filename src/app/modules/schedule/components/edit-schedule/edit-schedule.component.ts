@@ -62,6 +62,7 @@ import { BookingsOverlapsRequest, BookingsOverlapsResponse } from '../replacemen
 import {
   EditScheduleFormSourceKeys,
   EditScheduleSourcesMap,
+  NewShiftFormConfig,
   RemoveButtonTitleMap,
   ScheduledAvailabilityFormConfig,
   ScheduledShiftFormConfig,
@@ -98,7 +99,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   readonly scheduleTypesControl: FormControl = new FormControl(ScheduleItemType.Book);
 
   scheduleForm: CustomFormGroup<EditSchedule.ScheduledShiftForm>;
-  scheduleFormConfig: EditSchedule.EditScheduleFormConfig = ScheduledShiftFormConfig(false, false);
+  scheduleFormConfig: EditSchedule.EditScheduleFormConfig = ScheduledShiftFormConfig();
   scheduleTypes: ReadonlyArray<ScheduleTypeRadioButton> = ScheduleTypes;
   shiftTabs: EditSchedule.ShiftTab[] = [];
   scheduledItem: ScheduledItem;
@@ -113,8 +114,6 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private readonly customShiftId = -1;
   private readonly newScheduleId = -1;
-  private filtered = false;
-  private filteredSkillId: number | null;
   private scheduleShifts: ScheduleShift[] = [];
   private scheduleFilterStructure: ScheduleFilterStructure;
   private hasInitData = false;
@@ -208,14 +207,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.scheduleItemType = type;
 
     if (type === ScheduleItemType.Book) {
-      this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.isCreateMode);
-      this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
-      this.watchForRegionControls();
-
-      patchData.regionId = this.getRegionId();
-      patchData.locationId = this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations][0].value as number;
-      patchData.departmentId = this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments][0].value as number;
-      patchData.skillId = this.getSkillId();
+      this.scheduleFormConfig = NewShiftFormConfig();
+      this.scheduleForm = this.editScheduleService.createNewShiftForm();
+      this.watchForOrientatedControl();
     }
 
     if (type === ScheduleItemType.Unavailability) {
@@ -229,6 +223,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     this.watchForShiftControl();
+    this.watchForDateControl();
 
     patchData.date = DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date);
 
@@ -401,7 +396,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       this.scheduleForm?.patchValue({ skillId });
       this.cdr.markForCheck();
     }) || null;
+  }
 
+  private watchForOrientatedControl(): void {
     this.unsubscribe('orientated');
     this.subscriptions['orientated'] = this.scheduleForm.get('orientated')?.valueChanges.pipe(
       takeUntil(this.componentDestroy())
@@ -409,7 +406,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       this.createScheduleService.hideToggleControls(this.scheduleFormConfig as ScheduleFormConfig, !value);
       this.cdr.markForCheck();
     }) || null;
+  }
 
+  private watchForDateControl(): void {
     this.unsubscribe('date');
     this.subscriptions['date'] = this.scheduleForm.get('date')?.valueChanges.pipe(
       takeUntil(this.componentDestroy())
@@ -477,24 +476,20 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   private createBookFormForNewTab(): void {
     // TODO: temporary solution, will be refactored in the permission story
     if (this.store.selectSnapshot(UserState.user)?.isEmployee) {
+      this.scheduleItemType = ScheduleItemType.Unavailability;
       this.scheduleTypesControl.setValue(ScheduleItemType.Unavailability);
       this.changeScheduleType(ScheduleItemType.Unavailability);
       return;
     }
 
-    this.updateDataSource();
-    this.scheduleFormConfig = ScheduledShiftFormConfig(this.filtered, this.isCreateMode);
-    this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
-    this.watchForRegionControls();
+    this.scheduleItemType = ScheduleItemType.Book;
+    this.scheduleFormConfig = NewShiftFormConfig();
+    this.scheduleForm = this.editScheduleService.createNewShiftForm();
     this.watchForShiftControl();
+    this.watchForDateControl();
+    this.watchForOrientatedControl();
     this.scheduleTypesControl.setValue(ScheduleItemType.Book);
-    this.scheduleForm.patchValue({
-      regionId: this.getRegionId(),
-      locationId: this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations][0].value,
-      departmentId: this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments][0].value,
-      skillId: this.getSkillId(),
-      date: DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date),
-    });
+    this.scheduleForm.patchValue({ date: DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date) });
     this.cdr.markForCheck();
   }
 
@@ -509,7 +504,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.selectedDayScheduleIndex = scheduleIndex;
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Book) {
-      this.scheduleFormConfig = ScheduledShiftFormConfig(false, this.isCreateMode);
+      this.scheduleFormConfig = ScheduledShiftFormConfig();
       this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
       patchData.regionId = this.selectedDaySchedule.orderMetadata?.regionId;
       patchData.orientated = this.selectedDaySchedule.attributes.orientated;
@@ -518,6 +513,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       patchData.charge = this.selectedDaySchedule.attributes.charge;
       patchData.preceptor = this.selectedDaySchedule.attributes.preceptor;
       this.watchForRegionControls();
+      this.watchForOrientatedControl();
     }
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Unavailability) {
@@ -532,6 +528,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     this.watchForShiftControl();
+    this.watchForDateControl();
     patchData.date = DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date);
     patchData.shiftId = this.selectedDaySchedule.shiftId || this.customShiftId;
 
@@ -541,39 +538,6 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
     this.scheduleForm.patchValue(patchData);
     this.cdr.markForCheck();
-  }
-
-  private getRegionId(): number {
-    return this.filtered
-      ? this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Regions][0].value as number
-      : this.scheduleFilterStructure.regions[0].id as number;
-  }
-
-  private getSkillId(): number {
-    if (this.filtered && this.filteredSkillId) {
-      return this.filteredSkillId;
-    }
-
-    if (this.filtered && !this.filteredSkillId) {
-      return this.scheduledItem.candidate.skillId;
-    }
-
-    return this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills][0]?.value as number;
-  }
-
-  private updateDataSource(): void {
-    const dropDownsData = this.createScheduleService.getShiftDropDownsData(this.scheduleFilterStructure);
-
-    this.filtered = dropDownsData.filtered;
-    this.filteredSkillId = dropDownsData.selectedSkillId;
-
-    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Regions] = dropDownsData.regionsDataSource
-      || this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Regions];
-    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations] = dropDownsData.locationsDataSource;
-    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = dropDownsData.departmentsDataSource;
-    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = dropDownsData.skillsDataSource?.length
-      ? dropDownsData.skillsDataSource
-      : this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills];
   }
 
   private saveNewAvailabilityUnavailability(): void {
@@ -599,14 +563,15 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   }
 
   private checkBookingsOverlaps(): void {
-    const { departmentId, skillId, shiftId, startTime, endTime, date, orientated, critical, oncall, charge, preceptor }
+    const { departmentId, skillId } = this.getFilterDepartmentSkillIds();
+    const { shiftId, startTime, endTime, date, orientated, critical, oncall, charge, preceptor }
       = this.scheduleForm.getRawValue();
     this.scheduleToBook = {
       employeeBookedDays: [{
         employeeId: this.scheduledItem.candidate.id,
         bookedDays: [DateTimeHelper.toUtcFormat(new Date(date.setHours(0, 0, 0)))],
       }],
-      departmentId: departmentId,
+      departmentId: departmentId as number,
       skillId: skillId,
       shiftId: shiftId !== this.customShiftId ? shiftId : null,
       startTime: getTime(startTime),
@@ -693,10 +658,14 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
     this.showShiftTimeFields(isCustomShift);
 
-    if (selectedType === type.Book) {
+    if (selectedType === type.Book && !this.isCreateMode) {
       this.scheduleFormConfig.formClass = isCustomShift
         ? 'scheduled-shift-form custom-scheduled-shift-form'
         : 'scheduled-shift-form';
+    } else if (selectedType === type.Book && this.isCreateMode) {
+      this.scheduleFormConfig.formClass = isCustomShift
+        ? 'new-shift-form custom-new-shift-form'
+        : 'new-shift-form';
     } else if (selectedType === type.Unavailability) {
       this.scheduleFormConfig.formClass = isCustomShift
         ? 'scheduled-unavailability-form custom-scheduled-unavailability-form'
@@ -737,5 +706,17 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   @OutsideZone
   private scrollToNewScheduleTab() {
     setTimeout(() => this.tabs.nativeElement.scrollLeft = this.tabs.nativeElement.offsetLeft);
+  }
+
+  private getFilterDepartmentSkillIds(): { departmentId: number | null, skillId: number | null } {
+    const scheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
+    const departmentId = scheduleFiltersData.filters.departmentsIds?.length
+      ? scheduleFiltersData.filters.departmentsIds[0]
+      : null;
+    const skillId = scheduleFiltersData.filters.skillIds?.length
+      ? scheduleFiltersData.filters.skillIds[0]
+      : null;
+
+    return { departmentId, skillId };
   }
 }

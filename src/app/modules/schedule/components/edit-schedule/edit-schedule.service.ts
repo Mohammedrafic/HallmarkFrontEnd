@@ -35,6 +35,21 @@ export class EditScheduleService {
     }) as CustomFormGroup<ScheduledShiftForm>;
   }
 
+  createNewShiftForm(): CustomFormGroup<ScheduledShiftForm> {
+    return this.fb.group({
+      date: [null, Validators.required],
+      shiftId: [null, Validators.required],
+      startTime: [null, Validators.required],
+      endTime: [null, Validators.required],
+      hours: [null],
+      orientated: [false],
+      critical: [false],
+      oncall: [false],
+      charge: [false],
+      preceptor: [false],
+    }) as CustomFormGroup<ScheduledShiftForm>;
+  }
+
   createScheduledAvailabilityForm(): CustomFormGroup<ScheduledShiftForm> {
     return this.fb.group({
       date: [null, Validators.required],
