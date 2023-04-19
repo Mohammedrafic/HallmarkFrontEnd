@@ -93,7 +93,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
         headerName: 'configurationId',
         field: 'configurationId',
         minWidth: 250,
-  //      hide: true,
+        hide: true,
         filter: false,
       },
       {
@@ -107,6 +107,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
         headerName: 'runId',
         field: 'runId',
         minWidth: 250,
+        hide: true,
         filter: 'agTextColumnFilter',
       },
       {
