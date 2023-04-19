@@ -37,9 +37,6 @@ export class PayRateService {
   }
 
   public getskillsbyDepartment(id: number[]): Observable<any> {
-    const params = {
-      "departmentIds" : id
-    }
-    return this.http.get('/api/PayRates/skillsByDepartment', {params});
+    return this.http.post('/api/PayRates/skillsByDepartment', {departmentIds : id});
   }
 }

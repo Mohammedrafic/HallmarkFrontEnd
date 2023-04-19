@@ -93,9 +93,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   public readonly userPermissions = UserPermissions;
 
-  @Select(OrganizationManagementState.assignedSkillsByOrganization)
-  skills$: Observable<ListOfSkills[]>;
-
   @Select(PayRatesState.payRatesPage)
   payRatesPage$: Observable<PayRateSetupPage>;
 
@@ -286,14 +283,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         this.allRegions = [...this.orgRegions];
         this.filterColumns.regionIds.dataSource = this.allRegions;
       });
-
-    this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
-    this.skills$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
-      if (skills && skills.length > 0) {
-        this.filterColumns.skillIds.dataSource = skills;
-      }
-    });
-
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
@@ -505,7 +494,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   }
 
   public onFormSaveClick(): void {
-    // if (this.PayRatesFormGroup.valid) {
+    if (this.PayRatesFormGroup.valid) {
       const effectiveDate: Date = this.PayRatesFormGroup.controls['effectiveDate'].value;
       if (effectiveDate && !this.isEdit) {
         effectiveDate.setHours(0, 0, 0, 0);
@@ -528,8 +517,8 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
           : this.PayRatesFormGroup.controls['orderTypeIds'].value,
         amountMultiplier: this.PayRatesFormGroup.controls['amountMultiplier'].value,
         effectiveDate: effectiveDate,
-        // workCommitmentIds: this.PayRatesFormGroup.controls["WorkCommitmentIds"].value,
-        workCommitmentIds: [1],
+        workCommitmentIds: this.PayRatesFormGroup.controls["WorkCommitmentIds"].value,
+        // workCommitmentIds: [1],
         organizationId: this.orgId,
       };
 
@@ -543,9 +532,9 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       };
       
       this.store.dispatch(new SaveUpdatePayRate(billRate, filters));
-    // } else {
-    //   this.PayRatesFormGroup.markAllAsTouched();
-    // }
+    } else {
+      this.PayRatesFormGroup.markAllAsTouched();
+    }
   }
 
   public onEditRecordButtonClick(data: PayRateSetup, event: Event): void {
@@ -746,18 +735,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
           this.skills = skills;
           this.PayRatesFormGroup.controls['skillIds'].setValue(this.skills);
         });
-    
-    
-        // if (departmentIds && departmentIds.length > 0) {
-        //   const skills: [] = [];
-        //   departmentIds.forEach((id) => {
-        //     const selectedLocation = this.locations.find((location) => location.id === id);
-        //     // departments.push(...(selectedLocation?.departments as []));
-        //   });
-        //   this.departments = sortByField(skills, 'name');
-        // }
-
-        // this.PayRatesFormGroup.controls['skillIds'].setValue(null);
+  
         this.cd.markForCheck();
       });
   }
