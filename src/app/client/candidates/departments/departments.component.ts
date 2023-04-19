@@ -274,9 +274,12 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   private getActiveEmployeeWorkCommitment(): void {
     this.candidatesService
       .getActiveEmployeeWorkCommitment()
-      .pipe(takeUntil(this.componentDestroy()))
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy()),
+      )
       .subscribe((employeeWorkCommitment) => {
-        this.departmentsService.employeeWorkCommitmentId = employeeWorkCommitment.id!;
+        this.departmentsService.employeeWorkCommitmentId = employeeWorkCommitment.id;
         this.setDateRanges(employeeWorkCommitment);
       });
   }

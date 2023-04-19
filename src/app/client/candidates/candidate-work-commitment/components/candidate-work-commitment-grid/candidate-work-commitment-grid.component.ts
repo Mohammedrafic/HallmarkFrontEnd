@@ -9,7 +9,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { catchError, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, filter, Observable, Subject, takeUntil, tap, switchMap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { CandidateWorkCommitment, CandidateWorkCommitmentsPage } from '../../models/candidate-work-commitment.model';
@@ -73,8 +73,12 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
       this.pageNumber,
       this.pageSize,
       this.employeeId
-    ).subscribe((page) => {
-      this.candidateWorkCommitmentsPage = page;
+    ).pipe(
+      tap((page) => {
+        this.candidateWorkCommitmentsPage = page;
+      }),
+      switchMap(() => this.candidateSevice.getEmployeeWorkCommitments())
+    ).subscribe(() => {
       this.cd.markForCheck();
     });
   }
