@@ -320,7 +320,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     });
 
     this.payRateFilterFormGroup.get('locationIds')?.valueChanges.subscribe((locationIds: number[]) => {
-      console.log(locationIds);
       if (locationIds && locationIds.length > 0) {
         this.filterColumns.departmentIds.dataSource = [];
         const departments: OrganizationDepartment[] = [];
@@ -447,7 +446,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   }
 
   public onDepartmentsFiltering(e: FilteringEventArgs): void {
-    console.log(e);
     const char = e.text.length + 1;
     let query: Query = new Query();
     query =
@@ -517,10 +515,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   }
 
   public onFormSaveClick(): void {
-    console.log(this.PayRatesFormGroup.controls['payType'].value, this.PayRatesFormGroup.controls["WorkCommitmentIds"].value, this.PayRatesFormGroup.controls['amountMultiplier'].value
-   , this.PayRatesFormGroup.controls['orderTypes'].value, this.PayRatesFormGroup.controls['skillIds'].value.length > 0, 
-    this.PayRatesFormGroup.controls['payRateConfigId'].value,  (this.allRegionsSelected || this.PayRatesFormGroup.controls['regionIds'].value), 
-    (this.allLocationsSelected || this.PayRatesFormGroup.controls['locationIds'].value), (this.allDepartmentsSelected || this.PayRatesFormGroup.controls['departmentIds'].value))
     if (this.PayRatesFormGroup.valid) {
       const effectiveDate: Date = this.PayRatesFormGroup.controls['effectiveDate'].value;
       if (effectiveDate && !this.isEdit) {
