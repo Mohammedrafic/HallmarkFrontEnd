@@ -299,7 +299,7 @@
                 [showSelectAll]="true"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"
-                formControlName="orderTypeIds"
+                formControlName="orderTypes"
               >
               </ejs-multiselect>
             </div>
@@ -315,7 +315,7 @@
                 [allowFiltering]="true"
                 [dataSource]="PayRateTitleOption"
                 [fields]="fields"
-                formControlName="payRateTitleId"
+                formControlName="payRateConfigId"
               >
               </ejs-dropdownlist>
             </div>
@@ -328,6 +328,7 @@
                 class="e-input e-disabled"
                 type="text"
                 placeholder="Regular"
+                value = "Regular"
                 formControlName="payRatesCategory"
               />
             </div>
@@ -399,7 +400,7 @@
       (applyFilterClicked)="onFilterApply()"
       (closeDialogClicked)="onFilterClose()"
     >
-      <form class="bootstrap" [formGroup]="billRateFilterFormGroup">
+      <form class="bootstrap" [formGroup]="payRateFilterFormGroup">
         <div class="filter-row">
           <div class="input-container">
             <label>Region</label>

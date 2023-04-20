@@ -5,6 +5,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Store } from '@ngxs/store';
 import { EMPTY, Observable, of, Subject } from 'rxjs';
 
+import { DateWeekService } from '@core/services';
 import { getTime } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
@@ -16,7 +17,7 @@ import { UserState } from 'src/app/store/user.state';
 import { CreateScheduleItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
 import {
-  EmployeeBookingDay,
+  EmployeeBookingDay, OpenPositionParams,
   ScheduleBookingErrors,
   ScheduleCandidate,
   ScheduleDay,
@@ -50,7 +51,17 @@ export class CreateScheduleService {
     private fb: FormBuilder,
     private store: Store,
     private scheduleFiltersService:  ScheduleFiltersService,
+    private weekService: DateWeekService,
   ) {}
+
+  createOpenPositionsForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
+    return this.fb.group({
+      shiftId: [null, Validators.required],
+      startTime: [null, Validators.required],
+      endTime: [null, Validators.required],
+      hours: [null],
+    }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
+  }
 
   createUnavailabilityForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
     return this.fb.group({
@@ -273,21 +284,27 @@ export class CreateScheduleService {
     let className = ScheduleClassesList[ScheduleItemType.Book];
 
     if (scheduleType === ScheduleItemType.Book) {
-      className = isCustom
-        ? ScheduleCustomClassesList[ScheduleItemType.Book]
-        : ScheduleClassesList[ScheduleItemType.Book];
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Book] :
+        ScheduleClassesList[ScheduleItemType.Book];
     }
 
     if (scheduleType === ScheduleItemType.Availability) {
-      className = isCustom
-        ? ScheduleCustomClassesList[ScheduleItemType.Availability]
-        : ScheduleClassesList[ScheduleItemType.Availability];
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Availability] :
+        ScheduleClassesList[ScheduleItemType.Availability];
     }
 
-    if (scheduleType === ScheduleItemType.Unavailability){
-      className = isCustom
-        ? ScheduleCustomClassesList[ScheduleItemType.Unavailability]
-        : ScheduleClassesList[ScheduleItemType.Unavailability];
+    if (scheduleType === ScheduleItemType.Unavailability) {
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Unavailability] :
+        ScheduleClassesList[ScheduleItemType.Unavailability];
+    }
+
+    if(scheduleType === ScheduleItemType.OpenPositions) {
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.OpenPositions] :
+        ScheduleClassesList[ScheduleItemType.OpenPositions];
     }
 
     return className;
@@ -345,6 +362,26 @@ export class CreateScheduleService {
     });
   }
 
+  createOpenPositionsParams(dates: string[]): OpenPositionParams {
+    const scheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
+
+    if (dates.length) {
+      return  {
+        departmentId: (scheduleFiltersData.filters.departmentsIds as number[])[0],
+        skillId: (scheduleFiltersData.filters.skillIds as number[])[0],
+        selectedDates: dates,
+      };
+    }
+
+    const [startDate, endDate] = this.weekService.getRange();
+
+    return {
+      departmentId: (scheduleFiltersData.filters.departmentsIds as number[])[0],
+      skillId: (scheduleFiltersData.filters.skillIds as number[])[0],
+      startDate,
+      endDate,
+    };
+  }
   private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]): void {
     const isCandidatesOriented = candidates.map((candidate: ScheduleCandidate) => {
       return this.getCandidateOrientation(candidate);

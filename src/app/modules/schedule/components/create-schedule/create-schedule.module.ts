@@ -13,6 +13,7 @@ import { ReplacementOrderDialogModule } from '../replacement-order-dialog/replac
 import { ScheduleItemsModule } from '../schedule-items/schedule-items.module';
 import { CreateScheduleComponent } from "./create-schedule.component";
 import { Icons } from './create-schedules.constant';
+import { ScheduleOpenPositionsModule } from '../schedule-open-positions/schedule-open-positions.module';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { Icons } from './create-schedules.constant';
     ReplacementOrderDialogModule,
     SwitchModule,
     TooltipModule,
+    ScheduleOpenPositionsModule,
     FeatherModule.pick(Icons),
   ],
   exports: [CreateScheduleComponent],

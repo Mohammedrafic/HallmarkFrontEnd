@@ -13,6 +13,10 @@ export class DateWeekService {
     this.rangeStore.set(range);
   }
 
+  getRange(): [string, string] {
+    return this.rangeStore.get();
+  }
+
   getRangeStream(): Observable<[string, string]> {
     return this.rangeStore.getStream()
     .pipe(
