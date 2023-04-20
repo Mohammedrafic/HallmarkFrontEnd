@@ -57,5 +57,6 @@ export const DisabledSettingsByDefault = [
   'CandidateAppliedInLastNDays',
   'CandidatePayRate',
   'MandateCandidateAddress',
-  'MandateCandidatePhone1'
+  'MandateCandidatePhone1',
+  'CreateReplacementPerDiemOrder'
 ];

@@ -110,3 +110,20 @@ ejs-textbox.e-control {
     height: 120px !important;
   }
 }
+
+
+.dropdown-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.input-group.bootstrap {
+  width: 100%;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+}
