@@ -2,7 +2,7 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
 
-export class CommonReportFilterOptions {
+export class AgencyCommonFilterReportOptions {
   orderStatuses: OrderStatusDto[];
   jobStatuses: JobStatusDto[];
   candidateStatuses: {
@@ -94,6 +94,9 @@ export class SearchCredential {
   expireDateApplicable: boolean;
   credentialTypeId: number;
   credentialTypeName: string;
+}
+export class AgencyCommonReportFilter {
+  businessUnitIds: number[];
 }
 
 

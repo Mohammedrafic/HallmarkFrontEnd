@@ -11,7 +11,7 @@ import { LogiReportService } from "@shared/services/logi-report.service";
 import { catchError, filter, Observable, tap } from "rxjs";
 import { JobDetailSummaryReportFilterOptions } from "../../admin/analytics/models/jobdetail-summary.model";
 import { AssociateAgencyDto } from "../../shared/models/logi-report-file";
-import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions, GetCommonReportCredentialSearch, GetCommonReportCandidateStatusOptions, GetStaffScheduleReportFilterOptions, GetCandidateSearchFromScheduling, GetStaffListReportCandidateSearch, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds} from "./logi-report.action";
+import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions, GetCommonReportCredentialSearch, GetCommonReportCandidateStatusOptions, GetStaffScheduleReportFilterOptions, GetCandidateSearchFromScheduling, GetStaffListReportCandidateSearch, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions} from "./logi-report.action";
 import { ScheduleCandidate, ScheduleCandidatesPage } from 'src/app/modules/schedule/interface/schedule.interface';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { ShowToast } from '../../store/app.actions';
@@ -20,6 +20,7 @@ import { DataSourceItem } from '../../core/interface/common.interface';
 import { HttpErrorResponse } from '@angular/common/http';
 import { OrganizationStructure } from '../../shared/models/organization.model';
 import { OrderManagementModel } from '../../agency/store/order-management.state';
+import { AgencyCommonFilterReportOptions } from '../../agency/agency-reports/models/agency-common-report.model';
 export interface LogiReportStateModel {
 
     departments: Department[] | DepartmentsPage;
@@ -35,6 +36,7 @@ export interface LogiReportStateModel {
    getEmployeesSearchFromScheduling: ScheduleCandidatesPage | null;
   organizations: DataSourceItem[];
   organizationsStructure: OrganizationStructure[];
+  agencyCommonFilterReportOptions: AgencyCommonFilterReportOptions | null;
 
 }
 @State<LogiReportStateModel>({
@@ -52,7 +54,8 @@ export interface LogiReportStateModel {
         getStaffScheduleReportFilterOptions: null,
         getEmployeesSearchFromScheduling: null,
         organizations: [],
-      organizationsStructure:[]
+      organizationsStructure: [],
+      agencyCommonFilterReportOptions:null
     },
 })
 @Injectable()
@@ -106,6 +109,8 @@ export class LogiReportState {
   static getOrganizationsStructure(state: LogiReportStateModel): OrganizationStructure[] | null {
     return state.organizationsStructure;
   }
+  @Selector()
+  static agencycommonReportFilterData(state: LogiReportStateModel): AgencyCommonFilterReportOptions | null { return state.agencyCommonFilterReportOptions; }
 
 
     @Action(GetRegionsByOrganizations)
@@ -251,6 +256,14 @@ export class LogiReportState {
       .getOrganizationsStructure(organizationIds)
       .pipe(tap((payload) => patchState({ organizationsStructure: payload }))
       );
+  }
+  @Action(GetAgencyCommonFilterReportOptions)
+  GetAgencyCommonFilterReportOptions({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<AgencyCommonFilterReportOptions> {
+    return this.logiReportService.getAgencyCommonReportFilterOptions(filter).pipe(tap((payload: any) => {
+      patchState({ commonReportFilterOptions: payload });
+      return payload
+
+    }));
   }
 }
 

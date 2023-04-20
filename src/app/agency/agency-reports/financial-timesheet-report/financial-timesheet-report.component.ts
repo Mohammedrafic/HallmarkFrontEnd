@@ -14,7 +14,7 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -28,8 +28,8 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import {
-  CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions,
-  MasterSkillDto, SearchCandidate, SkillCategoryDto, OrderTypeOptionsForReport
+  CommonCandidateSearchFilter, CommonReportFilter,
+  MasterSkillDto, SearchCandidate, SkillCategoryDto, OrderTypeOptionsForReport, AgencyCommonFilterReportOptions
 } from '../models/agency-common-report.model';
 import { OutsideZone } from "@core/decorators";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
@@ -93,8 +93,8 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
   @Select(LogiReportState.getOrganizationsStructure)
   public getOrganizationsStructure$: Observable<OrganizationStructure[]>;
 
-  @Select(LogiReportState.commonReportFilterData)
-  public financialTimeSheetFilterData$: Observable<CommonReportFilterOptions>;
+  @Select(LogiReportState.agencycommonReportFilterData)
+  public agencycommonReportFilterData$: Observable<AgencyCommonFilterReportOptions>;
 
   @Select(LogiReportState.commonReportCandidateSearch)
   public financialTimeSheetCandidateSearchData$: Observable<SearchCandidate[]>;
@@ -147,7 +147,7 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
   public isDefaultLoad: boolean = false;
   public baseUrl: string = '';
   public user: User | null;
-  public filterOptionsData: CommonReportFilterOptions;
+  public filterOptionsData: AgencyCommonFilterReportOptions;
   public candidateFilterData: { [key: number]: SearchCandidate; }[] = [];
   public isResetFilter: boolean = false;
   private isAlive = true;
@@ -303,8 +303,8 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
             businessUnitIds: businessIdData
           };
 
-          this.store.dispatch(new GetCommonReportFilterOptions(filter));
-          this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+          this.store.dispatch(new GetAgencyCommonFilterReportOptions(filter));
+          this.agencycommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: AgencyCommonFilterReportOptions | null) => {
             if (data != null) {
               this.isAlive = true;
               this.filterOptionsData = data;
