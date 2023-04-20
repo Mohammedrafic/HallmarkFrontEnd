@@ -24,6 +24,6 @@ export class ScheduleFilterHelper {
   }
 
   static adaptOrganizationSkillToOption(skills: AssignedSkillsByOrganization[]): DropdownOption[] {
-    return skills.map((skill) => ({ text: skill.skillDescription, value: skill.id })) as DropdownOption[];
+    return skills.map((skill) => ({ text: skill.skillDescription, value: skill.masterSkillId })) as DropdownOption[];
   }
 }
