@@ -5,6 +5,8 @@ import {
   AgencyDto,
   CandidateStatusAndReasonFilterOptionsDto,
   MasterSkillDto,
+  StaffScheduleReportFilterOptions,
+  workCommitmentDto,
 } from './../../../analytics/models/common-report.model';
 import {
   GetGroupEmailRoles,
@@ -14,7 +16,10 @@ import {
   GetGroupEmailCandidateStatuses,
   GetGroupEmailCandidates,
   GetDocumentPreviewDeatils,
-  GetDocumentDownloadDeatils
+  GetDocumentDownloadDeatils,
+  GetGroupEmailDepartmentSkills,
+  GetGroupEmailEmployees,
+  GetStaffScheduleReportFilterOptions
 } from './../../../store/alerts.actions';
 import { DownloadDocumentDetail, GroupEmailRole } from '@shared/models/group-email.model';
 import { takeUntil } from 'rxjs';
@@ -56,10 +61,9 @@ import { UserSubscriptionFilters, UserSubscriptionPage } from '@shared/models/us
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { AgencyUserType, OrganizationUserType } from '@admin/alerts/group-email.enum';
-import { Organisation, Region, Location } from '@shared/models/visibility-settings.model';
+import { Organisation, Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { CommonReportFilter, CommonReportFilterOptions } from '@admin/analytics/models/common-report.model';
-import { GetCommonReportFilterOptions } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
@@ -73,6 +77,7 @@ import {
   AnnotationService, 
   ToolbarService,
 } from '@syncfusion/ej2-angular-pdfviewer';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-send-group-email',
@@ -140,14 +145,23 @@ export class SendGroupEmailComponent
   @Select(AlertsState.GetGroupEmailSkills)
   public skillData$: Observable<MasterSkillDto[]>;
 
+  @Select(AlertsState.GetGroupEmailDeptSkills)
+  public deptSkillData$: Observable<MasterSkillDto[]>;
+
   @Select(AlertsState.GetGroupEmailCandidates)
   public candidateData$: Observable<User[]>;
+
+  @Select(AlertsState.GetGroupEmailEmployees)
+  public employeeData$: Observable<User[]>;
 
   @Select(AlertsState.GetGroupEmailCandidateStatuses)
   public candidateStatusData$: Observable<CandidateStatusAndReasonFilterOptionsDto[]>;
 
   @Select(AlertsState.documentDownloadDetail)
   documentDownloadDetail$: Observable<DownloadDocumentDetail>;
+
+  @Select(AlertsState.getStaffScheduleReportOptionData)
+  public staffScheduleReportFilterData$: Observable<StaffScheduleReportFilterOptions>;
 
   public organizations: Organisation[] = [];
   public agencies: AgencyDto[] = [];
@@ -157,6 +171,8 @@ export class SendGroupEmailComponent
   public defaultOrderTypes: (number | undefined)[] = OrderTypeOptions.map((list) => list.id);
   public locationsList: Location[] = [];
   public locationsData: Location[] = [];
+  public departmentsData: Department[] = [];
+  public departmentsList: Department[] = [];
   public regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   public candidateStatusFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
@@ -170,6 +186,7 @@ export class SendGroupEmailComponent
   public businessData: BusinessUnit[];
   public roleData: GroupEmailRole[];
   public skillData: MasterSkillDto[];
+  public workCommitmentData:workCommitmentDto[];
   public range: Range = new Range();
   public isBusinessFormDisabled = false;
   public businessUnits = BUSINESS_UNITS_VALUES;
@@ -204,6 +221,7 @@ export class SendGroupEmailComponent
   public hideUserTypeControl: boolean = false;
   public isAgencyCandidatesType: boolean = false;
   public isBusinessUnitTypeAgency: boolean = false;
+  public isEmployeeType: boolean = false;
   public isOrgUser: boolean = false;
   public userBusinessUnitType: BusinessUnitType | undefined;
   public uploaderstatus:boolean = true;
@@ -239,6 +257,9 @@ export class SendGroupEmailComponent
   get businessesControl(): AbstractControl {
     return this.groupEmailTemplateForm.get('businesses') as AbstractControl;
   }
+  get orientationCompleteControl(): AbstractControl {
+    return this.groupEmailTemplateForm.get('orientationComplete') as AbstractControl;
+  }
   get usersControl(): AbstractControl {
     return this.groupEmailTemplateForm.get('user') as AbstractControl;
   }
@@ -254,6 +275,10 @@ export class SendGroupEmailComponent
     return this.groupEmailTemplateForm.get('location') as AbstractControl;
   }
 
+  get departmentControl(): AbstractControl {
+    return this.groupEmailTemplateForm.get('departmentIds') as AbstractControl;
+  }
+
   get rolesControl(): AbstractControl {
     return this.groupEmailTemplateForm.get('roles') as AbstractControl;
   }
@@ -264,6 +289,10 @@ export class SendGroupEmailComponent
 
   get skillsControl(): AbstractControl {
     return this.groupEmailTemplateForm.get('skills') as AbstractControl;
+  }
+
+  get workCommitmentsControl(): AbstractControl {
+    return this.groupEmailTemplateForm.get('workCommitments') as AbstractControl;
   }
 
   get orderTypesControl(): AbstractControl {
@@ -334,10 +363,13 @@ export class SendGroupEmailComponent
     this.onUserTypeValueChanged();
     this.onRegionValueChanged();
     this.onLocationValueChanged();
+    this.onDepartmentValueChanged();    
     this.onSkillsValueChanged();
     this.onCandidateValueChanged();
     this.onCandidateStatusValueChanged();
     this.onOrderTypeValueChanged();
+    this.onWorkCommitmentValueChanged();
+    this.onOrientationValueChanged();
     const user = this.store.selectSnapshot(UserState.user);
     this.userBusinessUnitType = user?.businessUnitType;
     if (user?.businessUnitType === BusinessUnitType.MSP || 
@@ -603,7 +635,7 @@ export class SendGroupEmailComponent
               }
             });
           }
-        }
+        }        
       }
     });
   }
@@ -613,8 +645,7 @@ export class SendGroupEmailComponent
       if (this.isSend == true) {        
         this.clearFields();
         this.userData = [];
-        this.ResetForm();
-        this.dispatchNewPage(null);
+        this.ResetForm();        
         let businessUnitIds = [];
         if (value != 0 && value != null) {
           businessUnitIds.push(this.businessControl.value);
@@ -627,16 +658,21 @@ export class SendGroupEmailComponent
           value.regions.forEach((region) => {
             this.locationsList.push(...region.locations);
           });
+          this.departmentsList = this.locationsList
+              .map((obj) => {
+                return obj.departments.filter((department) => department.locationId === obj.id);
+              })
+              .reduce((a, b) => a.concat(b), []);
         });
 
-        this.locationsData = this.locationsList;
+        this.regionsList = sortByField(this.regionsList, 'name');
+        this.locationsList = sortByField(this.locationsList, 'name');
+        this.departmentsList = sortByField(this.departmentsList, 'name');
 
-        if (value != undefined && value > 0) {
-          this.store.dispatch(new GetGroupEmailRoles(value));
-          this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-            this.roleData = data;
-          });
-        }
+        this.locationsData = this.locationsList;
+        this.departmentsData = this.departmentsList;        
+        
+        this.changeDetectorRef.detectChanges();
       }
     });
   }
@@ -667,6 +703,7 @@ export class SendGroupEmailComponent
     this.regionControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (value != undefined && value.length > 0) {
         this.locationsList = this.locationsData.filter((i) => value.indexOf(i.regionId) !== -1);
+        if(this.isEmployeeType) this.getEmployees();
       } else {
         this.locationsList = this.locationsData;
         this.locationControl.patchValue([]);        
@@ -685,8 +722,54 @@ export class SendGroupEmailComponent
         if (value != undefined && value.length > 0) {
           this.getCandidates()
         }
-      }     
+      }    
+      if(this.isEmployeeType){
+        this.departmentsList = this.departmentsData.filter((i) => value.indexOf(i.locationId) !== -1);
+        if (value != undefined && value.length > 0)  this.getEmployees();
+      } 
     });
+  }
+
+  private onDepartmentValueChanged(): void {
+    this.departmentControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      this.getSkillsByDepartments();      
+    });
+  }
+
+  private onWorkCommitmentValueChanged(): void {
+    this.workCommitmentsControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {      
+      if (value != undefined && value.length > 0) 
+        this.getEmployees(); 
+    });
+  }
+
+  private onOrientationValueChanged(): void { 
+    this.orientationCompleteControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {      
+      if (value != undefined && value != null 
+        && (this.regionControl.value?.length > 0 || 
+          this.locationControl.value?.length > 0 ||
+          this.departmentControl.value?.length > 0 ||
+          this.skillsControl.value?.length > 0 ||
+          this.workCommitmentsControl.value?.length > 0)) 
+        this.getEmployees(); 
+    });
+  }
+
+  private getSkillsByDepartments(): void{
+    this.skillData = [];
+    var departments = this.departmentControl.value.join();
+    var businessId = this.businessControl.value;        
+    if(departments !=''){
+      this.store.dispatch(new GetGroupEmailDepartmentSkills(departments, businessId));
+      this.deptSkillData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+        this.skillData = data;
+        this.getEmployees(); 
+      });
+    }else{      
+      if(businessId > 0 && this.regionControl.value?.length > 0 && this.locationControl.value?.length > 0){
+        this.loadSkillsAndWorkCommitments(businessId);
+      }
+    }
   }
 
   private onRolesValueChanged(): void {
@@ -716,6 +799,7 @@ export class SendGroupEmailComponent
         this.isAgencyUserType = false;
         this.isOrgCandidatesType = false;
         this.isOrgInternalUserType = false;
+        this.isEmployeeType = false;
         this.clearFields();
         var businessUnit = this.businessUnitControl.value;
         var businessId = this.businessControl.value;        
@@ -723,9 +807,17 @@ export class SendGroupEmailComponent
           if (value == 1) {
             this.isOrgInternalUserType = true;
             this.userData = [];
+            this.dispatchNewPage(null);
+            if (businessId != undefined && businessId > 0) {
+              this.store.dispatch(new GetGroupEmailRoles(businessId));
+              this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+                this.roleData = data;
+              });
+            }              
           }
           if (value == 2) {            
             this.userData = [];
+            this.dispatchNewPage(null);
             this.isOrgCandidatesType = true;
             this.skillsControl.patchValue([]);
             this.candidateControl.patchValue([]);
@@ -751,6 +843,11 @@ export class SendGroupEmailComponent
               this.candidateStatusData.splice(offeredBillRateIndex, 1);
             });
           }
+          if (value == 4) {                    
+            this.isEmployeeType = true; 
+            this.userData = [];
+            this.loadSkillsAndWorkCommitments(businessId);
+          }   
         } else if (businessUnit == 4) {
           if (value == 1) {
             this.isAgencyUserType = true;
@@ -787,12 +884,31 @@ export class SendGroupEmailComponent
     });
   }
 
+  private loadSkillsAndWorkCommitments(businessId:any): void{
+    let businessIdData = [];
+    businessIdData.push(businessId);
+    let filter: CommonReportFilter = {
+      businessUnitIds: businessIdData,
+    };
+    this.store.dispatch(new GetStaffScheduleReportFilterOptions(filter));
+    this.staffScheduleReportFilterData$
+      .pipe(takeWhile(() => this.isAlive))
+      .subscribe((data: StaffScheduleReportFilterOptions | null) => {            
+        if (data != null) {
+          this.workCommitmentData = [];
+          this.skillData = [];
+          this.workCommitmentData = data.masterWorkCommitments;
+          this.skillData = data.masterSkills;                  
+        }
+      });      
+  }
+
   private onSkillsValueChanged(): void {
     this.skillsControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {                        
       this.userData = [];
       this.candidateControl.patchValue([]);
       if (value != undefined && value.length > 0) 
-        this.getCandidates();      
+        this.isEmployeeType ? this.getEmployees() : this.getCandidates();      
     });
   }
 
@@ -816,10 +932,13 @@ export class SendGroupEmailComponent
     this.candidateControl.patchValue([]);
     this.regionControl.patchValue([]);
     this.locationControl.patchValue([]);
+    this.departmentControl.patchValue([]);
     this.rolesControl.patchValue([]);
     this.agenciesControl.patchValue([]);
     this.orderTypesControl.patchValue([]);
     this.statusControl.patchValue([]);
+    this.workCommitmentsControl.patchValue([]);
+    this.orientationCompleteControl.patchValue(false);
     this.jobIDControl.patchValue('');  
   }
 
@@ -883,6 +1002,50 @@ export class SendGroupEmailComponent
     });
   }
 
+  private getEmployees(): void {
+    this.candidateControl.patchValue([]);
+    this.userData = [];
+    var skills =
+      this.skillsControl.value != null && this.skillsControl.value != undefined
+        ? this.skillsControl.value.join()
+        : 'null';
+    var regions =
+      this.regionControl.value != null && this.regionControl.value != undefined
+        ? this.regionControl.value.join()
+        : 'null';
+    var locations =
+      this.locationControl.value != null && this.locationControl.value != undefined
+        ? this.locationControl.value.join()
+        : 'null';
+    var departments =
+      this.departmentControl.value != null && this.departmentControl.value != undefined
+        ? this.departmentControl.value.join()
+        : 'null';
+    var workCommitments =
+      this.workCommitmentsControl.value != null && this.workCommitmentsControl.value != undefined
+        ? this.workCommitmentsControl.value.join()
+        : 'null';
+    var orientationComplete = this.orientationCompleteControl.value;
+    
+    this.store.dispatch(
+      new GetGroupEmailEmployees(
+        this.businessControl.value,
+        regions,
+        locations,
+        departments,
+        skills,
+        workCommitments,
+        orientationComplete
+      )
+    );
+    this.employeeData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      console.log("employeedata",data);
+      this.userData = data;
+    });
+
+    this.changeDetectorRef.detectChanges();
+  }
+
   rteCreated(): void {
     this.rteObj.toolbarSettings.type = ToolbarType.Scrollable;
     this.rteObj.toolbarSettings.enableFloating = true;
@@ -935,14 +1098,17 @@ export class SendGroupEmailComponent
       userType: new FormControl(0),
       region: new FormControl(),
       location: new FormControl(),
+      departmentIds:new FormControl(),
       roles: new FormControl([]),
       agencies: new FormControl([]),
       skills: new FormControl([]),
+      workCommitments: new FormControl([]),
       orderTypes: new FormControl([]),
       candidateStatus: new FormControl([]),
       jobID: new FormControl(''),
       user: new FormControl([]),
       candidate: new FormControl([]),
+      orientationComplete: new FormControl(null),
       emailCc: new FormControl('', [emailsValidator()]),
       emailTo: new FormControl('', [
         Validators.required,

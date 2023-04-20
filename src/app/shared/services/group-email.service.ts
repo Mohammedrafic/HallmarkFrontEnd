@@ -166,4 +166,30 @@ export class GroupEmailService {
       `/api/GroupMail/getcandidates?agencies=${agencies}&skills=${skills}&regions=${regionIds}&locations=${locationIds}&orderTypes=${orderTypes}&statuses=${statuses}&jobID=${jobID}&isAgency=${isAgency}&businessUnitIds=${businessUnitIds}`
     );
   }
+
+  /**
+   * Get Department skills
+   * @param departmentIds
+   * @param businessUnitId 
+   * @returns MasterSkills
+   */
+  public GetGroupEmailDepartmentSkills(departmentIds: string, businessUnitId: number): Observable<MasterSkillDto> {
+    return this.http.get<MasterSkillDto>(
+      `/api/GroupMail/getdeptskills?BusinessUnitId=${businessUnitId}&DepartmentIds=${departmentIds}`
+    );
+  }
+
+  public GetGroupEmailEmployees(
+    businessUnitId: number,    
+    regions: string,
+    locations: string,
+    departments: string,
+    skills: string,
+    WorkCommitments: string,
+    orientationComplete: boolean
+  ): Observable<User> {
+    return this.http.get<User>(
+      `/api/GroupMail/getemployees?businessUnitId=${businessUnitId}&regions=${regions}&locations=${locations}&departments=${departments}&skills=${skills}&WorkCommitments=${WorkCommitments}&orientationComplete=${orientationComplete}`
+    );
+  }
 }
