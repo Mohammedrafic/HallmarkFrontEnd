@@ -31,6 +31,7 @@ export interface Closurevalue {
   reason: string;
   includeInIRP: boolean;
   includeInVMS: boolean;
+  isAutoPopulate? : boolean;
 }
 
 

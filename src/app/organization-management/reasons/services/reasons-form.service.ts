@@ -50,6 +50,7 @@ export class ReasonsFormsService {
           Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
         includeInIRP: [false],
         includeInVMS: [false],
+        isAutoPopulate: [false]
       });
     } else if (formType === ReasonFormType.CategoryNoteReason) {
       this.form = this.fb.group({
