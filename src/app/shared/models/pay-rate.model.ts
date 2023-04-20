@@ -51,6 +51,7 @@ export class PayRateSetup {
   editAllowed: boolean;
   payType: number;
   WorkCommitmentIds: number;
+  workCommitments : any;
 }
 
 export class PayRateSetupPost {

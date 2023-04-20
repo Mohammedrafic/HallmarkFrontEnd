@@ -229,8 +229,6 @@
                   [showDropDownIcon]="true"
                   formControlName="departmentIds"
                   maximumSelectionLength="50000"
-                  [query]="query"
-                  (filtering)="onDepartmentsFiltering($event)"
                 >
                 </ejs-multiselect>
               </div>
@@ -243,9 +241,6 @@
                 ></ejs-switch>
                 <label for="allDepartments" class="switch-text">All</label>
               </div>
-            </div>
-            <div *ngIf="departments && departments.length > maxDepartmentsLength">
-              Narrow down locations/regions or use input search for departments.
             </div>
           </div>
           <div class="input-container dropdown">
@@ -276,8 +271,8 @@
                 appValidateWithMessage
                 selectAllText="Select All"
                 mode="CheckBox"
-                [dataSource]="(commitmentsPage$ | async)?.items"
-                [fields]="optionFields"
+                [dataSource]="workcommitments"
+                [fields]="fields"
                 [showSelectAll]="true"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"
