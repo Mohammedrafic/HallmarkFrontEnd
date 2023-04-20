@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { LogInterfacePage, OrgInterfacePage } from '@shared/models/org-interface.model';
+import { LogInterfacePage, LogTimeSheetHistoryPage, OrgInterfacePage } from '@shared/models/org-interface.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -28,7 +28,7 @@ export class OrgInterfaceService {
     }
 
 
-        /**
+  /**
    * Get the list of Log Interface by  BusinessUnitId
    * @param BusinessUnitId
    * @param PageNumber
@@ -36,11 +36,30 @@ export class OrgInterfaceService {
    *
    * @return OrgInterfacePage
    */
-        public getLogInterfacePage(
-          OrganizationId: number | null,
-          PageNumber: number,
-          PageSize: number,
-        ): Observable<LogInterfacePage> {
-          return this.http.post<LogInterfacePage>(`/api/Integration/getIntegrationProcessDetails`, { OrganizationId, PageNumber, PageSize });
-        }
+    public getLogInterfacePage(
+      OrganizationId: number | null,
+      PageNumber: number,
+      PageSize: number,
+    ): Observable<LogInterfacePage> {
+      return this.http.post<LogInterfacePage>(`/api/Integration/getIntegrationProcessDetails`, { OrganizationId, PageNumber, PageSize });
+    }
+
+    
+    /**
+   * Get the list of LogTimeSheet History by RunId and OrganizationId
+   * @param RunId
+   * @param OrganizationId
+   * @param PageNumber
+   * @param PageSize
+   *
+   * @return OrgInterfacePage
+   */
+      public getLogTimeSheetHistory(
+        RunId: string | '',
+        OrganizationId: number | null,
+        PageNumber: number,
+        PageSize: number,
+      ): Observable<LogTimeSheetHistoryPage> {
+        return this.http.post<LogTimeSheetHistoryPage>(`/api/Integration/getTimesheetStagingHistory`, { RunId, OrganizationId, PageNumber, PageSize });
+      }
 }

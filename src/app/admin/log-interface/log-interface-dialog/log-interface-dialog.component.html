@@ -1,0 +1,75 @@
+
+<ejs-dialog
+  id="dialog"
+  #sideDialog
+  cssClass="dialog order-details-dialog"
+  [target]="targetElement"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+<ng-template #content>
+    <section class="container preview-dialog">
+      <section class="header-container">
+        <div class="e-card-header preview-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title preview-title">Intertface Error Records Details</h3>
+          </div>
+          <div class="e-card-content">
+            <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
+              <i-feather name="x" class="icon"></i-feather>
+            </button>
+          </div>
+        </div>
+        <p><b>File Name:</b> {{selectedLog?.originalFileName}}</p>
+        <section class="app-grid table-wrapper" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
+            <div class="custom-grid">
+              <ag-grid-angular #agGridLogTimeSheetHistoryPage
+                               class="ag-theme-alpine grid app-grid__component"
+                               [animateRows]="true"
+                               [columnDefs]="columnDefs"
+                               [defaultColDef]="defaultColDef"
+                               [suppressAggFuncInHeader]="true"
+                               [modules]="modules"
+                               [cacheBlockSize]="cacheBlockSize"
+                               [rowModelType]="rowModelType"
+                               [frameworkComponents]="frameworkComponents"
+                               [pagination]="true"
+                               [paginationPageSize]="paginationPageSize"
+                               (gridReady)="onGridReady($event)"
+                               [sideBar]="sideBar"
+                               toolPanel="columns"
+                               [serverSideStoreType]="serverSideStoreType"
+                               [paginationAutoPageSize]="false"
+                               [maxBlocksInCache]="maxBlocksInCache"
+                               [noRowsOverlayComponent]="noRowsOverlayComponent"
+                               [noRowsOverlayComponentParams]="noRowsOverlayComponentParams"
+                               [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
+                               [headerHeight]="52">
+              </ag-grid-angular>
+              <div class="grid-pagination">
+                <ejs-dropdownlist id="rowsPerPage"
+                                  class="dropdown-no-border"
+                                  [allowFiltering]="true"
+                                  [dataSource]="rowsPerPageDropDown"
+                                  [(value)]="activeRowsPerPageDropDown"
+                                  (change)="onPageSizeChanged($event)">
+                </ejs-dropdownlist>
+                <div class="total-rows">
+                  Total Rows: {{totalRecordsCount}}
+                </div>
+              </div>
+            </div>
+          </section>
+      </section>
+    </section>
+</ng-template>
+<ng-template #footerTemplate>
+   <app-dialog-next-previous
+      *ngIf="logDialogOptions$ | async as options"
+      [title]="'Order'"
+      [options]="options"
+      (nextEvent)="onNextPreviousLog(true)"
+      (previousEvent)="onNextPreviousLog(false)"
+    ></app-dialog-next-previous> 
+  </ng-template>
+</ejs-dialog>
