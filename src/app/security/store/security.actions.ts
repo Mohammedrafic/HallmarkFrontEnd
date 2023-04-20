@@ -3,6 +3,7 @@ import { Role, RoleDTO, RolesFilters } from '@shared/models/roles.model';
 import { User, UserDTO } from '@shared/models/user-managment-page.model';
 import { UserVisibilityFilter, UserVisibilitySettingBody } from '@shared/models/visibility-settings.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 
 export class GetBusinessByUnitType {
   static readonly type = '[security] Get Business By Unit Type';
@@ -174,3 +175,9 @@ export class GetLogInterfacePage {
     public pageSize: number,
   ) {}
 }
+
+export class GetLogHistoryById {
+  static readonly type = '[security log interface] Get History By Id';
+  constructor(public runId: string, public organizationId: number, public pageNumber: number,public pageSize: number,public options?: DialogNextPreviousOption) {}
+}
+
