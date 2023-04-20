@@ -243,4 +243,5 @@ export const RemoveButtonTitleMap = {
   [ScheduleType.Book]: 'Booking',
   [ScheduleType.Availability]: 'Availability',
   [ScheduleType.Unavailability]: 'Unavailability',
+  [ScheduleType.OpenPositions]: 'OpenPositions',
 };

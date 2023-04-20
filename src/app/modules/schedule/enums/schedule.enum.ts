@@ -19,6 +19,7 @@ export enum ScheduleType {
   Book = 'Book',
   Availability = 'Availability',
   Unavailability = 'Unavailability',
+  OpenPositions = 'Open Positions'
 }
 
 export enum ScheduleOrderType {

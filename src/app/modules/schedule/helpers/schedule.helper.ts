@@ -211,6 +211,7 @@ export const GetScheduleTabItems = (daySchedules: ScheduleItem[]): ShiftTab[] =>
     [ScheduleType.Book]: 'Booking',
     [ScheduleType.Unavailability]: 'Unavailable',
     [ScheduleType.Availability]: 'Available',
+    [ScheduleType.OpenPositions]: 'Open Positions',
   };
 
   return daySchedules.map((schedule: ScheduleItem) => {

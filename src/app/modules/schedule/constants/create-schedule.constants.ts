@@ -8,6 +8,7 @@ export enum ScheduleItemType {
   Book = 0,
   Availability = 1,
   Unavailability = 2,
+  OpenPositions = 3,
 }
 
 export enum ScheduleFormSourceKeys {
@@ -28,6 +29,13 @@ export const ScheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> =
     permission: UserPermissions.CanAddShift,
   },
   {
+    label: ScheduleType.OpenPositions,
+    value: ScheduleItemType.OpenPositions,
+    name: 'scheduleType',
+    disabled: false,
+    permission: UserPermissions.CanViewSchedule,
+  },
+  {
     label: ScheduleType.Availability,
     value: ScheduleItemType.Availability,
     name: 'scheduleType',
@@ -43,8 +51,42 @@ export const ScheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> =
   },
 ];
 
-
 const availabilityFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
+  {
+    field: 'shiftId',
+    title: 'Shift',
+    type: FieldType.Dropdown,
+    gridAreaName: 'shift',
+    required: true,
+    sourceKey: ScheduleFormSourceKeys.Shifts,
+  },
+  {
+    field: 'startTime',
+    title: 'Start Time',
+    type: FieldType.Time,
+    gridAreaName: 'startTime',
+    show: false,
+    required: true,
+  },
+  {
+    field: 'endTime',
+    title: 'End Time',
+    type: FieldType.Time,
+    gridAreaName: 'endTime',
+    show: false,
+    required: true,
+  },
+  {
+    field: 'hours',
+    title: 'Hrs',
+    type: FieldType.Input,
+    gridAreaName: 'hours',
+    required: false,
+    readonly: true,
+  },
+];
+
+const openPositionsFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
   {
     field: 'shiftId',
     title: 'Shift',
@@ -152,6 +194,11 @@ export const UnavailabilityFormConfig: ScheduleInt.ScheduleFormConfig = {
 export const BookFormConfig: ScheduleInt.ScheduleFormConfig = {
   formClass: 'book-form',
   formFields: bookFormFields,
+};
+
+export const OpenPositionsConfig: ScheduleInt.ScheduleFormConfig = {
+  formClass: 'open-positions-form',
+  formFields: openPositionsFormFields,
 };
 
 export const ScheduleSourcesMap: ScheduleInt.ScheduleFormSource = {
