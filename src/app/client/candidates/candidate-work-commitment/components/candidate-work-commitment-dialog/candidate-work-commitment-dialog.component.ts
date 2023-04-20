@@ -448,8 +448,6 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
           this.disableControls();
         }
 
-        console.log(this.selectedRegionLocations);
-
         this.cd.markForCheck();
       });
   }
