@@ -73,22 +73,22 @@
                               [isLoading]="isLoading"
                               [description]="isAgencyUser ? widgetDescriptionEnum.AGENCY_DESCRIPTION : widgetDescriptionEnum.ORG"
                               [isDarkTheme]="isDarkTheme"></app-org-widget>
-          <app-agencyposition-widget *ngSwitchCase="widgetTypeEnum.AGENCY_POSITION_COUNT"
+          <app-agencyposition-widget *ngSwitchCase="isAgencyUser ? widgetTypeEnum.AGENCY_POSITION_COUNT : -1"
                               [chartData]="widgetsData?.[widgetTypeEnum.AGENCY_POSITION_COUNT]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.AGENCY_POSITION_COUNT"
                               [isDarkTheme]="isDarkTheme"></app-agencyposition-widget>
-          <app-rn-utilization-widget *ngSwitchCase="widgetTypeEnum.RN_UTILIZATION" 
+          <app-rn-utilization-widget *ngSwitchCase="widgetTypeEnum.RN_UTILIZATION"
                                 [isLoading]="isLoading"
                                 [chartData]="widgetsData?.[widgetTypeEnum.RN_UTILIZATION]"
                                 [description]="widgetDescriptionEnum.RN_UTILIZATION_DESCRIPTION"
                                 [isDarkTheme]="isDarkTheme"></app-rn-utilization-widget>
-          <app-already-expired-creds *ngSwitchCase="widgetTypeEnum.ALREADY_EXPIRED_CREDS" class="exp_creds"   
+          <app-already-expired-creds *ngSwitchCase="widgetTypeEnum.ALREADY_EXPIRED_CREDS" class="exp_creds"
                               [chartData]="widgetsData?.[widgetTypeEnum.ALREADY_EXPIRED_CREDS]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.ALREADY_EXPIRED_CREDS"
                               [isDarkTheme]="isDarkTheme"></app-already-expired-creds>
-          <app-upcoming-exp-creds *ngSwitchCase="widgetTypeEnum.UPCOMING_EXP_CREDS" class="exp_creds"  
+          <app-upcoming-exp-creds *ngSwitchCase="widgetTypeEnum.UPCOMING_EXP_CREDS" class="exp_creds"
                               [chartData]="widgetsData?.[widgetTypeEnum.UPCOMING_EXP_CREDS]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.UPCOMING_EXP_CREDS"

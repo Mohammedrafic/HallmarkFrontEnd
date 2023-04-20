@@ -140,7 +140,7 @@ export class InvoiceAddPaymentService {
     initBalance: number | null = null): CustomFormGroup<PaymentForm> {
     return this.fb.group({
       id: [{ value: null, disabled: true }],
-      amount: [initAmount, [Validators.required, Validators.min(0), Validators.max(9999999999)]],
+      amount: [initAmount, [Validators.required, Validators.min(-9999999999), Validators.max(9999999999)]],
       balance: [{ value: initBalance, disabled: true }, [ Validators.min(0)]],
     }) as CustomFormGroup<PaymentForm>;
   }

@@ -424,6 +424,16 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/scheduled-hours',
     },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
+    },
     95: {
       // VMS Invoice Report Beta
       icon: '',
@@ -635,6 +645,16 @@ export const MENU_CONFIG: any = {
       // Scheduled Hours Report
       icon: '',
       route: '/analytics/scheduled-hours',
+    },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
     },
     95: {
       // VMS Invoice Report Beta
@@ -1029,6 +1049,16 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/scheduled-hours',
     },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
+    },
     95: {
       // VMS Invoice Report Beta
       icon: '',
@@ -1257,6 +1287,16 @@ export const MENU_CONFIG: any = {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',
+    },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
     },
     95: {
       // VMS Invoice Report Beta

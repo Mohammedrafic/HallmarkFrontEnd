@@ -5,7 +5,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Store } from '@ngxs/store';
 import { EMPTY, Observable, of, Subject } from 'rxjs';
 
-import { FilteredItem } from '@shared/models/filter.model';
+import { DateWeekService } from '@core/services';
 import { getTime } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
@@ -17,18 +17,15 @@ import { UserState } from 'src/app/store/user.state';
 import { CreateScheduleItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
 import {
-  EmployeeBookingDay,
+  EmployeeBookingDay, OpenPositionParams,
   ScheduleBookingErrors,
   ScheduleCandidate,
   ScheduleDay,
-  ScheduleFiltersData,
-  ScheduleFilterStructure,
   ScheduleForm,
   ScheduleFormConfig,
   ScheduleFormFieldConfig,
   ScheduleSelectedSlots,
   ScheduleTypeRadioButton,
-  ShiftDropDownsData,
 } from '../interface';
 import { ScheduleFiltersService } from './schedule-filters.service';
 import { ScheduleClassesList, ScheduleCustomClassesList, ToggleControls } from '../components/create-schedule';
@@ -54,7 +51,17 @@ export class CreateScheduleService {
     private fb: FormBuilder,
     private store: Store,
     private scheduleFiltersService:  ScheduleFiltersService,
+    private weekService: DateWeekService,
   ) {}
+
+  createOpenPositionsForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
+    return this.fb.group({
+      shiftId: [null, Validators.required],
+      startTime: [null, Validators.required],
+      endTime: [null, Validators.required],
+      hours: [null],
+    }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
+  }
 
   createUnavailabilityForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
     return this.fb.group({
@@ -277,50 +284,30 @@ export class CreateScheduleService {
     let className = ScheduleClassesList[ScheduleItemType.Book];
 
     if (scheduleType === ScheduleItemType.Book) {
-      className = isCustom
-        ? ScheduleCustomClassesList[ScheduleItemType.Book]
-        : ScheduleClassesList[ScheduleItemType.Book];
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Book] :
+        ScheduleClassesList[ScheduleItemType.Book];
     }
 
     if (scheduleType === ScheduleItemType.Availability) {
-      className = isCustom
-        ? ScheduleCustomClassesList[ScheduleItemType.Availability]
-        : ScheduleClassesList[ScheduleItemType.Availability];
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Availability] :
+        ScheduleClassesList[ScheduleItemType.Availability];
     }
 
-    if (scheduleType === ScheduleItemType.Unavailability){
-      className = isCustom
-        ? ScheduleCustomClassesList[ScheduleItemType.Unavailability]
-        : ScheduleClassesList[ScheduleItemType.Unavailability];
+    if (scheduleType === ScheduleItemType.Unavailability) {
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Unavailability] :
+        ScheduleClassesList[ScheduleItemType.Unavailability];
+    }
+
+    if(scheduleType === ScheduleItemType.OpenPositions) {
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.OpenPositions] :
+        ScheduleClassesList[ScheduleItemType.OpenPositions];
     }
 
     return className;
-  }
-
-  getShiftDropDownsData(scheduleFilterStructure: ScheduleFilterStructure): ShiftDropDownsData {
-    const scheduleFiltersData: ScheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
-
-    if (scheduleFiltersData?.filters?.departmentsIds?.length === 1) {
-      return {
-        filtered: true,
-        selectedSkillId: scheduleFiltersData.filters?.skillIds?.length ? scheduleFiltersData.filters.skillIds[0] : null,
-        regionsDataSource: this.getDataSourceFromFilteredItems('regionIds', scheduleFiltersData.filteredItems),
-        locationsDataSource: this.getDataSourceFromFilteredItems('locationIds', scheduleFiltersData.filteredItems),
-        departmentsDataSource: this.getDataSourceFromFilteredItems('departmentsIds', scheduleFiltersData.filteredItems),
-        skillsDataSource: this.getDataSourceFromFilteredItems('skillIds', scheduleFiltersData.filteredItems),
-      };
-    } else {
-      const data: ShiftDropDownsData = {} as ShiftDropDownsData;
-
-      data.filtered = false;
-      data.selectedSkillId = null;
-      data.locationsDataSource = this.scheduleFiltersService
-        .getSelectedLocatinOptions(scheduleFilterStructure, [scheduleFilterStructure.regions[0].id as number]);
-      data.departmentsDataSource = this.scheduleFiltersService
-        .getSelectedDepartmentOptions(scheduleFilterStructure, [data.locationsDataSource[0].value as number]);
-
-      return data;
-    }
   }
 
   getCandidateOrientation(candidate: ScheduleCandidate): boolean {
@@ -375,19 +362,26 @@ export class CreateScheduleService {
     });
   }
 
-  private getDataSourceFromFilteredItems(column: string, filteredItems: FilteredItem[]): DropdownOption[] {
-    const filteredItem = filteredItems.find((item: FilteredItem) => item.column === column);
+  createOpenPositionsParams(dates: string[]): OpenPositionParams {
+    const scheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
 
-    if (!filteredItem) {
-      return [];
+    if (dates.length) {
+      return  {
+        departmentId: (scheduleFiltersData.filters.departmentsIds as number[])[0],
+        skillId: (scheduleFiltersData.filters.skillIds as number[])[0],
+        selectedDates: dates,
+      };
     }
 
-    return [{
-      text: filteredItem.text,
-      value: filteredItem.value,
-    }];
-  }
+    const [startDate, endDate] = this.weekService.getRange();
 
+    return {
+      departmentId: (scheduleFiltersData.filters.departmentsIds as number[])[0],
+      skillId: (scheduleFiltersData.filters.skillIds as number[])[0],
+      startDate,
+      endDate,
+    };
+  }
   private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]): void {
     const isCandidatesOriented = candidates.map((candidate: ScheduleCandidate) => {
       return this.getCandidateOrientation(candidate);

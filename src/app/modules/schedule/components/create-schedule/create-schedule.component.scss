@@ -24,6 +24,7 @@ app-schedule-items {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 40px;
+  min-height: 40px;
 
   .title {
     h3 {
@@ -88,7 +89,7 @@ app-schedule-items {
 
 .schedule-types {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   border: 1px solid $primary-active-blue-10;
   border-radius: 8px;
   margin-bottom: 24px;
@@ -102,12 +103,13 @@ app-schedule-items {
   .input-group:last-child {
     border-bottom-right-radius: 5px;
     border-top-right-radius: 5px;
+    min-width: 93px;
   }
 
   .input-group {
-    width: 100%;
     text-align: center;
     border-left: 1px solid $primary-active-blue-10;
+    padding: 0 4px;
   }
 
   .input-group:has(.e-control.e-radio:checked) {
@@ -125,7 +127,7 @@ app-schedule-items {
   }
 
   ejs-radiobutton .e-control.e-radio + label {
-    min-width: 130px;
+    min-width: 90px;
 
     .e-label {
       color: $primary-active-blue-10 !important;
@@ -153,7 +155,8 @@ app-schedule-items {
   }
 }
 
-.availability-form {
+.availability-form,
+.open-positions-form {
   display: grid;
   grid-template-columns: 1.5fr 0.3fr 0.3fr 0.9fr 0.7fr;
   grid-template-rows: 1fr;
@@ -196,7 +199,8 @@ app-schedule-items {
     "switch-wrap switch-wrap switch-wrap switch-wrap switch-wrap";
 }
 
-.availability-time-form {
+.availability-time-form,
+.open-positions-time-form {
   display: grid;
   grid-template-columns: 1.3fr 0.4fr 0.4fr 0.9fr 0.7fr;
   grid-template-rows: 1fr;

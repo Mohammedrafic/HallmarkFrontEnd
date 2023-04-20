@@ -155,3 +155,22 @@ export class ImportUsers {
 
   constructor(public readonly file: FormData) {}
 }
+
+
+export class GetOrgInterfacePage {
+  static readonly type = '[security] Get OrgInterface Page';
+  constructor(
+    public organizationId: number | null,
+    public pageNumber: number,
+    public pageSize: number,
+  ) {}
+}
+
+export class GetLogInterfacePage {
+  static readonly type = '[security] Get LogInterface Page';
+  constructor(
+    public organizationId: number | null,
+    public pageNumber: number,
+    public pageSize: number,
+  ) {}
+}

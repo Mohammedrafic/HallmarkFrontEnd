@@ -2,19 +2,20 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
-import { map, skip } from 'rxjs/operators';
+import { distinctUntilChanged, map, skip } from 'rxjs/operators';
 
-import { Destroyable } from '@core/helpers';
-import { FilterPageName } from '@core/enums';
-import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { SystemType } from '@shared/enums/system-type.enum';
+import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
+import { SkillsService } from '@shared/services/skills.service';
+import { Destroyable, isObjectsEqual } from '@core/helpers';
+import { FieldType, FilterPageName } from '@core/enums';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { Skill } from '@shared/models/skill.model';
 import { OrganizationStructureService } from '@shared/services';
 import { FilterService } from '@shared/services/filter.service';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { ScheduleFiltersColumns } from '../../constants';
+import { ScheduleFilterFormGroupConfig, ScheduleFiltersColumns } from '../../constants';
 import { ScheduleFilterHelper } from '../../helpers';
 import { ScheduleFilters, ScheduleFiltersData, ScheduleFilterStructure } from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
@@ -34,9 +35,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   @Select(UserState.organizationStructure)
   private readonly organizationStructure$: Observable<OrganizationStructure>;
 
-  @Select(OrganizationManagementState.assignedSkillsByOrganization)
-  private readonly skills$: Observable<Skill[]>;
-
   public filteredItems: FilteredItem[] = [];
 
   public readonly scheduleFilterFormGroup = this.scheduleFiltersService.createScheduleFilterForm();
@@ -44,6 +42,10 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   public readonly filterColumns = ScheduleFiltersColumns;
 
   public readonly optionFields = { text: 'text', value: 'value' };
+
+  public readonly formConfig = ScheduleFilterFormGroupConfig;
+
+  public readonly fieldTypes = FieldType;
 
   private filters: ScheduleFilters = {};
 
@@ -55,22 +57,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   private autoApplyFilters = false;
 
-  get selectedSkillsNumber(): number {
-    return this.scheduleFilterFormGroup.get('skillIds')?.value?.length || 0;
-  }
-
-  get selectedRegionsNumber(): number {
-    return this.scheduleFilterFormGroup.get('regionIds')?.value?.length || 0;
-  }
-
-  get selectedLocationsNumber(): number {
-    return this.scheduleFilterFormGroup.get('locationIds')?.value?.length || 0;
-  }
-
-  get selectedDepartmentsNumber(): number {
-    return this.scheduleFilterFormGroup.get('departmentsIds')?.value?.length || 0;
-  }
-
   constructor(
     private store: Store,
     private filterService: FilterService,
@@ -78,6 +64,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     private scheduleFiltersService: ScheduleFiltersService,
     private scheduleApiService: ScheduleApiService,
     private organizationStructureService: OrganizationStructureService,
+    private skillsService: SkillsService,
   ) {
     super();
   }
@@ -183,12 +170,15 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
           }
         }),
         filter((departmentsIds: number[]) => !!departmentsIds?.length),
-        switchMap((departmentsIds: number[]) => this.scheduleApiService.getSkillsByEmployees(departmentsIds[0])),
-        filter((skills: Skill[]) => !!skills.length),
+        switchMap((departmentsIds: number[]) => {
+          const params = { SystemType: SystemType.IRP, DepartmentIds: departmentsIds };
+          return this.skillsService.getAssignedSkillsByOrganization({ params });
+        }),
+        filter((skills: AssignedSkillsByOrganization[]) => !!skills.length),
         takeUntil(this.componentDestroy())
-      ).subscribe((skills: Skill[]) => {
+      ).subscribe((skills: AssignedSkillsByOrganization[]) => {
         if (skills.length) {
-          const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
+          const skillOption = ScheduleFilterHelper.adaptOrganizationSkillToOption(skills);
           this.filterColumns.skillIds.dataSource = skillOption;
           this.scheduleFilterFormGroup.get('skillIds')?.patchValue([skillOption[0]?.value]);
         } else {
@@ -291,9 +281,10 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   private applyPreservedFilters(): void {
     this.organizationStructure$.pipe(
-      filter((structure) => !!structure),
-      switchMap(() => this.scheduleFiltersService.getPreservedFiltersDataStream()),
-      filter((filters) => !!filters),
+      switchMap((structure) => this.scheduleFiltersService.getPreservedFiltersDataStream().pipe(
+        filter(() => !!structure),
+      )),
+      distinctUntilChanged((prev, next) => isObjectsEqual(prev as Record<string, unknown>, next as Record<string, unknown>)),
       takeUntil(this.componentDestroy())
     )
     .subscribe((preservFilters) => {

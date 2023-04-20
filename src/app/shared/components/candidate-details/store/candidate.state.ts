@@ -136,7 +136,7 @@ export class CandidateDetailsState {
 
   @Action(GetCandidateSkills)
   GetCandidateSkills({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<MasterSkillByOrganization[]> {
-    return this.skillsService.getAssignedSkillsByOrganization().pipe(
+    return this.skillsService.getSortedAssignedSkillsByOrganization().pipe(
       tap((payload: MasterSkillByOrganization[]) => {
         patchState({ candidateSkills: payload });
         return payload;

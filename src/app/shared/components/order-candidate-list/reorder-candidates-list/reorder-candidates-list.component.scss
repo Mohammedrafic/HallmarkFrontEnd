@@ -7,6 +7,19 @@
     color: $primary-active-blue-10;
     font-weight: 700;
     font-size: 14px;
+  }
+
+  .candidate-link {
+    cursor: pointer;
+    color: $primary-active-blue-10;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+
+    .link-name {
+      margin-bottom: 4px;
+    }
 
     i-feather {
       cursor: pointer;

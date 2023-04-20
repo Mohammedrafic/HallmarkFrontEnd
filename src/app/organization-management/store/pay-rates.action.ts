@@ -31,3 +31,8 @@ export class ExportPayRateSetup {
   constructor(public payload: ExportPayload) { }
 }
 
+export class GetSkillsbyDepartment {
+  static readonly type = '[payrates] Get Skills by department';
+  constructor(public payload: number[]) { }
+}
+

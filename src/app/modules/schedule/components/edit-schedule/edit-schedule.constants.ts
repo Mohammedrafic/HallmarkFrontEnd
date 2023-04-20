@@ -74,9 +74,9 @@ const scheduledUnavailabilityFormFields = (createMode: boolean): EditScheduleFor
   ];
 };
 
-const scheduledShiftFormFields = (filtered: boolean,  createMode: boolean): EditScheduleFormFieldConfig[] => {
+const scheduledShiftFormFields = (): EditScheduleFormFieldConfig[] => {
   return [
-    ...scheduledAvailabilityFormFields(createMode),
+    ...scheduledAvailabilityFormFields(false),
     {
       field: 'orientated',
       title: 'ORI',
@@ -123,7 +123,7 @@ const scheduledShiftFormFields = (filtered: boolean,  createMode: boolean): Edit
       type: FieldType.Dropdown,
       gridAreaName: 'region',
       required: false,
-      readonly: filtered,
+      readonly: false,
       sourceKey: EditScheduleFormSourceKeys.Regions,
     },
     {
@@ -132,7 +132,7 @@ const scheduledShiftFormFields = (filtered: boolean,  createMode: boolean): Edit
       type: FieldType.Dropdown,
       gridAreaName: 'location',
       required: false,
-      readonly: filtered,
+      readonly: false,
       sourceKey: EditScheduleFormSourceKeys.Locations,
     },
     {
@@ -141,7 +141,7 @@ const scheduledShiftFormFields = (filtered: boolean,  createMode: boolean): Edit
       type: FieldType.Dropdown,
       gridAreaName: 'department',
       required: false,
-      readonly: filtered,
+      readonly: false,
       sourceKey: EditScheduleFormSourceKeys.Departments,
     },
     {
@@ -149,17 +149,70 @@ const scheduledShiftFormFields = (filtered: boolean,  createMode: boolean): Edit
       title: 'Skill',
       type: FieldType.Dropdown,
       gridAreaName: 'skill',
-      readonly: filtered,
+      readonly: false,
       required: false,
       sourceKey: EditScheduleFormSourceKeys.Skills,
     },
   ];
 };
 
-export const ScheduledShiftFormConfig = (filtered: boolean, createMode: boolean): EditScheduleFormConfig => {
+const newShiftFormFields = (): EditScheduleFormFieldConfig[] => {
+  return [
+    ...scheduledAvailabilityFormFields(true),
+    {
+      field: 'orientated',
+      title: 'ORI',
+      type: FieldType.Toggle,
+      gridAreaName: 'toggle1',
+      required: false,
+      show: true,
+    },
+    {
+      field: 'critical',
+      title: 'CRT',
+      type: FieldType.Toggle,
+      gridAreaName: 'toggle2',
+      required: false,
+      show: true,
+    },
+    {
+      field: 'oncall',
+      title: 'OC',
+      type: FieldType.Toggle,
+      gridAreaName: 'toggle3',
+      required: false,
+      show: true,
+    },
+    {
+      field: 'charge',
+      title: 'CHG',
+      type: FieldType.Toggle,
+      gridAreaName: 'toggle4',
+      required: false,
+      show: true,
+    },
+    {
+      field: 'preceptor',
+      title: 'PRC',
+      type: FieldType.Toggle,
+      gridAreaName: 'toggle5',
+      required: false,
+      show: true,
+    },
+  ];
+};
+
+export const ScheduledShiftFormConfig = (): EditScheduleFormConfig => {
   return {
     formClass: 'scheduled-shift-form',
-    formFields: scheduledShiftFormFields(filtered, createMode),
+    formFields: scheduledShiftFormFields(),
+  };
+};
+
+export const NewShiftFormConfig = (): EditScheduleFormConfig => {
+  return {
+    formClass: 'new-shift-form',
+    formFields: newShiftFormFields(),
   };
 };
 
@@ -190,4 +243,5 @@ export const RemoveButtonTitleMap = {
   [ScheduleType.Book]: 'Booking',
   [ScheduleType.Availability]: 'Availability',
   [ScheduleType.Unavailability]: 'Unavailability',
+  [ScheduleType.OpenPositions]: 'OpenPositions',
 };

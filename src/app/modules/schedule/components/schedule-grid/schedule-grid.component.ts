@@ -46,8 +46,9 @@ import { ScheduleGridService } from './schedule-grid.service';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
-import { GetPreservedFiltersByPage } from 'src/app/store/preserved-filters.actions';
+import { GetPreservedFiltersByPage, ResetPageFilters } from 'src/app/store/preserved-filters.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -147,6 +148,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.watchForScroll();
     this.watchForCandidateSearch();
     this.watchForSideBarAction();
+    this.watchForPreservedFilters();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -249,14 +251,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         }
       }),
       switchMap((businessUnitId: number) => {
-        return this.store.dispatch([
-          new GetOrganizationById(businessUnitId),
-          new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
-        ]);
-      }),
-      switchMap(() => this.preservedFiltersByPageName$),
-      tap((filters) => {
-        this.setPreservedFiltersDataSource(filters);
+        return this.store.dispatch(new GetOrganizationById(businessUnitId));
       }),
       switchMap(() => {
         this.checkOrgPreferences();
@@ -380,9 +375,25 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     }
   }
 
-  private setPreservedFiltersDataSource(filters: PreservedFiltersByPage<ScheduleInt.ScheduleFilters>): void {
-    if (!filters.isNotPreserved && filters.dispatch) {
-      this.scheduleFiltersService.setPreservedFiltersDataStream({ ...filters.state });
-    }
+  private watchForPreservedFilters(): void {
+    this.organizationId$.pipe(
+      filter((id) => !!id),
+      tap(() => {
+        this.store.dispatch([
+          new ClearOrganizationStructure(),
+          new ResetPageFilters(),
+          new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
+        ]);
+      }),
+      switchMap(() => this.preservedFiltersByPageName$),
+      filter(({ dispatch }) => dispatch),
+      takeUntil(this.componentDestroy()),
+    ).subscribe((filters) => {
+      this.setPreservedFiltersDataSource(filters.state || {});
+    });
+  }
+
+  private setPreservedFiltersDataSource(filters: ScheduleInt.ScheduleFilters): void {
+    this.scheduleFiltersService.setPreservedFiltersDataStream({ ...filters });
   }
 }

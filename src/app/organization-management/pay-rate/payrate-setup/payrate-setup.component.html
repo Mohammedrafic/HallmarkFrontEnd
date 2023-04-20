@@ -256,8 +256,8 @@
                 appValidateWithMessage
                 selectAllText="Select All"
                 mode="CheckBox"
-                [dataSource]="allSkills"
-                [fields]="skillsFields"
+                [dataSource]="skills"
+                [fields]="fields"
                 [showSelectAll]="true"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"
@@ -276,7 +276,7 @@
                 appValidateWithMessage
                 selectAllText="Select All"
                 mode="CheckBox"
-                [dataSource]="commitmentsPage$ | async"
+                [dataSource]="(commitmentsPage$ | async)?.items"
                 [fields]="optionFields"
                 [showSelectAll]="true"
                 [allowFiltering]="true"
@@ -299,7 +299,7 @@
                 [showSelectAll]="true"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"
-                formControlName="orderTypeIds"
+                formControlName="orderTypes"
               >
               </ejs-multiselect>
             </div>
@@ -315,7 +315,7 @@
                 [allowFiltering]="true"
                 [dataSource]="PayRateTitleOption"
                 [fields]="fields"
-                formControlName="payRateTitleId"
+                formControlName="payRateConfigId"
               >
               </ejs-dropdownlist>
             </div>
@@ -328,6 +328,7 @@
                 class="e-input e-disabled"
                 type="text"
                 placeholder="Regular"
+                value = "Regular"
                 formControlName="payRatesCategory"
               />
             </div>
@@ -399,7 +400,7 @@
       (applyFilterClicked)="onFilterApply()"
       (closeDialogClicked)="onFilterClose()"
     >
-      <form class="bootstrap" [formGroup]="billRateFilterFormGroup">
+      <form class="bootstrap" [formGroup]="payRateFilterFormGroup">
         <div class="filter-row">
           <div class="input-container">
             <label>Region</label>
@@ -455,7 +456,7 @@
                 mode="CheckBox"
                 formControlName="skillIds"
                 placeholder="All"
-                [fields]="skillsFields"
+                [fields]="fields"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"
                 [dataSource]="filterColumns.skillIds.dataSource"
