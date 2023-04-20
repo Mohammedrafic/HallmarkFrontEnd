@@ -181,7 +181,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     });
 
     this.commitmentsPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
-      if(id.items){
+      if(id){
         this.workcommitments = id.items;
       }
     });
@@ -749,7 +749,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   }
 
   private setupFormValues(data: PayRateSetup): void {
-    console.log(data);
     this.allRegionsChange({ checked: !data.regionId });
     this.allLocationsChange({ checked: !data.locationId });
     this.allDepartmentsChange({ checked: !data.departmentId });
