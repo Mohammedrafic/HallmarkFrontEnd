@@ -124,3 +124,26 @@ export const isPrimitiveArraysEqual = (arr1: unknown[], arr2: unknown[], strictE
 
   return arrayA.every((val: unknown, index: number) => val === arrayB[index]);
 };
+
+/**
+ * @param arr array to group
+ * @param keys group by keys
+ * @param names names of the groups
+ * @returns { groupId: { items: [], id: '0', name: 'groupName' } }
+ */
+export const groupBy = <T>(arr: T[], keys: (keyof T)[], names: (keyof T)[]): { [key: string]: {items:T[], id: string, name: string} } => {
+  return arr.reduce((storage, item) => {
+    const objKey = keys.map(key => `${ item[key] }`).join(':');
+    const objName = names.map(name => `${ item[name] }`).join(':');
+    if (storage[objKey]) {
+      storage[objKey].items.push(item);
+    } else {
+      storage[objKey] = { items: [item], id: objKey, name: objName };
+    }
+    return storage;
+  }, {} as { [key: string]: { items: T[], id: string, name: string }});
+}
+
+export const distinctByKey = <T>(arr: T[], key: (keyof T)): T[] => {
+  return [...new Map(arr.map(item => [item[key], item])).values()];
+}

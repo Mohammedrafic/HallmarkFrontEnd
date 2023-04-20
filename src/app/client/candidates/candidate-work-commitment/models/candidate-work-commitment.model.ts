@@ -1,14 +1,9 @@
 import { PageOfCollections } from "@shared/models/page.model";
 
-export type WorkCommitmentDataSource = {
-  id: number;
-  name: string;
-}
-
 export type CandidateWorkCommitment = {
   id?: number;
   employeeId?: number;
-  workCommitmentId?: number;
+  workCommitmentIds: number[];
   name?: string;
   regions?: string[];
   locations?: string[];
