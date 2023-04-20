@@ -6,6 +6,7 @@ import { Store } from '@ngxs/store';
 
 import { PayRateHistory } from '../interfaces';
 import { handleHttpError } from '@core/operators/http-error-handler';
+import { PageOfCollections } from '@shared/models/page.model';
 
 @Injectable()
 export class PayRateApiService {
@@ -14,15 +15,31 @@ export class PayRateApiService {
     private readonly store: Store,
   ) { }
 
-  public getPayRateRecords(): Observable<PayRateHistory[]> {
-    return this.httpClient.get<PayRateHistory[]>('/api/PayRateHistory').pipe(handleHttpError(this.store));
+  public getPayRateRecords(
+    payload: {
+      employeeId: number,
+      employeeWorkCommitmentId: number,
+      pageNumber: number,
+      pageSize: number,
+    }
+  ): Observable<PageOfCollections<PayRateHistory>> {
+    return this.httpClient.post<PageOfCollections<PayRateHistory>>
+      ('/api/EmployeeWorkCommitmentPayRates/list', payload)
+      .pipe(handleHttpError(this.store));
   }
 
-  public addPayRateRecord(payRate: PayRateHistory): Observable<PayRateHistory> {
-    return this.httpClient.post<PayRateHistory>('/api/PayRateHistory', { payRate }).pipe(handleHttpError(this.store));
+  public addPayRateRecord(
+    payload: {
+      employeeWorkCommitmentId: number,
+      payRate: number,
+      startDate: string,
+    }
+  ): Observable<PayRateHistory> {
+    return this.httpClient.post<PayRateHistory>('/api/EmployeeWorkCommitmentPayRates', { ...payload })
+      .pipe(handleHttpError(this.store));
   }
 
   public deletePayRateRecord(id: number): Observable<void> {
-    return this.httpClient.delete<void>('/api/PayRateHistory/' + id).pipe(handleHttpError(this.store));
+    return this.httpClient.delete<void>('/api/EmployeeWorkCommitmentPayRates/' + id).pipe(handleHttpError(this.store));
   }
 }

@@ -7,6 +7,8 @@
   ></app-candidate-work-commitment-grid>
   <app-pay-rate-history
     class="grid"
+    [employeeIdVal]="candidateService.employeeId"
+    [refreshSubject$]="refreshSubject$"
   ></app-pay-rate-history>
   <app-availability-restriction
     class="grid"

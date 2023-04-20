@@ -33,7 +33,7 @@ export class CandidatesService {
     this.candidateName$.next(name);
   }
 
-  public setActiveEmployeeWorkCommitment(commitment: CandidateWorkCommitmentShort): void {
+  public setActiveEmployeeWorkCommitment(commitment: CandidateWorkCommitmentShort | null): void {
     this.activeEmployeeWorkCommitment$.set(commitment);
   }
 
@@ -53,7 +53,7 @@ export class CandidatesService {
       .pipe(
         map((data) => {
           const activeWorkCommitment = data.find((commitment) => commitment.isActive);
-          activeWorkCommitment && this.setActiveEmployeeWorkCommitment(activeWorkCommitment);
+          this.setActiveEmployeeWorkCommitment(activeWorkCommitment || null);
           return activeWorkCommitment;
         })
       );

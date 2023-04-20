@@ -3,23 +3,32 @@ import { formatDate } from "@angular/common";
 import { ValueFormatterParams } from "@ag-grid-community/core";
 
 import { formatDate as format } from "@shared/constants";
-import { CandidateCommitmentGridActionRendererComponent } from 
-  "../components/candidate-work-commitment-grid/grid-action-renderer/grid-action-renderer.component";
 import { PayRateColumns } from "../enums/pay-rate-columns.enum";
 import { PayRateHistory } from "../interfaces/pay-rate-history.interface";
+import { GridActionsCellComponent, GridActionsCellConfig } from "@shared/components/grid/cell-renderers/grid-actions-cell";
 
-export const PayRateColumnDef = (deleteCallback: (value: number) => void) =>  ([
+export const PayRateColumnDef = (deleteCallback: (value: number) => void) => ([
   {
     field: '',
     headerName: '',
-    cellRenderer: CandidateCommitmentGridActionRendererComponent,
     maxWidth: 100,
-    cellRendererParams: {
-      delete: (value: PayRateHistory) => {
-        if (value.id) {
-          deleteCallback(value.id);
-        }
-      },
+    cellRenderer: GridActionsCellComponent,
+    cellRendererParams: (): GridActionsCellConfig => {
+      return {
+        actionsConfig: [
+          {
+            action: (value) => {
+              const id = (value as PayRateHistory).id as number;
+              if (id) {
+                deleteCallback(id);
+              }
+            },
+            iconName: 'trash-2',
+            buttonClass: 'remove-button',
+            disabled: false,
+          },
+        ],
+      };
     },
   },
   {
@@ -39,6 +48,7 @@ export const PayRateColumnDef = (deleteCallback: (value: number) => void) =>  ([
   {
     field: PayRateColumns.PAY_RATE,
     headerName: 'Pay Rate',
+    type: 'rightAligned',
     width: 160,
     valueFormatter: (params: ValueFormatterParams) => `$ ${params.value}`,
   },
@@ -46,6 +56,6 @@ export const PayRateColumnDef = (deleteCallback: (value: number) => void) =>  ([
   {
     field: PayRateColumns.WORC_COMMITMENT,
     headerName: 'Work Commitment',
-    width: 160,
+    width: 260,
   },
 ]);

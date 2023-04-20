@@ -34,6 +34,7 @@ import { PayRateHistoryComponent } from './components/pay-rate-history/pay-rate-
 import { PayRateHistoryDialogComponent } from './components/pay-rate-history-dialog/pay-rate-history-dialog.component';
 import { PayRateService } from './services/pay-rate.service';
 import { PayRateApiService } from './services/pay-rate-api.service';
+import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,7 @@ import { PayRateApiService } from './services/pay-rate-api.service';
     DropDownListModule,
     DialogModule,
     ReactiveFormsModule,
+    TooltipContainerModule,
   ],
   providers: [
     CandidateWorkCommitmentService,
