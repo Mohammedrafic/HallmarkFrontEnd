@@ -277,4 +277,11 @@ export class DateTimeHelper {
 
     return range;
   }
+
+  public static getDSTCorrectionInMs(date: Date): number {
+    const janOffset = new Date(0, 1).getTimezoneOffset();
+    const dateOffset = new Date(date).getTimezoneOffset();
+ 
+    return (janOffset - dateOffset) * 60 * 60 * 1000;
+  }
 }

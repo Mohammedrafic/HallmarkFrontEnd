@@ -90,7 +90,10 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
   }
 
   public prevWeek(): void {
-    const weekStart = new Date(new Date(this.startDateValue).getTime() - this.weekInMs);
+    const startDate = new Date(this.startDateValue);
+    const dstCorrection = DateTimeHelper.getDSTCorrectionInMs(startDate);
+
+    const weekStart = new Date(new Date(startDate.getTime() + dstCorrection - this.weekInMs));
     const dateRange = DateTimeHelper.getRange(weekStart, this.startDate, this.rangeType, this.firstDayOfWeek,
       !!this.maxDate);
 
@@ -98,7 +101,10 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
   }
 
   public nextWeek(): void {
-    const weekStart = new Date(new Date(this.startDateValue).getTime() + this.weekInMs);
+    const startDate = new Date(this.startDateValue);
+    const dstCorrection = DateTimeHelper.getDSTCorrectionInMs(startDate);
+
+    const weekStart = new Date(startDate.getTime() - dstCorrection + this.weekInMs);
     const dateRange = DateTimeHelper.getRange(weekStart, this.startDate, this.rangeType, this.firstDayOfWeek,
       !!this.maxDate);
 
@@ -234,7 +240,6 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   private setRangeToService(range: string, value: Date | string): void {
     this.dateControl.setValue(range, { emitEvent: false });
-
     const startRangeDate = DateTimeHelper.getDynamicWeekDate(value, true, this.startDate, this.rangeType,
       this.firstDayOfWeek, !!this.maxDate);
 
