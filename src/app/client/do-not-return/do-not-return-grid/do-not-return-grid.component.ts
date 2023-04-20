@@ -312,6 +312,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.isAlive = false;
     this.getDoNotReturn();
     this.GetAllOrganization();
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   public onRowsDropDownChanged(): void {
