@@ -20,8 +20,8 @@
       action-button
       class="add-action"
       cssClass="e-action-button"
-      ejs-button (click)="addPayRate()"
-      [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile] || !this.noActiveWorkCommitment"
+      ejs-button (click)="openDialog()"
+      [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile] || this.noActiveWorkCommitment"
     >
       <i-feather name="plus" class="icon"></i-feather>
       Add Pay rate

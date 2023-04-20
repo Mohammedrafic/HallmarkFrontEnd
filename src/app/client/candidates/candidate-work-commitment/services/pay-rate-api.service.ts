@@ -24,8 +24,7 @@ export class PayRateApiService {
     }
   ): Observable<PageOfCollections<PayRateHistory>> {
     return this.httpClient.post<PageOfCollections<PayRateHistory>>
-      ('/api/EmployeeWorkCommitmentPayRates/list', payload)
-      .pipe(handleHttpError(this.store));
+      ('/api/EmployeeWorkCommitmentPayRates/list', payload);
   }
 
   public addPayRateRecord(

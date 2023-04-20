@@ -273,7 +273,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
 
   private getActiveEmployeeWorkCommitment(): void {
     this.candidatesService
-      .getActiveEmployeeWorkCommitment()
+      .getActiveWorkCommitmentStream()
       .pipe(
         filter(Boolean),
         takeUntil(this.componentDestroy()),

@@ -37,7 +37,7 @@ export class CandidatesService {
     this.activeEmployeeWorkCommitment$.set(commitment);
   }
 
-  public getActiveEmployeeWorkCommitment(): Observable<CandidateWorkCommitmentShort | null> {
+  public getActiveWorkCommitmentStream(): Observable<CandidateWorkCommitmentShort | null> {
     return this.activeEmployeeWorkCommitment$.getStream();
   }
 

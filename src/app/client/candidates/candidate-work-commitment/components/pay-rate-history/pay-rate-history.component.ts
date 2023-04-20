@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input } 
 import { FormGroup } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { Subject, switchMap, take, Observable, filter, of, takeUntil } from 'rxjs';
+import { Subject, switchMap, take, Observable, filter, takeUntil, map } from 'rxjs';
 
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { PagerConfig } from '../../constants';
@@ -14,6 +14,7 @@ import { PayRateApiService } from '../../services/pay-rate-api.service';
 import { PageOfCollections } from '@shared/models/page.model';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { DateTimeHelper } from '@core/helpers';
+import { handleHttpError } from '@core/operators';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, NO_ACTIVE_WORK_COMMITMET } from '@shared/constants';
 import { DateRanges } from '@client/candidates/departments/departments.model';
@@ -68,12 +69,7 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
     this.initFormGroup();
     this.initColumnsDefinition();
     this.getActiveEmployeeWorkCommitment();
-
-    //TODO implement refresh grid while updating wc EIN-14375
-    // this.refreshSubject$.subscribe((data) => {
-    //   console.error(data);
-    //   this.dispatchNewPage();
-    // });
+    this.syncWorkCommitmentWithPayRate();
   }
 
   public handleChangePage(pageNumber: number): void {
@@ -83,7 +79,7 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
     }
   }
 
-  public addPayRate(): void {
+  public openDialog(): void {
     this.dialogSubject$.next({ isOpen: true });
   }
 
@@ -98,12 +94,10 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
 
       this.payRateApiService.addPayRateRecord(payload)
         .pipe(
-          switchMap(() => this.getPayRateRecords()),
           take(1)
-        ).subscribe((data) => {
+        ).subscribe(() => {
           this.dialogSubject$.next({ isOpen: false });
           this.refreshSubject$.next();
-          this.extractData(data);
         });
     } else {
       this.formGroup.markAllAsTouched();
@@ -142,19 +136,19 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
   }
 
   private getPayRateRecords(): Observable<PageOfCollections<PayRateHistory>> {
-    return this.candidateService.getActiveEmployeeWorkCommitment()
+    return this.candidateService.getActiveWorkCommitmentStream()
       .pipe(
         filter(Boolean),
-        switchMap((activeWorkCommitment) => of({
+        map((activeWorkCommitment) => ({
           employeeId: this.employeeId,
           employeeWorkCommitmentId: activeWorkCommitment.id,
           pageNumber: this.pagingData.pageNumber,
           pageSize: this.pagingData.pageSize,
         })),
-        switchMap((payload) => this.payRateApiService.getPayRateRecords(payload))
+        switchMap((payload) => this.payRateApiService.getPayRateRecords(payload)),
+        handleHttpError(this.store)
       );
   }
-
 
   public extractData(data: PageOfCollections<PayRateHistory>): void {
     this.payRateRecords = data.items;
@@ -179,15 +173,25 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
   }
 
   public getActiveEmployeeWorkCommitment(): void {
-    this.candidateService.getActiveEmployeeWorkCommitment()
+    this.candidateService.getActiveWorkCommitmentStream()
       .pipe(
         takeUntil(this.componentDestroy())
       ).subscribe((data) => {
-        this.noActiveWorkCommitment = !!data;
+        this.noActiveWorkCommitment = !data;
         if (data) {
           this.employeeWorkCommitmentId = data.id;
           this.setDateRanges(data);
         }
+      });
+  }
+
+  private syncWorkCommitmentWithPayRate(): void {
+    this.refreshSubject$
+      .pipe(
+        switchMap(() => this.getPayRateRecords()),
+        takeUntil(this.componentDestroy()),
+      ).subscribe((data) => {
+        this.extractData(data);
       });
   }
 }
