@@ -16,6 +16,12 @@ export interface WorkCommitmentOrgHierarchies {
   locationName: string;
 }
 
+export interface WorkCommitmentDetailsGroup {
+  items: WorkCommitmentDetails[];
+  id: string;
+  name: string;
+}
+
 export interface WorkCommitmentDetails {
   availabilityRequirement: number;
   comments: string;

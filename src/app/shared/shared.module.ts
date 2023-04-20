@@ -57,6 +57,7 @@ import { DialogNextPreviousComponent } from './components/dialog-next-previous/d
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
 import { AccordionModule, SidebarModule, TabAllModule, TreeViewAllModule } from '@syncfusion/ej2-angular-navigations';
 import { OrderTypeName } from '@shared/pipes/order-type-name.pipe';
+import { PayOrderTypeName } from '@shared/pipes/payrate-order-type.pipe';
 import { GeneralOrderInfoComponent } from './components/general-order-info/general-order-info.component';
 import {
   ColumnMenuService,
@@ -203,6 +204,7 @@ const icons = {
 const COMPONENTS = [
   ChipsCssClass,
   OrderTypeName,
+  PayOrderTypeName,
   CandidateStatusName,
   FormatPhoneNumberPipe,
   RateHourPipe,

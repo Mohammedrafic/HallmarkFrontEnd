@@ -32,6 +32,8 @@ export class OrganizationSettingsPost {
   hierarchyId: number;
   settingKey: string;
   value: string;
+  locationId?: number[];
+  regionId?: number[];
 }
 
 export class OrganizationSettingsDropDownOption {

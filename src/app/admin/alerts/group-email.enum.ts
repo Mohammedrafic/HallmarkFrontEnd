@@ -11,6 +11,7 @@ export enum AgencyUserType {
 
 export enum OrganizationUserType {
   InternalUsers = 1,
-  Candidates = 2
+  Candidates = 2,
   // Agencies = 3
+  Employees = 4
 }

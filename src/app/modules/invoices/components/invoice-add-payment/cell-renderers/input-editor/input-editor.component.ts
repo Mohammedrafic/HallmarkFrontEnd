@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, ChangeDetectorRef } from '@angular/
 
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
+
 import { InvoiceAddPaymentComponent } from '../../invoice-add-payment.component';
 
 @Component({

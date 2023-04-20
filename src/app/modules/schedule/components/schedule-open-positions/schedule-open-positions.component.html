@@ -1,0 +1,29 @@
+<div class="open-position-wrapper">
+  <div class="title">Matching Open Positions</div>
+  <div class="content">
+    <ng-container *ngFor="let item of openPositions; trackBy: trackByPosition">
+      <div class="position-item" *ngIf="item.positions.length">
+        <div class="position-item__title">
+          {{item.date | date: 'E MM/dd'}}
+          <span class="position-counter">{{item.totalOpenPositions}}</span>
+        </div>
+        <div class="card-container">
+          <ng-container *ngFor="let card of item.positions; trackBy: trackByCard">
+            <div class="card-container__card">
+              <div class="card-container__card--time">
+                {{card.shiftStartTime | date: 'HH:mm': 'UTC'}} - {{card.shiftEndTime | date: 'HH:mm': 'UTC'}}
+              </div>
+              <div class="card-container__card--attributes">{{card.attributes}}</div>
+              <div class="card-container__card--action">
+                <button>
+                  {{card.publicId}}
+                </button>
+                <span class="position-counter">{{card.openPositions}}</span>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

@@ -46,6 +46,7 @@ import { VendorActivityComponent } from './vendor-activity/vendor-activity.compo
 import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-schedule-by-shift.component';
 import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-report/finance-medicare-wage-report.component';
 import { GrantReportComponent } from './grant-report/grant-report.component';
+import { VmsInvoiceReportBetaComponent } from './vms-invoice-report-beta/vms-invoice-report-beta.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '', pathMatch: 'full' },
@@ -357,6 +358,13 @@ const routes: Routes = [
       {
         path: 'scheduled-hours',
         component: ScheduledHoursComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'vms-invoice-report-beta',
+        component: VmsInvoiceReportBetaComponent,
         data: {
           isOrganizationArea: true,
         }

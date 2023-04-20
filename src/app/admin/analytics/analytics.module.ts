@@ -59,6 +59,7 @@ import { StaffListComponent } from './staff-list/staff-list.component';
 import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-report/finance-medicare-wage-report.component';
 import { GrantReportComponent } from './grant-report/grant-report.component';
 import { ScheduledHoursComponent } from './scheduled-hours/scheduled-hours.component';
+import { VmsInvoiceReportBetaComponent } from './vms-invoice-report-beta/vms-invoice-report-beta.component';
 import { LogiReportModule } from '../../shared/components/logi-report/logi-report.module';
 
 
@@ -109,7 +110,8 @@ import { LogiReportModule } from '../../shared/components/logi-report/logi-repor
     StaffListComponent,
     FinanceMedicareWageReportComponent,
     GrantReportComponent,
-    ScheduledHoursComponent],
+    ScheduledHoursComponent,
+    VmsInvoiceReportBetaComponent],
   exports: [
     CandidateListComponent
   ],

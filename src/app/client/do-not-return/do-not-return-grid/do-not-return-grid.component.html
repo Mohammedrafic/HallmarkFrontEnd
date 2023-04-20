@@ -84,7 +84,7 @@
     <div class="input-container bootstrap" [hidden]="allOrganizations.length == 1">
       <label>Organization<span class="required">*</span></label>
       <div class="input-group">
-        <ejs-dropdownlist appValidateWithMessage formControlName="businessUnitId" [fields]="optionFields"
+        <ejs-dropdownlist appValidateWithMessage [readonly]="isEdit" formControlName="businessUnitId" [fields]="optionFields"
           [allowFiltering]="true" [dataSource]="allOrganizations$ | async"
           (select)="onOrganizationDropDownChanged($event)">
         </ejs-dropdownlist>
@@ -96,7 +96,7 @@
         <div class="input-container bootstrap">
           <label>Candidate Name<span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-autocomplete formControlName="candidateProfileId" [dataSource]="CandidateNames" filterType='StartsWith'
+            <ejs-autocomplete formControlName="candidateProfileId" [readonly]="isEdit" [dataSource]="CandidateNames" filterType='StartsWith'
               [fields]='candidateNameFields' [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending'
               (filtering)='onFiltering($event)'></ejs-autocomplete>
           </div>
@@ -109,7 +109,7 @@
     </div>
     <div class="d-flex">
       <div class="input-container bootstrap f-grow-2">
-        <label>SSN<span class="required">*</span></label>
+        <label>SSN</label>
         <div class="input-group">
           <input  appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" [attr.disabled]="true" />
         </div>

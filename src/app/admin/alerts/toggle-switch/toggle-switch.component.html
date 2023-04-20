@@ -1,10 +1,11 @@
-<div class="input-group switch">
+<div class="input-group switch" [ngClass]="disableFlag ? toggleYesOrNo ? 'yesFlag' : ''  : '' ">
     <ejs-switch
       id="switcher"
       class="switch"
       onLabel="ON" offLabel="OFF"
       [(checked)]="toggleYesOrNo"
       (change)="onChange($event)"
+      [disabled] = "disableFlag"
     ></ejs-switch>
     <label class="switch-label">{{toggleYesOrNo==true?"Yes":"No"}}</label>
   </div>

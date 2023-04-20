@@ -44,4 +44,11 @@ export const ORG_SETTINGS: MenuSettings[] = [
     permissionKeys: ['CanViewOrientation'],
     isIRPOnly: true,
   },
+  {
+    text: 'Pay Rate',
+    id: 16,
+    route: './pay-rate',
+    // permissionKeys: ['CanViewOrientation'],
+    isIRPOnly: true,
+  },
 ];

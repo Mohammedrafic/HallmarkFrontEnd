@@ -76,10 +76,6 @@ export const GetTimeRange = (startDate: string, endDate: string): string  => {
   return '';
 };
 
-export const DisableScheduleControls = (form: FormGroup, controls: string[]): void => {
-  controls.forEach((controlName: string) => form.get(controlName)?.disable());
-};
-
 export const CreateScheduleSuccessMessage = (schedule: ScheduleInt.Schedule): string => {
   return schedule.employeeScheduledDays.length === 1
   && schedule.employeeScheduledDays[0].dates.length === 1
@@ -164,8 +160,8 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
 };
 
 export const HasNotMandatoryFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
-  return (filters.departmentsIds && !filters.departmentsIds.length)
-    || (filters.skillIds && !filters.skillIds.length);
+  return (!filters.departmentsIds || !filters.departmentsIds.length)
+    || (!filters.skillIds || !filters.skillIds.length);
 };
 
 export const HasMultipleFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
@@ -215,6 +211,7 @@ export const GetScheduleTabItems = (daySchedules: ScheduleItem[]): ShiftTab[] =>
     [ScheduleType.Book]: 'Booking',
     [ScheduleType.Unavailability]: 'Unavailable',
     [ScheduleType.Availability]: 'Available',
+    [ScheduleType.OpenPositions]: 'Open Positions',
   };
 
   return daySchedules.map((schedule: ScheduleItem) => {

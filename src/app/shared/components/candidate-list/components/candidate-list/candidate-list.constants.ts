@@ -30,9 +30,9 @@ export const filterColumns: CandidateListFiltersColumn = {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
     dataSource: [
-      {id : 1, name : "Licenses"},
-      {id : 2, name : "Certificates"},
-      {id : 3, name : "Checklists"}
+      {id : 3, name : "Licenses"},
+      {id : 1, name : "Certificates"},
+      {id : 2, name : "Checklists"}
     ],
     valueField: 'name',
     valueId: 'id',
@@ -81,9 +81,9 @@ export const IRPFilterColumns: CandidateListFiltersColumn = {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
     dataSource: [
-      {id : 1, name : "Licenses"},
-      {id : 2, name : "Certificates"},
-      {id : 3, name : "Checklists"}
+      {id : 3, name : "Licenses"},
+      {id : 1, name : "Certificates"},
+      {id : 2, name : "Checklists"}
     ],
     valueField: 'name',
     valueId: 'id',

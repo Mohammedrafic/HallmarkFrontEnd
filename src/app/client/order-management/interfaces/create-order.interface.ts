@@ -150,5 +150,6 @@ export interface SkillParams {
   params: {
     SystemType: OrderSystem | SystemType;
     SkillCategoryIds?: number[];
+    DepartmentIds?: number[];
   }
 }

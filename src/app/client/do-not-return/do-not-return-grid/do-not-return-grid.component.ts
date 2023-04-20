@@ -3,7 +3,7 @@ import { DonotReturnState } from '@admin/store/donotreturn.state';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserPermissions } from '@core/enums';
 import { CustomFormGroup, Permission } from '@core/interface';
-import { BehaviorSubject, debounceTime, delay, distinctUntilChanged, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, delay, distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import {
@@ -136,6 +136,12 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   public locations$: Observable<Location[]>;
   selectedLocations: Location[];
 
+  @Select(UserState.lastSelectedAgencyId)
+  private lastSelectedAgencyId$: Observable<number>;
+  @Select(UserState.lastSelectedOrganizationId)
+  private lastSelectedOrganizationId$: Observable<number>;
+  private isAlive = true;
+
   get reasonControl(): AbstractControl | null {
     return this.doNotReturnForm.get('firstName');
   }
@@ -192,6 +198,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.watchForDefaultExport();
     this.store.dispatch(new GetOrganizationDataSources());
     this.getOrganizationList();
+    this.subscribeOnBusinessUnitChange();
     this.doNotReturnFormGroup.get('ssn')?.valueChanges.pipe(delay(500),distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((ssnValue: any) => {
       if(ssnValue!= '' && ssnValue!= null && ssnValue.indexOf('XXX-XX') == -1){
         this.maskedSSN = ssnValue;
@@ -216,6 +223,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
               this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue(null); 
             }
           }
+        }else{
+          this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue(null);
         }
      });
 
@@ -223,16 +232,20 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       if(ssnValue!= '' && ssnValue!= null && ssnValue.indexOf('XXX-XX') == -1){
         this.maskedFilterSSN = ssnValue;
       }
-    });
+    });       
     this.doNotReturnFormGroup.get('candidateProfileId')?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((CandidateProfileId: any) => {
       if(CandidateProfileId!= '' && CandidateProfileId!= null ){
         if(this.CandidateNames.length > 0){
             let selectedCandidate : DoNotReturnSearchCandidate | undefined = this.CandidateNames.find(data=> data.id == CandidateProfileId || data.fullName == CandidateProfileId)
             this.doNotReturnFormGroup.get('candidateEmail')?.setValue(selectedCandidate?.email);
-            if(selectedCandidate?.ssn != null){
-              this.maskedSSN = selectedCandidate?.ssn.toString();
-              this.onSSNBlur();
-            }
+          if (selectedCandidate?.ssn != null) {
+            this.maskedSSN = selectedCandidate?.ssn.toString();
+            this.onSSNBlur();
+          }
+          else {
+            this.maskSSNPattern = "000-00-0000";
+            this.doNotReturnFormGroup.get('ssn')?.setValue(null); 
+          }
         }        
       }
     });
@@ -296,8 +309,11 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnDestroy(): void {
+    this.isAlive = false;
     this.getDoNotReturn();
     this.GetAllOrganization();
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   public onRowsDropDownChanged(): void {
@@ -475,7 +491,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     if (this.selectedOrganization.id) {
        this.loadRegionsAndLocations(this.selectedOrganization.id);
     }
-    this.doNotReturnFormGroup.get(FormControlNames.RegionIds)?.setValue([]);
+    this.doNotReturnFormGroup.reset();
+    this.doNotReturnFormGroup.get(FormControlNames.BusinessUnitId)?.setValue(this.selectedOrganization.id);
   }
 
   @OutsideZone
@@ -619,6 +636,15 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   public export(event: ExportOptions): void {
     this.closeExport();
     this.defaultExport(event.fileType, event);
+  }
+
+  private subscribeOnBusinessUnitChange(): void {
+    combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$])
+      .pipe(takeWhile(() => this.isAlive))
+      .subscribe(() => {
+        this.onFilterClearAll();
+        this.store.dispatch(new ShowSideDialog(false));
+      });
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {

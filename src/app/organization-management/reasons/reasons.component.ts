@@ -212,6 +212,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         reason: reason.reason,
         includeInIRP: reason.includeInIRP,
         includeInVMS: reason.includeInVMS,
+        isAutoPopulate : !!reason.isAutoPopulate
         });
     } else if((this.selectedTab === ReasonsNavigationTabs.Closure)) {
 

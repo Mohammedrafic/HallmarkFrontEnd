@@ -11,8 +11,10 @@ import { BookingsOverlapsResponse } from './replacement-order.interface';
 })
 export class ReplacementOrderDialogComponent extends DestroyDialog implements OnInit {
   @Input() replacementOrderData: BookingsOverlapsResponse[] = [];
+  @Input() isRemoveMode = false;
 
-  @Output() createOrder: EventEmitter<boolean> = new EventEmitter();
+  @Output() createOrder: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() removeOrder: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   trackByEmployeeId: TrackByFunction<BookingsOverlapsResponse> =
     (_: number, item: BookingsOverlapsResponse) => item.employeeId;
@@ -22,17 +24,25 @@ export class ReplacementOrderDialogComponent extends DestroyDialog implements On
   }
 
   create(): void {
-    this.createOrder.emit(true);
+    this.handleOrderAction(true);
     this.closeDialog();
   }
 
   remove(): void {
-    this.createOrder.emit(false);
+    this.handleOrderAction(false);
     this.closeDialog();
   }
 
   closeOnEscape(): void {
     this.destroyableDialog.hide();
     this.destroyDialog.emit();
+  }
+
+  private handleOrderAction(value: boolean): void {
+    if(this.isRemoveMode) {
+      this.removeOrder.emit(value);
+    } else {
+      this.createOrder.emit(value);
+    }
   }
 }

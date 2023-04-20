@@ -117,7 +117,7 @@ export class CandidateListService {
       hireDate: filters.hireDate || null,
       startDate: filters.startDate || null,
       endDate: filters.endDate || null,
-      credType: filters.credType || []
+      credType: filters.credType || [],
     });
   }
 }

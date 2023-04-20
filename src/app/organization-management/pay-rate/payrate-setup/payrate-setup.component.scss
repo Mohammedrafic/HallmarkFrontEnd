@@ -1,0 +1,93 @@
+@import "colors";
+@import "adaptive-response";
+
+.container {
+  padding-top: 24px;
+  height: calc(100% - 40px);
+}
+
+.checkbox {
+  width: 25px;
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+
+  .input-container {
+    width: 100%;
+
+    &:first-child {
+      margin-right: 12px;
+    }
+  }
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+
+  @media #{$min-tablet} {
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  .input-container {
+    width: 100%;
+
+    &:nth-child(n+2) {
+      margin-left: 0;
+
+      @media #{$min-tablet} {
+        margin-left: 12px;
+      }
+
+    }
+  }
+}
+
+.form-container {
+  padding-top: 24px;
+
+  .switch {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dropdown-wrapper {
+    display: flex;
+
+    .input-group {
+      width: 100%;
+      margin-right: 12px;
+    }
+  }
+
+  .group {
+    display: flex;
+
+    .input-container + .input-container {
+      padding-left: 13px;
+    }
+
+    .input-container {
+      width: 100%;
+
+      ejs-numerictextbox {
+        span.e-disabled {
+          border: 1px solid $grey;
+          background-color: $secondary-dark-blue-50;
+        }
+      }
+    }
+  }
+}

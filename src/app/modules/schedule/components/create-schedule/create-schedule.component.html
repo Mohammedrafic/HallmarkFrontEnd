@@ -4,7 +4,21 @@
       <h3>Schedule</h3>
     </div>
     <div class="controls">
+      <ejs-tooltip
+        *ngIf="sideBarSettings.showRemoveButton"
+        [showTipPointer]="false"
+        [content]="removeBtnTooltip"
+        position="TopCenter">
+        <button
+          ejs-button
+          class="remove-button"
+          (click)="removeSchedules()"
+        >
+          <span><i-feather name="trash-2" class="icon"></i-feather></span>
+        </button>
+      </ejs-tooltip>
       <button
+        *ngIf="sideBarSettings.showOpenPositions"
         [disabled]="!scheduleSelectedSlots.candidates.length"
         (click)="saveSchedule()"
         [isPrimary]="true"
@@ -32,7 +46,7 @@
       </div>
     </ng-container>
   </div>
-  <div class="form-container" *ngIf="showScheduleForm && scheduleFormConfig">
+  <div class="form-container" *ngIf="sideBarSettings.showScheduleForm && scheduleFormConfig">
     <form [formGroup]="scheduleForm" [class]="scheduleFormConfig.formClass">
       <ng-container *ngFor="let control of scheduleFormConfig.formFields">
         <ng-container [ngSwitch]="control.type">
@@ -109,16 +123,22 @@
     </form>
   </div>
   <app-schedule-items
+    *ngIf="sideBarSettings.showOpenPositions"
     [scheduleSelectedSlots]="scheduleSelectedSlots"
     (isEmpty)="hideScheduleForm()"
     [datePickerLimitations]="datePickerLimitations"
     [selectedScheduleType]="scheduleType"
   ></app-schedule-items>
+  <app-schedule-open-positions
+    *ngIf="!sideBarSettings.showOpenPositions"
+  ></app-schedule-open-positions>
 </div>
 
 <app-replacement-order-dialog
-  *ngIf="replacementOrderDialogOpen"
+  *ngIf="sideBarSettings.replacementOrderDialogOpen"
   [replacementOrderData]="replacementOrderDialogData"
+  [isRemoveMode]="sideBarSettings.removeReplacementMode"
   (destroyDialog)="closeReplacementOrderDialog()"
+  (removeOrder)="deleteSchedule($event)"
   (createOrder)="saveNewBooking($event)"
 ></app-replacement-order-dialog>

@@ -6,10 +6,11 @@ import { Destroyable } from '@core/helpers';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
 import { DateItem, CreateScheduleItem } from './schedule-items.interface';
-import { ScheduleBookingErrors, ScheduleCandidate, ScheduleSelectedSlots } from '../../interface';
+import { ScheduleBookingErrors, ScheduleCandidate, ScheduleDay, ScheduleSelectedSlots } from '../../interface';
 import { GetCountErrors, ScheduleItemsWithErrors } from '../../helpers';
 import { ScheduleCircleType, ScheduleItemType } from '../../constants';
 import { IrpOrderType } from '@shared/enums/order-type';
+import { CreateScheduleService } from '../../services';
 
 @Component({
   selector: 'app-schedule-items',
@@ -42,6 +43,7 @@ export class ScheduleItemsComponent extends Destroyable implements OnInit {
 
   constructor(
     private scheduleItemsService: ScheduleItemsService,
+    private createScheduleService:CreateScheduleService,
     private cdr: ChangeDetectorRef,
   ) {
     super();
@@ -75,7 +77,6 @@ export class ScheduleItemsComponent extends Destroyable implements OnInit {
 
   removeDateItem(candidateId: number, dateValue: string, id: number | null): void {
     const scheduleItem = this.scheduleItems.find((item: CreateScheduleItem) => item.candidateId === candidateId);
-
     if (!scheduleItem) {
       return;
     }
@@ -87,22 +88,28 @@ export class ScheduleItemsComponent extends Destroyable implements OnInit {
     }
 
     scheduleItem.selectedDates = this.scheduleItemsService.getSelectedDates(scheduleItem);
-    this.setRemovedItem(dateValue, candidateId);
+    this.setRemovedItem(dateValue, candidateId, id);
 
     if (!scheduleItem.dateItems.length) {
       this.removeScheduleItem(candidateId);
     }
   }
 
-  private setRemovedItem(dateValue: string, candidateId: number): void {
+  private setRemovedItem(dateValue: string, candidateId: number, id: number | null): void {
     const formatDate = dateValue.split('T');
     const selectedCandidate =
       this.scheduleItemsService.getSelectedCandidate(this.scheduleSelectedSlot.candidates, candidateId);
+
+    if(id) {
+      selectedCandidate.days = [...selectedCandidate.days].filter((day: ScheduleDay) => day.id !== id);
+    }
+
     this.scheduleItemsService.removeCandidateItem.next({
       date: formatDate[0],
       candidate: selectedCandidate as ScheduleCandidate,
     });
   }
+
   /*todo: uncomment in future implementation -->*/
   /*updateDateItems(dates: Date[], candidateId: number): void {
     const scheduleItem = this.scheduleItems.find((item: CreateScheduleItem) => item.candidateId === candidateId);

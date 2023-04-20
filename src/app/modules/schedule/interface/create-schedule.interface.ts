@@ -89,3 +89,11 @@ export interface ScheduleBookingErrors {
   DateLevelErrors: BookingError[];
   EmployeeLevelErrors: string[];
 }
+
+export interface BarSettings {
+  showScheduleForm: boolean;
+  showRemoveButton: boolean;
+  showOpenPositions: boolean;
+  removeReplacementMode: boolean;
+  replacementOrderDialogOpen: boolean;
+}

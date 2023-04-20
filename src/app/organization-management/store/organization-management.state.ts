@@ -901,7 +901,7 @@ export class OrganizationManagementState {
     { patchState }: StateContext<OrganizationManagementStateModel>,
     { params }: GetAssignedSkillsByOrganization,
   ): Observable<AssignedSkillsByOrganization[]> {
-    return this.skillsService.getAssignedSkillsByOrganization(params).pipe(
+    return this.skillsService.getSortedAssignedSkillsByOrganization(params).pipe(
       tap((payload) => {
        patchState({ assignedSkillsByOrganization: payload.map((skill) => ({...skill, id: skill.masterSkillId, name: skill.skillDescription})) });
       })
@@ -913,7 +913,7 @@ export class OrganizationManagementState {
     { patchState }: StateContext<OrganizationManagementStateModel>,
     { params }: GetFilteringAssignedSkillsByOrganization,
   ): Observable<AssignedSkillsByOrganization[]> {
-    return this.skillsService.getAssignedSkillsByOrganization(params).pipe(
+    return this.skillsService.getSortedAssignedSkillsByOrganization(params).pipe(
       tap((payload) => {
        patchState({ filteringAssignedSkillsByOrganization: payload.map((skill) => ({...skill, id: skill.masterSkillId, name: skill.skillDescription})) });
       })

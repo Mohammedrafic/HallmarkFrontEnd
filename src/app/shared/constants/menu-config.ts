@@ -427,7 +427,22 @@ export const MENU_CONFIG: any = {
       // Scheduled Hours Report
       icon: '',
       route: '/analytics/scheduled-hours',
-    }
+    },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
+    },
+    95: {
+      // VMS Invoice Report Beta
+      icon: '',
+      route: '/analytics/vms-invoice-report-beta',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -633,7 +648,22 @@ export const MENU_CONFIG: any = {
       // Scheduled Hours Report
       icon: '',
       route: '/analytics/scheduled-hours',
-    }
+    },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
+    },
+    95: {
+      // VMS Invoice Report Beta
+      icon: '',
+      route: '/analytics/vms-invoice-report-beta',
+    },
   },
 
   [BusinessUnitType.Organization]: {
@@ -1020,7 +1050,22 @@ export const MENU_CONFIG: any = {
       // Scheduled Hours Report
       icon: '',
       route: '/analytics/scheduled-hours',
-    }
+    },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
+    },
+    95: {
+      // VMS Invoice Report Beta
+      icon: '',
+      route: '/analytics/vms-invoice-report-beta',
+    },
   },
 
   [BusinessUnitType.Agency]: {
@@ -1248,7 +1293,22 @@ export const MENU_CONFIG: any = {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',
-    }
+    },
+    93: {
+      // Interface Logs
+      icon: '',
+      route: '/admin/loginterfaces',
+    },
+    94: {
+      // Organization Interface
+      icon: '',
+      route: '/admin/orginterfaces',
+    },
+    95: {
+      // VMS Invoice Report Beta
+      icon: '',
+      route: '/analytics/vms-invoice-report-beta',
+    },
   },
 };
 

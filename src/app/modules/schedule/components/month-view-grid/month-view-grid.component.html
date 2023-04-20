@@ -12,7 +12,7 @@
   </td>
   <ng-container *ngFor="let item of dateList; trackBy: trackByDateList">
     <td class="table-cell">
-      <div class="date-cell" *ngFor="let dateItem of item; trackBy: trackByDateItem" weeksEnd [date]="dateItem.dateSlot">
+      <div class="date-cell" *ngFor="let dateItem of item; trackBy: trackByDateItem">
         <div
           *ngIf="dateItem.dateSlot | calendarDateSlot: scheduleItem.schedule as dateSchedule; else emptyCell"
           class="date-slot"
