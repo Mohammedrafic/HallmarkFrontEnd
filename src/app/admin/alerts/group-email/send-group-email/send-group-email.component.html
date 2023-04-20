@@ -116,8 +116,8 @@
                                 showSelectAll=true>
               </ejs-multiselect>
             </div>
-          </div>
-          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType" class="dropdown-container">
+          </div>          
+          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType || isEmployeeType" class="dropdown-container">
             <div class="input-group dropdown">
               <label>Region<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox" formControlName="region"
@@ -132,7 +132,7 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType" class="dropdown-container">
+          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType || isEmployeeType" class="dropdown-container">
             <div class="input-group dropdown">
               <label>Location<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox" formControlName="location"
@@ -145,6 +145,23 @@
                                [selectAllText]='allOption'
                                showSelectAll=true>
               </ejs-multiselect>
+            </div>
+          </div>
+          <div *ngIf="isEmployeeType" class="dropdown-container">
+            <div class="input-container bootstrap">
+              <label>Department<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <ejs-multiselect mode="CheckBox" formControlName="departmentIds"
+                                appValidateWithMessage
+                                [placeholder]="allOption"
+                                [allowFiltering]="true"
+                                [showDropDownIcon]="true"
+                                [dataSource]="departmentsList"
+                                [fields]="regionFields"
+                                [selectAllText]='allOption'
+                                showSelectAll=true>
+                </ejs-multiselect>
+              </div>
             </div>
           </div>
           <div *ngIf="isOrgCandidatesType" class="dropdown-container">
@@ -203,7 +220,46 @@
                                showSelectAll=true>
               </ejs-multiselect>
             </div>
-          </div>     
+          </div>    
+          <div *ngIf="isEmployeeType" class="dropdown-container">
+            <div class="input-group dropdown">
+              <label>Skills<span class="required">*</span></label>
+              <ejs-multiselect  mode="CheckBox" appValidateWithMessage
+                                formControlName="skills"
+                                [fields]="regionFields"
+                                [dataSource]="skillData"                                
+                                [allowFiltering]="true"
+                                placeholder="Skills"
+                                [showDropDownIcon]="true"
+                                [selectAllText]='allOption'
+                                showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div *ngIf="isEmployeeType" class="dropdown-container">
+            <div class="input-group dropdown">
+              <label>Work Commitment</label>
+              <ejs-multiselect  mode="CheckBox" appValidateWithMessage
+                                formControlName="workCommitments"
+                                [fields]="regionFields"
+                                [dataSource]="workCommitmentData"                                
+                                [allowFiltering]="true"
+                                placeholder="Work Commitments"
+                                [showDropDownIcon]="true"
+                                [selectAllText]='allOption'
+                                showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div *ngIf="isEmployeeType" class="dropdown-container">
+            <div class="input-group dropdown">    
+              <div style="height: 25px;"></div>
+              <label for="chkOrientationComplete">
+                <input type="checkbox" formControlName="orientationComplete" id="chkOrientationComplete" /> 
+                Orientation Complete
+              </label>
+            </div>
+          </div>
           <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="dropdown-container">
             <div class="input-group dropdown">
               <label>User<span class="required">*</span></label>
@@ -220,7 +276,7 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType" class="dropdown-container">
+          <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType || isEmployeeType" class="dropdown-container">
             <div class="input-group dropdown">
               <label>Candidate<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox"

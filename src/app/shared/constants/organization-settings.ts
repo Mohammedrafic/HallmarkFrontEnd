@@ -40,6 +40,7 @@ export enum OrganizationSettingKeys {
   HideContactDetailsOfOrderInAgencyLogin,
   DisableAddEditTimesheetsInAgencyLogin,
   DefaultTimezone,
+  OTHours
 }
 
 export enum OrganizationalHierarchy {

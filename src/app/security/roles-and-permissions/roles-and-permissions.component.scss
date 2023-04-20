@@ -1,10 +1,11 @@
 .business-dropdowns {
   display: flex;
-  width: 100%;
 
   .dropdown-container {
     margin-right: 12px;
-    width: 100%;
-    max-width: 220px;
   }
+}
+
+.businessForm-dropdown {
+  width: 220px !important;
 }

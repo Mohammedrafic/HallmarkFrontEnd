@@ -19,6 +19,7 @@ export type RejectReasonwithSystem = {
   includeInVMS?: boolean;
   includeInIRP?: boolean;
   isVMSIRP?:boolean;
+  isAutoPopulate? : boolean;
 }
 
 export type RejectReasonWithRedflag = {

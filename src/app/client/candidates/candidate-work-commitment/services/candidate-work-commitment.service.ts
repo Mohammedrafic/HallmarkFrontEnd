@@ -6,15 +6,14 @@ import { map, Observable } from 'rxjs';
 import {
   CandidateWorkCommitment,
   CandidateWorkCommitmentsPage,
-  WorkCommitmentDataSource,
 } from '../models/candidate-work-commitment.model';
 
 @Injectable()
 export class CandidateWorkCommitmentService {
   public constructor(private readonly httpClient: HttpClient) {}
 
-  public getAvailableWorkCommitments(employeeId: number): Observable<WorkCommitmentDataSource[]> {
-    return this.httpClient.get<WorkCommitmentDataSource[]>('/api/WorkCommitment/all', { params: { EmployeeId: employeeId }});
+  public getAvailableWorkCommitments(employeeId: number): Observable<WorkCommitmentDetails[]> {
+    return this.httpClient.get<WorkCommitmentDetails[]>('/api/WorkCommitment/all', { params: { EmployeeId: employeeId }});
   }
 
   public saveCandidateWorkCommitment(workCommitment: CandidateWorkCommitment): Observable<CandidateWorkCommitment> {
@@ -48,10 +47,6 @@ export class CandidateWorkCommitmentService {
 
   public deleteCandidateWorkCommitmentById(id: number): Observable<void> {
     return this.httpClient.delete<void>('/api/EmployeeWorkCommitments/' + id);
-  }
-
-  public getWorkCommitmentById(id: number): Observable<WorkCommitmentDetails> {
-    return this.httpClient.get<WorkCommitmentDetails>('/api/WorkCommitment/' + id);
   }
 
   public getHolidays(): Observable<HolidaysPage> {
