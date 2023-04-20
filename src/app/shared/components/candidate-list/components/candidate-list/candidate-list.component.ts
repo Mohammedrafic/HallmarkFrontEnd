@@ -417,7 +417,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       hireDate: this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
       includeDeployedCandidates: this.includeDeployedCandidates,
       expiry : {
-        type : this.filters.credType!,
+        type : this.filters.credType! ? this.filters.credType! : [],
         startDate : this.filters.startDate! ? DateTimeHelper.toUtcFormat(this.filters.startDate!) : null,
         endDate : this.filters.endDate! ? DateTimeHelper.toUtcFormat(this.filters.endDate!) : null,
       },
