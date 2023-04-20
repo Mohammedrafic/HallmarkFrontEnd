@@ -31,7 +31,7 @@ export const columnDef = (columnParams: ColumnDefParams) => [
       return {
         actionsConfig: [
           {
-            action: (value) => { columnParams.editHandler(value as DepartmentAssigned) },
+            action: (value) => { columnParams.editHandler(value as DepartmentAssigned); },
             iconName: 'edit',
             buttonClass: 'edit-button',
             disabled: columnParams.disable,
@@ -45,6 +45,11 @@ export const columnDef = (columnParams: ColumnDefParams) => [
         ],
       };
     },
+  },
+  {
+    field: 'workCommitmentName',
+    headerName: 'Work Commitment',
+    flex: 1,
   },
   {
     field: 'regionName',
