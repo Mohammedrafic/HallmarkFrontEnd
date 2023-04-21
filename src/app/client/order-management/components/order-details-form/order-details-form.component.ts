@@ -312,14 +312,11 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
               isAutoPopulate : item.isAutoPopulate
             });
           }
-        });
-        this.reasons.forEach((item, i) => {
           if(item.isAutoPopulate === true){
-            this.reasons.splice(i, 1);
-            this.reasons.unshift(item);
+            this.jobDescriptionForm.controls['orderRequisitionReasonId'].setValue(item.id);
           }
-        })
-    });
+        });
+      });
   }
 
   private getSettings(): void {
