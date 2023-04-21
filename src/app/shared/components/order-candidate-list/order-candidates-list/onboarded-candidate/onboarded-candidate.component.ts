@@ -297,6 +297,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public onBillRatesChanged(bill: BillRate): void {
     this.form.markAllAsTouched();
     if (!this.form.errors && this.candidateJob) {
+      const rates = this.getBillRateForUpdate(bill);
+
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
@@ -312,13 +314,15 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             requestComment: this.candidateJob?.requestComment as string,
             clockId: this.candidateJob?.clockId,
             guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
-            billRates: this.getBillRateForUpdate(bill),
+            billRates: rates,
+            billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.candidateJob.candidatePayRate,
           })
         )
         .subscribe(() => {
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
           this.closeDialog();
+          this.deleteUpdateFieldInRate();
           this.store.dispatch(new SetIsDirtyOrderForm(true));
         });
     }
@@ -341,6 +345,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     const existingBillRateIndex = this.candidateJob?.billRates.findIndex(
       (billRate) => billRate.id === value.id
     ) as number;
+
     if (existingBillRateIndex > -1) {
       this.candidateJob?.billRates.splice(existingBillRateIndex, 1, value);
       billRates = this.candidateJob?.billRates;
@@ -692,5 +697,16 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.form.get('startDate')?.disable();
       this.form.get('endDate')?.disable();
     }
+  }
+
+  private deleteUpdateFieldInRate(): void {
+    this.candidateJob?.billRates.filter((rate) => Object.prototype.hasOwnProperty.call(rate, 'isUpdated'))
+    .forEach((rate) => {
+      delete rate.isUpdated;
+    });
+  }
+
+  private checkForBillRateUpdate(rates: BillRate[]): boolean {
+    return rates.some((rate) => !!rate.isUpdated);
   }
 }

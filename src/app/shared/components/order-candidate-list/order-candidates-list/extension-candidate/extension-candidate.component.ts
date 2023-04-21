@@ -222,6 +222,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
           clockId: this.candidateJob.clockId,
         };
       }
+      const rates = this.getBillRateForUpdate(bill);
+
       const valueForUpdate = {
         ...additionalValues,
         organizationId: this.candidateJob.organizationId,
@@ -235,11 +237,13 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
           applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
           statusText: this.candidateJob.applicantStatus.statusText,
         },
-        billRates: this.getBillRateForUpdate(bill),
+        billRates: rates,
+        billRatesUpdated: this.checkForBillRateUpdate(rates),
         candidatePayRate: this.candidateJob.candidatePayRate,
       };
 
       this.store.dispatch(new UpdateOrganisationCandidateJob(valueForUpdate));
+      this.deleteUpdateFieldInRate();
     }
   }
 
@@ -731,7 +735,17 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         candidatePayRateControl?.disable();
       }
       this.changeDetectorRef.markForCheck();
-    })
+    });
   }
 
+  private deleteUpdateFieldInRate(): void {
+    this.candidateJob?.billRates.filter((rate) => Object.prototype.hasOwnProperty.call(rate, 'isUpdated'))
+    .forEach((rate) => {
+      delete rate.isUpdated;
+    });
+  }
+
+  private checkForBillRateUpdate(rates: BillRate[]): boolean {
+    return rates.some((rate) => !!rate.isUpdated);
+  }
 }
