@@ -3,6 +3,7 @@
     *ngIf="isActive"
     gridTitle="Historical Data"
     [isActive]="isActive"
+    [isFilter]="isFilter"
     (pageChange)="pageChange($event)"
     (onEdit)="openDialog($event)"
     [dataSource]="dataSource"
