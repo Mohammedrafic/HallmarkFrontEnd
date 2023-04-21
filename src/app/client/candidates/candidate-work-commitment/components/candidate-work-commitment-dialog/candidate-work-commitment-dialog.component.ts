@@ -220,7 +220,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       availabilityRequirement: this.isEveryValSame(selectedCommitments, 'availabilityRequirement') ? selectedCommitments[0].availabilityRequirement : 0,
       comments: this.isEveryValSame(selectedCommitments, 'comments') ? selectedCommitments[0].comments : '',
       criticalOrder: this.isEveryValSame(selectedCommitments, 'criticalOrder') ? selectedCommitments[0].criticalOrder : 0,
-      endDate: commonRange ? commonRange[1].toString() : null,
+      endDate: commonRange && commonRange[1] ? commonRange[1].toString() : null,
       holiday: this.isEveryValSame(selectedCommitments, 'holiday') ? selectedCommitments[0].holiday : 0,
       jobCode: this.isEveryValSame(selectedCommitments, 'jobCode') ? selectedCommitments[0].jobCode : '',
       masterWorkCommitmentId: 0,
@@ -332,10 +332,10 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.populateRegionsLocations(this.workCommitmentGroup);
     if (!populateForm) {
       if (candidateCommitment) {
-        this.candidateWorkCommitmentForm.patchValue(candidateCommitment as {}, { emitEvent: false });
         this.candidateWorkCommitmentForm.controls['regionIds'].setValue(candidateCommitment.regionIds);
         this.candidateWorkCommitmentForm.controls['locationIds'].setValue(candidateCommitment.locationIds);
         this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].setValue('' + id, { emitEvent: false });
+        this.candidateWorkCommitmentForm.patchValue(candidateCommitment as {}, { emitEvent: false });
         this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
       }
       this.refreshDatepicker();

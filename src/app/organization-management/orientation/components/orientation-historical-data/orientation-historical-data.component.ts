@@ -36,6 +36,7 @@ import { ExportOrientation } from './orientation.action';
 @TakeUntilDestroy
 export class OrientationHistoricalDataComponent extends AbstractPermissionGrid implements OnInit {
   @Input() public isActive: boolean;
+  @Input() public isFilter:boolean;
   @ViewChild('grid')
   public grid: GridComponent;
   public regions: OrganizationRegion[] = [];

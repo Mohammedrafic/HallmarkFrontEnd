@@ -80,6 +80,7 @@ export interface BillRate {
   seventhDayOtEnabled?: boolean;
   weeklyOtEnabled?: boolean;
   dailyOtEnabled?: boolean;
+  isUpdated?: boolean;
 }
 
 export type ImportedBillRate = {

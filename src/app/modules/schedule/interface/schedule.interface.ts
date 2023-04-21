@@ -86,6 +86,7 @@ export interface ScheduleItemAttributes {
   onCall: boolean;
   orientated: boolean;
   preceptor: boolean;
+  meal: boolean;
 }
 
 export interface ScheduleModel {

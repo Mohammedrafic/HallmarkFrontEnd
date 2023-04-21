@@ -32,7 +32,7 @@
         </ng-template>
         <ng-template #content>
           <app-orientation-historical-data [isActive]="selectedTab === orientationTab.HistoricalData"
-            [export$]="exportOrientation$"></app-orientation-historical-data>
+            [isFilter]="selectedTab === orientationTab.HistoricalData" [export$]="exportOrientation$"></app-orientation-historical-data>
         </ng-template>
       </e-tabitem>
     </e-tabitems>

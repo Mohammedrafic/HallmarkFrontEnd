@@ -352,6 +352,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
             }
           )
         }
+        if(element.isAutoPopulate === true){
+          const rejectreasonfield = {
+              id:element.id,
+              name:element.reason,
+              businessUnitId:element.businessUnitId,
+          }
+          this.jobDescriptionForm.controls['orderRequisitionReasonId'].setValue(element);
+        }
       });
     }
     return this.reason;
@@ -363,6 +371,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((reasons: RejectReason[]) => {
       this.updateDataSourceFormList('reasons', reasons);
+      console.log(reasons);
       const selectedForm = this.getSelectedFormConfig(JobDescriptionForm);
       setDataSource(selectedForm.fields, 'orderRequisitionReasonId', reasons);
       this.changeDetection.markForCheck();
