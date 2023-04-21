@@ -192,6 +192,9 @@ export enum UserPermissions {
   CanEditOrientation = 5202,
   CanBulkHourlyRateUpdate = 5105,
 
+  // Pay rate
+  CanViewPayRates= 6403,
+  CanEditPayRates = 6404,
   //AgencyReports
   AgencyReports=7000,
   CanViewAgencyFinancialTimesheet =7001

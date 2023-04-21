@@ -74,7 +74,7 @@
 </section>
 
 <app-side-dialog (formCancelClicked)="onFormCancelClick()" (formSaveClicked)="saveDonotReturn()"
-  header="{{ isEdit ? 'Edit' : 'Add' }} Do Not Return">
+  header="{{ isEdit ? 'Edit' : 'Add' }} Candidate">
   <form [formGroup]="doNotReturnFormGroup" class="donotreturn-form">
     <div class="input-container bootstrap" *ngIf="isEdit">
       <ejs-switch id="switcher" (change)="onSwitcher($event);" formControlName="dnrStatus" [checked]="isBlock"></ejs-switch>
@@ -84,7 +84,7 @@
     <div class="input-container bootstrap" [hidden]="allOrganizations.length == 1">
       <label>Organization<span class="required">*</span></label>
       <div class="input-group">
-        <ejs-dropdownlist appValidateWithMessage [readonly]="isEdit" formControlName="businessUnitId" [fields]="optionFields"
+        <ejs-dropdownlist appValidateWithMessage [enabled]="!isEdit" formControlName="businessUnitId" [fields]="optionFields"
           [allowFiltering]="true" [dataSource]="allOrganizations$ | async"
           (select)="onOrganizationDropDownChanged($event)">
         </ejs-dropdownlist>
@@ -96,7 +96,7 @@
         <div class="input-container bootstrap">
           <label>Candidate Name<span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-autocomplete formControlName="candidateProfileId" [readonly]="isEdit" [dataSource]="CandidateNames" filterType='StartsWith'
+            <ejs-autocomplete formControlName="candidateProfileId" [enabled]="!isEdit" [dataSource]="CandidateNames" filterType='StartsWith'
               [fields]='candidateNameFields' [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending'
               (filtering)='onFiltering($event)'></ejs-autocomplete>
           </div>

@@ -29,7 +29,7 @@ export interface WorkCommitmentDetails {
   departmentId: number;
   departmentName: string;
   holiday: number;
-  startDate: string | null;
+  startDate: string;
   endDate: string | null;
   jobCode: string;
   masterWorkCommitmentId: number;

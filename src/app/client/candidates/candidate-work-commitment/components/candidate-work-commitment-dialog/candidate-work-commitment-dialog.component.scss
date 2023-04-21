@@ -1,3 +1,5 @@
+@import "colors";
+
 .commitment-form {
   &>div {
     margin-top: 12px;
@@ -13,5 +15,17 @@
     .control-field {
       width: 100%;
     }
+  }
+
+  .location-container {
+    position: relative;
+  }
+
+  .common-range-error {
+    position: absolute;
+    left: 0;
+    bottom: -16px;
+    font-size: 12px;
+    color: $supportive-red;
   }
 }
