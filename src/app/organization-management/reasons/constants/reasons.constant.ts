@@ -200,7 +200,13 @@ export const requisitionDialogConfig: ReasonFormConfig[]  = [
     title: 'Reason',
     required: true,
     fieldType: FieldType.Input,
-  }
+  },
+  {
+    field: 'isAutoPopulate',
+    title: 'Auto Populate',
+    required: false,
+    fieldType: FieldType.Toggle,
+  },
 ];
 
 export const closureDialogConfig: ReasonFormConfig[]  = [

@@ -16,6 +16,12 @@ export interface WorkCommitmentOrgHierarchies {
   locationName: string;
 }
 
+export interface WorkCommitmentDetailsGroup {
+  items: WorkCommitmentDetails[];
+  id: string;
+  name: string;
+}
+
 export interface WorkCommitmentDetails {
   availabilityRequirement: number;
   comments: string;
@@ -23,7 +29,7 @@ export interface WorkCommitmentDetails {
   departmentId: number;
   departmentName: string;
   holiday: number;
-  startDate: string | null;
+  startDate: string;
   endDate: string | null;
   jobCode: string;
   masterWorkCommitmentId: number;

@@ -33,20 +33,20 @@
           <div>
             <app-dropdown
               [dataSource]="workCommitments"
-              [fields]="commitmentFields"
+              [fields]="fields"
               [sortOrder]="sortOrder.ASCENDING"
               [formGroupInstance]="candidateWorkCommitmentForm"
               [hideBorder]="false"
               class="control-field"
               label="Work Commitment"
               id="workCommitmentId"
-              controlName="workCommitmentId"
+              controlName="masterWorkCommitmentId"
             ></app-dropdown>
           </div>
           <div>
             <app-multiselect-dropdown
               [formGroupInstance]="candidateWorkCommitmentForm"
-              [fields]="commitmentFields"
+              [fields]="fields"
               [dataSource]="regions"
               [showSelectAll]="true"
               [required]="true"
@@ -57,10 +57,10 @@
               label="Region"
             ></app-multiselect-dropdown>
           </div>
-          <div>
+          <div class="location-container">
             <app-multiselect-dropdown
               [formGroupInstance]="candidateWorkCommitmentForm"
-              [fields]="commitmentFields"
+              [fields]="fields"
               [dataSource]="locations"
               [showSelectAll]="true"
               [required]="true"
@@ -70,6 +70,7 @@
               class="control-field"
               label="Location"
             ></app-multiselect-dropdown>
+            <span *ngIf="showCommonRangesError" class="common-range-error">Selected Work Commitments should have common dates</span>
           </div>
 
           <div class="row">
@@ -159,7 +160,7 @@
             ></app-numeric-textbox>
             <app-dropdown
               [dataSource]="holidays"
-              [fields]="commitmentFields"
+              [fields]="fields"
               class="control-field"
               [formGroupInstance]="candidateWorkCommitmentForm"
               [hideBorder]="false"
