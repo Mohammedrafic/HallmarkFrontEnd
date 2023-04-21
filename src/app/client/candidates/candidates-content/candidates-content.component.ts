@@ -98,6 +98,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   private getOrganization(businessUnitId: number) {
     const id = businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
 
+    this.preferencesLoaded = false;
     this.store.dispatch(new GetOrganizationById(id)).pipe(
       takeUntil(this.unsubscribe$)
     ).subscribe(() => {
