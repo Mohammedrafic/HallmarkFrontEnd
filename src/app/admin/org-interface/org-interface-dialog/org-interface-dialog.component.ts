@@ -21,6 +21,8 @@ export class OrgInterfaceDialogComponent implements OnInit,  OnDestroy {
   selectedOrgLogDataset:OrgInterface;
   private unsubscribe$: Subject<void> = new Subject();
   selectedOrgLogDataset$: Subject<OrgInterface> = new Subject<OrgInterface>();
+  onSaveEvent$: Subject<boolean> = new Subject<boolean>();
+  onClearEvent$: Subject<boolean> = new Subject<boolean>();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
 
   constructor() { }

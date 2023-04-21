@@ -17,8 +17,8 @@
         </ng-container>
         <ng-container right>
           <ng-container >
-            <button ejs-button  cssClass="e-outline">Clear</button>
-            <button ejs-button [isPrimary]="true">Save</button>
+            <button ejs-button  cssClass="e-outline" (click)="onClearEvent$.next(true)">Clear</button>
+            <button ejs-button [isPrimary]="true" (click)="onSaveEvent$.next(true)">Save</button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
@@ -30,19 +30,19 @@
         <ejs-tab #tab  id="element">
           <e-tabitems>
             <e-tabitem>
-              <ng-template #headerText>Configuration</ng-template>
+              <ng-template #headerText>Configuration<span class="required">*</span></ng-template>
               <ng-template #content>
                 <div class="e-card-content">
-                  <app-org-interface-configuration [selectedOrgLog$]="selectedOrgLogDataset$">
-
+                  <app-org-interface-configuration [selectedOrgLog$]="selectedOrgLogDataset$"
+                    [onClearClick$]="onClearEvent$" [onSaveClick$]="onSaveEvent$" (onCloseEvent)="onClose()">
                   </app-org-interface-configuration>
                 </div>
               </ng-template>
             </e-tabitem>
             <e-tabitem>
-              <ng-template #headerText>Column Mapping </ng-template>
+              <ng-template #headerText>Column Mapping<span class="required">*</span></ng-template>
               <ng-template #content>
-                Column Mapping -------------
+                
               </ng-template>
             </e-tabitem>
 

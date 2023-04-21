@@ -73,6 +73,7 @@ import { LogInterfaceDialogComponent } from './log-interface/log-interface-dialo
 import { OrgInterfaceDialogComponent } from './org-interface/org-interface-dialog/org-interface-dialog.component';
 import { OrgInterfaceConfigurationComponent } from './org-interface/org-interface-dialog/org-interface-configuration/org-interface-configuration.component';
 import { InputModule } from '@shared/components/form-controls/input/input.module';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 const sidebarIcons = {
   Download,
@@ -149,6 +150,7 @@ const sidebarIcons = {
     AppGridModule,
     AgGridModule,
     InputModule,
+    FontAwesomeModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     //STORE

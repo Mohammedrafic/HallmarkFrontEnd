@@ -1,4 +1,5 @@
-.org-configurations-container{
+@import "./../../../../styles/variables/colors.scss";
+.org-configurations-container{    
     .flex-container {
         display: flex;
         gap:30px;
@@ -24,8 +25,8 @@
     }
     .info{
         border-radius: 8px;
-        color: #2368ee;
-        background-color: #ecf2ff;
+        color: $primary-active-blue;
+        background-color: $primary-active-blue-90;
         padding: 10px;
         width: 300px;
     }
