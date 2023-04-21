@@ -34,7 +34,7 @@ import { UnavailabilityReason } from '@shared/models/unavailability-reason.model
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ShiftsService } from '@shared/services/shift.service';
 import { getTime } from '@shared/utils/date-time.utils';
-import { ScheduleFormSourceKeys, ScheduleItemType, ScheduleTypes } from 'src/app/modules/schedule/constants';
+import { ScheduleFormSourceKeys, ScheduleItemType, ScheduleTypesForEditBar } from 'src/app/modules/schedule/constants';
 import { ScheduleType } from 'src/app/modules/schedule/enums';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -42,6 +42,7 @@ import {
   GetScheduleTabItems,
   GetShiftHours,
   GetShiftTimeControlsValue,
+  HasTimeControlValues,
   MapShiftToDropdownOptions,
   MapToDropdownOptions,
   ScheduleFilterHelper,
@@ -100,7 +101,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   scheduleForm: CustomFormGroup<EditSchedule.ScheduledShiftForm>;
   scheduleFormConfig: EditSchedule.EditScheduleFormConfig = ScheduledShiftFormConfig();
-  scheduleTypes: ReadonlyArray<ScheduleTypeRadioButton> = ScheduleTypes;
+  scheduleTypes: ReadonlyArray<ScheduleTypeRadioButton> = ScheduleTypesForEditBar;
   shiftTabs: EditSchedule.ShiftTab[] = [];
   scheduledItem: ScheduledItem;
   scheduleItemType = ScheduleItemType.Book;
@@ -125,6 +126,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     departmentId: null,
     orientated: null,
     date: null,
+    meal: null,
+    oncall: null,
   };
 
   constructor(
@@ -209,7 +212,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     if (type === ScheduleItemType.Book) {
       this.scheduleFormConfig = NewShiftFormConfig();
       this.scheduleForm = this.editScheduleService.createNewShiftForm();
-      this.watchForOrientatedControl();
+      this.watchForToggleControls();
     }
 
     if (type === ScheduleItemType.Unavailability) {
@@ -302,7 +305,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     endTimeDate: Date = this.scheduleForm.get('endTime')?.value,
   ): void {
     if (startTimeDate && endTimeDate) {
-      this.scheduleForm.get('hours')?.setValue(GetShiftHours(startTimeDate, endTimeDate));
+      const meal = this.scheduleForm.get('meal')?.value;
+      this.scheduleForm.get('hours')?.setValue(GetShiftHours(startTimeDate, endTimeDate, meal));
     }
   }
 
@@ -398,12 +402,39 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }) || null;
   }
 
-  private watchForOrientatedControl(): void {
+  private watchForToggleControls(): void {
     this.unsubscribe('orientated');
     this.subscriptions['orientated'] = this.scheduleForm.get('orientated')?.valueChanges.pipe(
       takeUntil(this.componentDestroy())
     ).subscribe((value: boolean) => {
       this.createScheduleService.hideToggleControls(this.scheduleFormConfig as ScheduleFormConfig, !value);
+      this.cdr.markForCheck();
+    }) || null;
+
+    this.unsubscribe('meal');
+    this.subscriptions['meal'] = this.scheduleForm.get('meal')?.valueChanges.pipe(
+      filter(() => {
+        return HasTimeControlValues(this.scheduleForm);
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.setHours();
+
+      this.cdr.markForCheck();
+    }) || null;
+
+    this.unsubscribe('oncall');
+    this.subscriptions['oncall'] = this.scheduleForm.get('oncall')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((value: boolean) => {
+      const mealControl = this.scheduleForm.get('meal');
+
+      if(value) {
+        mealControl?.patchValue(false);
+        mealControl?.disable();
+      } else {
+        mealControl?.enable();
+      }
       this.cdr.markForCheck();
     }) || null;
   }
@@ -420,7 +451,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private updateScheduledShift(): void {
     const { departmentId, skillId, shiftId, startTime, endTime, date,
-      unavailabilityReasonId, orientated, critical, oncall, charge, preceptor } = this.scheduleForm.getRawValue();
+      unavailabilityReasonId, orientated, critical, oncall, charge, preceptor, meal } = this.scheduleForm.getRawValue();
     const schedule: EditSchedule.ScheduledShift = {
       scheduleId: this.selectedDaySchedule.id,
       unavailabilityReasonId,
@@ -436,6 +467,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       onCall: oncall || false,
       charge: charge || false,
       preceptor: preceptor || false,
+      meal: meal || false,
     };
 
     if (this.selectedDaySchedule.scheduleType !== ScheduleType.Book) {
@@ -487,7 +519,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.scheduleForm = this.editScheduleService.createNewShiftForm();
     this.watchForShiftControl();
     this.watchForDateControl();
-    this.watchForOrientatedControl();
+    this.watchForToggleControls();
     this.scheduleTypesControl.setValue(ScheduleItemType.Book);
     this.scheduleForm.patchValue({ date: DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date) });
     this.cdr.markForCheck();
@@ -512,8 +544,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       patchData.oncall = this.selectedDaySchedule.attributes.onCall;
       patchData.charge = this.selectedDaySchedule.attributes.charge;
       patchData.preceptor = this.selectedDaySchedule.attributes.preceptor;
+      patchData.meal = this.selectedDaySchedule.attributes.meal;
       this.watchForRegionControls();
-      this.watchForOrientatedControl();
+      this.watchForToggleControls();
     }
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Unavailability) {
@@ -564,7 +597,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private checkBookingsOverlaps(): void {
     const { departmentId, skillId } = this.getFilterDepartmentSkillIds();
-    const { shiftId, startTime, endTime, date, orientated, critical, oncall, charge, preceptor }
+    const { shiftId, startTime, endTime, date, orientated, critical, oncall, charge, preceptor, meal }
       = this.scheduleForm.getRawValue();
     this.scheduleToBook = {
       employeeBookedDays: [{
@@ -582,6 +615,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       onCall: oncall || false,
       charge: charge || false,
       preceptor: preceptor || false,
+      meal: meal || false,
     };
     const request: BookingsOverlapsRequest = {
       employeeScheduledDays: this.scheduleToBook.employeeBookedDays,
@@ -634,7 +668,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private setScheduleTypes(): void {
     if (this.store.selectSnapshot(UserState.user)?.isEmployee) {
-      this.scheduleTypes = ScheduleTypes.filter((type: ScheduleTypeRadioButton) => type.value !== ScheduleItemType.Book);
+      this.scheduleTypes = ScheduleTypesForEditBar.filter((type: ScheduleTypeRadioButton) => {
+        return type.value !== ScheduleItemType.Book;
+      });
     }
   }
 

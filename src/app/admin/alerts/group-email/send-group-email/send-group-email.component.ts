@@ -237,7 +237,7 @@ export class SendGroupEmailComponent
   public isExcel: boolean = false;
   fileAsBase64: string;
   faDownload = faDownload as IconProp;
-
+  public isCurrentBusinessHasIRPEnabled: boolean | undefined = false;
 
   constructor(private actions$: Actions, 
               private store: Store, 
@@ -413,11 +413,12 @@ export class SendGroupEmailComponent
           this.defaultBusinessValue = data[0]?.id;
           if (!this.isBusinessFormDisabled) {
             this.defaultValue = data[0]?.id;
-          }        
+          }          
+          this.CheckBusinessIRPEnabled(this.defaultBusinessValue);                    
         }
       }
-    });
-
+    });    
+    
     this.populateUserType();
 
     this.store.dispatch(new GetOrganizationsStructureAll(user?.id!));
@@ -430,6 +431,11 @@ export class SendGroupEmailComponent
       });
     }
   }
+
+  CheckBusinessIRPEnabled(businessId:number): void{
+    let currentBusinessData = this.businessData?.filter(i=>i.id == businessId)[0];   
+    this.isCurrentBusinessHasIRPEnabled = currentBusinessData?.isIRPEnabled;
+  }  
 
   populateUserType(): void{
     this.userType = [];
@@ -554,6 +560,10 @@ export class SendGroupEmailComponent
                 this.businessData = data;
                 if (this.groupEmailTemplateForm.controls['business'].value != data[0].id) {
                   this.groupEmailTemplateForm.controls['business'].setValue(data[0].id);
+                  this.CheckBusinessIRPEnabled(data[0].id);
+                  if(!this.isCurrentBusinessHasIRPEnabled && value == 3){
+                    this.filteredUserType.pop();
+                  }
                 }                
               }
               if (this.userBusinessUnitType === BusinessUnitType.Agency){
@@ -672,7 +682,12 @@ export class SendGroupEmailComponent
         this.locationsData = this.locationsList;
         this.departmentsData = this.departmentsList;        
         
-        this.changeDetectorRef.detectChanges();
+        this.CheckBusinessIRPEnabled(value);
+        this.filteredUserType = this.userType.filter((i: any) => i.isAgency == false);
+        if(!this.isCurrentBusinessHasIRPEnabled && this.businessUnitControl.value == 3){          
+          this.filteredUserType.pop();
+        }
+        this.changeDetectorRef.detectChanges();        
       }
     });
   }

@@ -93,6 +93,7 @@ export class CreateScheduleService {
       onCall: [false],
       charge: [false],
       preceptor: [false],
+      meal: [true],
     }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
   }
 
@@ -146,6 +147,7 @@ export class CreateScheduleService {
       onCall,
       charge ,
       preceptor,
+      meal,
     } = scheduleForm.getRawValue();
 
     return  {
@@ -161,6 +163,7 @@ export class CreateScheduleService {
       onCall: onCall || false,
       charge: charge || false,
       preceptor: preceptor || false,
+      meal: meal || false,
     };
   }
 

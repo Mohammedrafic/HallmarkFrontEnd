@@ -48,7 +48,7 @@ import {
   OpenPositionsConfig,
   ScheduleItemType,
   ScheduleSourcesMap,
-  ScheduleTypes,
+  ScheduleTypesForCreateBar,
   UnavailabilityFormConfig,
 } from '../../constants';
 import * as ScheduleInt from '../../interface';
@@ -67,6 +67,7 @@ import {
   CreateScheduleSuccessMessage,
   GetShiftHours,
   GetShiftTimeControlsValue,
+  HasTimeControlValues,
   MapShiftToDropdownOptions,
   MapToDropdownOptions,
 } from '../../helpers';
@@ -110,7 +111,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = ScheduleSourcesMap;
   readonly removeBtnTooltip: string = RemoveButtonToolTip;
 
-  scheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = ScheduleTypes;
+  scheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = ScheduleTypesForCreateBar;
   scheduleForm: CustomFormGroup<ScheduleInt.ScheduleForm>;
   scheduleFormConfig: ScheduleInt.ScheduleFormConfig;
   scheduleType: ScheduleItemType;
@@ -299,7 +300,8 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     endTimeDate: Date = this.scheduleForm.get('endTime')?.value,
   ): void {
     if (startTimeDate && endTimeDate) {
-      this.scheduleForm.get('hours')?.setValue(GetShiftHours(startTimeDate, endTimeDate));
+      const meal = this.scheduleForm.get('meal')?.value;
+      this.scheduleForm.get('hours')?.setValue(GetShiftHours(startTimeDate, endTimeDate, meal));
     }
   }
 
@@ -405,6 +407,31 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       takeUntil(this.componentDestroy())
     ).subscribe((value: boolean) => {
       this.createScheduleService.hideToggleControls(this.scheduleFormConfig, !value);
+      this.cdr.markForCheck();
+    });
+
+    this.scheduleForm.get('meal')?.valueChanges.pipe(
+      filter(() => {
+        return HasTimeControlValues(this.scheduleForm);
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.setHours();
+
+      this.cdr.markForCheck();
+    });
+
+    this.scheduleForm.get('onCall')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((value: boolean) => {
+      const mealControl = this.scheduleForm.get('meal');
+
+      if(value) {
+        mealControl?.patchValue(false);
+        mealControl?.disable();
+      } else {
+        mealControl?.enable();
+      }
       this.cdr.markForCheck();
     });
   }
