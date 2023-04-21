@@ -27,12 +27,11 @@ import { DateRanges } from '@client/candidates/departments/departments.model';
 export class PayRateHistoryDialogComponent extends Destroyable implements OnInit {
   @Input() formGroup: FormGroup;
   @Input() public dateRanges: DateRanges = {};
+  @Input() public dialogSubject$: Subject<{ isOpen: boolean }>;
 
   @Output() public submitFormData: EventEmitter<void> = new EventEmitter();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
-
-  @Input() public dialogSubject$: Subject<{ isOpen: boolean }>;
 
   public actionTitle = 'Add';
   public formatPayRate = '#.###';
@@ -63,7 +62,6 @@ export class PayRateHistoryDialogComponent extends Destroyable implements OnInit
         } else {
           this.closeSideDialog();
         }
-        this.cdr.markForCheck();
       });
   }
 
