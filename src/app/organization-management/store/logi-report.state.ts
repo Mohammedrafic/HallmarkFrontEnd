@@ -260,7 +260,7 @@ export class LogiReportState {
   @Action(GetAgencyCommonFilterReportOptions)
   GetAgencyCommonFilterReportOptions({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<AgencyCommonFilterReportOptions> {
     return this.logiReportService.getAgencyCommonReportFilterOptions(filter).pipe(tap((payload: any) => {
-      patchState({ commonReportFilterOptions: payload });
+      patchState({ agencyCommonFilterReportOptions: payload });
       return payload
 
     }));

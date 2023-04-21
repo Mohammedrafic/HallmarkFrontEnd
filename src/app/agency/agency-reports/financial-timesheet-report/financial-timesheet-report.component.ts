@@ -43,27 +43,27 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, Organ
 })
 export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
   public paramsData: any = {
-    "OrganizationParamFTS": "",
-    "StartDateParamFTS": "",
-    "EndDateParamFTS": "",
-    "RegionParamFTS": "",
-    "LocationParamFTS": "",
-    "DepartmentParamFTS": "",
-    "SkillCategoriesParamFTS": "",
-    "SkillsParamFTS": "",
-    "CandidateNameParamFTS": "",
-    "CandidateStatusesParamFTS": "",
-    "OrderTypesParamFTS": "",
-    "JobStatusesParamFTS": "",
-    "JobIdParamFTS": "",
-    "BearerParamFTS": "",
-    "BusinessUnitIdParamFTS": "",
+    "OrganizationParamAFTS": "",
+    "StartDateParamAFTS": "",
+    "EndDateParamAFTS": "",
+    "RegionParamAFTS": "",
+    "LocationParamAFTS": "",
+    "DepartmentParamAFTS": "",
+    "SkillCategoriesParamAFTS": "",
+    "SkillsParamAFTS": "",
+    "CandidateNameParamAFTS": "",
+    "CandidateStatusesParamAFTS": "",
+    "OrderTypesParamAFTS": "",
+    "JobStatusesParamAFTS": "",
+    "JobIdParamAFTS": "",
+    "BearerParamAFTS": "",
+    "BusinessUnitIdParamAFTS": "",
     "HostName": "",
-    "AccrualReportFilterTypeFTS": "",
-    "InvoiceIdParamFTS": ""
+    "AccrualReportFilterTypeAFTS": "",
+    "InvoiceIdParamAFTS": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cat" };
+  public reportName: LogiReportFileDetails = { name: "/AgencyReports/FinancialTimeSheet/FinancialTimeSheet.wls" };
+  public catelogName: LogiReportFileDetails = { name: "/AgencyReports/FinancialTimeSheet/FinancialTimeSheet.cat" };
   public title: string = "Financial Timesheet";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
@@ -426,27 +426,27 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
 
     this.paramsData =
     {
-      "OrganizationParamFTS": this.selectedOrganizations?.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "StartDateParamFTS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamFTS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamFTS": regionIds.length == 0 ? "null" : regionIds,
-      "LocationParamFTS": locationIds.length == 0 ? "null" : locationIds,
-      "DepartmentParamFTS": departmentIds.length == 0 ? "null" : departmentIds,
-      "SkillCategoriesParamFTS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
-      "SkillsParamFTS": skillIds.length == 0 ? "null" : skillIds,
-      "CandidateNameParamFTS": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
-      "CandidateStatusesParamFTS": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
-      "OrderTypesParamFTS": orderTypes.length == 0 ? "null" : orderTypes.join(","),
-      "JobStatusesParamFTS": jobStatuses.length == 0 ? "null" : jobStatuses.join(","),
-      "JobIdParamFTS": jobId == null || jobId == "" ? "null" : jobId,
-      "BearerParamFTS": auth,
-      "BusinessUnitIdParamFTS": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "OrganizationParamAFTS": this.selectedOrganizations?.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "StartDateParamAFTS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "EndDateParamAFTS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionParamAFTS": regionIds.length == 0 ? "null" : regionIds,
+      "LocationParamAFTS": locationIds.length == 0 ? "null" : locationIds,
+      "DepartmentParamAFTS": departmentIds.length == 0 ? "null" : departmentIds,
+      "SkillCategoriesParamAFTS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
+      "SkillsParamAFTS": skillIds.length == 0 ? "null" : skillIds,
+      "CandidateNameParamAFTS": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
+      "CandidateStatusesParamAFTS": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
+      "OrderTypesParamAFTS": orderTypes.length == 0 ? "null" : orderTypes.join(","),
+      "JobStatusesParamAFTS": jobStatuses.length == 0 ? "null" : jobStatuses.join(","),
+      "JobIdParamAFTS": jobId == null || jobId == "" ? "null" : jobId,
+      "BearerParamAFTS": auth,
+      "BusinessUnitIdParamAFTS": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations.length>0 && this.organizations[0]?.organizationId != null ?
           this.organizations[0].organizationId.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "AccrualReportFilterTypeFTS": accrualReportTypes.toString(),
-      "InvoiceIdParamFTS": invoiceID == null || invoiceID == "" ? "null" : invoiceID
+      "AccrualReportFilterTypeAFTS": accrualReportTypes.toString(),
+      "InvoiceIdParamAFTS": invoiceID == null || invoiceID == "" ? "null" : invoiceID
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
