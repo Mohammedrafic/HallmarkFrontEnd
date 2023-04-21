@@ -533,6 +533,7 @@ export type AcceptJobDTO = {
   expAsTravelers?: number;
   availableStartDate?: string | null;
   candidatePayRate: string | null;
+  billRatesUpdated?: boolean;
 };
 
 export type CandidateProfile = {
