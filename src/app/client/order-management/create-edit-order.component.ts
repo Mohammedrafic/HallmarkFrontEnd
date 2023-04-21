@@ -10,6 +10,7 @@ import { SetHeaderState } from '../../store/app.actions';
 import { OrderSystemConfig, SaveForLate, SubmitAsTemplate, SubmitForLater } from '@client/order-management/constants';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Order } from '@shared/models/order-management.model';
+import { SystemType } from '@shared/enums/system-type.enum';
 import { Destroyable } from '@core/helpers';
 import {
   GetAssociateAgencies,
@@ -200,8 +201,8 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   }
 
   private getSkillsByActiveSystem(): void {
-    this.store.dispatch(new GetAssignedSkillsByOrganization({
-      params: { SystemType: this.activeSystem === OrderSystem.IRP ? OrderSystem.VMS : OrderSystem.IRP },
-    }));
+    if (this.activeSystem === OrderSystem.VMS) {
+      this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.VMS } }));
+    }
   }
 }
