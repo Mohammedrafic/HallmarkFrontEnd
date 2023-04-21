@@ -11,8 +11,13 @@
         Errors
         <span class="header-itm__errors">{{itemsErrorCounter}}</span>
       </div>
-      <div class="error-message">Remove or correct invalid records to save</div>
     </div>
+  </div>
+  <div
+    class="error-message"
+    *ngIf="itemsErrorCounter && scheduleItems.length"
+  >
+    Remove or correct invalid records to save
   </div>
   <div class="schedule-item" *ngFor="let item of scheduleItems; trackBy: trackByCandidateId">
     <button ejs-button cssClass="e-flat" (click)="removeScheduleItem(item.candidateId)">

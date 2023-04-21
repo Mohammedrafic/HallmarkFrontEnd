@@ -13,6 +13,7 @@ export interface ScheduleForm {
   onCall?: boolean;
   charge?: boolean;
   preceptor?: boolean;
+  meal?: boolean;
 }
 
 export interface ScheduleFormConfig {
