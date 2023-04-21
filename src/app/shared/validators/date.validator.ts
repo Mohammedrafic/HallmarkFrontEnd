@@ -52,6 +52,14 @@ export function endTimeValidator(form: AbstractControl, controlName: string): Va
   };
 }
 
+const commonRangesValidationFunc = (): ValidationErrors | null => {
+  return {invalidRange: {value: true}};
+};
+
+export function commonRangesValidator(): ValidatorFn {
+  return commonRangesValidationFunc;
+}
+
 export function datesValidator(form: AbstractControl, startDateControlName: string, endDateControlName: string): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const start = form.get(startDateControlName);

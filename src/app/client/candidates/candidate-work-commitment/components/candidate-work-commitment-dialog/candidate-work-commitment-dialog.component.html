@@ -57,7 +57,7 @@
               label="Region"
             ></app-multiselect-dropdown>
           </div>
-          <div>
+          <div class="location-container">
             <app-multiselect-dropdown
               [formGroupInstance]="candidateWorkCommitmentForm"
               [fields]="fields"
@@ -70,6 +70,7 @@
               class="control-field"
               label="Location"
             ></app-multiselect-dropdown>
+            <span *ngIf="showCommonRangesError" class="common-range-error">Selected Work Commitments should have common dates</span>
           </div>
 
           <div class="row">
