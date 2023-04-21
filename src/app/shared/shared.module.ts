@@ -262,7 +262,7 @@ const COMPONENTS = [
   SendEmailSideDialogComponent,
   DocumentPreviewSideDialogComponent,
   CustomSideDialogComponent,
-  CustomExportDialogComponent,
+  CustomExportDialogComponent
 ];
 
 @NgModule({

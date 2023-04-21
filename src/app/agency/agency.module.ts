@@ -95,6 +95,9 @@ import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-to
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { CandidatesModule } from '@agency/candidates/candidates.module';
 import { AgencySettingsService } from './services/agency-settings.service';
+import { AgencyReportsModule } from '@agency/agency-reports/agency-reports.module';
+import { LogiReportState } from '../organization-management/store/logi-report.state';
+
 
 
 const sidebarIcons = {
@@ -203,7 +206,8 @@ const sidebarIcons = {
     ChildOrderDialogModule,
     BoolValuePipeModule,
     GridPaginationModule,
-    CandidatesModule
+    CandidatesModule,
+    AgencyReportsModule
   ],
   providers: [
     OrderCandidateApiService,
