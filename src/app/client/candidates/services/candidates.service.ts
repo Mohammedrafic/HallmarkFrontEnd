@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
-import { CandidateTabsEnum } from '@client/candidates/enums/candidate-tabs.enum';
 import { HttpClient } from '@angular/common/http';
+
+import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
+
+import { CandidateTabsEnum } from '@client/candidates/enums/candidate-tabs.enum';
 import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
+import { BaseObservable } from '@core/helpers';
 
 @Injectable()
 export class CandidatesService {
@@ -10,7 +13,8 @@ export class CandidatesService {
     CandidateTabsEnum.CandidateProfile
   );
   private candidateName$: Subject<string> = new Subject<string>();
-  private activeEmployeeWorkCommitment$: Subject<CandidateWorkCommitmentShort> = new Subject<CandidateWorkCommitmentShort>();
+  private activeEmployeeWorkCommitment$: 
+  BaseObservable<CandidateWorkCommitmentShort | null> = new BaseObservable<CandidateWorkCommitmentShort | null>(null);
   private employeeHireDate: string;
 
   public employeeId: number | null;
@@ -29,12 +33,12 @@ export class CandidatesService {
     this.candidateName$.next(name);
   }
 
-  public setActiveEmployeeWorkCommitment(commitment: CandidateWorkCommitmentShort): void {
-    this.activeEmployeeWorkCommitment$.next(commitment);
+  public setActiveEmployeeWorkCommitment(commitment: CandidateWorkCommitmentShort | null): void {
+    this.activeEmployeeWorkCommitment$.set(commitment);
   }
 
-  public getActiveEmployeeWorkCommitment(): Observable<CandidateWorkCommitmentShort> {
-    return this.activeEmployeeWorkCommitment$.asObservable();
+  public getActiveWorkCommitmentStream(): Observable<CandidateWorkCommitmentShort | null> {
+    return this.activeEmployeeWorkCommitment$.getStream();
   }
 
   public changeTab(tab: CandidateTabsEnum): void {
@@ -49,7 +53,7 @@ export class CandidatesService {
       .pipe(
         map((data) => {
           const activeWorkCommitment = data.find((commitment) => commitment.isActive);
-          activeWorkCommitment && this.setActiveEmployeeWorkCommitment(activeWorkCommitment);
+          this.setActiveEmployeeWorkCommitment(activeWorkCommitment || null);
           return activeWorkCommitment;
         })
       );

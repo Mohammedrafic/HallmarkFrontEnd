@@ -30,6 +30,11 @@ import { AvailabilityRestrictionDialogComponent } from
 import { AvailabilityApiService } from './services/availability-api.service';
 import { AvailabilityService } from './services/availability.service';
 import { TimepickerModule } from '@shared/components/form-controls/timepicker/timepicker.module';
+import { PayRateHistoryComponent } from './components/pay-rate-history/pay-rate-history.component';
+import { PayRateHistoryDialogComponent } from './components/pay-rate-history-dialog/pay-rate-history-dialog.component';
+import { PayRateService } from './services/pay-rate.service';
+import { PayRateApiService } from './services/pay-rate-api.service';
+import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 
 @NgModule({
   declarations: [
@@ -39,6 +44,8 @@ import { TimepickerModule } from '@shared/components/form-controls/timepicker/ti
     CandidateWorkCommitmentDialogComponent,
     AvailabilityRestrictionComponent,
     AvailabilityRestrictionDialogComponent,
+    PayRateHistoryComponent,
+    PayRateHistoryDialogComponent,
   ],
   exports: [],
   imports: [
@@ -58,11 +65,14 @@ import { TimepickerModule } from '@shared/components/form-controls/timepicker/ti
     DropDownListModule,
     DialogModule,
     ReactiveFormsModule,
+    TooltipContainerModule,
   ],
   providers: [
     CandidateWorkCommitmentService,
     AvailabilityApiService,
     AvailabilityService,
+    PayRateApiService,
+    PayRateService,
   ],
 })
 export class CandidateWorkCommitmentModule { }

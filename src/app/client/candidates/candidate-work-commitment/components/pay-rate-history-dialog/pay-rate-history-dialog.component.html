@@ -1,0 +1,62 @@
+<ejs-dialog
+  #sideDialog
+  cssClass="dialog"
+  [width]="'528px'"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title"> {{ actionTitle }} Pay Rate</h3>
+          </div>
+          <div  class="e-card-content">
+            <button
+              ejs-button
+              cssClass="e-outline button-cancel"
+              (click)="closeDialog()"
+            >Cancel</button>
+            <button
+              ejs-button
+              type="submit"
+              [isPrimary]="true"
+              (click)="submitForm()"
+            >Save</button>
+          </div>
+        </div>
+      </section>
+      <section>
+        <form class="pay-rate-form">
+          <app-numeric-textbox
+          [formGroupInstance]="formGroup"
+          [required]="true"
+          [strictMode]="true"
+          [min]="0"
+          [maxLength]="10"
+          [decimals]="3"
+          [format]="formatPayRate"
+          id="payRate"
+          class="control-field"
+          label="Base Pay Rate"
+          controlName="payRate"
+        ></app-numeric-textbox>
+
+        <app-datepicker
+          #startDatePicker
+          [formGroupInstance]="formGroup"
+          id="startDate"
+          controlName="startDate"
+          class="control control-field"
+          label="Start Date"
+          [required]="true"
+          [min]="dateRanges.min"
+          [max]="dateRanges.max"
+        ></app-datepicker>
+        </form>
+      </section>
+    </section>
+  </ng-template>
+</ejs-dialog>
