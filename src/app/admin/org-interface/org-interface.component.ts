@@ -1,7 +1,7 @@
 import { ColDef } from '@ag-grid-community/core';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { AppState } from 'src/app/store/app.state';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
@@ -52,6 +52,8 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
   maxBlocksInCache: any;
   sideBar = SideBarConfig;
   itemList: Array<OrgInterface> | undefined;
+  selectedOrgLogItem$: Subject<OrgInterface> = new Subject<OrgInterface>();
+  openLogDetailsDialogue = new Subject<boolean>();
 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
@@ -138,7 +140,7 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
       },
       {
         headerName: 'Column Delimiter',
-        field: 'ColumnDelimiter',
+        field: 'columnDelimiter',
         width: 50,
         filter: false,
         sortable: false,
@@ -251,21 +253,21 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
       },*/
       {
         headerName: 'Region Specific',
-        field: 'RegionSpecific',
+        field: 'regionSpecific',
         minWidth: 250,
         filter: false,
         sortable: false,
       },
       {
         headerName: 'Clean Import',
-        field: 'CleanImport',
+        field: 'cleanImport',
         minWidth: 250,
         filter: false,
         sortable: false,
       },
       {
         headerName: 'Retention Period In Days',
-        field: 'RetentionPeriodInDays',
+        field: 'retentionPeriodInDays',
         minWidth: 250,
         filter: false,
         sortable: false,
@@ -277,7 +279,8 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
   }
 
   public onEdit(data: any): void {
-    // this.editRoleEvent.emit(data.rowData);
+     this.selectedOrgLogItem$.next(data.rowData);
+     this.openLogDetailsDialogue.next(true);
   }
 
   onGridReady(params: any) {
