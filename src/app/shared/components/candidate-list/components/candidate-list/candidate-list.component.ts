@@ -56,7 +56,7 @@ import { ExportColumn, ExportOptions } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { isNil } from 'lodash';
-import { ERROR_START_LESS_END_DATE, optionFields, regionFields } from '@shared/constants';
+import { END_DATE_REQUIRED, ERROR_START_LESS_END_DATE, optionFields, regionFields } from '@shared/constants';
 import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
 import { filterColumns, IRPCandidates, IRPFilterColumns, VMSCandidates } from './candidate-list.constants';
 import { Permission } from '@core/interface';
@@ -247,29 +247,37 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public onFilterApply(): void {
     if(this.isIRP){
-      if(new Date(this.CandidateFilterFormGroup.get("endDate")?.value) >= new Date(this.CandidateFilterFormGroup.get("startDate")?.value)){
-        if (this.CandidateFilterFormGroup.dirty) {
-          this.filters = this.CandidateFilterFormGroup.getRawValue();
-          this.filters.profileStatuses = this.filters.profileStatuses || [];
-          this.filters.regionsNames = this.filters.regionsNames || [];
-          this.filters.skillsIds = this.filters.skillsIds || [];
-          this.filters.candidateName = this.filters.candidateName || null;
-          this.filters.expiry = {
-            type : this.filters.credType || [],
-            startDate : this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
-            endDate : this.filters.endDate  ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
-          };
+     
+        if ((this.CandidateFilterFormGroup.get("startDate") != null && this.CandidateFilterFormGroup.get("endDate") != null) && new Date(this.CandidateFilterFormGroup.get("endDate")?.value) >= new Date(this.CandidateFilterFormGroup.get("startDate")?.value)) {
+         
+          if (this.CandidateFilterFormGroup.dirty) {
+            this.filters = this.CandidateFilterFormGroup.getRawValue();
+            this.filters.profileStatuses = this.filters.profileStatuses || [];
+            this.filters.regionsNames = this.filters.regionsNames || [];
+            this.filters.skillsIds = this.filters.skillsIds || [];
+            this.filters.candidateName = this.filters.candidateName || null;
+            this.filters.expiry = {
+              type: this.filters.credType || [],
+              startDate: this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
+              endDate: this.filters.endDate ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
+            };
 
-          this.saveFiltersByPageName(this.filters);
-          this.dispatchNewPage();
-          this.store.dispatch(new ShowFilterDialog(false));
-          this.CandidateFilterFormGroup.markAsPristine();
-        } else {
-          this.store.dispatch(new ShowFilterDialog(false));
+            this.saveFiltersByPageName(this.filters);
+            this.dispatchNewPage();
+            this.store.dispatch(new ShowFilterDialog(false));
+            this.CandidateFilterFormGroup.markAsPristine();
+          } else {
+            this.store.dispatch(new ShowFilterDialog(false));
+          }
+      //  }
+          // else {
+          //   this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_START_LESS_END_DATE));
+          // }
         }
-      } else {
-        this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_START_LESS_END_DATE));
-      }
+        else {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, END_DATE_REQUIRED));
+    //    }
+      } 
     } else {
       if (this.CandidateFilterFormGroup.dirty) {
         this.filters = this.CandidateFilterFormGroup.getRawValue();
@@ -278,11 +286,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.filters.skillsIds = this.filters.skillsIds || [];
         this.filters.candidateName = this.filters.candidateName || null;
         this.filters.hireDate = this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
-        this.filters.expiry = {
-          type : this.filters.credType || [],
-          startDate : this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
-          endDate : this.filters.endDate  ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
-        };
+          this.filters.expiry = {
+            type: this.filters.credType || [],
+            startDate: this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
+            endDate: this.filters.endDate ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
+          };
 
         this.saveFiltersByPageName(this.filters);
         this.dispatchNewPage();
