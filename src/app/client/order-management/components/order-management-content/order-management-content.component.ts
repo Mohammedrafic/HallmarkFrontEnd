@@ -200,6 +200,7 @@ import {
   StatusesByDefault,
   SystemGroupConfig,
   ThreeDotsMenuOptions,
+  initOrderManagementFilterColumns,
 } from '@client/order-management/constants';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { BreakpointObserverService } from '@core/services';
@@ -1550,121 +1551,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private orderFilterColumnsSetup(): void {
-    this.filterColumns = {
-      orderPublicId: { type: ControlTypes.Text, valueType: ValueType.Text },
-      regionIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      locationIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      departmentsIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      skillIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'skillDescription',
-        valueId: 'id',
-      },
-      orderTypes: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: OrderTypeOptions,
-        valueField: 'name',
-        valueId: 'id',
-      },
-      jobTitle: { type: ControlTypes.Text, valueType: ValueType.Text },
-      billRateFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
-      billRateTo: { type: ControlTypes.Text, valueType: ValueType.Text },
-      openPositions: { type: ControlTypes.Text, valueType: ValueType.Text },
-      jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      orderStatuses: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'statusText',
-        valueId: 'status',
-      },
-      candidateStatuses: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'statusText',
-        valueId: 'status',
-      },
-      contactEmails: {
-        type: ControlTypes.Autocomplete,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'fullName',
-        valueId: 'email',
-      },
-      candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
-      candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },
-      agencyIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      agencyType: { type: ControlTypes.Radio, dataSource: { 1: 'Yes', 2: 'No' }, default: '0' },
-      templateTitle: { type: ControlTypes.Text, valueType: ValueType.Text },
-      annualSalaryRangeFrom: {
-        type: ControlTypes.Text,
-        valueType: ValueType.Text,
-      },
-      annualSalaryRangeTo: {
-        type: ControlTypes.Text,
-        valueType: ValueType.Text,
-      },
-      creationDateFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
-      creationDateTo: { type: ControlTypes.Date, valueType: ValueType.Text },
-      distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
-      distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
-      candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
-      projectTypeIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'projectType',
-        valueId: 'id',
-      },
-      projectNameIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'projectName',
-        valueId: 'id',
-      },
-      poNumberIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'poNumber',
-        valueId: 'id',
-      },
-      irpOnly: {
-        type: ControlTypes.Checkbox,
-        valueType: ValueType.Text,
-        checkBoxTitle: 'IRP Only',
-      }
-    };
+    this.filterColumns = initOrderManagementFilterColumns();
+
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe(() => {
       this.onFilterApply();
     });
