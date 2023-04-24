@@ -9,7 +9,6 @@ import {
   takeUntil,
   takeWhile,
   tap,
-  distinctUntilChanged,
 } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent }
@@ -68,7 +67,7 @@ import { DepartmentHelper } from '@client/candidates/departments/helpers/departm
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { SystemType } from '@shared/enums/system-type.enum';
-import { DateTimeHelper, areArraysEqual } from '@core/helpers';
+import { DateTimeHelper } from '@core/helpers';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
@@ -269,6 +268,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.filters.regionsNames = this.filters.regionsNames || [];
         this.filters.skillsIds = this.filters.skillsIds || [];
         this.filters.candidateName = this.filters.candidateName || null;
+        this.filters.hireDate = this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
+        this.filters.expiry = {
+          type : this.filters.credType || [],
+          startDate : this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
+          endDate : this.filters.endDate  ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
+        };
+
         this.saveFiltersByPageName(this.filters);
         this.dispatchNewPage();
         this.store.dispatch(new ShowFilterDialog(false));
