@@ -77,6 +77,7 @@ import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
 import { CandidateListScroll } from './candidate-list.enum';
+import { OutsideZone } from '@core/decorators';
 
 @Component({
   selector: 'app-candidate-list',
@@ -281,10 +282,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.grid.hideScroll();
     this.contentLoadedHandler();
     this.createScrollSubscription();
-
-    setTimeout(() => {
-      this.checkScrollPosition();
-    }, 500);
+    this.checkScroll();
   }
 
   public onRowsDropDownChanged(): void {
@@ -723,6 +721,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private getStructure(): Observable<OrganizationStructure> | Observable<string[]> {
     const structure$ = this.isAgency ? this.regions$ : this.organizationStructure$;
     return structure$;
+  }
+
+  @OutsideZone
+  private checkScroll(): void {
+    setTimeout(() => {
+      this.checkScrollPosition();
+    }, 500);
   }
 
   private createScrollSubscription(): void {
