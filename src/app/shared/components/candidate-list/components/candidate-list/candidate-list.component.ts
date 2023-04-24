@@ -165,8 +165,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     { text: 'Region', column: 'Region' },
   ];
   public columnsToExportIrp: ExportColumn[] = [
-    { text: 'Id', column: 'Id' },
-    { text: 'Name', column: 'Name' },
+    { text: 'Emp Id', column: 'Id' },
+    { text: 'Emp Name', column: 'Name' },
     { text: 'Profile Status', column: 'Status' },
     { text: 'Primary Skill', column: 'PrimarySkill' },
     { text: 'Secondary Skill', column: 'SecondarySkill' },
