@@ -49,7 +49,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   private filters: ScheduleFilters = {};
 
-  private preservedSkills: number[] | null = null;
+  private isPreservedFilters = false;
 
   private filterStructure: ScheduleFilterStructure = {
     regions: [],
@@ -182,16 +182,16 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         if (skills.length) {
           const skillOption = ScheduleFilterHelper.adaptOrganizationSkillToOption(skills);
           this.filterColumns.skillIds.dataSource = skillOption;
-          const skillIds = this.preservedSkills ? this.preservedSkills : [skillOption[0]?.value];
+          const skillIds = this.isPreservedFilters ? this.filters.skillIds : [skillOption[0]?.value];
 
           this.scheduleFilterFormGroup.get('skillIds')?.patchValue(skillIds);
         } else {
           this.resetSkillFilters();
         }
 
-        if (this.preservedSkills) {
+        if (this.isPreservedFilters) {
           this.setFilters();
-          this.preservedSkills = null;
+          this.isPreservedFilters = false;
         } else {
           this.setFilteredItems();
           this.applyHomeCostCenterFilters();
@@ -298,7 +298,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     )
       .subscribe((preservFilters) => {
         this.filters = preservFilters || {};
-        this.preservedSkills = this.filters.skillIds ? [...this.filters.skillIds] : null;
+        this.isPreservedFilters = !!preservFilters;
         const { regionIds, locationIds, departmentsIds } = this.filters;
 
         this.scheduleFilterFormGroup.patchValue({
@@ -307,7 +307,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
           departmentsIds: departmentsIds ? [...departmentsIds] : [],
         });
 
-        if (!this.preservedSkills) {
+        if (!this.filters.skillIds?.length) {
           this.setFilters();
         }
       });
