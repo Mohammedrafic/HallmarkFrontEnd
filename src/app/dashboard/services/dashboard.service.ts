@@ -344,11 +344,15 @@ export class DashboardService {
   }
 
   private getalreadyExpiredCredentials(filter: DashboartFilterDto) : Observable<ExpiryDetailsModel[]> {
-    return this.httpClient.get<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`);
+    return this.httpClient.post<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`, { ...filter }).pipe(
+      map((data)=> data)
+    );
   }
 
   private getupcomingExpiredCredentials(filter: DashboartFilterDto) : Observable<ExpiryDetailsModel[]> {
-    return this.httpClient.get<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`);
+    return this.httpClient.post<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`, { ...filter }).pipe(
+      map((data)=> data)
+    );
   }
 
   private getActivePositionWidgetData(filter: DashboartFilterDto): Observable<AccumulationChartModel> {
