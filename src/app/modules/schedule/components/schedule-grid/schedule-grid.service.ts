@@ -51,24 +51,15 @@ export class ScheduleGridService {
   }
 
   private updateScheduleDays(days: ScheduleDay[], createdDays: ScheduleDay[]): ScheduleDay[] {
-    const hasDuplicate = createdDays.map((createdDay: ScheduleDay) => {
-      return days.some((day: ScheduleDay) => day.id === createdDay.id);
-    }).some((value: boolean) => value);
+    const daysIds = days.map((day: ScheduleDay) => day.id);
+    const hasDuplicate = createdDays.some((createdDay: ScheduleDay) => daysIds.includes(createdDay.id));
 
     if(hasDuplicate) {
-      const dayWithoutDuplicates: ScheduleDay[] = [];
-
-      days.forEach((day: ScheduleDay) => {
-        const duplication = createdDays.some((createdDay: ScheduleDay) => createdDay.id === day.id);
-        if(!duplication) {
-          dayWithoutDuplicates.push(day);
-        }
-      });
-
-      return dayWithoutDuplicates;
+      const createdDaysIds = createdDays.map((day: ScheduleDay) => day.id);
+      return days.filter((day: ScheduleDay) => !createdDaysIds.includes(day.id));
     }
 
-      return [...days, ...createdDays];
+    return [...days, ...createdDays];
   }
 
   private createDays(scheduleDays: ScheduleItem[]): ScheduleDay[] {

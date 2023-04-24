@@ -55,6 +55,7 @@ import {
 import * as ScheduleInt from '../../interface';
 import {
   BarSettings,
+  CreateScheduleTypesConfig,
   DeleteScheduleRequest,
   OpenPositionsList,
   Schedule,
@@ -113,7 +114,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = ScheduleSourcesMap;
   readonly removeBtnTooltip: string = RemoveButtonToolTip;
 
-  scheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = ScheduleTypesForCreateBar;
+  scheduleTypes: CreateScheduleTypesConfig = ScheduleTypesForCreateBar;
   scheduleForm: CustomFormGroup<ScheduleInt.ScheduleForm>;
   scheduleFormConfig: ScheduleInt.ScheduleFormConfig;
   scheduleType: ScheduleItemType;

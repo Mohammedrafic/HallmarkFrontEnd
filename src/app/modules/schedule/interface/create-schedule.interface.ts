@@ -1,7 +1,8 @@
 import { FieldType, InputAttrType, UserPermissions } from "@core/enums";
 import { DropdownOption } from "@core/interface";
-import { ScheduleFormSourceKeys, ScheduleItemType } from "src/app/modules/schedule/constants";
+import { ScheduleFormSourceKeys, ScheduleItemType, ScheduleTypesForEditBar } from "src/app/modules/schedule/constants";
 import { ScheduleItemAttributes } from './schedule.interface';
+import * as ScheduleInt from './index';
 
 export interface ScheduleForm {
   shiftId: number;
@@ -33,6 +34,11 @@ export interface ScheduleFormFieldConfig {
   show?: boolean;
   inputType?: InputAttrType;
   sourceKey?: ScheduleFormSourceKeys;
+}
+
+export interface CreateScheduleTypesConfig {
+  columnsTemplate: string;
+  source: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton>;
 }
 
 export interface ScheduleTypeRadioButton {
