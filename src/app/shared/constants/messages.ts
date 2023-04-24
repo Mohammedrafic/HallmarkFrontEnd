@@ -82,6 +82,7 @@ export const DOCUMENT_DELETE_SUCCESS = 'Documents deleted successfully';
 export const DOCUMENT_UNSHARED_SUCCESS = 'Documents UnShared successfully';
 export const FOLDER_DELETE_SUCCESS = 'Folder deleted successfully';
 export const EMAIL_RESEND_SUCCESS = 'Email was sent successfully';
+export const END_DATE_REQUIRED ='Start date should be before end date or less & End Date is required.';
 export const CANDIDATE_STATUS= 'Selected Candidate status is unavailable';
 export const CandidateSSNRequired = 'SSN of Candidate is mandatory to submit candidate application. Once SSN is updated on Candidate Profile screen and come back here to apply.';
 export const CandidateDOBRequired= 'DOB of Candidate is mandatory to accept the offer. Please update DOB of candidate on Candidate Profile screen and come back here to accept offer.';
