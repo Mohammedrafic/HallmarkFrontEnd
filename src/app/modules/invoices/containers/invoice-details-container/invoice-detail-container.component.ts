@@ -113,6 +113,11 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     this.listenResizeContent();
   }
 
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.resizeObserver.detach();
+  }
+
   public closeInvoiceDetails(): void {
     this.store.dispatch(new Invoices.ToggleInvoiceDialog(DialogAction.Close)).pipe(
       takeUntil(this.componentDestroy())
