@@ -2,9 +2,15 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CandidatesComponent } from '@agency/candidates/candidates.component';
 import { CandidateAgencyComponent } from '@agency/candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
-import { CandidateContactDetailsComponent } from '@agency/candidates/add-edit-candidate/candidate-contact-details/candidate-contact-details.component';
-import { CandidateProfessionalSummaryComponent } from '@agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
-import { CandidateGeneralInfoComponent } from '@agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
+import {
+  CandidateContactDetailsComponent,
+} from '@agency/candidates/add-edit-candidate/candidate-contact-details/candidate-contact-details.component';
+import {
+  CandidateProfessionalSummaryComponent,
+} from '@agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
+import {
+  CandidateGeneralInfoComponent,
+} from '@agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { EducationGridComponent } from '@agency/candidates/add-edit-candidate/education-grid/education-grid.component';
 import { ExperienceGridComponent } from '@agency/candidates/add-edit-candidate/experience-grid/experience-grid.component';
 import { AgencyFileViewerModule } from '@agency/candidates/add-edit-candidate/file-viewer/agency-file-viewer.module';
@@ -25,9 +31,15 @@ import { CandidateListModule } from '@shared/components/candidate-list/candidate
 import { ImportCandidatesComponent } from '@agency/candidates/import-candidates/import-candidates.component';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
-import { CandidateProfileComponent } from '@agency/candidates/import-candidates/candidate-profile/candidate-profile.component';
-import { CandidateExperienceComponent } from '@agency/candidates/import-candidates/candidate-experience/candidate-experience.component';
-import { CandidateEducationComponent } from '@agency/candidates/import-candidates/candidate-education/candidate-education.component';
+import {
+  CandidateProfileComponent,
+} from '@agency/candidates/import-candidates/candidate-profile/candidate-profile.component';
+import {
+  CandidateExperienceComponent,
+} from '@agency/candidates/import-candidates/candidate-experience/candidate-experience.component';
+import {
+  CandidateEducationComponent,
+} from '@agency/candidates/import-candidates/candidate-education/candidate-education.component';
 import { GridModule } from '@shared/components/grid/grid.module';
 import { CandidatesRoutingModule } from '@agency/candidates/candidates-routing.module';
 import { CredentialsGridModule } from '@shared/components/credentials-grid/credentials-grid.module';

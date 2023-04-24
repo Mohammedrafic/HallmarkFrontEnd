@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   debounceTime,
   filter,
@@ -204,6 +204,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     private datePipe: DatePipe,
     private candidateListService: CandidateListService,
     private scrollService: ScrollRestorationService,
+    private readonly ngZone: NgZone,
   ) {
     super();
   }
@@ -258,7 +259,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
             startDate : this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
             endDate : this.filters.endDate  ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
           };
-  
+
           this.saveFiltersByPageName(this.filters);
           this.dispatchNewPage();
           this.store.dispatch(new ShowFilterDialog(false));
