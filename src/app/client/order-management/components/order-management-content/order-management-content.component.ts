@@ -554,6 +554,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderManagementService.selectedOrderAfterRedirect = null;
     this.store.dispatch(new PreservedFilters.ResetPageFilters());
     this.store.dispatch(new ClearSelectedOrder());
+    this.resizeObserver.detach();
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
@@ -1279,7 +1280,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   changeSystem(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
-    this.store.dispatch(new PreservedFilters.ResetPageFilters());
+    this.store.dispatch([new PreservedFilters.ResetPageFilters(), new ClearOrders()]);
     this.getPreservedFiltersByPage();
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
 
@@ -2170,6 +2171,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.activeSystem = OrderManagementIRPSystemId.VMS;
       } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
         this.activeSystem = OrderManagementIRPSystemId.IRP;
+        this.getPreservedFiltersByPage();
       }
 
       if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
