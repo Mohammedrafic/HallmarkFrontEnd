@@ -9,6 +9,8 @@ import {
   takeUntil,
   takeWhile,
   tap,
+  fromEvent,
+  Subscription,
   distinctUntilChanged,
 } from 'rxjs';
 import { FormGroup } from '@angular/forms';
@@ -73,6 +75,8 @@ import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interf
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { MessageTypes } from '@shared/enums/message-types';
+import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
+import { CandidateListScroll } from './candidate-list.enum';
 
 @Component({
   selector: 'app-candidate-list',
@@ -187,6 +191,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private unsubscribe$: Subject<void> = new Subject();
   private isAlive = true;
   private activeTab: number;
+  private scrollSubscription: Subscription;
 
   constructor(
     private store: Store,
@@ -197,6 +202,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     private filterService: FilterService,
     private datePipe: DatePipe,
     private candidateListService: CandidateListService,
+    private scrollService: ScrollRestorationService,
   ) {
     super();
   }
@@ -274,6 +280,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public dataBound(): void {
     this.grid.hideScroll();
     this.contentLoadedHandler();
+    this.createScrollSubscription();
+
+    setTimeout(() => {
+      this.checkScrollPosition();
+    }, 500);
   }
 
   public onRowsDropDownChanged(): void {
@@ -712,5 +723,38 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private getStructure(): Observable<OrganizationStructure> | Observable<string[]> {
     const structure$ = this.isAgency ? this.regions$ : this.organizationStructure$;
     return structure$;
+  }
+
+  private createScrollSubscription(): void {
+    if (!this.scrollSubscription) {
+      const element = this.grid.element.querySelectorAll('.e-content')[0];
+
+      this.scrollSubscription = fromEvent(element, 'scroll')
+      .pipe(
+        debounceTime(500),
+        map(() => {
+          return element.scrollTop;
+        }),
+        distinctUntilChanged(),
+        takeUntil(this.unsubscribe$),
+      )
+      .subscribe((position) => {
+        this.scrollService.setScrollPosition(CandidateListScroll.CandidateList, position);
+      });
+    }
+  }
+
+  public checkScrollPosition(): void {
+    const scrollValue = this.scrollService.getScrollPosition(CandidateListScroll.CandidateList);
+
+    if (scrollValue === undefined) {
+      this.scrollService.createScrollPositionStorage(CandidateListScroll.CandidateList);
+    } else {
+      this.restoreScrollPosition(scrollValue);
+    }
+  }
+
+  private restoreScrollPosition(position: number): void {
+    this.grid.element.querySelectorAll('.e-content')[0].scrollTop = position;
   }
 }

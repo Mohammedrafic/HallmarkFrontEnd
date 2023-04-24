@@ -1,7 +1,10 @@
 <ejs-grid #grid [dataSource]="(candidates$ | async)?.items" [allowSelection]="true" [allowPaging]="allowPaging"
   [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight" [enableVirtualization]="false"
   [resizeSettings]="resizeSettings" [allowSorting]="allowSorting" [allowResizing]="allowResizing"
-  (dataBound)="dataBound()" [selectionSettings]="selectionOptions" (rowSelected)="rowSelected($event, grid)"
+  (dataBound)="dataBound()"
+  [selectionSettings]="selectionOptions"
+  (rowSelected)="rowSelected($event, grid)"
+  [enablePersistence]="true"
   (rowDeselected)="rowDeselected($event, grid)">
   <e-columns>
     <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>

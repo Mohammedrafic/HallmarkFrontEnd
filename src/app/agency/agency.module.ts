@@ -95,6 +95,7 @@ import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-to
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { CandidatesModule } from '@agency/candidates/candidates.module';
 import { AgencySettingsService } from './services/agency-settings.service';
+import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
 
 
 const sidebarIcons = {
@@ -158,7 +159,7 @@ const sidebarIcons = {
     ManualFormComponent,
     PaymentDialogComponent,
     JobDistributionComponent,
-    AgencyNameComponent
+    AgencyNameComponent,
   ],
   imports: [
     CommonModule,
@@ -203,12 +204,13 @@ const sidebarIcons = {
     ChildOrderDialogModule,
     BoolValuePipeModule,
     GridPaginationModule,
-    CandidatesModule
+    CandidatesModule,
   ],
   providers: [
     OrderCandidateApiService,
     CandidateGeneralInfoService,
-    AgencySettingsService
-  ]
+    AgencySettingsService,
+    ScrollRestorationService,
+  ],
 })
 export class AgencyModule {}
