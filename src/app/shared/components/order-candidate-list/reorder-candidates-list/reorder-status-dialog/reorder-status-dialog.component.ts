@@ -346,6 +346,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.acceptForm.markAllAsTouched();
     if (!this.acceptForm.errors && this.orderCandidateJob) {
       const value = this.acceptForm.getRawValue();
+      const rates = this.getBillRateForUpdate(bill);
+
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
@@ -359,11 +361,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
               applicantStatus: this.orderCandidateJob.applicantStatus.applicantStatus,
               statusText: this.orderCandidateJob.applicantStatus.statusText,
             },
-            billRates: this.getBillRateForUpdate(bill),
+            billRates: rates,
+            billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.orderCandidateJob.candidatePayRate,
           })
         )
         .subscribe(() => {
+          this.deleteUpdateFieldInRate();
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
         });
     }
@@ -677,5 +681,16 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       actualStartDate: DateTimeHelper.toUtcFormat(initDate),
       actualEndDate: DateTimeHelper.toUtcFormat(initDate),
     };
+  }
+
+  private deleteUpdateFieldInRate(): void {
+    this.candidateJob?.billRates.filter((rate) => Object.prototype.hasOwnProperty.call(rate, 'isUpdated'))
+    .forEach((rate) => {
+      delete rate.isUpdated;
+    });
+  }
+
+  private checkForBillRateUpdate(rates: BillRate[]): boolean {
+    return rates.some((rate) => !!rate.isUpdated);
   }
 }

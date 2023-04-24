@@ -5,7 +5,7 @@
     </div>
     <div class="controls">
       <ejs-tooltip
-        *ngIf="sideBarSettings.showRemoveButton"
+        *ngIf="sideBarSettings.showRemoveButton && scheduleSelectedSlots.dates.length"
         [showTipPointer]="false"
         [content]="removeBtnTooltip"
         position="TopCenter">
@@ -140,5 +140,5 @@
   [isRemoveMode]="sideBarSettings.removeReplacementMode"
   (destroyDialog)="closeReplacementOrderDialog()"
   (removeOrder)="deleteSchedule($event)"
-  (createOrder)="saveNewBooking($event)"
+  (createOrder)="saveNewEvent($event)"
 ></app-replacement-order-dialog>

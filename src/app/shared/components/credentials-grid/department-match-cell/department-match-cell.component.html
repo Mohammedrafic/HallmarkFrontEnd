@@ -1,0 +1,8 @@
+<div
+  *ngIf="cell"
+  [ngStyle]="{ color: cell.color }"
+  class="department-match"
+>
+  <i-feather [name]="cell.icon" class="icon"></i-feather>
+  <span>{{ cell.status }}</span>
+</div>

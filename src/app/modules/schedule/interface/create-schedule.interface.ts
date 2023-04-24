@@ -13,6 +13,7 @@ export interface ScheduleForm {
   onCall?: boolean;
   charge?: boolean;
   preceptor?: boolean;
+  meal?: boolean;
 }
 
 export interface ScheduleFormConfig {
@@ -68,6 +69,7 @@ export interface Schedule {
   endTime: string | null;
   unavailabilityReasonId: number | null;
   employeeScheduledDays: EmployeeScheduledDay[];
+  createOrder: boolean;
 }
 
 export interface ScheduleBook extends ScheduleItemAttributes{

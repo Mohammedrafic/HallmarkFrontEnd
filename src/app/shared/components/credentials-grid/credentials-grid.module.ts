@@ -16,10 +16,15 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CredentialGridService } from '@agency/services/credential-grid.service';
 import { CredentialStorageService } from '@agency/services/credential-storage.service';
 import { CredentialStorageFacadeService } from '@agency/services/credential-storage-facade.service';
+import { DepartmentMatchCellComponent } from './department-match-cell/department-match-cell.component';
 
 
 @NgModule({
-  declarations: [CredentialsGridComponent, OrderMatchColumnComponent],
+  declarations: [
+    CredentialsGridComponent,
+    OrderMatchColumnComponent,
+    DepartmentMatchCellComponent,
+  ],
   exports: [CredentialsGridComponent],
   imports: [
     CommonModule,
@@ -39,7 +44,7 @@ import { CredentialStorageFacadeService } from '@agency/services/credential-stor
     ReactiveFormsModule,
   ],
   providers: [CredentialGridService, CredentialStorageService, CredentialStorageFacadeService,
-  ]
+  ],
 })
 export class CredentialsGridModule {
 }

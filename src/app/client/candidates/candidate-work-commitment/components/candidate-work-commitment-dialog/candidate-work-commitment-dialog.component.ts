@@ -25,6 +25,7 @@ import { UserState } from 'src/app/store/user.state';
 import { CandidateWorkCommitment } from '../../models/candidate-work-commitment.model';
 import { CandidateWorkCommitmentService } from '../../services/candidate-work-commitment.service';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
+import { commonRangesValidator } from '@shared/validators/date.validator';
 
 @Component({
   selector: 'app-candidate-work-commitment-dialog',
@@ -78,6 +79,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public minimumDate: Date | undefined;
   public maximumDate: Date | undefined;
   public startDate: Date;
+  public showCommonRangesError: boolean = false;
 
 
   constructor(
@@ -160,23 +162,73 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     });
   }
 
+  private getDatesOverlap(selectedCommitments: WorkCommitmentDetails[]): Date[] | null {
+    let start = new Date(selectedCommitments[0].startDate);
+    let end = selectedCommitments[0].endDate ? new Date(selectedCommitments[0].endDate) : null;
+    let overlap: boolean = true;
+
+    selectedCommitments.forEach(item => {
+      const currentStart = new Date(item.startDate);
+      const currentEnd = item.endDate ? new Date(item.endDate) : null;
+  
+      if ((end && currentStart > end) || (end && currentEnd && currentEnd < start)) {
+        overlap = false;
+      } else {
+        start = new Date(Math.max(start.getTime(), currentStart.getTime()));
+        if (end === null || currentEnd === null) {
+          end = null;
+        } else {
+          end = new Date(Math.min(end.getTime(), currentEnd.getTime()));
+        }
+      }
+    });
+
+    return overlap ? ([start, end] as Date[]) : null;
+  }
+
+  private addValidators(): void {
+    this.candidateWorkCommitmentForm.controls['locationIds'].markAsTouched();
+    this.candidateWorkCommitmentForm.controls['locationIds'].markAsDirty();
+    this.candidateWorkCommitmentForm.controls['locationIds'].addValidators(commonRangesValidator());
+    this.candidateWorkCommitmentForm.controls['locationIds'].updateValueAndValidity();
+    this.candidateWorkCommitmentForm.controls['regionIds'].markAsTouched();
+    this.candidateWorkCommitmentForm.controls['regionIds'].markAsDirty();
+    this.candidateWorkCommitmentForm.controls['regionIds'].addValidators(commonRangesValidator());
+    this.candidateWorkCommitmentForm.controls['regionIds'].updateValueAndValidity();
+  }
+
+  private removeValidators(): void {
+    this.candidateWorkCommitmentForm.controls['locationIds'].removeValidators(commonRangesValidator());
+    this.candidateWorkCommitmentForm.controls['locationIds'].updateValueAndValidity();
+    this.candidateWorkCommitmentForm.controls['regionIds'].removeValidators(commonRangesValidator());
+    this.candidateWorkCommitmentForm.controls['regionIds'].updateValueAndValidity();
+    this.showCommonRangesError = false;
+  }
+
   private generateGeneralCommitmentModel(workCommitmentIds: number[]): WorkCommitmentDetails {
     const selectedCommitments = this.workCommitmentGroup.items.filter(item => {
       return workCommitmentIds.includes(item.workCommitmentId)
     });
+    const commonRange = this.getDatesOverlap(selectedCommitments);
+    if (!commonRange) {
+      this.showCommonRangesError = true;
+      this.addValidators();
+    } else {
+      this.removeValidators();
+    }
     const commitment: WorkCommitmentDetails = {
-      availabilityRequirement: this.isEveryValSame(selectedCommitments, 'availabilityRequirement') ? selectedCommitments[0].availabilityRequirement : 0,
+      availabilityRequirement: this.isEveryValSame(selectedCommitments, 'availabilityRequirement') ? selectedCommitments[0].availabilityRequirement : null,
       comments: this.isEveryValSame(selectedCommitments, 'comments') ? selectedCommitments[0].comments : '',
-      criticalOrder: this.isEveryValSame(selectedCommitments, 'criticalOrder') ? selectedCommitments[0].criticalOrder : 0,
-      endDate: null,
-      holiday: this.isEveryValSame(selectedCommitments, 'holiday') ? selectedCommitments[0].holiday : 0,
+      criticalOrder: this.isEveryValSame(selectedCommitments, 'criticalOrder') ? selectedCommitments[0].criticalOrder : null,
+      endDate: commonRange && commonRange[1] ? commonRange[1].toString() : null,
+      holiday: this.isEveryValSame(selectedCommitments, 'holiday') ? selectedCommitments[0].holiday : null,
       jobCode: this.isEveryValSame(selectedCommitments, 'jobCode') ? selectedCommitments[0].jobCode : '',
       masterWorkCommitmentId: 0,
       masterWorkCommitmentName: '',
-      minimumWorkExperience: this.isEveryValSame(selectedCommitments, 'minimumWorkExperience') ? selectedCommitments[0].minimumWorkExperience : 0,
-      schedulePeriod: this.isEveryValSame(selectedCommitments, 'schedulePeriod') ? selectedCommitments[0].schedulePeriod : 0,
+      minimumWorkExperience: this.isEveryValSame(selectedCommitments, 'minimumWorkExperience') ? selectedCommitments[0].minimumWorkExperience : null,
+      schedulePeriod: this.isEveryValSame(selectedCommitments, 'schedulePeriod') ? selectedCommitments[0].schedulePeriod : null,
       skills: [],
-      startDate: null,
+      startDate: commonRange ? commonRange[0].toString() : '',
       workCommitmentId: 0,
       workCommitmentOrgHierarchies: [],
       departmentId: 0,
@@ -187,14 +239,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   
   private setDatesValidation(commitment: WorkCommitmentDetails): void {
-    // TODO: 
+    const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
+    this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
+    this.minimumDate = this.setMinimumDate();
+    this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
 
-    //const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
-    //this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
-    //this.minimumDate = this.setMinimumDate();
-    //this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
-
-    //this.setWCStartDate();
+    this.setWCStartDate();
   }
 
   private commitmentGroupHandler(selectedSettings: WorkCommitmentOrgHierarchies[]): void {
@@ -202,11 +252,14 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       // multiple commitments are selected
       const workCommitmentIds = selectedSettings.map(item => item.workCommitmentId);
       this.candidateWorkCommitmentForm.controls['workCommitmentIds'].setValue(workCommitmentIds);
-      this.populateFormWithMasterCommitment(this.generateGeneralCommitmentModel(workCommitmentIds));
-      
+      const commitment = this.generateGeneralCommitmentModel(workCommitmentIds);
+      this.setDatesValidation(commitment);
+      this.populateFormWithMasterCommitment(commitment);
     } else if (selectedSettings.length === 1) {
       // single commitment is selected
+      this.removeValidators();
       const commitment = this.workCommitmentGroup.items.find(item => item.workCommitmentId === selectedSettings[0].workCommitmentId)!;
+      this.setDatesValidation(commitment);
       this.populateFormWithMasterCommitment(commitment);
       this.candidateWorkCommitmentForm.controls['workCommitmentIds'].setValue([commitment.workCommitmentId]);
     }
@@ -229,6 +282,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private resetForm(): void {
+    this.removeValidators();
     this.candidateWorkCommitmentForm.controls['jobCode'].setValue(null);
     this.candidateWorkCommitmentForm.controls['availRequirement'].setValue(null);
     this.candidateWorkCommitmentForm.controls['schedulePeriod'].setValue(null);
@@ -269,25 +323,19 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   ): void {
     this.resetFields();
     this.workCommitmentGroup = this.workCommitments.find(group => +group.id === +id)!;
-    //const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
     const workCommitmentOrgHierarchies: WorkCommitmentOrgHierarchies[] = [];
     this.workCommitmentGroup.items.forEach(item => {
       workCommitmentOrgHierarchies.push(...item.workCommitmentOrgHierarchies);
     });
     this.selectedLocations = this.getCommitmentLocationsFromHierarchy(workCommitmentOrgHierarchies);
-    //this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
-    //this.minimumDate = this.setMinimumDate();
-    //this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
-
-    //this.setWCStartDate();
 
     this.populateRegionsLocations(this.workCommitmentGroup);
     if (!populateForm) {
       if (candidateCommitment) {
-        this.candidateWorkCommitmentForm.patchValue(candidateCommitment as {}, { emitEvent: false });
         this.candidateWorkCommitmentForm.controls['regionIds'].setValue(candidateCommitment.regionIds);
         this.candidateWorkCommitmentForm.controls['locationIds'].setValue(candidateCommitment.locationIds);
         this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].setValue('' + id, { emitEvent: false });
+        this.candidateWorkCommitmentForm.patchValue(candidateCommitment as {}, { emitEvent: false });
         this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
       }
       this.refreshDatepicker();
@@ -380,7 +428,6 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
           this.sideDialog.hide();
         }
         this.title = value.isEdit ? DialogMode.Edit : DialogMode.Add;
-        debugger;
         if (value.isEdit) {
           this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].disable({ emitEvent: false });
           this.enableRegionLocation();
@@ -425,6 +472,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         } else {
           this.locations = [];
           this.selectedRegions = [];
+          this.resetForm();
         }
         this.candidateWorkCommitmentForm.controls['locationIds'].setValue([]);
         this.cd.markForCheck();
@@ -444,6 +492,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
           this.populateWorkCommitment();
           this.enableControls();
         } else {
+          this.resetForm();
           this.selectedRegionLocations = [];
           this.disableControls();
         }

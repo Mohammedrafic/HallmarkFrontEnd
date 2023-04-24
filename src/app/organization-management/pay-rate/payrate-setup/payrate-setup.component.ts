@@ -512,7 +512,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       }
 
       const billRate: PayRateSetupPost = {
-        payRateSettingId: this.editRecordId,
+        Id: this.editRecordId,
         payType: this.PayRatesFormGroup.controls['payType'].value,
         regionIds: this.allRegionsSelected ? [] : this.PayRatesFormGroup.controls['regionIds'].value,
         locationIds: this.allLocationsSelected

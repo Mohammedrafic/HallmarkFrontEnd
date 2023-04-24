@@ -96,6 +96,9 @@ import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { CandidatesModule } from '@agency/candidates/candidates.module';
 import { AgencySettingsService } from './services/agency-settings.service';
 import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
+import { AgencyReportsModule } from '@agency/agency-reports/agency-reports.module';
+import { LogiReportState } from '../organization-management/store/logi-report.state';
+
 
 
 const sidebarIcons = {
@@ -205,6 +208,7 @@ const sidebarIcons = {
     BoolValuePipeModule,
     GridPaginationModule,
     CandidatesModule,
+    AgencyReportsModule
   ],
   providers: [
     OrderCandidateApiService,

@@ -120,6 +120,16 @@ const routes: Routes = [
           isAgencyArea: true,
         },
       },
+      {
+        path: 'reports',
+        loadChildren: () => import('../agency/agency-reports/agency-reports.module').then(
+          (m) => m.AgencyReportsModule),
+        data: {
+          isOrganizationArea: false,
+          isAgencyArea: true,
+        },
+      },
+      
     ],
   },
 ];

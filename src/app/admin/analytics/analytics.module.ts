@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { AnalyticsComponent } from './analytics.component';
 import { CandidateListComponent } from './candidate-list/candidate-list.component';
 import { AnalyticsRoutingModule } from './analytics-routing.module';
-import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { LogiWebReportComponent } from '@shared/components/logi-web-report/logi-web-report.component';
 import { AutoCompleteAllModule, DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -61,13 +60,13 @@ import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-repo
 import { GrantReportComponent } from './grant-report/grant-report.component';
 import { ScheduledHoursComponent } from './scheduled-hours/scheduled-hours.component';
 import { VmsInvoiceReportBetaComponent } from './vms-invoice-report-beta/vms-invoice-report-beta.component';
+import { LogiReportModule } from '../../shared/components/logi-report/logi-report.module';
 
 
 @NgModule({
   declarations: [
     AnalyticsComponent,
     CandidateListComponent,
-    LogiReportComponent,
     LogiWebReportComponent,
     CandidateJourneyComponent,
     JobDetailsComponent,
@@ -130,6 +129,7 @@ import { VmsInvoiceReportBetaComponent } from './vms-invoice-report-beta/vms-inv
     FeatherModule,
     AutoCompleteAllModule,
     RadioButtonModule,
+    LogiReportModule,
     NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState])
   ],
   providers:[

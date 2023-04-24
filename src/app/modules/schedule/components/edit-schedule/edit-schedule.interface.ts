@@ -20,6 +20,7 @@ export interface ScheduledShift {
   onCall?: boolean;
   charge?: boolean;
   preceptor?: boolean;
+  meal?: boolean;
 }
 
 export interface ScheduledShiftForm {
@@ -38,6 +39,7 @@ export interface ScheduledShiftForm {
   oncall?: boolean,
   charge?: boolean,
   preceptor?: boolean,
+  meal?: boolean,
 }
 
 export interface EditScheduleFormConfig {

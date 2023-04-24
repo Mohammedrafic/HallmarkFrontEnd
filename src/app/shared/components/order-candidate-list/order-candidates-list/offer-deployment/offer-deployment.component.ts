@@ -264,6 +264,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
         .subscribe((isConfirm) => {
           if (isConfirm && this.candidateJob) {
             const value = this.formGroup.getRawValue();
+            const rates = this.billRatesComponent.billRatesControl.value;
+
             this.store
               .dispatch(
                 new UpdateOrganisationCandidateJob({
@@ -280,7 +282,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                   guaranteedWorkWeek: value.guaranteedWorkWeek,
                   offeredStartDate: DateTimeHelper.toUtcFormat(new Date(value.offeredStartDate)),
                   allowDeployWoCredentials: true,
-                  billRates: this.billRatesComponent.billRatesControl.value,
+                  billRates: rates,
+                  billRatesUpdated: this.checkForBillRateUpdate(rates),
                   candidatePayRate: value.candidatePayRate,
                 })
               )
@@ -490,5 +493,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       candidatePayRateField?.disable();
     }
     this.changeDetectorRef.markForCheck();
+  }
+
+  private checkForBillRateUpdate(rates: BillRate[]): boolean {
+    return rates.some((rate) => !!rate.isUpdated);
   }
 }

@@ -41,6 +41,7 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ShiftsService } from '@shared/services/shift.service';
+import { getTime } from '@shared/utils/date-time.utils';
 import { BookingsOverlapsRequest, BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
 import {
   AvailabilityFormConfig,
@@ -48,7 +49,7 @@ import {
   OpenPositionsConfig,
   ScheduleItemType,
   ScheduleSourcesMap,
-  ScheduleTypes,
+  ScheduleTypesForCreateBar,
   UnavailabilityFormConfig,
 } from '../../constants';
 import * as ScheduleInt from '../../interface';
@@ -56,6 +57,7 @@ import {
   BarSettings,
   DeleteScheduleRequest,
   OpenPositionsList,
+  Schedule,
   ScheduleBook,
   ScheduleBookingErrors,
   ScheduleFormFieldConfig,
@@ -67,6 +69,7 @@ import {
   CreateScheduleSuccessMessage,
   GetShiftHours,
   GetShiftTimeControlsValue,
+  HasTimeControlValues,
   MapShiftToDropdownOptions,
   MapToDropdownOptions,
 } from '../../helpers';
@@ -110,7 +113,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = ScheduleSourcesMap;
   readonly removeBtnTooltip: string = RemoveButtonToolTip;
 
-  scheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = ScheduleTypes;
+  scheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = ScheduleTypesForCreateBar;
   scheduleForm: CustomFormGroup<ScheduleInt.ScheduleForm>;
   scheduleFormConfig: ScheduleInt.ScheduleFormConfig;
   scheduleType: ScheduleItemType;
@@ -122,6 +125,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   private scheduleShifts: ScheduleShift[] = [];
   private firstLoadDialog = true;
   private scheduleToBook: ScheduleInt.ScheduleBook | null;
+  private unavailabilityToSave: Schedule | null;
 
   constructor(
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
@@ -234,7 +238,16 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     this.sideBarSettings.showScheduleForm = false;
   }
 
-  saveNewBooking(createOrder: boolean): void {
+  saveNewEvent(createOrder: boolean): void {
+    if (this.unavailabilityToSave) {
+      this.unavailabilityToSave.createOrder = createOrder;
+      this.createUnavailability()
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe(() => this.successSave());
+
+      return;
+    }
+
     if (this.scheduleToBook) {
       this.scheduleToBook.createOrder = createOrder;
       this.saveBooking()
@@ -263,11 +276,17 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       return;
     }
 
-    if (this.scheduleType === ScheduleItemType.Book) {
-      this.checkBookingsOverlaps();
-    } else {
-      this.saveAvailabilityUnavailability();
+   if (this.scheduleType === ScheduleItemType.Book) {
+     this.checkBookingsOverlaps();
+     return;
+   }
+
+    if (this.scheduleType === ScheduleItemType.Unavailability) {
+      this.checkUnavailabilityOverlaps();
+      return;
     }
+
+    this.saveAvailability();
   }
 
   closeReplacementOrderDialog(): void {
@@ -299,7 +318,8 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     endTimeDate: Date = this.scheduleForm.get('endTime')?.value,
   ): void {
     if (startTimeDate && endTimeDate) {
-      this.scheduleForm.get('hours')?.setValue(GetShiftHours(startTimeDate, endTimeDate));
+      const meal = this.scheduleForm.get('meal')?.value;
+      this.scheduleForm.get('hours')?.setValue(GetShiftHours(startTimeDate, endTimeDate, meal));
     }
   }
 
@@ -407,6 +427,31 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.createScheduleService.hideToggleControls(this.scheduleFormConfig, !value);
       this.cdr.markForCheck();
     });
+
+    this.scheduleForm.get('meal')?.valueChanges.pipe(
+      filter(() => {
+        return HasTimeControlValues(this.scheduleForm);
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.setHours();
+
+      this.cdr.markForCheck();
+    });
+
+    this.scheduleForm.get('onCall')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((value: boolean) => {
+      const mealControl = this.scheduleForm.get('meal');
+
+      if(value) {
+        mealControl?.patchValue(false);
+        mealControl?.disable();
+      } else {
+        mealControl?.enable();
+      }
+      this.cdr.markForCheck();
+    });
   }
 
   private watchForScheduleType(): void {
@@ -426,7 +471,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     this.scheduleFormConfig.formClass = this.createScheduleService.updateScheduleFormClass(this.scheduleType, false);
   }
 
-  private saveAvailabilityUnavailability(): void {
+  private saveAvailability(): void {
     const schedule = this.createScheduleService.createAvailabilityUnavailability(
       this.scheduleForm,
       this.scheduleItemsComponent.scheduleItems,
@@ -501,10 +546,53 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     });
   }
 
+  private checkUnavailabilityOverlaps(): void {
+    const { shiftId, startTime, endTime } = this.scheduleForm.getRawValue();
+    const request: BookingsOverlapsRequest = {
+      employeeScheduledDays: this.createScheduleService.getEmployeeBookedDays(this.scheduleItemsComponent.scheduleItems),
+      shiftId: shiftId !== this.customShiftId ? shiftId : null,
+      startTime: getTime(startTime),
+      endTime: getTime(endTime),
+    };
+
+    this.unavailabilityToSave = this.createScheduleService.createAvailabilityUnavailability(
+      this.scheduleForm,
+      this.scheduleItemsComponent.scheduleItems,
+      this.scheduleTypesControl.value,
+      this.customShiftId
+    );
+
+    this.scheduleApiService.checkBookingsOverlaps(request).pipe(
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+      switchMap((response: BookingsOverlapsResponse[]) => {
+        if (!response.length && this.unavailabilityToSave) {
+          return this.createUnavailability();
+        } else {
+          this.openReplacementOrderDialog(response);
+
+          return EMPTY;
+        }
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.successSave();
+    });
+  }
+
+  private createUnavailability(): Observable<void> {
+    return this.scheduleApiService.createSchedule(this.unavailabilityToSave as Schedule)
+      .pipe(catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)));
+  }
+
   private successSave(): void {
+    const successMessage = this.scheduleToBook
+      ? CreateBookingSuccessMessage(this.scheduleToBook as ScheduleInt.ScheduleBook)
+      : CreateScheduleSuccessMessage(this.unavailabilityToSave as ScheduleInt.Schedule);
+
     this.scheduleItemsService.setErrors([]);
-    this.handleSuccessSaveDate(CreateBookingSuccessMessage(this.scheduleToBook as ScheduleInt.ScheduleBook));
+    this.handleSuccessSaveDate(successMessage);
     this.scheduleToBook = null;
+    this.unavailabilityToSave = null;
   }
 
   private setInitData(): void {

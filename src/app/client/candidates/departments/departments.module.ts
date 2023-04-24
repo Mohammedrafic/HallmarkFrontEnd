@@ -33,7 +33,7 @@ import { RadioButtonModule } from '@shared/components/form-controls/radio-button
     FilterDepartmentComponent,
     EditDepartmentsComponent,
     DepartmentNameComponent,
-    HomeCostCenterPipe
+    HomeCostCenterPipe,
   ],
   imports: [
     CommonModule,
@@ -48,7 +48,7 @@ import { RadioButtonModule } from '@shared/components/form-controls/radio-button
     MultiplePipeModule,
     JoinPipeModule,
     DropdownModule,
-    RadioButtonModule
+    RadioButtonModule,
   ],
   providers: [DepartmentsService, DepartmentFormService],
 })
