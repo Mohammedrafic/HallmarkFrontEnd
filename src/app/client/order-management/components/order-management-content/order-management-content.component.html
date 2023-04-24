@@ -31,15 +31,6 @@
     <ng-container *ngIf="!isMobile">
       <div class="buttons-container">
         <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
-        <button
-          *ngIf="!isIRPFlagEnabled && !isContentSmallDesktop"
-          ejs-button
-          appHideBeforeSyncfusionLoad
-          cssClass="e-outline button-template"
-          [disabled]="isIRPFlagEnabled"
-        >
-          <div class="filter-button-content">Templates <i-feather name="clipboard" class="icon"></i-feather></div>
-        </button>
         <ng-container
           *ngIf="!(isContentTabletWidth || isMiddleTabletWidth)"
           [ngTemplateOutlet]="filterButton"
@@ -82,7 +73,7 @@
           id="importButton" cssClass="e-outline button-export">
           <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
         </button>
-        
+
         <ng-container
           *ngIf="!isActiveSystemIRP && (isContentSmallDesktop || isMiddleTabletWidth)"
           [ngTemplateOutlet]="smallMenuButton"
