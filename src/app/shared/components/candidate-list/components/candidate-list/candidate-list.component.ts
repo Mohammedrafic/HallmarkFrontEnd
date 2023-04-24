@@ -453,11 +453,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       candidates &&
       candidates.map((candidate: CandidateRow) => {
         if (candidate.candidateProfileSkills.length > 2) {
-          const [first, second] = candidate.candidateProfileSkills;
-          candidate = {
-            ...candidate,
-            candidateProfileSkills: [first, second, { skillDescription: '...' }],
-          };
+          // const [first, second] = candidate.candidateProfileSkills;
+          // candidate = {
+          //   ...candidate,
+          //   candidateProfileSkills: [first, second, { skillDescription: '...' }],
+          // };
         }
         if (candidate.candidateProfileRegions.length > 2) {
           const [first, second] = candidate.candidateProfileRegions;
