@@ -56,6 +56,6 @@ export const PayRateColumnDef = (deleteCallback: (value: number) => void) => ([
   {
     field: PayRateColumns.WORC_COMMITMENT,
     headerName: 'Work Commitment',
-    width: 260,
+    flex: 1,
   },
 ]);
