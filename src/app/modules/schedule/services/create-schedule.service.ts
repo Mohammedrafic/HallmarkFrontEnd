@@ -128,6 +128,7 @@ export class CreateScheduleService {
       endTime: getTime(endTime),
       unavailabilityReasonId,
       shiftId: shiftId !== customShiftId ? shiftId : null,
+      createOrder: false,
     };
   }
 

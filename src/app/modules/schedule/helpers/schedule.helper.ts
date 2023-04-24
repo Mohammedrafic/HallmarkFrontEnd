@@ -78,15 +78,15 @@ export const GetTimeRange = (startDate: string, endDate: string): string  => {
 };
 
 export const CreateScheduleSuccessMessage = (schedule: ScheduleInt.Schedule): string => {
-  return schedule.employeeScheduledDays.length === 1
-  && schedule.employeeScheduledDays[0].dates.length === 1
+  return schedule?.employeeScheduledDays.length === 1
+  && schedule?.employeeScheduledDays[0].dates.length === 1
     ? RECORD_ADDED
     : RECORDS_ADDED;
 };
 
 export const CreateBookingSuccessMessage = (schedule: ScheduleInt.ScheduleBook): string => {
-  return schedule.employeeBookedDays.length === 1
-  && schedule.employeeBookedDays[0].bookedDays.length === 1
+  return schedule?.employeeBookedDays.length === 1
+  && schedule?.employeeBookedDays[0].bookedDays.length === 1
     ? RECORD_ADDED
     : RECORDS_ADDED;
 };
