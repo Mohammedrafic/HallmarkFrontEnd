@@ -347,5 +347,6 @@
   [orderType]="candidateJob?.order?.orderType"
   [candidateJob]="candidateJob"
   (submitCandidateCancellation)="cancelCandidate($event)"
+  [candidateCancellation]="candidateCancellationReasons"
   (cancelCandidateCancellation)="resetStatusesFormControl()"
 ></app-candidate-cancellation-dialog>
