@@ -69,6 +69,7 @@ export interface Schedule {
   endTime: string | null;
   unavailabilityReasonId: number | null;
   employeeScheduledDays: EmployeeScheduledDay[];
+  createOrder: boolean;
 }
 
 export interface ScheduleBook extends ScheduleItemAttributes{

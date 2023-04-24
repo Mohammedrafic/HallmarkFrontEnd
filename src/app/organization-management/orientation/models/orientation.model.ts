@@ -51,6 +51,7 @@ export class OrientationConfigurationFilters {
   orderBy?: string;
   pageNumber: number;
   pageSize: number;
+  orientationIDs?:number[];
   regionIds?: number[];
   locationIds?: number[];
   departmentsIds?: number[];

@@ -88,6 +88,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       seventhDayOtEnabled: false,
       weeklyOtEnabled: false,
       dailyOtEnabled: false,
+      isUpdated: true,
     });
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
     this.store.dispatch(new ShowSideDialog(true));
@@ -120,6 +121,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
         seventhDayOtEnabled: value.seventhDayOtEnabled,
         weeklyOtEnabled: value.weeklyOtEnabled,
         dailyOtEnabled: value.dailyOtEnabled,
+        isUpdated: true,
       }
     );
 

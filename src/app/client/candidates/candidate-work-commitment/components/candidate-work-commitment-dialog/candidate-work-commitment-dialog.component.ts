@@ -217,16 +217,16 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       this.removeValidators();
     }
     const commitment: WorkCommitmentDetails = {
-      availabilityRequirement: this.isEveryValSame(selectedCommitments, 'availabilityRequirement') ? selectedCommitments[0].availabilityRequirement : 0,
+      availabilityRequirement: this.isEveryValSame(selectedCommitments, 'availabilityRequirement') ? selectedCommitments[0].availabilityRequirement : null,
       comments: this.isEveryValSame(selectedCommitments, 'comments') ? selectedCommitments[0].comments : '',
-      criticalOrder: this.isEveryValSame(selectedCommitments, 'criticalOrder') ? selectedCommitments[0].criticalOrder : 0,
-      endDate: commonRange ? commonRange[1].toString() : null,
-      holiday: this.isEveryValSame(selectedCommitments, 'holiday') ? selectedCommitments[0].holiday : 0,
+      criticalOrder: this.isEveryValSame(selectedCommitments, 'criticalOrder') ? selectedCommitments[0].criticalOrder : null,
+      endDate: commonRange && commonRange[1] ? commonRange[1].toString() : null,
+      holiday: this.isEveryValSame(selectedCommitments, 'holiday') ? selectedCommitments[0].holiday : null,
       jobCode: this.isEveryValSame(selectedCommitments, 'jobCode') ? selectedCommitments[0].jobCode : '',
       masterWorkCommitmentId: 0,
       masterWorkCommitmentName: '',
-      minimumWorkExperience: this.isEveryValSame(selectedCommitments, 'minimumWorkExperience') ? selectedCommitments[0].minimumWorkExperience : 0,
-      schedulePeriod: this.isEveryValSame(selectedCommitments, 'schedulePeriod') ? selectedCommitments[0].schedulePeriod : 0,
+      minimumWorkExperience: this.isEveryValSame(selectedCommitments, 'minimumWorkExperience') ? selectedCommitments[0].minimumWorkExperience : null,
+      schedulePeriod: this.isEveryValSame(selectedCommitments, 'schedulePeriod') ? selectedCommitments[0].schedulePeriod : null,
       skills: [],
       startDate: commonRange ? commonRange[0].toString() : '',
       workCommitmentId: 0,
@@ -332,10 +332,10 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.populateRegionsLocations(this.workCommitmentGroup);
     if (!populateForm) {
       if (candidateCommitment) {
-        this.candidateWorkCommitmentForm.patchValue(candidateCommitment as {}, { emitEvent: false });
         this.candidateWorkCommitmentForm.controls['regionIds'].setValue(candidateCommitment.regionIds);
         this.candidateWorkCommitmentForm.controls['locationIds'].setValue(candidateCommitment.locationIds);
         this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].setValue('' + id, { emitEvent: false });
+        this.candidateWorkCommitmentForm.patchValue(candidateCommitment as {}, { emitEvent: false });
         this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
       }
       this.refreshDatepicker();

@@ -55,6 +55,7 @@ export class PayRateSetup {
 }
 
 export class PayRateSetupPost {
+  Id? : number;
   payRateSettingId?: number;
   regionIds: number[];
   locationIds: number[];

@@ -370,6 +370,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   public onBillRatesChanged(bill: BillRate): void {
     if (!this.acceptForm.errors && this.candidateJob) {
+      const rates = this.getBillRateForUpdate(bill);
+
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
@@ -388,12 +390,14 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
             requestComment: this.candidateJob?.requestComment as string,
             clockId: this.candidateJob?.clockId,
             guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
-            billRates: this.getBillRateForUpdate(bill),
+            billRates: rates,
+            billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.candidateJob.candidatePayRate,
           })
         )
         .subscribe(() => {
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+          this.deleteUpdateFieldInRate();
         });
     }
   }
@@ -878,10 +882,21 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       nextApplicantStatus: {
         applicantStatus: ApplicantStatus.Cancelled,
         statusText: "Cancelled",
-        isEnabled: true
+        isEnabled: true,
       },
     };
 
     this.store.dispatch(new UpdateOrganisationCandidateJob(candidateJob));
+  }
+
+  private deleteUpdateFieldInRate(): void {
+    this.candidateJob?.billRates.filter((rate) => Object.prototype.hasOwnProperty.call(rate, 'isUpdated'))
+    .forEach((rate) => {
+      delete rate.isUpdated;
+    });
+  }
+
+  private checkForBillRateUpdate(rates: BillRate[]): boolean {
+    return rates.some((rate) => !!rate.isUpdated);
   }
 }
