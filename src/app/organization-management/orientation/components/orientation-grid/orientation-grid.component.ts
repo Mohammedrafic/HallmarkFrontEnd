@@ -210,7 +210,6 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
           ? value.flatMap((categoryId: number) => this.skills.filter((skill: Skill) => skill.categoryId === categoryId))
           : this.skills;
         setDataSourceValue(this.filterColumns, 'skillIds', sortByField(skills, 'name'));
-        clearFormControl(value, this.filtersForm, 'skillIds');
         this.generateFilteredChips();
         this.cd.markForCheck();
       });
