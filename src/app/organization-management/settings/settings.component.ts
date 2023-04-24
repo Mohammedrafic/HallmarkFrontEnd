@@ -1132,4 +1132,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.OThoursSettingsFormGroup.controls['locationId'].enable();
     this.OThoursSettingsFormGroup.controls['regionId'].enable();
   }
+  onlyNumerics(event:any){
+    if (event.key === '.') {
+      event.preventDefault();
+    }
+  }
 }
