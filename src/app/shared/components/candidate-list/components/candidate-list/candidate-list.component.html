@@ -37,8 +37,8 @@
         </div>
       </ng-template>
     </e-column>
-    <e-column headerText="ID" field="employeeId" [visible]="false" width=80></e-column>
-    <e-column field="lastName" headerText="Name" width=200>
+    <e-column headerText="Emp ID" field="employeeId" [visible]="false" width=80></e-column>
+    <e-column field="lastName" [headerText]="!isIRP ? 'Name' : 'Emp Name'" width=200>
       <ng-template #template let-data>
         <div class="name-wrapper">
           <ng-container *ngIf="false">

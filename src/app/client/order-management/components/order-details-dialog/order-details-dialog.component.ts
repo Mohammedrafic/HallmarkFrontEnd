@@ -132,6 +132,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public canCreateOrder: boolean;
   public canCloseOrderPermission: boolean;
   public readonly systemType = OrderManagementIRPSystemId;
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
 
   public disabledCloseButton = true;
   public showCloseButton = false;

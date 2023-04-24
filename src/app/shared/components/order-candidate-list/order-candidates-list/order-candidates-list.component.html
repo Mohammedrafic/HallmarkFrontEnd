@@ -2,12 +2,22 @@
   <ng-container *ngIf="system !== systemType.IRP || !isFeatureIrpEnabled || isAgency; else irpTableHeader">
     <div class="e-gridcustomheader">
       <div class="title">
-        <h3>Employees List</h3>
+        <h3 *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidates List</h3>
+        <h3 *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employees List</h3>
       </div>
       <div class="grid-toolbar">
         <app-search
+          *ngIf="activeSystem === OrderManagementIRPSystemId.VMS"
           class="search"
           [placeholder]="candidateSearchPlaceholder"
+          [showClearButton]="true"
+          (inputKeyUpEnter)="searchByCandidateName($event)"
+          (clearInput)="clearInputField()"
+        ></app-search>
+        <app-search
+          *ngIf="activeSystem === OrderManagementIRPSystemId.IRP"
+          class="search"
+          [placeholder]="employeeSearchPlaceholder"
           [showClearButton]="true"
           (inputKeyUpEnter)="searchByCandidateName($event)"
           (clearInput)="clearInputField()"

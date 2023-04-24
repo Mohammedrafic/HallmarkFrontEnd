@@ -1,8 +1,8 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Store } from '@ngxs/store';
-import { distinctUntilChanged, filter, merge, Subject, takeUntil } from 'rxjs';
+import { Select, Store } from '@ngxs/store';
+import { distinctUntilChanged, filter, merge, Observable, Subject, takeUntil } from 'rxjs';
 
 import { Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
@@ -15,6 +15,11 @@ import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.
 import { SettingsViewService } from '@shared/services';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { GlobalWindow } from '@core/tokens';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
+import { SelectedSystems } from '@shared/components/credentials-list/constants';
 
 @Component({
   selector: 'app-order-per-diem-candidates-list',
@@ -34,10 +39,22 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
   public isCandidatePayRateVisible: boolean;
   public readonly systemType = OrderManagementIRPSystemId;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
+  public selectedSystem: SelectedSystemsFlag = SelectedSystems;
+  private isOrgIRPEnabled = false;
+  private previousSelectedSystemId: OrderManagementIRPSystemId | null;
+  private isOrgVMSEnabled = false;
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
+  public activeSystem: OrderManagementIRPSystemId;
+
+
   constructor(
     protected override store: Store,
     protected override router: Router,
     private settingService: SettingsViewService,
+    private orderManagementService: OrderManagementService,
     @Inject(GlobalWindow) protected override readonly globalWindow : WindowProxy & typeof globalThis,
     ) {
     super(store, router, globalWindow);
@@ -51,6 +68,12 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     if (this.isAgency) {
       this.checkForAgencyStatus();
     }
+    this.organizationId$.pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((id) => {
+      this.getOrganization(id);
+    });
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
@@ -134,5 +157,40 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
         this.isCandidatePayRateVisible = JSON.parse(CandidatePayRate);
       });
     }
+  }
+
+  private setPreviousSelectedSystem(): void {
+    this.previousSelectedSystemId = this.orderManagementService.getOrderManagementSystem();
+  }
+
+
+  private getOrganization(businessUnitId: number) {
+
+    const id = businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+
+    this.store.dispatch(new GetOrganizationById(id)).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      const { isIRPEnabled, isVMCEnabled } =
+        this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+
+      this.isOrgIRPEnabled = !!isIRPEnabled;
+      this.isOrgVMSEnabled = !!isVMCEnabled;
+      this.setPreviousSelectedSystem();
+      
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
+      }
+
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && this.isOrgVMSEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
+      }
+
+      this.previousSelectedSystemId = null;
+    });
   }
 }

@@ -168,7 +168,8 @@
             </e-tabitem>
             <e-tabitem>
               <ng-template #headerText>
-                {{ order?.extensionFromId ? 'Employee' : 'Employees' }}
+                <span *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">{{ order?.extensionFromId ? 'Employee' : 'Employees' }}</span>
+                <span *ngIf="activeSystem !== OrderManagementIRPSystemId.IRP">{{ order?.extensionFromId ? 'Candidate' : 'Candidates' }}</span>
                 <span class="e-badge e-badge-success e-badge-pill">{{
                   activeSystem ===  systemType.IRP? (irpCandidatesCount$ | async) : (orderCandidatesLength$ | async)
                 }}</span>
