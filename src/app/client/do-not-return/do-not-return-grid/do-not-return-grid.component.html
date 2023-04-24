@@ -22,9 +22,9 @@
       </e-column>
       <e-column field="lastName" headerText="last name" width=250>
       </e-column>
-      <e-column field="regionName" headerText="Region" width=250>
+      <e-column field="regionName" headerText="Region blocked" width=250>
       </e-column>
-      <e-column field="locationName" headerText="Locations" width=250>
+      <e-column field="locationName" headerText="Location blocked" width=250>
       </e-column>
       <e-column field="email" headerText="email" width=250>
       </e-column>
@@ -35,7 +35,7 @@
       </e-column>
       <e-column field="dnrStatus" headerText="Current Status" width=250>
       </e-column>
-      <e-column field="dnrDate" headerText="Date Blocked" width=250>
+      <e-column field="dnrDate" headerText="Last Updated Date" width=250>
         <ng-template #template let-data>
           {{ data.dnrDate | date: "MM/dd/yyyy" }}
         </ng-template>
@@ -123,7 +123,7 @@
     <div class="form-elemet">
       <div class="group">
         <div class="input-container calendar">
-          <label for="regionIds">Region <span class="required">*</span></label>
+          <label for="regionIds">Region blocked <span class="required">*</span></label>
           <div class="input-group bootstrap">
             <ejs-multiselect #regionIdsControl id="regionIds" mode="CheckBox" formControlName="regionIds"
               placeholder="All" [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true"
@@ -133,7 +133,7 @@
           </div>
         </div>
         <div class="input-container">
-          <label for="locationIds">Location <span class="required">*</span></label>
+          <label for="locationIds">Location blocked <span class="required">*</span></label>
           <div class="input-group bootstrap">
             <ejs-multiselect id="locationIds" mode="CheckBox" formControlName="locationIds" placeholder="All"
               [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true" appValidateWithMessage
