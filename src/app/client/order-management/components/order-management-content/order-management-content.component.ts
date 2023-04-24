@@ -1958,11 +1958,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private applyDashboardFilters(): OrderFilter {
+    const filters = {} as OrderFilter;
+
     this.orderStaus > 0 ? this.numberArr.push(this.orderStaus) : [];
-    this.filters.orderStatuses = this.numberArr;
+    filters.orderStatuses = this.numberArr;
     this.candidateStatusId > 0 ? this.candidateStatusIds.push(this.candidateStatusId) : [];
-    this.filters.candidateStatuses = this.candidateStatusIds;
-    this.filters.orderStatuses = this.orderPositionStatus
+    filters.candidateStatuses = this.candidateStatusIds;
+    filters.orderStatuses = this.orderPositionStatus
       ? [this.orderPositionStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')]
       : [];
 
@@ -1973,11 +1975,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       || item.column === FilterColumnTypeEnum.SKILL
     );
 
-    const filters = {} as OrderFilter;
-
     filteredItems.forEach((item: FilteredItem) => {
       const filterKey = item.column as keyof OrderFilter;
-      if (filterKey in this.filters) {
+      if (filterKey in filters) {
         (filters[filterKey] as number[]).push(item.value);
       } else {
         (filters[filterKey] as number[]) = [item.value];
