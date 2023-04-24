@@ -13,6 +13,21 @@
   }
 }
 
+.region-option-container, .g {
+  display: inline-block;
+  position: relative;
+  height: 60px;
+  text-indent: 0;
+
+  .org-name {
+    font-size: 12px;
+    color: $secondary-dark-blue-20;
+    position: absolute;
+    left: 0;
+    top: 20px;
+  }
+}
+
 .ordered-chips {
   &__section {
     display: flex;
