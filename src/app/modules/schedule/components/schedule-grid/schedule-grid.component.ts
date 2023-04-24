@@ -376,11 +376,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private watchForPreservedFilters(): void {
+    let clearStructure = false;
     this.organizationId$.pipe(
       filter((id) => !!id),
       tap(() => {
-        this.store.dispatch([
-          new ClearOrganizationStructure(),
+        if (clearStructure) {
+          this.store.dispatch(new ClearOrganizationStructure());
+        } else {
+          clearStructure = true;
+        }
+
+        this.store.dispatch([  
           new ResetPageFilters(),
           new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
         ]);

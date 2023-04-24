@@ -30,8 +30,11 @@
       </button>
     </div>
   </div>
-  <div class="input-container schedule-types" >
-    <ng-container *ngFor="let type of scheduleTypes">
+  <div
+    class="input-container schedule-types"
+    [ngStyle]="{'grid-template-columns': scheduleTypes.columnsTemplate}"
+  >
+    <ng-container *ngFor="let type of scheduleTypes.source">
       <div class="input-group radio">
         <app-tooltip-container [showToolTip]="type.disabled">
           <ejs-radiobutton

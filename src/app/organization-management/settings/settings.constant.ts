@@ -45,7 +45,9 @@ export const SettingsAppliedToPermissions: string[] = [
   'SetDefaultCommentsScopeToExternal',
   'CandidatePayRate',
   'MandateCandidateAddress',
-  'MandateCandidatePhone1'
+  'MandateCandidatePhone1',
+  'CreateReplacementPerDiemOrder',
+  'OTHours'
 ];
 
 export const DisabledSettingsByDefault = [

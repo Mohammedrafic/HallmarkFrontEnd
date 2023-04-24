@@ -2,6 +2,7 @@ import { FieldType, UserPermissions } from "@core/enums";
 
 import { ScheduleType } from "../enums";
 import * as ScheduleInt from '../interface';
+import { CreateScheduleTypesConfig } from '../interface';
 
 
 export enum ScheduleItemType {
@@ -56,9 +57,12 @@ export const ScheduleTypesForEditBar: ReadonlyArray<ScheduleInt.ScheduleTypeRadi
   BookTypes,AvailabilityTypes, UnavailabilityTypes,
 ];
 
-export const ScheduleTypesForCreateBar: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = [
-  BookTypes,OpenPositionTypes, AvailabilityTypes, UnavailabilityTypes,
-];
+export const ScheduleTypesForCreateBar: CreateScheduleTypesConfig = {
+  columnsTemplate: 'auto auto auto auto',
+  source: [
+    BookTypes,OpenPositionTypes, AvailabilityTypes, UnavailabilityTypes,
+  ],
+};
 
 const availabilityFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
   {

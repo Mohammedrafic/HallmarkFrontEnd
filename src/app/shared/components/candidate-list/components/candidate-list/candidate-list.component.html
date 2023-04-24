@@ -73,7 +73,7 @@
       </ng-template>
     </e-column>
     <e-column headerText="Primary Skill" field="primarySkillName" [visible]="false" width=200></e-column>
-    <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200>
+    <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200 *ngIf="isIRP">
       <ng-template #template let-data>
         <!-- <div  *ngFor="let skill of (data.candidateProfileSkills || data.employeeSkills)">{{skill.skillDescription || skill}}</div>  -->
         <ng-container *ngIf="data.employeeSkills?.length === 2 || data.employeeSkills?.length === 1">
@@ -89,9 +89,24 @@
         </ng-container>
       </ng-template>
     </e-column>
+    <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200 *ngIf="!isIRP">
+      <ng-template #template let-data>
+        <ng-container *ngIf="data.candidateProfileSkills?.length === 2 || data.candidateProfileSkills?.length === 1">
+          <span *ngFor="let skill of data.candidateProfileSkills; let i = index" class="skill-name">
+            {{skill }}
+            <span class="skill-name" *ngIf="i !== data.candidateProfileSkills.length - 1">, </span>
+          </span>
+        </ng-container>
+        <ng-container *ngIf="data.candidateProfileSkills?.length >= 2">
+          <ejs-tooltip content="{{ data.candidateProfileSkills.join(', ') }}" target="#skillName">
+            <span id="skillName" class="skill-name">Multiple Skills</span>
+          </ejs-tooltip>
+        </ng-container>
+      </ng-template>
+    </e-column>
     <e-column headerText="Location" field="locationName" [visible]="false" width=200></e-column>
     <e-column headerText="DEpartment" field="departmentName" [visible]="false" width=200></e-column>
-    <e-column headerText="Work Commitment" field="employeeWorkCommitments" width=200>
+    <e-column headerText="Work Commitment" field="employeeWorkCommitments" width=200 *ngIf="isIRP">
       <ng-template #template let-data>
         <ng-container *ngIf="data.employeeWorkCommitments">
           {{data.employeeWorkCommitments}}
