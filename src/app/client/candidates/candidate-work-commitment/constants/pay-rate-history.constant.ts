@@ -36,19 +36,15 @@ export const PayRateColumnDef = (deleteCallback: (value: number) => void, disabl
     field: PayRateColumns.START_DATE,
     headerName: 'Start Date',
     width: 160,
-    valueFormatter: (params: ValueFormatterParams) => {
-      const timeZone = params.value ? DateTimeHelper.getISOTimeZone(params.value) : 'UTC';
-      return params.value && formatDate(params.value, format, 'en-US', timeZone);
-    },
+    valueFormatter: (params: ValueFormatterParams) => 
+      params.value && formatDate(params.value, format, 'en-US', 'UTC'),
   },
   {
     field: PayRateColumns.END_DATE,
     headerName: 'End Date',
     width: 160,
-    valueFormatter: (params: ValueFormatterParams) => {
-      const timeZone = params.value ? DateTimeHelper.getISOTimeZone(params.value) : 'UTC';
-      return params.value && formatDate(params.value, format, 'en-US', timeZone);
-    },
+    valueFormatter: (params: ValueFormatterParams) => 
+      params.value && formatDate(params.value, format, 'en-US', 'UTC'),
   },
   {
     field: PayRateColumns.PAY_RATE,
