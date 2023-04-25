@@ -1860,7 +1860,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       : [];
 
     const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
-    const items = JSON.parse(dashboardFilterState) as FilteredItem[];
+    const items = JSON.parse(dashboardFilterState) as FilteredItem[]||[];
     const filteredItems = items.filter((item: FilteredItem) =>
       (item.organizationId === this.organizationId && item.column !== FilterColumnTypeEnum.ORGANIZATION)
       || item.column === FilterColumnTypeEnum.SKILL
