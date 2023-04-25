@@ -180,9 +180,10 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.orderFilterColumnsSetup();
       if (data != null && data != undefined) {
         this.defaultAgency = data.toString();
-      }
+        
         this.store.dispatch(new GetOrganizationsByAgency())
         this.store.dispatch(new ClearLogiReportState());
         this.organizationsByAgency$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: DataSourceItem[]) => {
@@ -202,8 +203,9 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
             });
           }
         });
+      }
      
-        this.orderFilterColumnsSetup();
+        
         this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
           if (data.length > 0) {
             this.logiReportComponent.SetReportData(data);
