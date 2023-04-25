@@ -573,7 +573,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       hierarchyLevel: this.organizationHierarchy,
       value: dynamicValue,
       regionId: this.OThoursSettingsFormGroup.controls['regionId'].value || null,
-      locationId: this.OThoursSettingsFormGroup.controls['locationId'].value || null
+      locationId: (!this.allRegionsSelected&&this.allLocationsSelected  )? this.regionBasedLocations.map(m=>m.id) || null:this.OThoursSettingsFormGroup.controls['locationId'].value ||null
     };
 
     this.store.dispatch(new SaveOrganizationSettings(setting));
@@ -1131,5 +1131,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.allRegionsSelected=false;
     this.OThoursSettingsFormGroup.controls['locationId'].enable();
     this.OThoursSettingsFormGroup.controls['regionId'].enable();
+  }
+  onlyNumerics(event:any){
+    if (event.key === '.') {
+      event.preventDefault();
+    }
   }
 }

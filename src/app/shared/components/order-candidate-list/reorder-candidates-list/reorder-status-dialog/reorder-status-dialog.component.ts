@@ -11,6 +11,7 @@ import { AbstractControl, FormControl } from '@angular/forms';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
+  GetCandidateCancellationReason,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
@@ -37,7 +38,7 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { CandidatesStatusText } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
 import { JobCancellation } from "@shared/models/candidate-cancellation.model";
-import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import PriceUtils from '@shared/utils/price.utils';
@@ -65,6 +66,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   @Select(OrderManagementContentState.applicantStatuses)
   applicantStatuses$: Observable<ApplicantStatus[]>;
+
+  @Select(OrderManagementContentState.getCandidateCancellationReasons)
+  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
 
   @Input() openEvent: Subject<boolean>;
   @Input() candidate: OrderCandidatesList;
@@ -172,7 +176,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   private statuses: ApplicantStatus[];
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
-
+  public candidateCancellationReasons: CandidateCancellationReason[] | null;
 
   constructor(
     private store: Store,
@@ -437,6 +441,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       clockId: clockId,
     });
     this.enableFields();
+    this.subscribeCandidateCancellationReasons();
   }
 
   private getNewApplicantStatus(): ApplicantStatus {
@@ -692,5 +697,21 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   private checkForBillRateUpdate(rates: BillRate[]): boolean {
     return rates.some((rate) => !!rate.isUpdated);
+  }
+
+  private subscribeCandidateCancellationReasons() {
+    if (this.candidateJob) {
+      let payload: CandidateCancellationReasonFilter = {
+        locationId: this.candidateJob?.order.locationId,
+        regionId: this.candidateJob?.order.regionId
+      };
+      this.store.dispatch(new GetCandidateCancellationReason(payload));
+      this.candidateCancellationReasons$
+        .pipe().subscribe((value) => {
+          console.log(value);
+          this.candidateCancellationReasons =value;
+        });
+
+    }
   }
 }

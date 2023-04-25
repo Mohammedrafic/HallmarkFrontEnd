@@ -38,6 +38,7 @@ import {
   ClearOrderCandidatePage,
   ClearOrganisationCandidateJob,
   GetAvailableSteps,
+  GetCandidateCancellationReason,
   GetOrganisationCandidateJob,
   GetOrganizationExtensions,
   ReloadOrganisationOrderCandidatesLists,
@@ -76,6 +77,8 @@ import {
   OrderFilter,
   OrderManagementChild,
   ApplicantStatus as ApplicantStatusModel,
+  CandidateCancellationReason,
+  CandidateCancellationReasonFilter,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
@@ -157,6 +160,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Select(OrderManagementState.deployedCandidateOrderInfo)
   public readonly deployedCandidateOrderInfo$: Observable<DeployedCandidateOrderInfo[]>;
 
+  @Select(OrderManagementContentState.getCandidateCancellationReasons)
+  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
+
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
@@ -185,6 +191,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public isClosedOrder = false;
   public selectedApplicantStatus: ApplicantStatusModel | null = null;
   public isCandidatePayRateVisible: boolean;
+  public candidateCancellationReasons: CandidateCancellationReason[] | null;
 
   public readonly nextApplicantStatuses = [
     {
@@ -691,6 +698,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.getExtensions();
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
+          this.subscribeCandidateCancellationReasons();
         }
       });
     }
@@ -898,5 +906,22 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   private checkForBillRateUpdate(rates: BillRate[]): boolean {
     return rates.some((rate) => !!rate.isUpdated);
+  }
+
+  
+  private subscribeCandidateCancellationReasons() {
+    if (this.candidateJob) {
+      let payload: CandidateCancellationReasonFilter = {
+        locationId: this.candidateJob?.order.locationId,
+        regionId: this.candidateJob?.order.regionId
+      };
+      this.store.dispatch(new GetCandidateCancellationReason(payload));
+      this.candidateCancellationReasons$
+        .pipe().subscribe((value) => {
+          console.log(value);
+          this.candidateCancellationReasons =value;
+        });
+
+    }
   }
 }

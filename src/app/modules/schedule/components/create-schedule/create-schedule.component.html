@@ -30,8 +30,11 @@
       </button>
     </div>
   </div>
-  <div class="input-container schedule-types" >
-    <ng-container *ngFor="let type of scheduleTypes">
+  <div
+    class="input-container schedule-types"
+    [ngStyle]="{'grid-template-columns': scheduleTypes.columnsTemplate}"
+  >
+    <ng-container *ngFor="let type of scheduleTypes.source">
       <div class="input-group radio">
         <app-tooltip-container [showToolTip]="type.disabled">
           <ejs-radiobutton
@@ -140,5 +143,5 @@
   [isRemoveMode]="sideBarSettings.removeReplacementMode"
   (destroyDialog)="closeReplacementOrderDialog()"
   (removeOrder)="deleteSchedule($event)"
-  (createOrder)="saveNewBooking($event)"
+  (createOrder)="saveNewEvent($event)"
 ></app-replacement-order-dialog>

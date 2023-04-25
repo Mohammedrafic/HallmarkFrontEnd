@@ -49,6 +49,8 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   private filters: ScheduleFilters = {};
 
+  private isPreservedFilters = false;
+
   private filterStructure: ScheduleFilterStructure = {
     regions: [],
     locations: [],
@@ -180,13 +182,20 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         if (skills.length) {
           const skillOption = ScheduleFilterHelper.adaptOrganizationSkillToOption(skills);
           this.filterColumns.skillIds.dataSource = skillOption;
-          this.scheduleFilterFormGroup.get('skillIds')?.patchValue([skillOption[0]?.value]);
+          const skillIds = this.isPreservedFilters ? this.filters.skillIds : [skillOption[0]?.value];
+
+          this.scheduleFilterFormGroup.get('skillIds')?.patchValue(skillIds);
         } else {
           this.resetSkillFilters();
         }
 
-        this.setFilteredItems();
-        this.applyHomeCostCenterFilters();
+        if (this.isPreservedFilters) {
+          this.setFilters();
+          this.isPreservedFilters = false;
+        } else {
+          this.setFilteredItems();
+          this.applyHomeCostCenterFilters();
+        }
       });
 
     this.scheduleFilterFormGroup.get('skillIds')?.valueChanges
@@ -287,10 +296,20 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       distinctUntilChanged((prev, next) => isObjectsEqual(prev as Record<string, unknown>, next as Record<string, unknown>)),
       takeUntil(this.componentDestroy())
     )
-    .subscribe((preservFilters) => {
-      this.filters = preservFilters || {};
-      this.scheduleFilterFormGroup.patchValue({ ...this.filters });
-      this.setFilters();
-    });
+      .subscribe((preservFilters) => {
+        this.filters = preservFilters || {};
+        this.isPreservedFilters = !!preservFilters;
+        const { regionIds, locationIds, departmentsIds } = this.filters;
+
+        this.scheduleFilterFormGroup.patchValue({
+          regionIds: regionIds ? [...regionIds] : [],
+          locationIds: locationIds ? [...locationIds] : [],
+          departmentsIds: departmentsIds ? [...departmentsIds] : [],
+        });
+
+        if (!this.filters.skillIds?.length) {
+          this.setFilters();
+        }
+      });
   }
 }

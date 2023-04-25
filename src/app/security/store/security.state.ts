@@ -521,6 +521,9 @@ export class SecurityState {
   ): Observable<Organisation[] | void> {
     return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(
       tap((payload) => {
+        payload.forEach(item => {
+          item.regions.forEach(region => region.organisationName = item.name);
+        });
         patchState({ organizations: payload });
         return payload;
       }),

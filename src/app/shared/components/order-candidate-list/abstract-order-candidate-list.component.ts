@@ -21,7 +21,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { PageOfCollections } from '@shared/models/page.model';
-import { CandidateSearchPlaceholder } from '@shared/constants/candidate-search-placeholder';
+import { CandidateSearchPlaceholder, EmployeeSearchPlaceholder } from '@shared/constants/candidate-search-placeholder';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
 
 @Directive()
@@ -49,6 +49,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   public isAgency: boolean;
   public isOrganization: boolean;
   public candidateSearchPlaceholder = CandidateSearchPlaceholder;
+  public employeeSearchPlaceholder = EmployeeSearchPlaceholder;
   public isAvailable = false;
 
   private readonly searchByCandidateName$: Subject<string> = new Subject();
@@ -143,6 +144,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   private listenScreenResolution(): void {
     this.isMobileScreen$.pipe(takeUntil(this.unsubscribe$)).subscribe((isMobile) => {
       this.candidateSearchPlaceholder = isMobile ? '' : CandidateSearchPlaceholder;
+      this.employeeSearchPlaceholder = isMobile ? "" : EmployeeSearchPlaceholder;
     });
   }
 

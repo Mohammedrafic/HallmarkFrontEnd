@@ -17,7 +17,9 @@ import { UserState } from 'src/app/store/user.state';
 import { CreateScheduleItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
 import {
-  EmployeeBookingDay, OpenPositionParams,
+  CreateScheduleTypesConfig,
+  EmployeeBookingDay,
+  OpenPositionParams,
   ScheduleBookingErrors,
   ScheduleCandidate,
   ScheduleDay,
@@ -128,6 +130,7 @@ export class CreateScheduleService {
       endTime: getTime(endTime),
       unavailabilityReasonId,
       shiftId: shiftId !== customShiftId ? shiftId : null,
+      createOrder: false,
     };
   }
 
@@ -262,10 +265,10 @@ export class CreateScheduleService {
   }
 
   getScheduleTypesWithPermissions(
-    scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>,
+    scheduleTypes:CreateScheduleTypesConfig,
     userPermission: Permission
-  ): ReadonlyArray<ScheduleTypeRadioButton> {
-    let types = scheduleTypes.map((item: ScheduleTypeRadioButton) => {
+  ): CreateScheduleTypesConfig {
+    let types = scheduleTypes.source.map((item: ScheduleTypeRadioButton) => {
       return {
         ...item,
         disabled: !userPermission[item.permission],
@@ -276,11 +279,14 @@ export class CreateScheduleService {
       types = types.filter((type: ScheduleTypeRadioButton) => type.value !== ScheduleItemType.Book);
     }
 
-    return types;
+    return {
+      columnsTemplate: this.getScheduleTypeColumnsTemplate(types),
+      source: types,
+    };
   }
 
-  getFirstAllowedScheduleType(scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>): ScheduleItemType {
-    return (scheduleTypes.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
+  getFirstAllowedScheduleType(scheduleTypes: CreateScheduleTypesConfig): ScheduleItemType {
+    return (scheduleTypes.source.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
   }
 
   updateScheduleFormClass(scheduleType: ScheduleItemType, isCustom: boolean): string {
@@ -413,5 +419,9 @@ export class CreateScheduleService {
     } else {
       control?.enable();
     }
+  }
+
+  private getScheduleTypeColumnsTemplate(types: ScheduleTypeRadioButton[]): string {
+    return types.length > 3 ? 'auto auto auto auto' : `repeat(${types.length},1fr)`;
   }
 }

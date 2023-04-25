@@ -119,6 +119,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   private scheduleFilterStructure: ScheduleFilterStructure;
   private hasInitData = false;
   private scheduleToBook: ScheduleBook | null;
+  private unavailabilityToSave: Schedule | null;
   private subscriptions: Record<string, Subscription | null> = {
     shiftId: null,
     regionId: null,
@@ -254,16 +255,23 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       return;
     }
 
-    if (!this.isCreateMode) {
+    if (!this.isCreateMode && this.selectedDaySchedule.scheduleType !== ScheduleType.Unavailability) {
       this.updateScheduledShift();
+      return;
+    }
+
+    if (this.selectedDaySchedule.scheduleType === ScheduleType.Unavailability
+      || this.scheduleItemType === ScheduleItemType.Unavailability) {
+      this.checkUnavailabilityOverlaps();
       return;
     }
 
     if (this.scheduleItemType === ScheduleItemType.Book) {
       this.checkBookingsOverlaps();
-    } else {
-      this.saveNewAvailabilityUnavailability();
+      return;
     }
+
+    this.createAvailability();
   }
 
   deleteSchedule(): void {
@@ -291,7 +299,16 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     });
   }
 
-  saveNewBooking(createOrder: boolean): void {
+  saveNewEvent(createOrder: boolean): void {
+    if (this.unavailabilityToSave) {
+      this.unavailabilityToSave.createOrder = createOrder;
+      this.createUnavailability()
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe(() => this.handleSuccessAdding());
+
+      return;
+    }
+
     if (this.scheduleToBook) {
       this.scheduleToBook.createOrder = createOrder;
       this.createBookSchedule()
@@ -573,8 +590,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.cdr.markForCheck();
   }
 
-  private saveNewAvailabilityUnavailability(): void {
-    const { shiftId, startTime, endTime, date, unavailabilityReasonId = null } = this.scheduleForm.getRawValue();
+  private createAvailability(): void {
+    const { shiftId, startTime, endTime, date } = this.scheduleForm.getRawValue();
     const schedule: Schedule = {
       employeeScheduledDays: [{
         employeeId: this.scheduledItem.candidate.id,
@@ -583,8 +600,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       scheduleType: this.scheduleTypesControl.value,
       startTime: getTime(startTime),
       endTime: getTime(endTime),
-      unavailabilityReasonId,
+      unavailabilityReasonId: null,
       shiftId: shiftId !== this.customShiftId ? shiftId : null,
+      createOrder: false,
     };
 
     this.scheduleApiService.createSchedule(schedule)
@@ -639,6 +657,45 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     ).subscribe(() => this.handleSuccessAdding());
   }
 
+  private checkUnavailabilityOverlaps(): void {
+    const { shiftId, startTime, endTime, date, unavailabilityReasonId = null } = this.scheduleForm.getRawValue();
+    this.unavailabilityToSave = {
+      employeeScheduledDays: [{
+        employeeId: this.scheduledItem.candidate.id,
+        dates: [DateTimeHelper.toUtcFormat(new Date(date.setHours(0, 0, 0)))],
+      }],
+      scheduleType: this.scheduleTypesControl.value,
+      startTime: getTime(startTime),
+      endTime: getTime(endTime),
+      unavailabilityReasonId,
+      shiftId: shiftId !== this.customShiftId ? shiftId : null,
+      createOrder: false,
+    };
+    const request: BookingsOverlapsRequest = {
+      employeeScheduledDays: [{
+        employeeId: this.scheduledItem.candidate.id,
+        bookedDays: [DateTimeHelper.toUtcFormat(new Date(date.setHours(0, 0, 0)))],
+      }],
+      shiftId: this.unavailabilityToSave.shiftId,
+      startTime: this.unavailabilityToSave.startTime,
+      endTime: this.unavailabilityToSave.endTime,
+    };
+
+    this.scheduleApiService.checkBookingsOverlaps(request).pipe(
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+      switchMap((response: BookingsOverlapsResponse[]) => {
+        if (!response.length && this.unavailabilityToSave) {
+          return this.createUnavailability();
+        } else {
+          this.openReplacementOrderDialog(response);
+
+          return EMPTY;
+        }
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => this.handleSuccessAdding());
+  }
+
   private openReplacementOrderDialog(replacementOrderDialogData: BookingsOverlapsResponse[]): void {
     this.replacementOrderDialogData = replacementOrderDialogData;
     this.replacementOrderDialogOpen = true;
@@ -657,6 +714,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   private handleSuccessAdding(): void {
     this.updateScheduleGrid.emit();
     this.scheduleToBook = null;
+    this.unavailabilityToSave = null;
     this.store.dispatch(new ShowToast(MessageTypes.Success, RECORDS_ADDED));
   }
 
@@ -664,6 +722,29 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     return this.scheduleApiService.createBookSchedule(this.scheduleToBook as ScheduleBook).pipe(
       catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
     );
+  }
+
+  private createUnavailability(): Observable<void> {
+    if (!this.isCreateMode) {
+      const { shiftId, startTime, endTime, date, unavailabilityReasonId } = this.scheduleForm.getRawValue();
+      const schedule: EditSchedule.ScheduledShift = {
+        scheduleId: this.selectedDaySchedule.id,
+        unavailabilityReasonId,
+        shiftId: shiftId === this.customShiftId ? null : shiftId,
+        date: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+        startTime: getTime(startTime),
+        endTime: getTime(endTime),
+        createOrder: !!this.unavailabilityToSave?.createOrder,
+        initialStartTime: this.selectedDaySchedule.startDate,
+        initialEndTime: this.selectedDaySchedule.endDate,
+      };
+
+      return this.scheduleApiService.updateScheduledShift(schedule, this.selectedDaySchedule.scheduleType)
+        .pipe(catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)));
+    }
+
+    return this.scheduleApiService.createSchedule(this.unavailabilityToSave as Schedule)
+      .pipe(catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)));
   }
 
   private setScheduleTypes(): void {

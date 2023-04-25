@@ -2,7 +2,7 @@ import { GetCandidateJob, ReloadOrderCandidatesLists } from '@agency/store/order
 import { ChangeDetectorRef, Component, Inject, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
-import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { OrganizationalHierarchy, OrganizationSettingKeys, RECORD_MODIFIED } from '@shared/constants';
@@ -25,6 +25,10 @@ import {
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderStatus } from '@shared/enums/order-management';
 import { GlobalWindow } from '@core/tokens';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
+import { SelectedSystems } from '@shared/components/credentials-list/constants';
+import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 
 enum ReorderCandidateStatuses {
   BillRatePending = 44,
@@ -59,6 +63,16 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
 
   private selectedIndex: number;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
+  public selectedSystem: SelectedSystemsFlag = SelectedSystems;
+  private isOrgIRPEnabled = false;
+  private previousSelectedSystemId: OrderManagementIRPSystemId | null;
+  private isOrgVMSEnabled = false;
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
+  public activeSystem: OrderManagementIRPSystemId;
+
   constructor(
     protected override store: Store,
     protected override router: Router,
@@ -83,6 +97,12 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     if (this.isAgency) {
       this.checkForAgencyStatus();
     }
+    this.organizationId$.pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((id) => {
+      this.getOrganization(id);
+    });
   }
 
   public onEdit(data: OrderCandidatesList & { index: string }, event: MouseEvent): void {
@@ -198,5 +218,39 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
         this.cdr.markForCheck();
       });
     }
+  }
+
+  private setPreviousSelectedSystem(): void {
+    this.previousSelectedSystemId = this.orderManagementService.getOrderManagementSystem();
+  }
+
+
+  private getOrganization(businessUnitId: number) {
+
+    const id = businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+
+    this.store.dispatch(new GetOrganizationById(id)).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      const { isIRPEnabled, isVMCEnabled } =
+        this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+
+      this.isOrgIRPEnabled = !!isIRPEnabled;
+      this.isOrgVMSEnabled = !!isVMCEnabled;
+      this.setPreviousSelectedSystem();
+      
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
+      }
+
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && this.isOrgVMSEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
+      }
+      this.previousSelectedSystemId = null;
+    });
   }
 }

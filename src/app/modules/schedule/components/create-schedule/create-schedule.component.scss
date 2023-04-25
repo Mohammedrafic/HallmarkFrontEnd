@@ -88,11 +88,12 @@ app-schedule-items {
 }
 
 .schedule-types {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
   border: 1px solid $primary-active-blue-10;
   border-radius: 8px;
   margin-bottom: 24px;
+  align-items: center;
+  justify-content: stretch;
 
   .input-group:first-child {
     border-bottom-left-radius: 5px;
@@ -103,13 +104,13 @@ app-schedule-items {
   .input-group:last-child {
     border-bottom-right-radius: 5px;
     border-top-right-radius: 5px;
-    min-width: 93px;
   }
 
   .input-group {
     text-align: center;
     border-left: 1px solid $primary-active-blue-10;
     padding: 0 4px;
+    min-width: 1px;
   }
 
   .input-group:has(.e-control.e-radio:checked) {
@@ -127,8 +128,6 @@ app-schedule-items {
   }
 
   ejs-radiobutton .e-control.e-radio + label {
-    min-width: 90px;
-
     .e-label {
       color: $primary-active-blue-10 !important;
       padding: 10px 0 !important;
