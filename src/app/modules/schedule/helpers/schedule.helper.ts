@@ -1,10 +1,11 @@
 import { FormGroup } from '@angular/forms';
 
-import { WeekDays } from '@shared/enums/week-days.enum';
-
 import { DropdownOption } from '@core/interface';
-import * as ScheduleInt from '../interface';
+import { DateTimeHelper } from '@core/helpers';
+import { RECORD_ADDED, RECORDS_ADDED } from '@shared/constants';
+import { WeekDays } from '@shared/enums/week-days.enum';
 import { convertMsToTime, getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
+import * as ScheduleInt from '../interface';
 import { ShiftTab } from '../components/edit-schedule/edit-schedule.interface';
 import { ScheduleAttributeKeys, ScheduleType } from '../enums';
 import {
@@ -18,10 +19,8 @@ import {
   ScheduleModel,
   ScheduleModelPage,
 } from '../interface';
-import { DateTimeHelper } from '@core/helpers';
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
-import { RECORD_ADDED, RECORDS_ADDED } from '@shared/constants';
-import { AboutSixHoursMs, AboutTwentyHoursMs, HalfHourTimeMealMs, HourTimeMealMs, WeekList } from '../constants';
+import { AboutSixHoursMs, AboutTwentyHoursMs, DayMs, HalfHourTimeMealMs, HourTimeMealMs, WeekList } from '../constants';
 
 export const GetScheduleDayWithEarliestTime = (schedules: ScheduleInt.ScheduleItem[]): ScheduleItem => {
   if(schedules.length >= 2) {
@@ -177,11 +176,10 @@ export const GetShiftHours = (startTimeDate: Date, endTimeDate: Date, meal = fal
   let endTimeMs: number = endTimeDate.setMilliseconds(0);
 
   if (startTimeMs > endTimeMs) {
-    const dayMs = 86400000;
-    endTimeMs = endTimeMs + dayMs;
+    endTimeMs = endTimeMs + DayMs;
   }
 
-  const workTime = endTimeMs - startTimeMs;
+  const workTime = startTimeMs === endTimeMs ? DayMs : endTimeMs - startTimeMs;
 
   if(meal && workTime < AboutSixHoursMs) {
     return convertMsToTime(workTime);
