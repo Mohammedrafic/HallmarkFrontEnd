@@ -193,6 +193,11 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.listenResizeToolbar();
   }
 
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.resizeObserver.detach();
+  }
+
   public onOpen(args: { preventFocus: boolean }): void {
     args.preventFocus = true;
   }

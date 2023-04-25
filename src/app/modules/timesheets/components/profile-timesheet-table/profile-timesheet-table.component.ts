@@ -218,6 +218,11 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.listenResizeContent();
   }
 
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.resizeObserver.detach();
+  }
+
   public onTabSelect(selectEvent: SelectingEventArgs): void {
     this.isFirstSelected = false;
 
