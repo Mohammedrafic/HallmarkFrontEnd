@@ -171,7 +171,7 @@ export const OrientationHistoricalDataColumnDef = (
     minWidth: 185,
   },
   {
-    field: 'orientationConfigurationSkills',
+    field: 'historicalOrientationConfigurationSkills',
     headerName: 'Skill',
     cellRenderer: SkillNameRendererComponent,
     flex: 1,

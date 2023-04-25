@@ -704,7 +704,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.actions$
       .pipe(ofActionSuccessful(GetCredentialStatusesSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((payload: { statuses: CredentialStatus[] }) => {
-        this.credentialStatusOptions = this.credentialGridService.getCredentialStatusOptions(payload.statuses);
+        this.credentialStatusOptions = this.credentialGridService.getCredentialStatusOptions(payload.statuses, this.isIRP);
         this.addCredentialForm.patchValue({ status: this.credentialStatus });
       });
   }
@@ -725,7 +725,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         disableEdit: this.disableEdit(item),
         disableViewDocument:this.disableViewDocument(item),
         showDisableEditTooltip:
-          (item.status === this.statusEnum.Reviewed || item.status === this.statusEnum.Verified) &&
+          (item.status === this.statusEnum.Reviewed) &&
           !this.isOrganizationSide,
         disableDelete: this.disableDelete(item),
       };
@@ -749,7 +749,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return (
       !this.areAgencyActionsAllowed ||
       item.id === this.orderCredentialId ||
-      ((item.status === this.statusEnum.Reviewed || item.status === this.statusEnum.Verified) &&
+      ((item.status === this.statusEnum.Reviewed) &&
         !this.isOrganizationSide) ||
       (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
     );
