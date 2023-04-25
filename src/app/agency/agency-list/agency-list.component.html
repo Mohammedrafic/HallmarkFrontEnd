@@ -82,7 +82,7 @@
       </e-column>
       <e-column field="ContactPerson" headerText="CONTACT PERSON" width="220">
         <ng-template #template let-data>
-          {{ data.agencyContactDetails[0].contactPerson }}
+          {{ data.contactPerson }}
         </ng-template>
       </e-column>
       <e-column field="agencyContactDetails.0.phone1" headerText="PHONE" width="220" [allowSorting]="false"></e-column>
