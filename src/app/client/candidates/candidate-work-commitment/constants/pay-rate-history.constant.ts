@@ -7,7 +7,7 @@ import { PayRateColumns } from "../enums/pay-rate-columns.enum";
 import { PayRateHistory } from "../interfaces/pay-rate-history.interface";
 import { GridActionsCellComponent, GridActionsCellConfig } from "@shared/components/grid/cell-renderers/grid-actions-cell";
 
-export const PayRateColumnDef = (deleteCallback: (value: number) => void) => ([
+export const PayRateColumnDef = (deleteCallback: (value: number) => void, disabled: boolean) => ([
   {
     field: '',
     headerName: '',
@@ -25,7 +25,7 @@ export const PayRateColumnDef = (deleteCallback: (value: number) => void) => ([
             },
             iconName: 'trash-2',
             buttonClass: 'remove-button',
-            disabled: false,
+            disabled: disabled,
           },
         ],
       };
