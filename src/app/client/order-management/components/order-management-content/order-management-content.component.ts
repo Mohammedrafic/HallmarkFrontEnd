@@ -1874,23 +1874,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         (filters[filterKey] as number[]) = [item.value];
       }
     });
-    const items = JSON.parse(dashboardFilterState) as FilteredItem[];
-
-    if(items!= null && items.length >0){
-        const filteredItems = items.filter((item: FilteredItem) =>
-        (item.organizationId === this.organizationId && item.column !== FilterColumnTypeEnum.ORGANIZATION)
-        || item.column === FilterColumnTypeEnum.SKILL);
-
-        
-        filteredItems.forEach((item: FilteredItem) => {
-          const filterKey = item.column as keyof OrderFilter;
-          if (filterKey in filters) {
-            (filters[filterKey] as number[]).push(item.value);
-          } else {
-            (filters[filterKey] as number[]) = [item.value];
-          }
-        });
-    }
 
     this.orderPositionStatus = null;
     this.isRedirectedFromDashboard = false;
