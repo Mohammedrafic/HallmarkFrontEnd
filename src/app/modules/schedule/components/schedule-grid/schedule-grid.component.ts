@@ -395,11 +395,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       filter(({ dispatch }) => dispatch),
       takeUntil(this.componentDestroy()),
     ).subscribe((filters) => {
-      this.setPreservedFiltersDataSource(filters.state || {});
+      this.setPreservedFiltersDataSource(filters.state);
     });
   }
 
   private setPreservedFiltersDataSource(filters: ScheduleInt.ScheduleFilters): void {
-    this.scheduleFiltersService.setPreservedFiltersDataStream({ ...filters });
+    this.scheduleFiltersService.setPreservedFiltersDataStream(filters);
   }
 }
