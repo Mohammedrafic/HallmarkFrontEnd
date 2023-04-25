@@ -21,7 +21,7 @@
       class="add-action"
       cssClass="e-action-button"
       ejs-button (click)="openDialog()"
-      [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile] || this.noActiveWorkCommitment"
+      [disabled]="disableDeleteButton || this.noActiveWorkCommitment"
     >
       <i-feather name="plus" class="icon"></i-feather>
       Add Pay Rate
