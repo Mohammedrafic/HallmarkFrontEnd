@@ -700,15 +700,14 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   private subscribeCandidateCancellationReasons() {
-    if (this.candidateJob) {
+    if (this.orderCandidateJob) {
       let payload: CandidateCancellationReasonFilter = {
-        locationId: this.candidateJob?.order.locationId,
-        regionId: this.candidateJob?.order.regionId
+        locationId: this.orderCandidateJob?.order.locationId,
+        regionId: this.orderCandidateJob?.order.regionId
       };
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
         .pipe().subscribe((value) => {
-          console.log(value);
           this.candidateCancellationReasons =value;
         });
 
