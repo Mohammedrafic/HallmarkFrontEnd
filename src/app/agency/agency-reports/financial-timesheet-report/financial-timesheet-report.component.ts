@@ -113,7 +113,7 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
 
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
-  @Select(UserState.lastSelectedOrganizationId)
+  @Select(UserState.lastSelectedAgencyId)
   private agencyId$: Observable<number>;
 
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
@@ -182,6 +182,7 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
     this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       if (data != null && data != undefined) {
         this.defaultAgency = data.toString();
+      }
         this.store.dispatch(new GetOrganizationsByAgency())
         this.store.dispatch(new ClearLogiReportState());
         this.organizationsByAgency$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: DataSourceItem[]) => {
@@ -201,20 +202,21 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
             });
           }
         });
+     
         this.orderFilterColumnsSetup();
         this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
           if (data.length > 0) {
             this.logiReportComponent.SetReportData(data);
           }
         });
-
+       
         this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.AccrualReportTypes)?.setValue(1);
         this.onFilterControlValueChangedHandler();
         this.onFilterRegionChangedHandler();
         this.onFilterLocationChangedHandler();
         this.onFilterSkillCategoryChangedHandler();
         this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.enable() : this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.disable();
-      }
+      
       });
   
   }
