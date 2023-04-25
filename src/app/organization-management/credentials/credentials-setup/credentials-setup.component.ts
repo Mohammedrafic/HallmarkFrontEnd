@@ -138,7 +138,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
     this.credentialsSetupService.populateCredentialSetupForm(
       this.credentialsSetupFormGroup,
       credentialSetup,
-      this.isIRPAndVMSEnabled,
+      this.isIRPAndVMSEnabled && !!(credentialSetup.includeInIRP),
       checkboxName,
       event.checked,
     );
