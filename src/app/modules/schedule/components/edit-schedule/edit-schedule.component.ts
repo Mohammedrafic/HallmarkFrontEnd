@@ -260,8 +260,10 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       return;
     }
 
-    if (this.selectedDaySchedule.scheduleType === ScheduleType.Unavailability
-      || this.scheduleItemType === ScheduleItemType.Unavailability) {
+    if (
+      (this.selectedDaySchedule.scheduleType === ScheduleType.Unavailability && !this.isCreateMode)
+      || (this.scheduleItemType === ScheduleItemType.Unavailability && this.isCreateMode)
+    ) {
       this.checkUnavailabilityOverlaps();
       return;
     }
