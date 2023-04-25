@@ -22,8 +22,10 @@ export class CredentialGridService {
     return credentialRows.filter((item: CandidateCredential) => item.credentialFiles?.length);
   }
 
-  public getCredentialStatusOptions(statuses: CredentialStatus[]): FieldSettingsModel[] {
-    return statuses.map((item: CredentialStatus) => {
+  public getCredentialStatusOptions(statuses: CredentialStatus[], isIRP: boolean): FieldSettingsModel[] {
+    const statusList = isIRP ? statuses.filter((status) => status !== CredentialStatus.Reviewed) : statuses;
+
+    return statusList.map((item: CredentialStatus) => {
       return {
         text: CredentialStatus[item],
         id: item,

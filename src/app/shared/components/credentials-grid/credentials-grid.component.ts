@@ -704,7 +704,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.actions$
       .pipe(ofActionSuccessful(GetCredentialStatusesSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((payload: { statuses: CredentialStatus[] }) => {
-        this.credentialStatusOptions = this.credentialGridService.getCredentialStatusOptions(payload.statuses);
+        this.credentialStatusOptions = this.credentialGridService.getCredentialStatusOptions(payload.statuses, this.isIRP);
         this.addCredentialForm.patchValue({ status: this.credentialStatus });
       });
   }
