@@ -99,6 +99,18 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public dateValueChange(event: Date): void {
     this.startDate = event;
   }
+  
+  public getPayRateById(event:any){
+    if(event.itemData.id>0){
+      this.candidateWorkCommitmentService.getPayRateById(event.itemData.id)
+      .subscribe((payrate:number) => {
+        if (payrate) {
+          this.candidateWorkCommitmentForm.controls['payRate'].setValue(payrate);
+        }
+        this.cd.detectChanges();
+      });
+    }
+  }
 
   private createForm(): void {
     this.candidateWorkCommitmentForm = this.fb.group({

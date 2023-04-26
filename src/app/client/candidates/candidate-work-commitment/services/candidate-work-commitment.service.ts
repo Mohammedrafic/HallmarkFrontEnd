@@ -16,6 +16,9 @@ export class CandidateWorkCommitmentService {
   public getAvailableWorkCommitments(employeeId: number): Observable<WorkCommitmentDataSource[]> {
     return this.httpClient.get<WorkCommitmentDataSource[]>('/api/WorkCommitment/all', { params: { EmployeeId: employeeId }});
   }
+  public getPayRateById(workcommitmentId: number): Observable<number> {
+    return this.httpClient.get<number>('/api/EmployeeWorkCommitments/getPayRateById/' + workcommitmentId);
+  }
 
   public saveCandidateWorkCommitment(workCommitment: CandidateWorkCommitment): Observable<CandidateWorkCommitment> {
     if (workCommitment.id) {

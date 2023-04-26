@@ -12,6 +12,7 @@
       [sortOrder]="sortOrder"
       (open)="openDropdown.emit($event)"
       (blur)="onBlur()"
+      (change)="change.emit($event)"
     ></ejs-dropdownlist>
     <app-error-message [control]="getControl()"></app-error-message>
   </div>
