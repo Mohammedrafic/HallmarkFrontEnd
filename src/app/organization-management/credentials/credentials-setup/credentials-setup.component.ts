@@ -135,10 +135,12 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
     checkboxName: string,
     event: { checked: boolean }
   ): void {
+    this.isCredentialIRP = this.isIRPAndVMSEnabled && !!(credentialSetup.includeInIRP);
+    this.credentialsSetupService.irpCommentFieldSettings(this.credentialsSetupFormGroup, this.isCredentialIRP);
     this.credentialsSetupService.populateCredentialSetupForm(
       this.credentialsSetupFormGroup,
       credentialSetup,
-      this.isIRPAndVMSEnabled && !!(credentialSetup.includeInIRP),
+      this.isCredentialIRP,
       checkboxName,
       event.checked,
     );
