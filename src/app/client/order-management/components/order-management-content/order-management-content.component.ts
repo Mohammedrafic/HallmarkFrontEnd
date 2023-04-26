@@ -637,7 +637,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      this.defaultFileName = `Organization Management/${this.activeIRPtabs} ` + this.generateDateTime(this.datePipe);
+      this.defaultFileName = `Order Management/${this.activeIRPtabs} ` + this.generateDateTime(this.datePipe);
       this.store.dispatch(
         new ExportIRPOrders(
           new ExportPayload(
