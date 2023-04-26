@@ -204,9 +204,6 @@
       <h5 class="alert-title-header-body-color">Notifications</h5>
     </div>
     <div class="closebtn">
-      <div class="e-row item-clear">
-        <span (click)="alertSideBarClearAllClick()">Clear All</span>
-      </div>
       <button ejs-button id="close" class="e-btn close-btn" title="Close" (click)="alertSideBarCloseClick()">
         <fa-icon [icon]="faTimes"></fa-icon>
       </button>
@@ -239,13 +236,6 @@
           (click)="getContentDetails(item.organizationId, item.orderId,item.alertTitle)"
           [innerHTML]="item.content"
         ></div>
-        <div class="alert-panel-footer">
-          <div class="alert-panel-footer__footer_flex-child"></div>
-          <div class="alert-panel-footer__footer_flex-child" (click)="alertDismiss(item.id)">
-            <i-feather name="check-circle"></i-feather>
-            <div class="dismiss-text"><span>Dismiss</span></div>
-          </div>
-        </div>
       </section>
     </section>
   </div>
