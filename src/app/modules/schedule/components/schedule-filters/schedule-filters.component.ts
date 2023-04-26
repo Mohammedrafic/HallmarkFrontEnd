@@ -10,7 +10,12 @@ import { SkillsService } from '@shared/services/skills.service';
 import { Destroyable, isObjectsEqual } from '@core/helpers';
 import { FieldType, FilterPageName } from '@core/enums';
 import { FilteredItem } from '@shared/models/filter.model';
-import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import {
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
 import { OrganizationStructureService } from '@shared/services';
 import { FilterService } from '@shared/services/filter.service';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
@@ -265,20 +270,40 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   }
 
   private preSelectHomeCostCenterFilters(): void {
-    const regionId = this.filterStructure.regions[0].id as number;
+    const homeCostCenterDepartment = this.filterStructure.departments
+      .find((department: OrganizationDepartment) => department.isHomeCostCenter);
+    let regionId: number;
+    let locationId: number;
+    let departmentId: number;
 
     this.autoApplyFilters = true;
 
-    this.filterColumns.locationIds.dataSource = this.scheduleFiltersService
-      .getSelectedLocatinOptions(this.filterStructure, [regionId]);
-    this.filterColumns.departmentsIds.dataSource = this.scheduleFiltersService
-      .getSelectedDepartmentOptions(this.filterStructure, [this.filterColumns.locationIds.dataSource[0].value as number]);
+    if (homeCostCenterDepartment) {
+      departmentId = homeCostCenterDepartment.id;
+      locationId = homeCostCenterDepartment.locationId as number;
+      regionId = this.filterStructure.locations
+        .find((location: OrganizationLocation) => location.id === locationId)?.regionId as number;
+
+      this.filterColumns.locationIds.dataSource = this.scheduleFiltersService
+        .getSelectedLocatinOptions(this.filterStructure, [regionId]);
+      this.filterColumns.departmentsIds.dataSource = this.scheduleFiltersService
+        .getSelectedDepartmentOptions(this.filterStructure, [locationId]);
+
+    } else {
+      regionId = this.filterStructure.regions[0].id as number;
+
+      this.filterColumns.locationIds.dataSource = this.scheduleFiltersService
+        .getSelectedLocatinOptions(this.filterStructure, [regionId]);
+      locationId = this.filterColumns.locationIds.dataSource[0]?.value as number;
+
+      this.filterColumns.departmentsIds.dataSource = this.scheduleFiltersService
+        .getSelectedDepartmentOptions(this.filterStructure, [locationId]);
+      departmentId = this.filterColumns.departmentsIds.dataSource[0]?.value as number;
+    }
 
     this.scheduleFilterFormGroup?.get('regionIds')?.patchValue([regionId], { emitEvent: false, onlySelf: true });
-    this.scheduleFilterFormGroup?.get('locationIds')?.patchValue(
-      [this.filterColumns.locationIds.dataSource[0]?.value], { emitEvent: false, onlySelf: true });
-    this.scheduleFilterFormGroup?.get('departmentsIds')?.patchValue(
-      [this.filterColumns.departmentsIds.dataSource[0]?.value]);
+    this.scheduleFilterFormGroup?.get('locationIds')?.patchValue([locationId], { emitEvent: false, onlySelf: true });
+    this.scheduleFilterFormGroup?.get('departmentsIds')?.patchValue([departmentId]);
   }
 
   private applyHomeCostCenterFilters(): void {

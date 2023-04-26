@@ -31,7 +31,7 @@ export const filterColumns: CandidateListFiltersColumn = {
     valueType: ValueType.Id,
     dataSource: [
       {id : 3, name : "Licenses"},
-      {id : 1, name : "Certificates"},
+      {id : 1, name : "Certifications"},
       {id : 2, name : "Checklists"}
     ],
     valueField: 'name',
@@ -82,7 +82,7 @@ export const IRPFilterColumns: CandidateListFiltersColumn = {
     valueType: ValueType.Id,
     dataSource: [
       {id : 3, name : "Licenses"},
-      {id : 1, name : "Certificates"},
+      {id : 1, name : "Certifications"},
       {id : 2, name : "Checklists"}
     ],
     valueField: 'name',

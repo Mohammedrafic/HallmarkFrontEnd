@@ -1,6 +1,7 @@
 <app-page-toolbar>
   <ng-container left>
-    <h3>Employees</h3>
+    <h3 *ngIf="isIRP">Employees</h3>
+    <h3 *ngIf="!isIRP">Candidates</h3>
   </ng-container>
   <ng-container right>
     <div class="button-group" *ngIf="!isIRP">

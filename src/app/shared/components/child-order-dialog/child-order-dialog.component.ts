@@ -688,6 +688,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.getExtensions();
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
+          this.subscribeCandidateCancellationReasons();
         }
       });
     }
@@ -702,7 +703,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         }
       });
     }
-  }
+     }
 
   private setAcceptForm({
     order: {
@@ -918,7 +919,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
         .pipe().subscribe((value) => {
-          console.log(value);
           this.candidateCancellationReasons =value;
         });
 

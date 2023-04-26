@@ -16,9 +16,17 @@ import { CandidatesService } from '@client/candidates/services/candidates.servic
 import { DateTimeHelper } from '@core/helpers';
 import { handleHttpError } from '@core/operators';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, NO_ACTIVE_WORK_COMMITMET } from '@shared/constants';
+import {
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+  NO_ACTIVE_WORK_COMMITMET,
+  RECORD_ADDED,
+  RECORD_DELETE,
+} from '@shared/constants';
 import { DateRanges } from '@client/candidates/departments/departments.model';
 import { CandidateWorkCommitmentShort } from '@client/candidates/interface/employee-work-commitments.model';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-pay-rate-history',
@@ -45,6 +53,7 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
   public customRowsPerPageDropDownObject = PagerConfig;
   public dateRanges: DateRanges = {};
   public noActiveWorkCommitment = false;
+  public disableDeleteButton = false;
   public tooltipMessage = NO_ACTIVE_WORK_COMMITMET;
   public pagingData = {
     pageNumber: 1,
@@ -67,7 +76,7 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
   public override ngOnInit(): void {
     super.ngOnInit();
     this.initFormGroup();
-    this.initColumnsDefinition();
+    this.subscribeForUserPermissions();
     this.getActiveEmployeeWorkCommitment();
     this.syncWorkCommitmentWithPayRate();
   }
@@ -98,14 +107,15 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
         ).subscribe(() => {
           this.dialogSubject$.next({ isOpen: false });
           this.refreshSubject$.next();
+          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         });
     } else {
       this.formGroup.markAllAsTouched();
     }
   }
 
-  private initColumnsDefinition(): void {
-    this.columnDef = PayRateColumnDef(this.deletePayRate.bind(this));
+  private initColumnsDefinition(disabled: boolean): void {
+    this.columnDef = PayRateColumnDef(this.deletePayRate.bind(this), disabled);
   }
 
   private deletePayRate(id: number): void {
@@ -119,6 +129,8 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
         filter((confirm) => !!confirm),
         switchMap(() => this.payRateApiService.deletePayRateRecord(id)),
         switchMap(() => {
+          this.refreshSubject$.next();
+          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
           this.pagingData.pageNumber = this.candidateService.getGridPageNumber(
             this.payRateRecords.length,
             this.pagingData.pageNumber,
@@ -182,6 +194,8 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
           this.employeeWorkCommitmentId = data.id;
           this.setDateRanges(data);
         }
+
+        this.cdr.markForCheck();
       });
   }
 
@@ -192,6 +206,17 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
         takeUntil(this.componentDestroy()),
       ).subscribe((data) => {
         this.extractData(data);
+      });
+  }
+
+  private subscribeForUserPermissions(): void {
+    this.getPermissionStream()
+      .pipe(
+        takeUntil(this.componentDestroy())
+      ).subscribe((userPermission) => {
+        this.disableDeleteButton = !userPermission[this.userPermissions.ManageIrpCandidateProfile];
+        this.initColumnsDefinition(this.disableDeleteButton);
+        this.cdr.markForCheck();
       });
   }
 }

@@ -637,7 +637,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      this.defaultFileName = `Organization Management/${this.activeIRPtabs} ` + this.generateDateTime(this.datePipe);
+      this.defaultFileName = `Order Management/${this.activeIRPtabs} ` + this.generateDateTime(this.datePipe);
       this.store.dispatch(
         new ExportIRPOrders(
           new ExportPayload(
@@ -1860,7 +1860,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       : [];
 
     const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
-    const items = JSON.parse(dashboardFilterState) as FilteredItem[];
+    const items = JSON.parse(dashboardFilterState) as FilteredItem[]||[];
     const filteredItems = items.filter((item: FilteredItem) =>
       (item.organizationId === this.organizationId && item.column !== FilterColumnTypeEnum.ORGANIZATION)
       || item.column === FilterColumnTypeEnum.SKILL

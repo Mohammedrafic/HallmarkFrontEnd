@@ -15,6 +15,7 @@ export type Agency = {
   agencyContactDetails: AgencyContactDetails[];
   agencyPaymentDetails: PaymentDetails[] | ElectronicPaymentDetails[];
   agencyJobDistribution: AgencyRegionSkills;
+  contactPerson?: string
 };
 
 export type AgencyCreateUnder = {

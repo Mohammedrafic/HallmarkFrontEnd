@@ -247,9 +247,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public onFilterApply(): void {
     if(this.isIRP){
-     
-        if ((this.CandidateFilterFormGroup.get("startDate") != null && this.CandidateFilterFormGroup.get("endDate") != null) && new Date(this.CandidateFilterFormGroup.get("endDate")?.value) >= new Date(this.CandidateFilterFormGroup.get("startDate")?.value)) {
-         
+      if (this.CandidateFilterFormGroup.get("startDate") != null && this.CandidateFilterFormGroup.get("endDate") != null) {
+        if (new Date(this.CandidateFilterFormGroup.get("endDate")?.value) >= new Date(this.CandidateFilterFormGroup.get("startDate")?.value)){
           if (this.CandidateFilterFormGroup.dirty) {
             this.filters = this.CandidateFilterFormGroup.getRawValue();
             this.filters.profileStatuses = this.filters.profileStatuses || [];
@@ -261,7 +260,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
               startDate: this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
               endDate: this.filters.endDate ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
             };
-
             this.saveFiltersByPageName(this.filters);
             this.dispatchNewPage();
             this.store.dispatch(new ShowFilterDialog(false));
@@ -269,14 +267,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
           } else {
             this.store.dispatch(new ShowFilterDialog(false));
           }
-      //  }
-          // else {
-          //   this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_START_LESS_END_DATE));
-          // }
+       }
+          else {
+            this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_START_LESS_END_DATE));
+           }
         }
         else {
           this.store.dispatch(new ShowToast(MessageTypes.Error, END_DATE_REQUIRED));
-    //    }
       } 
     } else {
       if (this.CandidateFilterFormGroup.dirty) {

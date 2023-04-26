@@ -6,8 +6,9 @@ import { formatDate as format } from "@shared/constants";
 import { PayRateColumns } from "../enums/pay-rate-columns.enum";
 import { PayRateHistory } from "../interfaces/pay-rate-history.interface";
 import { GridActionsCellComponent, GridActionsCellConfig } from "@shared/components/grid/cell-renderers/grid-actions-cell";
+import { DateTimeHelper } from "@core/helpers";
 
-export const PayRateColumnDef = (deleteCallback: (value: number) => void) => ([
+export const PayRateColumnDef = (deleteCallback: (value: number) => void, disabled: boolean) => ([
   {
     field: '',
     headerName: '',
@@ -25,7 +26,7 @@ export const PayRateColumnDef = (deleteCallback: (value: number) => void) => ([
             },
             iconName: 'trash-2',
             buttonClass: 'remove-button',
-            disabled: false,
+            disabled: disabled,
           },
         ],
       };
@@ -35,14 +36,14 @@ export const PayRateColumnDef = (deleteCallback: (value: number) => void) => ([
     field: PayRateColumns.START_DATE,
     headerName: 'Start Date',
     width: 160,
-    valueFormatter: (params: ValueFormatterParams) =>
+    valueFormatter: (params: ValueFormatterParams) => 
       params.value && formatDate(params.value, format, 'en-US', 'UTC'),
   },
   {
     field: PayRateColumns.END_DATE,
     headerName: 'End Date',
     width: 160,
-    valueFormatter: (params: ValueFormatterParams) =>
+    valueFormatter: (params: ValueFormatterParams) => 
       params.value && formatDate(params.value, format, 'en-US', 'UTC'),
   },
   {
@@ -56,6 +57,6 @@ export const PayRateColumnDef = (deleteCallback: (value: number) => void) => ([
   {
     field: PayRateColumns.WORC_COMMITMENT,
     headerName: 'Work Commitment',
-    width: 260,
+    flex: 1,
   },
 ]);

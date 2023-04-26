@@ -284,4 +284,9 @@ export class DateTimeHelper {
  
     return (janOffset - dateOffset) * 60 * 60 * 1000;
   }
+
+  public static getISOTimeZone(date: string): string {
+    //get timezone from ISO string. example: "2023-01-30T09:43:32.2300926-05:00" => "-0500"
+    return date.slice(-6).split(':').join('');
+  }
 }

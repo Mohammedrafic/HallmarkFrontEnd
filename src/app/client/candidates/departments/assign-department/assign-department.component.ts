@@ -75,6 +75,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     locationIds: false,
     departmentIds: false,
   };
+  public deptdatas : any;
 
   public constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -97,6 +98,14 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     if (changes['departmentHierarchy']?.currentValue) {
       this.dataSource.regions = this.departmentHierarchy;
       this.disableToggles = !this.dataSource.regions.length;
+      this.deptdatas = mapperSelectedItems(mapperSelectedItems(this.dataSource.regions, 'locations'), 'departments');
+      if(this.deptdatas.length == 0){
+        this.disableToggles = true;
+        this.dataSource.regions = [];
+      } else {
+        this.disableToggles = false
+      }
+      this.cdr.markForCheck();
     }
   }
 

@@ -43,6 +43,7 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, Organ
 })
 export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
   public paramsData: any = {
+    "AgenciesParamAFTS":"",
     "OrganizationParamAFTS": "",
     "StartDateParamAFTS": "",
     "EndDateParamAFTS": "",
@@ -112,8 +113,8 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
 
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
-  @Select(UserState.lastSelectedOrganizationId)
-  private organizationId$: Observable<number>;
+  @Select(UserState.lastSelectedAgencyId)
+  private agencyId$: Observable<number>;
 
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   public organizationFields = {text: 'organizationName',value: 'organizationId'};
@@ -152,6 +153,7 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
+  private defaultAgency: string;
 
   public masterRegionsList: OrganizationRegion[] = [];
   public masterLocationsList: OrganizationLocation[] = [];
@@ -177,40 +179,48 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
-      this.store.dispatch(new GetOrganizationsByAgency())
-      this.store.dispatch(new ClearLogiReportState());
-      this.organizationsByAgency$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: DataSourceItem[]) => {
-        if (data != null && data != undefined) {
-          this.associatedOrganizations = data;
-
-          this.store.dispatch(new GetOrganizationsStructureByOrgIds(data.map(i => i.id ?? 0)));
-          this.getOrganizationsStructure$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrganizationStructure[]) => {
-
-            if (data != undefined && data != null && data.length > 0) {
-              this.organizations = uniqBy(data, 'organizationId');
-              this.filterColumns.businessIds.dataSource = this.organizations;
-              this.defaultOrganizations = this.organizations.length==0?0:this.organizations[0].organizationId;
-              this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
-              this.changeDetectorRef.detectChanges();
-            }
-          });
-        }
-      });
+    this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.orderFilterColumnsSetup();
-      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
-        if (data.length > 0) {
-          this.logiReportComponent.SetReportData(data);
-        }
-      });
+      if (data != null && data != undefined) {
+        this.defaultAgency = data.toString();
+        
+        this.store.dispatch(new GetOrganizationsByAgency())
+        this.store.dispatch(new ClearLogiReportState());
+        this.organizationsByAgency$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: DataSourceItem[]) => {
+          if (data != null && data != undefined) {
+            this.associatedOrganizations = data;
 
-      this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.AccrualReportTypes)?.setValue(1);
-      this.onFilterControlValueChangedHandler();
-      this.onFilterRegionChangedHandler();
-      this.onFilterLocationChangedHandler();
-      this.onFilterSkillCategoryChangedHandler();
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.enable() : this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.disable();
-    });
+            this.store.dispatch(new GetOrganizationsStructureByOrgIds(data.map(i => i.id ?? 0)));
+            this.getOrganizationsStructure$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrganizationStructure[]) => {
+
+              if (data != undefined && data != null && data.length > 0) {
+                this.organizations = uniqBy(data, 'organizationId');
+                this.filterColumns.businessIds.dataSource = this.organizations;
+                this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
+                this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
+                this.changeDetectorRef.detectChanges();
+              }
+            });
+          }
+        });
+      }
+     
+        
+        this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
+          if (data.length > 0) {
+            this.logiReportComponent.SetReportData(data);
+          }
+        });
+       
+        this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.AccrualReportTypes)?.setValue(1);
+        this.onFilterControlValueChangedHandler();
+        this.onFilterRegionChangedHandler();
+        this.onFilterLocationChangedHandler();
+        this.onFilterSkillCategoryChangedHandler();
+        this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.enable() : this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.disable();
+      
+      });
+  
   }
 
   private initForm(): void {
@@ -426,6 +436,7 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
 
     this.paramsData =
     {
+      "AgenciesParamAFTS": this.defaultAgency,
       "OrganizationParamAFTS": this.selectedOrganizations?.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       "StartDateParamAFTS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamAFTS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
