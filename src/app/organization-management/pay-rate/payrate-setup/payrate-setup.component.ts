@@ -143,6 +143,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   public allRegionsSelected: boolean = false;
   public allLocationsSelected: boolean = false;
   public allDepartmentsSelected: boolean = false;
+  public allSkillsSelected: boolean = false;
   protected componentDestroy: () => Observable<unknown>;
   public pageNumber = 1;
   public deptId: any[] = [];
@@ -445,6 +446,17 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     }
   }
 
+  public allSkillsChange(event: { checked: boolean }): void {
+    this.allSkillsSelected = event.checked;
+    const skillsControl = this.PayRatesFormGroup.controls['skillIds'];
+    if (this.allSkillsSelected) {
+      skillsControl.setValue(null);
+      skillsControl.disable();
+    } else {
+      skillsControl.enable();
+    }
+  }
+
   public loadData(): void {
     this.store.dispatch(new GetAssignedSkillsByOrganization());
     this.filters = this.PayRatesFormGroup.getRawValue();
@@ -521,7 +533,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         departmentIds: this.allDepartmentsSelected
           ? []
           : this.PayRatesFormGroup.controls['departmentIds'].value,
-        skillIds: this.PayRatesFormGroup.controls['skillIds'].value,
+        skillIds: this.allSkillsSelected ? [] : this.PayRatesFormGroup.controls['skillIds'].value,
         payRateConfigId: this.PayRatesFormGroup.controls['payRateConfigId'].value,
         orderTypes: this.PayRatesFormGroup.controls['orderTypes'].value.length === this.orderTypes.length
           ? [] 
@@ -686,6 +698,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     this.allRegionsChange({ checked: false });
     this.allLocationsChange({ checked: false });
     this.allDepartmentsChange({ checked: false });
+    this.allSkillsChange({ checked : false});
   }
 
   private regionChangedHandler(): void {
@@ -752,6 +765,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     this.allRegionsChange({ checked: !data.regionId });
     this.allLocationsChange({ checked: !data.locationId });
     this.allDepartmentsChange({ checked: !data.departmentId });
+    this.allSkillsChange({ checked : !data.skillId});
     if (!data.regionId) {
       this.allRegionsSelected = true;
       this.PayRatesFormGroup.controls['regionIds'].setValue(null);
@@ -782,6 +796,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     }
 
     if (!data.skillId) {
+      this.allSkillsSelected = true;
       this.PayRatesFormGroup.controls['skillIds'].setValue(null);
     } else {
       this.PayRatesFormGroup.controls['skillIds'].setValue([data.skillId]);
