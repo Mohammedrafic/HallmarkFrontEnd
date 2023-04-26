@@ -801,6 +801,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       .subscribe(() => {
         this.quickOrderConditions.isFormDirty = this.isAnyFormsDirty;
         this.store.dispatch(new SetIsDirtyQuickOrderForm(this.isAnyFormsDirty));
+        this.cdr.markForCheck();
       });
   }
 

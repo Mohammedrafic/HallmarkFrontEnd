@@ -3,6 +3,10 @@
   margin-bottom: 15px;
 
   .input-group {
+    margin-top: 5px;
+  }
+
+  .input-group {
     position: relative;
 
     .e-badge {
@@ -13,11 +17,14 @@
   }
 }
 
-.region-option-container, .g {
+.region-option-container {
   display: inline-block;
   position: relative;
-  height: 60px;
   text-indent: 0;
+
+  &.admin {
+    height: 60px;
+  }
 
   .org-name {
     font-size: 12px;
