@@ -18,7 +18,7 @@ export class Organization {
   isOrganizationUsed?: boolean;
   organizationPrefix: string;
   externalCommentsConfiguration?:boolean | null;
-  
+
   constructor(
     organizationId: number,
     businessUnitId: number,
@@ -130,6 +130,7 @@ export class OrganizationDepartment {
   inactiveDate?: string;
   extDepartmentId?: string;
   reactivateDate?: string;
+  isHomeCostCenter?: boolean;
 }
 
 export class OrganizationLocation {
