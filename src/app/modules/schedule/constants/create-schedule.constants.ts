@@ -2,12 +2,14 @@ import { FieldType, UserPermissions } from "@core/enums";
 
 import { ScheduleType } from "../enums";
 import * as ScheduleInt from '../interface';
+import { CreateScheduleTypesConfig } from '../interface';
 
 
 export enum ScheduleItemType {
   Book = 0,
   Availability = 1,
   Unavailability = 2,
+  OpenPositions = 3,
 }
 
 export enum ScheduleFormSourceKeys {
@@ -19,32 +21,85 @@ export enum ScheduleFormSourceKeys {
   Skills = 'skill',
 }
 
-export const ScheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = [
+export const OpenPositionTypes: ScheduleInt.ScheduleTypeRadioButton = {
+  label: ScheduleType.OpenPositions,
+  value: ScheduleItemType.OpenPositions,
+  name: 'scheduleType',
+  disabled: false,
+  permission: UserPermissions.CanViewSchedule,
+};
+
+export const BookTypes: ScheduleInt.ScheduleTypeRadioButton = {
+  label: ScheduleType.Book,
+  value: ScheduleItemType.Book,
+  name: 'scheduleType',
+  disabled: false,
+  permission: UserPermissions.CanAddShift,
+};
+
+export const AvailabilityTypes: ScheduleInt.ScheduleTypeRadioButton = {
+  label: ScheduleType.Availability,
+  value: ScheduleItemType.Availability,
+  name: 'scheduleType',
+  disabled: false,
+  permission: UserPermissions.CanAddAvailability,
+};
+
+export const UnavailabilityTypes = {
+  label: ScheduleType.Unavailability,
+  value: ScheduleItemType.Unavailability,
+  name: 'scheduleType',
+  disabled: false,
+  permission: UserPermissions.CanAddUnavailability,
+};
+
+export const ScheduleTypesForEditBar: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = [
+  BookTypes,AvailabilityTypes, UnavailabilityTypes,
+];
+
+export const ScheduleTypesForCreateBar: CreateScheduleTypesConfig = {
+  columnsTemplate: 'auto auto auto auto',
+  source: [
+    BookTypes,OpenPositionTypes, AvailabilityTypes, UnavailabilityTypes,
+  ],
+};
+
+const availabilityFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
   {
-    label: ScheduleType.Book,
-    value: ScheduleItemType.Book,
-    name: 'scheduleType',
-    disabled: false,
-    permission: UserPermissions.CanAddShift,
+    field: 'shiftId',
+    title: 'Shift',
+    type: FieldType.Dropdown,
+    gridAreaName: 'shift',
+    required: true,
+    sourceKey: ScheduleFormSourceKeys.Shifts,
   },
   {
-    label: ScheduleType.Availability,
-    value: ScheduleItemType.Availability,
-    name: 'scheduleType',
-    disabled: false,
-    permission: UserPermissions.CanAddAvailability,
+    field: 'startTime',
+    title: 'Start Time',
+    type: FieldType.Time,
+    gridAreaName: 'startTime',
+    show: false,
+    required: true,
   },
   {
-    label: ScheduleType.Unavailability,
-    value: ScheduleItemType.Unavailability,
-    name: 'scheduleType',
-    disabled: false,
-    permission: UserPermissions.CanAddUnavailability,
+    field: 'endTime',
+    title: 'End Time',
+    type: FieldType.Time,
+    gridAreaName: 'endTime',
+    show: false,
+    required: true,
+  },
+  {
+    field: 'hours',
+    title: 'Hrs',
+    type: FieldType.Input,
+    gridAreaName: 'hours',
+    required: false,
+    readonly: true,
   },
 ];
 
-
-const availabilityFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
+const openPositionsFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
   {
     field: 'shiftId',
     title: 'Shift',
@@ -132,6 +187,14 @@ const bookingToggleForm: ScheduleInt.ScheduleFormFieldConfig[] = [
     required: false,
     show: true,
   },
+  {
+    field: 'meal',
+    title: 'Meal',
+    type: FieldType.Toggle,
+    gridAreaName: 'meal',
+    required: false,
+    show: true,
+  },
 ];
 
 const bookFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
@@ -152,6 +215,11 @@ export const UnavailabilityFormConfig: ScheduleInt.ScheduleFormConfig = {
 export const BookFormConfig: ScheduleInt.ScheduleFormConfig = {
   formClass: 'book-form',
   formFields: bookFormFields,
+};
+
+export const OpenPositionsConfig: ScheduleInt.ScheduleFormConfig = {
+  formClass: 'open-positions-form',
+  formFields: openPositionsFormFields,
 };
 
 export const ScheduleSourcesMap: ScheduleInt.ScheduleFormSource = {

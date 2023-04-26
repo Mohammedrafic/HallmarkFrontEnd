@@ -18,6 +18,7 @@ export class DoNotReturnFormService {
       regionIds:['',[Validators.required]],
       locations: [''],
       locationIds: ['', [Validators.required]],
+      ssn: ['', [Validators.minLength(9)]],
       candidateEmail: ['',[Validators.email, Validators.maxLength(200)]],
       dnrComment: ['', [Validators.required]],
       dnrRequestedBy: [''],

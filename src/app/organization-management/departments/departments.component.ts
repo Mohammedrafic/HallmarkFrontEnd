@@ -374,7 +374,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   onAddDepartmentClick(): void {
     if (this.selectedLocation && this.selectedRegion) {
       this.departmentsDetailsFormGroup.controls['inactiveDate'].enable();
-      this.departmentsDetailsFormGroup.controls['includeInIRP'].setValue(this.isIRPFlagEnabled && !this.isOrgUseIRPAndVMS);
+      this.departmentsDetailsFormGroup.controls['includeInIRP']?.setValue(this.isIRPFlagEnabled && !this.isOrgUseIRPAndVMS);
       this.isLocationIRPEnabled = this.selectedLocation.includeInIRP;
       this.reactivationDateHandler();
       this.store.dispatch(new ShowSideDialog(true));

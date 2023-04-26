@@ -22,7 +22,7 @@ export class CredentialsComponent extends AbstractPermission implements OnInit {
   public selectedTab$: Observable<CandidateTabsEnum>;
 
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
-  public renderCredentialGrid: boolean = false;
+  public renderCredentialGrid = false;
 
   constructor(
     protected override store: Store,

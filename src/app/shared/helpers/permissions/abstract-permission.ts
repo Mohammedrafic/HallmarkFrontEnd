@@ -35,6 +35,7 @@ export abstract class AbstractPermission extends Destroyable implements OnInit, 
     return settings.filter((setting: MenuSettings) => {
       if (setting.permissionKeys?.length) {
         return setting.permissionKeys.some((key, index, array) => {
+          let x = this.userPermission[this.userPermissions[array[index] as unknown as number]];
           return this.userPermission[this.userPermissions[array[index] as unknown as number]];
         });
       } else {

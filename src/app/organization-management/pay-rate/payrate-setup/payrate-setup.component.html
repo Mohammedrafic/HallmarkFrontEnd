@@ -64,6 +64,13 @@
             <span *ngIf="!data.skillId">All</span>
           </ng-template>
         </e-column>
+        <e-column field="workCommitName" headerText="Work Commitment" width="170">
+          <ng-template #template let-data>
+            <ejs-tooltip id="tooltip" [content]="data.workCommitName" position="TopCenter">
+              <span>{{ data.workCommitName }}</span>
+            </ejs-tooltip>
+          </ng-template>
+        </e-column>
         <e-column field="orderTypes" headerText="ORDER TYPE" width="180">
           <ng-template #template let-data>
             <span *ngFor="let orderTypeId of data.orderTypes; let i = index"
@@ -229,8 +236,6 @@
                   [showDropDownIcon]="true"
                   formControlName="departmentIds"
                   maximumSelectionLength="50000"
-                  [query]="query"
-                  (filtering)="onDepartmentsFiltering($event)"
                 >
                 </ejs-multiselect>
               </div>
@@ -244,27 +249,33 @@
                 <label for="allDepartments" class="switch-text">All</label>
               </div>
             </div>
-            <div *ngIf="departments && departments.length > maxDepartmentsLength">
-              Narrow down locations/regions or use input search for departments.
-            </div>
           </div>
           <div class="input-container dropdown">
             <label for="skill">Skill <span class="required">*</span></label>
-            <div class="input-group dropdown bootstrap">
-              <ejs-multiselect
-                id="skill"
-                appValidateWithMessage
-                selectAllText="Select All"
-                mode="CheckBox"
-                [dataSource]="skills"
-                [fields]="fields"
-                [showSelectAll]="true"
-                [allowFiltering]="true"
-                [showDropDownIcon]="true"
-                formControlName="skillIds"
-              >
-              </ejs-multiselect>
-            </div>
+            <div class="dropdown-wrapper">
+              <div class="input-group dropdown bootstrap">
+                <ejs-multiselect
+                  id="skill"
+                  appValidateWithMessage
+                  mode="CheckBox"
+                  [dataSource]="skills"
+                  [fields]="fields"
+                  [allowFiltering]="true"
+                  [showDropDownIcon]="true"
+                  formControlName="skillIds"
+                >
+                </ejs-multiselect>
+              </div>
+              <div class="switch">
+                <ejs-switch
+                  name="allSkills"
+                  [checked]="allSkillsSelected"
+                  (change)="allSkillsChange($event)"
+                  label="All"
+                ></ejs-switch>
+                <label for="allSkills" class="switch-text">All</label>
+              </div>
+              </div>
           </div>
         </div>
         <div class="group">
@@ -276,8 +287,8 @@
                 appValidateWithMessage
                 selectAllText="Select All"
                 mode="CheckBox"
-                [dataSource]="(commitmentsPage$ | async)?.items"
-                [fields]="optionFields"
+                [dataSource]="workcommitments"
+                [fields]="fields"
                 [showSelectAll]="true"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"

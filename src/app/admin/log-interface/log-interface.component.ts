@@ -1,7 +1,7 @@
 import { ColDef } from '@ag-grid-community/core';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { AppState } from 'src/app/store/app.state';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
@@ -10,10 +10,11 @@ import { ButtonRendererComponent } from '@shared/components/button/button-render
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { GRID_CONFIG } from '@shared/constants';
-import { GetLogInterfacePage } from 'src/app/security/store/security.actions';
+import { GetLogHistoryById, GetLogInterfacePage } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { LogInterface, LogInterfacePage } from '@shared/models/org-interface.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
+import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 
 @Component({
   selector: 'app-log-interface',
@@ -50,6 +51,8 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   maxBlocksInCache: any;
   sideBar = SideBarConfig;
   itemList: Array<LogInterface> | undefined;
+  selectedLogItem: LogInterface;
+  openLogDetailsDialogue = new Subject<boolean>();
 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
@@ -99,14 +102,14 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
       {
         headerName: 'organizationId',
         field: 'organizationId',
-        minWidth: 250,
+        minWidth: 100,
         hide: true,
         filter: false,
       },
       {
         headerName: 'runId',
         field: 'runId',
-        minWidth: 250,
+        minWidth: 350,
         hide: true,
         filter: 'agTextColumnFilter',
       },
@@ -176,7 +179,33 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
 
 
   public onEdit(data: any): void {
-    // this.editRoleEvent.emit(data.rowData);
+    this.selectedLogItem = data.rowData;
+    this.openLogDetailsDialogue.next(true);
+    const options = this.getDialogNextPreviousOption(data.rowData);
+    // this.store.dispatch(new GetLogHistoryById("d2874d41-874d-4400-be4d-d2919f366dee",2,this.currentPage,this.pageSize, options));
+     this.store.dispatch(new GetLogHistoryById(data.rowData.runId, data.rowData.organizationId,this.currentPage,this.pageSize, options));
+  }
+
+  private getDialogNextPreviousOption(selectedOrder: LogInterface): DialogNextPreviousOption {
+    const gridData = this.itemList as LogInterface[];
+    const first = gridData[0];
+    const last = gridData[gridData.length - 1];
+    return {
+      previous: first.runId !== selectedOrder.runId,
+      next: last.runId !== selectedOrder.runId,
+    };
+  }
+
+  public onNextPreviousLogEvent(next: any): void {
+    if(this.itemList != null && this.itemList?.length > 0){
+      const index =  this.itemList.findIndex(ele=> ele.runId === this.selectedLogItem.runId) 
+      const nextIndex = next ? index + 1 : index - 1;
+      this.selectedLogItem = this.itemList[nextIndex];
+      this.openLogDetailsDialogue.next(true);
+      const options = this.getDialogNextPreviousOption(this.itemList[nextIndex]);
+      // this.store.dispatch(new GetLogHistoryById("d2874d41-874d-4400-be4d-d2919f366dee",2,this.currentPage,this.pageSize, options));
+      this.store.dispatch(new GetLogHistoryById(this.itemList[nextIndex].runId, this.itemList[nextIndex].organizationId,this.currentPage,this.pageSize, options));
+    }
   }
 
   onGridReady(params: any) {

@@ -1,14 +1,12 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { EMPTY, Observable, catchError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Store } from '@ngxs/store';
 
 import { AvailabilityRestriction } from '../interfaces';
 import { PageOfCollections } from '@shared/models/page.model';
-import { ShowToast } from 'src/app/store/app.actions';
-import { getAllErrors } from '@shared/utils/error.utils';
-import { MessageTypes } from '@shared/enums/message-types';
+import { handleHttpError } from '@core/operators/http-error-handler';
 
 @Injectable()
 export class AvailabilityApiService {
@@ -28,13 +26,7 @@ export class AvailabilityApiService {
     };
 
     return this.httpClient.post<PageOfCollections<AvailabilityRestriction>>(
-      '/api/EmployeeAvailabilityRestrictions/all', payload)
-      .pipe(
-        catchError((error: HttpErrorResponse) => {
-          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
-          return EMPTY;
-        })
-      );
+      '/api/EmployeeAvailabilityRestrictions/all', payload).pipe(handleHttpError(this.store));
   }
 
   public saveAvailabilityRestriction(avalRestriction: AvailabilityRestriction): Observable<AvailabilityRestriction> {
@@ -47,31 +39,16 @@ export class AvailabilityApiService {
 
   public deleteAvailabilityRestriction(id: number): Observable<void> {
     return this.httpClient.delete<void>(`/api/EmployeeAvailabilityRestrictions/${id}`)
-      .pipe(
-        catchError((error: HttpErrorResponse) => {
-          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
-          return EMPTY;
-        })
-      );
+      .pipe(handleHttpError(this.store));
   }
 
   private createAvailabilityRestriction(avalRestriction: AvailabilityRestriction): Observable<AvailabilityRestriction> {
     return this.httpClient.post<AvailabilityRestriction>('/api/EmployeeAvailabilityRestrictions', avalRestriction)
-      .pipe(
-        catchError((error: HttpErrorResponse) => {
-          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
-          return EMPTY;
-        })
-      );
+      .pipe(handleHttpError(this.store));
   }
 
   private updateAvailabilityRestriction(avalRestriction: AvailabilityRestriction): Observable<AvailabilityRestriction> {
     return this.httpClient.put<AvailabilityRestriction>('/api/EmployeeAvailabilityRestrictions', avalRestriction)
-      .pipe(
-        catchError((error: HttpErrorResponse) => {
-          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
-          return EMPTY;
-        })
-      );
+      .pipe(handleHttpError(this.store));
   }
 }

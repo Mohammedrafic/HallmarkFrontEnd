@@ -24,6 +24,7 @@ app-schedule-items {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 40px;
+  min-height: 40px;
 
   .title {
     h3 {
@@ -87,11 +88,12 @@ app-schedule-items {
 }
 
 .schedule-types {
-  display: flex;
-  justify-content: space-around;
+  display: grid;
   border: 1px solid $primary-active-blue-10;
   border-radius: 8px;
   margin-bottom: 24px;
+  align-items: center;
+  justify-content: stretch;
 
   .input-group:first-child {
     border-bottom-left-radius: 5px;
@@ -105,9 +107,10 @@ app-schedule-items {
   }
 
   .input-group {
-    width: 100%;
     text-align: center;
     border-left: 1px solid $primary-active-blue-10;
+    padding: 0 4px;
+    min-width: 1px;
   }
 
   .input-group:has(.e-control.e-radio:checked) {
@@ -125,8 +128,6 @@ app-schedule-items {
   }
 
   ejs-radiobutton .e-control.e-radio + label {
-    min-width: 130px;
-
     .e-label {
       color: $primary-active-blue-10 !important;
       padding: 10px 0 !important;
@@ -153,7 +154,8 @@ app-schedule-items {
   }
 }
 
-.availability-form {
+.availability-form,
+.open-positions-form {
   display: grid;
   grid-template-columns: 1.5fr 0.3fr 0.3fr 0.9fr 0.7fr;
   grid-template-rows: 1fr;
@@ -177,7 +179,7 @@ app-schedule-items {
 .book-form {
   display: grid;
   grid-template-columns: 1.5fr 0.3fr 0.3fr 0.9fr 0.7fr;
-  grid-template-rows: 1fr 0.4fr;
+  grid-template-rows: 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
@@ -188,7 +190,7 @@ app-schedule-items {
 .book-time-form {
   display: grid;
   grid-template-columns: 1.3fr 0.4fr 0.4fr 0.9fr 0.7fr;
-  grid-template-rows: 1fr 0.4fr;
+  grid-template-rows: 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
@@ -196,7 +198,8 @@ app-schedule-items {
     "switch-wrap switch-wrap switch-wrap switch-wrap switch-wrap";
 }
 
-.availability-time-form {
+.availability-time-form,
+.open-positions-time-form {
   display: grid;
   grid-template-columns: 1.3fr 0.4fr 0.4fr 0.9fr 0.7fr;
   grid-template-rows: 1fr;
@@ -220,9 +223,10 @@ app-schedule-items {
 .switch-wrap {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: 1fr 1fr;
   grid-template-areas:
-    "toggle1 toggle2 toggle3 toggle4 toggle5";
+    "toggle1 toggle2 toggle3 toggle4 toggle5"
+    "meal meal meal meal meal";
   grid-area: switch-wrap;
 }
 

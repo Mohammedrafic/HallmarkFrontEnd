@@ -1,9 +1,11 @@
 import { FormGroup } from '@angular/forms';
-import { WeekDays } from '@shared/enums/week-days.enum';
 
-import * as ScheduleInt from '../interface';
 import { DropdownOption } from '@core/interface';
+import { DateTimeHelper } from '@core/helpers';
+import { RECORD_ADDED, RECORDS_ADDED } from '@shared/constants';
+import { WeekDays } from '@shared/enums/week-days.enum';
 import { convertMsToTime, getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
+import * as ScheduleInt from '../interface';
 import { ShiftTab } from '../components/edit-schedule/edit-schedule.interface';
 import { ScheduleAttributeKeys, ScheduleType } from '../enums';
 import {
@@ -17,10 +19,8 @@ import {
   ScheduleModel,
   ScheduleModelPage,
 } from '../interface';
-import { DateTimeHelper } from '@core/helpers';
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
-import { RECORD_ADDED, RECORDS_ADDED } from '@shared/constants';
-import { WeekList } from '../constants';
+import { AboutSixHoursMs, AboutTwentyHoursMs, DayMs, HalfHourTimeMealMs, HourTimeMealMs, WeekList } from '../constants';
 
 export const GetScheduleDayWithEarliestTime = (schedules: ScheduleInt.ScheduleItem[]): ScheduleItem => {
   if(schedules.length >= 2) {
@@ -77,15 +77,15 @@ export const GetTimeRange = (startDate: string, endDate: string): string  => {
 };
 
 export const CreateScheduleSuccessMessage = (schedule: ScheduleInt.Schedule): string => {
-  return schedule.employeeScheduledDays.length === 1
-  && schedule.employeeScheduledDays[0].dates.length === 1
+  return schedule?.employeeScheduledDays.length === 1
+  && schedule?.employeeScheduledDays[0].dates.length === 1
     ? RECORD_ADDED
     : RECORDS_ADDED;
 };
 
 export const CreateBookingSuccessMessage = (schedule: ScheduleInt.ScheduleBook): string => {
-  return schedule.employeeBookedDays.length === 1
-  && schedule.employeeBookedDays[0].bookedDays.length === 1
+  return schedule?.employeeBookedDays.length === 1
+  && schedule?.employeeBookedDays[0].bookedDays.length === 1
     ? RECORD_ADDED
     : RECORDS_ADDED;
 };
@@ -171,16 +171,29 @@ export const HasMultipleFilters = (filters: ScheduleInt.ScheduleFilters): boolea
     filters.skillIds && filters.skillIds.length > 1;
 };
 
-export const GetShiftHours = (startTimeDate: Date, endTimeDate: Date): string => {
+export const GetShiftHours = (startTimeDate: Date, endTimeDate: Date, meal = false): string => {
   const startTimeMs: number = startTimeDate.setMilliseconds(0);
   let endTimeMs: number = endTimeDate.setMilliseconds(0);
 
   if (startTimeMs > endTimeMs) {
-    const dayMs = 86400000;
-    endTimeMs = endTimeMs + dayMs;
+    endTimeMs = endTimeMs + DayMs;
   }
 
-  return convertMsToTime(endTimeMs - startTimeMs);
+  const workTime = startTimeMs === endTimeMs ? DayMs : endTimeMs - startTimeMs;
+
+  if(meal && workTime < AboutSixHoursMs) {
+    return convertMsToTime(workTime);
+  }
+
+  if(meal && workTime > AboutSixHoursMs && workTime < AboutTwentyHoursMs) {
+    return convertMsToTime(workTime - HalfHourTimeMealMs);
+  }
+
+  if(meal && workTime > AboutTwentyHoursMs) {
+    return convertMsToTime(workTime - HourTimeMealMs);
+  }
+
+  return convertMsToTime(workTime);
 };
 
 export const MapToDropdownOptions = (items: { name: string; id: number }[]): DropdownOption[] => {
@@ -211,6 +224,7 @@ export const GetScheduleTabItems = (daySchedules: ScheduleItem[]): ShiftTab[] =>
     [ScheduleType.Book]: 'Booking',
     [ScheduleType.Unavailability]: 'Unavailable',
     [ScheduleType.Availability]: 'Available',
+    [ScheduleType.OpenPositions]: 'Open Positions',
   };
 
   return daySchedules.map((schedule: ScheduleItem) => {
@@ -302,4 +316,11 @@ export const GetScheduledShift = (
     candidate: scheduledShiftData?.candidate as ScheduleCandidate,
     schedule: scheduledShiftData?.schedule.find((item: ScheduleDateItem) => item.date === date) as ScheduleDateItem,
   };
+};
+
+export const HasTimeControlValues = (form: FormGroup): boolean => {
+  const startTime = form.get('startTime')?.value;
+  const endTime = form.get('endTime')?.value;
+
+  return startTime && endTime;
 };

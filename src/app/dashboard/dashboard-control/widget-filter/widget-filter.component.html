@@ -39,6 +39,12 @@
             [showSelectAll]="true"
             [changeOnBlur]="!isMobile"
           >
+            <ng-template #itemTemplate="" let-data="">
+              <div class="region-option-container" [class.admin]="userIsAdmin">
+                <span class="region-name">{{data.name}}</span>
+                <span *ngIf="userIsAdmin" class="org-name">{{data.organisationName}}</span>
+              </div>
+            </ng-template>
           </ejs-multiselect>
           <span *ngIf="selectedRegions" class="e-badge e-badge-success e-badge-pill">{{ selectedRegions }}</span>
         </div>

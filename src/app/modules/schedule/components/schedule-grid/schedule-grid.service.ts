@@ -36,45 +36,45 @@ export class ScheduleGridService {
       slotsWithDate.includes(`${selectedDateList[0]}T00:00:00+00:00`);
   }
 
-  public createDaysForSelectedSlots (days: ScheduleDay[], scheduleDay: ScheduleItem[]): ScheduleDay[] {
-    const createdDay = this.createDay(scheduleDay[0]);
+  public createDaysForSelectedSlots (days: ScheduleDay[], scheduleDays: ScheduleItem[]): ScheduleDay[] {
+    const createdDays = this.createDays(scheduleDays);
 
     if(days?.length) {
-      return this.updateScheduleDays(days, createdDay);
+      return this.updateScheduleDays(days, createdDays);
     }
 
-    return [createdDay];
+    return createdDays;
   }
 
   public getFirstSelectedDate(selectedCandidatesSlot: Map<number, ScheduleDateSlot>): string {
     return `${this.getSelectedListDates(selectedCandidatesSlot)[0]}T00:00:00+00:00`;
   }
 
-  private updateScheduleDays(days: ScheduleDay[], createdDay: ScheduleDay): ScheduleDay[] {
-    const selectedDayIndex = days.findIndex((day: ScheduleDay) => day.id === createdDay.id);
+  private updateScheduleDays(days: ScheduleDay[], createdDays: ScheduleDay[]): ScheduleDay[] {
+    const daysIds = days.map((day: ScheduleDay) => day.id);
+    const hasDuplicate = createdDays.some((createdDay: ScheduleDay) => daysIds.includes(createdDay.id));
 
-    if(selectedDayIndex === -1) {
-      return [
-        ...days,
-        createdDay,
-      ];
-    } else {
-      days.splice(selectedDayIndex, 1);
-      return days;
+    if(hasDuplicate) {
+      const createdDaysIds = createdDays.map((day: ScheduleDay) => day.id);
+      return days.filter((day: ScheduleDay) => !createdDaysIds.includes(day.id));
     }
+
+    return [...days, ...createdDays];
   }
 
-  private createDay(scheduleDay: ScheduleItem): ScheduleDay {
-    return {
-      id: scheduleDay.id,
-      scheduleType: scheduleDay.scheduleType,
-      type: scheduleDay?.orderMetadata?.orderType ?? null,
-      department: scheduleDay.orderMetadata?.department ?? null,
-      location: scheduleDay.orderMetadata?.location ?? null,
-      endTime: scheduleDay.endDate,
-      shiftDate: scheduleDay.date,
-      startTime: scheduleDay.startDate,
-    };
+  private createDays(scheduleDays: ScheduleItem[]): ScheduleDay[] {
+    return scheduleDays.map((scheduleDay: ScheduleItem) => {
+      return {
+        id: scheduleDay.id,
+        scheduleType: scheduleDay.scheduleType,
+        type: scheduleDay?.orderMetadata?.orderType ?? null,
+        department: scheduleDay.orderMetadata?.department ?? null,
+        location: scheduleDay.orderMetadata?.location ?? null,
+        endTime: scheduleDay.endDate,
+        shiftDate: scheduleDay.date,
+        startTime: scheduleDay.startDate,
+      };
+    });
   }
 
   private getSelectedListDates(selectedCandidatesSlot: Map<number, ScheduleDateSlot>): string[] {

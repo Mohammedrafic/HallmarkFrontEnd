@@ -1,5 +1,4 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
-import { DatePipe } from '@angular/common';
 
 import { Select } from '@ngxs/store';
 import { BehaviorSubject, distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
@@ -18,7 +17,8 @@ import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/fil
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormFieldConfig, DepartmentFiltersColumns, DepartmentFilterState } from '../departments.model';
 import { FilterService } from '@shared/services/filter.service';
-import { DepartmentFilterFormConfig, OrientedFilterPayload } from '@client/candidates/departments/constants/department-filter.constant';
+import { DepartmentFilterFormConfig, OrientedFilterPayload } from
+  '@client/candidates/departments/constants/department-filter.constant';
 import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentFiltersColumnsEnum } from '@client/candidates/enums';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -61,7 +61,6 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
     private readonly cdr: ChangeDetectorRef,
     private readonly filterService: FilterService,
     private readonly departmentFormService: DepartmentFormService,
-    private readonly datePipe: DatePipe
   ) {
     super();
     this.initFilterForm();
@@ -79,7 +78,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   public trackByFn = (_: number, item: DepartmentFormFieldConfig<DepartmentFiltersColumnsEnum>) => item.field;
 
   public applyFilters(): void {
-    this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+    this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     const formState = this.formGroup.getRawValue();
     const filterState = { ...formState, isOriented: OrientedFilterPayload[formState.isOriented] };
     this.applyFilters$.next(filterState);
@@ -172,7 +171,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
           this.filterColumns.locationIds.dataSource = regionLocations;
         } else {
           this.formGroup.get('locationIds')?.setValue([]);
-          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
         }
 
         this.cdr.markForCheck();
@@ -196,7 +195,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
           this.filterColumns.departmentsIds.dataSource = locationDepartments;
         } else {
           this.formGroup.get('departmentsIds')?.setValue([]);
-          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
         }
 
         this.cdr.markForCheck();

@@ -223,16 +223,19 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private processCellSelection(candidate: ScheduleInt.ScheduleCandidate, schedule?: ScheduleInt.ScheduleDateItem): void {
+    const candidateId = this.selectedCandidatesSlot.size === 1
+      ? Array.from(this.selectedCandidatesSlot.keys())[0]
+      : candidate.id;
     const isEditSideBar = this.scheduleGridService.shouldShowEditSideBar(
       this.selectedCandidatesSlot,
       this.scheduleData?.items as ScheduleModel[],
-      candidate.id
+      candidateId
     );
 
     if(isEditSideBar) {
       this.editCell.emit(GetScheduledShift(
         this.scheduleData as ScheduleInt.ScheduleModelPage,
-        candidate.id,
+        candidateId,
         this.scheduleGridService.getFirstSelectedDate(this.selectedCandidatesSlot),
       ));
     } else {
@@ -376,11 +379,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private watchForPreservedFilters(): void {
+    let clearStructure = false;
     this.organizationId$.pipe(
       filter((id) => !!id),
       tap(() => {
+        if (clearStructure) {
+          this.store.dispatch(new ClearOrganizationStructure());
+        } else {
+          clearStructure = true;
+        }
+
         this.store.dispatch([
-          new ClearOrganizationStructure(),
           new ResetPageFilters(),
           new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
         ]);
@@ -389,11 +398,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       filter(({ dispatch }) => dispatch),
       takeUntil(this.componentDestroy()),
     ).subscribe((filters) => {
-      this.setPreservedFiltersDataSource(filters.state || {});
+      this.setPreservedFiltersDataSource(filters.state);
     });
   }
 
   private setPreservedFiltersDataSource(filters: ScheduleInt.ScheduleFilters): void {
-    this.scheduleFiltersService.setPreservedFiltersDataStream({ ...filters });
+    this.scheduleFiltersService.setPreservedFiltersDataStream(filters);
   }
 }

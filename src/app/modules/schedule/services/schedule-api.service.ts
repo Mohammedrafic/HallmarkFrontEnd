@@ -16,7 +16,7 @@ import * as ScheduleInt from '../interface';
 import {
   CandidateSchedules,
   DeleteScheduleRequest,
-  EmployeesFilters,
+  EmployeesFilters, OpenPositionParams, OpenPositionsList,
   Schedule,
   ScheduleBookingErrors,
   ScheduleCandidatesPage,
@@ -25,8 +25,7 @@ import {
 
 @Injectable()
 export class ScheduleApiService {
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) {}
 
   getScheduleEmployees(filters: ScheduleFilters | null = null): Observable<ScheduleCandidatesPage> {
     return this.http.post<ScheduleCandidatesPage>('/api/Schedules/employees', filters);
@@ -83,5 +82,9 @@ export class ScheduleApiService {
 
   deleteSchedule(deleteScheduleRequest: DeleteScheduleRequest):Observable<void> {
     return this.http.post<void>('/api/Schedules/delete', deleteScheduleRequest);
+  }
+
+  getOpenPositions(openPositionsParams: OpenPositionParams): Observable<OpenPositionsList[]> {
+    return this.http.post<OpenPositionsList[]>('/api/schedules/openPositions', openPositionsParams);
   }
 }

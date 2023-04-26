@@ -1,3 +1,4 @@
+import { DepartmentMatchStatus } from '@shared/components/credentials-grid/department-match-cell/department-match-cell-enum';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { PageOfCollections } from '@shared/models/page.model';
 
@@ -27,6 +28,7 @@ export interface CandidateCredential {
   credentialNumber?: string;
   certifiedOn?: string;
   certifiedUntil?: string;
+  departmentMatch?: DepartmentMatchStatus;
 }
 
 export interface CandidateCredentialGridItem extends CandidateCredential {

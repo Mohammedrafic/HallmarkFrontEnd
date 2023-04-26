@@ -1,0 +1,37 @@
+<app-grid
+  class="pay-rate-grid"
+  [gridTitle]="gridTitle"
+  [rowData]="payRateRecords"
+  [columnDefinitions]="columnDef"
+  [totalRecordsCount]="pagingData.totalCount"
+  [pageSize]="pagingData.pageSize"
+  [currentPage]="pagingData.pageNumber"
+  [customRowsPerPageDropDownObject]="customRowsPerPageDropDownObject"
+  [disableRowsPerPageDropdown]="true"
+  (navigateToPageEmitter)="handleChangePage($event)">
+
+  <app-tooltip-container
+    action-button
+    position="TopCenter"
+    [showToolTip]="this.noActiveWorkCommitment"
+    [message]="tooltipMessage"
+  >
+    <button 
+      action-button
+      class="add-action"
+      cssClass="e-action-button"
+      ejs-button (click)="openDialog()"
+      [disabled]="disableDeleteButton || this.noActiveWorkCommitment"
+    >
+      <i-feather name="plus" class="icon"></i-feather>
+      Add Pay Rate
+    </button>
+  </app-tooltip-container>
+</app-grid>
+
+<app-pay-rate-history-dialog
+  [dialogSubject$]="dialogSubject$"
+  [formGroup]="formGroup"
+  [dateRanges]="dateRanges"
+  (submitFormData)="submitFormData()"
+></app-pay-rate-history-dialog>

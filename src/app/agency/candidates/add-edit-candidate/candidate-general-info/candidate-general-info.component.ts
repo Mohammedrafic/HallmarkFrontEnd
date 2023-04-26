@@ -7,11 +7,9 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { CheckBoxSelectionService } from '@syncfusion/ej2-angular-dropdowns';
 
 import { MasterSkill, Skill } from '@shared/models/skill.model';
-import { GetAllSkills } from 'src/app/agency/store/candidate.actions';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
 import { JobDistributionMasterSkills } from '@shared/models/associate-organizations.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { GetRegionList } from '@shared/components/candidate-list/store/candidate-list.actions';
 import { CandidateListState } from '@shared/components/candidate-list/store/candidate-list.state';
 import { Classifications, DefaultOptionFields, SkillFields } from "./candidate-general-info.constants";
 import { CandidateGeneralInfoService } from "./candidate-general-info.service";
@@ -58,7 +56,6 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
 
   ngOnInit(): void {
     this.getCandidateSkills();
-    this.store.dispatch([new GetAllSkills(), new GetRegionList()]);
     this.formGroup.get('ssn')?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((ssnValue: any) => {
       if(ssnValue != null &&  ssnValue.indexOf('XXX-XX') == -1){
         this.maskedSSN = ssnValue;

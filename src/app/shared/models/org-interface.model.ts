@@ -130,3 +130,42 @@ export enum LogInterfaceStatus {
     CopyDataActivityFailed = "Copy Data Activity Failed",
     ImportedSuccessfully = "Imported Successfully",
 }
+
+export class LogTimeSheetHistoryPage {
+  items:           LogTimeSheetHistory[];
+  pageNumber:      number;
+  totalPages:      number;
+  totalCount:      number;
+  hasPreviousPage: boolean;
+  hasNextPage:     boolean;
+}
+
+export class LogTimeSheetHistory {
+  id:               number;
+  timesheetitemid:  number;
+  employeeid:       string;
+  fname:            null;
+  mname:            null;
+  lname:            null;
+  locationId:       string;
+  costcenterId:     string;
+  workedlocationid: string;
+  workedccid:       string;
+  shiftType:        string;
+  punchIndate:      string;
+  punchIntime:      string;
+  punchOutdate:     string;
+  punchOuttime:     string;
+  lunch:            string;
+  totalHours:       string;
+  jobcode:          string;
+  deleted:          null;
+  organizationId:   number;
+  runId:            string;
+  status:           number;
+  failureReason:    string;
+  jobId:            null;
+  billRateConfigId: null;
+  createdDate:      Date;
+  weekStartDate:    null;
+}

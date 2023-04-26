@@ -5,6 +5,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Store } from '@ngxs/store';
 import { EMPTY, Observable, of, Subject } from 'rxjs';
 
+import { DateWeekService } from '@core/services';
 import { getTime } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
@@ -16,7 +17,9 @@ import { UserState } from 'src/app/store/user.state';
 import { CreateScheduleItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
 import {
+  CreateScheduleTypesConfig,
   EmployeeBookingDay,
+  OpenPositionParams,
   ScheduleBookingErrors,
   ScheduleCandidate,
   ScheduleDay,
@@ -50,7 +53,17 @@ export class CreateScheduleService {
     private fb: FormBuilder,
     private store: Store,
     private scheduleFiltersService:  ScheduleFiltersService,
+    private weekService: DateWeekService,
   ) {}
+
+  createOpenPositionsForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
+    return this.fb.group({
+      shiftId: [null, Validators.required],
+      startTime: [null, Validators.required],
+      endTime: [null, Validators.required],
+      hours: [null],
+    }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
+  }
 
   createUnavailabilityForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
     return this.fb.group({
@@ -82,6 +95,7 @@ export class CreateScheduleService {
       onCall: [false],
       charge: [false],
       preceptor: [false],
+      meal: [true],
     }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
   }
 
@@ -116,6 +130,7 @@ export class CreateScheduleService {
       endTime: getTime(endTime),
       unavailabilityReasonId,
       shiftId: shiftId !== customShiftId ? shiftId : null,
+      createOrder: false,
     };
   }
 
@@ -135,6 +150,7 @@ export class CreateScheduleService {
       onCall,
       charge ,
       preceptor,
+      meal,
     } = scheduleForm.getRawValue();
 
     return  {
@@ -150,6 +166,7 @@ export class CreateScheduleService {
       onCall: onCall || false,
       charge: charge || false,
       preceptor: preceptor || false,
+      meal: meal || false,
     };
   }
 
@@ -248,10 +265,10 @@ export class CreateScheduleService {
   }
 
   getScheduleTypesWithPermissions(
-    scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>,
+    scheduleTypes:CreateScheduleTypesConfig,
     userPermission: Permission
-  ): ReadonlyArray<ScheduleTypeRadioButton> {
-    let types = scheduleTypes.map((item: ScheduleTypeRadioButton) => {
+  ): CreateScheduleTypesConfig {
+    let types = scheduleTypes.source.map((item: ScheduleTypeRadioButton) => {
       return {
         ...item,
         disabled: !userPermission[item.permission],
@@ -262,32 +279,41 @@ export class CreateScheduleService {
       types = types.filter((type: ScheduleTypeRadioButton) => type.value !== ScheduleItemType.Book);
     }
 
-    return types;
+    return {
+      columnsTemplate: this.getScheduleTypeColumnsTemplate(types),
+      source: types,
+    };
   }
 
-  getFirstAllowedScheduleType(scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>): ScheduleItemType {
-    return (scheduleTypes.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
+  getFirstAllowedScheduleType(scheduleTypes: CreateScheduleTypesConfig): ScheduleItemType {
+    return (scheduleTypes.source.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
   }
 
   updateScheduleFormClass(scheduleType: ScheduleItemType, isCustom: boolean): string {
     let className = ScheduleClassesList[ScheduleItemType.Book];
 
     if (scheduleType === ScheduleItemType.Book) {
-      className = isCustom
-        ? ScheduleCustomClassesList[ScheduleItemType.Book]
-        : ScheduleClassesList[ScheduleItemType.Book];
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Book] :
+        ScheduleClassesList[ScheduleItemType.Book];
     }
 
     if (scheduleType === ScheduleItemType.Availability) {
-      className = isCustom
-        ? ScheduleCustomClassesList[ScheduleItemType.Availability]
-        : ScheduleClassesList[ScheduleItemType.Availability];
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Availability] :
+        ScheduleClassesList[ScheduleItemType.Availability];
     }
 
-    if (scheduleType === ScheduleItemType.Unavailability){
-      className = isCustom
-        ? ScheduleCustomClassesList[ScheduleItemType.Unavailability]
-        : ScheduleClassesList[ScheduleItemType.Unavailability];
+    if (scheduleType === ScheduleItemType.Unavailability) {
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.Unavailability] :
+        ScheduleClassesList[ScheduleItemType.Unavailability];
+    }
+
+    if(scheduleType === ScheduleItemType.OpenPositions) {
+      className = isCustom ?
+        ScheduleCustomClassesList[ScheduleItemType.OpenPositions] :
+        ScheduleClassesList[ScheduleItemType.OpenPositions];
     }
 
     return className;
@@ -345,6 +371,26 @@ export class CreateScheduleService {
     });
   }
 
+  createOpenPositionsParams(dates: string[]): OpenPositionParams {
+    const scheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
+
+    if (dates.length) {
+      return  {
+        departmentId: (scheduleFiltersData.filters.departmentsIds as number[])[0],
+        skillId: (scheduleFiltersData.filters.skillIds as number[])[0],
+        selectedDates: dates,
+      };
+    }
+
+    const [startDate, endDate] = this.weekService.getRange();
+
+    return {
+      departmentId: (scheduleFiltersData.filters.departmentsIds as number[])[0],
+      skillId: (scheduleFiltersData.filters.skillIds as number[])[0],
+      startDate,
+      endDate,
+    };
+  }
   private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]): void {
     const isCandidatesOriented = candidates.map((candidate: ScheduleCandidate) => {
       return this.getCandidateOrientation(candidate);
@@ -373,5 +419,9 @@ export class CreateScheduleService {
     } else {
       control?.enable();
     }
+  }
+
+  private getScheduleTypeColumnsTemplate(types: ScheduleTypeRadioButton[]): string {
+    return types.length > 3 ? 'auto auto auto auto' : `repeat(${types.length},1fr)`;
   }
 }

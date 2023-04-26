@@ -118,6 +118,14 @@ const scheduledShiftFormFields = (): EditScheduleFormFieldConfig[] => {
       show: true,
     },
     {
+      field: 'meal',
+      title: 'Meal',
+      type: FieldType.Toggle,
+      gridAreaName: 'meal',
+      required: false,
+      show: true,
+    },
+    {
       field: 'regionId',
       title: 'Region',
       type: FieldType.Dropdown,
@@ -199,6 +207,14 @@ const newShiftFormFields = (): EditScheduleFormFieldConfig[] => {
       required: false,
       show: true,
     },
+    {
+      field: 'meal',
+      title: 'Meal',
+      type: FieldType.Toggle,
+      gridAreaName: 'meal',
+      required: false,
+      show: true,
+    },
   ];
 };
 
@@ -243,4 +259,5 @@ export const RemoveButtonTitleMap = {
   [ScheduleType.Book]: 'Booking',
   [ScheduleType.Availability]: 'Availability',
   [ScheduleType.Unavailability]: 'Unavailability',
+  [ScheduleType.OpenPositions]: 'OpenPositions',
 };

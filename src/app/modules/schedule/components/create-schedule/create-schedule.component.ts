@@ -16,10 +16,24 @@ import { FormControl } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
-import { catchError, EMPTY, filter, map, Observable, Subscription, switchMap, take, takeUntil, tap, zip } from 'rxjs';
+import {
+  catchError,
+  combineLatest,
+  EMPTY,
+  filter,
+  map,
+  Observable,
+  Subscription,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+  zip,
+} from 'rxjs';
 
+import { OutsideZone } from '@core/decorators';
 import { FieldType } from '@core/enums';
-import { Destroyable } from '@core/helpers';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
@@ -27,24 +41,36 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ShiftsService } from '@shared/services/shift.service';
+import { getTime } from '@shared/utils/date-time.utils';
 import { BookingsOverlapsRequest, BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
 import {
   AvailabilityFormConfig,
   BookFormConfig,
+  OpenPositionsConfig,
   ScheduleItemType,
   ScheduleSourcesMap,
-  ScheduleTypes,
+  ScheduleTypesForCreateBar,
   UnavailabilityFormConfig,
 } from '../../constants';
 import * as ScheduleInt from '../../interface';
-import { DeleteScheduleRequest, ScheduleBook, ScheduleBookingErrors, ScheduleFormFieldConfig } from '../../interface';
+import {
+  BarSettings,
+  CreateScheduleTypesConfig,
+  DeleteScheduleRequest,
+  OpenPositionsList,
+  Schedule,
+  ScheduleBook,
+  ScheduleBookingErrors,
+  ScheduleFormFieldConfig,
+} from '../../interface';
 import { ScheduleItemsComponent } from '../schedule-items/schedule-items.component';
-import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
+import { CreateScheduleService, OpenPositionService, ScheduleApiService, ScheduleFiltersService } from '../../services';
 import {
   CreateBookingSuccessMessage,
   CreateScheduleSuccessMessage,
   GetShiftHours,
   GetShiftTimeControlsValue,
+  HasTimeControlValues,
   MapShiftToDropdownOptions,
   MapToDropdownOptions,
 } from '../../helpers';
@@ -53,11 +79,11 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
 import { EditScheduleFormSourceKeys } from '../edit-schedule/edit-schedule.constants';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_MODIFIED } from '@shared/constants';
-import { OutsideZone } from '@core/decorators';
 import {
   EndTimeField,
   RemoveButtonToolTip,
   ScheduleControlsToReset,
+  SideBarSettings,
   StartTimeField,
 } from './create-schedules.constant';
 import { ScheduleType } from '../../enums';
@@ -88,21 +114,19 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = ScheduleSourcesMap;
   readonly removeBtnTooltip: string = RemoveButtonToolTip;
 
-  scheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = ScheduleTypes;
+  scheduleTypes: CreateScheduleTypesConfig = ScheduleTypesForCreateBar;
   scheduleForm: CustomFormGroup<ScheduleInt.ScheduleForm>;
   scheduleFormConfig: ScheduleInt.ScheduleFormConfig;
   scheduleType: ScheduleItemType;
-  replacementOrderDialogOpen = false;
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
-  showScheduleForm = true;
-  showRemoveButton = false;
-  removeReplacementMode = false;
+  sideBarSettings: BarSettings = SideBarSettings;
 
   private readonly customShiftId = -1;
   private shiftControlSubscription: Subscription | null;
   private scheduleShifts: ScheduleShift[] = [];
   private firstLoadDialog = true;
   private scheduleToBook: ScheduleInt.ScheduleBook | null;
+  private unavailabilityToSave: Schedule | null;
 
   constructor(
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
@@ -115,6 +139,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     private scheduleFiltersService: ScheduleFiltersService,
     private readonly ngZone: NgZone,
     private store: Store,
+    private openPositionService: OpenPositionService
   ) {
     super();
   }
@@ -127,13 +152,14 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   ngOnChanges(changes: SimpleChanges) {
     const candidates = changes['scheduleSelectedSlots']?.currentValue.candidates;
 
-    if(candidates?.length && !this.showScheduleForm){
-      this.showScheduleForm = true;
+    if(candidates?.length && !this.sideBarSettings.showScheduleForm){
+      this.sideBarSettings.showScheduleForm = true;
     }
 
     if(candidates && candidates?.length >= 1) {
+      this.getOpenPositions();
       this.createScheduleService.setOrientationControlValue(this.scheduleSelectedSlots, this.scheduleForm);
-      this.showRemoveButton = this.createScheduleService.hasSelectedSlotsWithDate(candidates);
+      this.sideBarSettings.showRemoveButton = this.createScheduleService.hasSelectedSlotsWithDate(candidates);
     }
   }
 
@@ -141,8 +167,8 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     const hasBookDate = this.createScheduleService.hasBookingDate(this.scheduleSelectedSlots.candidates);
 
     if(hasBookDate) {
-      this.replacementOrderDialogOpen = true;
-      this.removeReplacementMode = true;
+      this.sideBarSettings.replacementOrderDialogOpen = true;
+      this.sideBarSettings.removeReplacementMode = true;
 
       this.replacementOrderDialogData = this.createScheduleService.prepareCandidateReplacementDates(
         this.scheduleSelectedSlots.candidates
@@ -178,7 +204,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   closeSchedule(): void {
-   if (this.scheduleForm?.touched) {
+   if (this.scheduleForm?.touched && this.scheduleType !== ScheduleItemType.OpenPositions) {
       this.confirmService.confirm(
         CANCEL_CONFIRM_TEXT,
         {
@@ -205,14 +231,24 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     this.showShiftTimeFields(false);
     this.scheduleFormConfig.formClass =
       this.createScheduleService.updateScheduleFormClass(this.scheduleType, false);
+    this.sideBarSettings.showOpenPositions = this.scheduleType !== ScheduleItemType.OpenPositions;
     this.cdr.markForCheck();
   }
 
   hideScheduleForm(): void {
-    this.showScheduleForm = false;
+    this.sideBarSettings.showScheduleForm = false;
   }
 
-  saveNewBooking(createOrder: boolean): void {
+  saveNewEvent(createOrder: boolean): void {
+    if (this.unavailabilityToSave) {
+      this.unavailabilityToSave.createOrder = createOrder;
+      this.createUnavailability()
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe(() => this.successSave());
+
+      return;
+    }
+
     if (this.scheduleToBook) {
       this.scheduleToBook.createOrder = createOrder;
       this.saveBooking()
@@ -241,15 +277,21 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       return;
     }
 
-    if (this.scheduleType === ScheduleItemType.Book) {
-      this.checkBookingsOverlaps();
-    } else {
-      this.saveAvailabilityUnavailability();
+   if (this.scheduleType === ScheduleItemType.Book) {
+     this.checkBookingsOverlaps();
+     return;
+   }
+
+    if (this.scheduleType === ScheduleItemType.Unavailability) {
+      this.checkUnavailabilityOverlaps();
+      return;
     }
+
+    this.saveAvailability();
   }
 
   closeReplacementOrderDialog(): void {
-    this.replacementOrderDialogOpen = false;
+    this.sideBarSettings.replacementOrderDialogOpen = false;
     this.cdr.markForCheck();
   }
 
@@ -268,7 +310,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
 
   private openReplacementOrderDialog(replacementOrderDialogData: BookingsOverlapsResponse[]): void {
     this.replacementOrderDialogData = replacementOrderDialogData;
-    this.replacementOrderDialogOpen = true;
+    this.sideBarSettings.replacementOrderDialogOpen = true;
     this.cdr.markForCheck();
   }
 
@@ -277,7 +319,8 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     endTimeDate: Date = this.scheduleForm.get('endTime')?.value,
   ): void {
     if (startTimeDate && endTimeDate) {
-      this.scheduleForm.get('hours')?.setValue(GetShiftHours(startTimeDate, endTimeDate));
+      const meal = this.scheduleForm.get('meal')?.value;
+      this.scheduleForm.get('hours')?.setValue(GetShiftHours(startTimeDate, endTimeDate, meal));
     }
   }
 
@@ -291,6 +334,13 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
         this.watchForControls();
         this.createScheduleService.setOrientationControlValue(this.scheduleSelectedSlots, this.scheduleForm);
         break;
+      case ScheduleItemType.OpenPositions:
+        this.scheduleFormConfig = OpenPositionsConfig;
+        this.scheduleForm = this.createScheduleService.createOpenPositionsForm();
+        this.openPositionService.setOpenPosition('shiftTime', null);
+        this.getOpenPositions();
+        this.setShiftTimeState();
+        break;
       case ScheduleItemType.Unavailability:
         this.scheduleFormConfig = UnavailabilityFormConfig;
         this.scheduleForm = this.createScheduleService.createUnavailabilityForm();
@@ -302,6 +352,31 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     }
 
     this.watchForShiftControl();
+  }
+
+  private setShiftTimeState(): void {
+    combineLatest([
+      this.scheduleForm.get(StartTimeField)?.valueChanges as Observable<Date>,
+      this.scheduleForm.get(EndTimeField)?.valueChanges as Observable<Date>,
+    ]).pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe(([startTime, endTime]: [Date, Date]) => {
+      const shiftTime = `${DateTimeHelper.toUtcFormat(startTime)}/${DateTimeHelper.toUtcFormat(endTime)}`;
+      this.openPositionService.setOpenPosition('shiftTime', shiftTime);
+    });
+  }
+
+  private getOpenPositions(): void {
+    if(this.scheduleType === ScheduleItemType.OpenPositions) {
+      this.scheduleApiService.getOpenPositions(
+        this.createScheduleService.createOpenPositionsParams(this.scheduleSelectedSlots.dates)
+      ).pipe(
+        tap((positions: OpenPositionsList[]) => {
+          this.openPositionService.setOpenPosition('initialPositions', positions);
+        }),
+        takeUntil(this.componentDestroy()),
+      ).subscribe();
+    }
   }
 
   private watchForShiftControl(): void {
@@ -353,6 +428,31 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.createScheduleService.hideToggleControls(this.scheduleFormConfig, !value);
       this.cdr.markForCheck();
     });
+
+    this.scheduleForm.get('meal')?.valueChanges.pipe(
+      filter(() => {
+        return HasTimeControlValues(this.scheduleForm);
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.setHours();
+
+      this.cdr.markForCheck();
+    });
+
+    this.scheduleForm.get('onCall')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((value: boolean) => {
+      const mealControl = this.scheduleForm.get('meal');
+
+      if(value) {
+        mealControl?.patchValue(false);
+        mealControl?.disable();
+      } else {
+        mealControl?.enable();
+      }
+      this.cdr.markForCheck();
+    });
   }
 
   private watchForScheduleType(): void {
@@ -364,13 +464,15 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   private closeSideBar(): void {
+    this.openPositionService.clearOpenPositionState();
+    this.sideBarSettings.showOpenPositions = true;
     this.createScheduleService.closeSideBarEvent.next(true);
     this.scheduleItemsService.setErrors([]);
     this.showShiftTimeFields(false);
     this.scheduleFormConfig.formClass = this.createScheduleService.updateScheduleFormClass(this.scheduleType, false);
   }
 
-  private saveAvailabilityUnavailability(): void {
+  private saveAvailability(): void {
     const schedule = this.createScheduleService.createAvailabilityUnavailability(
       this.scheduleForm,
       this.scheduleItemsComponent.scheduleItems,
@@ -445,10 +547,53 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     });
   }
 
+  private checkUnavailabilityOverlaps(): void {
+    const { shiftId, startTime, endTime } = this.scheduleForm.getRawValue();
+    const request: BookingsOverlapsRequest = {
+      employeeScheduledDays: this.createScheduleService.getEmployeeBookedDays(this.scheduleItemsComponent.scheduleItems),
+      shiftId: shiftId !== this.customShiftId ? shiftId : null,
+      startTime: getTime(startTime),
+      endTime: getTime(endTime),
+    };
+
+    this.unavailabilityToSave = this.createScheduleService.createAvailabilityUnavailability(
+      this.scheduleForm,
+      this.scheduleItemsComponent.scheduleItems,
+      this.scheduleTypesControl.value,
+      this.customShiftId
+    );
+
+    this.scheduleApiService.checkBookingsOverlaps(request).pipe(
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+      switchMap((response: BookingsOverlapsResponse[]) => {
+        if (!response.length && this.unavailabilityToSave) {
+          return this.createUnavailability();
+        } else {
+          this.openReplacementOrderDialog(response);
+
+          return EMPTY;
+        }
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.successSave();
+    });
+  }
+
+  private createUnavailability(): Observable<void> {
+    return this.scheduleApiService.createSchedule(this.unavailabilityToSave as Schedule)
+      .pipe(catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)));
+  }
+
   private successSave(): void {
+    const successMessage = this.scheduleToBook
+      ? CreateBookingSuccessMessage(this.scheduleToBook as ScheduleInt.ScheduleBook)
+      : CreateScheduleSuccessMessage(this.unavailabilityToSave as ScheduleInt.Schedule);
+
     this.scheduleItemsService.setErrors([]);
-    this.handleSuccessSaveDate(CreateBookingSuccessMessage(this.scheduleToBook as ScheduleInt.ScheduleBook));
+    this.handleSuccessSaveDate(successMessage);
     this.scheduleToBook = null;
+    this.unavailabilityToSave = null;
   }
 
   private setInitData(): void {

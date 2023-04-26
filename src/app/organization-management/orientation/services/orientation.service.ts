@@ -15,6 +15,13 @@ import { HistoricalOrientationConfigurationDTO, OrientationConfiguration, Orient
 @Injectable()
 export class OrientationService {
   public filterColumns = {
+    orientationIDs: {
+      type: ControlTypes.Multiselect,
+      valueType: ValueType.Id,
+      dataSource: [],
+      valueField: 'text',
+      valueId: 'id',
+    },
     regionIds: {
       type: ControlTypes.Multiselect,
       valueType: ValueType.Id,
@@ -72,7 +79,7 @@ export class OrientationService {
   }
 
   public getHistoricalOrientationConfigs(filters: OrientationConfigurationFilters): Observable<OrientationConfigurationPage> {
-    if(filters.regionIds || filters.skillCategoryIds){
+    if(filters.regionIds || filters.skillCategoryIds || filters.orientationIDs){
       return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/historical/filter', filters)
     }
     return this.http.post<OrientationConfigurationPage>('/api/OrientationSettings/historical/configurations/list', filters)  
@@ -150,6 +157,7 @@ export class OrientationService {
 
   public generateConfigurationFilterForm(): FormGroup {
     return new FormGroup({
+      orientationIDs: new FormControl(null),
       regionIds: new FormControl(null),
       locationIds: new FormControl(null),
       departmentsIds: new FormControl(null),
@@ -160,6 +168,7 @@ export class OrientationService {
 
   public refreshFilterForm(form: FormGroup, filters: OrientationConfigurationFilters): void {
     form.setValue({
+      orientationIDs: filters.orientationIDs || null,
       regionIds: filters.regionIds || null,
       locationIds: filters.locationIds || null,
       departmentsIds: filters.departmentsIds || null,

@@ -121,7 +121,11 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: 'agency/invoices',
     },
-    26: reportsMenuItemConfiguration,
+    26: {
+      // Reports
+      icon: 'pie-chart',
+      route: 'agency/reports/financial-timesheet-report',
+    },
     28: {
       // Associated Organizations
       icon: 'clock',
@@ -364,9 +368,9 @@ export const MENU_CONFIG: any = {
     },
     80:
     {
-        // group-email
-        icon: '',
-        route: '/alerts/group-email',
+      // group-email
+      icon: '',
+      route: '/alerts/group-email',
     },
     47: {
       // Alerts Template
@@ -539,7 +543,6 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: 'agency/invoices',
     },
-    26: reportsMenuItemConfiguration,
     27: {
       // Settings
       icon: '',
@@ -597,9 +600,9 @@ export const MENU_CONFIG: any = {
     },
     80:
     {
-        // group-email
-        icon: '',
-        route: '/alerts/group-email',
+      // group-email
+      icon: '',
+      route: '/alerts/group-email',
     },
     47: {
       // Alerts Template
@@ -777,7 +780,6 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: '',
     },
-    26: reportsMenuItemConfiguration,
     27: {
       // Settings
       icon: '',
@@ -858,7 +860,7 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/ytd-summary',
     },
-    55:{
+    55: {
       // Missing Credentials
       icon: '',
       route: '/analytics/missing-credentials',
@@ -990,9 +992,9 @@ export const MENU_CONFIG: any = {
     },
     80:
     {
-        // group-email
-        icon: '',
-        route: '/alerts/group-email',
+      // group-email
+      icon: '',
+      route: '/alerts/group-email',
     },
     47: {
       // Alerts Template
@@ -1028,7 +1030,7 @@ export const MENU_CONFIG: any = {
       // Staff Schedule By Shift Report
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
-    },  
+    },
     89: {
       // Finance Medicare Wage Report
       icon: '',
@@ -1175,7 +1177,11 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: 'agency/invoices',
     },
-    26: reportsMenuItemConfiguration,
+    26: {
+      // Reports
+      icon: 'pie-chart',
+      route: 'agency/reports/financial-timesheet-report',
+    },
     27: {
       // Settings
       icon: 'user',
@@ -1273,9 +1279,9 @@ export const MENU_CONFIG: any = {
     },
     80:
     {
-        // group-email
-        icon: '',
-        route: '/alerts/group-email',
+      // group-email
+      icon: '',
+      route: '/alerts/group-email',
     },
 
     47: {

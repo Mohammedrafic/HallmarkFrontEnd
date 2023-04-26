@@ -299,6 +299,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
   public getVMSOrderRequisition()
   {
+    this.reasons = [];
     this.reasons$
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(data => {
@@ -307,11 +308,15 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
               this.reasons.push({
               id: item.id,
               reason:item.reason,
-              businessUnitId:item.businessUnitId
+              businessUnitId:item.businessUnitId,
+              isAutoPopulate : item.isAutoPopulate
             });
           }
+          if(item.isAutoPopulate === true){
+            this.jobDescriptionForm.controls['orderRequisitionReasonId'].setValue(item.id);
+          }
         });
-    });
+      });
   }
 
   private getSettings(): void {

@@ -24,8 +24,9 @@ import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CANDIDATE_STATUS } from '@shared/constants';
+import { CANDIDATE_STATUS, DASHBOARD_FILTER_STATE } from '@shared/constants';
 import { AlertService } from '@shared/services/alert.service';
+import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 
 @Component({
   selector: 'app-accumulation-chart',
@@ -67,6 +68,19 @@ export class AccumulationChartComponent
   }
 
   public redirectToSourceContent(status: string): void {
+    let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
+    let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
+    if(filteredList.length > 0){
+      let organizations = filteredList.filter((ele:any)=>ele.column == "organizationIds").sort((a:any,b:any)=> a.value - b.value);
+      if(organizations.length > 0 && organizations[0].value != lastSelectedOrganizationId){
+        this.store.dispatch(
+          new SetLastSelectedOrganizationAgencyId({
+            lastSelectedAgencyId: null,
+            lastSelectedOrganizationId: organizations[0].value
+          })
+        );
+      }
+    }
     const user = this.store.selectSnapshot(UserState.user);
     let Enumvalues: number;
     if (this.chartData?.title == "Candidates") {
