@@ -207,6 +207,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     .pipe(takeWhile(() => this.isAlive)).
     subscribe((value) => {
       this.store.dispatch(new GetBusinessByUnitType(value)).subscribe(() => {
+        this.businessControl?.setValue(null);
         if (this.isBusinessDisabledForNewRole) {
           this.businessControl.patchValue([this.userbusinessUnitId]);
         }
