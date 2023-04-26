@@ -129,6 +129,7 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
         filter((confirm) => !!confirm),
         switchMap(() => this.payRateApiService.deletePayRateRecord(id)),
         switchMap(() => {
+          this.refreshSubject$.next();
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
           this.pagingData.pageNumber = this.candidateService.getGridPageNumber(
             this.payRateRecords.length,
