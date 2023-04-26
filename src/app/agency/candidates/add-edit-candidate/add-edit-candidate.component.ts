@@ -27,6 +27,7 @@ import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import {
+  GetAllSkills,
   GetCandidateById,
   GetCandidateByIdSucceeded,
   GetCandidatePhoto,
@@ -43,6 +44,7 @@ import { AgencySettingsService } from '@agency/services/agency-settings.service'
 import { DateTimeHelper } from '@core/helpers';
 import { GlobalWindow } from "@core/tokens";
 import { Country } from "@shared/enums/states";
+import { GetRegionList } from "@shared/components/candidate-list/store/candidate-list.actions";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -108,6 +110,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.store.dispatch([new GetAllSkills(), new GetRegionList()]);
     this.generateCandidateForm();
     this.checkForAgencyStatus();
     this.setCredentialParams();
