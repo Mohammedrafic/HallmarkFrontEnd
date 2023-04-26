@@ -154,7 +154,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private dataSourceContainer: OrderDataSourceContainer = {};
   private selectedSystem: SelectSystem;
   private isTieringLogicLoad = true;
-
+  public AutopopulateId:number | undefined;
   private reason:OrderRequisitionReason[]=[];
 
   @Select(RejectReasonState.sortedOrderRequisition)
@@ -198,6 +198,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForSelectOrder();
     this.watchForOrganizationStructure();
     this.observeOrderType();
+    this.setReasonAutopopulate();
   }
 
   public addFields(config: OrderFormsArrayConfig): void {
@@ -340,6 +341,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.changeDetection.markForCheck();
   }
 
+  private setReasonAutopopulate() {
+    if(this.jobDescriptionForm != undefined && this.AutopopulateId != undefined){
+      this.jobDescriptionForm.controls["orderRequisitionReasonId"].patchValue(this.AutopopulateId);
+      this.changeDetection.detectChanges();
+    }
+  }
+
   private getIRPOrderRequisition(orderRequisition:RejectReasonwithSystem[]):OrderRequisitionReason[]{
     if(orderRequisition.length>0){
       orderRequisition.forEach(element => {
@@ -353,12 +361,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           )
         }
         if(element.isAutoPopulate === true){
-          const rejectreasonfield = {
-              id:element.id,
-              name:element.reason,
-              businessUnitId:element.businessUnitId,
-          }
-          this.jobDescriptionForm.controls['orderRequisitionReasonId'].setValue(element);
+          this.AutopopulateId = element.id;      
         }
       });
     }
