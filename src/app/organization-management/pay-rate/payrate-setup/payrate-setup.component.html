@@ -64,6 +64,13 @@
             <span *ngIf="!data.skillId">All</span>
           </ng-template>
         </e-column>
+        <e-column field="workCommitName" headerText="Work Commitment" width="170">
+          <ng-template #template let-data>
+            <ejs-tooltip id="tooltip" [content]="data.workCommitName" position="TopCenter">
+              <span>{{ data.workCommitName }}</span>
+            </ejs-tooltip>
+          </ng-template>
+        </e-column>
         <e-column field="orderTypes" headerText="ORDER TYPE" width="180">
           <ng-template #template let-data>
             <span *ngFor="let orderTypeId of data.orderTypes; let i = index"
