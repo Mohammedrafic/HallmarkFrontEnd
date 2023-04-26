@@ -160,7 +160,7 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
       title: 'Job Date',
       required: true,
       cssClass: 'item6',
-      type: FieldType.Date,
+      type: FieldType.Calendar,
     },
     {
       field: 'shift',
