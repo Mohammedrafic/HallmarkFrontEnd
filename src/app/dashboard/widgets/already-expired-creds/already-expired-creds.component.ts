@@ -68,7 +68,7 @@ export class AlreadyExpiredCredsComponent  {
       type = 2;
     }
 
-    this.dashboardService.redirect_to_credentials("/client/candidates",startDate, yesterdayDate, type);
+    this.dashboardService.redirect_to_already_expired_credentials("/client/candidates", yesterdayDate, type);
   }
 
   ngOnChanges():void {
