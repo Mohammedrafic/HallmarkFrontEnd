@@ -169,7 +169,7 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
     private readonly ngZone: NgZone,
     @Inject(APP_SETTINGS) private appSettings: AppSettings) {
     this.baseUrl = this.appSettings.host.replace("https://", "").replace("http://", "");
-    this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
+    this.store.dispatch(new SetHeaderState({ title: "Reports", iconName: '' }));
     this.initForm();
     this.user = this.store.selectSnapshot(UserState.user);
     //if (this.user?.id != null) {
@@ -257,15 +257,7 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
     this.bussinessControl = this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds) as AbstractControl;
     this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
     this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
-    //this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-    //  //if (data != null && data.length > 0) {
-    //  //  this.organizations = uniqBy(data, 'organizationId');
-    //  //  this.filterColumns.businessIds.dataSource = this.organizations;
-    //  //  this.defaultOrganizations = this.agencyOrganizationId;
-    //  //  this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
-    //  //  this.changeDetectorRef.detectChanges();
-    //  //}
-    //});
+    
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.RegionIds)?.setValue([]);
