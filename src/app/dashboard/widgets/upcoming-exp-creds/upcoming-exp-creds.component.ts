@@ -50,7 +50,7 @@ export class UpcomingExpCredsComponent {
       type = 2;
     }
 
-    this.dashboardService.redirect_to_credentials("/client/candidates",startDate, endDate, type);
+    this.dashboardService.redirect_to_expiring_credentials("/client/candidates", startDate,endDate, type);
   }
 
   public load(args: ILoadedEventArgs): void {
