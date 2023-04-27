@@ -6,6 +6,7 @@ import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { PopupEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { DropdownOption } from '@core/interface';
+import { ChangedEventArgs } from '@syncfusion/ej2-angular-inputs';
 
 @Component({
   selector: 'app-dropdown',
@@ -24,4 +25,5 @@ export class DropdownComponent extends BaseFormControlDirective {
   @Input() public sortOrder: SortOrder = SortOrder.NONE;
 
   @Output() public openDropdown: EventEmitter<PopupEventArgs> = new EventEmitter();
+  @Output() public change: EventEmitter<ChangedEventArgs> = new EventEmitter<ChangedEventArgs>();
 }
