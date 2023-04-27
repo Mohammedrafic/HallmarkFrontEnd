@@ -3,28 +3,28 @@
     <!-- validation errors-->
     <div *ngIf="isSend && isFormInvalid" class="alert alert-danger">
       <div *ngIf="emailToControl.value == ''">
-        - Field Email to is required.
+        Field Email To is required.
       </div>
     </div>
 
     <div *ngIf="emailCcControl.invalid && isFormInvalid"
       class="alert alert-danger">
       <div *ngIf="emailCcControl.errors?.['emails']">
-        - Some of email(s) in CC not matching valid email address pattern.
+        Some of email(s) in CC not matching valid email address pattern.
       </div>
     </div>
 
     <div *ngIf="subjectControl.invalid && isFormInvalid"
       class="alert alert-danger">
       <div *ngIf="subjectControl.errors?.['required']">
-        - Field Email subject is required.
+        Field Email Subject is required.
       </div>
     </div>
 
     <div *ngIf="emailBodyControl.invalid && isFormInvalid"
       class="alert alert-danger">
       <div *ngIf="emailBodyControl.errors?.['required']">
-        - Field Email body is required.
+        Field Email Body is required.
       </div>
     </div>
 
