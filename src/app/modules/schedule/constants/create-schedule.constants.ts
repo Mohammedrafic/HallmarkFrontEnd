@@ -1,9 +1,8 @@
-import { FieldType, UserPermissions } from "@core/enums";
+import { FieldType, UserPermissions } from '@core/enums';
 
-import { ScheduleType } from "../enums";
+import { ScheduleType } from '../enums';
 import * as ScheduleInt from '../interface';
 import { CreateScheduleTypesConfig } from '../interface';
-
 
 export enum ScheduleItemType {
   Book = 0,
@@ -26,7 +25,7 @@ export const OpenPositionTypes: ScheduleInt.ScheduleTypeRadioButton = {
   value: ScheduleItemType.OpenPositions,
   name: 'scheduleType',
   disabled: false,
-  permission: UserPermissions.CanViewSchedule,
+  permission: UserPermissions.CanAddShift,
 };
 
 export const BookTypes: ScheduleInt.ScheduleTypeRadioButton = {
@@ -53,9 +52,12 @@ export const UnavailabilityTypes = {
   permission: UserPermissions.CanAddUnavailability,
 };
 
-export const ScheduleTypesForEditBar: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = [
-  BookTypes,AvailabilityTypes, UnavailabilityTypes,
-];
+export const ScheduleTypesForEditBar: CreateScheduleTypesConfig = {
+  columnsTemplate: 'auto auto auto auto',
+  source: [
+    BookTypes,AvailabilityTypes, UnavailabilityTypes,
+  ],
+};
 
 export const ScheduleTypesForCreateBar: CreateScheduleTypesConfig = {
   columnsTemplate: 'auto auto auto auto',
