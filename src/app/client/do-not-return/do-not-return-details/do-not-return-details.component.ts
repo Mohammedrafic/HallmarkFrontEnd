@@ -37,7 +37,7 @@ public filters: DonoreturnFilters = {
 
   constructor(protected override store:Store) { 
     super(store)
-    store.dispatch(new SetHeaderState({ title: TITLE, iconName: 'user-X' }));
+    store.dispatch(new SetHeaderState({ title: TITLE, iconName: 'users' }));
   }
 
   override ngOnInit(): void {
