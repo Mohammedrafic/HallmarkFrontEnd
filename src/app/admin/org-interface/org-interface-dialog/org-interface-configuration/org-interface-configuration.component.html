@@ -1,0 +1,124 @@
+<div class="org-configurations-container">
+    <form  [formGroup]="orgConfigurationFormGroup">
+        <section>
+            <div class="flex-container">
+                <div class="input-container-name">
+                    <app-input  id="configurations-name" appValidateWithMessage [formGroupInstance]="orgConfigurationFormGroup" controlName="etlprocessName"  label="Name"  [disable]="true"></app-input>
+                </div>
+                <div class="input-container-description">
+                    <app-input  id="configurations-description" [formGroupInstance]="orgConfigurationFormGroup" controlName="description"  label="Description"></app-input>
+                </div>
+                <div class="input-container-type">
+                    <app-input  id="configurations-fileExtension" appValidateWithMessage [formGroupInstance]="orgConfigurationFormGroup" controlName="fileExtension"  label="File Type"></app-input>
+                </div>
+            </div>
+            <div class="flex-container">
+                <div class="input-container">
+                    <app-input  id="configurations-fileNamePattern" appValidateWithMessage [formGroupInstance]="orgConfigurationFormGroup" controlName="fileNamePattern"  label="File Name Pattern"></app-input>
+                </div>
+                <div class="input-container">
+                    <app-input  id="configurations-columnDelimiter" [formGroupInstance]="orgConfigurationFormGroup" controlName="columnDelimiter"  label="Delimiter"></app-input>
+                </div>
+            </div>
+            <hr>
+        </section>
+        <section>
+            <b>File Settings</b>
+            <div  class="flex-container mar-top-10">
+                <div  class="input-container-switch">
+                    <ejs-switch id="configurations-hasHeader" class="switch" formControlName="hasHeader" bonLabel="ON" offLabel="OFF"></ejs-switch>
+                    <label class="switch-label">Header</label>
+                </div>
+                <div  class="input-container-switch">
+                    <ejs-switch id="configurations-importAllFilesIntheFolder" class="switch" formControlName="importAllFilesIntheFolder" bonLabel="ON" offLabel="OFF"></ejs-switch>
+                    <label class="switch-label">Import All Files In the Folder</label>
+                </div>
+                <div  class="input-container-switch">
+                    <ejs-switch id="configurations-processSameFileAgain" class="switch" formControlName="processSameFileAgain" bonLabel="ON" offLabel="OFF"></ejs-switch>
+                    <label class="switch-label">Process Same File Again</label>
+                </div>
+            </div>
+            <hr>
+        </section>
+        
+        
+            <div  class="input-container mar-top-bottom-20">
+                <ejs-switch id="configurations-emailNotification" class="switch" (change)="onEmailSwitcher($event);" formControlName="emailNotification"></ejs-switch>
+                <label class="switch-label">Email Notification</label>
+            </div>
+        
+            <p></p>
+        <section *ngIf="emailNotificationFlag">
+            <div class="input-container-subject  mar-top-10">
+                <app-input  id="configurations-sendMailSubject"  [formGroupInstance]="orgConfigurationFormGroup" controlName="sendMailSubject"  label="Subject"></app-input>
+            </div>
+        
+            <p></p>
+            <p class="info">
+                <fa-icon [icon]="faInfoCircle" size="sm"></fa-icon>&nbsp;&nbsp;&nbsp;
+                Add multiple emails seperated by ','</p>
+            <p></p>
+        
+            <b>Success Recipients</b>
+            <div class="flex-container mar-bottom-20">
+                <div class="input-container">
+                    <app-input  id="configurations-emailRecipientsSuccess"   [formGroupInstance]="orgConfigurationFormGroup" controlName="emailRecipientsSuccess"  label="To"></app-input>
+                </div>
+                <!-- <div class="input-container">
+                    <app-input  id="configurations-name"  [formGroupInstance]="orgConfigurationFormGroup" controlName="region"   label="Cc"></app-input>
+                </div>
+                <div class="input-container">
+                    <app-input  id="configurations-name"  [formGroupInstance]="orgConfigurationFormGroup" controlName="region"   label="Bcc"></app-input>
+                </div> -->
+            </div>
+        
+            <b>Failure Recipients</b>
+            <div class="flex-container mar-bottom-20">
+                <div class="input-container">
+                    <app-input  id="configurations-emailRecipientsError"  [formGroupInstance]="orgConfigurationFormGroup" controlName="emailRecipientsError"   label="To"></app-input>
+                </div>
+                <div class="input-container">
+                    <app-input  id="configurations-emailRecipientsCc"  [formGroupInstance]="orgConfigurationFormGroup" controlName="emailRecipientsCc"   label="Cc"></app-input>
+                </div>
+                <div class="input-container">
+                    <app-input  id="configurations-emailRecipientsBcc"  [formGroupInstance]="orgConfigurationFormGroup" controlName="emailRecipientsBcc"   label="Bcc"></app-input>
+                </div>
+            </div>
+        
+            <b>Technical Recipients</b>
+            <div class="flex-container mar-bottom-20">
+                <!-- <div class="input-container">
+                    <app-input  id="configurations-name"  [formGroupInstance]="orgConfigurationFormGroup" controlName="region"   label="To"></app-input>
+                </div>
+                <div class="input-container">
+                    <app-input  id="configurations-name"   [formGroupInstance]="orgConfigurationFormGroup" controlName="region"  label="Cc"></app-input>
+                </div>
+                <div class="input-container">
+                    <app-input  id="configurations-name"   [formGroupInstance]="orgConfigurationFormGroup" controlName="region"  label="Bcc"></app-input>
+                </div> -->
+            </div>
+            <hr>
+        </section>
+        
+        <section>
+            <b>Additional Settings</b>
+            <div  class="flex-container mar-top-10">
+                <div  class="input-container-switch">
+                    <ejs-switch id="configurations-regionSpecific" class="switch"  formControlName="regionSpecific" bonLabel="ON" offLabel="OFF"></ejs-switch>
+                    <label class="switch-label">Region Specific</label>
+                </div>
+                <div  class="input-container-switch">
+                    <ejs-switch id="configurations-cleanImport" class="switch"  formControlName="cleanImport" bonLabel="ON" offLabel="OFF"></ejs-switch>
+                    <label class="switch-label">Clean Import</label>
+                </div>
+            </div>
+            <div  class="flex-container">
+                <div class="input-container-type">
+                    <app-input  id="configurations-retentionPeriodInDays"   [formGroupInstance]="orgConfigurationFormGroup" controlName="retentionPeriodInDays"  label="Retention Period In Days"></app-input>
+                </div>
+            </div>
+        </section>
+    </form>
+
+</div>
+
