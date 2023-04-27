@@ -1,5 +1,5 @@
 
-import { OrganizationFilter } from "@shared/models/organization.model";
+import { FilteredDataByOrganizationId } from "./group-by-organization-filter-data.model";
 
 export interface GetWorkCommitment {
     id: number
@@ -11,7 +11,7 @@ export interface GetNursingUtilizationbyByFilters {
   todayDate: Date;
   workCommitmentIds: number[];
   skillIds: number[];
-  organizationFilter: OrganizationFilter[] | null;
+  organizationFilter: FilteredDataByOrganizationId[] | null;
 }
 
 export interface GetNursingWidgetData {

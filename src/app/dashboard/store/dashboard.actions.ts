@@ -3,6 +3,7 @@ import type { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { DashboardFiltersModel } from '../models/dashboard-filters.model';
 import { GetNursingUtilizationbyByFilters } from '../models/rn-utilization.model';
+import { DashboartFilterDto } from '../models/dashboard-filter-dto.model';
 
 const dashboardStatePrefix: string = '[dashboard]';
 
@@ -66,4 +67,11 @@ export class GetSkilldata {
 export class FilterNursingWidget {
   static readonly type =  `${dashboardStatePrefix} Get Filter by Page`;
   constructor(public payload:GetNursingUtilizationbyByFilters) {}
+}
+
+
+
+export class SetDashboardWidgetFilter {
+  static readonly type =  `${dashboardStatePrefix} Set Dashboard Widget Filter Data`;
+  constructor(public payload:DashboartFilterDto) {}
 }
