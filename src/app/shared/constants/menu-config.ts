@@ -168,7 +168,7 @@ export const MENU_CONFIG: any = {
     },
     86: {
       // DNR Details
-      icon: 'user-X',
+      icon: '',
       route: 'client/dnr-details',
     },
     37: {
