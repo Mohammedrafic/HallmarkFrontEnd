@@ -1,4 +1,4 @@
-<div class="app-widget-wrapper" [ngClass]="{ 'with-legend': legend }">
+<div class="app-widget-wrapper" [ngClass]="legend ? 'with-legend' : OrgChart ? 'with-orgchart' : ''">
   <div class="app-widget-wrapper__content">
     <h3 *ngIf="title" class="app-widget-wrapper__title">{{ title }}</h3>
     <ng-container [ngTemplateOutlet]="isLoading ? loadingTemplate : regularWidgetTemplate"></ng-container>

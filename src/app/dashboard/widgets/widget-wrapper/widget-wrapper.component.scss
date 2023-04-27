@@ -23,6 +23,10 @@ $headerHeight: 19px;
     }
   }
 
+  &.with-orgchart {
+    padding: 6% !important;
+  }
+
   &__content {
     display: flex;
     flex-direction: column;
@@ -118,7 +122,7 @@ $headerHeight: 19px;
   }
 }
 .app-widget-wrapper__agency_count, .app-widget-wrapper__org-chart{
-  height: calc(100% - 19px);
+  // height: calc(100% - 19px);
   overflow: auto;
 }
 .app-widget-wrapper__position-chart{
