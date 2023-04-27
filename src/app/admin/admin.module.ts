@@ -70,6 +70,10 @@ import { OrgInterfaceComponent } from './org-interface/org-interface.component';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { LogInterfaceComponent } from './log-interface/log-interface.component';
 import { LogInterfaceDialogComponent } from './log-interface/log-interface-dialog/log-interface-dialog.component';
+import { OrgInterfaceDialogComponent } from './org-interface/org-interface-dialog/org-interface-dialog.component';
+import { OrgInterfaceConfigurationComponent } from './org-interface/org-interface-dialog/org-interface-configuration/org-interface-configuration.component';
+import { InputModule } from '@shared/components/form-controls/input/input.module';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 const sidebarIcons = {
   Download,
@@ -107,7 +111,9 @@ const sidebarIcons = {
     CommitmentGridActionRendererComponent,
     OrgInterfaceComponent,
     LogInterfaceComponent,
-    LogInterfaceDialogComponent
+    LogInterfaceDialogComponent,
+    OrgInterfaceDialogComponent,
+    OrgInterfaceConfigurationComponent
   ],
   imports: [
     CommonModule,
@@ -143,6 +149,8 @@ const sidebarIcons = {
     CredentialListModule,
     AppGridModule,
     AgGridModule,
+    InputModule,
+    FontAwesomeModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     //STORE

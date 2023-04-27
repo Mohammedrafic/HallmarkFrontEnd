@@ -1,0 +1,34 @@
+@import "./../../../../styles/variables/colors.scss";
+.org-configurations-container{    
+    .flex-container {
+        display: flex;
+        gap:30px;
+        padding: 10px;
+    }    
+    .input-container-description{
+        width: 400px;
+    }    
+    .input-container{
+        width: 300px;
+    }    
+    .mar-top-10{
+        margin-top: 10px;
+    }    
+    .mar-top-bottom-20{
+        margin: 20px 0px;
+    }
+    .mar-bottom-20{
+        margin-bottom: 20px;
+    }    
+    .input-container-subject{
+        width: 600px;
+    }
+    .info{
+        border-radius: 8px;
+        color: $primary-active-blue;
+        background-color: $primary-active-blue-90;
+        padding: 10px;
+        width: 300px;
+    }
+}
+
