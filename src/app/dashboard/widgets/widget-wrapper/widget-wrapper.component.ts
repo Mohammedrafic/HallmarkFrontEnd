@@ -23,4 +23,5 @@ export class WidgetWrapperComponent {
   @ContentChild("RNUtilizationChart") public readonly RNUtilizationChart: TemplateRef<HTMLElement>;
   @ContentChild("already_expired_credentials") public readonly already_expired_credentials: TemplateRef<HTMLElement>;
   @ContentChild("upcoming_exp_creds") public readonly upcoming_exp_creds: TemplateRef<HTMLElement>;
+  @ContentChild("available_employee") public readonly available_employee: TemplateRef<HTMLElement>;
 }

@@ -101,7 +101,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     else{
       this.UserType=0;
     }
-   
   }
 
   private getAdminOrganizationsStructureAll(): void {
@@ -212,6 +211,9 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     );
   }
 
+
+
+
   private getPanels$(): Observable<PanelModel[]> {
     return this.panels$.pipe(
       distinctUntilChanged((previous: PanelModel[], current: PanelModel[]) =>
@@ -300,4 +302,5 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     })
     this.filterData$.next({ organizationFilter, skillIds });
   }
+
 }
