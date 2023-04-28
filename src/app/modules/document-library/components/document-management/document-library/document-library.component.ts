@@ -254,6 +254,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public sharedDocumentInformation$: Observable<BusinessUnit[]>;
 
   public IsSearchDone:boolean = false;
+  allAgencies:boolean = false;
+  allOrgnizations:boolean = false;
 
   constructor(private store: Store, private datePipe: DatePipe,
     private changeDetectorRef: ChangeDetectorRef,
@@ -505,10 +507,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.sharedDocumentInformation$.pipe(takeUntil(this.unsubscribe$))
     .subscribe((data: BusinessUnit[]) => {
       if(data.length>0){
-        this.sharedWith.gridOptions.api?.setRowData(data);
+        this.sharedWith?.gridOptions?.api?.setRowData(data);
       }
       else{
-        this.sharedWith.gridOptions.api?.setRowData(data);
+        this.sharedWith?.gridOptions?.api?.setRowData(data);
       }
     });
   }
@@ -1259,6 +1261,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public onAgencySwitcher(event: any) {
     this.agencySwitch = !this.agencySwitch;
+    this.allAgencies = false;
     if (this.agencySwitch) {
       this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
       this.isShowSharedWith=true;
@@ -1274,6 +1277,27 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.isShowSharedWith=false;
     }
     this.changeDetectorRef.markForCheck();
+  }
+
+  public allAgenciesChange(event: any) {
+    this.allAgencies=!this.allAgencies;
+    if(this.allAgencies){
+      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([-1]);
+      this.sharedWith.gridOptions.api?.setRowData([]);
+      this.isShowSharedWith=false;
+      this.changeDetectorRef.markForCheck();
+    }
+  }
+
+  public allOrgnizationsChange(event: any) {
+    this.allOrgnizations=!this.allOrgnizations;
+    if(this.allOrgnizations){
+      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([-1]);
+      this.sharedWith.gridOptions.api?.setRowData([]);
+      this.isShowSharedWith=false;
+      this.changeDetectorRef.markForCheck();
+    }
+
   }
 
   private getAssociateAgencyData() {
