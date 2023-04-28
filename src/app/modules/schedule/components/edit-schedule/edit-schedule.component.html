@@ -3,12 +3,15 @@
   <div class="sidebar-header">
     <h3 class="title">{{scheduledItem.candidate.lastName}}, {{scheduledItem.candidate.firstName}}</h3>
     <div class="controls">
-      <button
-        (click)="saveSchedule()"
-        [isPrimary]="true"
-        ejs-button>
-        Save
-      </button>
+      <app-tooltip-container [showToolTip]="!isCreateMode && !hasEditPermissions">
+        <button
+          [disabled]="!isCreateMode && !hasEditPermissions"
+          (click)="saveSchedule()"
+          [isPrimary]="true"
+          ejs-button>
+          Save
+        </button>
+      </app-tooltip-container>
       <button class="close" (click)="closeSchedule()">
         <i-feather name="x" class="icon"></i-feather>
       </button>
@@ -29,7 +32,7 @@
     </div>
     <div class="add-new-schedule">
       <div *ngIf="isCreateMode" class="input-container schedule-types">
-        <ng-container *ngFor="let type of scheduleTypes">
+        <ng-container *ngFor="let type of scheduleTypes.source">
           <div class="input-group radio">
             <app-tooltip-container [showToolTip]="type.disabled">
               <ejs-radiobutton
@@ -45,14 +48,17 @@
         </ng-container>
       </div>
       <div *ngIf="!isCreateMode" class="add-btn-container">
-        <button
-          ejs-button
-          cssClass="e-outline"
-          (click)="addNewSchedule()"
-        >
-          <i-feather name="plus" class="icon"></i-feather>
-          <span>Add Schedule</span>
-        </button>
+        <app-tooltip-container [showToolTip]="scheduleItemType === undefined">
+          <button
+            ejs-button
+            cssClass="e-outline"
+            [disabled]="scheduleItemType === undefined"
+            (click)="addNewSchedule()"
+          >
+            <i-feather name="plus" class="icon"></i-feather>
+            <span>Add Schedule</span>
+          </button>
+        </app-tooltip-container>
       </div>
     </div>
     <div class="separator"></div>
@@ -63,7 +69,7 @@
             <ng-template [ngSwitchCase]="FieldTypes.Toggle">
               <div class="switch-wrap">
                 <div *ngIf="control.show" class="input-group" [ngStyle]="{'grid-area': control.gridAreaName}">
-                  <ejs-switch class="switch" [formControlName]="control.field"></ejs-switch>
+                  <ejs-switch class="switch" [formControlName]="control.field" [disabled]="!!control.readonly"></ejs-switch>
                   <label class="switch-label">{{control.title}}</label>
                 </div>
               </div>
@@ -140,12 +146,16 @@
     <div class="checkbox-container bootstrap" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
       <ejs-checkbox [formControl]="createPerDiemOrderControl" label="Create Per Diem Order"></ejs-checkbox>
     </div>
-    <button *ngIf="selectedDaySchedule"
-      (click)="deleteSchedule()"
-      cssClass="e-outline remove-schedule"
-      ejs-button>
-      Remove {{ removeButtonTitleMap[selectedDaySchedule.scheduleType] }}
-    </button>
+    <app-tooltip-container class="remove-schedule-wrapper" [showToolTip]="!hasEditPermissions">
+      <button
+        *ngIf="selectedDaySchedule"
+        [disabled]="!hasEditPermissions"
+        (click)="deleteSchedule()"
+        cssClass="e-outline remove-schedule"
+        ejs-button>
+        Remove {{ removeButtonTitleMap[selectedDaySchedule.scheduleType] }}
+      </button>
+    </app-tooltip-container>
   </div>
 </div>
 

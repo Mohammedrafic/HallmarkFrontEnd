@@ -5,6 +5,7 @@ import { Select, StateContext, Store } from '@ngxs/store';
 import {
   Observable,
   Subject,
+  combineLatest,
   debounceTime,
   distinctUntilChanged,
   filter,
@@ -21,7 +22,7 @@ import {
   GetAllCommitmentByPage,
   GetSkilldata as GetSkillData,
 } from '../../store/dashboard.actions';
-import { DashboardState, DashboardStateModel } from '../../store/dashboard.state';
+import { DashboardState } from '../../store/dashboard.state';
 import { RnUtilizationFormService } from './rn-utilization-widget-service';
 import {
   ACTUALPERDIEMHOURS,
@@ -37,6 +38,8 @@ import {
   GetWorkCommitment,
 } from '../../models/rn-utilization.model';
 import { ProgressBar } from '@syncfusion/ej2-angular-progressbar';
+import { FilteredItem } from '@shared/models/filter.model';
+import { DashboartFilterDto } from '../../models/dashboard-filter-dto.model';
 
 @Component({
   selector: 'app-rn-utilization-widget',
@@ -58,6 +61,10 @@ export class RnUtilizationWidgetComponent implements OnInit {
   nursingSkill$: Observable<GetWorkCommitment[]>;
   @Select(DashboardState.nursingCount)
   nursingCount$: Observable<GetNursingWidgetData>;
+  @Select(DashboardState.filteredItems)
+  filteredItems$: Observable<FilteredItem[]>;
+  @Select(DashboardState.filterData)
+  filterData$: Observable<DashboartFilterDto>;
 
   workcommitmentvalue: number[];
   skillDatavalue: number[];
@@ -119,20 +126,18 @@ export class RnUtilizationWidgetComponent implements OnInit {
   }
 
   setupChangeListeners() {
-    this.rnUtilizationForm.valueChanges
+    combineLatest([this.rnUtilizationForm.valueChanges, this.filterData$])
       .pipe(
         takeUntil(this.unsubscribe$),
         distinctUntilChanged(),
         debounceTime(500),
-        filter(() => {
-          return this.rnUtilizationForm.valid;
-        }),
-        switchMap((value: RnUtilizationForm) => {
+        filter(() => this.rnUtilizationForm.valid),
+        switchMap(([value, filters]) => {
           const skillsList = this.nursingSkill$.pipe(take(1), takeUntil(this.unsubscribe$));
           const workCommitmentList = this.commitmentsPage$.pipe(take(1), takeUntil(this.unsubscribe$));
-          return forkJoin([of(value), skillsList, workCommitmentList]);
+          return forkJoin([of(value), of(filters), skillsList, workCommitmentList]);
         }),
-        tap(([value, skillsList, workCommitmentList]) => {
+        tap(([value,, skillsList, workCommitmentList]) => {
           this.skillsText =
             skillsList.length == value.skills.length
               ? `${this.allOption} (${value.skills.length})` : value.skills.length.toString();
@@ -141,13 +146,13 @@ export class RnUtilizationWidgetComponent implements OnInit {
               ? `${this.allOption} (${value.workCommitment.length})` : value.workCommitment.length.toString();
           this.dateText = value.workDate.toLocaleDateString();
         }),
-        switchMap(([value]) => {
+        switchMap(([value, filters]) => {
           const data: GetNursingUtilizationbyByFilters = {
             targetUtilization: value.targetUtilization / 100,
             todayDate: value.workDate,
             skillIds: value.skills,
             workCommitmentIds: value.workCommitment,
-            organizationFilter: null, //TODO See how other grids access this value
+            organizationFilter: filters.organizationFilter,
           };
           return this.store.dispatch(new FilterNursingWidget(data));
         })

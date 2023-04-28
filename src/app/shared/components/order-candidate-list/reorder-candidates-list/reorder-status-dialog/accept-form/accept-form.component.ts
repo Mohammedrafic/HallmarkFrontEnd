@@ -88,7 +88,7 @@ export class AcceptFormComponent implements OnChanges{
       shiftStartTime: new FormControl({ value: '', disabled: true }),
       shiftEndTime: new FormControl({ value: '', disabled: true }),
       openPositions: new FormControl({ value: '', disabled: true }),
-      hourlyRate: new FormControl({ value: '', disabled: false }, [Validators.required]),
+      hourlyRate: new FormControl({ value: '', disabled: false }, [Validators.required, Validators.max(9999)]),
       rejectReason: new FormControl({ value: '', disabled: true }),
       jobCancellationReason: new FormControl({ value: '', disabled: true }),
       penaltyCriteria: new FormControl({ value: '', disabled: true }),
