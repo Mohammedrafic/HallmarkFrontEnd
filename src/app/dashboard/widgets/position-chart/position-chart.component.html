@@ -1,4 +1,4 @@
-<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme" [isLTAOrderEnding]="isLTAOrderEnding" >
   <ng-template #header>
       <div class="app-widget-wrapper__tooltip" *ngIf="description.length>0">
         <ejs-tooltip [content]="description" position='TopCenter'>

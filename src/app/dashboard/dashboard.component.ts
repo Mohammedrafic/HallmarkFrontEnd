@@ -257,7 +257,9 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
       if (
         panel.id === WidgetTypeEnum.FILLED_POSITIONS ||
         panel.id === WidgetTypeEnum.IN_PROGRESS_POSITIONS ||
-        panel.id === WidgetTypeEnum.OPEN_POSITIONS
+        panel.id === WidgetTypeEnum.OPEN_POSITIONS || 
+        panel.id === WidgetTypeEnum.Candidate_Applied_In_Last_N_Days ||
+        panel.id === WidgetTypeEnum.LTA_ORDER_ENDING
       ) {
         return { ...panel, sizeY: 0.3, maxSizeY: 0.3, minSizeY: 0.3 };
       } else {

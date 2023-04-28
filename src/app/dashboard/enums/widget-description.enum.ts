@@ -23,5 +23,6 @@ export enum WidgetDescriptionEnum {
   AGENCY_DESCRIPTION = 'Agency Widget Description',
   RN_UTILIZATION_DESCRIPTION = 'RN Utilization Widget Description',
   ALREADY_EXPIRED_CREDS = 'Already Expired Credentials',
-  UPCOMING_EXP_CREDS = 'Upcoming Expiring Credentials'
+  UPCOMING_EXP_CREDS = 'Upcoming Expiring Credentials',
+  AVAILABLE_EMPLOYEE='Available Empolyee For Next 24 Hours'
 }

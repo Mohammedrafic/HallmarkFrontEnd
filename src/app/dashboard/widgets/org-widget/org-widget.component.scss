@@ -30,14 +30,29 @@
       font-size: 12px;
     }
   }
+  ul{
+    margin: 0px 0px 0px 5px;
+    margin-block-start: 4px;
+    margin-block-end: 0px;
+    padding-inline-start: 15px;
+  }
+
 }
 
   .app-widget-wrapper {
     &__tooltip {
-      text-align: right;
-      float: right;
-      width: 100%
+    //  text-align: right;
+    //  float: right;
+      width: 5%
     }
+  }
+
+  .app-accumulation-chart{
+    &__title {
+      //  text-align: right;
+      //  float: right;
+        width: 95%
+      }
   }
 
 .orgcount {
@@ -45,6 +60,8 @@
     width: -webkit-fill-available;
     width: -moz-available;
     width : 10%;
+    font-weight: 700;
+    color: $black;
 }
 .orgname {
     text-align: left;
@@ -65,8 +82,13 @@
 .widget{
     padding: 10px 0px 0px 0px !important;
 }
+.irpWidget{
+  .widget{
+    padding: 5px 0px 0px 0px !important;
+}
+}
 .widget__type p {
-    margin: 5px 0px;
+    margin: 5px 8px 5px 0px;
 }
 .app-widget-wrapper__header{
     padding-bottom: 5px;

@@ -62,7 +62,7 @@
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager id="gridPager" #gridPager [pageSize]="pageSize"
-                [totalRecordsCount]="(donotreturnpage$ | async)?.totalCount" [enablePagerMessage]="false"
+                [totalRecordsCount]="(donotreturnpage$ | async)?.totalCount" [enablePagerMessage]="false"  (click)="onChangePage($event)"
                 [currentPage]="currentPage">
               </ejs-pager>
             </section>

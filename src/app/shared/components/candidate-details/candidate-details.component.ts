@@ -43,6 +43,7 @@ import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { CandidateDetailsService } from './services/candidate-details.service';
 import { PreservedFiltersByPage } from '@core/interface';
 import { FilterPageName } from '@core/enums';
+import { GetMasterRegions } from '@organization-management/store/organization-management.actions';
 
 @Component({
   selector: 'app-candidate-details',
@@ -87,9 +88,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   public pageNumber = GRID_CONFIG.initialPage;
   public pageSize = GRID_CONFIG.initialRowsPerPage;
   public CandidateStatus: number;
+  public isAgency = false;
 
   private selectedTab: number | null;
-  private isAgency = false;
 
   constructor(
     private store: Store,
@@ -111,6 +112,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     this.createFilterForm();
     this.initFilterColumns();
     this.setOrderTypes();
+    this.store.dispatch(new GetMasterRegions());
 
     combineLatest([
       this.subscribeOnPageNumberChange(),
@@ -220,7 +222,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   private subscribeOnRegions(): Observable<CandidatesDetailsRegions[]> {
     return this.candidateRegions$.pipe(
-      tap((regions: CandidatesDetailsRegions[]) => (this.filterColumns.regionsIds.dataSource = regions || []))
+      tap((regions: CandidatesDetailsRegions[]) => {
+        this.filterColumns.regionsIds.dataSource = regions || [];
+      })
     );
   }
 

@@ -80,7 +80,7 @@ export class AcceptFormComponent implements OnChanges{
     return new FormGroup({
       reOrderFromId: new FormControl({ value: '', disabled: true }),
       offeredBillRate: new FormControl({ value: '', disabled: true }),
-      candidateBillRate: new FormControl({ value: '', disabled: true }, [Validators.required]),
+      candidateBillRate: new FormControl({ value: '', disabled: true }, [Validators.required,  Validators.max(9999)]),
       locationName: new FormControl({ value: '', disabled: true }),
       departmentName: new FormControl({ value: '', disabled: true }),
       skillName: new FormControl({ value: '', disabled: true }),
