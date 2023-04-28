@@ -8,6 +8,6 @@ export enum FormControlNames {
   }
 
 export enum Candidatests {
-Block="Block",
-UnBlock="Unblock"
+Block="Blocked",
+UnBlock="Unblocked"
 }

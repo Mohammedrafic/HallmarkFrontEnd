@@ -10,6 +10,7 @@
     selectAllText="All"
   ></app-multiselect-dropdown>
   <app-multiselect-dropdown
+    appValidateWithMessage
     [formGroupInstance]="reorderForm"
     [fields]="agenciesOptionFields"
     [dataSource]="agencies$ | async"
@@ -22,6 +23,7 @@
   ></app-multiselect-dropdown>
   <app-datepicker
     *ngIf="isEditMode"
+    appValidateWithMessage
     [formGroupInstance]="reorderForm"
     [enableMask]="true"
     [required]="true"
@@ -35,6 +37,7 @@
   <div class="input-container" *ngIf="!isEditMode">
     <label>Re-Order Date <span class="required">*</span></label>
     <app-multi-date-picker
+      appValidateWithMessage
       [showChipsBelowControl]="true"
       [hasError]="!!(!reorderForm.get('reorderDate')?.untouched && reorderForm.get('reorderDate')?.errors)"
       (appliedDates)="setMultipleDates($event)"></app-multi-date-picker>
@@ -44,6 +47,7 @@
   </div>
   <div class="row-controls">
     <app-timepicker
+      appValidateWithMessage
       [formGroupInstance]="reorderForm"
       [maskPlaceholder]="timepickerMask"
       [enableMask]="true"
@@ -56,6 +60,7 @@
       format="HH:mm"
     ></app-timepicker>
     <app-timepicker
+      appValidateWithMessage
       [formGroupInstance]="reorderForm"
       [maskPlaceholder]="timepickerMask"
       [enableMask]="true"
@@ -70,6 +75,7 @@
   </div>
   <div class="row-controls">
     <app-numeric-textbox
+      appValidateWithMessage
       [formGroupInstance]="reorderForm"
       [required]="true"
       [htmlAttributes]="numericInputAttributes"
@@ -81,6 +87,7 @@
       label="Bill Rate"
     ></app-numeric-textbox>
     <app-numeric-textbox
+      appValidateWithMessage
       [formGroupInstance]="reorderForm"
       [required]="true"
       [htmlAttributes]="numericInputAttributes"
