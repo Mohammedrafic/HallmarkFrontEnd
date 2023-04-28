@@ -63,7 +63,7 @@
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.LTA_ORDER_ENDING"
                               [isDarkTheme]="isDarkTheme"></app-position-chart>
-          <app-candidate-chart *ngSwitchCase="widgetTypeEnum.Candidate_Applied_In_Last_N_Days"
+          <app-candidate-chart *ngSwitchCase="widgetTypeEnum.Candidate_Applied_In_Last_N_Days"  [isCandidateApplied]="true"
                               [chartData]="widgetsData?.[widgetTypeEnum.Candidate_Applied_In_Last_N_Days]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.Candidate_Applied_In_Last_N_Days"

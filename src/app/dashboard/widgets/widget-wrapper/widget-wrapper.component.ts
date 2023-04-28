@@ -11,6 +11,8 @@ export class WidgetWrapperComponent {
   @Input() public title: string;
   @Input() public description: string;
   @Input() public isDarkTheme: boolean |false;
+  @Input() public isLTAOrderEnding: boolean = false;
+  @Input() public isCandidateApplied: boolean = false;
 
   @ContentChild('header') public readonly header: TemplateRef<HTMLElement>;
   @ContentChild('chart') public readonly chart: TemplateRef<HTMLElement>;

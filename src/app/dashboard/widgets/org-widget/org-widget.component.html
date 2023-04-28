@@ -18,18 +18,30 @@
       <div class="widget">
         <span class="widget__type" (mousedown)="defineMousePosition($event)"
           (click)="toSourceContent('OrdersforApproval')">
+          <ul>
+            <li>
+            </li>
+          </ul> 
           <p class="orgname">Pending Order(s) Approval</p>
           <p class="orgcount">{{chartData?.pendingOrders}}</p>
         </span>
       </div>
       <div class="widget">
         <span class="widget__type" (mousedown)="defineMousePosition($event)" (click)="toSourceContent('ManualInvoice')">
+          <ul>
+            <li>
+            </li>
+          </ul> 
           <p class="orgname">Pending Manual Invoice(s) Approval</p>
           <p class="orgcount">{{chartData?.pendingManualInvoices}}</p>
         </span>
       </div>
       <div class="widget">
         <span class="widget__type" (mousedown)="defineMousePosition($event)" (click)="toSourceContent('pendingInvoice')">
+          <ul>
+            <li>
+            </li>
+          </ul> 
           <p class="orgname">Pending Invoice(s) Approval</p>
           <p class="orgcount">{{chartData?.pendingOrganizationInvoices}}</p>
         </span>
@@ -37,6 +49,10 @@
       <div class="widget">
         <span class="widget__type" (mousedown)="defineMousePosition($event)"
           (click)="toSourceContent('Pending Timesheet')">
+          <ul>
+            <li>
+            </li>
+          </ul> 
           <p class="orgname">Pending Timesheet(s) Approval</p>
           <p class="orgcount">{{chartData?.pendingTimeSheets}}</p>
         </span>
@@ -44,7 +60,11 @@
       <div class="widget" *ngIf="selectedSystem.isIRP">
           <span class="widget__type" (mousedown)="defineMousePosition($event)"
             (click)="toSourceContent('NoOfLongTermOrders')">
-            <p class="orgname">No. of Long Term Orders in Next 30 Days</p>
+            <ul>
+              <li>
+              </li>
+            </ul> 
+             <p class="orgname">No. of Long Term Orders in Next 30 Days</p>
             <p class="orgcount">{{chartData?.quickLinkNoOfLongTermOrdersInNext30Days}}</p>
           </span>
       </div>
@@ -52,13 +72,21 @@
 
     <div class="widget" *ngIf="isAgencyUser">
       <span class="widget__type" (mousedown)="defineMousePosition($event)">
+        <ul>
+          <li>
+          </li>
+        </ul> 
         <p class="orgname">Credentials Expiring in next 30 days </p>
         <p class="orgcount">{{chartData?.expiringCredentialsCount}}</p>
       </span>
       <span class="widget__type" *ngFor="let missingdata of chartData?.missingTimeSheet"
         (mousedown)="defineMousePosition($event)" (click)="toTimesheetcontent(missingdata.organizationId)">
         <ejs-tooltip [content]="missingdata?.organizationName" position="TopCenter">
-          <p class="orgname">Timesheet missing - {{missingdata?.organizationName}}</p>
+          <ul>
+            <li>
+            </li>
+          </ul> 
+           <p class="orgname">Timesheet missing - {{missingdata?.organizationName}}</p>
           <p class="orgcount">{{missingdata?.count}}</p>
         </ejs-tooltip>
       </span>
