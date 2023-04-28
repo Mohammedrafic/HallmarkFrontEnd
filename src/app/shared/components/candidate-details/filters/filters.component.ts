@@ -14,6 +14,7 @@ import { debounceTime } from 'rxjs';
 export class FiltersComponent implements OnInit {
   @Input() public filterColumns: FilterColumnsModel;
   @Input() public filtersForm: FormGroup;
+  @Input() public isAgency: boolean;
 
   @ViewChild('regionDropdown') public readonly regionDropdown: MultiSelectComponent;
 
