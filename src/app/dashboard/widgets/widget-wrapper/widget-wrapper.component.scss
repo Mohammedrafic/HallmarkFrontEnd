@@ -23,6 +23,10 @@ $headerHeight: 19px;
     }
   }
 
+  &.with-orgchart {
+    padding: 6% !important;
+  }
+
   &__content {
     display: flex;
     flex-direction: column;
@@ -58,9 +62,9 @@ $headerHeight: 19px;
 
   &__position-chart {
     height: 100%;
-    padding-left: 0px;
-    margin-left: -10%;
-    margin-top: -10px;
+   // padding-left: 0px;
+   // margin-left: -10%;
+   // margin-top: -10px;
   }
 
   &__legend {
@@ -118,10 +122,19 @@ $headerHeight: 19px;
   }
 }
 .app-widget-wrapper__agency_count, .app-widget-wrapper__org-chart{
+  //height needed for menu collapse mode
+  height: calc(100% - 19px);
   overflow: auto;
 }
 .app-widget-wrapper__position-chart{
   margin-top: -17px;
+}
+.with-isCandidate{
+  margin-top: -10px !important;
+}
+.with-isLTA{
+  margin-top: -20px !important;
+ // margin-left: -2px !important;
 }
 .app-widget-wrapper__agency_count, .app-widget-wrapper__RNUtilization-chart{
   overflow-x: hidden;
