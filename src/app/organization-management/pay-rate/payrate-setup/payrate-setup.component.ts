@@ -139,7 +139,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   ];
   public fileName: string;
   public defaultFileName: string;
-  public format = '#';
+  public format = 'n3';
   public allRegionsSelected: boolean = false;
   public allLocationsSelected: boolean = false;
   public allDepartmentsSelected: boolean = false;
