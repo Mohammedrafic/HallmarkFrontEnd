@@ -34,6 +34,8 @@ import { ScheduleClassesList, ScheduleCustomClassesList, ToggleControls } from '
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { ScheduleType } from '../enums';
 import { BookingsOverlapsResponse } from '../components/replacement-order-dialog/replacement-order.interface';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ORIENTED_SHIFT_CHANGE_CONFIRM_TEXT, WARNING_TITLE } from '@shared/constants/messages';
 
 @Injectable()
 export class CreateScheduleService {
@@ -54,6 +56,7 @@ export class CreateScheduleService {
     private store: Store,
     private scheduleFiltersService:  ScheduleFiltersService,
     private weekService: DateWeekService,
+    private readonly confirmService: ConfirmService,
   ) {}
 
   createOpenPositionsForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
@@ -203,6 +206,14 @@ export class CreateScheduleService {
         return ToggleControls.includes(configField.field);
       }).forEach((configField: ScheduleFormFieldConfig) => {
         configField.show = value;
+    });
+  }
+
+  public confirmEditing(): Observable<boolean> {
+    return this.confirmService.confirm(ORIENTED_SHIFT_CHANGE_CONFIRM_TEXT, {
+      title: WARNING_TITLE,
+      okButtonLabel: 'Ok',
+      okButtonClass: 'ok-button',
     });
   }
 
