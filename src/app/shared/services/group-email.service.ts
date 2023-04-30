@@ -2,6 +2,7 @@ import {
   AgencyDto,
   CandidateStatusAndReasonFilterOptionsDto,
   MasterSkillDto,
+  workCommitmentDto,
 } from './../../admin/analytics/models/common-report.model';
 import { User } from './../models/user.model';
 import { DownloadDocumentDetail, GroupEmailRole } from './../models/group-email.model';
@@ -190,6 +191,17 @@ export class GroupEmailService {
   ): Observable<User> {
     return this.http.get<User>(
       `/api/GroupMail/getemployees?businessUnitId=${businessUnitId}&regions=${regions}&locations=${locations}&departments=${departments}&skills=${skills}&WorkCommitments=${WorkCommitments}&orientationComplete=${orientationComplete}`
+    );
+  }
+
+  public GetGroupEmailWorkCommitments(
+    businessUnitId: number,    
+    regions: string,
+    locations: string,
+    skills: string
+  ): Observable<workCommitmentDto> {
+    return this.http.get<workCommitmentDto>(
+      `/api/GroupMail/getworkcommitments?businessUnitId=${businessUnitId}&regions=${regions}&locations=${locations}&skills=${skills}`
     );
   }
 }

@@ -19,7 +19,8 @@ import {
   GetDocumentDownloadDeatils,
   GetGroupEmailDepartmentSkills,
   GetGroupEmailEmployees,
-  GetStaffScheduleReportFilterOptions
+  GetStaffScheduleReportFilterOptions,
+  GetGroupEmailWorkCommitments
 } from './../../../store/alerts.actions';
 import { DownloadDocumentDetail, GroupEmailRole } from '@shared/models/group-email.model';
 import { takeUntil } from 'rxjs';
@@ -153,6 +154,9 @@ export class SendGroupEmailComponent
 
   @Select(AlertsState.GetGroupEmailEmployees)
   public employeeData$: Observable<User[]>;
+
+  @Select(AlertsState.GetGroupEmailWorkCommitments)
+  public workCommitmentData$: Observable<workCommitmentDto[]>;
 
   @Select(AlertsState.GetGroupEmailCandidateStatuses)
   public candidateStatusData$: Observable<CandidateStatusAndReasonFilterOptionsDto[]>;
@@ -719,14 +723,18 @@ export class SendGroupEmailComponent
   private onRegionValueChanged(): void {
     this.regionControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (value != undefined && value.length > 0) {
+
         this.locationsList = this.locationsData.filter((i) => value.indexOf(i.regionId) !== -1);
-        if(this.isEmployeeType) this.getEmployees();
+        if(this.isEmployeeType) { 
+          this.getEmployees(); 
+          this.getWorkCommitments();
+        }
       } else {
-        this.locationsList = this.locationsData;
-        this.locationControl.patchValue([]); 
-        this.departmentControl.patchValue([]);        
-        this.skillsControl.patchValue([]);        
+        this.locationsList = this.locationsData;        
       }
+      this.locationControl.patchValue([]); 
+      this.departmentControl.patchValue([]);        
+      this.skillsControl.patchValue([]);        
     });
   }
 
@@ -746,10 +754,10 @@ export class SendGroupEmailComponent
         this.departmentsList = this.departmentsData.filter((i) => value.indexOf(i.locationId) !== -1);
         if (value != undefined && value.length > 0) {  
           this.getEmployees();
-        } else {
-          this.departmentControl.patchValue([]);        
-          this.skillsControl.patchValue([]);        
-        }
+        } 
+        this.departmentControl.patchValue([]);        
+        this.skillsControl.patchValue([]);     
+        this.getWorkCommitments();
       } 
     });
   }
@@ -761,9 +769,10 @@ export class SendGroupEmailComponent
   }
 
   private onWorkCommitmentValueChanged(): void {
-    this.workCommitmentsControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {      
-      if (value != undefined && value.length > 0) 
+    this.workCommitmentsControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {  
+      if (this.businessControl.value > 0) {          
         this.getEmployees(); 
+      }
     });
   }
 
@@ -779,19 +788,19 @@ export class SendGroupEmailComponent
     });
   }
 
-  private getSkillsByDepartments(): void{
+  private getSkillsByDepartments(): void{     
     this.skillData = [];
     var departments = this.departmentControl.value.join();
     var businessId = this.businessControl.value;        
+    this.skillsControl.patchValue([]);   
     if(departments !=''){
       this.store.dispatch(new GetGroupEmailDepartmentSkills(departments, businessId));
       this.deptSkillData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
         this.skillData = data;
         this.getEmployees(); 
       });
-    }else{      
-      this.skillsControl.patchValue([]);        
-      if(businessId > 0 && this.regionControl.value?.length > 0 && this.locationControl.value?.length > 0){
+    }else{                 
+      if(businessId > 0 && (this.regionControl.value?.length > 0 || this.locationControl.value?.length > 0)){
         this.loadSkillsAndWorkCommitments(businessId);
       }
     }
@@ -859,11 +868,11 @@ export class SendGroupEmailComponent
             this.store.dispatch(new GetGroupEmailCandidateStatuses(businessId));
             this.candidateStatusData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
               this.candidateStatusData = data;
-              let billRatePending = this.candidateStatusData.filter((item)=>item.statusText=="Bill Rate Pending")[0];
+              let billRatePending = this.candidateStatusData?.filter((item)=>item.statusText=="Bill Rate Pending")[0];
               let billRatePendingIndex = this.candidateStatusData.indexOf(billRatePending, 0);
               this.candidateStatusData.splice(billRatePendingIndex, 1);
 
-              let offeredBillRate = this.candidateStatusData.filter((item)=>item.statusText=="Offered Bill Rate")[0];
+              let offeredBillRate = this.candidateStatusData?.filter((item)=>item.statusText=="Offered Bill Rate")[0];
               let offeredBillRateIndex = this.candidateStatusData.indexOf(offeredBillRate, 0);
               this.candidateStatusData.splice(offeredBillRateIndex, 1);
             });
@@ -920,9 +929,9 @@ export class SendGroupEmailComponent
       .pipe(takeWhile(() => this.isAlive))
       .subscribe((data: StaffScheduleReportFilterOptions | null) => {            
         if (data != null) {
-          this.workCommitmentData = [];
+          // this.workCommitmentData = [];
           this.skillData = [];
-          this.workCommitmentData = data.masterWorkCommitments;
+          // this.workCommitmentData = data.masterWorkCommitments;
           this.skillData = data.masterSkills;                  
         }
       });      
@@ -933,7 +942,7 @@ export class SendGroupEmailComponent
       this.userData = [];
       this.candidateControl.patchValue([]);
       if (value != undefined && value.length > 0) 
-        this.isEmployeeType ? this.getEmployees() : this.getCandidates();      
+        this.isEmployeeType ? (this.getEmployees(), this.getWorkCommitments()) : this.getCandidates();      
     });
   }
 
@@ -1063,9 +1072,39 @@ export class SendGroupEmailComponent
         orientationComplete
       )
     );
-    this.employeeData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      console.log("employeedata",data);
+    this.employeeData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {      
       this.userData = data;
+    });
+
+    this.changeDetectorRef.detectChanges();
+  }
+
+  private getWorkCommitments(): void {
+    this.workCommitmentsControl.patchValue([]);
+    this.workCommitmentData = [];
+    var skills =
+      this.skillsControl.value != null && this.skillsControl.value != undefined
+        ? this.skillsControl.value.join()
+        : 'null';
+    var regions =
+      this.regionControl.value != null && this.regionControl.value != undefined
+        ? this.regionControl.value.join()
+        : 'null';
+    var locations =
+      this.locationControl.value != null && this.locationControl.value != undefined
+        ? this.locationControl.value.join()
+        : 'null';
+    
+    this.store.dispatch(
+      new GetGroupEmailWorkCommitments(
+        this.businessControl.value,
+        regions,
+        locations,
+        skills,
+      )
+    );
+    this.workCommitmentData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {      
+      this.workCommitmentData = data;
     });
 
     this.changeDetectorRef.detectChanges();
