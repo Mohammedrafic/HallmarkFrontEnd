@@ -4,6 +4,7 @@ import {
   CandidateStatusAndReasonFilterOptionsDto,
   MasterSkillDto,
   StaffScheduleReportFilterOptions,
+  workCommitmentDto,
 } from './../analytics/models/common-report.model';
 import { Injectable } from '@angular/core';
 import { UserSubscriptionPage, UserSubscriptionRequest } from '@shared/models/user-subscription.model';
@@ -27,6 +28,7 @@ import {
   GetGroupEmailInternalUsers,
   GetGroupEmailRoles,
   GetGroupEmailSkills,
+  GetGroupEmailWorkCommitments,
   GetGroupMailByBusinessUnitIdPage,
   GetStaffScheduleReportFilterOptions,
   GetTemplateByAlertId,
@@ -83,6 +85,7 @@ interface AlertsStateModel {
   documentPreviewDetail : DownloadDocumentDetail;
   documentDownloadDetail : DownloadDocumentDetail;
   getStaffScheduleReportFilterOptions: StaffScheduleReportFilterOptions | null;
+  groupEmailWorkCommitmentData: workCommitmentDto;
 }
 
 @Injectable()
@@ -166,6 +169,11 @@ export class AlertsState {
   static getStaffScheduleReportOptionData(state: AlertsStateModel):
   StaffScheduleReportFilterOptions | null {
     return state.getStaffScheduleReportFilterOptions;
+  }
+
+  @Selector()
+  static GetGroupEmailWorkCommitments(state: AlertsStateModel): workCommitmentDto {
+    return state.groupEmailWorkCommitmentData;
   }
 
 
@@ -533,4 +541,26 @@ export class AlertsState {
     }));
   }
 
+  @Action(GetGroupEmailWorkCommitments)
+  GetGroupEmailWorkCommitments(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    {
+      businessUnitId,
+      regions,
+      locations,      
+      skills      
+    }: GetGroupEmailWorkCommitments
+  ): Observable<workCommitmentDto | void> {
+    return this.groupEmailService
+      .GetGroupEmailWorkCommitments(businessUnitId, regions, locations, skills)
+      .pipe(
+        tap((payload) => {
+          patchState({ groupEmailWorkCommitmentData: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
+  }
 }

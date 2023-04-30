@@ -1023,7 +1023,7 @@ export const MENU_CONFIG: any = {
     },
     86: {
       // DNR Details
-      icon: 'users',
+      icon: '',
       route: 'client/dnr-details',
     },
     87: {
