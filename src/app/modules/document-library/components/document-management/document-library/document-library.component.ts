@@ -109,6 +109,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public unitFields = UNIT_FIELDS;
   public businessUnits = BUSINESS_UNITS_VALUES;
+  public businessUnitsDataset : Array<{id: number;text: string;}> = [];
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   private isAlive = true;
   public isBusinessFormDisabled = false;
@@ -349,7 +350,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
     if (this.user?.businessUnitType === BusinessUnitType.MSP) {
       const [Hallmark, ...rest] = this.businessUnits;
-      this.businessUnits = rest;
+      this.businessUnitsDataset = rest;
     }
     if (this.user?.businessUnitType === BusinessUnitType.Organization || this.user?.businessUnitType === BusinessUnitType.Agency) {
       this.businessFilterForm.disable();
@@ -378,9 +379,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   private skipBusinessUnit() {
+    this.businessUnitsDataset = [];
     this.businessUnits.forEach((element, index) => {
-      if (element.id == BusinessUnitType.Hallmark || element.id == BusinessUnitType.MSP) {
-        delete this.businessUnits[index];
+      if (element.id != BusinessUnitType.Hallmark && element.id != BusinessUnitType.MSP) {
+        // element.id == BusinessUnitType.Hallmark || element.id == BusinessUnitType.MSP
+        // delete this.businessUnits[index];
+        this.businessUnitsDataset.push(element);
       }
     });
   }
