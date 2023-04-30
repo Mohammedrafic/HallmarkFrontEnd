@@ -90,7 +90,11 @@ export class TimesheetsFilterDialogComponent
         takeUntil(this.componentDestroy())
       )
       .subscribe(({ state }) => {
+        let timeSheetMissing = JSON.parse(localStorage.getItem('timeSheetMissing') || '""') as string
         this.applyPreservedFilters(state);
+        if(timeSheetMissing != ''){
+          this.clearAllFilters();
+        }
       });
   }
 
@@ -110,6 +114,7 @@ export class TimesheetsFilterDialogComponent
       map(({ state }) => this.filterPreservedFilters(state)),
       takeUntil(this.componentDestroy())
     ).subscribe((state) => { 
+      console.log('watchForSwitchTabs timeSheetMissing',JSON.parse(localStorage.getItem('timeSheetMissing') || '""') as string);
       this.applyPreservedFilters(state);
     });
   }
