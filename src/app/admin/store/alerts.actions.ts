@@ -202,3 +202,13 @@ export class GetStaffScheduleReportFilterOptions{
   static readonly type = '[LogiReport] Get Staff Schedule Report Filter Options';
   constructor(public filter: CommonReportFilter) { }
 }
+
+export class GetGroupEmailWorkCommitments {
+  static readonly type = '[groupemail] Get Group Email workcommitments by criteria';
+  constructor(
+    public businessUnitId: number,    
+    public regions: string,
+    public locations: string,
+    public skills: string
+  ) { }
+}
