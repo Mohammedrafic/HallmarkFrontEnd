@@ -24,7 +24,9 @@ export enum StatusEnum {
 export enum FormControlNames {
   FolderName = 'folderName',
   Agencies = 'agencies',
+  AllAgencies = 'allagencies',
   Orgnizations = 'orgnizations',
+  AllOrgnizations = 'allorgnizations',
   OrgnizationIds = 'organizationIds',
   RegionIds = 'regionIds',
   LocationIds = 'locationIds',
