@@ -84,8 +84,8 @@ export class UserService {
    * Get Alerts for Current User
    * @returns list of alerts
    */
-  public getAlertsForUser(): Observable<AlertsModel[]> {
-    return this.http.get<AlertsModel[]>('/api/Alerts/GetAlertsForUser');
+  public getAlertsForUser(pageNumber: number =0, pageSize: number =50): Observable<AlertsModel[]> {
+    return this.http.get<AlertsModel[]>('/api/Alerts/GetAlertsForUser', { params: { PageNumber: pageNumber, PageSize: pageSize }});
   }
 
   public getAlertsCountForUser(): Observable<number> {
