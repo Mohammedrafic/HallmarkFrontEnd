@@ -328,7 +328,6 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     this.createScheduleService.scheduleData?.forEach(item => item.schedule.forEach(schedule => schedule.daySchedules.forEach(day => scheduleDays.push(day))));
     this.scheduleSelectedSlots.candidates.forEach(item => item.days?.forEach(day => selectedScheduleDaysIds.push(day.id)))
     const orientatedShifts = scheduleDays.filter(day => day.attributes?.orientated && selectedScheduleDaysIds.includes(day.id));
-    console.log(orientatedShifts);
     return !!orientatedShifts.length;
   }
 
