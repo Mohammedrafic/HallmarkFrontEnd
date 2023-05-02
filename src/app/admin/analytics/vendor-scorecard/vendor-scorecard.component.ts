@@ -180,7 +180,6 @@ public VendorScorecardresponse: VendorScorecardresponse[]=[];
   }
 
   ngOnInit(): void {
-debugger;
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
@@ -560,7 +559,7 @@ debugger;
     this.store.dispatch(new Filtervendorscorecard(vendorscorecard)).pipe(delay(500)).subscribe((data)=>
     {
       if (!data ) {
-        this.VendorScorecardresponse = data["VendorScoreCard"]["VendorScorecardEntity"];
+        this.VendorScorecardresponse = [];
       }
       else {
          this.VendorScorecardresponse = data["VendorScoreCard"]["VendorScorecardEntity"];

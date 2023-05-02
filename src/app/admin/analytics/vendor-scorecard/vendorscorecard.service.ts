@@ -14,7 +14,6 @@ constructor(
 
 
 public VendorscorecardFilter(filters: VendorScorePayload): Observable<VendorScorecardresponse> {
-    debugger;
     if (filters) {
         return this.http.post<VendorScorecardresponse>(`/api/Reports/Vendorpost`, filters);
     }

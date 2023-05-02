@@ -5,6 +5,5 @@ export class Filtervendorscorecard {
     static readonly type = '[admin] Export Orientation list';
     
     constructor(public payload: VendorScorePayload) {
-        debugger;
     }
   }
