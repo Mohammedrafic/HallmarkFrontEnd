@@ -7,6 +7,7 @@ import {
   Input,
   NgZone,
   OnChanges,
+  OnDestroy,
   OnInit,
   SimpleChanges,
   ViewChild,
@@ -94,7 +95,7 @@ import { ScheduleType } from '../../enums';
   styleUrls: ['./create-schedule.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CreateScheduleComponent extends Destroyable implements OnInit, OnChanges {
+export class CreateScheduleComponent extends Destroyable implements OnInit, OnChanges, OnDestroy {
   @ViewChild(ScheduleItemsComponent) scheduleItemsComponent: ScheduleItemsComponent;
 
   @Input() scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
@@ -161,6 +162,12 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.createScheduleService.setOrientationControlValue(this.scheduleSelectedSlots, this.scheduleForm);
       this.sideBarSettings.showRemoveButton = this.createScheduleService.hasSelectedSlotsWithDate(candidates);
     }
+  }
+
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
+
+    this.sideBarSettings.showOpenPositions = true;
   }
 
   removeSchedules(): void {
@@ -350,7 +357,6 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
 
   private updateScheduleDialogConfig(scheduleTypeMode: ScheduleItemType): void {
     this.scheduleType = scheduleTypeMode;
-
     switch (this.scheduleType) {
       case ScheduleItemType.Book:
         this.scheduleFormConfig = BookFormConfig;
