@@ -17,9 +17,11 @@ export class UpdateRegRateComponent implements OnInit {
   public showcontent:Boolean = false;
   public updateform: FormGroup;
   public getorderdatas:any;
+  public getperdiemorderdatas:any;
   public disabledbtn:boolean = true;
   @Output() public reloadItemsListforupdate: EventEmitter<void> = new EventEmitter<void>();
   @Input() public orderdatas: any;
+  @Input() public perdiemOrderData: any;
   constructor(
         private formBuilder: FormBuilder,
         private updateregrateservice : UpdateRegRateService,
@@ -47,7 +49,8 @@ export class UpdateRegRateComponent implements OnInit {
   public updateformvalue(){
     const payload = {
       "orderIds" : this.getorderdatas,
-      "hourlyRate" : this.updateform.value.updaterate
+      "hourlyRate": this.updateform.value.updaterate,
+      "perDiemIds": this.getperdiemorderdatas
     };
     this.store.dispatch(new UpdateRegRateorder(payload));
     this.reloadItemsListforupdate.next();
@@ -55,6 +58,7 @@ export class UpdateRegRateComponent implements OnInit {
 
   ngOnChanges(orderdatas : SimpleChanges):void{
     this.getorderdatas = orderdatas['orderdatas'].currentValue;
+    this.getperdiemorderdatas=orderdatas['perdiemOrderData'].currentValue;
   }
 
 }

@@ -95,7 +95,9 @@ import {
   RECORD_ADDED,
   RECORD_MODIFIED,
   updateCandidateJobMessage,
-  UpdateRegularRatesucceedcount
+  UpdateRegularRatesucceedcount,
+  PerDiemReOrdersErrorMessage,
+  UpdateRegularRateWithPerDiemsucceedcount
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -1071,11 +1073,16 @@ export class OrderManagementContentState {
     { payload } : UpdateRegRateorder
   ) : Observable<UpdateRegrateModel | Observable<void>>{
     return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
-      tap((payload) => {
-        const count = payload.length;
-        dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
+      tap((data) => {
+        const count = data.length;
+        if(count>0 && payload.perDiemIds.length===0) 
+          dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
+        else if(payload.perDiemIds.length===payload.orderIds.length)
+          dispatch(new ShowToast(MessageTypes.Error, PerDiemReOrdersErrorMessage));
+        else if(count>0 && payload.perDiemIds.length>0)
+          dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRateWithPerDiemsucceedcount(count)));
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Reg rate is not updated'))))
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rate is not updated'))))
     );
   }
 
