@@ -32,6 +32,20 @@ export const analyticsConstants = {
   }
 }
 
+export const VendorScorecardReportConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',    
+    AgencyIds: 'agencyIds',
+    StartDate: 'startDate',
+    EndDate: 'endDate',
+    OrderTypes: 'orderTypes',
+    SkillIds: 'skillIds'
+  }
+}
+
 export const accrualConstants = {
   formControlNames: {
     BusinessIds: 'businessIds',
