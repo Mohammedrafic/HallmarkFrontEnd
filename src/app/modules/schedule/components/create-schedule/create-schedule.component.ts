@@ -7,6 +7,7 @@ import {
   Input,
   NgZone,
   OnChanges,
+  OnDestroy,
   OnInit,
   SimpleChanges,
   ViewChild,
@@ -94,7 +95,7 @@ import { ScheduleType } from '../../enums';
   styleUrls: ['./create-schedule.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CreateScheduleComponent extends Destroyable implements OnInit, OnChanges {
+export class CreateScheduleComponent extends Destroyable implements OnInit, OnChanges, OnDestroy {
   @ViewChild(ScheduleItemsComponent) scheduleItemsComponent: ScheduleItemsComponent;
 
   @Input() scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
@@ -161,6 +162,12 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.createScheduleService.setOrientationControlValue(this.scheduleSelectedSlots, this.scheduleForm);
       this.sideBarSettings.showRemoveButton = this.createScheduleService.hasSelectedSlotsWithDate(candidates);
     }
+  }
+
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
+
+    this.sideBarSettings.showOpenPositions = true;
   }
 
   removeSchedules(): void {
@@ -328,7 +335,6 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     this.createScheduleService.scheduleData?.forEach(item => item.schedule.forEach(schedule => schedule.daySchedules.forEach(day => scheduleDays.push(day))));
     this.scheduleSelectedSlots.candidates.forEach(item => item.days?.forEach(day => selectedScheduleDaysIds.push(day.id)))
     const orientatedShifts = scheduleDays.filter(day => day.attributes?.orientated && selectedScheduleDaysIds.includes(day.id));
-    console.log(orientatedShifts);
     return !!orientatedShifts.length;
   }
 
@@ -350,7 +356,6 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
 
   private updateScheduleDialogConfig(scheduleTypeMode: ScheduleItemType): void {
     this.scheduleType = scheduleTypeMode;
-
     switch (this.scheduleType) {
       case ScheduleItemType.Book:
         this.scheduleFormConfig = BookFormConfig;
