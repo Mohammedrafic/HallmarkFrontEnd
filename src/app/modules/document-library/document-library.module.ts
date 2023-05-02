@@ -52,6 +52,7 @@ import { SecurityState } from '../../security/store/security.state';
 import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
 import { DocumentEditorModule } from '@syncfusion/ej2-angular-documenteditor';
 import { DocumentEditorContainerModule } from '@syncfusion/ej2-angular-documenteditor';
+import { ScheduleApiService } from '../schedule/services';
 
 const sidebarIcons = {
   Download,
@@ -109,6 +110,9 @@ const sidebarIcons = {
     DocumentEditorModule,
     DocumentEditorContainerModule,
     NgxsModule.forFeature([SecurityState, DocumentLibraryState, LogiReportState])
+  ],
+  providers: [
+    ScheduleApiService
   ]
 })
 export class DocumentLibraryModule { }

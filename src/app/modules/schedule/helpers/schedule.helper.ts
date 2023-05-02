@@ -181,15 +181,15 @@ export const GetShiftHours = (startTimeDate: Date, endTimeDate: Date, meal = fal
 
   const workTime = startTimeMs === endTimeMs ? DayMs : endTimeMs - startTimeMs;
 
-  if(meal && workTime < AboutSixHoursMs) {
+  if(meal && workTime <= AboutSixHoursMs) {
     return convertMsToTime(workTime);
   }
 
-  if(meal && workTime > AboutSixHoursMs && workTime < AboutTwentyHoursMs) {
+  if(meal && workTime >= AboutSixHoursMs && workTime <= AboutTwentyHoursMs) {
     return convertMsToTime(workTime - HalfHourTimeMealMs);
   }
 
-  if(meal && workTime > AboutTwentyHoursMs) {
+  if(meal && workTime >= AboutTwentyHoursMs) {
     return convertMsToTime(workTime - HourTimeMealMs);
   }
 

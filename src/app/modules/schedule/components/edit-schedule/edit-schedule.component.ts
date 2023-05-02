@@ -115,6 +115,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private readonly customShiftId = -1;
   private readonly newScheduleId = -1;
+  private isShiftOriented: boolean;
   private scheduleShifts: ScheduleShift[] = [];
   private scheduleFilterStructure: ScheduleFilterStructure;
   private hasInitData = false;
@@ -256,7 +257,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     if (!this.isCreateMode && this.selectedDaySchedule.scheduleType !== ScheduleType.Unavailability) {
-      this.updateScheduledShift();
+      this.updateScheduledShiftHandler();
       return;
     }
 
@@ -287,18 +288,11 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       deleteScheduleRequest.endDateTime = this.selectedDaySchedule.endDate;
     }
 
-    this.scheduleApiService.deleteSchedule(deleteScheduleRequest).pipe(
-      catchError((error: HttpErrorResponse) => this.editScheduleService.handleError(error)),
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      if (this.scheduledItem.schedule.daySchedules.length === 1) {
-        this.closeSideBar();
-      }
-
-      this.updateScheduleGrid.emit();
-      this.scheduleForm.markAsUntouched();
-      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-    });
+    if (!this.isCreateMode && this.selectedDaySchedule.scheduleType !== ScheduleType.Unavailability) {
+      this.deleteScheduleHandler(deleteScheduleRequest);
+    } else {
+      this.performDelete(deleteScheduleRequest);
+    }
   }
 
   saveNewEvent(createOrder: boolean): void {
@@ -317,6 +311,50 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
         .pipe(takeUntil(this.componentDestroy()))
         .subscribe(() => this.handleSuccessAdding());
     }
+  }
+
+  private performDelete(deleteScheduleRequest: DeleteScheduleRequest): void {
+    this.scheduleApiService.deleteSchedule(deleteScheduleRequest).pipe(
+      catchError((error: HttpErrorResponse) => this.editScheduleService.handleError(error)),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      if (this.scheduledItem.schedule.daySchedules.length === 1) {
+        this.closeSideBar();
+      }
+
+      this.updateScheduleGrid.emit();
+      this.scheduleForm.markAsUntouched();
+      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+    });
+  }
+
+  private deleteScheduleHandler(deleteScheduleRequest: DeleteScheduleRequest): void {
+    if (this.isShiftOriented) {
+      this.createScheduleService.confirmEditing().pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
+        this.performDelete(deleteScheduleRequest);
+      });
+    } else {
+      this.performDelete(deleteScheduleRequest);
+    }
+  }
+
+  private updateScheduledShiftHandler(): void {
+    if (
+         this.isShiftOriented &&
+         (this.scheduleForm.get('departmentId')?.dirty || this.scheduleForm.get('date')?.dirty)
+       ) {
+        this.createScheduleService.confirmEditing().pipe(
+          filter(Boolean),
+          takeUntil(this.componentDestroy())
+        ).subscribe(() => {
+          this.updateScheduledShift();
+        });
+      } else {
+        this.updateScheduledShift();
+      }
   }
 
   private setHours(
@@ -574,6 +612,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       this.setTimeForCustomShift();
     }
 
+    this.isShiftOriented = !!patchData.orientated;
     this.scheduleForm.patchValue(patchData);
     this.cdr.markForCheck();
   }
