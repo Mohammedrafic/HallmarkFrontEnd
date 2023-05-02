@@ -57,7 +57,7 @@ export const GridCellsSystemIRPTabAll = (
             iconName: params.data.isLocked ? 'lock' : 'unlock',
             buttonClass: params.data.isLocked ? 'e-danger' : '',
             isCustomIcon: !params.data.isLocked,
-            disabled: true,
+            disabled: params.data.orderTypeText!="LTA",
           }),
           {
             action: (itemId: number) => {

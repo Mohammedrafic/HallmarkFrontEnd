@@ -456,7 +456,9 @@ export class OrderManagementContentState {
         const actions = [new LockUpdatedSuccessfully(), new ShowToast(MessageTypes.Success, message)];
         dispatch(updateOpened ? [...actions, new GetSelectedOrderById(id)] : actions);
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error?.detail)))
+      catchError((error: any) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
     );
   }
 
