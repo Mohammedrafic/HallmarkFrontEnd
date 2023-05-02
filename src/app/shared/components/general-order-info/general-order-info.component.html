@@ -79,6 +79,10 @@
           <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
           <div class="sup-title">Distributed On</div>
         </div>
+        <div class="column" *ngIf="orderInformation.minYrsRequired">
+          <div class="title">{{ orderInformation.minYrsRequired }}</div>
+          <div class="sup-title">Exp. Req.</div>
+        </div>
       </ng-container>
     </div>
   </section>

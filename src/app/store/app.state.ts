@@ -192,9 +192,9 @@ export class AppState {
   @Action(GetAlertsForCurrentUser)
   GetAlertsForCurrentUser(
     { patchState }: StateContext<AppStateModel>,
-    { payload }: GetAlertsForCurrentUser
+    { pageNumber,pageSize }: GetAlertsForCurrentUser
   ): Observable<AlertsModel[]> {
-    return this.userService.getAlertsForUser().pipe(
+    return this.userService.getAlertsForUser(pageNumber,pageSize).pipe(
       tap((payload) => {
         patchState({ getAlertsForCurrentUser: payload });
         return payload;

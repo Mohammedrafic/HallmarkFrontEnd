@@ -356,10 +356,10 @@ export class CandidateState {
   @Action(GetMasterCredentials)
   GetMasterCredentials(
     { patchState }: StateContext<CandidateStateModel>,
-    { searchTerm, credentialTypeId }: GetMasterCredentials
+    { searchTerm, credentialTypeId, orderId }: GetMasterCredentials
   ): Observable<Credential[]> {
     patchState({ isCandidateLoading: true });
-    return this.candidateService.getMasterCredentials(searchTerm, credentialTypeId).pipe(
+    return this.candidateService.getMasterCredentials(searchTerm, credentialTypeId, orderId).pipe(
       tap((payload) => {
         patchState({ isCandidateLoading: false, masterCredentials: payload });
         return payload;

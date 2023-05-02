@@ -19,6 +19,7 @@ import { Education } from 'src/app/shared/models/education.model';
 import { Experience } from 'src/app/shared/models/experience.model';
 import { AppState } from '../../store/app.state';
 import { Store } from '@ngxs/store';
+import { GetQueryParams } from '@core/helpers';
 
 @Injectable({
   providedIn: 'root',
@@ -102,7 +103,7 @@ export class CandidateService {
                 createdUntil: item.certifiedUntil,
                 createdOn: item.certifiedOn,
                 masterName: item.credential,
-                number: item.credentialNumber
+                number: item.credentialNumber,
               };
             }),
           }};
@@ -110,14 +111,23 @@ export class CandidateService {
     }));
   }
 
-  public getMasterCredentials(searchTerm: string, credentialTypeId: number | string): Observable<Credential[]> {
+  public getMasterCredentials(searchTerm: string, credentialTypeId: number | string,
+    orderId: number | null): Observable<Credential[]> {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+
     const endpoint = new Map<boolean, string>([
       [true, '/api/MasterCredentials/forAgency'],
       [false, '/api/MasterCredentials'],
     ]);
+
+    const params = {
+      ...searchTerm ? { SearchTerm: searchTerm } : {},
+      ...credentialTypeId ? { CredentialTypeId: credentialTypeId } : {},
+      ...orderId ? { OrderId: orderId } : {},
+    };
+
     return this.http.get<Credential[]>(endpoint.get(isAgencyArea) as string, {
-      params: { SearchTerm: searchTerm, CredentialTypeId: credentialTypeId },
+      params: GetQueryParams(params),
     });
   }
 

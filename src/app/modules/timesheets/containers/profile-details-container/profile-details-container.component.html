@@ -127,11 +127,11 @@
           </div>
 
           <div class="controls-block">
-            <div class="checkbox-block" *ngIf="isDNWEnabled">
+            <div class="checkbox-block">
               <ejs-switch
                 #dnwSwitch
                 class="toggle"
-                [disabled]="disableAnyAction || !hasEditTimesheetRecordsPermission"
+                [disabled]="disableAnyAction || !hasEditTimesheetRecordsPermission || !isDNWEnabled"
                 [checked]="timesheetDetails.noWorkPerformed"
                 (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
               ></ejs-switch>

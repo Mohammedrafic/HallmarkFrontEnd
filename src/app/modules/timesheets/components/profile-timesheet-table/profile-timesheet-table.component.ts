@@ -530,6 +530,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         )
         .subscribe((disabled: boolean) => {
           this.isEditEnabled = !disabled && !!currentTabMapping.get(this.currentTab);
+          this.isApproveBtnEnabled = !disabled && !!currentTabMapping.get(this.currentTab);
           this.cd.markForCheck();
         });
     } else {

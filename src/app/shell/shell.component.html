@@ -210,7 +210,7 @@
     </div>
   </div>
 
-  <div id="listcontainer">
+  <div id="listcontainer" #uiElement  (scroll)="onScrollLoadData()">
     <section class="alert-body">
       <section class="alert-panel" *ngFor="let item of alerts">
         <div class="alert-panel-header">
@@ -237,6 +237,7 @@
           [innerHTML]="item.content"
         ></div>
       </section>
+      <p *ngIf="!scrollData">{{loadMoreCotent}}</p>
     </section>
   </div>
 </ejs-sidebar>
