@@ -164,17 +164,16 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   removeSchedules(): void {
-    const hasBookDate = this.createScheduleService.hasBookingDate(this.scheduleSelectedSlots.candidates);
-
-    if(hasBookDate) {
-      this.sideBarSettings.replacementOrderDialogOpen = true;
-      this.sideBarSettings.removeReplacementMode = true;
-
-      this.replacementOrderDialogData = this.createScheduleService.prepareCandidateReplacementDates(
-        this.scheduleSelectedSlots.candidates
-      );
+    if (this.isOrientedScheduleSelected()) {
+      this.createScheduleService.confirmEditing().pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
+        this.checkBooked();
+        this.cdr.markForCheck();
+      });
     } else {
-      this.deleteSchedule();
+      this.checkBooked();
     }
   }
 
@@ -306,6 +305,31 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
         return !errors;
       }),
     );
+  }
+
+  private checkBooked(): void {
+    const hasBookDate = this.createScheduleService.hasBookingDate(this.scheduleSelectedSlots.candidates);
+
+    if(hasBookDate) {
+      this.sideBarSettings.replacementOrderDialogOpen = true;
+      this.sideBarSettings.removeReplacementMode = true;
+
+      this.replacementOrderDialogData = this.createScheduleService.prepareCandidateReplacementDates(
+        this.scheduleSelectedSlots.candidates
+      );
+    } else {
+      this.deleteSchedule();
+    }
+  }
+
+  private isOrientedScheduleSelected(): boolean {
+    const scheduleDays: ScheduleInt.ScheduleItem[] = [];
+    const selectedScheduleDaysIds: number[] = [];
+    this.createScheduleService.scheduleData?.forEach(item => item.schedule.forEach(schedule => schedule.daySchedules.forEach(day => scheduleDays.push(day))));
+    this.scheduleSelectedSlots.candidates.forEach(item => item.days?.forEach(day => selectedScheduleDaysIds.push(day.id)))
+    const orientatedShifts = scheduleDays.filter(day => day.attributes?.orientated && selectedScheduleDaysIds.includes(day.id));
+    console.log(orientatedShifts);
+    return !!orientatedShifts.length;
   }
 
   private openReplacementOrderDialog(replacementOrderDialogData: BookingsOverlapsResponse[]): void {
