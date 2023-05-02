@@ -39,7 +39,7 @@
             [showSelectAll]="true"
             [changeOnBlur]="!isMobile"
           >
-            <ng-template #itemTemplate="" let-data="">
+            <ng-template #itemTemplate let-data>
               <div class="region-option-container" [class.admin]="userIsAdmin">
                 <span class="region-name">{{data.name}}</span>
                 <span *ngIf="userIsAdmin" class="org-name">{{data.organisationName}}</span>

@@ -80,7 +80,7 @@ export class AcceptFormComponent implements OnChanges{
     return new FormGroup({
       reOrderFromId: new FormControl({ value: '', disabled: true }),
       offeredBillRate: new FormControl({ value: '', disabled: true }),
-      candidateBillRate: new FormControl({ value: '', disabled: true }, [Validators.required]),
+      candidateBillRate: new FormControl({ value: '', disabled: true }, [Validators.required,  Validators.max(9999)]),
       locationName: new FormControl({ value: '', disabled: true }),
       departmentName: new FormControl({ value: '', disabled: true }),
       skillName: new FormControl({ value: '', disabled: true }),
@@ -88,7 +88,7 @@ export class AcceptFormComponent implements OnChanges{
       shiftStartTime: new FormControl({ value: '', disabled: true }),
       shiftEndTime: new FormControl({ value: '', disabled: true }),
       openPositions: new FormControl({ value: '', disabled: true }),
-      hourlyRate: new FormControl({ value: '', disabled: false }, [Validators.required]),
+      hourlyRate: new FormControl({ value: '', disabled: false }, [Validators.required, Validators.max(9999)]),
       rejectReason: new FormControl({ value: '', disabled: true }),
       jobCancellationReason: new FormControl({ value: '', disabled: true }),
       penaltyCriteria: new FormControl({ value: '', disabled: true }),

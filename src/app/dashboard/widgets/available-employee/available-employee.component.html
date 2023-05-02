@@ -1,0 +1,20 @@
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+    <ng-template #header>
+      <div class="app-accumulation-chart__title w-100">
+        <h3 class="widget-header__title d-inline"><i-feather name="grid" class="icon"></i-feather>{{description}}</h3> 
+      </div>
+    </ng-template>
+    <ng-template #available_employee>
+      <div class="shared-with-grid" *ngIf="(chartData)">
+        <ag-grid-angular #availableEmployees  style="max-height: 330px;overflow: scroll;"
+                         [rowHeight]="50"
+                         domLayout="autoHeight"
+                         [headerHeight]="50"
+                         [columnDefs]="columnDefs"
+                         [rowData]="chartData"
+                         class="ag-theme-alpine grid app-grid__component">
+        </ag-grid-angular>
+      </div>
+        </ng-template>
+  </app-widget-wrapper>
+  

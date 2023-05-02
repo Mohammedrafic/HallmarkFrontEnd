@@ -167,7 +167,7 @@ export class RnUtilizationWidgetComponent implements OnInit {
           this.showProgressBar = false;
           return;
         } else {
-          this.showProgressBar = true;
+          this.showProgressBar = false;
           this.changeDetector.detectChanges();
         }
         this.percent = (result.perdayTotalHoursSchedule / result.targetPerdiemNursingHours) * 100;

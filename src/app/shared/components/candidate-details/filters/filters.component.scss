@@ -1,7 +1,13 @@
+@import 'mixins';
+
 .input-group {
   margin-top: 5px;
+  position: relative;
 }
 
 .input-container {
   margin-bottom: 15px;
+
 }
+
+@include regions-by-unit-options;
