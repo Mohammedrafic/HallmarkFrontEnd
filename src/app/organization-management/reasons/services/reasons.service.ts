@@ -91,7 +91,7 @@ export class ReasonsService {
     } else if (params.selectedTab === ReasonsNavigationTabs.Closure) {
       var value = params.formValue as Closurevalue;
       var reasonvalue = {
-        id : null,
+        id : value.id || undefined,
         includeInIRP : this.selectedSystem.isIRP,
         includeInVMS : this.selectedSystem.isVMS,
         reason : params.formValue.reason
@@ -119,7 +119,7 @@ export class ReasonsService {
     } else if (params.selectedTab === ReasonsNavigationTabs.Requisition) {
       var value = params.formValue as Closurevalue;
       var reqreasonvalue = {
-        id : null,
+        id : value.id || undefined,
         includeInIRP : this.selectedSystem.isIRP,
         includeInVMS : this.selectedSystem.isVMS,
         reason : params.formValue.reason,

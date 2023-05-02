@@ -75,6 +75,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   @Select(OrganizationManagementState.organization)
   public readonly organization$: Observable<Organization>;
   public showSystem:boolean = false;
+  public system:any;
   constructor(
     protected override store: Store,
     public confirmService: ConfirmService,
@@ -114,10 +115,8 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.selectedTab = ReasonsNavigationTabs.Penalties;
     } else if(selectedTab.selectedItem.innerText === "Order Requisition"){
       this.selectedTab = ReasonsNavigationTabs.Requisition;
-      this.showhidesystem();
     } else if(selectedTab.selectedItem.innerText === "Order Closure"){
       this.selectedTab = ReasonsNavigationTabs.Closure;
-      this.showhidesystem();
     } else if(selectedTab.selectedItem.innerText === "Manual Invoice"){
       this.selectedTab = ReasonsNavigationTabs.ManualInvoice;
     } else if(selectedTab.selectedItem.innerText === "Unavailability"){
@@ -387,15 +386,21 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         isIRP: !!organization.preferences.isIRPEnabled,
         isVMS: !!organization.preferences.isVMCEnabled,
       };
+      this.showhidesystem();
     });
   }
 
   private showhidesystem(){
     if((this.selectedSystem.isIRP) && (this.selectedSystem.isVMS)){
       this.showSystem = true;
-    } else {
+      this.system = "ALL";
+    } else if(this.selectedSystem.isIRP && !this.selectedSystem.isVMS) {
       this.showSystem = false;
-    }
+      this.system = "IRP"
+    } else if(this.selectedSystem.isVMS && !this.selectedSystem.isIRP) {
+      this.showSystem = false;
+      this.system = "VMS"
+    } 
   }
 
   private setIRPFlag(): void {
