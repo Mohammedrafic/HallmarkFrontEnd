@@ -88,14 +88,19 @@ export const CandidateSSNRequired = 'SSN of Candidate is mandatory to submit can
 export const CandidateDOBRequired= 'DOB of Candidate is mandatory to accept the offer. Please update DOB of candidate on Candidate Profile screen and come back here to accept offer.';
 export const CandidatePHONE1Required = (place:any) => 'Phone 1 of the Candidate is mandatory to '+place+' the position.';
 export const CandidateADDRESSRequired = (place:any) => 'Address 1, Country, State, City and Zipcode of the Candidate in the Candidate profile are mandatory to '+place+' the position.';
-export const REGULAR_RATE_UPDATE_SUCCESS = 'Regular Rate on Open and In-Progress Status are updated. Other Positions stays unaffected';
+export const TravelerContracttoPermOrdersSucceedMessage = 'Regular Rate on Open and In-Progress Status are updated. Other Positions stays unaffected';
+export const PerDiemReOrdersSucceedMessage = 'Open Per Diems and Re-Orders bill rates cannot be updated.';
+export const PerDiemReOrdersErrorMessage = 'Bill Rate cannot be updated for Open Per Diems and Re-Orders.';
 export const UpdateRegularRatesucceedcount = (count: number) =>
-  ` ${count} Order(s) affected , ` + REGULAR_RATE_UPDATE_SUCCESS;
+  ` ${count} Order(s) updated , ` + TravelerContracttoPermOrdersSucceedMessage;
+export const UpdateRegularRateWithPerDiemsucceedcount = (count: number) =>
+  ` ${count} Order(s) updated , ` + PerDiemReOrdersSucceedMessage;
 
 export const DOCUMENT_DOWNLOAD_SUCCESS = 'Document downloaded successfully';
 export const SubmissionsLimitReached = 'The order has reached its submission limit';
 export const EDIT_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to edit multiple records? It may affect existing schedules and orders.';
 export const EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT = 'Are you sure you want to change those dates? It may affect existing schedules and orders.';
+export const ORIENTED_SHIFT_CHANGE_CONFIRM_TEXT = 'Provided changes may have impact on changing Orientation Date, it won’t be automatically updated.';
 export const DELETE_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to delete multiple records?';
 export const BLOCK_RECORD_TEXT = 'Are you sure you want to block?';
 export const BLOCK_RECORD_TITLE = 'Block Record';

@@ -36,14 +36,14 @@
       <e-tabitem>
         <ng-template #headerText><div>Order Requisition</div></ng-template>
         <ng-template #content>
-          <app-order-requisition (editReason)="editReason($event)" [form]="reasonForm" [showSystem]="showSystem"></app-order-requisition>
+          <app-order-requisition (editReason)="editReason($event)" [form]="reasonForm" [showSystem]="showSystem" [system]="system"></app-order-requisition>
         </ng-template>
       </e-tabitem>
 
       <e-tabitem *ngIf="userPermission[userPermissions.CanViewOrderClosureReasons] && userPermission[userPermissions.CanManageOrderClosureReasons]">
         <ng-template #headerText><div>Order Closure</div></ng-template>
         <ng-template #content>
-          <app-closure-reason [userPermission]="userPermission" (editReason)="editReason($event)" [showSystem]="showSystem" [form]="reasonForm"></app-closure-reason>
+          <app-closure-reason [userPermission]="userPermission" (editReason)="editReason($event)" [showSystem]="showSystem" [system]="system" [form]="reasonForm"></app-closure-reason>
         </ng-template>
       </e-tabitem>
 

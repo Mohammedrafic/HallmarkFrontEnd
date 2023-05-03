@@ -257,6 +257,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public IsSearchDone:boolean = false;
   allAgencies:boolean = false;
   allOrgnizations:boolean = false;
+  currentDocumentData :DocumentLibraryDto;
 
   constructor(private store: Store, private datePipe: DatePipe,
     private changeDetectorRef: ChangeDetectorRef,
@@ -357,6 +358,29 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.filterBbusinessControl.patchValue(this.user?.businessUnitId);
     }
     this.skipBusinessUnit();
+      this.sharedDocumentInformation$.pipe(takeUntil(this.unsubscribe$))
+          .subscribe((data: BusinessUnit[]) => {
+            this.sharedDocumentInformation = data;
+            if(data != null && data.length>0){
+              if(data.length == 1 && data[0].id === -1 && data[0].name === 'All'){
+                this.isShowSharedWith = false;
+                if(this.agencySwitch) {
+                    this.allAgencies = true;
+                    this.documentLibraryform.get(FormControlNames.AllAgencies)?.setValue(true);
+                }
+                else if(this.organizationSwitch){
+                    this.allOrgnizations = true;
+                    this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(true);
+                }
+              }else{
+                this.sharedWith?.gridOptions?.api?.setRowData(data);
+              }
+            }
+            else{
+              this.sharedWith?.gridOptions?.api?.setRowData(data);
+            }
+            this.changeDetectorRef.markForCheck();
+          });
   }
 
   ngAfterViewInit(): void {
@@ -508,15 +532,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
     
     this.store.dispatch(new GetSharedDocumentInformation(sharedDocumentInformation));
-    this.sharedDocumentInformation$.pipe(takeUntil(this.unsubscribe$))
-    .subscribe((data: BusinessUnit[]) => {
-      if(data.length>0){
-        this.sharedWith?.gridOptions?.api?.setRowData(data);
-      }
-      else{
-        this.sharedWith?.gridOptions?.api?.setRowData(data);
-      }
-    });
+   
   }
 
   public createForm(): void {
@@ -562,7 +578,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       if (this.documentLibraryform.contains(FormControlNames.LocationIds)) this.documentLibraryform.removeControl(FormControlNames.LocationIds);
     }
     this.documentLibraryform.addControl(FormControlNames.Agencies, new FormControl(null, []));
+    this.documentLibraryform.addControl(FormControlNames.AllAgencies, new FormControl(false, []));
     this.documentLibraryform.addControl(FormControlNames.Orgnizations, new FormControl(null, []));
+    this.documentLibraryform.addControl(FormControlNames.AllOrgnizations, new FormControl(false, []));
+
   }
 
   private applyDateValidations() {
@@ -953,6 +972,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   private editDocument(docItem: DocumentLibraryDto) {
     if (docItem) {
+      this.currentDocumentData = docItem;
       this.isEditDocument = true;
       this.formDailogTitle = FormDailogTitle.EditDocument;
       this.documentId = docItem.id;
@@ -1184,8 +1204,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.halmarkSwitch = false;
     this.agencySwitch = false;
     this.organizationSwitch = false;
+    this.allOrgnizations = false;
+    this.allAgencies = false;
     this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
     this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
+    this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(this.allOrgnizations);
+    this.documentLibraryform.get(FormControlNames.AllAgencies)?.setValue(this.allAgencies);
     if (this.isAddNewFolder) {
       this.store.dispatch(new IsAddNewFolder(false));
     }
@@ -1197,20 +1221,23 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public saveShareDocument(shareWhileUpload: boolean = false) {
     let unitType: number = 0;
     let unitIds: number[] = [];
+    let allFlag: boolean = false;
     if (this.agencySwitch) {
       unitType = BusinessUnitType.Agency;
       unitIds = this.documentLibraryform.get(FormControlNames.Agencies)?.value;
+      allFlag = this.documentLibraryform.get(FormControlNames.AllAgencies)?.value;
     }
     else if (this.organizationSwitch) {
       unitType = BusinessUnitType.Organization;
       unitIds = this.documentLibraryform.get(FormControlNames.Orgnizations)?.value;
+      allFlag = this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.value;
     }
     let mapping: { [id: number]: number[]; } = {};
-    if (unitType != 0 && unitIds?.length > 0) {
+    if (unitType != 0 && (unitIds?.length > 0 || allFlag)) {
       const shareDocumentsFilter: ShareDocumentsFilter = {
         documentIds: this.shareDocumentIds,
         businessUnitType: unitType,
-        businessUnitIds: unitIds,
+        businessUnitIds: allFlag ? [-1] : unitIds,
         regionLocationMappings: mapping,
         isShareWhileUpload: shareWhileUpload
       }
@@ -1230,6 +1257,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   private ShareDocument(data: DocumentLibraryDto) {
     if (data) {
+      this.currentDocumentData = data;
       this.documentId=data.id;
       this.formDailogTitle = "";
       this.isAddNewFolder = false;
@@ -1257,8 +1285,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     if (this.halmarkSwitch) {
       this.agencySwitch = false;
       this.organizationSwitch = false;
+      this.allOrgnizations = false;
+      this.allAgencies = false;
       this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
       this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
+      this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(this.allOrgnizations);
+      this.documentLibraryform.get(FormControlNames.AllAgencies)?.setValue(this.allAgencies);
     }
     this.changeDetectorRef.markForCheck();
   }
@@ -1266,6 +1298,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public onAgencySwitcher(event: any) {
     this.agencySwitch = !this.agencySwitch;
     this.allAgencies = false;
+    this.documentLibraryform.get(FormControlNames.AllAgencies)?.setValue(this.allAgencies);
     if (this.agencySwitch) {
       this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
       this.isShowSharedWith=true;
@@ -1274,10 +1307,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.isShare = true;
       this.halmarkSwitch = false;
       this.organizationSwitch = false;
+      this.allOrgnizations = false;
+      this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(this.allOrgnizations);
     }
     else {
       this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
-      this.sharedWith.gridOptions.api?.setRowData([]);
+      this.sharedWith?.gridOptions?.api?.setRowData([]);
       this.isShowSharedWith=false;
     }
     this.changeDetectorRef.markForCheck();
@@ -1285,23 +1320,24 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public allAgenciesChange(event: any) {
     this.allAgencies=!this.allAgencies;
+    this.documentLibraryform.get(FormControlNames.AllAgencies)?.setValue(this.allAgencies);
     if(this.allAgencies){
-      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([-1]);
-      this.sharedWith.gridOptions.api?.setRowData([]);
       this.isShowSharedWith=false;
-      this.changeDetectorRef.markForCheck();
+    }else{
+      this.isShowSharedWith=true;
     }
+    this.changeDetectorRef.markForCheck();
   }
 
   public allOrgnizationsChange(event: any) {
     this.allOrgnizations=!this.allOrgnizations;
-    if(this.allOrgnizations){
-      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([-1]);
-      this.sharedWith.gridOptions.api?.setRowData([]);
+    this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(this.allOrgnizations);
+    if(this.allOrgnizations){    
       this.isShowSharedWith=false;
-      this.changeDetectorRef.markForCheck();
+    }else{
+      this.isShowSharedWith=true;
     }
-
+    this.changeDetectorRef.markForCheck();
   }
 
   private getAssociateAgencyData() {
@@ -1315,6 +1351,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public onOrganizationSwitcher(event: any) {
     this.organizationSwitch = !this.organizationSwitch;
+    this.allOrgnizations = false;
+    this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(this.allOrgnizations);
     if (this.organizationSwitch) {
       this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
       this.isShowSharedWith=true;
@@ -1323,10 +1361,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.isShare = true;
       this.halmarkSwitch = false;
       this.agencySwitch = false;
+      this.allAgencies = false;
+      this.documentLibraryform.get(FormControlNames.AllAgencies)?.setValue(this.allAgencies);
     }
     else {
       this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
-      this.sharedWith.gridOptions.api?.setRowData([]);
+      this.sharedWith?.gridOptions.api?.setRowData([]);
       this.isShowSharedWith=false;
     }
     this.changeDetectorRef.markForCheck();

@@ -116,7 +116,7 @@ export class ClearCandidatesCredentials {
 
 export class GetMasterCredentials {
   static readonly type = '[candidate] Get Master Credentials by searchTerm and credentialTypeId';
-  constructor(public searchTerm: string, public credentialTypeId: number | string) {}
+  constructor(public searchTerm: string, public credentialTypeId: number | string, public orderId: number | null) {}
 }
 
 export class GetCredentialStatuses {

@@ -662,6 +662,8 @@
 
   #listcontainer {
     padding: 10px;
+    max-height: 90vh;  
+    overflow: auto;
 
     .item-clear {
       float: right;
@@ -675,6 +677,10 @@
 
     .alert-body {
       padding-top: 21px;
+      p{
+        text-align: center;
+        font-weight: 700;
+      }
     }
 
     .alert-panel {
