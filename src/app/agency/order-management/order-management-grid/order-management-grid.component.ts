@@ -401,6 +401,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.Organizations]);
         this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
       }
+      if(this.orderStatus != null && this.orderStatus.length > 0){
+        this.OrderFilterFormGroup.get('orderStatuses')?.setValue([...this.orderStatus]);
+        this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : undefined;
+      }
       this.patchFilterForm(!!this.filters?.regionIds?.length);
       this.prepopulateFilterFormStructure();
       this.dispatchNewPage();
@@ -447,22 +451,26 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText) =>
         Status.includes(f)
       );
-      this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
-      this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
-      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-      for (let i = 0; i < this.filteredItems.length; i++) {
-        if (this.filteredItems[i].text == undefined) {
-          this.filteredItems[i].text = this.filteredItems[i].value;
-        }
-      }
-      this.filteredItems$.next(this.filteredItems.length);
+      setTimeout(() => {
+          this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
+          this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
+          this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+          for (let i = 0; i < this.filteredItems.length; i++) {
+            if (this.filteredItems[i].text == undefined) {
+              this.filteredItems[i].text = this.filteredItems[i].value;
+            }
+          }
+          this.filteredItems$.next(this.filteredItems.length);
+      }, 500);
     } 
     if(this.Organizations.length > 0){
       this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
       this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
     } 
-    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-    this.dispatchNewPage();
+    setTimeout(() => {
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+      this.dispatchNewPage();
+    }, 500);
   }
 
   private onTabChange(): void {
