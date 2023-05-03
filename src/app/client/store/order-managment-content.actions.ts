@@ -51,7 +51,8 @@ export class SetLock {
     public lockStatus: boolean,
     public filters: OrderFilter = {},
     public prefixId: string,
-    public updateOpened = false
+    public isIrp: boolean,
+    public updateOpened = false,
   ) {}
 }
 

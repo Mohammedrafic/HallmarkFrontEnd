@@ -298,6 +298,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         !this.order.isLocked,
         {},
         `${this.order.organizationPrefix || ''}-${this.order.publicId}`,
+        this.activeSystem=== this.systemType.IRP,
         true
       )
     );
