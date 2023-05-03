@@ -32,9 +32,9 @@ import {
   AlertCircle,
   Mail,
   MessageSquare,
-  CheckCircle,
   File,
-  UserX
+  UserX,
+  Server,
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -76,7 +76,8 @@ const sidebarIcons = {
   Mail,
   MessageSquare,
   File,
-  UserX
+  UserX,
+  Server
 };
 
 @NgModule({

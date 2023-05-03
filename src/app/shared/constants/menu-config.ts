@@ -16,12 +16,13 @@ export const MENU_CONFIG: any = {
     },
     2: {
       // Organization
-      icon: 'file-text',
+      icon: 'organization',
+      custom: true,
       route: '/admin/client-management',
     },
     3: {
       // Agency
-      icon: 'clock',
+      icon: 'briefcase',
       route: 'agency/agency-list',
     },
     4: {
@@ -42,7 +43,7 @@ export const MENU_CONFIG: any = {
     },
     8: {
       // Master Data
-      icon: 'user',
+      icon: 'server',
       route: '/admin/master-data',
     },
 
@@ -84,7 +85,7 @@ export const MENU_CONFIG: any = {
     17: reportsMenuItemConfiguration,
     18: {
       // Settings
-      icon: 'user',
+      icon: 'settings',
       route: '/admin/organization-management',
     },
     19: {
@@ -183,7 +184,7 @@ export const MENU_CONFIG: any = {
     },
     41: {
       // Accrual Report
-      icon: '',
+      icon: 'pie-chart',
       route: '/analytics/financial-time-sheet-report',
     },
     42: {
@@ -458,7 +459,7 @@ export const MENU_CONFIG: any = {
     },
     3: {
       // Agency
-      icon: 'clock',
+      icon: 'briefcase',
       route: 'agency/agency-list',
     },
     4: {
@@ -479,7 +480,7 @@ export const MENU_CONFIG: any = {
     },
     8: {
       // Master Data
-      icon: 'user',
+      icon: 'server',
       route: '/admin/master-data',
     },
 
@@ -511,7 +512,7 @@ export const MENU_CONFIG: any = {
     17: reportsMenuItemConfiguration,
     18: {
       // Settings
-      icon: 'user',
+      icon: 'settings',
       route: '/admin/organization-management',
     },
     19: {
@@ -679,7 +680,7 @@ export const MENU_CONFIG: any = {
     },
     3: {
       // Agency
-      icon: 'clock',
+      icon: 'briefcase',
       route: 'agency/agency-list',
     },
     4: {
@@ -711,12 +712,12 @@ export const MENU_CONFIG: any = {
     },
     12: {
       // Associated Agencies
-      icon: 'clock',
+      icon: 'briefcase',
       route: '/client/associate-list',
     },
     38: {
       // Scheduling
-      icon: 'file-text',
+      icon: 'calendar',
       route: 'client/scheduling',
     },
     13: {
@@ -726,7 +727,7 @@ export const MENU_CONFIG: any = {
     },
     14: {
       // Candidates
-      icon: 'file-text',
+      icon: 'users',
       route: 'agency/candidates',
     },
     15: {
@@ -742,7 +743,7 @@ export const MENU_CONFIG: any = {
     17: reportsMenuItemConfiguration,
     18: {
       // Settings
-      icon: 'user',
+      icon: 'settings',
       route: 'client/organization-management',
     },
     19: {
@@ -767,7 +768,7 @@ export const MENU_CONFIG: any = {
     },
     23: {
       // Candidates
-      icon: 'file-text',
+      icon: 'users',
       route: 'agency/candidates',
     },
     24: {
@@ -802,12 +803,12 @@ export const MENU_CONFIG: any = {
     },
     36: {
       // Candidates
-      icon: 'file-text',
+      icon: 'users',
       route: 'client/candidates',
     },
     37: {
       // Candidate Details
-      icon: 'users',
+      icon: 'user',
       route: 'client/candidate-details',
     },
     40: {
@@ -817,7 +818,7 @@ export const MENU_CONFIG: any = {
     },
     41: {
       // Accrual Report
-      icon: '',
+      icon: 'pie-chart',
       route: '/analytics/financial-time-sheet-report',
     },
     42: {
@@ -977,7 +978,8 @@ export const MENU_CONFIG: any = {
     },
     44: {
       // Organization Profile
-      icon: 'user',
+      icon: 'organization',
+      custom: true,
       route: '/admin/profile',
     },
     45: {
@@ -1123,7 +1125,7 @@ export const MENU_CONFIG: any = {
     },
     14: {
       // Candidates
-      icon: 'file-text',
+      icon: 'users',
       route: 'agency/candidates',
     },
     15: {
@@ -1153,8 +1155,8 @@ export const MENU_CONFIG: any = {
       route: 'agency/agency-list',
     },
     21: {
-      // Associated Organizations
-      icon: 'file-text',
+      // Profile
+      icon: 'briefcase',
       route: 'agency/profile',
     },
     22: {
@@ -1164,7 +1166,7 @@ export const MENU_CONFIG: any = {
     },
     23: {
       // Candidates
-      icon: 'file-text',
+      icon: 'users',
       route: 'agency/candidates',
     },
     24: {
@@ -1189,7 +1191,8 @@ export const MENU_CONFIG: any = {
     },
     28: {
       // Associated Organizations
-      icon: 'clock',
+      icon: 'organization',
+      custom: true,
       route: 'agency/associate-list',
     },
     29: {
@@ -1209,12 +1212,12 @@ export const MENU_CONFIG: any = {
     },
     34: {
       // Candidates
-      icon: 'file-text',
+      icon: 'users',
       route: 'agency/candidates',
     },
     35: {
       // Candidate Details
-      icon: 'users',
+      icon: 'user',
       route: 'agency/candidate-details',
     },
     40: {
