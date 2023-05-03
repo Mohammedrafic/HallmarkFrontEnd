@@ -24,7 +24,7 @@ import {
   DELETE_RECORD_TITLE, ERROR_START_LESS_END_DATE
 } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import {
   CheckIfExist,
@@ -43,6 +43,7 @@ import { GetOrganizationStructure } from '../../store/user.actions';
 import { DateTimeHelper } from '@core/helpers';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-holidays',
@@ -137,6 +138,8 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       holidayName: new FormControl(null, [Validators.required]),
       startDateTime: new FormControl(null, [Validators.required]),
       endDateTime: new FormControl(null, [Validators.required]),
+      includeInIRP : new FormControl(false, [Validators.required]),
+      includeInVMS : new FormControl(false, [Validators.required])
     });
 
     this.startTimeField = this.HolidayFormGroup.get('startDateTime') as AbstractControl;
@@ -443,6 +446,8 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       holidayName: holiday.holidayName,
       startDateTime: DateTimeHelper.convertDateToUtc(holiday.startDateTime),
       endDateTime: DateTimeHelper.convertDateToUtc(holiday.endDateTime),
+      includeInIRP : holiday.includeInIRP,
+      includeInVMS : holiday.includeInVMS
     });
 
     this.store.dispatch(new ShowSideDialog(true));
@@ -487,42 +492,46 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
 
   public saveHoliday(): void {
     if (this.HolidayFormGroup.valid) {
-      if (this.title === DialogMode.Assign) {
-        this.store
-          .dispatch(
-            new CheckIfExist(
-              new OrganizationHoliday(
-                this.HolidayFormGroup.getRawValue(),
-                this.selectedRegions,
-                this.isAllRegionsSelected, this.isAllLocationsSelected
+      if(this.HolidayFormGroup.controls['includeInIRP'].value || this.HolidayFormGroup.controls['includeInVMS'].value){
+        if (this.title === DialogMode.Assign) {
+          this.store
+            .dispatch(
+              new CheckIfExist(
+                new OrganizationHoliday(
+                  this.HolidayFormGroup.getRawValue(),
+                  this.selectedRegions,
+                  this.isAllRegionsSelected, this.isAllLocationsSelected
+                )
               )
             )
-          )
-          .subscribe((val) => {
-            if (val.orgHolidays.isExist) {
-              this.confirmService
-                .confirm(DATA_OVERRIDE_TEXT, {
-                  title: DATA_OVERRIDE_TITLE,
-                  okButtonLabel: 'Confirm',
-                  okButtonClass: '',
-                })
-                .pipe(
-                  filter((confirm) => !!confirm),
-                  takeUntil(this.unsubscribe$)
-                )
-                .subscribe(() => {
-                  this.saveHandler(true);
-                });
-            } else {
-              this.saveHandler(false);
-            }
-          });
-      } else {
-        this.editHandler();
-      }
+            .subscribe((val) => {
+              if (val.orgHolidays.isExist) {
+                this.confirmService
+                  .confirm(DATA_OVERRIDE_TEXT, {
+                    title: DATA_OVERRIDE_TITLE,
+                    okButtonLabel: 'Confirm',
+                    okButtonClass: '',
+                  })
+                  .pipe(
+                    filter((confirm) => !!confirm),
+                    takeUntil(this.unsubscribe$)
+                  )
+                  .subscribe(() => {
+                    this.saveHandler(true);
+                  });
+              } else {
+                this.saveHandler(false);
+              }
+            });
+        } else {
+          this.editHandler();
+        }
     } else {
-      this.HolidayFormGroup.markAllAsTouched();
+      this.store.dispatch(new ShowToast(MessageTypes.Error, "Atleast one system should be selected"));
     }
+  } else {
+    this.HolidayFormGroup.markAllAsTouched();
+  }
     this.removeActiveCssClass();
   }
 

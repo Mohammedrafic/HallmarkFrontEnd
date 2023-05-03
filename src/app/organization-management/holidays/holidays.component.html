@@ -216,7 +216,17 @@
   <form *ngIf="showForm" class="holidays-form-dialog form-container bootstrap"
         id="addEditHolidaysForm"
         [formGroup]="HolidayFormGroup">
+
+        <div class="input-container">
+          <label>System Configuration</label>
+          <div class="bootstrap checkbox-container">
+            <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>&nbsp;&nbsp;&nbsp;
+            <ejs-checkbox formControlName="includeInVMS" label="VMS"></ejs-checkbox>
+          </div>
+        </div>
+        
     <ng-container *ngIf="title === 'Assign'">
+
       <div>
         <div class="input-container">
           <label>Region <span class="required">*</span></label>
