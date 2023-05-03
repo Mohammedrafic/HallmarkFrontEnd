@@ -406,8 +406,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.businessUnitsDataset = [];
     this.businessUnits.forEach((element, index) => {
       if (element.id != BusinessUnitType.Hallmark && element.id != BusinessUnitType.MSP) {
-        // element.id == BusinessUnitType.Hallmark || element.id == BusinessUnitType.MSP
-        // delete this.businessUnits[index];
         this.businessUnitsDataset.push(element);
       }
     });
