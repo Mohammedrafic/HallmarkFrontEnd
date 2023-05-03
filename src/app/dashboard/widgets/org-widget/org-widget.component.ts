@@ -96,6 +96,10 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
       this.dashboardService.redirectToUrl('client/order-management/');
       this.globalWindow.localStorage.setItem("ISIrpEnabled", JSON.stringify(true));
     }
+    else if(orgname =='NoOfUnAssignedEmployee'){
+      this.dashboardService.redirectToUrl('analytics/staff-list/');
+      this.globalWindow.localStorage.setItem("unassignedemployeecountwidget", JSON.stringify(true));
+    }
   }
 
   public toTimesheetcontent(orgId: number): void {
