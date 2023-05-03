@@ -80,6 +80,8 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   @ViewChild('mainContainer', { static: true }) private mainContainer: ElementRef<HTMLElement>;
 
+  @ViewChild('uiElement', { static: false })  public uiElement: ElementRef;
+
   @Select(AppState.isSidebarOpened)
   isSideBarDocked$: Observable<boolean>;
 
@@ -164,6 +166,11 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   private permissions: CurrentUserPermission[] = [];
   private orderMenuItems: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
   private irpVmsHelpSiteUrl = 'https://eiiohelp.einsteinii.org/';
+
+  scrollData:boolean = false;
+  loadMoreCotent:string = '';
+  pageNumber:number = 0;
+  pageSize:number = 50;
 
   constructor(
     private store: Store,
@@ -417,14 +424,22 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   bellIconClicked(): void {
-    this.store.dispatch(new GetAlertsForCurrentUser({}));
-
+    this.pageNumber = 0;
+    this.alerts = [];
+    this.store.dispatch(new GetAlertsForCurrentUser(this.pageNumber,this.pageSize));
     this.alertStateModel$
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe((alertdata) => {
-      this.alerts = alertdata;
-      this.showAlertSidebar = true;
-      this.alertSidebar.show();
+      if(alertdata != null && alertdata.length > 0){
+        this.scrollData = true;
+        this.alerts =  [...this.alerts,...alertdata]; //alertdata;
+        this.showAlertSidebar = true;
+        this.alertSidebar?.show();      
+      }else{
+        this.scrollData = false;
+        this.loadMoreCotent = "No more data found!";
+      }
+
     });
 
   }
@@ -478,7 +493,8 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   private getAlertsForUser(): void {
-    this.store.dispatch(new GetAlertsForCurrentUser({}));
+    this.pageNumber = 0;
+    this.store.dispatch(new GetAlertsForCurrentUser(this.pageNumber,this.pageSize));
     this.alertStateModel$
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe((x) => {
@@ -786,5 +802,15 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       .subscribe(({ url }) => {
         this.irpVmsHelpSiteUrl = url;
       });
+  }
+
+  public onScrollLoadData(){
+    const nativeElement= this.uiElement.nativeElement;    
+    if(nativeElement.clientHeight + Math.round(nativeElement.scrollTop) === nativeElement.scrollHeight && this.scrollData){
+      this.scrollData = false;
+      this.loadMoreCotent = "loading..";
+      this.pageNumber = this.pageNumber + 1;
+      this.store.dispatch(new GetAlertsForCurrentUser(this.pageNumber,this.pageSize));
+    }
   }
 }

@@ -11,6 +11,7 @@ import {
   SaveUpdatePayRateSucceed,
   GetPayRates,
   GetSkillsbyDepartment,
+  GetWorkCommitmentByPage,
 } from '@organization-management/store/pay-rates.action';
 import { PayRateService } from '@shared/services/pay-rates.service';
 import {
@@ -25,17 +26,21 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { PayRateSetup, PayRateSetupPage } from '@shared/models/pay-rate.model';
+import { CommitmentStateModel } from '@admin/store/commitment.state';
+import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 
 export interface PayRateStateModel {
   payRatesPage: PayRateSetupPage | null,
-  skillbydepartment: any
+  skillbydepartment: any,
+  workCommitmentsPage: MasterCommitmentsPage | null
 }
 
 @State<PayRateStateModel>({
   name: 'payrates',
   defaults: {
     payRatesPage: null,
-    skillbydepartment: []
+    skillbydepartment: [],
+    workCommitmentsPage: null
   }
 })
 @Injectable()
@@ -46,6 +51,11 @@ export class PayRatesState {
 
   @Selector()
   static skillbydepartment(state: PayRateStateModel): any | null { return state.skillbydepartment; }
+
+  @Selector()
+  static workCommitmentsPage(state: CommitmentStateModel): MasterCommitmentsPage | null {
+    return state.commitmentsPage;
+  }
 
   constructor(private payRateService: PayRateService) {}
 
@@ -114,6 +124,21 @@ export class PayRatesState {
       patchState({ skillbydepartment : payload });
       return payload;
     }));
+  }
+
+  @Action(GetWorkCommitmentByPage)
+  GetWorkCommitmentByPage(
+    { patchState }: StateContext<CommitmentStateModel>,
+    { pageNumber, pageSize }: GetWorkCommitmentByPage
+  ): Observable<MasterCommitmentsPage> {
+    patchState({ isCommitmentLoading: true });
+
+    return this.payRateService.getMasterWorkCommitments(pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({commitmentsPage: payload, isCommitmentLoading: false});
+        return payload;
+      })
+    );
   }
  
 }

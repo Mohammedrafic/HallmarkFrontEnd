@@ -81,7 +81,7 @@ export class ShowOnScreenSideDialog {
 
 export class GetAlertsForCurrentUser {
   static readonly type = '[app] Get Alerts For Current User';
-  constructor(public payload: any) { }
+  constructor(public pageNumber: number, public pageSize: number) { }
 }
 
 export class GetAlertsCountForCurrentUser {

@@ -61,6 +61,9 @@ import { GrantReportComponent } from './grant-report/grant-report.component';
 import { ScheduledHoursComponent } from './scheduled-hours/scheduled-hours.component';
 import { VmsInvoiceReportBetaComponent } from './vms-invoice-report-beta/vms-invoice-report-beta.component';
 import { LogiReportModule } from '../../shared/components/logi-report/logi-report.module';
+import { ProgressBarAllModule } from '@syncfusion/ej2-angular-progressbar';
+import { VendorSCorecardState } from './vendor-scorecard/vendorscorecard.state';
+import { VendorscorecardService } from './vendor-scorecard/vendorscorecard.service';
 
 
 @NgModule({
@@ -130,10 +133,12 @@ import { LogiReportModule } from '../../shared/components/logi-report/logi-repor
     AutoCompleteAllModule,
     RadioButtonModule,
     LogiReportModule,
-    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState])
+    ProgressBarAllModule,
+    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState])
   ],
   providers:[
-    ScheduleApiService
+    ScheduleApiService,
+    VendorscorecardService
   ]
 })
 export class AnalyticsModule { }

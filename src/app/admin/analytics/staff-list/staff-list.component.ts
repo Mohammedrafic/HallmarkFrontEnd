@@ -47,6 +47,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { uniqBy } from 'lodash';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-staff-list',
@@ -123,6 +124,7 @@ export class StaffListComponent implements OnInit {
 
   private agencyOrganizationId: number;
   private previousOrgId: number = 0;
+  private unassignedemployeecountwidget:boolean;
   public organizationFields = ORGANIZATION_DATA_FIELDS;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -130,6 +132,7 @@ export class StaffListComponent implements OnInit {
   public allOption: string = 'All';
   public candidateFilterData: { [key: number]: SearchCandidate }[] = [];
   candidateSearchData: SearchCandidate[] = [];
+
 
   public filterOptionData: StaffScheduleReportFilterOptions;
 
@@ -139,10 +142,12 @@ export class StaffListComponent implements OnInit {
     private filterService: FilterService,
     private changeDetectorRef: ChangeDetectorRef,
     private readonly ngZone: NgZone,
-    @Inject(APP_SETTINGS) private appSettings: AppSettings
+    @Inject(APP_SETTINGS) private appSettings: AppSettings,
+    @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
     this.baseUrl = this.appSettings.host.replace('https://', '').replace('http://', '');
     this.store.dispatch(new SetHeaderState({ title: 'Analytics', iconName: '' }));
+    this.unassignedemployeecountwidget = JSON.parse(localStorage.getItem('unassignedemployeecountwidget') || '"false"') as boolean; 
     this.initForm();
     this.user = this.store.selectSnapshot(UserState.user);
     if (this.user?.id != null) {
@@ -158,8 +163,14 @@ export class StaffListComponent implements OnInit {
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
           this.logiReportComponent.SetReportData(data);
+          if(this.unassignedemployeecountwidget)
+          {
+            this.onFilterApply();
+            this.globalWindow.localStorage.setItem("unassignedemployeecountwidget", JSON.stringify(false));
+          }
         }
       });
+     
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
       this.onFilterControlValueChangedHandler();
@@ -404,7 +415,7 @@ export class StaffListComponent implements OnInit {
       skillIds: new FormControl([]),
       workCommitmentIds: new FormControl([]),
       employeeName: new FormControl(''),
-      showOnlyDepartmentUnassignedCandidates: false,
+      showOnlyDepartmentUnassignedCandidates: this.unassignedemployeecountwidget,
     });
   }
 
@@ -467,7 +478,7 @@ export class StaffListComponent implements OnInit {
       skillIds,
       showOnlyDepartmentUnassignedCandidates
     } = this.staffListReportForm.getRawValue();
-    if (!this.staffListReportForm.dirty) {
+    if (!this.staffListReportForm.dirty && !this.unassignedemployeecountwidget) {
       this.message = 'Default filter selected with all regions, locations and departments.';
     } else {
       this.isResetFilter = false;
@@ -505,7 +516,7 @@ export class StaffListComponent implements OnInit {
     else this.reportName.name = this.RegularReportName; 
 
     this.paramsData = {
-      OrganizationParam: this.selectedOrganizations?.map((list) => list.organizationId).join(','),
+      OrganizationParam: typeof(this.selectedOrganizations)!== "undefined" ?this.selectedOrganizations?.map((list) => list.organizationId).join(',') : [],
       RegionsParam: regions,
       LocationsParam: locations,
       DepartmentsParam: departments,

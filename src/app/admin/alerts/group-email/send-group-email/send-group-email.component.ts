@@ -1061,21 +1061,22 @@ export class SendGroupEmailComponent
         : 'null';
     var orientationComplete = this.orientationCompleteControl.value;
     
-    this.store.dispatch(
-      new GetGroupEmailEmployees(
-        this.businessControl.value,
-        regions,
-        locations,
-        departments,
-        skills,
-        workCommitments,
-        orientationComplete
-      )
-    );
-    this.employeeData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {      
-      this.userData = data;
-    });
-
+    if(this.isEmployeeType) {
+      this.store.dispatch(
+        new GetGroupEmailEmployees(
+          this.businessControl.value,
+          regions,
+          locations,
+          departments,
+          skills,
+          workCommitments,
+          orientationComplete
+        )
+      );
+      this.employeeData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {      
+        this.userData = data;
+      });
+    }
     this.changeDetectorRef.detectChanges();
   }
 

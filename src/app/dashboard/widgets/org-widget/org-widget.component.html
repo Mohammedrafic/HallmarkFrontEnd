@@ -69,7 +69,18 @@
           </span>
       </div>
     </div>
-
+    <div class="widget" *ngIf="selectedSystem.isIRP">
+      <span class="widget__type" (mousedown)="defineMousePosition($event)"
+        (click)="toSourceContent('NoOfUnAssignedEmployee')">
+        <ul>
+          <li>
+          </li>
+        </ul> 
+        <p class="orgname">Departments Unassigned Employee Count</p>
+        
+        <p class="orgcount">{{chartData?.departmentUnAssignedEmployeeCount}}</p>
+      </span>
+    </div>
     <div class="widget" *ngIf="isAgencyUser">
       <span class="widget__type" (mousedown)="defineMousePosition($event)">
         <ul>

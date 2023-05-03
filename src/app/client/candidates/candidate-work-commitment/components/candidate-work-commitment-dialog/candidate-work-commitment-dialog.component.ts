@@ -105,16 +105,16 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public dateValueChange(event: Date): void {
     this.startDate = event;
   }
-  
-  public getPayRateById(event:any){
-    if(event.itemData.id>0){
+
+  public getPayRateById(event: any) {
+    if (event.itemData.id > 0) {
       this.candidateWorkCommitmentService.getPayRateById(event.itemData.id)
-      .subscribe((payrate:number) => {
-        if (payrate) {
-          this.candidateWorkCommitmentForm.controls['payRate'].setValue(payrate);
-        }
-        this.cd.detectChanges();
-      });
+        .subscribe((payrate: number) => {
+          if (payrate) {
+            this.candidateWorkCommitmentForm.controls['payRate'].setValue(payrate);
+          }
+          this.cd.detectChanges();
+        });
     }
   }
 
@@ -182,7 +182,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     selectedCommitments.forEach(item => {
       const currentStart = new Date(item.startDate);
       const currentEnd = item.endDate ? new Date(item.endDate) : null;
-  
+
       if ((end && currentStart > end) || (end && currentEnd && currentEnd < start)) {
         overlap = false;
       } else {
@@ -244,12 +244,13 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       workCommitmentId: 0,
       workCommitmentOrgHierarchies: [],
       departmentId: 0,
-      departmentName: ''
+      departmentName: '',
+      allRegionsSelected: false,
+      allLocationsSelected: false
     }
     return commitment;
   }
 
-  
   private setDatesValidation(commitment: WorkCommitmentDetails): void {
     const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
     this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
@@ -283,7 +284,6 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       this.workCommitmentGroup.items.forEach(item => {
         workCommitmentOrgHierarchies.push(...item.workCommitmentOrgHierarchies);
       });
-      
       const selectedHierarchies: WorkCommitmentOrgHierarchies[] = [];
       this.selectedRegionLocations.forEach(location => {
         selectedHierarchies.push(...workCommitmentOrgHierarchies.filter((item => item.locationId === location.id)));
@@ -490,7 +490,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         this.cd.markForCheck();
       });
 
-      this.candidateWorkCommitmentForm.controls['locationIds'].valueChanges
+    this.candidateWorkCommitmentForm.controls['locationIds'].valueChanges
       .pipe(
         distinctUntilChanged(),
         takeUntil(this.destroy$)

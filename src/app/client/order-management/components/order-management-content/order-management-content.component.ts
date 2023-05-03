@@ -380,6 +380,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public gridDomLayout: 'normal' | 'autoHeight' | 'print' | undefined;
   public openregrateupdate = false;
   public CurrentOrderDatas:any = [];
+  public PerDiemOrderDatas:any=[];
   public filteredUsers: FilteredUser[] = [];
   public userSearch$ = new Subject<FilteringEventArgs>();
 
@@ -888,7 +889,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filters = {};
     this.search?.clear();
   }
-
+  
   private checkSelectedChildrenItem(): void {
     const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children?.length !== 0);
     const hasSelectedChildReorders = this.selectedItems.some((itm) => itm.reOrders?.length !== 0);
@@ -928,9 +929,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           : permPlacementColumnsToExport;
     }
     this.CurrentOrderDatas = [];
+    this.PerDiemOrderDatas=[];
     for(let i=0;i<this.selectedItems.length;i++){
       if((this.selectedItems[i].statusText === "Open") || (this.selectedItems[i].statusText === "In progress")){
         this.CurrentOrderDatas.push(this.selectedItems[i].id);
+        if ((this.selectedItems[i].orderType === OrderType.ReOrder) || (this.selectedItems[i].orderType === OrderType.OpenPerDiem)) {
+          this.PerDiemOrderDatas.push(this.selectedItems[i].id);
+        }
       }
     }
 

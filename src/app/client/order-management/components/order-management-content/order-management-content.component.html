@@ -1170,6 +1170,7 @@
   #updaterateRow
   *ngIf="userPermission[userPermissions.CanBulkHourlyRateUpdate] && openregrateupdate"
   [orderdatas]="CurrentOrderDatas"
+  [perdiemOrderData]="PerDiemOrderDatas"
   (reloadItemsListforupdate)="updatePageforbulk()"
 ></app-update-reg-rate>
 
