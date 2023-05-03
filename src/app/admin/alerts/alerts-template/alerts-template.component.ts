@@ -1,3 +1,5 @@
+import { GetBusinessForEmployeeType } from './../../../security/store/security.actions';
+import { ButtonModel } from '@shared/models/buttons-group.model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, NgZone } from '@angular/core';
@@ -43,6 +45,10 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { AppState } from '../../../store/app.state';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 import { OutsideZone } from '@core/decorators';
+import { DetectActiveSystem, SystemGroupConfig } from '@client/order-management/constants';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { GetOrganizationById } from '@admin/store/admin.actions';
 
 @Component({
   selector: 'app-template',
@@ -66,6 +72,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public businessForm: FormGroup;
   public isBusinessFormDisabled = false;
   public businessUnits = BUSINESS_UNITS_VALUES;
+  public filteredBusinessUnits = BUSINESS_UNITS_VALUES;
   public optionFields = OPRION_FIELDS;
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   @ViewChild('RTE')
@@ -121,7 +128,13 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public totalRecordsCount: number;
   public getdata:any;
   public showtoast:boolean = true;
-
+  public isIRPFlagEnabled = false;
+  public isOrgVMSEnabled = false;
+  public isOrgIRPEnabled = false;
+  private previousSelectedSystemId: OrderManagementIRPSystemId | null;
+  public activeSystem: OrderManagementIRPSystemId;
+  public systemGroupConfig: ButtonModel[];
+  
   defaultValue: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   rowModelType: any;
@@ -229,7 +242,43 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
       sortable: true,
       filter: false
     };
+
+    this.loadSystemButtons();
   }
+
+  loadSystemButtons(){    
+    const businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+    console.log(businessUnitType);
+    // this.store.dispatch(new GetOrganizationById(id)).pipe(
+    //   takeUntil(this.unsubscribe$)
+    // ).subscribe(() => {
+    //   debugger;
+    //   const { isIRPEnabled, isVMCEnabled } =
+    //     this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+
+    //   this.isOrgIRPEnabled = !!isIRPEnabled;
+    //   this.isOrgVMSEnabled = !!isVMCEnabled;
+
+    //   if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
+    //     this.activeSystem = OrderManagementIRPSystemId.VMS;
+    //   } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
+    //     this.activeSystem = OrderManagementIRPSystemId.IRP;        
+    //   }
+
+    //   if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
+    //     this.activeSystem = OrderManagementIRPSystemId.IRP;
+    //   } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && this.isOrgVMSEnabled) {
+    //     this.activeSystem = OrderManagementIRPSystemId.VMS;
+    //   }
+
+    //   if (!this.previousSelectedSystemId) {
+    //     this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+    //   }
+      this.activeSystem = OrderManagementIRPSystemId.VMS;
+      this.systemGroupConfig = SystemGroupConfig(true, true, this.activeSystem);
+    // });
+  }
+
   ngOnDestroy(): void {
     this.store.dispatch(new ClearAlertTemplateState());
     this.unsubscribe$.next();
@@ -246,6 +295,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.onBusinessValueChanged();
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
+    this.filteredBusinessUnits = this.businessUnits;
     if (user?.businessUnitType) {
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
       this.isBusinessFormDisabled && this.businessForm.disable();
@@ -254,6 +304,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
     }
+    this.adjustBusinessUnitTypeBasedActiveSystem();
+
     this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
     this.actions$
       .pipe(
@@ -315,6 +367,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         }
       });
   }
+
   public onEmailTemplateEdit(data: any): void {
     this.alertChannel=AlertChannel.Email;
     this.alertTemplateType = AlertChannel[AlertChannel.Email];
@@ -377,11 +430,12 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     }
   }
   private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
-    this.getdata = this.store.dispatch(new GetAlertsTemplatePage(this.businessUnitControl.value, this.businessControl.value == 0 ? null : this.businessControl.value, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    this.getdata = this.store.dispatch(new GetAlertsTemplatePage(this.businessUnitControl.value, this.businessControl.value == 0 ? null : this.businessControl.value, this.currentPage, this.pageSize, sortModel, filterModel, this.filters, this.activeSystem == OrderManagementIRPSystemId.IRP));
     this.getErrorAlert();
   }
   private dispatchEditAlertTemplate(alertId: number, alertChannel: AlertChannel,businessUnitId:number|null): void {
-    this.store.dispatch(new GetTemplateByAlertId(alertId, alertChannel,businessUnitId));
+    let businessUnitType = this.businessUnitControl.value;
+    this.store.dispatch(new GetTemplateByAlertId(alertId, alertChannel,businessUnitId,businessUnitType,this.activeSystem == OrderManagementIRPSystemId.IRP));
   }
   onPageSizeChanged(event: any) {
     this.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
@@ -396,7 +450,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public onEdit({ index, column, foreignKeyData, alertId, ...alertsTemplate }: AlertsTemplate & { index: string; column: unknown; foreignKeyData: unknown }): void {
     this.subTitle = alertsTemplate.alertTitle;
     this.alertTemplate={alertId, ...alertsTemplate };
-    let businessUnitId=this.businessControl.value==0?null:this.businessControl.value;
+    let businessUnitId=this.businessControl.value==0?null:this.businessControl.value;    
     if (this.alertTemplateType === AlertChannel[AlertChannel.Email]) {
       this.emailTemplateForm.addEditEmailTemplateForm.reset();
       this.SetEditData(alertId, AlertChannel.Email,businessUnitId);
@@ -440,7 +494,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           alertTitle: formValues.alertTitle,
           toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
           cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
+          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList,
+          businessUnitType:this.businessUnitControl.value
         };
         this.store.dispatch(new SaveTemplateByAlertId(emailAddTemplateDto));
       }
@@ -472,7 +527,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           alertTitle: this.editAlertTemplateData.alertTitle == undefined?"":this.editAlertTemplateData.alertTitle,
           toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
           cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
+          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList,
+          businessUnitType:this.businessUnitControl.value
         };
         this.store.dispatch(new SaveTemplateByAlertId(smsAddTemplateDto));
       }
@@ -505,7 +561,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           alertTitle: formValues.alertTitle,
           toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
           cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
+          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList,
+          businessUnitType:this.businessUnitControl.value
         };
         this.store.dispatch(new SaveTemplateByAlertId(onScreenAddTemplateDto));
       }
@@ -534,7 +591,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   private onScreenTemplateCloseDialog(): void {
     this.store.dispatch(new ShowOnScreenSideDialog(false));
   }
-  private SetEditData(alertId: number, alertChannel: AlertChannel,businessUnitId:number |null): void {
+  private SetEditData(alertId: number, alertChannel: AlertChannel,businessUnitId:number |null): void {    
     this.dispatchEditAlertTemplate(alertId, alertChannel,businessUnitId);
   }
   private generateBusinessForm(): FormGroup {
@@ -545,7 +602,11 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   }
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      this.store.dispatch(new GetBusinessByUnitType(value));
+      if(value == BusinessUnitType.Candidates){
+        this.store.dispatch(new GetBusinessForEmployeeType());
+      } else {
+        this.store.dispatch(new GetBusinessByUnitType(value));
+      }
       if (value == 1) {
         this.dispatchNewPage();
       }
@@ -585,4 +646,18 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     },3000)
   }
 
+  changeSystem(selectedBtn: ButtonModel) {
+    this.activeSystem = selectedBtn.id;
+    this.adjustBusinessUnitTypeBasedActiveSystem();    
+    this.dispatchNewPage();
+  }
+
+  adjustBusinessUnitTypeBasedActiveSystem(){    
+    this.filteredBusinessUnits = this.businessUnits;
+    if(this.activeSystem == OrderManagementIRPSystemId.IRP)
+      this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
+        
+    if(this.activeSystem == OrderManagementIRPSystemId.VMS)
+      this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.Candidates);
+  }
 }

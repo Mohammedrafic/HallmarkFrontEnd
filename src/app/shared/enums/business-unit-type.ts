@@ -9,6 +9,7 @@ export enum BusinessUnitType {
   MSP = 2,
   Organization = 3,
   Agency = 4,
+  Candidates = 7
 }
 
 export const businessUnitValues = Object.values(BusinessUnitType)

@@ -212,10 +212,10 @@ export class AlertsState {
   @Action(GetAlertsTemplatePage)
   GetAlertsTemplatePage(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters }: GetAlertsTemplatePage
+    { businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters, isIRP }: GetAlertsTemplatePage
   ): Observable<AlertsTemplatePage | void> {
     return this.alertsService
-      .getAlertsTemplatePage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters)
+      .getAlertsTemplatePage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters, isIRP)
       .pipe(
         tap((payload) => {
           patchState({ alertsTemplatePage: payload });
@@ -230,9 +230,9 @@ export class AlertsState {
   @Action(GetTemplateByAlertId)
   GetTemplateByAlertId(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { alertId, alertChannel, businessUnitId }: GetTemplateByAlertId
+    { alertId, alertChannel, businessUnitId, businessUnitType, isIRP }: GetTemplateByAlertId
   ): Observable<EditAlertsTemplate | void> {
-    return this.alertsService.getTemplateByAlertId(alertId, alertChannel, businessUnitId).pipe(
+    return this.alertsService.getTemplateByAlertId(alertId, alertChannel, businessUnitId, businessUnitType, isIRP).pipe(
       tap((payload) => {
         patchState({ editAlertsTemplate: payload });
         return payload;

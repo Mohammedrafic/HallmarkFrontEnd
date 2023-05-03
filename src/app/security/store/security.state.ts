@@ -35,6 +35,7 @@ import {
   GetOrgInterfacePage,
   GetLogInterfacePage,
   GetLogHistoryById,
+  GetBusinessForEmployeeType,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -649,5 +650,20 @@ export class SecurityState {
         })
       );
   }
-  
+
+  @Action(GetBusinessForEmployeeType)
+  GetBusinessForEmployeeType(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { }: GetBusinessForEmployeeType
+  ): Observable<BusinessUnit[] | void> {
+    return this.businessUnitService.getBusinessForEmployeeType().pipe(
+      tap((payload) => {
+        patchState({ bussinesData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
 }

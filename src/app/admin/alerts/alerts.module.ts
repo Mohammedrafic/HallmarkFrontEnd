@@ -1,3 +1,4 @@
+import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AlertsRoutingModule } from './alerts-routing.module';
@@ -62,6 +63,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     UploaderModule,
     PdfViewerModule,
     FontAwesomeModule,
+    ButtonGroupModule,
     NgxsModule.forFeature([AlertsState]),
   ]
 })

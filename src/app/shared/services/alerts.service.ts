@@ -65,12 +65,13 @@ export class AlertsService {
     PageSize: number,
     SortModel: any,
     FilterModel: any,
-    Filters: AlertsTemplateFilters
+    Filters: AlertsTemplateFilters,
+    IsIRP: boolean
    ): Observable<AlertsTemplatePage> {
      if (BusinessUnitId == null) {
-       return this.http.get<AlertsTemplatePage>(`/api/Templates/GetAlertsForTemplate/` + BusinessUnitType, { params: { PageNumber: PageNumber, PageSize: PageSize } });
+       return this.http.get<AlertsTemplatePage>(`/api/Templates/GetAlertsForTemplate/` + BusinessUnitType, { params: { PageNumber: PageNumber, PageSize: PageSize, IsIRP } });
      }
-    return this.http.get<AlertsTemplatePage>(`/api/Templates/GetAlertsForTemplate/`+BusinessUnitType,{ params: {BusinessUnitId :BusinessUnitId, PageNumber: PageNumber, PageSize: PageSize }});
+    return this.http.get<AlertsTemplatePage>(`/api/Templates/GetAlertsForTemplate/`+BusinessUnitType,{ params: {BusinessUnitId :BusinessUnitId, PageNumber: PageNumber, PageSize: PageSize, IsIRP }});
       }
   
   /**
@@ -83,13 +84,15 @@ export class AlertsService {
    public getTemplateByAlertId(
     AlertId:number,
     AlertChannel:AlertChannel,
-    BusinessUnitId:any
+    BusinessUnitId:any,
+    BusinessUnitType:any,
+    IsIRP:boolean
   ): Observable<EditAlertsTemplate> {     
      if(BusinessUnitId==null)
      {
-      return this.http.get<EditAlertsTemplate>(`/api/Templates/GetTemplateByAlertId/`+ AlertId,{params:{AlertChannel: AlertChannel}});
+      return this.http.get<EditAlertsTemplate>(`/api/Templates/GetTemplateByAlertId/`+ AlertId,{params:{AlertChannel: AlertChannel,BusinessUnitType,IsIRP}});
      }
-    return this.http.get<EditAlertsTemplate>(`/api/Templates/GetTemplateByAlertId/`+ AlertId,{params:{AlertChannel: AlertChannel, BusinessUnitId: BusinessUnitId}});
+    return this.http.get<EditAlertsTemplate>(`/api/Templates/GetTemplateByAlertId/`+ AlertId,{params:{AlertChannel: AlertChannel, BusinessUnitId: BusinessUnitId, BusinessUnitType,IsIRP}});
   }
 
   /**

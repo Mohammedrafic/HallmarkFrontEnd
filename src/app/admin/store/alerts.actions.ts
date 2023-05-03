@@ -32,7 +32,8 @@ export class GetUserSubscriptionPage {
       public pageSize: number,
       public sortModel: any,
       public filterModel: any,
-      public filters: AlertsTemplateFilters
+      public filters: AlertsTemplateFilters,
+      public isIRP: boolean
     ) {}
   }
 
@@ -41,7 +42,9 @@ export class GetUserSubscriptionPage {
     constructor(
       public alertId:number,
       public alertChannel: AlertChannel,
-      public businessUnitId:number |null
+      public businessUnitId:number |null,
+      public businessUnitType:number | null,
+      public isIRP: boolean
     ) {}
   }
   export class UpdateTemplateByAlertId {
