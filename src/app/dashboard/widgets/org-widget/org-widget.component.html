@@ -57,6 +57,18 @@
           <p class="orgcount">{{chartData?.pendingTimeSheets}}</p>
         </span>
       </div>
+      <div class="widget">
+        <span class="widget__type" (mousedown)="defineMousePosition($event)"
+          (click)="toSourceContent('Unassignedworkcommitment')">
+          <ul>
+            <li>
+            </li>
+          </ul> 
+          <p class="orgname">Employee list work commitment not assigned</p>
+          
+          <p class="orgcount">{{chartData?.workCommitmentUnAssignedEmployeeCount}}</p>
+        </span>
+      </div>
       <div class="widget" *ngIf="selectedSystem.isIRP">
           <span class="widget__type" (mousedown)="defineMousePosition($event)"
             (click)="toSourceContent('NoOfLongTermOrders')">
@@ -81,6 +93,7 @@
         <p class="orgcount">{{chartData?.departmentUnAssignedEmployeeCount}}</p>
       </span>
     </div>
+    
     <div class="widget" *ngIf="isAgencyUser">
       <span class="widget__type" (mousedown)="defineMousePosition($event)">
         <ul>
