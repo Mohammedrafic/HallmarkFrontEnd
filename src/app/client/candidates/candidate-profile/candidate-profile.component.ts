@@ -76,18 +76,26 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
       });
   }
 
+  private isSkillChanged(): boolean {
+    return !!(this.candidateService.employeeId && 
+      (this.candidateProfileFormService.candidateForm.get('primarySkillId')?.dirty || this.candidateProfileFormService.candidateForm.get('secondarySkills')?.dirty));
+  }
+
+  private skillChangeConfirmation(): Observable<void | CandidateModel> {
+    return this.confirmService
+      .confirm(EMPLOYEE_SKILL_CHANGE_WARNING, {
+        title: WARNING_TITLE,
+        okButtonLabel: 'Yes',
+        okButtonClass: 'delete-button',
+      }).pipe(
+        filter(Boolean),
+        switchMap(() => this.saveCandidate()),
+        takeUntil(this.destroy$));
+  }
+
   private skillsChangeHandler(): Observable<void | CandidateModel> {
-    if (this.candidateService.employeeId && 
-         (this.candidateProfileFormService.candidateForm.get('primarySkillId')?.dirty || this.candidateProfileFormService.candidateForm.get('secondarySkills')?.dirty)) {
-            return this.confirmService
-              .confirm(EMPLOYEE_SKILL_CHANGE_WARNING, {
-                title: WARNING_TITLE,
-                okButtonLabel: 'Yes',
-                okButtonClass: 'delete-button',
-              }).pipe(
-                filter(Boolean),
-                switchMap(result => this.saveCandidate()),
-                takeUntil(this.destroy$));
+    if (this.isSkillChanged()) {
+      return this.skillChangeConfirmation();
     }
     return this.saveCandidate();
   }
