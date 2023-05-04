@@ -5,6 +5,7 @@ import { AnalyticsMenuId } from '../../shared/constants/menu-config';
 import { Menu, MenuItem } from '../../shared/models/menu.model';
 import { UserState } from '../../store/user.state';
 import { MenuSettings } from '@shared/models';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-analytics',
@@ -14,12 +15,13 @@ export class AnalyticsComponent implements OnInit, OnDestroy  {
   public sideMenuConfig: MenuSettings[] = [];
   @Select(UserState.menu)
   menu$: Observable<Menu>;
-
+  private isRedirectedFromDashboard: boolean;
   private unsubscribe$: Subject<void> = new Subject();
   public isLoad: boolean = false;
 
-  constructor() {
-
+  constructor(private router: Router) {
+    const routerState = this.router.getCurrentNavigation()?.extras?.state;
+    this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
   }
   ngOnInit(): void {
     this.isLoad = false;
@@ -32,6 +34,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy  {
   }
 
   initAnalyticsSubMenu(): void {
+    if(!this.isRedirectedFromDashboard)
+    {
     this.menu$.pipe(takeUntil(this.unsubscribe$)).subscribe((menu: Menu) => {
       this.sideMenuConfig = [];
       if (menu.menuItems.length) {
@@ -45,4 +49,5 @@ export class AnalyticsComponent implements OnInit, OnDestroy  {
       }
     });
   }
+}
 }

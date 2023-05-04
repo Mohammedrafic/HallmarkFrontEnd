@@ -933,9 +933,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     for(let i=0;i<this.selectedItems.length;i++){
       if((this.selectedItems[i].statusText === "Open") || (this.selectedItems[i].statusText === "In progress")){
         this.CurrentOrderDatas.push(this.selectedItems[i].id);
-      }
-      if ((this.selectedItems[i].orderType === OrderType.ReOrder) || (this.selectedItems[i].orderType === OrderType.OpenPerDiem)){
-        this.PerDiemOrderDatas.push(this.selectedItems[i].id);
+        if ((this.selectedItems[i].orderType === OrderType.ReOrder) || (this.selectedItems[i].orderType === OrderType.OpenPerDiem)) {
+          this.PerDiemOrderDatas.push(this.selectedItems[i].id);
+        }
       }
     }
 
@@ -1784,7 +1784,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public lockOrder(order: Order): void {
     this.store.dispatch(
-      new SetLock(order.id, !order.isLocked, this.filters, `${order.organizationPrefix || ''}-${order.publicId}`)
+      new SetLock(order.id, !order.isLocked, this.filters, `${order.organizationPrefix || ''}-${order.publicId}`,this.isActiveSystemIRP,false)
     );
   }
 

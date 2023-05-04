@@ -1,5 +1,6 @@
 import { PayRateFilters, PayRateSetupPost } from '@shared/models/pay-rate.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { MasterCommitment } from "@shared/models/commitment.model";
 
 export class GetPayRates {
   static readonly type = '[payrates] Get Pay Rates Pages';
@@ -36,3 +37,7 @@ export class GetSkillsbyDepartment {
   constructor(public payload: number[]) { }
 }
 
+export class GetWorkCommitmentByPage {
+  static readonly type = '[payrates] Get Work Commitment by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}

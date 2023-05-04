@@ -9,5 +9,6 @@ export interface OrgDetailsInfoModel {
     expiringCredentialsCount: number;
     missingTimeSheet: AgencyPositionModel[];
     quickLinkNoOfLongTermOrdersInNext30Days:number;
+    departmentUnAssignedEmployeeCount:number;
     id : WidgetTypeEnum.ORG;
 }

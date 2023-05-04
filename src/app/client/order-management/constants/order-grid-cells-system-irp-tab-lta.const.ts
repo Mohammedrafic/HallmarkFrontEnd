@@ -15,6 +15,7 @@ import { GridValuesHelper } from '@core/helpers';
 import {
   CriticalCellComponent,
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell/critical-cell.component';
+import { OrderStatus } from '@shared/enums/order-management';
 
 export const GridCellsSystemIRPTabLta = (
   threeDotsMenuOptions: Record<string, ItemModel[]> = {},
@@ -53,7 +54,10 @@ export const GridCellsSystemIRPTabLta = (
             iconName: params.data.isLocked ? 'lock' : 'unlock',
             buttonClass: params.data.isLocked ? 'e-danger' : '',
             isCustomIcon: !params.data.isLocked,
-            disabled: params.data.orderTypeText!="LTA",
+            disabled: !canCreateOrder
+            || ![OrderStatus.Open, OrderStatus.InProgress, OrderStatus.Filled].includes(params.data.status)
+            || !hasCreateEditOrderPermission
+            || params.data.orderTypeText != "LTA",
           },
           {
             action: (itemId: number) => {

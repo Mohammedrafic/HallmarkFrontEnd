@@ -212,6 +212,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.isAlive = false;
   }
 
   public onFilterControlValueChangedHandler(): void {

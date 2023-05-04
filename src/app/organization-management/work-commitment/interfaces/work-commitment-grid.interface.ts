@@ -39,6 +39,8 @@ export interface WorkCommitmentDetails {
   skills: ListOfSkills[];
   workCommitmentId: number;
   workCommitmentOrgHierarchies: WorkCommitmentOrgHierarchies[];
+  allRegionsSelected :boolean;
+  allLocationsSelected :boolean;
 }
 
 export interface WorkCommitmentGrid {
@@ -62,6 +64,8 @@ export interface WorkCommitmentGrid {
   skillNames: string[];
   skillIds: number[];
   workCommitmentId: number;
+ allRegionsSelected :boolean;
+  allLocationsSelected :boolean;
 }
 
 export type WorkCommitmentsPage = PageOfCollections<WorkCommitmentDetails>;
