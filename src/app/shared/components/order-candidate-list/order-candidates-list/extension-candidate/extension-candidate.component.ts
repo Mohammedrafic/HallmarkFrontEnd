@@ -767,7 +767,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
         .pipe().subscribe((value) => {
-          console.log(value);
           this.candidateCancellationReasons =value;
         });
 
