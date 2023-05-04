@@ -669,7 +669,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
         .pipe().subscribe((value) => {
-          console.log(value);
           this.candidateCancellationReasons =value;
         });
 

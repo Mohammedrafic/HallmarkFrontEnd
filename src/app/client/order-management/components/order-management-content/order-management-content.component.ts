@@ -537,19 +537,18 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.subscribeOnUserSearch();
     this.watchForUpdateCandidate();
    
-  let isIrpEnabled=  JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
-  if(isIrpEnabled==true){
-    this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
-    this.activeSystem = OrderManagementIRPSystemId.IRP;
-    this.getPreservedFiltersByPage();
-    this.orderManagementService.setOrderManagementSystem(this.activeSystem);
-    this.setOrderTypesFilterDataSource();
-    this.clearFilters();
-    this.initMenuItems();
-    this.initGridColumns();
-    this.getOrders();
-  }
-   
+    let isIrpEnabled = JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
+    if (isIrpEnabled === true ) {
+      this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
+      this.activeSystem = OrderManagementIRPSystemId.IRP;
+      this.getPreservedFiltersByPage();
+      this.orderManagementService.setOrderManagementSystem(this.activeSystem);
+      this.setOrderTypesFilterDataSource();
+      this.clearFilters();
+      this.initMenuItems();
+      this.initGridColumns();
+      this.getOrders();
+    }
   }
 
   ngOnDestroy(): void {
@@ -1961,7 +1960,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   updatePositionDetails(position: OrderManagementChild): void {
-    this.getOrders();
+    this.getOrders(true);
     this.store.dispatch(new GetOrganisationCandidateJob(position.organizationId, position.jobId));
     this.candidatesJob$.pipe(take(2), filter(Boolean)).subscribe((res) => {
       this.selectedCandidate = {
