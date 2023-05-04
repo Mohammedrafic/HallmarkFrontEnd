@@ -151,7 +151,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     ) as PreservedFiltersByPage<TimesheetsFilterState>;
     const filters = !preservedFilters.isNotPreserved ? preservedFilters.state : {};
     const statusIds = this.activeTabIdx === 0 ? filters.statusIds : this.tabConfig[tabIndex].value;
-    this.grid?.gridInstance$?.value.columnApi.resetColumnState();
+    this.grid?.gridInstance$?.value?.columnApi.resetColumnState();
 
     this.store.dispatch(
       new Timesheets.UpdateFiltersState(

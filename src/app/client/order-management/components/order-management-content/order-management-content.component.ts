@@ -1865,6 +1865,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
     const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
     const items = JSON.parse(dashboardFilterState) as FilteredItem[]||[];
+    let pendingApprovalOrders = this.globalWindow.localStorage.getItem('pendingApprovalOrders') || 'null';
+    if(pendingApprovalOrders != ''){
+      this.store.dispatch(new PreservedFilters.ResetPageFilters());
+    }
     const filteredItems = items.filter((item: FilteredItem) =>
       (item.organizationId === this.organizationId && item.column !== FilterColumnTypeEnum.ORGANIZATION)
       || item.column === FilterColumnTypeEnum.SKILL
