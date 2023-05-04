@@ -193,8 +193,8 @@ export class GeneralCommentsComponent implements OnInit {
     });
   }
   private initForm(): void {
-    let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 14);
+    let EndDate = new Date(Date.now());
+    EndDate.setDate(EndDate.getDate() + 7);
     this.generalcmntReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
@@ -202,8 +202,8 @@ export class GeneralCommentsComponent implements OnInit {
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),
         agencyIds: new FormControl([]),
-        startDate: new FormControl(startDate, [Validators.required]),
-        endDate: new FormControl(new Date(Date.now()), [Validators.required]),
+        startDate: new FormControl(new Date(Date.now()), [Validators.required]),
+        endDate: new FormControl(EndDate, [Validators.required]),
         CommentedType: new FormControl(null),
         CommentedLevel: new FormControl(null),
         Commentedby: new FormControl(null),
@@ -494,14 +494,14 @@ export class GeneralCommentsComponent implements OnInit {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
+    let EndDate = new Date(Date.now());
+    EndDate.setDate(EndDate.getDate() + 7);
     this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
     this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.LocationIds)?.setValue([]);
     this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.DepartmentIds)?.setValue([]);
     this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.AgencyIds)?.setValue([]);
-    this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.StartDate)?.setValue(startDate);
-    this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.StartDate)?.setValue(new Date(Date.now()));
+    this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.EndDate)?.setValue(EndDate);
     this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.OrderId)?.setValue([]);
     this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.CandidateName)?.setValue(null);
     this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.Commentedby)?.setValue(0);
