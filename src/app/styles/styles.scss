@@ -638,3 +638,11 @@ body.dark .title, body.dark .contact-name {
   overflow-y: auto;
   overflow-x: hidden;
 }
+svg.svg-inline--fa.fa-users , svg.feather.feather-eye, svg.feather.feather-eye-off{
+  width: 20px;
+  height: 20px;
+}
+svg.svg-inline--fa.fa-lock,  svg.svg-inline--fa.fa-unlock{
+  width: 17px;
+  height: 17px;
+}

@@ -172,6 +172,9 @@ import { ValidationErrorModule } from './pipes/validation-error/validation.error
 import { GridPaginationModule } from './components/grid/grid-pagination/grid-pagination.module';
 import { EditIrpCandidateModule } from '@shared/components/order-candidate-list/edit-irp-candidate/edit-irp-candidate.module';
 import { CustomExportDialogComponent } from './components/custom-export-dialog/custom-export-dialog.component';
+import { CommentsIrpComponent } from './components/comments-irp/comments-irp.component';
+import { CommentdataComponent } from './components/comments-irp/commentdata/commentdata.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 const icons = {
   AlertCircle,
@@ -263,6 +266,8 @@ const COMPONENTS = [
   DocumentPreviewSideDialogComponent,
   CustomSideDialogComponent,
   CustomExportDialogComponent,
+  CommentsIrpComponent,
+  CommentdataComponent
 ];
 
 @NgModule({
@@ -313,6 +318,7 @@ const COMPONENTS = [
     ValidationErrorModule,
     GridPaginationModule,
     EditIrpCandidateModule,
+    FontAwesomeModule
   ],
   exports: [
     ...COMPONENTS,
@@ -351,6 +357,9 @@ const COMPONENTS = [
     HideByCandidateStatusPipe,
     TabsMobileShadowDirective,
     LocalDateTimePipe,
+    CommentsIrpComponent,
+    CommentsComponent,
+    CommentdataComponent,
   ],
   providers: [
     DatePipe,

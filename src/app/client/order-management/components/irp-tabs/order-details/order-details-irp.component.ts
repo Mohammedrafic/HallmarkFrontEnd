@@ -102,6 +102,7 @@ import { OrganizationStructureService, SettingsViewService } from '@shared/servi
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
+import { Comment } from '@shared/models/comment.model';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -148,6 +149,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public orderStatus = Incomplete;
   public selectedOrder: Order;
   public regionsStructure: OrganizationRegion[] = [];
+  public comments: Comment[] = [];
+  public commentContainerId = 0;
+  @Input() public externalCommentConfiguration ?: boolean | null;
 
   private dataSourceContainer: OrderDataSourceContainer = {};
   private selectedSystem: SelectSystem;

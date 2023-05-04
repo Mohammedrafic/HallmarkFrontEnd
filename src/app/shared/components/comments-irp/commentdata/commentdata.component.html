@@ -1,0 +1,16 @@
+<section #message class="comment" [class.new]="comment.new || !comment.isRead">
+    <div class="comment-header">
+      <div class="name">
+        <span class="avatar"><i-feather name="user" class="icon"></i-feather></span>{{ comment.firstName }} {{ comment.lastName }}
+      </div>
+      <div class="controls">
+        <i-feather *ngIf="comment.isExternal" name="eye" class="icon visibility"></i-feather>
+        <i-feather *ngIf="!comment.isExternal" name="eye-off" class="icon visibility"></i-feather>
+        <span class="date">{{ comment.createdAt | date: "MM/dd/yyyy" }}</span>
+      </div>
+    </div>
+    <div class="comment-body">
+      {{ comment.text }}
+    </div>
+  </section>
+  
