@@ -372,7 +372,7 @@ export class GeneralCommentsComponent implements OnInit {
     }
       = this.generalcmntReportForm.getRawValue();
     if (!this.generalcmntReportForm.dirty) {
-      this.message = "Default filter selected with all regions, locations and departments for 30 days";
+      this.message = "Default filter selected with all regions, locations and departments for 7 days";
     }
     else {
       this.isResetFilter = false;
