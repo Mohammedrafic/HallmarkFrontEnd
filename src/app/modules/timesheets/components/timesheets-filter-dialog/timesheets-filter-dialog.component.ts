@@ -91,8 +91,9 @@ export class TimesheetsFilterDialogComponent
       )
       .subscribe(({ state }) => {
         let timeSheetMissing = JSON.parse(localStorage.getItem('timeSheetMissing') || '""') as string
+        let orgpendingwidget = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
         this.applyPreservedFilters(state);
-        if(timeSheetMissing != ''){
+        if(timeSheetMissing != '' || orgpendingwidget != ''){
           this.clearAllFilters();
         }
       });
