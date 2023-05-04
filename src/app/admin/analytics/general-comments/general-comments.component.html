@@ -90,15 +90,15 @@
     <div class="form-element">
       <div class="group">
         <div class="input-container bootstrap">
-          <label>Start Date<span class="required">*</span></label>
+          <label>Start Date</label>
           <div class="input-group datepicker">
             <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            appValidateWithMessage formControlName="startDate">
+                            appValidateWithMessage formControlName="startDate" [max]="generalcmntReportForm.controls['endDate'].value">
             </ejs-datepicker>
           </div>
         </div>
         <div class="input-container bootstrap">
-          <label>End Date<span class="required">*</span></label>
+          <label>End Date</label>
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                             formControlName="endDate" [min]="generalcmntReportForm.controls['startDate'].value">
