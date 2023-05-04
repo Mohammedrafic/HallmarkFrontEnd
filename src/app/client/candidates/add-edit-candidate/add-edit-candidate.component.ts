@@ -41,7 +41,7 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
     private store: Store,
   ) {
     super();
-    store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'clock' }));
+    store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'users' }));
   }
 
   public ngOnInit(): void {

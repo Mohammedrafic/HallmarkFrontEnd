@@ -450,14 +450,14 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
 
   private orgProfileActions(): void {
     this.profileMode = true;
-    this.store.dispatch(new SetHeaderState({ iconName: 'user', title: 'Organization Profile' }));
+    this.store.dispatch(new SetHeaderState({ iconName: 'organization', custom: true, title: 'Organization Profile' }));
     const user = this.store.selectSnapshot(UserState.user);
     this.store.dispatch(new GetOrganizationById(user?.businessUnitId as number));
     this.store.dispatch(new GetOrganizationLogo(user?.businessUnitId as number));
   }
 
   private orgListActions(): void {
-    this.store.dispatch(new SetHeaderState({ iconName: 'file-text', title: 'Organization List' }));
+    this.store.dispatch(new SetHeaderState({ iconName: 'organization', custom: true, title: 'Organization List' }));
     this.store.dispatch(new GetBusinessUnitList());
     this.store.dispatch(new GetDBConnections());
   }

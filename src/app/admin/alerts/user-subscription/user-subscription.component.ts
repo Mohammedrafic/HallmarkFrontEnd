@@ -119,7 +119,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     private readonly ngZone: NgZone,
     private store: Store) {
     super();
-    store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    store.dispatch(new SetHeaderState({ title: this.title, iconName: 'lock' }));
     this.rowModelType = 'serverSide';
     this.serverSideInfiniteScroll = true,
       this.pagination = true;

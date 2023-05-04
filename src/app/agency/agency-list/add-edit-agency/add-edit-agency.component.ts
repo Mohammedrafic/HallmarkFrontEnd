@@ -130,7 +130,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     private confirmService: ConfirmService
   ) {
     super(store);
-    this.store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'clock' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'briefcase' }));
     this.store.dispatch(new GetBusinessUnitList());
   }
 

@@ -2,7 +2,8 @@
   <div class="header-item">
     <div class="header-item__sidebar-menu" *ngIf="isMobile$ | async" (click)="toggleSidebar()"></div>
     <ng-container *ngIf="headerState$ | async as headerState">
-      <i-feather name="{{ headerState?.iconName }}" class="icon"></i-feather>
+      <i-feather *ngIf="!headerState?.custom" name="{{ headerState?.iconName }}" class="icon"></i-feather>
+      <app-custom-icon *ngIf="headerState?.custom" name="{{ headerState?.iconName }}" class="icon"></app-custom-icon>
       <h1 class="header-title">{{ headerState?.title }}</h1>
     </ng-container>
   </div>
@@ -105,7 +106,8 @@
                   (click)="selectMenuItem(data)"
                   (mouseenter)="showContextMenu(data, $event)"
                 >
-                  <i-feather [name]="data.icon" class="icon"></i-feather>
+                  <app-custom-icon *ngIf="data.custom" [name]="data.icon" class="icon"></app-custom-icon>
+                  <i-feather *ngIf="!data.custom" [name]="data.icon" class="icon"></i-feather>
                   <span class="e-text">{{ data.title }}</span>
                   <span class="e-badge e-badge-success e-badge-circle" *ngIf="data.count">{{ data.count }}</span>
                 </section>
