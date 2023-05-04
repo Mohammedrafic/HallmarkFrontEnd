@@ -243,6 +243,7 @@ export class UserState {
               menuItem.icon = MENU_CONFIG[businessUnitType][menuItem.id]?.icon;
               menuItem.route = MENU_CONFIG[businessUnitType][menuItem.id]?.route;
               menuItem.anch = menuItem.title;
+              menuItem.custom = MENU_CONFIG[businessUnitType][menuItem.id]?.custom;
               if (menuItem.children) {
                 menuItem.children = menuItem.children.map((child: any) => {
                   return {

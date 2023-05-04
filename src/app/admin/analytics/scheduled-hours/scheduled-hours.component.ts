@@ -135,7 +135,7 @@ export class ScheduledHoursComponent implements OnInit {
     @Inject(APP_SETTINGS) private appSettings: AppSettings
   ) {
     this.baseUrl = this.appSettings.host.replace('https://', '').replace('http://', '');
-    this.store.dispatch(new SetHeaderState({ title: 'Analytics', iconName: '' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Analytics', iconName: 'pie-chart' }));
     this.initForm();
     this.user = this.store.selectSnapshot(UserState.user);
     if (this.user?.id != null) {

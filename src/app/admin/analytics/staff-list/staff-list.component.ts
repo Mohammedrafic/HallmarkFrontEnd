@@ -146,7 +146,7 @@ export class StaffListComponent implements OnInit {
     @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
     this.baseUrl = this.appSettings.host.replace('https://', '').replace('http://', '');
-    this.store.dispatch(new SetHeaderState({ title: 'Analytics', iconName: '' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Analytics', iconName: 'pie-chart' }));
     this.unassignedemployeecountwidget = JSON.parse(localStorage.getItem('unassignedemployeecountwidget') || '"false"') as boolean; 
     this.initForm();
     this.user = this.store.selectSnapshot(UserState.user);

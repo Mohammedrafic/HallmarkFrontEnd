@@ -56,7 +56,7 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { downloadBlobFile } from '@shared/utils/file.utils';
-import { SetHeaderState, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import {
   AllowedCredentialFileExtensions,
@@ -222,7 +222,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     private ngZone: NgZone,
   ) {
     super();
-    this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
     this.candidateProfileId = Number(this.route.snapshot.paramMap.get('id'));
   }
 
