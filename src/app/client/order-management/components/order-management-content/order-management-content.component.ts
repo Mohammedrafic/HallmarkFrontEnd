@@ -1749,7 +1749,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ApproveOrder)).subscribe(() => {
       const [index] = this.gridWithChildRow.getSelectedRowIndexes();
       this.selectedIndex = index;
-      this.getOrders();
+      this.getOrders(true);
     });
   }
 
@@ -1957,7 +1957,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   updateOrderDetails(order: Order | OrderManagement): void {
     this.store.dispatch(new GetOrderById(order.id, order.organizationId as number));
     this.dispatchAgencyOrderCandidatesList(order.id, order.organizationId as number, !!order.irpOrderMetadata);
-    this.getOrders();
+    this.getOrders(true);
   }
 
   updatePositionDetails(position: OrderManagementChild): void {
