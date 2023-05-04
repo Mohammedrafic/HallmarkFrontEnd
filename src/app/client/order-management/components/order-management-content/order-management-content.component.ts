@@ -537,19 +537,18 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.subscribeOnUserSearch();
     this.watchForUpdateCandidate();
    
-  let isIrpEnabled=  JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
-  if(isIrpEnabled==true){
-    this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
-    this.activeSystem = OrderManagementIRPSystemId.IRP;
-    this.getPreservedFiltersByPage();
-    this.orderManagementService.setOrderManagementSystem(this.activeSystem);
-    this.setOrderTypesFilterDataSource();
-    this.clearFilters();
-    this.initMenuItems();
-    this.initGridColumns();
-    this.getOrders();
-  }
-   
+    let isIrpEnabled = JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
+    if (isIrpEnabled === true ) {
+      this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
+      this.activeSystem = OrderManagementIRPSystemId.IRP;
+      this.getPreservedFiltersByPage();
+      this.orderManagementService.setOrderManagementSystem(this.activeSystem);
+      this.setOrderTypesFilterDataSource();
+      this.clearFilters();
+      this.initMenuItems();
+      this.initGridColumns();
+      this.getOrders();
+    }
   }
 
   ngOnDestroy(): void {
@@ -1749,7 +1748,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ApproveOrder)).subscribe(() => {
       const [index] = this.gridWithChildRow.getSelectedRowIndexes();
       this.selectedIndex = index;
-      this.getOrders();
+      this.getOrders(true);
     });
   }
 
@@ -1961,11 +1960,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   updateOrderDetails(order: Order | OrderManagement): void {
     this.store.dispatch(new GetOrderById(order.id, order.organizationId as number));
     this.dispatchAgencyOrderCandidatesList(order.id, order.organizationId as number, !!order.irpOrderMetadata);
-    this.getOrders();
+    this.getOrders(true);
   }
 
   updatePositionDetails(position: OrderManagementChild): void {
-    this.getOrders();
+    this.getOrders(true);
     this.store.dispatch(new GetOrganisationCandidateJob(position.organizationId, position.jobId));
     this.candidatesJob$.pipe(take(2), filter(Boolean)).subscribe((res) => {
       this.selectedCandidate = {

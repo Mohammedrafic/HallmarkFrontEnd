@@ -418,7 +418,7 @@ export class OrderManagementContentState {
     return patchState({ ordersPage: null });
   }
 
-  @Action(GetOrderById)
+  @Action(GetOrderById, { cancelUncompleted: true })
   GetOrderById(
     { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
     { id, options, isIrp }: GetOrderById
@@ -465,7 +465,7 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetAgencyOrderCandidatesList)
+  @Action(GetAgencyOrderCandidatesList, { cancelUncompleted: true })
   GetAgencyOrderCandidatesPage(
     { patchState }: StateContext<OrderManagementContentStateModel>,
     { orderId, organizationId, pageNumber, pageSize, excludeDeployed, searchTerm }: GetAgencyOrderCandidatesList

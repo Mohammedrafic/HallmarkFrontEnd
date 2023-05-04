@@ -245,7 +245,6 @@ export class HeadCountComponent implements OnInit {
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
         this.defaultLocations = this.locations.map((list) => list.id);
-        this.headCountReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
         this.changeDetectorRef.detectChanges();
       }
       else {

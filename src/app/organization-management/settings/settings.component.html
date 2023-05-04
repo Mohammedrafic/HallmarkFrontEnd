@@ -108,6 +108,8 @@
           <span *ngIf="data.controlType === organizationSettingControlType.CheckboxValue">
             {{ formatCheckboxValue(data) }}
           </span>
+          <span *ngIf="data.controlType === organizationSettingControlType.PayPeriod">
+            {{ data.parsedValue?.isEnabled ? 'Yes' : 'No'}}</span>
         </ng-template>
       </e-column>
     </e-columns>
@@ -183,7 +185,7 @@
   (formCancelClicked)="onFormCancelClick()" (formSaveClicked)="onFormSaveClick()" [header]="dialogHeader + ' Settings'">
   <form class="form-container" id="addEditRecordForm" *ngIf="isFormShown" [formGroup]="organizationSettingsFormGroup">
     <div>
-      <div class="input-container bootstrap">
+      <div class="input-container bootstrap" *ngIf="!payPeriodFormGroup">
         <label for="attribute">Attribute</label>
         <div class="input-group">
           <ejs-tooltip [content]="attribute.value" [showTipPointer]="false">
@@ -193,7 +195,7 @@
       </div>
     </div>
 
-    <form [formGroup]="regionFormGroup" *ngIf="isEdit && !IsSettingKeyOtHours">
+    <form [formGroup]="regionFormGroup" *ngIf="isEdit && !IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="region">Region</label>
         <div class="input-group dropdown">
@@ -205,7 +207,7 @@
       </div>
     </form>
 
-    <form [formGroup]="regionRequiredFormGroup" *ngIf="!isEdit && !IsSettingKeyOtHours">
+    <form [formGroup]="regionRequiredFormGroup" *ngIf="!isEdit && !IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="regionRequired">Region <span class="required">*</span></label>
         <div class="input-group dropdown">
@@ -217,7 +219,7 @@
       </div>
     </form>
 
-    <form [formGroup]="locationFormGroup" *ngIf="!IsSettingKeyOtHours">
+    <form [formGroup]="locationFormGroup" *ngIf="!IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="location">Location</label>
         <div class="input-group dropdown">
@@ -229,7 +231,7 @@
       </div>
     </form>
 
-    <form [formGroup]="departmentFormGroup" *ngIf="!IsSettingKeyOtHours">
+    <form [formGroup]="departmentFormGroup" *ngIf="!IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="department">Department</label>
         <div class="input-group dropdown">
@@ -240,7 +242,7 @@
         </div>
       </div>
     </form>
-    <form [formGroup]="OThoursSettingsFormGroup" *ngIf="IsSettingKeyOtHours">
+    <form [formGroup]="OThoursSettingsFormGroup" *ngIf="IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
       <div class="input-container">
         <label>Region<span class="required">*</span></label>
         <div class="dropdown-wrapper">
@@ -368,6 +370,36 @@
 
     </form>
 
+    <form [formGroup]="payPeriodFormGroup" 
+    *ngIf="formControlType === organizationSettingControlType.PayPeriod">
+  <div class="row">
+    <div class="input-container bootstrap">
+      <label>
+        Schedule Management Start Date
+        </label>
+      <div class="input-group datepicker">
+        <ejs-datepicker id="datepicker" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+          appValidateWithMessage [showClearButton]="false" formControlName="date"></ejs-datepicker>
+      </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="input-container bootstrap">
+      <label>
+        No of pay periods
+        </label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist appValidateWithMessage [allowFiltering]="true" [dataSource]="noOfWeek"
+          [fields]="noOfWeekFields" formControlName="noOfWeek">
+        </ejs-dropdownlist>
+      </div>
+      
+    </div>
+
+
+  </div>
+ </form>
+
     <div [ngSwitch]="formControlType">
       <ng-container *ngSwitchCase="organizationSettingControlType.Checkbox">
         <ng-container *ngTemplateOutlet="switcher"></ng-container>
@@ -378,6 +410,10 @@
       </ng-container>
 
       <ng-container *ngSwitchCase="organizationSettingControlType.InvoiceAutoGeneration">
+        <ng-container *ngTemplateOutlet="switcher"></ng-container>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="organizationSettingControlType.PayPeriod">
         <ng-container *ngTemplateOutlet="switcher"></ng-container>
       </ng-container>
 
@@ -457,6 +493,8 @@
         </div>
       </div>
 
+     
+
       <ng-container *ngIf="showBillingMessage">
         <div class="toggle-message">
           Please make sure to align Billing contact e-mail recipients configuration with group by set in Auto-generation
@@ -464,5 +502,9 @@
         </div>
       </ng-container>
     </div>
+ 
+
+ 
   </form>
+
 </app-side-dialog>
