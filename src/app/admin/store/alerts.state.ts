@@ -179,10 +179,10 @@ export class AlertsState {
   @Action(GetUserSubscriptionPage)
   GetUserSubscriptionPage(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { userId, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters }: GetUserSubscriptionPage
+    { userId, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters, isIRP }: GetUserSubscriptionPage
   ): Observable<UserSubscriptionPage | void> {
     return this.alertsService
-      .getUserSubscriptionPage(businessUnitType, userId, pageNumber, pageSize, sortModel, filterModel, filters)
+      .getUserSubscriptionPage(businessUnitType, userId, pageNumber, pageSize, sortModel, filterModel, filters, isIRP)
       .pipe(
         tap((payload) => {
           patchState({ userSubscriptionPage: payload });

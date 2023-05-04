@@ -1,3 +1,4 @@
+import { BusinessUnitType } from './../enums/business-unit-type';
 import { AlertChannel } from "@admin/alerts/alerts.enum";
 import { DateTime } from "@syncfusion/ej2-angular-charts";
 import { Alert } from "./alerts-template.model";
@@ -17,7 +18,9 @@ export type UserSubscriptionRequest = {
   alertId:number,
   userId:string,
   alertChannel:AlertChannel,
-  enabled:boolean 
+  enabled:boolean,
+  businessUnitType?:BusinessUnitType,
+  isIRP?:boolean
 };
 export type UserSubscriptionPage = PageOfCollections<UserSubscription>;
 export type UserSubscriptionFilters = {

@@ -185,3 +185,10 @@ export class GetBusinessForEmployeeType {
   static readonly type = '[security] Get Business for Employee type';
   constructor() {}
 }
+
+export class GetEmployeeUsers {
+  static readonly type = '[security] Get Users with Employee role';
+  constructor(
+    public businessUnitId: number
+  ) {}
+}

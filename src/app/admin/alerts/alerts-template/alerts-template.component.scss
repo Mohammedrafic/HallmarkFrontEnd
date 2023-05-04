@@ -17,21 +17,14 @@
 :host {
   .button-group {
     margin-top: 24px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid $secondary-dark-blue-40;
     display: block;
+    border-bottom: 1px solid $secondary-dark-blue-40;
   }
 }
 
 .system-buttons {
-  position: fixed;
-  top: 81px;
-  left: 50%;
-  z-index: 3;
+  position: relative;    
   margin-top: 0 !important;
   padding: 12px 24px;
-  transform: translateX(-50%);
-  background-color: $background;
-  display: flex !important;
-  justify-content: center;
+  background-color: $background;    
 }

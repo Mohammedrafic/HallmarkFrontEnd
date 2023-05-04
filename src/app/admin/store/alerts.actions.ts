@@ -14,7 +14,8 @@ export class GetUserSubscriptionPage {
       public pageSize: number,
       public sortModel: any,
       public filterModel: any,
-      public filters: UserSubscriptionFilters
+      public filters: UserSubscriptionFilters,
+      public isIRP: boolean = false
     ) {}
   }
   export class UpdateUserSubscription {

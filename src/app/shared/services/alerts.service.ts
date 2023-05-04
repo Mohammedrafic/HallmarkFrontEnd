@@ -31,13 +31,14 @@ export class AlertsService {
     PageSize: number,
     SortModel: any,
     FilterModel: any,
-    Filters: UserSubscriptionFilters
+    Filters: UserSubscriptionFilters,
+    IsIRP: boolean
   ): Observable<UserSubscriptionPage> {
     if(UserId==null)
     {
       return of(this.userSubscriptionPage);
     }
-    return this.http.get<UserSubscriptionPage>(`/api/UserSubscription/GetPagedUserSubscriptions/`+BusinessUnitType+`/`+UserId,{params: { pageNumber:PageNumber,pageSize: PageSize }});
+    return this.http.get<UserSubscriptionPage>(`/api/UserSubscription/GetPagedUserSubscriptions/`+BusinessUnitType+`/`+UserId,{params: { pageNumber:PageNumber,pageSize: PageSize, isIRP: IsIRP }});
   }
   /**
    * Update UserSubscription 
