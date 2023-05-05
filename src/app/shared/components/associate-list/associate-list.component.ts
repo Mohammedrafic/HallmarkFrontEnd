@@ -40,8 +40,10 @@ export class AssociateListComponent extends AbstractPermission implements OnInit
 
   private setHeaderName(): void {
     this.isAgency = this.router.url.includes('agency');
-    this.store.dispatch(
-      new SetHeaderState({ title: `Associated ${this.isAgency ? 'Organizations' : 'Agencies'}`, iconName: 'clock' })
+    !this.isAgency ? this.store.dispatch(
+      new SetHeaderState({ title: `Associated Agencies`, iconName: 'briefcase' })
+    ) : this.store.dispatch(
+      new SetHeaderState({ title: `Associated Organizations`, iconName: 'organization', custom: true })
     );
   }
 

@@ -21,7 +21,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { UserState } from 'src/app/store/user.state';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { GRID_CONFIG, SEND_EMAIL, SEND_EMAIL_REQUIRED } from '@shared/constants';
+import { GRID_CONFIG, SEND_EMAIL } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AppState } from '../../../store/app.state';
@@ -130,7 +130,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     private confirmService: ConfirmService,
     private store: Store) {
     super();
-    store.dispatch(new SetHeaderState({ title: this.title, iconName: "" }));
+    store.dispatch(new SetHeaderState({ title: this.title, iconName: 'lock' }));
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
     }

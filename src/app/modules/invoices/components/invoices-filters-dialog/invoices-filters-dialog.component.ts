@@ -174,9 +174,17 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       } else if (this.selectedTabId === InvoicesOrgTabId.ManualInvoicePending
         || this.selectedTabId === InvoicesAgencyTabId.ManualInvoicePending
       ) {
+        let orgwidgetmanualinvoice = JSON.parse(localStorage.getItem('orgmanualinvoicewidget') || '""') as string;
         this.initManualPendingFiltersDataSources(id);
+        if(orgwidgetmanualinvoice != ''){
+          this.clearAllFilters(true)
+        }
       } else {
+        let orgwidgetpendinginvoice = JSON.parse(localStorage.getItem('pendingInvoiceApproval') || '""') as string;
         this.store.dispatch(new Invoices.GetFiltersDataSource(orgId));
+        if(orgwidgetpendinginvoice != ''){
+          this.clearAllFilters(true)
+        }
       }
     });
   }

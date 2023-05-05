@@ -183,7 +183,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private setHeaderName(): void {
-    this.store.dispatch(new SetHeaderState({ title: 'Candidate Assignment', iconName: 'users' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Candidate Assignment', iconName: 'user' }));
   }
 
   private subscribeOnPageNumberChange(): Observable<number> {

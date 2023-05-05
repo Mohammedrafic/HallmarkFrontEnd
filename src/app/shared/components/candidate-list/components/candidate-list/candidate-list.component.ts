@@ -526,7 +526,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private dispatchInitialIcon(): void {
-    this.store.dispatch(new SetHeaderState({ title: this.isIRP ? 'Employees' : 'Candidates', iconName: 'clock' }));
+    this.store.dispatch(new SetHeaderState({ title: this.isIRP ? 'Employees' : 'Candidates', iconName: 'users' }));
   }
 
 

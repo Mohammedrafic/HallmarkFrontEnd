@@ -18,7 +18,7 @@ export class MasterDataContentComponent extends AbstractPermission implements On
 
   constructor(protected override store: Store) {
     super(store);
-    store.dispatch(new SetHeaderState({ title: 'Master Data', iconName: 'user' }));
+    store.dispatch(new SetHeaderState({ title: 'Master Data', iconName: 'server' }));
   }
 
   override ngOnInit(): void {

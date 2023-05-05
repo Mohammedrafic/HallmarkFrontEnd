@@ -36,7 +36,6 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
-import { ConfirmService } from '@shared/services/confirm.service';
 import { GRID_CONFIG, RECORD_ADDED, RECORD_MODIFIED, USER_ALERTS_PERMISSION } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -148,11 +147,10 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
   constructor(private actions$: Actions,
-    private confirmService: ConfirmService,
     private readonly ngZone: NgZone,
     private store: Store) {
     super();
-    store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    store.dispatch(new SetHeaderState({ title: this.title, iconName: 'lock' }));
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
     }
