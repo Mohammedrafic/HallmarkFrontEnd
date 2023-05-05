@@ -1,3 +1,4 @@
+import { OrganizationService } from './../../shared/services/organization.service';
 import { LogiReportService } from './../../shared/services/logi-report.service';
 import {
   AgencyDto,
@@ -28,6 +29,7 @@ import {
   GetGroupEmailRoles,
   GetGroupEmailSkills,
   GetGroupMailByBusinessUnitIdPage,
+  GetOrganizationById,
   GetStaffScheduleReportFilterOptions,
   GetTemplateByAlertId,
   GetUserSubscriptionPage,
@@ -60,6 +62,7 @@ import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '../../shared/enums/message-types';
 import { User } from '@shared/models/user.model';
 import { DOCUMENT_DOWNLOAD_SUCCESS } from '@shared/constants/messages';
+import { Organization } from '@shared/models/organization.model';
 
 interface AlertsStateModel {
   userSubscriptionPage: UserSubscriptionPage | null;
@@ -83,6 +86,7 @@ interface AlertsStateModel {
   documentPreviewDetail : DownloadDocumentDetail;
   documentDownloadDetail : DownloadDocumentDetail;
   getStaffScheduleReportFilterOptions: StaffScheduleReportFilterOptions | null;
+  organization: Organization | null;
 }
 
 @Injectable()
@@ -168,12 +172,17 @@ export class AlertsState {
     return state.getStaffScheduleReportFilterOptions;
   }
 
+  @Selector()
+  static getOrganizationData(state: AlertsStateModel):Organization | null {
+    return state.organization;
+  }
 
   constructor(
     private businessUnitService: BusinessUnitService,
     private alertsService: AlertsService,
     private groupEmailService: GroupEmailService,
-    private logiReportService: LogiReportService
+    private logiReportService: LogiReportService,
+    private organizationService: OrganizationService
   ) {}
 
   @Action(GetUserSubscriptionPage)
@@ -533,4 +542,12 @@ export class AlertsState {
     }));
   }
 
+  @Action(GetOrganizationById)
+  GetOrganizationById({ patchState }: StateContext<AlertsStateModel>, { businessUnitId }: 
+    GetOrganizationById): Observable<Organization> {
+    return this.organizationService.getOrganizationById(businessUnitId).pipe(tap((payload) => {
+      patchState({ organization: payload });      
+      return payload;
+    }));
+  }
 }

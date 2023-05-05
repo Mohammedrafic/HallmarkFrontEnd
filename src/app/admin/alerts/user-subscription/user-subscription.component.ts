@@ -1,3 +1,5 @@
+import { AdminState } from './../../store/admin.state';
+import { OrderManagementService } from './../../../client/order-management/components/order-management-content/order-management.service';
 import { GetEmployeeUsers } from './../../../security/store/security.actions';
 import { ButtonModel } from './../../../shared/models/buttons-group.model';
 import { Component, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
@@ -6,7 +8,7 @@ import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SecurityState } from 'src/app/security/store/security.state';
 import {
   alertsFilterColumns,
@@ -37,10 +39,13 @@ import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-
 import { MessageTypes } from '@shared/enums/message-types';
 import { GRID_CONFIG, RECORD_MODIFIED, USER_SUBSCRIPTION_PERMISSION } from '@shared/constants';
 import { AppState } from '../../../store/app.state';
-import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
+import { BUSINESS_UNITS_VALUES_WITH_IRP } from '@shared/constants/business-unit-type-list';
 import { OutsideZone } from '@core/decorators';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
-import { SystemGroupConfig } from '@client/order-management/constants';
+import { DetectActiveSystem, SystemGroupConfig } from '@client/order-management/constants';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { GetOrganizationById } from '@admin/store/alerts.actions';
+import { Organization } from '@shared/models/organization.model';
 
 @Component({
   selector: 'app-user-subscription',
@@ -69,13 +74,15 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   @Select(SecurityState.userData)
   public employeeUserData$: Observable<User[]>;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
 
   @Input() filterForm: FormGroup;
   public businessForm: FormGroup;
   public isEditRole = false;
   public isBusinessFormDisabled = false;
-  public businessUnits = BUSINESS_UNITS_VALUES;
-  public filteredBusinessUnits = BUSINESS_UNITS_VALUES;
+  public businessUnits = BUSINESS_UNITS_VALUES_WITH_IRP;
+  public filteredBusinessUnits = BUSINESS_UNITS_VALUES_WITH_IRP;
   public optionFields = OPRION_FIELDS;
   public businessDataFields = BUSINESS_DATA_FIELDS;
   public userDataFields = User_DATA_FIELDS;
@@ -117,8 +124,12 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public isIRPFlagEnabled = false;
   public isOrgVMSEnabled = false;
   public isOrgIRPEnabled = false;
+  private previousSelectedSystemId: OrderManagementIRPSystemId | null;
   public activeSystem: OrderManagementIRPSystemId;
   public systemGroupConfig: ButtonModel[];
+  public organizationId: number;
+  public previousSelectedOrderId: number | null;
+  private pageSubject = new Subject<number>();
 
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
@@ -132,9 +143,11 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   }
   constructor(private actions$: Actions,
     private readonly ngZone: NgZone,
-    private store: Store) {
+    private store: Store,
+    private orderManagementService: OrderManagementService) {
     super();
     store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
     this.rowModelType = 'serverSide';
     this.serverSideInfiniteScroll = true,
       this.pagination = true;
@@ -216,15 +229,51 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       minWidth: 280,
       field: 'name',
     };
-
-    this.loadSystemButtons();
   }
 
-  loadSystemButtons(){    
+  private onOrganizationChangedHandler(): void {
+    this.organizationId$.pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((id) => {
+      this.organizationId = id;      
+      this.loadSystemButtons(id);
+    });
+  }
+
+  loadSystemButtons(businessId?:number){      
+    this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
     const businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
-    console.log(businessUnitType);
-    this.activeSystem = OrderManagementIRPSystemId.VMS;
-    this.systemGroupConfig = SystemGroupConfig(true, true, this.activeSystem);    
+    if(businessUnitType == BusinessUnitType.Hallmark || businessUnitType == BusinessUnitType.Organization) {
+      const id = businessId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+      this.store.dispatch(new GetOrganizationById(id)).pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe(() => {        
+        const { isIRPEnabled, isVMCEnabled } = 
+            this.store.selectSnapshot(AlertsState.getOrganizationData)?.preferences || {};
+
+        this.isOrgIRPEnabled = !!isIRPEnabled;
+        this.isOrgVMSEnabled = !!isVMCEnabled;
+
+        if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
+          this.activeSystem = OrderManagementIRPSystemId.VMS;
+        } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
+          this.activeSystem = OrderManagementIRPSystemId.IRP;        
+        }
+
+        if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
+          this.activeSystem = OrderManagementIRPSystemId.IRP;
+        } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && this.isOrgVMSEnabled) {
+          this.activeSystem = OrderManagementIRPSystemId.VMS;
+        }
+
+        if (!this.previousSelectedSystemId) {
+          this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+        }  
+        this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem);
+        this.adjustBusinessUnitTypeBasedActiveSystem();
+      });
+    } else this.isIRPFlagEnabled = false;
   }
 
   ngOnDestroy(): void {
@@ -241,7 +290,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     this.onBusinessUnitValueChanged();
     this.onBusinessValueChanged();
     this.onUserValueChanged();
-
+    this.onOrganizationChangedHandler();
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
     if (user?.businessUnitType) {
@@ -252,9 +301,13 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
     }
+    
+    if (user?.businessUnitType !== BusinessUnitType.Hallmark) {
+      this.loadSystemButtons();
+    }
+
     this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
 
-    this.adjustBusinessUnitTypeBasedActiveSystem();
     this.actions$
       .pipe(
         takeWhile(() => this.isAlive)
@@ -459,12 +512,20 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     this.dispatchNewPage(this.businessForm.controls['user']?.value);
   }
 
-  adjustBusinessUnitTypeBasedActiveSystem(){        
+  adjustBusinessUnitTypeBasedActiveSystem(){
+    const user = this.store.selectSnapshot(UserState.user);    
+    this.businessControl.patchValue([]);
     this.filteredBusinessUnits = this.businessUnits;
-    if(this.activeSystem == OrderManagementIRPSystemId.IRP)
+    if(this.activeSystem == OrderManagementIRPSystemId.IRP){
       this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
+      if(user?.businessUnitType == BusinessUnitType.Hallmark){
+        this.businessUnitControl.patchValue(this.filteredBusinessUnits[0].id);
+      }
+    }
         
-    if(this.activeSystem == OrderManagementIRPSystemId.VMS)
+    if(this.activeSystem == OrderManagementIRPSystemId.VMS){
       this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.Candidates);
+      this.businessUnitControl.patchValue(user?.businessUnitType);
+    }
   }
 }

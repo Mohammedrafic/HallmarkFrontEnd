@@ -1,9 +1,9 @@
-<!-- *ngIf="isIRPFlagEnabled" -->
 <app-button-group
+*ngIf="isIRPFlagEnabled"
 class="button-group system-buttons"    
 [buttonOptions]="systemGroupConfig"
-(buttonChange)="changeSystem($event)"
-></app-button-group>
+(buttonChange)="changeSystem($event)">
+</app-button-group>
 
 <app-page-toolbar>
   <ng-container left>

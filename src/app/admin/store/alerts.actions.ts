@@ -206,3 +206,8 @@ export class GetStaffScheduleReportFilterOptions{
   static readonly type = '[LogiReport] Get Staff Schedule Report Filter Options';
   constructor(public filter: CommonReportFilter) { }
 }
+
+export class GetOrganizationById {
+  static readonly type = '[admin] Get Organization by ID';
+  constructor(public businessUnitId: number) { }
+}
