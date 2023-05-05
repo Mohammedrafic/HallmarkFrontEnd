@@ -88,6 +88,7 @@
           </ng-container>
         </ng-template>
       </e-column>
+      <e-column field="system" headerText="System" width="100%"></e-column>
       <e-column field="holidayName" headerText="holiday name" width="100%"></e-column>
       <e-column field="startDateTime" headerText="start date & time" width="100%">
         <ng-template #template let-data>
@@ -217,15 +218,17 @@
         id="addEditHolidaysForm"
         [formGroup]="HolidayFormGroup">
 
-        <div class="input-container">
-          <label>System Configuration</label>
-          <div class="bootstrap checkbox-container">
-            <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>&nbsp;&nbsp;&nbsp;
-            <ejs-checkbox formControlName="includeInVMS" label="VMS"></ejs-checkbox>
-          </div>
-        </div>
+  
         
     <ng-container *ngIf="title === 'Assign'">
+
+      <div class="input-container">
+        <label>System Configuration</label>
+        <div class="bootstrap checkbox-container">
+          <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>&nbsp;&nbsp;&nbsp;
+          <ejs-checkbox formControlName="includeInVMS" label="VMS"></ejs-checkbox>
+        </div>
+      </div>
 
       <div>
         <div class="input-container">
@@ -273,6 +276,15 @@
       </div>
     </ng-container>
     <ng-container *ngIf="title === 'Edit'">
+
+      <div class="input-container">
+        <label>System Configuration</label>
+        <div class="bootstrap checkbox-container">
+          <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>&nbsp;&nbsp;&nbsp;
+          <ejs-checkbox formControlName="includeInVMS" label="VMS"></ejs-checkbox>
+        </div>
+      </div>
+
       <div>
         <div class="input-container">
           <label for="region">Region <span class="required">*</span></label>
