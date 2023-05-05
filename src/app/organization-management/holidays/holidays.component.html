@@ -88,7 +88,7 @@
           </ng-container>
         </ng-template>
       </e-column>
-      <e-column field="system" headerText="System" width="100%"></e-column>
+      <e-column *ngIf="selectedSystem.isIRP && selectedSystem.isVMS" field="system" headerText="System" width="100%"></e-column>
       <e-column field="holidayName" headerText="holiday name" width="100%"></e-column>
       <e-column field="startDateTime" headerText="start date & time" width="100%">
         <ng-template #template let-data>
@@ -222,8 +222,8 @@
         
     <ng-container *ngIf="title === 'Assign'">
 
-      <div class="input-container">
-        <label>System Configuration</label>
+      <div class="input-container" *ngIf="selectedSystem.isIRP && selectedSystem.isVMS">
+        <label>System Configuration <span class="required">*</span></label>
         <div class="bootstrap checkbox-container">
           <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>&nbsp;&nbsp;&nbsp;
           <ejs-checkbox formControlName="includeInVMS" label="VMS"></ejs-checkbox>
@@ -277,8 +277,8 @@
     </ng-container>
     <ng-container *ngIf="title === 'Edit'">
 
-      <div class="input-container">
-        <label>System Configuration</label>
+      <div class="input-container"  *ngIf="selectedSystem.isIRP && selectedSystem.isVMS">
+        <label>System Configuration <span class="required">*</span></label>
         <div class="bootstrap checkbox-container">
           <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>&nbsp;&nbsp;&nbsp;
           <ejs-checkbox formControlName="includeInVMS" label="VMS"></ejs-checkbox>
