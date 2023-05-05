@@ -90,6 +90,8 @@ export class ReasonsService {
       }));
     } else if (params.selectedTab === ReasonsNavigationTabs.Closure) {
       var value = params.formValue as Closurevalue;
+      (value.includeInIRP == null) ? (value.includeInIRP = false) : "";
+      (value.includeInVMS == null) ? (value.includeInVMS = false) : "";
       var reasonvalue = {
         id : value.id || undefined,
         includeInIRP : this.selectedSystem.isIRP,
@@ -118,6 +120,8 @@ export class ReasonsService {
       }
     } else if (params.selectedTab === ReasonsNavigationTabs.Requisition) {
       var value = params.formValue as Closurevalue;
+      (value.includeInIRP == null) ? (value.includeInIRP = false) : "";
+      (value.includeInVMS == null) ? (value.includeInVMS = false) : "";
       var reqreasonvalue = {
         id : value.id || undefined,
         includeInIRP : this.selectedSystem.isIRP,

@@ -32,6 +32,8 @@ export class OrganizationHoliday {
   toOverwrite?: boolean;
   foreignKey?: string;
   isOrganizationHoliday: boolean;
+  includeInIRP? : boolean;
+  includeInVMS? : boolean;
 
   constructor(holiday: OrganizationHoliday, selectedRegions?: OrganizationRegion[], allRegions?: boolean, allLocations?: boolean, isExist?: boolean) {
     this.id = holiday.id;
@@ -41,6 +43,8 @@ export class OrganizationHoliday {
     this.endDateTime = DateTimeHelper.toUtcFormat(holiday.endDateTime);
     this.regionId = holiday.regionId || null;
     this.locationId = holiday.locationId || null;
+    this.includeInIRP = holiday.includeInIRP || false;
+    this.includeInVMS = holiday.includeInVMS || false;
 
     if (isExist !== undefined) {
       this.toOverwrite = isExist;
