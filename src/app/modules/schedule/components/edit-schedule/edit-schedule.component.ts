@@ -341,20 +341,22 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
   }
 
+  private ifShiftEdited(): boolean {
+    return !!(this.isShiftOriented &&
+      (this.scheduleForm.get('departmentId')?.dirty || this.scheduleForm.get('date')?.dirty || this.scheduleForm.get('skillId')?.dirty));
+  }
+
   private updateScheduledShiftHandler(): void {
-    if (
-         this.isShiftOriented &&
-         (this.scheduleForm.get('departmentId')?.dirty || this.scheduleForm.get('date')?.dirty)
-       ) {
-        this.createScheduleService.confirmEditing().pipe(
-          filter(Boolean),
-          takeUntil(this.componentDestroy())
-        ).subscribe(() => {
-          this.updateScheduledShift();
-        });
-      } else {
+    if (this.ifShiftEdited()) {
+      this.createScheduleService.confirmEditing().pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
         this.updateScheduledShift();
-      }
+      });
+    } else {
+      this.updateScheduledShift();
+    }
   }
 
   private setHours(
