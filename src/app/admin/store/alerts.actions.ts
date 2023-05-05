@@ -207,6 +207,16 @@ export class GetStaffScheduleReportFilterOptions{
   constructor(public filter: CommonReportFilter) { }
 }
 
+export class GetGroupEmailWorkCommitments {
+  static readonly type = '[groupemail] Get Group Email workcommitments by criteria';
+  constructor(
+    public businessUnitId: number,    
+    public regions: string,
+    public locations: string,
+    public skills: string
+  ) { }
+}
+
 export class GetOrganizationById {
   static readonly type = '[admin] Get Organization by ID';
   constructor(public businessUnitId: number) { }

@@ -51,7 +51,9 @@ export class DateTimeHelper {
     ).toISOString();
   }
 
-  //Use this function with cautions. it needs to be removed.
+  /**
+   * Use this function with cautions. it needs to be removed.
+   */
   public static setInitHours(data: string): string {
     const date = new Date(this.convertDateToUtc(data));
     date.setHours(0, 0, 0);

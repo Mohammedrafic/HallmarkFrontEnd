@@ -74,6 +74,8 @@ export class WorkCommitmentAdapter {
         skills,
         workCommitmentId,
         workCommitmentOrgHierarchies,
+        allLocationsSelected,
+        allRegionsSelected
       } = item;
       itemsForGrid.push({
         availabilityRequirement,
@@ -85,17 +87,19 @@ export class WorkCommitmentAdapter {
         startDate,
         endDate,
         jobCode,
-        locationName: workCommitmentOrgHierarchies.map((item) => item.locationName),
+        locationName:allLocationsSelected?["All"]: workCommitmentOrgHierarchies.map((item) => item.locationName),
         locationIds: workCommitmentOrgHierarchies.map((item) => item.locationId),
         masterWorkCommitmentId,
         masterWorkCommitmentName,
         minimumWorkExperience,
-        regionName: getRegionsArray(workCommitmentOrgHierarchies, 'regionName'),
+        regionName:allRegionsSelected? ["All"]: getRegionsArray(workCommitmentOrgHierarchies, 'regionName'),
         regionIds: getRegionsArray(workCommitmentOrgHierarchies, 'regionId'),
         schedulePeriod,
         skillNames: skills.map((item) => item.name),
         skillIds: skills.map((item) => item.id),
         workCommitmentId,
+        allLocationsSelected,
+        allRegionsSelected
       });
     });
     return itemsForGrid;

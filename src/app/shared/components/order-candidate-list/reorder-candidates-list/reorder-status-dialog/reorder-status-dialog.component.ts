@@ -125,7 +125,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   get showAccept(): boolean {
     return (
       this.isAgency &&
-      ![CandidatStatus.BillRatePending, CandidatStatus.OnBoard, CandidatStatus.Rejected].includes(
+      ![CandidatStatus.BillRatePending, CandidatStatus.OnBoard, CandidatStatus.Rejected, CandidatStatus.Offboard,
+        CandidatStatus.Cancelled].includes(
         this.currentCandidateApplicantStatus
       )
     );
@@ -428,8 +429,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       departmentName,
       skillName,
       orderOpenDate: DateTimeHelper.formatDateUTC(reOrderDate as string, 'MM/dd/yyyy'),
-      shiftStartTime: DateTimeHelper.convertDateToUtc(shiftStartTime.toString()),
-      shiftEndTime: DateTimeHelper.convertDateToUtc(shiftEndTime.toString()),
+      shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
+      shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
       rejectReason,

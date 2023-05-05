@@ -3,7 +3,7 @@ import { NavigationWrapperService } from '@shared/services/navigation-wrapper.se
 import { CandidateProfileService } from '@client/candidates/candidate-profile/candidate-profile.service';
 import { ActivatedRoute } from '@angular/router';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
-import { EMPTY, Observable, switchMap, takeUntil } from 'rxjs';
+import { EMPTY, filter, Observable, switchMap, takeUntil } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
@@ -12,6 +12,8 @@ import { CandidateTabsEnum } from '@client/candidates/enums';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { Store } from '@ngxs/store';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { EMPLOYEE_SKILL_CHANGE_WARNING, WARNING_TITLE } from '@shared/constants/messages';
 
 @Component({
   selector: 'app-candidate-profile',
@@ -35,6 +37,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     private route: ActivatedRoute,
     private navigationWrapperService: NavigationWrapperService,
     private store: Store,
+    private confirmService: ConfirmService
   ) {
     super();
     this.employeeIdHandler();
@@ -57,9 +60,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
       this.candidateProfileFormService.markCandidateFormAsTouched();
       return EMPTY;
     } else {
-      return this.candidateProfileService
-        .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId)
-        .pipe(takeUntil(this.destroy$));
+      return this.skillsChangeHandler();
     }
   }
 
@@ -73,6 +74,36 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
         this.candidateProfileFormService.candidateForm.markAsPristine();
         this.navigationWrapperService.areUnsavedChanges = () => false;
       });
+  }
+
+  private isSkillChanged(): boolean {
+    return !!(this.candidateService.employeeId && 
+      (this.candidateProfileFormService.candidateForm.get('primarySkillId')?.dirty || this.candidateProfileFormService.candidateForm.get('secondarySkills')?.dirty));
+  }
+
+  private skillChangeConfirmation(): Observable<void | CandidateModel> {
+    return this.confirmService
+      .confirm(EMPLOYEE_SKILL_CHANGE_WARNING, {
+        title: WARNING_TITLE,
+        okButtonLabel: 'Yes',
+        okButtonClass: 'delete-button',
+      }).pipe(
+        filter(Boolean),
+        switchMap(() => this.saveCandidate()),
+        takeUntil(this.destroy$));
+  }
+
+  private skillsChangeHandler(): Observable<void | CandidateModel> {
+    if (this.isSkillChanged()) {
+      return this.skillChangeConfirmation();
+    }
+    return this.saveCandidate();
+  }
+
+  private saveCandidate(): Observable<void | CandidateModel> {
+    return this.candidateProfileService
+        .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId)
+        .pipe(takeUntil(this.destroy$));
   }
 
   private hasUnsavedChanges(): boolean {

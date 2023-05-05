@@ -8,5 +8,6 @@ export enum OrganizationSettingControlType {
   InvoiceAutoGeneration = 7,
   EmailAria = 8,
   SwitchedValue = 9,
-  CheckboxValue = 10
+  CheckboxValue = 10,
+  PayPeriod =11
 }

@@ -9,7 +9,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { Holiday, HolidayFilters, OrganizationHoliday, OrganizationHolidaysPage } from '@shared/models/holiday.model';
-import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { Organization, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { FilterService } from '@shared/services/filter.service';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
@@ -24,7 +24,7 @@ import {
   DELETE_RECORD_TITLE, ERROR_START_LESS_END_DATE
 } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import {
   CheckIfExist,
@@ -43,6 +43,11 @@ import { GetOrganizationStructure } from '../../store/user.actions';
 import { DateTimeHelper } from '@core/helpers';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { MessageTypes } from '@shared/enums/message-types';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
+import { SelectedSystems } from '@shared/components/credentials-list/constants';
 
 @Component({
   selector: 'app-holidays',
@@ -72,6 +77,11 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
+  @Select(OrganizationManagementState.organization)
+  public readonly organization$: Observable<Organization>;
+  
+  public selectedSystem: SelectedSystemsFlag = SelectedSystems;
+  protected componentDestroy: () => Observable<unknown>;
   public HolidayFormGroup: FormGroup;
   public HolidayFilterFormGroup: FormGroup;
   public title: DialogMode = DialogMode.Add;
@@ -108,6 +118,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
   public filterColumns: any;
   public yearsList: number[] = [];
   public datesValidationMessage = ERROR_START_LESS_END_DATE;
+  public showSystem:boolean = false;
 
 
   constructor(
@@ -137,6 +148,8 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       holidayName: new FormControl(null, [Validators.required]),
       startDateTime: new FormControl(null, [Validators.required]),
       endDateTime: new FormControl(null, [Validators.required]),
+      includeInIRP : new FormControl(false, [Validators.required]),
+      includeInVMS : new FormControl(false, [Validators.required])
     });
 
     this.startTimeField = this.HolidayFormGroup.get('startDateTime') as AbstractControl;
@@ -294,6 +307,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
     this.holidayDataSource$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
       this.filterColumns.holidayNames.dataSource = dataSource;
     });
+    this.getOrganizagionData();
   }
 
   ngOnDestroy(): void {
@@ -443,6 +457,8 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       holidayName: holiday.holidayName,
       startDateTime: DateTimeHelper.convertDateToUtc(holiday.startDateTime),
       endDateTime: DateTimeHelper.convertDateToUtc(holiday.endDateTime),
+      includeInIRP : holiday.includeInIRP,
+      includeInVMS : holiday.includeInVMS
     });
 
     this.store.dispatch(new ShowSideDialog(true));
@@ -486,43 +502,84 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   public saveHoliday(): void {
-    if (this.HolidayFormGroup.valid) {
-      if (this.title === DialogMode.Assign) {
-        this.store
-          .dispatch(
-            new CheckIfExist(
-              new OrganizationHoliday(
-                this.HolidayFormGroup.getRawValue(),
-                this.selectedRegions,
-                this.isAllRegionsSelected, this.isAllLocationsSelected
+    if (this.HolidayFormGroup.controls['holidayName'].value != null && this.HolidayFormGroup.controls['locations'].value.length != 0 && this.HolidayFormGroup.controls['regions'].value.length != 0) {
+      if(this.selectedSystem.isIRP && this.selectedSystem.isVMS){
+        if(this.HolidayFormGroup.controls['includeInIRP'].value || this.HolidayFormGroup.controls['includeInVMS'].value){
+          if (this.title === DialogMode.Assign) {
+            this.store
+              .dispatch(
+                new CheckIfExist(
+                  new OrganizationHoliday(
+                    this.HolidayFormGroup.getRawValue(),
+                    this.selectedRegions,
+                    this.isAllRegionsSelected, this.isAllLocationsSelected
+                  )
+                )
+              )
+              .subscribe((val) => {
+                if (val.orgHolidays.isExist) {
+                  this.confirmService
+                    .confirm(DATA_OVERRIDE_TEXT, {
+                      title: DATA_OVERRIDE_TITLE,
+                      okButtonLabel: 'Confirm',
+                      okButtonClass: '',
+                    })
+                    .pipe(
+                      filter((confirm) => !!confirm),
+                      takeUntil(this.unsubscribe$)
+                    )
+                    .subscribe(() => {
+                      this.saveHandler(true);
+                    });
+                } else {
+                  this.saveHandler(false);
+                }
+              });
+          } else {
+            this.editHandler();
+          }
+        } else {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, "Atleast one system should be selected"));
+        }
+      } else {
+        if (this.title === DialogMode.Assign) {
+          this.store
+            .dispatch(
+              new CheckIfExist(
+                new OrganizationHoliday(
+                  this.HolidayFormGroup.getRawValue(),
+                  this.selectedRegions,
+                  this.isAllRegionsSelected, this.isAllLocationsSelected
+                )
               )
             )
-          )
-          .subscribe((val) => {
-            if (val.orgHolidays.isExist) {
-              this.confirmService
-                .confirm(DATA_OVERRIDE_TEXT, {
-                  title: DATA_OVERRIDE_TITLE,
-                  okButtonLabel: 'Confirm',
-                  okButtonClass: '',
-                })
-                .pipe(
-                  filter((confirm) => !!confirm),
-                  takeUntil(this.unsubscribe$)
-                )
-                .subscribe(() => {
-                  this.saveHandler(true);
-                });
-            } else {
-              this.saveHandler(false);
-            }
-          });
-      } else {
-        this.editHandler();
+            .subscribe((val) => {
+              if (val.orgHolidays.isExist) {
+                this.confirmService
+                  .confirm(DATA_OVERRIDE_TEXT, {
+                    title: DATA_OVERRIDE_TITLE,
+                    okButtonLabel: 'Confirm',
+                    okButtonClass: '',
+                  })
+                  .pipe(
+                    filter((confirm) => !!confirm),
+                    takeUntil(this.unsubscribe$)
+                  )
+                  .subscribe(() => {
+                    this.saveHandler(true);
+                  });
+              } else {
+                this.saveHandler(false);
+              }
+            });
+        } else {
+          this.editHandler();
+        }
       }
     } else {
-      this.HolidayFormGroup.markAllAsTouched();
-    }
+    this.HolidayFormGroup.markAllAsTouched();
+    this.store.dispatch(new ShowToast(MessageTypes.Error, "Please fill the required Fields"));
+  }
     this.removeActiveCssClass();
   }
 
@@ -614,5 +671,18 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
 
   private getOrganizationStructure(): void {
     this.store.dispatch(new GetOrganizationStructure());
+  }
+
+  private getOrganizagionData(): void {
+    this.organization$
+    .pipe(
+      filter(Boolean)    )
+    .subscribe((organization : Organization) => {
+      const isOrgUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
+      this.selectedSystem = {
+        isIRP: !!organization.preferences.isIRPEnabled,
+        isVMS: !!organization.preferences.isVMCEnabled,
+      };
+    });
   }
 }

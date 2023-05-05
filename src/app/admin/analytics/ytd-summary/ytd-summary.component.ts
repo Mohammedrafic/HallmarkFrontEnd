@@ -171,6 +171,7 @@ export class YtdSummaryComponent implements OnInit, OnDestroy {
           this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
           this.filterColumns.skillIds.dataSource = [];
           this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
+          this.defaultSkills = data.masterSkills.map((list) => list.id)
           let currentDate = new Date();
           this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Month)?.setValue(currentDate.getMonth() + 1);
           this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Year)?.setValue(currentDate.getFullYear());
@@ -180,6 +181,7 @@ export class YtdSummaryComponent implements OnInit, OnDestroy {
           }
 
           this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
+          this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
         }
       });
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
@@ -490,8 +492,8 @@ export class YtdSummaryComponent implements OnInit, OnDestroy {
     this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
     this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.LocationIds)?.setValue([]);
     this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.DepartmentIds)?.setValue([]);
-    this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillCategoryIds)?.setValue([]);
-    this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillIds)?.setValue([]);
+    this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
+    this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
     this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Year)?.setValue([]);
     this.ytdSummaryReportForm.get(ytdSummaryConstants.formControlNames.Month)?.setValue([]);
     this.filteredItems = [];

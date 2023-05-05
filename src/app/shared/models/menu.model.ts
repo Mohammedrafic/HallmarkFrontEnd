@@ -12,6 +12,7 @@ export class MenuItem {
   route?: string;
   icon?: string;
   count?: number;
+  custom?: boolean;
 }
 
 export class ChildMenuItem {

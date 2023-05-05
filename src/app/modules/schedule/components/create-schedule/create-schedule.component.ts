@@ -7,6 +7,7 @@ import {
   Input,
   NgZone,
   OnChanges,
+  OnDestroy,
   OnInit,
   SimpleChanges,
   ViewChild,
@@ -94,7 +95,7 @@ import { ScheduleType } from '../../enums';
   styleUrls: ['./create-schedule.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CreateScheduleComponent extends Destroyable implements OnInit, OnChanges {
+export class CreateScheduleComponent extends Destroyable implements OnInit, OnChanges, OnDestroy {
   @ViewChild(ScheduleItemsComponent) scheduleItemsComponent: ScheduleItemsComponent;
 
   @Input() scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
@@ -163,18 +164,23 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     }
   }
 
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
+
+    this.sideBarSettings.showOpenPositions = true;
+  }
+
   removeSchedules(): void {
-    const hasBookDate = this.createScheduleService.hasBookingDate(this.scheduleSelectedSlots.candidates);
-
-    if(hasBookDate) {
-      this.sideBarSettings.replacementOrderDialogOpen = true;
-      this.sideBarSettings.removeReplacementMode = true;
-
-      this.replacementOrderDialogData = this.createScheduleService.prepareCandidateReplacementDates(
-        this.scheduleSelectedSlots.candidates
-      );
+    if (this.isOrientedScheduleSelected()) {
+      this.createScheduleService.confirmEditing().pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
+        this.checkBooked();
+        this.cdr.markForCheck();
+      });
     } else {
-      this.deleteSchedule();
+      this.checkBooked();
     }
   }
 
@@ -308,8 +314,33 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     );
   }
 
+  private checkBooked(): void {
+    const hasBookDate = this.createScheduleService.hasBookingDate(this.scheduleSelectedSlots.candidates);
+
+    if(hasBookDate) {
+      this.sideBarSettings.replacementOrderDialogOpen = true;
+      this.sideBarSettings.removeReplacementMode = true;
+
+      this.replacementOrderDialogData = this.createScheduleService.prepareCandidateReplacementDates(
+        this.scheduleSelectedSlots.candidates
+      );
+    } else {
+      this.deleteSchedule();
+    }
+  }
+
+  private isOrientedScheduleSelected(): boolean {
+    const scheduleDays: ScheduleInt.ScheduleItem[] = [];
+    const selectedScheduleDaysIds: number[] = [];
+    this.createScheduleService.scheduleData?.forEach(item => item.schedule.forEach(schedule => schedule.daySchedules.forEach(day => scheduleDays.push(day))));
+    this.scheduleSelectedSlots.candidates.forEach(item => item.days?.forEach(day => selectedScheduleDaysIds.push(day.id)))
+    const orientatedShifts = scheduleDays.filter(day => day.attributes?.orientated && selectedScheduleDaysIds.includes(day.id));
+    return !!orientatedShifts.length;
+  }
+
   private openReplacementOrderDialog(replacementOrderDialogData: BookingsOverlapsResponse[]): void {
     this.replacementOrderDialogData = replacementOrderDialogData;
+    this.sideBarSettings.removeReplacementMode = false;
     this.sideBarSettings.replacementOrderDialogOpen = true;
     this.cdr.markForCheck();
   }
@@ -326,7 +357,6 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
 
   private updateScheduleDialogConfig(scheduleTypeMode: ScheduleItemType): void {
     this.scheduleType = scheduleTypeMode;
-
     switch (this.scheduleType) {
       case ScheduleItemType.Book:
         this.scheduleFormConfig = BookFormConfig;

@@ -76,7 +76,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   ) {
     super(store);
 
-    store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'file-text' }));
+    store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'calendar' }));
   }
 
   public override ngOnInit(): void {

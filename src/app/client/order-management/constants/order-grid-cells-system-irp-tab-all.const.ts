@@ -18,6 +18,7 @@ import {
 import {
   CriticalCellComponent,
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
+import { OrderStatus } from '@shared/enums/order-management';
 
 export const GridCellsSystemIRPTabAll = (
   threeDotsMenuOptions: Record<string, ItemModel[]> = {},
@@ -38,7 +39,7 @@ export const GridCellsSystemIRPTabAll = (
     cellRenderer: GridActionsCellComponent,
     cellClass: 'fat-icon-btn',
     cellRendererParams: (params: ICellRendererParams) => {
-      return {
+       return {
         actionsConfig: [
           {
             action: () => {
@@ -57,7 +58,10 @@ export const GridCellsSystemIRPTabAll = (
             iconName: params.data.isLocked ? 'lock' : 'unlock',
             buttonClass: params.data.isLocked ? 'e-danger' : '',
             isCustomIcon: !params.data.isLocked,
-            disabled: true,
+            disabled: !canCreateOrder
+            || ![OrderStatus.Open, OrderStatus.InProgress, OrderStatus.Filled].includes(params.data.status)
+            || !hasCreateEditOrderPermission
+            || params.data.orderTypeText != "LTA",
           }),
           {
             action: (itemId: number) => {

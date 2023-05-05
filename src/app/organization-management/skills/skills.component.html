@@ -242,7 +242,7 @@
   (applyFilterClicked)="applyFilter()"
   (closeDialogClicked)="closeFilter()">
   <form class="bootstrap" [formGroup]="skillFilterForm">
-    <div class="input-container" *ngIf="orgModuleSettings.isIrpDisplayed">
+    <div class="input-container" *ngIf="orgModuleSettings.isIrpDisplayed && orgModuleSettings.isFeatureIrpEnabled">
       <span class="controls-group-title">System Configuration</span>
         <div class="input-group checkboxes">
           <div class="control-block">

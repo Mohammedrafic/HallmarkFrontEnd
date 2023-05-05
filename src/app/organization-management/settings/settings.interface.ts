@@ -28,3 +28,9 @@ export interface SwitchValuePayload {
   isEnabled: boolean;
   value: number | null;
 }
+
+export interface PayPeriodPayload {
+  isEnabled: boolean;
+  noOfWeek: number;
+  date: Date;
+}

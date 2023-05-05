@@ -165,9 +165,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     { text: 'Region', column: 'Region' },
   ];
   public columnsToExportIrp: ExportColumn[] = [
-    { text: 'Emp Id', column: 'Id' },
-    { text: 'Emp Name', column: 'Name' },
-    { text: 'Profile Status', column: 'Status' },
+    { text: 'Emp Id', column: 'EmpId' },
+    { text: 'Emp Name', column: 'EmpName' },
+    { text: 'Profile Status', column: 'ProfileStatus' },
     { text: 'Primary Skill', column: 'PrimarySkill' },
     { text: 'Secondary Skill', column: 'SecondarySkill' },
     { text: 'Location', column: 'Location' },
@@ -526,7 +526,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private dispatchInitialIcon(): void {
-    this.store.dispatch(new SetHeaderState({ title: this.isIRP ? 'Employees' : 'Candidates', iconName: 'clock' }));
+    this.store.dispatch(new SetHeaderState({ title: this.isIRP ? 'Employees' : 'Candidates', iconName: 'users' }));
   }
 
 

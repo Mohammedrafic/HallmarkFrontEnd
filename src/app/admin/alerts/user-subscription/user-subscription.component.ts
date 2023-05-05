@@ -146,7 +146,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     private store: Store,
     private orderManagementService: OrderManagementService) {
     super();
-    store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    store.dispatch(new SetHeaderState({ title: this.title, iconName: 'lock' }));
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
     this.rowModelType = 'serverSide';
     this.serverSideInfiniteScroll = true,

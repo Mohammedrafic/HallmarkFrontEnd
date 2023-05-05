@@ -32,6 +32,20 @@ export const analyticsConstants = {
   }
 }
 
+export const VendorScorecardReportConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',    
+    AgencyIds: 'agencyIds',
+    StartDate: 'startDate',
+    EndDate: 'endDate',
+    OrderTypes: 'orderTypes',
+    SkillIds: 'skillIds'
+  }
+}
+
 export const accrualConstants = {
   formControlNames: {
     BusinessIds: 'businessIds',
@@ -136,6 +150,25 @@ export const JobeventConstants = {
     EndDate: 'endDate'
   }
 }
+
+export const GeneralCommentReportConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    AgencyIds: 'agencyIds',
+    StartDate: 'startDate',
+    EndDate: 'endDate',
+    CommentedType: 'CommentedType',
+    CommentedLevel: 'CommentedLevel',
+    Commentedby: 'Commentedby',
+    OrderId: 'OrderId',
+    CandidateName: 'candidateName',
+
+  }
+}
+
 export const grantReportConstants = {
   formControlNames: {
     BusinessIds: 'businessIds',
@@ -225,5 +258,22 @@ export const searchByList: { name: string; id: number }[] = [
   { name: 'By Skill', id: 2 }
 ];
 
+export const CommentsTypeFilter: { name: string; id: number }[] = [
+  { name: 'All', id: 0 },
+  { name: 'Internal Comments', id: 1 },
+  { name: 'External Comments', id: 2 }
+];
+
+export const CommentsLevelFilter: { name: string; id: number }[] = [
+  { name: 'All', id: 0 },
+  { name: 'Order Level', id: 1 },
+  { name: 'Canidate Level', id: 2 }
+];
+
+export const CommentsByFilter: { name: string; id: number }[] = [
+  { name: 'All', id: 0 },
+  { name: 'Organization', id: 1 },
+  { name: 'Agency', id: 2 }
+];
 
 

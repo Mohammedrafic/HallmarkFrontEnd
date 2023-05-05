@@ -1,6 +1,6 @@
-import { FieldType, InputAttrType, UserPermissions } from "@core/enums";
-import { DropdownOption } from "@core/interface";
-import { ScheduleFormSourceKeys, ScheduleItemType, ScheduleTypesForEditBar } from "src/app/modules/schedule/constants";
+import { FieldType, InputAttrType, UserPermissions } from '@core/enums';
+import { DropdownOption } from '@core/interface';
+import { ScheduleFormSourceKeys, ScheduleItemType } from 'src/app/modules/schedule/constants';
 import { ScheduleItemAttributes } from './schedule.interface';
 import * as ScheduleInt from './index';
 

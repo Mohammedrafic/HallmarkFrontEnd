@@ -142,12 +142,16 @@
     margin-right: 34px;
   }
 
-  .remove-schedule {
+  .remove-schedule-wrapper {
     flex-grow: 1;
+  }
+
+  .remove-schedule {
+    width: 100%;
     color: $supportive-red !important;
     border-color: $supportive-red;
 
-    &:hover {
+    &:hover:not([disabled]) {
       background-color: unset !important;
       border-color: $supportive-red-20 !important;
       color: $supportive-red-20 !important;;
@@ -157,7 +161,7 @@
 
 .scheduled-availability-form {
   display: grid;
-  grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
+  grid-template-columns: 3.2fr 2.2fr 2.2fr 1.8fr;
   grid-template-rows: 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
@@ -174,7 +178,7 @@
 
 .scheduled-unavailability-form {
   display: grid;
-  grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
+  grid-template-columns: 3.2fr 2.2fr 2.2fr 1.8fr;
   grid-template-rows: 1fr 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
@@ -193,7 +197,7 @@
 
 .scheduled-shift-form {
   display: grid;
-  grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
+  grid-template-columns: 3.2fr 2.2fr 2.2fr 1.8fr;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
@@ -220,7 +224,7 @@
 
 .new-shift-form {
   display: grid;
-  grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
+  grid-template-columns: 3.2fr 2.2fr 2.2fr 1.8fr;
   grid-template-rows: 1fr 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
@@ -294,5 +298,9 @@
 ::ng-deep {
   label {
     margin-bottom: 0 !important;
+  }
+
+  .tooltip-container {
+    width: 100%;
   }
 }

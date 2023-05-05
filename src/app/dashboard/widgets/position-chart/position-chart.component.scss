@@ -3,7 +3,7 @@
 .widget {
   display: flex;
   flex-direction: column;
-  padding-left: 10px;
+ // padding-left: 10px;
   height: 100%;
   text-align: center;
   justify-content: center;
@@ -41,3 +41,8 @@
     }
   }
 
+  .tooltip_pos{
+    position: relative;
+    top: 6px;
+    right: 6px;
+  }

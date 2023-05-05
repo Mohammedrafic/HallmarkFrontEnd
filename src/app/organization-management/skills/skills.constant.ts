@@ -14,12 +14,12 @@ export const VmsSkillsColsExport: ExportColumn[] = [
 ];
 
 export const IrpSkillsColsExport: ExportColumn[] = [
-  { text:'Skill Category', column: 'SkillCategory_Name' },
+  { text: 'Skill Category', column: 'SkillCategory_Name' },
   { text: 'Skill Code', column: 'SkillCode'},
-  { text:'Skill Description', column: 'SkillDescription' },
-  { text:'GL Number', column: 'GLNumber' },
-  { text:'Allow Onboard', column: 'AllowOnboard' },
-  { text:'Inactivate Date', column: 'InactiveDate' },
+  { text: 'Skill Description', column: 'SkillDescription' },
+  { text: 'GL Number', column: 'GLNumber' },
+  { text: 'Allow Onboard', column: 'AllowOnboard' },
+  { text: 'Inactivate Date', column: 'InactiveDate' },
   { text: 'System', column: 'System'},
 ];
 

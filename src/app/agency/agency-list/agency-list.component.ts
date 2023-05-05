@@ -68,7 +68,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     private formBuilder: FormBuilder
   ) {
     super(store);
-    this.store.dispatch(new SetHeaderState({ title: 'Agency List', iconName: 'clock' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Agency List', iconName: 'briefcase' }));
   }
 
   override ngOnInit(): void {

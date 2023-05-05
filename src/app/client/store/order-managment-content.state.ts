@@ -95,7 +95,10 @@ import {
   RECORD_ADDED,
   RECORD_MODIFIED,
   updateCandidateJobMessage,
-  UpdateRegularRatesucceedcount
+  UpdateRegularRatesucceedcount,
+  PerDiemReOrdersErrorMessage,
+  UpdateRegularRateWithPerDiemsucceedcount,
+  TravelerContracttoPermOrdersErrorMessage
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -415,7 +418,7 @@ export class OrderManagementContentState {
     return patchState({ ordersPage: null });
   }
 
-  @Action(GetOrderById)
+  @Action(GetOrderById, { cancelUncompleted: true })
   GetOrderById(
     { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
     { id, options, isIrp }: GetOrderById
@@ -448,19 +451,21 @@ export class OrderManagementContentState {
   @Action(SetLock)
   SetLock(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id, lockStatus, filters, prefixId, updateOpened }: SetLock
+    { id, lockStatus, filters, prefixId,isIrp, updateOpened,  }: SetLock
   ): Observable<boolean | void> {
     return this.orderManagementService.setLock(id, lockStatus).pipe(
       tap(() => {
         const message = lockStatus ? `The Order ${prefixId} is locked` : `The Order ${prefixId} is unlocked`;
-        const actions = [new LockUpdatedSuccessfully(), new ShowToast(MessageTypes.Success, message)];
+        const actions = [new LockUpdatedSuccessfully(), new ShowToast(MessageTypes.Success, message),isIrp ? new GetIRPOrders(filters): new GetOrders(filters)];
         dispatch(updateOpened ? [...actions, new GetSelectedOrderById(id)] : actions);
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error?.detail)))
+      catchError((error: any) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
     );
   }
 
-  @Action(GetAgencyOrderCandidatesList)
+  @Action(GetAgencyOrderCandidatesList, { cancelUncompleted: true })
   GetAgencyOrderCandidatesPage(
     { patchState }: StateContext<OrderManagementContentStateModel>,
     { orderId, organizationId, pageNumber, pageSize, excludeDeployed, searchTerm }: GetAgencyOrderCandidatesList
@@ -1071,11 +1076,18 @@ export class OrderManagementContentState {
     { payload } : UpdateRegRateorder
   ) : Observable<UpdateRegrateModel | Observable<void>>{
     return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
-      tap((payload) => {
-        const count = payload.length;
-        dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
+      tap((data) => {
+        const count = data.length;
+        if(count>0 && payload.perDiemIds.length===0) 
+          dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
+        else if(count==0 && payload.perDiemIds.length===0 && payload.orderIds.length===0) 
+          dispatch(new ShowToast(MessageTypes.Error, TravelerContracttoPermOrdersErrorMessage));
+        else if(payload.perDiemIds.length===payload.orderIds.length)
+          dispatch(new ShowToast(MessageTypes.Error, PerDiemReOrdersErrorMessage));
+        else if(count>0 && payload.perDiemIds.length>0)
+          dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRateWithPerDiemsucceedcount(count)));
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Reg rate is not updated'))))
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rate is not updated'))))
     );
   }
 

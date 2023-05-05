@@ -23,6 +23,7 @@ import {
   ExportPayRateSetup,
   GetPayRates,
   GetSkillsbyDepartment,
+  GetWorkCommitmentByPage,
   SaveUpdatePayRate,
   SaveUpdatePayRateSucceed,
   ShowConfirmationPopUp
@@ -79,7 +80,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
 
-  @Select(MasterCommitmentState.commitmentsPage)
+  @Select(PayRatesState.workCommitmentsPage)
   public commitmentsPage$: Observable<MasterCommitmentsPage>;
 
   public orgRegions: OrganizationRegion[] = [];
@@ -139,7 +140,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   ];
   public fileName: string;
   public defaultFileName: string;
-  public format = '#';
+  public format = 'n3';
   public allRegionsSelected: boolean = false;
   public allLocationsSelected: boolean = false;
   public allDepartmentsSelected: boolean = false;
@@ -164,6 +165,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   }
 
   ngOnInit(): void {
+    this.getWorkCommitment();
     this.idFieldName = 'payRateSettingId';
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
       if (val.isDialogShown) {
@@ -180,7 +182,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       this.clearFilters();
       this.loadData();
     });
-
     this.commitmentsPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
       if(id){
         this.workcommitments = id.items;
@@ -373,12 +374,15 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
           }
         });
     });
-    this.store.dispatch(new GetCommitmentByPage(this.pageNumber, this.pageSize));
-
   }
 
   ngOnChanges(changes: SimpleChanges): void {
       this.loadData();
+  }
+
+  public getWorkCommitment():void {
+    this.store.dispatch(new GetWorkCommitmentByPage(this.pageNumber, this.pageSize));
+    
   }
 
   ngOnDestroy(): void {
@@ -459,6 +463,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
 
   public loadData(): void {
     this.store.dispatch(new GetAssignedSkillsByOrganization());
+    this.getWorkCommitment();
     this.filters = this.PayRatesFormGroup.getRawValue();
     this.store.dispatch(new GetPayRates({  
       pageNumber: this.currentPage, 

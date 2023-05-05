@@ -9,6 +9,7 @@ import { OrgDetailsInfoModel } from './org-details-info.model';
 import { AgencyPositionModel } from './agency-position.model';
 import { RnUtilizationModel } from './rnutilization.model';
 import { ExpiryDetailsModel } from './expiry.model';
+import { AvailableEmployeeModel } from './available-employee.model';
 
 export interface WidgetsDataModel {
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: CandidatesByStateWidgetAggregatedDataModel;
@@ -32,4 +33,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.RN_UTILIZATION]: RnUtilizationModel;
   [WidgetTypeEnum.ALREADY_EXPIRED_CREDS] : ExpiryDetailsModel[];
   [WidgetTypeEnum.UPCOMING_EXP_CREDS] : ExpiryDetailsModel[];
+  [WidgetTypeEnum.AVAILABLE_EMPLOYEE] : AvailableEmployeeModel[];
 }

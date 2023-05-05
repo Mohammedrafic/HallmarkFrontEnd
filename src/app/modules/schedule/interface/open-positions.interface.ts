@@ -1,3 +1,5 @@
+import { ScheduleModel } from './schedule.interface';
+
 export interface OpenPositionParams {
   departmentId: number;
   skillId: number;
@@ -27,4 +29,14 @@ export interface Positions {
 export interface OpenPositionState {
   initialPositions: OpenPositionsList[];
   shiftTime: string | null;
+}
+
+export interface PositionDragEvent {
+  action: boolean;
+  date: string | null;
+}
+
+export interface DroppedEvent {
+  dateItem: string;
+  scheduleItem: ScheduleModel;
 }

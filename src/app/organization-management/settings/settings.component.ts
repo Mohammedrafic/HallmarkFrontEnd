@@ -46,6 +46,7 @@ import { GetOrganizationStructure } from '../../store/user.actions';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { Days } from '@shared/enums/days';
+import { Weeks } from '@shared/enums/weeks';
 import { SettingsGroupInvoicesOptions } from 'src/app/modules/invoices/constants';
 import {
   AssociatedLink,
@@ -62,7 +63,7 @@ import { SideMenuService } from '@shared/components/side-menu/services';
 import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
 import { OrganizationSettingKeys, OrganizationSettings } from '@shared/constants';
 import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
-import { AutoGenerationPayload, SwitchValuePayload } from './settings.interface';
+import { AutoGenerationPayload, SwitchValuePayload,PayPeriodPayload } from './settings.interface';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -92,9 +93,16 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public checkboxValueForm: FormGroup;
   public OThoursSettingsFormGroup: FormGroup;
   public formBuilder: FormBuilder;
+  public payPeriodFormGroup: FormGroup;
 
   public readonly daysOfWeek = Days;
+  public readonly noOfWeek = Weeks;
   public readonly daysOfWeekFields = {
+    text: 'text',
+    value: 'id',
+  };
+
+  public readonly noOfWeekFields = {
     text: 'text',
     value: 'id',
   };
@@ -187,6 +195,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public IsSettingKeyOtHours: boolean = false;
   public allRegionsSelected: boolean = false;
   public allLocationsSelected: boolean = false;
+  public IsSettingKeyPayPeriod: boolean = false;
 
   constructor(
     protected override store: Store,
@@ -277,6 +286,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public onOverrideButtonClick(data: any): void {
     this.enableOtForm();
     this.IsSettingKeyOtHours = OrganizationSettingKeys[OrganizationSettingKeys['OTHours']].toString() == data.settingKey ? true : false;
+    this.IsSettingKeyPayPeriod = OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == data.settingKey ? true : false;
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
     this.setOrganizationSettingKey = data.settingKey;
@@ -287,6 +297,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.OThoursSettingsFormGroup.reset();
     this.locationFormGroup.reset();
     this.departmentFormGroup.reset();
+    this.payPeriodFormGroup.reset();
     this.store.dispatch(new ClearLocationList());
     this.store.dispatch(new ClearDepartmentList());
     this.setFormValidation(data);
@@ -296,6 +307,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   public onEditButtonClick(parentRecord: any, childRecord: any, event: any): void {
     this.IsSettingKeyOtHours = OrganizationSettingKeys[OrganizationSettingKeys['OTHours']].toString() == parentRecord.settingKey ? true : false;
+    this.IsSettingKeyPayPeriod = OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == parentRecord.settingKey ? true : false;
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
@@ -352,7 +364,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.departmentFormGroup.touched ||
       this.pushStartDateFormGroup.touched ||
       this.invoiceGeneratingFormGroup.touched ||
-      this.OThoursSettingsFormGroup.touched
+      this.OThoursSettingsFormGroup.touched || 
+      this.payPeriodFormGroup.touched
     ) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -421,8 +434,19 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
             this.organizationSettingsFormGroup.markAllAsTouched();
           }
         }
+        if (this.payPeriodFormGroup.valid) {
+          this.organizationHierarchy = OrganizationHierarchy.Organization;
+          this.organizationHierarchyId = this.organizationId;
+          if (this.organizationSettingsFormGroup.valid) {
+            this.sendForm();
+          } else {
+            this.organizationSettingsFormGroup.markAllAsTouched();
+          }
+        }
+        
         this.OThoursSettingsFormGroup.markAllAsTouched();
         this.regionRequiredFormGroup.markAllAsTouched();
+        this.payPeriodFormGroup.markAllAsTouched();
         this.validatePushStartDateForm();
         this.validateInvoiceGeneratingForm();
       }
@@ -522,7 +546,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private sendForm(): void {
     let dynamicValue: any;
-
     switch (this.organizationSettingsFormGroup.controls['controlType'].value) {
       case OrganizationSettingControlType.Multiselect:
         const options: string[] = [];
@@ -560,6 +583,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         break;
       case OrganizationSettingControlType.CheckboxValue:
         dynamicValue = JSON.stringify(this.createCheckboxValuePayload());
+        break;
+        case OrganizationSettingControlType.PayPeriod:
+        dynamicValue = JSON.stringify(this.createPayPeriodPayload());
         break;
       default:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
@@ -702,6 +728,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       const valueOptions = this.isParentEdit ? parentData.value : childData.value;
       dynamicValue = { ...JSON.parse(valueOptions), isCheckboxValue: true };
     }
+    if (this.formControlType === OrganizationSettingControlType.PayPeriod) {
+      const valueOptions = this.isParentEdit ? parentData.value : childData.value;
+      dynamicValue = { ...JSON.parse(valueOptions), isPayPeriod: true };
+    }
+
 
 
     // TODO: run outside zone
@@ -711,7 +742,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         settingKey: parentData.settingKey,
         controlType: parentData.controlType,
         name: parentData.name,
-        value: dynamicValue?.isDictionary || dynamicValue?.isInvoice ? !!dynamicValue.isEnabled : dynamicValue,
+        value: (dynamicValue?.isDictionary || dynamicValue?.isInvoice || dynamicValue?.isPayPeriod)? !!dynamicValue.isEnabled : dynamicValue,
       });
 
       if (dynamicValue?.isDictionary) {
@@ -741,6 +772,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.checkboxValueForm.setValue({
         value: dynamicValue.value ? dynamicValue.value : '',
         isEnabled: dynamicValue.isEnabled ? dynamicValue.isEnabled : false,
+      });
+    }
+
+    if (dynamicValue?.isPayPeriod) {
+      this.payPeriodFormGroup.setValue({
+        date: dynamicValue.date,
+        noOfWeek: dynamicValue.noOfWeek
       });
     }
   }
@@ -796,6 +834,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.departmentFormGroup.reset();
     this.pushStartDateFormGroup.reset();
     this.invoiceGeneratingFormGroup.reset();
+    this.payPeriodFormGroup.reset();
     this.switchedValueForm.reset();
     this.checkboxValueForm.reset();
     this.isEdit = false;
@@ -837,6 +876,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       time: [null, Validators.required],
       groupingBy: [null, Validators.required],
     });
+    this.payPeriodFormGroup = this.formBuilder.group({
+      noOfWeek: [null],
+      date: [null]
+    });
 
     // Remove this validation after be implementation. This is be bug.
     this.switchedValueForm = this.formBuilder.group({
@@ -861,6 +904,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     if (invoiceGneration && invoiceGneration.value && typeof invoiceGneration.value === 'string') {
       invoiceGneration.parsedValue = JSON.parse(invoiceGneration.value);
+    }
+
+    const payPeriodGneration: any = data.find((setting: any) => {
+      return setting.controlType === this.organizationSettingControlType.PayPeriod;
+    });
+
+    if (payPeriodGneration && payPeriodGneration.value && typeof payPeriodGneration.value === 'string') {
+      payPeriodGneration.parsedValue = JSON.parse(payPeriodGneration.value);
     }
 
     const switchedValues: any[] = data.filter((setting: any) => {
@@ -1019,6 +1070,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       value: this.checkboxValueForm.get('value')?.value,
       isEnabled: !!this.checkboxValueForm.get('isEnabled')?.value,
     });
+  }
+
+  private createPayPeriodPayload(): PayPeriodPayload {
+    return ({
+      isEnabled:  !!this.organizationSettingsFormGroup.controls['value'].value,
+      noOfWeek: this.payPeriodFormGroup.controls['noOfWeek'].value,
+      date: this.payPeriodFormGroup.controls['date'].value
+  });
   }
 
   private observeToggleControl(): void {
