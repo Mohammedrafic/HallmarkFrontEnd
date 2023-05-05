@@ -7,9 +7,19 @@
           {{item.date | date: 'E MM/dd'}}
           <span class="position-counter">{{item.totalOpenPositions}}</span>
         </div>
-        <div class="card-container">
+        <div class="card-container"
+             cdkDropList
+             cdkDropListSortingDisabled
+             [cdkDropListData]="item.positions"
+        >
           <ng-container *ngFor="let card of item.positions; trackBy: trackByCard">
-            <div class="card-container__card">
+            <div
+              class="card-container__card"
+              [cdkDragData]="card"
+              cdkDrag
+              (cdkDragStarted)="dragStart($event)"
+              (cdkDragEnded)="dragEnd()"
+            >
               <div class="card-container__card--time">
                 {{card.shiftStartTime | date: 'HH:mm': 'UTC'}} - {{card.shiftEndTime | date: 'HH:mm': 'UTC'}}
               </div>
@@ -18,7 +28,7 @@
                 <button>
                   {{card.publicId}}
                 </button>
-                <span class="position-counter">{{card.openPositions}}</span>
+                <span class="position-counter" *ngIf="card.openPositions > 1">{{card.openPositions}}</span>
               </div>
             </div>
           </ng-container>

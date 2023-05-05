@@ -7,7 +7,7 @@ import { ScheduleCardService } from '../services';
 @Directive()
 export abstract class ScheduleCard implements OnInit {
   @Input() isSelected = false;
-  @Input() dateSchedule: ScheduleDateItem ;
+  @Input() dateSchedule: ScheduleDateItem;
 
   bigCardConfig: ScheduleEventConfig;
   firstSmallCardConfig: ScheduleEventConfig;

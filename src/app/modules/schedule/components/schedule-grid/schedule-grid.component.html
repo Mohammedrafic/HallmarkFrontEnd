@@ -81,7 +81,7 @@
               weeksEnd [date]="dateHead.dateText"
               [weekStartDay]="orgFirstDayOfWeek"
               [selectedPeriod]="activePeriod"
-              [noBorder]="dateHead.noBorder" 
+              [noBorder]="dateHead.noBorder"
             >
               <span>{{ dateHead.dateText | date: 'E MM/dd' }}</span>
             </th>
@@ -89,7 +89,7 @@
 
           <ng-template #monthRange>
             <th
-              *ngFor="let day of monthRangeDays; ; trackBy: trackByweekDays"
+              *ngFor="let day of monthRangeDays; trackBy: trackByweekDays"
               class="table-title date left-border month-date fixed fixed--top">
               <span>{{day}}</span>
             </th>
@@ -106,16 +106,25 @@
               (click)="emitSelectedCandidate(scheduleItem.candidate)"
             ></app-candidate-card>
           </td>
-          <ng-container *ngFor="let dateSlot of datesRanges; trackBy: trackByDatesRange">
+          <ng-container
+            *ngFor="let dateSlot of datesRanges; trackBy: trackByDatesRange">
             <td
               *ngIf="dateSlot.dateText| calendarDateSlot: scheduleItem.schedule as dateSchedule; else emptyCell"
               [attr.colspan]="dateSchedule.extendedDays"
               weeksEnd [date]="dateSlot.dateText"
               [weekStartDay]="orgFirstDayOfWeek"
               [noBorder]="dateSlot.noBorder"
-              [selectedPeriod]="activePeriod">
+              cdkDropList
+              class="cdk-drop-list"
+              [cdkDropListData]="{dateItem: dateSlot.dateText,scheduleItem}"
+              (cdkDropListDropped)="handleDroppedElement($event)"
+              [selectedPeriod]="activePeriod"
+            >
               <div
                 class="table-cell date-slot"
+                canSchedule
+                [dragDate]="dateSchedule.date"
+                [dragEvent]="dragEvent"
                 [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot.dateText)"
                 (click)="selectCellSlots(dateSlot.dateText, scheduleItem.candidate, dateSchedule)"
               >
@@ -129,7 +138,11 @@
                 <ng-template #disabledCell>
                   <ejs-tooltip
                     [content]="dateSchedule | calendarTooltipSlot">
-                    <div class="disabled-cell">
+                    <div class="disabled-cell"
+                         canSchedule
+                         [dragDate]="dateSchedule.date"
+                         [dragEvent]="dragEvent"
+                    >
                       <i-feather name="slash" class="icon"></i-feather>
                     </div>
                   </ejs-tooltip>
@@ -141,9 +154,16 @@
               <td weeksEnd [date]="dateSlot.dateText"
                 [weekStartDay]="orgFirstDayOfWeek"
                 [selectedPeriod]="activePeriod"
+                  cdkDropList
+                  class="cdk-drop-list"
+                  [cdkDropListData]="{dateItem: dateSlot.dateText,scheduleItem}"
+                  (cdkDropListDropped)="handleDroppedElement($event)"
                 [noBorder]="dateSlot.noBorder">
                 <div
                   class="table-cell date-slot empty-cell"
+                  canSchedule
+                  [dragDate]="dateSlot.dateText"
+                  [dragEvent]="dragEvent"
                   [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot.dateText)"
                   (click)="selectCellSlots(dateSlot.dateText, scheduleItem.candidate)"
                 >
@@ -162,6 +182,7 @@
             (handleSelectCandidate)="emitSelectedCandidate($event)"
             (monthClick)="handleMonthClick($event)"
             [selectedCandidatesSlot]="selectedCandidatesSlot"
+            (dropElement)="handleDroppedElement($event)"
           ></app-month-view-grid>
       </ng-template>
       </tbody>
@@ -173,3 +194,10 @@
     </ng-template>
   </div>
 </div>
+
+<app-replacement-order-dialog
+  *ngIf="replacementOrderDialogOpen"
+  [replacementOrderData]="replacementOrderDialogData"
+  (destroyDialog)="closeReplacementOrderDialog()"
+  (createOrder)="saveNewBooking($event)"
+></app-replacement-order-dialog>

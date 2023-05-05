@@ -1,0 +1,11 @@
+@import "colors";
+
+.preview-drag-slots {
+  border: 2px dashed $supportive-green-15 !important;
+  opacity: 1 !important;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+  display: none;
+}
