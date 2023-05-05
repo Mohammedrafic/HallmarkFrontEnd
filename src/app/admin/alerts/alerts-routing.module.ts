@@ -14,10 +14,16 @@ const routes: Routes = [
       {
         path: 'user-subscription',
         component: UserSubscriptionComponent,
+        data: {
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'alerts-template',
         component: AlertsTemplateComponent,
+        data: {
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'group-email',

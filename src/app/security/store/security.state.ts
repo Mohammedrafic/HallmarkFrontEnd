@@ -35,6 +35,8 @@ import {
   GetOrgInterfacePage,
   GetLogInterfacePage,
   GetLogHistoryById,
+  GetBusinessForEmployeeType,
+  GetEmployeeUsers,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -77,6 +79,7 @@ interface SecurityStateModel {
   logInterfacePage: LogInterfacePage | null;
   logDialogOptions: DialogNextPreviousOption;
   logTimeSheetHistoryPage: LogTimeSheetHistoryPage | null;
+  userData: User[];
 }
 
 @State<SecurityStateModel>({
@@ -101,6 +104,7 @@ interface SecurityStateModel {
       previous: false,
     },
     logTimeSheetHistoryPage:null,
+    userData: []
   },
 })
 @Injectable()
@@ -244,6 +248,11 @@ export class SecurityState {
   @Selector()
   static timeZones(state: SecurityStateModel): TimeZoneModel[] | null {
     return state.timeZones;
+  }
+
+  @Selector()
+  static userData(state: SecurityStateModel): User[] {
+    return state.userData;
   }
 
   constructor(
@@ -649,5 +658,36 @@ export class SecurityState {
         })
       );
   }
+
+  @Action(GetBusinessForEmployeeType)
+  GetBusinessForEmployeeType(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { }: GetBusinessForEmployeeType
+  ): Observable<BusinessUnit[] | void> {
+    return this.businessUnitService.getBusinessForEmployeeType().pipe(
+      tap((payload) => {
+        patchState({ bussinesData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
   
+  @Action(GetEmployeeUsers)
+  GetEmployeeUsers(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { businessUnitId }: GetEmployeeUsers
+  ): Observable<User[] | void> {
+    return this.userService.getEmployeeUsers(businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ userData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
 }
