@@ -1469,7 +1469,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       .subscribe(() => {
         this.dispatchAgencyOrderCandidatesList(this.selectedOrder.id, this.selectedOrder.organizationId as number,
           !!this.selectedOrder.irpOrderMetadata);
-        this.getOrders();
+        this.getOrders(true);
         this.store.dispatch(
           new GetOrderById(
             this.selectedOrder.id,
