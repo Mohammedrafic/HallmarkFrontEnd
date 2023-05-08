@@ -604,6 +604,7 @@ export type OrderCandidateJob = {
   candidatePhone1Required:any;
   candidateAddressRequired:any;
   candidateProfileContactDetails: CandidateProfileContactDetail;
+  wasActualStartDateChanged?: boolean;
 };
 
 export type CandidatesBasicInfo = {
