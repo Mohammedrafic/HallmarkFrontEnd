@@ -17,6 +17,14 @@
     background-color: $secondary-dark-blue-50;
     border: 1px solid $secondary-dark-blue-40;
 
+    .empty {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18px;
+      color: $secondary-dark-blue-15;
+      text-align: center;
+    }
+
     .position-item:first-child {
       margin-top: 0;
     }

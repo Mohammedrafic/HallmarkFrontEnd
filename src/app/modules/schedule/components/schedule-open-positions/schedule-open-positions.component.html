@@ -1,6 +1,9 @@
 <div class="open-position-wrapper">
   <div class="title">Matching Open Positions</div>
   <div class="content">
+    <div class="empty" *ngIf="!openPositions.length">
+      There is no open positions for selected date(s)
+    </div>
     <ng-container *ngFor="let item of openPositions; trackBy: trackByPosition">
       <div class="position-item" *ngIf="item.positions.length">
         <div class="position-item__title">
