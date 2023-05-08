@@ -60,8 +60,9 @@
         </e-column>
         <e-column field="skillName" headerText="SKILL" width="170">
           <ng-template #template let-data>
-            <span *ngIf="data.skillId">{{ data.skillName }}</span>
-            <span *ngIf="!data.skillId">All</span>
+            <ejs-tooltip id="tooltip" [content]="data.skillName" position="TopCenter">
+              <span>{{ data.skillName }}</span>
+            </ejs-tooltip>
           </ng-template>
         </e-column>
         <e-column field="workCommitName" headerText="Work Commitment" width="170">
@@ -95,6 +96,8 @@
           <ng-template #template let-data>
             <span>{{ data.effectiveDate | date: 'MM/dd/yyy':'UTC' }}</span>
           </ng-template>
+        </e-column>
+        <e-column field="amountMultiplier" headerText="Pay Rate Value" width="180">
         </e-column>
       </e-columns>
       <ng-template #pagerTemplate let-data>
@@ -252,11 +255,12 @@
           </div>
           <div class="input-container dropdown">
             <label for="skill">Skill <span class="required">*</span></label>
-            <div class="dropdown-wrapper">
               <div class="input-group dropdown bootstrap">
                 <ejs-multiselect
                   id="skill"
                   appValidateWithMessage
+                  selectAllText="Select All"
+                  [showSelectAll]="true"
                   mode="CheckBox"
                   [dataSource]="skills"
                   [fields]="fields"
@@ -265,16 +269,6 @@
                   formControlName="skillIds"
                 >
                 </ejs-multiselect>
-              </div>
-              <div class="switch">
-                <ejs-switch
-                  name="allSkills"
-                  [checked]="allSkillsSelected"
-                  (change)="allSkillsChange($event)"
-                  label="All"
-                ></ejs-switch>
-                <label for="allSkills" class="switch-text">All</label>
-              </div>
               </div>
           </div>
         </div>
