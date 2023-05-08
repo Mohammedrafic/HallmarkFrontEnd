@@ -246,7 +246,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private collectInvalidFields(): string[] {
-    const fields: string[] = [];
     const forms = [
       this.orderDetailsFormComponent.generalInformationForm.controls,
       this.orderDetailsFormComponent.jobDistributionForm.controls,
@@ -255,18 +254,49 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.workLocationForm.controls,
       this.orderDetailsFormComponent.specialProject.controls,
     ];
-    forms.forEach((form) => collectInvalidFieldsFromForm(form, fields));
-    return fields;
+
+    const requiredFields = forms.map((controls) => {
+      const invalidaControls = Object.keys(controls).filter((control) => {
+        const filedHasRequiredError = !!(controls[control].invalid && controls[control].errors?.['required']);
+        return filedHasRequiredError;
+      });
+
+      return invalidaControls;
+    }).flat().map((controlName) => {
+      return `\u2022 ${FieldName[controlName as keyof typeof FieldName]}`;
+    });
+
+    return requiredFields;
   }
 
   private showOrderFormValidationMessage(fieldsString?: string): void {
     const fields = fieldsString || this.collectInvalidFields().join(',\n');
-    ToastUtility.show({
-      title: 'Error',
-      content: 'Please fill in the required fields in Order Details tab:\n' + fields,
-      position: { X: 'Center', Y: 'Top' },
-      cssClass: 'error-toast',
-    });
+
+    if (fields && fields.length) {
+      ToastUtility.show({
+        title: 'Error',
+        content: 'Please fill in the required fields in Order Details tab:\n' + fields,
+        position: { X: 'Center', Y: 'Top' },
+        cssClass: 'error-toast',
+      });
+    }
+  }
+
+  private showInvalidValueMessage(): void {
+    const controls = this.orderDetailsFormComponent.generalInformationForm.controls;
+    const invalidFields = Object.keys(controls).filter((control) => {
+      const filedHasRequiredError = !!(controls[control].invalid && !controls[control].errors?.['required']);
+      return filedHasRequiredError;
+    }).map((controlName) => `\u2022 ${FieldName[controlName as keyof typeof FieldName]}`);
+
+    if (invalidFields && invalidFields.length) {
+      ToastUtility.show({
+        title: 'Error',
+        content: 'Please fill in a correct value in Order Details tab:\n' + invalidFields.join(',\n'),
+        position: { X: 'Center', Y: 'Top' },
+        cssClass: 'error-toast',
+      });
+    }
   }
 
   private showCredentialsValidationMessage(): void {
@@ -753,6 +783,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
     if (!orderValid) {
       this.showOrderFormValidationMessage();
+      this.showInvalidValueMessage();
     }
 
     if (orderValid && billRatesValid && credentialsValid) {
