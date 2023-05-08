@@ -1319,9 +1319,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public allAgenciesChange(event: any) {
     this.allAgencies=!this.allAgencies;
     this.documentLibraryform.get(FormControlNames.AllAgencies)?.setValue(this.allAgencies);
-    if(this.allAgencies){
+    if (this.allAgencies && !this.agencySwitch){
       this.isShowSharedWith=false;
-    }else{
+    } else if (!this.allAgencies && !this.agencySwitch){
       this.isShowSharedWith=true;
     }
     this.changeDetectorRef.markForCheck();
@@ -1330,9 +1330,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public allOrgnizationsChange(event: any) {
     this.allOrgnizations=!this.allOrgnizations;
     this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(this.allOrgnizations);
-    if(this.allOrgnizations){    
+    if (this.allOrgnizations && !this.organizationSwitch){    
       this.isShowSharedWith=false;
-    }else{
+    } else if (!this.allOrgnizations && !this.organizationSwitch){
       this.isShowSharedWith=true;
     }
     this.changeDetectorRef.markForCheck();
