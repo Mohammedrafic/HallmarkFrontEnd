@@ -24,6 +24,14 @@
 
 .input-container {
   margin-bottom: 15px;
+
+  .checkbox-container {
+    margin-top: 8px;
+
+    ejs-checkbox {
+      margin-right: 16px;
+    }
+  }
 }
 
 .form-container {
@@ -46,6 +54,11 @@
       }
     }
   }
+}
+
+app-button-group {
+  display: block;
+  margin-bottom: 12px;
 }
 
 .grid-component {
@@ -126,4 +139,8 @@ ejs-textbox.e-control {
 .switch {
   display: flex;
   align-items: center;
+}
+
+.attr-td {
+  width: 400px !important;
 }

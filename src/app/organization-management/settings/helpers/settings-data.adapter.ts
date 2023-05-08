@@ -1,9 +1,14 @@
 import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
-import { OrganizationSettingsDropDownOption, OrganizationSettingsGet, OrganizationSettingValueOptions } from '@shared/models/organization-settings.model';
+import {
+  OrganizationSettingChild,
+  OrganizationSettingsDropDownOption,
+  OrganizationSettingsGet,
+  OrganizationSettingValueOptions,
+} from '@shared/models/organization-settings.model';
 
 export class SettingsDataAdapter {
 
-  static adaptSettings(settings: OrganizationSettingsGet[]): OrganizationSettingsGet[] {
+  static adaptSettings(settings: OrganizationSettingsGet[], IRPAndVMS: boolean): OrganizationSettingsGet[] {
     /**
      * TODO: refactoring needed here. High cyclomatic complexity.
      */
@@ -24,11 +29,15 @@ export class SettingsDataAdapter {
             if (typeof child.value === 'string') {
               child.value = SettingsDataAdapter.getDropDownOptionsFromString(child.value, item.valueOptions);
             }
-
-
           });
         }
       }
+
+      item.children?.forEach((child) => {
+        child.systemType = IRPAndVMS ? SettingsDataAdapter.getSettingChildSystemType(child) : null;
+      });
+
+      item.systemType = IRPAndVMS ? SettingsDataAdapter.getSettingSystemType(item) : null;
 
       return item;
     });
@@ -49,5 +58,29 @@ export class SettingsDataAdapter {
       });
     }
     return options;
+  }
+
+  static getSettingSystemType(setting: OrganizationSettingsGet): string | null {
+    if (setting.includeInVMS && !setting.includeInIRP) {
+      return 'VMS';
+    }
+
+    if (setting.includeInIRP && !setting.includeInVMS) {
+      return 'IRP';
+    }
+
+    if (setting.includeInIRP && setting.includeInVMS) {
+      return 'IRP, VMS';
+    }
+
+    return null;
+  }
+
+  static getSettingChildSystemType(setting: OrganizationSettingChild): string {
+    if (setting.isIRPConfigurationValue) {
+      return 'IRP';
+    } else {
+      return 'VMS';
+    }
   }
 }

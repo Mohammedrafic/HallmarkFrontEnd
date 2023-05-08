@@ -14,7 +14,6 @@ import { LocationsComponent } from './locations/locations.component';
 import { OrganizationManagementComponent } from './organization-management.component';
 import { PayRateComponent } from './pay-rate/pay-rate.component';
 import { RegionsComponent } from './regions/regions.component';
-import { SettingsComponent } from './settings/settings.component';
 import { ShiftsComponent } from './shifts/shifts.component';
 import { SkillsComponent } from './skills/skills.component';
 import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
@@ -95,7 +94,7 @@ const routes: Routes = [
       },
       {
         path: 'settings',
-        component: SettingsComponent,
+        loadChildren: () => import('./settings/settings.module').then((m) => m.SettingsModule),
         data: {
           isOrganizationArea: true,
         },

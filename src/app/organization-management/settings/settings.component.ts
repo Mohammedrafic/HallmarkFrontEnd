@@ -1,11 +1,23 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { filter, map, Observable, Subject, takeUntil } from 'rxjs';
-import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
 import { Select, Store } from '@ngxs/store';
+import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
+import { SideMenuService } from '@shared/components/side-menu/services';
+import { OrganizationSettingKeys, OrganizationSettings } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
+import { Days } from '@shared/enums/days';
+import { OrganizationHierarchy } from '@shared/enums/organization-hierarchy';
+import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
+import { OrganizationSettingValidationType } from '@shared/enums/organization-setting-validation-type';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { SystemType } from '@shared/enums/system-type.enum';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { ButtonModel } from '@shared/models/buttons-group.model';
 import { Department } from '@shared/models/department.model';
+import { FilteredItem } from '@shared/models/filter.model';
 import { Location } from '@shared/models/location.model';
-import { Region } from '@shared/models/region.model';
 import {
   OrganizationSettingFilter,
   OrganizationSettingsDropDownOption,
@@ -13,8 +25,26 @@ import {
   OrganizationSettingsPost,
   OrganizationSettingValidation,
 } from '@shared/models/organization-settings.model';
-import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
+import {
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
+import { Region } from '@shared/models/region.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { FilterService } from '@shared/services/filter.service';
+import { customEmailValidator } from '@shared/validators/email.validator';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
+import { distinctUntilChanged, filter, Observable, skip, Subject, takeUntil } from 'rxjs';
+import { SettingsGroupInvoicesOptions } from 'src/app/modules/invoices/constants';
+import { PermissionService } from 'src/app/security/services/permission.service';
+import { AppState } from 'src/app/store/app.state';
+import { ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
+import { GetOrganizationStructure } from '../../store/user.actions';
+import { UserState } from '../../store/user.state';
 import {
   ClearDepartmentList,
   ClearLocationList,
@@ -25,44 +55,21 @@ import {
   GetRegions,
   SaveOrganizationSettings,
 } from '../store/organization-management.actions';
-import { ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { OrganizationHierarchy } from '@shared/enums/organization-hierarchy';
-import { OrganizationSettingValidationType } from '@shared/enums/organization-setting-validation-type';
 import { OrganizationManagementState } from '../store/organization-management.state';
-import { customEmailValidator } from '@shared/validators/email.validator';
-import { UserState } from '../../store/user.state';
-import { FilteredItem } from '@shared/models/filter.model';
-import { FilterService } from '@shared/services/filter.service';
-import {
-  OrganizationDepartment,
-  OrganizationLocation,
-  OrganizationRegion,
-  OrganizationStructure,
-} from '@shared/models/organization.model';
-import { GetOrganizationStructure } from '../../store/user.actions';
-import { PermissionService } from 'src/app/security/services/permission.service';
-import { AbstractPermissionGrid } from '@shared/helpers/permissions';
-import { Days } from '@shared/enums/days';
 import { Weeks } from '@shared/enums/weeks';
-import { SettingsGroupInvoicesOptions } from 'src/app/modules/invoices/constants';
 import {
   AssociatedLink,
   billingSettingsKey,
   DisabledSettingsByDefault,
+  GetSettingSystemButtons,
   invoiceGeneratingSettingsKey,
   SettingsAppliedToPermissions,
   SettingsFilterCols,
+  SettingsSystemFilterCols,
   tierSettingsKey,
 } from './settings.constant';
 import { SettingsDataAdapter } from './helpers/settings-data.adapter';
-import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { SideMenuService } from '@shared/components/side-menu/services';
-import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
-import { OrganizationSettingKeys, OrganizationSettings } from '@shared/constants';
-import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
+
 import { AutoGenerationPayload, SwitchValuePayload,PayPeriodPayload } from './settings.interface';
 
 export enum TextFieldTypeControl {
@@ -197,6 +204,17 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public allLocationsSelected: boolean = false;
   public IsSettingKeyPayPeriod: boolean = false;
 
+  separateValuesInSystems = false;
+  configurationSystemType: SystemType = SystemType.VMS;
+  systemButtons: ButtonModel[] = [];
+  readonly orgSystems = {
+    IRP: false,
+    VMS: false,
+    IRPAndVMS: false,
+  };
+
+  private configurations: OrganizationSettingsGet[] = [];
+
   constructor(
     protected override store: Store,
     @Inject(FormBuilder) private builder: FormBuilder,
@@ -214,7 +232,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   override ngOnInit(): void {
     super.ngOnInit();
     this.watchForOrgId();
-    this.mapGridData();
+    this.watchForSettings();
     this.watchForStructure();
     this.watchForFilterOptions();
     this.watchForRegionControl();
@@ -226,6 +244,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  setConfigurationSystemType(system: SystemType, updateButtons = false): void {
+    this.configurationSystemType = system;
+
+    if (updateButtons) {
+      this.systemButtons = GetSettingSystemButtons(this.configurationSystemType === SystemType.IRP);
+    }
   }
 
   private getSettings(): void {
@@ -243,6 +269,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       locationIds: this.filters.locationIds || [],
       departmentIds: this.filters.departmentIds || [],
       attributes: this.filters.attributes || [],
+      includeInIRP: this.filters.includeInIRP || false,
+      includeInVMS: this.filters.includeInVMS || false,
     });
     this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
   }
@@ -265,6 +293,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   public onFilterApply(): void {
     this.filters = this.SettingsFilterFormGroup.getRawValue();
+    this.filters.includeInVMS = this.filters.includeInVMS ?? false;
+    this.filters.includeInIRP = this.filters.includeInIRP ?? false;
     this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
     this.getSettings();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -284,6 +314,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   public onOverrideButtonClick(data: any): void {
+    this.setConfigurationSystemType(this.getParentConfigurationSystemType(), true);
+    this.separateValuesInSystems = data.separateValuesInSystems;
     this.enableOtForm();
     this.IsSettingKeyOtHours = OrganizationSettingKeys[OrganizationSettingKeys['OTHours']].toString() == data.settingKey ? true : false;
     this.IsSettingKeyPayPeriod = OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == data.settingKey ? true : false;
@@ -306,6 +338,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   public onEditButtonClick(parentRecord: any, childRecord: any, event: any): void {
+    if (childRecord) {
+      this.setConfigurationSystemType( childRecord.isIRPConfigurationValue ? SystemType.IRP : SystemType.VMS, true);
+    } else {
+      this.setConfigurationSystemType(this.getParentConfigurationSystemType(), true);
+    }
+
+    this.separateValuesInSystems = parentRecord.separateValuesInSystems;
     this.IsSettingKeyOtHours = OrganizationSettingKeys[OrganizationSettingKeys['OTHours']].toString() == parentRecord.settingKey ? true : false;
     this.IsSettingKeyPayPeriod = OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == parentRecord.settingKey ? true : false;
     this.enableOtForm();
@@ -364,7 +403,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.departmentFormGroup.touched ||
       this.pushStartDateFormGroup.touched ||
       this.invoiceGeneratingFormGroup.touched ||
-      this.OThoursSettingsFormGroup.touched || 
+      this.OThoursSettingsFormGroup.touched ||
       this.payPeriodFormGroup.touched
     ) {
       this.confirmService
@@ -443,7 +482,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
             this.organizationSettingsFormGroup.markAllAsTouched();
           }
         }
-        
+
         this.OThoursSettingsFormGroup.markAllAsTouched();
         this.regionRequiredFormGroup.markAllAsTouched();
         this.payPeriodFormGroup.markAllAsTouched();
@@ -504,14 +543,17 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
-  public mapGridData(): void {
+  watchForSettings(): void {
     this.settings$
       .pipe(
+        skip(1),
         takeUntil(this.unsubscribe$),
       )
-      .subscribe((data) => {
+      .subscribe((data: OrganizationSettingsGet[]) => {
+        const adaptedData = SettingsDataAdapter.adaptSettings(data, this.orgSystems.IRPAndVMS);
+
+        this.configurations = data;
         this.lastAvailablePage = this.getLastPage(data);
-        const adaptedData = SettingsDataAdapter.adaptSettings(data);
         this.gridDataSource = this.getRowsPerPage(adaptedData, this.currentPagerPage);
         this.totalDataRecords = adaptedData.length;
         this.dataSource = adaptedData;
@@ -531,16 +573,18 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.sideMenuService.selectedMenuItem$.next(ORG_SETTINGS[13]);
   }
 
-  public onRowsDropDownChanged(): void {
-    this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
+  changePageSize(event: { isInteracted: boolean }): void {
+    if (event.isInteracted) {
+      this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
+      this.lastAvailablePage = this.getLastPage(this.configurations);
+    }
   }
 
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.settings$.subscribe((data) => {
-        this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
-        this.currentPagerPage = event.currentPage || event.value;
-      });
+  changePage(event: { currentPage: number, value: number }): void {
+    if ((event.currentPage && event.currentPage !== this.currentPagerPage) || event.value) {
+      this.gridDataSource = this.getRowsPerPage(this.configurations, event.currentPage || event.value);
+      this.lastAvailablePage = this.getLastPage(this.configurations);
+      this.currentPagerPage = event.currentPage || event.value;
     }
   }
 
@@ -599,7 +643,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       hierarchyLevel: this.organizationHierarchy,
       value: dynamicValue,
       regionId: this.OThoursSettingsFormGroup.controls['regionId'].value || null,
-      locationId: this.OThoursSettingsFormGroup.controls['locationId'].value ||null
+      locationId: this.OThoursSettingsFormGroup.controls['locationId'].value ||null,
+      isIRPConfigurationValue: this.configurationSystemType === SystemType.IRP,
     };
 
     this.store.dispatch(new SaveOrganizationSettings(setting));
@@ -855,6 +900,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       locationIds: [[]],
       departmentIds: [[]],
       attributes: [[]],
+      includeInIRP: [false],
+      includeInVMS: [false],
     });
   }
 
@@ -943,19 +990,18 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private setPermissionsToManageSettings(): void {
-    this.permissionService
-      .getPermissions()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(({ canManageOrganizationConfigurations }) => {
-        this.settingsAppliedToPermissions.forEach((key) => (this.hasPermissions[key] = canManageOrganizationConfigurations));
-      });
+    this.settingsAppliedToPermissions.forEach((key) => {
+      this.hasPermissions[key] = this.userPermission[PermissionTypes.ManageOrganizationConfigurations];
+    });
   }
 
   private watchForOrgId(): void {
     this.organizationId$.pipe(
+      distinctUntilChanged(),
       takeUntil(this.unsubscribe$),
     ).subscribe((id) => {
       this.organizationId = id || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+      this.setOrgSystems();
       this.clearFilters();
       this.store.dispatch(new GetOrganizationSettingsFilterOptions());
       this.getSettings();
@@ -1169,7 +1215,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.OThoursSettingsFormGroup.controls['regionId'].enable();
       this.OThoursSettingsFormGroup.controls['regionId'].setValue([regionId]);
     }
-    
+
   }
   public otHoursLocationsEdit(locationId: number): void {
     if(locationId==null){
@@ -1184,7 +1230,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.OThoursSettingsFormGroup.controls['locationId'].enable();
       this.OThoursSettingsFormGroup.controls['locationId'].setValue([locationId]);
     }
-   
+
   }
   public enableOtForm(){
     this.allLocationsSelected=false;
@@ -1195,6 +1241,35 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   onlyNumerics(event:any){
     if (event.key === '.') {
       event.preventDefault();
+    }
+  }
+
+  private setOrgSystems(): void {
+    const orgPreferences = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences;
+    const isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+
+    this.orgSystems.IRPAndVMS = isIRPFlagEnabled && !!(orgPreferences?.isIRPEnabled && orgPreferences?.isVMCEnabled);
+    this.orgSystems.IRP = isIRPFlagEnabled && !!orgPreferences?.isIRPEnabled;
+    this.orgSystems.VMS = !!orgPreferences?.isVMCEnabled;
+    this.setConfigurationSystemType(this.getParentConfigurationSystemType());
+
+    if (this.orgSystems.IRPAndVMS) {
+      this.updateFilterColumns();
+    }
+  }
+
+  private updateFilterColumns(): void {
+    this.filterColumns = {
+      ...this.filterColumns,
+      ...SettingsSystemFilterCols,
+    };
+  }
+
+  private getParentConfigurationSystemType(): SystemType {
+    if (this.orgSystems.IRPAndVMS || (this.orgSystems.IRP && !this.orgSystems.VMS)) {
+      return SystemType.IRP;
+    } else {
+      return SystemType.VMS;
     }
   }
 }
