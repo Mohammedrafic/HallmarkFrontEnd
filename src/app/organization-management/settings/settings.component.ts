@@ -81,7 +81,7 @@ import {
   TierSettingsKey,
 } from './settings.constant';
 import { SettingsDataAdapter } from './helpers/settings-data.adapter';
-import { AutoGenerationPayload, SwitchValuePayload,PayPeriodPayload } from './settings.interface';
+import { AutoGenerationPayload, SwitchValuePayload, PayPeriodPayload } from './settings.interface';
 
 /**
  * TODO: component needs to be rework with configurable dialog and form.
@@ -141,7 +141,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   invoiceGeneratingFormGroup: FormGroup;
   switchedValueForm: FormGroup;
   checkboxValueForm: FormGroup;
-  OThoursSettingsFormGroup: FormGroup;
+  RegionLocationSettingsMultiFormGroup: FormGroup;
   payPeriodFormGroup: FormGroup;
 
   dropdownDataSource: OrganizationSettingValueOptions[];
@@ -154,6 +154,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   allLocationsSelected = false;
   IsSettingKeyPayPeriod = false;
   separateValuesInSystems = false;
+  IsSettingKeyScheduleOnlyWithAvailability: boolean = false;
+  IsSettingKeyAvailabiltyOverLap: boolean = false;
   systemButtons: ButtonModel[] = [];
   isEdit = false;
   isParentEdit = false;
@@ -265,6 +267,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.enableOtForm();
     this.IsSettingKeyOtHours = OrganizationSettingKeys[OrganizationSettingKeys['OTHours']].toString() == data.settingKey;
     this.IsSettingKeyPayPeriod = OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == data.settingKey;
+    this.IsSettingKeyAvailabiltyOverLap = OrganizationSettingKeys[OrganizationSettingKeys['AvailabilityOverLapRule']].toString() == data.settingKey;
+    this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == data.settingKey;
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
     this.setOrganizationSettingKey(data.settingKey);
@@ -272,7 +276,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.disableDepForInvoiceGeneration();
     this.regionFormGroup.reset();
     this.regionRequiredFormGroup.reset();
-    this.OThoursSettingsFormGroup.reset();
+    this.RegionLocationSettingsMultiFormGroup.reset();
     this.locationFormGroup.reset();
     this.departmentFormGroup.reset();
     this.payPeriodFormGroup.reset();
@@ -281,6 +285,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.setFormValidation(data);
     this.setFormValuesForOverride(data);
     this.store.dispatch(new ShowSideDialog(true));
+    if (this.IsSettingKeyAvailabiltyOverLap) {
+      this.switchedValueForm.controls["value"].setValue(4)
+      this.switchedValueForm.controls['isEnabled'].setValue(true)
+    }
   }
 
   openEditSettingDialog(
@@ -293,6 +301,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       OrganizationSettingKeys[OrganizationSettingKeys['OTHours']].toString() == parentRecord.settingKey;
     this.IsSettingKeyPayPeriod =
       OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == parentRecord.settingKey;
+    this.IsSettingKeyAvailabiltyOverLap = OrganizationSettingKeys[OrganizationSettingKeys['AvailabilityOverLapRule']].toString() == parentRecord.settingKey;
+    this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == parentRecord.settingKey;
+
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
@@ -318,7 +329,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.departmentFormGroup.touched ||
       this.pushStartDateFormGroup.touched ||
       this.invoiceGeneratingFormGroup.touched ||
-      this.OThoursSettingsFormGroup.touched ||
+      this.RegionLocationSettingsMultiFormGroup.touched ||
       this.payPeriodFormGroup.touched
     ) {
       this.confirmService
@@ -359,7 +370,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       return;
     }
 
-    if (this.IsSettingKeyOtHours && this.allLocationsSelected && this.allRegionsSelected) {
+    if ((this.IsSettingKeyOtHours||this.IsSettingKeyScheduleOnlyWithAvailability) && this.allLocationsSelected && this.allRegionsSelected) {
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = this.organizationId;
 
@@ -370,7 +381,17 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       }
     }
 
-    if (this.OThoursSettingsFormGroup.valid) {
+    if(this.IsSettingKeyAvailabiltyOverLap && this.allLocationsSelected && this.allRegionsSelected) {
+      this.organizationHierarchy = OrganizationHierarchy.Organization;
+      this.organizationHierarchyId = this.organizationId;
+      if (this.switchedValueForm.valid) {
+        this.sendForm();
+      } else {
+        this.switchedValueForm.markAllAsTouched();
+      }
+    }
+
+    if (this.RegionLocationSettingsMultiFormGroup.valid) {
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = this.organizationId;
 
@@ -379,20 +400,16 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       } else {
         this.organizationSettingsFormGroup.markAllAsTouched();
       }
-    }
 
-    if (this.payPeriodFormGroup.valid) {
-      this.organizationHierarchy = OrganizationHierarchy.Organization;
-      this.organizationHierarchyId = this.organizationId;
-
-      if (this.organizationSettingsFormGroup.valid) {
+      if (this.IsSettingKeyAvailabiltyOverLap  &&
+        this.switchedValueForm.valid) {
         this.sendForm();
       } else {
-        this.organizationSettingsFormGroup.markAllAsTouched();
+        this.switchedValueForm.markAllAsTouched();
       }
     }
 
-    this.OThoursSettingsFormGroup.markAllAsTouched();
+    this.RegionLocationSettingsMultiFormGroup.markAllAsTouched();
     this.regionRequiredFormGroup.markAllAsTouched();
     this.payPeriodFormGroup.markAllAsTouched();
     this.validatePushStartDateForm();
@@ -533,7 +550,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       case OrganizationSettingControlType.CheckboxValue:
         dynamicValue = JSON.stringify(this.createCheckboxValuePayload());
         break;
-        case OrganizationSettingControlType.PayPeriod:
+      case OrganizationSettingControlType.PayPeriod:
         dynamicValue = JSON.stringify(this.createPayPeriodPayload());
         break;
       default:
@@ -547,8 +564,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       hierarchyId: this.organizationHierarchyId,
       hierarchyLevel: this.organizationHierarchy,
       value: dynamicValue,
-      regionId: this.OThoursSettingsFormGroup.controls['regionId'].value || null,
-      locationId: this.OThoursSettingsFormGroup.controls['locationId'].value ||null,
+      regionId: this.RegionLocationSettingsMultiFormGroup.controls['regionId'].value || null,
+      locationId: this.RegionLocationSettingsMultiFormGroup.controls['locationId'].value || null,
       isIRPConfigurationValue: this.configurationSystemType === SystemType.IRP,
     };
 
@@ -737,7 +754,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.organizationSettingsFormGroup.reset();
     this.regionFormGroup.reset();
     this.regionRequiredFormGroup.reset();
-    this.OThoursSettingsFormGroup.reset();
+    this.RegionLocationSettingsMultiFormGroup.reset();
     this.locationFormGroup.reset();
     this.departmentFormGroup.reset();
     this.pushStartDateFormGroup.reset();
@@ -771,7 +788,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private createRegionLocationDepartmentForm(): void {
     this.regionFormGroup = this.formBuilder.group({ regionId: [null] });
     this.regionRequiredFormGroup = this.formBuilder.group({ regionId: [null, Validators.required] });
-    this.OThoursSettingsFormGroup = this.formBuilder.group({
+    this.RegionLocationSettingsMultiFormGroup = this.formBuilder.group({
       regionId: [null, Validators.required],
       locationId: [null, Validators.required]
     });
@@ -983,10 +1000,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private createPayPeriodPayload(): PayPeriodPayload {
     return ({
-      isEnabled:  !!this.organizationSettingsFormGroup.controls['value'].value,
+      isEnabled: !!this.organizationSettingsFormGroup.controls['value'].value,
       noOfWeek: this.payPeriodFormGroup.controls['noOfWeek'].value,
       date: this.payPeriodFormGroup.controls['date'].value
-  });
+    });
   }
 
   private observeToggleControl(): void {
@@ -1020,7 +1037,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   watchRegionControlChanges() {
-    this.OThoursSettingsFormGroup.get('regionId')?.valueChanges
+    this.RegionLocationSettingsMultiFormGroup.get('regionId')?.valueChanges
       .pipe(
         takeUntil(this.unsubscribe$),
       )
@@ -1038,14 +1055,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           this.regionBasedLocations = sortByField(locations, 'name');
         } else {
           this.regionBasedLocations = [];
-          this.OThoursSettingsFormGroup.get('locationId')?.setValue([]);
+          this.RegionLocationSettingsMultiFormGroup.get('locationId')?.setValue([]);
         }
       });
   }
 
   public allRegionsChange(event: { checked: boolean }): void {
     this.allRegionsSelected = event.checked;
-    const regionsControl = this.OThoursSettingsFormGroup.controls['regionId'];
+    const regionsControl = this.RegionLocationSettingsMultiFormGroup.controls['regionId'];
     if (this.allRegionsSelected) {
       regionsControl.setValue(null);
       regionsControl.disable();
@@ -1061,7 +1078,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
   public allLocationsChange(event: { checked: boolean }): void {
     this.allLocationsSelected = event.checked;
-    const locationsControl = this.OThoursSettingsFormGroup.controls['locationId'];
+    const locationsControl = this.RegionLocationSettingsMultiFormGroup.controls['locationId'];
     if (this.allLocationsSelected) {
       locationsControl.setValue(null);
       locationsControl.disable();
@@ -1071,37 +1088,37 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   public otHoursRegionChangesEdit(regionId: number): void {
-    if(regionId==null){
-      this.allRegionsSelected=true;
-      this.OThoursSettingsFormGroup.controls['regionId'].disable();
-    }else{
-      this.OThoursSettingsFormGroup.controls['regionId'].enable();
-      this.OThoursSettingsFormGroup.controls['regionId'].setValue([regionId]);
+    if (regionId == null) {
+      this.allRegionsSelected = true;
+      this.RegionLocationSettingsMultiFormGroup.controls['regionId'].disable();
+    } else {
+      this.RegionLocationSettingsMultiFormGroup.controls['regionId'].enable();
+      this.RegionLocationSettingsMultiFormGroup.controls['regionId'].setValue([regionId]);
     }
 
   }
   public otHoursLocationsEdit(locationId: number): void {
-    if(locationId==null){
-      this.allLocationsSelected=true;
-      this.OThoursSettingsFormGroup.controls['locationId'].disable();
+    if (locationId == null) {
+      this.allLocationsSelected = true;
+      this.RegionLocationSettingsMultiFormGroup.controls['locationId'].disable();
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = this.organizationId;
-      this.OThoursSettingsFormGroup.controls['locationId'].setValue(null);
-    }else{
+      this.RegionLocationSettingsMultiFormGroup.controls['locationId'].setValue(null);
+    } else {
       this.organizationHierarchy = OrganizationHierarchy.Location;
       this.organizationHierarchyId = locationId;
-      this.OThoursSettingsFormGroup.controls['locationId'].enable();
-      this.OThoursSettingsFormGroup.controls['locationId'].setValue([locationId]);
+      this.RegionLocationSettingsMultiFormGroup.controls['locationId'].enable();
+      this.RegionLocationSettingsMultiFormGroup.controls['locationId'].setValue([locationId]);
     }
 
   }
-  public enableOtForm(){
-    this.allLocationsSelected=false;
-    this.allRegionsSelected=false;
-    this.OThoursSettingsFormGroup.controls['locationId'].enable();
-    this.OThoursSettingsFormGroup.controls['regionId'].enable();
+  public enableOtForm() {
+    this.allLocationsSelected = false;
+    this.allRegionsSelected = false;
+    this.RegionLocationSettingsMultiFormGroup.controls['locationId'].enable();
+    this.RegionLocationSettingsMultiFormGroup.controls['regionId'].enable();
   }
-  onlyNumerics(event:any){
+  onlyNumerics(event: any) {
     if (event.key === '.') {
       event.preventDefault();
     }
@@ -1172,13 +1189,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
 
     if (childRecord.regionId) {
-      if (this.IsSettingKeyOtHours) {
+      if (this.IsSettingKeyOtHours||this.IsSettingKeyAvailabiltyOverLap||this.IsSettingKeyScheduleOnlyWithAvailability) {
         this.otHoursRegionChangesEdit(childRecord.regionId);
       } else {
         this.regionChanged(childRecord.regionId);
       }
     } else {
-      if (this.IsSettingKeyOtHours) {
+      if (this.IsSettingKeyOtHours||this.IsSettingKeyAvailabiltyOverLap||this.IsSettingKeyScheduleOnlyWithAvailability) {
         this.otHoursRegionChangesEdit(childRecord.regionId as number);
       }
 
@@ -1187,13 +1204,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
 
     if (childRecord.locationId) {
-      if (this.IsSettingKeyOtHours) {
+      if (this.IsSettingKeyOtHours||this.IsSettingKeyAvailabiltyOverLap||this.IsSettingKeyScheduleOnlyWithAvailability) {
         this.otHoursLocationsEdit(childRecord.locationId);
       } else {
         this.locationChanged(childRecord.locationId);
       }
     } else {
-      if (this.IsSettingKeyOtHours) {
+      if (this.IsSettingKeyOtHours||this.IsSettingKeyAvailabiltyOverLap||this.IsSettingKeyScheduleOnlyWithAvailability) {
         this.otHoursLocationsEdit(childRecord.locationId as number);
       }
 
@@ -1205,7 +1222,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
 
     this.setFormValuesForEdit(parentRecord, childRecord);
-    this.setConfigurationSystemType( childRecord.isIRPConfigurationValue ? SystemType.IRP : SystemType.VMS, true);
+    this.setConfigurationSystemType(childRecord.isIRPConfigurationValue ? SystemType.IRP : SystemType.VMS, true);
   }
 
   private closeSettingDialog(): void {
@@ -1243,7 +1260,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         settingKey: parentData.settingKey,
         controlType: parentData.controlType,
         name: parentData.name,
-        value: (dynamicValue?.isDictionary || dynamicValue?.isInvoice || dynamicValue?.isPayPeriod)?
+        value: (dynamicValue?.isDictionary || dynamicValue?.isInvoice || dynamicValue?.isPayPeriod) ?
           !!dynamicValue.isEnabled : dynamicValue,
       });
 
