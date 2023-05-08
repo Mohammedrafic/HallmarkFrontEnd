@@ -161,6 +161,10 @@
         <div class="title">{{ (orderInformation?.irpOrderMetadata?.orderOpenDate | date: 'MM/dd/yyy':'UTC') || '-' }}</div>
         <div class="sup-title">Distributed On</div>
       </div>
+      <div class="column" *ngIf="orderInformation.minYrsRequired">
+        <div class="title">{{ orderInformation.minYrsRequired }}</div>
+        <div class="sup-title">Exp. Req.</div>
+      </div>
     </div>
   </section>
 </ng-template>
