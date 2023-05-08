@@ -1,8 +1,9 @@
-import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
 import { Select, Store } from '@ngxs/store';
 import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
+import { TextFieldTypeControl } from '@organization-management/settings/enums/settings.enum';
 import { SideMenuService } from '@shared/components/side-menu/services';
 import { OrganizationSettingKeys, OrganizationSettings } from '@shared/constants';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
@@ -59,23 +60,24 @@ import { OrganizationManagementState } from '../store/organization-management.st
 import { Weeks } from '@shared/enums/weeks';
 import {
   AssociatedLink,
-  billingSettingsKey,
+  BillingSettingsKey,
+  DepartmentFields,
   DisabledSettingsByDefault,
+  DropdownCheckboxValueDataSource,
+  DropdownFields,
   GetSettingSystemButtons,
-  invoiceGeneratingSettingsKey,
+  InvoiceGeneratingSettingsKey,
+  OptionFields,
+  OrganizationSystems,
   SettingsAppliedToPermissions,
   SettingsFilterCols,
   SettingsSystemFilterCols,
-  tierSettingsKey,
+  TextOptionFields,
+  TierSettingsKey,
 } from './settings.constant';
 import { SettingsDataAdapter } from './helpers/settings-data.adapter';
-
 import { AutoGenerationPayload, SwitchValuePayload,PayPeriodPayload } from './settings.interface';
 
-export enum TextFieldTypeControl {
-  Email = 1,
-  Numeric = 2,
-}
 /**
  * TODO: component needs to be rework with configurable dialog and form.
  * Component can be slightly simplified. A lot of code smells.
@@ -89,39 +91,8 @@ export enum TextFieldTypeControl {
 export class SettingsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
-  public organizationSettingsFormGroup: FormGroup;
-  public regionFormGroup: FormGroup;
-  public regionRequiredFormGroup: FormGroup;
-  public locationFormGroup: FormGroup;
-  public departmentFormGroup: FormGroup;
-  public pushStartDateFormGroup: FormGroup;
-  public invoiceGeneratingFormGroup: FormGroup;
-  public switchedValueForm: FormGroup;
-  public checkboxValueForm: FormGroup;
-  public OThoursSettingsFormGroup: FormGroup;
-  public formBuilder: FormBuilder;
-  public payPeriodFormGroup: FormGroup;
-
-  public readonly daysOfWeek = Days;
-  public readonly noOfWeek = Weeks;
-  public readonly daysOfWeekFields = {
-    text: 'text',
-    value: 'id',
-  };
-
-  public readonly noOfWeekFields = {
-    text: 'text',
-    value: 'id',
-  };
-
-  public readonly groupInvoicesOptions = SettingsGroupInvoicesOptions;
-  public readonly groupInvoicesFields = {
-    text: 'text',
-    value: 'id',
-  };
-
   @Select(OrganizationManagementState.organizationSettings)
-  public settings$: Observable<OrganizationSettingsGet[]>;
+  settings$: Observable<OrganizationSettingsGet[]>;
 
   @Select(OrganizationManagementState.sortedRegions)
   regions$: Observable<Region[]>;
@@ -132,99 +103,93 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   @Select(OrganizationManagementState.sortedLocationsByRegionId)
   locations$: Observable<Location[]>;
 
-  public regionLocationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
   @Select(OrganizationManagementState.sortedDepartments)
   departments$: Observable<Department[]>;
-  public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
-  public orgStructure: OrganizationStructure;
-  public orgRegions: OrganizationRegion[] = [];
-  public allRegions: OrganizationRegion[] = [];
-  public regionBasedLocations: OrganizationLocation[] = [];
 
-  public isEdit: boolean;
-  public isParentEdit = false;
-  public isFormShown = false;
-  public organizationSettingControlType = OrganizationSettingControlType;
-  public formControlType: number;
+  readonly daysOfWeek = Days;
+  readonly noOfWeek = Weeks;
+  readonly orgSystems = OrganizationSystems;
+  readonly associateLink = AssociatedLink;
+  readonly dropdownFields = DropdownFields;
+  readonly departmentFields = DepartmentFields;
+  readonly textOptionFields = TextOptionFields;
+  readonly optionFields: FieldSettingsModel = OptionFields;
+  readonly groupInvoicesOptions = SettingsGroupInvoicesOptions;
+  readonly textFieldTypeControl = TextFieldTypeControl;
+  readonly dropdownCheckboxValueDataSource = DropdownCheckboxValueDataSource;
+  readonly organizationSettingControlType = OrganizationSettingControlType;
+  readonly disabledSettings = DisabledSettingsByDefault;
 
-  public dropdownDataSource: OrganizationSettingsDropDownOption[];
-  public dropdownFields: FieldSettingsModel = { text: 'value', value: 'key' };
-  public dropdownCheckboxValueDataSource: any[] = [{ key: 'Apply', value: 'Apply' }, { key: 'Accept', value: 'Accept' }];
+
+  organizationSettingsFormGroup: FormGroup;
+  regionFormGroup: FormGroup;
+  regionRequiredFormGroup: FormGroup;
+  locationFormGroup: FormGroup;
+  departmentFormGroup: FormGroup;
+  pushStartDateFormGroup: FormGroup;
+  invoiceGeneratingFormGroup: FormGroup;
+  switchedValueForm: FormGroup;
+  checkboxValueForm: FormGroup;
+  OThoursSettingsFormGroup: FormGroup;
+  payPeriodFormGroup: FormGroup;
+
+  dropdownDataSource: OrganizationSettingsDropDownOption[];
+  allRegions: OrganizationRegion[] = [];
+  regionBasedLocations: OrganizationLocation[] = [];
+  SettingsFilterFormGroup: FormGroup;
+  filterColumns = SettingsFilterCols;
+  IsSettingKeyOtHours = false;
+  allRegionsSelected = false;
+  allLocationsSelected = false;
+  IsSettingKeyPayPeriod = false;
+  separateValuesInSystems = false;
+  systemButtons: ButtonModel[] = [];
+  isEdit = false;
+  isParentEdit = false;
+  isFormShown = false;
+  formControlType: number;
+  showToggleMessage = false;
+  showBillingMessage = false;
+  textFieldType: number;
+  maxFieldLength = 100;
+  hasPermissions: Record<string, boolean> = {};
+  regularLocalRatesToggleMessage = false;
+  dialogHeader = 'Add Settings';
 
 
-  public organizationHierarchy: number;
-  public organizationHierarchyId: number;
-  public showToggleMessage = false;
-  public showBillingMessage = false;
-  public readonly associateLink: string = AssociatedLink;
+  private readonly settingsAppliedToPermissions = SettingsAppliedToPermissions;
 
-  public textFieldType: number;
-  public textFieldTypeControl = TextFieldTypeControl;
-  public organizationId: number;
-  public maxFieldLength = 100;
-  public hasPermissions: Record<string, boolean> = {};
-  public settingsAppliedToPermissions: string[] = SettingsAppliedToPermissions;
-  public disabledSettings = DisabledSettingsByDefault;
-  public dataSource: any;
-  public regularLocalRatesToggleMessage: boolean = false;
+  private orgStructure: OrganizationStructure;
+  private orgRegions: OrganizationRegion[] = [];
+  private organizationHierarchy: number;
+  private organizationHierarchyId: number;
+  private organizationId: number;
+  private dataSource: OrganizationSettingsGet[];
+  private configurations: OrganizationSettingsGet[] = [];
+  private unsubscribe$: Subject<void> = new Subject();
+  private filters: OrganizationSettingFilter = {};
+  private configurationSystemType: SystemType = SystemType.VMS;
+  private organizationSettingKey: OrganizationSettingKeys;
 
-  get dialogHeader(): string {
-    return this.isEdit ? 'Edit' : 'Add';
-  }
   get switcherValue(): string {
     return this.organizationSettingsFormGroup.controls['value'].value ? 'on' : 'off';
   }
 
-  private unsubscribe$: Subject<void> = new Subject();
-
-  public SettingsFilterFormGroup: FormGroup;
-  public filters: OrganizationSettingFilter = {};
-  public filterColumns = SettingsFilterCols;
-
-  public optionFields = {
-    text: 'name',
-    value: 'id',
-  };
-
-  private organizationSettingKey: OrganizationSettingKeys;
-
-  set setOrganizationSettingKey(key: string) {
-    this.organizationSettingKey = Number(OrganizationSettingKeys[key as keyof object]);
-  }
-
-  public IsSettingKeyOtHours: boolean = false;
-  public allRegionsSelected: boolean = false;
-  public allLocationsSelected: boolean = false;
-  public IsSettingKeyPayPeriod: boolean = false;
-
-  separateValuesInSystems = false;
-  configurationSystemType: SystemType = SystemType.VMS;
-  systemButtons: ButtonModel[] = [];
-  readonly orgSystems = {
-    IRP: false,
-    VMS: false,
-    IRPAndVMS: false,
-  };
-
-  private configurations: OrganizationSettingsGet[] = [];
-
   constructor(
     protected override store: Store,
-    @Inject(FormBuilder) private builder: FormBuilder,
+    private formBuilder: FormBuilder,
     private confirmService: ConfirmService,
     private filterService: FilterService,
     private permissionService: PermissionService,
     private sideMenuService: SideMenuService
   ) {
     super(store);
-    this.formBuilder = builder;
     this.createSettingsForm();
     this.createRegionLocationDepartmentForm();
   }
@@ -300,19 +265,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  formatCheckboxValue(data: any) {
-    if (data.value === null) {
-      return 'No';
-    } else {
-      if (JSON.parse(data.value).isEnabled) {
-        return 'Yes'
-      } else {
-        return 'No';
-      }
-    }
-
-  }
-
   public onOverrideButtonClick(data: any): void {
     this.setConfigurationSystemType(this.getParentConfigurationSystemType(), true);
     this.separateValuesInSystems = data.separateValuesInSystems;
@@ -321,7 +273,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.IsSettingKeyPayPeriod = OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == data.settingKey ? true : false;
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
-    this.setOrganizationSettingKey = data.settingKey;
+    this.setOrganizationSettingKey(data.settingKey);
     this.formControlType = data.controlType;
     this.disableDepForInvoiceGeneration();
     this.regionFormGroup.reset();
@@ -352,13 +304,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.store.dispatch(new GetOrganizationStructure());
     this.isFormShown = true;
     this.addActiveCssClass(event);
-    this.isEdit = true;
-    this.setOrganizationSettingKey = parentRecord.settingKey;
-    this.regularLocalRatesToggleMessage = false;
-    if (OrganizationSettings.MandateCandidateAddress === parentRecord.settingKey &&
-      this.dataSource.find((data: any) => data.settingKey === OrganizationSettings.EnableRegularLocalRates).value == 'true') {
-      this.regularLocalRatesToggleMessage = true;
-    }
+    this.setEditMode();
+    this.setOrganizationSettingKey(parentRecord.settingKey);
+    this.regularLocalRatesToggleMessage = OrganizationSettings.MandateCandidateAddress === parentRecord.settingKey &&
+      this.dataSource.find((data: OrganizationSettingsGet) => data.settingKey === OrganizationSettings.EnableRegularLocalRates)?.value == 'true';
     this.formControlType = parentRecord.controlType;
     this.disableDepForInvoiceGeneration();
     this.setFormValidation(parentRecord);
@@ -736,18 +685,19 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.formControlType === OrganizationSettingControlType.Multiselect) {
       this.dropdownDataSource = parentData.valueOptions;
       if (this.isParentEdit) {
-        dynamicValue = this.getDropDownOptionIds(parentData.value);
+        dynamicValue = SettingsDataAdapter.getDropDownOptionIds(parentData.value);
       } else {
-        dynamicValue =
-          typeof childData.value === 'string' ? childData.value.split(';') : this.getDropDownOptionIds(childData.value);
+        dynamicValue = typeof childData.value === 'string'
+          ? childData.value.split(';')
+          : SettingsDataAdapter.getDropDownOptionIds(childData.value);
       }
     }
 
     if (this.formControlType === OrganizationSettingControlType.Select) {
       this.dropdownDataSource = parentData.valueOptions;
       dynamicValue = this.isParentEdit
-        ? this.getDropDownOptionIds(parentData.value)
-        : this.getDropDownOptionIds(childData.value);
+        ? SettingsDataAdapter.getDropDownOptionIds(parentData.value)
+        : SettingsDataAdapter.getDropDownOptionIds(childData.value);
       dynamicValue = dynamicValue.length !== 0 ? dynamicValue[0] : '';
     }
 
@@ -857,18 +807,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
-  // TODO: move to helper class
-  private getDropDownOptionIds(data: any): string[] {
-    const ids: string[] = [];
-    // TODO: rework with map
-    if (data) {
-      data.forEach((item: OrganizationSettingsDropDownOption) => {
-        ids.push(item.value);
-      });
-    }
-    return ids;
-  }
-
   private clearFormDetails(): void {
     this.organizationSettingsFormGroup.get('value')?.clearValidators();
     this.organizationSettingsFormGroup.reset();
@@ -882,7 +820,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.payPeriodFormGroup.reset();
     this.switchedValueForm.reset();
     this.checkboxValueForm.reset();
-    this.isEdit = false;
+    this.setEditMode(false);
     this.isParentEdit = false;
     this.dropdownDataSource = [];
   }
@@ -1081,8 +1019,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private handleShowToggleMessage(key: string): void {
-    this.showToggleMessage = key === tierSettingsKey;
-    this.showBillingMessage = key === billingSettingsKey || key === invoiceGeneratingSettingsKey;
+    this.showToggleMessage = key === TierSettingsKey;
+    this.showBillingMessage = key === BillingSettingsKey || key === InvoiceGeneratingSettingsKey;
   }
 
   private disableDepForInvoiceGeneration(): void {
@@ -1271,5 +1209,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     } else {
       return SystemType.VMS;
     }
+  }
+
+  private setEditMode(isEdit = true): void {
+    this.isEdit = isEdit;
+    this.dialogHeader = this.isEdit ? 'Edit Settings' : 'Add Settings';
+  }
+
+  private setOrganizationSettingKey(key: string) {
+    this.organizationSettingKey = Number(OrganizationSettingKeys[key as keyof object]);
   }
 }

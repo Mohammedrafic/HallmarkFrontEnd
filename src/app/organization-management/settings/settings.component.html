@@ -100,7 +100,7 @@
             : 'No' }}
           </span>
           <span *ngIf="data.controlType === organizationSettingControlType.CheckboxValue">
-            {{ formatCheckboxValue(data) }}
+            {{ data | settingCheckboxValue }}
           </span>
           <span *ngIf="data.controlType === organizationSettingControlType.PayPeriod">
             {{ data.parsedValue?.isEnabled ? 'Yes' : 'No'}}</span>
@@ -183,7 +183,7 @@
 </app-filter-dialog>
 
 <app-side-dialog [disableSaveButton]="!userPermission[userPermissions.CanEditOrganizationSettings]"
-  (formCancelClicked)="onFormCancelClick()" (formSaveClicked)="onFormSaveClick()" [header]="dialogHeader + ' Settings'">
+  (formCancelClicked)="onFormCancelClick()" (formSaveClicked)="onFormSaveClick()" [header]="dialogHeader">
   <form class="form-container" id="addEditRecordForm" *ngIf="isFormShown" [formGroup]="organizationSettingsFormGroup">
     <app-button-group
       *ngIf="separateValuesInSystems && orgSystems.IRPAndVMS"
@@ -206,8 +206,8 @@
         <label for="region">Region</label>
         <div class="input-group dropdown">
           <ejs-dropdownlist id="region" [allowFiltering]="true" [dataSource]="regions$ | async"
-            [fields]="regionLocationFields" (select)="onRegionChange($event)" [enabled]="!isParentEdit"
-            formControlName="regionId">
+                            [fields]="optionFields" (select)="onRegionChange($event)" [enabled]="!isParentEdit"
+                            formControlName="regionId">
           </ejs-dropdownlist>
         </div>
       </div>
@@ -218,8 +218,8 @@
         <label for="regionRequired">Region <span class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist id="regionRequired" appValidateWithMessage [allowFiltering]="true"
-            [dataSource]="regions$ | async" [fields]="regionLocationFields" (select)="onRegionChange($event)"
-            formControlName="regionId">
+                            [dataSource]="regions$ | async" [fields]="optionFields" (select)="onRegionChange($event)"
+                            formControlName="regionId">
           </ejs-dropdownlist>
         </div>
       </div>
@@ -230,8 +230,8 @@
         <label for="location">Location</label>
         <div class="input-group dropdown">
           <ejs-dropdownlist id="location" [allowFiltering]="true" [dataSource]="locations$ | async"
-            [fields]="regionLocationFields" (select)="onLocationChange($event)" [enabled]="!isParentEdit"
-            formControlName="locationId">
+                            [fields]="optionFields" (select)="onLocationChange($event)" [enabled]="!isParentEdit"
+                            formControlName="locationId">
           </ejs-dropdownlist>
         </div>
       </div>
@@ -309,7 +309,7 @@
           <label>Day of week <span class="required">*</span></label>
           <div class="input-group dropdown">
             <ejs-dropdownlist appValidateWithMessage [allowFiltering]="true" [dataSource]="daysOfWeek"
-              [fields]="daysOfWeekFields" formControlName="dayOfWeek">
+                              [fields]="textOptionFields" formControlName="dayOfWeek">
             </ejs-dropdownlist>
           </div>
         </div>
@@ -326,7 +326,7 @@
         <label>Grouping By<span class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist appValidateWithMessage [allowFiltering]="true" [dataSource]="groupInvoicesOptions"
-            [fields]="groupInvoicesFields" formControlName="groupingBy">
+            [fields]="textOptionFields" formControlName="groupingBy">
           </ejs-dropdownlist>
         </div>
       </div>
@@ -396,7 +396,7 @@
         </label>
       <div class="input-group dropdown">
         <ejs-dropdownlist appValidateWithMessage [allowFiltering]="true" [dataSource]="noOfWeek"
-          [fields]="noOfWeekFields" formControlName="noOfWeek">
+          [fields]="textOptionFields" formControlName="noOfWeek">
         </ejs-dropdownlist>
       </div>
 
