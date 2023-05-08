@@ -25,7 +25,7 @@
             <td class="e-rowcell e-templatecell" [style.width.px]="100">
               <div class="row-tool-buttons">
                 <button ejs-button cssClass="e-flat primary-icon-button"
-                  (click)="onEditButtonClick(data, child, $event)"
+                  (click)="openEditSettingDialog(data, child, $event)"
                   [disabled]="hasPermissions | hasAccess : data : false">
                   <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
                 </button>
@@ -64,11 +64,11 @@
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
             <button ejs-button cssClass="e-flat primary-icon-button"
-              (click)="onEditButtonClick(data, undefined, $event)"
+              (click)="openEditSettingDialog(data, undefined, $event)"
               [disabled]="hasPermissions | hasAccess : data : true">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat default-icon-button" (click)="onOverrideButtonClick(data)"
+            <button ejs-button cssClass="e-flat default-icon-button" (click)="openOverrideSettingDialog(data)"
               [disabled]="hasPermissions | hasAccess : data : false : disabledSettings">
               <span class="edit-button"><i-feather name="plus" class="icon"></i-feather></span>
             </button>
@@ -136,9 +136,9 @@
   </ejs-grid>
 </section>
 
-<app-filter-dialog [items]="filteredItems" [count]="totalDataRecords" (deleteFilter)="onFilterDelete($event)"
-  (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()"
-  (closeDialogClicked)="onFilterClose()">
+<app-filter-dialog [items]="filteredItems" [count]="totalDataRecords" (deleteFilter)="deleteFilter($event)"
+                   (clearAllFiltersClicked)="clearAllFilters()" (applyFilterClicked)="applyFilters()"
+                   (closeDialogClicked)="closeFilters()">
   <form class="bootstrap" [formGroup]="SettingsFilterFormGroup">
     <div class="input-container" *ngIf="orgSystems.IRPAndVMS">
       <label>Select System</label>
@@ -183,7 +183,7 @@
 </app-filter-dialog>
 
 <app-side-dialog [disableSaveButton]="!userPermission[userPermissions.CanEditOrganizationSettings]"
-  (formCancelClicked)="onFormCancelClick()" (formSaveClicked)="onFormSaveClick()" [header]="dialogHeader">
+                 (formCancelClicked)="cancelSettingChanges()" (formSaveClicked)="saveSetting()" [header]="dialogHeader">
   <form class="form-container" id="addEditRecordForm" *ngIf="isFormShown" [formGroup]="organizationSettingsFormGroup">
     <app-button-group
       *ngIf="separateValuesInSystems && orgSystems.IRPAndVMS"
