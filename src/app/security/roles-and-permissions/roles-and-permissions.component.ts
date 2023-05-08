@@ -42,6 +42,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
   public optionFields = OPRION_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public roleId: number | null;
+  public isShowIRPOnly:boolean=false;
   public filteredItems$ = new Subject<number>();
   public agencyActionsAllowed = false;
   public userbusinessUnitId: number | null;
@@ -103,12 +104,21 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
 
   public addRole(): void {
     this.isEditRole = false;
+    var bussiness=this.businessForm.get('business')?.value;
+    if(bussiness?.length>0){
+      this.bussinesData$.subscribe((data)=>{
+        var item=data.filter(x=>x.isIRPEnabled==true && x.id==bussiness[0])
+        if(item.length>0)
+          this.isShowIRPOnly=true;
+      })
+    }
     this.roleFormGroup.reset();
     this.roleFormGroup.enable();
     this.roleFormGroup.patchValue({
       businessUnitType: this.businessUnitControl.value,
       businessUnitId: this.roleForm.defaultBusinessValue,
       isActive: true,
+      isShowIRPOnly: this.isShowIRPOnly
     });
     this.disableBussinesUnitForRole();
     this.store.dispatch(new ShowSideDialog(true));
@@ -203,10 +213,11 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
   }
 
   private onBusinessUnitValueChanged(): void {
+    debugger;
     this.businessUnitControl.valueChanges
     .pipe(takeWhile(() => this.isAlive)).
     subscribe((value) => {
-      this.store.dispatch(new GetBusinessByUnitType(value)).subscribe(() => {
+     this.store.dispatch(new GetBusinessByUnitType(value)).subscribe(() => {
         this.businessControl?.setValue(null);
         if (this.isBusinessDisabledForNewRole) {
           this.businessControl.patchValue([this.userbusinessUnitId]);

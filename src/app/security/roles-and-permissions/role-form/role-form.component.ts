@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -99,7 +100,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   private isAlive = true;
   private notAssignableIds: number[];
 
-  constructor(private store: Store, private actions$: Actions) {}
+  constructor(private store: Store, private actions$: Actions,private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.onBusinessUnitControlChanged();
@@ -109,7 +110,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.onNewRoleBussinesDataFetched();
     this.onUsersAssignedToRoleFetched();
     this.subOnBusinessUnitControlChange();
-
+   
     this.copyRoleData$ = this.store.select(SecurityState.copyRoleData)
     .pipe(
       map((roles) => {
@@ -261,6 +262,13 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
         }
       });
   }
+  isShowIRPOnly(arg:any){
+    this.roleTreeField$=this.store.select(SecurityState.roleTreeField).pipe(map((roles)=>{
+      roles.dataSource.filter(x=>x.includeIRP==true)
+      return roles;
+  }))
+  this.changeDetectorRef.detectChanges();
+  }
 
   static createForm(): FormGroup {
     return new FormGroup({
@@ -269,6 +277,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       businessUnitId: new FormControl('', [Validators.required]),
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       isActive: new FormControl(true),
+      isShowIRPOnly:new FormControl(false),
       permissions: new FormControl([], [Validators.required]),
     });
   }

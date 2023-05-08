@@ -67,6 +67,10 @@
       </div>
     </div>
   </div>
+  <div class="active-toggle" *ngIf="form.get('isShowIRPOnly')?.value">
+    <ejs-switch class="switch" (change)="isShowIRPOnly($event)"></ejs-switch>
+    <span class="e-text">Show IRP Only</span>
+  </div>
 
   <hr class="divider" />
   <div class="tree-lebel">
