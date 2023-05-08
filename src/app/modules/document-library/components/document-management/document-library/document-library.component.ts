@@ -1319,11 +1319,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public allAgenciesChange(event: any) {
     this.allAgencies=!this.allAgencies;
     this.documentLibraryform.get(FormControlNames.AllAgencies)?.setValue(this.allAgencies);
-    if(this.allAgencies){
-      this.isShowSharedWith=false;
-    }else{
-      this.isShowSharedWith=true;
-    }
     this.changeDetectorRef.markForCheck();
   }
 
