@@ -41,7 +41,7 @@ export class PayRateSetup {
   locationName: string;
   departmentId: number;
   departmentName: string;
-  skills: MasterSkillByOrganization[];
+  skills: any;
   skillName: string;
   skillId: number;
   orderTypes: number[];
