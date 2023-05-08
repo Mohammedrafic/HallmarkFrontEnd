@@ -34,6 +34,9 @@ import {
   ImportUsers,
   GetOrgInterfacePage,
   GetLogInterfacePage,
+  GetLogHistoryById,
+  GetBusinessForEmployeeType,
+  GetEmployeeUsers,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -52,8 +55,9 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from
 import { TimeZoneModel } from '@shared/models/location.model';
 import { GetUSCanadaTimeZoneIds } from './security.actions';
 import { NodatimeService } from '@shared/services/nodatime.service';
-import { LogInterface, LogInterfacePage, OrgInterface, OrgInterfacePage } from '@shared/models/org-interface.model';
+import { LogInterface, LogInterfacePage, LogTimeSheetHistory, LogTimeSheetHistoryPage, OrgInterface, OrgInterfacePage } from '@shared/models/org-interface.model';
 import { OrgInterfaceService } from '../services/org-interface.service';
+import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 
 const BUSINNESS_DATA_DEFAULT_VALUE = { id: 0, name: 'All' };
 const BUSINNESS_DATA_HALLMARK_VALUE = { id: 0, name: 'Hallmark' };
@@ -73,6 +77,9 @@ interface SecurityStateModel {
   timeZones: TimeZoneModel[] | null;
   orgInterfacePage: OrgInterfacePage | null;
   logInterfacePage: LogInterfacePage | null;
+  logDialogOptions: DialogNextPreviousOption;
+  logTimeSheetHistoryPage: LogTimeSheetHistoryPage | null;
+  userData: User[];
 }
 
 @State<SecurityStateModel>({
@@ -92,6 +99,12 @@ interface SecurityStateModel {
     timeZones: [],
     orgInterfacePage: null,
     logInterfacePage: null,
+    logDialogOptions: {
+      next: false,
+      previous: false,
+    },
+    logTimeSheetHistoryPage:null,
+    userData: []
   },
 })
 @Injectable()
@@ -165,6 +178,21 @@ export class SecurityState {
     return state.logInterfacePage;
   }
 
+  @Selector()
+  static logDialogOptions(state: SecurityStateModel): DialogNextPreviousOption {
+    return state.logDialogOptions;
+  }
+
+  @Selector()
+  static logTimeSheetHistoryPage(state: SecurityStateModel): LogTimeSheetHistoryPage | null {
+    return state.logTimeSheetHistoryPage;
+  }
+
+  @Selector()
+  static logTimeSheetHistoryGridData(state: SecurityStateModel): LogTimeSheetHistory[] {
+    return state.logTimeSheetHistoryPage?.items || [];
+  }
+
   static getPermissionsForCopyById(id: number) {
     return createSelector([SecurityState], (state: SecurityStateModel): string[] => {
       const role = state.copyRoleData.find((role) => role.id === id);
@@ -220,6 +248,11 @@ export class SecurityState {
   @Selector()
   static timeZones(state: SecurityStateModel): TimeZoneModel[] | null {
     return state.timeZones;
+  }
+
+  @Selector()
+  static userData(state: SecurityStateModel): User[] {
+    return state.userData;
   }
 
   constructor(
@@ -497,6 +530,9 @@ export class SecurityState {
   ): Observable<Organisation[] | void> {
     return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(
       tap((payload) => {
+        payload.forEach(item => {
+          item.regions.forEach(region => region.organisationName = item.name);
+        });
         patchState({ organizations: payload });
         return payload;
       }),
@@ -602,5 +638,56 @@ export class SecurityState {
           return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
         })
       );
+  }
+
+  @Action(GetLogHistoryById)
+  GetLogHistoryById(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { runId,organizationId,  pageNumber, pageSize, options }: GetLogHistoryById
+  ): Observable<LogTimeSheetHistoryPage | void> {
+    patchState({ logDialogOptions: options });
+    return this.orgInterfaceService
+      .getLogTimeSheetHistory(runId, organizationId, pageNumber, pageSize)
+      .pipe(
+        tap((payload) => {
+          patchState({ logTimeSheetHistoryPage: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
+  }
+
+  @Action(GetBusinessForEmployeeType)
+  GetBusinessForEmployeeType(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { }: GetBusinessForEmployeeType
+  ): Observable<BusinessUnit[] | void> {
+    return this.businessUnitService.getBusinessForEmployeeType().pipe(
+      tap((payload) => {
+        patchState({ bussinesData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+  
+  @Action(GetEmployeeUsers)
+  GetEmployeeUsers(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { businessUnitId }: GetEmployeeUsers
+  ): Observable<User[] | void> {
+    return this.userService.getEmployeeUsers(businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ userData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
   }
 }

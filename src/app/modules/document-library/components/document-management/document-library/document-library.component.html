@@ -7,7 +7,7 @@
                             formControlName="filterBusinessUnit"
                             [allowFiltering]="true"
                             [fields]="unitFields"
-                            [dataSource]="businessUnits"
+                            [dataSource]="businessUnitsDataset"
                             placeholder="Business Unit"></ejs-dropdownlist>
         </div>
       </div>
@@ -280,9 +280,21 @@
                                    [fields]="agencyFields"
                                    [dataSource]="AssociateAgencyData"
                                    [selectAllText]='allOption'
-                                   [showSelectAll]="true" 
-                                   [enabled]="agencySwitch" >
+                                   [showSelectAll]="false" 
+                                   [enabled]="!allAgencies && agencySwitch" >
                   </ejs-multiselect>
+                </div>
+              </div>
+              <div class="input-container allSwitch">
+                <div class="switch">
+                  <ejs-switch
+                    name="allAgencies"
+                    [checked]="allAgencies"
+                    (change)="allAgenciesChange($event)"
+                    label="All"
+                    [disabled] = "!agencySwitch"
+                  ></ejs-switch>
+                  <label for="allAgencies" class="switch-text">All</label>
                 </div>
               </div>
             </div>
@@ -306,8 +318,20 @@
                                    [showDropDownIcon]="true"
                                    [fields]="optionFields"
                                    [dataSource]="ShareOrganizationsData"
-                                   [enabled]="organizationSwitch" >
+                                   [enabled]="!allOrgnizations && organizationSwitch" >
                   </ejs-multiselect>
+                </div>
+              </div>
+              <div class="input-container allSwitch">
+                <div class="switch">
+                  <ejs-switch
+                    name="allOrgnizations"
+                    [checked]="allOrgnizations"
+                    (change)="allOrgnizationsChange($event)"
+                    label="All"
+                    [disabled] = "!organizationSwitch"
+                  ></ejs-switch>
+                  <label for="allOrgnizations" class="switch-text">All</label>
                 </div>
               </div>
             </div>
@@ -353,9 +377,21 @@
                                [fields]="agencyFields"
                                [dataSource]="AssociateAgencyData"
                                [selectAllText]='allOption'
-                               [showSelectAll]="true" 
-                               [enabled]="agencySwitch">
+                               [showSelectAll]="false" 
+                               [enabled]="!allAgencies && agencySwitch">
               </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container allSwitch">
+            <div class="switch">
+              <ejs-switch
+                name="allAgencies"
+                [checked]="allAgencies"
+                (change)="allAgenciesChange($event)"
+                label="All"
+                [disabled] = "!agencySwitch"
+              ></ejs-switch>
+              <label for="allAgencies" class="switch-text">All</label>
             </div>
           </div>
         </div>
@@ -379,8 +415,20 @@
                                [showDropDownIcon]="true"
                                [fields]="optionFields"
                                [dataSource]="ShareOrganizationsData"
-                               [enabled]="organizationSwitch">
+                               [enabled]="!allOrgnizations && organizationSwitch">
               </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container allSwitch">
+            <div class="switch">
+              <ejs-switch
+                name="allOrgnizations"
+                [checked]="allOrgnizations"
+                (change)="allOrgnizationsChange($event)"
+                label="All"
+                [disabled] = "!organizationSwitch"
+              ></ejs-switch>
+              <label for="allOrgnizations" class="switch-text">All</label>
             </div>
           </div>
         </div>

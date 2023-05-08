@@ -4,80 +4,58 @@
       <h3>Configurations</h3>
     </section>
     <section>
-      <button
-        ejs-button
-        appHideBeforeSyncfusionLoad
-        id="filterButton"
-        cssClass="e-outline button-filter"
+      <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter"
         (click)="showFilters()">
         <div class="filter-button-content">
-          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length
+            }}</span>
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
     </section>
   </section>
-  <ejs-grid
-    #grid
-    [dataSource]="gridDataSource"
-    (rowDataBound)="rowDataBound($event)"
-    [allowPaging]="allowPaging"
-    [pageSettings]="pageSettings"
-    [height]="fullScreenGridHeight"
-    [rowHeight]="rowHeight"
-    [enableVirtualization]="false"
-    [resizeSettings]="resizeSettings"
-    [allowSorting]="allowSorting"
-    [allowResizing]="allowResizing"
-    (dataBound)="gridDataBound(grid)"
-    (actionBegin)="actionBegin($event, grid)"
-    class="grid-component"
-  >
+  <ejs-grid #grid [dataSource]="gridDataSource" (rowDataBound)="rowDataBound($event)" [allowPaging]="allowPaging"
+    [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight" [enableVirtualization]="false"
+    [resizeSettings]="resizeSettings" [allowSorting]="allowSorting" [allowResizing]="allowResizing"
+    (dataBound)="gridDataBound(grid)" (actionBegin)="actionBegin($event, grid)" class="grid-component">
     <ng-template #detailTemplate let-data>
       <table class="detailtable" width="100%">
-        <colgroup>
-          <col width="120">
-          <col width="400">
-          <col width="150">
-          <col width="150">
-          <col width="150">
-          <col width="400">
-        </colgroup>
         <tbody>
-        <tr *ngFor="let child of data.children">
-          <td class="e-rowcell e-templatecell">
-            <div class="row-tool-buttons">
-              <button
-                ejs-button
-                cssClass="e-flat primary-icon-button"
-                (click)="onEditButtonClick(data, child, $event)"
-                [disabled]="hasPermissions | hasAccess : data : false"
-              >
-                <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
-              </button>
-            </div>
-          </td>
-          <td class="e-rowcell e-templatecell"></td>
-          <td class="e-rowcell e-templatecell">{{child.regionName}}</td>
-          <td class="e-rowcell e-templatecell">{{child.locationName}}</td>
-          <td class="e-rowcell e-templatecell">{{child.departmentName}}</td>
-          <td class="e-rowcell e-templatecell">
-            <span *ngIf="data.controlType === organizationSettingControlType.Checkbox">{{child.value === 'true' ? 'Yes' : 'No'}}</span>
-            <span *ngIf="data.controlType === organizationSettingControlType.Multiselect">
-              <span *ngFor="let option of child.value; let i = index">{{option.text}}
-                <span *ngIf="i !== child.value.length - 1">, </span>
+          <tr *ngFor="let child of data.children">
+            <td class="e-rowcell e-templatecell" [style.width.px]="100">
+              <div class="row-tool-buttons">
+                <button ejs-button cssClass="e-flat primary-icon-button"
+                  (click)="onEditButtonClick(data, child, $event)"
+                  [disabled]="hasPermissions | hasAccess : data : false">
+                  <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+                </button>
+              </div>
+            </td>
+            <td class="e-rowcell e-templatecell attr-td" [style.width.px]="400"> </td>
+            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.systemType}}</td>
+            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.regionName}}</td>
+            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.locationName}}</td>
+            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.departmentName}}</td>
+            <td class="e-rowcell e-templatecell" [style.width.px]="400">
+              <span *ngIf="data.controlType === organizationSettingControlType.Checkbox">{{child.value === 'true' ?
+                'Yes' : 'No'}}</span>
+              <span *ngIf="data.controlType === organizationSettingControlType.Multiselect">
+                <span *ngFor="let option of child.value; let i = index">{{option.text}}
+                  <span *ngIf="i !== child.value.length - 1">, </span>
+                </span>
               </span>
-            </span>
-            <span *ngIf="data.controlType === organizationSettingControlType.Select">
-              <span>{{child.value[0].text}}</span>
-            </span>
-            <span *ngIf="data.controlType === organizationSettingControlType.Text">{{child.value}}</span>
-            <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{child.value | date: 'MM/dd/yyyy'}}</span>
-            <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
-              {{  child.parsedValue != null && child.parsedValue.value && child.parsedValue.isEnabled ? child.parsedValue.value : 'No' }}
-            </span>
-          </td>
-        </tr>
+              <span *ngIf="data.controlType === organizationSettingControlType.Select">
+                <span>{{child.value[0].text}}</span>
+              </span>
+              <span *ngIf="data.controlType === organizationSettingControlType.Text">{{child.value}}</span>
+              <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{child.value | date:
+                'MM/dd/yyyy'}}</span>
+              <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
+                {{ child.parsedValue != null && child.parsedValue.value && child.parsedValue.isEnabled ?
+                child.parsedValue.value : 'No' }}
+              </span>
+            </td>
+          </tr>
         </tbody>
       </table>
     </ng-template>
@@ -85,47 +63,47 @@
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button
-              ejs-button
-              cssClass="e-flat primary-icon-button"
+            <button ejs-button cssClass="e-flat primary-icon-button"
               (click)="onEditButtonClick(data, undefined, $event)"
-              [disabled]="hasPermissions | hasAccess : data : true"
-            >
-              <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
+              [disabled]="hasPermissions | hasAccess : data : true">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button
-              ejs-button
-              cssClass="e-flat default-icon-button"
-              (click)="onOverrideButtonClick(data)"
-              [disabled]="hasPermissions | hasAccess : data : false : disabledSettings"
-            >
-              <span class="edit-button" ><i-feather name="plus" class="icon"></i-feather></span>
+            <button ejs-button cssClass="e-flat default-icon-button" (click)="onOverrideButtonClick(data)"
+              [disabled]="hasPermissions | hasAccess : data : false : disabledSettings">
+              <span class="edit-button"><i-feather name="plus" class="icon"></i-feather></span>
             </button>
           </div>
         </ng-template>
       </e-column>
       <e-column field="name" headerText="ATTRIBUTE" width=400></e-column>
+      <e-column [visible]="orgSystems.IRPAndVMS" field="systemType" headerText="SYSTEM" width=150></e-column>
       <e-column field="regionName" headerText="REGION" width=150></e-column>
       <e-column field="locationName" headerText="LOCATION" width=150></e-column>
       <e-column field="departmentName" headerText="DEPARTMENT" width=150></e-column>
       <e-column field="value" headerText="VALUE" width=400>
         <ng-template #template let-data>
-          <span *ngIf="data.controlType === organizationSettingControlType.Checkbox">{{ data.value === 'true' ? 'Yes' : 'No'}}</span>
-          <span *ngIf="data.controlType === organizationSettingControlType.Multiselect || data.controlType === organizationSettingControlType.Select">
+          <span *ngIf="data.controlType === organizationSettingControlType.Checkbox">{{ data.value === 'true' ? 'Yes' :
+            'No'}}</span>
+          <span
+            *ngIf="data.controlType === organizationSettingControlType.Multiselect || data.controlType === organizationSettingControlType.Select">
             <span *ngFor="let option of data.value; let i = index">{{option.text}}
               <span *ngIf="i !== data.value.length - 1">, </span>
             </span>
           </span>
           <span *ngIf="data.controlType === organizationSettingControlType.Text">{{data.value}}</span>
-          <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{data.value | date: 'MM/dd/yyyy'}}</span>
+          <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{data.value | date:
+            'MM/dd/yyyy'}}</span>
           <span *ngIf="data.controlType === organizationSettingControlType.InvoiceAutoGeneration">
             {{ data.parsedValue?.isEnabled ? 'Yes' : 'No'}}</span>
           <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
-            {{ data.parsedValue != null && data.parsedValue.value && data.parsedValue.isEnabled ? data.parsedValue.value : 'No' }}
+            {{ data.parsedValue != null && data.parsedValue.value && data.parsedValue.isEnabled ? data.parsedValue.value
+            : 'No' }}
           </span>
           <span *ngIf="data.controlType === organizationSettingControlType.CheckboxValue">
-           {{ formatCheckboxValue(data) }} 
+            {{ formatCheckboxValue(data) }}
           </span>
+          <span *ngIf="data.controlType === organizationSettingControlType.PayPeriod">
+            {{ data.parsedValue?.isEnabled ? 'Yes' : 'No'}}</span>
         </ng-template>
       </e-column>
     </e-columns>
@@ -134,42 +112,21 @@
         <div class="control-section">
           <div class="content-wrapper">
             <section class="left-side-pager-controls">
-              <ejs-dropdownlist
-                id="rowsPerPage"
-                class="dropdown-no-border"
-                [allowFiltering]="true"
-                [dataSource]="rowsPerPageDropDown"
-                [(value)]="activeRowsPerPageDropDown"
-                (change)="onRowsDropDownChanged()"
-              >
+              <ejs-dropdownlist id="rowsPerPage" class="dropdown-no-border" [allowFiltering]="true"
+                [dataSource]="rowsPerPageDropDown" [(value)]="activeRowsPerPageDropDown"
+                (change)="changePageSize($event)">
               </ejs-dropdownlist>
-              <ejs-numerictextbox
-                id="goToPage"
-                class="numeric-input-no-border"
-                format="#"
-                [validateDecimalOnType]="validateDecimalOnType"
-                [decimals]="decimals"
-                placeholder="Go to:"
-                min="1" [max]="lastAvailablePage"
-                [showSpinButton]="false"
-                (change)="onGoToClick($event)"
-              >
+              <ejs-numerictextbox id="goToPage" class="numeric-input-no-border" format="#"
+                [validateDecimalOnType]="validateDecimalOnType" [decimals]="decimals" placeholder="Go to:" min="1"
+                [max]="lastAvailablePage" [showSpinButton]="false" (change)="changePage($event)">
               </ejs-numerictextbox>
               <div class="total-rows">
                 Total Rows: {{totalDataRecords}}
               </div>
             </section>
             <section class="right-side-pager-controls">
-              <ejs-pager
-                id="gridPager"
-                #gridPager
-                [pageSize]="pageSizePager"
-                [totalRecordsCount]="totalDataRecords"
-
-                [enablePagerMessage]="false"
-                [currentPage]="currentPagerPage"
-                (click)="onGoToClick($event)"
-              >
+              <ejs-pager id="gridPager" #gridPager [pageSize]="pageSizePager" [totalRecordsCount]="totalDataRecords"
+                [enablePagerMessage]="false" [currentPage]="currentPagerPage" (click)="changePage($event)">
               </ejs-pager>
             </section>
           </div>
@@ -179,163 +136,157 @@
   </ejs-grid>
 </section>
 
-<app-filter-dialog [items]="filteredItems" [count]="totalDataRecords" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+<app-filter-dialog [items]="filteredItems" [count]="totalDataRecords" (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()">
   <form class="bootstrap" [formGroup]="SettingsFilterFormGroup">
+    <div class="input-container" *ngIf="orgSystems.IRPAndVMS">
+      <label>Select System</label>
+      <div class="bootstrap checkbox-container">
+        <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>
+        <ejs-checkbox formControlName="includeInVMS" label="VMS"></ejs-checkbox>
+      </div>
+    </div>
     <div class="input-container">
       <label>Region</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="regionIds"
-                         placeholder="All"
-                         [fields]="optionFields"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.regionIds.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="regionIds" placeholder="All" [fields]="optionFields"
+          [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource">
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container">
       <label>Location</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="locationIds"
-                         placeholder="All"
-                         [fields]="optionFields"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.locationIds.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="locationIds" placeholder="All" [fields]="optionFields"
+          [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.locationIds.dataSource">
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container">
       <label>Department</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="departmentIds"
-                         placeholder="All"
-                         [fields]="optionFields"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.departmentIds.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="departmentIds" placeholder="All" [fields]="optionFields"
+          [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource">
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container">
       <label>Attributes</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="attributes"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.attributes.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="attributes" placeholder="All" [allowFiltering]="true"
+          [showDropDownIcon]="true" [dataSource]="filterColumns.attributes.dataSource">
         </ejs-multiselect>
       </div>
     </div>
   </form>
 </app-filter-dialog>
 
-<app-side-dialog
-  [disableSaveButton]="!userPermission[userPermissions.CanEditOrganizationSettings]"
-  (formCancelClicked)="onFormCancelClick()"
-  (formSaveClicked)="onFormSaveClick()"
-  [header]="dialogHeader + ' Settings'"
->
-  <form class="form-container"
-        id="addEditRecordForm"
-        *ngIf="isFormShown"
-        [formGroup]="organizationSettingsFormGroup">
+<app-side-dialog [disableSaveButton]="!userPermission[userPermissions.CanEditOrganizationSettings]"
+  (formCancelClicked)="onFormCancelClick()" (formSaveClicked)="onFormSaveClick()" [header]="dialogHeader + ' Settings'">
+  <form class="form-container" id="addEditRecordForm" *ngIf="isFormShown" [formGroup]="organizationSettingsFormGroup">
+    <app-button-group
+      *ngIf="separateValuesInSystems && orgSystems.IRPAndVMS"
+      [buttonOptions]="systemButtons"
+      (buttonChange)="setConfigurationSystemType($event.id)"
+    ></app-button-group>
     <div>
-      <div class="input-container bootstrap">
+      <div class="input-container bootstrap" *ngIf="!payPeriodFormGroup">
         <label for="attribute">Attribute</label>
         <div class="input-group">
           <ejs-tooltip [content]="attribute.value" [showTipPointer]="false">
-            <input #attribute
-                   id="attribute"
-                   class="e-input"
-                   type="text"
-                   formControlName="name" />
+            <input #attribute id="attribute" class="e-input" type="text" formControlName="name" />
           </ejs-tooltip>
         </div>
       </div>
     </div>
 
-    <form [formGroup]="regionFormGroup" *ngIf="isEdit">
+    <form [formGroup]="regionFormGroup" *ngIf="isEdit && !IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="region">Region</label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist id="region"
-                            [allowFiltering]="true"
-                            [dataSource]="regions$ | async"
-                            [fields]="regionLocationFields"
-                            (select)="onRegionChange($event)"
-                            [enabled]="!isParentEdit"
-                            formControlName="regionId">
+          <ejs-dropdownlist id="region" [allowFiltering]="true" [dataSource]="regions$ | async"
+            [fields]="regionLocationFields" (select)="onRegionChange($event)" [enabled]="!isParentEdit"
+            formControlName="regionId">
           </ejs-dropdownlist>
         </div>
       </div>
     </form>
 
-    <form [formGroup]="regionRequiredFormGroup" *ngIf="!isEdit">
+    <form [formGroup]="regionRequiredFormGroup" *ngIf="!isEdit && !IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="regionRequired">Region <span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist id="regionRequired"
-                            appValidateWithMessage
-                            [allowFiltering]="true"
-                            [dataSource]="regions$ | async"
-                            [fields]="regionLocationFields"
-                            (select)="onRegionChange($event)"
-                            formControlName="regionId">
+          <ejs-dropdownlist id="regionRequired" appValidateWithMessage [allowFiltering]="true"
+            [dataSource]="regions$ | async" [fields]="regionLocationFields" (select)="onRegionChange($event)"
+            formControlName="regionId">
           </ejs-dropdownlist>
         </div>
       </div>
     </form>
 
-    <form [formGroup]="locationFormGroup">
+    <form [formGroup]="locationFormGroup" *ngIf="!IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="location">Location</label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist id="location"
-                            [allowFiltering]="true"
-                            [dataSource]="locations$ | async"
-                            [fields]="regionLocationFields"
-                            (select)="onLocationChange($event)"
-                            [enabled]="!isParentEdit"
-                            formControlName="locationId">
+          <ejs-dropdownlist id="location" [allowFiltering]="true" [dataSource]="locations$ | async"
+            [fields]="regionLocationFields" (select)="onLocationChange($event)" [enabled]="!isParentEdit"
+            formControlName="locationId">
           </ejs-dropdownlist>
         </div>
       </div>
     </form>
 
-    <form [formGroup]="departmentFormGroup">
+    <form [formGroup]="departmentFormGroup" *ngIf="!IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="department">Department</label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist id="department"
-                            [allowFiltering]="true"
-                            [dataSource]="departments$ | async"
-                            [fields]="departmentFields"
-                            (select)="onDepartmentChange($event)"
-                            [enabled]="!isParentEdit"
-                            formControlName="departmentId">
+          <ejs-dropdownlist id="department" [allowFiltering]="true" [dataSource]="departments$ | async"
+            [fields]="departmentFields" (select)="onDepartmentChange($event)" [enabled]="!isParentEdit"
+            formControlName="departmentId">
           </ejs-dropdownlist>
         </div>
       </div>
     </form>
+    <form [formGroup]="OThoursSettingsFormGroup" *ngIf="IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
+      <div class="input-container">
+        <label>Region<span class="required">*</span></label>
+        <div class="dropdown-wrapper">
+          <div class="input-group bootstrap">
+            <ejs-multiselect mode="CheckBox" appValidateWithMessage formControlName="regionId" placeholder="All" [fields]="optionFields"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="allRegions" >
+            </ejs-multiselect>
+          </div>
+          <div class="switch">
+            <ejs-switch name="allRegions" [checked]="allRegionsSelected"  (change)="allRegionsChange($event)" label="All"></ejs-switch>
+            <label for="allRegions" class="switch-text">All</label>
+          </div>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Location<span class="required">*</span></label>
+        <div class="dropdown-wrapper">
+          <div class="input-group bootstrap">
+            <ejs-multiselect mode="CheckBox" appValidateWithMessage formControlName="locationId" placeholder="All" [fields]="optionFields"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="regionBasedLocations" >
+            </ejs-multiselect>
+          </div>
+          <div class="switch">
+            <ejs-switch name="allLocations"  [checked]="allLocationsSelected" (change)="allLocationsChange($event)" label="All"></ejs-switch>
+            <label for="allLocations" class="switch-text">All</label>
+          </div>
+        </div>
+      </div>
+    </form>
 
-    <form [formGroup]="pushStartDateFormGroup" *ngIf="formControlType === organizationSettingControlType.FixedKeyDictionary">
+    <form [formGroup]="pushStartDateFormGroup"
+      *ngIf="formControlType === organizationSettingControlType.FixedKeyDictionary">
       <div class="row">
         <div class="input-container bootstrap">
           <label>Days to Consider<span class="required">*</span></label>
           <div class="input-group">
-            <ejs-numerictextbox class="numeric-input"
-                                appValidateWithMessage
-                                min="0"
-                                maxlength="3"
-                                format="0"
-                                formControlName="daysToConsider"
-                                [showSpinButton]="false">
+            <ejs-numerictextbox class="numeric-input" appValidateWithMessage min="0" maxlength="3" format="0"
+              formControlName="daysToConsider" [showSpinButton]="false">
             </ejs-numerictextbox>
           </div>
         </div>
@@ -343,14 +294,8 @@
         <div class="input-container bootstrap">
           <label for="daysToPush">Days to Push<span class="required">*</span></label>
           <div class="input-group">
-            <ejs-numerictextbox id="daysToPush"
-                                class="numeric-input"
-                                appValidateWithMessage
-                                min="0"
-                                maxlength="3"
-                                format="0"
-                                formControlName="daysToPush"
-                                [showSpinButton]="false">
+            <ejs-numerictextbox id="daysToPush" class="numeric-input" appValidateWithMessage min="0" maxlength="3"
+              format="0" formControlName="daysToPush" [showSpinButton]="false">
             </ejs-numerictextbox>
           </div>
         </div>
@@ -358,30 +303,21 @@
     </form>
 
     <form [formGroup]="invoiceGeneratingFormGroup"
-          *ngIf="formControlType === organizationSettingControlType.InvoiceAutoGeneration">
+      *ngIf="formControlType === organizationSettingControlType.InvoiceAutoGeneration">
       <div class="row">
         <div class="input-container bootstrap">
           <label>Day of week <span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-dropdownlist appValidateWithMessage
-                              [allowFiltering]="true"
-                              [dataSource]="daysOfWeek"
-                              [fields]="daysOfWeekFields"
-                              formControlName="dayOfWeek">
+            <ejs-dropdownlist appValidateWithMessage [allowFiltering]="true" [dataSource]="daysOfWeek"
+              [fields]="daysOfWeekFields" formControlName="dayOfWeek">
             </ejs-dropdownlist>
           </div>
         </div>
         <div class="input-container">
           <label>Time<span class="required">*</span> </label>
           <div class="input-group">
-            <ejs-timepicker placeholder="HH:MM"
-                            formControlName="time"
-                            appValidateWithMessage
-                            format="HH:mm"
-                            [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                            [enableMask]="true"
-                            [step]="15"
-                            maskPlaceholder="HH:MM">
+            <ejs-timepicker placeholder="HH:MM" formControlName="time" appValidateWithMessage format="HH:mm"
+              [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }" [enableMask]="true" [step]="15" maskPlaceholder="HH:MM">
             </ejs-timepicker>
           </div>
         </div>
@@ -389,32 +325,21 @@
       <div class="input-container bootstrap">
         <label>Grouping By<span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist appValidateWithMessage
-                            [allowFiltering]="true"
-                            [dataSource]="groupInvoicesOptions"
-                            [fields]="groupInvoicesFields"
-                            formControlName="groupingBy">
+          <ejs-dropdownlist appValidateWithMessage [allowFiltering]="true" [dataSource]="groupInvoicesOptions"
+            [fields]="groupInvoicesFields" formControlName="groupingBy">
           </ejs-dropdownlist>
         </div>
       </div>
     </form>
 
-    <form *ngIf="formControlType === organizationSettingControlType.SwitchedValue"
-          [formGroup]="switchedValueForm">
+    <form *ngIf="formControlType === organizationSettingControlType.SwitchedValue" [formGroup]="switchedValueForm">
 
       <div class="input-container bootstrap">
         <label for="numeric">Value<span class="required">*</span></label>
         <div class="input-group">
-          <ejs-numerictextbox id="numeric"
-                              class="numeric-input"
-                              min="0"
-                              [maxlength]="maxFieldLength"
-                              [validateDecimalOnType]='true'
-                              decimals='0'
-                              format="#"
-                              [showSpinButton]="false"
-                              appValidateWithMessage
-                              formControlName="value"></ejs-numerictextbox>
+          <ejs-numerictextbox id="numeric" class="numeric-input" min="0" [maxlength]="maxFieldLength"
+            [validateDecimalOnType]='true' decimals='0' format="#" [showSpinButton]="false" appValidateWithMessage
+            formControlName="value"></ejs-numerictextbox>
         </div>
       </div>
 
@@ -426,35 +351,60 @@
       </div>
     </form>
 
-    <form *ngIf="formControlType === organizationSettingControlType.CheckboxValue"
-          [formGroup]="checkboxValueForm">
+    <form *ngIf="formControlType === organizationSettingControlType.CheckboxValue" [formGroup]="checkboxValueForm">
 
-          <ng-container *ngIf="!checkboxValueForm.get('isEnabled')?.value && regularLocalRatesToggleMessage">
-            <div class="toggle-message">
-              Candidate Contact Details is mandatory as Enable Regular Local Rates flag is turned on.
-            </div>
-          </ng-container>
-
-        <div class="input-container">
-          <div class="input-group switch">
-            <ejs-switch id="switcher" class="switch" formControlName="isEnabled"></ejs-switch>
-            <label class="switch-label">Turned {{ checkboxValueForm.get('isEnabled')?.value ? 'on' : 'off' }}</label>
-          </div>
+      <ng-container *ngIf="!checkboxValueForm.get('isEnabled')?.value && regularLocalRatesToggleMessage">
+        <div class="toggle-message">
+          Candidate Contact Details is mandatory as Enable Regular Local Rates flag is turned on.
         </div>
-        <ng-container *ngIf="checkboxValueForm.get('isEnabled')?.value == true">
-          <label for="numeric">Status<span class="required">*</span></label>
-          <div class="input-group">
-            <ejs-dropdownlist id="dropdown"
-                              [allowFiltering]="false"
-                              [dataSource]="dropdownCheckboxValueDataSource"
-                              [fields]="dropdownFields"
-                              appValidateWithMessage
-                              formControlName="value"></ejs-dropdownlist>
-          </div>
-        </ng-container>       
+      </ng-container>
+
+      <div class="input-container">
+        <div class="input-group switch">
+          <ejs-switch id="switcher" class="switch" formControlName="isEnabled"></ejs-switch>
+          <label class="switch-label">Turned {{ checkboxValueForm.get('isEnabled')?.value ? 'on' : 'off' }}</label>
+        </div>
+      </div>
+      <ng-container *ngIf="checkboxValueForm.get('isEnabled')?.value == true">
+        <label for="numeric">Status<span class="required">*</span></label>
+        <div class="input-group">
+          <ejs-dropdownlist id="dropdown" [allowFiltering]="false" [dataSource]="dropdownCheckboxValueDataSource"
+            [fields]="dropdownFields" appValidateWithMessage formControlName="value"></ejs-dropdownlist>
+        </div>
+      </ng-container>
 
 
     </form>
+
+    <form [formGroup]="payPeriodFormGroup"
+    *ngIf="formControlType === organizationSettingControlType.PayPeriod">
+  <div class="row">
+    <div class="input-container bootstrap">
+      <label>
+        Schedule Management Start Date
+        </label>
+      <div class="input-group datepicker">
+        <ejs-datepicker id="datepicker" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+          appValidateWithMessage [showClearButton]="false" formControlName="date"></ejs-datepicker>
+      </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="input-container bootstrap">
+      <label>
+        No of pay periods
+        </label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist appValidateWithMessage [allowFiltering]="true" [dataSource]="noOfWeek"
+          [fields]="noOfWeekFields" formControlName="noOfWeek">
+        </ejs-dropdownlist>
+      </div>
+
+    </div>
+
+
+  </div>
+ </form>
 
     <div [ngSwitch]="formControlType">
       <ng-container *ngSwitchCase="organizationSettingControlType.Checkbox">
@@ -466,6 +416,10 @@
       </ng-container>
 
       <ng-container *ngSwitchCase="organizationSettingControlType.InvoiceAutoGeneration">
+        <ng-container *ngTemplateOutlet="switcher"></ng-container>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="organizationSettingControlType.PayPeriod">
         <ng-container *ngTemplateOutlet="switcher"></ng-container>
       </ng-container>
 
@@ -489,13 +443,8 @@
       <div class="input-container datepicker bootstrap" *ngSwitchCase="organizationSettingControlType.DateTime">
         <label for="datepicker">Value <span class="required">*</span></label>
         <div class="input-group datepicker">
-          <ejs-datepicker id="datepicker"
-                          class="datepicker"
-                          format="MM/dd/yyyy"
-                          placeholder="MM/DD/YYYY"
-                          appValidateWithMessage
-                          [showClearButton]="false"
-                          formControlName="value"></ejs-datepicker>
+          <ejs-datepicker id="datepicker" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+            appValidateWithMessage [showClearButton]="false" formControlName="value"></ejs-datepicker>
         </div>
       </div>
 
@@ -503,13 +452,9 @@
         <div class="input-container bootstrap" *ngIf="textFieldType === textFieldTypeControl.Email">
           <label for="email">Value</label>
           <div class="input-group">
-            <input id="email"
-                   class="e-input"
-                   type="email"
-                   formControlName="value" />
-            <i-feather name="alert-circle"
-                       class="icon validation-icon"
-                       [ngStyle]="{ display: !organizationSettingsFormGroup?.untouched && organizationSettingsFormGroup?.invalid ? 'block' : 'none' }"></i-feather>
+            <input id="email" class="e-input" type="email" formControlName="value" />
+            <i-feather name="alert-circle" class="icon validation-icon"
+              [ngStyle]="{ display: !organizationSettingsFormGroup?.untouched && organizationSettingsFormGroup?.invalid ? 'block' : 'none' }"></i-feather>
           </div>
         </div>
 
@@ -517,45 +462,28 @@
           <div class="input-container bootstrap">
             <label for="numeric">Value<span class="required">*</span></label>
             <div class="input-group">
-              <ejs-numerictextbox id="numeric"
-                                  class="numeric-input"
-                                  min="0"
-                                  [maxlength]="maxFieldLength"
-                                  [validateDecimalOnType]='true'
-                                  decimals='0'
-                                  format="#"
-                                  [showSpinButton]="false"
-                                  appValidateWithMessage
-                                  formControlName="value"></ejs-numerictextbox>
+              <ejs-numerictextbox id="numeric" class="numeric-input" min="0" [maxlength]="maxFieldLength"
+                [validateDecimalOnType]='true' decimals='0' (keydown)="onlyNumerics($event)" format="#" [showSpinButton]="false" appValidateWithMessage
+                formControlName="value"></ejs-numerictextbox>
             </div>
           </div>
         </div>
       </div>
 
       <div class="input-container dropdown bootstrap" *ngSwitchCase="organizationSettingControlType.Select">
-        <label for="dropdown">Value  <span class="required">*</span></label>
+        <label for="dropdown">Value <span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist id="dropdown"
-                            [allowFiltering]="true"
-                            [dataSource]="dropdownDataSource"
-                            [fields]="dropdownFields"
-                            appValidateWithMessage
-                            formControlName="value"></ejs-dropdownlist>
+          <ejs-dropdownlist id="dropdown" [allowFiltering]="true" [dataSource]="dropdownDataSource"
+            [fields]="dropdownFields" appValidateWithMessage formControlName="value"></ejs-dropdownlist>
         </div>
       </div>
 
       <div class="input-container dropdown bootstrap" *ngSwitchCase="organizationSettingControlType.Multiselect">
         <label for="dropdownMulti">Value <span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-multiselect id="dropdownMulti"
-                           mode="CheckBox"
-                           appValidateWithMessage
-                           [allowFiltering]="true"
-                           [dataSource]="dropdownDataSource"
-                           [fields]="dropdownFields"
-                           selectAllText="All"
-                           showSelectAll="true"
-                           formControlName="value">
+          <ejs-multiselect id="dropdownMulti" mode="CheckBox" appValidateWithMessage [allowFiltering]="true"
+            [dataSource]="dropdownDataSource" [fields]="dropdownFields" selectAllText="All" showSelectAll="true"
+            formControlName="value">
           </ejs-multiselect>
         </div>
       </div>
@@ -564,21 +492,25 @@
         <div class="input-container">
           <label for="email">Emails</label>
           <div class="input-group">
-            <ejs-textbox name="email"
-                         appValidateWithMessage
-                         formControlName="value"
-                         placeholder="Comma separated email"
-                         [multiline]="true">
+            <ejs-textbox name="email" appValidateWithMessage formControlName="value" placeholder="Comma separated email"
+              [multiline]="true">
             </ejs-textbox>
           </div>
         </div>
       </div>
 
+
+
       <ng-container *ngIf="showBillingMessage">
         <div class="toggle-message">
-          Please make sure to align Billing contact e-mail recipients configuration with group by set in Auto-generation of invoices.
+          Please make sure to align Billing contact e-mail recipients configuration with group by set in Auto-generation
+          of invoices.
         </div>
       </ng-container>
     </div>
+
+
+
   </form>
+
 </app-side-dialog>

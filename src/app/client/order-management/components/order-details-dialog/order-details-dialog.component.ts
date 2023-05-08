@@ -132,6 +132,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public canCreateOrder: boolean;
   public canCloseOrderPermission: boolean;
   public readonly systemType = OrderManagementIRPSystemId;
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
 
   public disabledCloseButton = true;
   public showCloseButton = false;
@@ -297,6 +298,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         !this.order.isLocked,
         {},
         `${this.order.organizationPrefix || ''}-${this.order.publicId}`,
+        this.activeSystem=== this.systemType.IRP,
         true
       )
     );

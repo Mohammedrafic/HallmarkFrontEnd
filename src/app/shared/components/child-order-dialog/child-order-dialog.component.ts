@@ -38,6 +38,7 @@ import {
   ClearOrderCandidatePage,
   ClearOrganisationCandidateJob,
   GetAvailableSteps,
+  GetCandidateCancellationReason,
   GetOrganisationCandidateJob,
   GetOrganizationExtensions,
   ReloadOrganisationOrderCandidatesLists,
@@ -76,6 +77,8 @@ import {
   OrderFilter,
   OrderManagementChild,
   ApplicantStatus as ApplicantStatusModel,
+  CandidateCancellationReason,
+  CandidateCancellationReasonFilter,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
@@ -157,6 +160,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Select(OrderManagementState.deployedCandidateOrderInfo)
   public readonly deployedCandidateOrderInfo$: Observable<DeployedCandidateOrderInfo[]>;
 
+  @Select(OrderManagementContentState.getCandidateCancellationReasons)
+  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
+
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
@@ -185,6 +191,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public isClosedOrder = false;
   public selectedApplicantStatus: ApplicantStatusModel | null = null;
   public isCandidatePayRateVisible: boolean;
+  public candidateCancellationReasons: CandidateCancellationReason[] | null;
 
   public readonly nextApplicantStatuses = [
     {
@@ -370,6 +377,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   public onBillRatesChanged(bill: BillRate): void {
     if (!this.acceptForm.errors && this.candidateJob) {
+      const rates = this.getBillRateForUpdate(bill);
+
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
@@ -388,12 +397,14 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
             requestComment: this.candidateJob?.requestComment as string,
             clockId: this.candidateJob?.clockId,
             guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
-            billRates: this.getBillRateForUpdate(bill),
+            billRates: rates,
+            billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.candidateJob.candidatePayRate,
           })
         )
         .subscribe(() => {
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+          this.deleteUpdateFieldInRate();
         });
     }
   }
@@ -677,6 +688,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.getExtensions();
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
+          this.subscribeCandidateCancellationReasons();
         }
       });
     }
@@ -687,10 +699,11 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.getExtensions();
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
+          this.subscribeCandidateCancellationReasons();
         }
       });
     }
-  }
+     }
 
   private setAcceptForm({
     order: {
@@ -718,6 +731,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       this.candidateJob?.applicantStatus.applicantStatus === CandidatStatus.BillRatePending
         ? candidateBillRate
         : offeredBillRate;
+    const orderDate = this.order.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate;
 
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
@@ -726,9 +740,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: this.order.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate,
-      shiftStartTime,
-      shiftEndTime,
+      orderOpenDate: DateTimeHelper.convertDateToUtc(orderDate as string),
+      shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
+      shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
       jobCancellationReason: CancellationReasonsMap[jobCancellation?.jobCancellationReason || 0],
@@ -878,10 +892,37 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       nextApplicantStatus: {
         applicantStatus: ApplicantStatus.Cancelled,
         statusText: "Cancelled",
-        isEnabled: true
+        isEnabled: true,
       },
     };
 
     this.store.dispatch(new UpdateOrganisationCandidateJob(candidateJob));
+  }
+
+  private deleteUpdateFieldInRate(): void {
+    this.candidateJob?.billRates.filter((rate) => Object.prototype.hasOwnProperty.call(rate, 'isUpdated'))
+    .forEach((rate) => {
+      delete rate.isUpdated;
+    });
+  }
+
+  private checkForBillRateUpdate(rates: BillRate[]): boolean {
+    return rates.some((rate) => !!rate.isUpdated);
+  }
+
+  
+  private subscribeCandidateCancellationReasons() {
+    if (this.candidateJob) {
+      let payload: CandidateCancellationReasonFilter = {
+        locationId: this.candidateJob?.order.locationId,
+        regionId: this.candidateJob?.order.regionId
+      };
+      this.store.dispatch(new GetCandidateCancellationReason(payload));
+      this.candidateCancellationReasons$
+        .pipe().subscribe((value) => {
+          this.candidateCancellationReasons =value;
+        });
+
+    }
   }
 }

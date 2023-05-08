@@ -41,6 +41,7 @@ export class AddAlertsTemplateRequest {
   toList: string;
   cCList: string;
   bCCList: string;  
+  businessUnitType: number;
 };
   
   export class AlertsTemplateFilters {

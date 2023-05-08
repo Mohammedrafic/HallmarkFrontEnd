@@ -1,0 +1,74 @@
+<ejs-dialog
+  id="dialog"
+  #sideOrgInterfaceDialog
+  cssClass="dialog order-details-dialog"
+  [target]="targetElement"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+<ng-template #content>
+
+    <div class="e-card">
+      <app-page-toolbar [rightPanelButtonsOnly]="true">
+        <ng-container left>
+          <div class="candidate-left-container">
+            <h3 class="e-card-title">Edit Interface Specification</h3>
+          </div>
+        </ng-container>
+        <ng-container right>
+          <ng-container >
+            <button ejs-button  cssClass="e-outline" (click)="onClearEvent$.next(true)">Clear</button>
+            <button ejs-button [isPrimary]="true" (click)="onSaveEvent$.next(true)">Save</button>
+            <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
+              <i-feather name="x" class="icon"></i-feather>
+            </button>
+          </ng-container>
+        </ng-container>
+      </app-page-toolbar>
+      <hr>
+      <div class="order-tabs" >
+        <ejs-tab #tab  id="element">
+          <e-tabitems>
+            <e-tabitem>
+              <ng-template #headerText>Configuration<span class="required">*</span></ng-template>
+              <ng-template #content>
+                <div class="e-card-content">
+                  <app-org-interface-configuration [selectedOrgLog$]="selectedOrgLogDataset$"
+                    [onClearClick$]="onClearEvent$" [onSaveClick$]="onSaveEvent$" (onCloseEvent)="onClose()">
+                  </app-org-interface-configuration>
+                </div>
+              </ng-template>
+            </e-tabitem>
+            <e-tabitem>
+              <ng-template #headerText>Column Mapping<span class="required">*</span></ng-template>
+              <ng-template #content>
+                <section class="document-grid table-wrapper" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
+                  <div class="custom-grid">
+                    <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
+                                     [gridOptions]="gridOptions"
+                                     (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
+                                     [headerHeight]="52"></ag-grid-angular>
+                    <div class="grid-pagination">
+                      <button ejs-button [isPrimary]="true" (click)="gridApi.applyTransaction({add: [{}]})">Add New Row</button>
+                      <ejs-dropdownlist id="rowsPerPage"
+                                        class="dropdown-no-border"
+                                        [allowFiltering]="true"
+                                        [dataSource]="rowsPerPageDropDown"
+                                        [(value)]="activeRowsPerPageDropDown"
+                                        (change)="onPageSizeChanged($event)">
+                      </ejs-dropdownlist>
+                      <div class="total-rows">
+                        Total Rows: 0
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </ng-template>
+            </e-tabitem>
+
+          </e-tabitems>
+        </ejs-tab>
+      </div>
+    </div>
+</ng-template>
+</ejs-dialog>

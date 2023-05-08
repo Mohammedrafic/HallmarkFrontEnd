@@ -281,6 +281,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
         intervalMax: new FormControl(),
         considerForOT: new FormControl(),
       }),
+      isUpdated: new FormControl(false),
     });
   }
 

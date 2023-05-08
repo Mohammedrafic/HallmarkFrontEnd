@@ -76,7 +76,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   ) {
     super(store);
 
-    store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'file-text' }));
+    store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'calendar' }));
   }
 
   public override ngOnInit(): void {
@@ -167,9 +167,12 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   updateScheduleFilter(data: ScheduleInt.ScheduleFiltersData): void {
     this.scheduleFiltersService.setScheduleFiltersData(data);
-    this.chipsData = data.chipsData;
     this.changeFilters(data.filters, data.skipDataUpdate);
     this.appliedFiltersAmount = data.filteredItems?.length;
+
+    if (!this.store.selectSnapshot(UserState.user)?.isEmployee) {
+      this.chipsData = data.chipsData;
+    }
   }
 
   selectCandidate(selectedCandidate: ScheduleInt.ScheduleCandidate | null): void {

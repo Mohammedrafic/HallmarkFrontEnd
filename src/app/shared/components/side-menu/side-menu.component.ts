@@ -35,9 +35,11 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
   }
 
   ngAfterViewInit(): void {
-    const menuItem = this.config[0];
-    this.listBox.selectItems([menuItem['text'] as string]);
-    this.router.navigate([(menuItem as any).route], { relativeTo: this.route });
+    if (this.config.length > 0) {
+      const menuItem = this.config[0];
+      this.listBox.selectItems([menuItem['text'] as string]);
+      this.router.navigate([(menuItem as any).route], { relativeTo: this.route });
+    }
   }
 
   public selectMenuItem(event: ListBoxChangeEventArgs | null, mnuItem?: MenuSettings): void {

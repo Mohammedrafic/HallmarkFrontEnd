@@ -9,14 +9,14 @@ export const DepartmentFilterFormConfig = (): ReadonlyArray<
 > => [
   {
     type: ControlTypes.Multiselect,
-    title: 'Region ',
+    title: 'Region',
     field: DepartmentFiltersColumnsEnum.REGION,
     sortOrder: SortOrder.NONE,
     optionFields: filterOptionFields,
   },
   {
     type: ControlTypes.Multiselect,
-    title: 'Location ',
+    title: 'Location',
     field: DepartmentFiltersColumnsEnum.LOCATION,
     sortOrder: SortOrder.ASCENDING,
     optionFields: filterOptionFields,

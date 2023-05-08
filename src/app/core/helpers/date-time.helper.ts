@@ -51,7 +51,9 @@ export class DateTimeHelper {
     ).toISOString();
   }
 
-  //Use this function with cautions. it needs to be removed.
+  /**
+   * Use this function with cautions. it needs to be removed.
+   */
   public static setInitHours(data: string): string {
     const date = new Date(this.convertDateToUtc(data));
     date.setHours(0, 0, 0);
@@ -283,5 +285,10 @@ export class DateTimeHelper {
     const dateOffset = new Date(date).getTimezoneOffset();
  
     return (janOffset - dateOffset) * 60 * 60 * 1000;
+  }
+
+  public static getISOTimeZone(date: string): string {
+    //get timezone from ISO string. example: "2023-01-30T09:43:32.2300926-05:00" => "-0500"
+    return date.slice(-6).split(':').join('');
   }
 }

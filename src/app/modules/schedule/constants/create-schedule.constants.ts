@@ -1,8 +1,8 @@
-import { FieldType, UserPermissions } from "@core/enums";
+import { FieldType, UserPermissions } from '@core/enums';
 
-import { ScheduleType } from "../enums";
+import { ScheduleType } from '../enums';
 import * as ScheduleInt from '../interface';
-
+import { CreateScheduleTypesConfig } from '../interface';
 
 export enum ScheduleItemType {
   Book = 0,
@@ -20,36 +20,51 @@ export enum ScheduleFormSourceKeys {
   Skills = 'skill',
 }
 
-export const ScheduleTypes: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton> = [
-  {
-    label: ScheduleType.Book,
-    value: ScheduleItemType.Book,
-    name: 'scheduleType',
-    disabled: false,
-    permission: UserPermissions.CanAddShift,
-  },
-  {
-    label: ScheduleType.OpenPositions,
-    value: ScheduleItemType.OpenPositions,
-    name: 'scheduleType',
-    disabled: false,
-    permission: UserPermissions.CanViewSchedule,
-  },
-  {
-    label: ScheduleType.Availability,
-    value: ScheduleItemType.Availability,
-    name: 'scheduleType',
-    disabled: false,
-    permission: UserPermissions.CanAddAvailability,
-  },
-  {
-    label: ScheduleType.Unavailability,
-    value: ScheduleItemType.Unavailability,
-    name: 'scheduleType',
-    disabled: false,
-    permission: UserPermissions.CanAddUnavailability,
-  },
-];
+export const OpenPositionTypes: ScheduleInt.ScheduleTypeRadioButton = {
+  label: ScheduleType.OpenPositions,
+  value: ScheduleItemType.OpenPositions,
+  name: 'scheduleType',
+  disabled: false,
+  permission: UserPermissions.CanAddShift,
+};
+
+export const BookTypes: ScheduleInt.ScheduleTypeRadioButton = {
+  label: ScheduleType.Book,
+  value: ScheduleItemType.Book,
+  name: 'scheduleType',
+  disabled: false,
+  permission: UserPermissions.CanAddShift,
+};
+
+export const AvailabilityTypes: ScheduleInt.ScheduleTypeRadioButton = {
+  label: ScheduleType.Availability,
+  value: ScheduleItemType.Availability,
+  name: 'scheduleType',
+  disabled: false,
+  permission: UserPermissions.CanAddAvailability,
+};
+
+export const UnavailabilityTypes = {
+  label: ScheduleType.Unavailability,
+  value: ScheduleItemType.Unavailability,
+  name: 'scheduleType',
+  disabled: false,
+  permission: UserPermissions.CanAddUnavailability,
+};
+
+export const ScheduleTypesForEditBar: CreateScheduleTypesConfig = {
+  columnsTemplate: 'auto auto auto auto',
+  source: [
+    BookTypes,AvailabilityTypes, UnavailabilityTypes,
+  ],
+};
+
+export const ScheduleTypesForCreateBar: CreateScheduleTypesConfig = {
+  columnsTemplate: 'auto auto auto auto',
+  source: [
+    BookTypes,OpenPositionTypes, AvailabilityTypes, UnavailabilityTypes,
+  ],
+};
 
 const availabilityFormFields: ScheduleInt.ScheduleFormFieldConfig[] = [
   {
@@ -171,6 +186,14 @@ const bookingToggleForm: ScheduleInt.ScheduleFormFieldConfig[] = [
     title: 'PRC',
     type: FieldType.Toggle,
     gridAreaName: 'toggle5',
+    required: false,
+    show: true,
+  },
+  {
+    field: 'meal',
+    title: 'Meal',
+    type: FieldType.Toggle,
+    gridAreaName: 'meal',
     required: false,
     show: true,
   },

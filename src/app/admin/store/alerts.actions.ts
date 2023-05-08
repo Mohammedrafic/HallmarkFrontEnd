@@ -1,4 +1,5 @@
 import { AlertChannel } from "@admin/alerts/alerts.enum";
+import { CommonReportFilter } from "@admin/analytics/models/common-report.model";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { AddAlertsTemplateRequest, AlertsTemplateFilters, AlertTriggerDto, DismissAlertDto, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
 import { GroupEmailFilters, SendGroupEmailRequest } from "@shared/models/group-email.model";
@@ -13,7 +14,8 @@ export class GetUserSubscriptionPage {
       public pageSize: number,
       public sortModel: any,
       public filterModel: any,
-      public filters: UserSubscriptionFilters
+      public filters: UserSubscriptionFilters,
+      public isIRP: boolean = false
     ) {}
   }
   export class UpdateUserSubscription {
@@ -31,7 +33,8 @@ export class GetUserSubscriptionPage {
       public pageSize: number,
       public sortModel: any,
       public filterModel: any,
-      public filters: AlertsTemplateFilters
+      public filters: AlertsTemplateFilters,
+      public isIRP: boolean
     ) {}
   }
 
@@ -40,7 +43,9 @@ export class GetUserSubscriptionPage {
     constructor(
       public alertId:number,
       public alertChannel: AlertChannel,
-      public businessUnitId:number |null
+      public businessUnitId:number |null,
+      public businessUnitType:number | null,
+      public isIRP: boolean
     ) {}
   }
   export class UpdateTemplateByAlertId {
@@ -174,4 +179,45 @@ export class GetGroupEmailCandidates {
 export class Toaster{
   static readonly type = "User Subscription CatchError";
   constructor(){}
+}
+
+export class GetGroupEmailDepartmentSkills {
+  static readonly type = '[groupemail] Get Group Email department skills';
+  constructor(
+    public departmentIds: string,
+    public businessUnitId: number
+  ) { }
+}
+
+export class GetGroupEmailEmployees {
+  static readonly type = '[groupemail] Get Group Email employees by criteria';
+  constructor(
+    public businessUnitId: number,    
+    public regions: string,
+    public locations: string,
+    public departments: string,
+    public skills: string,
+    public workCommitments: string,
+    public orientationComplete: boolean
+  ) { }
+}
+
+export class GetStaffScheduleReportFilterOptions{
+  static readonly type = '[LogiReport] Get Staff Schedule Report Filter Options';
+  constructor(public filter: CommonReportFilter) { }
+}
+
+export class GetGroupEmailWorkCommitments {
+  static readonly type = '[groupemail] Get Group Email workcommitments by criteria';
+  constructor(
+    public businessUnitId: number,    
+    public regions: string,
+    public locations: string,
+    public skills: string
+  ) { }
+}
+
+export class GetOrganizationById {
+  static readonly type = '[admin] Get Organization by ID';
+  constructor(public businessUnitId: number) { }
 }

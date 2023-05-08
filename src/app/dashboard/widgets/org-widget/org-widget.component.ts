@@ -15,6 +15,8 @@ import { Organization } from '@shared/models/organization.model';
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
+import { DASHBOARD_FILTER_STATE } from '@shared/constants';
+import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 
 @Component({
   selector: 'app-org-widget',
@@ -32,6 +34,7 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
   public selectedSystem: SelectedSystemsFlag = SelectedSystems;
   public countzero = "Ordercountzero";
   public isAgencyUser: boolean = false;
+  public isOrgUser: boolean = false;
   public isIRPEnabledOrg: boolean = this.store.selectSnapshot(AppState.isIrpFlagEnabled);;
   private mousePosition = {
     x: 0,
@@ -49,9 +52,12 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
     if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
       this.isAgencyUser = true;
     }
-    if(user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Organization){}
-    this.store.dispatch(new GetOrganizationById(this.store.selectSnapshot(UserState.user)?.businessUnitId as number));
-    this.getOrganizagionData();
+    if(user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Organization){
+      this.store.dispatch(new GetOrganizationById(this.store.selectSnapshot(UserState.user)?.businessUnitId as number));
+      this.getOrganizagionData();
+      this.isOrgUser =true
+    }
+ 
 
   }
 
@@ -61,6 +67,19 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
     this.mousePosition.y = $event.screenY;
   }
   public toSourceContent(orgname: string): void {
+    let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
+    let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
+    if(filteredList.length > 0){
+      let organizations = filteredList.filter((ele:any)=>ele.column == "organizationIds").sort((a:any,b:any)=> a.value - b.value);
+      if(organizations.length > 0 && organizations[0].value != lastSelectedOrganizationId){
+        this.store.dispatch(
+          new SetLastSelectedOrganizationAgencyId({
+            lastSelectedAgencyId: null,
+            lastSelectedOrganizationId: organizations[0].value
+          })
+        );
+      }
+    }
     if (orgname === LocalStorageStatus.OrdersforApproval) {
       if (this.chartData?.pendingOrders == 0) {
         this.globalWindow.localStorage.setItem("pendingApprovalOrders", JSON.stringify(this.countzero))
@@ -80,6 +99,10 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
     }else if(orgname =='NoOfLongTermOrders'){
       this.dashboardService.redirectToUrl('client/order-management/');
       this.globalWindow.localStorage.setItem("ISIrpEnabled", JSON.stringify(true));
+    }
+    else if(orgname =='NoOfUnAssignedEmployee'){
+      this.dashboardService.redirectToUrl('analytics/staff-list/');
+      this.globalWindow.localStorage.setItem("unassignedemployeecountwidget", JSON.stringify(true));
     }
   }
 

@@ -13,13 +13,15 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { Select, Store } from '@ngxs/store';
 import { AutoCompleteComponent } from '@syncfusion/ej2-angular-dropdowns/src/auto-complete/autocomplete.component';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
 import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { debounceTime, fromEvent, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
+import { catchError, debounceTime, EMPTY, fromEvent, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { DatesRangeType, WeekDays } from '@shared/enums';
@@ -29,14 +31,20 @@ import { PreservedFiltersByPage } from '@core/interface';
 import { FilterPageName } from '@core/enums';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
+import { MessageTypes } from '@shared/enums/message-types';
+import { RECORD_ADDED } from '@shared/constants';
+import { CreateScheduleService, OpenPositionService, ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { UserState } from '../../../../store/user.state';
 import { ScheduleGridAdapter } from '../../adapters';
 import { DatesPeriods, MonthPeriod, PermissionRequired } from '../../constants';
 import * as ScheduleInt from '../../interface';
 import {
   CardClickEvent,
+  DroppedEvent,
+  OpenPositionsList,
+  PositionDragEvent,
   RemovedSlot,
+  ScheduleBook,
   ScheduleCandidatesPage,
   ScheduleModel,
   SelectedCells,
@@ -44,11 +52,11 @@ import {
 import { GetMonthRange, GetScheduledShift } from '../../helpers';
 import { ScheduleGridService } from './schedule-grid.service';
 import { ShowToast } from '../../../../store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
 import { GetPreservedFiltersByPage, ResetPageFilters } from 'src/app/store/preserved-filters.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
+import { BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -116,9 +124,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   isEmployee = false;
 
+  dragEvent: PositionDragEvent | null = null;
+
+  replacementOrderDialogOpen = false;
+
+  replacementOrderDialogData: BookingsOverlapsResponse[] = [];
+
   private itemsPerPage = 30;
 
   private filteredByEmployee = false;
+
+  private scheduleToBook: ScheduleBook | null;
 
   constructor(
     private store: Store,
@@ -129,6 +145,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     private scheduleGridService: ScheduleGridService,
     private scheduleItemsService: ScheduleItemsService,
     private scheduleFiltersService: ScheduleFiltersService,
+    private openPositionService: OpenPositionService,
   ) {
     super();
   }
@@ -149,12 +166,62 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.watchForCandidateSearch();
     this.watchForSideBarAction();
     this.watchForPreservedFilters();
+    this.watchForDragEvent();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.selectedCandidatesSlot.clear();
     if (changes['selectedFilters'] && !this.filteredByEmployee) {
       this.filterByEmployee();
+    }
+  }
+
+   handleDroppedElement(event: CdkDragDrop<DroppedEvent>): void {
+   this.openPositionService.dropElementToDropList(event).pipe(
+   catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+     switchMap((response: BookingsOverlapsResponse[]) => {
+       this.scheduleToBook = this.openPositionService.createPositionBookDto(event);
+
+       if (!response.length) {
+         return this.scheduleApiService.createBookSchedule(this.scheduleToBook);
+       } else {
+         this.openReplacementOrderDialog(response);
+         return EMPTY;
+       }
+     }),
+     catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+     switchMap(() => {
+       return this.getOpenPositions();
+     }),
+     tap((positions: OpenPositionsList[]) => {
+       this.openPositionService.setOpenPosition('initialPositions', positions);
+     }),
+     takeUntil(this.componentDestroy()),
+   ).subscribe(() => {
+     this.successSaveBooking();
+   });
+  }
+
+  closeReplacementOrderDialog(): void {
+    this.replacementOrderDialogOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  saveNewBooking(createOrder: boolean): void {
+    if (this.scheduleToBook) {
+      this.scheduleToBook.createOrder = createOrder;
+      this.scheduleApiService.createBookSchedule(this.scheduleToBook).pipe(
+        catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+        switchMap(() => {
+          return this.getOpenPositions();
+        }),
+        tap((positions: OpenPositionsList[]) => {
+          this.openPositionService.setOpenPosition('initialPositions', positions);
+        }),
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
+        this.successSaveBooking();
+      });
     }
   }
 
@@ -223,16 +290,19 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private processCellSelection(candidate: ScheduleInt.ScheduleCandidate, schedule?: ScheduleInt.ScheduleDateItem): void {
+    const candidateId = this.selectedCandidatesSlot.size === 1
+      ? Array.from(this.selectedCandidatesSlot.keys())[0]
+      : candidate.id;
     const isEditSideBar = this.scheduleGridService.shouldShowEditSideBar(
       this.selectedCandidatesSlot,
       this.scheduleData?.items as ScheduleModel[],
-      candidate.id
+      candidateId
     );
 
     if(isEditSideBar) {
       this.editCell.emit(GetScheduledShift(
         this.scheduleData as ScheduleInt.ScheduleModelPage,
-        candidate.id,
+        candidateId,
         this.scheduleGridService.getFirstSelectedDate(this.selectedCandidatesSlot),
       ));
     } else {
@@ -240,6 +310,18 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         cells: ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot, schedule),
       });
     }
+  }
+
+  private openReplacementOrderDialog(replacementOrderDialogData: BookingsOverlapsResponse[]): void {
+    this.replacementOrderDialogData = replacementOrderDialogData;
+    this.replacementOrderDialogOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  private getOpenPositions(): Observable<OpenPositionsList[]> {
+    return this.scheduleApiService.getOpenPositions(
+      this.createScheduleService.createOpenPositionsParams([])
+    );
   }
 
   private startOrgIdWatching(): void {
@@ -376,11 +458,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private watchForPreservedFilters(): void {
+    let clearStructure = false;
     this.organizationId$.pipe(
       filter((id) => !!id),
       tap(() => {
+        if (clearStructure) {
+          this.store.dispatch(new ClearOrganizationStructure());
+        } else {
+          clearStructure = true;
+        }
+
         this.store.dispatch([
-          new ClearOrganizationStructure(),
           new ResetPageFilters(),
           new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
         ]);
@@ -389,11 +477,27 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       filter(({ dispatch }) => dispatch),
       takeUntil(this.componentDestroy()),
     ).subscribe((filters) => {
-      this.setPreservedFiltersDataSource(filters.state || {});
+      this.setPreservedFiltersDataSource(filters.state);
     });
   }
 
   private setPreservedFiltersDataSource(filters: ScheduleInt.ScheduleFilters): void {
-    this.scheduleFiltersService.setPreservedFiltersDataStream({ ...filters });
+    this.scheduleFiltersService.setPreservedFiltersDataStream(filters);
+  }
+
+  private watchForDragEvent(): void {
+    this.openPositionService.getDragEventStream().pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe((event: PositionDragEvent) => {
+      this.dragEvent = {
+        ...event,
+      };
+      this.cdr.markForCheck();
+    });
+  }
+
+  private successSaveBooking(): void {
+    this.createScheduleService.closeSideBarEvent.next(false);
+    this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
   }
 }

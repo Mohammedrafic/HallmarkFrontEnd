@@ -82,25 +82,32 @@ export const DOCUMENT_DELETE_SUCCESS = 'Documents deleted successfully';
 export const DOCUMENT_UNSHARED_SUCCESS = 'Documents UnShared successfully';
 export const FOLDER_DELETE_SUCCESS = 'Folder deleted successfully';
 export const EMAIL_RESEND_SUCCESS = 'Email was sent successfully';
+export const END_DATE_REQUIRED ='End Date is required.';
 export const CANDIDATE_STATUS= 'Selected Candidate status is unavailable';
 export const CandidateSSNRequired = 'SSN of Candidate is mandatory to submit candidate application. Once SSN is updated on Candidate Profile screen and come back here to apply.';
 export const CandidateDOBRequired= 'DOB of Candidate is mandatory to accept the offer. Please update DOB of candidate on Candidate Profile screen and come back here to accept offer.';
 export const CandidatePHONE1Required = (place:any) => 'Phone 1 of the Candidate is mandatory to '+place+' the position.';
 export const CandidateADDRESSRequired = (place:any) => 'Address 1, Country, State, City and Zipcode of the Candidate in the Candidate profile are mandatory to '+place+' the position.';
-export const REGULAR_RATE_UPDATE_SUCCESS = 'Regular Rate on Open and In-Progress Status are updated. Other Positions stays unaffected';
+export const TravelerContracttoPermOrdersSucceedMessage = 'Regular Rate on Open and In-Progress Status are updated. Other Statuses/Positions stays unaffected';
+export const TravelerContracttoPermOrdersErrorMessage = 'Regular Rate on Open and In-Progress Status can be updated. Other Statuses/Positions stays unaffected';
+export const PerDiemReOrdersSucceedMessage = 'Open Per Diems and Re-Orders bill rates cannot be updated.';
+export const PerDiemReOrdersErrorMessage = 'Bill Rate cannot be updated for Open Per Diems and Re-Orders.';
 export const UpdateRegularRatesucceedcount = (count: number) =>
-  ` ${count} Order(s) affected , ` + REGULAR_RATE_UPDATE_SUCCESS;
+  ` ${count} Order(s) updated , ` + TravelerContracttoPermOrdersSucceedMessage;
+export const UpdateRegularRateWithPerDiemsucceedcount = (count: number) =>
+  ` ${count} Order(s) updated , ` + PerDiemReOrdersSucceedMessage;
 
 export const DOCUMENT_DOWNLOAD_SUCCESS = 'Document downloaded successfully';
 export const SubmissionsLimitReached = 'The order has reached its submission limit';
-export const EDIT_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to edit multiple records?';
+export const EDIT_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to edit multiple records? It may affect existing schedules and orders.';
+export const EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT = 'Are you sure you want to change those dates? It may affect existing schedules and orders.';
+export const ORIENTED_SHIFT_CHANGE_CONFIRM_TEXT = 'Provided changes may have impact on changing Orientation Date, it won’t be automatically updated.';
 export const DELETE_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to delete multiple records?';
 export const BLOCK_RECORD_TEXT = 'Are you sure you want to block?';
 export const BLOCK_RECORD_TITLE = 'Block Record';
 export const BLOCK_RECORD_SUCCESS = 'Record Blocked';
 export const CANDIDATE_BLOCK='Candidate Blocked';
 export const CANDIDATE_UNBLOCK='Candidate Unblocked';
-export const CANDIDATE_DONOTRETURN ='Candidate cannot be blocked. This Candidate was used in '
 export const ASSIGN_HOME_COST_CENTER = 'Home Cost Center is already assigned, are you sure you want to reassign this department as Home Cost Center?';
 export const USER_SUBSCRIPTION_PERMISSION = 'User missing required permissions(CanViewSubscriptions)';
 export const USER_ALERTS_PERMISSION = 'User missing required permissions(CanViewTemplates)';
@@ -110,3 +117,4 @@ export const CLOSE_IRP_POSITION = 'Closing position will permanently close it wi
 export const ALL_DEPARTMENTS_SELECTED = 'You can`t assign Departments manually when "All" is selected';
 export const NO_ACTIVE_WORK_COMMITMET = 'No active Work Commitment';
 export const REASON_WARNING = 'Please select a System for Reason';
+export const EMPLOYEE_SKILL_CHANGE_WARNING = 'Are you sure, you want to update Employee Skills? It may have impact on Schedule and Orders.';

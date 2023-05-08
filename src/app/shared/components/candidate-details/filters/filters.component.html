@@ -59,7 +59,6 @@
     <label>Region</label>
     <div class="input-group multiselect bootstrap">
       <ejs-multiselect
-        #regionDropdown
         mode="CheckBox"
         formControlName="regionsIds"
         placeholder="All"
@@ -67,6 +66,14 @@
         [allowFiltering]="true"
         [showDropDownIcon]="true"
         [dataSource]="filterColumns.regionsIds.dataSource">
+
+        <ng-template #itemTemplate let-data>
+          <div class="region-option-container" [class.admin]="isAgency">
+            <span class="region-name">{{ data.name }}</span>
+            <span *ngIf="isAgency" class="org-name">{{ data.organizationName }}</span>
+          </div>
+        </ng-template>
+
       </ejs-multiselect>
     </div>
   </div>

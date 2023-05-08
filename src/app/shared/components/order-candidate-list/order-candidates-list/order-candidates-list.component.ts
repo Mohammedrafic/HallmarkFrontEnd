@@ -15,8 +15,8 @@ import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-or
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { combineLatest, Observable, Subject } from 'rxjs';
-import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
-import { UserState } from 'src/app/store/user.state';
+import { distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
+import { UserState } from 'src/app/store/user.state'; 
 import { Duration } from '@shared/enums/durations';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.component';
@@ -31,6 +31,12 @@ import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/consta
 import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
 import { OrderStatus } from '@shared/enums/order-management';
 import { GlobalWindow } from '@core/tokens';
+import { Organization } from '@shared/models/organization.model';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
+import { SelectedSystems } from '@shared/components/credentials-list/constants';
+import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -55,6 +61,13 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   @Select(OrderManagementState.deployedCandidateOrderInfo)
   public readonly deployedCandidateOrderInfo$: Observable<DeployedCandidateOrderInfo[]>;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
+  public selectedSystem: SelectedSystemsFlag = SelectedSystems;
+  private isOrgIRPEnabled = false;
+  private previousSelectedSystemId: OrderManagementIRPSystemId | null;
+  private isOrgVMSEnabled = false;
   public templateState: Subject<any> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
@@ -65,6 +78,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public agencyActionsAllowed = true;
   public deployedCandidateOrderIds: string[] = [];
   public isOrderOverlapped = false;
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
+  public activeSystem: OrderManagementIRPSystemId;
   public hideWithStatus = [
     ApplicantStatus.Rejected,
     ApplicantStatus.Cancelled,
@@ -92,6 +107,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     private orderCandidateListViewService: OrderCandidateListViewService,
     private settingService: SettingsViewService,
     @Inject(GlobalWindow) protected override readonly globalWindow : WindowProxy & typeof globalThis,
+    private orderManagementService: OrderManagementService,
   ) {
     super(store, router, globalWindow);
     this.setIrpFeatureFlag();
@@ -109,6 +125,12 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.checkForAgencyStatus();
       this.subscribeToDeployedCandidateOrdersInfo();
     }
+    this.organizationId$.pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((id) => {
+      this.getOrganization(id);
+    });
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
@@ -301,5 +323,40 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
         this.isCandidatePayRateVisible = JSON.parse(CandidatePayRate);
       });
     }
+  }
+
+  private setPreviousSelectedSystem(): void {
+    this.previousSelectedSystemId = this.orderManagementService.getOrderManagementSystem();
+  }
+
+
+  private getOrganization(businessUnitId: number) {
+
+    const id = businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+
+    this.store.dispatch(new GetOrganizationById(id)).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      const { isIRPEnabled, isVMCEnabled } =
+        this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+
+      this.isOrgIRPEnabled = !!isIRPEnabled;
+      this.isOrgVMSEnabled = !!isVMCEnabled;
+      this.setPreviousSelectedSystem();
+
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
+      }
+
+      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.IRP;
+      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && this.isOrgVMSEnabled) {
+        this.activeSystem = OrderManagementIRPSystemId.VMS;
+      }
+
+      this.previousSelectedSystemId = null;
+    });
   }
 }

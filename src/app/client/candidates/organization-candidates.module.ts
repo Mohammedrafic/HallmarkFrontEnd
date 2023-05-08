@@ -12,6 +12,7 @@ import { CandidateWorkCommitmentModule } from './candidate-work-commitment/candi
 import { CandidatesService } from './services/candidates.service';
 import { DepartmentsModule } from './departments/departments.module';
 import { CredentialsModule } from './credentials/credentials.module';
+import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
 
 @NgModule({
   declarations: [CandidateProfileComponent, AddEditCandidateComponent],
@@ -27,6 +28,6 @@ import { CredentialsModule } from './credentials/credentials.module';
     DepartmentsModule,
     CredentialsModule,
   ],
-  providers: [CandidatesService],
+  providers: [CandidatesService, ScrollRestorationService],
 })
 export class OrganizationCandidatesModule {}

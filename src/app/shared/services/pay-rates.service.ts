@@ -9,6 +9,7 @@ import {
   ImportedPayRate,
 } from '@shared/models/pay-rate.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 
 @Injectable({
   providedIn: 'root',
@@ -38,5 +39,9 @@ export class PayRateService {
 
   public getskillsbyDepartment(id: number[]): Observable<any> {
     return this.http.post('/api/PayRates/skillsByDepartment', {departmentIds : id});
+  }
+
+  public getMasterWorkCommitments(currentPage: number, pageSize: number): Observable<MasterCommitmentsPage> {
+    return this.http.post<MasterCommitmentsPage>('/api/MasterWorkCommitment/getAll', { currentPage, pageSize });
   }
 }

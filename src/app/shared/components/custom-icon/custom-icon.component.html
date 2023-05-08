@@ -1,5 +1,6 @@
 <ng-container *ngIf="name === 'unlock' then unlock"></ng-container>
 <ng-container *ngIf="name === 'sorting' then sorting"></ng-container>
+<ng-container *ngIf="name === 'organization' then organization"></ng-container>
 
 <ng-template #unlock>
   <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,5 +22,11 @@
         <rect width="16" height="16" fill="white" transform="translate(0.0175781)"/>
       </clipPath>
     </defs>
+  </svg>
+</ng-template>
+
+<ng-template #organization>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 24" fill="none">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M2 1.25H10C10.4142 1.25 10.75 1.58579 10.75 2V22.75H8V19H4V22.75H2C1.58579 22.75 1.25 22.4142 1.25 22V2C1.25 1.58579 1.58579 1.25 2 1.25ZM0 2C0 0.89543 0.895431 0 2 0H10C11.1046 0 12 0.895431 12 2V9H12.05H20.8C21.9046 9 22.8 9.89543 22.8 11V22C22.8 23.1046 21.9046 24 20.8 24H12.05H12H10.8H10.75H2C0.895431 24 0 23.1046 0 22V2ZM12.05 10.25H20.8C21.2142 10.25 21.55 10.5858 21.55 11V22C21.55 22.4142 21.2142 22.75 20.8 22.75H19V19H15V22.75H12.05V10.25ZM4 9H8V11H4V9ZM8 4H4V6H8V4ZM4 14H8V16H4V14ZM15 14H19V16H15V14Z" fill="currentColor"/>
   </svg>
 </ng-template>

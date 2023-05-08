@@ -31,15 +31,6 @@
     <ng-container *ngIf="!isMobile">
       <div class="buttons-container">
         <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
-        <button
-          *ngIf="!isIRPFlagEnabled && !isContentSmallDesktop"
-          ejs-button
-          appHideBeforeSyncfusionLoad
-          cssClass="e-outline button-template"
-          [disabled]="isIRPFlagEnabled"
-        >
-          <div class="filter-button-content">Templates <i-feather name="clipboard" class="icon"></i-feather></div>
-        </button>
         <ng-container
           *ngIf="!(isContentTabletWidth || isMiddleTabletWidth)"
           [ngTemplateOutlet]="filterButton"
@@ -82,7 +73,7 @@
           id="importButton" cssClass="e-outline button-export">
           <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
         </button>
-        
+
         <ng-container
           *ngIf="!isActiveSystemIRP && (isContentSmallDesktop || isMiddleTabletWidth)"
           [ngTemplateOutlet]="smallMenuButton"
@@ -782,14 +773,16 @@
     <div class="filter-row bootstrap"
          *ngIf="!isActiveSystemIRP || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
       <div class="input-container">
-        <label>Candidate Name</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Name</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Name</label>
         <div class="input-group">
           <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
         </div>
       </div>
       <div class="input-container"
            *ngIf="!isActiveSystemIRP">
-        <label>Candidate Status</label>
+          <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Status</label>
+          <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Status</label>
         <div class="input-group multiselect">
           <ejs-multiselect
             mode="CheckBox"
@@ -911,13 +904,15 @@
     <div class="filter-row bootstrap"
     *ngIf="(activeTab !== OrganizationOrderManagementTabs.PerDiem && !isActiveSystemIRP) || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
       <div class="input-container">
-        <label>Candidates Count From</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Count From</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Count From</label>
         <div class="input-group">
           <input class="e-input" type="text" maxlength="50" formControlName="candidatesCountFrom" />
         </div>
       </div>
       <div class="input-container">
-        <label>Candidates Count To</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Count To</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Count To</label>
         <div class="input-group">
           <input class="e-input" type="text" maxlength="50" formControlName="candidatesCountTo" />
         </div>
@@ -1175,6 +1170,7 @@
   #updaterateRow
   *ngIf="userPermission[userPermissions.CanBulkHourlyRateUpdate] && openregrateupdate"
   [orderdatas]="CurrentOrderDatas"
+  [perdiemOrderData]="PerDiemOrderDatas"
   (reloadItemsListforupdate)="updatePageforbulk()"
 ></app-update-reg-rate>
 

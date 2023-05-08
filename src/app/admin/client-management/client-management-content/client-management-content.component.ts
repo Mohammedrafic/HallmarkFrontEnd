@@ -5,14 +5,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { FilterService } from '@shared/services/filter.service';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
-import { OrganizationStatus, Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
+import { OrganizationStatus, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import {
   Organization,
   OrganizationDataSource,
@@ -83,7 +82,7 @@ export class ClientManagementContentComponent
     super(store);
     this.idFieldName = 'organizationId';
     this.fileName = 'Organizations ' + datePipe.transform(Date.now(), 'MM/dd/yyyy');
-    store.dispatch(new SetHeaderState({ title: 'Organization List', iconName: 'file-text' }));
+    store.dispatch(new SetHeaderState({ title: 'Organization List', iconName: 'organization', custom: true }));
     this.OrganizationFilterFormGroup = this.fb.group({
       searchTerm: new FormControl(''),
       businessUnitNames: new FormControl([]),

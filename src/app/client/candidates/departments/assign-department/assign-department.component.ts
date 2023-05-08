@@ -37,12 +37,13 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormService } from '../services/department-form.service';
 import { OptionFields } from '@client/order-management/constants';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT, RECORD_ADDED, RECORD_MODIFIED, WARNING_TITLE } from '@shared/constants';
 import { CustomFormGroup } from '@core/interface';
 import { departmentName } from '../helpers/department.helper';
 import { findSelectedItems } from '@core/helpers';
 import { mapperSelectedItems } from '@shared/components/tiers-dialog/helper';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-assign-department',
@@ -75,12 +76,14 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     locationIds: false,
     departmentIds: false,
   };
+  public deptdatas : any;
 
   public constructor(
     private readonly cdr: ChangeDetectorRef,
     private readonly departmentService: DepartmentsService,
     private readonly departmentFormService: DepartmentFormService,
-    private readonly store: Store
+    private readonly store: Store,
+    private readonly confirmService: ConfirmService,
   ) {
     super();
   }
@@ -97,6 +100,14 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     if (changes['departmentHierarchy']?.currentValue) {
       this.dataSource.regions = this.departmentHierarchy;
       this.disableToggles = !this.dataSource.regions.length;
+      this.deptdatas = mapperSelectedItems(mapperSelectedItems(this.dataSource.regions, 'locations'), 'departments');
+      if(this.deptdatas.length == 0){
+        this.disableToggles = true;
+        this.dataSource.regions = [];
+      } else {
+        this.disableToggles = false
+      }
+      this.cdr.markForCheck();
     }
   }
 
@@ -212,11 +223,32 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       });
   }
 
+  private editDepartmentHandler(): Observable<boolean> {
+    return this.confirmService.confirm(EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT, {
+      title: WARNING_TITLE,
+      okButtonLabel: 'Yes',
+      okButtonClass: 'ok-button',
+    });
+  }
+
   private saveAssignedDepartment(): Observable<DepartmentPayload> {
     const formData = this.assignDepartmentForm.getRawValue();
 
     if (this.departmentId) {
-      return this.departmentService.editAssignedDepartments(formData, [this.departmentId]);
+      // Show pop up if start | end | orientation are changed
+      if (
+            this.assignDepartmentForm.controls['startDate'].dirty ||
+            this.assignDepartmentForm.controls['endDate'].dirty ||
+            this.assignDepartmentForm.controls['orientationDate'].dirty
+         ) {
+              return this.editDepartmentHandler().pipe(
+                filter(Boolean),
+                switchMap(() => {
+                  return this.departmentService.editAssignedDepartments(formData, [this.departmentId as number]);
+                }));
+           } else {
+            return this.departmentService.editAssignedDepartments(formData, [this.departmentId]);
+           }
     } else {
       return this.departmentService.assignNewDepartment(formData);
     }

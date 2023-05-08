@@ -52,7 +52,7 @@ export const AvailabilityRestrictionColumnDef = (
   {
     field: AvailabilityFilterColumns.END_TIME,
     headerName: 'End Time',
-    width: 160,
+    flex: 1,
     valueFormatter: (params: ValueFormatterParams) =>
       params.value && formatDate(params.value, formatTime, 'en-US', 'UTC'),
   },

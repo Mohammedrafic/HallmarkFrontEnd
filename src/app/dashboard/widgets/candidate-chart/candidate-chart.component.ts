@@ -22,6 +22,8 @@ export class CandidateChartComponent  {
   @Input() public description: string;
   @Input() public isDarkTheme: boolean;
   @Input() public isLTAOrderEnding: boolean = false;
+  @Input() public isCandidateApplied: boolean = false;
+
   
 
   private mousePosition = {

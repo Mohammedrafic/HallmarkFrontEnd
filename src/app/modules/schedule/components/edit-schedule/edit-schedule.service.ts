@@ -32,6 +32,7 @@ export class EditScheduleService {
       oncall: [false],
       charge: [false],
       preceptor: [false],
+      meal: [true],
     }) as CustomFormGroup<ScheduledShiftForm>;
   }
 
@@ -47,6 +48,7 @@ export class EditScheduleService {
       oncall: [false],
       charge: [false],
       preceptor: [false],
+      meal: [true],
     }) as CustomFormGroup<ScheduledShiftForm>;
   }
 

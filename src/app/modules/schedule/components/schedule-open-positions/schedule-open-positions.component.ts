@@ -1,10 +1,12 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { CdkDragStart } from '@angular/cdk/drag-drop';
 
-import { filter, map, takeUntil } from 'rxjs';
+import { map, takeUntil } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
 import { OpenPositionService } from '../../services';
 import { OpenPositionsList, OpenPositionState, Positions } from '../../interface';
+import { InitialDragEvent } from './open-position.constant';
 
 @Component({
   selector: 'app-schedule-open-positions',
@@ -14,6 +16,8 @@ import { OpenPositionsList, OpenPositionState, Positions } from '../../interface
 })
 export class ScheduleOpenPositionsComponent extends Destroyable implements OnInit {
   public openPositions: OpenPositionsList[];
+
+  private previousOpenPositionState: OpenPositionsList[];
 
   constructor(
     private openPositionService: OpenPositionService,
@@ -34,10 +38,29 @@ export class ScheduleOpenPositionsComponent extends Destroyable implements OnIni
     return card.publicId;
   }
 
+  public dragStart(event: CdkDragStart): void {
+    const shiftDate = event.source.data.shiftEndTime.split('T');
+    this.openPositionService.setDragEvent({
+      action: true,
+      date: shiftDate[0],
+    });
+
+    this.previousOpenPositionState = JSON.parse(JSON.stringify(this.openPositions));
+
+    if(event.source.data.openPositions > 1) {
+      this.openPositionService.updateDragElementCounter(event);
+    }
+  }
+
+  public dragEnd(): void {
+    this.openPositionService.setDragEvent(InitialDragEvent);
+    this.openPositions = this.previousOpenPositionState;
+    this.cdr.markForCheck();
+  }
+
   private watchForOpenPositions(): void {
     this.openPositionService.getOpenPositionsStream()
       .pipe(
-        filter((state: OpenPositionState) => !!state.initialPositions.length),
         map((state: OpenPositionState) => this.openPositionService.getOpenPositionsBySelectedSlots(state)),
         map((positions: OpenPositionsList[]) => this.openPositionService.prepareOpenPositions(positions)),
         takeUntil(this.componentDestroy()),

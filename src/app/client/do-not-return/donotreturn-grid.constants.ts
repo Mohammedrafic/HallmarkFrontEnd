@@ -5,13 +5,13 @@ export const MasterDNRExportCols: MasterDoNotReturnExportColumn[] = [
   { text: 'first name', column: 'FirstName' },
   { text: 'middle name', column: 'MiddleName' },
   { text: 'last name', column: 'LastName' },
-  {text: 'RegionName',column:'RegionName'},
-  {text: 'LocationName',column:'LocationName'},
+  {text: 'RegionName',column:'RegionBlocked'},
+  {text: 'LocationName',column:'LocationBlocked'},
   { text: 'email', column: 'EMAIL' },
   { text: 'ssn', column: 'SSN' },
-  { text: 'dnrStatus', column: 'DNRStatus' },
-  { text: 'dnrDate', column: 'DNRDate' },
-  { text: 'dnrComment', column: 'DNRComment' },
+  { text: 'dnrStatus', column: 'CurrentStatus' },
+  { text: 'dnrDate', column: 'LastUpdatedDate' },
+  { text: 'dnrComment', column: 'ReasonForBlocking' },
 ];
 
 export const doNotReturnFilterConfig: FilterConfig = {

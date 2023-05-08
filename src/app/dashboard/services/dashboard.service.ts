@@ -60,6 +60,7 @@ import { AgencyPositionModel } from '../models/agency-position.model';
 import { ExpiryDetailsModel } from '../models/expiry.model';
 import { RnUtilizationModel } from '../models/rnutilization.model';
 import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetWorkCommitment } from '../models/rn-utilization.model';
+import { AvailableEmployeeModel } from '../models/available-employee.model';
 
 @Injectable()
 export class DashboardService {
@@ -86,9 +87,10 @@ export class DashboardService {
     [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
     [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters),
     [WidgetTypeEnum.AGENCY_POSITION_COUNT]: (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
-    [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => of(null), //Empty loader. Data is loaded in the component due to load order for lookups
+      [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => of(null), //Empty loader. Data is loaded in the component due to load order for lookups
     [WidgetTypeEnum.ALREADY_EXPIRED_CREDS]: (filters: DashboartFilterDto) => this.getalreadyExpiredCredentials(filters),
     [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpiredCredentials(filters),
+    [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -344,11 +346,15 @@ export class DashboardService {
   }
 
   private getalreadyExpiredCredentials(filter: DashboartFilterDto) : Observable<ExpiryDetailsModel[]> {
-    return this.httpClient.get<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`);
+    return this.httpClient.post<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`, { ...filter }).pipe(
+      map((data)=> data)
+    );
   }
 
   private getupcomingExpiredCredentials(filter: DashboartFilterDto) : Observable<ExpiryDetailsModel[]> {
-    return this.httpClient.get<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`);
+    return this.httpClient.post<ExpiryDetailsModel[]>(`${this.baseUrl}/get-expiry-tracking`, { ...filter }).pipe(
+      map((data)=> data)
+    );
   }
 
   private getActivePositionWidgetData(filter: DashboartFilterDto): Observable<AccumulationChartModel> {
@@ -379,12 +385,17 @@ export class DashboardService {
   public redirectToUrlWithAgencyposition(url: string,orderStatus? :number,condition? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,condition: condition} });
   }
-  public redirect_to_credentials(url : string, startDate? : Date, endDate? : Date, type? : number) : void {
-    this.router.navigate([url], { state: { redirectedFromDashboard: true , startDate: startDate,endDate: endDate, type : type} });
+  public redirect_to_already_expired_credentials(url : string, endDate? : Date, type? : number) : void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , endDate: endDate, type : type} });
+  }
+  public redirect_to_expiring_credentials(url : string,startDate? : Date,  endDate? : Date, type? : number) : void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true ,startDate: startDate, endDate: endDate, type : type} });
   }
   private getTasksWidgetData(): Observable<string> {
     return of('temporary-collapsed-widget-tasks');
   }
+
+
 
   private getChatWidgetData(): Observable<string> {
     return of('assets/icons/temporary-widget-chat.png');
@@ -480,5 +491,9 @@ export class DashboardService {
 
   public filterNursingWidget(data : GetNursingUtilizationbyByFilters): Observable<GetNursingWidgetData> {
     return this.httpClient.post<GetNursingWidgetData>(`${this.baseUrl}/get-nursing-utilization-by-filters`, data);
+  }
+
+  public getAvailableEmployee(): Observable<AvailableEmployeeModel[]> {
+    return this.httpClient.get<AvailableEmployeeModel[]>(`/api/Schedules/AvailableEmployee`);
   }
 }

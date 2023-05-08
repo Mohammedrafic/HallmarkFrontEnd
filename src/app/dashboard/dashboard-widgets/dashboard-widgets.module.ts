@@ -20,6 +20,7 @@ import { CandidateChartModule } from '../widgets/candidate-chart/candidate-chart
 import { RnUtilizationWidgetModule } from '../widgets/rn-utilization-widget/rn-utilization-widget.module';
 import { AlreadyExpiredCredsModule } from '../widgets/already-expired-creds/already-expired-creds.module';
 import { UpcomingExpCredsModule } from '../widgets/upcoming-exp-creds/upcoming-exp-creds.module';
+import { AvailableEmployeeModule } from '../widgets/available-employee/available-employee.module'
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -42,6 +43,7 @@ import { UpcomingExpCredsModule } from '../widgets/upcoming-exp-creds/upcoming-e
     RnUtilizationWidgetModule,
     AlreadyExpiredCredsModule,
     UpcomingExpCredsModule,
+    AvailableEmployeeModule,
     NgxsModule.forFeature([ UserState])
   ]
 })

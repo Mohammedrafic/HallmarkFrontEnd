@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
@@ -32,6 +33,7 @@ const icons = { Sliders };
     ButtonModule,
     TooltipContainerModule,
     InlineChipsModule,
+    DragDropModule,
   ],
   providers: [
     ScheduleApiService,

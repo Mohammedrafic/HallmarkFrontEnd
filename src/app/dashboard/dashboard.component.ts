@@ -3,13 +3,13 @@ import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
 import { Select, Store } from '@ngxs/store';
 import type { PanelModel, DashboardLayoutComponent } from '@syncfusion/ej2-angular-layouts';
-import { Observable, takeUntil, distinctUntilChanged, switchMap, combineLatest, map, filter, BehaviorSubject } from 'rxjs';
+import { Observable, takeUntil, distinctUntilChanged, switchMap, combineLatest, map, filter, BehaviorSubject, tap } from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
 import lodashMap from 'lodash/fp/map';
 
 import { SetHeaderState } from '../store/app.actions';
 import { DashboardService } from './services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, GetAllSkills } from './store/dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, GetAllSkills, SetDashboardWidgetFilter } from './store/dashboard.actions';
 import { DashboardState, DashboardStateModel } from './store/dashboard.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { WidgetDataDependenciesAggregatedModel } from './models/widget-data-dependencies-aggregated.model';
@@ -92,6 +92,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     this.subscribeOnPermissions();
     this.getDashboardFilterState();
     this.setWidgetsData();
+    this.setWidgetFilter();
     this.store.dispatch(new GetDashboardData());
     this.store.dispatch(new GetAllSkills());
     const user = this.store.selectSnapshot(UserState.user);
@@ -101,7 +102,14 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     else{
       this.UserType=0;
     }
-   
+
+  }
+  setWidgetFilter() {
+    this.filterData$.pipe(
+      takeUntil(this.destroy$),
+      tap((value) =>
+      this.store.dispatch(new SetDashboardWidgetFilter(value)))
+    ).subscribe();
   }
 
   private getAdminOrganizationsStructureAll(): void {
@@ -249,7 +257,9 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
       if (
         panel.id === WidgetTypeEnum.FILLED_POSITIONS ||
         panel.id === WidgetTypeEnum.IN_PROGRESS_POSITIONS ||
-        panel.id === WidgetTypeEnum.OPEN_POSITIONS
+        panel.id === WidgetTypeEnum.OPEN_POSITIONS || 
+        panel.id === WidgetTypeEnum.Candidate_Applied_In_Last_N_Days ||
+        panel.id === WidgetTypeEnum.LTA_ORDER_ENDING
       ) {
         return { ...panel, sizeY: 0.3, maxSizeY: 0.3, minSizeY: 0.3 };
       } else {

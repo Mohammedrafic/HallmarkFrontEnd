@@ -7,7 +7,7 @@ import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 import { BreakpointObserverService } from '@core/services';
 import { Select, Store } from '@ngxs/store';
 import { OrientationColumnDef, OrientationHistoricalDataColumnDef } from '@organization-management/orientation/constants/orientation.constant';
-import { OrientationTab } from '@organization-management/orientation/enums/orientation-type.enum';
+import { OrientationTab, OrientationTypeDataSource } from '@organization-management/orientation/enums/orientation-type.enum';
 import { clearFormControl, setDataSourceValue } from '@organization-management/orientation/helpers/orientation-dialog.helper';
 import { OrientationConfiguration, OrientationConfigurationFilters, OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
 import { OrientationService } from '@organization-management/orientation/services/orientation.service';
@@ -26,6 +26,7 @@ import { SkillCategory } from '@shared/models/skill-category.model';
 import { Skill } from '@shared/models/skill.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { FilterService } from '@shared/services/filter.service';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { filter, Observable, takeUntil } from 'rxjs';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -39,6 +40,7 @@ import { UserState } from 'src/app/store/user.state';
 @TakeUntilDestroy
 export class OrientationGridComponent extends AbstractPermissionGrid implements OnInit {
   @Input() public isActive: boolean;
+  @Input() public isFilter: boolean;
   @Input() public gridTitle: string;
   @Input() public dataSource: OrientationConfigurationPage;
   @Input() public orientationTab: OrientationTab;
@@ -69,7 +71,8 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     new EventEmitter<any>();
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
   public readonly orientationTabEnum = OrientationTab;
-
+  public orientationTypeDataSource = OrientationTypeDataSource;
+  public fields: FieldSettingsModel = { text: 'text', value: 'id' };
   public columnDef: ColumnDefinitionModel[];
   public allRegions: OrganizationRegion[];
   public locations: OrganizationLocation[];
@@ -85,6 +88,11 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   };
   public optionFields = {
     text: 'name',
+    value: 'id',
+  };
+
+  public optionField = {
+    text: 'text',
     value: 'id',
   };
   public gridActionsParams = {
@@ -115,6 +123,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   public override ngOnInit(): void {
     super.ngOnInit();
     this.watchForOrgChange();
+    this.watchForOrientation();
     this.watchForSkills();
     this.watchForRegions();
     this.watchForLocation();
@@ -158,6 +167,17 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
       });
   }
 
+  private watchForOrientation(): void {
+    this.filtersForm?.get('orientationIDs')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((value: number[]) => {
+        setDataSourceValue(this.filterColumns, 'orientationIDs', this.orientationTypeDataSource);
+        this.generateFilteredChips();
+        this.cd.markForCheck();
+       });
+  }
+
+
   private watchForLocation(): void {
     this.filtersForm?.get('locationIds')?.valueChanges
       .pipe(takeUntil(this.componentDestroy()))
@@ -190,7 +210,6 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
           ? value.flatMap((categoryId: number) => this.skills.filter((skill: Skill) => skill.categoryId === categoryId))
           : this.skills;
         setDataSourceValue(this.filterColumns, 'skillIds', sortByField(skills, 'name'));
-        clearFormControl(value, this.filtersForm, 'skillIds');
         this.generateFilteredChips();
         this.cd.markForCheck();
       });

@@ -1,7 +1,11 @@
+import { OrganizationService } from './../../shared/services/organization.service';
+import { LogiReportService } from './../../shared/services/logi-report.service';
 import {
   AgencyDto,
   CandidateStatusAndReasonFilterOptionsDto,
   MasterSkillDto,
+  StaffScheduleReportFilterOptions,
+  workCommitmentDto,
 } from './../analytics/models/common-report.model';
 import { Injectable } from '@angular/core';
 import { UserSubscriptionPage, UserSubscriptionRequest } from '@shared/models/user-subscription.model';
@@ -20,10 +24,15 @@ import {
   GetGroupEmailById,
   GetGroupEmailCandidates,
   GetGroupEmailCandidateStatuses,
+  GetGroupEmailDepartmentSkills,
+  GetGroupEmailEmployees,
   GetGroupEmailInternalUsers,
   GetGroupEmailRoles,
   GetGroupEmailSkills,
+  GetGroupEmailWorkCommitments,
   GetGroupMailByBusinessUnitIdPage,
+  GetOrganizationById,
+  GetStaffScheduleReportFilterOptions,
   GetTemplateByAlertId,
   GetUserSubscriptionPage,
   SaveTemplateByAlertId,
@@ -55,6 +64,7 @@ import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '../../shared/enums/message-types';
 import { User } from '@shared/models/user.model';
 import { DOCUMENT_DOWNLOAD_SUCCESS } from '@shared/constants/messages';
+import { Organization } from '@shared/models/organization.model';
 
 interface AlertsStateModel {
   userSubscriptionPage: UserSubscriptionPage | null;
@@ -71,10 +81,15 @@ interface AlertsStateModel {
   groupEmailUserData: User;
   groupEmailAgencyData: AgencyDto;
   groupEmailSkillsData: MasterSkillDto;
+  groupEmailDeptSkillsData: MasterSkillDto;
   groupEmailCandidateStatusData: CandidateStatusAndReasonFilterOptionsDto;
   groupEmailCandidateData: User;
+  groupEmailEmployeeData: User;
   documentPreviewDetail : DownloadDocumentDetail;
   documentDownloadDetail : DownloadDocumentDetail;
+  getStaffScheduleReportFilterOptions: StaffScheduleReportFilterOptions | null;
+  groupEmailWorkCommitmentData: workCommitmentDto;
+  organization: Organization | null;
 }
 
 @Injectable()
@@ -132,6 +147,10 @@ export class AlertsState {
     return state.groupEmailSkillsData;
   }
   @Selector()
+  static GetGroupEmailDeptSkills(state: AlertsStateModel): MasterSkillDto {
+    return state.groupEmailDeptSkillsData;
+  }
+  @Selector()
   static GetGroupEmailCandidateStatuses(state: AlertsStateModel): CandidateStatusAndReasonFilterOptionsDto {
     return state.groupEmailCandidateStatusData;
   }
@@ -139,25 +158,48 @@ export class AlertsState {
   static GetGroupEmailCandidates(state: AlertsStateModel): User {
     return state.groupEmailCandidateData;
   }
+  
+  @Selector()
+  static GetGroupEmailEmployees(state: AlertsStateModel): User {
+    return state.groupEmailEmployeeData;
+  }
+
   @Selector()
   static documentDownloadDetail(state: AlertsStateModel): DownloadDocumentDetail | null {
     return state.documentDownloadDetail;
   }
 
+  @Selector()
+  static getStaffScheduleReportOptionData(state: AlertsStateModel):
+  StaffScheduleReportFilterOptions | null {
+    return state.getStaffScheduleReportFilterOptions;
+  }
+
+  @Selector()
+  static GetGroupEmailWorkCommitments(state: AlertsStateModel): workCommitmentDto {
+    return state.groupEmailWorkCommitmentData;
+  }
+
+  @Selector()
+  static getOrganizationData(state: AlertsStateModel):Organization | null {
+    return state.organization;
+  }
 
   constructor(
     private businessUnitService: BusinessUnitService,
     private alertsService: AlertsService,
-    private groupEmailService: GroupEmailService
+    private groupEmailService: GroupEmailService,
+    private logiReportService: LogiReportService,
+    private organizationService: OrganizationService
   ) {}
 
   @Action(GetUserSubscriptionPage)
   GetUserSubscriptionPage(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { userId, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters }: GetUserSubscriptionPage
+    { userId, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters, isIRP }: GetUserSubscriptionPage
   ): Observable<UserSubscriptionPage | void> {
     return this.alertsService
-      .getUserSubscriptionPage(businessUnitType, userId, pageNumber, pageSize, sortModel, filterModel, filters)
+      .getUserSubscriptionPage(businessUnitType, userId, pageNumber, pageSize, sortModel, filterModel, filters, isIRP)
       .pipe(
         tap((payload) => {
           patchState({ userSubscriptionPage: payload });
@@ -187,10 +229,10 @@ export class AlertsState {
   @Action(GetAlertsTemplatePage)
   GetAlertsTemplatePage(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters }: GetAlertsTemplatePage
+    { businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters, isIRP }: GetAlertsTemplatePage
   ): Observable<AlertsTemplatePage | void> {
     return this.alertsService
-      .getAlertsTemplatePage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters)
+      .getAlertsTemplatePage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters, isIRP)
       .pipe(
         tap((payload) => {
           patchState({ alertsTemplatePage: payload });
@@ -205,9 +247,9 @@ export class AlertsState {
   @Action(GetTemplateByAlertId)
   GetTemplateByAlertId(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { alertId, alertChannel, businessUnitId }: GetTemplateByAlertId
+    { alertId, alertChannel, businessUnitId, businessUnitType, isIRP }: GetTemplateByAlertId
   ): Observable<EditAlertsTemplate | void> {
-    return this.alertsService.getTemplateByAlertId(alertId, alertChannel, businessUnitId).pipe(
+    return this.alertsService.getTemplateByAlertId(alertId, alertChannel, businessUnitId, businessUnitType, isIRP).pipe(
       tap((payload) => {
         patchState({ editAlertsTemplate: payload });
         return payload;
@@ -458,4 +500,84 @@ export class AlertsState {
     );
   }
 
+  @Action(GetGroupEmailDepartmentSkills)
+  GetGroupEmailDepartmentSkills(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    { departmentIds, businessUnitId }: GetGroupEmailDepartmentSkills
+  ): Observable<MasterSkillDto | void> {
+    return this.groupEmailService.GetGroupEmailDepartmentSkills(departmentIds, businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ groupEmailDeptSkillsData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetGroupEmailEmployees)
+  GetGroupEmailEmployees(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    {
+      businessUnitId,
+      regions,
+      locations,
+      departments,
+      skills,
+      workCommitments,
+      orientationComplete      
+    }: GetGroupEmailEmployees
+  ): Observable<User | void> {
+    return this.groupEmailService
+      .GetGroupEmailEmployees(businessUnitId, regions, locations, departments, skills, workCommitments, orientationComplete)
+      .pipe(
+        tap((payload) => {
+          patchState({ groupEmailEmployeeData: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
+  }
+
+  @Action(GetStaffScheduleReportFilterOptions)
+  GetStaffScheduleReportFilterOptions({ patchState }: StateContext<AlertsStateModel>, { filter }: any): Observable<StaffScheduleReportFilterOptions> {
+    return this.logiReportService.getStaffScheduleReportOptions(filter).pipe(tap((payload: any) => {
+      patchState({ getStaffScheduleReportFilterOptions: payload });
+      return payload
+    }));
+  }
+
+  @Action(GetGroupEmailWorkCommitments)
+  GetGroupEmailWorkCommitments(
+    { dispatch, patchState }: StateContext<AlertsStateModel>,
+    {
+      businessUnitId,
+      regions,
+      locations,      
+      skills      
+    }: GetGroupEmailWorkCommitments
+  ): Observable<workCommitmentDto | void> {
+    return this.groupEmailService
+      .GetGroupEmailWorkCommitments(businessUnitId, regions, locations, skills)
+      .pipe(
+        tap((payload) => {
+          patchState({ groupEmailWorkCommitmentData: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
+  }
+  @Action(GetOrganizationById)
+  GetOrganizationById({ patchState }: StateContext<AlertsStateModel>, { businessUnitId }: 
+    GetOrganizationById): Observable<Organization> {
+    return this.organizationService.getOrganizationById(businessUnitId).pipe(tap((payload) => {
+      patchState({ organization: payload });      
+      return payload;
+    }));
+  }
 }

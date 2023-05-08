@@ -1,7 +1,8 @@
-import { FieldType, InputAttrType, UserPermissions } from "@core/enums";
-import { DropdownOption } from "@core/interface";
-import { ScheduleFormSourceKeys, ScheduleItemType } from "src/app/modules/schedule/constants";
+import { FieldType, InputAttrType, UserPermissions } from '@core/enums';
+import { DropdownOption } from '@core/interface';
+import { ScheduleFormSourceKeys, ScheduleItemType } from 'src/app/modules/schedule/constants';
 import { ScheduleItemAttributes } from './schedule.interface';
+import * as ScheduleInt from './index';
 
 export interface ScheduleForm {
   shiftId: number;
@@ -13,6 +14,7 @@ export interface ScheduleForm {
   onCall?: boolean;
   charge?: boolean;
   preceptor?: boolean;
+  meal?: boolean;
 }
 
 export interface ScheduleFormConfig {
@@ -32,6 +34,11 @@ export interface ScheduleFormFieldConfig {
   show?: boolean;
   inputType?: InputAttrType;
   sourceKey?: ScheduleFormSourceKeys;
+}
+
+export interface CreateScheduleTypesConfig {
+  columnsTemplate: string;
+  source: ReadonlyArray<ScheduleInt.ScheduleTypeRadioButton>;
 }
 
 export interface ScheduleTypeRadioButton {
@@ -68,6 +75,7 @@ export interface Schedule {
   endTime: string | null;
   unavailabilityReasonId: number | null;
   employeeScheduledDays: EmployeeScheduledDay[];
+  createOrder: boolean;
 }
 
 export interface ScheduleBook extends ScheduleItemAttributes{

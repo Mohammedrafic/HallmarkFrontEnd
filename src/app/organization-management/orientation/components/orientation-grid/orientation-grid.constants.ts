@@ -2,7 +2,7 @@ import { ControlTypes, ValueType } from "@shared/enums/control-types.enum";
 import { MasterOrientationExportColumn } from "./orientation-grid.interface";
 
 export const MasterOrientationExportCols: MasterOrientationExportColumn[] = [
-  { text: 'Orientation Type', column: 'OrientationType' },
+  { text: 'Orientation Type', column: 'OrientationTypes' },
 { text: 'Start Date', column: 'Startdate' },
 { text: 'End Date', column: 'EndDate' },
 {text: 'Region',column:'RegionName'},

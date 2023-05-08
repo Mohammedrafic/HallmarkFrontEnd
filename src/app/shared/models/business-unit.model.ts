@@ -4,4 +4,5 @@ export class BusinessUnit {
   name: string;
   parentUnitId: number;
   agencyStatus: number;
+  isIRPEnabled?: boolean;
 }

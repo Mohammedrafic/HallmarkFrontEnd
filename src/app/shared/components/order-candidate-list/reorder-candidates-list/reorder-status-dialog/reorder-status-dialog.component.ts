@@ -11,6 +11,7 @@ import { AbstractControl, FormControl } from '@angular/forms';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
+  GetCandidateCancellationReason,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
@@ -37,7 +38,7 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { CandidatesStatusText } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
 import { JobCancellation } from "@shared/models/candidate-cancellation.model";
-import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import PriceUtils from '@shared/utils/price.utils';
@@ -65,6 +66,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   @Select(OrderManagementContentState.applicantStatuses)
   applicantStatuses$: Observable<ApplicantStatus[]>;
+
+  @Select(OrderManagementContentState.getCandidateCancellationReasons)
+  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
 
   @Input() openEvent: Subject<boolean>;
   @Input() candidate: OrderCandidatesList;
@@ -121,7 +125,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   get showAccept(): boolean {
     return (
       this.isAgency &&
-      ![CandidatStatus.BillRatePending, CandidatStatus.OnBoard, CandidatStatus.Rejected].includes(
+      ![CandidatStatus.BillRatePending, CandidatStatus.OnBoard, CandidatStatus.Rejected, CandidatStatus.Offboard,
+        CandidatStatus.Cancelled].includes(
         this.currentCandidateApplicantStatus
       )
     );
@@ -172,7 +177,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   private statuses: ApplicantStatus[];
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
-
+  public candidateCancellationReasons: CandidateCancellationReason[] | null;
 
   constructor(
     private store: Store,
@@ -346,6 +351,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.acceptForm.markAllAsTouched();
     if (!this.acceptForm.errors && this.orderCandidateJob) {
       const value = this.acceptForm.getRawValue();
+      const rates = this.getBillRateForUpdate(bill);
+
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
@@ -359,11 +366,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
               applicantStatus: this.orderCandidateJob.applicantStatus.applicantStatus,
               statusText: this.orderCandidateJob.applicantStatus.statusText,
             },
-            billRates: this.getBillRateForUpdate(bill),
+            billRates: rates,
+            billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.orderCandidateJob.candidatePayRate,
           })
         )
         .subscribe(() => {
+          this.deleteUpdateFieldInRate();
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
         });
     }
@@ -419,9 +428,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: DateTimeHelper.formatDateUTC(reOrderDate as string, 'MM/dd/yyyy'),
-      shiftStartTime: DateTimeHelper.convertDateToUtc(shiftStartTime.toString()),
-      shiftEndTime: DateTimeHelper.convertDateToUtc(shiftEndTime.toString()),
+      orderOpenDate: DateTimeHelper.convertDateToUtc(reOrderDate as string),
+      shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
+      shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
       rejectReason,
@@ -433,6 +442,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       clockId: clockId,
     });
     this.enableFields();
+    this.subscribeCandidateCancellationReasons();
   }
 
   private getNewApplicantStatus(): ApplicantStatus {
@@ -677,5 +687,31 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       actualStartDate: DateTimeHelper.toUtcFormat(initDate),
       actualEndDate: DateTimeHelper.toUtcFormat(initDate),
     };
+  }
+
+  private deleteUpdateFieldInRate(): void {
+    this.candidateJob?.billRates.filter((rate) => Object.prototype.hasOwnProperty.call(rate, 'isUpdated'))
+    .forEach((rate) => {
+      delete rate.isUpdated;
+    });
+  }
+
+  private checkForBillRateUpdate(rates: BillRate[]): boolean {
+    return rates.some((rate) => !!rate.isUpdated);
+  }
+
+  private subscribeCandidateCancellationReasons() {
+    if (this.orderCandidateJob) {
+      let payload: CandidateCancellationReasonFilter = {
+        locationId: this.orderCandidateJob?.order.locationId,
+        regionId: this.orderCandidateJob?.order.regionId
+      };
+      this.store.dispatch(new GetCandidateCancellationReason(payload));
+      this.candidateCancellationReasons$
+        .pipe().subscribe((value) => {
+          this.candidateCancellationReasons =value;
+        });
+
+    }
   }
 }

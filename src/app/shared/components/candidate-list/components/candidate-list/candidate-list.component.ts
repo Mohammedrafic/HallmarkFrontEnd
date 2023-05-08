@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   debounceTime,
   filter,
@@ -9,6 +9,8 @@ import {
   takeUntil,
   takeWhile,
   tap,
+  fromEvent,
+  Subscription,
   distinctUntilChanged,
 } from 'rxjs';
 import { FormGroup } from '@angular/forms';
@@ -54,7 +56,7 @@ import { ExportColumn, ExportOptions } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { isNil } from 'lodash';
-import { ERROR_START_LESS_END_DATE, optionFields, regionFields } from '@shared/constants';
+import { END_DATE_REQUIRED, ERROR_START_LESS_END_DATE, optionFields, regionFields } from '@shared/constants';
 import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
 import { filterColumns, IRPCandidates, IRPFilterColumns, VMSCandidates } from './candidate-list.constants';
 import { Permission } from '@core/interface';
@@ -68,11 +70,14 @@ import { DepartmentHelper } from '@client/candidates/departments/helpers/departm
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { SystemType } from '@shared/enums/system-type.enum';
-import { DateTimeHelper, areArraysEqual } from '@core/helpers';
+import { DateTimeHelper } from '@core/helpers';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { MessageTypes } from '@shared/enums/message-types';
+import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
+import { CandidateListScroll } from './candidate-list.enum';
+import { OutsideZone } from '@core/decorators';
 
 @Component({
   selector: 'app-candidate-list',
@@ -160,9 +165,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     { text: 'Region', column: 'Region' },
   ];
   public columnsToExportIrp: ExportColumn[] = [
-    { text: 'Id', column: 'Id' },
-    { text: 'Name', column: 'Name' },
-    { text: 'Profile Status', column: 'Status' },
+    { text: 'Emp Id', column: 'EmpId' },
+    { text: 'Emp Name', column: 'EmpName' },
+    { text: 'Profile Status', column: 'ProfileStatus' },
     { text: 'Primary Skill', column: 'PrimarySkill' },
     { text: 'Secondary Skill', column: 'SecondarySkill' },
     { text: 'Location', column: 'Location' },
@@ -187,6 +192,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private unsubscribe$: Subject<void> = new Subject();
   private isAlive = true;
   private activeTab: number;
+  private scrollSubscription: Subscription;
 
   constructor(
     private store: Store,
@@ -197,6 +203,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     private filterService: FilterService,
     private datePipe: DatePipe,
     private candidateListService: CandidateListService,
+    private scrollService: ScrollRestorationService,
+    private readonly ngZone: NgZone,
   ) {
     super();
   }
@@ -238,18 +246,48 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFilterApply(): void {
-    if(new Date(this.CandidateFilterFormGroup.get("endDate")?.value) >= new Date(this.CandidateFilterFormGroup.get("startDate")?.value)){
+    if(this.isIRP){
+      if (this.CandidateFilterFormGroup.get("startDate") != null && this.CandidateFilterFormGroup.get("endDate") != null) {
+        if (new Date(this.CandidateFilterFormGroup.get("endDate")?.value) >= new Date(this.CandidateFilterFormGroup.get("startDate")?.value)){
+          if (this.CandidateFilterFormGroup.dirty) {
+            this.filters = this.CandidateFilterFormGroup.getRawValue();
+            this.filters.profileStatuses = this.filters.profileStatuses || [];
+            this.filters.regionsNames = this.filters.regionsNames || [];
+            this.filters.skillsIds = this.filters.skillsIds || [];
+            this.filters.candidateName = this.filters.candidateName || null;
+            this.filters.expiry = {
+              type: this.filters.credType || [],
+              startDate: this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
+              endDate: this.filters.endDate ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
+            };
+            this.saveFiltersByPageName(this.filters);
+            this.dispatchNewPage();
+            this.store.dispatch(new ShowFilterDialog(false));
+            this.CandidateFilterFormGroup.markAsPristine();
+          } else {
+            this.store.dispatch(new ShowFilterDialog(false));
+          }
+       }
+          else {
+            this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_START_LESS_END_DATE));
+           }
+        }
+        else {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, END_DATE_REQUIRED));
+      } 
+    } else {
       if (this.CandidateFilterFormGroup.dirty) {
         this.filters = this.CandidateFilterFormGroup.getRawValue();
         this.filters.profileStatuses = this.filters.profileStatuses || [];
         this.filters.regionsNames = this.filters.regionsNames || [];
         this.filters.skillsIds = this.filters.skillsIds || [];
         this.filters.candidateName = this.filters.candidateName || null;
-        this.filters.expiry = {
-          type : this.filters.credType || [],
-          startDate : this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
-          endDate : this.filters.endDate  ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
-        };
+        this.filters.hireDate = this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
+          this.filters.expiry = {
+            type: this.filters.credType || [],
+            startDate: this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
+            endDate: this.filters.endDate ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
+          };
 
         this.saveFiltersByPageName(this.filters);
         this.dispatchNewPage();
@@ -258,8 +296,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       } else {
         this.store.dispatch(new ShowFilterDialog(false));
       }
-    } else {
-      this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_START_LESS_END_DATE));
     }
   }
 
@@ -274,6 +310,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public dataBound(): void {
     this.grid.hideScroll();
     this.contentLoadedHandler();
+    this.createScrollSubscription();
+    this.checkScroll();
   }
 
   public onRowsDropDownChanged(): void {
@@ -417,7 +455,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       hireDate: this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
       includeDeployedCandidates: this.includeDeployedCandidates,
       expiry : {
-        type : this.filters.credType!,
+        type : this.filters.credType! ? this.filters.credType! : [],
         startDate : this.filters.startDate! ? DateTimeHelper.toUtcFormat(this.filters.startDate!) : null,
         endDate : this.filters.endDate! ? DateTimeHelper.toUtcFormat(this.filters.endDate!) : null,
       },
@@ -431,11 +469,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       candidates &&
       candidates.map((candidate: CandidateRow) => {
         if (candidate.candidateProfileSkills.length > 2) {
-          const [first, second] = candidate.candidateProfileSkills;
-          candidate = {
-            ...candidate,
-            candidateProfileSkills: [first, second, { skillDescription: '...' }],
-          };
+          // const [first, second] = candidate.candidateProfileSkills;
+          // candidate = {
+          //   ...candidate,
+          //   candidateProfileSkills: [first, second, { skillDescription: '...' }],
+          // };
         }
         if (candidate.candidateProfileRegions.length > 2) {
           const [first, second] = candidate.candidateProfileRegions;
@@ -488,7 +526,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private dispatchInitialIcon(): void {
-    this.store.dispatch(new SetHeaderState({ title: this.isIRP ? 'Employees' : 'Candidates', iconName: 'clock' }));
+    this.store.dispatch(new SetHeaderState({ title: this.isIRP ? 'Employees' : 'Candidates', iconName: 'users' }));
   }
 
 
@@ -712,5 +750,45 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private getStructure(): Observable<OrganizationStructure> | Observable<string[]> {
     const structure$ = this.isAgency ? this.regions$ : this.organizationStructure$;
     return structure$;
+  }
+
+  @OutsideZone
+  private checkScroll(): void {
+    setTimeout(() => {
+      this.checkScrollPosition();
+    }, 500);
+  }
+
+  private createScrollSubscription(): void {
+    if (!this.scrollSubscription) {
+      const element = this.grid.element.querySelectorAll('.e-content')[0];
+
+      this.scrollSubscription = fromEvent(element, 'scroll')
+      .pipe(
+        debounceTime(500),
+        map(() => {
+          return element.scrollTop;
+        }),
+        distinctUntilChanged(),
+        takeUntil(this.unsubscribe$),
+      )
+      .subscribe((position) => {
+        this.scrollService.setScrollPosition(CandidateListScroll.CandidateList, position);
+      });
+    }
+  }
+
+  public checkScrollPosition(): void {
+    const scrollValue = this.scrollService.getScrollPosition(CandidateListScroll.CandidateList);
+
+    if (scrollValue === undefined) {
+      this.scrollService.createScrollPositionStorage(CandidateListScroll.CandidateList);
+    } else {
+      this.restoreScrollPosition(scrollValue);
+    }
+  }
+
+  private restoreScrollPosition(position: number): void {
+    this.grid.element.querySelectorAll('.e-content')[0].scrollTop = position;
   }
 }

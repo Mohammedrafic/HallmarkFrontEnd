@@ -1,7 +1,10 @@
 export const addLeadingZero = (val: number) => (val < 10 ? '0' + val : val);
+
 export const getTime = (val: Date) =>
   addLeadingZero(val.getHours()) + ':' + addLeadingZero(val.getMinutes()) + ':' + addLeadingZero(val.getSeconds());
+
 export const getHoursMinutesSeconds = (val: string /** HH:mm:ss */) => val.split(':').map((val) => parseInt(val));
+
 export const militaryToStandard = (val: string /** HH:mm:ss */) => {
   let [h, m, s] = getHoursMinutesSeconds(val);
   let suffix = h >= 12 ? 'PM' : 'AM';
@@ -9,6 +12,10 @@ export const militaryToStandard = (val: string /** HH:mm:ss */) => {
   let sM = m.toString().length === 1 ? '0' + m : m;
   return sH + ':' + sM + ' ' + suffix;
 };
+
+/**
+ * DO NOT USE THIS FUNCTION. It's not working properly.
+ */
 export const toCorrectTimezoneFormat = (value: Date | string): any => {
   if (value) {
     const valueDate = new Date(value);
@@ -50,10 +57,9 @@ export const addDays = (date: string | Date, days: number): Date | null => {
 export const convertMsToTime = (milliseconds: number): string => {
   const seconds = Math.floor(milliseconds / 1000);
   let minutes = Math.floor(seconds / 60);
-  let hours = Math.floor(minutes / 60);
+  const hours = Math.floor(minutes / 60);
 
   minutes = minutes % 60;
-  hours = hours % 24;
 
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 };

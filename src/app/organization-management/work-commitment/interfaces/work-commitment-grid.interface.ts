@@ -16,32 +16,40 @@ export interface WorkCommitmentOrgHierarchies {
   locationName: string;
 }
 
+export interface WorkCommitmentDetailsGroup {
+  items: WorkCommitmentDetails[];
+  id: string;
+  name: string;
+}
+
 export interface WorkCommitmentDetails {
-  availabilityRequirement: number;
+  availabilityRequirement: number | null;
   comments: string;
-  criticalOrder: number;
+  criticalOrder: number | null;
   departmentId: number;
   departmentName: string;
-  holiday: number;
-  startDate: string | null;
+  holiday: number | null;
+  startDate: string;
   endDate: string | null;
   jobCode: string;
   masterWorkCommitmentId: number;
   masterWorkCommitmentName: string;
-  minimumWorkExperience: number;
-  schedulePeriod: number;
+  minimumWorkExperience: number | null;
+  schedulePeriod: number | null;
   skills: ListOfSkills[];
   workCommitmentId: number;
   workCommitmentOrgHierarchies: WorkCommitmentOrgHierarchies[];
+  allRegionsSelected :boolean;
+  allLocationsSelected :boolean;
 }
 
 export interface WorkCommitmentGrid {
-  availabilityRequirement: number;
+  availabilityRequirement: number | null;
   comments: string;
-  criticalOrder: number;
+  criticalOrder: number | null;
   departmentId: number;
   departmentName: string;
-  holiday: number;
+  holiday: number | null;
   startDate: string | null;
   endDate: string | null;
   jobCode: string;
@@ -49,13 +57,15 @@ export interface WorkCommitmentGrid {
   locationIds: number[];
   masterWorkCommitmentId: number;
   masterWorkCommitmentName: string;
-  minimumWorkExperience: number;
+  minimumWorkExperience: number | null;
   regionName: string[];
   regionIds: string[];
-  schedulePeriod: number;
+  schedulePeriod: number | null;
   skillNames: string[];
   skillIds: number[];
   workCommitmentId: number;
+ allRegionsSelected :boolean;
+  allLocationsSelected :boolean;
 }
 
 export type WorkCommitmentsPage = PageOfCollections<WorkCommitmentDetails>;

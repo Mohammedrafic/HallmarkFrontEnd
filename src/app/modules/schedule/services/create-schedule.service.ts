@@ -17,7 +17,9 @@ import { UserState } from 'src/app/store/user.state';
 import { CreateScheduleItem } from '../components/schedule-items/schedule-items.interface';
 import * as ScheduleInt from '../interface';
 import {
-  EmployeeBookingDay, OpenPositionParams,
+  CreateScheduleTypesConfig,
+  EmployeeBookingDay,
+  OpenPositionParams,
   ScheduleBookingErrors,
   ScheduleCandidate,
   ScheduleDay,
@@ -32,6 +34,8 @@ import { ScheduleClassesList, ScheduleCustomClassesList, ToggleControls } from '
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { ScheduleType } from '../enums';
 import { BookingsOverlapsResponse } from '../components/replacement-order-dialog/replacement-order.interface';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ORIENTED_SHIFT_CHANGE_CONFIRM_TEXT, WARNING_TITLE } from '@shared/constants/messages';
 
 @Injectable()
 export class CreateScheduleService {
@@ -52,6 +56,7 @@ export class CreateScheduleService {
     private store: Store,
     private scheduleFiltersService:  ScheduleFiltersService,
     private weekService: DateWeekService,
+    private readonly confirmService: ConfirmService,
   ) {}
 
   createOpenPositionsForm(): CustomFormGroup<ScheduleInt.ScheduleForm> {
@@ -93,6 +98,7 @@ export class CreateScheduleService {
       onCall: [false],
       charge: [false],
       preceptor: [false],
+      meal: [true],
     }) as CustomFormGroup<ScheduleInt.ScheduleForm>;
   }
 
@@ -127,6 +133,7 @@ export class CreateScheduleService {
       endTime: getTime(endTime),
       unavailabilityReasonId,
       shiftId: shiftId !== customShiftId ? shiftId : null,
+      createOrder: false,
     };
   }
 
@@ -146,6 +153,7 @@ export class CreateScheduleService {
       onCall,
       charge ,
       preceptor,
+      meal,
     } = scheduleForm.getRawValue();
 
     return  {
@@ -161,6 +169,7 @@ export class CreateScheduleService {
       onCall: onCall || false,
       charge: charge || false,
       preceptor: preceptor || false,
+      meal: meal || false,
     };
   }
 
@@ -197,6 +206,14 @@ export class CreateScheduleService {
         return ToggleControls.includes(configField.field);
       }).forEach((configField: ScheduleFormFieldConfig) => {
         configField.show = value;
+    });
+  }
+
+  public confirmEditing(): Observable<boolean> {
+    return this.confirmService.confirm(ORIENTED_SHIFT_CHANGE_CONFIRM_TEXT, {
+      title: WARNING_TITLE,
+      okButtonLabel: 'Ok',
+      okButtonClass: 'ok-button',
     });
   }
 
@@ -259,10 +276,10 @@ export class CreateScheduleService {
   }
 
   getScheduleTypesWithPermissions(
-    scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>,
+    scheduleTypes:CreateScheduleTypesConfig,
     userPermission: Permission
-  ): ReadonlyArray<ScheduleTypeRadioButton> {
-    let types = scheduleTypes.map((item: ScheduleTypeRadioButton) => {
+  ): CreateScheduleTypesConfig {
+    let types = scheduleTypes.source.map((item: ScheduleTypeRadioButton) => {
       return {
         ...item,
         disabled: !userPermission[item.permission],
@@ -273,11 +290,14 @@ export class CreateScheduleService {
       types = types.filter((type: ScheduleTypeRadioButton) => type.value !== ScheduleItemType.Book);
     }
 
-    return types;
+    return {
+      columnsTemplate: this.getScheduleTypeColumnsTemplate(types),
+      source: types,
+    };
   }
 
-  getFirstAllowedScheduleType(scheduleTypes:ReadonlyArray<ScheduleTypeRadioButton>): ScheduleItemType {
-    return (scheduleTypes.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
+  getFirstAllowedScheduleType(scheduleTypes: CreateScheduleTypesConfig): ScheduleItemType {
+    return (scheduleTypes.source.find((item: ScheduleTypeRadioButton) => !item.disabled) as ScheduleTypeRadioButton)?.value;
   }
 
   updateScheduleFormClass(scheduleType: ScheduleItemType, isCustom: boolean): string {
@@ -410,5 +430,9 @@ export class CreateScheduleService {
     } else {
       control?.enable();
     }
+  }
+
+  private getScheduleTypeColumnsTemplate(types: ScheduleTypeRadioButton[]): string {
+    return types.length > 3 ? 'auto auto auto auto' : `repeat(${types.length},1fr)`;
   }
 }

@@ -477,6 +477,7 @@ hr {
 @import './controls/custom-buttons';
 @import './controls/dropdownbutton.scss';
 @import './controls/menu.scss';
+@import './controls/open-positions';
 @import 'text';
 
 a, a:hover, a:focus, a:active {
@@ -608,7 +609,7 @@ body.dark .title, body.dark .contact-name {
   height: calc(74vh - 164px) !important;
   overflow: auto;
 }
-  
+
 .document-grid {
   height: calc(89vh - 164px) !important;
 }
@@ -645,4 +646,7 @@ svg.svg-inline--fa.fa-users , svg.feather.feather-eye, svg.feather.feather-eye-o
 svg.svg-inline--fa.fa-lock,  svg.svg-inline--fa.fa-unlock{
   width: 17px;
   height: 17px;
+}
+.item6 .datepicker {
+  width: 150px;
 }

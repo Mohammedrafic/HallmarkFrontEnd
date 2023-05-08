@@ -56,7 +56,7 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { downloadBlobFile } from '@shared/utils/file.utils';
-import { SetHeaderState, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import {
   AllowedCredentialFileExtensions,
@@ -83,8 +83,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() isCandidateAssigned = false;
   @Input() userPermission: Permission;
   @Input() employee: string | null;
-  @Input() isIRP: boolean = false;
-  @Input() isActive: boolean = true;
+  @Input() isIRP = false;
+  @Input() isActive = true;
   @Input() set employeeId(value: number | null | undefined) {
     if (value) {
       this.candidateProfileId = value;
@@ -222,7 +222,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     private ngZone: NgZone,
   ) {
     super();
-    this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
     this.candidateProfileId = Number(this.route.snapshot.paramMap.get('id'));
   }
 
@@ -257,7 +256,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public openAddCredentialDialog(): void {
     this.store.dispatch(new GetCredentialStatuses(this.isOrganizationSide, this.orderId || null));
-    this.store.dispatch(new GetMasterCredentials('', ''));
+    this.store.dispatch(new GetMasterCredentials('', '', this.orderId));
 
     this.store
       .dispatch(new ShowSideDialog(true))
@@ -498,7 +497,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public addMissingCredentials(): void {
     this.candidateService.getMissingCredentials(this.candidateProfileId).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
-    })
+    });
   }
 
   private closeSideDialog(): void {
@@ -585,7 +584,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       )
       .subscribe(() => {
         this.store.dispatch(
-          new GetMasterCredentials(this.searchTermControl?.value || '', this.credentialTypeIdControl?.value || '')
+          new GetMasterCredentials(this.searchTermControl?.value || '', this.credentialTypeIdControl?.value || '', this.orderId)
         );
       });
   }
@@ -704,7 +703,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.actions$
       .pipe(ofActionSuccessful(GetCredentialStatusesSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((payload: { statuses: CredentialStatus[] }) => {
-        this.credentialStatusOptions = this.credentialGridService.getCredentialStatusOptions(payload.statuses);
+        this.credentialStatusOptions = this.credentialGridService.getCredentialStatusOptions(payload.statuses, this.isIRP);
         this.addCredentialForm.patchValue({ status: this.credentialStatus });
       });
   }
@@ -725,7 +724,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         disableEdit: this.disableEdit(item),
         disableViewDocument:this.disableViewDocument(item),
         showDisableEditTooltip:
-          (item.status === this.statusEnum.Reviewed || item.status === this.statusEnum.Verified) &&
+          (item.status === this.statusEnum.Reviewed) &&
           !this.isOrganizationSide,
         disableDelete: this.disableDelete(item),
       };
@@ -749,7 +748,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return (
       !this.areAgencyActionsAllowed ||
       item.id === this.orderCredentialId ||
-      ((item.status === this.statusEnum.Reviewed || item.status === this.statusEnum.Verified) &&
+      ((item.status === this.statusEnum.Reviewed) &&
         !this.isOrganizationSide) ||
       (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
     );

@@ -142,12 +142,16 @@
     margin-right: 34px;
   }
 
-  .remove-schedule {
+  .remove-schedule-wrapper {
     flex-grow: 1;
+  }
+
+  .remove-schedule {
+    width: 100%;
     color: $supportive-red !important;
     border-color: $supportive-red;
 
-    &:hover {
+    &:hover:not([disabled]) {
       background-color: unset !important;
       border-color: $supportive-red-20 !important;
       color: $supportive-red-20 !important;;
@@ -157,7 +161,7 @@
 
 .scheduled-availability-form {
   display: grid;
-  grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
+  grid-template-columns: 3.2fr 2.2fr 2.2fr 1.8fr;
   grid-template-rows: 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
@@ -174,7 +178,7 @@
 
 .scheduled-unavailability-form {
   display: grid;
-  grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
+  grid-template-columns: 3.2fr 2.2fr 2.2fr 1.8fr;
   grid-template-rows: 1fr 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
@@ -193,8 +197,8 @@
 
 .scheduled-shift-form {
   display: grid;
-  grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
-  grid-template-rows: 1fr 1fr 0.4fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 3.2fr 2.2fr 2.2fr 1.8fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
@@ -220,8 +224,8 @@
 
 .new-shift-form {
   display: grid;
-  grid-template-columns: 3.3fr 2fr 2fr 1.6fr;
-  grid-template-rows: 1fr 1fr 0.4fr;
+  grid-template-columns: 3.2fr 2.2fr 2.2fr 1.8fr;
+  grid-template-rows: 1fr 1fr 1fr;
   gap: 12px;
   grid-auto-flow: row;
   grid-template-areas:
@@ -240,9 +244,10 @@
 .switch-wrap {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: 1fr 1fr;
   grid-template-areas:
-    "toggle1 toggle2 toggle3 toggle4 toggle5";
+    "toggle1 toggle2 toggle3 toggle4 toggle5"
+    "meal meal meal meal meal";
   grid-area: switch-wrap;
 }
 
@@ -293,5 +298,9 @@
 ::ng-deep {
   label {
     margin-bottom: 0 !important;
+  }
+
+  .tooltip-container {
+    width: 100%;
   }
 }

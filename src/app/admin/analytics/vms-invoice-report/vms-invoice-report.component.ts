@@ -14,7 +14,7 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetCommonReportFilterOptions,  GetLogiReportData, } from '@organization-management/store/logi-report.action';
+import { GetCommonReportFilterOptions, GetLogiReportData, } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -26,9 +26,9 @@ import { User } from '@shared/models/user.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
-import { AgencyDto,  CommonReportFilter, CommonReportFilterOptions } from '../models/common-report.model';
+import { AgencyDto, CommonReportFilter, CommonReportFilterOptions } from '../models/common-report.model';
 import { OutsideZone } from "@core/decorators";
-import { vmsInvoiceConstants,analyticsConstants, Month, Year, InvoiceStatus } from '../constants/analytics.constant';
+import { vmsInvoiceConstants, analyticsConstants, Month, Year, InvoiceStatus } from '../constants/analytics.constant';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { uniqBy } from 'lodash';
 
@@ -166,7 +166,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.loadYearAndMonth();
       this.loadInvoiceStatus();
-     
+
       this.CommonReportFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
           this.filterOptionsData = data;
@@ -201,7 +201,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
 
   private initForm(): void {
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate()-6);
+    startDate.setDate(startDate.getDate() - 6);
     let endDate = new Date(Date.now());
     endDate.setDate(endDate.getDate());
     this.vmsInvoiceReportForm = this.formBuilder.group(
@@ -377,7 +377,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
       }
     }
     let { departmentIds, locationIds,
-      regionIds, agencyIds, startDate, endDate,year,month,invoiceStatus,invoiceId } = this.vmsInvoiceReportForm.getRawValue();
+      regionIds, agencyIds, startDate, endDate, year, month, invoiceStatus, invoiceId } = this.vmsInvoiceReportForm.getRawValue();
     if (!this.vmsInvoiceReportForm.dirty) {
       this.message = "Default filter selected with all regions ,locations and departments for last 7 days";
     }
@@ -386,12 +386,10 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
       this.message = ""
     }
 
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
-    departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
 
     let currentDate = new Date(Date.now());
 
@@ -504,7 +502,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
   public onFilterClearAll(): void {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() -6);
+    startDate.setDate(startDate.getDate() - 6);
     let endDate = new Date(Date.now());
     endDate.setDate(endDate.getDate());
     this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
@@ -546,7 +544,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
   }
   @OutsideZone
   private onFilterChild(e: FilteringEventArgs) {
- 
+
   }
 
 }

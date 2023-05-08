@@ -2,7 +2,8 @@
   <div class="header-item">
     <div class="header-item__sidebar-menu" *ngIf="isMobile$ | async" (click)="toggleSidebar()"></div>
     <ng-container *ngIf="headerState$ | async as headerState">
-      <i-feather name="{{ headerState?.iconName }}" class="icon"></i-feather>
+      <i-feather *ngIf="!headerState?.custom" name="{{ headerState?.iconName }}" class="icon"></i-feather>
+      <app-custom-icon *ngIf="headerState?.custom" name="{{ headerState?.iconName }}" class="icon"></app-custom-icon>
       <h1 class="header-title">{{ headerState?.title }}</h1>
     </ng-container>
   </div>
@@ -105,7 +106,8 @@
                   (click)="selectMenuItem(data)"
                   (mouseenter)="showContextMenu(data, $event)"
                 >
-                  <i-feather [name]="data.icon" class="icon"></i-feather>
+                  <app-custom-icon *ngIf="data.custom" [name]="data.icon" class="icon"></app-custom-icon>
+                  <i-feather *ngIf="!data.custom" [name]="data.icon" class="icon"></i-feather>
                   <span class="e-text">{{ data.title }}</span>
                   <span class="e-badge e-badge-success e-badge-circle" *ngIf="data.count">{{ data.count }}</span>
                 </section>
@@ -204,16 +206,13 @@
       <h5 class="alert-title-header-body-color">Notifications</h5>
     </div>
     <div class="closebtn">
-      <div class="e-row item-clear">
-        <span (click)="alertSideBarClearAllClick()">Clear All</span>
-      </div>
       <button ejs-button id="close" class="e-btn close-btn" title="Close" (click)="alertSideBarCloseClick()">
         <fa-icon [icon]="faTimes"></fa-icon>
       </button>
     </div>
   </div>
 
-  <div id="listcontainer">
+  <div id="listcontainer" #uiElement  (scroll)="onScrollLoadData()">
     <section class="alert-body">
       <section class="alert-panel" *ngFor="let item of alerts">
         <div class="alert-panel-header">
@@ -239,14 +238,8 @@
           (click)="getContentDetails(item.organizationId, item.orderId,item.alertTitle)"
           [innerHTML]="item.content"
         ></div>
-        <div class="alert-panel-footer">
-          <div class="alert-panel-footer__footer_flex-child"></div>
-          <div class="alert-panel-footer__footer_flex-child" (click)="alertDismiss(item.id)">
-            <i-feather name="check-circle"></i-feather>
-            <div class="dismiss-text"><span>Dismiss</span></div>
-          </div>
-        </div>
       </section>
+      <p *ngIf="!scrollData">{{loadMoreCotent}}</p>
     </section>
   </div>
 </ejs-sidebar>

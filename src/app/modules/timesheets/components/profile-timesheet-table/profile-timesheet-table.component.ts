@@ -218,6 +218,11 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.listenResizeContent();
   }
 
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.resizeObserver.detach();
+  }
+
   public onTabSelect(selectEvent: SelectingEventArgs): void {
     this.isFirstSelected = false;
 
@@ -525,6 +530,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         )
         .subscribe((disabled: boolean) => {
           this.isEditEnabled = !disabled && !!currentTabMapping.get(this.currentTab);
+          this.isApproveBtnEnabled = !disabled && !!currentTabMapping.get(this.currentTab);
           this.cd.markForCheck();
         });
     } else {

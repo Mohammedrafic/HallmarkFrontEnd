@@ -2,9 +2,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, Input, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OutsideZone } from '@core/decorators';
-import { DateTimeHelper } from '@core/helpers';
+import { DateTimeHelper, distinctByKey, groupBy } from '@core/helpers';
 import { Select, Store } from '@ngxs/store';
-import { WorkCommitmentDetails } from '@organization-management/work-commitment/interfaces';
+import { WorkCommitmentDetails, WorkCommitmentDetailsGroup, WorkCommitmentOrgHierarchies, WorkCommitmentsPage } from '@organization-management/work-commitment/interfaces';
 import { DatepickerComponent } from '@shared/components/form-controls/datepicker/datepicker.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -22,9 +22,10 @@ import { uniq } from 'lodash';
 import { catchError, distinctUntilChanged, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { CandidateWorkCommitment, WorkCommitmentDataSource } from '../../models/candidate-work-commitment.model';
+import { CandidateWorkCommitment } from '../../models/candidate-work-commitment.model';
 import { CandidateWorkCommitmentService } from '../../services/candidate-work-commitment.service';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
+import { commonRangesValidator } from '@shared/validators/date.validator';
 
 @Component({
   selector: 'app-candidate-work-commitment-dialog',
@@ -50,7 +51,11 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   organizationStructure$: Observable<OrganizationStructure>;
 
   public title: string;
-  public workCommitments: WorkCommitmentDataSource[] = [];
+  public workCommitments: WorkCommitmentDetailsGroup[] = [];
+  public allWorkCommitments: WorkCommitmentDetails[] = [];
+  public workCommitmentGroup: WorkCommitmentDetailsGroup;
+  public selectedRegions: OrganizationRegion[];
+  public selectedRegionLocations: OrganizationLocation[];
   public holidays: { id: number, name: number }[] = [];
   public regions: OrganizationRegion[] = [];
   public allRegions: OrganizationRegion[] = [];
@@ -60,7 +65,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public employeeId: number;
   public sortOrder = SortOrder;
   public formatPayRate = '#.###';
-  public readonly commitmentFields = {
+  public readonly fields = {
     text: 'name',
     value: 'id',
   };
@@ -74,6 +79,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public minimumDate: Date | undefined;
   public maximumDate: Date | undefined;
   public startDate: Date;
+  public showCommonRangesError: boolean = false;
 
 
   constructor(
@@ -100,11 +106,24 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.startDate = event;
   }
 
+  public getPayRateById(event: any) {
+    if (event.itemData.id > 0) {
+      this.candidateWorkCommitmentService.getPayRateById(event.itemData.id)
+        .subscribe((payrate: number) => {
+          if (payrate) {
+            this.candidateWorkCommitmentForm.controls['payRate'].setValue(payrate);
+          }
+          this.cd.detectChanges();
+        });
+    }
+  }
+
   private createForm(): void {
     this.candidateWorkCommitmentForm = this.fb.group({
       id: [0],
       employeeId: [this.employeeId],
-      workCommitmentId: [null, Validators.required],
+      workCommitmentIds: [[], Validators.required],
+      masterWorkCommitmentId: [null],
       regionIds: [[], Validators.required],
       locationIds: [[], Validators.required],
       startDate: [null, Validators.required],
@@ -120,14 +139,14 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     });
   }
 
-  private getCommitmentRegionsFromHierarchy(commitment: WorkCommitmentDetails): number[] {
-    let regions = commitment.workCommitmentOrgHierarchies.map((val) => val.regionId);
+  private getCommitmentRegionsFromHierarchy(workCommitmentOrgHierarchies: WorkCommitmentOrgHierarchies[]): number[] {
+    let regions = workCommitmentOrgHierarchies.map((val) => val.regionId);
     regions = uniq(regions);
     return regions;
   }
 
-  private getCommitmentLocationsFromHierarchy(commitment: WorkCommitmentDetails): number[] {
-    let locations = commitment.workCommitmentOrgHierarchies.map((val) => val.locationId);
+  private getCommitmentLocationsFromHierarchy(workCommitmentOrgHierarchies: WorkCommitmentOrgHierarchies[]): number[] {
+    let locations = workCommitmentOrgHierarchies.map((val) => val.locationId);
     locations = uniq(locations);
     return locations;
   }
@@ -140,12 +159,154 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.locations = locations.filter((location) => this.selectedLocations.indexOf(location.locationId as number) > -1);
   }
 
-  private populateFormWithMasterCommitment(commitment: WorkCommitmentDetails): void {
-    const regions = this.getCommitmentRegionsFromHierarchy(commitment);
-    const locations = this.getCommitmentLocationsFromHierarchy(commitment);
+  private populateRegionsLocations(commitmentGroup: WorkCommitmentDetailsGroup): void {
+    const workCommitmentOrgHierarchies: WorkCommitmentOrgHierarchies[] = [];
+    commitmentGroup.items.forEach(item => {
+      workCommitmentOrgHierarchies.push(...item.workCommitmentOrgHierarchies);
+    });
+    const regions = this.getCommitmentRegionsFromHierarchy(workCommitmentOrgHierarchies);
     this.setRegionsDataSource(regions);
-    this.candidateWorkCommitmentForm.controls['regionIds'].setValue(regions);
-    this.candidateWorkCommitmentForm.controls['locationIds'].setValue(locations);
+  }
+
+  private isEveryValSame(selectedCommitments: WorkCommitmentDetails[], key: keyof WorkCommitmentDetails): boolean {
+    return selectedCommitments.every(item => {
+      return selectedCommitments[0][key] === item[key];
+    });
+  }
+
+  private getDatesOverlap(selectedCommitments: WorkCommitmentDetails[]): Date[] | null {
+    let start = new Date(selectedCommitments[0].startDate);
+    let end = selectedCommitments[0].endDate ? new Date(selectedCommitments[0].endDate) : null;
+    let overlap: boolean = true;
+
+    selectedCommitments.forEach(item => {
+      const currentStart = new Date(item.startDate);
+      const currentEnd = item.endDate ? new Date(item.endDate) : null;
+
+      if ((end && currentStart > end) || (end && currentEnd && currentEnd < start)) {
+        overlap = false;
+      } else {
+        start = new Date(Math.max(start.getTime(), currentStart.getTime()));
+        if (end === null || currentEnd === null) {
+          end = null;
+        } else {
+          end = new Date(Math.min(end.getTime(), currentEnd.getTime()));
+        }
+      }
+    });
+
+    return overlap ? ([start, end] as Date[]) : null;
+  }
+
+  private addValidators(): void {
+    this.candidateWorkCommitmentForm.controls['locationIds'].markAsTouched();
+    this.candidateWorkCommitmentForm.controls['locationIds'].markAsDirty();
+    this.candidateWorkCommitmentForm.controls['locationIds'].addValidators(commonRangesValidator());
+    this.candidateWorkCommitmentForm.controls['locationIds'].updateValueAndValidity();
+    this.candidateWorkCommitmentForm.controls['regionIds'].markAsTouched();
+    this.candidateWorkCommitmentForm.controls['regionIds'].markAsDirty();
+    this.candidateWorkCommitmentForm.controls['regionIds'].addValidators(commonRangesValidator());
+    this.candidateWorkCommitmentForm.controls['regionIds'].updateValueAndValidity();
+  }
+
+  private removeValidators(): void {
+    this.candidateWorkCommitmentForm.controls['locationIds'].removeValidators(commonRangesValidator());
+    this.candidateWorkCommitmentForm.controls['locationIds'].updateValueAndValidity();
+    this.candidateWorkCommitmentForm.controls['regionIds'].removeValidators(commonRangesValidator());
+    this.candidateWorkCommitmentForm.controls['regionIds'].updateValueAndValidity();
+    this.showCommonRangesError = false;
+  }
+
+  private generateGeneralCommitmentModel(workCommitmentIds: number[]): WorkCommitmentDetails {
+    const selectedCommitments = this.workCommitmentGroup.items.filter(item => {
+      return workCommitmentIds.includes(item.workCommitmentId)
+    });
+    const commonRange = this.getDatesOverlap(selectedCommitments);
+    if (!commonRange) {
+      this.showCommonRangesError = true;
+      this.addValidators();
+    } else {
+      this.removeValidators();
+    }
+    const commitment: WorkCommitmentDetails = {
+      availabilityRequirement: this.isEveryValSame(selectedCommitments, 'availabilityRequirement') ? selectedCommitments[0].availabilityRequirement : null,
+      comments: this.isEveryValSame(selectedCommitments, 'comments') ? selectedCommitments[0].comments : '',
+      criticalOrder: this.isEveryValSame(selectedCommitments, 'criticalOrder') ? selectedCommitments[0].criticalOrder : null,
+      endDate: commonRange && commonRange[1] ? commonRange[1].toString() : null,
+      holiday: this.isEveryValSame(selectedCommitments, 'holiday') ? selectedCommitments[0].holiday : null,
+      jobCode: this.isEveryValSame(selectedCommitments, 'jobCode') ? selectedCommitments[0].jobCode : '',
+      masterWorkCommitmentId: 0,
+      masterWorkCommitmentName: '',
+      minimumWorkExperience: this.isEveryValSame(selectedCommitments, 'minimumWorkExperience') ? selectedCommitments[0].minimumWorkExperience : null,
+      schedulePeriod: this.isEveryValSame(selectedCommitments, 'schedulePeriod') ? selectedCommitments[0].schedulePeriod : null,
+      skills: [],
+      startDate: commonRange ? commonRange[0].toString() : '',
+      workCommitmentId: 0,
+      workCommitmentOrgHierarchies: [],
+      departmentId: 0,
+      departmentName: '',
+      allRegionsSelected: false,
+      allLocationsSelected: false
+    }
+    return commitment;
+  }
+
+  private setDatesValidation(commitment: WorkCommitmentDetails): void {
+    const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
+    this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
+    this.minimumDate = this.setMinimumDate();
+    this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
+
+    this.setWCStartDate();
+  }
+
+  private commitmentGroupHandler(selectedSettings: WorkCommitmentOrgHierarchies[]): void {
+    if (selectedSettings.length > 1) {
+      // multiple commitments are selected
+      const workCommitmentIds = selectedSettings.map(item => item.workCommitmentId);
+      this.candidateWorkCommitmentForm.controls['workCommitmentIds'].setValue(workCommitmentIds);
+      const commitment = this.generateGeneralCommitmentModel(workCommitmentIds);
+      this.setDatesValidation(commitment);
+      this.populateFormWithMasterCommitment(commitment);
+    } else if (selectedSettings.length === 1) {
+      // single commitment is selected
+      this.removeValidators();
+      const commitment = this.workCommitmentGroup.items.find(item => item.workCommitmentId === selectedSettings[0].workCommitmentId)!;
+      this.setDatesValidation(commitment);
+      this.populateFormWithMasterCommitment(commitment);
+      this.candidateWorkCommitmentForm.controls['workCommitmentIds'].setValue([commitment.workCommitmentId]);
+    }
+  }
+
+  private populateWorkCommitment(): void {
+    if (this.selectedRegions?.length && this.workCommitmentGroup) {
+      const workCommitmentOrgHierarchies: WorkCommitmentOrgHierarchies[] = [];
+      this.workCommitmentGroup.items.forEach(item => {
+        workCommitmentOrgHierarchies.push(...item.workCommitmentOrgHierarchies);
+      });
+      const selectedHierarchies: WorkCommitmentOrgHierarchies[] = [];
+      this.selectedRegionLocations.forEach(location => {
+        selectedHierarchies.push(...workCommitmentOrgHierarchies.filter((item => item.locationId === location.id)));
+      });
+      const selectedSettings = distinctByKey(selectedHierarchies, 'workCommitmentId');
+      this.commitmentGroupHandler(selectedSettings);
+    }
+  }
+
+  private resetForm(): void {
+    this.removeValidators();
+    this.candidateWorkCommitmentForm.controls['jobCode'].setValue(null);
+    this.candidateWorkCommitmentForm.controls['availRequirement'].setValue(null);
+    this.candidateWorkCommitmentForm.controls['schedulePeriod'].setValue(null);
+    this.candidateWorkCommitmentForm.controls['minWorkExperience'].setValue(null);
+    this.candidateWorkCommitmentForm.controls['criticalOrder'].setValue(null);
+    this.candidateWorkCommitmentForm.controls['holiday'].setValue(null);
+    this.candidateWorkCommitmentForm.controls['comment'].setValue(null);
+    this.candidateWorkCommitmentForm.controls['startDate'].setValue(null);
+    this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
+  }
+
+  private populateFormWithMasterCommitment(commitment: WorkCommitmentDetails): void {
     this.candidateWorkCommitmentForm.controls['jobCode'].setValue(commitment.jobCode);
     this.candidateWorkCommitmentForm.controls['availRequirement'].setValue(commitment.availabilityRequirement);
     this.candidateWorkCommitmentForm.controls['schedulePeriod'].setValue(commitment.schedulePeriod);
@@ -162,46 +323,46 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     setTimeout(() => this.startDatePicker.datepicker.refresh());
   }
 
+  private resetFields(): void {
+    this.candidateWorkCommitmentForm.controls['regionIds'].setValue([]);
+    this.candidateWorkCommitmentForm.controls['locationIds'].setValue([]);
+  }
+
   private getWorkCommitmentById(
-    id: number,
+    id: number, // group id (master commitment id)
     candidateCommitment: CandidateWorkCommitment | null = null,
     populateForm = true
   ): void {
-    this.candidateWorkCommitmentService.getWorkCommitmentById(id)
-      .subscribe((commitment: WorkCommitmentDetails) => {
-        const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
+    this.resetFields();
+    this.workCommitmentGroup = this.workCommitments.find(group => +group.id === +id)!;
+    const workCommitmentOrgHierarchies: WorkCommitmentOrgHierarchies[] = [];
+    this.workCommitmentGroup.items.forEach(item => {
+      workCommitmentOrgHierarchies.push(...item.workCommitmentOrgHierarchies);
+    });
+    this.selectedLocations = this.getCommitmentLocationsFromHierarchy(workCommitmentOrgHierarchies);
 
-        this.selectedLocations = this.getCommitmentLocationsFromHierarchy(commitment);
-        this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
-        this.minimumDate = this.setMinimumDate();
-        this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
-
-        this.setWCStartDate();
-
-        if (populateForm) {
-          this.populateFormWithMasterCommitment(commitment);
-        } else {
-          const regions = this.getCommitmentRegionsFromHierarchy(commitment);
-          this.setRegionsDataSource(regions);
-          if (candidateCommitment) {
-            this.candidateWorkCommitmentForm.patchValue(candidateCommitment as {}, { emitEvent: false });
-            this.candidateWorkCommitmentForm.controls['regionIds'].setValue(candidateCommitment.regionIds);
-            this.candidateWorkCommitmentForm.controls['locationIds'].setValue(candidateCommitment.locationIds);
-            this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
-          }
-          this.refreshDatepicker();
-          this.cd.detectChanges();
-        }
-      });
+    this.populateRegionsLocations(this.workCommitmentGroup);
+    if (!populateForm) {
+      if (candidateCommitment) {
+        this.candidateWorkCommitmentForm.controls['regionIds'].setValue(candidateCommitment.regionIds);
+        this.candidateWorkCommitmentForm.controls['locationIds'].setValue(candidateCommitment.locationIds);
+        this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].setValue('' + id, { emitEvent: false });
+        this.candidateWorkCommitmentForm.patchValue(candidateCommitment as {}, { emitEvent: false });
+        this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
+      }
+      this.refreshDatepicker();
+      this.cd.detectChanges();
+    }
   }
 
   private subscribeOnCommitmentDropdownChange(): void {
-    this.candidateWorkCommitmentForm.controls['workCommitmentId'].valueChanges
+    this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].valueChanges
       .pipe(takeUntil(this.destroy$), distinctUntilChanged())
       .subscribe((value) => {
-        if (value) {
+        if (value && this.title !== DialogMode.Edit) {
+          this.resetForm();
           this.resetStartDateField();
-          this.enableControls();
+          this.enableRegionLocation();
           this.getWorkCommitmentById(value);
         }
       });
@@ -231,12 +392,22 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private controlsStateHandler(disable: boolean): void {
     for (const control in this.candidateWorkCommitmentForm.controls) {
-      if (control !== 'workCommitmentId') {
+      if (control !== 'workCommitmentIds' && control !== 'masterWorkCommitmentId' && control !== 'regionIds' && control !== 'locationIds') {
         disable
           ? this.candidateWorkCommitmentForm.controls[control].disable()
           : this.candidateWorkCommitmentForm.controls[control].enable();
       }
     }
+  }
+
+  private enableRegionLocation(): void {
+    this.candidateWorkCommitmentForm.controls['regionIds'].enable();
+    this.candidateWorkCommitmentForm.controls['locationIds'].enable();
+  }
+
+  private disableRegionLocation(): void {
+    this.candidateWorkCommitmentForm.controls['regionIds'].disable();
+    this.candidateWorkCommitmentForm.controls['locationIds'].disable();
   }
 
   private disableControls(): void {
@@ -250,8 +421,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   private getCandidateWorkCommitmentById(commitment: CandidateWorkCommitment): void {
     this.candidateWorkCommitmentService.getCandidateWorkCommitmentById(commitment.id as number)
       .subscribe((commitment: CandidateWorkCommitment) => {
-        if (commitment.workCommitmentId) {
-          this.getWorkCommitmentById(commitment.workCommitmentId, commitment, false);
+        if (commitment.workCommitmentIds) {
+          const masterId = this.allWorkCommitments.find(item => item.workCommitmentId === commitment.workCommitmentIds[0])
+          masterId && this.getWorkCommitmentById(masterId.masterWorkCommitmentId, commitment, false);
         }
         commitment.startDate = commitment.startDate && DateTimeHelper.convertDateToUtc(commitment.startDate as string);
       });
@@ -269,9 +441,13 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         }
         this.title = value.isEdit ? DialogMode.Edit : DialogMode.Add;
         if (value.isEdit) {
+          this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].disable({ emitEvent: false });
+          this.enableRegionLocation();
           this.enableControls();
           this.setWorkCommitmentDataSource(value.commitment);
         } else {
+          this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].enable({ emitEvent: false });
+          this.disableRegionLocation();
           this.disableControls();
         }
         this.cd.markForCheck();
@@ -290,6 +466,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         takeUntil(this.destroy$)
       )
       .subscribe((val: number[]) => {
+        this.resetForm();
         if (val?.length) {
           const selectedRegions: OrganizationRegion[] = [];
           const locations: OrganizationLocation[] = [];
@@ -303,10 +480,35 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
           });
           this.locations.push(...sortByField(locations, 'name'));
           this.setLocationsDataSource(this.locations);
+          this.selectedRegions = selectedRegions;
         } else {
           this.locations = [];
+          this.selectedRegions = [];
+          this.resetForm();
         }
         this.candidateWorkCommitmentForm.controls['locationIds'].setValue([]);
+        this.cd.markForCheck();
+      });
+
+    this.candidateWorkCommitmentForm.controls['locationIds'].valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((val: number[]) => {
+        if (val?.length) {
+          this.selectedRegionLocations = [];
+          val.forEach((id) =>
+            this.selectedRegionLocations.push(this.locations.find((location) => location.id === id) as OrganizationLocation)
+          );
+          this.populateWorkCommitment();
+          this.enableControls();
+        } else {
+          this.resetForm();
+          this.selectedRegionLocations = [];
+          this.disableControls();
+        }
+
         this.cd.markForCheck();
       });
   }
@@ -320,8 +522,10 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private setWorkCommitmentDataSource(commitment?: CandidateWorkCommitment): void {
     this.candidateWorkCommitmentService.getAvailableWorkCommitments(this.employeeId)
-      .subscribe((commitments: WorkCommitmentDataSource[]) => {
-        this.workCommitments = commitments;
+      .subscribe((commitments: WorkCommitmentDetails[]) => {
+        const commitmentGroups = groupBy(commitments, ['masterWorkCommitmentId'], ['masterWorkCommitmentName']);
+        this.workCommitments = Object.keys(commitmentGroups).map(key => commitmentGroups[key]);
+        this.allWorkCommitments = commitments;
         if (commitment) {
           this.getCandidateWorkCommitmentById(commitment);
         }

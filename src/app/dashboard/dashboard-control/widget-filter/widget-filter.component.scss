@@ -1,6 +1,12 @@
 @import "colors";
+@import 'mixins';
+
 .input-container {
   margin-bottom: 15px;
+
+  .input-group {
+    margin-top: 5px;
+  }
 
   .input-group {
     position: relative;
@@ -12,6 +18,8 @@
     }
   }
 }
+
+@include regions-by-unit-options;
 
 .ordered-chips {
   &__section {

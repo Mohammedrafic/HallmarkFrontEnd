@@ -90,8 +90,10 @@ export class ReasonsService {
       }));
     } else if (params.selectedTab === ReasonsNavigationTabs.Closure) {
       var value = params.formValue as Closurevalue;
+      (value.includeInIRP == null) ? (value.includeInIRP = false) : "";
+      (value.includeInVMS == null) ? (value.includeInVMS = false) : "";
       var reasonvalue = {
-        id : null,
+        id : value.id || undefined,
         includeInIRP : this.selectedSystem.isIRP,
         includeInVMS : this.selectedSystem.isVMS,
         reason : params.formValue.reason
@@ -118,13 +120,16 @@ export class ReasonsService {
       }
     } else if (params.selectedTab === ReasonsNavigationTabs.Requisition) {
       var value = params.formValue as Closurevalue;
-      var reasonvalue = {
-        id : null,
+      (value.includeInIRP == null) ? (value.includeInIRP = false) : "";
+      (value.includeInVMS == null) ? (value.includeInVMS = false) : "";
+      var reqreasonvalue = {
+        id : value.id || undefined,
         includeInIRP : this.selectedSystem.isIRP,
         includeInVMS : this.selectedSystem.isVMS,
-        reason : params.formValue.reason
+        reason : params.formValue.reason,
+        isAutoPopulate : value.isAutoPopulate
       };
-      ((this.selectedSystem.isIRP && this.selectedSystem.isVMS) ? "" : value = reasonvalue as Closurevalue);
+      ((this.selectedSystem.isIRP && this.selectedSystem.isVMS) ? "" : value = reqreasonvalue as Closurevalue);
       if (params.isVMSIRP) {
         if ((value.includeInIRP == false) && (value.includeInVMS == false)) {
           this.store.dispatch(new ShowToast(MessageTypes.Error, REASON_WARNING));
@@ -134,6 +139,7 @@ export class ReasonsService {
             reason: value.reason,
             includeInVMS: !!value.includeInVMS,
             includeInIRP: !!value.includeInIRP,
+            isAutoPopulate : !!value.isAutoPopulate
           }));
         }
       } else {
@@ -142,6 +148,7 @@ export class ReasonsService {
           reason: value.reason,
           includeInVMS: !!value.includeInVMS,
           includeInIRP: !!value.includeInIRP,
+          isAutoPopulate : !!value.isAutoPopulate
         }));
       }
 

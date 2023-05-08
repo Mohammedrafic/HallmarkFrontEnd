@@ -14,7 +14,7 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState } from '@organization-management/store/logi-report.action';
+import { GetCommonReportFilterOptions, GetLogiReportData, GetCommonReportCandidateSearch, ClearLogiReportState } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -162,7 +162,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     private readonly ngZone: NgZone,
     @Inject(APP_SETTINGS) private appSettings: AppSettings) {
     this.baseUrl = this.appSettings.host.replace("https://", "").replace("http://", "");
-    this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
+    this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: 'pie-chart' }));
     this.initForm();
     this.user = this.store.selectSnapshot(UserState.user);
     if (this.user?.id != null) {

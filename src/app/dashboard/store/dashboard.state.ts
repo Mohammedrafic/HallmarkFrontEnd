@@ -20,6 +20,7 @@ import {
   GetAllCommitmentByPage,
   GetSkilldata,
   FilterNursingWidget,
+  SetDashboardWidgetFilter,
 } from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
@@ -30,8 +31,8 @@ import { DASHBOARD_FILTER_STATE, TIME_SELECTION_OF_CHART_LINE } from '@shared/co
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
-import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 import { GetNursingWidgetData, GetWorkCommitment } from '../models/rn-utilization.model';
+import { DashboartFilterDto } from '../models/dashboard-filter-dto.model';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
@@ -39,6 +40,7 @@ export interface DashboardStateModel {
   widgets: WidgetOptionModel[];
   isMobile: boolean;
   filteredItems: FilteredItem[];
+  filterData: DashboartFilterDto | null;
   positionTrendTimeSelection: TimeSelectionEnum;
   skills: AllOrganizationsSkill[];
   organizationSkills: AssignedSkillsByOrganization[];
@@ -57,6 +59,7 @@ export interface DashboardStateModel {
     widgets: [],
     isMobile: false,
     filteredItems: JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [],
+    filterData: null,
     positionTrendTimeSelection: JSON.parse(window.localStorage.getItem(TIME_SELECTION_OF_CHART_LINE) as string) || TimeSelectionEnum.Monthly,
     organizationSkills: [],
     skills: [],
@@ -132,6 +135,11 @@ export class DashboardState {
   @Selector()
   static nursingCount(state: DashboardStateModel): DashboardStateModel['nursingCount'] {
     return state.nursingCount;
+  }
+
+  @Selector()
+  static filterData(state: DashboardStateModel): DashboardStateModel['filterData'] {
+    return state.filterData;
   }
 
   public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
@@ -255,6 +263,15 @@ export class DashboardState {
         patchState({nursingCount : payload});
       }),
     )
+  }
+
+  @Action(SetDashboardWidgetFilter)
+  SetDashboardWidgetFilter(
+    { patchState }: StateContext<DashboardStateModel>,
+    { payload  }: SetDashboardWidgetFilter
+  ): DashboartFilterDto {
+      patchState({filterData: payload});
+      return payload;
   }
 
 }

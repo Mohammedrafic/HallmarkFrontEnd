@@ -2,7 +2,7 @@
   <ejs-grid
     #reasonGrid
     class="grid-component"
-    [dataSource]="(reasons$ | async)?.items"
+    [dataSource]="reqReason"
     [allowSorting]="allowSorting"
     [allowResizing]="true"
     [allowSelection]="false"
@@ -30,6 +30,7 @@
       </e-column>
       <e-column field="reason" headerText="Reason" textAlign="Left" width="100%"></e-column>
       <e-column  *ngIf="showSystem" field="system" headerText="System Config" textAlign="Left" width="100%"></e-column>
+      <e-column field="isAutoPopulate" headerText="Auto Populate" textAlign="Left" width="100%"></e-column>
     </e-columns>
 
     <ng-template #pagerTemplate let-data>

@@ -1,5 +1,4 @@
-import { ControlTypes } from '@shared/enums/control-types.enum';
-import { ValueType } from '@shared/enums/control-types.enum';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 
 export interface SettingFilterColumn<T> {
@@ -8,6 +7,7 @@ export interface SettingFilterColumn<T> {
   dataSource: T[],
   valueField?: 'name',
   valueId?: 'id',
+  checkBoxTitle?: string,
 }
 
 export interface SettingsFilterColsConfig {
@@ -15,6 +15,8 @@ export interface SettingsFilterColsConfig {
   locationIds: SettingFilterColumn<OrganizationLocation>,
   departmentIds: SettingFilterColumn<OrganizationDepartment>,
   attributes: SettingFilterColumn<string>,
+  includeInIRP?: SettingFilterColumn<boolean>,
+  includeInVMS?: SettingFilterColumn<boolean>,
 }
 
 export interface AutoGenerationPayload {
@@ -27,4 +29,10 @@ export interface AutoGenerationPayload {
 export interface SwitchValuePayload {
   isEnabled: boolean;
   value: number | null;
+}
+
+export interface PayPeriodPayload {
+  isEnabled: boolean;
+  noOfWeek: number;
+  date: Date;
 }
