@@ -314,6 +314,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
       this.initForms(value);
       this.setConfigDataSources();
+      this.setReasonAutopopulate();
       this.changeDetection.markForCheck();
     });
   }

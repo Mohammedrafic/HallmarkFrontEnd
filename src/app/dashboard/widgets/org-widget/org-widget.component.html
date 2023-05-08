@@ -69,7 +69,7 @@
           <p class="orgcount">{{chartData?.workCommitmentUnAssignedEmployeeCount}}</p>
         </span>
       </div>
-      <div class="widget" *ngIf="selectedSystem.isIRP">
+      <div class="widget" *ngIf="selectedSystem.isIRP && isOrgUser">
           <span class="widget__type" (mousedown)="defineMousePosition($event)"
             (click)="toSourceContent('NoOfLongTermOrders')">
             <ul>

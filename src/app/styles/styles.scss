@@ -477,6 +477,7 @@ hr {
 @import './controls/custom-buttons';
 @import './controls/dropdownbutton.scss';
 @import './controls/menu.scss';
+@import './controls/open-positions';
 @import 'text';
 
 a, a:hover, a:focus, a:active {
@@ -608,7 +609,7 @@ body.dark .title, body.dark .contact-name {
   height: calc(74vh - 164px) !important;
   overflow: auto;
 }
-  
+
 .document-grid {
   height: calc(89vh - 164px) !important;
 }
@@ -637,4 +638,7 @@ body.dark .title, body.dark .contact-name {
 .exp_creds .app-widget-wrapper__projection-wrapper {
   overflow-y: auto;
   overflow-x: hidden;
+}
+.item6 .datepicker {
+  width: 150px;
 }

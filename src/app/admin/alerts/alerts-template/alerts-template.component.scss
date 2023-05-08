@@ -1,3 +1,4 @@
+@import 'colors';
 .alerts-template-top-padding {
   padding-top: 10px;
 }
@@ -11,4 +12,19 @@
     width: 100%;
     max-width: 220px;
   }
+}
+
+:host {
+  .button-group {
+    margin-top: 24px;
+    display: block;
+    border-bottom: 1px solid $secondary-dark-blue-40;
+  }
+}
+
+.system-buttons {
+  position: relative;    
+  margin-top: 0 !important;
+  padding: 12px 24px;
+  background-color: $background;    
 }

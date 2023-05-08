@@ -27,4 +27,12 @@ export class BusinessUnitService {
     public getBusinessUnits(): Observable<BusinessUnit[]> {
       return this.http.get<BusinessUnit[]>(`/api/BusinessUnit/basicInfo`);
     }
+
+    /**
+   * Get the list of available business for employee type
+   * @return Array of business
+   */
+     public getBusinessForEmployeeType(): Observable<BusinessUnit[]> {
+      return this.http.get<BusinessUnit[]>(`/api/BusinessUnit/getBusinessForEmployeeType`);
+    }
 }

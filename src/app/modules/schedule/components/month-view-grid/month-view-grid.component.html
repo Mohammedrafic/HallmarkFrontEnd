@@ -19,6 +19,12 @@
           [attr.colspan]="dateSchedule.extendedDays"
           [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateItem.dateSlot)"
           (click)="selectDateSlot(dateItem.dateSlot, scheduleItem.candidate, dateItem.active, dateSchedule)"
+          cdkDropList
+          [cdkDropListData]="{dateItem: dateItem.dateSlot,scheduleItem}"
+          (cdkDropListDropped)="handleDroppedElement($event)"
+          canSchedule
+          [dragDate]="dateSchedule.date"
+          [dragEvent]="dragEvent"
         >
             <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
               <app-month-card
@@ -32,7 +38,11 @@
             <ng-template #disabledCell>
               <ejs-tooltip
                 [content]="dateSchedule | calendarTooltipSlot">
-                <div class="disabled-cell">
+                <div class="disabled-cell"
+                     canSchedule
+                     [dragDate]="dateSchedule.date"
+                     [dragEvent]="dragEvent"
+                >
                   <div class="day">
                     {{dateItem.dateSlot | date: 'd'}}
                   </div>
@@ -48,7 +58,13 @@
             [class.disabled-cell]="!dateItem.active"
             [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateItem.dateSlot)"
             (click)="selectDateSlot(dateItem.dateSlot, scheduleItem.candidate, dateItem.active)"
+            cdkDropList
+            [cdkDropListData]="{dateItem: dateItem.dateSlot,scheduleItem}"
+            (cdkDropListDropped)="handleDroppedElement($event)"
             class="date-slot empty-cell"
+            canSchedule
+            [dragDate]="dateItem.dateSlot"
+            [dragEvent]="dragEvent"
           >
             <div class="day">
               {{dateItem.dateSlot | date: 'd'}}

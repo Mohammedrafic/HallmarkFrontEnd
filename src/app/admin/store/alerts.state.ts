@@ -1,3 +1,4 @@
+import { OrganizationService } from './../../shared/services/organization.service';
 import { LogiReportService } from './../../shared/services/logi-report.service';
 import {
   AgencyDto,
@@ -30,6 +31,7 @@ import {
   GetGroupEmailSkills,
   GetGroupEmailWorkCommitments,
   GetGroupMailByBusinessUnitIdPage,
+  GetOrganizationById,
   GetStaffScheduleReportFilterOptions,
   GetTemplateByAlertId,
   GetUserSubscriptionPage,
@@ -62,6 +64,7 @@ import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '../../shared/enums/message-types';
 import { User } from '@shared/models/user.model';
 import { DOCUMENT_DOWNLOAD_SUCCESS } from '@shared/constants/messages';
+import { Organization } from '@shared/models/organization.model';
 
 interface AlertsStateModel {
   userSubscriptionPage: UserSubscriptionPage | null;
@@ -86,6 +89,7 @@ interface AlertsStateModel {
   documentDownloadDetail : DownloadDocumentDetail;
   getStaffScheduleReportFilterOptions: StaffScheduleReportFilterOptions | null;
   groupEmailWorkCommitmentData: workCommitmentDto;
+  organization: Organization | null;
 }
 
 @Injectable()
@@ -176,21 +180,26 @@ export class AlertsState {
     return state.groupEmailWorkCommitmentData;
   }
 
+  @Selector()
+  static getOrganizationData(state: AlertsStateModel):Organization | null {
+    return state.organization;
+  }
 
   constructor(
     private businessUnitService: BusinessUnitService,
     private alertsService: AlertsService,
     private groupEmailService: GroupEmailService,
-    private logiReportService: LogiReportService
+    private logiReportService: LogiReportService,
+    private organizationService: OrganizationService
   ) {}
 
   @Action(GetUserSubscriptionPage)
   GetUserSubscriptionPage(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { userId, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters }: GetUserSubscriptionPage
+    { userId, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters, isIRP }: GetUserSubscriptionPage
   ): Observable<UserSubscriptionPage | void> {
     return this.alertsService
-      .getUserSubscriptionPage(businessUnitType, userId, pageNumber, pageSize, sortModel, filterModel, filters)
+      .getUserSubscriptionPage(businessUnitType, userId, pageNumber, pageSize, sortModel, filterModel, filters, isIRP)
       .pipe(
         tap((payload) => {
           patchState({ userSubscriptionPage: payload });
@@ -220,10 +229,10 @@ export class AlertsState {
   @Action(GetAlertsTemplatePage)
   GetAlertsTemplatePage(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters }: GetAlertsTemplatePage
+    { businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters, isIRP }: GetAlertsTemplatePage
   ): Observable<AlertsTemplatePage | void> {
     return this.alertsService
-      .getAlertsTemplatePage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters)
+      .getAlertsTemplatePage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel, filters, isIRP)
       .pipe(
         tap((payload) => {
           patchState({ alertsTemplatePage: payload });
@@ -238,9 +247,9 @@ export class AlertsState {
   @Action(GetTemplateByAlertId)
   GetTemplateByAlertId(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { alertId, alertChannel, businessUnitId }: GetTemplateByAlertId
+    { alertId, alertChannel, businessUnitId, businessUnitType, isIRP }: GetTemplateByAlertId
   ): Observable<EditAlertsTemplate | void> {
-    return this.alertsService.getTemplateByAlertId(alertId, alertChannel, businessUnitId).pipe(
+    return this.alertsService.getTemplateByAlertId(alertId, alertChannel, businessUnitId, businessUnitType, isIRP).pipe(
       tap((payload) => {
         patchState({ editAlertsTemplate: payload });
         return payload;
@@ -562,5 +571,13 @@ export class AlertsState {
           return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
         })
       );
+  }
+  @Action(GetOrganizationById)
+  GetOrganizationById({ patchState }: StateContext<AlertsStateModel>, { businessUnitId }: 
+    GetOrganizationById): Observable<Organization> {
+    return this.organizationService.getOrganizationById(businessUnitId).pipe(tap((payload) => {
+      patchState({ organization: payload });      
+      return payload;
+    }));
   }
 }

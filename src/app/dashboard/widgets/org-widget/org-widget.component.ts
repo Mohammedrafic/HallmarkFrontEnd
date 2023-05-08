@@ -34,6 +34,7 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
   public selectedSystem: SelectedSystemsFlag = SelectedSystems;
   public countzero = "Ordercountzero";
   public isAgencyUser: boolean = false;
+  public isOrgUser: boolean = false;
   public isIRPEnabledOrg: boolean = this.store.selectSnapshot(AppState.isIrpFlagEnabled);;
   private mousePosition = {
     x: 0,
@@ -51,9 +52,12 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
     if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
       this.isAgencyUser = true;
     }
-    if(user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Organization){}
-    this.store.dispatch(new GetOrganizationById(this.store.selectSnapshot(UserState.user)?.businessUnitId as number));
-    this.getOrganizagionData();
+    if(user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Organization){
+      this.store.dispatch(new GetOrganizationById(this.store.selectSnapshot(UserState.user)?.businessUnitId as number));
+      this.getOrganizagionData();
+      this.isOrgUser =true
+    }
+ 
 
   }
 

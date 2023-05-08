@@ -445,7 +445,6 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     .pipe(
       filter(Boolean),
       delay(100),
-      filter(() => this.orgModuleSettings.isFeatureIrpEnabled),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((organization) => {
@@ -453,7 +452,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       this.orgModuleSettings.isIrpDisplayed = !!organization.preferences.isVMCEnabled
       && !!organization.preferences.isIRPEnabled && !isMspUser;
 
-      if (this.orgModuleSettings.isIrpDisplayed) {
+      if (this.orgModuleSettings.isIrpDisplayed && this.orgModuleSettings.isFeatureIrpEnabled) {
         this.skillDialogConfig = IrpSkillsDialogConfig;
         this.columnsToExport = IrpSkillsColsExport;
       } else {

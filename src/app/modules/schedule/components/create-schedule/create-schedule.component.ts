@@ -340,6 +340,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
 
   private openReplacementOrderDialog(replacementOrderDialogData: BookingsOverlapsResponse[]): void {
     this.replacementOrderDialogData = replacementOrderDialogData;
+    this.sideBarSettings.removeReplacementMode = false;
     this.sideBarSettings.replacementOrderDialogOpen = true;
     this.cdr.markForCheck();
   }
