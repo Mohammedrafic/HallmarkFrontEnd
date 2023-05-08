@@ -104,7 +104,7 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
       this.globalWindow.localStorage.setItem("unassignedemployeecountwidget", JSON.stringify(true));
     } else if(orgname =='Unassignedworkcommitment'){
       this.dashboardService.redirectToUrl('client/candidates/');
-      this.globalWindow.localStorage.setItem("unassignedemployeecountwidget", JSON.stringify(true));
+      this.globalWindow.localStorage.setItem("unassignedworkcommitment", JSON.stringify(true));
     }
   }
 
