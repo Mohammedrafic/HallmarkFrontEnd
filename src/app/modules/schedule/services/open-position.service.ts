@@ -88,12 +88,15 @@ export class OpenPositionService {
       const [startTime, endTime] = state.shiftTime.split('/');
 
       return [...this.openPositionsState.get().initialPositions].map((openPositions: OpenPositionsList) => {
+        const filteredPositions = this.getFilteredPositions(openPositions.positions, startTime,endTime);
+        const totalPositions = filteredPositions?.reduce((acc: number, current: Positions) => {
+          return acc + current.openPositions;
+        }, 0) || 0;
+
         return {
           ...openPositions,
-          positions: openPositions.positions.filter((position: Positions) => {
-            return this.getFormattedShiftTime(position.shiftStartTime, false) === this.getFormattedShiftTime(startTime) &&
-                   this.getFormattedShiftTime(position.shiftEndTime, false) === this.getFormattedShiftTime(endTime);
-          }),
+          totalOpenPositions: totalPositions,
+          positions: filteredPositions,
         };
       }).flat();
     }
@@ -196,5 +199,12 @@ export class OpenPositionService {
     }
 
     return attributes.length ? attributes.join(',') : '';
+  }
+
+  private getFilteredPositions(positions: Positions[], startTime: string, endTime: string): Positions[] {
+    return positions.filter((position: Positions) => {
+      return this.getFormattedShiftTime(position.shiftStartTime, false) === this.getFormattedShiftTime(startTime) &&
+        this.getFormattedShiftTime(position.shiftEndTime, false) === this.getFormattedShiftTime(endTime);
+    });
   }
 }
