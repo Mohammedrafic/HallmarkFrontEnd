@@ -1,7 +1,14 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
+
 import { Select, Store } from '@ngxs/store';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
+import { distinctUntilChanged, filter, Observable, skip, Subject, takeUntil } from 'rxjs';
+
+import { OutsideZone } from '@core/decorators';
+import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
 import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
 import { TextFieldTypeControl } from '@organization-management/settings/enums/settings.enum';
 import { SideMenuService } from '@shared/components/side-menu/services';
@@ -22,10 +29,10 @@ import { Location } from '@shared/models/location.model';
 import {
   OrganizationSettingChild,
   OrganizationSettingFilter,
-  OrganizationSettingsDropDownOption,
   OrganizationSettingsGet,
   OrganizationSettingsPost,
   OrganizationSettingValidation,
+  OrganizationSettingValueOptions,
 } from '@shared/models/organization-settings.model';
 import {
   OrganizationDepartment,
@@ -37,13 +44,10 @@ import { Region } from '@shared/models/region.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { FilterService } from '@shared/services/filter.service';
 import { customEmailValidator } from '@shared/validators/email.validator';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { distinctUntilChanged, filter, Observable, skip, Subject, takeUntil } from 'rxjs';
 import { SettingsGroupInvoicesOptions } from 'src/app/modules/invoices/constants';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { AppState } from 'src/app/store/app.state';
+
 import { ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { UserState } from '../../store/user.state';
@@ -140,7 +144,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   OThoursSettingsFormGroup: FormGroup;
   payPeriodFormGroup: FormGroup;
 
-  dropdownDataSource: OrganizationSettingsDropDownOption[];
+  dropdownDataSource: OrganizationSettingValueOptions[];
   allRegions: OrganizationRegion[] = [];
   regionBasedLocations: OrganizationLocation[] = [];
   SettingsFilterFormGroup: FormGroup;
@@ -188,7 +192,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     private confirmService: ConfirmService,
     private filterService: FilterService,
     private permissionService: PermissionService,
-    private sideMenuService: SideMenuService
+    private sideMenuService: SideMenuService,
+    private readonly ngZone: NgZone,
   ) {
     super(store);
     this.createSettingsForm();
@@ -394,6 +399,45 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.validateInvoiceGeneratingForm();
   }
 
+  changeRegion(event: { itemData: { id: number } }): void {
+    if (event.itemData && event.itemData.id) {
+      this.store.dispatch(new ClearLocationList());
+      this.store.dispatch(new ClearDepartmentList());
+      this.regionChanged(event.itemData.id);
+    }
+  }
+
+  changeLocation(event: { itemData: { id: number } }): void {
+    if (event.itemData && event.itemData.id) {
+      this.locationChanged(event.itemData.id);
+    }
+  }
+
+  changeDepartment(event: { itemData: { departmentId: number } }): void {
+    if (event.itemData && event.itemData.departmentId) {
+      this.departmentChanged(event.itemData.departmentId);
+    }
+  }
+
+  redirectToTiers(): void {
+    this.sideMenuService.selectedMenuItem$.next(ORG_SETTINGS[13]);
+  }
+
+  changePageSize(event: { isInteracted: boolean }): void {
+    if (event.isInteracted) {
+      this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
+      this.lastAvailablePage = this.getLastPage(this.configurations);
+    }
+  }
+
+  changePage(event: { currentPage: number, value: number }): void {
+    if ((event.currentPage && event.currentPage !== this.currentPagerPage) || event.value) {
+      this.gridDataSource = this.getRowsPerPage(this.configurations, event.currentPage || event.value);
+      this.lastAvailablePage = this.getLastPage(this.configurations);
+      this.currentPagerPage = event.currentPage || event.value;
+    }
+  }
+
   private isPushStartDateValid(): boolean {
     return (
       this.formControlType !== OrganizationSettingControlType.FixedKeyDictionary || this.pushStartDateFormGroup.valid
@@ -425,27 +469,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
-  public onRegionChange(event: any): void {
-    if (event.itemData && event.itemData.id) {
-      this.store.dispatch(new ClearLocationList());
-      this.store.dispatch(new ClearDepartmentList());
-      this.regionChanged(event.itemData.id);
-    }
-  }
-
-  public onLocationChange(event: any): void {
-    if (event.itemData && event.itemData.id) {
-      this.locationChanged(event.itemData.id);
-    }
-  }
-
-  public onDepartmentChange(event: any): void {
-    if (event.itemData && event.itemData.departmentId) {
-      this.departmentChanged(event.itemData.departmentId);
-    }
-  }
-
-  watchForSettings(): void {
+  private watchForSettings(): void {
     this.settings$
       .pipe(
         skip(1),
@@ -471,30 +495,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
-  public redirectToTiers(): void {
-    this.sideMenuService.selectedMenuItem$.next(ORG_SETTINGS[13]);
-  }
-
-  changePageSize(event: { isInteracted: boolean }): void {
-    if (event.isInteracted) {
-      this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
-      this.lastAvailablePage = this.getLastPage(this.configurations);
-    }
-  }
-
-  changePage(event: { currentPage: number, value: number }): void {
-    if ((event.currentPage && event.currentPage !== this.currentPagerPage) || event.value) {
-      this.gridDataSource = this.getRowsPerPage(this.configurations, event.currentPage || event.value);
-      this.lastAvailablePage = this.getLastPage(this.configurations);
-      this.currentPagerPage = event.currentPage || event.value;
-    }
-  }
-
   private sendForm(): void {
-    let dynamicValue: any;
+    let dynamicValue: string;
+    const options: string[] = [];
+
     switch (this.organizationSettingsFormGroup.controls['controlType'].value) {
       case OrganizationSettingControlType.Multiselect:
-        const options: string[] = [];
         if (this.organizationSettingsFormGroup.controls['value'].value) {
           this.organizationSettingsFormGroup.controls['value'].value.forEach((item: string) => options.push(item));
         }
@@ -508,16 +514,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       case OrganizationSettingControlType.Text:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value?.toString();
         break;
-
       case OrganizationSettingControlType.FixedKeyDictionary:
-        const pushStartDate = {
+        dynamicValue = JSON.stringify({
           isEnabled: this.organizationSettingsFormGroup.controls['value'].value,
           daysToPush: this.pushStartDateFormGroup.controls['daysToPush'].value,
           daysToConsider: this.pushStartDateFormGroup.controls['daysToConsider'].value,
-        };
-        dynamicValue = JSON.stringify(pushStartDate);
+        });
         break;
-
       case OrganizationSettingControlType.InvoiceAutoGeneration:
         dynamicValue = JSON.stringify(this.createAutoGenerationPayload());
         break;
@@ -556,8 +559,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.isFormShown = false;
   }
 
-  private setFormValidation(data: any): void {
-    let validators: ValidatorFn[] = [];
+  private setFormValidation(data: OrganizationSettingsGet): void {
+    const validators: ValidatorFn[] = [];
+
     data.validations.forEach((validation: OrganizationSettingValidation) => {
       switch (validation.key) {
         case OrganizationSettingValidationType.Required:
@@ -604,12 +608,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
-  private setFormValuesForOverride(data: any): void {
+  private setFormValuesForOverride(data: OrganizationSettingsGet): void {
     if (
       this.formControlType === OrganizationSettingControlType.Multiselect ||
       this.formControlType === OrganizationSettingControlType.Select
     ) {
-      this.dropdownDataSource = data.valueOptions.sort((a: any, b: any) => a.value?.localeCompare(b.value));
+      this.dropdownDataSource = data.valueOptions
+        .sort((a: OrganizationSettingValueOptions, b: OrganizationSettingValueOptions) => a.value?.localeCompare(b.value));
     }
 
     this.organizationSettingsFormGroup.setValue({
@@ -681,41 +686,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       dynamicValue = { ...JSON.parse(valueOptions), isPayPeriod: true };
     }
 
-
-
-    // TODO: run outside zone
-    setTimeout(() => {
-      this.organizationSettingsFormGroup.setValue({
-        settingValueId: this.isParentEdit ? null : childData.settingValueId,
-        settingKey: parentData.settingKey,
-        controlType: parentData.controlType,
-        name: parentData.name,
-        value: (dynamicValue?.isDictionary || dynamicValue?.isInvoice || dynamicValue?.isPayPeriod)? !!dynamicValue.isEnabled : dynamicValue,
-      });
-
-      if (dynamicValue?.isDictionary) {
-        this.pushStartDateFormGroup.setValue({
-          daysToPush: dynamicValue.daysToPush || null,
-          daysToConsider: dynamicValue.daysToConsider || null,
-        });
-      }
-
-      if (dynamicValue?.isInvoice) {
-        this.invoiceGeneratingFormGroup.setValue({
-          time: dynamicValue.time ? DateTimeHelper.convertDateToUtc(dynamicValue.time) : '',
-          dayOfWeek: dynamicValue.dayOfWeek,
-          groupingBy: dynamicValue.groupingBy,
-        });
-      }
-
-      if (dynamicValue.isSwitchedValue) {
-        this.switchedValueForm.setValue({
-          value: dynamicValue.value,
-          isEnabled: dynamicValue.isEnabled,
-        });
-      }
-
-    });
     if (dynamicValue.isCheckboxValue) {
       this.checkboxValueForm.setValue({
         value: dynamicValue.value ? dynamicValue.value : '',
@@ -729,6 +699,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         noOfWeek: dynamicValue.noOfWeek
       });
     }
+
+    this.updateFormOutsideZone(parentData, childData, dynamicValue);
   }
 
   private regionChanged(regionId: number): void {
@@ -1257,5 +1229,45 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.validatePushStartDateForm();
       this.validateInvoiceGeneratingForm();
     }
+  }
+
+  @OutsideZone
+  private updateFormOutsideZone(
+    parentData: OrganizationSettingsGet,
+    childData: OrganizationSettingChild | null,
+    dynamicValue: any,
+  ): void {
+    setTimeout(() => {
+      this.organizationSettingsFormGroup.setValue({
+        settingValueId: this.isParentEdit ? null : childData?.settingValueId,
+        settingKey: parentData.settingKey,
+        controlType: parentData.controlType,
+        name: parentData.name,
+        value: (dynamicValue?.isDictionary || dynamicValue?.isInvoice || dynamicValue?.isPayPeriod)?
+          !!dynamicValue.isEnabled : dynamicValue,
+      });
+
+      if (dynamicValue?.isDictionary) {
+        this.pushStartDateFormGroup.setValue({
+          daysToPush: dynamicValue.daysToPush || null,
+          daysToConsider: dynamicValue.daysToConsider || null,
+        });
+      }
+
+      if (dynamicValue?.isInvoice) {
+        this.invoiceGeneratingFormGroup.setValue({
+          time: dynamicValue.time ? DateTimeHelper.convertDateToUtc(dynamicValue.time) : '',
+          dayOfWeek: dynamicValue.dayOfWeek,
+          groupingBy: dynamicValue.groupingBy,
+        });
+      }
+
+      if (dynamicValue.isSwitchedValue) {
+        this.switchedValueForm.setValue({
+          value: dynamicValue.value,
+          isEnabled: dynamicValue.isEnabled,
+        });
+      }
+    });
   }
 }

@@ -206,7 +206,7 @@
         <label for="region">Region</label>
         <div class="input-group dropdown">
           <ejs-dropdownlist id="region" [allowFiltering]="true" [dataSource]="regions$ | async"
-                            [fields]="optionFields" (select)="onRegionChange($event)" [enabled]="!isParentEdit"
+                            [fields]="optionFields" (select)="changeRegion($event)" [enabled]="!isParentEdit"
                             formControlName="regionId">
           </ejs-dropdownlist>
         </div>
@@ -218,7 +218,7 @@
         <label for="regionRequired">Region <span class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist id="regionRequired" appValidateWithMessage [allowFiltering]="true"
-                            [dataSource]="regions$ | async" [fields]="optionFields" (select)="onRegionChange($event)"
+                            [dataSource]="regions$ | async" [fields]="optionFields" (select)="changeRegion($event)"
                             formControlName="regionId">
           </ejs-dropdownlist>
         </div>
@@ -230,7 +230,7 @@
         <label for="location">Location</label>
         <div class="input-group dropdown">
           <ejs-dropdownlist id="location" [allowFiltering]="true" [dataSource]="locations$ | async"
-                            [fields]="optionFields" (select)="onLocationChange($event)" [enabled]="!isParentEdit"
+                            [fields]="optionFields" (select)="changeLocation($event)" [enabled]="!isParentEdit"
                             formControlName="locationId">
           </ejs-dropdownlist>
         </div>
@@ -242,8 +242,8 @@
         <label for="department">Department</label>
         <div class="input-group dropdown">
           <ejs-dropdownlist id="department" [allowFiltering]="true" [dataSource]="departments$ | async"
-            [fields]="departmentFields" (select)="onDepartmentChange($event)" [enabled]="!isParentEdit"
-            formControlName="departmentId">
+                            [fields]="departmentFields" (select)="changeDepartment($event)" [enabled]="!isParentEdit"
+                            formControlName="departmentId">
           </ejs-dropdownlist>
         </div>
       </div>
