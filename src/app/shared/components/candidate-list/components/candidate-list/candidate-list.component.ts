@@ -1,4 +1,4 @@
-import { Component, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   debounceTime,
   filter,
@@ -78,6 +78,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
 import { CandidateListScroll } from './candidate-list.enum';
 import { OutsideZone } from '@core/decorators';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-candidate-list',
@@ -186,7 +187,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   };
   public readonly optionFields = optionFields;
   public readonly regionFields = regionFields;
-
+  public unassignedworkCommitment: any;
   private pageSubject = new Subject<number>();
   private includeDeployedCandidates = true;
   private unsubscribe$: Subject<void> = new Subject();
@@ -205,8 +206,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     private candidateListService: CandidateListService,
     private scrollService: ScrollRestorationService,
     private readonly ngZone: NgZone,
+    @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis
   ) {
     super();
+    this.unassignedworkCommitment = JSON.parse(localStorage.getItem('unassignedworkcommitment') || '"false"') as boolean; 
   }
 
   ngOnInit(): void {
@@ -460,7 +463,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         endDate : this.filters.endDate! ? DateTimeHelper.toUtcFormat(this.filters.endDate!) : null,
       },
       orderBy: this.orderBy,
+      ShowNoWorkCommitmentOnly : this.unassignedworkCommitment
     };
+    this.unassignedworkCommitment = false;
+    this.globalWindow.localStorage.setItem("unassignedworkcommitment", JSON.stringify(false));
+
     return filter;
   }
 

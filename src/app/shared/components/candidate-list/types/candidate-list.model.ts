@@ -56,6 +56,7 @@ export interface CandidateListRequest {
     endDate?: string | null;
     type: number[] | null;
   };
+  ShowNoWorkCommitmentOnly?: boolean;
 }
 
 export type CandidateListFilters = {
