@@ -38,7 +38,7 @@
   </section>
   <ejs-grid class="grid grid-component"
     #grid
-    [dataSource]="(holidaysPage$ | async)?.items"
+    [dataSource]="holidayItems"
     [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
     [height]="fullScreenGridHeight"

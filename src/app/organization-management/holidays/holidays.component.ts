@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -119,7 +119,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
   public yearsList: number[] = [];
   public datesValidationMessage = ERROR_START_LESS_END_DATE;
   public showSystem:boolean = false;
-
+  public holidayItems: any[] = [];
 
   constructor(
     protected override store: Store,
@@ -127,7 +127,8 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
     private fb: FormBuilder,
     private confirmService: ConfirmService,
     private filterService: FilterService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private cd : ChangeDetectorRef
   ) {
     super(store);
     this.idFieldName = 'foreignKey';
@@ -252,6 +253,18 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
 
   override ngOnInit() {
     super.ngOnInit();
+    this.getOrganizagionData();
+    this.holidaysPage$.pipe(
+      filter(x => x !== null && x !== undefined), takeUntil(this.unsubscribe$)).subscribe((data) => {
+        if ((this.selectedSystem.isVMS) && (!this.selectedSystem.isIRP))
+          this.holidayItems = data.items.filter((f) => f.includeInVMS == true)
+        if ((!this.selectedSystem.isVMS) && (this.selectedSystem.isIRP))
+          this.holidayItems = data.items.filter((f) => f.includeInIRP == true)
+        if (this.selectedSystem.isVMS && this.selectedSystem.isIRP)
+          this.holidayItems = data.items
+        this.holidayItems = [...this.holidayItems];
+        this.cd.detectChanges();
+      });
     this.filterColumns = {
       holidayNames: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
       years: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
@@ -307,7 +320,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
     this.holidayDataSource$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
       this.filterColumns.holidayNames.dataSource = dataSource;
     });
-    this.getOrganizagionData();
+    
   }
 
   ngOnDestroy(): void {
@@ -542,6 +555,8 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
           this.store.dispatch(new ShowToast(MessageTypes.Error, "Atleast one system should be selected"));
         }
       } else {
+        this.HolidayFormGroup.controls["includeInIRP"].setValue(this.selectedSystem.isIRP);
+        this.HolidayFormGroup.controls["includeInVMS"].setValue(this.selectedSystem.isVMS);
         if (this.title === DialogMode.Assign) {
           this.store
             .dispatch(
