@@ -991,7 +991,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             this.documentLibraryform.get(FormControlNames.TypeIds)?.setValue(data.docType);
             this.documentLibraryform.get(FormControlNames.Tags)?.setValue(data.tags);
             this.documentLibraryform.get(FormControlNames.StatusIds)?.setValue(status?.id);
-            this.documentLibraryform.get(FormControlNames.StartDate)?.setValue(data.startDate != null ? new Date(data.startDate.toString()) : this.startDate);
+            this.documentLibraryform.get(FormControlNames.StartDate)?.setValue(data.startDate != null ? new Date(data.startDate.toString()) : null);
             this.documentLibraryform.get(FormControlNames.EndDate)?.setValue(data.endDate != null ? new Date(data.endDate.toString()) : null);
             this.documentLibraryform.get(FormControlNames.Comments)?.setValue(data.comments);
             setTimeout(() => {
