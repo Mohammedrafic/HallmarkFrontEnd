@@ -14,7 +14,7 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
 import { combineLatest, distinctUntilChanged, filter, map, Observable, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
-import { DrawNodeEventArgs, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
+import { DrawNodeEventArgs, TreeView, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { UsersAssignedToRole } from '@shared/models/user.model';
@@ -110,7 +110,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.onNewRoleBussinesDataFetched();
     this.onUsersAssignedToRoleFetched();
     this.subOnBusinessUnitControlChange();
-   
+       
     this.copyRoleData$ = this.store.select(SecurityState.copyRoleData)
     .pipe(
       map((roles) => {
@@ -263,13 +263,22 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       });
   }
   isShowIRPOnly(arg:any){
-    this.roleTreeField$=this.store.select(SecurityState.roleTreeField).pipe(map((roles)=>{
-      roles.dataSource.filter(x=>x.includeIRP==true)
-      return roles;
-  }))
-  this.changeDetectorRef.detectChanges();
+    debugger;
+    var elements:TreeView = this.tree;
+    this.roleTreeField$.subscribe((roleTreeField) => {
+      var item=roleTreeField.dataSource
+      .filter(x=>x.includeIRP==true);
+      elements.fields={
+        dataSource:roleTreeField.dataSource.filter(x=>x.includeIRP==true),
+        id: 'id',
+        parentID: 'parentId',
+        text: 'name',
+        hasChildren: 'hasChild'
+      }
+    });
+    this.changeDetectorRef.detectChanges();
   }
-
+ 
   static createForm(): FormGroup {
     return new FormGroup({
       id: new FormControl(),
