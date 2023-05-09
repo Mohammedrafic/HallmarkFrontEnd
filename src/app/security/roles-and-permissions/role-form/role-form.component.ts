@@ -117,7 +117,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
         return id ? roles.filter((role) => role.id !== id) : roles;
       })
     );
-  }
+   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['roleId']?.currentValue) {
@@ -232,9 +232,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       const user = this.store.selectSnapshot(UserState.user);
       this.newRoleBussinesData =
       this.store.selectSnapshot(SecurityState.newRoleBussinesData)(user?.businessUnitType as BusinessUnitType);
-      if (user?.businessUnitType !== BusinessUnitType.Hallmark) {
         this.defaultBusinessValue = this.newRoleBussinesData[0]?.id;
-      }
     });
   }
 
