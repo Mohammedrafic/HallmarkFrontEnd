@@ -1,7 +1,7 @@
 <div class="warning-deployed-candidate">
   <ng-container *ngIf="isAgency; else orgMessage">
     <div *ngFor="let candidateInfo of candidateBasicInfo">
-      <span *ngIf="isAgency">Candidate</span> <span *ngIf="!isAgency">Employee</span> is already working in Position ID:
+      Candidate is already working in Position ID:
       <span>
         {{ candidateInfo.orderPublicId }}/{{ candidateInfo.positionId }};
         {{ candidateInfo.positionActualStartDate | date: 'MM/dd/yyyy' }} -
@@ -11,7 +11,7 @@
     </div>
   </ng-container>
   <ng-template #orgMessage>
-    Employee is already working on an assignment till
+    Candidate is already working on an assignment till
     <span>{{ candidateBasicInfo.pop()?.positionActualEndDate | date: 'MM/dd/yyyy' }}</span>
   </ng-template>
 </div>
