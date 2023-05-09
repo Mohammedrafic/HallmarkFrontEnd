@@ -191,7 +191,7 @@
       (buttonChange)="setConfigurationSystemType($event.id)"
     ></app-button-group>
     <div>
-      <div class="input-container bootstrap" *ngIf="!payPeriodFormGroup">
+      <div class="input-container bootstrap" *ngIf="!IsSettingKeyPayPeriod">
         <label for="attribute">Attribute</label>
         <div class="input-group">
           <ejs-tooltip [content]="attribute.value" [showTipPointer]="false">
@@ -201,7 +201,7 @@
       </div>
     </div>
 
-    <form [formGroup]="regionFormGroup" *ngIf="isEdit && !IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
+    <form [formGroup]="regionFormGroup" *ngIf="isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="region">Region</label>
         <div class="input-group dropdown">
@@ -213,7 +213,7 @@
       </div>
     </form>
 
-    <form [formGroup]="regionRequiredFormGroup" *ngIf="!isEdit && !IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
+    <form [formGroup]="regionRequiredFormGroup" *ngIf="!isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="regionRequired">Region <span class="required">*</span></label>
         <div class="input-group dropdown">
@@ -225,7 +225,7 @@
       </div>
     </form>
 
-    <form [formGroup]="locationFormGroup" *ngIf="!IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
+    <form [formGroup]="locationFormGroup" *ngIf="!(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="location">Location</label>
         <div class="input-group dropdown">
@@ -237,7 +237,7 @@
       </div>
     </form>
 
-    <form [formGroup]="departmentFormGroup" *ngIf="!IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
+    <form [formGroup]="departmentFormGroup" *ngIf="!(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="department">Department</label>
         <div class="input-group dropdown">
@@ -248,7 +248,7 @@
         </div>
       </div>
     </form>
-    <form [formGroup]="OThoursSettingsFormGroup" *ngIf="IsSettingKeyOtHours && !IsSettingKeyPayPeriod">
+    <form [formGroup]="RegionLocationSettingsMultiFormGroup" *ngIf="(IsSettingKeyOtHours||IsSettingKeyAvailabiltyOverLap || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
       <div class="input-container">
         <label>Region<span class="required">*</span></label>
         <div class="dropdown-wrapper">
@@ -338,7 +338,7 @@
         <label for="numeric">Value<span class="required">*</span></label>
         <div class="input-group">
           <ejs-numerictextbox id="numeric" class="numeric-input" min="0" [maxlength]="maxFieldLength"
-            [validateDecimalOnType]='true' decimals='0' format="#" [showSpinButton]="false" appValidateWithMessage
+          (keydown)="onlyNumerics($event)" [validateDecimalOnType]='true' decimals='0' format="#" [showSpinButton]="false" appValidateWithMessage
             formControlName="value"></ejs-numerictextbox>
         </div>
       </div>
