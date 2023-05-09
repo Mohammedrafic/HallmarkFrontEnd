@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, O
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../store/user.state';
@@ -655,19 +655,19 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   }
 
   private createFormGroups(): void {
-    this.PayRatesFormGroup = this.formBuilder.group({
-      regionIds: [[], [Validators.required]],
-      locationIds: [[], [Validators.required]],
-      departmentIds: [[], [Validators.required]],
-      skillIds: [[], [Validators.required]],
-      orderTypes: [[], [Validators.required]],
-      payRatesCategory: [{ value: '', disabled: true }],
-      payRateConfigId: [[], [Validators.required]],
-      amountMultiplier: ["", [Validators.required, Validators.maxLength(11)]],
-      effectiveDate: [null, [Validators.required]],
-      WorkCommitmentIds : [[], [Validators.required]], 
-      payType : [[], [Validators.required]],
-    });
+      this.PayRatesFormGroup = new FormGroup({
+        regionIds: new FormControl([], [Validators.required]),
+        locationIds: new FormControl([], [Validators.required]),
+        departmentIds: new FormControl([], [Validators.required]),
+        skillIds: new FormControl([], [Validators.required]),
+        orderTypes: new FormControl([], [Validators.required]),
+        payRatesCategory: new FormControl({ value: '', disabled: true }),
+        payRateConfigId: new FormControl([], [Validators.required]),
+        amountMultiplier: new FormControl("", [Validators.required, Validators.maxLength(11)]),
+        effectiveDate: new FormControl(null, [Validators.required]),
+        WorkCommitmentIds : new FormControl([], [Validators.required]), 
+        payType : new FormControl([], [Validators.required]),
+      });
 
     this.payRateFilterFormGroup = this.formBuilder.group({
       regionIds: [[]],
