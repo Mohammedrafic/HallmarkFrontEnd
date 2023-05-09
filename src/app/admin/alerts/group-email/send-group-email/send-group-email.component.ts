@@ -242,6 +242,7 @@ export class SendGroupEmailComponent
   fileAsBase64: string;
   faDownload = faDownload as IconProp;
   public isCurrentBusinessHasIRPEnabled: boolean | undefined = false;
+  public isCurrentBusinessHasVMSEnabled: boolean | undefined = false;
 
   constructor(private actions$: Actions, 
               private store: Store, 
@@ -439,6 +440,7 @@ export class SendGroupEmailComponent
   CheckBusinessIRPEnabled(businessId:number): void{
     let currentBusinessData = this.businessData?.filter(i=>i.id == businessId)[0];   
     this.isCurrentBusinessHasIRPEnabled = currentBusinessData?.isIRPEnabled;
+    this.isCurrentBusinessHasVMSEnabled = currentBusinessData?.isVMSEnabled;
   }  
 
   populateUserType(): void{
@@ -565,8 +567,14 @@ export class SendGroupEmailComponent
                 if (this.groupEmailTemplateForm.controls['business'].value != data[0].id) {
                   this.groupEmailTemplateForm.controls['business'].setValue(data[0].id);
                   this.CheckBusinessIRPEnabled(data[0].id);
-                  if(!this.isCurrentBusinessHasIRPEnabled && value == 3){
-                    this.filteredUserType.pop();
+                  // if(!this.isCurrentBusinessHasIRPEnabled && value == 3){
+                  //   this.filteredUserType.pop();
+                  // }
+                  if(!this.isCurrentBusinessHasIRPEnabled && value == 3){                      
+                    this.filteredUserType = this.filteredUserType.filter((x:any) => x.value != OrganizationUserType.Employees);
+                  }
+                  if(this.isCurrentBusinessHasIRPEnabled && !this.isCurrentBusinessHasVMSEnabled && value == 3){                      
+                    this.filteredUserType = this.filteredUserType.filter((x:any) => x.value != OrganizationUserType.Candidates);
                   }
                 }                
               }
@@ -686,11 +694,14 @@ export class SendGroupEmailComponent
         this.locationsData = this.locationsList;
         this.departmentsData = this.departmentsList;        
         
-        if(value > 0 && this.businessUnitControl.value == 3){
+        if(value > 0 && this.businessUnitControl.value == 3){          
           this.CheckBusinessIRPEnabled(value);
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == false);
-          if(!this.isCurrentBusinessHasIRPEnabled){          
-            this.filteredUserType.pop();
+          if(!this.isCurrentBusinessHasIRPEnabled){                      
+            this.filteredUserType = this.filteredUserType.filter((x:any) => x.value != OrganizationUserType.Employees);
+          }
+          if(this.isCurrentBusinessHasIRPEnabled && !this.isCurrentBusinessHasVMSEnabled){                      
+            this.filteredUserType = this.filteredUserType.filter((x:any) => x.value != OrganizationUserType.Candidates);
           }
         }
         this.changeDetectorRef.detectChanges();        
