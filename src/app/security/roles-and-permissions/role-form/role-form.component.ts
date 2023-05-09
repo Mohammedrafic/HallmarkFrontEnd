@@ -263,7 +263,6 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       });
   }
   isShowIRPOnly(arg:any){
-    debugger;
     var elements:TreeView = this.tree;
     this.roleTreeField$.subscribe((roleTreeField) => {
       var item=roleTreeField.dataSource
