@@ -28,3 +28,12 @@ export const getRegionsArray = (orgStructure: WorkCommitmentOrgHierarchies[], ke
 
   return Array.from(regions) as string[];
 };
+export const getLocationssArray = (orgStructure: WorkCommitmentOrgHierarchies[], key: string): string[] => {
+  const regions = new Set();
+
+  orgStructure.forEach((location: any) => {
+    regions.add(location[key]);
+  });
+
+  return Array.from(regions) as string[];
+};
