@@ -683,8 +683,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public updatePageforbulk(): void {
-    this.getOrders();
     this.clearSelection(this.gridWithChildRow);
+    this.getOrders(true);
+    this.cd.markForCheck();
   }
 
   public onAddReorderClose(): void {
