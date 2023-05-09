@@ -683,8 +683,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public updatePageforbulk(): void {
-    this.getOrders();
     this.clearSelection(this.gridWithChildRow);
+    this.getOrders(true);
+    this.cd.markForCheck();
   }
 
   public onAddReorderClose(): void {
@@ -717,6 +718,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public getOrders(cleared?: boolean): void {
+    console.log("came");
     this.filters.orderBy = this.orderBy;
     this.filters.orderPublicId = this.filters.orderPublicId ? this.filters.orderPublicId.toUpperCase() : null;
     this.filters.jobStartDate ? this.filters.jobStartDate : null;
