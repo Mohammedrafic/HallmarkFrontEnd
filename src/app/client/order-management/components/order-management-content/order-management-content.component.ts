@@ -718,7 +718,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public getOrders(cleared?: boolean): void {
-    console.log("came");
     this.filters.orderBy = this.orderBy;
     this.filters.orderPublicId = this.filters.orderPublicId ? this.filters.orderPublicId.toUpperCase() : null;
     this.filters.jobStartDate ? this.filters.jobStartDate : null;
