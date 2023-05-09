@@ -157,6 +157,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public readonly candidateStatus = CandidatesStatusText;
   public candidates$: Observable<CandidateList | IRPCandidateList>;
   public readonly userPermissions = UserPermissions;
+  public selecteditmesids : any[]=[];
   public columnsToExport: ExportColumn[] = [
     { text: 'Name', column: 'Name' },
     { text: 'Profile Status', column: 'ProfileStatus' },
@@ -373,6 +374,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     const columnMap = this.isIRP ? this.columnsToExportIrp : this.columnsToExport;
+    this.selecteditmesids = this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : [];
     const requestBody: CandidateListExport = {
       filterQuery: this.getFilterValues(),
       exportFileType: fileType,
@@ -457,6 +459,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       secondarySkillIds: this.filters.secondarySkillIds!,
       hireDate: this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
       includeDeployedCandidates: this.includeDeployedCandidates,
+      ids: this.selecteditmesids,
       expiry : {
         type : this.filters.credType! ? this.filters.credType! : [],
         startDate : this.filters.startDate! ? DateTimeHelper.toUtcFormat(this.filters.startDate!) : null,

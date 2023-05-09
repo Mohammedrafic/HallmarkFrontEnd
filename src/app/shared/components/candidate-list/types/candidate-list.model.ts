@@ -51,6 +51,7 @@ export interface CandidateListRequest {
   startDate?: string | null;
   endDate?: string | null;
   credType? : number[];
+  ids?:number[];
   expiry? : {
     startDate?: string | null;
     endDate?: string | null;
