@@ -630,6 +630,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     ).subscribe((selectedOrder: Order) => {
       this.selectedOrder = selectedOrder;
       this.orderTypeForm.disable();
+      this.commentContainerId = selectedOrder.commentContainerId as number;
       this.orderStatus = selectedOrder.statusText;
 
       this.setConfigType(selectedOrder);

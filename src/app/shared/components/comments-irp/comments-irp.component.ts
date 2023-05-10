@@ -189,7 +189,8 @@ export class CommentsIrpComponent {
       isExternal: this.isExternal,
       new: true,
       commentContainerId: this.commentContainerId,
-      isRead: true
+      isRead: true,
+      IsPrivate: this.isPrivate
     };
     this.comments.push(comment);
     this.message = '';
