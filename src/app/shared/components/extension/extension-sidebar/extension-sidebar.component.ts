@@ -3,7 +3,7 @@ import { extensionDurationPrimary, extensionDurationSecondary } from '@shared/co
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Duration } from '@shared/enums/durations';
-import { catchError, combineLatest, filter, startWith, tap } from 'rxjs';
+import { catchError, combineLatest, filter, startWith, takeUntil, tap } from 'rxjs';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
 import isNil from 'lodash/fp/isNil';
 import { addDays } from '@shared/utils/date-time.utils';
@@ -18,14 +18,14 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { BillRate } from '@shared/models';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { DateTimeHelper } from '@core/helpers';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 
 @Component({
   selector: 'app-extension-sidebar',
   templateUrl: './extension-sidebar.component.html',
   styleUrls: ['./extension-sidebar.component.scss'],
 })
-export class ExtensionSidebarComponent implements OnInit {
+export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   @Input() public candidateJob: OrderCandidateJob;
   @Input() public orderPosition: OrderManagementChild;
   @Output() public saveEmitter: EventEmitter<void> = new EventEmitter<void>();
@@ -40,8 +40,9 @@ export class ExtensionSidebarComponent implements OnInit {
 
   public minDate: Date;
   public extensionForm: FormGroup;
-  public comments: Comment[] = []
+  public comments: Comment[] = [];
   public startDate: Date;
+  public maxEndDate: Date;
 
   private get billRateControl(): FormControl {
     return this.extensionForm?.get('billRate') as FormControl;
@@ -52,7 +53,9 @@ export class ExtensionSidebarComponent implements OnInit {
     private extensionSidebarService: ExtensionSidebarService,
     private store: Store,
     private billRatesSyncService: BillRatesSyncService
-  ) {}
+  ) {
+    super();
+  }
 
   public ngOnInit(): void {
     const minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
@@ -62,6 +65,7 @@ export class ExtensionSidebarComponent implements OnInit {
     this.listenDurationChanges();
     this.listenStartEndDatesChanges();
     this.subsToBillRateControlChange();
+    this.observeStartDate();
   }
 
   public hourlyRateToOrderSync(event: { value: string; billRate?: BillRate }): void {
@@ -85,6 +89,7 @@ export class ExtensionSidebarComponent implements OnInit {
     }
     const { value: billRate } = this.billRatesComponent.billRatesControl;
     const extension = this.extensionForm.getRawValue();
+
     this.extensionSidebarService
       .saveExtension({
         billRates: billRate,
@@ -132,6 +137,8 @@ export class ExtensionSidebarComponent implements OnInit {
   private initExtensionForm(): void {
     const { actualEndDate, candidateBillRate } = this.candidateJob || {};
     const startDate = addDays(actualEndDate, 1);
+    this.maxEndDate = addDays(startDate as Date, 14) as Date;
+
     this.extensionForm = this.formBuilder.group({
       durationPrimary: [Duration.Other],
       durationSecondary: [],
@@ -195,5 +202,16 @@ export class ExtensionSidebarComponent implements OnInit {
         }
         this.extensionForm.get('durationPrimary')?.setValue(Duration.Other);
       });
+  }
+
+  private observeStartDate(): void {
+    this.extensionForm.get('startDate')?.valueChanges
+    .pipe(
+      filter((date) => !!date),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((start: Date) => {
+      this.maxEndDate = addDays(start, 14) as Date;
+    });
   }
 }
