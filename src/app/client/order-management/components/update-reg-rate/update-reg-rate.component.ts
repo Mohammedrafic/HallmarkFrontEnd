@@ -6,6 +6,7 @@ import { Store } from '@ngxs/store';
 import { UpdateRegRateorder, UpdateRegRateSucceeded } from '@client/store/order-managment-content.actions';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
+import { delay } from 'rxjs';
 
 
 @Component({
@@ -52,8 +53,9 @@ export class UpdateRegRateComponent implements OnInit {
       "hourlyRate": this.updateform.value.updaterate,
       "perDiemIds": this.getperdiemorderdatas
     };
-    this.store.dispatch(new UpdateRegRateorder(payload));
-    this.reloadItemsListforupdate.next();
+    this.store.dispatch(new UpdateRegRateorder(payload)).pipe(delay(500)).subscribe(() => {
+      this.reloadItemsListforupdate.next();
+    });
   }
 
   ngOnChanges(orderdatas : SimpleChanges):void{
