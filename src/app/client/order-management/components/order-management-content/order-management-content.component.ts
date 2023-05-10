@@ -1701,11 +1701,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         debounceTime(50),
         filter((structure) => !!structure),
         tap((structure: OrganizationStructure) => {
-          this.orgStructure = structure;
-          this.regions = structure.regions;
-          this.filterColumns.regionIds.dataSource = this.regions;
-          this.store.dispatch(new PreservedFilters.ResetPageFilters());
-          this.getPreservedFiltersByPage();
+          if(this.organizationId === structure.organizationId){
+            this.orgStructure = structure;
+            this.regions = structure.regions;
+            this.filterColumns.regionIds.dataSource = this.regions;
+            this.store.dispatch(new PreservedFilters.ResetPageFilters());
+            this.getPreservedFiltersByPage();
+          }
         }),
         //get preserved filters and dispatch orders
         switchMap(() => this.preservedFiltersByPageName$),
