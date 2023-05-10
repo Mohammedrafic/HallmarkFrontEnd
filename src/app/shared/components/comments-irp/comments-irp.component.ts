@@ -70,6 +70,8 @@ export class CommentsIrpComponent {
 
   public selectedFilter = CommentsFilter.All;
   public showExternal = false;
+  public showInternal = false;
+  public showPrivate = false;
   public commentsFilterItems = [CommentsFilter.All, CommentsFilter.External, CommentsFilter.Internal, CommentsFilter.Private];
   public commentsFilter = CommentsFilter;
   public isExternal = false;
@@ -202,6 +204,8 @@ export class CommentsIrpComponent {
 
   public onFilterChange(event: SelectEventArgs): void {
     this.showExternal = event.itemData.value === CommentsFilter.External;
+    this.showInternal = event.itemData.value === CommentsFilter.Internal;
+    this.showPrivate = event.itemData.value === CommentsFilter.Private;
     this.scroll$.next(null);
   }
 }
