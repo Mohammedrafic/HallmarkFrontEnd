@@ -82,6 +82,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   }
 
   override ngOnInit(): void {
+    super.ngOnInit();
     this.watchForDefaultExport();
   }
   private watchForSettingState(): void {
