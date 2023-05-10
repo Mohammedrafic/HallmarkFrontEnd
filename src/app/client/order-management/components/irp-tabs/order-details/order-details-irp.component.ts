@@ -104,6 +104,8 @@ import { OrganizationStructureService, SettingsViewService } from '@shared/servi
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
+import { Comment } from '@shared/models/comment.model';
+import { CommentsService } from '@shared/services/comments.service';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -150,6 +152,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public orderStatus = Incomplete;
   public selectedOrder: Order;
   public regionsStructure: OrganizationRegion[] = [];
+  public comments: Comment[] = [];
+  public commentContainerId = 0;
+  @Input() public externalCommentConfiguration ?: boolean | null;
 
   private dataSourceContainer: OrderDataSourceContainer = {};
   private selectedSystem: SelectSystem;
@@ -182,6 +187,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     private store: Store,
     private durationService: DurationService,
     private irpStateService: IrpContainerStateService,
+    private commentsService: CommentsService,
     private organizationStructureService: OrganizationStructureService,
     private settingsViewService: SettingsViewService,
     private skillsService: SkillsService,
@@ -618,6 +624,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.workLocationFormsList = [];
   }
 
+  private getComments(): void {
+    this.commentsService.getComments(this.commentContainerId, null)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+      });
+  }
+
   private watchForSelectOrder(): void {
     this.selectedOrder$.pipe(
       filter(Boolean),
@@ -626,6 +640,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     ).subscribe((selectedOrder: Order) => {
       this.selectedOrder = selectedOrder;
       this.orderTypeForm.disable();
+      this.commentContainerId = selectedOrder.commentContainerId as number;
+      this.getComments();
       this.orderStatus = selectedOrder.statusText;
 
       this.setConfigType(selectedOrder);

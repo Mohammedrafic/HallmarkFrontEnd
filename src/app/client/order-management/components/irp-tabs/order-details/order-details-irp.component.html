@@ -323,5 +323,15 @@
       (deleteDocument)="deleteSelectDocument($event)"
     >
     </app-document-uploader>
+    <div  tabindex="1" class="e-card comments">
+      <div class="e-card-content">
+        <app-comments-irp
+          [comments]="comments"
+          [commentContainerId]="commentContainerId"
+          [useBackground]="false"
+          [externalCommentConfiguration]="externalCommentConfiguration"
+        ></app-comments-irp>
+      </div>
+    </div>
   </div>
 </section>
