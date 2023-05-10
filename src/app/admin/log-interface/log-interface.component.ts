@@ -1,7 +1,7 @@
 import { ColDef } from '@ag-grid-community/core';
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { AppState } from 'src/app/store/app.state';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
@@ -15,6 +15,10 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { LogInterface, LogInterfacePage } from '@shared/models/org-interface.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { UserState } from 'src/app/store/user.state';
+import { Organisation } from '@shared/models/visibility-settings.model';
+import { uniqBy } from 'lodash';
+
 
 @Component({
   selector: 'app-log-interface',
@@ -22,7 +26,7 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
   styleUrls: ['./log-interface.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LogInterfaceComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class LogInterfaceComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
 
   @Select(SecurityState.logInterfaceGridData)
   private _logInterfaceData$: Observable<LogInterface[]>;
@@ -33,7 +37,13 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  private lastSelectedOrganizationId$: Observable<number>;
 
+  @Select(SecurityState.organisations)
+  public organizationData$: Observable<Organisation[]>;
+
+  private isAlive = true;
   public totalRecordsCount: number;
   public gridApi: any;
   private gridColumnApi: any;
@@ -53,6 +63,8 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   itemList: Array<LogInterface> | undefined;
   selectedLogItem: LogInterface;
   openLogDetailsDialogue = new Subject<boolean>();
+  private unsubscribe$: Subject<void> = new Subject();
+  public organizations: Organisation[] = [];
 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
@@ -107,13 +119,6 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
         filter: false,
       },
       {
-        headerName: 'runId',
-        field: 'runId',
-        minWidth: 350,
-        hide: true,
-        filter: 'agTextColumnFilter',
-      },
-      {
         headerName: 'Input File Name',
         field: 'originalFileName',
         minWidth: 250,
@@ -164,17 +169,28 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
           return {color: 'red'};
         }
       },
-      {
-        headerName: 'Skipped Records',
-        field: 'skippedRecord',
-        minWidth: 175,
-        filter: false,
-        sortable: false,
-      },    
+ 
     ];
    }
 
   ngOnInit(): void {
+    this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.organizations = [];
+      if (data != null && data.length > 0) {
+        this.organizations = uniqBy(data, 'organizationId');
+        this.organizations.sort((a:any,b:any)=> a.name.localeCompare(b.name));
+      }
+    });
+    this.subscribeOnBusinessUnitChange();
+  }
+
+  private subscribeOnBusinessUnitChange(): void {
+    this.lastSelectedOrganizationId$.pipe(takeWhile(() => this.isAlive))
+      .subscribe(() => {
+        var datasource = this.createServerSideDatasource();
+        this.gridApi?.setServerSideDatasource(datasource);
+        this.openLogDetailsDialogue.next(false);
+      });
   }
 
 
@@ -244,7 +260,11 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   }
   
   public dispatchNewPage(postData:any): void {
-    this.store.dispatch(new GetLogInterfacePage(JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0'))  as number,postData.currentPage,postData.pageSize));
+    if(localStorage.getItem('lastSelectedOrganizationId') === null){
+      this.store.dispatch(new GetLogInterfacePage(this.organizations[0].organizationId,postData.currentPage,postData.pageSize));
+    }else{
+      this.store.dispatch(new GetLogInterfacePage(JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0'))  as number,postData.currentPage,postData.pageSize));
+    }
   }
 
   onPageSizeChanged(event: any) {
@@ -260,6 +280,11 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
        this.gridApi.setServerSideDatasource(datasource);
     }
   }
-
+  
+  ngOnDestroy(): void {
+    this.isAlive = false;
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
 
 }
