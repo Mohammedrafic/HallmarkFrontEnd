@@ -18,12 +18,14 @@ import {
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
-import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
+import { OPTION_FIELDS
+} from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order,
+  OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe, formatDate } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -306,9 +308,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             organizationId: this.candidateJob?.organizationId as number,
             jobId: this.candidateJob?.jobId as number,
             nextApplicantStatus: this.candidateJob?.applicantStatus,
-            actualStartDate: toCorrectTimezoneFormat(this.candidateJob?.actualStartDate) as string,
-            actualEndDate: toCorrectTimezoneFormat(this.candidateJob?.actualEndDate) as string,
-            offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
+            actualStartDate: DateTimeHelper.toUtcFormat(this.candidateJob?.actualStartDate),
+            actualEndDate: DateTimeHelper.toUtcFormat(this.candidateJob?.actualEndDate) as string,
+            offeredStartDate: DateTimeHelper.toUtcFormat(this.candidateJob?.availableStartDate as string),
             candidateBillRate: this.candidateJob?.candidateBillRate as number,
             offeredBillRate: this.candidateJob?.offeredBillRate,
             requestComment: this.candidateJob?.requestComment as string,
@@ -427,6 +429,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           }
           this.billRatesData = [...value?.billRates];
 
+          const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
+          ? value.offeredStartDate : value.actualStartDate;
+          const actualEnd = this.durationService.getEndDate(value.order.duration, new Date(actualStart)).toString();
+
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
             date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
@@ -443,12 +449,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             clockId: value.clockId ? value.clockId : '',
             offeredBillRate: value.offeredBillRate ? PriceUtils.formatNumbers(value.offeredBillRate) : null,
             allow: value.allowDeployCredentials,
-            startDate: value.actualStartDate
-              ? DateTimeHelper.convertDateToUtc(value.actualStartDate)
-              : DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
-            endDate: value.actualEndDate
-              ? DateTimeHelper.convertDateToUtc(value.actualEndDate)
-              : DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()),
+            startDate: DateTimeHelper.convertDateToUtc(actualStart),
+            endDate: DateTimeHelper.convertDateToUtc(actualEnd),
             rejectReason: value.rejectReason,
             offeredStartDate: formatDate(DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(),
             'MM/dd/YYYY', 'en-US'),

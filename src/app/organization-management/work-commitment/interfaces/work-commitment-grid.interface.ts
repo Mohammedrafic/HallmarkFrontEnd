@@ -54,7 +54,7 @@ export interface WorkCommitmentGrid {
   endDate: string | null;
   jobCode: string;
   locationName: string[];
-  locationIds: number[];
+  locationIds: string[];
   masterWorkCommitmentId: number;
   masterWorkCommitmentName: string;
   minimumWorkExperience: number | null;

@@ -428,7 +428,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: DateTimeHelper.formatDateUTC(reOrderDate as string, 'MM/dd/yyyy'),
+      orderOpenDate: DateTimeHelper.convertDateToUtc(reOrderDate as string),
       shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
       shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
       openPositions,

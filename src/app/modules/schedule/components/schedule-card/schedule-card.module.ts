@@ -23,12 +23,12 @@ const icons = {
   exports: [
     ScheduleCardComponent,
   ],
-  imports: [
-    CommonModule,
-    FeatherModule.pick(icons),
-    TooltipModule,
-    TooltipContainerModule,
-  ],
+    imports: [
+        CommonModule,
+        FeatherModule.pick(icons),
+        TooltipModule,
+        TooltipContainerModule,
+    ],
   providers: [ScheduleCardService],
 })
 export class ScheduleCardModule { }

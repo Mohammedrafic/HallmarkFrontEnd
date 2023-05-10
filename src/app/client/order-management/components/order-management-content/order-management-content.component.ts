@@ -683,8 +683,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public updatePageforbulk(): void {
-    this.getOrders();
     this.clearSelection(this.gridWithChildRow);
+    this.getOrders(true);
+    this.cd.markForCheck();
   }
 
   public onAddReorderClose(): void {
@@ -1469,7 +1470,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       .subscribe(() => {
         this.dispatchAgencyOrderCandidatesList(this.selectedOrder.id, this.selectedOrder.organizationId as number,
           !!this.selectedOrder.irpOrderMetadata);
-        this.getOrders();
+        this.getOrders(true);
         this.store.dispatch(
           new GetOrderById(
             this.selectedOrder.id,

@@ -20,7 +20,7 @@ export class SkillMatchComponent extends GridCellRenderer<DepartmentAssigned & I
     const messages: { [key: number]: string } = {
       [SkillTypeEnum.PrimarySkill]: 'Primary Skill',
       [SkillTypeEnum.SecondarySkill]: 'Secondary Skill',
-      [SkillTypeEnum.PrimarySecondarySkill]: 'Primary and Secondary Skills',
+      [SkillTypeEnum.PrimarySecondarySkill]: 'Primary and Secondary Skills'
     };
     return messages[this.params.data?.skillType] ?? '';
   }

@@ -14,7 +14,8 @@ export class GetUserSubscriptionPage {
       public pageSize: number,
       public sortModel: any,
       public filterModel: any,
-      public filters: UserSubscriptionFilters
+      public filters: UserSubscriptionFilters,
+      public isIRP: boolean = false
     ) {}
   }
   export class UpdateUserSubscription {
@@ -32,7 +33,8 @@ export class GetUserSubscriptionPage {
       public pageSize: number,
       public sortModel: any,
       public filterModel: any,
-      public filters: AlertsTemplateFilters
+      public filters: AlertsTemplateFilters,
+      public isIRP: boolean
     ) {}
   }
 
@@ -41,7 +43,9 @@ export class GetUserSubscriptionPage {
     constructor(
       public alertId:number,
       public alertChannel: AlertChannel,
-      public businessUnitId:number |null
+      public businessUnitId:number |null,
+      public businessUnitType:number | null,
+      public isIRP: boolean
     ) {}
   }
   export class UpdateTemplateByAlertId {
@@ -211,4 +215,9 @@ export class GetGroupEmailWorkCommitments {
     public locations: string,
     public skills: string
   ) { }
+}
+
+export class GetOrganizationById {
+  static readonly type = '[alerts] Get Organization by ID';
+  constructor(public businessUnitId: number) { }
 }

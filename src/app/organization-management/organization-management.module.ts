@@ -61,7 +61,6 @@ import { CredentialsSetupComponent } from './credentials/credentials-setup/crede
 import { SkillsComponent } from './skills/skills.component';
 import { ShiftsComponent } from './shifts/shifts.component';
 import { GroupSetupComponent } from './credentials/credentials-setup/group-setup/group-setup.component';
-import { SettingsComponent } from './settings/settings.component';
 import { CredentialsComponent } from './credentials/credentials.component';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 import { HolidaysState } from './store/holidays.state';
@@ -104,7 +103,6 @@ import { GridModule as AppGridModule } from '@shared/components/grid/grid.module
 import { ImportDepartmentsComponent } from './departments/import-departments/import-departments.component';
 import { ImportBillRatesComponent } from './bill-rates/import-bill-rates/import-bill-rates.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
-import { CanManageSettingPipe } from '@shared/pipes/can-manage-setting.pipe';
 import { ImportRegionsComponent } from './regions/import-regions/import-regions.component';
 import { RegionsGridComponent } from './regions/import-regions/regions-grid/regions-grid.component';
 import { PenaltiesGridActionsRendererComponent,
@@ -173,7 +171,6 @@ const sidebarIcons = {
     SkillsComponent,
     ShiftsComponent,
     GroupSetupComponent,
-    SettingsComponent,
     GroupComponent,
     HolidaysComponent,
     JobOrderComponent,
@@ -198,7 +195,6 @@ const sidebarIcons = {
     ImportLocationsComponent,
     ImportDepartmentsComponent,
     ImportBillRatesComponent,
-    CanManageSettingPipe,
     ImportRegionsComponent,
     RegionsGridComponent,
     PenaltiesGridActionsRendererComponent,

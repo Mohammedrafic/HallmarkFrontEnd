@@ -1,4 +1,4 @@
-import { Component, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   debounceTime,
   filter,
@@ -78,6 +78,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
 import { CandidateListScroll } from './candidate-list.enum';
 import { OutsideZone } from '@core/decorators';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-candidate-list',
@@ -156,6 +157,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public readonly candidateStatus = CandidatesStatusText;
   public candidates$: Observable<CandidateList | IRPCandidateList>;
   public readonly userPermissions = UserPermissions;
+  public selecteditmesids : any[]=[];
   public columnsToExport: ExportColumn[] = [
     { text: 'Name', column: 'Name' },
     { text: 'Profile Status', column: 'ProfileStatus' },
@@ -186,7 +188,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   };
   public readonly optionFields = optionFields;
   public readonly regionFields = regionFields;
-
+  public unassignedworkCommitment: any;
   private pageSubject = new Subject<number>();
   private includeDeployedCandidates = true;
   private unsubscribe$: Subject<void> = new Subject();
@@ -205,8 +207,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     private candidateListService: CandidateListService,
     private scrollService: ScrollRestorationService,
     private readonly ngZone: NgZone,
+    @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis
   ) {
     super();
+    this.unassignedworkCommitment = JSON.parse(localStorage.getItem('unassignedworkcommitment') || '"false"') as boolean; 
   }
 
   ngOnInit(): void {
@@ -370,6 +374,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     const columnMap = this.isIRP ? this.columnsToExportIrp : this.columnsToExport;
+    this.selecteditmesids = this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : [];
     const requestBody: CandidateListExport = {
       filterQuery: this.getFilterValues(),
       exportFileType: fileType,
@@ -454,13 +459,18 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       secondarySkillIds: this.filters.secondarySkillIds!,
       hireDate: this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
       includeDeployedCandidates: this.includeDeployedCandidates,
+      ids: this.selecteditmesids,
       expiry : {
         type : this.filters.credType! ? this.filters.credType! : [],
         startDate : this.filters.startDate! ? DateTimeHelper.toUtcFormat(this.filters.startDate!) : null,
         endDate : this.filters.endDate! ? DateTimeHelper.toUtcFormat(this.filters.endDate!) : null,
       },
       orderBy: this.orderBy,
+      ShowNoWorkCommitmentOnly : this.unassignedworkCommitment
     };
+    this.unassignedworkCommitment = false;
+    this.globalWindow.localStorage.setItem("unassignedworkcommitment", JSON.stringify(false));
+
     return filter;
   }
 

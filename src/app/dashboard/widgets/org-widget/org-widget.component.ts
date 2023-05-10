@@ -34,6 +34,7 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
   public selectedSystem: SelectedSystemsFlag = SelectedSystems;
   public countzero = "Ordercountzero";
   public isAgencyUser: boolean = false;
+  public isOrgUser: boolean = false;
   public isIRPEnabledOrg: boolean = this.store.selectSnapshot(AppState.isIrpFlagEnabled);;
   private mousePosition = {
     x: 0,
@@ -51,9 +52,12 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
     if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
       this.isAgencyUser = true;
     }
-    if(user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Organization){}
-    this.store.dispatch(new GetOrganizationById(this.store.selectSnapshot(UserState.user)?.businessUnitId as number));
-    this.getOrganizagionData();
+    if(user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Organization){
+      this.store.dispatch(new GetOrganizationById(this.store.selectSnapshot(UserState.user)?.businessUnitId as number));
+      this.getOrganizagionData();
+      this.isOrgUser =true
+    }
+ 
 
   }
 
@@ -92,13 +96,15 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
     } else if (orgname === 'Pending Timesheet') {
       this.dashboardService.redirectToUrl('client/timesheets/');
       this.globalWindow.localStorage.setItem("orgpendingwidget", JSON.stringify(orgname));
-    }else if(orgname =='NoOfLongTermOrders'){
+    } else if(orgname =='NoOfLongTermOrders'){
       this.dashboardService.redirectToUrl('client/order-management/');
       this.globalWindow.localStorage.setItem("ISIrpEnabled", JSON.stringify(true));
-    }
-    else if(orgname =='NoOfUnAssignedEmployee'){
+    } else if(orgname =='NoOfUnAssignedEmployee'){
       this.dashboardService.redirectToUrl('analytics/staff-list/');
       this.globalWindow.localStorage.setItem("unassignedemployeecountwidget", JSON.stringify(true));
+    } else if(orgname =='Unassignedworkcommitment'){
+      this.dashboardService.redirectToUrl('client/candidates/');
+      this.globalWindow.localStorage.setItem("unassignedworkcommitment", JSON.stringify(true));
     }
   }
 

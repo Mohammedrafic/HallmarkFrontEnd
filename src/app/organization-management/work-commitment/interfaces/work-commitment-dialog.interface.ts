@@ -11,7 +11,7 @@ export interface Option {
 export interface WorkCommitmentForm {
   masterWorkCommitmentId: number;
   regions: OrganizationRegion[] | string[];
-  locations: OrganizationLocation[] | number[];
+  locations: OrganizationLocation[] | string[];
   skillIds: (ListOfSkills | null | string | number)[];
   minimumWorkExperience: number | null;
   availabilityRequirement: number | null;

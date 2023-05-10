@@ -731,6 +731,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       this.candidateJob?.applicantStatus.applicantStatus === CandidatStatus.BillRatePending
         ? candidateBillRate
         : offeredBillRate;
+    const orderDate = this.order.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate;
 
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
@@ -739,7 +740,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: this.order.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate,
+      orderOpenDate: DateTimeHelper.convertDateToUtc(orderDate as string),
       shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
       shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
       openPositions,

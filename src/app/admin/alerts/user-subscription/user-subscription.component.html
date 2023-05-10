@@ -1,3 +1,10 @@
+<app-button-group
+*ngIf="isIRPFlagEnabled"
+class="button-group system-buttons"    
+[buttonOptions]="systemGroupConfig"
+(buttonChange)="changeSystem($event)">
+</app-button-group>
+
 <app-page-toolbar>
   <ng-container left>
     <div class="bootstrap business-dropdowns" [formGroup]="businessForm">
@@ -6,7 +13,7 @@
           <ejs-dropdownlist appValidateWithMessage
                             formControlName="businessUnit"
                             [fields]="optionFields"
-                            [dataSource]="businessUnits"
+                            [dataSource]="filteredBusinessUnits"
                             [allowFiltering]="true"
                             placeholder="Business Unit">
           </ejs-dropdownlist>
@@ -40,7 +47,6 @@
   </ng-container>
 
 </app-page-toolbar>
-
 <section class="table-wrapper" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
   <div class="custom-grid">
     <ag-grid-angular #agGridPagination

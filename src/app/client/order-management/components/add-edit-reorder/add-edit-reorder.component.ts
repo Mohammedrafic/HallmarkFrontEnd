@@ -279,17 +279,13 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
     return (
       !this.areDatesEquals(reorderDate, reorderDateInitial) ||
-      !this.areTimesEquals(shiftEndTime, shiftEndTimeInitial) ||
-      !this.areTimesEquals(shiftStartTime, shiftStartTimeInitial)
+      !this.areDatesEquals(shiftEndTime, shiftEndTimeInitial) ||
+      !this.areDatesEquals(shiftStartTime, shiftStartTimeInitial)
     );
   }
 
   private areDatesEquals(date1: Date, date2: Date): boolean {
-    return new Date(date1).toLocaleDateString() === new Date(date2).toLocaleDateString();
-  }
-
-  private areTimesEquals(time1: Date, time2: Date): boolean {
-    return DateTimeHelper.toUtcFormat(time1) === DateTimeHelper.toUtcFormat(time2);
+    return DateTimeHelper.toUtcFormat(date1) === DateTimeHelper.toUtcFormat(date2);
   }
 
   private saveReorder(): void {

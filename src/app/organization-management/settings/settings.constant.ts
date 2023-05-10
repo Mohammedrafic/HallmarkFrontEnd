@@ -1,10 +1,28 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { SystemType } from '@shared/enums/system-type.enum';
+import { ButtonModel } from '@shared/models/buttons-group.model';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { SettingsFilterColsConfig } from './settings.interface';
 
-export const AssociatedLink: string = '/client/associate-list';
-export const tierSettingsKey: string = 'TieringLogic';
-export const billingSettingsKey: string = 'BillingContactEmails';
-export const invoiceGeneratingSettingsKey: string = 'InvoiceAutoGeneration';
+export const AssociatedLink = '/client/associate-list';
+export const TierSettingsKey = 'TieringLogic';
+export const BillingSettingsKey = 'BillingContactEmails';
+export const InvoiceGeneratingSettingsKey = 'InvoiceAutoGeneration';
+
+export const SettingsSystemFilterCols = {
+  includeInIRP: {
+    type: ControlTypes.Checkbox,
+    valueType: ValueType.Text,
+    checkBoxTitle: 'IRP',
+    dataSource: [],
+  },
+  includeInVMS: {
+    type: ControlTypes.Checkbox,
+    valueType: ValueType.Text,
+    checkBoxTitle: 'VMS',
+    dataSource: [],
+  },
+};
 
 export const SettingsFilterCols: SettingsFilterColsConfig = {
   regionIds: {
@@ -47,7 +65,7 @@ export const SettingsAppliedToPermissions: string[] = [
   'MandateCandidateAddress',
   'MandateCandidatePhone1',
   'CreateReplacementPerDiemOrder',
-  'OTHours'
+  'OTHours',
 ];
 
 export const DisabledSettingsByDefault = [
@@ -60,5 +78,57 @@ export const DisabledSettingsByDefault = [
   'CandidatePayRate',
   'MandateCandidateAddress',
   'MandateCandidatePhone1',
-  'CreateReplacementPerDiemOrder'
+  'CreateReplacementPerDiemOrder',
 ];
+
+export const GetSettingSystemButtons = (isIRP: boolean): ButtonModel[] => {
+  return [
+    {
+      id: SystemType.IRP,
+      title: SystemType[SystemType.IRP],
+      active: isIRP,
+    },
+    {
+      id: SystemType.VMS,
+      title: SystemType[SystemType.VMS],
+      active: !isIRP,
+    },
+  ];
+};
+
+export const DropdownCheckboxValueDataSource = [
+  {
+    key: 'Apply',
+    value: 'Apply',
+  },
+  {
+    key: 'Accept',
+    value: 'Accept',
+  },
+];
+
+export const OptionFields: FieldSettingsModel = {
+  text: 'name',
+  value: 'id',
+};
+
+export const DepartmentFields: FieldSettingsModel = {
+  text: 'departmentName',
+  value: 'departmentId',
+};
+
+export const TextOptionFields: FieldSettingsModel = {
+  text: 'text',
+  value: 'id',
+};
+
+export const DropdownFields: FieldSettingsModel = {
+  text: 'value',
+  value: 'key',
+};
+
+export const OrganizationSystems = {
+  IRP: false,
+  VMS: false,
+  IRPAndVMS: false,
+};

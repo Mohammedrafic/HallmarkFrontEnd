@@ -161,4 +161,10 @@ export class UsersService {
   public importUsers(file: FormData): Observable<void> {
     return this.http.post<void>('/api/Users/import', file);
   }
+
+  public getEmployeeUsers(businessUnitId:number): Observable<User[]>
+  {
+    return this.http.get<User[]>(`/api/Users/getemployeeusers/?BusinessUnitId=${businessUnitId}`)
+      .pipe(map((data) => sortByField(data, 'name')));
+  }
 }
