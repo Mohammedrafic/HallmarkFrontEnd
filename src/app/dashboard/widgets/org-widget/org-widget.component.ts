@@ -96,13 +96,15 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
     } else if (orgname === 'Pending Timesheet') {
       this.dashboardService.redirectToUrl('client/timesheets/');
       this.globalWindow.localStorage.setItem("orgpendingwidget", JSON.stringify(orgname));
-    }else if(orgname =='NoOfLongTermOrders'){
+    } else if(orgname =='NoOfLongTermOrders'){
       this.dashboardService.redirectToUrl('client/order-management/');
       this.globalWindow.localStorage.setItem("ISIrpEnabled", JSON.stringify(true));
-    }
-    else if(orgname =='NoOfUnAssignedEmployee'){
+    } else if(orgname =='NoOfUnAssignedEmployee'){
       this.dashboardService.redirectToUrl('analytics/staff-list/');
       this.globalWindow.localStorage.setItem("unassignedemployeecountwidget", JSON.stringify(true));
+    } else if(orgname =='Unassignedworkcommitment'){
+      this.dashboardService.redirectToUrl('client/candidates/');
+      this.globalWindow.localStorage.setItem("unassignedworkcommitment", JSON.stringify(true));
     }
   }
 

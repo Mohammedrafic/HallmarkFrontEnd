@@ -218,6 +218,6 @@ export class GetGroupEmailWorkCommitments {
 }
 
 export class GetOrganizationById {
-  static readonly type = '[admin] Get Organization by ID';
+  static readonly type = '[alerts] Get Organization by ID';
   constructor(public businessUnitId: number) { }
 }

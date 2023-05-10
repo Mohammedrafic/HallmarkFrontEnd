@@ -38,6 +38,7 @@ import {
 import {
   CriticalCellComponent,
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
+import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 
 
 @NgModule({
@@ -71,6 +72,7 @@ import {
     NumericTextBoxModule,
     MaskedTextBoxModule,
     MultiDatePickerModule,
+    ValidateDirectiveModule,
   ],
   providers: [
     OrderDetailsIrpService,

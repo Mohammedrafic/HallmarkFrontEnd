@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, O
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../store/user.state';
@@ -126,6 +126,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
   private workcommitmentsedit: any[] = [];
+  private skillsEdit: any[] = [];
   public columnsToExport: ExportColumn[] = [
     { text: 'Region', column: 'Region' },
     { text: 'Location', column: 'Location' },
@@ -144,7 +145,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   public allRegionsSelected: boolean = false;
   public allLocationsSelected: boolean = false;
   public allDepartmentsSelected: boolean = false;
-  public allSkillsSelected: boolean = false;
   protected componentDestroy: () => Observable<unknown>;
   public pageNumber = 1;
   public deptId: any[] = [];
@@ -214,7 +214,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'skillDescription',
+        valueField: 'name',
         valueId: 'id',
       },
       PayRateTitleOption: {
@@ -450,17 +450,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     }
   }
 
-  public allSkillsChange(event: { checked: boolean }): void {
-    this.allSkillsSelected = event.checked;
-    const skillsControl = this.PayRatesFormGroup.controls['skillIds'];
-    if (this.allSkillsSelected) {
-      skillsControl.setValue(null);
-      skillsControl.disable();
-    } else {
-      skillsControl.enable();
-    }
-  }
-
   public loadData(): void {
     this.store.dispatch(new GetAssignedSkillsByOrganization());
     this.getWorkCommitment();
@@ -538,7 +527,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         departmentIds: this.allDepartmentsSelected
           ? []
           : this.PayRatesFormGroup.controls['departmentIds'].value,
-        skillIds: this.allSkillsSelected ? [] : this.PayRatesFormGroup.controls['skillIds'].value,
+        skillIds: this.PayRatesFormGroup.controls['skillIds'].value,
         payRateConfigId: this.PayRatesFormGroup.controls['payRateConfigId'].value,
         orderTypes: this.PayRatesFormGroup.controls['orderTypes'].value.length === this.orderTypes.length
           ? [] 
@@ -666,19 +655,19 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   }
 
   private createFormGroups(): void {
-    this.PayRatesFormGroup = this.formBuilder.group({
-      regionIds: [[], [Validators.required]],
-      locationIds: [[], [Validators.required]],
-      departmentIds: [[], [Validators.required]],
-      skillIds: [[], [Validators.required]],
-      orderTypes: [[], [Validators.required]],
-      payRatesCategory: [{ value: '', disabled: true }],
-      payRateConfigId: [[], [Validators.required]],
-      amountMultiplier: ["", [Validators.required, Validators.maxLength(11)]],
-      effectiveDate: [null, [Validators.required]],
-      WorkCommitmentIds : [[], [Validators.required]], 
-      payType : [[], [Validators.required]],
-    });
+      this.PayRatesFormGroup = new FormGroup({
+        regionIds: new FormControl([], [Validators.required]),
+        locationIds: new FormControl([], [Validators.required]),
+        departmentIds: new FormControl([], [Validators.required]),
+        skillIds: new FormControl([], [Validators.required]),
+        orderTypes: new FormControl([], [Validators.required]),
+        payRatesCategory: new FormControl({ value: '', disabled: true }),
+        payRateConfigId: new FormControl([], [Validators.required]),
+        amountMultiplier: new FormControl("", [Validators.required, Validators.maxLength(11)]),
+        effectiveDate: new FormControl(null, [Validators.required]),
+        WorkCommitmentIds : new FormControl([], [Validators.required]), 
+        payType : new FormControl([], [Validators.required]),
+      });
 
     this.payRateFilterFormGroup = this.formBuilder.group({
       regionIds: [[]],
@@ -703,7 +692,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     this.allRegionsChange({ checked: false });
     this.allLocationsChange({ checked: false });
     this.allDepartmentsChange({ checked: false });
-    this.allSkillsChange({ checked : false});
   }
 
   private regionChangedHandler(): void {
@@ -770,7 +758,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     this.allRegionsChange({ checked: !data.regionId });
     this.allLocationsChange({ checked: !data.locationId });
     this.allDepartmentsChange({ checked: !data.departmentId });
-    this.allSkillsChange({ checked : !data.skillId});
     if (!data.regionId) {
       this.allRegionsSelected = true;
       this.PayRatesFormGroup.controls['regionIds'].setValue(null);
@@ -800,13 +787,15 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       this.PayRatesFormGroup.controls['departmentIds'].setValue([data.departmentId]);
     }
 
-    if (!data.skillId) {
-      this.allSkillsSelected = true;
+    if (data.skills.length === 0) {
       this.PayRatesFormGroup.controls['skillIds'].setValue(null);
     } else {
-      this.PayRatesFormGroup.controls['skillIds'].setValue([data.skillId]);
+      this.skillsEdit = [];
+      for(let i=0; i < data.skills.length; i++){
+        this.skillsEdit.push(data.skills[i].skillId);
+      }
+      this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
     }
-
     if (data.orderTypes.length === 0) {
       this.PayRatesFormGroup.controls['orderTypes'].setValue(this.orderTypes.map((type) => type.id));
     } else {

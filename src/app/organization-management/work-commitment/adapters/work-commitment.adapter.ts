@@ -7,7 +7,7 @@ import {
   WorkCommitmentDetails,
   WorkCommitmentGrid,
 } from '../interfaces';
-import { getRegionsArray } from '../helpers';
+import { getLocationssArray, getRegionsArray } from '../helpers';
 import { DateTimeHelper } from '@core/helpers';
 
 export class WorkCommitmentAdapter {
@@ -87,8 +87,8 @@ export class WorkCommitmentAdapter {
         startDate,
         endDate,
         jobCode,
-        locationName:allLocationsSelected?["All"]: workCommitmentOrgHierarchies.map((item) => item.locationName),
-        locationIds: workCommitmentOrgHierarchies.map((item) => item.locationId),
+        locationName:allLocationsSelected ? ["All"] : getLocationssArray(workCommitmentOrgHierarchies.filter(f=>f.locationId!=null), 'locationName'),
+        locationIds: getLocationssArray(workCommitmentOrgHierarchies.filter(f=>f.locationId!=null), 'locationId'),
         masterWorkCommitmentId,
         masterWorkCommitmentName,
         minimumWorkExperience,

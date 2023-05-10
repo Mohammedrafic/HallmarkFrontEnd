@@ -8,11 +8,16 @@ import {
 
 export class SettingsDataAdapter {
 
+  static getDropDownOptionIds(data: OrganizationSettingsDropDownOption[]): string[] {
+    if (data) {
+      return data.map((item: OrganizationSettingsDropDownOption) => item.value);
+    }
+
+    return [];
+  }
+
   static adaptSettings(settings: OrganizationSettingsGet[], IRPAndVMS: boolean): OrganizationSettingsGet[] {
-    /**
-     * TODO: refactoring needed here. High cyclomatic complexity.
-     */
-    return settings.map((item) => {
+    return settings.map((item: OrganizationSettingsGet) => {
       if (
         item.controlType === OrganizationSettingControlType.Select ||
         item.controlType === OrganizationSettingControlType.Multiselect
@@ -22,18 +27,15 @@ export class SettingsDataAdapter {
           item.value = SettingsDataAdapter.getDropDownOptionsFromString(item.value, item.valueOptions);
         }
 
-        if (item.children && item.children.length > 0) {
+        item.children?.forEach((child: OrganizationSettingChild) => {
+          if (typeof child.value === 'string') {
+            child.value = SettingsDataAdapter.getDropDownOptionsFromString(child.value, item.valueOptions);
+          }
+        });
 
-          item.children.forEach((child) => {
-
-            if (typeof child.value === 'string') {
-              child.value = SettingsDataAdapter.getDropDownOptionsFromString(child.value, item.valueOptions);
-            }
-          });
-        }
       }
 
-      item.children?.forEach((child) => {
+      item.children?.forEach((child: OrganizationSettingChild) => {
         child.systemType = IRPAndVMS ? SettingsDataAdapter.getSettingChildSystemType(child) : null;
       });
 
@@ -43,13 +45,13 @@ export class SettingsDataAdapter {
     });
   }
 
-  static getDropDownOptionsFromString(
+  private static getDropDownOptionsFromString(
     text: string,
     valueOptions: OrganizationSettingValueOptions[]
   ): OrganizationSettingsDropDownOption[] {
-    let options: OrganizationSettingsDropDownOption[] = [];
+    const options: OrganizationSettingsDropDownOption[] = [];
     if (text) {
-      let optionIds = text.split(';');
+      const optionIds = text.split(';');
       optionIds.forEach((id) => {
         const foundOption = valueOptions.find((option) => option.key === id);
         if (foundOption) {
@@ -60,7 +62,7 @@ export class SettingsDataAdapter {
     return options;
   }
 
-  static getSettingSystemType(setting: OrganizationSettingsGet): string | null {
+  private static getSettingSystemType(setting: OrganizationSettingsGet): string | null {
     if (setting.includeInVMS && !setting.includeInIRP) {
       return 'VMS';
     }
@@ -76,7 +78,7 @@ export class SettingsDataAdapter {
     return null;
   }
 
-  static getSettingChildSystemType(setting: OrganizationSettingChild): string {
+  private static getSettingChildSystemType(setting: OrganizationSettingChild): string {
     if (setting.isIRPConfigurationValue) {
       return 'IRP';
     } else {

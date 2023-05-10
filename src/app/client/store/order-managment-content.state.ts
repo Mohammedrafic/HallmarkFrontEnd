@@ -97,8 +97,7 @@ import {
   updateCandidateJobMessage,
   UpdateRegularRatesucceedcount,
   PerDiemReOrdersErrorMessage,
-  UpdateRegularRateWithPerDiemsucceedcount,
-  TravelerContracttoPermOrdersErrorMessage
+  TravelerContracttoPermOrdersSucceedMessage
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -1080,12 +1079,12 @@ export class OrderManagementContentState {
         const count = data.length;
         if(count>0 && payload.perDiemIds.length===0) 
           dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
-        else if(count==0 && payload.perDiemIds.length===0 && payload.orderIds.length===0) 
-          dispatch(new ShowToast(MessageTypes.Error, TravelerContracttoPermOrdersErrorMessage));
+        else if(count==0 && payload.perDiemIds.length===0) 
+          dispatch(new ShowToast(MessageTypes.Error, TravelerContracttoPermOrdersSucceedMessage));
         else if(payload.perDiemIds.length===payload.orderIds.length)
           dispatch(new ShowToast(MessageTypes.Error, PerDiemReOrdersErrorMessage));
         else if(count>0 && payload.perDiemIds.length>0)
-          dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRateWithPerDiemsucceedcount(count)));
+          dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rate is not updated'))))
     );

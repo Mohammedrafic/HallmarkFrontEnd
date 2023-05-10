@@ -10,5 +10,6 @@ export interface OrgDetailsInfoModel {
     missingTimeSheet: AgencyPositionModel[];
     quickLinkNoOfLongTermOrdersInNext30Days:number;
     departmentUnAssignedEmployeeCount:number;
+    workCommitmentUnAssignedEmployeeCount: number;
     id : WidgetTypeEnum.ORG;
 }

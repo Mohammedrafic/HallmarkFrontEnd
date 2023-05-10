@@ -192,7 +192,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
         okButtonClass: 'delete-button'
       })
       .subscribe((confirm) => {
-        if (confirm && this.selectedNode.id && this.selectedNode.parentID!=null && this.selectedNode.parentID!=-1 && this.selectedNode.id!=-1 ) {
+        if (confirm && this.selectedNode.id && this.selectedNode.parentID != -1 && this.selectedNode.id != -1) {
           const deleteFolderFilter: DeleteDocumentFolderFilter = {
             folderId: this.selectedNode.id,
             businessUnitType: this.selectedBusinessType,

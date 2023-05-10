@@ -5,4 +5,5 @@ export class BusinessUnit {
   parentUnitId: number;
   agencyStatus: number;
   isIRPEnabled?: boolean;
+  isVMSEnabled?: boolean;
 }

@@ -991,7 +991,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             this.documentLibraryform.get(FormControlNames.TypeIds)?.setValue(data.docType);
             this.documentLibraryform.get(FormControlNames.Tags)?.setValue(data.tags);
             this.documentLibraryform.get(FormControlNames.StatusIds)?.setValue(status?.id);
-            this.documentLibraryform.get(FormControlNames.StartDate)?.setValue(data.startDate != null ? new Date(data.startDate.toString()) : this.startDate);
+            this.documentLibraryform.get(FormControlNames.StartDate)?.setValue(data.startDate != null ? new Date(data.startDate.toString()) : null);
             this.documentLibraryform.get(FormControlNames.EndDate)?.setValue(data.endDate != null ? new Date(data.endDate.toString()) : null);
             this.documentLibraryform.get(FormControlNames.Comments)?.setValue(data.comments);
             setTimeout(() => {
@@ -1319,9 +1319,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public allAgenciesChange(event: any) {
     this.allAgencies=!this.allAgencies;
     this.documentLibraryform.get(FormControlNames.AllAgencies)?.setValue(this.allAgencies);
-    if(this.allAgencies){
+    if (this.allAgencies && !this.agencySwitch){
       this.isShowSharedWith=false;
-    }else{
+    } else if (!this.allAgencies && !this.agencySwitch){
       this.isShowSharedWith=true;
     }
     this.changeDetectorRef.markForCheck();
@@ -1330,9 +1330,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public allOrgnizationsChange(event: any) {
     this.allOrgnizations=!this.allOrgnizations;
     this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(this.allOrgnizations);
-    if(this.allOrgnizations){    
+    if (this.allOrgnizations && !this.organizationSwitch){    
       this.isShowSharedWith=false;
-    }else{
+    } else if (!this.allOrgnizations && !this.organizationSwitch){
       this.isShowSharedWith=true;
     }
     this.changeDetectorRef.markForCheck();

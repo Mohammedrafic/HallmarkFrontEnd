@@ -42,7 +42,7 @@ export class OrderDetailsService {
         hourlyRate: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(ONLY_NUMBER_AND_DOT)]],
         openPositions: [null, [Validators.required, Validators.max(9999999999), Validators.min(1),
           Validators.pattern(ONLY_NUMBER)]],
-        minYrsRequired: [null, [Validators.maxLength(10), Validators.pattern(NUMBER_AND_ONE_DECIMAL)]],
+        minYrsRequired: [null, [Validators.max(9999999999), Validators.min(0.1)]],
         joiningBonus: [null, [Validators.maxLength(10), Validators.pattern(ONLY_NUMBER_AND_DOT)]],
         compBonus: [null, [Validators.maxLength(10), Validators.pattern(ONLY_NUMBER_AND_DOT)]],
         duration: [null, Validators.required],

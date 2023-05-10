@@ -41,7 +41,9 @@ export enum OrganizationSettingKeys {
   DisableAddEditTimesheetsInAgencyLogin,
   DefaultTimezone,
   OTHours,
-  PayPeriod
+  PayPeriod,
+  AvailabilityOverLapRule,
+  ScheduleOnlyWithAvailability
 }
 
 export enum OrganizationalHierarchy {
