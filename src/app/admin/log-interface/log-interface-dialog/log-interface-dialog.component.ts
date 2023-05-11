@@ -350,9 +350,8 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
         this.gridApi?.showNoRowsOverlay();
       } else {
         this.gridApi?.hideOverlay();
-        this.timeSheetHistoryItemList = data.items;
-        this.gridApi?.setRowData(this.timeSheetHistoryItemList);
       }
+      this.gridApi?.setRowData(this.timeSheetHistoryItemList);
     });
 
   }
