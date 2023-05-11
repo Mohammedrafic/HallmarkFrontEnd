@@ -62,6 +62,8 @@ import {
   Schedule,
   ScheduleBook,
   ScheduleBookingErrors,
+  ScheduleCandidate,
+  ScheduleDay,
   ScheduleFormFieldConfig,
 } from '../../interface';
 import { ScheduleItemsComponent } from '../schedule-items/schedule-items.component';
@@ -101,6 +103,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   @Input() scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
   @Input() datePickerLimitations: DatePickerLimitations;
   @Input() userPermission: Permission = {};
+  @Input() isEmployee = false;
 
   @Input() set scheduleData(page: ScheduleInt.ScheduleModelPage | null) {
     if (page) {
@@ -121,6 +124,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   scheduleType: ScheduleItemType;
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
   sideBarSettings: BarSettings = SideBarSettings;
+  disableRemoveButton = false;
 
   private readonly customShiftId = -1;
   private shiftControlSubscription: Subscription | null;
@@ -151,7 +155,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    const candidates = changes['scheduleSelectedSlots']?.currentValue.candidates;
+    const candidates: ScheduleCandidate[] = changes['scheduleSelectedSlots']?.currentValue.candidates;
 
     if(candidates?.length && !this.sideBarSettings.showScheduleForm){
       this.sideBarSettings.showScheduleForm = true;
@@ -161,6 +165,10 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.getOpenPositions();
       this.createScheduleService.setOrientationControlValue(this.scheduleSelectedSlots, this.scheduleForm);
       this.sideBarSettings.showRemoveButton = this.createScheduleService.hasSelectedSlotsWithDate(candidates);
+    }
+
+    if (candidates?.length && this.isEmployee) {
+      this.disableRemoveButton = candidates[0].days.some((day: ScheduleDay) => !day.employeeCanEdit);
     }
   }
 

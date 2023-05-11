@@ -114,10 +114,28 @@
   .separator {
     height: 1px;
     background-color: $secondary-dark-blue-45;
-    margin: 0 0 28px 0;
+    margin: 0 -24px 16px;
+  }
+
+  .locked-message {
+    width: 100%;
+    line-height: 37px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: $roux;
+    background-color: $sheer-peach;
+
+    i-feather {
+      width: 14px;
+      height: 14px;
+      margin: 0 14px;
+      color: $supportive-orange;
+    }
   }
 
   .form-container {
+    margin-top: 20px;
+
     .validation-icon {
       display: none !important;
     }

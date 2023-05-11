@@ -62,6 +62,10 @@
       </div>
     </div>
     <div class="separator"></div>
+    <div *ngIf="showLockedMessage" class="locked-message">
+      <i-feather name="lock" class="icon"></i-feather>
+      <span>Locked {{selectedDaySchedule?.scheduleType}}</span>
+    </div>
     <div class="form-container" *ngIf="scheduleForm">
       <form [formGroup]="scheduleForm" [class]="scheduleFormConfig.formClass">
         <ng-container *ngFor="let control of scheduleFormConfig.formFields">

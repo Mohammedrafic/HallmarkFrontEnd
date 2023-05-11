@@ -18,7 +18,8 @@ export interface ScheduleDay {
   endTime: string;
   shiftDate: string;
   startTime: string;
-  scheduleType: ScheduleType
+  scheduleType: ScheduleType;
+  employeeCanEdit: boolean;
 }
 
 export interface ScheduleCandidate {
@@ -66,6 +67,7 @@ export interface ScheduleItem {
   shiftId: number;
   floated: boolean;
   attributes: ScheduleItemAttributes;
+  employeeCanEdit: boolean;
   orderMetadata: {
     orderType: IrpOrderType;
     location: string;
@@ -204,6 +206,7 @@ export interface EmployeesFilters {
   startDate: string | Date;
   endDate: string | Date;
   departmentsIds: number[];
+  userLocalTime: string;
 }
 
 export interface DatesByWeekday {

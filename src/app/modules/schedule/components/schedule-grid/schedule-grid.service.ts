@@ -73,6 +73,7 @@ export class ScheduleGridService {
         endTime: scheduleDay.endDate,
         shiftDate: scheduleDay.date,
         startTime: scheduleDay.startDate,
+        employeeCanEdit: scheduleDay.employeeCanEdit,
       };
     });
   }

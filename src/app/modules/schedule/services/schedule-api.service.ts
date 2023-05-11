@@ -16,7 +16,9 @@ import * as ScheduleInt from '../interface';
 import {
   CandidateSchedules,
   DeleteScheduleRequest,
-  EmployeesFilters, OpenPositionParams, OpenPositionsList,
+  EmployeesFilters,
+  OpenPositionParams,
+  OpenPositionsList,
   Schedule,
   ScheduleBookingErrors,
   ScheduleCandidatesPage,

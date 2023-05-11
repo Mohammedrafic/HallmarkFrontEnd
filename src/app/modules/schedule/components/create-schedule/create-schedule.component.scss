@@ -59,9 +59,19 @@ app-schedule-items {
         margin-left: 0;
       }
 
-      &:hover,
-      &:active {
+      &:hover:not([disabled]),
+      &:active:not([disabled]) {
         opacity: 0.8;
+      }
+
+      &:disabled {
+        color: $secondary-dark-blue-30 !important;
+        border-color: $secondary-dark-blue-40 !important;
+        background-color: $secondary-dark-blue-50 !important;
+
+        i-feather {
+          color: $secondary-dark-blue-30;
+        }
       }
     }
   }

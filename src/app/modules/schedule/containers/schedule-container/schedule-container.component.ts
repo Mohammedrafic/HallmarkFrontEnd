@@ -125,7 +125,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
  selectCells(cells: ScheduleInt.ScheduleSelectedSlots, closeBar= true): void {
-   if ((HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) && cells.dates.length) {
+   if (this.canNotSelectCells(cells)) {
      this.store.dispatch(new ShowToast(MessageTypes.Error, FilterErrorMessage));
      return;
    }
@@ -150,7 +150,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   editScheduledItem(scheduledItem: ScheduledItem): void {
-    if (HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) {
+    if ((HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) && !this.isEmployee) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, FilterErrorMessage));
       return;
     }
@@ -339,5 +339,12 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       .subscribe((employeeOrganizationStructure: OrganizationStructure) => {
         this.scheduleFiltersService.setEmployeeOrganizationStructure(employeeOrganizationStructure);
       });
+  }
+
+  private canNotSelectCells(cells: ScheduleInt.ScheduleSelectedSlots): boolean {
+    const filterError = ((HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters))
+      && !!cells.dates.length);
+
+    return !this.isEmployee && !!filterError;
   }
 }

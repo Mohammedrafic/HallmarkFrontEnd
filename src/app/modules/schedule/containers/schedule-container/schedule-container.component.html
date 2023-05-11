@@ -61,6 +61,7 @@
           *ngIf="sideBarSettings.isOpen"
           [datePickerLimitations]="datePickerLimitations"
           [scheduledShift]="scheduledShift"
+          [isEmployee]="isEmployee"
           [userPermission]="userPermission"
           (updateScheduleGrid)="updateScheduleGrid(false)"
         ></app-edit-schedule>
@@ -72,6 +73,7 @@
           [datePickerLimitations]="datePickerLimitations"
           [scheduleSelectedSlots]="scheduleSelectedSlots"
           [scheduleData]="scheduleData"
+          [isEmployee]="isEmployee"
           [userPermission]="userPermission"
         ></app-create-schedule>
       </ng-template>

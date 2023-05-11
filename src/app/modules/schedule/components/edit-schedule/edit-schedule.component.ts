@@ -37,6 +37,7 @@ import { getTime } from '@shared/utils/date-time.utils';
 import { ScheduleFormSourceKeys, ScheduleItemType, ScheduleTypesForEditBar } from 'src/app/modules/schedule/constants';
 import { ScheduleType } from 'src/app/modules/schedule/enums';
 import { ShowToast } from 'src/app/store/app.actions';
+import { UserState } from 'src/app/store/user.state';
 import {
   GetScheduleTabItems,
   GetShiftHours,
@@ -81,6 +82,7 @@ import { EditScheduleService } from './edit-schedule.service';
 export class EditScheduleComponent extends Destroyable implements OnInit {
   @ViewChild('tabs') private tabs: ElementRef;
 
+  @Input() isEmployee = false;
   @Input() datePickerLimitations: DatePickerLimitations;
   @Input() userPermission: Permission = {};
   @Input() set scheduledShift(scheduledItem: ScheduledItem | null) {
@@ -99,6 +101,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   readonly scheduleTypesControl: FormControl = new FormControl(ScheduleItemType.Book);
 
   hasEditPermissions = false;
+  canEmployeeEdit = false;
+  showLockedMessage = false;
   scheduleForm: CustomFormGroup<EditSchedule.ScheduledShiftForm>;
   scheduleFormConfig: EditSchedule.EditScheduleFormConfig = ScheduledShiftFormConfig(this.hasEditPermissions);
   scheduleTypes = ScheduleTypesForEditBar;
@@ -241,6 +245,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.newScheduleIndex = this.shiftTabs.length - 1;
     this.selectedDayScheduleIndex = this.newScheduleIndex;
     this.isCreateMode = true;
+    this.showLockedMessage = false;
     this.createFormForNewTab();
     this.scrollToNewScheduleTab();
   }
@@ -864,6 +869,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   }
 
   private setEditPermissions(): void {
-    this.hasEditPermissions = this.userPermission[EditSchedulePermissionsMap[this.selectedDaySchedule.scheduleType]];
+    this.canEmployeeEdit = !this.isEmployee || this.selectedDaySchedule.employeeCanEdit;
+    this.showLockedMessage = this.selectedDaySchedule.scheduleType !== ScheduleType.Book && !this.canEmployeeEdit;
+    this.hasEditPermissions = this.userPermission[EditSchedulePermissionsMap[this.selectedDaySchedule.scheduleType]]
+      && this.canEmployeeEdit;
   }
 }
