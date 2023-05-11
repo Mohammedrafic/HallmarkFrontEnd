@@ -151,6 +151,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   maxBlocksInCache: any;
   defaultColDef: any;
   itemList: Array<AlertsTemplate> | undefined;
+  public userBusinessType: any;
 
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
@@ -307,6 +308,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.onOrganizationChangedHandler();
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
+    this.userBusinessType = user?.businessUnitType;   
     this.filteredBusinessUnits = this.businessUnits;
     if (user?.businessUnitType) {
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
@@ -668,7 +670,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
 
   adjustBusinessUnitTypeBasedActiveSystem(){
     const user = this.store.selectSnapshot(UserState.user);    
-    this.businessControl.patchValue([]);
+    if(this.userBusinessType == BusinessUnitType.Hallmark)
+      this.businessControl.patchValue(0);
     this.filteredBusinessUnits = this.businessUnits;
     if(this.activeSystem == OrderManagementIRPSystemId.IRP){
       this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
