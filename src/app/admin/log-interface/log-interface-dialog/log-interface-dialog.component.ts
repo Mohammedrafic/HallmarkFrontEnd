@@ -387,7 +387,6 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       }
     });
 
-    console.log('this.selectedLog ---->',this.selectedLog);
     if(this.selectedLog != undefined){
       this.dispatchNewPageRequest({currentPage:this.currentPage,pageSize:this.pageSize});
     }
@@ -442,7 +441,6 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
   }
 
   public dispatchNewPageRequest(postData:any): void {
-    console.log('this.selectedLog ===>',this.selectedLog);
    // this.store.dispatch(new GetLogHistoryById("d2874d41-874d-4400-be4d-d2919f366dee",2,postData.currentPage,postData.pageSize));
     this.store.dispatch(new GetLogHistoryById(this.selectedLog.runId,this.selectedLog.organizationId,postData.currentPage,postData.pageSize));
   }
