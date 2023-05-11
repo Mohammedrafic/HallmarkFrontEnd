@@ -25,7 +25,7 @@
     Edit
   </fa-icon>
 </button>
-<button *ngIf="label === 'View'"
+<button *ngIf="label === 'View' || label === 'View Errors'"
   style='color:rgb(62, 127, 255); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
   [attr.title]="label"
   (click)="onClick($event)">

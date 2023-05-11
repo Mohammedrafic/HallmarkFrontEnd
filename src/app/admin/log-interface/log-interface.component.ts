@@ -1,4 +1,4 @@
-import { ColDef } from '@ag-grid-community/core';
+import { ColDef, FilterChangedEvent, GridOptions, ICellRendererParams } from '@ag-grid-community/core';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subject } from 'rxjs';
@@ -15,6 +15,9 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { LogInterface, LogInterfacePage } from '@shared/models/org-interface.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { ColumnDefinitionModel } from '@shared/components/grid/models';
+import { DatePipe } from '@angular/common';
+
 
 @Component({
   selector: 'app-log-interface',
@@ -37,7 +40,6 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   public totalRecordsCount: number;
   public gridApi: any;
   private gridColumnApi: any;
-  columnDefs: ColDef[];
   defaultColDef: ColDef = DefaultUserGridColDef;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   cacheBlockSize: any;
@@ -50,7 +52,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   paginationPageSize: number;
   maxBlocksInCache: any;
   sideBar = SideBarConfig;
-  itemList: Array<LogInterface> | undefined;
+  itemList: Array<LogInterface>= [];
   selectedLogItem: LogInterface;
   openLogDetailsDialogue = new Subject<boolean>();
 
@@ -60,124 +62,192 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
   };
+  public rowData: LogInterfacePage[]=[];
+  public readonly columnDefs: ColumnDefinitionModel[] = [
+    {
+      field: 'id',
+      hide: true,
+      filter: false,
+    },
+    {
+      headerName: 'View',
+      cellRenderer: ButtonRendererComponent,
+      minWidth: 50,
+      cellRendererParams: {
+        onClick: this.onEdit.bind(this),
+        label: 'View Errors',
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      }, 
+      sortable: true,
+      resizable: true    
+    },   
+    {
+      headerName: 'configurationId',
+      field: 'configurationId',
+      minWidth: 250,
+      hide: true,
+      filter: false,
+    },
+    {
+      headerName: 'organizationId',
+      field: 'organizationId',
+      minWidth: 100,
+      hide: true,
+      filter: false,
+    },
+    {
+      headerName: 'runId',
+      field: 'runId',
+      minWidth: 350,
+      hide: true,
+      filter: 'agTextColumnFilter',
+    },
+    {
+      headerName: 'File Name',
+      field: 'originalFileName',
+      minWidth: 250,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'Processed Date',
+      field: 'processDate',
+      minWidth: 175,
+      filter: 'agDateColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
+          if (cellValue == null) {
+            return 0;
+          }
+          const dateAsString = this.datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateParts = dateAsString.split('/');
+          const year = Number(dateParts[2]);
+          const month = Number(dateParts[0]) - 1;
+          const day = Number(dateParts[1]);
 
-  constructor(private store: Store,) {
+          const cellDate = new Date(year, month, day);
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
+      },
+      cellRenderer: (params: ICellRendererParams) => {
+        const str = this.datePipe?.transform(params.data.processDate, 'MM/dd/yyyy') as string
+        return str?.length > 0 ? str : "";
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'Status',
+      field: 'status',
+      minWidth: 250,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'Total Count',
+      field: 'totalRows',
+      minWidth: 175,
+      filter: false,
+      sortable: false,
+    },
+    {
+      headerName: 'Inserted Record Count',
+      field: 'insertedRecord',
+      minWidth: 175,
+      filter: false,
+    },
+    {
+      headerName: 'Updated Record Count',
+      field: 'updatedRecord',
+      minWidth: 175,
+      filter: false,
+      sortable: false,
+    },
+    {
+      headerName: 'Error Record Count',
+      field: 'failedRecord',
+      minWidth: 175,
+      filter: false,
+      sortable: false,
+      cellStyle: (params:any) => {
+        return {color: 'red'};
+      }
+    },
+    {
+      headerName: 'Skipped Records',
+      field: 'skippedRecord',
+      minWidth: 175,
+      filter: false,
+      sortable: false,
+    },    
+  ];
+
+  constructor(private store: Store,private datePipe: DatePipe) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Interface Log Summary', iconName: 'file-text' }));
-    var self = this;
-    this.frameworkComponents = {
-      buttonRenderer: ButtonRendererComponent,
-    };
-    this.rowModelType = 'serverSide';
-    this.serverSideStoreType = 'partial';
-    (this.serverSideInfiniteScroll = true), (this.serverSideFilterOnServer = true), (this.pagination = true);
-    (this.paginationPageSize = this.pageSize), (this.cacheBlockSize = this.pageSize);
-    this.maxBlocksInCache = 1;
-
-    this.columnDefs = [
-      {
-        headerName: 'Action',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onEdit.bind(this),
-          label: 'Edit',
-        },
-        width: 50,
-        filter: false,
-        sortable: false,
-        menuTabs: [],
-      },
-      {
-        field: 'id',
-        hide: true,
-        filter: false,
-      },
-      {
-        headerName: 'configurationId',
-        field: 'configurationId',
-        minWidth: 250,
-        hide: true,
-        filter: false,
-      },
-      {
-        headerName: 'organizationId',
-        field: 'organizationId',
-        minWidth: 100,
-        hide: true,
-        filter: false,
-      },
-      {
-        headerName: 'runId',
-        field: 'runId',
-        minWidth: 350,
-        hide: true,
-        filter: 'agTextColumnFilter',
-      },
-      {
-        headerName: 'Input File Name',
-        field: 'originalFileName',
-        minWidth: 250,
-        filter: 'agTextColumnFilter',
-      },
-      {
-        headerName: 'Processed Date',
-        field: 'processDate',
-        minWidth: 175,
-        filter: 'agTextColumnFilter',
-        cellRenderer: (params:any) => {
-          return params.data.processDate ? (new Date(params.data.processDate)).toLocaleDateString() : '';
-        }
-      },
-      {
-        headerName: 'status',
-        field: 'status',
-        minWidth: 250,
-        filter: 'agTextColumnFilter',
-      },
-      {
-        headerName: 'Total Count',
-        field: 'totalRows',
-        minWidth: 175,
-        filter: false,
-        sortable: false,
-      },
-      {
-        headerName: 'Created Records',
-        field: 'insertedRecord',
-        minWidth: 175,
-        filter: false,
-      },
-      {
-        headerName: 'Updated Records',
-        field: 'updatedRecord',
-        minWidth: 175,
-        filter: false,
-        sortable: false,
-      },
-      {
-        headerName: 'Error Records',
-        field: 'failedRecord',
-        minWidth: 175,
-        filter: false,
-        sortable: false,
-        cellStyle: params => {
-          return {color: 'red'};
-        }
-      },
-      {
-        headerName: 'Skipped Records',
-        field: 'skippedRecord',
-        minWidth: 175,
-        filter: false,
-        sortable: false,
-      },    
-    ];
+  
    }
 
   ngOnInit(): void {
+          this.store.dispatch(new GetLogInterfacePage(JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0'))  as number,this.currentPage,this.pageSize));
+          this.logInterfacePage$.pipe().subscribe((data: any) => {
+            if (!data || !data?.items.length) {
+              this.gridApi?.showNoRowsOverlay();
+            }
+            else {
+              this.gridApi?.hideOverlay();
+              this.rowData = data.items;
+              this.gridApi?.setRowData(this.rowData);
+            }
+            this.itemList = data?.items;
+            this.totalRecordsCount = data?.totalCount;          
+
+          });
   }
 
-
+  public gridOptions: GridOptions = {
+    pagination: true,
+    cacheBlockSize: this.pageSize,
+    paginationPageSize: this.pageSize,
+    columnDefs: this.columnDefs,
+    rowData: this.itemList,
+    sideBar: this.sideBar,
+    noRowsOverlayComponent: CustomNoRowsOverlayComponent,
+    noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
+    onFilterChanged: (event: FilterChangedEvent) => {
+      if (!event.api.getDisplayedRowCount()) {
+        this.gridApi?.showNoRowsOverlay();
+      }
+      else {
+        this.gridApi?.hideOverlay();
+      }
+    }
+  };
+  
   public onEdit(data: any): void {
     this.selectedLogItem = data.rowData;
     this.openLogDetailsDialogue.next(true);
@@ -210,10 +280,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
 
   onGridReady(params: any) {
     this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    params.api.showLoadingOverlay();
-    var datasource = this.createServerSideDatasource();
-     params.api.setServerSideDatasource(datasource);
+    this.gridApi.setRowData(this.rowData);
   }
 
   createServerSideDatasource() {
@@ -251,13 +318,8 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
     this.cacheBlockSize = Number(event.value.toLowerCase().replace('rows', ''));
     this.paginationPageSize = Number(event.value.toLowerCase().replace('rows', ''));
     if (this.gridApi != null) {
-      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace('rows', '')));
-      this.gridApi.gridOptionsWrapper.setProperty(
-        'cacheBlockSize',
-        Number(event.value.toLowerCase().replace('rows', ''))
-      );
-       var datasource = this.createServerSideDatasource();
-       this.gridApi.setServerSideDatasource(datasource);
+       this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
+      this.gridApi.setRowData(this.rowData);
     }
   }
 
