@@ -73,7 +73,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
   };
-  public rowData: LogInterfacePage[]=[];
+  // public rowData: LogInterfacePage[]=[];
   public readonly columnDefs: ColumnDefinitionModel[] = [
     {
       field: 'id',
@@ -216,8 +216,8 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
             }
             else {
               this.gridApi?.hideOverlay();
-              this.rowData = data.items;
-              this.gridApi?.setRowData(this.rowData);
+              this.itemList = data.items;
+              this.gridApi?.setRowData(this.itemList);
             }
             this.itemList = data?.items;
             this.totalRecordsCount = data?.totalCount;          
@@ -237,8 +237,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
     private subscribeOnBusinessUnitChange(): void {
       this.lastSelectedOrganizationId$.pipe(takeWhile(() => this.isAlive))
         .subscribe(() => {
-          var datasource = this.createServerSideDatasource();
-          this.gridApi?.setServerSideDatasource(datasource);
+          this.dispatchNewPage({currentPage:this.currentPage,pageSize:this.pageSize});
           this.openLogDetailsDialogue.next(false);
         });
     }
@@ -267,7 +266,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
     this.openLogDetailsDialogue.next(true);
     const options = this.getDialogNextPreviousOption(data.rowData);
     // this.store.dispatch(new GetLogHistoryById("d2874d41-874d-4400-be4d-d2919f366dee",2,this.currentPage,this.pageSize, options));
-     this.store.dispatch(new GetLogHistoryById(data.rowData.runId, data.rowData.organizationId,this.currentPage,this.pageSize, options));
+    this.store.dispatch(new GetLogHistoryById(data.rowData.runId, data.rowData.organizationId,this.currentPage,this.pageSize, options));
   }
 
   private getDialogNextPreviousOption(selectedOrder: LogInterface): DialogNextPreviousOption {
@@ -294,7 +293,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
 
   onGridReady(params: any) {
     this.gridApi = params.api;
-    this.gridApi.setRowData(this.rowData);
+    this.gridApi.setRowData(this.itemList);
   }
 
   createServerSideDatasource() {
@@ -337,7 +336,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
     this.paginationPageSize = Number(event.value.toLowerCase().replace('rows', ''));
     if (this.gridApi != null) {
        this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
-      this.gridApi.setRowData(this.rowData);
+      this.gridApi.setRowData(this.itemList);
     }
   }
   
