@@ -25,6 +25,7 @@ import {
   OrderTypes,
   PoNumbers,
   ProjectNames,
+  SelectedStructureState,
   SelectSystem,
   SpecialProjectCategories,
   SpecialProjectStructure,
@@ -80,7 +81,12 @@ import { AssignedSkillsByOrganization, ListOfSkills } from '@shared/models/skill
 import { DurationService } from '@shared/services/duration.service';
 import { Duration } from '@shared/enums/durations';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
-import { OrderRequisitionReason, RejectReason, RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
+import {
+  OrderRequisitionReason,
+  RejectReason,
+  RejectReasonPage,
+  RejectReasonwithSystem,
+} from '@shared/models/reject-reason.model';
 import {
   OrderDetailsIrpService,
 } from '@client/order-management/components/irp-tabs/services/order-details-irp.service';
@@ -159,8 +165,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private dataSourceContainer: OrderDataSourceContainer = {};
   private selectedSystem: SelectSystem;
   private isTieringLogicLoad = true;
-  public AutopopulateId:number | undefined;
-  private reason:OrderRequisitionReason[]=[];
+  public AutopopulateId: number | undefined;
+  private reason: OrderRequisitionReason[] = [];
+  private selectedStructureState: SelectedStructureState;
 
   @Select(RejectReasonState.sortedOrderRequisition)
   private reasons$: Observable<RejectReasonPage>;
@@ -205,6 +212,11 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForOrganizationStructure();
     this.observeOrderType();
     this.setReasonAutopopulate();
+  }
+
+  public changeOrderType(): void {
+    const { regionId, locationId, departmentId, skillId } = this.generalInformationForm.getRawValue();
+    this.selectedStructureState = { regionId, locationId, departmentId, skillId };
   }
 
   public addFields(config: OrderFormsArrayConfig): void {
@@ -321,7 +333,25 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.initForms(value);
       this.setConfigDataSources();
       this.setReasonAutopopulate();
+      this.populateSelectedOrganizationStructure();
+
       this.changeDetection.markForCheck();
+    });
+  }
+
+  private populateSelectedOrganizationStructure(): void {
+    if(!this.selectedOrder && this.selectedStructureState) {
+      this.setStructureFormValue();
+    }
+  }
+
+  private setStructureFormValue(): void {
+    Object.keys(this.selectedStructureState).forEach((key: string) => {
+      const value = (this.selectedStructureState)[key as keyof SelectedStructureState];
+
+      if(value) {
+        this.generalInformationForm.controls[key].patchValue(value);
+      }
     });
   }
 
@@ -368,7 +398,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           )
         }
         if(element.isAutoPopulate === true){
-          this.AutopopulateId = element.id;      
+          this.AutopopulateId = element.id;
         }
       });
     }
@@ -381,7 +411,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((reasons: RejectReason[]) => {
       this.updateDataSourceFormList('reasons', reasons);
-      console.log(reasons);
       const selectedForm = this.getSelectedFormConfig(JobDescriptionForm);
       setDataSource(selectedForm.fields, 'orderRequisitionReasonId', reasons);
       this.changeDetection.markForCheck();
@@ -466,7 +495,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       if(!this.selectedOrder) {
         this.store.dispatch(new GetSuggestedDetails(value));
       }
-
       this.changeDetection.markForCheck();
     });
 
@@ -488,7 +516,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           });
         }),
         takeUntil(this.componentDestroy())
-      ).subscribe((skills: ListOfSkills[]) => this.setSkillFilters(skills));
+      ).subscribe((skills: ListOfSkills[]) => {
+        this.setSkillFilters(skills);
+
+        if(!this.selectedOrder && this.selectedStructureState.skillId) {
+          this.generalInformationForm.controls['skillId'].patchValue(this.selectedStructureState.skillId);
+        }
+      });
 
     this.generalInformationForm.get('duration')?.valueChanges.pipe(
       takeUntil(this.componentDestroy())
