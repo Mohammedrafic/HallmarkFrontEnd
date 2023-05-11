@@ -109,6 +109,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
     { text: 'Region', column: 'Region' },
     { text: 'Location', column: 'Location' },
     { text: 'Holiday Name', column: 'HolidayName' },
+    { text: 'System', column: 'System' },
     { text: 'Start Date & Time', column: 'StartDateTime' },
     { text: 'End Date & Time', column: 'EndDateTime' },
   ];
