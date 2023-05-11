@@ -435,6 +435,7 @@ export class OrderManagementContentService {
           poNumbers: 'poNumber',
           projectNames: 'projectName',
           specialProjectCategories: 'projectType',
+          reorderStatuses: 'statusText',
         };
           return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]));
       }),
