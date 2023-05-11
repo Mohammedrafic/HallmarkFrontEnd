@@ -1,29 +1,11 @@
 <app-page-toolbar></app-page-toolbar>
 <section class="app-grid table-wrapper controls-container" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
     <div class="custom-grid">
-      <ag-grid-angular #agGridLogInterface
-                       class="ag-theme-alpine grid app-grid__component"
-                       [animateRows]="true"
-                       [columnDefs]="columnDefs"
-                       [defaultColDef]="defaultColDef"
-                       [suppressAggFuncInHeader]="true"
-                       [modules]="modules"
-                       [cacheBlockSize]="cacheBlockSize"
-                       [rowModelType]="rowModelType"
-                       [frameworkComponents]="frameworkComponents"
-                       [pagination]="true"
-                       [paginationPageSize]="paginationPageSize"
-                       (gridReady)="onGridReady($event)"
-                       [sideBar]="sideBar"
-                       toolPanel="columns"
-                       [serverSideStoreType]="serverSideStoreType"
-                       [paginationAutoPageSize]="false"
-                       [maxBlocksInCache]="maxBlocksInCache"
-                       [noRowsOverlayComponent]="noRowsOverlayComponent"
-                       [noRowsOverlayComponentParams]="noRowsOverlayComponentParams"
-                       [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                       [headerHeight]="52">
-      </ag-grid-angular>
+      <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
+                       [gridOptions]="gridOptions"
+                       (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
+                       [headerHeight]="52"></ag-grid-angular>
+
       <div class="grid-pagination">
         <ejs-dropdownlist id="rowsPerPage"
                           class="dropdown-no-border"
