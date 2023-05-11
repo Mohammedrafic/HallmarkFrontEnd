@@ -94,6 +94,13 @@ export const initOrderManagementFilterColumns = () => ({
     valueField: 'statusText',
     valueId: 'status',
   },
+  reorderStatuses: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'statusText',
+    valueId: 'status',
+  },
   candidateStatuses: {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,

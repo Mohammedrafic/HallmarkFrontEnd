@@ -1,7 +1,7 @@
 import { ColDef, FilterChangedEvent, GridOptions, ICellRendererParams } from '@ag-grid-community/core';
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { AppState } from 'src/app/store/app.state';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
@@ -15,6 +15,10 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { LogInterface, LogInterfacePage } from '@shared/models/org-interface.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { UserState } from 'src/app/store/user.state';
+import { Organisation } from '@shared/models/visibility-settings.model';
+import { uniqBy } from 'lodash';
+
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { DatePipe } from '@angular/common';
 
@@ -25,7 +29,7 @@ import { DatePipe } from '@angular/common';
   styleUrls: ['./log-interface.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LogInterfaceComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class LogInterfaceComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
 
   @Select(SecurityState.logInterfaceGridData)
   private _logInterfaceData$: Observable<LogInterface[]>;
@@ -36,7 +40,13 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  private lastSelectedOrganizationId$: Observable<number>;
 
+  @Select(SecurityState.organisations)
+  public organizationData$: Observable<Organisation[]>;
+
+  private isAlive = true;
   public totalRecordsCount: number;
   public gridApi: any;
   private gridColumnApi: any;
@@ -55,6 +65,8 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   itemList: Array<LogInterface>= [];
   selectedLogItem: LogInterface;
   openLogDetailsDialogue = new Subject<boolean>();
+  private unsubscribe$: Subject<void> = new Subject();
+  public organizations: Organisation[] = [];
 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
@@ -213,20 +225,6 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
    }
 
   ngOnInit(): void {
-          this.store.dispatch(new GetLogInterfacePage(JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0'))  as number,this.currentPage,this.pageSize));
-          this.logInterfacePage$.pipe().subscribe((data: any) => {
-            if (!data || !data?.items.length) {
-              this.gridApi?.showNoRowsOverlay();
-            }
-            else {
-              this.gridApi?.hideOverlay();
-              this.rowData = data.items;
-              this.gridApi?.setRowData(this.rowData);
-            }
-            this.itemList = data?.items;
-            this.totalRecordsCount = data?.totalCount;          
-
-          });
   }
 
   public gridOptions: GridOptions = {
@@ -311,7 +309,11 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   }
   
   public dispatchNewPage(postData:any): void {
-    this.store.dispatch(new GetLogInterfacePage(JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0'))  as number,postData.currentPage,postData.pageSize));
+    if(localStorage.getItem('lastSelectedOrganizationId') === null){
+      this.store.dispatch(new GetLogInterfacePage(this.organizations[0].organizationId,postData.currentPage,postData.pageSize));
+    }else{
+      this.store.dispatch(new GetLogInterfacePage(JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0'))  as number,postData.currentPage,postData.pageSize));
+    }
   }
 
   onPageSizeChanged(event: any) {
@@ -322,6 +324,11 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
       this.gridApi.setRowData(this.rowData);
     }
   }
-
+  
+  ngOnDestroy(): void {
+    this.isAlive = false;
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
 
 }

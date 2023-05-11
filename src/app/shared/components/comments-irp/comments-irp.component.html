@@ -1,0 +1,75 @@
+<section class="comments-container" [class.background]="useBackground">
+    <div class="comments-header">
+      <div class="title">
+        Comments
+      </div>
+      <div class="dropdown-container bootstrap">
+        <ejs-dropdownlist
+          *ngIf="!isAgencyUser"
+          [allowFiltering]="true"
+          [dataSource]="commentsFilterItems"
+          [(value)]="selectedFilter"
+          (select)="onFilterChange($event)"
+          [readonly]="disabled"
+        ></ejs-dropdownlist>
+      </div>
+    </div>
+    <div #body class="comments-body" (scroll)="onScroll()">
+      <ng-container *ngFor="let comment of comments">
+        <app-commentdata
+          *ngIf="selectedFilter === commentsFilter.All || comment.isExternal === showExternal"
+          [scrolledToMessage$]="scrolledToMessage$"
+          [comment]="comment"
+          (onRead)="onRead(comment)"></app-commentdata>
+      </ng-container>
+      <div class="no-comments" *ngIf="!comments.length">
+        There are no comments to display yet!
+      </div>
+    </div>
+    <div class="comments-controls">
+      <div class="input-group bootstrap">
+        <ejs-textbox
+          class="comment-text-box"
+          [class.readonly]="disabled"
+          #textBox
+          [multiline]="true"
+          (created)="textBoxInit()"
+          maxlength="500"
+          [(value)]="message"
+          [readonly]="disabled"
+          placeholder="Enter your comment here..."></ejs-textbox>
+      </div>
+      <div class="actions" [class.readonly]="disabled">
+        <ejs-tooltip
+          [content]="'Send'">
+          <span class="control-wrapper send" (click)="send()">
+            <i-feather name="send" class="icon"></i-feather>
+          </span>
+        </ejs-tooltip>
+      </div>
+    </div>
+    <div>
+    <ejs-tooltip
+        [content]="isExternal ? 'External' : 'Internal'">
+        <span class="control-wrapper visibility" (click)="visibilityHandler()">
+          <i-feather *ngIf="!isExternal" name="eye-off" class="icon"></i-feather>
+          <i-feather *ngIf="isExternal" name="eye" class="icon"></i-feather>
+        </span>
+    </ejs-tooltip>
+    <ejs-tooltip
+        content="Private">
+        <span class="control-wrapper visibility" (click)="privateHandler()">
+            <fa-icon *ngIf="isPrivate" [icon]='faUsers' class="pr-3 privatecls"></fa-icon>
+            <fa-icon *ngIf="!isPrivate" [icon]='faUsers' class="pr-3"></fa-icon>
+        </span>
+    </ejs-tooltip>
+    <ejs-tooltip
+        [content]="isExternal ? 'Unlock' : 'lock'">
+        <span class="control-wrapper visibility" (click)="lockHandler()">
+            <fa-icon  *ngIf="!lock" [icon]='faUnlock' class="pr-3"></fa-icon>
+            <fa-icon  *ngIf="lock" [icon]='faLock' class="pr-3"></fa-icon>
+        </span>
+    </ejs-tooltip>
+    </div>
+  </section>
+  

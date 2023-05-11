@@ -771,6 +771,27 @@
       </div>
     </div>
     <div class="filter-row bootstrap"
+    *ngIf="!isActiveSystemIRP && activeTab === OrganizationOrderManagementTabs.PerDiem">
+      <div
+        class="input-container">
+        <div class="input-group multiselect">
+          <label>Re-Order Status</label>
+          <ejs-multiselect
+            #orderStatusFilter
+            mode="CheckBox"
+            formControlName="reorderStatuses"
+            placeholder="All"
+            [fields]="statusFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.reorderStatuses.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="filter-row bootstrap"
          *ngIf="!isActiveSystemIRP || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
       <div class="input-container">
         <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Name</label>

@@ -680,6 +680,7 @@ export class OrderFilter {
   orderType?: number | null;
   contactEmails?: string[] | string;
   irpOnly?: boolean | null;
+  reorderStatuses?: (string | number)[];
 }
 
 export class SortModel {
@@ -722,6 +723,7 @@ export class OrderFilterDataSource {
   poNumbers: { id: number; poNumber: string }[];
   projectNames: { id: number; projectName: string }[];
   specialProjectCategories: { id: number; projectType: string }[];
+  reorderStatuses: FilterOrderStatus[];
 }
 
 export type CandidateListEvent = {

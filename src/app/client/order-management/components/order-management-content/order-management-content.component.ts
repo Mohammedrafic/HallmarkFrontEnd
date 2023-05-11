@@ -869,6 +869,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       poNumberIds: this.filters.poNumberIds || null,
       contactEmails: this.contactEmails,
       irpOnly: this.filters.irpOnly || null,
+      reorderStatuses: this.filters.reorderStatuses || null,
     });
 
     if (!prepopulate) {
@@ -1596,7 +1597,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private setDefaultFilter(): void {
-
     if (!(this.filters.isTemplate || this.isIncomplete)) {
       const statuses = this.filterColumns.orderStatuses.dataSource
         .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed, FilterOrderStatusText.Incomplete].includes(status.status))
@@ -2281,6 +2281,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
 
     this.filterColumns.orderStatuses.dataSource = statuses;
+    this.filterColumns.reorderStatuses.dataSource = data.reorderStatuses;
     this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
     this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
   }
