@@ -106,7 +106,6 @@ import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.const
 import { SearchComponent } from '@shared/components/search/search.component';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderStatus } from '@shared/enums/order-management';
@@ -366,6 +365,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public fileName: string;
   public defaultFileName: string;
   public selectedRowRef: any;
+  public selectedRowIndex: number | null;
 
   private isOrgIRPEnabled = false;
   private isOrgVMSEnabled = false;
@@ -1077,6 +1077,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderPositionSelected$.next({ state: false });
     this.openDetails.next(true);
     this.selectedRowRef = event;
+    this.selectedRowIndex = event.rowIndex || null;
   }
 
   setGridApi(params: GridReadyEvent): void {
@@ -1117,6 +1118,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         if (!isArray(data)) {
           this.openDetails.next(true);
           this.selectedRowRef = event;
+          this.selectedRowIndex = event.rowIndex || null;
         }
       }
     }
@@ -1213,7 +1215,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if (!this.previousSelectedOrderId) {
       this.openDetails.next(false);
       this.store.dispatch(new ClearOrders());
-      this.selectedIndex = null;
+      this.selectedIndex = this.selectedRowIndex = null;
 
       this.initGridColumns();
 
@@ -1234,7 +1236,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       const { selectedOrderAfterRedirect } = this.orderManagementService;
       this.openDetails.next(false);
       this.store.dispatch(new ClearOrders());
-      this.selectedIndex = null;
+      this.selectedIndex = this.selectedRowIndex = null;
       this.clearSelection(this.gridWithChildRow);
 
       if (this.isIRPFlagEnabled) {
@@ -1444,6 +1446,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public editOrder(data: OrderManagement): void {
     if (!isNil(data.reOrderFromId) && data.reOrderFromId !== 0) {
       this.addEditReOrderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.EditReOrder);
+      const index = (this.gridWithChildRow.dataSource as []).findIndex((item: OrderManagement) => {
+        return item.id === data.id;
+      })
+      this.selectedRowIndex = index < 0 ? null : index;
       this.openReOrderDialog(data.id, data.organizationId);
     } else {
       this.router.navigate(['./edit', data.id], { relativeTo: this.route });
@@ -1660,6 +1666,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.selectedReOrder = null;
         this.previousSelectedOrderId = null;
         this.orderManagementPagerState = null;
+        this.selectedIndex = this.selectedRowIndex = null;
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
           table.style.transform = 'translate(0px, 0px)';
@@ -1801,9 +1808,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public updateGrid(): void {
-    this.getOrders();
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrders)).subscribe(() => {
-      const [index] = this.gridWithChildRow.getSelectedRowIndexes();
+    this.getOrders(true);
+    this.actions$.pipe(ofActionSuccessful(GetOrders), take(1)).subscribe(() => {
+      const [index] = this.selectedRowIndex === null ? this.gridWithChildRow.getSelectedRowIndexes() : [this.selectedRowIndex];
       this.selectedIndex = index;
       this.cd$.next(true);
     });
