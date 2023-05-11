@@ -13,7 +13,8 @@ import { GetAssignedSkillsByOrganization } from '@organization-management/store/
 import { Store } from '@ngxs/store';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { EMPLOYEE_SKILL_CHANGE_WARNING, WARNING_TITLE } from '@shared/constants/messages';
+import { EMPLOYEE_SKILL_CHANGE_WARNING, EMPLOYEE_TERMINATED_WARNING, WARNING_TITLE } from '@shared/constants/messages';
+import { ProfileStatusesEnum } from './candidate-profile.constants';
 
 @Component({
   selector: 'app-candidate-profile',
@@ -81,9 +82,15 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
       (this.candidateProfileFormService.candidateForm.get('primarySkillId')?.dirty || this.candidateProfileFormService.candidateForm.get('secondarySkills')?.dirty));
   }
 
-  private skillChangeConfirmation(): Observable<void | CandidateModel> {
+  private isEmployeeTerminated(): boolean {
+    const profileStatusControl = this.candidateProfileFormService.candidateForm.get('profileStatus');
+    return !!(this.candidateService.employeeId && 
+      (profileStatusControl?.dirty && profileStatusControl?.value === ProfileStatusesEnum.Terminated));
+  }
+
+  private profileStatusTerminatedConfirmation(): Observable<void | CandidateModel> {
     return this.confirmService
-      .confirm(EMPLOYEE_SKILL_CHANGE_WARNING, {
+      .confirm(EMPLOYEE_TERMINATED_WARNING, {
         title: WARNING_TITLE,
         okButtonLabel: 'Yes',
         okButtonClass: 'delete-button',
@@ -93,11 +100,30 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
         takeUntil(this.destroy$));
   }
 
+  private skillChangeConfirmation(): Observable<void | CandidateModel> {
+    return this.confirmService
+      .confirm(EMPLOYEE_SKILL_CHANGE_WARNING, {
+        title: WARNING_TITLE,
+        okButtonLabel: 'Yes',
+        okButtonClass: 'delete-button',
+      }).pipe(
+        filter(Boolean),
+        switchMap(() => this.employeeTerminationHandler()),
+        takeUntil(this.destroy$));
+  }
+
+  private employeeTerminationHandler(): Observable<void | CandidateModel> {
+    if (this.isEmployeeTerminated()) {
+      return this.profileStatusTerminatedConfirmation();
+    }
+    return this.saveCandidate();
+  }
+
   private skillsChangeHandler(): Observable<void | CandidateModel> {
     if (this.isSkillChanged()) {
       return this.skillChangeConfirmation();
     }
-    return this.saveCandidate();
+    return this.employeeTerminationHandler();
   }
 
   private saveCandidate(): Observable<void | CandidateModel> {
