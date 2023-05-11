@@ -15,12 +15,11 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { LogInterface, LogInterfacePage } from '@shared/models/org-interface.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { ColumnDefinitionModel } from '@shared/components/grid/models';
+import { DatePipe } from '@angular/common';
 import { UserState } from 'src/app/store/user.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
-
-import { ColumnDefinitionModel } from '@shared/components/grid/models';
-import { DatePipe } from '@angular/common';
 
 
 @Component({
@@ -109,13 +108,6 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
       minWidth: 100,
       hide: true,
       filter: false,
-    },
-    {
-      headerName: 'runId',
-      field: 'runId',
-      minWidth: 350,
-      hide: true,
-      filter: 'agTextColumnFilter',
     },
     {
       headerName: 'File Name',
@@ -209,42 +201,66 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
         return {color: 'red'};
       }
     },
-    {
-      headerName: 'Skipped Records',
-      field: 'skippedRecord',
-      minWidth: 175,
-      filter: false,
-      sortable: false,
-    },    
   ];
 
   constructor(private store: Store,private datePipe: DatePipe) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Interface Log Summary', iconName: 'file-text' }));
-  
    }
 
   ngOnInit(): void {
-  }
+          this.dispatchNewPage({currentPage:this.currentPage,pageSize:this.pageSize});
+          this.logInterfacePage$.pipe().subscribe((data: any) => {
+            if (!data || !data?.items.length) {
+              this.gridApi?.showNoRowsOverlay();
+            }
+            else {
+              this.gridApi?.hideOverlay();
+              this.rowData = data.items;
+              this.gridApi?.setRowData(this.rowData);
+            }
+            this.itemList = data?.items;
+            this.totalRecordsCount = data?.totalCount;          
 
-  public gridOptions: GridOptions = {
-    pagination: true,
-    cacheBlockSize: this.pageSize,
-    paginationPageSize: this.pageSize,
-    columnDefs: this.columnDefs,
-    rowData: this.itemList,
-    sideBar: this.sideBar,
-    noRowsOverlayComponent: CustomNoRowsOverlayComponent,
-    noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
-    onFilterChanged: (event: FilterChangedEvent) => {
-      if (!event.api.getDisplayedRowCount()) {
-        this.gridApi?.showNoRowsOverlay();
-      }
-      else {
-        this.gridApi?.hideOverlay();
-      }
+          });
+
+          this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+            this.organizations = [];
+            if (data != null && data.length > 0) {
+              this.organizations = uniqBy(data, 'organizationId');
+              this.organizations.sort((a:any,b:any)=> a.name.localeCompare(b.name));
+            }
+          });
+          this.subscribeOnBusinessUnitChange();
     }
-  };
+
+    private subscribeOnBusinessUnitChange(): void {
+      this.lastSelectedOrganizationId$.pipe(takeWhile(() => this.isAlive))
+        .subscribe(() => {
+          var datasource = this.createServerSideDatasource();
+          this.gridApi?.setServerSideDatasource(datasource);
+          this.openLogDetailsDialogue.next(false);
+        });
+    }
+
+    public gridOptions: GridOptions = {
+      pagination: true,
+      cacheBlockSize: this.pageSize,
+      paginationPageSize: this.pageSize,
+      columnDefs: this.columnDefs,
+      rowData: this.itemList,
+      sideBar: this.sideBar,
+      noRowsOverlayComponent: CustomNoRowsOverlayComponent,
+      noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
+      onFilterChanged: (event: FilterChangedEvent) => {
+        if (!event.api.getDisplayedRowCount()) {
+          this.gridApi?.showNoRowsOverlay();
+        }
+        else {
+          this.gridApi?.hideOverlay();
+        }
+      }
+    };
   
   public onEdit(data: any): void {
     this.selectedLogItem = data.rowData;
