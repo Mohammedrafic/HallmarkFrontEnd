@@ -127,6 +127,7 @@
                     placeholder="HH:MM"
                     [formControlName]="control.field"
                     format="HH:mm"
+                    [enabled]="!control.readonly"
                     [showClearButton]="false"
                     [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                     [enableMask]="true"
@@ -144,7 +145,11 @@
 
   <div *ngIf="!isCreateMode" class="sidebar-footer">
     <div class="checkbox-container bootstrap" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
-      <ejs-checkbox [formControl]="createPerDiemOrderControl" label="Create Per Diem Order"></ejs-checkbox>
+      <ejs-checkbox
+        [disabled]="!hasEditPermissions"
+        [formControl]="createPerDiemOrderControl"
+        label="Create Per Diem Order"
+      ></ejs-checkbox>
     </div>
     <app-tooltip-container class="remove-schedule-wrapper" [showToolTip]="!hasEditPermissions">
       <button
