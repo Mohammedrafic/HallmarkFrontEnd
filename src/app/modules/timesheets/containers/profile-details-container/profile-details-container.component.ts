@@ -364,7 +364,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public showCustomExportDialog(): void {
-    this.fileName = `Timesheet ${formatDate(Date.now(), 'MM/dd/yyyy hh:mm a', 'en-US')}`;
+    this.fileName = `Timesheet ${formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US')}`;
 
     this.store.dispatch(
       new ShowExportDialog(true)

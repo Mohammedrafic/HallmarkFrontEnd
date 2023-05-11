@@ -93,7 +93,7 @@ export abstract class AbstractGridConfigurationComponent {
    */
   generateDateTime(datePipe: DatePipe): string {
     if (datePipe) {
-      return datePipe.transform(Date.now(), 'MM/dd/yyyy hh:mm a') as string;
+      return datePipe.transform(Date.now(), 'MM/dd/yyyy HH:mm') as string;
     }
     return '';
   }

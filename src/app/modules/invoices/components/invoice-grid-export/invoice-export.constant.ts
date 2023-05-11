@@ -41,7 +41,7 @@ export const GetTabsToExport = (isAgency: boolean): number[] => {
 
 export const GetExportFileName = (isAgency: boolean, tabIndex: number): string => {
   const tabLists = GetTabLists(isAgency);
-  return `${tabLists[tabIndex].title} ${formatDate(Date.now(), 'MM/dd/yyyy hh:mm a', 'en-US')}`;
+  return `${tabLists[tabIndex].title} ${formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US')}`;
 };
 
 export const GetInvoiceState = (isAgency: boolean, tab: OrganizationInvoicesGridTab) => {

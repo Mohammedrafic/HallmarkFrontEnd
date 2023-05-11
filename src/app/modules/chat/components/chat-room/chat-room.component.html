@@ -10,13 +10,13 @@
           <div class="content-block">
             <div *ngIf="!message.isCurrentUser; else rightMessageBlock">
               <span class="sender">{{ message.sender }}</span>
-              <span class="timestamp">{{ message.timestamp | date: 'hh:mm a'}}</span>
+              <span class="timestamp">{{ message.timestamp | date: 'HH:mm a'}}</span>
             </div>
 
             <ng-template #rightMessageBlock>
               <div>
                 <i-feather class="read-indicator" name="eye" [ngClass]="{ 'show-ind': message.readIndicator }"></i-feather>
-                <span class="timestamp left-position">{{ message.timestamp | date: 'hh:mm a'}}</span>
+                <span class="timestamp left-position">{{ message.timestamp | date: 'HH:mm'}}</span>
                 <span class="sender left-position">{{ message.sender }}</span>
               </div>
             </ng-template>

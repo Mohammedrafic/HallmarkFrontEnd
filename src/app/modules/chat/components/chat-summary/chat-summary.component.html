@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="timestamp">
-      <span>{{ lastMessage?.timestamp | date: 'MM/dd hh:mm a'}}</span>
+      <span>{{ lastMessage?.timestamp | date: 'MM/dd HH:mm'}}</span>
     </div>
   </div>
   <span class="message-preview" [innerHtml]="lastMessage?.message"
