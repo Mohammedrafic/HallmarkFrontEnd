@@ -48,7 +48,7 @@
 <ng-template #footerTemplate>
    <app-dialog-next-previous
       *ngIf="logDialogOptions$ | async as options"
-      [title]="'Order'"
+      [title]="'Interface Error'"
       [options]="options"
       (nextEvent)="onNextPreviousLog(true)"
       (previousEvent)="onNextPreviousLog(false)"

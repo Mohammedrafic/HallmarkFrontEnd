@@ -83,7 +83,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       filter: false,
     },
     {
-      headerName: 'TIMESHEETITEMID',
+      headerName: 'Timesheet ID',
       field: 'timesheetitemid',
       minWidth: 100,
       filter: 'agTextColumnFilter',
@@ -96,14 +96,20 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'EMPLOYEEID',
+      headerName: 'Employee ID',
       field: 'employeeid',
       minWidth: 100,
-      hide: true,
-      filter: false,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
     },
     {
-      headerName: 'FNAME',
+      headerName: 'First Name',
       field: 'fname',
       minWidth: 100,
       filter: 'agTextColumnFilter',
@@ -119,7 +125,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'MNAME',
+      headerName: 'Middle Name',
       field: 'mname',
       minWidth: 100,
       filter: 'agTextColumnFilter',
@@ -135,7 +141,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'LNAME',
+      headerName: 'Last Name',
       field: 'lname',
       minWidth: 100,
       filter: 'agTextColumnFilter',
@@ -151,35 +157,28 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },    
     {
-      headerName: 'LOCATION_ID',
+      headerName: 'Location Id',
       field: 'locationId',
       minWidth: 125,
       sortable: false,
       resizable: true
     },
     {
-      headerName: 'COSTCENTER_ID',
-      field: 'costcenterId',
-      minWidth: 100,
-      sortable: false,
-      resizable: true
-    },
-    {
-      headerName: 'WORKEDLOCATIONID',
+      headerName: 'Worked LocationId',
       field: 'workedlocationid',
       minWidth: 125,
       sortable: false,
       resizable: true
     }, 
     {
-      headerName: 'WORKEDCCID',
+      headerName: 'Worked DeptId',
       field: 'workedccid',
       minWidth: 100,
       sortable: false,
       resizable: true
     },  
     {
-      headerName: 'SHIFT_TYPE',
+      headerName: 'Shift Type',
       field: 'shiftType',
       minWidth: 100,
       filter: 'agTextColumnFilter',
@@ -192,7 +191,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     }, 
     {
-      headerName: 'PunchINDate',
+      headerName: 'PunchIn Date',
       field: 'punchIndate',
       minWidth: 100,
       filter: 'agDateColumnFilter',
@@ -228,7 +227,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'PunchINTime',
+      headerName: 'PunchIn Time',
       field: 'punchIntime',
       minWidth: 100,
       filter: 'agTextColumnFilter',
@@ -241,7 +240,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'PunchOUTDate',
+      headerName: 'PunchOut Date',
       field: 'punchOutdate',
       minWidth: 100,
       filter: 'agDateColumnFilter',
@@ -277,7 +276,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'PunchOUTTime',
+      headerName: 'PunchOut Time',
       field: 'punchOuttime',
       minWidth: 100,
       filter: 'agTextColumnFilter',
@@ -297,65 +296,28 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'TOTAL_HOURS',
+      headerName: 'Total Hours',
       field: 'totalHours',
       minWidth: 50,
       resizable: true
-    },
+    },    
     {
-      headerName: 'status',
-      field: 'status',
-      minWidth: 150,
-      filter: false,
-      sortable: false,
-    },
-    {
-      headerName: 'jobid',
-      field: 'jobId',
-      minWidth: 150,
-      filter: false,
-      sortable: false,
-    },
-    {
-      headerName: 'jobcode',
+      headerName: 'Job Code',
       field: 'jobcode',
       minWidth: 150,
-      filter: false,
-      sortable: false,
+      resizable: true
     },
     {
-      headerName: 'Week StartDate',
-      field: 'weekStartDate',
+      headerName: 'Deleted',
+      field: 'deleted',
       minWidth: 150,
-      filter: 'agDateColumnFilter',
-      filterParams: {
-        buttons: ['reset'],
-        debounceMs: 1000,
-        suppressAndOrCondition: true,
-        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
-          if (cellValue == null) {
-            return 0;
-          }
-          const dateAsString = this.datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
-          const dateParts = dateAsString.split('/');
-          const year = Number(dateParts[2]);
-          const month = Number(dateParts[0]) - 1;
-          const day = Number(dateParts[1]);
-
-          const cellDate = new Date(year, month, day);
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
-      },
-      cellRenderer: (params: ICellRendererParams) => {
-        const str = this.datePipe?.transform(params.data.weekStartDate, 'MM/dd/yyyy') as string
-        return str?.length > 0 ? str : "";
-      },
+      resizable: true
+    },
+    {
+      headerName: 'Error Description',
+      field: 'failureReason',
+      minWidth: 150,
+      resizable: true
     },
   ];
   
@@ -363,16 +325,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
     private store: Store,private datePipe: DatePipe,
   ) { 
     super();
-    var self = this;
-    this.frameworkComponents = {
-      buttonRenderer: ButtonRendererComponent,
-    };
-    this.rowModelType = 'serverSide';
-    this.serverSideStoreType = 'partial';
-    (this.serverSideInfiniteScroll = true), (this.serverSideFilterOnServer = true), (this.pagination = true);
-    (this.paginationPageSize = this.pageSize), (this.cacheBlockSize = this.pageSize);
-    this.maxBlocksInCache = 1;
-    
+    var self = this;   
   }
 
   ngOnInit(): void {
@@ -397,9 +350,8 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
         this.gridApi?.showNoRowsOverlay();
       } else {
         this.gridApi?.hideOverlay();
-        this.timeSheetHistoryItemList = data.items;
-        this.gridApi?.setRowData(this.timeSheetHistoryItemList);
       }
+      this.gridApi?.setRowData(this.timeSheetHistoryItemList);
     });
 
   }
