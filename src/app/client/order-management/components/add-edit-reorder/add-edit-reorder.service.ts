@@ -9,7 +9,7 @@ import { OrderManagementContentService } from '@shared/services/order-management
 import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
-import { DateTimeHelper } from '@core/helpers';
+import { DateTimeHelper, GetQueryParams } from '@core/helpers';
 import { AgencyModel, CandidateModel } from './models/candidate.model';
 import { ReorderRequest, ReorderRequestModel, ReorderResponse } from './models/reorder.model';
 
@@ -47,16 +47,14 @@ export class AddEditReorderService {
     }
   }
 
-  public getAgencies(orderId: number, organizationId: number): Observable<AgencyModel[]> {
-    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-    const endpoint = `/api/reorders/${orderId}/agenciespool/`;
-    const params = { organizationId };
+  public getAgencies(reorderId: number, orderId: number): Observable<AgencyModel[]> {
+    const params = {
+      OrderId: orderId,
+      ReorderId: reorderId,
+    };
 
-    if (isAgencyArea) {
-      return this.http.get<AgencyModel[]>(endpoint, { params }).pipe(catchError(() => of([])));
-    } else {
-      return this.http.get<AgencyModel[]>(endpoint).pipe(catchError(() => of([])));
-    }
+    return this.http.get<AgencyModel[]>('/api/ReOrders/agenciespool',
+    { params: GetQueryParams(params) }).pipe(catchError(() => of([])));
   }
 
   public saveReorder(reorder: ReorderRequestModel, multipleReorderDates: Date[]): Observable<ReorderResponse[]> {

@@ -13,4 +13,5 @@ export interface AgencyModel {
   agencyName: string;
   id: number;
   name: string;
+  hasActiveCandidate: boolean;
 }

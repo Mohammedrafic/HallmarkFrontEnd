@@ -1,8 +1,8 @@
-<form class="reorder" *ngIf="(candidates$ | async) && (agencies$ | async)">
+<form class="reorder">
   <app-multiselect-dropdown
     [formGroupInstance]="reorderForm"
     [fields]="candidatesOptionFields"
-    [dataSource]="candidates$ | async"
+    [dataSource]="candidates"
     [showSelectAll]="true"
     controlName="candidates"
     id="candidates"
@@ -10,11 +10,13 @@
     selectAllText="All"
   ></app-multiselect-dropdown>
   <app-multiselect-dropdown
+    #agencySelector
     appValidateWithMessage
     [formGroupInstance]="reorderForm"
     [fields]="agenciesOptionFields"
-    [dataSource]="agencies$ | async"
-    [showSelectAll]="true"
+    [dataSource]="agencies"
+    [showSelectAll]="false"
+    [showClearAll]="false"
     [required]="true"
     selectAllText="All"
     controlName="agencies"
