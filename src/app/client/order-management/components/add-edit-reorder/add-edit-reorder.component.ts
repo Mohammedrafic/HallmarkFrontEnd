@@ -5,7 +5,7 @@ import uniq from 'lodash/fp/uniq';
 import {
   catchError,
   filter,
-  first,
+  forkJoin,
   map,
   merge,
   Observable,
@@ -18,7 +18,7 @@ import {
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component,EventEmitter, Input, NgZone, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { AddEditReorderService } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.service';
@@ -31,7 +31,7 @@ import {
   ReorderResponse,
 } from '@client/order-management/components/add-edit-reorder/models/reorder.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
-import { shareReplay } from 'rxjs/operators';
+import { distinct, distinctUntilChanged, skip } from 'rxjs/operators';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
@@ -41,7 +41,6 @@ import {
   ONBOARDED_STATUS,
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { DateTimeHelper } from '@core/helpers';
-import { getTimeFromDate } from '@shared/utils/date-time.utils';
 import { SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
 import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
@@ -50,13 +49,17 @@ import { AlertTriggerDto } from '@shared/models/alerts-template.model';
 import { OrderStatus } from '@shared/enums/order-management';
 import { AlertTrigger } from '@admin/store/alerts.actions';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { MultiselectDropdownComponent } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.component';
+import { OutsideZone } from '@core/decorators';
+import { SyncOptionType } from './add-edit-reorder.interface';
 
 @Component({
   selector: 'app-add-edit-reorder',
   templateUrl: './add-edit-reorder.component.html',
   styleUrls: ['./add-edit-reorder.component.scss'],
 })
-export class AddEditReorderComponent extends DestroyableDirective implements OnInit, OnDestroy {
+export class AddEditReorderComponent extends DestroyableDirective implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+  @ViewChild('agencySelector') agencySelector: MultiselectDropdownComponent;
   @Input() public order: Order;
   @Output() public saveEmitter: EventEmitter<void> = new EventEmitter<void>();
 
@@ -67,11 +70,11 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public readonly numericInputAttributes = { maxLength: '10' };
 
   public reorderForm: FormGroup;
-  public dialogTitle: string = 'Add Re-Order';
-  public candidates$: Observable<CandidateModel[]>;
-  public agencies$: Observable<AgencyModel[]>;
+  public dialogTitle = 'Add Re-Order';
+  public candidates: CandidateModel[];
+  public agencies: AgencyModel[];
   public billRate$: Observable<number>;
-  public commentContainerId: number = 0;
+  public commentContainerId = 0;
   public comments: Comment[] = [];
   public initialDates: {
     shiftStartTime: Date;
@@ -89,17 +92,17 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     private commentsService: CommentsService,
     private actions$: Actions,
     private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
   ) {
     super();
+    this.createForm();
   }
 
   public get isEditMode(): boolean {
     return this.order?.reOrderFromId !== 0;
   }
 
-  public ngOnInit(): void {
-    this.initAgenciesAndCandidates();
-    this.createReorderForm();
+  ngOnInit(): void {
     this.listenCandidateChanges();
     this.listenAginciesChanges();
     this.commentContainerId = this.order.commentContainerId as number;
@@ -136,6 +139,18 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     });
   }
 
+  ngOnChanges(): void {
+    if (this.order) {
+      this.setFormData(this.order);
+      this.setInitialDatesValue();
+      this.getComments();
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.initAgenciesAndCandidates();
+  }
+
   public override ngOnDestroy(): void {
     super.ngOnDestroy();
   }
@@ -154,55 +169,108 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.multipleReorderDates = dates;
   }
 
-  private getComments(): void {
-    this.commentsService.getComments(this.order.commentContainerId as number, null).subscribe((comments: Comment[]) => {
-      this.comments = comments;
-    });
-  }
-
-  private createReorderForm(): void {
-    if (this.isEditMode) {
-      this.initForm(this.order);
-      this.setInitialDatesValue();
-      this.getComments();
-    } else {
-      this.initForm();
-    }
-  }
-
-  private initAgenciesAndCandidates(): void {
-    const { id, organizationId, reOrderFromId, skillId } = this.order;
-    const isReOrder = !isNil(reOrderFromId) && reOrderFromId !== 0;
-    const orderId = isReOrder ? reOrderFromId : id;
-    this.candidates$ = this.reorderService.getCandidates(orderId, organizationId!).pipe(shareReplay());
-    this.billRate$ = this.reorderService.getBillRate(organizationId!, skillId).pipe(filter(() => !this.isEditMode));
-    this.agencies$ = this.reorderService.getAgencies(orderId, organizationId!).pipe(
-      tap((agencyIds: AgencyModel[]) => (this.numberOfAgencies = agencyIds.length)),
-      shareReplay()
-    );
-  }
-
-  private initForm(reorder?: Order): void {
-    const { candidates, jobStartDate, shiftStartTime, shiftEndTime, hourlyRate, openPositions, jobDistributions } =
-      reorder || {};
-    this.reorderForm = this.formBuilder.group({
-      candidates: [this.getCandidateIds(candidates!)],
-      agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
-      reorderDate: [jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '', Validators.required],
-      shiftStartTime: [shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '', Validators.required],
-      shiftEndTime: [ shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '', Validators.required],
-      billRate: [hourlyRate ?? '', Validators.required],
-      openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
-    });
-  }
-
-  setInitialDatesValue(): void {
+  public setInitialDatesValue(): void {
     const { jobStartDate, shiftStartTime, shiftEndTime } = this.order;
     this.initialDates = {
       shiftStartTime,
       shiftEndTime,
       jobStartDate,
     };
+  }
+
+  public isDatesChanged(): boolean {
+    const { reorderDate, shiftEndTime, shiftStartTime } = this.reorderForm.getRawValue();
+    const {
+      jobStartDate: reorderDateInitial,
+      shiftEndTime: shiftEndTimeInitial,
+      shiftStartTime: shiftStartTimeInitial,
+    } = this.initialDates;
+
+    return (
+      !this.areDatesEquals(reorderDate, reorderDateInitial) ||
+      !this.areDatesEquals(shiftEndTime, shiftEndTimeInitial) ||
+      !this.areDatesEquals(shiftStartTime, shiftStartTimeInitial)
+    );
+  }
+
+  private getComments(): void {
+    this.commentsService.getComments(this.order.commentContainerId as number, null).subscribe((comments: Comment[]) => {
+      this.comments = comments;
+    });
+  }
+
+  private initAgenciesAndCandidates(): void {
+    const { id, organizationId, reOrderFromId, skillId } = this.order;
+    const isReOrder = !isNil(reOrderFromId) && reOrderFromId !== 0;
+    const orderId = isReOrder ? reOrderFromId : id;
+
+    this.billRate$ = this.reorderService.getBillRate(organizationId!, skillId).pipe(filter(() => !this.isEditMode));
+
+    forkJoin([
+      this.reorderService.getAgencies(orderId, this.order.id),
+      this.reorderService.getCandidates(orderId, organizationId as number),
+    ])
+    .pipe(
+      takeUntil(this.destroy$),
+    )
+    .subscribe(([agencies, candidates]) => {
+      this.numberOfAgencies = agencies.length;
+      this.agencies = agencies;
+      this.candidates = candidates;
+
+      this.reorderForm.patchValue({
+        agencies: this.getAgencyIds(this.order.jobDistributions),
+        candidates: this.getCandidateIds(this.candidates),
+      });
+      this.cdr.markForCheck();
+
+      this.disableOptions();
+    });
+  }
+
+  @OutsideZone
+  private disableOptions(): void {
+      setTimeout(() => {
+        const items: NodeList[] = this.agencySelector.selector['popupObj'].element.querySelectorAll('.e-list-item');
+
+        items.forEach((element) => {
+          // We can't use Node and NodeList interfaces as syncfusion modified it.
+          const el = element as unknown as SyncOptionType;
+          const optionValue = el.dataset.value;
+          const agency = this.agencies.find((agency) => agency.agencyId === Number(optionValue));
+
+          if (agency && agency.hasActiveCandidate) {
+            (el as unknown as HTMLElement).classList.add('hidden-option');
+          }
+        });
+      }, 500);
+  }
+
+  private setFormData(reorder?: Order): void {
+    const { candidates, jobStartDate, shiftStartTime, shiftEndTime, hourlyRate, openPositions, jobDistributions } =
+      reorder || {};
+      
+    this.reorderForm.patchValue({
+      candidates: this.getCandidateIds(candidates!),
+      agencies: this.getAgencyIds(jobDistributions!),
+      reorderDate: jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '',
+      shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
+      shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
+      billRate: hourlyRate ?? '',
+      openPosition: openPositions ?? '',
+    });
+  }
+
+  private createForm(): void {
+    this.reorderForm = this.formBuilder.group({
+      candidates: [],
+      agencies: [null, Validators.required],
+      reorderDate: [null, Validators.required],
+      shiftStartTime: [null, Validators.required],
+      shiftEndTime: [null, Validators.required],
+      billRate: [null, Validators.required],
+      openPosition: [null, [Validators.required, Validators.min(1)]],
+    });
   }
 
   private listenAginciesChanges(): void {
@@ -222,21 +290,19 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.reorderForm
       .get('candidates')
       ?.valueChanges.pipe(
+        skip(1),
         tap((candidateIds: number[]) => {
           if (!candidateIds.length) {
-            this.reorderForm.patchValue({ openPosition: null, agencies: [] });
+            this.reorderForm.patchValue({ openPosition: null, agencies: this.getAgencyIds(this.order.jobDistributions) });
             this.reorderForm.updateValueAndValidity();
           } else {
             this.reorderForm.patchValue({ openPosition: candidateIds?.length || 1 });
           }
         }),
         filter((candidateIds: number[]) => !!candidateIds?.length),
-        switchMap((candidateIds: number[]) => {
-          return this.candidates$.pipe(
-            map((candidates: CandidateModel[]) => {
-              return candidates.filter((candidate: CandidateModel) => candidateIds.includes(candidate.candidateId))
-            }),
-            map(this.getAgenciesBelongToCandidates))
+        map((candidateIds) => {
+          const cands = this.candidates.filter((candidate: CandidateModel) => candidateIds.includes(candidate.candidateId));
+          return this.getAgenciesBelongToCandidates(cands);
         }),
         takeUntil(this.destroy$)
       )
@@ -267,21 +333,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     const onboardedCandidates = this.order.candidates?.filter((candidate) => candidate.status === ONBOARDED_STATUS);
 
     return onboardedCandidates.length > payload.reorder.openPosition;
-  }
-
-  isDatesChanged(): boolean {
-    const { reorderDate, shiftEndTime, shiftStartTime } = this.reorderForm.getRawValue();
-    const {
-      jobStartDate: reorderDateInitial,
-      shiftEndTime: shiftEndTimeInitial,
-      shiftStartTime: shiftStartTimeInitial,
-    } = this.initialDates;
-
-    return (
-      !this.areDatesEquals(reorderDate, reorderDateInitial) ||
-      !this.areDatesEquals(shiftEndTime, shiftEndTimeInitial) ||
-      !this.areDatesEquals(shiftStartTime, shiftStartTimeInitial)
-    );
   }
 
   private areDatesEquals(date1: Date, date2: Date): boolean {
@@ -365,10 +416,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private selectAllAgencies(): void {
-    this.agencies$.pipe(first()).subscribe((agencyIds: AgencyModel[]) => {
-      this.reorderForm.patchValue({
-        agencies: agencyIds?.map(({ agencyId }: AgencyModel) => agencyId),
-      });
+    this.reorderForm.patchValue({
+      agencies: this.agencies.map(({ agencyId }: AgencyModel) => agencyId),
     });
   }
 
