@@ -1,7 +1,7 @@
 import { ColDef, FilterChangedEvent, GridOptions, ICellRendererParams } from '@ag-grid-community/core';
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { AppState } from 'src/app/store/app.state';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
@@ -46,7 +46,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   public organizationData$: Observable<Organisation[]>;
 
   private isAlive = true;
-  public totalRecordsCount: number;
+  public totalRecordsCount$: BehaviorSubject<number> =new BehaviorSubject<number>(0);
   public gridApi: any;
   private gridColumnApi: any;
   defaultColDef: ColDef = DefaultUserGridColDef;
@@ -220,7 +220,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
 
           this.logInterfacePage$.pipe().subscribe((data: any) => {
               this.itemList = data?.items;
-              this.totalRecordsCount = data?.totalCount;   
+              this.totalRecordsCount$.next(data?.totalCount);
               if (!data || !data?.items.length) {
                 this.gridApi?.showNoRowsOverlay();
               }
@@ -267,6 +267,10 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
     this.store.dispatch(new GetLogHistoryById(data.rowData.runId, data.rowData.organizationId,this.currentPage,this.pageSize, options));
   }
 
+  public onFileDownload(data: any): void {
+    console.log('event.node',data.rowData);
+ }
+
   private getDialogNextPreviousOption(selectedOrder: LogInterface): DialogNextPreviousOption {
     const gridData = this.itemList as LogInterface[];
     const first = gridData[0];
@@ -294,33 +298,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
     this.gridApi.setRowData(this.itemList);
   }
 
-  createServerSideDatasource() {
-    let self = this;
-    return {
-      getRows: function (params: any) {
-        setTimeout(() => {
-          self.gridApi.hideOverlay();
-          let postData = {
-            pageNumber: params.request.endRow / self.paginationPageSize,
-            pageSize: self.paginationPageSize,
-          };
-          self.dispatchNewPage(postData);
-          self.logInterfacePage$.pipe().subscribe((data: any) => {
-            self.itemList = data?.items;
-            self.totalRecordsCount = data?.totalCount;
-            
-            if (!self.itemList || !self.itemList.length) {
-              self.gridApi.showNoRowsOverlay();
-            } else {
-              self.gridApi.hideOverlay();
-            }
-            params.successCallback(self.itemList, data?.totalCount || 1);
-          });
-        }, 500);
-      },
-    };
-  }
-  
+ 
   public dispatchNewPage(postData:any): void {
     if(localStorage.getItem('lastSelectedOrganizationId') === null){
       this.store.dispatch(new GetLogInterfacePage(this.organizations[0]?.organizationId,postData.currentPage,postData.pageSize));

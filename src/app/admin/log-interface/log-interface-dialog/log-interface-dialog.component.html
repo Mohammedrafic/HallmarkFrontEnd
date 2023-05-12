@@ -15,6 +15,17 @@
             <h3 class="e-card-title preview-title">Interface Error Records Details</h3>
           </div>
           <div class="e-card-content">
+            <button
+              [disabled]="(totalRecordsCount$ | async) === 0 ? true : false"
+              ejs-dropdownbutton
+              [items]="exportOptions"
+              (select)="exportSelected($event)"
+              id="exportButton"
+              cssClass="e-outline button-export">
+              <div class="button-export-container">
+                Export <i-feather name="upload" class="icon"></i-feather>
+              </div>
+            </button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
@@ -37,7 +48,7 @@
                                   (change)="onPageSizeChanged($event)">
                 </ejs-dropdownlist>
                 <div class="total-rows">
-                  Total Rows: {{totalRecordsCount}}
+                  Total Rows: {{totalRecordsCount$ | async}}
                 </div>
               </div>
             </div>
@@ -54,4 +65,5 @@
       (previousEvent)="onNextPreviousLog(false)"
     ></app-dialog-next-previous> 
   </ng-template>
+  <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 </ejs-dialog>

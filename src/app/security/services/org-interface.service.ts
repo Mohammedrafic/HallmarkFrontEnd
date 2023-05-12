@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ExportPayload } from '@shared/models/export.model';
 import { LogInterfacePage, LogTimeSheetHistoryPage, OrgInterfacePage } from '@shared/models/org-interface.model';
 import { Observable } from 'rxjs';
 
@@ -61,5 +62,15 @@ export class OrgInterfaceService {
         PageSize: number,
       ): Observable<LogTimeSheetHistoryPage> {
         return this.http.post<LogTimeSheetHistoryPage>(`/api/Integration/getTimesheetStagingHistory`, { RunId, OrganizationId, PageNumber, PageSize });
+      }
+
+    /**
+     * Export the list of Timesheet Data by ExportPayload
+     * @param ExportPayload
+     *
+     * @return Blob
+     */
+      public export(payload: ExportPayload): Observable<Blob> {
+        return this.http.post(`/api/integration/export`, payload, { responseType: 'blob' });
       }
 }
