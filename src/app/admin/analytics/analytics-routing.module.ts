@@ -1,3 +1,4 @@
+import { UnitProfileComponent } from './unit-profile/unit-profile.component';
 import { ScheduledHoursComponent } from './scheduled-hours/scheduled-hours.component';
 import { StaffListComponent } from './staff-list/staff-list.component';
 import { NgModule } from '@angular/core';
@@ -365,6 +366,13 @@ const routes: Routes = [
       {
         path: 'vms-invoice-report-beta',
         component: VmsInvoiceReportBetaComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'unit-profile',
+        component: UnitProfileComponent,
         data: {
           isOrganizationArea: true,
         }

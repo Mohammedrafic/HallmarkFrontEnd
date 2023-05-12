@@ -449,6 +449,11 @@ export const MENU_CONFIG: any = {
       icon: 'twitch',
       route: '',
     },
+    97: {
+      // Unit profile Report
+      icon: '',
+      route: '/analytics/unit-profile',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -674,6 +679,11 @@ export const MENU_CONFIG: any = {
       // Communication
       icon: 'twitch',
       route: '',
+    },
+    97: {
+      // Unit profile Report
+      icon: '',
+      route: '/analytics/unit-profile',
     },
   },
 
@@ -1082,6 +1092,11 @@ export const MENU_CONFIG: any = {
       // Communication
       icon: 'twitch',
       route: '',
+    },
+    97: {
+      // Unit profile Report
+      icon: '',
+      route: '/analytics/unit-profile',
     },
   },
 
