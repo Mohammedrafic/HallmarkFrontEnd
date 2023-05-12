@@ -36,7 +36,7 @@
             <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.regionName}}</td>
             <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.locationName}}</td>
             <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.departmentName}}</td>
-            <td class="e-rowcell e-templatecell" [style.width.px]="400">
+            <td class="e-rowcell e-templatecell" [style.width.px]="400" style="text-align: left">
               <span *ngIf="data.controlType === organizationSettingControlType.Checkbox">{{child.value === 'true' ?
                 'Yes' : 'No'}}</span>
               <span *ngIf="data.controlType === organizationSettingControlType.Multiselect">
