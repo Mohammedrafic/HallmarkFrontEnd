@@ -37,6 +37,7 @@ import {
   GetLogHistoryById,
   GetBusinessForEmployeeType,
   GetEmployeeUsers,
+  ExportTimeSheetList,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -657,6 +658,16 @@ export class SecurityState {
           return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
         })
       );
+  }
+
+  @Action(ExportTimeSheetList)
+  ExportTimeSheetList({}: StateContext<SecurityStateModel>, { payload }: ExportTimeSheetList): Observable<Blob> {
+    return this.orgInterfaceService.export(payload).pipe(
+      tap((file: Blob) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
   }
 
   @Action(GetBusinessForEmployeeType)

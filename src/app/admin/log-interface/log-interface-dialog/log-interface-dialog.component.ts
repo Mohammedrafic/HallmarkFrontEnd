@@ -6,7 +6,7 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { LogInterface, LogTimeSheetHistory, LogTimeSheetHistoryPage } from '@shared/models/org-interface.model';
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeWhile } from 'rxjs';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { AppState } from 'src/app/store/app.state';
@@ -15,9 +15,12 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { GRID_CONFIG } from '@shared/constants';
-import { GetLogHistoryById } from 'src/app/security/store/security.actions';
+import { ExportTimeSheetList, GetLogHistoryById } from 'src/app/security/store/security.actions';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { DatePipe } from '@angular/common';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { ShowExportDialog } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-log-interface-dialog',
@@ -52,7 +55,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
   private unsubscribe$: Subject<void> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
     
-  public totalRecordsCount: number;
+  public totalRecordsCount$: BehaviorSubject<number> =new BehaviorSubject<number>(0);
   public gridApi: any;
   private gridColumnApi: any;
   // columnDefs: ColDef[];
@@ -70,7 +73,6 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
   sideBar = SideBarConfig;
   timeSheetHistoryItemList: Array<LogTimeSheetHistory>=[];
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
-
   public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
@@ -320,6 +322,28 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
   ];
+  public defaultFileName: string;
+  public fileName: string;
+  public columnsToExport: ExportColumn[] = [
+    { text: 'Timesheet ID', column: 'timesheetitemid' },
+    { text: 'Employee ID', column: 'employeeid' },
+    { text: 'First Name', column: 'fname' },
+    { text: 'Middle Name', column: 'mname' },
+    { text: 'Last Name', column: 'lname' },
+    { text: 'Location Id', column: 'locationId' },
+    { text: 'Worked LocationId', column: 'workedlocationid' },
+    { text: 'Worked DeptId', column: 'workedccid'},
+    { text: 'Shift Type', column: 'shiftType' },
+    { text: 'PunchIn Date', column: 'punchIndate' },
+    { text: 'PunchIn Time', column: 'punchIntime' },
+    { text: 'PunchOut Date', column: 'punchOutdate' },
+    { text: 'PunchOut Time', column: 'punchOuttime' },
+    { text: 'Lunch', column: 'lunch' },
+    { text: 'Total Hours', column: 'totalHours' },
+    { text: 'Job Code', column: 'jobcode' },
+    { text: 'Deleted', column: 'deleted' },
+    { text: 'Error Description', column: 'failureReason' },
+  ];
   
   constructor(
     private store: Store,private datePipe: DatePipe,
@@ -345,7 +369,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
     }
     this.logTimeSheetHistoryPage$.pipe().subscribe((data: any) => {
       this.timeSheetHistoryItemList = data?.items;
-      this.totalRecordsCount = data?.totalCount;
+      this.totalRecordsCount$.next(data?.totalCount);
       if (!this.timeSheetHistoryItemList || !this.timeSheetHistoryItemList.length) {
         this.gridApi?.showNoRowsOverlay();
       } else {
@@ -384,12 +408,45 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
     this.nextPreviousLogEvent.emit(next);
   }
 
+  public override customExport(): void {
+    const currentDateTime = this.generateDateTime(this.datePipe);
+    this.fileName = `TimesheetDetails ${currentDateTime}`;
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public closeExport(): void {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = `TimesheetDetails ${this.generateDateTime(this.datePipe)}`;
+    this.store.dispatch(
+      new ExportTimeSheetList(
+        new ExportPayload(
+          fileType,
+          {
+            OrganizationId: this.selectedLog.organizationId,
+            RunId: this.selectedLog.runId,
+          },
+          options
+            ? options.columns.map((val: ExportColumn) => val.column)
+            : this.columnsToExport.map((val: ExportColumn) => val.column),
+          null,
+          options?.fileName || this.defaultFileName
+        )
+      )
+    );
+  }
+
   onGridReady(params: any) {
     this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    params.api.showLoadingOverlay();
-    var datasource = this.createServerSideDatasource();
-     params.api.setServerSideDatasource(datasource);
+    this.gridApi.setRowData(this.timeSheetHistoryItemList);
   }
 
   public dispatchNewPageRequest(postData:any): void {
@@ -397,45 +454,12 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
     this.store.dispatch(new GetLogHistoryById(this.selectedLog.runId,this.selectedLog.organizationId,postData.currentPage,postData.pageSize));
   }
 
-  createServerSideDatasource() {
-    let self = this;
-    return {
-      getRows: function (params: any) {
-        setTimeout(() => {
-          self.gridApi.hideOverlay();
-          let postData = {
-            pageNumber: params.request.endRow / self.paginationPageSize,
-            pageSize: self.paginationPageSize,
-          };
-          if(postData.pageNumber > 1){
-            self.dispatchNewPageRequest(postData);
-          }
-          self.logTimeSheetHistoryPage$.pipe().subscribe((data: any) => {
-            self.timeSheetHistoryItemList = data?.items;
-            self.totalRecordsCount = data?.totalCount;
-            if (!self.timeSheetHistoryItemList || !self.timeSheetHistoryItemList.length) {
-              self.gridApi.showNoRowsOverlay();
-            } else {
-              self.gridApi.hideOverlay();
-            }
-            params.successCallback(self.timeSheetHistoryItemList, data?.totalCount || 1);
-          });
-        }, 500);
-      },
-    };
-  }
-
   onPageSizeChanged(event: any) {
     this.cacheBlockSize = Number(event.value.toLowerCase().replace('rows', ''));
     this.paginationPageSize = Number(event.value.toLowerCase().replace('rows', ''));
     if (this.gridApi != null) {
       this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace('rows', '')));
-      this.gridApi.gridOptionsWrapper.setProperty(
-        'cacheBlockSize',
-        Number(event.value.toLowerCase().replace('rows', ''))
-      );
-       var datasource = this.createServerSideDatasource();
-       this.gridApi.setServerSideDatasource(datasource);
+      this.gridApi.setRowData(this.timeSheetHistoryItemList);
     }
   }
 
