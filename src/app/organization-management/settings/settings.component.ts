@@ -290,7 +290,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.switchedValueForm.controls['isEnabled'].setValue(true)
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
-    }else{
+    } else {
       this.switchedValueForm.get('value')?.removeValidators(Validators.maxLength(2));
       this.maxFieldLength = 100;
     }
@@ -326,7 +326,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.IsSettingKeyAvailabiltyOverLap) {
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
-    }else{
+    } else {
       this.switchedValueForm.get('value')?.removeValidators(Validators.maxLength(2));
       this.maxFieldLength = 100;
     }
@@ -382,7 +382,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       return;
     }
 
-    if ((this.IsSettingKeyOtHours||this.IsSettingKeyScheduleOnlyWithAvailability) && this.allLocationsSelected && this.allRegionsSelected) {
+    if ((this.IsSettingKeyOtHours || this.IsSettingKeyScheduleOnlyWithAvailability) && this.allLocationsSelected && this.allRegionsSelected) {
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = this.organizationId;
 
@@ -393,7 +393,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       }
     }
 
-    if(this.IsSettingKeyAvailabiltyOverLap && this.allLocationsSelected && this.allRegionsSelected) {
+    if (this.IsSettingKeyAvailabiltyOverLap && this.allLocationsSelected && this.allRegionsSelected) {
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = this.organizationId;
       if (this.switchedValueForm.valid) {
@@ -413,7 +413,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.organizationSettingsFormGroup.markAllAsTouched();
       }
 
-      if (this.IsSettingKeyAvailabiltyOverLap  &&
+      if (this.IsSettingKeyAvailabiltyOverLap &&
         this.switchedValueForm.valid) {
         this.sendForm();
       } else {
@@ -1201,13 +1201,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
 
     if (childRecord.regionId) {
-      if (this.IsSettingKeyOtHours||this.IsSettingKeyAvailabiltyOverLap||this.IsSettingKeyScheduleOnlyWithAvailability) {
+      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability) {
         this.otHoursRegionChangesEdit(childRecord.regionId);
       } else {
         this.regionChanged(childRecord.regionId);
       }
     } else {
-      if (this.IsSettingKeyOtHours||this.IsSettingKeyAvailabiltyOverLap||this.IsSettingKeyScheduleOnlyWithAvailability) {
+      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability) {
         this.otHoursRegionChangesEdit(childRecord.regionId as number);
       }
 
@@ -1216,13 +1216,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
 
     if (childRecord.locationId) {
-      if (this.IsSettingKeyOtHours||this.IsSettingKeyAvailabiltyOverLap||this.IsSettingKeyScheduleOnlyWithAvailability) {
+      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability) {
         this.otHoursLocationsEdit(childRecord.locationId);
       } else {
         this.locationChanged(childRecord.locationId);
       }
     } else {
-      if (this.IsSettingKeyOtHours||this.IsSettingKeyAvailabiltyOverLap||this.IsSettingKeyScheduleOnlyWithAvailability) {
+      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability) {
         this.otHoursLocationsEdit(childRecord.locationId as number);
       }
 
@@ -1244,18 +1244,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.isFormShown = false;
   }
 
-  private editSetting(): void {   
-    if (
-      this.organizationSettingsFormGroup.valid &&
-      this.isPushStartDateValid() &&
-      this.invoiceAutoGeneratingValig()
-      && this.switchedValueForm.valid
-      && this.checkboxValueForm.valid
-    ) {
-      if ((this.IsSettingKeyOtHours||this.IsSettingKeyScheduleOnlyWithAvailability) && this.allLocationsSelected && this.allRegionsSelected) {
+  private editSetting(): void {
+    if (this.IsSettingKeyOtHours || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyAvailabiltyOverLap) {
+      if ((this.IsSettingKeyOtHours || this.IsSettingKeyScheduleOnlyWithAvailability) && this.allLocationsSelected && this.allRegionsSelected) {
         this.organizationHierarchy = OrganizationHierarchy.Organization;
         this.organizationHierarchyId = this.organizationId;
-  
+
         if (this.organizationSettingsFormGroup.valid) {
           this.sendForm();
         } else {
@@ -1263,8 +1257,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           return
         }
       }
-  
-      if(this.IsSettingKeyAvailabiltyOverLap && this.allLocationsSelected && this.allRegionsSelected) {
+
+      if (this.IsSettingKeyAvailabiltyOverLap && this.allLocationsSelected && this.allRegionsSelected) {
         this.organizationHierarchy = OrganizationHierarchy.Organization;
         this.organizationHierarchyId = this.organizationId;
         if (this.switchedValueForm.valid) {
@@ -1274,29 +1268,37 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           return
         }
       }
-  
+
       if (this.RegionLocationSettingsMultiFormGroup.valid) {
         this.organizationHierarchy = OrganizationHierarchy.Organization;
         this.organizationHierarchyId = this.organizationId;
-  
+
         if (this.organizationSettingsFormGroup.valid) {
           this.sendForm();
         } else {
           this.organizationSettingsFormGroup.markAllAsTouched();
           return
         }
-  
-        if (this.IsSettingKeyAvailabiltyOverLap  &&
+
+        if (this.IsSettingKeyAvailabiltyOverLap &&
           this.switchedValueForm.valid) {
           this.sendForm();
         } else {
           this.switchedValueForm.markAllAsTouched();
           return
         }
-      }else{
+      } else {
         this.RegionLocationSettingsMultiFormGroup.markAllAsTouched();
         return
       }
+    }
+    if (
+      this.organizationSettingsFormGroup.valid &&
+      this.isPushStartDateValid() &&
+      this.invoiceAutoGeneratingValig()
+      && this.switchedValueForm.valid
+      && this.checkboxValueForm.valid
+    ) {
       this.sendForm();
     } else {
       this.organizationSettingsFormGroup.markAllAsTouched();
@@ -1338,8 +1340,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       if (dynamicValue.isSwitchedValue) {
         this.switchedValueForm.setValue({
-          value:this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? 4: dynamicValue.value,
-          isEnabled:this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? true: dynamicValue.isEnabled,
+          value: this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? 4 : dynamicValue.value,
+          isEnabled: this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? true : dynamicValue.isEnabled,
         });
       }
     });
