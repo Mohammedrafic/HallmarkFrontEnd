@@ -288,6 +288,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.IsSettingKeyAvailabiltyOverLap) {
       this.switchedValueForm.controls["value"].setValue(4)
       this.switchedValueForm.controls['isEnabled'].setValue(true)
+      this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
+      this.maxFieldLength = 2;
+    }else{
+      this.switchedValueForm.get('value')?.removeValidators(Validators.maxLength(2));
+      this.maxFieldLength = 100;
     }
   }
 
@@ -318,6 +323,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.setFormValidation(parentRecord);
     this.setChildRecordData(parentRecord, childRecord);
     this.store.dispatch(new ShowSideDialog(true));
+    if (this.IsSettingKeyAvailabiltyOverLap) {
+      this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
+      this.maxFieldLength = 2;
+    }else{
+      this.switchedValueForm.get('value')?.removeValidators(Validators.maxLength(2));
+      this.maxFieldLength = 100;
+    }
   }
 
   cancelSettingChanges(): void {
@@ -1232,7 +1244,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.isFormShown = false;
   }
 
-  private editSetting(): void {
+  private editSetting(): void {   
     if (
       this.organizationSettingsFormGroup.valid &&
       this.isPushStartDateValid() &&
@@ -1240,6 +1252,51 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       && this.switchedValueForm.valid
       && this.checkboxValueForm.valid
     ) {
+      if ((this.IsSettingKeyOtHours||this.IsSettingKeyScheduleOnlyWithAvailability) && this.allLocationsSelected && this.allRegionsSelected) {
+        this.organizationHierarchy = OrganizationHierarchy.Organization;
+        this.organizationHierarchyId = this.organizationId;
+  
+        if (this.organizationSettingsFormGroup.valid) {
+          this.sendForm();
+        } else {
+          this.organizationSettingsFormGroup.markAllAsTouched();
+          return
+        }
+      }
+  
+      if(this.IsSettingKeyAvailabiltyOverLap && this.allLocationsSelected && this.allRegionsSelected) {
+        this.organizationHierarchy = OrganizationHierarchy.Organization;
+        this.organizationHierarchyId = this.organizationId;
+        if (this.switchedValueForm.valid) {
+          this.sendForm();
+        } else {
+          this.switchedValueForm.markAllAsTouched();
+          return
+        }
+      }
+  
+      if (this.RegionLocationSettingsMultiFormGroup.valid) {
+        this.organizationHierarchy = OrganizationHierarchy.Organization;
+        this.organizationHierarchyId = this.organizationId;
+  
+        if (this.organizationSettingsFormGroup.valid) {
+          this.sendForm();
+        } else {
+          this.organizationSettingsFormGroup.markAllAsTouched();
+          return
+        }
+  
+        if (this.IsSettingKeyAvailabiltyOverLap  &&
+          this.switchedValueForm.valid) {
+          this.sendForm();
+        } else {
+          this.switchedValueForm.markAllAsTouched();
+          return
+        }
+      }else{
+        this.RegionLocationSettingsMultiFormGroup.markAllAsTouched();
+        return
+      }
       this.sendForm();
     } else {
       this.organizationSettingsFormGroup.markAllAsTouched();
@@ -1281,8 +1338,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       if (dynamicValue.isSwitchedValue) {
         this.switchedValueForm.setValue({
-          value: dynamicValue.value,
-          isEnabled: dynamicValue.isEnabled,
+          value:this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? 4: dynamicValue.value,
+          isEnabled:this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? true: dynamicValue.isEnabled,
         });
       }
     });
