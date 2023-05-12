@@ -212,6 +212,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     if (candidate?.currentValue && !candidate?.isFirstChange()) {
       this.getComments();
     }
+
+    if (this.orderDuration && this.order) {
+      this.changeActualEndDate(new Date(this.form.get('startDate')?.value));
+    }
   }
 
   ngOnDestroy(): void {
@@ -338,7 +342,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.order.jobStartDate,
         this.order.jobEndDate
       );
-      this.form.patchValue({ endDate });
+      this.form.patchValue({ endDate: DateTimeHelper.convertDateToUtc(endDate.toString()) });
     }
   }
 
