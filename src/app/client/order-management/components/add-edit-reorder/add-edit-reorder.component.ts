@@ -251,12 +251,11 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
         });
 
         candidatesItems.forEach((element) => {
-
           const el = element as unknown as SyncOptionType;
           const optionValue = el.dataset.value;
           const candidate = this.candidates.find((candidate) => candidate.candidateId === Number(optionValue));
           
-          if (candidate && statusesToDisable.includes(candidate.status)) {
+          if (candidate && candidate.hasActiveCandidate) {
             (el as unknown as HTMLElement).classList.add('hidden-option');
           }
         });
