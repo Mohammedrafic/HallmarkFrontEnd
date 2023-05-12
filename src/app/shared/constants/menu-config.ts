@@ -444,6 +444,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/vms-invoice-report-beta',
     },
+    96: {
+      // Communication
+      icon: 'twitch',
+      route: '',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -664,6 +669,11 @@ export const MENU_CONFIG: any = {
       // VMS Invoice Report Beta
       icon: '',
       route: '/analytics/vms-invoice-report-beta',
+    },
+    96: {
+      // Communication
+      icon: 'twitch',
+      route: '',
     },
   },
 
@@ -1068,6 +1078,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/vms-invoice-report-beta',
     },
+    96: {
+      // Communication
+      icon: 'twitch',
+      route: '',
+    },
   },
 
   [BusinessUnitType.Agency]: {
@@ -1311,6 +1326,11 @@ export const MENU_CONFIG: any = {
       // VMS Invoice Report Beta
       icon: '',
       route: '/analytics/vms-invoice-report-beta',
+    },
+    96: {
+      // Communication
+      icon: 'twitch',
+      route: '',
     },
   },
 };
