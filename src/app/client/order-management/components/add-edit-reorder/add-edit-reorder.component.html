@@ -1,13 +1,14 @@
 <form class="reorder">
   <app-multiselect-dropdown
+    #candidatesSelector
     [formGroupInstance]="reorderForm"
     [fields]="candidatesOptionFields"
     [dataSource]="candidates"
-    [showSelectAll]="true"
+    [showSelectAll]="false"
+    [showClearAll]="false"
     controlName="candidates"
     id="candidates"
     label="Candidate Name"
-    selectAllText="All"
   ></app-multiselect-dropdown>
   <app-multiselect-dropdown
     #agencySelector
@@ -18,7 +19,6 @@
     [showSelectAll]="false"
     [showClearAll]="false"
     [required]="true"
-    selectAllText="All"
     controlName="agencies"
     id="agencies"
     label="Agency Name"

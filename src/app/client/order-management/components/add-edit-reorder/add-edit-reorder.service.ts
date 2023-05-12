@@ -35,15 +35,22 @@ export class AddEditReorderService {
     this.reOrderDialogTitle.next(title);
   }
 
-  public getCandidates(orderId: number, organizationId: number): Observable<CandidateModel[]> {
+  public getCandidates(orderId: number, organizationId: number, reorderId?: number): Observable<CandidateModel[]> {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-    const params = { organizationId };
     const endpoint = `/api/reorders/${orderId}/candidatespool/`;
 
     if (isAgencyArea) {
+      const params = { organizationId };
+
       return this.http.get<CandidateModel[]>(endpoint, { params }).pipe(catchError(() => of([])));
     } else {
-      return this.http.get<CandidateModel[]>(endpoint).pipe(catchError(() => of([])));
+      const orhEndpoint = `/api/reorders/${orderId}/candidatespool`;
+      const params = {
+        ReorderId: reorderId,
+      };
+
+      return this.http.get<CandidateModel[]>(orhEndpoint, { params: GetQueryParams(params)})
+      .pipe(catchError(() => of([])));
     }
   }
 

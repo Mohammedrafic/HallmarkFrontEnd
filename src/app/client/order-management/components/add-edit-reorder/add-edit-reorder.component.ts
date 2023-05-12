@@ -60,6 +60,7 @@ import { SyncOptionType } from './add-edit-reorder.interface';
 })
 export class AddEditReorderComponent extends DestroyableDirective implements OnInit, OnDestroy, AfterViewInit, OnChanges {
   @ViewChild('agencySelector') agencySelector: MultiselectDropdownComponent;
+  @ViewChild('candidatesSelector') candidatesSelector: MultiselectDropdownComponent;
   @Input() public order: Order;
   @Output() public saveEmitter: EventEmitter<void> = new EventEmitter<void>();
 
@@ -208,7 +209,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
     forkJoin([
       this.reorderService.getAgencies(orderId, this.order.id),
-      this.reorderService.getCandidates(orderId, organizationId as number),
+      this.reorderService.getCandidates(orderId, organizationId as number, this.order.id),
     ])
     .pipe(
       takeUntil(this.destroy$),
@@ -217,23 +218,28 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       this.numberOfAgencies = agencies.length;
       this.agencies = agencies;
       this.candidates = candidates;
+      const orderCandidates = this.order.candidates;
 
       this.reorderForm.patchValue({
         agencies: this.getAgencyIds(this.order.jobDistributions),
-        candidates: this.getCandidateIds(this.candidates),
+        candidates: orderCandidates ? this.getCandidateIds(orderCandidates) : [],
       });
-      this.cdr.markForCheck();
 
+      this.cdr.markForCheck();
       this.disableOptions();
     });
   }
 
   @OutsideZone
   private disableOptions(): void {
-      setTimeout(() => {
-        const items: NodeList[] = this.agencySelector.selector['popupObj'].element.querySelectorAll('.e-list-item');
+    const statusesToDisable = ['Onboard', 'Cancelled', 'Offboard'];
 
-        items.forEach((element) => {
+      setTimeout(() => {
+        const agencyItems: NodeList[] = this.agencySelector.selector['popupObj'].element.querySelectorAll('.e-list-item');
+        const candidatesItems: NodeList[] = this.candidatesSelector.selector['popupObj']
+        .element.querySelectorAll('.e-list-item');
+
+        agencyItems.forEach((element) => {
           // We can't use Node and NodeList interfaces as syncfusion modified it.
           const el = element as unknown as SyncOptionType;
           const optionValue = el.dataset.value;
@@ -243,16 +249,24 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
             (el as unknown as HTMLElement).classList.add('hidden-option');
           }
         });
+
+        candidatesItems.forEach((element) => {
+
+          const el = element as unknown as SyncOptionType;
+          const optionValue = el.dataset.value;
+          const candidate = this.candidates.find((candidate) => candidate.candidateId === Number(optionValue));
+          
+          if (candidate && statusesToDisable.includes(candidate.status)) {
+            (el as unknown as HTMLElement).classList.add('hidden-option');
+          }
+        });
       }, 500);
   }
 
   private setFormData(reorder?: Order): void {
-    const { candidates, jobStartDate, shiftStartTime, shiftEndTime, hourlyRate, openPositions, jobDistributions } =
-      reorder || {};
+    const { jobStartDate, shiftStartTime, shiftEndTime, hourlyRate, openPositions } = reorder || {};
       
     this.reorderForm.patchValue({
-      candidates: this.getCandidateIds(candidates!),
-      agencies: this.getAgencyIds(jobDistributions!),
       reorderDate: jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '',
       shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
       shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
@@ -274,7 +288,9 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private listenAginciesChanges(): void {
-    this.reorderForm.get('agencies')?.valueChanges.pipe(
+    this.reorderForm.get('agencies')?.valueChanges
+    .pipe(
+      filter((agenciesIds) => !!agenciesIds),
       tap((agenciesIds: number[]) => {
         const candidates = this.reorderForm.get('candidates')?.value;
         if (!agenciesIds.length && candidates.length) {
@@ -409,16 +425,10 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     }
 
     if (jobDistributions?.[0].agencyId === null) {
-      this.selectAllAgencies();
+      return this.agencies.map(({ agencyId }: AgencyModel) => agencyId);
     } else {
       return jobDistributions?.map(({ agencyId }: JobDistributionModel) => agencyId);
     }
-  }
-
-  private selectAllAgencies(): void {
-    this.reorderForm.patchValue({
-      agencies: this.agencies.map(({ agencyId }: AgencyModel) => agencyId),
-    });
   }
 
   private getCandidateIds(candidate: CandidateModel[]): number[] {
