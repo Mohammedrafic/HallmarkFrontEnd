@@ -61,6 +61,9 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   @Select(SecurityState.roleTreeField)
   public roleTreeField$: Observable<RoleTreeField>;
 
+  @Select(SecurityState.permissionsTree)
+  public permissionsTree$: Observable<PermissionsTree>;
+
   @Select(SecurityState.isNewRoleDataLoading)
   public isNewRoleDataLoading$: Observable<boolean>;
 
@@ -213,7 +216,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       .subscribe((value) => {
         this.store.dispatch(new GetPermissionsTree(value));
         this.store.dispatch(new GetNewRoleBusinessByUnitType(value));
-      });
+    });
   }
 
   private onRoleTreeFieldChanged(): void {
@@ -263,12 +266,12 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       });
   }
   isShowIRPOnly(arg:any){
+    debugger;
     var elements:TreeView = this.tree;
-    this.roleTreeField$.subscribe((roleTreeField) => {
-      var item=roleTreeField.dataSource
-      .filter(x=>x.includeIRP==true);
+    this.permissionsTree$.subscribe((roleTreeField) => {
+      var item=roleTreeField.filter(x=>x.includeInIRP==arg.checked);
       elements.fields={
-        dataSource:roleTreeField.dataSource.filter(x=>x.includeIRP==true),
+        dataSource:roleTreeField.filter(x=>x.includeInIRP==arg.checked),
         id: 'id',
         parentID: 'parentId',
         text: 'name',
