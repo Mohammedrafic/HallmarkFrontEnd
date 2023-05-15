@@ -71,6 +71,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public disableSaveButton = false;
   public dialogConfig: ReadonlyArray<CandidateField>;
   public isOnboarded = false;
+  public comments: Comment[] = [];
+  public commentContainerId = 0;
+  @Input() public externalCommentConfiguration ?: boolean | null;
 
   private candidateModelState: EditCandidateDialogState;
 
