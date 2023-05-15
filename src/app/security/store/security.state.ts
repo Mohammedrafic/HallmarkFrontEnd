@@ -398,7 +398,6 @@ export class SecurityState {
     { type }: GetIRPPermissionsTree
   ): Observable<PermissionsTree | void> {
     patchState({ isNewRoleDataLoading: true });
-    debugger;
     return this.roleService.getPermissionsIRPTree(type).pipe(
       tap((payload) => {
         patchState({ permissionsIRPTree: payload });

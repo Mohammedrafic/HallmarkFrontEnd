@@ -42,7 +42,6 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
   public optionFields = OPRION_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public roleId: number | null;
-  public isShowIRPOnly:boolean=false;
   public filteredItems$ = new Subject<number>();
   public agencyActionsAllowed = false;
   public userbusinessUnitId: number | null;
@@ -205,7 +204,6 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
   }
 
   private onBusinessUnitValueChanged(): void {
-    debugger;
     this.businessUnitControl.valueChanges
     .pipe(takeWhile(() => this.isAlive)).
     subscribe((value) => {

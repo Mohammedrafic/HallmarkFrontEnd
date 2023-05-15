@@ -81,7 +81,6 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public optionFields = OPRION_FIELDS;
   public copyRoleControl = new FormControl();
-  public isIRPOnlyBusinessUnit:boolean=false;
   public copyRoleFields = {
     text: 'name',
     value: 'id',
