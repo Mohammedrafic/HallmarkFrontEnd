@@ -46,7 +46,6 @@ export class CandidateCardComponent implements OnInit, OnChanges {
     this.candidateIconName = CandidateIconName(this.candidateData, this.selectedFilters);
     this.iconTooltipMessage = this.candidateIconName === 'compass' ?
       CreateTooltipForOrientation(this.candidateData, this.startDate) : this.candidateData.employeeNote;
-
   }
 
   private watchForDateRangeChanges(): void {

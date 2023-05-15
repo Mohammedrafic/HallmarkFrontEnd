@@ -8,7 +8,7 @@ export const CreateTooltipForOrientation = (candidate: ScheduleCandidate, startD
   if(candidate.orientationDate && candidateOrientation) {
     return '';
   } else if(candidate.orientationDate && !candidateOrientation) {
-    return `Oriented from ${formatDate(candidate.orientationDate, 'MM/dd/yyyy', 'en-US')}`;
+    return `Oriented from ${formatDate(candidate.orientationDate, 'MM/dd/yyyy', 'en-US', 'UTC')}`;
   }
 
   return 'Not Oriented';
