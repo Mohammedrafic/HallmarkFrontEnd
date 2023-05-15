@@ -19,6 +19,13 @@
   }
 }
 
+.day-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0 8px;
+  height: 100%;
+}
+
 .card-wrapper {
   width: 100%;
   height: 100%;

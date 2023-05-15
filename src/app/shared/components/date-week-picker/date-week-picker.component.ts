@@ -104,7 +104,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     const startDate = new Date(this.startDateValue);
     const dstCorrection = DateTimeHelper.getDSTCorrectionInMs(startDate);
 
-    const weekStart = new Date(startDate.getTime() - dstCorrection + this.weekInMs);
+    const weekStart = new Date(startDate.getTime() + dstCorrection + this.weekInMs);
     const dateRange = DateTimeHelper.getRange(weekStart, this.startDate, this.rangeType, this.firstDayOfWeek,
       !!this.maxDate);
 
@@ -263,7 +263,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     if (this.weekInMs) {
       const prevSuggestDate = new Date(compareDate.getTime() - this.weekInMs);
       const nextSuggestDate = new Date(compareDate.getTime() + this.weekInMs);
-  
+
       this.isPrevDisabled = this.minDate ? this.minDate > prevSuggestDate : false;
       this.isNextDisabled = this.maxDate ? this.maxDate < nextSuggestDate : false;
       this.cdr.detectChanges();
