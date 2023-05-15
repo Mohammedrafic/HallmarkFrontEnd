@@ -7,6 +7,7 @@ export type PermissionsTreeItem = {
   hasChild: boolean;
   isAssignable: boolean;
   isAvailable: boolean;
+  includeInIRP:boolean;
 };
 
 export type PermissionsTree = PermissionsTreeItem[];

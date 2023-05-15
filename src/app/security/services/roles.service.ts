@@ -43,6 +43,14 @@ export class RolesService {
     return this.http.get<PermissionsTree>(`/api/Permissions`, { params: { BusinessUnitType } });
   }
 
+/**
+   * Get Permissions Tree
+   * @param BusinessUnitType
+   * @return PermissionsTree
+   */
+  public getPermissionsIRPTree(BusinessUnitType: BusinessUnitType): Observable<PermissionsTree> {
+    return this.http.get<PermissionsTree>(`/api/Permissions/GetIRPPermissions`, { params: { BusinessUnitType } });
+  }
   /**
    * Seve Role
    * @param RoleDTO

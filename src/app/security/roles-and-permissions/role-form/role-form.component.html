@@ -22,6 +22,7 @@
         [fields]="bussinesDataFields"
         [dataSource]="newRoleBussinesData"
         [value]="defaultBusinessValue"
+        (change)="ShowIsIRPToggle($event)"
       ></ejs-dropdownlist>
     </div>
   </div>
@@ -50,7 +51,7 @@
       Apply
     </button>
   </div>
-
+<div class="tree-filter">
   <div class="active-toggle">
     <ejs-switch class="switch" [disabled]="form.disabled" [checked]="form.get('isActive')?.value" (change)="toggleActive()"></ejs-switch>
     <span class="e-text">Active</span>
@@ -67,6 +68,11 @@
       </div>
     </div>
   </div>
+  <div #showIRPOnlyToggle class="active-toggle">
+    <ejs-switch class="switch" (change)="isShowIRPOnly($event)"></ejs-switch>
+    <span class="e-text">Show IRP Only</span>
+  </div>
+</div>
 
   <hr class="divider" />
   <div class="tree-lebel">

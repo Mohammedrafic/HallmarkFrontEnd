@@ -12,6 +12,7 @@ import {
   GetNewRoleBusinessByUnitType,
   GetRolesForCopy,
   GetPermissionsTree,
+  GetIRPPermissionsTree,
   GetRolePerUser,
   GetRolesPage,
   GetUsersPage,
@@ -70,6 +71,7 @@ interface SecurityStateModel {
   rolesPage: RolesPage | null;
   rolesPerUsers: RolesPerUser[] | null;
   permissionsTree: PermissionsTree;
+  permissionsIRPTree:PermissionsTree;
   isNewRoleDataLoading: boolean;
   newRoleBussinesData: BusinessUnit[];
   userVisibilitySettingsPage: UserVisibilitySettingsPage | null;
@@ -92,6 +94,7 @@ interface SecurityStateModel {
     allUsersPage: null,
     rolesPerUsers: [],
     permissionsTree: [],
+    permissionsIRPTree:[],
     isNewRoleDataLoading: false,
     newRoleBussinesData: [],
     userVisibilitySettingsPage: null,
@@ -204,7 +207,7 @@ export class SecurityState {
   @Selector()
   static roleTreeField(state: SecurityStateModel): RoleTreeField {
     return {
-      dataSource: state.permissionsTree.filter(({ isAvailable }) => isAvailable),
+      dataSource: state.permissionsTree.filter(({ isAvailable,includeInIRP }) => isAvailable&&!includeInIRP),
       id: 'id',
       parentID: 'parentId',
       text: 'name',
@@ -215,6 +218,10 @@ export class SecurityState {
   @Selector()
   static permissionsTree(state: SecurityStateModel): PermissionsTree {
     return state.permissionsTree;
+  }
+  @Selector()
+  static permissionsIRPTree(state: SecurityStateModel): PermissionsTree {
+    return state.permissionsIRPTree;
   }
 
   @Selector()
@@ -378,6 +385,23 @@ export class SecurityState {
     return this.roleService.getPermissionsTree(type).pipe(
       tap((payload) => {
         patchState({ permissionsTree: payload });
+        patchState({ isNewRoleDataLoading: false });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+  @Action(GetIRPPermissionsTree)
+  GetPermissionsIRPTree(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { type }: GetIRPPermissionsTree
+  ): Observable<PermissionsTree | void> {
+    patchState({ isNewRoleDataLoading: true });
+    return this.roleService.getPermissionsIRPTree(type).pipe(
+      tap((payload) => {
+        patchState({ permissionsIRPTree: payload });
         patchState({ isNewRoleDataLoading: false });
         return payload;
       }),

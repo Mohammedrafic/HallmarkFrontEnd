@@ -29,7 +29,10 @@
       }
     }
   }
-
+  .tree-filter{
+    display: flex;
+    gap: 20px;
+  }
   .divider {
     margin: 24px -24px;
     background-color: $secondary-dark-blue-40;

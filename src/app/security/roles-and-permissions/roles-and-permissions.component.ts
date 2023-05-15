@@ -109,6 +109,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
       businessUnitType: this.businessUnitControl.value,
       businessUnitId: this.roleForm.defaultBusinessValue,
       isActive: true,
+      isShowIRPOnly: false
     });
     this.disableBussinesUnitForRole();
     this.store.dispatch(new ShowSideDialog(true));
@@ -206,7 +207,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     this.businessUnitControl.valueChanges
     .pipe(takeWhile(() => this.isAlive)).
     subscribe((value) => {
-      this.store.dispatch(new GetBusinessByUnitType(value)).subscribe(() => {
+     this.store.dispatch(new GetBusinessByUnitType(value)).subscribe(() => {
         this.businessControl?.setValue(null);
         if (this.isBusinessDisabledForNewRole) {
           this.businessControl.patchValue([this.userbusinessUnitId]);
