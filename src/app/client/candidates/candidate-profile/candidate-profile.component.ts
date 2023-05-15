@@ -28,8 +28,8 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   public $statusConfirmDialog = new Subject<boolean>();
   public showSkillConfirmDialog = false;
   public showStatusConfirmDialog = false;
-  public EMPLOYEE_TERMINATED_WARNING = EMPLOYEE_TERMINATED_WARNING;
-  public EMPLOYEE_SKILL_CHANGE_WARNING = EMPLOYEE_SKILL_CHANGE_WARNING;
+  public employeeTerminatedWaring = EMPLOYEE_TERMINATED_WARNING;
+  public employeeSkillChangeWarning = EMPLOYEE_SKILL_CHANGE_WARNING;
 
   private filesDetails: Blob | null;
   private isRemoveLogo: boolean;

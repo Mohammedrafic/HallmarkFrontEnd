@@ -17,12 +17,12 @@
 
 <app-candidate-confirm-dialog
   *ngIf="showSkillConfirmDialog"
-  [text]="EMPLOYEE_SKILL_CHANGE_WARNING"
+  [text]="employeeSkillChangeWarning"
   [$confirmDialog]="$skillsConfirmDialog"
 ></app-candidate-confirm-dialog>
 
 <app-candidate-confirm-dialog
   *ngIf="showStatusConfirmDialog"
-  [text]="EMPLOYEE_TERMINATED_WARNING"
+  [text]="employeeTerminatedWaring"
   [$confirmDialog]="$statusConfirmDialog"
 ></app-candidate-confirm-dialog>

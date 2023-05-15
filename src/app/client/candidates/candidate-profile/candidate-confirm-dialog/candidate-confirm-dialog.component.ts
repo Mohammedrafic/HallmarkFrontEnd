@@ -14,23 +14,19 @@ export class CandidateConfirmDialogComponent extends DestroyDialog implements On
   @Input() text: string;
   @Input() $confirmDialog: Subject<boolean>;
 
-  public WARNING_TITLE = WARNING_TITLE;
+  public warningTitle = WARNING_TITLE;
 
   ngOnInit(): void {
     this.watchForCloseStream();
   }
 
-  public onYes(): void {
+  public submit(): void {
     this.$confirmDialog.next(true);
     this.closeDialog();
   }
 
-  public onCancel(): void {
+  public cancel(): void {
     this.$confirmDialog.next(false);
     this.closeDialog();
-  }
-
-  public closeOnEscape(): void {
-    this.onCancel();
   }
 }
