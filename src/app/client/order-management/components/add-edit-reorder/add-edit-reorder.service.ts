@@ -35,29 +35,18 @@ export class AddEditReorderService {
     this.reOrderDialogTitle.next(title);
   }
 
-  public getCandidates(orderId: number, organizationId: number, reorderId?: number): Observable<CandidateModel[]> {
-    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-    const endpoint = `/api/reorders/${orderId}/candidatespool/`;
+  public getCandidates(reorderId: number, perDiemId: number, isReorder: boolean): Observable<CandidateModel[]> {
+    const orhEndpoint = `/api/reorders/${perDiemId}/candidatespool`;
+    const params = isReorder ? { ReorderId: reorderId } : {};
 
-    if (isAgencyArea) {
-      const params = { organizationId };
-
-      return this.http.get<CandidateModel[]>(endpoint, { params }).pipe(catchError(() => of([])));
-    } else {
-      const orhEndpoint = `/api/reorders/${orderId}/candidatespool`;
-      const params = {
-        ReorderId: reorderId,
-      };
-
-      return this.http.get<CandidateModel[]>(orhEndpoint, { params: GetQueryParams(params)})
-      .pipe(catchError(() => of([])));
-    }
+    return this.http.get<CandidateModel[]>(orhEndpoint, { params: GetQueryParams(params)})
+    .pipe(catchError(() => of([])));
   }
 
-  public getAgencies(reorderId: number, orderId: number): Observable<AgencyModel[]> {
+  public getAgencies(reorderId: number, perDiemId: number, isReorder: boolean): Observable<AgencyModel[]> {
     const params = {
-      OrderId: orderId,
-      ReorderId: reorderId,
+      OrderId: perDiemId,
+      ...isReorder ? { ReorderId: reorderId } : {},
     };
 
     return this.http.get<AgencyModel[]>('/api/ReOrders/agenciespool',
