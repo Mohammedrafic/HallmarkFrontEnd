@@ -281,10 +281,9 @@ export class DateTimeHelper {
   }
 
   public static getDSTCorrectionInMs(date: Date): number {
-    const janOffset = new Date(0, 1).getTimezoneOffset();
+    const currentOffset = new Date(new Date().getFullYear(), 0, 1).getTimezoneOffset();
     const dateOffset = new Date(date).getTimezoneOffset();
- 
-    return (janOffset - dateOffset) * 60 * 60 * 1000;
+    return (currentOffset - dateOffset) * 60 * 1000;
   }
 
   public static getISOTimeZone(date: string): string {

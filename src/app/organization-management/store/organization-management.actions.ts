@@ -362,7 +362,8 @@ export class GetOrganizationSettings {
 
 export class SaveOrganizationSettings {
   static readonly type = '[organizationManagement] Save Organization Settings';
-  constructor(public organizationSettings: OrganizationSettingsPost) {}
+  constructor(public organizationSettings: OrganizationSettingsPost,
+              public filters: OrganizationSettingFilter) {}
 }
 
 export class ClearDepartmentList {

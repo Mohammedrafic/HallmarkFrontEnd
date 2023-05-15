@@ -132,6 +132,7 @@
                   <app-schedule-card
                     [isSelected]="!!selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot.dateText)"
                     [dateSchedule]="dateSchedule"
+                    [activePeriod]="activePeriod"
                   ></app-schedule-card>
                 </ng-container>
 

@@ -49,7 +49,7 @@ export class ScheduleCardService {
 
   private createAttributesTooltipText(attributes: ScheduleItemAttributes): string {
     const attributesList = CreateScheduleAttributes(attributes, true);
-    
+
     if(attributesList.length) {
       return ` | ${attributesList}`;
     } else {

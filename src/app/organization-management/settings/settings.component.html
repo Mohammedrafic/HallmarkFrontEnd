@@ -345,7 +345,7 @@
 
       <div class="input-container">
         <div class="input-group switch">
-          <ejs-switch id="switcher" class="switch" formControlName="isEnabled"></ejs-switch>
+          <ejs-switch id="switcher" class="switch" formControlName="isEnabled" (change)="disableSettingsValue($event,undefined)"></ejs-switch>
           <label class="switch-label">Turned {{ switchedValueForm.get('isEnabled')?.value ? 'on' : 'off' }}</label>
         </div>
       </div>

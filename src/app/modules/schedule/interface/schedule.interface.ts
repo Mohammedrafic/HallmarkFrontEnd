@@ -141,6 +141,11 @@ export interface ScheduleEventConfig {
   additionalAttributes?: string;
 }
 
+export interface DayCardConfig {
+  source: ScheduleEventConfig[];
+  tooltips: string[];
+}
+
 export interface ScheduleMonthCardConfig {
   title: string;
   titleColor: string;

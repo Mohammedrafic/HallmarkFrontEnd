@@ -6,7 +6,7 @@ import { SecurityState } from '../store/security.state';
 import { filter, map, Observable, Subject, takeWhile } from 'rxjs';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { SetHeaderState, ShowExportDialog, ShowSideDialog } from '../../store/app.actions';
+import { SetHeaderState, ShowExportDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import {
   ChangeBusinessUnit,
   GetBusinessByUnitType,
@@ -26,6 +26,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserGridComponent } from './user-grid/user-grid.component';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
+import { MessageTypes } from '@shared/enums/message-types';
 
 const DEFAULT_DIALOG_TITLE = 'Add User';
 const EDIT_DIALOG_TITLE = 'Edit User';
@@ -57,6 +58,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
   public createdUser: User | null;
   public agencyActionsAllowed = false;
   public importAllowed = false;
+  public dispatch: boolean = false;
 
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
@@ -134,25 +136,46 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
+
   public onSave(): void {
+    let empId: number = 6;
     this.userSettingForm.markAllAsTouched();
     if (this.userSettingForm.valid) {
       const value = this.userSettingForm.getRawValue();
-      let userDTO: UserDTO = {
-        businessUnitId: value.businessUnitId || null,
-        metadata: {
-          ...value,
-          isDeleted: !value.isDeleted,
-        },
-        roleIds: value.roles,
-      };
-      if (this.isEditRole) {
-        userDTO = {
-          ...userDTO,
-          userId: value.id,
+        let userDTO: UserDTO = {
+          businessUnitId: value.businessUnitId || null,
+          metadata: {
+            ...value,
+            isDeleted: !value.isDeleted,
+          },
+          roleIds: value.roles,
         };
+        if (this.isEditRole) {
+          userDTO = {
+            ...userDTO,
+            userId: value.id,
+          };
+        }
+      try{
+        value.roles.forEach((x : number) => {
+          if(x == empId){
+            if(value.phoneNumber != null){
+              this.dispatch = true;
+              this.store.dispatch(new SaveUser(userDTO));
+            } else {
+              this.store.dispatch(new ShowToast(MessageTypes.Error, "Phone Number is Required"));
+            }
+            throw "break";
+          } else {
+            this.dispatch = true;
+          }
+        });
+        if(this.dispatch){
+          this.store.dispatch(new SaveUser(userDTO));
+        }
+      } catch(e){
       }
-      this.store.dispatch(new SaveUser(userDTO));
+      
     }
   }
 
