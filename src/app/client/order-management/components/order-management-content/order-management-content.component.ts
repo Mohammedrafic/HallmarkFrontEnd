@@ -468,7 +468,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   get smallMenu(): any[] {
     let menu: { text: string }[] = [];
-    if (!this.isMobile && this.isContentTabletWidth) {
+    if (!this.isActiveSystemIRP && !this.isMobile && this.isContentTabletWidth) {
       menu = [...menu, { text: MobileMenuItems.Filters }];
     }
 
@@ -477,7 +477,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
     if (
       this.activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
-      this.activeTab !== OrganizationOrderManagementTabs.Incomplete
+      this.activeTab !== OrganizationOrderManagementTabs.Incomplete && 
+      !this.isActiveSystemIRP
     ) {
       menu = [
         ...menu,

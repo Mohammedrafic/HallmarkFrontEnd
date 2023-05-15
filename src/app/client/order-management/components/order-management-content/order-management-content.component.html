@@ -155,12 +155,14 @@
 <ng-template #smallMenuButton>
   <ng-container *ngIf="(isMobile || isTablet)" [ngTemplateOutlet]="filterButton"></ng-container>
   <button
+    *ngIf="!isActiveSystemIRP"
     ejs-dropdownbutton
     appHideBeforeSyncfusionLoad
     [items]="smallMenu"
     (select)="smallMenuSelected($event)"
     id="importButton"
     cssClass="e-outline menu-mobile"
+    [disabled]="isActiveSystemIRP"
   >
     <div class="button-export-container"><i-feather name="more-vertical" class="icon"></i-feather></div>
   </button>
