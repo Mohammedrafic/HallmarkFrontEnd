@@ -13,6 +13,7 @@ import { CandidatesService } from './services/candidates.service';
 import { DepartmentsModule } from './departments/departments.module';
 import { CredentialsModule } from './credentials/credentials.module';
 import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
+import { CandidateConfirmDialogModule } from './candidate-profile/candidate-confirm-dialog/candidate-confirm-dialog.module';
 
 @NgModule({
   declarations: [CandidateProfileComponent, AddEditCandidateComponent],
@@ -27,6 +28,7 @@ import { ScrollRestorationService } from '@core/services/scroll-restoration.serv
     SharedModule,
     DepartmentsModule,
     CredentialsModule,
+    CandidateConfirmDialogModule,
   ],
   providers: [CandidatesService, ScrollRestorationService],
 })
