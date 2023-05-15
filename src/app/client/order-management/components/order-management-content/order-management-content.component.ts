@@ -477,7 +477,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
     if (
       this.activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
-      this.activeTab !== OrganizationOrderManagementTabs.Incomplete &&
+      this.activeTab !== OrganizationOrderManagementTabs.Incomplete && 
       !this.isActiveSystemIRP
     ) {
       menu = [
