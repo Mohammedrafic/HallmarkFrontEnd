@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
@@ -23,6 +24,7 @@ import { GetUsersAssignedToRole } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 
 import {
+  GetIRPPermissionsTree,
   GetNewRoleBusinessByUnitType,
   GetNewRoleBusinessByUnitTypeSucceeded,
   GetPermissionsTree,
@@ -55,6 +57,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   @Output() changeUnitId = new EventEmitter<boolean>();
 
   @ViewChild('tree') tree: TreeViewComponent;
+  @ViewChild('showIRPOnlyToggle') showIRPOnlyToggle:ElementRef;
 
   public newRoleBussinesData: BusinessUnit[];
 
@@ -63,6 +66,9 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
 
   @Select(SecurityState.permissionsTree)
   public permissionsTree$: Observable<PermissionsTree>;
+
+  @Select(SecurityState.permissionsIRPTree)
+  public permissionsIRPTree$: Observable<PermissionsTree>;
 
   @Select(SecurityState.isNewRoleDataLoading)
   public isNewRoleDataLoading$: Observable<boolean>;
@@ -75,10 +81,12 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public optionFields = OPRION_FIELDS;
   public copyRoleControl = new FormControl();
+  public isIRPOnlyBusinessUnit:boolean=false;
   public copyRoleFields = {
     text: 'name',
     value: 'id',
   };
+
   defaultBusinessValue: any;
 
   get businessUnitControl(): AbstractControl | null {
@@ -113,7 +121,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.onNewRoleBussinesDataFetched();
     this.onUsersAssignedToRoleFetched();
     this.subOnBusinessUnitControlChange();
-       
+
     this.copyRoleData$ = this.store.select(SecurityState.copyRoleData)
     .pipe(
       map((roles) => {
@@ -133,6 +141,9 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.isAlive = false;
   }
 
+  ngAfterViewInit():void{
+    this.showIRPOnlyToggle.nativeElement.style.display='none';
+  }
   public toggleActive(): void {
     const activeControl = this.form.get('isActive');
     activeControl?.patchValue(!activeControl.value);
@@ -169,7 +180,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   private onBusinessUnitOrIdChange(): void {
     const businessUnitTypeControl = this.form.get('businessUnitType');
     const businessUnitIdControl = this.form.get('businessUnitId');
-
+    
     if (businessUnitTypeControl && businessUnitIdControl) {
       combineLatest([businessUnitTypeControl.valueChanges, businessUnitIdControl.valueChanges])
         .pipe(
@@ -215,6 +226,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       )
       .subscribe((value) => {
         this.store.dispatch(new GetPermissionsTree(value));
+        this.store.dispatch(new GetIRPPermissionsTree(value));
         this.store.dispatch(new GetNewRoleBusinessByUnitType(value));
     });
   }
@@ -265,19 +277,38 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
         }
       });
   }
+  ShowIsIRPToggle(arg:any){
+    if(arg.itemData.isIRPEnabled&&arg.itemData.isVMSEnabled){
+      this.showIRPOnlyToggle.nativeElement.style.display='block';
+    }
+    else{
+      this.showIRPOnlyToggle.nativeElement.style.display='none';
+    }
+  }
   isShowIRPOnly(arg:any){
-    debugger;
     var elements:TreeView = this.tree;
-    this.permissionsTree$.subscribe((roleTreeField) => {
-      var item=roleTreeField.filter(x=>x.includeInIRP==arg.checked);
-      elements.fields={
-        dataSource:roleTreeField.filter(x=>x.includeInIRP==arg.checked),
-        id: 'id',
-        parentID: 'parentId',
-        text: 'name',
-        hasChildren: 'hasChild'
-      }
-    });
+    if(arg.checked==true){
+      this.permissionsIRPTree$.subscribe((roleTreeField) => {
+        elements.fields={
+          dataSource:roleTreeField,
+          id: 'id',
+          parentID: 'parentId',
+          text: 'name',
+          hasChildren: 'hasChild'
+        }
+      });
+    }
+    else{
+      this.permissionsTree$.subscribe((roleTreeField) => {
+        elements.fields={
+          dataSource:roleTreeField.filter(x=>x.includeInIRP==false),
+          id: 'id',
+          parentID: 'parentId',
+          text: 'name',
+          hasChildren: 'hasChild'
+        }
+      });
+    }
     this.changeDetectorRef.detectChanges();
   }
  

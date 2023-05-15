@@ -22,6 +22,7 @@
         [fields]="bussinesDataFields"
         [dataSource]="newRoleBussinesData"
         [value]="defaultBusinessValue"
+        (change)="ShowIsIRPToggle($event)"
       ></ejs-dropdownlist>
     </div>
   </div>
@@ -67,7 +68,7 @@
       </div>
     </div>
   </div>
-  <div class="active-toggle" *ngIf="form.get('isShowIRPOnly')?.value">
+  <div #showIRPOnlyToggle class="active-toggle">
     <ejs-switch class="switch" (change)="isShowIRPOnly($event)"></ejs-switch>
     <span class="e-text">Show IRP Only</span>
   </div>

@@ -104,21 +104,13 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
 
   public addRole(): void {
     this.isEditRole = false;
-    var bussiness=this.businessForm.get('business')?.value;
-    if(bussiness?.length>0){
-      this.bussinesData$.subscribe((data)=>{
-        var item=data.filter(x=>x.isIRPEnabled==true && x.id==bussiness[0])
-        if(item.length>0)
-          this.isShowIRPOnly=true;
-      })
-    }
     this.roleFormGroup.reset();
     this.roleFormGroup.enable();
     this.roleFormGroup.patchValue({
       businessUnitType: this.businessUnitControl.value,
       businessUnitId: this.roleForm.defaultBusinessValue,
       isActive: true,
-      isShowIRPOnly: this.isShowIRPOnly
+      isShowIRPOnly: false
     });
     this.disableBussinesUnitForRole();
     this.store.dispatch(new ShowSideDialog(true));

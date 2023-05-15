@@ -56,7 +56,10 @@ export class GetPermissionsTree {
   static readonly type = '[security] Get Permissions Tree';
   constructor(public type: BusinessUnitType) {}
 }
-
+export class GetIRPPermissionsTree {
+  static readonly type = '[security] Get IRP Permissions Tree';
+  constructor(public type: BusinessUnitType) {}
+}
 export class GetNewRoleBusinessByUnitType {
   static readonly type = '[security] Get New Role Business By Unit Type';
   constructor(public type: BusinessUnitType) {}
