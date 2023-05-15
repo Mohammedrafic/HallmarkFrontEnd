@@ -19,6 +19,8 @@ export class DestroyDialog extends Destroyable implements AfterViewChecked {
 
   @Output() destroyDialog: EventEmitter<void> = new EventEmitter();
 
+  public animationSettings: Object = { effect: 'Zoom', duration: 400, delay: 0 };
+
   private readonly viewObserver: Subject<void> = new Subject();
 
   ngAfterViewChecked(): void {
@@ -32,7 +34,7 @@ export class DestroyDialog extends Destroyable implements AfterViewChecked {
 
    /**
    * This method not used here in OnInit/Constructor to prevent
-   * overriding Oninit/constructor in component class.
+   * overriding OnInit/constructor in component class.
    */
   protected watchForCloseStream(): void {
     this.viewObserver.asObservable()

@@ -1,0 +1,35 @@
+<ejs-dialog
+  #destroyableDialog
+  cssClass="confirm-dialog"
+  [animationSettings]='animationSettings'
+  isModal="true"
+  visible="false"
+  showCloseIcon="true"
+  width="448px"
+  closeOnEscape
+  (close)="closeOnEscape()"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">{{ WARNING_TITLE }}</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <div></div>
+    <div>
+      {{ text }}
+    </div>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <button ejs-button cssClass="e-outline" (click)="onCancel()">Cancel</button>
+      <button ejs-button cssClass="e-danger" [isPrimary]="true" (click)="onYes()">Yes</button>
+    </div>
+  </ng-template>
+</ejs-dialog>
