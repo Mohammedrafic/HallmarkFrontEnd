@@ -93,6 +93,7 @@ import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
 import { OfferDeploymentComponent,
 } from './components/order-candidate-list/order-candidates-list/offer-deployment/offer-deployment.component';
 import { BillRatePipe } from '@shared/pipes/bill-rate.pipe';
+import { BulkBillRatePipe } from '@shared/pipes/bulk-bill-rate.pipe';
 import { HistoricalEventsComponent } from './components/historical-events/historical-events.component';
 import { GridSubrowCandidateComponent } from './components/grid-subrow-candidate/grid-subrow-candidate.component';
 import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
@@ -212,6 +213,7 @@ const COMPONENTS = [
   FormatPhoneNumberPipe,
   RateHourPipe,
   BillRatePipe,
+  BulkBillRatePipe,
   ExBillRateNamesPipe,
   HideBeforeSyncfusionLoadDirective,
   OpenFirstAccordionDirective,
