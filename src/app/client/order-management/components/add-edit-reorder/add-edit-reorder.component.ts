@@ -204,11 +204,10 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     const { id, organizationId, reOrderFromId, skillId } = this.order;
     const isReOrder = !isNil(reOrderFromId) && reOrderFromId !== 0;
     const orderId = isReOrder ? reOrderFromId : id;
-
     this.billRate$ = this.reorderService.getBillRate(organizationId!, skillId).pipe(filter(() => !this.isEditMode));
 
     forkJoin([
-      this.reorderService.getAgencies(orderId, this.order.id),
+      this.reorderService.getAgencies(this.order.id, orderId),
       this.reorderService.getCandidates(orderId, organizationId as number, this.order.id),
     ])
     .pipe(
