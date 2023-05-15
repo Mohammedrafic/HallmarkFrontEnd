@@ -1285,15 +1285,16 @@ export class OrganizationManagementState {
   @Action(SaveOrganizationSettings)
   SaveOverrideOrganizationSettings(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
-    { organizationSettings }: SaveOrganizationSettings
-  ): Observable<void> {
+    { organizationSettings, filters }: SaveOrganizationSettings
+  ): Observable<void | Observable<void>> {
     return this.organizationSettingsService.saveOrganizationSetting(organizationSettings).pipe(
       tap((payload) => {
         patchState({ isCredentialSetupLoading: false });
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-        dispatch(new GetOrganizationSettings());
+        dispatch(new GetOrganizationSettings(filters));
         return payload;
-      })
+      }),
+      catchError((error: HttpErrorResponse) => of(dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))),
     );
   }
 

@@ -581,7 +581,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       isIRPConfigurationValue: this.configurationSystemType === SystemType.IRP,
     };
 
-    this.store.dispatch(new SaveOrganizationSettings(setting));
+    this.store.dispatch(new SaveOrganizationSettings(setting, this.filters));
     this.store.dispatch(new ShowSideDialog(false));
     this.removeActiveCssClass();
     this.clearFormDetails();
