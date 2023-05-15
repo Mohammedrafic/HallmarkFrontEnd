@@ -290,11 +290,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.switchedValueForm.controls['isEnabled'].setValue(true)
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
-      this.disableSettingsValue(undefined,this.switchedValueForm.get('isEnabled')?.value);
+      this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
     } else {
       this.switchedValueForm.get('value')?.removeValidators(Validators.maxLength(2));
       this.maxFieldLength = 100;
-      this.disableSettingsValue(undefined,this.switchedValueForm.get('isEnabled')?.value);
+      this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
     }
   }
 
@@ -1247,11 +1247,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private editSetting(): void {
-    if (this.IsSettingKeyOtHours || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyAvailabiltyOverLap) {
-      if ((this.IsSettingKeyOtHours || this.IsSettingKeyScheduleOnlyWithAvailability) && this.allLocationsSelected && this.allRegionsSelected) {
-        this.organizationHierarchy = OrganizationHierarchy.Organization;
-        this.organizationHierarchyId = this.organizationId;
-
+    if (this.IsSettingKeyOtHours || this.IsSettingKeyScheduleOnlyWithAvailability) {
+      this.organizationHierarchy = OrganizationHierarchy.Organization;
+      this.organizationHierarchyId = this.organizationId;
+      if (this.allLocationsSelected && this.allRegionsSelected) {
         if (this.organizationSettingsFormGroup.valid) {
           this.sendForm();
         } else {
@@ -1259,8 +1258,19 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           return
         }
       }
-
-      if (this.IsSettingKeyAvailabiltyOverLap && this.allLocationsSelected && this.allRegionsSelected) {
+      else if (this.RegionLocationSettingsMultiFormGroup.valid) {
+        if (this.organizationSettingsFormGroup.valid) {
+          this.sendForm();
+        } else {
+          this.organizationSettingsFormGroup.markAllAsTouched();
+          return
+        }
+      } else {
+        this.RegionLocationSettingsMultiFormGroup.markAllAsTouched();
+        return
+      }
+    } else if (this.IsSettingKeyAvailabiltyOverLap) {
+      if (this.allLocationsSelected && this.allRegionsSelected) {
         this.organizationHierarchy = OrganizationHierarchy.Organization;
         this.organizationHierarchyId = this.organizationId;
         if (this.switchedValueForm.valid) {
@@ -1270,20 +1280,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           return
         }
       }
-
-      if (this.RegionLocationSettingsMultiFormGroup.valid) {
-        this.organizationHierarchy = OrganizationHierarchy.Organization;
-        this.organizationHierarchyId = this.organizationId;
-
-        if (this.organizationSettingsFormGroup.valid) {
-          this.sendForm();
-        } else {
-          this.organizationSettingsFormGroup.markAllAsTouched();
-          return
-        }
-
-        if (this.IsSettingKeyAvailabiltyOverLap &&
-          this.switchedValueForm.valid) {
+      else if (this.RegionLocationSettingsMultiFormGroup.valid) {
+        if (this.switchedValueForm.valid) {
           this.sendForm();
         } else {
           this.switchedValueForm.markAllAsTouched();
@@ -1294,7 +1292,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         return
       }
     }
-    if (
+    else if (
       this.organizationSettingsFormGroup.valid &&
       this.isPushStartDateValid() &&
       this.invoiceAutoGeneratingValig()
@@ -1345,21 +1343,20 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           value: this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? 4 : dynamicValue.value,
           isEnabled: this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? true : dynamicValue.isEnabled,
         });
-        this.disableSettingsValue(undefined,this.switchedValueForm.get('isEnabled')?.value);
+        this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
       }
     });
   }
 
-  disableSettingsValue(event?:any,obj?:any) {
-    if(this.IsSettingKeyAvailabiltyOverLap){
-      if (event?.checked||obj) {
+  disableSettingsValue(event?: any, obj?: any) {
+    if (this.IsSettingKeyAvailabiltyOverLap) {
+      if (event?.checked || obj) {
         this.switchedValueForm.get("value")?.enable();
       } else {
         this.switchedValueForm.get("value")?.disable();
       }
-    }else{
+    } else {
       this.switchedValueForm.get("value")?.enable();
     }
-  
   }
 }
