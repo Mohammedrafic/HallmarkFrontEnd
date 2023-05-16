@@ -16,6 +16,7 @@ export class CandidatesService {
   private activeEmployeeWorkCommitment$: 
   BaseObservable<CandidateWorkCommitmentShort | null> = new BaseObservable<CandidateWorkCommitmentShort | null>(null);
   private employeeHireDate: string;
+  private terminationDate: string;
 
   public employeeId: number | null;
   
@@ -65,6 +66,14 @@ export class CandidatesService {
 
   public getEmployeeHireDate(): string {
     return this.employeeHireDate;
+  }
+
+  public setTerminationDate(terminationDate: string): void {
+    this.terminationDate = terminationDate;
+  }
+
+  public getTerminationDate(): string {
+    return this.terminationDate;
   }
 
   public getGridPageNumber(items: number, pageNumber: number): number {

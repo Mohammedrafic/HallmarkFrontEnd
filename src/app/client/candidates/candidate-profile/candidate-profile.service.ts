@@ -39,6 +39,7 @@ export class CandidateProfileService {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
         this.candidateService.setEmployeeHireDate(candidateDateInUTC.hireDate);
+        this.candidateService.setTerminationDate(candidateDateInUTC.terminationDate);
         this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
       }),
       catchError((errorResponse: HttpErrorResponse) => {
@@ -107,7 +108,7 @@ export class CandidateProfileService {
 
     return Object.fromEntries(
       Object.entries(dates).map(([key, value]: [string, any]) => {
-        return [key, value ? DateTimeHelper.toUtcFormat(value) : value];
+        return [key, value ? DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(value)) : value];
       })
     );
   }
