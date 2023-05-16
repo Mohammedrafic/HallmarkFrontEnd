@@ -107,6 +107,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   public orderTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public fields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public workcommitfields: FieldSettingsModel = { text: 'masterWorkCommitmentName', value: 'masterWorkCommitmentId' };
   public isEdit = false;
   public PayRatesFormGroup: FormGroup;
   public payRateFilterFormGroup: FormGroup;
