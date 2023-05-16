@@ -116,6 +116,7 @@ import { DoNotReturnFormService } from './do-not-return/do-not-return.form.servi
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { DocumentLibraryState } from '../modules/document-library/store/state/document-library.state';
 import { InputModule } from '@shared/components/form-controls/input/input.module';
+import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
 
 
 const gridIcons = {
@@ -212,6 +213,7 @@ const gridIcons = {
     DropDownButtonAllModule,
     TooltipContainerModule,
     InputModule,
+    DatepickerModule,
     MatMenuModule,
     AutoCompleteAllModule,
     NgxMaskModule,

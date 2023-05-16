@@ -11,7 +11,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { DoNotReturn } from './donotreturn.actions';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DoNotReturnStateModel } from '@client/do-not-return/do-not-return.interface';
-import { BLOCK_RECORD_SUCCESS, RECORD_ADDED, RECORD_ALREADY_EXISTS, RECORD_MODIFIED,CANDIDATE_UNBLOCK,CANDIDATE_BLOCK } from '@shared/constants';
+import { BLOCK_RECORD_SUCCESS, RECORD_SAVED_SUCCESS, RECORD_ALREADY_EXISTS,CANDIDATE_UNBLOCK,CANDIDATE_BLOCK } from '@shared/constants';
 
 @State<DoNotReturnStateModel>({
   name: 'donotreturn',
@@ -63,7 +63,7 @@ export class DonotReturnState {
       tap((payload) => {
         patchState({ isLocationLoading: false });
         if (payload.id != 0) {
-          dispatch([new DoNotReturn.UpdateDonotReturnSucceeded, new ShowToast(MessageTypes.Success, RECORD_MODIFIED)]);
+          dispatch([new DoNotReturn.UpdateDonotReturnSucceeded, new ShowToast(MessageTypes.Success, RECORD_SAVED_SUCCESS)]);
           dispatch(new DoNotReturn.GetDoNotReturnPage());
         } else {
           dispatch(new ShowToast(MessageTypes.Error, RECORD_ALREADY_EXISTS));
@@ -79,7 +79,7 @@ export class DonotReturnState {
     patchState({ isLocationLoading: true });
     return this.DonotreturnService.saveDonotReturn(donotreturn).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
-      dispatch([new DoNotReturn.SaveDonotReturnSucceeded, new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED)]);
+      dispatch([new DoNotReturn.SaveDonotReturnSucceeded, new ShowToast(MessageTypes.Success, RECORD_SAVED_SUCCESS)]);
       return payload;
     }),
       catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
