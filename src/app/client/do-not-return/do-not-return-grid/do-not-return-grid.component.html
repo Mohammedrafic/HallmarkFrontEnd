@@ -85,9 +85,9 @@
     <div class="form-elemet">
       <div class="input-container bootstrap">
           <div class="inline-radio-container">
-            <ejs-radiobutton formControlName="isExternal" label="Search Candidate" name="isExternal" value='false'></ejs-radiobutton>
+            <ejs-radiobutton formControlName="isExternal" label="Search Candidate" name="isExternal" value='false' [disabled]="!isEdit ? false : true"></ejs-radiobutton>
             &nbsp;&nbsp;
-            <ejs-radiobutton formControlName="isExternal" label="Block new candidate" name="isExternal"  value='true'></ejs-radiobutton>
+            <ejs-radiobutton formControlName="isExternal" label="Block new candidate" name="isExternal"  value='true' [disabled]="!isEdit ? false : true"></ejs-radiobutton>
           </div>
       </div>
     </div>

@@ -9,9 +9,11 @@ export const MasterDNRExportCols: MasterDoNotReturnExportColumn[] = [
   {text: 'LocationName',column:'LocationBlocked'},
   { text: 'email', column: 'EMAIL' },
   { text: 'ssn', column: 'SSN' },
-  { text: 'dnrStatus', column: 'CurrentStatus' },
-  { text: 'dnrDate', column: 'LastUpdatedDate' },
-  { text: 'dnrComment', column: 'ReasonForBlocking' },
+  { text: 'currentStatus', column: 'CurrentStatus' },
+  { text: 'lastUpdatedDate', column: 'LastUpdatedDate' },
+  { text: 'lastBlockedDate', column: 'LastBlockedDate' },
+  { text: 'lastUnBlockedDate', column: 'LastUnBlockedDate' },
+  { text: 'comment', column: 'Comment' },
 ];
 
 export const doNotReturnFilterConfig: FilterConfig = {

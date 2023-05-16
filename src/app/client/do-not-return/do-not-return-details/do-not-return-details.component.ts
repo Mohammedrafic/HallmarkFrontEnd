@@ -18,7 +18,7 @@ import { MasterDNRExportCols, TITLE } from '../donotreturn-grid.constants';
 })
 
 export class DoNotReturnDetailsComponent extends AbstractPermissionGrid implements OnInit {
-public filters: DonoreturnFilters;
+public filters: DonoreturnFilters = {};
 
   @ViewChild('grid')
   public grid: GridComponent;
