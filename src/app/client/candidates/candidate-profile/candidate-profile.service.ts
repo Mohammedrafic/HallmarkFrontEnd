@@ -12,6 +12,7 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
 import { DateTimeHelper } from '@core/helpers';
 import pick from 'lodash/fp/pick';
 import { CandidatesService } from '../services/candidates.service';
+import { candidateDateFields } from '../constants';
 
 @Injectable()
 export class CandidateProfileService {
@@ -94,17 +95,7 @@ export class CandidateProfileService {
   }
 
   private convertDatesToUTC(candidate: CandidateModel): Partial<CandidateModel> {
-    const props = [
-      'dob',
-      'hireDate',
-      'contractStartDate',
-      'contractEndDate',
-      'holdStartDate',
-      'holdEndDate',
-      'terminationDate',
-      'organizationOrientationDate',
-    ];
-    const dates = pick(props, candidate);
+    const dates = pick(candidateDateFields, candidate);
 
     return Object.fromEntries(
       Object.entries(dates).map(([key, value]: [string, any]) => {

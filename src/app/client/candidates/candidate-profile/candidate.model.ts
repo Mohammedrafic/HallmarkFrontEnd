@@ -10,7 +10,7 @@ export interface CandidateModel {
   primarySkillId: number,
   secondarySkills: number[],
   classification: number,
-  hireDate: string,
+  hireDate: Date | string,
   fte: number,
   profileStatus: number,
   hrCompanyCodeId: number,
