@@ -259,10 +259,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
     this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
     this.minimumDate = this.setMinimumDate();
-    this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
 
-    if(this.candidateService.getTerminationDate()) {
-      this.maximumDate = DateTimeHelper.convertDateToUtc(this.candidateService.getTerminationDate());
+    const terminationDate = this.candidateService.getTerminationDate();
+    if (terminationDate) {
+      this.maximumDate = DateTimeHelper.convertDateToUtc(terminationDate);
+    } else {
+      this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
     }
 
     this.setWCStartDate();
