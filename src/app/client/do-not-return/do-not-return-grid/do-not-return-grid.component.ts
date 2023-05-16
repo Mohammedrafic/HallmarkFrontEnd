@@ -542,12 +542,15 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
   public onOrganizationDropDownChanged(event: ChangeEventArgs): void {
     this.selectedOrganization = event.itemData as AllOrganization;
-    this.orgid=this.selectedOrganization.id;
+    // this.orgid=this.selectedOrganization.id;
     if (this.selectedOrganization.id) {
        this.loadRegionsAndLocations(this.selectedOrganization.id);
     }
+    let isExternal = this.doNotReturnFormGroup.value.isExternal;
     this.doNotReturnFormGroup.reset();
     this.doNotReturnFormGroup.get(FormControlNames.BusinessUnitId)?.setValue(this.selectedOrganization.id);
+    this.doNotReturnFormGroup.get('isExternal')?.setValue(isExternal);
+    
   }
 
   @OutsideZone
