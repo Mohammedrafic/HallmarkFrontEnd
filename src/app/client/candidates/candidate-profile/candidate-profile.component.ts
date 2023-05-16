@@ -164,6 +164,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
             this.candidateProfileFormService.populateCandidateForm(candidate);
             this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
             this.candidateService.setEmployeeHireDate(candidate.hireDate);
+            this.candidateService.setTerminationDate(candidate.terminationDate);
             this.generalNotesService.notes$.next(candidate.generalNotes);
           });
   

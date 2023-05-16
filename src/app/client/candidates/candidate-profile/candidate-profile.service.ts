@@ -39,6 +39,7 @@ export class CandidateProfileService {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
         this.candidateService.setEmployeeHireDate(candidateDateInUTC.hireDate);
+        this.candidateService.setTerminationDate(candidateDateInUTC.terminationDate);
         this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
       }),
       catchError((errorResponse: HttpErrorResponse) => {

@@ -22,7 +22,7 @@ export interface CandidateModel {
   contractEndDate: Date,
   holdStartDate: Date,
   holdEndDate: Date,
-  terminationDate: Date,
+  terminationDate: string,
   terminationReasonId: number,
   address1: string,
   state: string,

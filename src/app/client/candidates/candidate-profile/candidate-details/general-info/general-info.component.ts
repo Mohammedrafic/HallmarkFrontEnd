@@ -1,17 +1,24 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractContactDetails } from '@client/candidates/candidate-profile/candidate-details/abstract-contact-details';
-import { ProfileStatuses, ProfileStatusesEnum, TerminationReasons } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { Validators } from '@angular/forms';
+
+import { Select, Store } from '@ngxs/store';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { distinctUntilChanged, Observable, takeUntil } from 'rxjs';
+
+import { AbstractContactDetails } from '@client/candidates/candidate-profile/candidate-details/abstract-contact-details';
+import {
+  ProfileStatuses,
+  ProfileStatusesEnum,
+  TerminationReasons,
+} from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { JobClassifications } from '@client/order-management/constants';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { Select, Store } from '@ngxs/store';
 import { ListOfSkills } from '@shared/models/skill.model';
-import { distinctUntilChanged, Observable, takeUntil } from 'rxjs';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GetTerminationReasons } from '@organization-management/store/reject-reason.actions';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-general-info',
@@ -112,10 +119,10 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   private handleTerminatedProfileStatus(): void {
     this.isTerminatedSelected = true;
     this.isOnHoldSelected = false;
+    this.candidateForm.get('terminationDate')?.setValue(DateTimeHelper.setInitHours(new Date().toString()));
     this.candidateForm.get('terminationDate')?.setValidators(Validators.required);
     this.candidateForm.get('terminationReasonId')?.setValidators(Validators.required);
     this.removeValidatorsAndReset(['holdStartDate', 'holdEndDate']);
-
   }
 
   private removeValidatorsAndReset(controlNames: string | string[]): void {
