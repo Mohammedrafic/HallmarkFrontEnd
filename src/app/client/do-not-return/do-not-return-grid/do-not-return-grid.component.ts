@@ -92,7 +92,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     value: 'organizationId',
   };
 
-  public filters: DonoreturnFilter;
+  public filters: DonoreturnFilter = {};
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -168,7 +168,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.doNotReturnFormGroup.reset();
       this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
     });
-    this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
+    // this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
@@ -207,7 +207,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
         }
      }
     });
-    this.getDoNotReturn();
+    // this.getDoNotReturn();
     this.GetAllOrganization();
     this.watchForExportDialog();
     this.watchForDefaultExport();
@@ -249,8 +249,12 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       }
     });    
     this.doNotReturnFormGroup.get('isExternal')?.valueChanges.pipe(delay(500),distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((isExternalValue: any) => {
-      if(isExternalValue == "true"){
-        this.doNotReturnFormGroup.get('candidateProfileId')?.setValue(0);
+      if(!this.isEdit){
+          if(isExternalValue == "true"){
+            this.doNotReturnFormGroup.get('candidateProfileId')?.setValue(0);
+          }else{
+            this.doNotReturnFormGroup.get('candidateProfileId')?.setValue(null);
+          }
       }
       this.doNotReturnFormGroup.controls['isExternal']?.markAsTouched();  
       this.changeDetectorRef.markForCheck();              
