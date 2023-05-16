@@ -442,14 +442,7 @@ export class OrganizationManagementState {
 
   @Selector()
   static organizationSettings(state: OrganizationManagementStateModel): OrganizationSettingsGet[] {
-    return state.organizationSettings.map((set) => {
-      if (set.settingKey === "OnHoldDefault") {
-        return { ...set, validations:  [
-          { key: 4, value: null },
-        ]};
-      }
-      return set;
-    });
+    return state.organizationSettings;
   }
 
   @Selector()
