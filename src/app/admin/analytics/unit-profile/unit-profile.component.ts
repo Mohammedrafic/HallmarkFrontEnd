@@ -356,7 +356,7 @@ export class UnitProfileComponent implements OnInit {
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public SearchReport(): void {
+  public SearchReport(): void {    
     this.filteredItems = [];
 
     let {
@@ -396,9 +396,9 @@ export class UnitProfileComponent implements OnInit {
 
     this.paramsData = {
       OrganizationParam: businessIds,
-      RegionsParam: regions,
-      LocationsParam: locations,
-      DepartmentsParam: departments,    
+      RegionsParam: regions.join(','),
+      LocationsParam: locations.join(','),
+      DepartmentsParam: departments.join(','),    
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
