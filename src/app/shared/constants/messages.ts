@@ -115,3 +115,5 @@ export const NO_ACTIVE_WORK_COMMITMET = 'No active Work Commitment';
 export const REASON_WARNING = 'Please select a System for Reason';
 export const EMPLOYEE_SKILL_CHANGE_WARNING = 'Are you sure, you want to update Employee Skills? It may have impact on Schedule and Orders.';
 export const EMPLOYEE_TERMINATED_WARNING = 'Are you sure you want to terminate the employee?';
+
+export const RECORD_SAVED_SUCCESS = 'Record saved successfully';

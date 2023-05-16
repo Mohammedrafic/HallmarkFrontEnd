@@ -11,7 +11,7 @@ export class DonotreturnService {
   constructor(private http: HttpClient) { }
 
   public getDonotreturn(pageNumber: number, pageSize: number, filters: DonoreturnFilters, sortBy:number = 1): Observable<DoNotReturnsPage> {
-    if (filters.candidatename || filters.ssn) {
+    if (filters != null && filters != undefined && Object.keys(filters).length > 0) {
       let parameters;
       let urls;
       parameters = { parameters: { PageNumber: pageNumber, PageSize: pageSize, Filters: filters } };

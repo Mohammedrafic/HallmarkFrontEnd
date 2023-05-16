@@ -14,23 +14,33 @@ export class DoNotReturnFormService {
   createDoNotreturnForm(): CustomFormGroup<DoNotReturnForm> {
     return this.fb.group({
       id: [0],
+      isExternal: ['false', [Validators.required]],
       businessUnitId: ['', [Validators.required]],
       regionIds:['',[Validators.required]],
-      locations: [''],
       locationIds: ['', [Validators.required]],
       ssn: ['', [Validators.minLength(9)]],
+      dob: [null],
       candidateEmail: ['',[Validators.email, Validators.maxLength(200)]],
-      dnrComment: ['', [Validators.required]],
-      dnrRequestedBy: [''],
+      dnrComment: [''],
       candidateProfileId: ['', [Validators.required]],
-      dnrStatus: ['Active'],
+      firstName: ['', [Validators.required]],
+      middleName: [''],
+      lastName: ['', [Validators.required]],
+      dnrStatus: ['Blocked'],
     }) as CustomFormGroup<DoNotReturnForm>;
   }
 
   createDoNotreturnFilterForm(): CustomFormGroup<DoNotReturnFilterForm> {
     return this.fb.group({
-      candidatename: [''],
+      businessUnitId: ['', [Validators.required]],
+      firstName: [''],
+      middleName: [''],
+      lastName: [''],
       ssn: [''],
+      regionBlocked:[''],
+      locationBlocked: [''],
+      email: ['',[Validators.email, Validators.maxLength(200)]],
+      currentStatus: [''],
     }) as CustomFormGroup<DoNotReturnFilterForm>;
   }
 

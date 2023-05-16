@@ -4,16 +4,20 @@ import { DonoreturnAddedit, DoNotReturnSearchCandidate, DoNotReturnsPage, GetLoc
 import { UserAgencyOrganizationBusinessUnit } from "@shared/models/user-agency-organization.model";
 
 export interface DoNotReturnForm {
-  id?: number;
-  businessUnitId:number;
-  locations:string;
-  locationIds:number[];
-  candidateProfileId: number;
-  dnrComment: string;
-  dnrRequestedBy: string;
-  dnrStatus: string;
-  ssn:number;
-  candidateEmail:string;
+    id?: number;
+    isExternal:string;
+    businessUnitId:number;
+    regionIds:number[];
+    locationIds:number[];
+    candidateProfileId: number | null;
+    dnrComment: string;
+    dnrStatus: string;
+    ssn:number | null;
+    dob:Date | null;
+    candidateEmail:string;
+    firstName:string;
+    middleName:string;
+    lastName:string;
   }
 
   export interface DoNotReturnStateModel {
@@ -49,8 +53,15 @@ export interface FilterConfig {
 }
 
 export interface DoNotReturnFilterForm {
-    candidatename?:String;
+    businessUnitId?:number;
     ssn?:number;
+    regionBlocked:number[];
+    locationBlocked:number[];
+    firstName:string;
+    middleName:string;
+    lastName:string;
+    email:string;
+    currentStatus: string;
   }
   
 export interface MasterDoNotReturnExportColumn {
