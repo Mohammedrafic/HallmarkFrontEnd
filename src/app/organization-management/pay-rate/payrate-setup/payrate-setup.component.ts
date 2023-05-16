@@ -786,16 +786,19 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     } else {
       this.PayRatesFormGroup.controls['departmentIds'].setValue([data.departmentId]);
     }
-
-    if (data.skills.length === 0) {
-      this.PayRatesFormGroup.controls['skillIds'].setValue(null);
-    } else {
-      this.skillsEdit = [];
-      for(let i=0; i < data.skills.length; i++){
-        this.skillsEdit.push(data.skills[i].skillId);
+    setTimeout(() => {
+      if (data.skills.length === 0) {
+        this.PayRatesFormGroup.controls['skillIds'].setValue(null);
+      } else {
+        this.skillsEdit = [];
+        for(let i=0; i < data.skills.length; i++){
+          this.skillsEdit.push(data.skills[i].skillId);
+        }
+        this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
       }
-      this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
-    }
+    },1000)
+
+    
     if (data.orderTypes.length === 0) {
       this.PayRatesFormGroup.controls['orderTypes'].setValue(this.orderTypes.map((type) => type.id));
     } else {
