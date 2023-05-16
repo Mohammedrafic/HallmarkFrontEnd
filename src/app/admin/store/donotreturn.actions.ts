@@ -5,7 +5,7 @@ import { DoNotReturnActionsTypesEnum } from "@shared/enums/DoNotReturnActionsTyp
 export namespace DoNotReturn {
   export class DonotreturnByPage {
     static readonly type = DoNotReturnActionsTypesEnum.DONOTRETURNBYPAGE;
-    constructor(public pageNumber: number, public pageSize: number, public filters: DonoreturnFilters, public sortBy : number) { }
+    constructor(public businessUnitId: number, public pageNumber: number, public pageSize: number, public filters: DonoreturnFilters, public sortBy : number) { }
   }
 
   export class GetDoNotReturnPage {

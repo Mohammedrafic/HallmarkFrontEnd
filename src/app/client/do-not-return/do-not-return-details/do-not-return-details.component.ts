@@ -36,7 +36,7 @@ public filters: DonoreturnFilters = {};
   }
 
   override ngOnInit(): void {
-    this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, 1)]);
+   // this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, 1)]);
     super.ngOnInit();
   }
   

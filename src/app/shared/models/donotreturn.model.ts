@@ -203,6 +203,7 @@ export class DoNotReturnCandidateSearchFilter{
 }
 export class DoNotReturnCandidateListSearchFilter{
   candidateProfileId:number | null;
+  businessUnitId?:number;
 }
 
 export class DonoreturnFilter  {

@@ -10,7 +10,7 @@ export class DonotreturnService {
 
   constructor(private http: HttpClient) { }
 
-  public getDonotreturn(pageNumber: number, pageSize: number, filters: DonoreturnFilters, sortBy:number = 1): Observable<DoNotReturnsPage> {
+  public getDonotreturn(businessUnitId: number,pageNumber: number, pageSize: number, filters: DonoreturnFilters, sortBy:number = 1): Observable<DoNotReturnsPage> {
     if (filters != null && filters != undefined && Object.keys(filters).length > 0) {
       let parameters;
       let urls;
@@ -20,7 +20,7 @@ export class DonotreturnService {
     }
     let params;
     let url;
-    params = { params: { PageNumber: pageNumber, PageSize: pageSize, sortBy : sortBy } };
+    params = { params: { BusinessUnitId: businessUnitId,PageNumber: pageNumber, PageSize: pageSize, sortBy : sortBy } };
     url = '/api/DoNotReturn';
     return this.http.get<DoNotReturnsPage>(url, params);
   }
