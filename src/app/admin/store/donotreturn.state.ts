@@ -109,9 +109,9 @@ export class DonotReturnState {
   }
 
   @Action(DoNotReturn.DonotreturnByPage)
-  DonotreturnByPage({ patchState }: StateContext<DoNotReturnStateModel>, { pageNumber, pageSize, filters, sortBy }: DoNotReturn.DonotreturnByPage): Observable<DoNotReturnsPage> {
+  DonotreturnByPage({ patchState }: StateContext<DoNotReturnStateModel>, { businessUnitId,pageNumber, pageSize, filters, sortBy }: DoNotReturn.DonotreturnByPage): Observable<DoNotReturnsPage> {
     patchState({ donotloadings: true });
-    return this.DonotreturnService.getDonotreturn(pageNumber, pageSize, filters, sortBy).pipe(
+    return this.DonotreturnService.getDonotreturn(businessUnitId,pageNumber, pageSize, filters, sortBy).pipe(
       tap((payload) => {
         patchState({ donotloadings: false, donotreturnpage: payload });
         return payload;

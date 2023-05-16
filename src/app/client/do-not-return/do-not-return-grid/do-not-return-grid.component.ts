@@ -166,16 +166,16 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.sortByField = 1;
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DoNotReturn.SaveDonotReturnSucceeded)).subscribe(() => {
       this.doNotReturnFormGroup.reset();
-      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
+      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.orgid,this.currentPage, this.pageSize, this.filters, this.sortByField)]);
     });
     // this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
+      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.orgid,this.currentPage, this.pageSize, this.filters, this.sortByField)]);
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DoNotReturn.UpdateDonotReturnSucceeded)).subscribe(() => {
       this.doNotReturnFormGroup.reset();
-      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
+      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.orgid,this.currentPage, this.pageSize, this.filters, this.sortByField)]);
     });
     this.actions$.pipe(ofActionDispatched(ShowSideDialog,ShowFilterDialog), takeUntil(this.unsubscribe$)).subscribe((payload) => {
       if (payload.isDialogShown) {
@@ -207,7 +207,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
         }
      }
     });
-    // this.getDoNotReturn();
+    
     this.GetAllOrganization();
     this.watchForExportDialog();
     this.watchForDefaultExport();
@@ -226,6 +226,9 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.allOrganizations$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
       if(data != null && data.length > 0){
         this.allOrganizations = data;
+        this.selectedOrganization = this.allOrganizations.find((ele:any)=> ele.id == localStorage.getItem('lastSelectedOrganizationId')) as AllOrganization;
+        this.orgid=this.selectedOrganization.id;
+        this.getDoNotReturn();
       }
      });
 
@@ -249,13 +252,13 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       }
     });    
     this.doNotReturnFormGroup.get('isExternal')?.valueChanges.pipe(delay(500),distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((isExternalValue: any) => {
-      if(!this.isEdit){
+      
           if(isExternalValue == "true"){
             this.doNotReturnFormGroup.get('candidateProfileId')?.setValue(0);
-          }else{
+          }else if(!this.isEdit){
             this.doNotReturnFormGroup.get('candidateProfileId')?.setValue(null);
           }
-      }
+
       this.doNotReturnFormGroup.controls['isExternal']?.markAsTouched();  
       this.changeDetectorRef.markForCheck();              
     });
@@ -358,7 +361,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
   private getDoNotReturn(): void {
     this.selectedOrganization = {} as AllOrganization;
-    this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
+    this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.orgid,this.currentPage, this.pageSize, this.filters, this.sortByField)]);
   }
 
   private GetAllOrganization(): void {
@@ -520,7 +523,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
           if(data.candidateProfileId != null ){
             let filter: DoNotReturnCandidateListSearchFilter = {
-              candidateProfileId: data.candidateProfileId
+              candidateProfileId: data.candidateProfileId,
+              businessUnitId: this.orgid,
             };
             this.store.dispatch(new DoNotReturn.GetDoNotReturnCandidateListSearch(filter))
               .pipe(delay(500))
@@ -608,6 +612,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
   onFormCancelClick(): void {
     this.isEdit=false;
+    this.isBlock = true;
     if (this.doNotReturnFormGroup.dirty) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -700,9 +705,10 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
   private subscribeOnBusinessUnitChange(): void {
-    combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$])
+    this.lastSelectedOrganizationId$
       .pipe(takeWhile(() => this.isAlive))
-      .subscribe(() => {
+      .subscribe((data) => {
+        this.orgid=data;
         this.onFilterClearAll();
         this.store.dispatch(new ShowSideDialog(false));
       });
