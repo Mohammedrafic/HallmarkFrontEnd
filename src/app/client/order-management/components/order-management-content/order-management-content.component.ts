@@ -1289,14 +1289,16 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           break;
       }
 
-      this.dispatchPreservedFilters();
-
       if (!this.preservedOrderService.isOrderPreserved()) {
         this.filterApplied = false;
         this.clearFilters();
         this.store.dispatch(new ClearOrders());
         this.pageSubject.next(1);
+      } else {
+        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       }
+
+      this.dispatchPreservedFilters();
     }
     this.cd$.next(true);
   }
