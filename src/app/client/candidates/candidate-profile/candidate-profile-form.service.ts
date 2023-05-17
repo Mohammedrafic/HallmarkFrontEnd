@@ -113,7 +113,9 @@ export class CandidateProfileFormService {
   private convertDateFildsToUtc(candidate: CandidateModel): CandidateModel {
     const datesWithUtc = Object.fromEntries(candidateDateFields.map((dateName) => {
       const date = candidate[dateName as keyof CandidateModel];
-      return [dateName, date ? DateTimeHelper.convertDateToUtc(date as string) : null];
+      const dateUtc = date ? DateTimeHelper.convertDateToUtc(date as string) : null;
+
+      return [dateName, dateUtc];
     }));
 
     return { ...candidate, ...datesWithUtc };
