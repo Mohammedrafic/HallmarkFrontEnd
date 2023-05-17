@@ -142,7 +142,7 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
             .subscribe((candidate) => {
               this.candidateProfileFormService.populateCandidateForm(candidate);
               this.candidatesService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
-              this.candidatesService.setEmployeeHireDate(candidate.hireDate);
+              this.candidatesService.setEmployeeHireDate(candidate.hireDate as string);
               this.generalNotesService.notes$.next(candidate.generalNotes);
             });
           });

@@ -86,6 +86,7 @@ export interface ScheduleBook extends ScheduleItemAttributes{
   skillId: number | null;
   employeeBookedDays: EmployeeBookingDay[];
   createOrder: boolean;
+  perDiemOrderId?: number | null;
 }
 
 export interface BookingError {

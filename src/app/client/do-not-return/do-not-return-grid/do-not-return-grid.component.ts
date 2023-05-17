@@ -117,9 +117,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   @Select(DonotReturnState.donotreturnpage)
   public donotreturnpage$: Observable<DoNotReturnsPage>;
 
-  @Select(AdminState.organizationDataSources)
-  public organizationDataSources$: Observable<OrganizationDataSource>;
-
   @Select(UserState.user)
   public user$: Observable<User>;
 
@@ -226,9 +223,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.allOrganizations$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
       if(data != null && data.length > 0){
         this.allOrganizations = data;
-        this.selectedOrganization = this.allOrganizations.find((ele:any)=> ele.id == localStorage.getItem('lastSelectedOrganizationId')) as AllOrganization;
-        this.orgid=this.selectedOrganization.id;
-        this.getDoNotReturn();
       }
      });
 
@@ -337,7 +331,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
   private getOrganizationList(): void {
-    this.store.dispatch(new GetOrganizationsByPage(this.currentPage, this.pageSize));
+    this.store.dispatch(new DoNotReturn.GetAllOrganization());
   }
 
   ngOnDestroy(): void {
@@ -685,6 +679,9 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.sortByField = 1;
     this.isFilterBlock = false;
     this.filters = this.doNotReturnFilterForm.getRawValue();
+    if(this.filters.businessUnitId === null || this.filters.businessUnitId === undefined){
+      this.filters.businessUnitId = this.selectedOrganization?.id == undefined ? this.orgid : this.selectedOrganization?.id;
+    }
     this.filters.ssn = this.maskedFilterSSN == '' ? null : parseInt(this.maskedFilterSSN);
     this.filters.locationBlocked = this.doNotReturnFilterForm.value.locationBlocked?.join(',');
     this.filters.regionBlocked = this.doNotReturnFilterForm.value.regionBlocked?.join(',');
@@ -711,16 +708,22 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.lastSelectedOrganizationId$
       .pipe(takeWhile(() => this.isAlive))
       .subscribe((data) => {
-        this.orgid=data;
-        this.onFilterClearAll();
-        this.store.dispatch(new ShowSideDialog(false));
+        if(data != null && data != undefined){
+          this.orgid=data;
+          this.onFilterClearAll();
+          this.store.dispatch(new ShowSideDialog(false));
+        }
+
       });
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    if(this.filters.businessUnitId == null || this.filters.businessUnitId == undefined){
+      this.filters.businessUnitId = this.selectedOrganization?.id == undefined ? this.orgid : this.selectedOrganization?.id;
+    }
     this.store.dispatch(new DoNotReturn.ExportDonotreturn(new ExportPayload(
       fileType,
-      { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset())  },
+      { ...this.filters },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
       options?.fileName || this.defaultFileName
