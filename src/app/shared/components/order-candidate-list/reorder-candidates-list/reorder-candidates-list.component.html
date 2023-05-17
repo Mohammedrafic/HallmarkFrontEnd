@@ -189,7 +189,9 @@
                 ejs-button
                 cssClass="e-flat primary-icon-button custom-button"
                 [class.btn-icon__disabled]="selectedOrder.irpOrderMetadata?.status === orderStatus.Closed
-                || data?.status === onboardedCandidate || !data.isOriented"
+                || data?.status === onboardedCandidate
+                || !data.isOriented
+                || (data?.status === notAppliedCandidate && scheduleAvailabilitySetting)"
                 (click)="changeIrpCandidateStatus(data)"
               >
                 <span class="edit-button"><i-feather name="calendar" class="icon"></i-feather></span>
