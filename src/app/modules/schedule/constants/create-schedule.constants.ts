@@ -3,6 +3,7 @@ import { FieldType, UserPermissions } from '@core/enums';
 import { ScheduleType } from '../enums';
 import * as ScheduleInt from '../interface';
 import { CreateScheduleTypesConfig } from '../interface';
+import { REQUIRED_PERMISSIONS } from '@shared/constants';
 
 export enum ScheduleItemType {
   Book = 0,
@@ -25,6 +26,7 @@ export const OpenPositionTypes: ScheduleInt.ScheduleTypeRadioButton = {
   value: ScheduleItemType.OpenPositions,
   name: 'scheduleType',
   disabled: false,
+  toolTipMessage: REQUIRED_PERMISSIONS,
   permission: UserPermissions.CanAddShift,
 };
 
@@ -33,6 +35,7 @@ export const BookTypes: ScheduleInt.ScheduleTypeRadioButton = {
   value: ScheduleItemType.Book,
   name: 'scheduleType',
   disabled: false,
+  toolTipMessage: REQUIRED_PERMISSIONS,
   permission: UserPermissions.CanAddShift,
 };
 
@@ -41,6 +44,7 @@ export const AvailabilityTypes: ScheduleInt.ScheduleTypeRadioButton = {
   value: ScheduleItemType.Availability,
   name: 'scheduleType',
   disabled: false,
+  toolTipMessage: REQUIRED_PERMISSIONS,
   permission: UserPermissions.CanAddAvailability,
 };
 
@@ -49,6 +53,7 @@ export const UnavailabilityTypes = {
   value: ScheduleItemType.Unavailability,
   name: 'scheduleType',
   disabled: false,
+  toolTipMessage: REQUIRED_PERMISSIONS,
   permission: UserPermissions.CanAddUnavailability,
 };
 

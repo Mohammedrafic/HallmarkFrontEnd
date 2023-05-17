@@ -46,6 +46,7 @@ export interface ScheduleTypeRadioButton {
   value: ScheduleItemType;
   name: string;
   disabled: boolean;
+  toolTipMessage: string;
   permission: UserPermissions;
 }
 

@@ -35,7 +35,12 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { ScheduleType } from '../enums';
 import { BookingsOverlapsResponse } from '../components/replacement-order-dialog/replacement-order.interface';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { ORIENTED_SHIFT_CHANGE_CONFIRM_TEXT, WARNING_TITLE } from '@shared/constants/messages';
+import {
+  addAvailabilityToStart,
+  ORIENTED_SHIFT_CHANGE_CONFIRM_TEXT,
+  REQUIRED_PERMISSIONS,
+  WARNING_TITLE
+} from '@shared/constants/messages';
 
 @Injectable()
 export class CreateScheduleService {
@@ -277,12 +282,22 @@ export class CreateScheduleService {
 
   getScheduleTypesWithPermissions(
     scheduleTypes:CreateScheduleTypesConfig,
-    userPermission: Permission
+    userPermission: Permission,
+    scheduleWithAvailability: boolean,
+    candidates: ScheduleCandidate[]
   ): CreateScheduleTypesConfig {
+    let canScheduleWithoutAvailability = false;
+
+    if(scheduleWithAvailability) {
+      canScheduleWithoutAvailability = !this.hasDifferentTypeSchedule(candidates);
+    }
+
     let types = scheduleTypes.source.map((item: ScheduleTypeRadioButton) => {
       return {
         ...item,
-        disabled: !userPermission[item.permission],
+        toolTipMessage: !userPermission[item.permission] ? REQUIRED_PERMISSIONS : addAvailabilityToStart,
+        disabled: !userPermission[item.permission] || (canScheduleWithoutAvailability &&
+            (item.value === ScheduleItemType.Book || item.value === ScheduleItemType.OpenPositions)),
       };
     });
 
@@ -414,6 +429,13 @@ export class CreateScheduleService {
       control?.enable();
       control?.patchValue(false);
     }
+  }
+
+  private hasDifferentTypeSchedule(candidates: ScheduleCandidate[]): boolean {
+    const candidateDays = candidates?.map((candidate: ScheduleCandidate) => candidate.days).flat();
+    return candidateDays?.some((day: ScheduleDay) => {
+      return day?.scheduleType === ScheduleType.Book || day?.scheduleType === ScheduleType.Availability;
+    });
   }
 
   private getDaysWithBooking(days: ScheduleDay[]): ScheduleDay[] {

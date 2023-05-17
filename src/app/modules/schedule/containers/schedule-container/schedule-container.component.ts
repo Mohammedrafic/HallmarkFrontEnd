@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { Observable, switchMap, takeUntil } from 'rxjs';
+import { filter, Observable, switchMap, takeUntil } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
 import { MessageTypes } from '@shared/enums/message-types';
@@ -11,6 +11,8 @@ import { OrganizationStructure } from '@shared/models/organization.model';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+import { SettingsViewService } from '@shared/services';
+import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from '../../../../store/app.actions';
@@ -59,6 +61,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   isEmployee = false;
 
+  scheduleOnlyWithAvailability = false;
+
   sideBarSettings: SideBarSettings = {
     isOpen: false,
     isEditMode: false,
@@ -73,6 +77,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     private filterService: ScheduleFiltersService,
     private scheduleFiltersService: ScheduleFiltersService,
     private createScheduleService: CreateScheduleService,
+    private settingService: SettingsViewService,
   ) {
     super(store);
 
@@ -169,6 +174,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.scheduleFiltersService.setScheduleFiltersData(data);
     this.changeFilters(data.filters, data.skipDataUpdate);
     this.appliedFiltersAmount = data.filteredItems?.length;
+    this.checkIsScheduleAvailabilityTurn();
 
     if (!this.store.selectSnapshot(UserState.user)?.isEmployee) {
       this.chipsData = data.chipsData;
@@ -192,6 +198,22 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   deleteFilterItem(event: ChipDeleteEventType): void {
     this.filterService.deleteInlineChip(event);
+  }
+
+  private checkIsScheduleAvailabilityTurn(): void {
+    if(this.scheduleFilters?.locationIds?.length) {
+      this.settingService.getViewSettingKey(
+        OrganizationSettingKeys.ScheduleOnlyWithAvailability,
+        OrganizationalHierarchy.Location,
+        this.scheduleFilters?.locationIds[0],
+      ).pipe(
+        filter(({ScheduleOnlyWithAvailability}) => !!ScheduleOnlyWithAvailability),
+        take(1),
+      ).subscribe(({ScheduleOnlyWithAvailability}) => {
+        this.scheduleOnlyWithAvailability = JSON.parse(ScheduleOnlyWithAvailability);
+        this.cdr.markForCheck();
+      });
+    }
   }
 
   private initScheduleData(isLoadMore = false): void {
