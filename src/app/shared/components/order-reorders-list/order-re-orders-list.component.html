@@ -7,7 +7,7 @@
   <ejs-grid
     id="users-grid"
     class="users-grid e-gridwithheader"
-    [dataSource]="currentReOrders || []"
+    [dataSource]="paginatedReOrders"
     [allowSorting]="false"
     [allowResizing]="true"
     [allowSelection]="false"
@@ -83,8 +83,8 @@
   <app-grid-pagination
     [currentPage]="currentPage"
     [pageSize]="pageSize"
-    [totalRecordsCount]="currentReOrders?.length ?? 0"
+    [totalRecordsCount]="allReOrders.length ?? 0"
     (navigateToPageEmitter)="gridPageChanged($event)"
-    (pageSizeChangeEmitter)="onRowsDropDownChanged()"
+    (pageSizeChangeEmitter)="onRowsDropDownChanged($event)"
   ></app-grid-pagination>
 </section>
