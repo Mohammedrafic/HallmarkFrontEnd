@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -51,7 +51,7 @@ import { valuesOnly } from '@shared/utils/enum.utils';
 import { UserPermissions } from '@core/enums';
 import { Permission } from '@core/interface';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { TakeUntilDestroy } from '@core/decorators';
+import { OutsideZone, TakeUntilDestroy } from '@core/decorators';
 import { DefaultOptionFields } from 'src/app/dashboard/widgets/rn-utilization-widget/rn-utilization.constants';
 import { MasterCommitmentState } from '@admin/store/commitment.state';
 import { MasterCommitmentsPage } from '@shared/models/commitment.model';
@@ -159,7 +159,8 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     private confirmService: ConfirmService,
     private filterService: FilterService,
     private datePipe: DatePipe,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private ngZone : NgZone
   ) {
     super();
     this.formBuilder = builder;
@@ -788,16 +789,9 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     } else {
       this.PayRatesFormGroup.controls['departmentIds'].setValue([data.departmentId]);
     }
+    this.getSkillData(data);
 
-    if (data.skills.length === 0) {
-      this.PayRatesFormGroup.controls['skillIds'].setValue(null);
-    } else {
-      this.skillsEdit = [];
-      for(let i=0; i < data.skills.length; i++){
-        this.skillsEdit.push(data.skills[i].skillId);
-      }
-      this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
-    }
+    
     if (data.orderTypes.length === 0) {
       this.PayRatesFormGroup.controls['orderTypes'].setValue(this.orderTypes.map((type) => type.id));
     } else {
@@ -818,6 +812,21 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     this.PayRatesFormGroup.controls['effectiveDate'].setValue(data.effectiveDate);
     this.PayRatesFormGroup.controls['payType'].setValue(data.payType);
     this.PayRatesFormGroup.controls['payRateConfigId'].setValue(data.payRateConfigId);
+  }
+
+  @OutsideZone
+  private getSkillData(data: PayRateSetup) {
+    setTimeout(() => {
+      if (data.skills.length === 0) {
+        this.PayRatesFormGroup.controls['skillIds'].setValue(null);
+      } else {
+        this.skillsEdit = [];
+        for(let i=0; i < data.skills.length; i++){
+          this.skillsEdit.push(data.skills[i].skillId);
+        }
+        this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
+      }
+    },1000)
   }
 
 }
