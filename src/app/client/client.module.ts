@@ -116,6 +116,7 @@ import { DoNotReturnFormService } from './do-not-return/do-not-return.form.servi
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { DocumentLibraryState } from '../modules/document-library/store/state/document-library.state';
 import { InputModule } from '@shared/components/form-controls/input/input.module';
+import { PreservedOrderService } from './order-management/services/preserved-order.service';
 
 
 const gridIcons = {
@@ -248,7 +249,8 @@ const gridIcons = {
     OrderManagementIrpApiService,
     OrderCandidateApiService,
     DonotreturnService,
-    DoNotReturnFormService
+    DoNotReturnFormService,
+    PreservedOrderService,
   ],
 })
 export class ClientModule {}

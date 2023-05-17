@@ -49,6 +49,7 @@ import {
   distinctUntilChanged,
   tap,
   switchMap,
+  skip,
 } from 'rxjs';
 
 import { ORDERS_GRID_CONFIG } from '@client/client.config';
@@ -65,6 +66,7 @@ import {
 import { ReOpenOrderService } from '@client/order-management/components/reopen-order/reopen-order.service';
 import {
   ApproveOrder,
+  ClearOrderFilterDataSources,
   ClearOrders,
   ClearSelectedOrder,
   DeleteOrder,
@@ -217,6 +219,7 @@ import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interf
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { OutsideZone } from '@core/decorators';
+import { PreservedOrderService } from '@client/order-management/services/preserved-order.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -307,6 +310,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private search$ = new Subject();
+  private preservedOrder$ = new Subject();
   public selectedDataRow: OrderManagement | IRPOrderManagement;
 
   public hasCreateEditOrderPermission: boolean;
@@ -358,7 +362,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private selectedCandidateMeta: { order: number; positionId: number } | null;
   private selectedIndex: number | null;
-  private ordersPage: OrderManagementPage;
+  public ordersPage: OrderManagementPage;
 
   public columnsToExport: ExportColumn[];
 
@@ -438,6 +442,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private breakpointService: BreakpointObserverService,
     private commentsService: CommentsService,
     private readonly ngZone: NgZone,
+    private preservedOrderService: PreservedOrderService,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
@@ -493,7 +498,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.eliteOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
     (!this.eliteOrderId)?this.eliteOrderId=0:"";
     window.localStorage.setItem("OrderId", JSON.stringify(""));
-    this.getalerttitle()
+    this.getalerttitle();
     super.ngOnInit();
 
     this.getDeviceScreen();
@@ -535,6 +540,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.OnUpdateRegrateSucceededHandler();
     this.subscribeOnUserSearch();
     this.watchForUpdateCandidate();
+
+    const pagerState = this.preservedOrderService.getPagerSate();
+    if (pagerState) {
+      this.currentPage = pagerState.page;
+      this.pageSize = pagerState.pageSize;
+      this.filters = pagerState.filters;
+    }
+
+    this.preservedOrder$.pipe(skip(1), debounceTime(1000), takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.preservedOrderService.applyGridState(this.gridWithChildRow);
+    });
    
     let isIrpEnabled = JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
     if (isIrpEnabled === true ) {
@@ -986,6 +1002,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.gridWithChildRow.selectRow(this.selectedIndex);
     }
 
+    this.preservedOrder$.next(true);
+    
     if (this.selectedCandidate) {
       if (this.selectedCandidateMeta) {
         this.selectedCandidate.selected = this.selectedCandidateMeta;
@@ -1099,10 +1117,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.rowSelected(event, this.gridWithChildRow);
     if (!event.isInteracted) {
       if (event.data?.isTemplate) {
-        if (!this.canCreateOrder) {
+        if (!this.canCreateOrder || this.preservedOrderService.isOrderPreserved()) {
           return;
         }
-        this.navigateToOrderTemplateForm();
+        this.navigateToOrderTemplateForm(event.data.id);
         this.store.dispatch(new GetSelectedOrderById(event.data.id));
       } else {
         const data = isArray(event.data) ? event.data[0] : event.data;
@@ -1171,7 +1189,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
   }
 
-  public navigateToOrderTemplateForm(): void {
+  public navigateToOrderTemplateForm(id: number): void {
+    this.store.dispatch(new SelectNavigationTab(this.activeTab));
+    const pagerState = { page: this.currentPage, pageSize: this.pageSize, filters: this.filters };
+    this.preservedOrderService.preserveOrder(id, pagerState);
+    this.store.dispatch([new SelectNavigationTab(this.activeTab), new ClearOrders(), new ClearOrderFilterDataSources()]);
     this.router.navigate(['./add/fromTemplate'], { relativeTo: this.route });
   }
 
@@ -1225,16 +1247,15 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.cd$.next(true);
   }
 
-  public tabSelected(tabIndex: OrganizationOrderManagementTabs | any): void {
+  public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
-    this.filterApplied = false;
-    this.clearFilters();
+    
 
     // Don’t need reload orders if we go back from the candidate page
     if (!this.previousSelectedOrderId) {
       const { selectedOrderAfterRedirect } = this.orderManagementService;
       this.openDetails.next(false);
-      this.store.dispatch(new ClearOrders());
+      
       this.selectedIndex = this.selectedRowIndex = null;
       this.clearSelection(this.gridWithChildRow);
 
@@ -1270,7 +1291,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
       this.dispatchPreservedFilters();
 
-      this.pageSubject.next(1);
+      if (!this.preservedOrderService.isOrderPreserved()) {
+        this.filterApplied = false;
+        this.clearFilters();
+        this.store.dispatch(new ClearOrders());
+        this.pageSubject.next(1);
+      }
     }
     this.cd$.next(true);
   }
@@ -1447,10 +1473,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.addEditReOrderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.EditReOrder);
       const index = (this.gridWithChildRow.dataSource as []).findIndex((item: OrderManagement) => {
         return item.id === data.id;
-      })
+      });
       this.selectedRowIndex = index < 0 ? null : index;
       this.openReOrderDialog(data.id, data.organizationId);
     } else {
+      const pagerState = { page: this.currentPage, pageSize: this.pageSize, filters: this.filters };
+      this.preservedOrderService.preserveOrder(data.id, pagerState);
+      this.store.dispatch([new SelectNavigationTab(this.activeTab), new ClearOrders(), new ClearOrderFilterDataSources()]);
       this.router.navigate(['./edit', data.id], { relativeTo: this.route });
     }
   }
@@ -1507,10 +1536,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.getSettings();
       if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
         this.clearFilters();
-      }
-
-      if (!this.previousSelectedOrderId) {
-        this.pageSubject.next(1);
       }
 
       this.store.dispatch(new GetAssignedSkillsByOrganization());

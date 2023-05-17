@@ -63,7 +63,8 @@ import {
   UpdateRegRateorder,
   UpdateRegRateSucceeded,
   GetCandidateCancellationReason,
-  ExportIRPOrders
+  ExportIRPOrders,
+  ClearOrderFilterDataSources
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -411,8 +412,7 @@ export class OrderManagementContentState {
 
   @Action(ClearOrders)
   ClearOrders(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
-    {}: ClearOrders
+    { patchState }: StateContext<OrderManagementContentStateModel>
   ): OrderManagementContentStateModel {
     return patchState({ ordersPage: null });
   }
@@ -917,6 +917,13 @@ export class OrderManagementContentState {
         return payload;
       })
     );
+  }
+  
+  @Action(ClearOrderFilterDataSources)
+  ClearOrderFilterDataSources(
+    { patchState }: StateContext<OrderManagementContentStateModel>
+  ): OrderManagementContentStateModel {
+    return patchState({ orderFilterDataSources: null });
   }
 
   @Action(GetHistoricalData)
