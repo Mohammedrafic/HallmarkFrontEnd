@@ -25,7 +25,7 @@
     <e-column headerText="" field="actions" textAlign="Left" width="150" [visible]="false">
       <ng-template #template let-data>
         <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)" *ngIf="!isMobileScreen">
             <span><i-feather name="edit" class="icon"></i-feather></span>
           </button>
           <button ejs-button cssClass="e-flat secondary-icon-button enabled-button"
