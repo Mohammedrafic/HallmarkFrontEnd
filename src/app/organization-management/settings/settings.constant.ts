@@ -66,7 +66,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'MandateCandidatePhone1',
   'CreateReplacementPerDiemOrder',
   'OTHours',
-  'PayPeriod'
+  'PayPeriod',
+  'OnHoldDefault',
 ];
 
 export const DisabledSettingsByDefault = [
@@ -80,7 +81,8 @@ export const DisabledSettingsByDefault = [
   'MandateCandidateAddress',
   'MandateCandidatePhone1',
   'CreateReplacementPerDiemOrder',
-  'PayPeriod'
+  'PayPeriod',
+  'OnHoldDefault',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean): ButtonModel[] => {
