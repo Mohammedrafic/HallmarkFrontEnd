@@ -395,7 +395,7 @@ export class GeneralCommentsComponent implements OnInit {
       StartDateGCR: formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       EndDateGCR: formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       CommentType: CommentedType == "0" ? "All" : CommentedType == "1" ? "Internal Comments" : "External Comments",
-      CommentLevel: CommentedLevel == "0" ? "All" : CommentedLevel == "1" ? "Order Level" : "Canidate Level",
+      CommentLevel: CommentedLevel == "0" ? "All" : CommentedLevel == "1" ? "Order Level" : "Candidate Level",
       Commentby: Commentedby == "0" ? "All" : Commentedby == "1" ? "Organization" : "Agency",
       OrderId: OrderId == null || OrderId == "" ? '' : OrderId,
       CandidateName: candidateName == null || candidateName == "" ? '' : candidateName.toString(),
