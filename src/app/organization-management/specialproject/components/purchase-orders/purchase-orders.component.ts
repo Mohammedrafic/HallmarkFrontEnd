@@ -139,6 +139,7 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
     this.purchaseOrderPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (!data || !data?.items.length) {
         this.gridApi?.showNoRowsOverlay();
+        this.gridApi?.setRowData([]);
       }
       else {
         this.gridApi?.hideOverlay();

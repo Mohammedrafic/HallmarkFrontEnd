@@ -244,6 +244,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
 
   private onOrganizationChangedHandler(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.closeDialog();
       this.organizationId = data;
       switch (this.selectedTab) {
         case SpecialProjectTabs.SpecialProjects:
@@ -388,6 +389,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
         if (this.form.contains(FormControlNames.EndDate)) this.form.removeControl(FormControlNames.EndDate);
         if (this.form.contains(FormControlNames.ProjectBudget)) this.form.removeControl(FormControlNames.ProjectBudget);
         if (this.form.contains(FormControlNames.PoNamesMapping)) this.form.removeControl(FormControlNames.PoNamesMapping);
+        if (this.form.contains(FormControlNames.SpecialProjectCategoryName)) this.form.removeControl(FormControlNames.SpecialProjectCategoryName);
         this.addButtonTitle = AddButtonText.AddMapping;
         break;
       case SpecialProjectTabs.PurchaseOrdersMapping:
@@ -406,6 +408,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
         if (this.form.contains(FormControlNames.ProjectBudget)) this.form.removeControl(FormControlNames.ProjectBudget);
         if (this.form.contains(FormControlNames.projectNameMapping)) this.form.removeControl(FormControlNames.projectNameMapping);
         if (this.form.contains(FormControlNames.projectCategoryMapping)) this.form.removeControl(FormControlNames.projectCategoryMapping);
+        if (this.form.contains(FormControlNames.SpecialProjectCategoryName)) this.form.removeControl(FormControlNames.SpecialProjectCategoryName);
         this.addButtonTitle = AddButtonText.AddMapping;
         break;
     }

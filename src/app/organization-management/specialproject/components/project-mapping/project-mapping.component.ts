@@ -132,6 +132,7 @@ export class ProjectMappingComponent extends AbstractGridConfigurationComponent 
     this.specialProjectMappingPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (!data || !data?.items.length) {
         this.gridApi?.showNoRowsOverlay();
+        this.gridApi?.setRowData([]);
       }
       else {
         this.gridApi?.hideOverlay();

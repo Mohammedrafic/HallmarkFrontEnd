@@ -20,7 +20,7 @@ export namespace ManualInvoiceReasons {
 
   export class Remove {
     static readonly type = ManualInvoiceReasonsActionsTypesEnum.REMOVE;
-    constructor(public id: number){}
+    constructor(public id: number,public businessUnitId: number){}
   }
 
   export class SaveError {

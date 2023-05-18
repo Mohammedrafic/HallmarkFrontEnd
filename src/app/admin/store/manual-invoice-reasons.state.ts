@@ -87,13 +87,14 @@ export class ManualInvoiceReasonsState {
   @Action(ManualInvoiceReasons.Remove)
   Remove(
     { dispatch }: StateContext<ManualInvoiceReasonsModel>,
-    { id }: ManualInvoiceReasons.Remove
+    { id,businessUnitId }: ManualInvoiceReasons.Remove
   ): Observable<void> {
-    return this.manualInvoiceReasonsApiService.removeManualInvoiceReason(id).pipe(
+    return this.manualInvoiceReasonsApiService.removeManualInvoiceReason(id,businessUnitId).pipe(
       tap(() => {
         dispatch(new ManualInvoiceReasons.UpdateSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
-      })
+      }),
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }
 }

@@ -138,6 +138,7 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
     this.specialProjectCategoryPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
         if (!data?.items.length) {
           this.gridApi?.showNoRowsOverlay();
+          this.gridApi?.setRowData([]);
         }
         else {
           this.gridApi?.hideOverlay();
