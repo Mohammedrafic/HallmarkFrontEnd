@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
+import { Comment } from '@shared/models/comment.model';
 import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -151,7 +152,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
             };
 
             return this.orderCandidateApiService.closeIrpPosition(closeDto);
-      
+
           }),
           take(1),
         ).subscribe(() => {
@@ -173,7 +174,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           const statusConfigField = GetConfigField(this.dialogConfig, StatusField);
           const reasonConfigField = GetConfigField(this.dialogConfig, CloseReasonField);
           const reasons = this.store.selectSnapshot(RejectReasonState.closureReasonsPage)?.items;
-    
+
           statusConfigField.dataSource = this.editIrpCandidateService
           .createStatusOptions([...candidateDetails.availableStatuses ?? []]);
           reasonConfigField.dataSource = this.editIrpCandidateService.createReasonsOptions(reasons || []);
@@ -189,7 +190,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
                 OrganizationId: this.candidateModelState.order.organizationId as number,
                 JobId: this.candidateModelState.candidate.candidateJobId,
               };
-          
+
             return this.orderCandidateApiService.getPositionDetails(jobDto)
             .pipe(
               tap((job) => {

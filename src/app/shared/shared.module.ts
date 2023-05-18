@@ -175,6 +175,7 @@ import { CustomExportDialogComponent } from './components/custom-export-dialog/c
 import { CommentsIrpComponent } from './components/comments-irp/comments-irp.component';
 import { CommentdataComponent } from './components/comments-irp/commentdata/commentdata.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { EditIrpCandidateComponent } from './components/order-candidate-list/edit-irp-candidate/edit-irp-candidate.component';
 
 const icons = {
   AlertCircle,
@@ -267,6 +268,7 @@ const COMPONENTS = [
   CustomSideDialogComponent,
   CustomExportDialogComponent,
   CommentsIrpComponent,
+  EditIrpCandidateComponent,
   CommentdataComponent
 ];
 
@@ -357,7 +359,6 @@ const COMPONENTS = [
     HideByCandidateStatusPipe,
     TabsMobileShadowDirective,
     LocalDateTimePipe,
-    CommentsIrpComponent,
     CommentsComponent,
     CommentdataComponent,
   ],
