@@ -302,7 +302,9 @@ export class CreateScheduleService {
     });
 
     if (this.store.selectSnapshot(UserState.user)?.isEmployee) {
-      types = types.filter((type: ScheduleTypeRadioButton) => type.value !== ScheduleItemType.Book);
+      types = types.filter((type: ScheduleTypeRadioButton) => {
+        return type.value !== ScheduleItemType.Book && type.value !== ScheduleItemType.OpenPositions;
+      });
     }
 
     return {
