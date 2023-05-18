@@ -817,28 +817,4 @@ export class OrderJourneyFilter {
   orderStatuses?: (string | number)[];
   includeInIRP?:boolean;
   includeInVMS?:boolean;
-
-  // candidatesCountFrom?: number | null;
-  // candidatesCountTo?: number | null;
-  // agencyIds?: number[];
-  // agencyType?: string | number | null;
-  // includeReOrders?: boolean;
-  // sortModel?: SortModel = {};
-  // filterModel?: FilterModel = {};
-  // isTemplate?: boolean;
-  // templateTitle?: string;
-  // annualSalaryRangeFrom?: string | null;
-  // annualSalaryRangeTo?: string | null;
-  // creationDateFrom?: Date | null;
-  // creationDateTo?: Date | null;
-  // distributedOnFrom?: Date | null;
-  // distributedOnTo?: Date | null;
-  // candidateName?: string | null;
-  // projectTypeIds?: number | null;
-  // projectNameIds?: number | null;
-  // poNumberIds?: number | null;
-  // orderType?: number | null;
-  // contactEmails?: string[] | string;
-  // irpOnly?: boolean | null;
-  // reorderStatuses?: (string | number)[];
 }
