@@ -3,8 +3,8 @@ export interface ReorderModel {
   candidates: number[];
   agencies: number[];
   reorderDate: Date;
-  shiftStartTime: Date;
-  shiftEndTime: Date;
+  shiftStartTime: Date | string;
+  shiftEndTime: Date | string;
   billRate: number;
   openPosition: number;
 }

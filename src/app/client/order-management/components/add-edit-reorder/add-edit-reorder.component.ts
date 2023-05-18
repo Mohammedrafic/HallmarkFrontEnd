@@ -352,6 +352,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
+    reorder.shiftStartTime = DateTimeHelper.toUtcFormat(reorder.shiftStartTime);
+    reorder.shiftEndTime = DateTimeHelper.toUtcFormat(reorder.shiftEndTime);
     const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
     const reOrderId = this.isEditMode ? this.order.id : null;
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;
