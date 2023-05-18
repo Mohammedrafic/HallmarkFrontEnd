@@ -546,10 +546,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.currentPage = pagerState.page;
       this.pageSize = pagerState.pageSize;
       this.filters = pagerState.filters;
+      this.activeTab = this.preservedOrderService.getActiveTab();
     }
 
     this.preservedOrder$.pipe(skip(1), debounceTime(1000), takeUntil(this.unsubscribe$)).subscribe(() => {
       this.preservedOrderService.applyGridState(this.gridWithChildRow);
+      this.patchFilterForm();
     });
    
     let isIrpEnabled = JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
@@ -1488,6 +1490,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public preserveOrder(id: number): void {
     const pagerState = { page: this.currentPage, pageSize: this.pageSize, filters: this.filters };
+    this.preservedOrderService.setActiveTab(this.activeTab);
     this.preservedOrderService.preserveOrder(id, pagerState);
     this.store.dispatch([new SelectNavigationTab(this.activeTab), new ClearOrders(), new ClearOrderFilterDataSources()]);
   }

@@ -7,11 +7,19 @@ import { GridComponent } from '@syncfusion/ej2-angular-grids';
 export class PreservedOrderService {
   private orderPagerState: OrderManagementPagerState | null = null;
   private preservedOrderId: number | null = null;
-  private activeTab: OrganizationOrderManagementTabs;
+  private activeTab: OrganizationOrderManagementTabs | null;
 
   public preserveOrder(id: number, pagerState: OrderManagementPagerState): void {
     this.preservedOrderId = id;
     this.orderPagerState = pagerState;
+  }
+
+  public setActiveTab(activeTab: OrganizationOrderManagementTabs): void {
+    this.activeTab = activeTab;
+  }
+
+  public getActiveTab(): OrganizationOrderManagementTabs {
+    return this.activeTab || OrganizationOrderManagementTabs.AllOrders;
   }
 
   public getPagerSate(): OrderManagementPagerState | null {
@@ -19,7 +27,7 @@ export class PreservedOrderService {
   }
 
   public resetPreservedOrder(): void {
-    this.preservedOrderId = this.orderPagerState = null;
+    this.preservedOrderId = this.orderPagerState = this.activeTab = null;
   }
 
   public applyGridState(grid: GridComponent): void {
