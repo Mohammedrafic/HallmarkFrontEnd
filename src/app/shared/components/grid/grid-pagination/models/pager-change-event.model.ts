@@ -1,12 +1,12 @@
 export interface PagerChangeEventModel {
   currentPage: number;
-  newProp: Prop;
-  oldProp: Prop;
+  newProp: PagerState;
+  oldProp: PagerState;
   cancel: boolean;
   name: 'click';
 }
 
-interface Prop {
+interface PagerState {
   currentPage: number;
   totalRecordsCount?: number;
 }
