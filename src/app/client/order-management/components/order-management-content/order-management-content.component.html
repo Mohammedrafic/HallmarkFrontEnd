@@ -36,7 +36,7 @@
           [ngTemplateOutlet]="filterButton"
         ></ng-container>
         <app-tooltip-container
-          *ngIf="!isActiveSystemIRP && !(isContentSmallDesktop || isMiddleTabletWidth)"
+          *ngIf="!isActiveSystemIRP && !(isContentSmallDesktop || isMiddleTabletWidth)  && activeSystem != OrderManagementIRPSystemId.OrderJourney"
           [message]="toolTipMessage"
           [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
         >
@@ -106,7 +106,7 @@
   </ng-container>
 </ng-container>
 
-<ng-container *ngIf="isIRPFlagEnabled && activeSystem !== OrderManagementIRPSystemId.VMS; else vmsGridTemplate">
+<ng-container *ngIf="isIRPFlagEnabled && activeSystem == OrderManagementIRPSystemId.IRP else vmsGridTemplate;">
   <div class="grid-table-container table-wrapper">
     <div class="mobile-group-button" *ngIf="isMobile">
       <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
@@ -133,7 +133,7 @@
 <app-grid-pagination
   [currentPage]="currentPage"
   [pageSize]="pageSize"
-  [totalRecordsCount]="(ordersPage$ | async)?.totalCount || 0"
+  [totalRecordsCount]="activeSystem==OrderManagementIRPSystemId.OrderJourney ? (ordersJourneyPage$ | async)?.totalCount||0 : (ordersPage$ | async)?.totalCount||0"
   (navigateToPageEmitter)="gridPageChanged($event)"
   (pageSizeChangeEmitter)="gridPerPageChanged($event)"
 ></app-grid-pagination>
@@ -146,7 +146,8 @@
     (click)="showFilters()"
   >
     <div class="filter-button-content">
-      <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
+      <span *ngIf="activeSystem != OrderManagementIRPSystemId.OrderJourney && filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{filteredItems.length }}</span>
+      <span *ngIf="activeSystem == OrderManagementIRPSystemId.OrderJourney && filteredOrdersJourneyItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredOrdersJourneyItems.length }}</span>
       Filters <i-feather name="sliders" class="icon"></i-feather>
     </div>
   </button>
@@ -183,6 +184,7 @@
 </ng-template>
 
 <ng-template #vmsGridTemplate>
+  <ng-container *ngIf="activeSystem == OrderManagementIRPSystemId.VMS;else orderJourneyGridTemplate">
   <div class="mobile-group-button" [ngClass]="isIRPFlagEnabled ? 'irp' : 'vms'" *ngIf="isMobile">
     <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
   </div>
@@ -604,7 +606,85 @@
       </ng-template>
     </ejs-grid>
   </section>
+  </ng-container>
 </ng-template>
+<ng-template #orderJourneyGridTemplate>
+  <section class="grid-component">
+    <ejs-grid #grid [dataSource]="(ordersJourneyPage$ | async)?.items" class="e-gridwithchildrow" (rowDataBound)="setRowHighlight($event)"
+      [pageSettings]="pageSettings" [height]="isMobile ? mobileGridHeight : fullScreenGridHeight"
+      [rowHeight]="rowHeight" [resizeSettings]="resizeSettings" [allowSorting]="allowSorting"
+      [allowResizing]="allowResizing" [allowTextWrap]="allowWrap" (actionBegin)="actionBegin($event)"
+      [selectionSettings]="selectionOptions" [textWrapSettings]="wrapSettings" [enableVirtualization]="false"
+      (rowSelected)="onOrderJourneyRowClick($event)"
+      (rowDeselected)="onOrderJourneyRowDeselect($event,gridWithChildRow)"
+      (dataBound)="onDataBound()">
+      <e-columns>
+        <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"
+          [allowResizing]="false"></e-column>
+        <e-column field="orderId" headerText="Order ID" width="140" minWidth="120" maxWidth="200"></e-column>
+        <e-column field="status" headerText="Order Status" width="215" minWidth="120" maxWidth="260">
+          <ng-template #template let-data>
+            <div class="status-cell" [class.ex-chip]="data?.status">
+              <ejs-chiplist>
+                <e-chips>
+                  <e-chip [text]="data.status" [cssClass]="data.status | chipsCssClass"></e-chip>
+                </e-chips>
+              </ejs-chiplist>
+            </div>
+          </ng-template>
+        </e-column>
+        <e-column field="system" headerText="System" width=250>
+          <ng-template #template let-data>
+            <ng-container *ngIf="data.system != 'IRP, VMS'; else bothSystem">
+              <div class="subrow-toggle" (click)="onClickSystem(data.system)">
+                <b>{{data.system}}</b>
+                </div>
+            </ng-container>
+            <ng-template #bothSystem >
+              <div class="subrow-toggle">
+                <b (click)="onClickSystem('IRP')">IRP,</b>&nbsp;<b (click)="onClickSystem('VMS')">VMS</b>
+              </div>
+            </ng-template>
+            
+          </ng-template>
+         
+        </e-column>
+        <e-column field="orderTypes" headerText="Type" textAlign="Center" width="85" minWidth="70" maxWidth="110">
+        </e-column>
+        <e-column field="jobTitle" headerText="Job Title" width="115" minWidth="100" maxWidth="200">
+        </e-column>
+        <e-column field="skill" headerText="Skill" textAlign="Left" width="100" minWidth="90" maxWidth="200">
+        </e-column>
+        <e-column field="creationDate" headerText="Creation Date" width="155" minWidth="135" maxWidth="200">
+          <ng-template #template let-data>
+            {{ data.creationDate | date: "MM/dd/yyyy" }}
+          </ng-template>
+        </e-column>
+        <e-column field="publishedInIRP" headerText="Published In IRP" width=150>
+          <ng-template #template let-data>
+            <ng-container *ngIf="data.publishedInIRP !=null">
+              <div >{{data.publishedInIRP | date: "MM/dd/yyyy" }}</div>
+            </ng-container>           
+          </ng-template>
+        </e-column>
+        <e-column field="noOfDaysInIRP" headerText="#Of Days In IRP" width=150>
+        </e-column>
+        <e-column field="publishedInVMS" headerText="Published In VMS" width=150>
+          <ng-template #template let-data>
+            <ng-container *ngIf="data.publishedInVMS !=null">
+              <div >{{data.publishedInVMS | date: "MM/dd/yyyy" }}</div>
+            </ng-container>           
+          </ng-template>
+        </e-column>
+        <e-column field="noOfDaysInVMS" headerText="#Of Days In VMS" width=150>
+        </e-column>
+      </e-columns>
+
+
+    </ejs-grid>
+  </section>
+</ng-template>
+
 
 <app-export-dialog
   [columns]="columnsToExport"
@@ -614,7 +694,7 @@
 ></app-export-dialog>
 
 <app-filter-dialog
-  *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates"
+  *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates && activeSystem != OrderManagementIRPSystemId.OrderJourney"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
   [targetElement]="targetElement"
@@ -1075,6 +1155,192 @@
 </app-filter-dialog>
 
 <app-filter-dialog
+  *ngIf="activeSystem == OrderManagementIRPSystemId.OrderJourney"
+  [items]="filteredOrdersJourneyItems"
+  [count]="(ordersJourneyPage$ | async)?.totalCount"
+  [targetElement]="targetElement"
+  (deleteFilter)="onOrderJourneyFilterDelete($event)"
+  (clearAllFiltersClicked)="onOrderJourneyFilterClearAll()"
+  (applyFilterClicked)="onOrderJourneyFilterApply()"
+  (closeDialogClicked)="onOrderJourneyFilterClose()"
+>
+  <form [formGroup]="OrderJourneyFilterFormGroup" *ngIf="showFilterForm">
+<div class="bootstrap">
+  <div class="input-container">
+    <label>Select System <span class="required">*</span></label>
+    <div class="bootstrap checkbox-container">
+      <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>
+      <ejs-checkbox formControlName="includeInVMS" label="VMS"></ejs-checkbox>
+    </div>
+  </div>
+</div>
+
+    <div class="bootstrap">
+      <div class="input-container">
+        <label for="orderId">Order ID</label>
+        <div class="input-group">
+          <input id="orderId" class="e-input" type="text" maxlength="50" formControlName="orderPublicId" />
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Region</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="regionIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterOrderJourneyColumns.regionIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Location</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="locationIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterOrderJourneyColumns.locationIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Department</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="departmentsIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterOrderJourneyColumns.departmentsIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="skillIds"
+            placeholder="All"
+            [fields]="skillsFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterOrderJourneyColumns.skillIds.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    
+    <div class="filter-row bootstrap">
+      <div
+        class="input-container"
+        *ngIf="
+          (!isActiveSystemIRP && activeTab !== OrganizationOrderManagementTabs.ReOrders &&
+          activeTab !== OrganizationOrderManagementTabs.PerDiem &&
+          activeTab !== OrganizationOrderManagementTabs.PermPlacement) ||
+          (isActiveSystemIRP && activeIRPTabIndex === OrderManagementIRPTabsIndex.AllOrders)">
+        <label>Order Type</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="orderTypes"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterOrderJourneyColumns.orderTypes.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container"
+           *ngIf="!isActiveSystemIRP || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
+        <label>Order Status</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            #orderStatusFilter
+            mode="CheckBox"
+            formControlName="orderStatuses"
+            placeholder="All"
+            [fields]="statusFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterOrderJourneyColumns.orderStatuses.dataSource"
+            [changeOnBlur]="!(isMobile || isTablet)">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>    
+    <div class="bootstrap" *ngIf="!isActiveSystemIRP">
+      <div class="input-container">
+        <label>Job Title</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="jobTitle" />
+        </div>
+      </div>
+    </div>
+    <div class="filter-row bootstrap">
+      <div class="input-container calendar">
+        <label for="jobStartDate">
+         Job Start Date
+        </label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            id="jobStartDate"
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
+            formControlName="jobStartDate">
+          </ejs-datepicker>
+        </div>
+      </div>
+      <div class="input-container calendar">
+        <label for="jobEndDate">Job End Date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            id="jobEndDate"
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
+            formControlName="jobEndDate"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>
+<app-filter-dialog
   *ngIf="activeTab === OrganizationOrderManagementTabs.OrderTemplates"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
@@ -1177,7 +1443,7 @@
   [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"
   [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
   (selectReOrder)="selectReOrder($event)"
-  (saveReOrderEmitter)="updateGrid()"
+  (saveReOrderEmitter)="updateGrid(true)"
   (closeReOrderEmitter)="onAddReorderClose()"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
   (updateOrders)="getOrders()"

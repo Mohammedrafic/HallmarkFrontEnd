@@ -184,6 +184,16 @@ export class GetLogHistoryById {
   constructor(public runId: string, public organizationId: number, public pageNumber: number,public pageSize: number,public options?: DialogNextPreviousOption) {}
 }
 
+export class GetLogFileDownload {
+  static readonly type = '[security log interface] Get History log file';
+  constructor(public runId: string, public organizationId: number,) {}
+}
+
+export class GetLogFileDownloadSucceeded {
+  static readonly type = '[security log interface] Get History log file download details Succeeded';
+  constructor(public logFileDownloadDetail: any) { }
+}
+
 export class ExportTimeSheetList {
   static readonly type = '[security] Export TimeSheet List';
   constructor(public payload: ExportPayload) {}

@@ -52,8 +52,6 @@ import { AlertTrigger } from '@admin/store/alerts.actions';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { MultiselectDropdownComponent,
 } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.component';
-import { OutsideZone } from '@core/decorators';
-import { SyncOptionType } from './add-edit-reorder.interface';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -162,7 +160,13 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   public onSave(): void {
-    if (this.reorderForm.invalid) {
+    const selectedAgencyIds = this.reorderForm.get('agencies')?.value;
+    const selectedCandidateIds = this.reorderForm.get('candidates')?.value;
+    const agenciesValid = this.reorderService.checkAgencies(this.agencies, selectedAgencyIds);
+    const candidatesValid = this.reorderService.checkCandidates(this.candidates, selectedCandidateIds);
+    const formInvalid = this.reorderForm.invalid || !agenciesValid || !candidatesValid;
+
+    if (formInvalid) {
       this.reorderForm.markAllAsTouched();
       this.cdr.markForCheck();
     } else {
@@ -222,12 +226,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     )
     .subscribe(([agencies, candidates]) => {
       this.numberOfAgencies = agencies.length;
-      this.disabledAgencyIds = agencies.filter((agency) => agency.hasActiveCandidate)
-      .map((agency) => agency.agencyId);
-      this.agencies = agencies.filter((agency) => !agency.hasActiveCandidate);
-      this.disabledCandidatesIds = candidates.filter((candidate) => candidate.hasActiveCandidate)
-      .map((candidate) => candidate.candidateId);
-      this.candidates = candidates.filter((candidate) => !candidate.hasActiveCandidate);
+      this.agencies = agencies;
+      this.candidates = candidates;
 
       this.setFormData(this.order);
       this.setInitialDatesValue();
@@ -301,8 +301,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
           if (!candidateIds.length) {
             this.reorderForm.patchValue({ agencies: this.getAgencyIds(this.order.jobDistributions) });
             this.reorderForm.updateValueAndValidity();
-          } else {
-            this.reorderForm.patchValue({ openPosition: candidateIds?.length || 1 });
           }
         }),
         filter((candidateIds: number[]) => !!candidateIds?.length),
@@ -354,8 +352,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
-    reorder.candidates = [...reorder.candidates, ...this.disabledCandidatesIds];
-    reorder.agencies = [...reorder.agencies, ...this.disabledAgencyIds];
+    reorder.shiftStartTime = DateTimeHelper.toUtcFormat(reorder.shiftStartTime);
+    reorder.shiftEndTime = DateTimeHelper.toUtcFormat(reorder.shiftEndTime);
     const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
     const reOrderId = this.isEditMode ? this.order.id : null;
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;

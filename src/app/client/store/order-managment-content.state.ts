@@ -64,7 +64,9 @@ import {
   UpdateRegRateSucceeded,
   GetCandidateCancellationReason,
   ExportIRPOrders,
-  ClearOrderFilterDataSources
+  ClearOrderFilterDataSources,
+  GetOrdersJourney,
+  ExportOrdersJourney,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -79,6 +81,7 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementPage,
+  OrdersJourneyPage,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -128,6 +131,7 @@ import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
+  ordersJourneyPage: OrdersJourneyPage |null;
   selectedOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
   applicantStatuses: ApplicantStatus[];
@@ -161,6 +165,7 @@ export interface OrderManagementContentStateModel {
   name: 'orderManagement',
   defaults: {
     ordersPage: null,
+    ordersJourneyPage:null,
     selectedOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
@@ -199,6 +204,11 @@ export class OrderManagementContentState {
   @Selector()
   static ordersPage(state: OrderManagementContentStateModel): OrderManagementPage | null {
     return state.ordersPage;
+  }
+
+  @Selector()
+  static ordersJourneyPage(state:OrderManagementContentStateModel): OrdersJourneyPage | null {
+    return state.ordersJourneyPage;
   }
 
   @Selector()
@@ -406,6 +416,20 @@ export class OrderManagementContentState {
     return this.orderManagementIrpApiService.getOrders(payload).pipe(
       tap((orders) => {
         patchState({ ordersPage: orders as unknown as OrderManagementPage });
+      }),
+    );
+  }
+
+  @Action(GetOrdersJourney, { cancelUncompleted: true })
+  GetOrdersJourney(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { payload }: GetOrdersJourney
+  ) {
+    patchState({ ordersJourneyPage: null });
+
+    return this.orderManagementService.getOrdersJourney(payload).pipe(
+      tap((orders) => {
+        patchState({ ordersJourneyPage: orders as unknown as OrdersJourneyPage });
       }),
     );
   }
@@ -968,6 +992,16 @@ export class OrderManagementContentState {
     );
   }
   
+  @Action(ExportOrdersJourney)
+  ExportOrdersJourney({}: StateContext<OrderManagementContentStateModel>, { payload}: ExportOrdersJourney): Observable<any> {
+    return this.orderManagementService.orderJourneyexport(payload).pipe(
+      tap((file) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
+  }
+
   @Action(DuplicateOrder)
   DuplicateOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
