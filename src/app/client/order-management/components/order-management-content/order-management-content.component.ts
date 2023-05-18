@@ -1114,6 +1114,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
         this.openChildDialog.next(false);
         this.orderPositionSelected$.next({ state: false });
+
         if (!isArray(data)) {
           this.openDetails.next(true);
           this.selectedRowRef = event;
@@ -1812,6 +1813,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if (reorderDialog) {
       this.dispatchAgencyOrderCandidatesList(this.selectedReOrder.id, this.selectedReOrder.organizationId,
         this.selectedReOrder.irpOrderMetadata);
+        this.store.dispatch(new GetOrderById(this.selectedReOrder.id, this.selectedReOrder.organizationId));
     }
 
     this.actions$.pipe(ofActionSuccessful(GetOrders), take(1))
