@@ -258,7 +258,7 @@
             </ejs-multiselect>
           </div>
           <div class="switch">
-            <ejs-switch name="allRegions" [checked]="allRegionsSelected"  (change)="allRegionsChange($event)" label="All"></ejs-switch>
+            <ejs-switch name="allRegions" [disabled]="isParentEdit" [checked]="allRegionsSelected"  (change)="allRegionsChange($event)" label="All"></ejs-switch>
             <label for="allRegions" class="switch-text">All</label>
           </div>
         </div>
@@ -272,7 +272,7 @@
             </ejs-multiselect>
           </div>
           <div class="switch">
-            <ejs-switch name="allLocations"  [checked]="allLocationsSelected" (change)="allLocationsChange($event)" label="All"></ejs-switch>
+            <ejs-switch name="allLocations" [disabled]="isParentEdit" [checked]="allLocationsSelected" (change)="allLocationsChange($event)" label="All"></ejs-switch>
             <label for="allLocations" class="switch-text">All</label>
           </div>
         </div>
