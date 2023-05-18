@@ -210,6 +210,20 @@ export const irpIncompleteOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Creation date', column: 'CreationDate' },
 ];
 
+export const orderJourneyColumnsToExport: ExportColumn[] = [
+  { text: 'Order ID', column: 'OrderID' },
+  { text: 'Status', column: 'Status' },
+  { text: 'System', column: 'System' },
+  { text: 'Type', column: 'Type' },
+  { text: 'Job Title', column: 'JobTitle' },
+  { text: 'Skill', column: 'Skill' },
+  { text: 'Creation date', column: 'CreationDate' },
+  { text: 'Published In IRP', column: 'PublishedInIRP' },
+  { text: '#Of Days In IRP', column: 'NoOfDaysInIRP' },
+  { text: 'Published In VMS', column: 'PublishedInVMS' },
+  { text: '#Of Days In VMS', column: 'NoOfDaysInVMS' },
+];
+
 export const ReOrdersColumnsConfig = [
   {
     fieldName: 'reOrderFromId',

@@ -99,6 +99,22 @@ export interface IRPOrderManagement {
   children: OrderManagementChild[];
 }
 
+export interface GetOrdersJourney{
+  id: number;
+  orderId: string;
+  status:  string;
+  system:  string;
+  orderTypes:  string;
+  jobTitle:  string;
+  skill:  string;
+  creationDate: Date,
+  publishedInIRP: Date|null,
+  publishedInVMS: Date|null,
+  noOfDaysInIRP?: number,
+  noOfDaysInVMS?: number,
+  revokedInVMS: Date|null
+}
+
 export interface IRPCandidateForPosition {
   system: string;
   rowsSource: IRPOrderPosition[]
@@ -174,6 +190,7 @@ export class OrderManagementFilter {
 
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
 export type IRPOrderManagementPage = PageOfCollections<IRPOrderManagement>;
+export type OrdersJourneyPage = PageOfCollections<GetOrdersJourney>;
 
 export type AgencyOrderManagement = {
   orderId: number;
@@ -781,4 +798,23 @@ export class CandidateCancellationReason{
 export class CandidateCancellationReasonFilter{
   regionId?:number;
   locationId?:number;
+}
+
+
+export class OrderJourneyFilter {
+  orderBy?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+  orderPublicId?: string | null;
+  skillIds?: number[];
+  orderTypes?: number[];
+  jobTitle?: string;
+  jobStartDate?: Date | null;
+  jobEndDate?: Date | null;
+  orderStatuses?: (string | number)[];
+  includeInIRP?:boolean;
+  includeInVMS?:boolean;
 }

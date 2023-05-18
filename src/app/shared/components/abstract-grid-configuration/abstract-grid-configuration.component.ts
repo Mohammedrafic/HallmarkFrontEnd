@@ -74,6 +74,7 @@ export abstract class AbstractGridConfigurationComponent {
   idFieldName = 'id'; // Override in child component in case different id property
 
   filteredItems: FilteredItem[] = [];
+  filteredOrdersJourneyItems: FilteredItem[] = [];
   filteredCount = 0;
 
   isLoaded = false;
