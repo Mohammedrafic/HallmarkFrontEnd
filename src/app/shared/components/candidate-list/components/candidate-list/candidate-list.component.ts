@@ -133,7 +133,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       this.dispatchNewPage();
     }
   }
-
+  @Input() public isMobileScreen: boolean = false;
   public filters: CandidateListFilters = {
     candidateName: null,
     profileStatuses: [],

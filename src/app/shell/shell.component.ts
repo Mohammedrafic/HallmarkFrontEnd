@@ -58,6 +58,7 @@ import { SearchMenuComponent } from './components/search-menu/search-menu.compon
 import { MenuItemNames } from './shell.constant';
 import { ProfileMenuItem, THEME } from './shell.enum';
 import { UserService } from '@shared/services/user.service';
+import { BreakpointObserverService } from '@core/services';
 
 @Component({
   selector: 'app-shell',
@@ -171,6 +172,9 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   loadMoreCotent:string = '';
   pageNumber:number = 0;
   pageSize:number = 50;
+  public isMobile = false;
+  public isSmallDesktop = false;
+  nonResponsiveMenuItesm :Array<number> = [81,44,18,40,21,34];
 
   constructor(
     private store: Store,
@@ -183,6 +187,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     private readonly ngZone: NgZone,
     private ResizeContentService: ResizeContentService,
     private userService: UserService,
+    private breakpointService: BreakpointObserverService,
   ) {
     super();
 
@@ -204,6 +209,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   ngOnInit(): void {
+    this.getDeviceScreen();
     this.observeOrderNavigation();
     this.observeThemeChange();
     this.initSidebarFields();
@@ -296,6 +302,11 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   selectMenuItem(menuItem: MenuItem): void {
+    /** Preventing the page navigation  which are not responsive*/
+    if(this.isMobile  || this.isSmallDesktop){
+      if(this.nonResponsiveMenuItesm.includes(menuItem.id))
+        return;
+    }
     this.setSideBarForFirstLoad(menuItem.route as string);
 
     if (menuItem.id == AnalyticsMenuId) {
@@ -812,5 +823,15 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       this.pageNumber = this.pageNumber + 1;
       this.store.dispatch(new GetAlertsForCurrentUser(this.pageNumber,this.pageSize));
     }
+  }
+
+  private getDeviceScreen(): void {
+    this.breakpointService
+      .getBreakpointMediaRanges()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((screen) => {
+        this.isMobile = screen.isMobile;
+        this.isSmallDesktop = screen.isDesktopSmall;
+      });
   }
 }

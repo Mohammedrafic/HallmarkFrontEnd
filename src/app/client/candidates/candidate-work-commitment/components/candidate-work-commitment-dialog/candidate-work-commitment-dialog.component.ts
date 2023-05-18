@@ -4,7 +4,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OutsideZone } from '@core/decorators';
 import { DateTimeHelper, distinctByKey, groupBy } from '@core/helpers';
 import { Select, Store } from '@ngxs/store';
-import { WorkCommitmentDetails, WorkCommitmentDetailsGroup, WorkCommitmentOrgHierarchies, WorkCommitmentsPage } from '@organization-management/work-commitment/interfaces';
+import {
+  WorkCommitmentDetails,
+  WorkCommitmentDetailsGroup,
+  WorkCommitmentOrgHierarchies,
+} from '@organization-management/work-commitment/interfaces';
 import { DatepickerComponent } from '@shared/components/form-controls/datepicker/datepicker.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -79,7 +83,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public minimumDate: Date | undefined;
   public maximumDate: Date | undefined;
   public startDate: Date;
-  public showCommonRangesError: boolean = false;
+  public showCommonRangesError = false;
 
 
   constructor(
@@ -255,7 +259,13 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
     this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
     this.minimumDate = this.setMinimumDate();
-    this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
+
+    const terminationDate = this.candidateService.getTerminationDate();
+    if (terminationDate) {
+      this.maximumDate = DateTimeHelper.convertDateToUtc(terminationDate);
+    } else {
+      this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
+    }
 
     this.setWCStartDate();
   }

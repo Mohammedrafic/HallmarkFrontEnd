@@ -112,7 +112,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public defaultLocations:(number|undefined)[]=[];
   public defaultDepartments: (number | undefined)[] = [];
   public defaultAgencys: (number | undefined)[] = [];
-  public defaultCandidateStatuses: (number | undefined)[] = [];
+  public defaultCandidateStatuses: (number | undefined)[] = [3, 4, 5];
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
@@ -131,7 +131,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-  private fixedCandidateStatusesIncluded: number[] = [1, 2, 3,4,5,8,9,13];
+  private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5, 13];
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
@@ -166,7 +166,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
           this.candidateStatusesData=data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
             this.filterColumns.candidateStatuses.dataSource =this.candidateStatusesData;
               this.filterColumns.agencyIds.dataSource = data.agencies;
-             this.defaultCandidateStatuses = (this.candidateStatusesData||[]).map((list) => list.status);
+             //this.defaultCandidateStatuses = (this.candidateStatusesData||[]).map((list) => list.status);
              this.defaultAgencys = data.agencies.map((list) => list.agencyId);
               this.credentialExpiryForm.controls["candidateStatuses"].setValue(this.defaultCandidateStatuses.filter(f=>f !==90));
           if (this.isInitialLoad) {

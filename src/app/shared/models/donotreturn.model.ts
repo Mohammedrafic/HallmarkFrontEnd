@@ -4,8 +4,15 @@ import { DateTimeHelper } from '@core/helpers';
 
 
 export class DonoreturnFilters {
-  candidatename?:string;
-  ssn?: number;
+  businessUnitId?:     number;
+  firstName?:          string;
+  middleName?:         string;
+  lastName?:           string;
+  email?:              string;
+  ssn?:                number | null;
+  currentStatus?:      string;
+  locationBlocked?:    string;
+  regionBlocked?:      string;
   pageSize?: number;
   pageNumber?: number;
 }
@@ -59,41 +66,46 @@ Id: number;
 
 
 export class DonoreturnAddedit {
-  id?: number;
-  businessUnitId:number;
-  locationId:string;
-  regionId:string;
-  regionLocationMappings: { [id: number]: number[]; } | null;
-  candidateProfileId:number;
-  dnrRequestedBy: string;
-  dnrStatus: string;
-  ssn:number;
-  dnrComment:string;
-  status:string;
-  candidateEmail?:string;
-
+    id?: number;
+    isExternal:boolean;
+    businessUnitId:number;
+    locationId:string;
+    regionId:string;
+    regionLocationMappings: { [id: number]: number[]; } | null;
+    email: string;
+    candidateProfileId: number | null;
+    comment: string;
+    firstName: string;
+    middleName:string;
+    lastName:string;
+    status: string;
+    dob:Date | null;
+    ssn:number | null;
 
   constructor(donotreturn: DonoreturnAddedit) {
-    this.id = donotreturn.id||0;
-    this.businessUnitId = donotreturn.businessUnitId;
-    this.locationId=donotreturn.locationId;
-    this.regionId=donotreturn.regionId;
-    this.candidateProfileId=donotreturn.candidateProfileId;
-    this.dnrStatus=donotreturn.dnrStatus;    
-    this.regionLocationMappings=donotreturn.regionLocationMappings
-    this.ssn=donotreturn.ssn;
-    this.dnrComment=donotreturn.dnrComment;
-    this.dnrRequestedBy=donotreturn.dnrRequestedBy;
-    this.status=donotreturn.status;
-    this.candidateEmail=donotreturn.candidateEmail||""
-      }
+      this.id = donotreturn.id||0;
+      this.isExternal= donotreturn.isExternal;
+      this.businessUnitId = donotreturn.businessUnitId;
+      this.locationId=donotreturn.locationId;
+      this.regionId=donotreturn.regionId;
+      this.regionLocationMappings = donotreturn.regionLocationMappings;
+      this.candidateProfileId=donotreturn.candidateProfileId;
+      this.status=donotreturn.status;    
+      this.ssn=donotreturn.ssn;
+      this.comment=donotreturn.comment;
+      this.firstName=donotreturn.firstName;
+      this.middleName=donotreturn.middleName;
+      this.lastName=donotreturn.lastName;
+      this.dob=donotreturn.dob;
+      this.email=donotreturn.email||""
+    }
 }
 
 export class Donoreturnedit {
   id?: number;
   businessUnitId:number;
   locations:string;
-  candidateProfileId:number;
+  candidateProfileId:number | null;
   dnrRequestedBy: string;
   dnrstatus: string;
   ssn:number;
@@ -139,43 +151,49 @@ export class ExportDonoreturn {
 
 
 export class Donotreturn {
-  id: number;
-  businessUnitId?: number;
-  locationsid?: string;
-  regionsid?:string;
-  regionName?:string
-  locationName?:string
-  candidateProfileId?: number;
-  dnrStatus?: string;
-  dnrDate?: DateTimeHelper;
-  dnrComment?: string;
-  dnrRequestedBy?: string;
-  isDeleted?: boolean;
-  ssn?: number;
-  firstName?: string;
-  middleName?: string;
-  lastName?: string;
-  email?: string;
+    id:                 number;
+    businessUnitId:     number;
+    regionId:           string;
+    locationId:         string;
+    regionBlocked:         string;
+    locationBlocked:       string;
+    candidateProfileId: number;
+    firstName:          string;
+    middleName:         null;
+    lastName:           string;
+    fullName:           string;
+    email:              string;
+    ssn:                number;
+    dob:                Date | null;
+    currentStatus:      string;
+    lastUpdatedDate:    string;
+    lastBlockedDate:    string;
+    lastUnBlockedDate:  string;
+    comment:            string;
+    isExternal:         boolean;
   
 
   constructor(donotreturn: Donotreturn) {
     this.id = donotreturn.id||0;
     this.businessUnitId = donotreturn.businessUnitId;
-    this.regionsid=donotreturn.regionsid;
-    this.regionName=donotreturn.regionName;
-    this.locationsid=donotreturn.locationsid;
-    this.locationName=donotreturn.locationName;
+    this.regionId=donotreturn.regionId;
+    this.regionBlocked=donotreturn.regionBlocked;
+    this.locationId=donotreturn.locationId;
+    this.locationBlocked=donotreturn.locationBlocked;
     this.candidateProfileId=donotreturn.candidateProfileId;
-    this.dnrStatus=donotreturn.dnrStatus;
-    this.dnrDate=donotreturn.dnrDate;
-    this.dnrComment=donotreturn.dnrComment;
-    this.dnrRequestedBy=donotreturn.dnrRequestedBy;
-    this.isDeleted=donotreturn.isDeleted;
+    this.currentStatus=donotreturn.currentStatus;
+    this.lastUpdatedDate=donotreturn.lastUpdatedDate;
+    this.comment=donotreturn.comment;
+    this.lastBlockedDate=donotreturn.lastBlockedDate;
+    this.lastUnBlockedDate=donotreturn.lastUnBlockedDate;
     this.ssn=donotreturn.ssn;
+    this.dob=donotreturn.dob;
     this.firstName=donotreturn.firstName;
     this.middleName=donotreturn.middleName;
     this.lastName=donotreturn.lastName;
+    this.fullName=donotreturn.fullName;
     this.email=donotreturn.email;
+    this.isExternal=donotreturn.isExternal;
   }
 
 }
@@ -184,12 +202,20 @@ export class DoNotReturnCandidateSearchFilter{
   businessUnitId?:number;
 }
 export class DoNotReturnCandidateListSearchFilter{
-  candidateProfileId:number;
+  candidateProfileId:number | null;
+  businessUnitId?:number;
 }
 
 export class DonoreturnFilter  {
-  candidatename?: string;
-  ssn?: number;
+  businessUnitId?:     number;
+  firstName?:          string;
+  middleName?:         string;
+  lastName?:           string;
+  email?:              string;
+  ssn?:                number | null;
+  currentStatus?:      string;
+  locationBlocked?:    string;
+  regionBlocked?:      string;
   pageSize?: number;
   pageNumber?: number;
 };
@@ -202,5 +228,6 @@ export class DoNotReturnSearchCandidate{
   fullName:string;
   email:string|null;
   ssn:string|null;
+  dob: Date|null;
 }
 

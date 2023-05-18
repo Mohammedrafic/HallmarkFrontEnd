@@ -44,6 +44,9 @@
   overflow-y: auto;
 }
 ::ng-deep {
+  body .input-group span.error{
+    display: none !important;
+  }
   .organization-agency-dropdown-popup {
     &.e-ddl.e-popup.e-control.e-popup-open .e-dropdownbase {
       border-radius: 0 0 8px 8px;

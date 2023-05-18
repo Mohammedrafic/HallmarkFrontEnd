@@ -23,6 +23,7 @@ import { UserState } from 'src/app/store/user.state';
 import { ExportOrganizations, GetOrganizationDataSources, GetOrganizationsByPage } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { BreakpointObserverService } from '@core/services';
 
 @Component({
   selector: 'app-client-management-content',
@@ -68,6 +69,8 @@ export class ClientManagementContentComponent
   public OrganizationFilterFormGroup: FormGroup;
   public filters: OrganizationFilter = {};
   public filterColumns: any;
+  public isMobile = false;
+  public isSmallDesktop = false;
 
   private permissions: CurrentUserPermission[] = [];
 
@@ -77,7 +80,8 @@ export class ClientManagementContentComponent
     private route: ActivatedRoute,
     private datePipe: DatePipe,
     private filterService: FilterService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private breakpointService: BreakpointObserverService
   ) {
     super(store);
     this.idFieldName = 'organizationId';
@@ -94,6 +98,7 @@ export class ClientManagementContentComponent
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.getDeviceScreen();
     this.idFieldName = 'organizationId';
     this.filterColumns = {
       searchTerm: { type: ControlTypes.Text },
@@ -250,5 +255,15 @@ export class ClientManagementContentComponent
     this.currentUserPermissions$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((permissions) => (this.permissions = permissions));
+  }
+
+  private getDeviceScreen(): void {
+    this.breakpointService
+      .getBreakpointMediaRanges()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((screen) => {
+        this.isMobile = screen.isMobile;
+        this.isSmallDesktop = screen.isDesktopSmall;
+      });
   }
 }

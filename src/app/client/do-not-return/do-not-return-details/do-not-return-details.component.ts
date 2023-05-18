@@ -18,12 +18,7 @@ import { MasterDNRExportCols, TITLE } from '../donotreturn-grid.constants';
 })
 
 export class DoNotReturnDetailsComponent extends AbstractPermissionGrid implements OnInit {
-public filters: DonoreturnFilters = {
-  candidatename:undefined, 
-    ssn: undefined,
-    pageSize: undefined,
-    pageNumber: undefined,
-  };
+public filters: DonoreturnFilters = {};
 
   @ViewChild('grid')
   public grid: GridComponent;
@@ -41,7 +36,7 @@ public filters: DonoreturnFilters = {
   }
 
   override ngOnInit(): void {
-    this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, 1)]);
+   // this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, 1)]);
     super.ngOnInit();
   }
   

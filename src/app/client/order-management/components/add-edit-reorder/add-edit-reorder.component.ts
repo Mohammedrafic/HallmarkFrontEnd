@@ -18,7 +18,8 @@ import {
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 
-import { AfterViewInit, ChangeDetectorRef, Component,EventEmitter, Input, NgZone, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component,EventEmitter, Input, NgZone, OnChanges, OnDestroy, OnInit, Output,
+  ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { AddEditReorderService } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.service';
@@ -31,7 +32,7 @@ import {
   ReorderResponse,
 } from '@client/order-management/components/add-edit-reorder/models/reorder.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
-import { distinct, distinctUntilChanged, skip } from 'rxjs/operators';
+import { skip } from 'rxjs/operators';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
@@ -49,7 +50,8 @@ import { AlertTriggerDto } from '@shared/models/alerts-template.model';
 import { OrderStatus } from '@shared/enums/order-management';
 import { AlertTrigger } from '@admin/store/alerts.actions';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { MultiselectDropdownComponent } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.component';
+import { MultiselectDropdownComponent,
+} from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.component';
 import { OutsideZone } from '@core/decorators';
 import { SyncOptionType } from './add-edit-reorder.interface';
 
@@ -60,8 +62,11 @@ import { SyncOptionType } from './add-edit-reorder.interface';
 })
 export class AddEditReorderComponent extends DestroyableDirective implements OnInit, OnDestroy, AfterViewInit, OnChanges {
   @ViewChild('agencySelector') agencySelector: MultiselectDropdownComponent;
+
   @ViewChild('candidatesSelector') candidatesSelector: MultiselectDropdownComponent;
+
   @Input() public order: Order;
+  
   @Output() public saveEmitter: EventEmitter<void> = new EventEmitter<void>();
 
   public readonly agenciesOptionFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
@@ -85,6 +90,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private unsubscribe$: Subject<void> = new Subject();
   private numberOfAgencies: number;
   private multipleReorderDates: Date[] = [];
+  private disabledCandidatesIds: number[];
+  private disabledAgencyIds: number[];
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -142,8 +149,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
   ngOnChanges(): void {
     if (this.order) {
-      this.setFormData(this.order);
-      this.setInitialDatesValue();
       this.getComments();
     }
   }
@@ -170,7 +175,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.multipleReorderDates = dates;
   }
 
-  public setInitialDatesValue(): void {
+  private setInitialDatesValue(): void {
     const { jobStartDate, shiftStartTime, shiftEndTime } = this.order;
     this.initialDates = {
       shiftStartTime,
@@ -179,7 +184,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     };
   }
 
-  public isDatesChanged(): boolean {
+  private isDatesChanged(): boolean {
     const { reorderDate, shiftEndTime, shiftStartTime } = this.reorderForm.getRawValue();
     const {
       jobStartDate: reorderDateInitial,
@@ -217,62 +222,31 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     )
     .subscribe(([agencies, candidates]) => {
       this.numberOfAgencies = agencies.length;
-      this.agencies = agencies;
-      this.candidates = candidates;
-      const orderCandidates = this.order.candidates;
+      this.disabledAgencyIds = agencies.filter((agency) => agency.hasActiveCandidate)
+      .map((agency) => agency.agencyId);
+      this.agencies = agencies.filter((agency) => !agency.hasActiveCandidate);
+      this.disabledCandidatesIds = candidates.filter((candidate) => candidate.hasActiveCandidate)
+      .map((candidate) => candidate.candidateId);
+      this.candidates = candidates.filter((candidate) => !candidate.hasActiveCandidate);
 
-      this.reorderForm.patchValue({
-        agencies: this.getAgencyIds(this.order.jobDistributions),
-        candidates: orderCandidates ? this.getCandidateIds(orderCandidates) : [],
-      });
-
+      this.setFormData(this.order);
+      this.setInitialDatesValue();
       this.cdr.markForCheck();
-      this.disableOptions();
     });
   }
 
-  @OutsideZone
-  private disableOptions(): void {
-    const statusesToDisable = ['Onboard', 'Cancelled', 'Offboard'];
+  private setFormData(reorder: Order): void {
+    const candidatesInOrder = this.order.candidates;
 
-      setTimeout(() => {
-        const agencyItems: NodeList[] = this.agencySelector.selector['popupObj'].element.querySelectorAll('.e-list-item');
-        const candidatesItems: NodeList[] = this.candidatesSelector.selector['popupObj']
-        .element.querySelectorAll('.e-list-item');
-
-        agencyItems.forEach((element) => {
-          // We can't use Node and NodeList interfaces as syncfusion modified it.
-          const el = element as unknown as SyncOptionType;
-          const optionValue = el.dataset.value;
-          const agency = this.agencies.find((agency) => agency.agencyId === Number(optionValue));
-
-          if (agency && agency.hasActiveCandidate) {
-            (el as unknown as HTMLElement).classList.add('hidden-option');
-          }
-        });
-
-        candidatesItems.forEach((element) => {
-          const el = element as unknown as SyncOptionType;
-          const optionValue = el.dataset.value;
-          const candidate = this.candidates.find((candidate) => candidate.candidateId === Number(optionValue));
-          
-          if (candidate && candidate.hasActiveCandidate) {
-            (el as unknown as HTMLElement).classList.add('hidden-option');
-          }
-        });
-      }, 500);
-  }
-
-  private setFormData(reorder?: Order): void {
-    const { jobStartDate, shiftStartTime, shiftEndTime, hourlyRate, openPositions } = reorder || {};
-      
     this.reorderForm.patchValue({
-      reorderDate: jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '',
-      shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
-      shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
-      billRate: hourlyRate ?? '',
-      openPosition: openPositions ?? '',
-    });
+      agencies: this.getAgencyIds(this.order.jobDistributions),
+      candidates: candidatesInOrder ? this.getCandidateIds(candidatesInOrder) : [],
+      reorderDate: reorder.jobStartDate ? DateTimeHelper.convertDateToUtc(reorder.jobStartDate.toString()) : '',
+      shiftStartTime: reorder.shiftStartTime ? DateTimeHelper.convertDateToUtc(reorder.shiftStartTime.toString()) : '',
+      shiftEndTime: reorder.shiftEndTime ? DateTimeHelper.convertDateToUtc(reorder.shiftEndTime.toString()) : '',
+      billRate: reorder.hourlyRate ?? '',
+      openPosition: reorder.openPositions ?? '',
+    }, { emitEvent: false });
   }
 
   private createForm(): void {
@@ -290,26 +264,42 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private listenAginciesChanges(): void {
     this.reorderForm.get('agencies')?.valueChanges
     .pipe(
-      filter((agenciesIds) => !!agenciesIds),
-      tap((agenciesIds: number[]) => {
-        const candidates = this.reorderForm.get('candidates')?.value;
+      map((agenciesIds: number[]) => {
+        const candidates: number[] = this.reorderForm.get('candidates')?.value;
+
         if (!agenciesIds.length && candidates.length) {
-          this.reorderForm.patchValue({ openPosition: null, candidates: [] });
+          this.reorderForm.patchValue({ candidates: [] });
           this.reorderForm.updateValueAndValidity();
         }
+
+        return [agenciesIds, candidates];
       }),
+      filter((data) => !!data[0].length && !!data[1].length),
       takeUntil(this.destroy$)
-    ).subscribe();
+    ).subscribe(([agenciesIds, candidates]) => {
+      this.checkCandidatesForSelectedAgencies(agenciesIds, candidates);
+    });
+  }
+
+  private checkCandidatesForSelectedAgencies(agencyids: number[], candidatesIds: number[]): void {
+    const selectedCandidates = this.candidates.filter((candidate) => candidatesIds.includes(candidate.candidateId));
+    const canidatesBySelectedAgencies = selectedCandidates.filter((candidate) => agencyids.includes(candidate.agencyId))
+    .map((candidate) => candidate.candidateId);
+
+    if (canidatesBySelectedAgencies.length < candidatesIds.length) {
+      this.reorderForm.patchValue({
+        candidates: canidatesBySelectedAgencies,
+      });
+    }
   }
 
   private listenCandidateChanges(): void {
-    this.reorderForm
-      .get('candidates')
+    this.reorderForm.get('candidates')
       ?.valueChanges.pipe(
         skip(1),
         tap((candidateIds: number[]) => {
           if (!candidateIds.length) {
-            this.reorderForm.patchValue({ openPosition: null, agencies: this.getAgencyIds(this.order.jobDistributions) });
+            this.reorderForm.patchValue({ agencies: this.getAgencyIds(this.order.jobDistributions) });
             this.reorderForm.updateValueAndValidity();
           } else {
             this.reorderForm.patchValue({ openPosition: candidateIds?.length || 1 });
@@ -322,9 +312,16 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
         }),
         takeUntil(this.destroy$)
       )
-      .subscribe((agencies: number[]) => {
-        const uniqueAgencies = uniq(agencies);
-        this.reorderForm?.patchValue({ agencies: uniqueAgencies });
+      .subscribe((agencyIdsToSelect) => {
+        const selectedAgenciesIds = this.reorderForm.get('agencies')?.value as number[];
+        const agenciesToSet = selectedAgenciesIds
+        .concat(agencyIdsToSelect.filter((id) => !selectedAgenciesIds.includes(id)));
+
+        if (agenciesToSet.length >= selectedAgenciesIds.length) {
+          this.reorderForm.patchValue({
+            agencies: agenciesToSet,
+          }, { emitEvent: false });
+        }
       });
   }
 
@@ -357,6 +354,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
+    reorder.candidates = [...reorder.candidates, ...this.disabledCandidatesIds];
+    reorder.agencies = [...reorder.agencies, ...this.disabledAgencyIds];
     const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
     const reOrderId = this.isEditMode ? this.order.id : null;
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;

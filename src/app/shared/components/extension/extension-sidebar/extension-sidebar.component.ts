@@ -65,7 +65,6 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     this.listenDurationChanges();
     this.listenStartEndDatesChanges();
     this.subsToBillRateControlChange();
-    this.observeStartDate();
   }
 
   public hourlyRateToOrderSync(event: { value: string; billRate?: BillRate }): void {
@@ -202,16 +201,5 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         }
         this.extensionForm.get('durationPrimary')?.setValue(Duration.Other);
       });
-  }
-
-  private observeStartDate(): void {
-    this.extensionForm.get('startDate')?.valueChanges
-    .pipe(
-      filter((date) => !!date),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe((start: Date) => {
-      this.maxEndDate = addDays(start, 14) as Date;
-    });
   }
 }

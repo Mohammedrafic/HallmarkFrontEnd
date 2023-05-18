@@ -113,10 +113,10 @@ import { DoNotReturnGridComponent } from './do-not-return/do-not-return-grid/do-
 import { DonotReturnState } from '@admin/store/donotreturn.state';
 import { DonotreturnService } from '@shared/services/donotreturn.service';
 import { DoNotReturnFormService } from './do-not-return/do-not-return.form.service';
-import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { DocumentLibraryState } from '../modules/document-library/store/state/document-library.state';
 import { InputModule } from '@shared/components/form-controls/input/input.module';
 import { PreservedOrderService } from './order-management/services/preserved-order.service';
+import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
 
 
 const gridIcons = {
@@ -213,6 +213,7 @@ const gridIcons = {
     DropDownButtonAllModule,
     TooltipContainerModule,
     InputModule,
+    DatepickerModule,
     MatMenuModule,
     AutoCompleteAllModule,
     NgxMaskModule,

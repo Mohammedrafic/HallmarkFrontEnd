@@ -37,7 +37,7 @@
   >
     <ng-container *ngFor="let type of scheduleTypes.source">
       <div class="input-group radio">
-        <app-tooltip-container [showToolTip]="type.disabled">
+        <app-tooltip-container [message]="type.toolTipMessage" [showToolTip]="type.disabled">
           <ejs-radiobutton
             (change)="changeScheduleType($event)"
             [formControl]="scheduleTypesControl"

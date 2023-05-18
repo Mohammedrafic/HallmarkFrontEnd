@@ -42,6 +42,6 @@ export class PayRateService {
   }
 
   public getMasterWorkCommitments(currentPage: number, pageSize: number): Observable<MasterCommitmentsPage> {
-    return this.http.post<MasterCommitmentsPage>('/api/MasterWorkCommitment/getAll', { currentPage, pageSize });
+    return this.http.post<MasterCommitmentsPage>('/api/WorkCommitment/GetAll', { currentPage, pageSize });
   }
 }

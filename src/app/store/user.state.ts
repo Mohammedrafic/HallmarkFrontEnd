@@ -247,6 +247,7 @@ export class UserState {
               if (menuItem.children) {
                 menuItem.children = menuItem.children.map((child: any) => {
                   return {
+                    id: child.id,
                     title: child.title,
                     route: MENU_CONFIG[businessUnitType][child.id]?.route,
                     icon: '',

@@ -83,13 +83,13 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   }
 
   private isSkillChanged(): boolean {
-    return !!(this.candidateService.employeeId && 
+    return !!(this.candidateService.employeeId &&
       (this.candidateProfileFormService.candidateForm.get('primarySkillId')?.dirty || this.candidateProfileFormService.candidateForm.get('secondarySkills')?.dirty));
   }
 
   private isEmployeeTerminated(): boolean {
     const profileStatusControl = this.candidateProfileFormService.candidateForm.get('profileStatus');
-    return !!(this.candidateService.employeeId && 
+    return !!(this.candidateService.employeeId &&
       (profileStatusControl?.dirty && profileStatusControl?.value === ProfileStatusesEnum.Terminated));
   }
 
@@ -131,8 +131,8 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
 
   private saveCandidate(): Observable<void | CandidateModel> {
     return this.candidateProfileService
-        .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId)
-        .pipe(takeUntil(this.destroy$));
+      .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId)
+      .pipe(takeUntil(this.destroy$));
   }
 
   private hasUnsavedChanges(): boolean {
@@ -158,21 +158,19 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   }
 
   private handleEditingCandidate(): void {
-    this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } })).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      if (this.candidateId) {
-        this.candidateProfileService
-          .getCandidateById(this.candidateId)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe((candidate) => {
-            this.candidateProfileFormService.populateCandidateForm(candidate);
-            this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
-            this.candidateService.setEmployeeHireDate(candidate.hireDate);
-            this.generalNotesService.notes$.next(candidate.generalNotes);
-          });
-  
-        this.photo$ = this.candidateProfileService.getCandidatePhotoById(this.candidateId);
-      }
-    });
+    this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }))
+      .pipe(
+        filter(() => !!this.candidateId),
+        tap(() => { this.photo$ = this.candidateProfileService.getCandidatePhotoById(this.candidateId); }),
+        switchMap(() => this.candidateProfileService.getCandidateById(this.candidateId)),
+        takeUntil(this.destroy$))
+      .subscribe((candidate) => {
+        this.candidateProfileFormService.populateCandidateForm(candidate);
+        this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
+        this.candidateService.setEmployeeHireDate(candidate.hireDate as string);
+        this.candidateService.setTerminationDate(candidate.terminationDate);
+        this.generalNotesService.notes$.next(candidate.generalNotes);
+      });
   }
 
   private initSelectedTab(): void {

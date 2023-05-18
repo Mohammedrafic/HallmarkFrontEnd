@@ -37,7 +37,6 @@ import { getTime } from '@shared/utils/date-time.utils';
 import { ScheduleFormSourceKeys, ScheduleItemType, ScheduleTypesForEditBar } from 'src/app/modules/schedule/constants';
 import { ScheduleType } from 'src/app/modules/schedule/enums';
 import { ShowToast } from 'src/app/store/app.actions';
-import { UserState } from 'src/app/store/user.state';
 import {
   GetScheduleTabItems,
   GetShiftHours,
@@ -83,6 +82,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   @ViewChild('tabs') private tabs: ElementRef;
 
   @Input() isEmployee = false;
+  @Input() scheduleOnlyWithAvailability = false;
   @Input() datePickerLimitations: DatePickerLimitations;
   @Input() userPermission: Permission = {};
   @Input() set scheduledShift(scheduledItem: ScheduledItem | null) {
@@ -782,7 +782,12 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   }
 
   private setScheduleTypes(): void {
-    this.scheduleTypes = this.createScheduleService.getScheduleTypesWithPermissions(this.scheduleTypes, this.userPermission);
+    this.scheduleTypes = this.createScheduleService.getScheduleTypesWithPermissions(
+      this.scheduleTypes,
+      this.userPermission,
+      this.scheduleOnlyWithAvailability,
+      [this.scheduledItem.candidate]
+    );
     this.scheduleItemType = this.createScheduleService.getFirstAllowedScheduleType(this.scheduleTypes);
   }
 

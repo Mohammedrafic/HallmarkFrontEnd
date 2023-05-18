@@ -22,26 +22,27 @@
       </e-column>
       <e-column field="lastName" headerText="last name" width=250>
       </e-column>
-      <e-column field="regionName" headerText="Region blocked" width=250>
+      <e-column field="regionBlocked" headerText="Region blocked" width=250>
       </e-column>
-      <e-column field="locationName" headerText="Location blocked" width=250>
+      <e-column field="locationBlocked" headerText="Location blocked" width=250>
       </e-column>
       <e-column field="email" headerText="email" width=250>
       </e-column>
       <e-column field="ssn" headerText="ssn" width=250>
         <ng-template #template let-data>
-          {{ data.ssn != null ? "XXX-XX-" + data.ssn.toString().substr(data.ssn.toString().length - 4):"" }}
+          {{ data.ssn != null && data.ssn != 0 ? "XXX-XX-" + data.ssn.toString().substr(data.ssn.toString().length - 4):"" }}
         </ng-template>
       </e-column>
-      <e-column field="dnrStatus" headerText="Current Status" width=250>
+      <e-column field="currentStatus" headerText="Current Status" width=250>
       </e-column>
-      <e-column field="dnrDate" headerText="Last Updated Date" width=250>
+      <e-column field="lastUpdatedDate" headerText="Last Updated Date" width=250></e-column>
+      <e-column field="lastBlockedDate" headerText="Last Blocked Date" width=250></e-column>
+      <e-column field="lastUnBlockedDate" headerText="Last Unblocked Date" width=250>
         <ng-template #template let-data>
-          {{ data.dnrDate | date: "MM/dd/yyyy" }}
+          {{ data.lastUnBlockedDate === '01/01/0001' ? '' :  data.lastUnBlockedDate }}
         </ng-template>
       </e-column>
-      <e-column field="dnrComment" headerText="Reason for Blocking" width=250>
-      </e-column>
+      <e-column field="comment" headerText="Comment" width=250></e-column>
 
     </e-columns>
 
@@ -80,6 +81,16 @@
       <ejs-switch id="switcher" (change)="onSwitcher($event);" formControlName="dnrStatus" [checked]="isBlock"></ejs-switch>
       <label for="switcher" class="switch-text">{{isBlock?'Blocked':'Unblocked'}}</label>
     </div>
+
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
+          <div class="inline-radio-container">
+            <ejs-radiobutton formControlName="isExternal" label="Search Candidate" name="isExternal" value='false' [disabled]="!isEdit ? false : true"></ejs-radiobutton>
+            &nbsp;&nbsp;
+            <ejs-radiobutton formControlName="isExternal" label="Block new candidate" name="isExternal"  value='true' [disabled]="!isEdit ? false : true"></ejs-radiobutton>
+          </div>
+      </div>
+    </div>
     
     <div class="input-container bootstrap" [hidden]="allOrganizations.length == 1">
       <label>Organization<span class="required">*</span></label>
@@ -91,7 +102,7 @@
       </div>
     </div>
 
-    <div class="form-elemet">
+    <div class="form-elemet"  [hidden]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true'">
       <div class="group">
         <div class="input-container bootstrap">
           <label>Candidate Name<span class="required">*</span></label>
@@ -103,22 +114,52 @@
         </div>
       </div>
     </div>
-    <div class="input-container">
-      <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="candidateEmail" id="email"  [disable]="true"
-        label="Email"></app-input>
+
+    <div class="form-elemet" [hidden]="this.doNotReturnFormGroup.get('isExternal')?.value == 'false'">
+      <div class="group">
+        <div class="input-container bootstrap">
+          <label>First Name<span class="required">*</span></label>
+          <div class="input-group">
+            <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="firstName" id="fName" 
+             maxlength="50" [disable]="isBlock ? null : true"></app-input>
+          </div>
+        </div>
+        <div class="input-container">
+          <label>Middle Name</label>
+          <div class="input-group">
+            <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="middleName" id="mName"  
+                 maxlength="10" [disable]="isBlock ? null : true"></app-input>
+          </div>
+        </div>
+        <div class="input-container">
+          <label>Last Name<span class="required">*</span></label>
+          <div class="input-group">
+            <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="lastName" id="lName" 
+               maxlength="50" [disable]="isBlock ? null : true"></app-input> <!--  -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-container">      
+      <app-datepicker
+          [formGroupInstance]="doNotReturnFormGroup" [max]="today"  id="dob" controlName="dob" label="Date of Birth" 
+          [enabled]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? true : false : (isEdit && isBlock) ? true : false"></app-datepicker>
     </div>
     <div class="d-flex">
       <div class="input-container bootstrap f-grow-2">
         <label>SSN</label>
         <div class="input-group">
-          <input  appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" [attr.disabled]="true" />
+          <input  appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" 
+              [attr.disabled]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? null : true : (isEdit && isBlock) ? null : true" />
         </div>
       </div>
       <div class="input-container"></div>
     </div>
-
-
-
+    <div class="input-container">
+      <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="candidateEmail" id="email"  [disable]="true"
+                [disable]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? null : true : (isEdit && isBlock) ? null : true" label="Email"></app-input>
+    </div>
     
     <div class="form-elemet">
       <div class="group">
@@ -147,9 +188,9 @@
 
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Reason for blocking <span class="required">*</span></label>
+        <label>Comment</label>
         <div class="input-group">
-          <ejs-textbox class="e-input" type="text" maxlength="3000" appValidateWithMessage name="dnrComment"
+          <ejs-textbox class="e-input" type="text" maxlength="280" appValidateWithMessage name="dnrComment"
           formControlName="dnrComment" [multiline]="true"></ejs-textbox>
         </div>
       </div>
@@ -166,12 +207,70 @@
 <app-filter-dialog [items]="filteredItems" (clearAllFiltersClicked)="onFilterClearAll()"
   (applyFilterClicked)="onFilterApply()">
   <form class="bootstrap" [formGroup]="doNotReturnFilterForm">
-    <div class="input-container bootstrap">
-      <label>Candidate name</label>
+    <div class="input-container bootstrap" [hidden]="true">
+      <label>Organization<span class="required">*</span></label>
       <div class="input-group">
-        <input class="e-input" type="text" appValidateWithMessage placeholder="e.g. Andrew Fuller" maxlength="100"
-          formControlName="candidatename" />
+        <ejs-dropdownlist appValidateWithMessage [enabled]="!isEdit" formControlName="businessUnitId" [fields]="optionFields"
+          [allowFiltering]="true" [dataSource]="allOrganizations$ | async"
+          (select)="onOrganizationDropDownChanged($event)">
+        </ejs-dropdownlist>
       </div>
+    </div>
+   
+    <div class="input-container bootstrap">
+      <ejs-switch id="switcher" (change)="onFilterSwitcher($event);" [checked]="isFilterBlock"></ejs-switch>
+      <label for="switcher" class="switch-text"> {{isFilterBlock ? "Blocked" : "Unblocked"}}</label>
+    </div>
+    <div class="form-elemet">
+      <div class="group">
+        <div class="input-container bootstrap">
+          <label>First Name</label>
+          <div class="input-group">
+            <app-input [formGroupInstance]="doNotReturnFilterForm" maxlength="200" controlName="firstName" id="fName" 
+             maxlength="50"></app-input>
+          </div>
+        </div>
+        <div class="input-container">
+          <label>Middle Name</label>
+          <div class="input-group">
+            <app-input [formGroupInstance]="doNotReturnFilterForm" maxlength="200" controlName="middleName" id="mName"  
+                 maxlength="10"></app-input>
+          </div>
+        </div>
+        <div class="input-container">
+          <label>Last Name</label>
+          <div class="input-group">
+            <app-input [formGroupInstance]="doNotReturnFilterForm" maxlength="200" controlName="lastName" id="lName" 
+               maxlength="50"></app-input> <!-- [disable]="(isEdit) ? null : true" -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="group">
+        <div class="input-container calendar">
+          <label for="regionIds">Region blocked</label>
+          <div class="input-group bootstrap">
+            <ejs-multiselect #regionIdsControl id="regionIds" mode="CheckBox" formControlName="regionBlocked"
+              placeholder="All" [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true"
+              appValidateWithMessage [dataSource]="regions$ | async" [selectAllText]='allOption'
+              [showSelectAll]="true" tabindex="2">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container">
+          <label for="locationIds">Location blocked</label>
+          <div class="input-group bootstrap">
+            <ejs-multiselect id="locationIds" mode="CheckBox" formControlName="locationBlocked" placeholder="All"
+              [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true" appValidateWithMessage
+              [dataSource]="locations$ | async" [selectAllText]='allOption' [showSelectAll]="true" tabindex="3">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="input-container">
+      <app-input [formGroupInstance]="doNotReturnFilterForm" maxlength="200" controlName="email" id="email" label="Email"></app-input>
     </div>
     <div class="d-flex">
       <div class="input-container bootstrap f-grow-2">

@@ -217,7 +217,7 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
         this.onFilterRegionChangedHandler();
         this.onFilterLocationChangedHandler();
         this.onFilterSkillCategoryChangedHandler();
-        this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.enable() : this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.enable() : this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.disable();
       
       });
   

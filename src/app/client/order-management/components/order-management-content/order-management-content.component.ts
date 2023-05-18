@@ -548,7 +548,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters = pagerState.filters;
     }
 
-    this.preservedOrder$.pipe(skip(1), debounceTime(1000), takeUntil(this.unsubscribe$)).subscribe(() => {
+    this.preservedOrder$.pipe(debounceTime(1000), takeUntil(this.unsubscribe$)).subscribe(() => {
       this.preservedOrderService.applyGridState(this.gridWithChildRow);
     });
    
@@ -1294,8 +1294,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.clearFilters();
         this.store.dispatch(new ClearOrders());
         this.pageSubject.next(1);
-      } else {
-        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       }
 
       this.dispatchPreservedFilters();
