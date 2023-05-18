@@ -362,7 +362,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private selectedCandidateMeta: { order: number; positionId: number } | null;
   private selectedIndex: number | null;
-  public ordersPage: OrderManagementPage;
+  private ordersPage: OrderManagementPage;
 
   public columnsToExport: ExportColumn[];
 
@@ -540,19 +540,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.OnUpdateRegrateSucceededHandler();
     this.subscribeOnUserSearch();
     this.watchForUpdateCandidate();
-
-    const pagerState = this.preservedOrderService.getPagerSate();
-    if (pagerState) {
-      this.currentPage = pagerState.page;
-      this.pageSize = pagerState.pageSize;
-      this.filters = pagerState.filters;
-      this.activeTab = this.preservedOrderService.getActiveTab();
-    }
-
-    this.preservedOrder$.pipe(skip(1), debounceTime(1000), takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.preservedOrderService.applyGridState(this.gridWithChildRow);
-      this.patchFilterForm();
-    });
+    this.preservedOrderHandler();
    
     let isIrpEnabled = JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
     if (isIrpEnabled === true ) {
@@ -583,6 +571,21 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if(Object.values(AlertIdEnum).includes(this.alertTitle)){
       this.isCondidateTab=true;
     }
+  }
+
+  private preservedOrderHandler(): void {
+    const pagerState = this.preservedOrderService.getPagerSate();
+    if (pagerState) {
+      this.currentPage = pagerState.page;
+      this.pageSize = pagerState.pageSize;
+      this.filters = pagerState.filters;
+      this.activeTab = this.preservedOrderService.getActiveTab();
+    }
+
+    this.preservedOrder$.pipe(skip(1), debounceTime(1000), takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.preservedOrderService.applyGridState(this.gridWithChildRow);
+      this.patchFilterForm();
+    });
   }
 
   private subscribeOnChanges(): void {
