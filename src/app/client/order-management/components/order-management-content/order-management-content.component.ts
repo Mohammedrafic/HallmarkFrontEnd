@@ -310,7 +310,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private search$ = new Subject();
-  private preservedOrder$ = new Subject();
   public selectedDataRow: OrderManagement | IRPOrderManagement;
 
   public hasCreateEditOrderPermission: boolean;
@@ -582,9 +581,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.activeTab = this.preservedOrderService.getActiveTab();
     }
 
-    this.preservedOrder$.pipe(skip(1), debounceTime(1000), takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.preservedOrderService.applyGridState(this.gridWithChildRow);
-      this.patchFilterForm();
+    this.preservedOrderService.getPreserveOrder()
+      .pipe(skip(1), filter(() => !!this.gridWithChildRow.dataSource), debounceTime(1000), takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        this.preservedOrderService.applyGridState(this.gridWithChildRow);
+        this.patchFilterForm();
     });
   }
 
@@ -1007,7 +1008,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.gridWithChildRow.selectRow(this.selectedIndex);
     }
 
-    this.preservedOrder$.next(true);
+    this.preservedOrderService.setPreservedOrder();
     
     if (this.selectedCandidate) {
       if (this.selectedCandidateMeta) {
@@ -1540,7 +1541,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     ).subscribe((id) => {
       this.organizationId = id;
       this.getSettings();
-      if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
+      if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast && !this.preservedOrderService.isOrderPreserved()) {
         this.clearFilters();
       }
 
@@ -1719,7 +1720,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private onSelectedOrderDataLoadHandler(): void {
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
       this.selectedOrder = order;
-      this.selectedOrder?.commentContainerId && this.getOrderComments();
+      if (this.selectedOrder?.commentContainerId) {
+        this.getOrderComments();
+      }
       this.cd$.next(true);
     });
   }
@@ -1751,7 +1754,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         switchMap(() => this.preservedFiltersByPageName$),
         filter(({ dispatch }) => dispatch),
         tap(({ isNotPreserved, state }) => {
-          this.prepareFiltersToDispatch(state);
+          if (!this.preservedOrderService.isOrderPreserved()) {
+            this.prepareFiltersToDispatch(state);
+          }
 
           if (!isNotPreserved) {
             this.getOrders(true);
