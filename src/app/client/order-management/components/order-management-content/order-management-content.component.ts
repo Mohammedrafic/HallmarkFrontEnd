@@ -548,7 +548,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters = pagerState.filters;
     }
 
-    this.preservedOrder$.pipe(debounceTime(1000), takeUntil(this.unsubscribe$)).subscribe(() => {
+    this.preservedOrder$.pipe(skip(1), debounceTime(1000), takeUntil(this.unsubscribe$)).subscribe(() => {
       this.preservedOrderService.applyGridState(this.gridWithChildRow);
     });
    
@@ -1190,10 +1190,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public navigateToOrderTemplateForm(id: number): void {
-    this.store.dispatch(new SelectNavigationTab(this.activeTab));
-    const pagerState = { page: this.currentPage, pageSize: this.pageSize, filters: this.filters };
-    this.preservedOrderService.preserveOrder(id, pagerState);
-    this.store.dispatch([new SelectNavigationTab(this.activeTab), new ClearOrders(), new ClearOrderFilterDataSources()]);
+    this.preserveOrder(id);
     this.router.navigate(['./add/fromTemplate'], { relativeTo: this.route });
   }
 
@@ -1249,7 +1246,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
-    
 
     // Don’t need reload orders if we go back from the candidate page
     if (!this.previousSelectedOrderId) {
@@ -1477,9 +1473,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.selectedRowIndex = index < 0 ? null : index;
       this.openReOrderDialog(data.id, data.organizationId);
     } else {
-      const pagerState = { page: this.currentPage, pageSize: this.pageSize, filters: this.filters };
-      this.preservedOrderService.preserveOrder(data.id, pagerState);
-      this.store.dispatch([new SelectNavigationTab(this.activeTab), new ClearOrders(), new ClearOrderFilterDataSources()]);
+      this.preserveOrder(data.id);
       this.router.navigate(['./edit', data.id], { relativeTo: this.route });
     }
   }
@@ -1490,6 +1484,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     } else {
       this.importDialogEvent.next(true);
     }
+  }
+
+  public preserveOrder(id: number): void {
+    const pagerState = { page: this.currentPage, pageSize: this.pageSize, filters: this.filters };
+    this.preservedOrderService.preserveOrder(id, pagerState);
+    this.store.dispatch([new SelectNavigationTab(this.activeTab), new ClearOrders(), new ClearOrderFilterDataSources()]);
   }
 
   private openReOrderDialog(orderId: number, organizationId: number): void {
@@ -1713,7 +1713,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private onSelectedOrderDataLoadHandler(): void {
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
       this.selectedOrder = order;
-      this.selectedOrder && this.getOrderComments();
+      this.selectedOrder?.commentContainerId && this.getOrderComments();
       this.cd$.next(true);
     });
   }
