@@ -130,8 +130,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
 
-  private itemsPerPage = 30;
-
   private filteredByEmployee = false;
 
   private scheduleToBook: ScheduleBook | null;
@@ -405,12 +403,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         takeUntil(this.componentDestroy()),
       )
       .subscribe(() => {
-        const { items, totalCount } = this.scheduleData || {};
-
-        if ((items?.length || 0) < (totalCount || 0)) {
-          this.loadMoreData.emit(Math.ceil((items?.length || 1) / this.itemsPerPage));
+        if (this.scheduleData) {
+          const { pageNumber, totalPages } = this.scheduleData;
+          this.loadMoreItemPerPage(pageNumber,totalPages);
         }
       });
+  }
+
+  private loadMoreItemPerPage(pageNumber: number, totalPages: number): void {
+    if (this.scheduleData && (totalPages > pageNumber)) {
+      this.loadMoreData.emit(pageNumber + 1);
+    }
   }
 
   private watchForCandidateSearch(): void {

@@ -1177,7 +1177,7 @@
   [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"
   [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
   (selectReOrder)="selectReOrder($event)"
-  (saveReOrderEmitter)="updateGrid()"
+  (saveReOrderEmitter)="updateGrid(true)"
   (closeReOrderEmitter)="onAddReorderClose()"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
   (updateOrders)="getOrders()"

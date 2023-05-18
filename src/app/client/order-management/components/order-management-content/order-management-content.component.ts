@@ -1114,6 +1114,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
         this.openChildDialog.next(false);
         this.orderPositionSelected$.next({ state: false });
+
         if (!isArray(data)) {
           this.openDetails.next(true);
           this.selectedRowRef = event;
@@ -1806,10 +1807,19 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     return field.orderId;
   }
 
-  public updateGrid(): void {
+  public updateGrid(reorderDialog?: boolean): void {
     this.getOrders(true);
-    this.actions$.pipe(ofActionSuccessful(GetOrders), take(1)).subscribe(() => {
-      const [index] = this.selectedRowIndex === null ? this.gridWithChildRow.getSelectedRowIndexes() : [this.selectedRowIndex];
+
+    if (reorderDialog) {
+      this.dispatchAgencyOrderCandidatesList(this.selectedReOrder.id, this.selectedReOrder.organizationId,
+        this.selectedReOrder.irpOrderMetadata);
+        this.store.dispatch(new GetOrderById(this.selectedReOrder.id, this.selectedReOrder.organizationId));
+    }
+
+    this.actions$.pipe(ofActionSuccessful(GetOrders), take(1))
+    .subscribe(() => {
+      const [index] = this.selectedRowIndex === null
+      ? this.gridWithChildRow.getSelectedRowIndexes() : [this.selectedRowIndex];
       this.selectedIndex = index;
       this.cd$.next(true);
     });
