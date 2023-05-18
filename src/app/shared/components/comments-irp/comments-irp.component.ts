@@ -9,7 +9,7 @@ import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { UserState } from 'src/app/store/user.state';
 import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments-irp.actions';
 import { CommentsState } from './store/comments-irp.state';
-import { faUnlock, faLock, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faUnlock, faLock, faUserFriends, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 enum CommentsFilter {
   All = 'All',
@@ -28,7 +28,9 @@ export class CommentsIrpComponent {
   
   faUnlock = faUnlock as IconProp;
   faLock = faLock as IconProp;
-  faUsers = faUsers as IconProp;
+  faUserFriends = faUserFriends as IconProp;
+  faEye = faEye as IconProp;
+  faEyeSlash = faEyeSlash as IconProp;
   @Input() useBackground: boolean = true;
   @Input() disabled: boolean = false;
   @Input() orderId: number;

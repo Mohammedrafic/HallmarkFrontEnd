@@ -10,10 +10,10 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { Comment } from '@shared/models/comment.model';
-import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of, map, Observable } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import {
@@ -43,7 +43,10 @@ import {
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { DurationService } from '@shared/services/duration.service';
 import { OrderType } from '@shared/enums/order-type';
-import { OrderCandidateJob } from '@shared/models/order-management.model';
+import { Order, OrderCandidateJob } from '@shared/models/order-management.model';
+import { adaptOrder } from '@client/order-management/components/irp-tabs/order-details/helpers';
+import { UserState } from 'src/app/store/user.state';
+import { CommentsService } from '@shared/services/comments.service';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -64,7 +67,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   @Output() handleCloseModal: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() handleSuccessSaveCandidate: EventEmitter<void> = new EventEmitter<void>();
-
+  @Input() public commentContainerId:number;
   public readonly optionFields: FieldSettingsModel = OptionField;
   public readonly title: string = CandidateTitle;
   public readonly FieldTypes = FieldType;
@@ -73,7 +76,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public dialogConfig: ReadonlyArray<CandidateField>;
   public isOnboarded = false;
   public comments: Comment[] = [];
-  public commentContainerId = 0;
   @Input() public externalCommentConfiguration ?: boolean | null;
 
   private candidateModelState: EditCandidateDialogState;
@@ -86,6 +88,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     private store: Store,
     private orderManagementService: OrderManagementService,
     private durationService: DurationService,
+    private commentsService: CommentsService,
   ) {
     super();
     this.dialogConfig = CandidateDialogConfig();
@@ -95,6 +98,15 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   ngOnInit(): void {
     this.observeCloseControl();
     this.watchForActualDateValues();
+    this.getComments();
+  }
+
+  private getComments(): void {
+    this.commentsService.getComments(this.commentContainerId, null)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+    });
   }
 
   public closeModal(): void {
