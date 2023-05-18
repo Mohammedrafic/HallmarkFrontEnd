@@ -1449,6 +1449,7 @@
   (updateOrders)="getOrders()"
   (reOpenOrderSuccess)="updateOrderDetails($event)"
   [orderComments]="orderComments"
+  (editOrderPressed)="preserveOrder($event)"
 ></app-order-details-dialog>
 
 <app-update-reg-rate

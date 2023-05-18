@@ -285,6 +285,11 @@ export class GetOrderFilterDataSources {
   constructor(public isIRP?: boolean) {}
 }
 
+export class ClearOrderFilterDataSources {
+  static readonly type = '[order management] Clear Order Filter Data Sources';
+  constructor() {}
+}
+
 export class GetHistoricalData {
   static readonly type = '[order management] Get Historical Data';
   constructor(public organizationId: number, public candidateJobId: number) {}
