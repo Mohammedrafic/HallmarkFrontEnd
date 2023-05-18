@@ -53,17 +53,20 @@
           <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <button
-        *ngIf="(currentUserPermissions$ | async) as userPermission"
-        ejs-button
-        appHideBeforeSyncfusionLoad
-        id="addIRPCandidate"
-        cssClass="e-primary"
-        [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
-        (click)="addIRPCandidate()"
-      >
-        Add Employee
-      </button>
+      <ng-container *ngIf="!isMobile && !isSmallDesktop">
+        <button
+          *ngIf="(currentUserPermissions$ | async) as userPermission"
+          ejs-button
+          appHideBeforeSyncfusionLoad
+          id="addIRPCandidate"
+          cssClass="e-primary"
+          [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
+          (click)="addIRPCandidate()"
+        >
+          Add Employee
+        </button>
+      </ng-container>
+
     </div>
   </ng-container>
 </app-page-toolbar>
@@ -87,5 +90,6 @@
     [credStartDate] = "credStartDate"
     [credEndDate] = "credEndDate"
     [credType] = "credType"
+    [isMobileScreen] = "isMobile || isSmallDesktop"
   ></app-candidate-list>
 </section>

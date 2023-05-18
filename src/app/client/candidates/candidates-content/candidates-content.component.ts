@@ -13,6 +13,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { UserPermissions } from '@core/enums';
 import { Permission } from '@core/interface';
 import { AppState } from 'src/app/store/app.state';
+import { BreakpointObserverService } from '@core/services';
 
 @Component({
   selector: 'app-candidates-content',
@@ -32,6 +33,9 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   public credEndDate : any;
   public credStartDate :  any;
   public credType : any;
+  public isMobile = false;
+  public isSmallDesktop = false;
+  
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
 
@@ -45,6 +49,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
+    private breakpointService: BreakpointObserverService,
   ) {
     super();
     store.dispatch(new SetHeaderState({ title: 'Employee List', iconName: 'users' }));
@@ -55,6 +60,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   }
 
   ngOnInit(): void {
+    this.getDeviceScreen();
     this.startOrgIdWatching();
   }
 
@@ -117,5 +123,15 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
 
   public addIRPCandidate(): void {
     this.navigateToCandidateForm();
+  }
+
+  private getDeviceScreen(): void {
+    this.breakpointService
+      .getBreakpointMediaRanges()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((screen) => {
+        this.isMobile = screen.isMobile;
+        this.isSmallDesktop = screen.isDesktopSmall;
+      });
   }
 }
