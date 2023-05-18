@@ -332,6 +332,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.switchedValueForm.get('value')?.removeValidators(Validators.maxLength(2));
       this.maxFieldLength = 100;
     }
+    if (this.isParentEdit && (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability)) {
+      this.RegionLocationSettingsMultiFormGroup.disable();
+      this.allRegionsSelected = true;
+      this.allLocationsSelected = true;
+    }
   }
 
   cancelSettingChanges(): void {
@@ -1340,8 +1345,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       if (dynamicValue.isSwitchedValue) {
         this.switchedValueForm.setValue({
-          value: this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? 4 : dynamicValue.value,
-          isEnabled: this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? true : dynamicValue.isEnabled,
+          value: dynamicValue.value,
+          isEnabled: dynamicValue.isEnabled,
         });
         this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
       }
