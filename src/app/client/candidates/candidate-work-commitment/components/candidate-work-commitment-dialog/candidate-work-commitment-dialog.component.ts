@@ -133,7 +133,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       startDate: [null, Validators.required],
       endDate: [null],
       jobCode: [null, Validators.required],
-      payRate: [null],
+      payRate: [null, Validators.required],
       minWorkExperience: [null],
       availRequirement: [null],
       schedulePeriod: [null],
