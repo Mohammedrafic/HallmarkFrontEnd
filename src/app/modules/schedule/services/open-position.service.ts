@@ -175,7 +175,7 @@ export class OpenPositionService {
         },
       ],
       shiftId: event.item.data.shiftId,
-      startTime: getTime(DateTimeHelper.convertDateToUtc(event.item.data.shiftEndTime)),
+      startTime: getTime(DateTimeHelper.convertDateToUtc(event.item.data.shiftStartTime)),
       endTime: getTime(DateTimeHelper.convertDateToUtc(event.item.data.shiftEndTime)),
     };
   }
