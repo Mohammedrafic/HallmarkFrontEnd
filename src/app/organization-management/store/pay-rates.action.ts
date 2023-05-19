@@ -39,5 +39,9 @@ export class GetSkillsbyDepartment {
 
 export class GetWorkCommitmentByPage {
   static readonly type = '[payrates] Get Work Commitment by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(  public businessUnitId: number,
+    public regions: string,
+    public locations: string,
+    public skills: string,
+    ) { }
 }
