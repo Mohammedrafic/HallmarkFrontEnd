@@ -61,14 +61,14 @@
         <e-column field="skillName" headerText="SKILL" width="170">
           <ng-template #template let-data>
             <ejs-tooltip id="tooltip" [content]="data.skillName" position="TopCenter">
-              <span>{{ data.skillName }}</span>
+              <span class="f-14">{{ data.skillName }}</span>
             </ejs-tooltip>
           </ng-template>
         </e-column>
         <e-column field="workCommitName" headerText="Work Commitment" width="170">
           <ng-template #template let-data>
             <ejs-tooltip id="tooltip" [content]="data.workCommitName" position="TopCenter">
-              <span>{{ data.workCommitName }}</span>
+              <span class="f-14">{{ data.workCommitName }}</span>
             </ejs-tooltip>
           </ng-template>
         </e-column>
@@ -282,7 +282,7 @@
                 selectAllText="Select All"
                 mode="CheckBox"
                 [dataSource]="workcommitments"
-                [fields]="workcommitfields"
+                [fields]="fields"
                 [showSelectAll]="true"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"
