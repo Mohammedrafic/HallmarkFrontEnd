@@ -75,3 +75,8 @@ export interface ShiftTab {
   subTitle: string;
   id: number;
 }
+
+export interface ChangeValueEvent {
+  isInteracted: boolean,
+  value: Date | number,
+}

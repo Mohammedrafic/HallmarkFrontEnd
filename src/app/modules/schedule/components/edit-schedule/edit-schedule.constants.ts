@@ -15,7 +15,7 @@ export enum EditScheduleFormSourceKeys {
   Skills = 'skill',
 }
 
-const scheduledAvailabilityFormFields = (createMode: boolean, hasPermissions: boolean): EditScheduleFormFieldConfig[] => {
+const newAvailabilityFormFields = (createMode: boolean, hasPermissions: boolean): EditScheduleFormFieldConfig[] => {
   return [
     {
       field: 'date',
@@ -63,9 +63,51 @@ const scheduledAvailabilityFormFields = (createMode: boolean, hasPermissions: bo
   ];
 };
 
+const scheduledAvailabilityFormFields = (hasPermissions: boolean): EditScheduleFormFieldConfig[] => {
+  return [
+    ...newAvailabilityFormFields(false, hasPermissions),
+    {
+      field: 'regionId',
+      title: 'Region',
+      type: FieldType.Dropdown,
+      gridAreaName: 'region',
+      required: false,
+      readonly: !hasPermissions,
+      sourceKey: EditScheduleFormSourceKeys.Regions,
+    },
+    {
+      field: 'locationId',
+      title: 'Location',
+      type: FieldType.Dropdown,
+      gridAreaName: 'location',
+      required: false,
+      readonly: !hasPermissions,
+      sourceKey: EditScheduleFormSourceKeys.Locations,
+    },
+    {
+      field: 'departmentId',
+      title: 'Department',
+      type: FieldType.Dropdown,
+      gridAreaName: 'department',
+      required: false,
+      readonly: !hasPermissions,
+      sourceKey: EditScheduleFormSourceKeys.Departments,
+    },
+    {
+      field: 'skillId',
+      title: 'Skill',
+      type: FieldType.Dropdown,
+      gridAreaName: 'skill',
+      readonly: !hasPermissions,
+      required: false,
+      sourceKey: EditScheduleFormSourceKeys.Skills,
+    },
+  ];
+};
+
 const scheduledUnavailabilityFormFields = (createMode: boolean, hasPermissions: boolean): EditScheduleFormFieldConfig[] => {
   return [
-    ...scheduledAvailabilityFormFields(createMode, hasPermissions),
+    ...newAvailabilityFormFields(createMode, hasPermissions),
     {
       field: 'unavailabilityReasonId',
       title: 'Reason',
@@ -80,7 +122,7 @@ const scheduledUnavailabilityFormFields = (createMode: boolean, hasPermissions: 
 
 const scheduledShiftFormFields = (hasPermissions: boolean): EditScheduleFormFieldConfig[] => {
   return [
-    ...scheduledAvailabilityFormFields(false, hasPermissions),
+    ...newAvailabilityFormFields(false, hasPermissions),
     {
       field: 'orientated',
       title: 'ORI',
@@ -176,7 +218,7 @@ const scheduledShiftFormFields = (hasPermissions: boolean): EditScheduleFormFiel
 
 const newShiftFormFields = (): EditScheduleFormFieldConfig[] => {
   return [
-    ...scheduledAvailabilityFormFields(true, true),
+    ...newAvailabilityFormFields(true, true),
     {
       field: 'orientated',
       title: 'ORI',
@@ -242,10 +284,17 @@ export const NewShiftFormConfig = (): EditScheduleFormConfig => {
   };
 };
 
-export const ScheduledAvailabilityFormConfig = (createMode: boolean, hasPermissions: boolean): EditScheduleFormConfig => {
+export const NewAvailabilityFormConfig = (createMode: boolean, hasPermissions: boolean): EditScheduleFormConfig => {
+  return {
+    formClass: 'new-availability-form',
+    formFields: newAvailabilityFormFields(createMode, hasPermissions),
+  };
+};
+
+export const ScheduledAvailabilityFormConfig = (hasPermissions: boolean): EditScheduleFormConfig => {
   return {
     formClass: 'scheduled-availability-form',
-    formFields: scheduledAvailabilityFormFields(createMode, hasPermissions),
+    formFields: scheduledAvailabilityFormFields(hasPermissions),
   };
 };
 
@@ -277,4 +326,10 @@ export const EditSchedulePermissionsMap = {
   [ScheduleType.Availability]: UserPermissions.CanAddAvailability,
   [ScheduleType.Unavailability]: UserPermissions.CanAddUnavailability,
   [ScheduleType.OpenPositions]: UserPermissions.CanAddShift,
+};
+
+export const OpenPositionsConfig = {
+  canFetchOpenPositions: false,
+  showOpenPositionsPanel: false,
+  totalOpenPositions: 0,
 };

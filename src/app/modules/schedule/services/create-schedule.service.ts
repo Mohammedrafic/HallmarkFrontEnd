@@ -399,25 +399,18 @@ export class CreateScheduleService {
     });
   }
 
-  createOpenPositionsParams(dates: string[]): OpenPositionParams {
+  createOpenPositionsParams(dates: string[], eventDepartmentId?: number, eventSkillId?: number): OpenPositionParams {
     const scheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
+    const departmentId = eventDepartmentId ?? (scheduleFiltersData.filters.departmentsIds as number[])[0];
+    const skillId = eventSkillId ?? (scheduleFiltersData.filters.skillIds as number[])[0];
 
     if (dates.length) {
-      return  {
-        departmentId: (scheduleFiltersData.filters.departmentsIds as number[])[0],
-        skillId: (scheduleFiltersData.filters.skillIds as number[])[0],
-        selectedDates: dates,
-      };
+      return  { departmentId, skillId, selectedDates: dates };
     }
 
     const [startDate, endDate] = this.weekService.getRange();
 
-    return {
-      departmentId: (scheduleFiltersData.filters.departmentsIds as number[])[0],
-      skillId: (scheduleFiltersData.filters.skillIds as number[])[0],
-      startDate,
-      endDate,
-    };
+    return { departmentId, skillId, startDate, endDate };
   }
   private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]): void {
     const isCandidatesOriented = candidates.map((candidate: ScheduleCandidate) => {

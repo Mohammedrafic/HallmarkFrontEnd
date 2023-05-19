@@ -68,7 +68,7 @@ export class OpenPositionService {
     }
   }
 
-  public setOpenPosition(key: string, value: OpenPositionsList[] | string | null): void {
+  public setOpenPosition(key: 'shiftTime' | 'initialPositions', value: OpenPositionsList[] | string | null): void {
     this.openPositionsState.set({
       ...this.openPositionsState.get(),
       [key]: value,

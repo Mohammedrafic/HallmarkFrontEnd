@@ -8,6 +8,7 @@ export const InitialPositionState: OpenPositionState = {
 export const InitialDragEvent: PositionDragEvent = {
   action: false,
   date: null,
+  candidateId: null,
 };
 
 export const MissingMatchDate = 'The Order date does not match to the selected date';
