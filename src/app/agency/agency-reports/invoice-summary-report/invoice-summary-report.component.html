@@ -96,7 +96,7 @@
                    type="text"
                    appValidateWithMessage
                    maxlength="50"
-                   formControlName="invoiceId" />
+                   formControlName="invoiceID" />
           </div>
         </div>
       </div>
@@ -115,16 +115,15 @@
     </div>
     <div class="form-element">
       <div class="group">
-        <div class="input-container bootstrap">
+        <div class="input-container calendar">
           <label>Invoice Start Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            appValidateWithMessage formControlName="startDate"
-                            [max]="agencyInvoicesummaryReportForm.controls['endDate'].value">
+                            appValidateWithMessage formControlName="startDate">
             </ejs-datepicker>
           </div>
         </div>
-        <div class="input-container bootstrap">
+        <div class="input-container calendar">
           <label>Invoice End Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
