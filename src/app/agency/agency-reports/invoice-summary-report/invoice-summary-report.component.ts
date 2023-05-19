@@ -44,7 +44,7 @@ import { InvoiceStatus, invoiceStatusListWithReject } from '../../../admin/analy
   styleUrls: ['./invoice-summary-report.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InvoiceSummaryReportComponent implements OnInit {
+export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
 
   public invoiceStatusListwithreject: InvoiceStatus[] = [];
 
@@ -360,8 +360,6 @@ export class InvoiceSummaryReportComponent implements OnInit {
   }
 
   public SearchReport(): void {
-
-    debugger;
     this.filteredItems = [];
 
     let {  businessIds, candidateName, invoiceStatus, departmentIds,   locationIds, 
