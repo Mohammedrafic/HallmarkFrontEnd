@@ -245,26 +245,32 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     }
   }
 
+  //TODO: refactor this method, avoid cyclomatic complexity
   selectDateSlot(date: string, candidate: ScheduleInt.ScheduleCandidate, schedule?: ScheduleInt.ScheduleDateItem): void {
     const candidateSelectedSlot = this.selectedCandidatesSlot.get(candidate.id);
-
-    if(schedule) {
-      candidate.days = this.scheduleGridService.createDaysForSelectedSlots(candidate.days, schedule.daySchedules);
-    }
 
     if (candidateSelectedSlot) {
       if (candidateSelectedSlot.dates.has(date)) {
         candidateSelectedSlot.dates.delete(date);
-        candidateSelectedSlot.candidate.days = candidate.days;
+        candidateSelectedSlot.candidate.days =
+          this.scheduleGridService.removeCandidateSlotDay(candidateSelectedSlot.candidate.days, date);
 
         if (!candidateSelectedSlot.dates.size) {
           this.selectedCandidatesSlot.delete(candidate.id);
         }
       } else {
         candidateSelectedSlot.dates.add(date);
+
+        if(schedule) {
+          candidateSelectedSlot.candidate.days =
+            this.scheduleGridService.createDaysForSelectedSlots(candidate.days, schedule.daySchedules);
+        }
       }
     } else {
-      this.selectedCandidatesSlot.set(candidate.id, { candidate, dates: new Set<string>().add(date) });
+      const selectedCandidateSlots =
+        this.scheduleGridService.createSelectedCandidateSlotsWithDays(candidate, date, schedule);
+
+      this.selectedCandidatesSlot.set(candidate.id, selectedCandidateSlots);
     }
   }
 

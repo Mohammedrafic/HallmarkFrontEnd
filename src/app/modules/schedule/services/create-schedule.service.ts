@@ -39,7 +39,7 @@ import {
   addAvailabilityToStart,
   ORIENTED_SHIFT_CHANGE_CONFIRM_TEXT,
   REQUIRED_PERMISSIONS,
-  WARNING_TITLE
+  WARNING_TITLE,
 } from '@shared/constants/messages';
 
 @Injectable()
