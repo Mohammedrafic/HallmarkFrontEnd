@@ -17,6 +17,7 @@ import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/co
 import { FormGroup } from '@angular/forms';
 import { SpecialProjectMappingState } from '../../../store/special-project-mapping.state';
 import { DeletSpecialProjectMapping, GetSpecialProjectMappings } from '../../../store/special-project-mapping.actions';
+import { SpecilaProjectCategoryTableColumns } from '@organization-management/specialproject/enums/specialproject.enum';
 
 @Component({
   selector: 'app-project-mapping',
@@ -25,6 +26,7 @@ import { DeletSpecialProjectMapping, GetSpecialProjectMappings } from '../../../
 })
 export class ProjectMappingComponent extends AbstractGridConfigurationComponent implements OnInit {
   @Input() form: FormGroup;
+  @Input() showSelectSystem:boolean;
   @Output() onEdit = new EventEmitter<SpecialProjectMapping>();
   @Select(SpecialProjectMappingState.specialProjectMappingPage)
   specialProjectMappingPage$: Observable<SpecialProjectMappingPage>;
@@ -48,6 +50,15 @@ export class ProjectMappingComponent extends AbstractGridConfigurationComponent 
   public readonly columnDefinitions: ColumnDefinitionModel[] = SpecialProjectMappingColumnsDefinition(this.actionCellrenderParams);
 
   ngOnInit(): void {
+    this.columnDefinitions.forEach(element => {
+      if(element.field==SpecilaProjectCategoryTableColumns.System){
+        if(this.showSelectSystem){
+          element.hide=false
+        }else{
+          element.hide=true
+        }
+      }
+        });
     this.getSpecialProjectMappings();
   }
 

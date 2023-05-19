@@ -30,6 +30,8 @@ export class SaveSpecialProjectMappingDto {
   skillIds: number[];
   forceUpsert?: boolean;
   prePopulateInOrders: boolean;
+  includeInIRP:boolean;
+  includeInVMS:boolean;
 }
 
 export class ProjectNames {
