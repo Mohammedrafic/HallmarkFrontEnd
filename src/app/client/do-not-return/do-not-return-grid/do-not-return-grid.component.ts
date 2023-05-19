@@ -275,6 +275,14 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
             this.doNotReturnFormGroup.get('ssn')?.setValue(null); 
           }
         }        
+      }else if(!this.isEdit){
+        this.doNotReturnFormGroup.get('candidateEmail')?.setValue(null);
+        this.doNotReturnFormGroup.get('dob')?.setValue(null);
+        this.doNotReturnFormGroup.get('firstName')?.setValue(null);
+        this.doNotReturnFormGroup.get('lastName')?.setValue(null);
+        this.doNotReturnFormGroup.get('middleName')?.setValue(null);
+        this.maskSSNPattern = "000-00-0000";
+        this.doNotReturnFormGroup.get('ssn')?.setValue(null); 
       }
     });
 
