@@ -157,8 +157,8 @@
   [currentPage]="currentPage"
   [pageSize]="pageSize"
   [totalRecordsCount]="(candidates$ | async)?.totalCount ?? 0"
-  (navigateToPageEmitter)="gridPageChanged($event)"
-  (pageSizeChangeEmitter)="gridPerPageChanged($event)"
+  (navigateToPageEmitter)="changePageNumber($event)"
+  (pageSizeChangeEmitter)="changePageSize($event)"
 ></app-grid-pagination>
 
 <app-filter-dialog [items]="filteredItems" [count]="(candidates$ | async)?.totalCount"

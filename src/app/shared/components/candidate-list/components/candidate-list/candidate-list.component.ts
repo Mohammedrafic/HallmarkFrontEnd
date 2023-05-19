@@ -318,12 +318,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.checkScroll();
   }
 
-  public gridPerPageChanged(event: number): void {
+  public changePageSize(event: number): void {
     this.pageSize = event;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
   }
 
-  public gridPageChanged(page: number): void {
+  public changePageNumber(page: number): void {
     this.pageSubject.next(page);
   }
 
