@@ -35,6 +35,9 @@ export type FilterColumnsModel = {
   endDate: FilterColumn;
   skillsIds: FilterColumn;
   regionsIds: FilterColumn;
+  applicantStatuses : FilterColumn;
+  locationIds:FilterColumn;
+  departmentIds:FilterColumn;
 };
 
 export type FiltersModal = {
@@ -44,6 +47,9 @@ export type FiltersModal = {
   endDate?: string;
   orderTypes?: Array<number>;
   organizationIds?: number[];
+  locationIds?: Array<number>;
+  departmentIds?: Array<number>;
+  applicantStatuses?: Array<number>;
 };
 
 export interface FiltersPageModal extends FiltersModal {
@@ -53,6 +59,20 @@ export interface FiltersPageModal extends FiltersModal {
 }
 
 export type CandidatesDetailsRegions = {
+  id: number;
+  name: string;
+  organizationId: number;
+  organizationName: string;
+};
+
+export type CandidatesDetailsLocations = {
+  id: number;
+  name: string;
+  organizationId: number;
+  organizationName: string;
+};
+
+export type CandidatesDetailsDepartments = {
   id: number;
   name: string;
   organizationId: number;

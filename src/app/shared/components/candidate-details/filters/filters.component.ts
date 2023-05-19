@@ -17,6 +17,8 @@ export class FiltersComponent implements OnInit {
   @Input() public isAgency: boolean;
 
   @ViewChild('regionDropdown') public readonly regionDropdown: MultiSelectComponent;
+  @ViewChild('locationDropdown') public readonly locationDropdown: MultiSelectComponent;
+  @ViewChild('departmentDropdown') public readonly departmentDropdown: MultiSelectComponent;
 
   public typeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public skillFields: FieldSettingsModel = { text: 'skillDescription', value: 'masterSkillId' };
@@ -28,7 +30,7 @@ export class FiltersComponent implements OnInit {
       ofActionDispatched(ShowFilterDialog),
       debounceTime(300)
     ).subscribe(() => {
-      this.regionDropdown.refresh();
+       this.regionDropdown.refresh();     
     });
   }
-}
+ }
