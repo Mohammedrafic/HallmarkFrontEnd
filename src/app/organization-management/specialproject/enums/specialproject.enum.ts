@@ -79,14 +79,18 @@ export enum SpecilaProjectCategoryTableColumns {
   Id = 'id',
   OrganizationId = "organizationId",
   Name = 'specialProjectCategory',
-  IsDeleted = 'isDeleted'
+  IsDeleted = 'isDeleted',
+  IncludeInIRP ='includeInIRP',
+  IncludeInVMS ='includeInVMS',
+  System ='system'
 }
 
 export enum SpecilaProjectCategoryHeaderText {
   Id = 'Id',
   OrganizationId = 'Organization Id',
   Name = 'Category',
-  IsDeleted = 'IsDeleted'
+  IsDeleted = 'IsDeleted',
+  System ='system'
 }
 
 export enum FormControlNames {
@@ -105,7 +109,9 @@ export enum FormControlNames {
   projectNameMapping = "projectNameMapping",
   projectCategoryMapping = "projectCategoryMapping",
   PoNamesMapping = "poNamesMapping",
-  PrePopulateInOrders = "PrePopulateInOrders"
+  PrePopulateInOrders = "PrePopulateInOrders",
+  IncludeInIRP ='includeInIRP',
+  IncludeInVMS ='includeInVMS'
 }
 
 export enum SpecilaProjectMappingTableColumns {
