@@ -1,4 +1,4 @@
-<ejs-grid #grid [dataSource]="(candidates$ | async)?.items" [allowSelection]="true" [allowPaging]="allowPaging"
+<ejs-grid #grid [dataSource]="(candidates$ | async)?.items" [allowSelection]="true" [allowPaging]="false"
   [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight" [enableVirtualization]="false"
   [resizeSettings]="resizeSettings" [allowSorting]="allowSorting" [allowResizing]="allowResizing"
   (dataBound)="dataBound()"
@@ -151,32 +151,15 @@
     </e-column>
   </e-columns>
   <ng-template #pagerTemplate let-data>
-    <div class="e-pagertemplate">
-      <div class="control-section">
-        <div class="content-wrapper">
-          <section class="left-side-pager-controls">
-            <ejs-dropdownlist id="rowsPerPage" class="dropdown-no-border" [allowFiltering]="true"
-              [dataSource]="rowsPerPageDropDown" [(value)]="activeRowsPerPageDropDown"
-              (change)="onRowsDropDownChanged()">
-            </ejs-dropdownlist>
-            <ejs-numerictextbox id="goToPage" class="numeric-input-no-border" format="#" placeholder="Go to:" min="1"
-              [max]="(candidates$ | async)?.totalPages" [showSpinButton]="false" (change)="onGoToClick($event)">
-            </ejs-numerictextbox>
-            <div class="total-rows">
-              Total Rows: {{(candidates$ | async)?.totalCount}}
-            </div>
-          </section>
-          <section class="right-side-pager-controls">
-            <ejs-pager id="gridPager" #gridPager [pageSize]="pageSize"
-              [totalRecordsCount]="(candidates$ | async)?.totalCount" [enablePagerMessage]="false"
-              [currentPage]="currentPage" (click)="onGoToClick($event)">
-            </ejs-pager>
-          </section>
-        </div>
-      </div>
-    </div>
   </ng-template>
 </ejs-grid>
+<app-grid-pagination
+  [currentPage]="currentPage"
+  [pageSize]="pageSize"
+  [totalRecordsCount]="(candidates$ | async)?.items?.length || 0"
+  (navigateToPageEmitter)="onGoToClick($event)"
+  (pageSizeChangeEmitter)="onRowsDropDownChanged()"
+></app-grid-pagination>
 
 <app-filter-dialog [items]="filteredItems" [count]="(candidates$ | async)?.totalCount"
   (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()"
@@ -196,9 +179,17 @@
         <div class="input-container">
           <label>Region</label>
           <div class="input-group multiselect">
-            <ejs-multiselect #regionMultiselect mode="CheckBox" formControlName="regionsNames" placeholder="All"
-              [fields]="regionFields" [allowFiltering]="true" [showDropDownIcon]="true"
-              [dataSource]="filterColumns.regionsNames?.dataSource">
+            <ejs-multiselect
+              #regionMultiselect
+              mode="CheckBox"
+              formControlName="regionsNames"
+              placeholder="All"
+              [fields]="regionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.regionsNames?.dataSource"
+              [changeOnBlur]="!isMobileScreen"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -207,8 +198,16 @@
         <div class="input-container">
           <label>Skill</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox" formControlName="skillsIds" placeholder="All" [fields]="optionFields"
-              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillsIds?.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="skillsIds"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.skillsIds?.dataSource"
+              [changeOnBlur]="!isMobileScreen"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -217,9 +216,16 @@
         <div class="input-container">
           <label>Profile Status</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox" formControlName="profileStatuses" placeholder="All" [fields]="optionFields"
-              [allowFiltering]="true" [showDropDownIcon]="true"
-              [dataSource]="filterColumns.profileStatuses?.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="profileStatuses"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.profileStatuses?.dataSource"
+              [changeOnBlur]="!isMobileScreen"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -244,43 +250,80 @@
         <div class="input-container">
           <label>Profile Status</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox" formControlName="profileStatuses" placeholder="All" [fields]="optionFields"
-              [allowFiltering]="true" [showDropDownIcon]="true"
-              [dataSource]="filterColumns.profileStatuses?.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="profileStatuses"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.profileStatuses?.dataSource"
+              [changeOnBlur]="!isMobileScreen"
+            >
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container">
           <label>Location</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox" formControlName="locationIds" placeholder="All" [fields]="optionFields"
-              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.locationIds?.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="locationIds"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.locationIds?.dataSource"
+              [changeOnBlur]="!isMobileScreen"
+            >
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container">
           <label>Department</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox" formControlName="departmentIds" placeholder="All" [fields]="optionFields"
-              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds?.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="departmentIds"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.departmentIds?.dataSource"
+              [changeOnBlur]="!isMobileScreen"
+            >
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container">
           <label>Primary Skill</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox" formControlName="primarySkillIds" placeholder="All" [fields]="optionFields"
-              [allowFiltering]="true" [showDropDownIcon]="true"
-              [dataSource]="filterColumns.primarySkillIds?.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="primarySkillIds"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.primarySkillIds?.dataSource"
+              [changeOnBlur]="!isMobileScreen"
+            >
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container">
           <label>Secondary Skill</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox" formControlName="secondarySkillIds" placeholder="All"
-              [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true"
-              [dataSource]="filterColumns.secondarySkillIds?.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="secondarySkillIds"
+              placeholder="All"
+              [fields]="optionFields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.secondarySkillIds?.dataSource"
+              [changeOnBlur]="!isMobileScreen"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -303,6 +346,7 @@
               [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.credType?.dataSource"
+              [changeOnBlur]="!isMobileScreen"
             >
             </ejs-multiselect>
           </div>

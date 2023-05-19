@@ -179,6 +179,10 @@
 
     &.number-of-positions {
       width: 80%;
+
+      @media #{$max-mobile} {
+        width: 100%;
+      }
     }
 
     &:nth-child(n + 2) {
@@ -462,7 +466,18 @@
       z-index: 1100;
     }
   }
+
+  .row {
+    flex-direction: column;
+
+    .input-container {
+      &:nth-child(n + 2) {
+        margin-left: 0;
+      }
+    }
+  }
 }
+
 .e-gridwithchildrow{
   height: 100% !important;
   .e-gridcontent{
