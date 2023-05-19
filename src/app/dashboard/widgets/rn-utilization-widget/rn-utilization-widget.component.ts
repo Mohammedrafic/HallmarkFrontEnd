@@ -40,6 +40,7 @@ import {
 import { ProgressBar } from '@syncfusion/ej2-angular-progressbar';
 import { FilteredItem } from '@shared/models/filter.model';
 import { DashboartFilterDto } from '../../models/dashboard-filter-dto.model';
+import { AbstractControl } from '@angular/forms';
 
 @Component({
   selector: 'app-rn-utilization-widget',
@@ -131,7 +132,7 @@ export class RnUtilizationWidgetComponent implements OnInit {
         takeUntil(this.unsubscribe$),
         distinctUntilChanged(),
         debounceTime(500),
-        filter(() => this.rnUtilizationForm.valid),
+        filter(() => true),
         switchMap(([value, filters]) => {
           const skillsList = this.nursingSkill$.pipe(take(1), takeUntil(this.unsubscribe$));
           const workCommitmentList = this.commitmentsPage$.pipe(take(1), takeUntil(this.unsubscribe$));
