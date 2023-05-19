@@ -1,34 +1,33 @@
+<div class="vendor-score-wrapper">
 
-  <div class="vendor-score-wrapper">
 
-
-    <section class="flex-column">
-      <section class="toolbar">
-        <section class="toolbar-header">
-          <div class="toolbar-header-div">
-            {{title }}
+  <section class="flex-column">
+    <section class="toolbar">
+      <section class="toolbar-header">
+        <div class="toolbar-header-div">
+          {{title }}
+        </div>
+      </section>
+      <section class="toolbar-message">
+        <div class="toolbar-message-div">
+          {{message}}
+        </div>
+      </section>
+      <section class="toolbar-buttons">
+        <button ejs-button id="filterButton" (click)="showFilters()" cssClass="e-outline button-filter">
+          <div class="filter-button-content">
+            Filters <i-feather name="sliders" class="icon"></i-feather>
           </div>
-        </section>
-        <section class="toolbar-message">
-          <div class="toolbar-message-div">
-            {{message}}
-          </div>
-        </section>
-        <section class="toolbar-buttons">
-          <button ejs-button id="filterButton" (click)="showFilters()" cssClass="e-outline button-filter">
-            <div class="filter-button-content">
-              Filters <i-feather name="sliders" class="icon"></i-feather>
-            </div>
-          </button>
-        </section>
+        </button>
       </section>
     </section>
-    <div class="vendor-graph">
-      
-    
+  </section>
+  <div class="vendor-graph">
+
+
     <div [hidden]="!istypeSetupTabActive" *ngFor="let agencies of VendorScorecardresponse;let i = index">
-    
-    
+
+
       <div class="Toplayer ">
         <div class="col3 graph-heading">
           <h4>Vendor Details</h4>
@@ -54,15 +53,15 @@
         <div class="col4 graph-heading">
           <h4>Vendor Overall Score</h4>
           <div class="">
-            <ejs-progressbar id='mainprogress{{i}}' [startAngle]="startAngle" 
-            [endAngle]="endAngle" type='Circular'
-              height='150' value={{agencies.vendorOverallScore}} width="150"
-              progressColor="{{agencies.vendorOverallScore>=80 ?'#15ce48':
+            <ejs-progressbar id='mainprogress{{i}}' [startAngle]="startAngle"
+                             [endAngle]="endAngle" type='Circular'
+                             height='150' value={{agencies.vendorOverallScore}} width="150"
+                             progressColor="{{agencies.vendorOverallScore>=80 ?'#15ce48':
               agencies.vendorOverallScore>=60?'#0f82bf':
               agencies.vendorOverallScore>=40?'#36b3ef':
               agencies.vendorOverallScore>=20?'#f9c679':
               '#f5602e'}}"
-               progressThickness="15" trackThickness="15">
+                             progressThickness="15" trackThickness="15">
             </ejs-progressbar>
             <p class="mainscore">{{agencies.vendorOverallScore}}%</p>
           </div>
@@ -113,8 +112,8 @@
           <div class="graph-cards">
             <div class="graphalign">
               <ejs-progressbar id='determinate1{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
-                [endAngle]="endAngle" type='Circular' height='120' value="{{agencies.submissionQualityPercent}}" width="120"
-                progressThickness="15" trackThickness="15">
+                               [endAngle]="endAngle" type='Circular' height='120' value="{{agencies.submissionQualityPercent}}" width="120"
+                               progressThickness="15" trackThickness="15">
               </ejs-progressbar>
               <p class="subscore">{{agencies.submissionQualityPercent}}%</p>
               <span class="spantag">Submission Quality</span>
@@ -122,8 +121,8 @@
             </div>
             <div class="graphalign">
               <ejs-progressbar id='determinate2{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
-                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.complianceRatingPercent}} width="120"
-                progressThickness="15" trackThickness="15">
+                               [endAngle]="endAngle" type='Circular' height='120' value={{agencies.complianceRatingPercent}} width="120"
+                               progressThickness="15" trackThickness="15">
               </ejs-progressbar>
               <p class="subscore">{{agencies.complianceRatingPercent}}%</p>
               <span class="spantag">Compliance Rating</span>
@@ -131,8 +130,8 @@
             </div>
             <div class="graphalign">
               <ejs-progressbar id='determinate3{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
-                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.fillRatePercent}} width="120"
-                progressThickness="15" trackThickness="15">
+                               [endAngle]="endAngle" type='Circular' height='120' value={{agencies.fillRatePercent}} width="120"
+                               progressThickness="15" trackThickness="15">
               </ejs-progressbar>
               <p class="subscore">{{agencies.fillRatePercent}}%</p>
               <span class="spantag">Fill Rate</span>
@@ -140,8 +139,8 @@
             </div>
             <div class="graphalign">
               <ejs-progressbar id='determinate4{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
-                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.costAdjustmentPercent}} width="120"
-                progressThickness="15" trackThickness="15">
+                               [endAngle]="endAngle" type='Circular' height='120' value={{agencies.costAdjustmentPercent}} width="120"
+                               progressThickness="15" trackThickness="15">
               </ejs-progressbar>
               <p class="subscore">{{agencies.costAdjustmentPercent}}</p>
               <span class="spantag">Cost Adjustment</span>
@@ -149,17 +148,17 @@
             </div>
             <div class="graphalign">
               <ejs-progressbar id='determinate5{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
-                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.onTimeStartPercent}} width="120"
-                progressThickness="15" trackThickness="15">
+                               [endAngle]="endAngle" type='Circular' height='120' value={{agencies.onTimeStartPercent}} width="120"
+                               progressThickness="15" trackThickness="15">
               </ejs-progressbar>
               <p class="subscore">{{agencies.onTimeStartPercent}}%</p>
-                <span class="spantag">On Time Start</span>
-                <span class="spantag"></span>
+              <span class="spantag">On Time Start</span>
+              <span class="spantag"></span>
             </div>
             <div class="graphalign">
               <ejs-progressbar id='determinate6{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
-                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.candidatesStartPercent}} width="120"
-                progressThickness="15" trackThickness="15">
+                               [endAngle]="endAngle" type='Circular' height='120' value={{agencies.candidatesStartPercent}} width="120"
+                               progressThickness="15" trackThickness="15">
               </ejs-progressbar>
               <p class="subscore">{{agencies.candidatesStartPercent}}</p>
               <span class="spantag">Candidate Starts</span>
@@ -167,8 +166,8 @@
             </div>
             <div class="graphalign">
               <ejs-progressbar id='determinate7{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
-                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.candidateRemainingonAssignmentPercent}}
-                width="120" progressThickness="15" trackThickness="15">
+                               [endAngle]="endAngle" type='Circular' height='120' value={{agencies.candidateRemainingonAssignmentPercent}}
+                               width="120" progressThickness="15" trackThickness="15">
               </ejs-progressbar>
               <p class="subscore">{{agencies.candidateRemainingonAssignmentPercent}}%</p>
               <span class="spantag">Cand. Remaining on Assignment.</span>
@@ -179,8 +178,10 @@
         <div class="col4">
           <div class="order-cound">
             <h4>Order Count 5</h4>
-            <p>( <span>{{VendorReportForm.controls['startDate'].value| date: 'MM/dd/yyyy'}}</span> -
-              <span>{{VendorReportForm.controls['endDate'].value| date: 'MM/dd/yyyy'}}</span> )</p>
+            <p>
+              ( <span>{{VendorReportForm.controls['startDate'].value| date: 'MM/dd/yyyy'}}</span> -
+              <span>{{VendorReportForm.controls['endDate'].value| date: 'MM/dd/yyyy'}}</span> )
+            </p>
           </div>
           <div class=" submit-wrapper">
             <div class="col6">
@@ -195,135 +196,136 @@
             </div>
           </div>
           <div>
-    
+
           </div>
         </div>
       </div>
     </div>
-    </div>
-    <div [hidden]="istypeSetupTabActive">
-      <section class="vendor-report-section">
-        <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName"
-          [reportType]="reportType"></app-logi-report>
-        <router-outlet></router-outlet>
-      </section>
-    </div>
-    <app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)"
-      (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
-      <form [formGroup]="VendorReportForm" class="filter-form-dialog form-container bootstrap">
-        <div class="form-elemet">
+  </div>
+  <div [hidden]="istypeSetupTabActive">
+    <section class="vendor-report-section">
+      <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName"
+                       [reportType]="reportType"></app-logi-report>
+      <router-outlet></router-outlet>
+    </section>
+  </div>
+  <app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)"
+                     (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+    <form [formGroup]="VendorReportForm" class="filter-form-dialog form-container bootstrap">
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Organization Name</label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist appValidateWithMessage formControlName="businessIds" [fields]="organizationFields"
+                              [dataSource]="filterColumns.businessIds.dataSource" [allowFiltering]="true" placeholder="Business">
+            </ejs-dropdownlist>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Region</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage placeholder="All"
+                             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
+                             [fields]="regionFields">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Location</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" formControlName="locationIds" appValidateWithMessage
+                             [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Department</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" formControlName="departmentIds" appValidateWithMessage placeholder="All"
+                             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
+                             [fields]="departmentFields">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="form-elemet">
+        <div class="group">
           <div class="input-container bootstrap">
-            <label>Organization Name<span class="required">*</span></label>
+            <label>Agency</label>
             <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage formControlName="businessIds" [fields]="organizationFields"
-                [dataSource]="filterColumns.businessIds.dataSource" [allowFiltering]="true" placeholder="Business">
+              <ejs-multiselect mode="CheckBox" formControlName="agencyIds" placeholder="All" appValidateWithMessage
+                               [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="this.filterColumns.agencyIds.dataSource"
+                               [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container calendar">
+            <label>Actual Start Date<span class="required">*</span></label>
+            <div class="input-group datepicker">
+              <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+                              appValidateWithMessage formControlName="startDate">
+              </ejs-datepicker>
+            </div>
+          </div>
+          <div class="input-container calendar">
+            <label>Actual End Date<span class="required">*</span></label>
+            <div class="input-group datepicker">
+              <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+                              appValidateWithMessage formControlName="endDate"
+                              [min]="VendorReportForm.controls['startDate'].value">
+              </ejs-datepicker>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container calendar">
+            <label>Order Type</label>
+            <div class="input-group datepicker">
+              <ejs-dropdownlist appValidateWithMessage formControlName="orderTypes"
+                                [fields]="commonFields"
+                                [dataSource]="filterColumns.orderTypes.dataSource"
+                                [allowFiltering]="true" placeholder="">
               </ejs-dropdownlist>
+
             </div>
           </div>
-        </div>
-        <div class="form-elemet">
-          <div class="input-container bootstrap">
-            <label>Region</label>
-            <div class="input-group dropdown">
-              <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage placeholder="All"
-                [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
-                [fields]="regionFields">
-              </ejs-multiselect>
-            </div>
+          <div class="input-container calendar">
+            <label>Skills</label>
+            <ejs-multiselect mode="CheckBox" formControlName="skillIds" placeholder="All" [allowFiltering]="true"
+                             [showDropDownIcon]="true" [dataSource]="filterColumns.SkillIds.dataSource" [fields]="commonFields"
+                             [selectAllText]='allOption' showSelectAll=true>
+            </ejs-multiselect>
           </div>
         </div>
-        <div class="form-elemet">
-          <div class="input-container bootstrap">
-            <label>Location</label>
-            <div class="input-group dropdown">
-              <ejs-multiselect mode="CheckBox" formControlName="locationIds" appValidateWithMessage
-                [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
-                [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields">
-              </ejs-multiselect>
-            </div>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <div class="inline-radio-container">
+            <ejs-radiobutton formControlName="invoiceType" label="Vendor Scorecard" name="invoiceType" value="0"
+                             (change)="onTabSelected($event)"></ejs-radiobutton>
+            <ejs-radiobutton formControlName="invoiceType" label="Vendor Scorecard Graph" name="invoiceType" value="1"
+                             (change)="onTabSelected($event)"></ejs-radiobutton>
           </div>
         </div>
-        <div class="form-elemet">
-          <div class="input-container bootstrap">
-            <label>Department</label>
-            <div class="input-group dropdown">
-              <ejs-multiselect mode="CheckBox" formControlName="departmentIds" appValidateWithMessage placeholder="All"
-                [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
-                [fields]="departmentFields">
-              </ejs-multiselect>
-            </div>
-          </div>
-        </div>
-    
-    
-        <div class="form-elemet">
-          <div class="group">
-            <div class="input-container bootstrap">
-              <label>Agency<span class="required">*</span></label>
-              <div class="input-group dropdown">
-                <ejs-multiselect mode="CheckBox" formControlName="agencyIds" placeholder="All" appValidateWithMessage
-                  [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="this.filterColumns.agencyIds.dataSource"
-                  [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true>
-                </ejs-multiselect>
-              </div>
-            </div>
-          </div>
-        </div>
-    
-    
-    
-        <div class="form-elemet">
-          <div class="group">
-            <div class="input-container calendar">
-              <label>Actual Start Date<span class="required">*</span></label>
-              <div class="input-group datepicker">
-                <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                  appValidateWithMessage formControlName="startDate">
-                </ejs-datepicker>
-              </div>
-            </div>
-            <div class="input-container calendar">
-              <label>Actual End Date<span class="required">*</span></label>
-              <div class="input-group datepicker">
-                <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                  appValidateWithMessage formControlName="endDate" [min]="VendorReportForm.controls['startDate'].value">
-                </ejs-datepicker>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="form-elemet">
-          <div class="group">
-            <div class="input-container calendar">
-              <label>Order Type<span class="required">*</span></label>
-              <div class="input-group datepicker">
-                <ejs-dropdownlist appValidateWithMessage formControlName="orderTypes"
-                 [fields]="commonFields"
-                [dataSource]="filterColumns.orderTypes.dataSource" 
-                [allowFiltering]="true" placeholder="">
-              </ejs-dropdownlist>
-    
-              </div>
-            </div>
-            <div class="input-container calendar">
-              <label>Skills<span class="required">*</span></label>
-              <ejs-multiselect mode="CheckBox" formControlName="skillIds" placeholder="All" [allowFiltering]="true"
-                [showDropDownIcon]="true" [dataSource]="filterColumns.SkillIds.dataSource" [fields]="commonFields"
-                [selectAllText]='allOption' showSelectAll=true>
-              </ejs-multiselect>
-            </div>
-          </div>
-        </div>
-        <div class="form-elemet">
-          <div class="input-container bootstrap">
-            <div class="inline-radio-container">
-              <ejs-radiobutton formControlName="invoiceType" label="Vendor Scorecard" name="invoiceType" value="0"
-                (change)="onTabSelected($event)"></ejs-radiobutton>
-              <ejs-radiobutton formControlName="invoiceType" label="Vendor Scorecard Graph" name="invoiceType" value="1"
-                (change)="onTabSelected($event)"></ejs-radiobutton>
-            </div>
-          </div>
-        </div>
-      </form>
-    </app-filter-dialog>
-    </div>
+      </div>
+    </form>
+  </app-filter-dialog>
+</div>

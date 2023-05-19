@@ -68,7 +68,7 @@ export class OpenPositionService {
     }
   }
 
-  public setOpenPosition(key: string, value: OpenPositionsList[] | string | null): void {
+  public setOpenPosition(key: 'shiftTime' | 'initialPositions', value: OpenPositionsList[] | string | null): void {
     this.openPositionsState.set({
       ...this.openPositionsState.get(),
       [key]: value,
@@ -175,7 +175,7 @@ export class OpenPositionService {
         },
       ],
       shiftId: event.item.data.shiftId,
-      startTime: getTime(DateTimeHelper.convertDateToUtc(event.item.data.shiftEndTime)),
+      startTime: getTime(DateTimeHelper.convertDateToUtc(event.item.data.shiftStartTime)),
       endTime: getTime(DateTimeHelper.convertDateToUtc(event.item.data.shiftEndTime)),
     };
   }

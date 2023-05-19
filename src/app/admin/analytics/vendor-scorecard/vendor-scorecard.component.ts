@@ -34,7 +34,7 @@ import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
 // import { ExportOrientation } from '@organization-management/orientation/components/orientation-historical-data/orientation.action';
 import { VendorScorePayload } from '@shared/models/vendorscorecard.model';
 import { Filtervendorscorecard } from './vendorscorecard.action';
-import {  VendorScorecardresponse, VendorScorecardresponsepayload } from "@shared/models/vendorscorecard.model";
+import {VendorScorecardresponse, VendorScorecardresponsepayload } from "@shared/models/vendorscorecard.model";
 import { VendorSCorecardState } from './vendorscorecard.state';
 import { DatePipe } from '@angular/common'
 
@@ -71,7 +71,7 @@ export class VendorScorecardComponent implements OnInit {
 
   public allOption: string = "All";
 
-public VendorScorecardresponse: VendorScorecardresponse[]=[];
+  public VendorScorecardresponse: VendorScorecardresponse[] = [];
   public invoiceStatusList: InvoiceStatus[] = [];
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
@@ -95,11 +95,11 @@ public VendorScorecardresponse: VendorScorecardresponse[]=[];
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
-  
+
   selectedOrganizations: Organisation[];
 
 
-  
+
   public agencyFields = {
     text: 'agencyName',
     value: 'agencyId',
@@ -402,7 +402,7 @@ public VendorScorecardresponse: VendorScorecardresponse[]=[];
       "EndDateVSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "OrderTypeVSR": orderTypes == null || orderTypes == "" ? "null" : orderTypes,
       "SkillVSR": skillIds.length == 0 ? "null" : skillIds.join(",")
-     
+
 
     };
     this.logiReportComponent.paramsData = this.paramsData;
@@ -480,9 +480,9 @@ public VendorScorecardresponse: VendorScorecardresponse[]=[];
   }
 
   public showFilters(): void {
-     if (this.isResetFilter) {
-    this.onFilterControlValueChangedHandler();
-     }
+    if (this.isResetFilter) {
+      this.onFilterControlValueChangedHandler();
+    }
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
@@ -510,18 +510,24 @@ public VendorScorecardresponse: VendorScorecardresponse[]=[];
     this.departmentsList = this.masterDepartmentsList;
   }
   public onFilterApply(): void {
-    if(!this.istypeSetupTabActive)
-    {this.VendorReportForm.markAllAsTouched();
-    if (this.VendorReportForm?.invalid) {
-      return;
+    if (!this.istypeSetupTabActive) {
+      this.VendorReportForm.markAllAsTouched();
+      if (this.VendorReportForm?.invalid) {
+        return;
+      }
+      this.filteredItems = [];
+      let { startDate, endDate } = this.VendorReportForm.getRawValue();
+      if (Date.parse(endDate) <= Date.parse(startDate)) {
+        alert("Actual start date cannot be greater than the Actual End date")
+      }
+      else {
+        this.SearchReport();
+        this.store.dispatch(new ShowFilterDialog(false));
+      }
     }
-    this.filteredItems = [];
-    this.SearchReport();
-    this.store.dispatch(new ShowFilterDialog(false));
-  }
-  else{
-    this.filtergraphdata();
-  }
+    else {
+      this.filtergraphdata();
+    }
   }
   public showToastMessage(regionsLength: number, locationsLength: number, departmentsLength: number) {
     this.message = "";
@@ -533,36 +539,35 @@ public VendorScorecardresponse: VendorScorecardresponse[]=[];
   public onTabSelected(selected: any): void {
     this.istypeSetupTabActive = selected.value == 1 ? true : false;
   }
-  
-  public  filtergraphdata(): void {
-     let StartDate=(this.VendorReportForm.controls['startDate'].value)!=null?this.datepipe.transform(this.VendorReportForm.controls['startDate'].value, 'MM/dd/yyyy'):"";       
-      let  EndDate=this.datepipe.transform(this.VendorReportForm.controls['endDate'].value, 'MM/dd/yyyy');
-      let { departmentIds, locationIds,
-        regionIds, startDate, endDate, agencyIds, orderTypes, skillIds } = this.VendorReportForm.getRawValue();
 
-        regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
-        locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
-        departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
-    
-    let vendorscorecard:VendorScorePayload=
+  public filtergraphdata(): void {
+    let StartDate = (this.VendorReportForm.controls['startDate'].value) != null ? this.datepipe.transform(this.VendorReportForm.controls['startDate'].value, 'MM/dd/yyyy') : "";
+    let EndDate = this.datepipe.transform(this.VendorReportForm.controls['endDate'].value, 'MM/dd/yyyy');
+    let { departmentIds, locationIds,
+      regionIds, startDate, endDate, agencyIds, orderTypes, skillIds } = this.VendorReportForm.getRawValue();
+
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
+
+    let vendorscorecard: VendorScorePayload =
     {
-      Organizations:this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      Organizations: this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       Regions: regionIds.length == 0 ? "null" : regionIds,
       Locations: locationIds.length == 0 ? "null" : locationIds,
-      Departments:departmentIds.length == 0 ? "null" : departmentIds,
-      Skill:skillIds.length == 0 ? "null" : skillIds.join(","),
-      OrderType:orderTypes == null || orderTypes == "" ? "null" : orderTypes.toString(),
-      Agencies:agencyIds.length == 0 ? "null" : agencyIds.join(","),
-       StartDate:StartDate !=null?StartDate:"",
-      EndDate:EndDate !=null?EndDate:"",
+      Departments: departmentIds.length == 0 ? "null" : departmentIds,
+      Skill: skillIds.length == 0 ? "null" : skillIds.join(","),
+      OrderType: orderTypes == null || orderTypes == "" ? "null" : orderTypes.toString(),
+      Agencies: agencyIds.length == 0 ? "null" : agencyIds.join(","),
+      StartDate: StartDate != null ? StartDate : "",
+      EndDate: EndDate != null ? EndDate : "",
     }
-    this.store.dispatch(new Filtervendorscorecard(vendorscorecard)).pipe(delay(500)).subscribe((data)=>
-    {
-      if (!data ) {
+    this.store.dispatch(new Filtervendorscorecard(vendorscorecard)).pipe(delay(500)).subscribe((data) => {
+      if (!data) {
         this.VendorScorecardresponse = [];
       }
       else {
-         this.VendorScorecardresponse = data["VendorScoreCard"]["VendorScorecardEntity"];
+        this.VendorScorecardresponse = data["VendorScoreCard"]["VendorScorecardEntity"];
       }
     });
   }

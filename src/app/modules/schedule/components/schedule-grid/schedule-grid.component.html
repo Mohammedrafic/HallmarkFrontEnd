@@ -125,6 +125,7 @@
                 canSchedule
                 [dragDate]="dateSchedule.date"
                 [dragEvent]="dragEvent"
+                [candidateId]="scheduleItem?.candidate?.id"
                 [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot.dateText)"
                 (click)="selectCellSlots(dateSlot.dateText, scheduleItem.candidate, dateSchedule)"
               >
@@ -143,6 +144,7 @@
                          canSchedule
                          [dragDate]="dateSchedule.date"
                          [dragEvent]="dragEvent"
+                         [candidateId]="scheduleItem?.candidate?.id"
                     >
                       <i-feather name="slash" class="icon"></i-feather>
                     </div>
@@ -165,6 +167,7 @@
                   canSchedule
                   [dragDate]="dateSlot.dateText"
                   [dragEvent]="dragEvent"
+                  [candidateId]="scheduleItem?.candidate?.id"
                   [class.selected]="selectedCandidatesSlot.get(scheduleItem.candidate.id)?.dates?.has(dateSlot.dateText)"
                   (click)="selectCellSlots(dateSlot.dateText, scheduleItem.candidate)"
                 >

@@ -28,6 +28,11 @@ export class GetIRPOrders {
   constructor(public payload: OrderManagementFilter | object) {}
 }
 
+export class GetOrdersJourney {
+  static readonly type = '[order management] Get Orders Journey';
+  constructor(public payload: OrderManagementFilter | object, public isIncomplete?: boolean | undefined) {}
+}
+
 export class ClearOrders {
   static readonly type = '[order management] Clear Orders';
   constructor() {}
@@ -280,6 +285,11 @@ export class GetOrderFilterDataSources {
   constructor(public isIRP?: boolean) {}
 }
 
+export class ClearOrderFilterDataSources {
+  static readonly type = '[order management] Clear Order Filter Data Sources';
+  constructor() {}
+}
+
 export class GetHistoricalData {
   static readonly type = '[order management] Get Historical Data';
   constructor(public organizationId: number, public candidateJobId: number) {}
@@ -298,6 +308,12 @@ export class ExportIRPOrders {
   static readonly type = '[order management] Export IRPOrders list';
   constructor(public payload: ExportPayload,public tab: OrderManagementIRPTabs)  {}
 }
+
+export class ExportOrdersJourney {
+  static readonly type = '[order management] Export Orders Journey list';
+  constructor(public payload: ExportPayload)  {}
+}
+
 
 export class ClearSuggestions {
   static readonly type = '[order management] Clear Suggestions';

@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 24px 6px;
+  padding: 24px 24px 16px;
 
   .title {
     @include dialog-title;
@@ -36,86 +36,95 @@
   }
 }
 
-.sidebar-content {
-  padding: 24px;
-  flex-grow: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+.sidebar-items-selector {
+  padding: 24px 24px 0;
 
-  .tabs-wrapper {
+  .sidebar-items {
     display: flex;
-    overflow: auto;
-    padding: 16px 0;
+    justify-content: space-between;
+    gap: 20px;
 
-    .tab {
-      min-width: 86px;
-      height: 36px;
-      padding: 16px;
-      margin-right: 9px;
-      border-radius: 12px;
-      background-color: $white;
-      border: 1px solid $secondary-dark-blue-45;
-      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+    .tabs-wrapper {
+      display: flex;
+      overflow: auto;
+      padding-bottom: 14px;
+      margin-bottom: 2px;
 
-      &__title {
-        font-size: 14px;
-        font-weight: 600;
-        color: $secondary-dark-blue-10;
-      }
+      .tab {
+        min-width: 86px;
+        height: 36px;
+        padding: 16px;
+        margin-right: 9px;
+        border-radius: 12px;
+        background-color: $white;
+        border: 1px solid $secondary-dark-blue-45;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
 
-      &__sub-title {
-        font-size: 12px;
-        color: $secondary-dark-blue-15;
-      }
+        &:last-child {
+          margin-right: 0;
+        }
 
-      &:hover {
-        cursor: pointer;
-      }
+        &__title {
+          font-size: 14px;
+          font-weight: 600;
+          color: $secondary-dark-blue-10;
+        }
 
-      &.selected {
-        background-color: $primary-active-blue-10;
+        &__sub-title {
+          font-size: 12px;
+          color: $secondary-dark-blue-15;
+        }
 
-        .tab__title, .tab__sub-title {
-          color: $white;
+        &:hover {
+          cursor: pointer;
+        }
+
+        &.selected {
+          background-color: $primary-active-blue-10;
+
+          .tab__title, .tab__sub-title {
+            color: $white;
+          }
         }
       }
-    }
-  }
-
-  .add-new-schedule {
-    margin-bottom: 20px;
-    height: 40px;
-
-    .schedule-types {
-      display: flex;
-      padding: 10px 0;
-      gap: 24px;
     }
 
     .add-btn-container {
       display: flex;
-      padding-right: 10px;
-      justify-content: flex-end;
+      align-items: center;
 
-      i-feather {
-        margin: 0 5px 4px 0;
+      button {
+        width: 40px;
+        padding: 8px;
       }
 
-      .e-outline {
-        border: none;
-
-        &:hover {
-          border: none;
-        }
+      i-feather {
+        margin: 0;
       }
     }
   }
 
-  .separator {
-    height: 1px;
-    background-color: $secondary-dark-blue-45;
-    margin: 0 -24px 16px;
+  .schedule-types {
+    display: flex;
+    padding: 12px 0 16px;
+    gap: 24px;
   }
+}
+
+.separator {
+  height: 1px;
+  background-color: $secondary-dark-blue-45;
+  margin: 0 -24px;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid $secondary-dark-blue-45;
+  padding: 16px 24px 24px;
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   .locked-message {
     width: 100%;
@@ -134,8 +143,6 @@
   }
 
   .form-container {
-    margin-top: 20px;
-
     .validation-icon {
       display: none !important;
     }
@@ -146,6 +153,67 @@
       background-color: $secondary-dark-blue-50;
       color: $secondary-dark-blue-30;
       border: 1px solid $secondary-dark-blue-40 !important;
+    }
+  }
+
+  .position-counter {
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 16px;
+    color: $white;
+    background-color: $primary-active-blue-10;
+    border-radius: 50%;
+    padding: 0 4px;
+    margin-left: 6px;
+  }
+
+  .availability-open-position {
+    &__title {
+      font-size: 16px;
+      font-weight: 700;
+      color: $secondary-dark-blue-15;
+      margin: 16px 0;
+    }
+  }
+
+  .schedule-open-position-wrapper {
+    margin: 8px -24px -24px;
+    flex-grow: 1;
+    color: $secondary-dark-blue-15;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+
+    .position-title {
+      padding: 8px 24px;
+    }
+
+    app-schedule-open-positions {
+      flex-grow: 1;
+    }
+
+    ::ng-deep {
+      .open-position-wrapper {
+        .title {
+          display: none;
+        }
+
+        .content {
+          padding-top: 16px !important;
+          margin: 0;
+          border: none;
+
+          .position-item {
+            &__title {
+              display: none;
+            }
+
+            .card-container {
+              margin-top: 0 !important;
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -177,7 +245,7 @@
   }
 }
 
-.scheduled-availability-form {
+.new-availability-form {
   display: grid;
   grid-template-columns: 3.2fr 2.2fr 2.2fr 1.8fr;
   grid-template-rows: 1fr 1fr;
@@ -188,10 +256,35 @@
     "shift shift shift hours";
 }
 
+.custom-new-availability-form {
+  grid-template-areas:
+    "date date date date"
+    "shift startTime endTime hours"
+}
+
+.scheduled-availability-form {
+  display: grid;
+  grid-template-columns: 3.2fr 2.2fr 2.2fr 1.8fr;
+  grid-template-rows: 1fr 1fr 1.9fr 1fr 1fr 1fr;
+  gap: 12px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "date date date date"
+    "shift shift shift hours"
+    "region region region region"
+    "location location location location"
+    "department department department department"
+    "skill skill skill skill";
+}
+
 .custom-scheduled-availability-form {
   grid-template-areas:
     "date date date date"
     "shift startTime endTime hours"
+    "region region region region"
+    "location location location location"
+    "department department department department"
+    "skill skill skill skill";
 }
 
 .scheduled-unavailability-form {

@@ -22,6 +22,7 @@ import {
   OrderManagement,
   OrderManagementFilter,
   OrderManagementPage,
+  OrdersJourneyPage,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { CandidateCancellation } from '@shared/models/candidate-cancellation.model';
@@ -83,6 +84,14 @@ export class OrderManagementContentService {
    */
   public getOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
     return this.http.post<OrderManagementPage>(`/api/Orders/all`, payload);
+  }
+
+    /**
+   * Get the orders journey
+   @param payload filter with details we need to get
+   */
+   public getOrdersJourney(payload: OrderManagementFilter | object): Observable<OrdersJourneyPage> {
+    return this.http.post<OrdersJourneyPage>(`/api/Orders/allOrderJourney`, payload);
   }
 
   /**
@@ -472,6 +481,13 @@ export class OrderManagementContentService {
   public irpexport(payload: ExportPayload, tab: OrderManagementIRPTabs): Observable<any> {
     return this.http.post(`/api/IRPOrders/export`, payload, { responseType: 'blob' });
   }
+
+  /**
+   * Export IRP Orders list*/
+  public orderJourneyexport(payload: ExportPayload): Observable<any> {
+    return this.http.post(`/api/Orders/exportOrderJourney`, payload, { responseType: 'blob' });
+  }
+
 
   /**
    * Export agency list

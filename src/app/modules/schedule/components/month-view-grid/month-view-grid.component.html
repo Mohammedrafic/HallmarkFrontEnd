@@ -25,6 +25,7 @@
           canSchedule
           [dragDate]="dateSchedule.date"
           [dragEvent]="dragEvent"
+          [candidateId]="scheduleItem?.candidate?.id"
         >
             <ng-container *ngIf="!dateSchedule.isDisabled; else disabledCell">
               <app-month-card
@@ -42,6 +43,7 @@
                      canSchedule
                      [dragDate]="dateSchedule.date"
                      [dragEvent]="dragEvent"
+                     [candidateId]="scheduleItem?.candidate?.id"
                 >
                   <div class="day">
                     {{dateItem.dateSlot | date: 'd'}}
@@ -65,6 +67,7 @@
             canSchedule
             [dragDate]="dateItem.dateSlot"
             [dragEvent]="dragEvent"
+            [candidateId]="scheduleItem?.candidate?.id"
           >
             <div class="day">
               {{dateItem.dateSlot | date: 'd'}}

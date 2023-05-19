@@ -292,8 +292,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.maxFieldLength = 2;
       this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
     } else {
-      this.switchedValueForm.get('value')?.removeValidators(Validators.maxLength(2));
-      this.maxFieldLength = 100;
+      this.switchedValueForm.get('value')?.clearValidators();
       this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
     }
   }
@@ -328,9 +327,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.IsSettingKeyAvailabiltyOverLap) {
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
-    } else {
-      this.switchedValueForm.get('value')?.removeValidators(Validators.maxLength(2));
-      this.maxFieldLength = 100;
+    } else{
+     this.switchedValueForm.get('value')?.clearValidators();
+    }
+    if (this.isParentEdit && (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability)) {
+      this.RegionLocationSettingsMultiFormGroup.disable();
+      this.allRegionsSelected = true;
+      this.allLocationsSelected = true;
     }
   }
 
@@ -591,6 +594,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private setFormValidation(data: OrganizationSettingsGet): void {
+    this.maxFieldLength =100;
     const validators: ValidatorFn[] = [];
 
     data.validations.forEach((validation: OrganizationSettingValidation) => {
@@ -1340,8 +1344,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       if (dynamicValue.isSwitchedValue) {
         this.switchedValueForm.setValue({
-          value: this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? 4 : dynamicValue.value,
-          isEnabled: this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? true : dynamicValue.isEnabled,
+          value: dynamicValue.value,
+          isEnabled: dynamicValue.isEnabled,
         });
         this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
       }

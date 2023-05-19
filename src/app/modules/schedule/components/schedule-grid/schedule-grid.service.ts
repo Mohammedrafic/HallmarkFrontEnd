@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import {
+  ScheduleCandidate,
   ScheduleDateItem,
   ScheduleDateSlot,
   ScheduleDay,
@@ -36,6 +37,35 @@ export class ScheduleGridService {
       slotsWithDate.includes(`${selectedDateList[0]}T00:00:00+00:00`);
   }
 
+  public removeCandidateSlotDay(days: ScheduleDay[], date: string): ScheduleDay[] {
+    return days.filter((day: ScheduleDay) => {
+      return day.shiftDate.split('T')[0] !== date;
+    });
+  }
+
+  public createSelectedCandidateSlotsWithDays(
+    candidate: ScheduleCandidate,
+    date: string,
+    schedule?: ScheduleDateItem,
+  ): ScheduleDateSlot {
+    let selectedCandidateSlots = {
+      candidate,
+      dates: new Set<string>().add(date),
+    };
+
+    if(schedule) {
+      selectedCandidateSlots = {
+        ...selectedCandidateSlots,
+        candidate: {
+          ...selectedCandidateSlots.candidate,
+          days: this.createDaysForSelectedSlots(candidate.days, schedule.daySchedules),
+        },
+      };
+    }
+
+    return selectedCandidateSlots;
+  }
+  
   public createDaysForSelectedSlots (days: ScheduleDay[], scheduleDays: ScheduleItem[]): ScheduleDay[] {
     const createdDays = this.createDays(scheduleDays);
 

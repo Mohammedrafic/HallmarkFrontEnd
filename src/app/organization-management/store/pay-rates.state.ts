@@ -129,11 +129,14 @@ export class PayRatesState {
   @Action(GetWorkCommitmentByPage)
   GetWorkCommitmentByPage(
     { patchState }: StateContext<CommitmentStateModel>,
-    { pageNumber, pageSize }: GetWorkCommitmentByPage
+    { businessUnitId,    
+      regions,
+      locations,
+      skills }: GetWorkCommitmentByPage
   ): Observable<MasterCommitmentsPage> {
     patchState({ isCommitmentLoading: true });
 
-    return this.payRateService.getMasterWorkCommitments(pageNumber, pageSize).pipe(
+    return this.payRateService.getMasterWorkCommitments(businessUnitId, regions, locations, skills).pipe(
       tap((payload) => {
         patchState({commitmentsPage: payload, isCommitmentLoading: false});
         return payload;

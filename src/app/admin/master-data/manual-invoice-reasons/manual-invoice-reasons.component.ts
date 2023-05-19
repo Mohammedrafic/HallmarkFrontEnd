@@ -13,6 +13,10 @@ import { ManualInvoiceReasonsState } from '@admin/store/manual-invoice-reasons.s
 import { ManualInvoiceReasonPage } from '@shared/models/manual-invoice-reasons.model';
 
 import { ShowSideDialog } from '../../../store/app.actions';
+import { UserState } from 'src/app/store/user.state';
+import { DoNotReturn } from '@admin/store/donotreturn.actions';
+import { DonotReturnState } from '@admin/store/donotreturn.state';
+import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 
 @Component({
   selector: 'app-manual-invoice-reasons',
@@ -24,11 +28,18 @@ export class ManualInvoiceReasonsComponent extends AbstractGridConfigurationComp
   @Select(ManualInvoiceReasonsState.manualInvoiceReasons)
   public manualInvoiceReasons$: Observable<ManualInvoiceReasonPage>
 
+  @Select(UserState.lastSelectedOrganizationId)
+  private lastSelectedOrganizationId$: Observable<number>;
+
+  @Select(DonotReturnState.allOrganizations)
+  allOrganizations$: Observable<UserAgencyOrganization>;
+
   public form: FormGroup;
   public title: string = '';
 
   private isEdit = false;
   private isAlive = true;
+  businessUnitId:number=0;
 
   constructor(
     private confirmService: ConfirmService,
@@ -48,6 +59,29 @@ export class ManualInvoiceReasonsComponent extends AbstractGridConfigurationComp
     this.subscribeOnSaveReasonError();
     this.subscribeOnUpdateReasonSuccess();
     this.subscribeOnSaveReasonSuccess();
+    this.subscribeOnBusinessUnitChange();
+
+  }
+
+  private getOrganizationList(): void {
+    this.store.dispatch(new DoNotReturn.GetAllOrganization());
+  }
+
+  private subscribeOnBusinessUnitChange(): void {
+    this.lastSelectedOrganizationId$
+    .pipe(takeWhile(() => this.isAlive))
+    .subscribe((data) => {
+      if(data != null && data != undefined){
+        this.businessUnitId=data;
+      }else{
+        this.getOrganizationList();
+        this.allOrganizations$.pipe(takeWhile(() => this.isAlive)).subscribe((data: any) => {
+          if(data != null && data.length > 0){
+            this.businessUnitId=data[0].id;
+          }
+         });
+      }
+    });
   }
 
   public addReason(): void {
@@ -75,7 +109,7 @@ export class ManualInvoiceReasonsComponent extends AbstractGridConfigurationComp
       })
       .subscribe((confirm: boolean) => {
         if (confirm) {
-          this.store.dispatch(new ManualInvoiceReasons.Remove(id));
+          this.store.dispatch(new ManualInvoiceReasons.Remove(id,this.businessUnitId));
         }
       });
   }

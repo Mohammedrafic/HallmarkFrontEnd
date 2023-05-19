@@ -34,6 +34,7 @@ export interface OpenPositionState {
 export interface PositionDragEvent {
   action: boolean;
   date: string | null;
+  candidateId: number | null;
 }
 
 export interface DroppedEvent {

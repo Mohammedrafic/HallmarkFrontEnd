@@ -114,9 +114,9 @@ export class SkillsService {
   public getMasterSkillsDataSources(): Observable<MasterSkillDataSources> {
     return this.http.get<MasterSkillDataSources>(`/api/masterSkills/filteringOptions`).pipe(
       map((data) => ({
-        skillCategories: sortByField(data.skillCategories, 'name'),
-        skillAbbreviations: sortBy(data.skillAbbreviations),
-        skillDescriptions: sortBy(data.skillDescriptions),
+        skillCategories: data.skillCategories ? sortByField(data.skillCategories, 'name') : [],
+        skillAbbreviations: data.skillAbbreviations ? sortBy(data.skillAbbreviations) : [],
+        skillDescriptions: data.skillDescriptions ? sortBy(data.skillDescriptions) : [],
       }))
     );
   }

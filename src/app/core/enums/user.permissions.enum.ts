@@ -197,6 +197,9 @@ export enum UserPermissions {
   CanEditPayRates = 6404,
   //AgencyReports
   AgencyReports=7000,
-  CanViewAgencyFinancialTimesheet =7001
+  CanViewAgencyFinancialTimesheet = 7001,
+  CanViewAgencyInvoiceSummary = 7002,
+  //View Order Journey
+  ViewOrderJourney = 8001,
 
 }

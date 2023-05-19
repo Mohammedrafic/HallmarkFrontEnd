@@ -133,7 +133,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       startDate: [null, Validators.required],
       endDate: [null],
       jobCode: [null, Validators.required],
-      payRate: [null],
+      payRate: [null, Validators.required],
       minWorkExperience: [null],
       availRequirement: [null],
       schedulePeriod: [null],
@@ -432,10 +432,10 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.candidateWorkCommitmentService.getCandidateWorkCommitmentById(commitment.id as number)
       .subscribe((commitment: CandidateWorkCommitment) => {
         if (commitment.workCommitmentIds) {
-          const masterId = this.allWorkCommitments.find(item => item.workCommitmentId === commitment.workCommitmentIds[0])
+          commitment.startDate = commitment.startDate && DateTimeHelper.convertDateToUtc(commitment.startDate as string);
+          const masterId = this.allWorkCommitments.find(item => item.workCommitmentId === commitment.workCommitmentIds[0]);
           masterId && this.getWorkCommitmentById(masterId.masterWorkCommitmentId, commitment, false);
         }
-        commitment.startDate = commitment.startDate && DateTimeHelper.convertDateToUtc(commitment.startDate as string);
       });
   }
 

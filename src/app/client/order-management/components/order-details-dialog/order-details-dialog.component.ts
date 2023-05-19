@@ -87,6 +87,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Output() closeReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() selectReOrder = new EventEmitter<any>();
   @Output() updateOrders = new EventEmitter();
+  @Output() editOrderPressed = new EventEmitter<number>();
 
   // TODO: Delete it when we will have re-open sidebar
   @Output() private reOpenOrderSuccess: EventEmitter<Order> = new EventEmitter<Order>();
@@ -355,6 +356,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       this.addEditReorderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.EditReOrder);
       this.store.dispatch(new ShowSideDialog(true));
     } else {
+      this.editOrderPressed.emit(data.id);
       this.router.navigate(['./edit', data.id], { relativeTo: this.route });
       this.onClose();
     }

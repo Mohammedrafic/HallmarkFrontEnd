@@ -48,3 +48,10 @@
     <i-feather name="mail" class="icon"></i-feather>
   </button>
 </ng-container>
+<ng-container *ngIf="label === 'NameLink'">
+  <span style='color:rgb(62, 127, 255); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
+  [attr.title]="'Download'"
+  (click)="onClick($event)">
+    {{this.params.node.data?.originalFileName}}
+  </span>
+</ng-container>

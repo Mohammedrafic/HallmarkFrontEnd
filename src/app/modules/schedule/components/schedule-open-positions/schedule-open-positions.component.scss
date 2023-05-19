@@ -1,6 +1,8 @@
 @import "colors";
 
 .open-position-wrapper {
+  height: calc(100% - 1px);
+
   .title {
     color: $secondary-dark-blue-15;
     font-weight: 400;
@@ -11,8 +13,7 @@
   .content {
     padding: 24px;
     box-sizing: border-box;
-    height: 69vh;
-    overflow-y: auto;
+    height: 100%;
     margin: 8px -24px 0;
     background-color: $secondary-dark-blue-50;
     border: 1px solid $secondary-dark-blue-40;

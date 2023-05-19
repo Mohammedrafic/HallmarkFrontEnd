@@ -1,8 +1,8 @@
 <section class="flex-column">
   <app-orientation-grid
-    *ngIf="isActive"
+    *ngIf="isTabActive"
     gridTitle="Historical Data"
-    [isActive]="isActive"
+    [isActive]="isTabActive"
     [isFilter]="isFilter"
     (pageChange)="pageChange($event)"
     (onEdit)="openDialog($event)"
@@ -15,13 +15,13 @@
     [bulkActionConfig]="bulkActionConfig">
   </app-orientation-grid>
 </section>
-<app-export-dialog *ngIf="isActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
+<app-export-dialog *ngIf="isTabActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
   (export)="export($event)"></app-export-dialog>
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
   (export)="export($event)"></app-export-dialog>
 <app-side-dialog
-  *ngIf="isActive"
+  *ngIf="isTabActive"
   header="Activate Setup"
   (formSaveClicked)="saveRecord()"
   (formCancelClicked)="closeDialog()"
