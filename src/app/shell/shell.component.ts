@@ -175,6 +175,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   public isMobile = false;
   public isSmallDesktop = false;
   nonResponsiveMenuItesm :Array<number> = [81,44,18,40,21,34];
+  selectedItem:number = 0;
 
   constructor(
     private store: Store,
@@ -188,6 +189,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     private ResizeContentService: ResizeContentService,
     private userService: UserService,
     private breakpointService: BreakpointObserverService,
+    public elementRef: ElementRef
   ) {
     super();
 
@@ -319,14 +321,8 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   onSubMenuItemClick(event: any): void {
+    this.selectedItem = event.element.id;
     this.tree.selectedNodes = [this.activeMenuItemData?.anch];
-
-    if (event.item) {
-      this.setSideBarForFirstLoad(event.item.route);
-      this.router.navigate([event.item.route]);
-
-      this.analyticsApiService.predefinedMenuClickAction(event.item.route, event.item.title).subscribe();
-    }
   }
 
   showContextMenu(data: MenuItem, event: any): void {
@@ -347,10 +343,21 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.hideAnalyticsSubMenuItems();
   }
 
+  onBeforeContextMenuClose(event: any): void {
+   let selectedMenuItem = event.items.find((data:any)=>data.id == this.selectedItem);
+
+    if (selectedMenuItem) {
+      this.setSideBarForFirstLoad(selectedMenuItem.route);
+      this.router.navigate([selectedMenuItem.route]);
+
+      this.analyticsApiService.predefinedMenuClickAction(selectedMenuItem.route, selectedMenuItem.title).subscribe();
+    }
+  }
+
   onBeforeContextMenuOpen(event: any): void {
     if (!this.sidebar.isOpen) {
       event.items.forEach((item: any) => {
-        if (item.route === this.router.url && item.id) {
+        if ((item.route === this.router.url || "/"+item.route === this.router.url) && item.id) {
           const contextMenuItem = document.getElementById(item.id);
           if (contextMenuItem) {
             // added left colored border
