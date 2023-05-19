@@ -318,15 +318,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.checkScroll();
   }
 
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+  public changePageSize(event: number): void {
+    this.pageSize = event;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
   }
 
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
+  public changePageNumber(page: number): void {
+    this.pageSubject.next(page);
   }
 
   public getChipCssClass(status: string): string {
