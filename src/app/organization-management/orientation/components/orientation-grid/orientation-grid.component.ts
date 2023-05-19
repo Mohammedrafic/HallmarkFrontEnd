@@ -6,10 +6,17 @@ import { findSelectedItems } from '@core/helpers';
 import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 import { BreakpointObserverService } from '@core/services';
 import { Select, Store } from '@ngxs/store';
-import { OrientationColumnDef, OrientationHistoricalDataColumnDef } from '@organization-management/orientation/constants/orientation.constant';
+import { 
+  OrientationColumnDef,
+  OrientationHistoricalDataColumnDef} from '@organization-management/orientation/constants/orientation.constant';
 import { OrientationTab, OrientationTypeDataSource } from '@organization-management/orientation/enums/orientation-type.enum';
-import { clearFormControl, setDataSourceValue } from '@organization-management/orientation/helpers/orientation-dialog.helper';
-import { OrientationConfiguration, OrientationConfigurationFilters, OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
+import { 
+  clearFormControl,
+  setDataSourceValue } from '@organization-management/orientation/helpers/orientation-dialog.helper';
+import { 
+  OrientationConfiguration,
+  OrientationConfigurationFilters,
+  OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
 import { OrientationService } from '@organization-management/orientation/services/orientation.service';
 import { GetFilteringAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -44,24 +51,24 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   @Input() public gridTitle: string;
   @Input() public dataSource: OrientationConfigurationPage;
   @Input() public orientationTab: OrientationTab;
-  @Input() public allowBulkSelection: boolean = true;
+  @Input() public allowBulkSelection = true;
   @Input() public rowSelection: 'single' | 'multiple' = 'multiple';
   @Input() public bulkActionConfig: BulkActionConfig;
   @Input('disableControls') set disableControls(value: boolean) {
     this.gridActionsParams.disableControls = value;
     this.gridDefHandler();
-  };
+  }
   @Input('skillCategories') set skillCategories(value: SkillCategory[] | undefined) {
     if (value) {
       setDataSourceValue(this.filterColumns, 'skillCategoryIds', value);
     }
-  };
+  }
   @Input('regions') set regions(value: OrganizationRegion[] | undefined) {
     if (value) {
       this.allRegions = value;
       setDataSourceValue(this.filterColumns, 'regionIds', this.allRegions);
     }
-  };
+  }
   @Output() public pageChange = new EventEmitter();
   @Output() public openDialog = new EventEmitter();
   @Output() public onEdit = new EventEmitter();
@@ -84,7 +91,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   public filtersForm: FormGroup = this.orientationService.generateConfigurationFilterForm();
   public filterColumns: FilterColumnsModel = this.orientationService.filterColumns;
   public filters: OrientationConfigurationFilters = {
-    pageNumber: 1, pageSize: this.pageSize
+    pageNumber: 1, pageSize: this.pageSize,
   };
   public optionFields = {
     text: 'name',
@@ -96,8 +103,8 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     value: 'id',
   };
   public gridActionsParams = {
-    disableControls: false
-  }
+    disableControls: false,
+  };
 
   private skills: Skill[] = [];
 
@@ -132,6 +139,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     this.watchForSkillSelection();
     this.getDeviceScreen();
     this.gridDefHandler();
+    this.clearFilters();
   }
 
   private watchForOrgChange(): void {
@@ -270,7 +278,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   public handleBulkEvent(event: BulkActionDataModel): void {
     this.onEdit.emit({
       isBulk: true,
-      data: event
+      data: event,
     });
   }
 
@@ -288,7 +296,11 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   }
 
   public onFilterApply(): void {
-    this.filters = { pageNumber: this.filters.pageNumber, pageSize: this.filters.pageSize, ...this.filtersForm.getRawValue()} ;
+    this.filters = { 
+      pageNumber: this.filters.pageNumber,
+      pageSize: this.filters.pageSize,
+      ...this.filtersForm.getRawValue(),
+    };
     this.generateFilteredChips();
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -320,7 +332,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
   public edit(data: OrientationConfiguration): void {
     this.onEdit.emit({
       isBulk: false,
-      data: data
+      data: data,
     });
   }
 
