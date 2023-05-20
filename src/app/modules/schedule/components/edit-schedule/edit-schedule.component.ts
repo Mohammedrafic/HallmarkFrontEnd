@@ -255,7 +255,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.selectedDayScheduleIndex = this.newScheduleIndex;
     this.isCreateMode = true;
     this.showLockedMessage = false;
-    this.openPositionsConfig.showOpenPositionsPanel = false;
+    this.resetOpenPositionsConfig();
     this.createFormForNewTab();
     this.scrollToNewScheduleTab();
   }
@@ -330,6 +330,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   checkOpenPositions(event: { isInteracted: boolean }): void {
     this.openPositionsConfig.canFetchOpenPositions = this.selectedDaySchedule.scheduleType !== ScheduleType.Unavailability
+      && !this.isEmployee
       && event.isInteracted
       && !this.isCreateMode;
   }
@@ -608,7 +609,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
     this.selectedDaySchedule = schedule;
     this.selectedDayScheduleIndex = scheduleIndex;
-    this.openPositionsConfig.showOpenPositionsPanel = false;
+    this.resetOpenPositionsConfig();
     this.setEditPermissions();
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Book) {
@@ -632,9 +633,13 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Availability) {
-      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.hasEditPermissions);
-      this.scheduleForm = this.editScheduleService.createScheduledAvailabilityForm();
-      this.openPositionsConfig.canFetchOpenPositions = true;
+      this.scheduleFormConfig = this.isEmployee
+        ? NewAvailabilityFormConfig(this.isCreateMode, this.hasEditPermissions)
+        : ScheduledAvailabilityFormConfig(this.hasEditPermissions);
+      this.scheduleForm = this.isEmployee
+        ? this.editScheduleService.createNewAvailabilityForm()
+        : this.editScheduleService.createScheduledAvailabilityForm();
+      this.openPositionsConfig.canFetchOpenPositions = !this.isEmployee;
       this.watchForRegionControls();
       this.setAvailabilityOpenPositionsFilter();
     }
@@ -840,7 +845,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
     this.showShiftTimeFields(isCustomShift);
     this.scheduleFormConfig.formClass = this.editScheduleService
-      .getFormClass(selectedType, type, isCustomShift, this.isCreateMode);
+      .getFormClass(selectedType, type, isCustomShift, this.isCreateMode, this.isEmployee);
     this.cdr.markForCheck();
   }
 
@@ -902,6 +907,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     if (!departmentId || !skillId || !date) {
       this.openPositionService.setOpenPosition('initialPositions', []);
       this.openPositionsConfig.totalOpenPositions = 0;
+      this.openPositionsConfig.showOpenPositionsPanel = true;
       return;
     }
 

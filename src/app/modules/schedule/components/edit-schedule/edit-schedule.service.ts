@@ -125,6 +125,7 @@ export class EditScheduleService {
     type: typeof ScheduleItemType | typeof ScheduleType,
     isCustomShift: boolean,
     isCreateMode: boolean,
+    isEmployee: boolean,
   ): string {
     let formClass = '';
 
@@ -140,11 +141,11 @@ export class EditScheduleService {
       formClass = isCustomShift
         ? 'scheduled-unavailability-form custom-scheduled-unavailability-form'
         : 'scheduled-unavailability-form';
-    } else if (selectedType === type.Availability && !isCreateMode) {
+    } else if (selectedType === type.Availability && !isCreateMode && !isEmployee) {
       formClass = isCustomShift
         ? 'scheduled-availability-form custom-scheduled-availability-form'
         : 'scheduled-availability-form';
-    } else if (selectedType === type.Availability && isCreateMode) {
+    } else if (selectedType === type.Availability && (isCreateMode || isEmployee)) {
       formClass = isCustomShift
         ? 'new-availability-form custom-new-availability-form'
         : 'scheduled-availability-form';
