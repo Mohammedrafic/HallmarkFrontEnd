@@ -842,41 +842,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     return parseInt(this.activeRowsPerPageDropDown);
   }
 
-  private getRowsPerPage(data: object[], currentPage: number): object[] {
-    const invoiceGneration: any = data.find((setting: any) => {
-      return setting.controlType === this.organizationSettingControlType.InvoiceAutoGeneration;
-    });
-
-    if (invoiceGneration && invoiceGneration.value && typeof invoiceGneration.value === 'string') {
-      invoiceGneration.parsedValue = JSON.parse(invoiceGneration.value);
-    }
-
-    const payPeriodGneration: any = data.find((setting: any) => {
-      return setting.controlType === this.organizationSettingControlType.PayPeriod;
-    });
-
-    if (payPeriodGneration && payPeriodGneration.value && typeof payPeriodGneration.value === 'string') {
-      payPeriodGneration.parsedValue = JSON.parse(payPeriodGneration.value);
-    }
-
-    const switchedValues: any[] = data.filter((setting: any) => {
-      return setting.controlType === this.organizationSettingControlType.SwitchedValue;
-    });
-
-    switchedValues.forEach((setting) => {
-      if (setting.value && typeof setting.value === 'string') {
-        setting.parsedValue = JSON.parse(setting.value);
-      }
-
-      if (setting.children && setting.children.length) {
-        setting.children.forEach((child: any) => {
-          if (child.value && typeof child.value === 'string') {
-            child.parsedValue = JSON.parse(child.value);
-          }
-        });
-      }
-    });
-
+  private getRowsPerPage(data: OrganizationSettingsGet[], currentPage: number): OrganizationSettingsGet[] {
     return data.slice(
       currentPage * this.getActiveRowsPerPage() - this.getActiveRowsPerPage(),
       currentPage * this.getActiveRowsPerPage()

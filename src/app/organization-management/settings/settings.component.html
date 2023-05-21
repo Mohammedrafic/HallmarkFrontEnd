@@ -36,25 +36,7 @@
             <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.regionName}}</td>
             <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.locationName}}</td>
             <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.departmentName}}</td>
-            <td class="e-rowcell e-templatecell" [style.width.px]="400" style="text-align: left">
-              <span *ngIf="data.controlType === organizationSettingControlType.Checkbox">{{child.value === 'true' ?
-                'Yes' : 'No'}}</span>
-              <span *ngIf="data.controlType === organizationSettingControlType.Multiselect">
-                <span *ngFor="let option of child.value; let i = index">{{option.text}}
-                  <span *ngIf="i !== child.value.length - 1">, </span>
-                </span>
-              </span>
-              <span *ngIf="data.controlType === organizationSettingControlType.Select">
-                <span>{{child.value[0].text}}</span>
-              </span>
-              <span *ngIf="data.controlType === organizationSettingControlType.Text">{{child.value}}</span>
-              <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{child.value | date:
-                'MM/dd/yyyy'}}</span>
-              <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
-                {{ child.parsedValue != null && child.parsedValue.value && child.parsedValue.isEnabled ?
-                child.parsedValue.value : 'No' }}
-              </span>
-            </td>
+            <td class="e-rowcell e-templatecell" [style.width.px]="400" style="text-align: left">{{child.displayValue}}</td>
           </tr>
         </tbody>
       </table>
@@ -80,32 +62,7 @@
       <e-column field="regionName" headerText="REGION" width=150></e-column>
       <e-column field="locationName" headerText="LOCATION" width=150></e-column>
       <e-column field="departmentName" headerText="DEPARTMENT" width=150></e-column>
-      <e-column field="value" headerText="VALUE" width=400>
-        <ng-template #template let-data>
-          <span *ngIf="data.controlType === organizationSettingControlType.Checkbox">{{ data.value === 'true' ? 'Yes' :
-            'No'}}</span>
-          <span
-            *ngIf="data.controlType === organizationSettingControlType.Multiselect || data.controlType === organizationSettingControlType.Select">
-            <span *ngFor="let option of data.value; let i = index">{{option.text}}
-              <span *ngIf="i !== data.value.length - 1">, </span>
-            </span>
-          </span>
-          <span *ngIf="data.controlType === organizationSettingControlType.Text">{{data.value}}</span>
-          <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{data.value | date:
-            'MM/dd/yyyy'}}</span>
-          <span *ngIf="data.controlType === organizationSettingControlType.InvoiceAutoGeneration">
-            {{ data.parsedValue?.isEnabled ? 'Yes' : 'No'}}</span>
-          <span *ngIf="data.controlType === organizationSettingControlType.SwitchedValue">
-            {{ data.parsedValue != null && data.parsedValue.value && data.parsedValue.isEnabled ? data.parsedValue.value
-            : 'No' }}
-          </span>
-          <span *ngIf="data.controlType === organizationSettingControlType.CheckboxValue">
-            {{ data | settingCheckboxValue }}
-          </span>
-          <span *ngIf="data.controlType === organizationSettingControlType.PayPeriod">
-            {{ data.parsedValue?.isEnabled ? 'Yes' : 'No'}}</span>
-        </ng-template>
-      </e-column>
+      <e-column field="displayValue" headerText="VALUE" width=400></e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">

@@ -17,6 +17,8 @@ export class OrganizationSettingsGet {
   includeInVMS: boolean;
   separateValuesInSystems: boolean;
   systemType?: string | null;
+  displayValue: string;
+  parsedValue?: any;
 }
 
 export class OrganizationSettingChild {
@@ -31,6 +33,8 @@ export class OrganizationSettingChild {
   departmentName?: string;
   isIRPConfigurationValue: boolean;
   systemType?: string | null;
+  displayValue: string;
+  parsedValue?: any;
 }
 
 export class OrganizationSettingsPost {
