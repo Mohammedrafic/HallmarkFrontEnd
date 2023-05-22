@@ -450,7 +450,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     .subscribe((alertdata) => {
       if(alertdata != null && alertdata.length > 0){
         this.scrollData = true;
-        this.alerts =  [...this.alerts,...alertdata]; //alertdata;
+        this.alerts =  [...alertdata,...this.alerts]; //alertdata;
         this.showAlertSidebar = true;
         this.alertSidebar?.show();      
       }else{
