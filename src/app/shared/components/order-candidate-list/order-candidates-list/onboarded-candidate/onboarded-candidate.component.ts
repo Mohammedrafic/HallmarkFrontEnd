@@ -19,7 +19,7 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged, skip } from 'rxjs';
 import { OPTION_FIELDS
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
@@ -95,8 +95,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Output() closeModalEvent = new EventEmitter<never>();
 
   @Input() candidate: OrderCandidatesList;
-  @Input() isTab: boolean = false;
-  @Input() isAgency: boolean = false;
+  @Input() isTab = false;
+  @Input() isAgency = false;
   @Input() orderDuration: Duration;
   @Input() actionsAllowed: boolean;
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
@@ -134,14 +134,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public payRateSetting = CandidatePayRateSettings;
   public candidateCancellationReasons: CandidateCancellationReason[] | null;
-
-  get startDateControl(): AbstractControl | null {
-    return this.form.get('startDate');
-  }
-
-  get endDateControl(): AbstractControl | null {
-    return this.form.get('endDate');
-  }
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -194,27 +186,25 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     private changeDetectorRef: ChangeDetectorRef
   ) {
     super();
+    this.createForm();
   }
 
   ngOnInit(): void {
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
-    this.createForm();
-    this.patchForm();
+
     this.subscribeOnReasonsList();
     this.checkRejectReason();
     this.subscribeOnUpdateOrganisationCandidateJobError();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeOnGetStatus();
+    this.oserveCandidateJob();
+    this.observeStartDate();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     const { candidate } = changes;
     if (candidate?.currentValue && !candidate?.isFirstChange()) {
       this.getComments();
-    }
-
-    if (this.orderDuration && this.order) {
-      this.changeActualEndDate(new Date(this.form.get('startDate')?.value));
     }
   }
 
@@ -342,7 +332,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.order.jobStartDate,
         this.order.jobEndDate
       );
-      this.form.patchValue({ endDate: DateTimeHelper.convertDateToUtc(endDate.toString()) });
+      const dateWithoutZone = DateTimeHelper.toUtcFormat(endDate);
+      
+      this.form.patchValue({ endDate: DateTimeHelper.convertDateToUtc(dateWithoutZone) });
     }
   }
 
@@ -418,7 +410,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       : of(true);
   }
 
-  private patchForm(): void {
+  private oserveCandidateJob(): void {
     this.candidateJobState$
       .pipe(
         takeUntil(this.unsubscribe$),
@@ -435,7 +427,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
           ? value.offeredStartDate : value.actualStartDate;
-          const actualEnd = this.durationService.getEndDate(value.order.duration, new Date(actualStart)).toString();
+          const actualEnd = this.durationService.getEndDate(value.order.duration, new Date(actualStart), {
+            jobStartDate: value.order.jobStartDate,
+            jobEndDate: value.order.jobEndDate,
+          }).toString();
 
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
@@ -629,7 +624,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       penaltyCriteria: new FormControl(''),
       rate: new FormControl(''),
       hours: new FormControl(''),
-      candidatePayRate: new FormControl(null)
+      candidatePayRate: new FormControl(null),
     });
 
     this.jobStatusControl = new FormControl('');
@@ -687,6 +682,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     jobStartDate: Date | string,
     jobEndDate: Date | string
   ): Date {
+
     return this.durationService.getEndDate(
       orderDuration,
       startDate,
@@ -713,5 +709,17 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   private checkForBillRateUpdate(rates: BillRate[]): boolean {
     return rates.some((rate) => !!rate.isUpdated);
+  }
+
+  private observeStartDate(): void {
+    this.form.get('startDate')?.valueChanges
+    .pipe(
+      distinctUntilChanged(),
+      filter((date) => !!date),
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((date: Date) => {
+      this.changeActualEndDate(date);
+    });
   }
 }

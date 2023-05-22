@@ -12,7 +12,6 @@ export class OrganizationSettingsGet {
   orderPosition: number;
   validations: OrganizationSettingValidation[];
   children?: OrganizationSettingChild[];
-  irpValue: string;
   includeInIRP: boolean;
   includeInVMS: boolean;
   separateValuesInSystems: boolean;

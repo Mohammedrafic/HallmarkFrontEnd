@@ -24,6 +24,20 @@ body.light, body.dark {
     }
   }
 
+  .export-dialog {
+    .e-footer-content {
+      .e-card-content {
+        display: flex;
+        justify-content: space-evenly;
+        padding: 10px 5px;
+
+        .action-btn {
+          width: 45%;
+        }
+      }
+    }
+  }
+
   .e-dialog.dialog {
     right: 0;
     left: auto !important;

@@ -21,16 +21,16 @@ export const financialTimesheetConstants = {
 }
 export const AgencyInvoiceSummaryConstants = {
   formControlNames: {
-    businessIds: 'businessIds',
-    regionIds: 'regionIds',
-    locationIds: 'locationIds',
-    departmentIds: 'departmentIds',
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
     startDate: 'startDate',
     endDate: 'endDate',
     candidateStatuses: 'candidateStatuses',
-    candidateName: 'candidateName',
-    invoiceStatus: 'invoiceStatus',
-    invoiceID: 'invoiceID'
+    CandidateName: 'candidateName',
+    InvoiceStatuses: 'invoiceStatus',
+    InvoiceID: 'invoiceID'
 
   }
 }
