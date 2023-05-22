@@ -114,6 +114,7 @@ export const ALL_DEPARTMENTS_SELECTED = 'You can`t assign Departments manually w
 export const NO_ACTIVE_WORK_COMMITMET = 'No active Work Commitment';
 export const REASON_WARNING = 'Please select a System for Reason';
 export const EMPLOYEE_SKILL_CHANGE_WARNING = 'Are you sure, you want to update Employee Skills? It may have impact on Schedule and Orders.';
+export const DEPARTMENT_SKILL_CHANGE_WARNING = 'Are you sure, you want to provide that change? It may cause deleting future schedules and canclecing Employee from orders.';
 export const EMPLOYEE_TERMINATED_WARNING = 'Are you sure you want to terminate the employee?';
 export const addAvailabilityToStart = 'Add Availability to start Scheduling';
 
