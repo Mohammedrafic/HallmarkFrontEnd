@@ -405,10 +405,10 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
           filter(Boolean),
           takeUntil(this.componentDestroy()),
       ).subscribe(() => {
-        this.closeDepartmentWindowHandler();
+        this.closeDepartmentWindow();
       });
     } else {
-      this.closeDepartmentWindowHandler();
+      this.closeDepartmentWindow();
     }
   }
 
@@ -429,15 +429,15 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.importDialogEvent.next(true);
   }
 
-  private closeDepartmentWindowHandler(): void {
+  private closeDepartmentWindow(): void {
     this.store.dispatch(new ShowSideDialog(false));
-      this.isEdit = false;
-      this.editedDepartmentId = undefined;
-      this.departmentsDetailsFormGroup.reset();
-      this.removeActiveCssClass();
+    this.isEdit = false;
+    this.editedDepartmentId = undefined;
+    this.departmentsDetailsFormGroup.reset();
+    this.removeActiveCssClass();
   }
 
-  private updateDepartmentHandler(department: Department, ignoreWarning: boolean): void {
+  private updateDepartment(department: Department, ignoreWarning: boolean): void {
     if (this.isSkillChanged()) {
       this.confirmService
         .confirm(DEPARTMENT_SKILL_CHANGE_WARNING, {
@@ -457,7 +457,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   private saveOrUpdateDepartment(department: Department, ignoreWarning: boolean): void {
     if (this.isEdit) {
-      this.updateDepartmentHandler(department, ignoreWarning);
+      this.updateDepartment(department, ignoreWarning);
     } else {
       this.store.dispatch(new SaveDepartment(department, this.filters));
     }
