@@ -1,13 +1,15 @@
 @import "colors";
+@import 'adaptive-response';
 
 .control-section {
   padding-bottom: 20px;
+  padding-right: 16px;
 
   #dashboardLayout {
     #In_Progress_Positions,
     #Open_Positions,
     #Filled_Positions {
-      @media screen and (max-width: 600px) {
+      @media #{max-mobile} {
         height: calc(5% - 5px) !important;
       }
     }
