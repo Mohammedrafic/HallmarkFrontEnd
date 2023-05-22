@@ -747,8 +747,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     if (dynamicValue?.isPayPeriod) {
       this.payPeriodFormGroup.setValue({
-        date: dynamicValue.date,
-        noOfWeek: dynamicValue.noOfWeek,
+        date: dynamicValue.date || dynamicValue.Date,
+        noOfWeek: dynamicValue.noOfWeek || dynamicValue.NoOfWeek,
       });
     }
 
