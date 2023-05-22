@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Action, Selector, State, StateContext, Actions } from '@ngxs/store';
+import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, tap } from 'rxjs';
 import lodashMap from 'lodash/fp/map';
@@ -11,7 +11,6 @@ import {
   SetPanels,
   SaveDashboard,
   ResetState,
-  IsMobile,
   SetFilteredItems,
   SwitchMonthWeekTimeSelection,
   GetOrganizationSkills,
@@ -33,12 +32,12 @@ import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 import { GetNursingWidgetData, GetWorkCommitment } from '../models/rn-utilization.model';
 import { DashboartFilterDto } from '../models/dashboard-filter-dto.model';
+import { AppState } from 'src/app/store/app.state';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
   isDashboardLoading: boolean;
   widgets: WidgetOptionModel[];
-  isMobile: boolean;
   filteredItems: FilteredItem[];
   filterData: DashboartFilterDto | null;
   positionTrendTimeSelection: TimeSelectionEnum;
@@ -57,17 +56,17 @@ export interface DashboardStateModel {
     panels: [],
     isDashboardLoading: false,
     widgets: [],
-    isMobile: false,
     filteredItems: JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [],
     filterData: null,
-    positionTrendTimeSelection: JSON.parse(window.localStorage.getItem(TIME_SELECTION_OF_CHART_LINE) as string) || TimeSelectionEnum.Monthly,
+    positionTrendTimeSelection: JSON.parse(window.localStorage.getItem(TIME_SELECTION_OF_CHART_LINE) as string)
+      || TimeSelectionEnum.Monthly,
     organizationSkills: [],
     skills: [],
     toggleQuickOrderDialog: false,
     commitmentsPage: [],
     isCommitmentLoading: false,
     nursingSkill: [],
-    nursingCount : null
+    nursingCount: null,
   },
 })
 @Injectable()
@@ -90,11 +89,6 @@ export class DashboardState {
   @Selector()
   static widgets(state: DashboardStateModel): DashboardStateModel['widgets'] {
     return state.widgets;
-  }
-
-  @Selector()
-  static isMobile(state: DashboardStateModel): DashboardStateModel['isMobile'] {
-    return state.isMobile;
   }
 
   @Selector()
@@ -142,7 +136,10 @@ export class DashboardState {
     return state.filterData;
   }
 
-  public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
+  public constructor(
+    private readonly dashboardService: DashboardService,
+    private readonly store: Store,
+  ) { }
 
   @Action(GetDashboardData)
   getDashboardData({ patchState }: StateContext<DashboardStateModel>): Observable<DashboardDataModel> {
@@ -157,15 +154,21 @@ export class DashboardState {
 
   @Action(SaveDashboard)
   private saveDashboard(
-    { patchState, getState }: StateContext<DashboardStateModel>,
+    { patchState }: StateContext<DashboardStateModel>,
     { payload }: SaveDashboard
   ): Observable<void> {
-    const panels: PanelModel[] = getState().isMobile
-      ? payload.map((panel: PanelModel) => ({
-          ...panel,
-          ...widgetTypeToConfigurationMapper[panel.id as WidgetTypeEnum],
-        }))
-      : payload;
+    const isMobile = this.store.selectSnapshot(AppState.isMobileScreen);
+    let panels: PanelModel[];
+
+    if (isMobile) {
+      panels = payload.map((panel: PanelModel) => ({
+        ...panel,
+        ...widgetTypeToConfigurationMapper[panel.id as WidgetTypeEnum],
+      }));
+    } else {
+      panels = payload;
+    }
+
     patchState({ panels });
 
     return this.dashboardService.saveDashboard(panels);
@@ -179,11 +182,6 @@ export class DashboardState {
   @Action(ResetState)
   private resetState({ patchState }: StateContext<DashboardStateModel>): void {
     patchState({ panels: [], widgets: [], isDashboardLoading: false });
-  }
-
-  @Action(IsMobile)
-  private isMobile({ patchState }: StateContext<DashboardStateModel>, { payload }: IsMobile): void {
-    patchState({ isMobile: payload });
   }
 
   @Action(SetFilteredItems)
@@ -223,8 +221,10 @@ export class DashboardState {
   }
 
   @Action(ToggleQuickOrderDialog)
-  private ToggleQuickOrderDialog ({ patchState }: StateContext<DashboardStateModel>, { isOpen }: ToggleQuickOrderDialog): void {
-    patchState({ toggleQuickOrderDialog: isOpen })
+  private ToggleQuickOrderDialog(
+    { patchState }: StateContext<DashboardStateModel>,
+    { isOpen }: ToggleQuickOrderDialog): void {
+    patchState({ toggleQuickOrderDialog: isOpen });
   }
 
   @Action(GetAllCommitmentByPage)
