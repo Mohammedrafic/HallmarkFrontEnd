@@ -210,7 +210,7 @@ export class SecurityState {
   @Selector()
   static roleTreeField(state: SecurityStateModel): RoleTreeField {
     return {
-      dataSource: state.permissionsTree.filter(({ isAvailable,includeInIRP }) => isAvailable&&!includeInIRP),
+      dataSource: state.permissionsTree.filter(({ isAvailable }) => isAvailable),
       id: 'id',
       parentID: 'parentId',
       text: 'name',
