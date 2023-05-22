@@ -52,6 +52,36 @@ export class SettingsDataAdapter {
     });
   }
 
+  static getParentSettingValue(parentSetting: OrganizationSettingsGet, isIRP: boolean): any {
+    if (!parentSetting.children?.length) {
+      return parentSetting.value;
+    }
+
+    if (isIRP) {
+      const setting = parentSetting.children
+        .find((item: OrganizationSettingChild) => item.isIRPConfigurationValue && !item.regionId);
+
+      return setting?.value || parentSetting.value;
+    } else {
+      const setting = parentSetting.children
+        .find((item: OrganizationSettingChild) => !item.isIRPConfigurationValue && !item.regionId);
+
+      return setting?.value || parentSetting.value;
+    }
+  }
+
+  static getParsedValue(value: any): any {
+    let parsedValue: any;
+
+    try {
+      parsedValue = JSON.parse(value);
+    } catch {
+      parsedValue = undefined;
+    }
+
+    return parsedValue;
+  }
+
   private static getDropDownOptionsFromString(
     text: string,
     valueOptions: OrganizationSettingValueOptions[]
@@ -138,7 +168,7 @@ export class SettingsDataAdapter {
         break;
       case OrganizationSettingControlType.Multiselect:
       case OrganizationSettingControlType.Select:
-        displayValue = setting.value.map((item: { text: string }) => item.text).join(', ');
+        displayValue = setting.value?.map((item: { text: string }) => item.text).join(', ');
         break;
       case OrganizationSettingControlType.Text:
         displayValue = setting.value;
@@ -174,7 +204,7 @@ export class SettingsDataAdapter {
         displayValue = child.value === 'true' ? CheckboxValue.Yes : CheckboxValue.No;
         break;
       case OrganizationSettingControlType.Multiselect:
-        displayValue = child.value.map((item: { text: string }) => item.text).join(', ');
+        displayValue = child.value?.map((item: { text: string }) => item.text).join(', ');
         break;
       case OrganizationSettingControlType.Select:
         displayValue = child.value[0]?.text;
@@ -206,17 +236,5 @@ export class SettingsDataAdapter {
     }
 
     return CheckboxValue.No;
-  }
-
-  private static getParsedValue(value: any): any {
-    let parsedValue: any;
-
-    try {
-      parsedValue = JSON.parse(value);
-    } catch {
-      parsedValue = undefined;
-    }
-
-    return parsedValue;
   }
 }

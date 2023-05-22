@@ -145,7 +145,7 @@
     <app-button-group
       *ngIf="separateValuesInSystems && orgSystems.IRPAndVMS"
       [buttonOptions]="systemButtons"
-      (buttonChange)="setConfigurationSystemType($event.id)"
+      (buttonChange)="setConfigurationSystemType($event.id, false, true)"
     ></app-button-group>
     <div>
       <div class="input-container bootstrap" *ngIf="!IsSettingKeyPayPeriod">
