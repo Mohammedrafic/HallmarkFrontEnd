@@ -19,14 +19,15 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged, skip } from 'rxjs';
-import { OPTION_FIELDS
+import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged } from 'rxjs';
+import {
+  OPTION_FIELDS,
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order,
   OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe, formatDate } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
@@ -66,6 +67,7 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -122,8 +124,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public priceUtils = PriceUtils;
   public nextApplicantStatuses: ApplicantStatus[];
   public isActiveCandidateDialog$: Observable<boolean>;
-  public showHoursControl: boolean = false;
-  public showPercentage: boolean = false;
+  public showHoursControl = false;
+  public showPercentage = false;
   public orderPermissions: CurrentUserPermission[];
   public canShortlist = false;
   public canInterview = false;
@@ -134,6 +136,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public payRateSetting = CandidatePayRateSettings;
   public candidateCancellationReasons: CandidateCancellationReason[] | null;
+  public readonly reorderType: OrderType = OrderType.ReOrder;
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -333,7 +336,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.order.jobEndDate
       );
       const dateWithoutZone = DateTimeHelper.toUtcFormat(endDate);
-      
+
       this.form.patchValue({ endDate: DateTimeHelper.convertDateToUtc(dateWithoutZone) });
     }
   }
@@ -434,8 +437,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-            date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
-              DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString())],
+            date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate?.toString()),
+              DateTimeHelper.convertDateToUtc(value.order.jobEndDate?.toString())],
             billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
@@ -663,9 +666,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   private subscribeCandidateCancellationReasons() {
     if (this.candidateJob) {
-      let payload: CandidateCancellationReasonFilter = {
+      const payload: CandidateCancellationReasonFilter = {
         locationId: this.candidateJob?.order.locationId,
-        regionId: this.candidateJob?.order.regionId
+        regionId: this.candidateJob?.order.regionId,
       };
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
