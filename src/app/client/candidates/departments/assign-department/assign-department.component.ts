@@ -192,9 +192,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
 
         if (!data && isOpen) {
           this.setMinMaxDateRange(this.dateRanges);
-        }
-
-        else if (data && this.departmentId) {
+        } else if (data && this.departmentId) {
           this.setupDialogState(data);
         } else {
           this.resetAssignDepartmentForm();
