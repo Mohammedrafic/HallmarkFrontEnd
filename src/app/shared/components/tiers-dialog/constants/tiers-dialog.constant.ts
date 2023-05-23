@@ -4,7 +4,7 @@ import { TierDialogConfig } from '@shared/components/tiers-dialog/interfaces';
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { FieldNames } from './tiers.constant';
 
-export const TiersDialogConfig = (regions?: OrganizationRegion[]): Record<Tiers, TierDialogConfig> => ({
+export const TiersDialogConfig = (regions?: OrganizationRegion[], workcommitmentIds? : any): Record<Tiers, TierDialogConfig> => ({
   [Tiers.tierSettings]: {
     title: 'Add Tier',
     editTitle: 'Edit Tier',
@@ -50,7 +50,16 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[]): Record<Tiers,
         dataSource: [],
         showAllToggle: true,
         customFiltering: true,
-      }
+      },
+      {
+        field: 'workcommitmentId',
+        title: 'WorkCommitment',
+        disabled: false,
+        required: true,
+        type: FieldType.MultiSelectDropdown,
+        dataSource: workcommitmentIds ?? [],
+        customFiltering: true
+      },
     ]
   },
   [Tiers.tierException]: {

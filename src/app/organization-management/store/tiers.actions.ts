@@ -40,4 +40,9 @@ export namespace Tiers {
       public payload: TierPriorityDTO
     ) {}
   }
+
+  export class GetWorkCommitmentByPageforTiers {
+    static readonly type = TIERS_ACTIONS.GET_WORKCOMMITMENT;
+    constructor(  public payload : any) { }
+  }
 }

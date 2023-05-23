@@ -7,6 +7,7 @@ import { SystemType } from "@shared/enums/system-type.enum";
 import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
 import { TiersPage } from '@shared/components/tiers-dialog/interfaces';
 import { TierPriorityDTO } from '@organization-management/tiers/interfaces';
+import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 
 @Injectable()
 export class TiersApiService {
@@ -26,5 +27,9 @@ export class TiersApiService {
 
   public updateTierPriority(payload: TierPriorityDTO): Observable<TiersPage> {
     return this.http.post<TiersPage>('/api/OrganizationTiers/priority', payload);
+  }
+
+  public getMasterWorkCommitments(): Observable<MasterCommitmentsPage> {
+    return this.http.post<MasterCommitmentsPage>(`/api/PayRates/MasterWorkCommitment/GetAll`, { pageNumber: 1, pageSize: 30 });
   }
 }

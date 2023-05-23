@@ -79,6 +79,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   public regions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
   public tierForm: CustomFormGroup<TierDTO> | null;
+  public workcommitmentIds : any;
   public readonly FieldTypes = FieldType;
   public optionFields: FieldSettingsModel = OPTION_FIELDS;
   public isTierSettingsDialog: boolean;
@@ -115,6 +116,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     this.createForm();
     this.watchForRegions();
     this.watchForLocation();
+    this.watchForWorkcommitment();
     this.watchForCloseDialog();
     this.watchForDepartments();
   }
@@ -170,6 +172,10 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     field === 'regionIds' && this.allRegionsChange(event);
     field === 'locationIds' && this.allLocationsChange(event);
     field === 'departmentIds' && this.allDepartmentsChange(event);
+  }
+
+  public watchForWorkcommitment(){
+    // this.store.dispatch(new Tiers.GetWorkCommitmentByPagebyTiers(this.orgId,this.regionSelected,this.locationSelected,this.skillSelected));
   }
 
   public getToggleValue(field: string): boolean {

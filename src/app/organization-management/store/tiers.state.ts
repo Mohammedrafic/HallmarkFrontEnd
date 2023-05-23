@@ -13,6 +13,8 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
 import { TiersPage } from '@shared/components/tiers-dialog/interfaces';
 import { TiersStateModel } from '@organization-management/interfaces';
+import { CommitmentStateModel } from '@admin/store/commitment.state';
+import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 
 @State<TiersStateModel>({
   name: 'tiers',
@@ -94,6 +96,20 @@ export class TiersState {
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(Tiers.GetWorkCommitmentByPageforTiers)
+  GetWorkCommitmentByPageforTiers(
+    { patchState }: StateContext<CommitmentStateModel>,
+    ): Observable<MasterCommitmentsPage> {
+    patchState({ isCommitmentLoading: true });
+
+    return this.tiersApiService.getMasterWorkCommitments().pipe(
+      tap((payload) => {
+        patchState({commitmentsPage: payload, isCommitmentLoading: false});
+        return payload;
       })
     );
   }
