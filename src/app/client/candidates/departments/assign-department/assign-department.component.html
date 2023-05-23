@@ -70,21 +70,21 @@
 
   <div class="date-fields">
     <app-datepicker
+      id="start-date"
+      label="Start Date"
+      controlName="startDate"
       [formGroupInstance]="assignDepartmentForm"
       [required]="true"
       [min]="dateRanges.min"
       [max]="dateRanges.max"
-      id="start-date"
-      controlName="startDate"
-      label="Start Date"
     ></app-datepicker>
     <app-datepicker
+      id="end-date"
+      label="End Date"
+      controlName="endDate"
       [formGroupInstance]="assignDepartmentForm"
       [min]="dateRanges.min"
       [max]="dateRanges.max"
-      id="end-date"
-      controlName="endDate"
-      label="End Date"
     ></app-datepicker>
   </div>
   <div class="toggles">
