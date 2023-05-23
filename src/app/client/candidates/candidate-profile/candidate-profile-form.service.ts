@@ -74,7 +74,7 @@ export class CandidateProfileFormService {
         workEmail: [null, [Validators.email, Validators.maxLength(200)]],
         phone1: [null, [Validators.required]],
         phone2: [null],
-        professionalSummary: [null],
+        professionalSummary: [null, Validators.maxLength(500)],
         generalNotes: [],
       },
       { validators: greaterThanValidator('contractStartDate', 'contractEndDate') }

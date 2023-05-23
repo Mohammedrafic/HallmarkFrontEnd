@@ -33,13 +33,11 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { AnalyticsApiService } from '@shared/services/analytics-api.service';
-import { FilterService } from '@shared/services/filter.service';
 import { ResizeContentService } from '@shared/services/resize-main-content.service';
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '@client/client.config';
 import { Menu, MenuItem } from '@shared/models/menu.model';
 import { User } from '@shared/models/user.model';
-import { InitPreservedFilters } from '../store/preserved-filters.actions';
 import { GetCurrentUserPermissions, GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
 import { DismissAlert, DismissAllAlerts } from '@admin/store/alerts.actions';
@@ -184,7 +182,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     private orderManagementAgencyService: OrderManagementAgencyService,
     private actions$: Actions,
     private analyticsApiService: AnalyticsApiService<string>,
-    private filterService: FilterService,
     private readonly ngZone: NgZone,
     private ResizeContentService: ResizeContentService,
     private userService: UserService,
@@ -192,8 +189,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     public elementRef: ElementRef
   ) {
     super();
-
-    this.filterService.canPreserveFilters() && store.dispatch(new InitPreservedFilters());
 
     router.events.pipe(filter((event) => event instanceof NavigationEnd), debounceTime(50)).subscribe((data: any) => {
       if (this.tree) {

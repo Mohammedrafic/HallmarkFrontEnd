@@ -105,7 +105,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         this.disableToggles = true;
         this.dataSource.regions = [];
       } else {
-        this.disableToggles = false
+        this.disableToggles = false;
       }
       this.cdr.markForCheck();
     }
