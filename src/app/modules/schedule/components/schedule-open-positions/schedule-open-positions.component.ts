@@ -65,7 +65,7 @@ export class ScheduleOpenPositionsComponent extends Destroyable implements OnIni
     this.openPositionService.getOpenPositionsStream()
       .pipe(
         map((state: OpenPositionState) => this.openPositionService.getOpenPositionsBySelectedSlots(state)),
-        map((positions: OpenPositionsList[]) => this.openPositionService.prepareOpenPositions(positions)),
+        map((positions: OpenPositionsList[]) => this.openPositionService.prepareOpenPositions(positions, this.candidateId)),
         takeUntil(this.componentDestroy()),
       ).subscribe((positions: OpenPositionsList[]) => {
         this.openPositions = positions;

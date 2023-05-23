@@ -16,6 +16,7 @@ import {
   ScheduleBook,
 } from '../interface';
 import {
+  DifferentEmployee,
   InitialDragEvent,
   InitialPositionState,
   MissingMatchDate,
@@ -104,7 +105,7 @@ export class OpenPositionService {
     return state.initialPositions;
   }
 
-  public prepareOpenPositions(openPositions: OpenPositionsList[]): OpenPositionsList[] {
+  public prepareOpenPositions(openPositions: OpenPositionsList[], candidateId?: number): OpenPositionsList[] {
     return openPositions.map((openPosition: OpenPositionsList) => {
       return {
         ...openPosition,
@@ -112,6 +113,7 @@ export class OpenPositionService {
           return {
             ...position,
             attributes: this.createAttributes(position),
+            candidateId,
           };
         }),
       };
@@ -143,10 +145,17 @@ export class OpenPositionService {
 
   public dropElementToDropList(event: CdkDragDrop<DroppedEvent>): Observable<BookingsOverlapsResponse[]> {
     if(event.isPointerOverContainer) {
+      const containerCandidateId = event.container.data.scheduleItem.candidate.id;
+      const dragElementCandidateId = event.item.data.candidateId;
       const containerData = event.container.data.dateItem;
       const dragElementData = event.item.data.shiftEndTime.split('T')[0];
       const orientedDate = event.container.data.scheduleItem.candidate.orientationDate?.split('T')[0] ??
         new Date(0).toDateString();
+
+      if (dragElementCandidateId && dragElementCandidateId !== containerCandidateId) {
+        this.store.dispatch(new ShowToast(MessageTypes.Error, DifferentEmployee));
+        return EMPTY;
+      }
 
       if(containerData  !== dragElementData) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, MissingMatchDate));
