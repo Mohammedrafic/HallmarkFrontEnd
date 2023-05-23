@@ -28,6 +28,7 @@ import {
   AssignDepartmentFormState,
   AssignDepartmentHierarchy,
   DateRanges,
+  DepartmentAssigned,
   DepartmentDialogState,
   DepartmentPayload,
 } from '../departments.model';
@@ -104,7 +105,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       this.dataSource.regions = this.departmentHierarchy;
       this.disableToggles = !this.dataSource.regions.length;
       this.deptdatas = mapperSelectedItems(mapperSelectedItems(this.dataSource.regions, 'locations'), 'departments');
-      if(this.deptdatas.length == 0){
+      if (this.deptdatas.length == 0) {
         this.disableToggles = true;
         this.dataSource.regions = [];
       } else {
@@ -114,8 +115,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     }
 
     if (changes['dateRanges']?.currentValue) {
-      this.minDate = this.dateRanges.min;
-      this.maxDate = this.dateRanges.max;
+      this.setMinMaxDateRange(this.dateRanges);
     }
   }
 
@@ -181,41 +181,26 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   }
 
   private subscribeOnDialogData(): void {
-    this.dialogData$.pipe(debounceTime(50), takeUntil(this.destroy$)).subscribe(({ data, isOpen }) => {
-      this.departmentId = data?.id;
-      this.isOpen = isOpen;
+    this.dialogData$
+      .pipe(
+        debounceTime(50),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(({ data, isOpen }) => {
+        this.departmentId = data?.id;
+        this.isOpen = isOpen;
 
-      if (!data && isOpen) {
-        this.minDate = this.dateRanges.min;
-        this.maxDate = this.dateRanges.max;
-      }
+        if (!data && isOpen) {
+          this.setMinMaxDateRange(this.dateRanges);
+        }
 
-      if (data && this.departmentId) {
-        const { workCommitmentStartDate, workCommitmentEndDate } = data;
-   
-        this.minDate = workCommitmentStartDate
-          ? DateTimeHelper.convertDateToUtc(workCommitmentStartDate)
-          : undefined;
-        this.maxDate = workCommitmentEndDate
-          ? DateTimeHelper.convertDateToUtc(workCommitmentEndDate)
-          : undefined;
- 
-        this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
-        this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
-        this.dataSource.departments = [
-          {
-            name: departmentName(data.departmentName, data.extDepartmentId),
-            id: data.departmentId,
-          } as OrganizationDepartment,
-        ];
-        this.isOriented$.next(data.isOriented);
-        this.departmentFormService.patchForm(this.assignDepartmentForm, data);
-        this.disableControls();
-      } else {
-        this.resetAssignDepartmentForm();
-      }
-      this.cdr.markForCheck();
-    });
+        else if (data && this.departmentId) {
+          this.setupDialogState(data);
+        } else {
+          this.resetAssignDepartmentForm();
+        }
+        this.cdr.markForCheck();
+      });
   }
 
   private disableControls(): void {
@@ -342,5 +327,33 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       this.departmentFormService.addRemoveValidator(orientationDateControl, isOriented);
       this.cdr.markForCheck();
     });
+  }
+
+  private setMinMaxDateRange({ min, max }: DateRanges): void {
+    this.minDate = min;
+    this.maxDate = max;
+  }
+
+  private setupDialogState(data: DepartmentAssigned): void {
+    const { workCommitmentStartDate, workCommitmentEndDate } = data;
+    const minDate = workCommitmentStartDate
+      ? DateTimeHelper.convertDateToUtc(workCommitmentStartDate)
+      : undefined;
+    const maxDate = workCommitmentEndDate
+      ? DateTimeHelper.convertDateToUtc(workCommitmentEndDate)
+      : undefined;
+    this.setMinMaxDateRange({ min: minDate, max: maxDate });
+
+    this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
+    this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
+    this.dataSource.departments = [
+      {
+        name: departmentName(data.departmentName, data.extDepartmentId),
+        id: data.departmentId,
+      } as OrganizationDepartment,
+    ];
+    this.isOriented$.next(data.isOriented);
+    this.departmentFormService.patchForm(this.assignDepartmentForm, data);
+    this.disableControls();
   }
 }
