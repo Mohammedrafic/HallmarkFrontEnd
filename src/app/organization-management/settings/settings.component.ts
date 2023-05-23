@@ -225,7 +225,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.configurationSystemType = system;
 
     if (updateButtons) {
-      this.systemButtons = GetSettingSystemButtons(this.configurationSystemType === SystemType.IRP);
+      this.systemButtons =
+        GetSettingSystemButtons(this.configurationSystemType === SystemType.IRP, !!this.selectedChildRecord);
     }
 
     if (updateForm && this.selectedParentRecord) {
@@ -738,7 +739,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isPayPeriod: true };
     }
 
-    if (dynamicValue.isCheckboxValue) {
+    if (dynamicValue?.isCheckboxValue) {
       this.checkboxValueForm.setValue({
         value: dynamicValue.value ? dynamicValue.value : '',
         isEnabled: dynamicValue.isEnabled ? dynamicValue.isEnabled : false,
@@ -1147,10 +1148,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private getParentConfigurationSystemType(): SystemType {
-    if (this.selectedParentRecord) {
-      const type = !this.selectedParentRecord.includeInIRP && this.selectedParentRecord.includeInVMS
-        ? SystemType.VMS
-        : SystemType.IRP;
+    if (this.selectedParentRecord && this.orgSystems.IRPAndVMS) {
+      const sharedConfiguration = this.selectedParentRecord.includeInIRP && this.selectedParentRecord.includeInVMS;
+      const sharedConfigurationWithTheSameValue = sharedConfiguration && !this.selectedParentRecord.separateValuesInSystems;
+      const type = (!this.selectedParentRecord.includeInIRP && this.selectedParentRecord.includeInVMS)
+        || sharedConfigurationWithTheSameValue ? SystemType.VMS : SystemType.IRP;
 
       return type;
     }
@@ -1325,7 +1327,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         });
       }
 
-      if (dynamicValue.isSwitchedValue) {
+      if (dynamicValue?.isSwitchedValue) {
         this.switchedValueForm.setValue({
           value: dynamicValue.value,
           isEnabled: dynamicValue.isEnabled,
