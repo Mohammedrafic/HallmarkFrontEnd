@@ -27,8 +27,8 @@ export class CloseOrderSideDialogComponent implements OnInit {
   ngOnInit(): void {
     this.action$.pipe(ofActionDispatched(ShowCloseOrderDialog)).subscribe(payload => {
       this.isPosition = payload.isPosition;
-      this.isPositionEmitter.emit(this.isPosition);
       if (payload.isDialogShown) {
+        this.isPositionEmitter.emit(this.isPosition);
         this.sideDialog.show();
       } else {
         this.sideDialog.hide();

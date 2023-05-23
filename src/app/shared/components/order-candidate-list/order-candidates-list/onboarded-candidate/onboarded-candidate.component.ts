@@ -4,11 +4,9 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import {
@@ -19,15 +17,15 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged, skip } from 'rxjs';
-import { OPTION_FIELDS
+import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged } from 'rxjs';
+import { OPTION_FIELDS,
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order,
   OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { DatePipe, formatDate } from '@angular/common';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { formatDate } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
@@ -74,7 +72,7 @@ import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-s
   providers: [MaskedDateTimeService, UNSAVED_FORM_PROVIDERS(OnboardedCandidateComponent)],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OnboardedCandidateComponent extends UnsavedFormComponentRef implements OnInit, OnDestroy, OnChanges {
+export class OnboardedCandidateComponent extends UnsavedFormComponentRef implements OnInit, OnDestroy {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
   @Select(OrderManagementContentState.rejectionReasonsList)
@@ -122,8 +120,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public priceUtils = PriceUtils;
   public nextApplicantStatuses: ApplicantStatus[];
   public isActiveCandidateDialog$: Observable<boolean>;
-  public showHoursControl: boolean = false;
-  public showPercentage: boolean = false;
+  public showHoursControl = false;
+  public showPercentage = false;
   public orderPermissions: CurrentUserPermission[];
   public canShortlist = false;
   public canInterview = false;
@@ -176,7 +174,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public comments: Comment[] = [];
 
   constructor(
-    private datePipe: DatePipe,
     private store: Store,
     private actions$: Actions,
     private orderCandidateListViewService: OrderCandidateListViewService,
@@ -194,18 +191,11 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
     this.subscribeOnReasonsList();
     this.checkRejectReason();
-    this.subscribeOnUpdateOrganisationCandidateJobError();
+    this.subscribeOnUpdateOrganizationCandidateJobError();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeOnGetStatus();
-    this.oserveCandidateJob();
+    this.observeCandidateJob();
     this.observeStartDate();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    const { candidate } = changes;
-    if (candidate?.currentValue && !candidate?.isFirstChange()) {
-      this.getComments();
-    }
   }
 
   ngOnDestroy(): void {
@@ -410,7 +400,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       : of(true);
   }
 
-  private oserveCandidateJob(): void {
+  private observeCandidateJob(): void {
     this.candidateJobState$
       .pipe(
         takeUntil(this.unsubscribe$),
@@ -493,7 +483,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     }
   }
 
-  private subscribeOnUpdateOrganisationCandidateJobError(): void {
+  private subscribeOnUpdateOrganizationCandidateJobError(): void {
     this.actions$
       .pipe(ofActionSuccessful(ShowToast))
       .pipe(
@@ -663,9 +653,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   private subscribeCandidateCancellationReasons() {
     if (this.candidateJob) {
-      let payload: CandidateCancellationReasonFilter = {
+      const payload: CandidateCancellationReasonFilter = {
         locationId: this.candidateJob?.order.locationId,
-        regionId: this.candidateJob?.order.regionId
+        regionId: this.candidateJob?.order.regionId,
       };
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
