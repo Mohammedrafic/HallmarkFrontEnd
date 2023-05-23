@@ -28,7 +28,7 @@ import {
   AssignDepartmentFormState,
   AssignDepartmentHierarchy,
   DateRanges,
-  DepartmentAssigned,
+  DepartmentDialogState,
   DepartmentPayload,
 } from '../departments.model';
 import { DepartmentsService } from '../services/departments.service';
@@ -40,7 +40,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT, RECORD_ADDED, RECORD_MODIFIED, WARNING_TITLE } from '@shared/constants';
 import { CustomFormGroup } from '@core/interface';
 import { departmentName } from '../helpers/department.helper';
-import { findSelectedItems } from '@core/helpers';
+import { DateTimeHelper, findSelectedItems } from '@core/helpers';
 import { mapperSelectedItems } from '@shared/components/tiers-dialog/helper';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -52,7 +52,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssignDepartmentComponent extends DestroyableDirective implements OnInit, OnChanges {
-  @Input() public dialogData$: BehaviorSubject<DepartmentAssigned | null>;
+  @Input() public dialogData$: BehaviorSubject<DepartmentDialogState>;
   @Input() public saveForm$: Subject<boolean>;
   @Input() public departmentHierarchy: OrganizationRegion[];
   @Input() public dateRanges: DateRanges;
@@ -60,12 +60,15 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
   public assignDepartmentForm: CustomFormGroup<AssignDepartmentFormState>;
+  public isOpen = false;
   public dataSource: AssignDepartmentHierarchy = {
     regions: [],
     locations: [],
     departments: [],
   };
 
+  public minDate: Date | undefined;
+  public maxDate: Date | undefined;
   public readonly departmentFields = OptionFields;
   public departmentId?: number | null = null;
   public isOriented$: Subject<boolean> = new Subject();
@@ -108,6 +111,11 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         this.disableToggles = false;
       }
       this.cdr.markForCheck();
+    }
+
+    if (changes['dateRanges']?.currentValue) {
+      this.minDate = this.dateRanges.min;
+      this.maxDate = this.dateRanges.max;
     }
   }
 
@@ -173,10 +181,25 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   }
 
   private subscribeOnDialogData(): void {
-    this.dialogData$.pipe(debounceTime(200), takeUntil(this.destroy$)).subscribe((data) => {
+    this.dialogData$.pipe(debounceTime(50), takeUntil(this.destroy$)).subscribe(({ data, isOpen }) => {
       this.departmentId = data?.id;
+      this.isOpen = isOpen;
+
+      if (!data && isOpen) {
+        this.minDate = this.dateRanges.min;
+        this.maxDate = this.dateRanges.max;
+      }
 
       if (data && this.departmentId) {
+        const { workCommitmentStartDate, workCommitmentEndDate } = data;
+   
+        this.minDate = workCommitmentStartDate
+          ? DateTimeHelper.convertDateToUtc(workCommitmentStartDate)
+          : undefined;
+        this.maxDate = workCommitmentEndDate
+          ? DateTimeHelper.convertDateToUtc(workCommitmentEndDate)
+          : undefined;
+ 
         this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
         this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
         this.dataSource.departments = [

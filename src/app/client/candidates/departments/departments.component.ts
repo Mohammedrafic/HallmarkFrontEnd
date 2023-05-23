@@ -23,6 +23,7 @@ import {
   DateRanges,
   DepartmentAssigned,
   DepartmentConditions,
+  DepartmentDialogState,
   DepartmentFilterState,
   DepartmentsPage,
 } from '@client/candidates/departments/departments.model';
@@ -64,8 +65,8 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
   public readonly sideDialogTitleEnum: typeof SideDialogTitleEnum = SideDialogTitleEnum;
-  public readonly dialogData$: BehaviorSubject<DepartmentAssigned | null> =
-    new BehaviorSubject<DepartmentAssigned | null>(null);
+  public readonly dialogData$: BehaviorSubject<DepartmentDialogState> =
+    new BehaviorSubject<DepartmentDialogState>({ data: null, isOpen: false });
   public readonly saveForm$: Subject<boolean> = new Subject();
   public readonly bulkActionConfig: BulkActionConfig = {
     edit: true,
@@ -115,7 +116,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public showAssignDepartmentDialog(): void {
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.AssignDepartment);
     this.showSideDialog(true);
-    this.dialogData$.next(null);
+    this.dialogData$.next({ data: null, isOpen: true });
     this.getAssignedDepartmentHierarchy();
   }
 
@@ -140,9 +141,11 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
           this.assignDepartment?.assignDepartmentForm.reset();
           this.editDepartments?.formGroup.reset();
           this.showSideDialog(false);
+          this.dialogData$.next({ data: null, isOpen: false });
         });
     } else {
       this.showSideDialog(false);
+      this.dialogData$.next({ data: null, isOpen: false });
     }
   }
 
@@ -237,7 +240,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   private editAssignedDepartment(department: DepartmentAssigned): void {
     this.showSideDialog(true);
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.EditAssignDepartment);
-    this.dialogData$.next(department);
+    this.dialogData$.next({ data: department, isOpen: true });
   }
 
   private deleteAssignedDepartments(departmentIds: number[] | null, isBulkAction?: boolean): void {
