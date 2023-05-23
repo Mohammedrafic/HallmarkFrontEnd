@@ -51,9 +51,9 @@ export const GridCellsSystemIRPTabLta = (
             action: () => {
               params.context.componentParent.lockOrder(params.data);
             },
-            iconName: params.data.isLocked ? 'lock' : 'unlock',
-            buttonClass: params.data.isLocked ? 'e-danger' : '',
-            isCustomIcon: !params.data.isLocked,
+            iconName: params.data.isLockedIRP ? 'lock' : 'unlock',
+            buttonClass: params.data.isLockedIRP ? 'e-danger' : '',
+            isCustomIcon: !params.data.isLockedIRP,
             disabled: !canCreateOrder
             || ![OrderStatus.Open, OrderStatus.InProgress, OrderStatus.Filled].includes(params.data.status)
             || !hasCreateEditOrderPermission
