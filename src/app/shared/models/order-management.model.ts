@@ -104,7 +104,7 @@ export interface GetOrdersJourney{
   orderId: string;
   status:  string;
   system:  string;
-  orderTypes:  string;
+  type:  string;
   jobTitle:  string;
   skill:  string;
   creationDate: Date,
