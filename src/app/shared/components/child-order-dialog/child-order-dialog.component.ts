@@ -671,13 +671,15 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private getComments(): void {
-    this.isReorderType && this.candidateJob?.commentContainerId && this.commentsService
+    if (this.isReorderType && this.candidateJob?.commentContainerId) {
+      this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
         this.changeDetectorRef.markForCheck();
       });
+    }
   }
 
   private subscribeOnCandidateJob(): void {
