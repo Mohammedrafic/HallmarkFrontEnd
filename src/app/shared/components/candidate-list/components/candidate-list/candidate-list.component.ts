@@ -214,7 +214,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis
   ) {
     super();
-    this.unassignedworkCommitment = JSON.parse(localStorage.getItem('unassignedworkcommitment') || '"false"') as boolean; 
+    this.unassignedworkCommitment = JSON.parse(localStorage.getItem('unassignedworkcommitment') || 'false') as boolean; 
   }
 
   ngOnInit(): void {
