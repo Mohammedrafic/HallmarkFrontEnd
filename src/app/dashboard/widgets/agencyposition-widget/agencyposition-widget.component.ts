@@ -7,7 +7,6 @@ import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-per
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { UserState } from '../../../store/user.state';
 import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
-import { SetPreservedFilters } from 'src/app/store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
 
 @Component({

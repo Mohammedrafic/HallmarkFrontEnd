@@ -2,52 +2,19 @@ import { DatePipe, formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { DropdownOption } from '@core/interface';
-import { Store } from '@ngxs/store';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
+
+import { isBoolean, isDate, isEmpty, isNumber } from 'lodash';
+import { debounceTime, map, Observable } from 'rxjs';
+
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { CommonFormConfig } from '@shared/models/common-form-config.model';
 import { FilteredItem } from '@shared/models/filter.model';
-import { FilteredUser, User } from '@shared/models/user.model';
-import { isBoolean, isDate, isEmpty, isNumber } from 'lodash';
-import { debounceTime, map, Observable } from 'rxjs';
-import { SetPreservedFilters, SetPreservedFiltersForTimesheets } from 'src/app/store/preserved-filters.actions';
+import { FilteredUser } from '@shared/models/user.model';
+import { DropdownOption } from '@core/interface';
 
 @Injectable({ providedIn: 'root' })
 export class FilterService {
-  constructor(private store: Store, private http: HttpClient) {}
-
-  public canPreserveFilters(): boolean {
-    const user = JSON.parse(localStorage.getItem('User') || '') as User;
-    return ![BusinessUnitType.Hallmark, BusinessUnitType.MSP].includes(user.businessUnitType);
-  }
-
-  public setPreservedFIlters(filters: any, regionPropName = 'regionIds'): void {
-    if (this.canPreserveFilters()) {
-      this.store.dispatch(
-        new SetPreservedFilters(
-          { 
-            regions: filters[regionPropName] || [], 
-            locations: filters.locationIds || [], 
-            organizations: filters.organizationIds || null, 
-            contactEmails: Array.isArray(filters.contactEmails) ? filters.contactEmails[0] : filters.contactEmails || null
-          }
-        )
-      );
-    }
-  }
-
-  public setPreservedFIltersTimesheets(filters: any, regionPropName = 'regionIds'): void {
-    if (this.canPreserveFilters()) {
-      this.store.dispatch(new SetPreservedFiltersForTimesheets({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }));
-    }
-  }
-
-  public setPreservedFIltersGlobal(filters: any, regionPropName = 'regionsNames'): void {
-    if (this.canPreserveFilters()) {
-      this.store.dispatch(new SetPreservedFilters({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }, true));
-    }
-  }
+  constructor(private http: HttpClient) {}
 
   /**
    * Remove value from form control

@@ -18,7 +18,7 @@ import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged } from 'rxjs';
-import { 
+import {
   OPTION_FIELDS,
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
@@ -65,6 +65,7 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -133,6 +134,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public payRateSetting = CandidatePayRateSettings;
   public candidateCancellationReasons: CandidateCancellationReason[] | null;
+  public readonly reorderType: OrderType = OrderType.ReOrder;
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -324,7 +326,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.order.jobEndDate
       );
       const dateWithoutZone = DateTimeHelper.toUtcFormat(endDate);
-      
+
       this.form.patchValue({ endDate: DateTimeHelper.convertDateToUtc(dateWithoutZone) });
     }
   }
@@ -425,8 +427,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-            date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
-              DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString())],
+            date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate?.toString()),
+              DateTimeHelper.convertDateToUtc(value.order.jobEndDate?.toString())],
             billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),

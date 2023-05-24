@@ -60,6 +60,7 @@ export class OrderManagement {
   irpOrderMetadata?: IRPMetaData;
   irpCandidatesCount?: number;
   activeCandidatesCount?: number;
+  isLockedIRP: boolean;
 }
 
 export interface IRPOrderManagement {
@@ -97,6 +98,7 @@ export interface IRPOrderManagement {
   acceptedEmployees: null;
   isMoreMenuWithDeleteButton?: boolean;
   children: OrderManagementChild[];
+  isLockedIRP: boolean;
 }
 
 export interface GetOrdersJourney{
@@ -104,7 +106,7 @@ export interface GetOrdersJourney{
   orderId: string;
   status:  string;
   system:  string;
-  orderTypes:  string;
+  type:  string;
   jobTitle:  string;
   skill:  string;
   creationDate: Date,
@@ -485,6 +487,7 @@ export class Order {
   canProceedRevoke?: boolean;
   externalCommentsConfiguration?:boolean | null;
   activeCandidatesCount?: number;
+  isLockedIRP?: boolean;
 }
 
 export class ReOrder {

@@ -137,6 +137,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     regionId: null,
     locationId: null,
     departmentId: null,
+    skillId: null,
     orientated: null,
     date: null,
     meal: null,
@@ -496,6 +497,11 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       this.getOpenPositions();
       this.cdr.markForCheck();
     }) || null;
+
+    this.unsubscribe('skillId');
+    this.subscriptions['skillId'] = this.scheduleForm.get('skillId')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => this.getOpenPositions()) || null;
   }
 
   private watchForToggleControls(): void {

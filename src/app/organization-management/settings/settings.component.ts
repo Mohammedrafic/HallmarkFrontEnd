@@ -168,6 +168,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   hasPermissions: Record<string, boolean> = {};
   regularLocalRatesToggleMessage = false;
   dialogHeader = 'Add Settings';
+  numericValueLabel = 'Value';
 
 
   private readonly settingsAppliedToPermissions = SettingsAppliedToPermissions;
@@ -225,7 +226,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.configurationSystemType = system;
 
     if (updateButtons) {
-      this.systemButtons = GetSettingSystemButtons(this.configurationSystemType === SystemType.IRP);
+      this.systemButtons =
+        GetSettingSystemButtons(this.configurationSystemType === SystemType.IRP, !!this.selectedChildRecord);
     }
 
     if (updateForm && this.selectedParentRecord) {
@@ -317,7 +319,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == parentRecord.settingKey;
     this.IsSettingKeyAvailabiltyOverLap = OrganizationSettingKeys[OrganizationSettingKeys['AvailabilityOverLapRule']].toString() == parentRecord.settingKey;
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == parentRecord.settingKey;
-
+    
+    this.setNumericValueLabel(parentRecord.settingKey);
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
@@ -521,7 +524,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         takeUntil(this.unsubscribe$),
       )
       .subscribe((data: OrganizationSettingsGet[]) => {
-        const adaptedData = SettingsDataAdapter.adaptSettings(data, this.orgSystems.IRPAndVMS);
+        const adaptedData = SettingsDataAdapter.adaptSettings(data, this.orgSystems);
 
         this.configurations = data;
         this.lastAvailablePage = this.getLastPage(data);
@@ -738,7 +741,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isPayPeriod: true };
     }
 
-    if (dynamicValue.isCheckboxValue) {
+    if (dynamicValue?.isCheckboxValue) {
       this.checkboxValueForm.setValue({
         value: dynamicValue.value ? dynamicValue.value : '',
         isEnabled: dynamicValue.isEnabled ? dynamicValue.isEnabled : false,
@@ -1147,10 +1150,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private getParentConfigurationSystemType(): SystemType {
-    if (this.selectedParentRecord) {
-      const type = !this.selectedParentRecord.includeInIRP && this.selectedParentRecord.includeInVMS
-        ? SystemType.VMS
-        : SystemType.IRP;
+    if (this.selectedParentRecord && this.orgSystems.IRPAndVMS) {
+      const sharedConfiguration = this.selectedParentRecord.includeInIRP && this.selectedParentRecord.includeInVMS;
+      const sharedConfigurationWithTheSameValue = sharedConfiguration && !this.selectedParentRecord.separateValuesInSystems;
+      const type = (!this.selectedParentRecord.includeInIRP && this.selectedParentRecord.includeInVMS)
+        || sharedConfigurationWithTheSameValue ? SystemType.VMS : SystemType.IRP;
 
       return type;
     }
@@ -1325,7 +1329,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         });
       }
 
-      if (dynamicValue.isSwitchedValue) {
+      if (dynamicValue?.isSwitchedValue) {
         this.switchedValueForm.setValue({
           value: dynamicValue.value,
           isEnabled: dynamicValue.isEnabled,
@@ -1361,5 +1365,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   ): void {
     this.selectedParentRecord = parentRecord;
     this.selectedChildRecord = childRecord;
+  }
+
+  private setNumericValueLabel(settingKey: string): void{
+    const isOnHold = OrganizationSettingKeys[OrganizationSettingKeys['OnHoldDefault']].toString() === settingKey;
+    this.numericValueLabel = isOnHold ? 'Value (Weeks)' : 'Value';
   }
 }

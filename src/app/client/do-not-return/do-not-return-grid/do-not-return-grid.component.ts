@@ -718,6 +718,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       .subscribe((data) => {
         if(data != null && data != undefined){
           this.orgid=data;
+          this.onFormCancelClick();
           this.onFilterClearAll();
           this.store.dispatch(new ShowSideDialog(false));
         }
@@ -746,7 +747,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       ids = this.orgid;
       let filter: DoNotReturnCandidateSearchFilter = {
         searchText: e.text,
-        businessUnitId: this.orgid,
+        businessUnitId: this.selectedOrganization?.id == undefined ? this.orgid : this.selectedOrganization?.id, //this.orgid,
       };
       this.CandidateNames = [];
       this.store.dispatch(new DoNotReturn.GetDoNotReturnCandidateSearch(filter))

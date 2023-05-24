@@ -54,6 +54,7 @@ export class SetLock {
   constructor(
     public id: number,
     public lockStatus: boolean,
+    public lockStatusIRP: boolean,
     public filters: OrderFilter = {},
     public prefixId: string,
     public isIrp: boolean,

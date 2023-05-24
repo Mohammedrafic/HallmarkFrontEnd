@@ -83,10 +83,11 @@ export const DisabledSettingsByDefault = [
   'CreateReplacementPerDiemOrder',
   'PayPeriod',
   'OnHoldDefault',
+  'LockIRPCandidateAvailability',
 ];
 
-export const GetSettingSystemButtons = (isIRP: boolean): ButtonModel[] => {
-  return [
+export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {
+  const buttons = [
     {
       id: SystemType.IRP,
       title: SystemType[SystemType.IRP],
@@ -98,6 +99,12 @@ export const GetSettingSystemButtons = (isIRP: boolean): ButtonModel[] => {
       active: !isIRP,
     },
   ];
+
+  if (showOnlyActive) {
+    return buttons.filter((item) => item.active);
+  }
+
+  return buttons;
 };
 
 export const DropdownCheckboxValueDataSource = [

@@ -7,6 +7,7 @@
         [class.errored]="hasError"
         readonly
         placeholder="MM/DD/YYYY"
+        [value] = "lastdatevalue ? (lastdatevalue | date: 'MM/dd/yyy') : ''"
       />
       <div
         [class.active]="isCalendarShow"
