@@ -51,6 +51,7 @@ import {
   SetIsFirstLoadState,
   ToggleSidebarState,
   ToggleTheme,
+  SaveMainContentElement,
 } from '../store/app.actions';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { MenuItemNames } from './shell.constant';
@@ -222,6 +223,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   ngAfterViewInit(): void {
     this.hideAnalyticsSubMenuItems();
     this.getAlertsPoollingTime();
+    this.saveMainContentElement();
   }
 
   onSelectProfileMenu(event: any): void {
@@ -835,5 +837,9 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         this.isMobile = screen.isMobile;
         this.isSmallDesktop = screen.isDesktopSmall;
       });
+  }
+
+  private saveMainContentElement(): void {
+    this.store.dispatch(new SaveMainContentElement(this.mainContainer.nativeElement));
   }
 }

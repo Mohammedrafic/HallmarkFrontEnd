@@ -161,9 +161,15 @@
   (pageSizeChangeEmitter)="changePageSize($event)"
 ></app-grid-pagination>
 
-<app-filter-dialog [items]="filteredItems" [count]="(candidates$ | async)?.totalCount"
-  (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()"
-  (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+<app-filter-dialog
+  [targetElement]="targetElement$ | async"
+  [items]="filteredItems"
+  [count]="(candidates$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
   <form [formGroup]="CandidateFilterFormGroup">
     <ng-container *ngIf="!isIRP && CandidateFilterFormGroup">
       <div class="bootstrap">

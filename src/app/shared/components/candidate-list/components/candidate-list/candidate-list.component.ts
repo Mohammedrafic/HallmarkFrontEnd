@@ -79,6 +79,7 @@ import { ScrollRestorationService } from '@core/services/scroll-restoration.serv
 import { CandidateListScroll } from './candidate-list.enum';
 import { OutsideZone } from '@core/decorators';
 import { GlobalWindow } from '@core/tokens';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-candidate-list',
@@ -112,6 +113,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   assignedSkills$: Observable<ListOfSkills[]>;
+
+  @Select(AppState.getMainContentElement)
+  public readonly targetElement$: Observable<HTMLElement | null>;
 
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;

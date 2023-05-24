@@ -17,6 +17,7 @@ import {
   SetIrpFlag,
   GetDeviceScreenResolution,
   GetAlertsCountForCurrentUser,
+  SaveMainContentElement,
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -40,6 +41,7 @@ export interface AppStateModel {
   isDekstopScreen: boolean;
   shouldDisableUserDropDown: boolean;
   isIrpEnabled: boolean;
+  mainContentElement: HTMLElement | null;
   breakpoints: {
     isMobile: boolean;
     isTablet: boolean;
@@ -68,6 +70,7 @@ export interface AppStateModel {
     isDekstopScreen: false,
     shouldDisableUserDropDown: false,
     isIrpEnabled: false,
+    mainContentElement: null,
     breakpoints: {
       isMobile: false,
       isTablet: false,
@@ -153,6 +156,11 @@ export class AppState {
   @Selector()
   static getDeviceScreenResolution(state: AppStateModel): AppStateModel['breakpoints'] {
     return state.breakpoints;
+  }
+
+  @Selector()
+  static getMainContentElement(state: AppStateModel): AppStateModel['mainContentElement'] {
+    return state.mainContentElement;
   }
 
   @Action(ToggleMobileView)
@@ -250,7 +258,7 @@ export class AppState {
   }
 
   @Action(GetDeviceScreenResolution)
-  GetDeviceScreenResolution({ patchState }: StateContext<AppStateModel>) {
+  GetDeviceScreenResolution({ patchState }: StateContext<AppStateModel>): void {
     this.breakpointObserver
       .getBreakpointMediaRanges()
       .subscribe(({ isMobile, isTablet, isDesktopSmall, isDesktopLarge }) => {
@@ -263,5 +271,13 @@ export class AppState {
           },
         });
       });
+  }
+
+  @Action(SaveMainContentElement)
+  SaveMainContentElement(
+    { patchState }: StateContext<AppStateModel>,
+    { contentElement }: SaveMainContentElement
+  ) {
+    patchState({ mainContentElement: contentElement });
   }
 }
