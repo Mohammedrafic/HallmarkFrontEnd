@@ -34,6 +34,7 @@ export class OrganizationSettingChild {
   systemType?: string | null;
   displayValue: string;
   parsedValue?: any;
+  hidden = false;
 }
 
 export class OrganizationSettingsPost {
