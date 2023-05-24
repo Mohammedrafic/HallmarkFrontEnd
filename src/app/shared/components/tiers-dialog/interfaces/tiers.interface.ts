@@ -45,6 +45,11 @@ export interface TierDetails {
   regionId: number;
   regionName: string;
   organizationTierId: number;
+  workcommitmentId : number;
+  skillId : number;
+  All : boolean;
+  Primary : boolean;
+  Secondary : boolean;
 }
 
 export type TiersPage = PageOfCollections<TierDetails>;
