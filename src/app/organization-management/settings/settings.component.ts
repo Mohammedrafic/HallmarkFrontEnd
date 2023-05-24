@@ -522,7 +522,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         takeUntil(this.unsubscribe$),
       )
       .subscribe((data: OrganizationSettingsGet[]) => {
-        const adaptedData = SettingsDataAdapter.adaptSettings(data, this.orgSystems.IRPAndVMS);
+        const adaptedData = SettingsDataAdapter.adaptSettings(data, this.orgSystems);
 
         this.configurations = data;
         this.lastAvailablePage = this.getLastPage(data);

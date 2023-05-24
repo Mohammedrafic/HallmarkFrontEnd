@@ -1,6 +1,7 @@
 import { formatDate } from '@angular/common';
 
 import { DropdownOption } from '@core/interface';
+import { OrganizationSystems } from '@organization-management/settings/settings.constant';
 import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
 import {
   OrganizationSettingChild,
@@ -21,7 +22,10 @@ export class SettingsDataAdapter {
     return [];
   }
 
-  static adaptSettings(settings: OrganizationSettingsGet[], IRPAndVMS: boolean): OrganizationSettingsGet[] {
+  static adaptSettings(
+    settings: OrganizationSettingsGet[],
+    orgSystems: typeof OrganizationSystems
+  ): OrganizationSettingsGet[] {
     SettingsDataAdapter.setParsedValues(settings);
     return settings.map((item: OrganizationSettingsGet) => {
       if (
@@ -42,12 +46,12 @@ export class SettingsDataAdapter {
       }
 
       item.children?.forEach((child: OrganizationSettingChild) => {
-        child.systemType = IRPAndVMS ? SettingsDataAdapter.getSettingChildSystemType(child) : null;
+        child.systemType = orgSystems.IRPAndVMS ? SettingsDataAdapter.getSettingChildSystemType(child) : null;
         child.displayValue = SettingsDataAdapter.getSettingChildDisplayValue(child, item.controlType);
       });
 
-      item.systemType = IRPAndVMS ? SettingsDataAdapter.getSettingSystemType(item) : null;
-      item.displayValue = SettingsDataAdapter.getSettingDisplayValue(item);
+      item.systemType = orgSystems.IRPAndVMS ? SettingsDataAdapter.getSettingSystemType(item) : null;
+      item.displayValue = SettingsDataAdapter.getSettingDisplayValue(item, orgSystems);
 
       return item;
     });
@@ -160,38 +164,44 @@ export class SettingsDataAdapter {
     });
   }
 
-  private static getSettingDisplayValue(setting: OrganizationSettingsGet): string {
+  private static getSettingDisplayValue(setting: OrganizationSettingsGet, orgSystems: typeof OrganizationSystems): string {
     let displayValue: string;
 
-    if (setting.separateValuesInSystems && setting.children && setting.children.length > 1) {
+    if (setting.separateValuesInSystems && orgSystems.IRPAndVMS) {
       return SettingsDataAdapter.getSharedSettingDisplayValue(setting);
     }
 
     switch (setting.controlType) {
       case OrganizationSettingControlType.Checkbox:
-        displayValue = SettingsDataAdapter.getCheckboxDisplayValue(setting.value);
+        displayValue = SettingsDataAdapter
+          .getCheckboxDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
         break;
       case OrganizationSettingControlType.Multiselect:
       case OrganizationSettingControlType.Select:
-        displayValue = SettingsDataAdapter.getMultiselectDisplayValue(setting.value);
+        displayValue = SettingsDataAdapter
+          .getMultiselectDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
         break;
       case OrganizationSettingControlType.Text:
-        displayValue = setting.value;
+        displayValue = SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP);
         break;
       case OrganizationSettingControlType.DateTime:
-        displayValue = formatDate(setting.value, 'MM/dd/yyyy', 'en-US');
+        displayValue = formatDate(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP), 'MM/dd/yyyy', 'en-US');
         break;
       case OrganizationSettingControlType.InvoiceAutoGeneration:
-        displayValue = SettingsDataAdapter.getInvoiceDisplayValue(setting.value);
+        displayValue = SettingsDataAdapter
+          .getInvoiceDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
         break;
       case OrganizationSettingControlType.SwitchedValue:
-        displayValue = SettingsDataAdapter.getSwitchedDisplayValue(setting.parsedValue);
+        displayValue = SettingsDataAdapter
+          .getSwitchedDisplayValue(SettingsDataAdapter.getParentSettingParsedValue(setting, orgSystems.IRP));
         break;
       case OrganizationSettingControlType.CheckboxValue:
-        displayValue = SettingsDataAdapter.getCheckboxValueDisplayValue(setting.value);
+        displayValue = SettingsDataAdapter
+          .getCheckboxValueDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
         break;
       case OrganizationSettingControlType.PayPeriod:
-        displayValue = SettingsDataAdapter.getPayPeriodDisplayValue(setting.parsedValue);
+        displayValue = SettingsDataAdapter
+          .getPayPeriodDisplayValue(SettingsDataAdapter.getParentSettingParsedValue(setting, orgSystems.IRP));
         break;
       default:
         displayValue = '';
