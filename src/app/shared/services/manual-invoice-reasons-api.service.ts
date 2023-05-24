@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
@@ -42,7 +42,8 @@ export class ManualInvoiceReasonsApiService {
    * Remove reason
    * @param id
    */
-  public removeManualInvoiceReason(id: number): Observable<void> {
-    return this.http.delete<void>(`/api/ManualInvoiceReasons/${id}`);
+  public removeManualInvoiceReason(id: number,businessUnitId?: number): Observable<void> {
+    const headers = businessUnitId ? new HttpHeaders({ 'selected-businessunit-id': `${businessUnitId}` }) : {};
+    return this.http.delete<void>(`/api/ManualInvoiceReasons/${id}`, { headers });
   }
 }

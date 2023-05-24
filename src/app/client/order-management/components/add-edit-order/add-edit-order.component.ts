@@ -756,7 +756,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     };
     const documents = this.orderDetailsFormComponent.documents;
     this.store.dispatch(new SaveOrder(extendedOrder, documents));
-    this.selectOrderTemplatesTab();
     this.closeSaveTemplateDialog();
   }
 
@@ -846,10 +845,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (!this.getOrderDetailsControl('departmentId')?.disabled) {
       this.getOrderDetailsControl('departmentId')?.markAsTouched();
     }
-  }
-
-  private selectOrderTemplatesTab(): void {
-    this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.OrderTemplates));
   }
 
   private getJobDistributionOptions(distributions: JobDistributionModel[]): number[] {

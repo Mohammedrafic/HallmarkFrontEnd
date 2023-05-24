@@ -23,6 +23,7 @@ import {
   OrderManagement,
   OrderManagementFilter,
   OrderManagementPage,
+  OrdersJourneyPage,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { CandidateCancellation } from '@shared/models/candidate-cancellation.model';
@@ -91,11 +92,19 @@ export class OrderManagementContentService {
     return this.http.post<OrderManagementPage>(`/api/Orders/all`, payload);
   }
 
+    /**
+   * Get the orders journey
+   @param payload filter with details we need to get
+   */
+   public getOrdersJourney(payload: OrderManagementFilter | object): Observable<OrdersJourneyPage> {
+    return this.http.post<OrdersJourneyPage>(`/api/Orders/allOrderJourney`, payload);
+  }
+
   /**
    * Lock/Unlock the order
    */
-  public setLock(orderId: number, lockStatus: boolean): Observable<boolean> {
-    return this.http.post<boolean>(`/api/Orders/setLock`, { orderId, lockStatus });
+  public setLock(orderId: number, lockStatus: boolean,lockStatusIRP:boolean): Observable<boolean> {
+    return this.http.post<boolean>(`/api/Orders/setLock`, { orderId, lockStatus ,lockStatusIRP});
   }
 
   /**
@@ -478,6 +487,13 @@ export class OrderManagementContentService {
   public irpexport(payload: ExportPayload, tab: OrderManagementIRPTabs): Observable<any> {
     return this.http.post(`/api/IRPOrders/export`, payload, { responseType: 'blob' });
   }
+
+  /**
+   * Export IRP Orders list*/
+  public orderJourneyexport(payload: ExportPayload): Observable<any> {
+    return this.http.post(`/api/Orders/exportOrderJourney`, payload, { responseType: 'blob' });
+  }
+
 
   /**
    * Export agency list

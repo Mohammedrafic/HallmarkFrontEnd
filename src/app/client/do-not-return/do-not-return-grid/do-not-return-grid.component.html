@@ -87,7 +87,7 @@
           <div class="inline-radio-container">
             <ejs-radiobutton formControlName="isExternal" label="Search Candidate" name="isExternal" value='false' [disabled]="!isEdit ? false : true"></ejs-radiobutton>
             &nbsp;&nbsp;
-            <ejs-radiobutton formControlName="isExternal" label="Block new candidate" name="isExternal"  value='true' [disabled]="!isEdit ? false : true"></ejs-radiobutton>
+            <ejs-radiobutton formControlName="isExternal" label="Block New Candidate" name="isExternal"  value='true' [disabled]="!isEdit ? false : true"></ejs-radiobutton>
           </div>
       </div>
     </div>
@@ -144,21 +144,21 @@
     <div class="input-container">      
       <app-datepicker
           [formGroupInstance]="doNotReturnFormGroup" [max]="today"  id="dob" controlName="dob" label="Date of Birth" 
-          [enabled]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? true : false : false"></app-datepicker>
+          [enabled]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? true : false : (isEdit && isBlock) ? true : false"></app-datepicker>
     </div>
     <div class="d-flex">
       <div class="input-container bootstrap f-grow-2">
         <label>SSN</label>
         <div class="input-group">
           <input  appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" 
-              [attr.disabled]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? null : true : true" />
+              [attr.disabled]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? null : true : (isEdit && isBlock) ? null : true" />
         </div>
       </div>
       <div class="input-container"></div>
     </div>
     <div class="input-container">
       <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="candidateEmail" id="email"  [disable]="true"
-                [disable]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? null : true : true" label="Email"></app-input>
+                [disable]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? null : true : (isEdit && isBlock) ? null : true" label="Email"></app-input>
     </div>
     
     <div class="form-elemet">

@@ -39,6 +39,7 @@ import {
   GetBusinessForEmployeeType,
   GetEmployeeUsers,
   ExportTimeSheetList,
+  GetLogFileDownload,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -46,7 +47,7 @@ import { PermissionsTree } from '@shared/models/permission.model';
 import { RoleTreeField } from '../roles-and-permissions/role-form/role-form.component';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
+import { DOCUMENT_DOWNLOAD_SUCCESS, EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UsersService } from '../services/users.service';
 import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
@@ -83,6 +84,7 @@ interface SecurityStateModel {
   logDialogOptions: DialogNextPreviousOption;
   logTimeSheetHistoryPage: LogTimeSheetHistoryPage | null;
   userData: User[];
+  logFileDownloadDetail:any;
 }
 
 @State<SecurityStateModel>({
@@ -108,7 +110,8 @@ interface SecurityStateModel {
       previous: false,
     },
     logTimeSheetHistoryPage:null,
-    userData: []
+    userData: [],
+    logFileDownloadDetail:null
   },
 })
 @Injectable()
@@ -207,7 +210,7 @@ export class SecurityState {
   @Selector()
   static roleTreeField(state: SecurityStateModel): RoleTreeField {
     return {
-      dataSource: state.permissionsTree.filter(({ isAvailable,includeInIRP }) => isAvailable&&!includeInIRP),
+      dataSource: state.permissionsTree.filter(({ isAvailable }) => isAvailable),
       id: 'id',
       parentID: 'parentId',
       text: 'name',
@@ -261,6 +264,11 @@ export class SecurityState {
   @Selector()
   static userData(state: SecurityStateModel): User[] {
     return state.userData;
+  }
+
+  @Selector()
+  static logFileDownloadDetail(state: SecurityStateModel): any | null {
+    return state.logFileDownloadDetail;
   }
 
   constructor(
@@ -682,6 +690,20 @@ export class SecurityState {
           return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
         })
       );
+  }
+  
+  @Action(GetLogFileDownload)
+  GetLogFileDownload({ patchState, dispatch }: StateContext<SecurityStateModel>, { runId,organizationId }: GetLogFileDownload): Observable<any | void> {
+    return this.orgInterfaceService.logFileDownload(runId,organizationId).pipe(
+      tap((payload) => {
+        patchState({ logFileDownloadDetail: payload });
+        dispatch(new ShowToast(MessageTypes.Success, DOCUMENT_DOWNLOAD_SUCCESS));
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
   }
 
   @Action(ExportTimeSheetList)

@@ -21,6 +21,12 @@ export const PurchaseOrdderColumnsDefinition = (
   actionCellParams: ICellRendererParams, datePipe?: DatePipe): ColumnDefinitionModel[] => {
   return [
     {
+      field: '',
+      headerName: 'Action',
+      cellRenderer: ActionCellRendererComponent,
+      cellRendererParams: actionCellParams,
+    },
+    {
       field: PurchaseOrderTableColumns.Id,
       headerName: PurchaseOrderHeaderText.Id,
       hide: true,
@@ -117,17 +123,17 @@ export const PurchaseOrdderColumnsDefinition = (
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY',
       },
     },
+  ];
+};
+
+export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererParams, datePipe?: DatePipe): ColumnDefinitionModel[] => {
+  return [
     {
       field: '',
       headerName: 'Action',
       cellRenderer: ActionCellRendererComponent,
       cellRendererParams: actionCellParams,
     },
-  ];
-};
-
-export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererParams, datePipe?: DatePipe): ColumnDefinitionModel[] => {
-  return [
     {
       field: SpecialProjectTableColumns.Id,
       headerName: SpecialProjectHeaderText.Id,
@@ -226,16 +232,25 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       },
     },
     {
-      field: '',
-      headerName: 'Action',
-      cellRenderer: ActionCellRendererComponent,
-      cellRendererParams: actionCellParams,
+      field: SpecilaProjectCategoryTableColumns.System,
+      headerName: SpecilaProjectCategoryHeaderText.System,
+      ...commonColumn,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+      },
     },
   ];
 };
 
 export const SpecialProjectCategoryColumnsDefinition = (actionCellParams: ICellRendererParams): ColumnDefinitionModel[] => {
   return [
+    {
+      field: '',
+      headerName: 'Action',
+      cellRenderer: ActionCellRendererComponent,
+      cellRendererParams: actionCellParams,
+    },
     {
       field: SpecilaProjectCategoryTableColumns.Id,
       headerName: SpecilaProjectCategoryHeaderText.Id,
@@ -251,16 +266,25 @@ export const SpecialProjectCategoryColumnsDefinition = (actionCellParams: ICellR
       },
     },
     {
-      field: '',
-      headerName: 'Action',
-      cellRenderer: ActionCellRendererComponent,
-      cellRendererParams: actionCellParams,
+      field: SpecilaProjectCategoryTableColumns.System,
+      headerName: SpecilaProjectCategoryHeaderText.System,
+      ...commonColumn,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+      },
     },
   ];
 };
 
 export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRendererParams): ColumnDefinitionModel[] => {
   return [
+    {
+      field: '',
+      headerName: 'Action',
+      cellRenderer: ActionCellRendererComponent,
+      cellRendererParams: actionCellParams,
+    },
     {
       field: SpecilaProjectMappingTableColumns.Id,
       headerName: SpecilaProjectMappingHeaderText.Id,
@@ -333,16 +357,25 @@ export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRe
       },
     },
     {
-      field: '',
-      headerName: 'Action',
-      cellRenderer: ActionCellRendererComponent,
-      cellRendererParams: actionCellParams,
+      field: SpecilaProjectCategoryTableColumns.System,
+      headerName: SpecilaProjectCategoryHeaderText.System,
+      ...commonColumn,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+      },
     },
   ];
 };
 
 export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRendererParams): ColumnDefinitionModel[] => {
   return [
+    {
+      field: '',
+      headerName: 'Action',
+      cellRenderer: ActionCellRendererComponent,
+      cellRendererParams: actionCellParams,
+    },
     {
       field: PurchaseOrderMappingTableColumns.Id,
       headerName: PurchaseOrderMappingHeaderText.Id,
@@ -404,12 +437,6 @@ export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRen
       filterParams: {
         buttons: ['reset'],
       },
-    },
-    {
-      field: '',
-      headerName: 'Action',
-      cellRenderer: ActionCellRendererComponent,
-      cellRendererParams: actionCellParams,
     },
   ];
 };

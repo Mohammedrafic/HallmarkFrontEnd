@@ -46,6 +46,7 @@ export interface ScheduleTypeRadioButton {
   value: ScheduleItemType;
   name: string;
   disabled: boolean;
+  toolTipMessage: string;
   permission: UserPermissions;
 }
 
@@ -86,6 +87,7 @@ export interface ScheduleBook extends ScheduleItemAttributes{
   skillId: number | null;
   employeeBookedDays: EmployeeBookingDay[];
   createOrder: boolean;
+  perDiemOrderId?: number | null;
 }
 
 export interface BookingError {

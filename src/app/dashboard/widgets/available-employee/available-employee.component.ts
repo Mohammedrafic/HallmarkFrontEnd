@@ -20,7 +20,7 @@ export class AvailableEmployeeComponent  implements OnInit {
   }
   public rowData: AvailableEmployeeModel[] ;
   public columnDefs:ColDef[] = [
-    { field: 'fullName', headerName:"Name",width:150},
+    { field: 'fullName', headerName:"Name",width:180},
     { field: 'startDateTime', headerName:"Start Date Time",width:180},
     { field: 'endDateTime', headerName:"End Date Time",width:180},
   ];

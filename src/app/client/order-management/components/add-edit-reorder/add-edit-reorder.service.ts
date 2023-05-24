@@ -12,6 +12,10 @@ import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enu
 import { DateTimeHelper, GetQueryParams } from '@core/helpers';
 import { AgencyModel, CandidateModel } from './models/candidate.model';
 import { ReorderRequest, ReorderRequestModel, ReorderResponse } from './models/reorder.model';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { MandatoryAgencyErrorMessage, MandatoryCandidateErrorMessage } from './add-edit-reorder.constant';
+import { ToastUtility } from '@syncfusion/ej2-notifications';
 
 @Injectable({
   providedIn: 'root',
@@ -62,6 +66,70 @@ export class AddEditReorderService {
       .getPredefinedBillRates(OrderType.OpenPerDiem, departmentId, skillId)
       .pipe(map((billRates: BillRate[]) => billRates[0].rateHour));
   }
+
+  /**
+   * Check if candidates that can't be unselected are still selected.
+   */
+  checkCandidates(cndidates: CandidateModel[], selectedIds: number[]): boolean {
+    const mandatoryCandidateIds = cndidates.filter((candidate) => candidate.hasActiveCandidate)
+    .map((candidate) => candidate.candidateId);
+
+    if (!mandatoryCandidateIds.length) {
+      return true;
+    }
+
+    const allMandatoryPresent = mandatoryCandidateIds.every((id) => {
+      const idPresent = selectedIds.includes(id);
+
+      if (!idPresent) {
+        const condidateName = cndidates.find((candidate) => candidate.candidateId === id)?.candidateName as string;
+        const message = MandatoryCandidateErrorMessage(condidateName);
+
+        ToastUtility.show({
+          title: 'Error',
+          content: message,
+          position: { X: 'Center', Y: 'Top' },
+          cssClass: 'error-toast',
+        });
+      }
+
+      return idPresent;
+    });
+
+    return allMandatoryPresent;
+  }
+
+    /**
+   * Check if agencies that can't be unselected are still selected.
+   */
+    checkAgencies(agencies: AgencyModel[], selectedIds: number[]): boolean {
+      const mandatoryAgencyIds = agencies.filter((agency) => agency.hasActiveCandidate)
+      .map((agency) => agency.agencyId);
+  
+      if (!mandatoryAgencyIds.length) {
+        return true;
+      }
+  
+      const allMandatoryPresent = mandatoryAgencyIds.every((id) => {
+        const idPresent = selectedIds.includes(id);
+  
+        if (!idPresent) {
+          const agencyName = agencies.find((agency) => agency.agencyId === id)?.agencyName as string;
+          const message = MandatoryAgencyErrorMessage(agencyName);
+
+          ToastUtility.show({
+            title: 'Error',
+            content: message,
+            position: { X: 'Center', Y: 'Top' },
+            cssClass: 'error-toast',
+          });
+        }
+  
+        return idPresent;
+      });
+  
+      return allMandatoryPresent;
+    }
 
   private adaptToReorderRequest(
     { reOrderId, reOrderFromId, agencyIds, reorder }: ReorderRequestModel,

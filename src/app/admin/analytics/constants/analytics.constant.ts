@@ -275,5 +275,11 @@ export const CommentsByFilter: { name: string; id: number }[] = [
   { name: 'Organization', id: 1 },
   { name: 'Agency', id: 2 }
 ];
+export const invoiceStatusListWithReject: { name: string; id: number }[] = [
+  { name: 'Submitted Pending Approval', id: 1 },
+  { name: 'Pending Payment', id: 2 },
+  { name: 'Paid', id: 0 },
+  { name: 'Rejected', id: 3 }
+];
 
 

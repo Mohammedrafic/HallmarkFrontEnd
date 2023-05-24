@@ -20,6 +20,7 @@ import { OrganizationSettingControlType } from '@shared/enums/organization-setti
 import { OrganizationSettingValidationType } from '@shared/enums/organization-setting-validation-type';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { Weeks } from '@shared/enums/weeks';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { ButtonModel } from '@shared/models/buttons-group.model';
@@ -62,7 +63,7 @@ import {
   SaveOrganizationSettings,
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
-import { Weeks } from '@shared/enums/weeks';
+import { SettingsDataAdapter } from './helpers/settings-data.adapter';
 import {
   AssociatedLink,
   BillingSettingsKey,
@@ -80,8 +81,7 @@ import {
   TextOptionFields,
   TierSettingsKey,
 } from './settings.constant';
-import { SettingsDataAdapter } from './helpers/settings-data.adapter';
-import { AutoGenerationPayload, SwitchValuePayload, PayPeriodPayload } from './settings.interface';
+import { AutoGenerationPayload, PayPeriodPayload, SwitchValuePayload } from './settings.interface';
 
 /**
  * TODO: component needs to be rework with configurable dialog and form.
@@ -172,6 +172,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private readonly settingsAppliedToPermissions = SettingsAppliedToPermissions;
 
+  private selectedParentRecord: OrganizationSettingsGet | null;
+  private selectedChildRecord: OrganizationSettingChild | null;
   private orgStructure: OrganizationStructure;
   private orgRegions: OrganizationRegion[] = [];
   private organizationHierarchy: number;
@@ -219,11 +221,16 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.unsubscribe$.complete();
   }
 
-  setConfigurationSystemType(system: SystemType, updateButtons = false): void {
+  setConfigurationSystemType(system: SystemType, updateButtons = false, updateForm = false): void {
     this.configurationSystemType = system;
 
     if (updateButtons) {
-      this.systemButtons = GetSettingSystemButtons(this.configurationSystemType === SystemType.IRP);
+      this.systemButtons =
+        GetSettingSystemButtons(this.configurationSystemType === SystemType.IRP, !!this.selectedChildRecord);
+    }
+
+    if (updateForm && this.selectedParentRecord) {
+      this.setFormValuesForEdit(this.selectedParentRecord, this.selectedChildRecord);
     }
   }
 
@@ -262,6 +269,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   openOverrideSettingDialog(data: OrganizationSettingsGet): void {
+    this.setSelectedRecords(data);
     this.setConfigurationSystemType(this.getParentConfigurationSystemType(), true);
     this.separateValuesInSystems = data.separateValuesInSystems;
     this.enableOtForm();
@@ -292,8 +300,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.maxFieldLength = 2;
       this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
     } else {
-      this.switchedValueForm.get('value')?.removeValidators(Validators.maxLength(2));
-      this.maxFieldLength = 100;
+      this.switchedValueForm.get('value')?.clearValidators();
       this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
     }
   }
@@ -303,6 +310,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     childRecord: OrganizationSettingChild | undefined,
     event: MouseEvent
   ): void {
+    this.setSelectedRecords(parentRecord, childRecord);
     this.separateValuesInSystems = parentRecord.separateValuesInSystems;
     this.IsSettingKeyOtHours =
       OrganizationSettingKeys[OrganizationSettingKeys['OTHours']].toString() == parentRecord.settingKey;
@@ -323,14 +331,21 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.formControlType = parentRecord.controlType;
     this.disableDepForInvoiceGeneration();
     this.setFormValidation(parentRecord);
-    this.setChildRecordData(parentRecord, childRecord);
+    this.isParentEdit = !childRecord;
+    this.setSystemTypeForEditMode(childRecord);
+    this.setChildRecordData(childRecord);
+    this.setFormValuesForEdit(parentRecord, childRecord || null);
     this.store.dispatch(new ShowSideDialog(true));
     if (this.IsSettingKeyAvailabiltyOverLap) {
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
-    } else {
-      this.switchedValueForm.get('value')?.removeValidators(Validators.maxLength(2));
-      this.maxFieldLength = 100;
+    } else{
+     this.switchedValueForm.get('value')?.clearValidators();
+    }
+    if (this.isParentEdit && (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability)) {
+      this.RegionLocationSettingsMultiFormGroup.disable();
+      this.allRegionsSelected = true;
+      this.allLocationsSelected = true;
     }
   }
 
@@ -507,7 +522,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         takeUntil(this.unsubscribe$),
       )
       .subscribe((data: OrganizationSettingsGet[]) => {
-        const adaptedData = SettingsDataAdapter.adaptSettings(data, this.orgSystems.IRPAndVMS);
+        const adaptedData = SettingsDataAdapter.adaptSettings(data, this.orgSystems);
 
         this.configurations = data;
         this.lastAvailablePage = this.getLastPage(data);
@@ -585,12 +600,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     this.store.dispatch(new SaveOrganizationSettings(setting, this.filters));
     this.store.dispatch(new ShowSideDialog(false));
+    this.setSelectedRecords();
     this.removeActiveCssClass();
     this.clearFormDetails();
     this.isFormShown = false;
   }
 
   private setFormValidation(data: OrganizationSettingsGet): void {
+    this.maxFieldLength =100;
     const validators: ValidatorFn[] = [];
 
     data.validations.forEach((validation: OrganizationSettingValidation) => {
@@ -657,67 +674,72 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     });
   }
 
-  private setFormValuesForEdit(parentData: any, childData: any): void {
+  private setFormValuesForEdit(parentData: OrganizationSettingsGet, childData: OrganizationSettingChild | null): void {
     let dynamicValue: any;
+    const childDataValue = childData?.value;
+    const parentDataValue = SettingsDataAdapter
+      .getParentSettingValue(parentData, this.configurationSystemType === SystemType.IRP);
 
     if (this.formControlType === OrganizationSettingControlType.Checkbox) {
-      dynamicValue = this.isParentEdit ? parentData.value === 'true' : childData.value === 'true';
+      dynamicValue = this.isParentEdit ? parentDataValue === 'true' : childDataValue === 'true';
     }
 
     if (
       this.formControlType === OrganizationSettingControlType.DateTime ||
       this.formControlType === OrganizationSettingControlType.Text
     ) {
-      dynamicValue = this.isParentEdit ? parentData.value : childData.value;
+      dynamicValue = this.isParentEdit ? parentDataValue : childDataValue;
     }
 
     if (this.formControlType === OrganizationSettingControlType.Multiselect) {
       this.dropdownDataSource = parentData.valueOptions;
       if (this.isParentEdit) {
-        dynamicValue = SettingsDataAdapter.getDropDownOptionIds(parentData.value);
+        dynamicValue = SettingsDataAdapter.getDropDownOptionIds(parentDataValue);
       } else {
-        dynamicValue = typeof childData.value === 'string'
-          ? childData.value.split(';')
-          : SettingsDataAdapter.getDropDownOptionIds(childData.value);
+        dynamicValue = typeof childDataValue === 'string'
+          ? childDataValue.split(';')
+          : SettingsDataAdapter.getDropDownOptionIds(childDataValue);
       }
     }
 
     if (this.formControlType === OrganizationSettingControlType.Select) {
       this.dropdownDataSource = parentData.valueOptions;
       dynamicValue = this.isParentEdit
-        ? SettingsDataAdapter.getDropDownOptionIds(parentData.value)
-        : SettingsDataAdapter.getDropDownOptionIds(childData.value);
+        ? SettingsDataAdapter.getDropDownOptionIds(parentDataValue)
+        : SettingsDataAdapter.getDropDownOptionIds(childDataValue);
       dynamicValue = dynamicValue.length !== 0 ? dynamicValue[0] : '';
     }
 
     if (this.formControlType === OrganizationSettingControlType.FixedKeyDictionary) {
-      const valueOptions = this.isParentEdit ? parentData.value : childData.value;
-      dynamicValue = { ...JSON.parse(valueOptions), isDictionary: true };
+      const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
+      dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isDictionary: true };
     }
 
     if (this.formControlType === OrganizationSettingControlType.InvoiceAutoGeneration) {
-      const valueOptions = this.isParentEdit ? parentData.value : childData.value;
-      dynamicValue = { ...JSON.parse(valueOptions), isInvoice: true };
+      const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
+      dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isInvoice: true };
     }
 
     if (this.formControlType === OrganizationSettingControlType.EmailAria) {
-      dynamicValue = this.isParentEdit ? parentData.value : childData.value;
+      dynamicValue = this.isParentEdit ? parentDataValue : childDataValue;
     }
 
     if (this.formControlType === OrganizationSettingControlType.SwitchedValue) {
-      const valueOptions = this.isParentEdit ? parentData.value : childData.value;
-      dynamicValue = { ...JSON.parse(valueOptions), isSwitchedValue: true };
-    }
-    if (this.formControlType === OrganizationSettingControlType.CheckboxValue) {
-      const valueOptions = this.isParentEdit ? parentData.value : childData.value;
-      dynamicValue = { ...JSON.parse(valueOptions), isCheckboxValue: true };
-    }
-    if (this.formControlType === OrganizationSettingControlType.PayPeriod) {
-      const valueOptions = this.isParentEdit ? parentData.value : childData.value;
-      dynamicValue = { ...JSON.parse(valueOptions), isPayPeriod: true };
+      const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
+      dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isSwitchedValue: true };
     }
 
-    if (dynamicValue.isCheckboxValue) {
+    if (this.formControlType === OrganizationSettingControlType.CheckboxValue) {
+      const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
+      dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isCheckboxValue: true };
+    }
+
+    if (this.formControlType === OrganizationSettingControlType.PayPeriod) {
+      const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
+      dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isPayPeriod: true };
+    }
+
+    if (dynamicValue?.isCheckboxValue) {
       this.checkboxValueForm.setValue({
         value: dynamicValue.value ? dynamicValue.value : '',
         isEnabled: dynamicValue.isEnabled ? dynamicValue.isEnabled : false,
@@ -726,8 +748,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     if (dynamicValue?.isPayPeriod) {
       this.payPeriodFormGroup.setValue({
-        date: dynamicValue.date,
-        noOfWeek: dynamicValue.noOfWeek
+        date: dynamicValue.date || dynamicValue.Date,
+        noOfWeek: dynamicValue.noOfWeek || dynamicValue.NoOfWeek,
       });
     }
 
@@ -838,41 +860,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     return parseInt(this.activeRowsPerPageDropDown);
   }
 
-  private getRowsPerPage(data: object[], currentPage: number): object[] {
-    const invoiceGneration: any = data.find((setting: any) => {
-      return setting.controlType === this.organizationSettingControlType.InvoiceAutoGeneration;
-    });
-
-    if (invoiceGneration && invoiceGneration.value && typeof invoiceGneration.value === 'string') {
-      invoiceGneration.parsedValue = JSON.parse(invoiceGneration.value);
-    }
-
-    const payPeriodGneration: any = data.find((setting: any) => {
-      return setting.controlType === this.organizationSettingControlType.PayPeriod;
-    });
-
-    if (payPeriodGneration && payPeriodGneration.value && typeof payPeriodGneration.value === 'string') {
-      payPeriodGneration.parsedValue = JSON.parse(payPeriodGneration.value);
-    }
-
-    const switchedValues: any[] = data.filter((setting: any) => {
-      return setting.controlType === this.organizationSettingControlType.SwitchedValue;
-    });
-
-    switchedValues.forEach((setting) => {
-      if (setting.value && typeof setting.value === 'string') {
-        setting.parsedValue = JSON.parse(setting.value);
-      }
-
-      if (setting.children && setting.children.length) {
-        setting.children.forEach((child: any) => {
-          if (child.value && typeof child.value === 'string') {
-            child.parsedValue = JSON.parse(child.value);
-          }
-        });
-      }
-    });
-
+  private getRowsPerPage(data: OrganizationSettingsGet[], currentPage: number): OrganizationSettingsGet[] {
     return data.slice(
       currentPage * this.getActiveRowsPerPage() - this.getActiveRowsPerPage(),
       currentPage * this.getActiveRowsPerPage()
@@ -1160,6 +1148,15 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private getParentConfigurationSystemType(): SystemType {
+    if (this.selectedParentRecord && this.orgSystems.IRPAndVMS) {
+      const sharedConfiguration = this.selectedParentRecord.includeInIRP && this.selectedParentRecord.includeInVMS;
+      const sharedConfigurationWithTheSameValue = sharedConfiguration && !this.selectedParentRecord.separateValuesInSystems;
+      const type = (!this.selectedParentRecord.includeInIRP && this.selectedParentRecord.includeInVMS)
+        || sharedConfigurationWithTheSameValue ? SystemType.VMS : SystemType.IRP;
+
+      return type;
+    }
+
     if (this.orgSystems.IRPAndVMS || (this.orgSystems.IRP && !this.orgSystems.VMS)) {
       return SystemType.IRP;
     } else {
@@ -1188,16 +1185,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.filters = {};
   }
 
-  private setChildRecordData(
-    parentRecord: OrganizationSettingsGet,
-    childRecord: OrganizationSettingChild | undefined
-  ): void {
+  private setChildRecordData(childRecord: OrganizationSettingChild | undefined): void {
     if (!childRecord) {
-      this.isParentEdit = true;
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = this.organizationId;
-      this.setFormValuesForEdit(parentRecord, null);
-      this.setConfigurationSystemType(this.getParentConfigurationSystemType(), true);
 
       return;
     }
@@ -1234,13 +1225,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (childRecord.departmentId) {
       this.departmentChanged(childRecord.departmentId);
     }
-
-    this.setFormValuesForEdit(parentRecord, childRecord);
-    this.setConfigurationSystemType(childRecord.isIRPConfigurationValue ? SystemType.IRP : SystemType.VMS, true);
   }
 
   private closeSettingDialog(): void {
     this.store.dispatch(new ShowSideDialog(false));
+    this.setSelectedRecords();
     this.removeActiveCssClass();
     this.clearFormDetails();
     this.isFormShown = false;
@@ -1338,10 +1327,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         });
       }
 
-      if (dynamicValue.isSwitchedValue) {
+      if (dynamicValue?.isSwitchedValue) {
         this.switchedValueForm.setValue({
-          value: this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? 4 : dynamicValue.value,
-          isEnabled: this.isParentEdit && this.IsSettingKeyAvailabiltyOverLap ? true : dynamicValue.isEnabled,
+          value: dynamicValue.value,
+          isEnabled: dynamicValue.isEnabled,
         });
         this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
       }
@@ -1358,5 +1347,21 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     } else {
       this.switchedValueForm.get("value")?.enable();
     }
+  }
+
+  private setSystemTypeForEditMode(childRecord: OrganizationSettingChild | undefined): void {
+    if (childRecord) {
+      this.setConfigurationSystemType(childRecord.isIRPConfigurationValue ? SystemType.IRP : SystemType.VMS, true);
+    } else {
+      this.setConfigurationSystemType(this.getParentConfigurationSystemType(), true);
+    }
+  }
+
+  private setSelectedRecords(
+    parentRecord: OrganizationSettingsGet | null = null,
+    childRecord: OrganizationSettingChild | null = null
+  ): void {
+    this.selectedParentRecord = parentRecord;
+    this.selectedChildRecord = childRecord;
   }
 }

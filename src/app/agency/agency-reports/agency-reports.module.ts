@@ -19,12 +19,14 @@ import { AgencyReportsComponent } from './agency-reports.component';
 import { FinancialTimesheetReportComponent } from './financial-timesheet-report/financial-timesheet-report.component';
 import { AgencyReportsRoutingModule } from './agency-reports-routing.module';
 import { LogiReportModule } from '../../shared/components/logi-report/logi-report.module';
+import { InvoiceSummaryReportComponent } from './invoice-summary-report/invoice-summary-report.component';
 
 
 @NgModule({
   declarations: [    
     AgencyReportsComponent,
-    FinancialTimesheetReportComponent
+    FinancialTimesheetReportComponent,
+    InvoiceSummaryReportComponent
   ],
   imports: [
     CommonModule,   

@@ -1,3 +1,4 @@
+import { formatDate } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
@@ -37,7 +38,6 @@ import { getTime } from '@shared/utils/date-time.utils';
 import { ScheduleFormSourceKeys, ScheduleItemType, ScheduleTypesForEditBar } from 'src/app/modules/schedule/constants';
 import { ScheduleType } from 'src/app/modules/schedule/enums';
 import { ShowToast } from 'src/app/store/app.actions';
-import { UserState } from 'src/app/store/user.state';
 import {
   GetScheduleTabItems,
   GetShiftHours,
@@ -49,6 +49,8 @@ import {
 } from '../../helpers';
 import {
   DeleteScheduleRequest,
+  OpenPositionParams,
+  OpenPositionsList,
   Schedule,
   ScheduleBook,
   ScheduleBookingErrors,
@@ -57,17 +59,19 @@ import {
   ScheduleFormConfig,
   ScheduleItem,
 } from '../../interface';
-import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
+import { CreateScheduleService, OpenPositionService, ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { BookingsOverlapsRequest, BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
 import {
   EditScheduleFormSourceKeys,
   EditScheduleSourcesMap,
   NewShiftFormConfig,
   RemoveButtonTitleMap,
-  ScheduledAvailabilityFormConfig,
+  NewAvailabilityFormConfig,
   ScheduledShiftFormConfig,
   ScheduledUnavailabilityFormConfig,
   EditSchedulePermissionsMap,
+  ScheduledAvailabilityFormConfig,
+  OpenPositionsConfig,
 } from './edit-schedule.constants';
 import * as EditSchedule from './edit-schedule.interface';
 import { EditScheduleFormFieldConfig, ShiftTab } from './edit-schedule.interface';
@@ -83,6 +87,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   @ViewChild('tabs') private tabs: ElementRef;
 
   @Input() isEmployee = false;
+  @Input() scheduleOnlyWithAvailability = false;
   @Input() datePickerLimitations: DatePickerLimitations;
   @Input() userPermission: Permission = {};
   @Input() set scheduledShift(scheduledItem: ScheduledItem | null) {
@@ -98,6 +103,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   readonly createPerDiemOrderControl: FormControl = new FormControl(false);
   readonly scheduleType = ScheduleType;
   readonly removeButtonTitleMap = RemoveButtonTitleMap;
+  readonly openPositionsConfig = OpenPositionsConfig;
   readonly scheduleTypesControl: FormControl = new FormControl(ScheduleItemType.Book);
 
   hasEditPermissions = false;
@@ -119,6 +125,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private readonly customShiftId = -1;
   private readonly newScheduleId = -1;
+  private availabilityOpenPositionSkillId: number | null;
   private isShiftOriented: boolean;
   private scheduleShifts: ScheduleShift[] = [];
   private scheduleFilterStructure: ScheduleFilterStructure;
@@ -130,6 +137,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     regionId: null,
     locationId: null,
     departmentId: null,
+    skillId: null,
     orientated: null,
     date: null,
     meal: null,
@@ -146,6 +154,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     private shiftsService: ShiftsService,
     private cdr: ChangeDetectorRef,
     private scheduleFiltersService: ScheduleFiltersService,
+    private openPositionService: OpenPositionService,
     private store: Store,
   ) {
     super();
@@ -154,6 +163,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   ngOnInit(): void {
     this.setScheduleTypes();
     this.setInitData();
+    this.resetOpenPositionsConfig();
   }
 
   closeSchedule(): void {
@@ -227,8 +237,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     if (type === ScheduleItemType.Availability) {
-      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.isCreateMode, true);
-      this.scheduleForm = this.editScheduleService.createScheduledAvailabilityForm();
+      this.scheduleFormConfig = NewAvailabilityFormConfig(this.isCreateMode, true);
+      this.scheduleForm = this.editScheduleService.createNewAvailabilityForm();
     }
 
     this.watchForShiftControl();
@@ -246,6 +256,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.selectedDayScheduleIndex = this.newScheduleIndex;
     this.isCreateMode = true;
     this.showLockedMessage = false;
+    this.resetOpenPositionsConfig();
     this.createFormForNewTab();
     this.scrollToNewScheduleTab();
   }
@@ -316,6 +327,13 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
         .pipe(takeUntil(this.componentDestroy()))
         .subscribe(() => this.handleSuccessAdding());
     }
+  }
+
+  checkOpenPositions(event: { isInteracted: boolean }): void {
+    this.openPositionsConfig.canFetchOpenPositions = this.selectedDaySchedule.scheduleType !== ScheduleType.Unavailability
+      && !this.isEmployee
+      && event.isInteracted
+      && !this.isCreateMode;
   }
 
   private performDelete(deleteScheduleRequest: DeleteScheduleRequest): void {
@@ -418,6 +436,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
         tap((shiftId: number) => {
           this.createScheduleService.setOnCallControlValue(this.scheduleForm, shiftId, this.scheduleShifts);
           this.updateScheduleFormConfig(shiftId === this.customShiftId);
+          this.getOpenPositions();
         }),
         map((shiftId: number) => this.scheduleShifts.find((shift: ScheduleShift) => shift.id === shiftId)),
         filter(Boolean),
@@ -436,17 +455,30 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     ).subscribe((value: number) => {
       this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations] = this.scheduleFiltersService
         .getSelectedLocatinOptions(this.scheduleFilterStructure, [value]);
-      this.scheduleForm.patchValue({ locationId: this.selectedDaySchedule?.orderMetadata?.locationId || null });
+      const locationId = this.editScheduleService.getLocationId(
+        this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations],
+        this.selectedDaySchedule?.orderMetadata?.locationId
+      );
+      const patchValue = locationId ? { locationId } : { locationId, departmentId: null, skillId: null };
+      this.scheduleForm.patchValue(patchValue);
+      this.getOpenPositions();
       this.cdr.markForCheck();
     }) || null;
 
     this.unsubscribe('locationId');
     this.subscriptions['locationId'] = this.scheduleForm.get('locationId')?.valueChanges.pipe(
+      filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
       this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = this.scheduleFiltersService
         .getSelectedDepartmentOptions(this.scheduleFilterStructure, [value], false);
-      this.scheduleForm.patchValue({ departmentId: this.selectedDaySchedule?.orderMetadata?.departmentId || null });
+      const departmentId = this.editScheduleService.getDepartmentId(
+        this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments],
+        this.selectedDaySchedule?.orderMetadata?.departmentId
+      );
+      const patchValue = departmentId ? { departmentId } : { departmentId, skillId: null };
+      this.scheduleForm.patchValue(patchValue);
+      this.getOpenPositions();
       this.cdr.markForCheck();
     }) || null;
 
@@ -457,13 +489,19 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((skills: Skill[]) => {
       const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
-      const skillId = this.selectedDaySchedule?.orderMetadata?.primarySkillId && !this.isCreateMode
-        ? this.selectedDaySchedule?.orderMetadata?.primarySkillId
-        : skillOption[0]?.value;
+      const skillId = this.editScheduleService
+        .getSkillId(this.selectedDaySchedule, this.availabilityOpenPositionSkillId, skillOption, this.isCreateMode);
+
       this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Skills] = skillOption;
       this.scheduleForm?.patchValue({ skillId });
+      this.getOpenPositions();
       this.cdr.markForCheck();
     }) || null;
+
+    this.unsubscribe('skillId');
+    this.subscriptions['skillId'] = this.scheduleForm.get('skillId')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => this.getOpenPositions()) || null;
   }
 
   private watchForToggleControls(): void {
@@ -508,6 +546,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.subscriptions['date'] = this.scheduleForm.get('date')?.valueChanges.pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
+      this.getOpenPositions();
       this.checkCandidateIsOrientedField();
       this.cdr.markForCheck();
     }) || null;
@@ -583,6 +622,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
     this.selectedDaySchedule = schedule;
     this.selectedDayScheduleIndex = scheduleIndex;
+    this.resetOpenPositionsConfig();
     this.setEditPermissions();
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Book) {
@@ -606,8 +646,15 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Availability) {
-      this.scheduleFormConfig = ScheduledAvailabilityFormConfig(this.isCreateMode, this.hasEditPermissions);
-      this.scheduleForm = this.editScheduleService.createScheduledAvailabilityForm();
+      this.scheduleFormConfig = this.isEmployee
+        ? NewAvailabilityFormConfig(this.isCreateMode, this.hasEditPermissions)
+        : ScheduledAvailabilityFormConfig(this.hasEditPermissions);
+      this.scheduleForm = this.isEmployee
+        ? this.editScheduleService.createNewAvailabilityForm()
+        : this.editScheduleService.createScheduledAvailabilityForm();
+      this.openPositionsConfig.canFetchOpenPositions = !this.isEmployee;
+      this.watchForRegionControls();
+      this.setAvailabilityOpenPositionsFilter();
     }
 
     this.watchForShiftControl();
@@ -782,7 +829,12 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   }
 
   private setScheduleTypes(): void {
-    this.scheduleTypes = this.createScheduleService.getScheduleTypesWithPermissions(this.scheduleTypes, this.userPermission);
+    this.scheduleTypes = this.createScheduleService.getScheduleTypesWithPermissions(
+      this.scheduleTypes,
+      this.userPermission,
+      this.scheduleOnlyWithAvailability,
+      [this.scheduledItem.candidate]
+    );
     this.scheduleItemType = this.createScheduleService.getFirstAllowedScheduleType(this.scheduleTypes);
   }
 
@@ -805,25 +857,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     this.showShiftTimeFields(isCustomShift);
-
-    if (selectedType === type.Book && !this.isCreateMode) {
-      this.scheduleFormConfig.formClass = isCustomShift
-        ? 'scheduled-shift-form custom-scheduled-shift-form'
-        : 'scheduled-shift-form';
-    } else if (selectedType === type.Book && this.isCreateMode) {
-      this.scheduleFormConfig.formClass = isCustomShift
-        ? 'new-shift-form custom-new-shift-form'
-        : 'new-shift-form';
-    } else if (selectedType === type.Unavailability) {
-      this.scheduleFormConfig.formClass = isCustomShift
-        ? 'scheduled-unavailability-form custom-scheduled-unavailability-form'
-        : 'scheduled-unavailability-form';
-    } else if (selectedType === type.Availability) {
-      this.scheduleFormConfig.formClass = isCustomShift
-        ? 'scheduled-availability-form custom-scheduled-availability-form'
-        : 'scheduled-availability-form';
-    }
-
+    this.scheduleFormConfig.formClass = this.editScheduleService
+      .getFormClass(selectedType, type, isCustomShift, this.isCreateMode, this.isEmployee);
     this.cdr.markForCheck();
   }
 
@@ -873,5 +908,64 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.showLockedMessage = this.selectedDaySchedule.scheduleType !== ScheduleType.Book && !this.canEmployeeEdit;
     this.hasEditPermissions = this.userPermission[EditSchedulePermissionsMap[this.selectedDaySchedule.scheduleType]]
       && this.canEmployeeEdit;
+  }
+
+  private getOpenPositions(): void {
+    if (!this.openPositionsConfig.canFetchOpenPositions) {
+      return;
+    }
+
+    const { departmentId, skillId, date } = this.scheduleForm.getRawValue();
+
+    if (!departmentId || !skillId || !date) {
+      this.openPositionService.setOpenPosition('initialPositions', []);
+      this.openPositionsConfig.totalOpenPositions = 0;
+      this.openPositionsConfig.showOpenPositionsPanel = true;
+      return;
+    }
+
+    const params: OpenPositionParams = this.createScheduleService.createOpenPositionsParams(
+      [formatDate(date, 'yyyy-MM-dd', 'en-US')],
+      departmentId,
+      skillId
+    );
+
+    this.openPositionsConfig.canFetchOpenPositions = false;
+    this.availabilityOpenPositionSkillId = null;
+    this.scheduleApiService.getOpenPositions(params)
+      .pipe(
+        catchError((error: HttpErrorResponse) => this.editScheduleService.handleError(error)),
+        tap((positions: OpenPositionsList[]) => {
+          this.openPositionsConfig.totalOpenPositions = positions[0]?.totalOpenPositions || 0;
+          this.openPositionService.setOpenPosition('initialPositions', positions);
+        }),
+        take(1),
+      )
+      .subscribe(() => {
+        this.openPositionsConfig.showOpenPositionsPanel = true;
+        this.cdr.markForCheck();
+      });
+  }
+
+  private setAvailabilityOpenPositionsFilter(): void {
+    const filters = this.scheduleFiltersService.getScheduleFiltersData().filters;
+    const regionId = (filters.regionIds as number[])[0];
+    const locationId = (filters.locationIds as number[])[0];
+    const departmentId = (filters.departmentsIds as number[])[0];
+
+    this.availabilityOpenPositionSkillId = (filters.skillIds as number[])[0];
+    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations] = this.scheduleFiltersService
+      .getSelectedLocatinOptions(this.scheduleFilterStructure, [regionId]);
+    this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = this.scheduleFiltersService
+      .getSelectedDepartmentOptions(this.scheduleFilterStructure, [locationId], false);
+    this.scheduleForm?.get('regionId')?.patchValue(regionId, { emitEvent: false, onlySelf: true });
+    this.scheduleForm?.get('locationId')?.patchValue(locationId, { emitEvent: false, onlySelf: true });
+    this.scheduleForm?.get('departmentId')?.patchValue(departmentId);
+  }
+
+  private resetOpenPositionsConfig(): void {
+    this.openPositionsConfig.showOpenPositionsPanel = false;
+    this.openPositionsConfig.canFetchOpenPositions = false;
+    this.openPositionsConfig.totalOpenPositions = 0;
   }
 }

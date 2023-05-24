@@ -10,7 +10,7 @@ import { ButtonRendererComponent } from '@shared/components/button/button-render
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { GRID_CONFIG } from '@shared/constants';
-import { GetLogHistoryById, GetLogInterfacePage } from 'src/app/security/store/security.actions';
+import { GetLogFileDownload, GetLogHistoryById, GetLogInterfacePage } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { LogInterface, LogInterfacePage } from '@shared/models/org-interface.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
@@ -45,6 +45,9 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
 
+  @Select(SecurityState.logFileDownloadDetail)
+  logFileDownloadDetail$: Observable<any>;
+
   private isAlive = true;
   public totalRecordsCount$: BehaviorSubject<number> =new BehaviorSubject<number>(0);
   public gridApi: any;
@@ -68,7 +71,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   public organizations: Organisation[] = [];
 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
-
+  public downloadedFileName: string = '';
   public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
@@ -83,10 +86,10 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
     {
       headerName: 'View',
       cellRenderer: ButtonRendererComponent,
-      minWidth: 50,
+      width: 100,
       cellRendererParams: {
         onClick: this.onEdit.bind(this),
-        label: 'View Errors',
+        label: 'View',
         suppressMovable: true,
         filter: false,
         sortable: false,
@@ -114,6 +117,11 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
       field: 'originalFileName',
       minWidth: 250,
       filter: 'agTextColumnFilter',
+      cellRenderer: ButtonRendererComponent,
+      cellRendererParams: {
+        onClick: this.onFileDownload.bind(this),
+        label: 'NameLink',
+      }, 
       filterParams: {
         buttons: ['reset'],
         debounceMs: 1000,
@@ -219,7 +227,9 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
           });
 
           this.logInterfacePage$.pipe().subscribe((data: any) => {
-              this.itemList = data?.items;
+              this.itemList = data?.items?.sort(function(a:any,b:any){
+                return b.processDate.localeCompare(a.processDate);
+              });
               this.totalRecordsCount$.next(data?.totalCount);
               if (!data || !data?.items.length) {
                 this.gridApi?.showNoRowsOverlay();
@@ -259,17 +269,44 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
       }
     };
   
-  public onEdit(data: any): void {
-    this.selectedLogItem = data.rowData;
-    this.openLogDetailsDialogue.next(true);
-    const options = this.getDialogNextPreviousOption(data.rowData);
-    // this.store.dispatch(new GetLogHistoryById("d2874d41-874d-4400-be4d-d2919f366dee",2,this.currentPage,this.pageSize, options));
-    this.store.dispatch(new GetLogHistoryById(data.rowData.runId, data.rowData.organizationId,this.currentPage,this.pageSize, options));
-  }
+      public onEdit(data: any): void {
+        this.selectedLogItem = data.rowData;
+        this.openLogDetailsDialogue.next(true);
+        const options = this.getDialogNextPreviousOption(data.rowData);
+        this.store.dispatch(new GetLogHistoryById(data.rowData.runId, data.rowData.organizationId,this.currentPage,this.pageSize, options));
+      }
 
-  public onFileDownload(data: any): void {
-    console.log('event.node',data.rowData);
- }
+      public onFileDownload(data: any): void {
+        this.store.dispatch(new GetLogFileDownload(data.rowData.runId, data.rowData.organizationId));
+        this.logFileDownloadDetail$.pipe(takeUntil(this.unsubscribe$))
+          .subscribe((data: any) => {
+            if (data) {
+              if (this.downloadedFileName != data.fileName) {
+                this.downloadedFileName = data.fileName;
+                this.createLinkToDownload(data.fileAsBase64, data.fileName, data.contentType);
+              }
+            }
+          });
+    }
+
+    createLinkToDownload(base64String: string, fileName: string, contentType: string) {
+      if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
+        const byteChar = atob(base64String);
+        const byteArray = new Array(byteChar.length);
+        for (let i = 0; i < byteChar.length; i++) {
+          byteArray[i] = byteChar.charCodeAt(i);
+        }
+        const uIntArray = new Uint8Array(byteArray);
+        const blob = new Blob([uIntArray], { type: contentType });
+        (window.navigator as any).msSaveOrOpenBlob(blob, `${fileName}`);
+      } else {
+        const source = `data:${contentType};base64,${base64String}`;
+        const link = document.createElement('a');
+        link.href = source;
+        link.download = `${fileName}`;
+        link.click();
+      }
+    }
 
   private getDialogNextPreviousOption(selectedOrder: LogInterface): DialogNextPreviousOption {
     const gridData = this.itemList as LogInterface[];
@@ -288,7 +325,6 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
       this.selectedLogItem = this.itemList[nextIndex];
       this.openLogDetailsDialogue.next(true);
       const options = this.getDialogNextPreviousOption(this.itemList[nextIndex]);
-      // this.store.dispatch(new GetLogHistoryById("d2874d41-874d-4400-be4d-d2919f366dee",2,this.currentPage,this.pageSize, options));
       this.store.dispatch(new GetLogHistoryById(this.itemList[nextIndex].runId, this.itemList[nextIndex].organizationId,this.currentPage,this.pageSize, options));
     }
   }

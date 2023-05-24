@@ -650,3 +650,16 @@ svg.svg-inline--fa.fa-lock,  svg.svg-inline--fa.fa-unlock{
 .item6 .datepicker {
   width: 150px;
 }
+.app-grid__component .ag-root-wrapper {
+  border: none !important;
+  }
+  .app-grid__component .ag-body-horizontal-scroll{
+    display: none;
+  }
+
+  .app-grid__component span.ag-icon.ag-icon-menu {
+    display: none;
+}
+body.dark .schedule-comp td ,body.dark .schedule-comp th {
+  background: #25263b;
+}

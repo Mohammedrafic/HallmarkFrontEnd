@@ -17,6 +17,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { SpecialProjectCategoryState } from '../../../store/special-project-category.state';
 import { DeletSpecialProjectCategory, GetSpecialProjectCategories } from '../../../store/special-project-category.actions';
 import { SpecialProjectCategory, SpecialProjectCategoryPage } from '@shared/models/special-project-category.model';
+import { SpecilaProjectCategoryTableColumns } from '@organization-management/specialproject/enums/specialproject.enum';
 
 @Component({
   selector: 'app-special-project-category',
@@ -26,6 +27,7 @@ import { SpecialProjectCategory, SpecialProjectCategoryPage } from '@shared/mode
 
 export class SpecialProjectCategoryComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
+  @Input() showSelectSystem:boolean;
   @Output() onEdit = new EventEmitter<DeletSpecialProjectCategory>();
 
   @Select(SpecialProjectCategoryState.specialProjectCategoryPage)
@@ -51,6 +53,15 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
   public readonly columnDefinitions: ColumnDefinitionModel[] = SpecialProjectCategoryColumnsDefinition(this.actionCellrenderParams);
   
   ngOnInit(): void {
+    this.columnDefinitions.forEach(element => {
+      if(element.field==SpecilaProjectCategoryTableColumns.System){
+        if(this.showSelectSystem){
+          element.hide=false
+        }else{
+          element.hide=true
+        }
+      }
+        });
     this.getSpecialProjectCategories();
   }
 
@@ -138,6 +149,7 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
     this.specialProjectCategoryPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
         if (!data?.items.length) {
           this.gridApi?.showNoRowsOverlay();
+          this.gridApi?.setRowData([]);
         }
         else {
           this.gridApi?.hideOverlay();

@@ -120,6 +120,7 @@
               target="#template"
               (onClose)="onContextMenuClose()"
               (beforeOpen)="onBeforeContextMenuOpen($event)"
+              (beforeClose)="onBeforeContextMenuClose($event)"
               (select)="onSubMenuItemClick($event)"
             ></ejs-contextmenu>
           </section>

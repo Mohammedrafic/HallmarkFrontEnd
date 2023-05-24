@@ -40,7 +40,7 @@ export class DoNotReturnFormService {
       regionBlocked:[''],
       locationBlocked: [''],
       email: ['',[Validators.email, Validators.maxLength(200)]],
-      currentStatus: [''],
+      currentStatus: ['Blocked'],
     }) as CustomFormGroup<DoNotReturnFilterForm>;
   }
 

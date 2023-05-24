@@ -8,7 +8,8 @@ export const InitialPositionState: OpenPositionState = {
 export const InitialDragEvent: PositionDragEvent = {
   action: false,
   date: null,
+  candidateId: null,
 };
 
 export const MissingMatchDate = 'The Order date does not match to the selected date';
-export const NotOrientEmployee = 'The Employee is not Oriented';
+export const DifferentEmployee = 'Booking cannot be scheduled for different employee than the one being edited';

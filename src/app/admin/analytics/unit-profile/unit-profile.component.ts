@@ -236,12 +236,12 @@ export class UnitProfileComponent implements OnInit {
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
 
-          this.SearchReport();
         } else {
           this.isClearAll = false;
           this.unitProfileReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }
+      this.SearchReport();
     });
   }
 

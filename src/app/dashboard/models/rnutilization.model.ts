@@ -4,6 +4,6 @@ export interface RnUtilizationModel {
     monthlyTotalHoursSchedule:number;
     noOfPerdiemNursing: number;
     perdayTotalHoursSchedule: number;
-    targetPerdiemNursingHours:number;
+    targetPerdiemNursingHours:string;
     id : WidgetTypeEnum.RN_UTILIZATION;
 }

@@ -11,6 +11,7 @@ import { Plus, Lock } from 'angular-feather/icons';
 
 import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { ScheduleOpenPositionsModule } from '../schedule-open-positions/schedule-open-positions.module';
 import { ReplacementOrderDialogModule } from '../replacement-order-dialog/replacement-order-dialog.module';
 import { EditScheduleService } from './edit-schedule.service';
 import { EditScheduleComponent } from './edit-schedule.component';
@@ -37,6 +38,7 @@ const icons = {
     CheckBoxModule,
     SwitchModule,
     ReplacementOrderDialogModule,
+    ScheduleOpenPositionsModule,
     FeatherModule.pick(icons),
   ],
   exports: [EditScheduleComponent],

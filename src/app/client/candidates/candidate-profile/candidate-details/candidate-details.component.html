@@ -5,9 +5,10 @@
   <div class="professional-summary">
     <h2 class="title">Professional Summary</h2>
     <app-textarea
+      maxlength="500"
+      controlName="professionalSummary"
       [formGroupInstance]="candidateForm"
       [cssClass]="'professional-summary__textarea'"
-      controlName="professionalSummary"
     ></app-textarea>
   </div>
 </div>

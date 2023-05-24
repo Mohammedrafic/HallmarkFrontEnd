@@ -217,7 +217,7 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
         this.onFilterRegionChangedHandler();
         this.onFilterLocationChangedHandler();
         this.onFilterSkillCategoryChangedHandler();
-        this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.enable() : this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.enable() : this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.disable();
       
       });
   
@@ -444,8 +444,8 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
       "JobIdParamAFTS": jobId == null || jobId == "" ? "null" : jobId,
       "BearerParamAFTS": auth,
       "BusinessUnitIdParamAFTS": window.localStorage.getItem("lastSelectedOrganizationId") == null
-        ? this.organizations != null && this.organizations.length>0 && this.organizations[0]?.organizationId != null ?
-          this.organizations[0].organizationId.toString() : "1" :
+        ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
+          this.selectedOrganizations[0].organizationId.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
       "AccrualReportFilterTypeAFTS": accrualReportTypes.toString(),

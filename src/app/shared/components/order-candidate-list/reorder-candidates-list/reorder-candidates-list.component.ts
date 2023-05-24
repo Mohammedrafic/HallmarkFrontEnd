@@ -1,5 +1,5 @@
 import { GetCandidateJob, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
-import { ChangeDetectorRef, Component, Inject, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -11,7 +11,7 @@ import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.
 
 import { Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { SettingsViewService } from '@shared/services';
-import { catchError, distinctUntilChanged, filter, merge, Observable, takeUntil, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, merge, Observable, take, takeUntil, tap } from 'rxjs';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
@@ -44,7 +44,7 @@ enum ReorderCandidateStatuses {
   templateUrl: './reorder-candidates-list.component.html',
   styleUrls: ['./reorder-candidates-list.component.scss'],
 })
-export class ReorderCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit {
+export class ReorderCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit, OnChanges {
   @Input() selectedOrder: Order;
 
   @Input() system: OrderManagementIRPSystemId;
@@ -55,11 +55,13 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   public candidateJob: OrderCandidateJob;
   public agencyActionsAllowed: boolean;
   public isFeatureIrpEnabled = false;
+  public scheduleAvailabilitySetting = false;
   public readonly orderStatus = OrderStatus;
   public isCandidatePayRateVisible: boolean;
   public readonly cancelledStatusName = ReorderCandidateStatuses[ReorderCandidateStatuses.Cancelled];
   public readonly systemType = OrderManagementIRPSystemId;
   public readonly onboardedCandidate: CandidateStatus = CandidateStatus.OnBoarded;
+  public readonly notAppliedCandidate: CandidateStatus = CandidateStatus.NotApplied;
 
   private selectedIndex: number;
 
@@ -105,6 +107,12 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedOrder']?.currentValue && this.system === OrderManagementIRPSystemId.IRP) {
+      this.checkIsScheduleAvailabilityTurn();
+    }
+  }
+
   public onEdit(data: OrderCandidatesList & { index: string }, event: MouseEvent): void {
     if (this.order?.isClosed && data.statusName !== this.cancelledStatusName) {
       return;
@@ -137,6 +145,20 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     }
   }
 
+  private checkIsScheduleAvailabilityTurn(): void {
+    this.settingService.getViewSettingKey(
+      OrganizationSettingKeys.ScheduleOnlyWithAvailability,
+      OrganizationalHierarchy.Location,
+      this.selectedOrder.locationId,
+      this.selectedOrder.organizationId,
+    ).pipe(
+      filter(({ScheduleOnlyWithAvailability}) => !!ScheduleOnlyWithAvailability),
+      take(1),
+    ).subscribe(({ScheduleOnlyWithAvailability}) => {
+      this.scheduleAvailabilitySetting = JSON.parse(ScheduleOnlyWithAvailability);
+    });
+  }
+
   private getDialogNextPreviousOption(selectedOrder: OrderCandidatesList): DialogNextPreviousOption {
     const gridData = this.grid.dataSource as OrderCandidatesList[];
     const [first] = gridData;
@@ -148,7 +170,8 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   }
 
   public changeIrpCandidateStatus(candidate: OrderCandidatesList): void {
-    if(candidate.status === this.onboardedCandidate) {
+    if(candidate.status === this.onboardedCandidate ||
+      (this.scheduleAvailabilitySetting && candidate.status === CandidateStatus.NotApplied)) {
       return;
     }
 
@@ -238,7 +261,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
       this.isOrgIRPEnabled = !!isIRPEnabled;
       this.isOrgVMSEnabled = !!isVMCEnabled;
       this.setPreviousSelectedSystem();
-      
+
       if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
         this.activeSystem = OrderManagementIRPSystemId.VMS;
       } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {

@@ -436,7 +436,7 @@ export const SpecialConfigProject = (): OrderFormsConfig => ({
       field: 'poNumberId',
       title: 'PO#',
       required: false,
-      show: true,
+      show: false,
       type: FieldType.Dropdown,
       dataSource: [],
     },

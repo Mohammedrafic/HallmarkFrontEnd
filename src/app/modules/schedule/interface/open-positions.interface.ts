@@ -24,6 +24,7 @@ export interface Positions {
   shiftId: number;
   shiftStartTime: string;
   attributes: string;
+  candidateId?: number;
 }
 
 export interface OpenPositionState {
@@ -34,6 +35,7 @@ export interface OpenPositionState {
 export interface PositionDragEvent {
   action: boolean;
   date: string | null;
+  candidateId: number | null;
 }
 
 export interface DroppedEvent {

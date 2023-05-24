@@ -35,7 +35,6 @@ import { CanManageSettingModule } from '@shared/pipes/can-manage-setting/can-man
 import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 
-import { CheckboxValueModule } from './pipes/checkbox-value/checkbox-value.module';
 import { SettingsComponent } from './settings.component';
 import { SettingsRoutingModule } from './settings-routing.module';
 
@@ -83,7 +82,6 @@ const icons = {
     SwitchAllModule,
     TimePickerAllModule,
     DatePickerModule,
-    CheckboxValueModule,
   ],
 })
 export class SettingsModule { }

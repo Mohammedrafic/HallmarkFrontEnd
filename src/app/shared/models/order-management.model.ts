@@ -60,6 +60,7 @@ export class OrderManagement {
   irpOrderMetadata?: IRPMetaData;
   irpCandidatesCount?: number;
   activeCandidatesCount?: number;
+  isLockedIRP: boolean;
 }
 
 export interface IRPOrderManagement {
@@ -97,6 +98,23 @@ export interface IRPOrderManagement {
   acceptedEmployees: null;
   isMoreMenuWithDeleteButton?: boolean;
   children: OrderManagementChild[];
+  isLockedIRP: boolean;
+}
+
+export interface GetOrdersJourney{
+  id: number;
+  orderId: string;
+  status:  string;
+  system:  string;
+  type:  string;
+  jobTitle:  string;
+  skill:  string;
+  creationDate: Date,
+  publishedInIRP: Date|null,
+  publishedInVMS: Date|null,
+  noOfDaysInIRP?: number,
+  noOfDaysInVMS?: number,
+  revokedInVMS: Date|null
 }
 
 export interface IRPCandidateForPosition {
@@ -174,6 +192,7 @@ export class OrderManagementFilter {
 
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
 export type IRPOrderManagementPage = PageOfCollections<IRPOrderManagement>;
+export type OrdersJourneyPage = PageOfCollections<GetOrdersJourney>;
 
 export type AgencyOrderManagement = {
   orderId: number;
@@ -468,6 +487,7 @@ export class Order {
   canProceedRevoke?: boolean;
   externalCommentsConfiguration?:boolean | null;
   activeCandidatesCount?: number;
+  isLockedIRP?: boolean;
 }
 
 export class ReOrder {
@@ -781,4 +801,23 @@ export class CandidateCancellationReason{
 export class CandidateCancellationReasonFilter{
   regionId?:number;
   locationId?:number;
+}
+
+
+export class OrderJourneyFilter {
+  orderBy?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+  orderPublicId?: string | null;
+  skillIds?: number[];
+  orderTypes?: number[];
+  jobTitle?: string;
+  jobStartDate?: Date | null;
+  jobEndDate?: Date | null;
+  orderStatuses?: (string | number)[];
+  includeInIRP?:boolean;
+  includeInVMS?:boolean;
 }

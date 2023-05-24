@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { OrganizationDepartment, OrganizationLocation, OrganizationStructure,OrganizationRegion } from '@shared/models/organization.model';
+import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
+import { DepartmentHelper } from '@client/candidates/departments/helpers/department.helper';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 
 import { Select, Store } from '@ngxs/store';
@@ -10,6 +14,7 @@ import {
   filter,
   Observable,
   takeUntil,
+  Subject,
   tap,
   switchMap,
   debounceTime,
@@ -29,13 +34,15 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import {
   CandidateDetailsPage,
   CandidatesDetailsRegions,
+  CandidatesDetailsDepartments,
+  CandidatesDetailsLocations,
   FilterColumnsModel,
   FiltersModal,
   NavigationTabModel,
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { UserState } from '../../../store/user.state';
-import { OrderTypeOptionsForCandidates } from '@shared/components/candidate-details/candidate-details.constant';
+import { ApplicantStatusOptionsForCandidates, OrderTypeOptionsForCandidates } from '@shared/components/candidate-details/candidate-details.constant';
 import { toCorrectTimezoneFormat } from '../../utils/date-time.utils';
 import { GRID_CONFIG } from '@shared/constants';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
@@ -44,6 +51,7 @@ import { CandidateDetailsService } from './services/candidate-details.service';
 import { PreservedFiltersByPage } from '@core/interface';
 import { FilterPageName } from '@core/enums';
 import { GetMasterRegions } from '@organization-management/store/organization-management.actions';
+import { adaptToNameEntity } from '@shared/helpers/dropdown-options.helper';
 
 @Component({
   selector: 'app-candidate-details',
@@ -69,28 +77,48 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   @Select(CandidateDetailsState.candidateRegions)
   public candidateRegions$: Observable<CandidatesDetailsRegions[]>;
 
+  @Select(CandidateDetailsState.candidateLocations)
+  public candidateLocations$: Observable<CandidatesDetailsLocations[]>;
+
+  @Select(CandidateDetailsState.candidateDepartments)
+  public candidateDepartments$: Observable<CandidatesDetailsDepartments[]>;
+
   @Select(UserState.lastSelectedAgencyId)
   lastSelectedAgencyId$: Observable<number>;
 
+  
   @Select(UserState.lastSelectedOrganizationId)
   lastSelectedOrganizationId$: Observable<number>;
 
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<FiltersModal>>;
 
+  @Select(UserState.organizationStructure)
+  organizationStructure$: Observable<OrganizationStructure>;
+
+  @Select(CandidateDetailsState.candidateRegions)
+  regions$: Observable<string[]>;
+
   public filtersForm: FormGroup;
   public filters: FiltersModal | null;
   public filterColumns: FilterColumnsModel;
   public filteredItems: FilteredItem[] = [];
   public orderTypes = OrderTypeOptionsForCandidates;
+  public applicantStatuses = ApplicantStatusOptionsForCandidates;
   public candidatesPage: CandidateDetailsPage;
 
   public pageNumber = GRID_CONFIG.initialPage;
   public pageSize = GRID_CONFIG.initialRowsPerPage;
   public CandidateStatus: number;
   public isAgency = false;
-
+  public allLocations: OrganizationLocation[];
   private selectedTab: number | null;
+  private unsubscribe$: Subject<void> = new Subject();
+  allRegions: OrganizationRegion[] = [];
+  regionBasedLocations: OrganizationLocation[] = [];
+  private orgStructure: OrganizationStructure;
+  private orgRegions: OrganizationRegion[] = [];
+
 
   constructor(
     private store: Store,
@@ -112,16 +140,21 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     this.createFilterForm();
     this.initFilterColumns();
     this.setOrderTypes();
+    this.setApplicantStatuses();
     this.store.dispatch(new GetMasterRegions());
+    this.getRegions();
+    this.watchForStructure();
+    this.subscribeOnLocationChange();
+    this.watchForRegionControl();
+   
 
     combineLatest([
       this.subscribeOnPageNumberChange(),
       this.subscribeOnPageSizeChange(),
       this.subscribeOnTabChange(),
       this.subscribeOnSkills(),
-      this.subscribeOnRegions(),
       this.subscribeOnCandidatePage(),
-    ])
+      ])
       .pipe(takeUntil(this.destroy$))
       .subscribe();
 
@@ -220,10 +253,18 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     );
   }
 
-  private subscribeOnRegions(): Observable<CandidatesDetailsRegions[]> {
-    return this.candidateRegions$.pipe(
-      tap((regions: CandidatesDetailsRegions[]) => {
-        this.filterColumns.regionsIds.dataSource = regions || [];
+  private subscribeOnLocaions(): Observable<CandidatesDetailsLocations[]> {
+    return this.candidateLocations$.pipe(
+      tap((locations: CandidatesDetailsLocations[]) => {
+        this.filterColumns.locationIds.dataSource = locations || [];
+      })
+    );
+  }
+
+  private subscribeOnDepartments(): Observable<CandidatesDetailsDepartments[]> {
+    return this.candidateDepartments$.pipe(
+      tap((departments: CandidatesDetailsDepartments[]) => {
+        this.filterColumns.locationIds.dataSource = departments || [];
       })
     );
   }
@@ -251,11 +292,35 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       endDate: [null],
       skillsIds: [null],
       regionsIds: [null],
+      locationIds: [null],
+      departmentIds: [null],
+      applicantStatuses:[null],
     });
   }
 
   private initFilterColumns(): void {
     this.filterColumns = {
+      regionsIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      applicantStatuses: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      locationIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
       orderTypes: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
@@ -272,7 +337,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         valueField: 'skillDescription',
         valueId: 'masterSkillId',
       },
-      regionsIds: {
+      
+      departmentIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
@@ -284,6 +350,10 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   private setOrderTypes(): void {
     this.filterColumns.orderTypes.dataSource = this.orderTypes;
+  }
+
+  private setApplicantStatuses(): void {
+    this.filterColumns.applicantStatuses.dataSource = this.applicantStatuses;
   }
 
   private clearFilters(): void {
@@ -307,7 +377,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private subscribeOnAgencyOrganizationChanges(): void {
-    combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$, this.candidateRegions$])
+    combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$, this.candidateRegions$, this.candidateDepartments$,this.candidateLocations$])
       .pipe(
         filter((data) => !!data[2]),
         debounceTime(600),
@@ -340,6 +410,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       endDate: this.filters?.endDate || null,
       skillsIds: this.filters?.skillsIds || [],
       regionsIds: this.filters?.regionsIds || [],
+      applicantStatuses: this.filters?.applicantStatuses || [],
+      locationIds: this.filters?.locationIds || [],
+      departmentIds: this.filters?.departmentIds || [],
     });
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
   }
@@ -353,6 +426,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         endDate: state?.endDate,
         skillsIds: (state?.skillsIds && [...state.skillsIds]) || [],
         regionsIds: (state?.regionsIds && [...state.regionsIds]) || [],
+        applicantStatuses: state?.applicantStatuses || [],
+        locationIds: (state?.locationIds && [...state.locationIds]) || [],
+        departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],
       };
 
       this.patchFormValue();
@@ -366,4 +442,98 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       return FilterPageName.CandidateAssignmentVMSOrganization;
     }
   }
+
+
+
+
+  private subscribeOnOrgStructure(): void {
+    this.organizationStructure$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((structure: OrganizationStructure) => {
+        this.allLocations = [];
+        structure.regions.forEach(region => {
+          region.locations && this.allLocations.push(...getIRPOrgItems(region.locations));
+        });
+        if (this.filterColumns.locationIds) {
+          this.filterColumns.locationIds.dataSource = this.allLocations;
+        }
+      });
+  }
+
+  private subscribeOnLocationChange(): void {
+    this.filtersForm.get('locationIds')?.valueChanges
+      .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
+      .subscribe((val: number[]) => {
+        if (this.filterColumns.departmentIds) {
+          this.filterColumns.departmentIds.dataSource = [];
+          if (val?.length) {
+            const locationDataSource = this.filterColumns.locationIds?.dataSource as OrganizationLocation[];
+            const selectedLocations: OrganizationLocation[] = DepartmentHelper.findSelectedItems(
+              val,
+              locationDataSource
+            ) as OrganizationLocation[];
+            const locationDepartments: OrganizationDepartment[] = selectedLocations.flatMap(
+              (location) => location.departments
+            );
+
+            this.filterColumns.departmentIds.dataSource = getIRPOrgItems(locationDepartments);
+          } else {
+            this.filtersForm.get('departmentIds')?.setValue([]);
+          }
+        }
+      });
+  }
+
+  private getRegions(): void {
+
+    this.getLastSelectedBusinessUnitId()
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.store.dispatch(new GetCandidateRegions())),
+        takeUntil(this.unsubscribe$)
+      ).subscribe();
+  }
+
+  private getLastSelectedBusinessUnitId(): Observable<number> {
+    const businessUnitId$ = this.isAgency ? this.lastSelectedAgencyId$ : this.lastSelectedOrganizationId$;
+    return businessUnitId$;
+  }
+
+  private watchForRegionControl(): void {
+    this.filtersForm.get('regionsIds')?.valueChanges
+      .pipe(
+        takeUntil(this.unsubscribe$),
+      )
+      .subscribe((val: number[]) => {
+        if (val?.length) {
+          const selectedRegions: OrganizationRegion[] = [];
+          const locations: OrganizationLocation[] = [];
+          val.forEach((id) =>
+            selectedRegions.push(this.allRegions.find((region) => region.id === id) as OrganizationRegion)
+          );
+          this.filterColumns.locationIds.dataSource = [];
+          selectedRegions.forEach((region) => {
+            locations.push(...(region.locations as []));
+          });
+          this.filterColumns.locationIds.dataSource = sortByField(locations, 'name');
+        } else {
+          this.filterColumns.locationIds.dataSource = [];
+          this.filtersForm.get('locationIds')?.setValue([]);
+          this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
+        }
+      });
+  }
+
+ 
+  private watchForStructure(): void {
+    this.organizationStructure$
+      .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
+      .subscribe((structure: OrganizationStructure) => {
+        this.orgStructure = structure;
+        this.orgRegions = structure.regions;
+        this.allRegions = [...this.orgRegions];
+        this.filterColumns.regionsIds.dataSource = this.allRegions;
+      });
+  }  
+
 }

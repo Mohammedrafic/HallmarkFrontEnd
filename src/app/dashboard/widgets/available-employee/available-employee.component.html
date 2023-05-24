@@ -1,12 +1,12 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
     <ng-template #header>
       <div class="app-accumulation-chart__title w-100">
-        <h3 class="widget-header__title d-inline"><i-feather name="grid" class="icon"></i-feather>{{description}}</h3> 
+        <h3 class="widget-header__title d-inline title"><i-feather name="grid" class="icon"></i-feather>{{description}}</h3> 
       </div>
     </ng-template>
     <ng-template #available_employee>
       <div class="shared-with-grid" *ngIf="(chartData)">
-        <ag-grid-angular #availableEmployees  style="max-height: 330px;overflow: scroll;"
+        <ag-grid-angular #availableEmployees  style="max-height: 330px;overflow: scroll;border:none"
                          [rowHeight]="50"
                          domLayout="autoHeight"
                          [headerHeight]="50"

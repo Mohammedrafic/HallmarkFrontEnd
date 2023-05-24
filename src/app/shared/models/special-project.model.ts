@@ -9,6 +9,8 @@ export class SpecialProject {
   startDate: Date;
   endDate: Date;
   isDeleted: boolean;
+  includeInIRP:boolean;
+  includeInVMS:boolean;
 }
 
 export type SpecialProjectPage = PageOfCollections<SpecialProject>;

@@ -189,7 +189,9 @@
                 ejs-button
                 cssClass="e-flat primary-icon-button custom-button"
                 [class.btn-icon__disabled]="selectedOrder.irpOrderMetadata?.status === orderStatus.Closed
-                || data?.status === onboardedCandidate || !data.isOriented"
+                || data?.status === onboardedCandidate
+                || !data.isOriented
+                || (data?.status === notAppliedCandidate && scheduleAvailabilitySetting)"
                 (click)="changeIrpCandidateStatus(data)"
               >
                 <span class="edit-button"><i-feather name="calendar" class="icon"></i-feather></span>
@@ -232,6 +234,7 @@
             </div>
           </ng-template>
         </e-column>
+        <e-column field="availMatch" headerText="Avail Match (HRS)" textAlign="Left" width="160"></e-column>
         <e-column field="option" headerText="Work Commitment" textAlign="Left" width="140">
         </e-column>
         <e-column field="isContract" headerText="Contract Employee" textAlign="Left" width="116">

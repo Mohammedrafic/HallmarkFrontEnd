@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 import { CdkDragStart } from '@angular/cdk/drag-drop';
 
 import { map, takeUntil } from 'rxjs';
@@ -15,6 +15,8 @@ import { InitialDragEvent } from './open-position.constant';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleOpenPositionsComponent extends Destroyable implements OnInit {
+  @Input() candidateId?: number;
+
   public openPositions: OpenPositionsList[];
 
   private previousOpenPositionState: OpenPositionsList[];
@@ -43,6 +45,7 @@ export class ScheduleOpenPositionsComponent extends Destroyable implements OnIni
     this.openPositionService.setDragEvent({
       action: true,
       date: shiftDate[0],
+      candidateId: this.candidateId ?? null,
     });
 
     this.previousOpenPositionState = JSON.parse(JSON.stringify(this.openPositions));
@@ -62,7 +65,7 @@ export class ScheduleOpenPositionsComponent extends Destroyable implements OnIni
     this.openPositionService.getOpenPositionsStream()
       .pipe(
         map((state: OpenPositionState) => this.openPositionService.getOpenPositionsBySelectedSlots(state)),
-        map((positions: OpenPositionsList[]) => this.openPositionService.prepareOpenPositions(positions)),
+        map((positions: OpenPositionsList[]) => this.openPositionService.prepareOpenPositions(positions, this.candidateId)),
         takeUntil(this.componentDestroy()),
       ).subscribe((positions: OpenPositionsList[]) => {
         this.openPositions = positions;
