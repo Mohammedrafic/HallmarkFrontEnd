@@ -83,6 +83,7 @@ export const DisabledSettingsByDefault = [
   'CreateReplacementPerDiemOrder',
   'PayPeriod',
   'OnHoldDefault',
+  'LockIRPCandidateAvailability',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

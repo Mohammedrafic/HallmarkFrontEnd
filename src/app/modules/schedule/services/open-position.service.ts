@@ -20,7 +20,6 @@ import {
   InitialDragEvent,
   InitialPositionState,
   MissingMatchDate,
-  NotOrientEmployee,
 } from '../components/schedule-open-positions';
 import { ScheduleAttributeKeys } from '../enums';
 import { ShowToast } from '../../../store/app.actions';
@@ -149,8 +148,6 @@ export class OpenPositionService {
       const dragElementCandidateId = event.item.data.candidateId;
       const containerData = event.container.data.dateItem;
       const dragElementData = event.item.data.shiftEndTime.split('T')[0];
-      const orientedDate = event.container.data.scheduleItem.candidate.orientationDate?.split('T')[0] ??
-        new Date(0).toDateString();
 
       if (dragElementCandidateId && dragElementCandidateId !== containerCandidateId) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, DifferentEmployee));
@@ -159,11 +156,6 @@ export class OpenPositionService {
 
       if(containerData  !== dragElementData) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, MissingMatchDate));
-        return EMPTY;
-      }
-
-      if(orientedDate > containerData) {
-        this.store.dispatch(new ShowToast(MessageTypes.Error, NotOrientEmployee));
         return EMPTY;
       }
 
