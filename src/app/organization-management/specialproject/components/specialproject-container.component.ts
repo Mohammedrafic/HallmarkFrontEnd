@@ -133,10 +133,11 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
   public startDateField: AbstractControl;
   public endDateField: AbstractControl;
   public today = new Date();
-  public startDate:any = new Date();
+  public startDate: any = new Date();
   public selectedSystem: SelectedSystemsFlag = SelectedSystems;
   public showSelectSystem: boolean = false;
   public isMSPUser: boolean = false;
+  public projectTypes: any;
 
 
   constructor(protected override store: Store,
@@ -153,6 +154,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
   override ngOnInit(): void {
     super.ngOnInit();
     this.startDate = null;
+    this.getOrganizagionData();
     this.orgStructureDataSetup();
     this.onOrganizationStructureDataLoadHandler();
     this.createForm();
@@ -160,7 +162,6 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
     this.onSkillDataLoadHandler();
     this.getProjectTypes();
     this.onOrganizationChangedHandler();
-    this.getOrganizagionData();
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SpecialProjectShowConfirmationPopUp))
       .subscribe(() => {
@@ -222,7 +223,14 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
     this.store.dispatch(new GetProjectTypes());
     this.projectTypes$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data) {
-        this.orgStructureData.projectTypeIds.dataSource = data;
+        this.projectTypes = data;
+        if (this.selectedSystem.isVMS && this.selectedSystem.isIRP) {
+          this.orgStructureData.projectTypeIds.dataSource = data;
+        } else if (this.selectedSystem.isVMS) {
+          this.orgStructureData.projectTypeIds.dataSource = data.filter(f => f.includeInVMS == true);
+        } else {
+          this.orgStructureData.projectTypeIds.dataSource = data.filter(f => f.includeInIRP == true);
+        }
       }
     });
 
@@ -311,6 +319,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
     switch (this.selectedTab) {
       case SpecialProjectTabs.SpecialProjects:
         this.childC?.getSpecialProjects();
+        this.getProjectTypes();
         break;
       case SpecialProjectTabs.PurchaseOrders:
         this.childPurchaseComponent?.getPurchaseOrders();
@@ -320,6 +329,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
         break;
       case SpecialProjectTabs.SpecialProjectsMapping:
         this.childSpecialProjectMappingComponent?.getSpecialProjectMappings();
+        this.getProjectTypes();
         break;
       case SpecialProjectTabs.PurchaseOrdersMapping:
         this.childPurchaseOrderMappingComponent?.getPurchaseOrderMappings();
@@ -610,7 +620,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
   }
 
   private saveSpecialProject() {
-    if(this.showSelectSystem){
+    if (this.showSelectSystem) {
       if ((this.form.value.includeInIRP == false || !this.form.value.includeInIRP) && (this.form.value.includeInVMS == false || !this.form.value.includeInVMS)) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, "Please select a System for special Projects"));
         return;
@@ -626,8 +636,8 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
       name: this.form.value.projectName,
       organizationId: this.organizationId,
       projectBudget: this.form.value.projectBudget,
-      includeInIRP:this.showSelectSystem ? this.form.value.includeInIRP??false : this.selectedSystem.isIRP,
-      includeInVMS:this.showSelectSystem ? this.form.value.includeInVMS??false : this.selectedSystem.isVMS
+      includeInIRP: this.showSelectSystem ? this.form.value.includeInIRP ?? false : this.selectedSystem.isIRP,
+      includeInVMS: this.showSelectSystem ? this.form.value.includeInVMS ?? false : this.selectedSystem.isVMS
     };
     this.store.dispatch(new SaveSpecialProject(specialProject)).subscribe(val => {
       this.form.reset();
@@ -656,7 +666,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
   }
 
   private saveSpecialProjectCategory() {
-    if(this.showSelectSystem){
+    if (this.showSelectSystem) {
       if ((this.form.value.includeInIRP == false || !this.form.value.includeInIRP) && (this.form.value.includeInVMS == false || !this.form.value.includeInVMS)) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, "Please select a System for special Projects"));
         return;
@@ -667,8 +677,8 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
       id: this.id,
       organizationId: this.organizationId,
       specialProjectCategory: this.form.value.SpecialProjectCategoryName,
-      includeInIRP:this.showSelectSystem ? this.form.value.includeInIRP??false : this.selectedSystem.isIRP,
-      includeInVMS:this.showSelectSystem ? this.form.value.includeInVMS??false : this.selectedSystem.isVMS
+      includeInIRP: this.showSelectSystem ? this.form.value.includeInIRP ?? false : this.selectedSystem.isIRP,
+      includeInVMS: this.showSelectSystem ? this.form.value.includeInVMS ?? false : this.selectedSystem.isVMS
     };
     this.store.dispatch(new SaveSpecialProjectCategory(specialProjectCategory)).subscribe(val => {
       this.form.reset();
@@ -683,7 +693,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
     const isAllDepartments = this.form.controls['departmentsIds'].value.length === this.orgStructureData.departmentsIds.dataSource.length;
     const isAllSkills = this.form.controls['skillIds'].value.length === this.orgStructureData.skillIds.dataSource.length;
     if (this.selectedTab == SpecialProjectTabs.SpecialProjectsMapping) {
-      if(this.showSelectSystem){
+      if (this.showSelectSystem) {
         if ((this.form.value.includeInIRP == false || !this.form.value.includeInIRP) && (this.form.value.includeInVMS == false || !this.form.value.includeInVMS)) {
           this.store.dispatch(new ShowToast(MessageTypes.Error, "Please select a System for special Projects"));
           return;
@@ -698,8 +708,8 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
         departmentIds: isAllRegions && isAllDepartments ? [] : this.form.controls['departmentsIds'].value,
         skillIds: isAllSkills ? [] : this.form.controls['skillIds'].value,
         prePopulateInOrders: this.form.controls['PrePopulateInOrders'].value != null ? this.form.controls['PrePopulateInOrders'].value : false,
-        includeInIRP:this.showSelectSystem ? this.form.value.includeInIRP??false : this.selectedSystem.isIRP,
-        includeInVMS:this.showSelectSystem ? this.form.value.includeInVMS??false : this.selectedSystem.isVMS
+        includeInIRP: this.showSelectSystem ? this.form.value.includeInIRP ?? false : this.selectedSystem.isIRP,
+        includeInVMS: this.showSelectSystem ? this.form.value.includeInVMS ?? false : this.selectedSystem.isVMS
       };
 
       this.specialProjectMappingToPost = specialProjectMapping;
@@ -877,22 +887,51 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
   }
 
   private getOrganizagionData(): void {
-   
     this.organization$
-    .pipe(
-      filter(Boolean),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe((organization : Organization) => {
-      this.selectedSystem = {
-        isIRP: !!organization.preferences.isIRPEnabled,
-        isVMS: !!organization.preferences.isVMCEnabled,
-      };
-      this.showSelectSystem = this.selectedSystem.isIRP &&
-      this.selectedSystem.isVMS
-      const user = this.store.selectSnapshot(UserState.user);
-      this.isMSPUser =user?.businessUnitType ==BusinessUnitType.MSP
-    });
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe((organization: Organization) => {
+        this.selectedSystem = {
+          isIRP: !!organization.preferences.isIRPEnabled,
+          isVMS: !!organization.preferences.isVMCEnabled,
+        };
+        this.showSelectSystem = this.selectedSystem.isIRP &&
+          this.selectedSystem.isVMS
+        const user = this.store.selectSnapshot(UserState.user);
+        this.isMSPUser = user?.businessUnitType == BusinessUnitType.MSP
+      });
   }
-
+  onCheckSystemConfig(event: any, system: any) {
+    console.log(event, system);
+    if (event.checked && system == 'VMS') {
+      this.orgStructureData.projectTypeIds.dataSource = this.projectTypes.filter((f: { includeInVMS: boolean; }) => f.includeInVMS == true);
+      if (this.form.get('includeInIRP')?.value) {
+        this.orgStructureData.projectTypeIds.dataSource = this.projectTypes;
+      }
+    } else if (event.checked && system == 'IRP') {
+      this.orgStructureData.projectTypeIds.dataSource = this.projectTypes.filter((f: { includeInIRP: boolean; }) => f.includeInIRP == true);
+      if (this.form.get('includeInVMS')?.value) {
+        this.orgStructureData.projectTypeIds.dataSource = this.projectTypes;
+      }
+    }
+    else if(system == 'IRP'){
+      this.form.get('includeInIRP')?.setValue(false);
+      this.orgStructureData.projectTypeIds.dataSource = this.projectTypes.filter((f: { includeInIRP: boolean;includeInVMS:boolean; }) => f.includeInIRP == false || f.includeInVMS ==this.form.get('includeInVMS')?.value);
+      if (!this.form.get('includeInVMS')?.value) {
+        this.orgStructureData.projectTypeIds.dataSource = this.projectTypes;
+      }
+    }
+    else if(system == 'VMS'){
+      this.form.get('includeInVMS')?.setValue(false);
+      this.orgStructureData.projectTypeIds.dataSource = this.projectTypes.filter((f: { includeInVMS: boolean;includeInIRP:boolean; }) => f.includeInVMS == false || f.includeInIRP ==this.form.get('includeInIRP')?.value);
+      if (!this.form.get('includeInIRP')?.value) {
+        this.orgStructureData.projectTypeIds.dataSource = this.projectTypes;
+      }
+    }
+    else{
+      this.orgStructureData.projectTypeIds.dataSource = this.projectTypes;
+    }
+  }
 }
