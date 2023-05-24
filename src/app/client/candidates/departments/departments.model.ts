@@ -23,6 +23,8 @@ export interface DepartmentAssigned {
   isHomeCostCenter: boolean;
   orientationDate: string | null;
   extDepartmentId: string;
+  workCommitmentEndDate: string;
+  workCommitmentStartDate: string;
 }
 
 interface Skill {
@@ -114,6 +116,11 @@ export interface DepartmentConditions {
 export interface DateRanges {
   min?: Date;
   max?: Date;
+}
+
+export interface DepartmentDialogState {
+  data: DepartmentAssigned | null;
+  isOpen: boolean;
 }
 
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;
