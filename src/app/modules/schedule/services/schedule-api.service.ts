@@ -74,9 +74,10 @@ export class ScheduleApiService {
   }
 
   updateScheduledShift(scheduledShift: ScheduledShift, type: ScheduleType):Observable<void> {
+    const userLocalTime = DateTimeHelper.toUtcFormat(new Date());
     return this.http.post<void>(
       type === ScheduleType.Book ? '/api/Schedules/booking/update' : '/api/Schedules/schedule/update',
-      scheduledShift
+      { ...scheduledShift, userLocalTime },
     );
   }
 
