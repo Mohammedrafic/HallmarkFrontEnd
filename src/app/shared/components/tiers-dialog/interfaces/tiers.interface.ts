@@ -18,6 +18,12 @@ export interface TiersInputConfig {
   dataSource?: TierDataSource;
   showAllToggle?: boolean;
   customFiltering?: boolean;
+  radiobuttons? : RadioButtonGroup[];
+}
+
+export interface RadioButtonGroup {
+  title: string;
+  value : boolean;
 }
 
 export interface TierDialogConfig {

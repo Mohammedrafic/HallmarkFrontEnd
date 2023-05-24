@@ -23,42 +23,65 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[], workcommitment
         required: true,
         type: FieldType.Number,
       },
-      {
-        field: FieldNames.regionIds,
-        title: 'Region',
-        disabled: false,
-        required: true,
-        type: FieldType.MultiSelectDropdown,
-        dataSource: regions ?? [],
-        showAllToggle: true,
-      },
-      {
-        field: FieldNames.locationIds,
-        title: 'Location',
-        disabled: false,
-        required: true,
-        type: FieldType.MultiSelectDropdown,
-        dataSource: [],
-        showAllToggle: true,
-      },
-      {
-        field: FieldNames.departmentIds,
-        title: 'Department',
-        disabled: false,
-        required: true,
-        type: FieldType.MultiSelectDropdown,
-        dataSource: [],
-        showAllToggle: true,
-        customFiltering: true,
-      },
+      // {
+      //   field: FieldNames.regionIds,
+      //   title: 'Region',
+      //   disabled: false,
+      //   required: true,
+      //   type: FieldType.MultiSelectDropdown,
+      //   dataSource: regions ?? [],
+      //   showAllToggle: true,
+      // },
+      // {
+      //   field: FieldNames.locationIds,
+      //   title: 'Location',
+      //   disabled: false,
+      //   required: true,
+      //   type: FieldType.MultiSelectDropdown,
+      //   dataSource: [],
+      //   showAllToggle: true,
+      // },
+      // {
+      //   field: FieldNames.departmentIds,
+      //   title: 'Department',
+      //   disabled: false,
+      //   required: true,
+      //   type: FieldType.MultiSelectDropdown,
+      //   dataSource: [],
+      //   showAllToggle: true,
+      //   customFiltering: true,
+      // },
       {
         field: 'workcommitmentId',
         title: 'WorkCommitment',
         disabled: false,
-        required: true,
+        required: false,
         type: FieldType.MultiSelectDropdown,
         dataSource: workcommitmentIds ?? [],
         customFiltering: true
+      },
+      {
+        field: 'skillId',
+        title: 'Skills',
+        disabled: false,
+        required: true,
+        type: FieldType.RadioButton,
+        dataSource: [],
+        customFiltering: true,
+        radiobuttons : [
+          {
+            title : "All",
+            value : true
+          },
+          {
+            title : "Primary",
+            value : false
+          },
+          {
+            title : "Secondary",
+            value : false
+          },
+        ]
       },
     ]
   },

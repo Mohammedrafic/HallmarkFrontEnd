@@ -119,6 +119,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     this.watchForWorkcommitment();
     this.watchForCloseDialog();
     this.watchForDepartments();
+    console.log(this.dialogConfig);
   }
 
   public allRegionsChange(event: { checked: boolean }): void {
