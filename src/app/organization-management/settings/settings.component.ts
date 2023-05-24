@@ -168,6 +168,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   hasPermissions: Record<string, boolean> = {};
   regularLocalRatesToggleMessage = false;
   dialogHeader = 'Add Settings';
+  numericValueLabel = 'Value';
 
 
   private readonly settingsAppliedToPermissions = SettingsAppliedToPermissions;
@@ -318,7 +319,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == parentRecord.settingKey;
     this.IsSettingKeyAvailabiltyOverLap = OrganizationSettingKeys[OrganizationSettingKeys['AvailabilityOverLapRule']].toString() == parentRecord.settingKey;
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == parentRecord.settingKey;
-
+    
+    this.setNumericValueLabel(parentRecord.settingKey);
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
@@ -1363,5 +1365,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   ): void {
     this.selectedParentRecord = parentRecord;
     this.selectedChildRecord = childRecord;
+  }
+
+  private setNumericValueLabel(settingKey: string): void{
+    const isOnHold = OrganizationSettingKeys[OrganizationSettingKeys['OnHoldDefault']].toString() === settingKey;
+    this.numericValueLabel = isOnHold ? 'Value (Weeks)' : 'Value';
   }
 }

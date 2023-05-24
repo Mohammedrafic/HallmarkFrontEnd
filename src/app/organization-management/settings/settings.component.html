@@ -417,11 +417,13 @@
 
         <div *ngIf="textFieldType === textFieldTypeControl.Numeric">
           <div class="input-container bootstrap">
-            <label for="numeric">Value<span class="required">*</span></label>
+            <label for="numeric">
+              {{numericValueLabel}}<span class="required">*</span>
+            </label>
             <div class="input-group">
               <ejs-numerictextbox id="numeric" class="numeric-input" min="0" [maxlength]="maxFieldLength"
-                [validateDecimalOnType]='true' decimals='0' (keydown)="onlyNumerics($event)" format="#" [showSpinButton]="false" appValidateWithMessage
-                formControlName="value"></ejs-numerictextbox>
+                [validateDecimalOnType]='true' decimals='0' (keydown)="onlyNumerics($event)" format="#"
+                [showSpinButton]="false" appValidateWithMessage formControlName="value"></ejs-numerictextbox>
             </div>
           </div>
         </div>
