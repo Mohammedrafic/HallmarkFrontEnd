@@ -115,13 +115,18 @@ export class ShowCustomSideDialog {
 
 export class SetIrpFlag {
   static readonly type = '[app] Set Irp flag';
-  constructor(public readonly irpEnabled: boolean) {}
+  constructor(public readonly irpEnabled: boolean) { }
 }
 
 export class GetDeviceScreenResolution {
-  static readonly type = '[app] Get Device Screen Resolution'
+  static readonly type = '[app] Get Device Screen Resolution';
 }
 export class ShowCustomExportDialog {
   static readonly type = '[app] Set Custom Export Dialog Showing state';
   constructor(public isDialogShown: boolean) { }
+}
+
+export class SaveMainContentElement {
+  static readonly type = '[app] Save Main Content Element';
+  constructor(public contentElement: HTMLElement) { }
 }
