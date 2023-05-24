@@ -411,3 +411,8 @@ export class GetCandidateCancellationReason{
   static readonly type ='[order management] Get Candidate Cancellation Reason';
   constructor(public payload:CandidateCancellationReasonFilter){}
 }
+
+export class GetAllShifts{
+  static readonly type ='[order management] Get All Shifts';
+  constructor(){}
+}
