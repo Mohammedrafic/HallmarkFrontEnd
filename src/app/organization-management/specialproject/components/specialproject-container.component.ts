@@ -904,7 +904,6 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
       });
   }
   onCheckSystemConfig(event: any, system: any) {
-    console.log(event, system);
     if (event.checked && system == 'VMS') {
       this.orgStructureData.projectTypeIds.dataSource = this.projectTypes.filter((f: { includeInVMS: boolean; }) => f.includeInVMS == true);
       if (this.form.get('includeInIRP')?.value) {
