@@ -339,10 +339,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.IsSettingKeyAvailabiltyOverLap) {
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
-    } else{
-     this.switchedValueForm.get('value')?.clearValidators();
+    } else {
+      this.switchedValueForm.get('value')?.clearValidators();
     }
-    if (this.isParentEdit && (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability)) {
+    if (this.isParentEdit && (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyOtHours)) {
       this.RegionLocationSettingsMultiFormGroup.disable();
       this.allRegionsSelected = true;
       this.allLocationsSelected = true;
@@ -523,10 +523,19 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       )
       .subscribe((data: OrganizationSettingsGet[]) => {
         const adaptedData = SettingsDataAdapter.adaptSettings(data, this.orgSystems.IRPAndVMS);
-
         this.configurations = data;
         this.lastAvailablePage = this.getLastPage(data);
-        this.gridDataSource = this.getRowsPerPage(adaptedData, this.currentPagerPage);
+        let settingData= this.getRowsPerPage(adaptedData, this.currentPagerPage);
+        settingData.forEach(element => {
+          if (element?.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
+          element.children?.forEach(e => {
+            if(e.regionId == null && e.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]){
+              e.hidden = true;
+            }
+          })
+          }
+        });
+        this.gridDataSource = settingData; 
         this.totalDataRecords = adaptedData.length;
         this.dataSource = adaptedData;
         this.grid?.refresh();
@@ -607,7 +616,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private setFormValidation(data: OrganizationSettingsGet): void {
-    this.maxFieldLength =100;
+    this.maxFieldLength = 100;
     const validators: ValidatorFn[] = [];
 
     data.validations.forEach((validation: OrganizationSettingValidation) => {

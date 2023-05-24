@@ -21,7 +21,7 @@
     <ng-template #detailTemplate let-data>
       <table class="detailtable" width="100%">
         <tbody>
-          <tr *ngFor="let child of data.children">
+          <tr *ngFor="let child of data.children" [hidden]="child.hidden">
             <td class="e-rowcell e-templatecell" [style.width.px]="100">
               <div class="row-tool-buttons">
                 <button ejs-button cssClass="e-flat primary-icon-button"
