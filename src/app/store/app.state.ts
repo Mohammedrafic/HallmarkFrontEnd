@@ -277,7 +277,7 @@ export class AppState {
   SaveMainContentElement(
     { patchState }: StateContext<AppStateModel>,
     { contentElement }: SaveMainContentElement
-  ) {
+  ): void {
     patchState({ mainContentElement: contentElement });
   }
 }
