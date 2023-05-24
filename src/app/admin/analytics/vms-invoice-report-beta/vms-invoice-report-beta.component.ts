@@ -59,7 +59,7 @@ export class VmsInvoiceReportBetaComponent implements OnInit, OnDestroy {
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReportBeta/VMSInvoiceReportBeta.wls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReportBeta/VMSInvoiceReportBeta.cat" };
-  public title: string = "VMS Invoice Report Beta";
+  public title: string = "VMS Invoice Report";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
   public allOption: string = "All";
