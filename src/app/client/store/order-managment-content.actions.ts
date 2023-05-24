@@ -87,7 +87,8 @@ export class GetIrpOrderCandidates {
     public organizationId: number,
     public pageNumber: number,
     public pageSize: number,
-    public isAvailable: boolean
+    public isAvailable: boolean,
+    public searchTerm?: any
   ) {}
 }
 
