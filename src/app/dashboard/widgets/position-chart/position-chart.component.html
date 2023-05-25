@@ -1,6 +1,11 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme" [isLTAOrderEnding]="isLTAOrderEnding" >
   <ng-template #header>
-      <div class="app-widget-wrapper__tooltip tooltip_pos" *ngIf="description.length>0">
+    <div [ngClass]="isLTAOrderEnding ? 'app-header padt-10' : 'app-header padt-5' ">
+      <div class="app-accumulation-chart__title">
+        <h3 class="widget-header__title">{{ chartData?.count }}</h3>
+      </div>
+    </div>
+      <div  *ngIf="description.length>0">
         <ejs-tooltip [content]="description" position='TopCenter'>
           <span class="mytooltip">
             <i-feather name="info" id="info"
@@ -12,12 +17,12 @@
   </ng-template>
   <ng-template #positionChat>
     <div class="widget">
-      <span class="widget__title">{{ chartData?.count }}</span>
-      <span class="widget__type" *ngIf="!isLTAOrderEnding"
+      
+      <span class="widget__type" *ngIf="isLTAOrderEnding"
             (mousedown)="defineMousePosition($event)"
             (click)="toSourceContent($event)">{{ chartData?.statusName | titlecase }} Positions</span>
-      <span class="widget__type" *ngIf="isLTAOrderEnding"
-            (mousedown)="defineMousePosition($event)">Positions ending in next 45 days</span>
+      <span class="widget__type__paddtop" *ngIf="!isLTAOrderEnding"
+            (mousedown)="defineMousePosition($event)">Positions ending in next  45  days</span>
     </div>
   </ng-template>
 </app-widget-wrapper>

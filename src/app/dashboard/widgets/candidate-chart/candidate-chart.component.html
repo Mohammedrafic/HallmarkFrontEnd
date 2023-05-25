@@ -1,6 +1,11 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme" [isCandidateApplied]="isCandidateApplied">
     <ng-template #header>
-        <div class="app-widget-wrapper__tooltip" *ngIf="description.length>0">
+        <div class="title-content">
+          <div class="app-accumulation-chart__title">
+            <h3 class="widget-header__title">{{ chartData?.count }}</h3>
+          </div>
+        </div>
+        <div *ngIf="description.length>0">
           <ejs-tooltip [content]="description" position='TopCenter'>
             <span class="mytooltip">
               <i-feather name="info" id="info"
@@ -12,7 +17,7 @@
     </ng-template>
     <ng-template #positionChat>
       <div class="widget">
-        <span class="widget__title">{{ chartData?.count }}</span>
+        
         <span class="widget__type" *ngIf="!isLTAOrderEnding"
               (mousedown)="defineMousePosition($event)"
               (click)="toSourceContent($event)">Candidate in applied status for {{chartData?.days||0}} or more days</span>
