@@ -168,6 +168,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   hasPermissions: Record<string, boolean> = {};
   regularLocalRatesToggleMessage = false;
   dialogHeader = 'Add Settings';
+  numericValueLabel = 'Value';
 
 
   private readonly settingsAppliedToPermissions = SettingsAppliedToPermissions;
@@ -318,7 +319,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == parentRecord.settingKey;
     this.IsSettingKeyAvailabiltyOverLap = OrganizationSettingKeys[OrganizationSettingKeys['AvailabilityOverLapRule']].toString() == parentRecord.settingKey;
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == parentRecord.settingKey;
-
+    
+    this.setNumericValueLabel(parentRecord.settingKey);
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
@@ -339,10 +341,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.IsSettingKeyAvailabiltyOverLap) {
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
-    } else{
-     this.switchedValueForm.get('value')?.clearValidators();
+    } else {
+      this.switchedValueForm.get('value')?.clearValidators();
     }
-    if (this.isParentEdit && (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability)) {
+    if (this.isParentEdit && (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyOtHours)) {
       this.RegionLocationSettingsMultiFormGroup.disable();
       this.allRegionsSelected = true;
       this.allLocationsSelected = true;
@@ -526,7 +528,17 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
         this.configurations = data;
         this.lastAvailablePage = this.getLastPage(data);
-        this.gridDataSource = this.getRowsPerPage(adaptedData, this.currentPagerPage);
+        let settingData= this.getRowsPerPage(adaptedData, this.currentPagerPage);
+        settingData.forEach(element => {
+          if (element?.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
+          element.children?.forEach(e => {
+            if(e.regionId == null && e.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]){
+              e.hidden = true;
+            }
+          })
+          }
+        });
+        this.gridDataSource = settingData; 
         this.totalDataRecords = adaptedData.length;
         this.dataSource = adaptedData;
         this.grid?.refresh();
@@ -607,7 +619,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private setFormValidation(data: OrganizationSettingsGet): void {
-    this.maxFieldLength =100;
+    this.maxFieldLength = 100;
     const validators: ValidatorFn[] = [];
 
     data.validations.forEach((validation: OrganizationSettingValidation) => {
@@ -1363,5 +1375,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   ): void {
     this.selectedParentRecord = parentRecord;
     this.selectedChildRecord = childRecord;
+  }
+
+  private setNumericValueLabel(settingKey: string): void{
+    const isOnHold = OrganizationSettingKeys[OrganizationSettingKeys['OnHoldDefault']].toString() === settingKey;
+    this.numericValueLabel = isOnHold ? 'Value (Weeks)' : 'Value';
   }
 }
