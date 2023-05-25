@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } fro
 import { Select, Store } from '@ngxs/store';
 import { debounceTime, Observable, Subject } from 'rxjs';
 
-import { AgencyOrderManagement, Order, OrderManagement, ReOrder, ReOrderPage } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, Order, OrderManagement, ReOrder } from '@shared/models/order-management.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { AbstractGridConfigurationComponent } from
   '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -16,7 +16,9 @@ import { OrderManagementService } from
 import { UserState } from '../../../../../store/user.state';
 import { PermissionService } from '../../../../../security/services/permission.service';
 import { CurrentUserPermission } from '@shared/models/permission.model';
-import { GetReOrdersByOrderId } from '@client/store/order-managment-content.actions';
+import { GetReOrdersByOrderId } from '../../store/re-order.actions';
+import { ReOrderPage } from '../../interfaces';
+
 
 @Component({
   selector: 'app-order-reorders-list',

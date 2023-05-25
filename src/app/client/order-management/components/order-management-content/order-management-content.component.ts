@@ -87,7 +87,6 @@ import {
   GetOrdersJourney,
   GetOrganisationCandidateJob,
   GetProjectSpecialData,
-  GetReOrdersByOrderId,
   GetSelectedOrderById,
   LockUpdatedSuccessfully,
   ReloadOrganisationOrderCandidatesLists,
@@ -226,6 +225,7 @@ import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { OutsideZone } from '@core/decorators';
 import { PreservedOrderService } from '@client/order-management/services/preserved-order.service';
+import { GetReOrdersByOrderId } from '@shared/components/order-reorders-container/store/re-order.actions';
 
 @Component({
   selector: 'app-order-management-content',
