@@ -30,10 +30,11 @@ export class ReOrderState {
     { patchState }: StateContext<ReorderStateModel>,
     { orderId, pageNumber, pageSize, organizationId }: GetReOrdersByOrderId
   ): Observable<ReOrderPage> {
-    return this.reOrderApiService.getReOrdersByOrderIdByOrderId(orderId, pageNumber, pageSize, organizationId).pipe(
-      tap((data) => {
-        patchState({ reOrderPage: data });
-      })
-    );
+    return this.reOrderApiService.getReOrdersByOrderId(orderId, pageNumber, pageSize, organizationId)
+      .pipe(
+        tap((data) => {
+          patchState({ reOrderPage: data });
+        })
+      );
   }
 }

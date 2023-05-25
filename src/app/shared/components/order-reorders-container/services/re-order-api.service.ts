@@ -9,7 +9,7 @@ import { ReOrderPage } from "../interfaces";
 export class ReOrderApiService {
   constructor(private readonly http: HttpClient) { }
 
-  public getReOrdersByOrderIdByOrderId(
+  public getReOrdersByOrderId(
     orderId: number,
     pageNumber: number,
     pageSize: number,

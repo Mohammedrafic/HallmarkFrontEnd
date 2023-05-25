@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import { debounceTime, Observable, Subject } from 'rxjs';
@@ -33,8 +33,8 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
     this.totalCountRecords = value?.totalCount || 0;
   }
 
-  @Output() editReorder = new EventEmitter();
-  @Output() selectReOrder = new EventEmitter<{
+  @Output() public editReorder = new EventEmitter();
+  @Output() public selectReOrder = new EventEmitter<{
     reOrder: OrderManagement | AgencyOrderManagement;
     order: Order | OrderManagement | AgencyOrderManagement;
   }>();
@@ -55,7 +55,6 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
     private orderManagementAgencyService: OrderManagementAgencyService,
     private orderService: OrderManagementService,
     private permissionService: PermissionService,
-    private cdr: ChangeDetectorRef,
   ) {
     super();
   }
@@ -69,7 +68,6 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.getReOrdersByPageSettings();
-      this.cdr.markForCheck();
     });
   }
 

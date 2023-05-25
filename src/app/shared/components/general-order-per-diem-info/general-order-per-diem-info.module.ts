@@ -7,8 +7,8 @@ import { GeneralOrderPerDiemInfoComponent } from "./general-order-per-diem-info.
 import { BoolValuePipeModule } from "@shared/pipes/bool-values/bool-values-pipe.module";
 
 @NgModule({
-    declarations: [GeneralOrderPerDiemInfoComponent],
-    exports: [GeneralOrderPerDiemInfoComponent],
-    imports: [CommonModule, BoolValuePipeModule, FeatherModule],
+  declarations: [GeneralOrderPerDiemInfoComponent],
+  exports: [GeneralOrderPerDiemInfoComponent],
+  imports: [CommonModule, BoolValuePipeModule, FeatherModule],
 })
 export class GeneralOrderPerDiemInfoModule { }
