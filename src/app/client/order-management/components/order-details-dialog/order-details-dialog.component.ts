@@ -23,7 +23,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
+import { Order, OrderCandidatesListPage, OrderManagementChild, ReOrderPage } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import {
@@ -64,6 +64,7 @@ import { PermissionService } from '../../../../security/services/permission.serv
 import { UserState } from '../../../../store/user.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
+import { CurrentUserPermission } from '@shared/models/permission.model';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -116,7 +117,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public irpCandidatesCount$: Observable<number>;
 
   @Select(UserState.currentUserPermissions)
-  public currentUserPermissions$: Observable<any[]>;
+  public currentUserPermissions$: Observable<CurrentUserPermission[]>;
+
+  @Select(OrderManagementContentState.GetReOrdersByOrderId)
+  public readonly reOrderList$: Observable<ReOrderPage | null>;
 
   public readonly isReOrderDialogOpened$: Observable<boolean> = this.isDialogOpened();
 

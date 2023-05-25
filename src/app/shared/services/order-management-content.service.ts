@@ -24,6 +24,7 @@ import {
   OrderManagementFilter,
   OrderManagementPage,
   OrdersJourneyPage,
+  ReOrderPage,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { CandidateCancellation } from '@shared/models/candidate-cancellation.model';
@@ -436,10 +437,10 @@ export class OrderManagementContentService {
   /**
    * Get order filter data sources
    */
-  public getOrderFilterDataSources(isIRP: boolean = false): Observable<OrderFilterDataSource> {
+  public getOrderFilterDataSources(isIRP = false): Observable<OrderFilterDataSource> {
     let url = '/api/OrdersFilteringOptions/organization';
     if (isIRP) {
-      url += '/irp'
+      url += '/irp';
     }
     return this.http.get<OrderFilterDataSource>(url).pipe(
       map((data) => {
@@ -452,7 +453,12 @@ export class OrderManagementContentService {
           specialProjectCategories: 'projectType',
           reorderStatuses: 'statusText',
         };
-          return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]));
+
+        return Object.fromEntries(
+          Object.entries(data)
+            .map(([key, value]) => 
+              [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]
+            ));
       }),
     );
   }
@@ -568,5 +574,15 @@ export class OrderManagementContentService {
 
   public GetCandidateCancellationReasons(filter: CandidateCancellationReasonFilter): Observable<CandidateCancellationReason[]> {
     return this.http.post<CandidateCancellationReason[]>(`/api/CandidateCancellationSettings/getCandidateCancellationReason`, filter);
+  }
+
+  public GetReOrdersByOrderIdByOrderId(
+    orderId: number,
+    pageNumber: number,
+    pageSize: number,
+  ): Observable<ReOrderPage> {
+    return this.http.post<ReOrderPage>(
+      '/api/Orders/reorders/organization', { orderId, pageNumber, pageSize }
+    );
   }
 }

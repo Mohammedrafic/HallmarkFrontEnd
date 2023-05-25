@@ -61,12 +61,12 @@ import {
   UploadOrderImportFile,
   UploadOrderImportFileSucceeded,
   UpdateRegRateorder,
-  UpdateRegRateSucceeded,
   GetCandidateCancellationReason,
   ExportIRPOrders,
   ClearOrderFilterDataSources,
   GetOrdersJourney,
   ExportOrdersJourney,
+  GetReOrdersByOrderId,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -82,6 +82,7 @@ import {
   OrderManagement,
   OrderManagementPage,
   OrdersJourneyPage,
+  ReOrderPage,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -101,7 +102,7 @@ import {
   updateCandidateJobMessage,
   UpdateRegularRatesucceedcount,
   PerDiemReOrdersErrorMessage,
-  TravelerContracttoPermOrdersSucceedMessage
+  TravelerContracttoPermOrdersSucceedMessage,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -159,6 +160,7 @@ export interface OrderManagementContentStateModel {
   extensions: any;
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
   candidateCancellationReasons:CandidateCancellationReason[]|null;
+  reOrderPage: ReOrderPage | null,
 }
 
 @State<OrderManagementContentStateModel>({
@@ -196,7 +198,8 @@ export interface OrderManagementContentStateModel {
     contactDetails: null,
     extensions: null,
     irpCandidates: null,
-    candidateCancellationReasons:null
+    candidateCancellationReasons:null,
+    reOrderPage: null,
   },
 })
 @Injectable()
@@ -372,6 +375,11 @@ export class OrderManagementContentState {
   @Selector()
   static getCandidateCancellationReasons(state: OrderManagementContentStateModel): CandidateCancellationReason[]|null {
     return state.candidateCancellationReasons || null;
+  }
+
+  @Selector()
+  static GetReOrdersByOrderId(state: OrderManagementContentStateModel): ReOrderPage | null {
+    return state.reOrderPage;
   }
 
   constructor(
@@ -1137,8 +1145,19 @@ export class OrderManagementContentState {
     ) : Observable<CandidateCancellationReason[] |null>{
       return this.orderManagementService.GetCandidateCancellationReasons(payload).pipe(tap((payload: CandidateCancellationReason[]) => {
         patchState({ candidateCancellationReasons: payload });
-        return payload
+        return payload;
       }));
     }
 
+  @Action(GetReOrdersByOrderId)
+  GetReOrdersByOrderId(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderId, pageNumber, pageSize }: GetReOrdersByOrderId
+  ): Observable<ReOrderPage> {
+    return this.orderManagementService.GetReOrdersByOrderIdByOrderId(orderId, pageNumber, pageSize).pipe(
+      tap((data) => {
+        patchState({ reOrderPage: data });
+      })
+    );
+  }
 }

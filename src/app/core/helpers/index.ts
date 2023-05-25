@@ -9,4 +9,3 @@ export * from './date.helper';
 export * from './grid-values.helper';
 export * from './destroy-dialog.helper';
 export * from './functions.helper';
-export * from './client-side-paginator.helper';

@@ -41,6 +41,7 @@ export class OrderManagement {
   candidates: number;
   startDate: string;
   isLocked?: boolean;
+  isTemplate?: boolean;
   reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
   children: OrderManagementChild[];
@@ -193,6 +194,7 @@ export class OrderManagementFilter {
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
 export type IRPOrderManagementPage = PageOfCollections<IRPOrderManagement>;
 export type OrdersJourneyPage = PageOfCollections<GetOrdersJourney>;
+export type ReOrderPage = PageOfCollections<ReOrder>;
 
 export type AgencyOrderManagement = {
   orderId: number;

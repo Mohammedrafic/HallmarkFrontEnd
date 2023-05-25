@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { AgencyOrderManagement, Order, OrderManagement } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, Order, OrderManagement, ReOrderPage } from '@shared/models/order-management.model';
 import {OrderType} from '@shared/enums/order-type';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
@@ -16,6 +16,8 @@ export class OrderReOrdersContainerComponent {
   @Input() isAgency = false;
 
   @Input() activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
+
+  @Input() reOrders: ReOrderPage | null;
 
   @Output() selectReOrder = new EventEmitter<{ reOrder: OrderManagement | AgencyOrderManagement, order: Order
     | OrderManagement | AgencyOrderManagement }>();
