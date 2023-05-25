@@ -1,12 +1,24 @@
 @import "colors";
-
+.app-header{
+  width: 100%;
+}
+.padt-10{
+  padding-top: 10%;
+}
+.padt-5{
+  padding-top: 3%;
+}
+.app-accumulation-chart__title{
+  text-align: center;   
+   margin-left: 10px;
+}
 .widget {
   display: flex;
   flex-direction: column;
  // padding-left: 10px;
   height: 100%;
   text-align: center;
-  justify-content: center;
+  // justify-content: center;
 
   &__title {
     padding-bottom: 4%;
@@ -23,14 +35,28 @@
   &__type {
     font-size: 14px;
     color: $secondary-dark-blue-20;
-    margin-right: -12px;
-    margin-right: 4px;
+  //  margin-right: -12px;
+  // margin-right: 4px;
     cursor: default;
 
     @media screen and (max-width: 1550px) {
       font-size: 12px;
     }
-  }
+    &__padd{
+      padding: 5%;
+    }
+    &__paddtop{
+      padding-top: 2%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  } 
+}
+.tooltip_lta{
+  position: relative;
+  bottom: 10px;
+  left: 4%;
 }
 
   .app-widget-wrapper {

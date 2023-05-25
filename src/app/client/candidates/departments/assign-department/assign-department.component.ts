@@ -194,6 +194,10 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
           this.setMinMaxDateRange(this.dateRanges);
         } else if (data && this.departmentId) {
           this.setupDialogState(data);
+          this.setDataSource(data);
+          this.isOriented$.next(data.isOriented);
+          this.departmentFormService.patchForm(this.assignDepartmentForm, data);
+          this.disableControls();
         } else {
           this.resetAssignDepartmentForm();
         }
@@ -341,7 +345,9 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       ? DateTimeHelper.convertDateToUtc(workCommitmentEndDate)
       : undefined;
     this.setMinMaxDateRange({ min: minDate, max: maxDate });
+  }
 
+  private setDataSource(data: DepartmentAssigned): void {
     this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
     this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
     this.dataSource.departments = [
@@ -350,8 +356,5 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         id: data.departmentId,
       } as OrganizationDepartment,
     ];
-    this.isOriented$.next(data.isOriented);
-    this.departmentFormService.patchForm(this.assignDepartmentForm, data);
-    this.disableControls();
   }
 }

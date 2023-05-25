@@ -56,6 +56,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   private searchTermByCandidateName: string;
   protected pageSubject = new Subject<number>();
   protected unsubscribe$: Subject<void> = new Subject();
+  isMobileScreen:boolean=false;
 
   constructor(protected override store: Store, protected router: Router, protected globalWindow : WindowProxy & typeof globalThis,) {
     super(store);
@@ -83,6 +84,9 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   }
 
   public onViewNavigation(data: any): void {
+    if(this.isMobileScreen){
+      return;
+    }
     const user = this.store.selectSnapshot(UserState.user);
     const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const url =
@@ -145,6 +149,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
     this.isMobileScreen$.pipe(takeUntil(this.unsubscribe$)).subscribe((isMobile) => {
       this.candidateSearchPlaceholder = isMobile ? '' : CandidateSearchPlaceholder;
       this.employeeSearchPlaceholder = isMobile ? "" : EmployeeSearchPlaceholder;
+      this.isMobileScreen = isMobile;
     });
   }
 

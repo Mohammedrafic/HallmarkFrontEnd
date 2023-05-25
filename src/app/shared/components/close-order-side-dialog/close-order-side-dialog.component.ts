@@ -8,15 +8,15 @@ import { ShowCloseOrderDialog } from '../../../store/app.actions';
 @Component({
   selector: 'app-close-order-side-dialog',
   templateUrl: './close-order-side-dialog.component.html',
-  styleUrls: ['../side-dialog/side-dialog.component.scss']
+  styleUrls: ['../side-dialog/side-dialog.component.scss'],
 })
 export class CloseOrderSideDialogComponent implements OnInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   targetElement: HTMLElement = document.body;
-  isPosition: boolean = false;
+  isPosition = false;
 
   @Input() header: string;
-  @Input() width: string = '434px';
+  @Input() width = '434px';
 
   @Output() formCancelClicked = new EventEmitter();
   @Output() formSaveClicked = new EventEmitter();
@@ -25,15 +25,7 @@ export class CloseOrderSideDialogComponent implements OnInit {
   constructor(private action$: Actions) { }
 
   ngOnInit(): void {
-    this.action$.pipe(ofActionDispatched(ShowCloseOrderDialog)).subscribe(payload => {
-      this.isPosition = payload.isPosition;
-      this.isPositionEmitter.emit(this.isPosition);
-      if (payload.isDialogShown) {
-        this.sideDialog.show();
-      } else {
-        this.sideDialog.hide();
-      }
-    });
+    this.subscribeOnCloseOrderDialog();
   }
 
   onFormCancelClick(): void {
@@ -42,5 +34,19 @@ export class CloseOrderSideDialogComponent implements OnInit {
 
   onFormSaveClick(): void {
     this.formSaveClicked.emit();
+  }
+
+  private subscribeOnCloseOrderDialog(): void {
+    this.action$
+      .pipe(ofActionDispatched(ShowCloseOrderDialog))
+      .subscribe(payload => {
+        this.isPosition = payload.isPosition;
+        if (payload.isDialogShown) {
+          this.isPositionEmitter.emit(this.isPosition);
+          this.sideDialog.show();
+        } else {
+          this.sideDialog.hide();
+        }
+      });
   }
 }

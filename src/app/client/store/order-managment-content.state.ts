@@ -66,6 +66,7 @@ import {
   ClearOrderFilterDataSources,
   GetOrdersJourney,
   ExportOrdersJourney,
+  GetAllShifts,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -127,6 +128,7 @@ import { createFormData } from '@client/order-management/helpers';
 import { PageOfCollections } from '@shared/models/page.model';
 import { UpdateRegRateService } from '@client/order-management/components/update-reg-rate/update-reg-rate.service';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
+import { ScheduleShift } from '@shared/models/schedule-shift.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -158,6 +160,7 @@ export interface OrderManagementContentStateModel {
   extensions: any;
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
   candidateCancellationReasons:CandidateCancellationReason[]|null;
+  allShifts:ScheduleShift[]|null;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -196,6 +199,8 @@ export interface OrderManagementContentStateModel {
     extensions: null,
     irpCandidates: null,
     candidateCancellationReasons:null,
+    allShifts:null
+	
   },
 })
 @Injectable()
@@ -371,6 +376,11 @@ export class OrderManagementContentState {
   @Selector()
   static getCandidateCancellationReasons(state: OrderManagementContentStateModel): CandidateCancellationReason[]|null {
     return state.candidateCancellationReasons || null;
+  }
+
+  @Selector()
+  static getAllShifts(state: OrderManagementContentStateModel): ScheduleShift[]|null {
+    return state.allShifts || null;
   }
 
   constructor(
@@ -1139,4 +1149,14 @@ export class OrderManagementContentState {
         return payload;
       }));
     }
+
+    @Action(GetAllShifts)
+    GetAllShifts(
+      { patchState } : StateContext<OrderManagementContentStateModel>, {  } : GetAllShifts
+      ) : Observable<ScheduleShift[] |null>{
+        return this.orderManagementService.getAllShifts().pipe(tap((payload:ScheduleShift[]) => {
+          patchState({ allShifts: payload });
+          return payload
+        }));
+      }
 }

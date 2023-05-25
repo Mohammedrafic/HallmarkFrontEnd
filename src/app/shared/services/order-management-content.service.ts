@@ -50,6 +50,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { PageOfCollections } from '@shared/models/page.model';
 import { AdaptIrpCandidates } from '@shared/components/order-candidate-list/order-candidate-list.utils';
 import { GetQueryParams } from '@core/helpers/functions.helper';
+import { ScheduleShift } from '@shared/models/schedule-shift.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -573,5 +574,9 @@ export class OrderManagementContentService {
 
   public GetCandidateCancellationReasons(filter: CandidateCancellationReasonFilter): Observable<CandidateCancellationReason[]> {
     return this.http.post<CandidateCancellationReason[]>(`/api/CandidateCancellationSettings/getCandidateCancellationReason`, filter);
+  }
+
+  public getAllShifts(): Observable<ScheduleShift[]> {
+    return this.http.get<ScheduleShift[]>(`/api/MasterShifts/all`);
   }
 }

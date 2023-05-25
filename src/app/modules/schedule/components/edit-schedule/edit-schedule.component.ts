@@ -485,7 +485,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.unsubscribe('departmentId');
     this.subscriptions['departmentId'] = this.scheduleForm.get('departmentId')?.valueChanges.pipe(
       filter(Boolean),
-      switchMap((value: number) => this.scheduleApiService.getSkillsByEmployees(value, this.scheduledItem.candidate.id)),
+      switchMap((value: number) => this.scheduleApiService.getSkillsByEmployees([value], this.scheduledItem.candidate.id)),
       takeUntil(this.componentDestroy())
     ).subscribe((skills: Skill[]) => {
       const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
