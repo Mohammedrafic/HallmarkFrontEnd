@@ -97,7 +97,7 @@ import { CandidatesModule } from '@agency/candidates/candidates.module';
 import { AgencySettingsService } from './services/agency-settings.service';
 import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
 import { AgencyReportsModule } from '@agency/agency-reports/agency-reports.module';
-import { LogiReportState } from '../organization-management/store/logi-report.state';
+import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-container/order-reorders-container.module';
 
 
 
@@ -208,7 +208,8 @@ const sidebarIcons = {
     BoolValuePipeModule,
     GridPaginationModule,
     CandidatesModule,
-    AgencyReportsModule
+    AgencyReportsModule,
+    OrderReOrdersContainerModule,
   ],
   providers: [
     OrderCandidateApiService,

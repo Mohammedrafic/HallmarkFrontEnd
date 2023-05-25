@@ -27,7 +27,7 @@ import {
   Flag,
   ArrowUp,
   Info,
-  RotateCw
+  RotateCw,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -52,7 +52,6 @@ import { SearchComponent } from './components/search/search.component';
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
 import { AccordionModule, SidebarModule, TabAllModule, TreeViewAllModule } from '@syncfusion/ej2-angular-navigations';
@@ -75,7 +74,6 @@ import {
 } from '@syncfusion/ej2-angular-grids';
 import { OrderCandidatesListComponent,
 } from './components/order-candidate-list/order-candidates-list/order-candidates-list.component';
-import { OrderReOrdersListComponent } from './components/order-reorders-list/order-re-orders-list.component';
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
 import { ApplyCandidateComponent,
 } from './components/order-candidate-list/order-candidates-list/apply-candidate/apply-candidate.component';
@@ -115,11 +113,7 @@ import { SecurityState } from '../security/store/security.state';
 import { NavigationPanelComponent } from './components/navigation-panel/navigation-panel.component';
 import { CandidateAvatarPipe } from './pipes/candidate-avatar.pipe';
 import { GridSubrowReorderComponent } from './components/grid-subrow-reorder/grid-subrow-reorder.component';
-import { GeneralOrderPerDiemInfoComponent,
-} from '@shared/components/general-order-per-diem-info/general-order-per-diem-info.component';
 import { GeneralReorderInfoComponent } from './components/general-reorder-info/general-reorder-info.component';
-import { OrderReOrdersContainerComponent,
-} from '@client/order-management/components/order-reorders-container/order-reorders-container.component';
 import { OrderPerDiemCandidatesListComponent,
 } from './components/order-candidate-list/order-per-diem-candidates-list/order-per-diem-candidates-list.component';
 import { CandidatesStatusModalComponent,
@@ -132,7 +126,6 @@ import { AcceptFormComponent,
 } from './components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
 import { NgxMaskModule } from 'ngx-mask';
 import { CloseOrderSideDialogComponent } from '@shared/components/close-order-side-dialog/close-order-side-dialog.component';
-import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-reason-info/order-close-reason-info.component';
 import { CommentComponent } from './components/comments/comment/comment.component';
 import { CommentsState } from './components/comments/store/comments.state';
 import { OpenFirstAccordionDirective } from './directives/always-open-first-accordition.directive';
@@ -176,6 +169,9 @@ import { CustomExportDialogComponent } from './components/custom-export-dialog/c
 import { CommentsIrpComponent } from './components/comments-irp/comments-irp.component';
 import { CommentdataComponent } from './components/comments-irp/commentdata/commentdata.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { OrderCloseReasonInfoModule } from './components/order-close-reason-info/order-close-reason-info.module';
+import { GeneralOrderPerDiemInfoModule } from './components/general-order-per-diem-info/general-order-per-diem-info.module';
+import { ChipsCssClassPipeModule } from './pipes/chip-css-class/chip-css-class-pipe.module';
 
 const icons = {
   AlertCircle,
@@ -202,11 +198,10 @@ const icons = {
   Flag,
   ArrowUp,
   Info,
-  RotateCw
+  RotateCw,
 };
 
 const COMPONENTS = [
-  ChipsCssClass,
   OrderTypeName,
   PayOrderTypeName,
   CandidateStatusName,
@@ -231,7 +226,6 @@ const COMPONENTS = [
   OrderDetailsComponent,
   SearchComponent,
   GeneralOrderInfoComponent,
-  GeneralOrderPerDiemInfoComponent,
   OrderCandidatesListComponent,
   OrderPerDiemCandidatesListComponent,
   CustomProgressBarComponent,
@@ -250,16 +244,13 @@ const COMPONENTS = [
   DeployCandidateMessageComponent,
   GeneralReorderInfoComponent,
   GridSubrowReorderComponent,
-  OrderReOrdersListComponent,
   ReorderCandidatesListComponent,
-  OrderReOrdersContainerComponent,
   ExtensionCandidateComponent,
   CustomIconComponent,
   ActionCellRendererComponent,
   EmailSideDialogComponent,
   SmsSideDialogComponent,
   OnScreenSideDialogComponent,
-  OrderCloseReasonInfoComponent,
   UnsavedFormDirective,
   ClearCacheComponent,
   CandidateCancellationDialogComponent,
@@ -269,7 +260,7 @@ const COMPONENTS = [
   CustomSideDialogComponent,
   CustomExportDialogComponent,
   CommentsIrpComponent,
-  CommentdataComponent
+  CommentdataComponent,
 ];
 
 @NgModule({
@@ -320,7 +311,10 @@ const COMPONENTS = [
     ValidationErrorModule,
     GridPaginationModule,
     EditIrpCandidateModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    ChipsCssClassPipeModule,
+    OrderCloseReasonInfoModule,
+    GeneralOrderPerDiemInfoModule,
   ],
   exports: [
     ...COMPONENTS,
@@ -337,7 +331,10 @@ const COMPONENTS = [
     TooltipModule,
     TabsMobileShadowDirective,
     CustomNumericTextboxModule,
-    ValidationErrorModule
+    ValidationErrorModule,
+    ChipsCssClassPipeModule,
+    OrderCloseReasonInfoModule,
+    GeneralOrderPerDiemInfoModule,
   ],
   declarations: [
     ...COMPONENTS,

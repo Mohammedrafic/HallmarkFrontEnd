@@ -13,8 +13,8 @@ import { AppState } from 'src/app/store/app.state';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { OrderManagementService } from
 '@client/order-management/components/order-management-content/order-management.service';
-import { UserState } from '../../../store/user.state';
-import { PermissionService } from '../../../security/services/permission.service';
+import { UserState } from '../../../../../store/user.state';
+import { PermissionService } from '../../../../../security/services/permission.service';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { GetReOrdersByOrderId } from '@client/store/order-managment-content.actions';
 
