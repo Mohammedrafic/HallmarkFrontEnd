@@ -102,6 +102,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   }
 
   public applyFilter(): void {
+    console.log(this.scheduleFilterFormGroup);
     if (this.scheduleFilterFormGroup.valid) {
       this.setFilters();
       this.store.dispatch([

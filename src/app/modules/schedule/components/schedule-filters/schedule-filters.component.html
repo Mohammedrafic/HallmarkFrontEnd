@@ -35,6 +35,17 @@
               </div>
             </div>
           </ng-template>
+          <ng-template [ngSwitchCase]="fieldTypes.Toggle">
+            <div class="input-container">
+              <div class="input-group wide">
+                <ejs-switch
+                  class="toggle"
+                  [formControlName]="item.field"
+                ></ejs-switch>
+                <label [for]="item.field">{{ item.title }}</label>
+              </div>
+            </div>
+          </ng-template>
         </ng-container>
       </ng-container>
     </div>

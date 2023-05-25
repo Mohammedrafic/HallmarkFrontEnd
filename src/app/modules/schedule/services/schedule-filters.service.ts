@@ -41,6 +41,12 @@ export class ScheduleFiltersService {
       locationIds: ['', Validators.required],
       departmentsIds: [],
       skillIds: [],
+      shiftIds: [],
+      ShowAvailability : [],
+      ShowUnavailability : [],
+      ShowOnlyscheduledcandidates : [],
+      ShowGeneralnotes : [],
+      ShowExcludenotoriented : []
     });
   }
 

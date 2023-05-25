@@ -170,6 +170,12 @@ export interface ScheduleFilters {
   locationIds?: number[];
   departmentsIds?: number[];
   skillIds?: number[];
+  shiftId?: number[];
+  ShowAvailability?: boolean;
+  ShowUnavailability?: boolean;
+  ShowOnlyscheduledcandidates?: boolean;
+  ShowGeneralnotes?: boolean;
+  ShowExcludenotoriented?: boolean;
   pageNumber?: number;
   pageSize?: number;
 }
@@ -179,6 +185,12 @@ export interface ScheduleFiltersConfig {
   [ScheduleFilterFormSourceKeys.Locations]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.Departments]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.Skills]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.Shift]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.ShowAvailability]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.ShowUnavailability]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.ShowOnlyscheduledcandidates]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.ShowGeneralnotes]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.ShowExcludenotoriented]: ScheduleFilterItem;
 }
 
 export interface ScheduleFilterFormFieldConfig {
