@@ -290,10 +290,14 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     if (this.activeSystem === this.systemType.IRP) {
       this.disabledCloseButton = !!(this.order.activeCandidatesCount && this.order.activeCandidatesCount > 0);
     }
+
+    if (this.order?.orderType === OrderType.ReOrder && this.order.status !== OrderStatus.Filled) {
+      this.disabledCloseButton = false;
+      return;
+    }
   }
 
   public lockOrder(): void {
-    
     this.store.dispatch(
       new SetLock(
         this.order.id,
