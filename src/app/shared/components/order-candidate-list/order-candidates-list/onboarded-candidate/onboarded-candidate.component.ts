@@ -4,11 +4,9 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import {
@@ -28,7 +26,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order,
   OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { DatePipe, formatDate } from '@angular/common';
+import { formatDate } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
@@ -76,7 +74,7 @@ import { OrderType } from '@shared/enums/order-type';
   providers: [MaskedDateTimeService, UNSAVED_FORM_PROVIDERS(OnboardedCandidateComponent)],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OnboardedCandidateComponent extends UnsavedFormComponentRef implements OnInit, OnDestroy, OnChanges {
+export class OnboardedCandidateComponent extends UnsavedFormComponentRef implements OnInit, OnDestroy {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
   @Select(OrderManagementContentState.rejectionReasonsList)
@@ -179,7 +177,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public comments: Comment[] = [];
 
   constructor(
-    private datePipe: DatePipe,
     private store: Store,
     private actions$: Actions,
     private orderCandidateListViewService: OrderCandidateListViewService,
@@ -197,18 +194,11 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
     this.subscribeOnReasonsList();
     this.checkRejectReason();
-    this.subscribeOnUpdateOrganisationCandidateJobError();
+    this.subscribeOnUpdateOrganizationCandidateJobError();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeOnGetStatus();
-    this.oserveCandidateJob();
+    this.observeCandidateJob();
     this.observeStartDate();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    const { candidate } = changes;
-    if (candidate?.currentValue && !candidate?.isFirstChange()) {
-      this.getComments();
-    }
   }
 
   ngOnDestroy(): void {
@@ -413,7 +403,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       : of(true);
   }
 
-  private oserveCandidateJob(): void {
+  private observeCandidateJob(): void {
     this.candidateJobState$
       .pipe(
         takeUntil(this.unsubscribe$),
@@ -496,7 +486,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     }
   }
 
-  private subscribeOnUpdateOrganisationCandidateJobError(): void {
+  private subscribeOnUpdateOrganizationCandidateJobError(): void {
     this.actions$
       .pipe(ofActionSuccessful(ShowToast))
       .pipe(

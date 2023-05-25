@@ -14,8 +14,10 @@ export class CommentsService {
 
   public getComments(commentContainerId: number, isExternal: boolean | null): Observable<Comment[]> {
     const user = this.store.selectSnapshot(UserState.user);
-    return this.httpClient.post<Comment[]>('/api/Comments/filter', { commentContainerId, isExternal, isAgency: user?.businessUnitType === BusinessUnitType.Agency })
-      .pipe(catchError(() => of([])));
+    return this.httpClient.post<Comment[]>(
+      '/api/Comments/filter', 
+      { commentContainerId, isExternal, isAgency: user?.businessUnitType === BusinessUnitType.Agency }
+    ).pipe(catchError(() => of([])));
   }
 
   public saveComment(comment: Comment): Observable<Comment> {
