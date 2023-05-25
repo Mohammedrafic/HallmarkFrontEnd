@@ -66,7 +66,6 @@ import {
   ClearOrderFilterDataSources,
   GetOrdersJourney,
   ExportOrdersJourney,
-  GetReOrdersByOrderId,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -82,7 +81,6 @@ import {
   OrderManagement,
   OrderManagementPage,
   OrdersJourneyPage,
-  ReOrderPage,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -160,7 +158,6 @@ export interface OrderManagementContentStateModel {
   extensions: any;
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
   candidateCancellationReasons:CandidateCancellationReason[]|null;
-  reOrderPage: ReOrderPage | null,
 }
 
 @State<OrderManagementContentStateModel>({
@@ -199,7 +196,6 @@ export interface OrderManagementContentStateModel {
     extensions: null,
     irpCandidates: null,
     candidateCancellationReasons:null,
-    reOrderPage: null,
   },
 })
 @Injectable()
@@ -375,11 +371,6 @@ export class OrderManagementContentState {
   @Selector()
   static getCandidateCancellationReasons(state: OrderManagementContentStateModel): CandidateCancellationReason[]|null {
     return state.candidateCancellationReasons || null;
-  }
-
-  @Selector()
-  static GetReOrdersByOrderId(state: OrderManagementContentStateModel): ReOrderPage | null {
-    return state.reOrderPage;
   }
 
   constructor(
@@ -1148,16 +1139,4 @@ export class OrderManagementContentState {
         return payload;
       }));
     }
-
-  @Action(GetReOrdersByOrderId)
-  GetReOrdersByOrderId(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderId, pageNumber, pageSize }: GetReOrdersByOrderId
-  ): Observable<ReOrderPage> {
-    return this.orderManagementService.GetReOrdersByOrderIdByOrderId(orderId, pageNumber, pageSize).pipe(
-      tap((data) => {
-        patchState({ reOrderPage: data });
-      })
-    );
-  }
 }

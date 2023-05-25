@@ -194,7 +194,6 @@ export class OrderManagementFilter {
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
 export type IRPOrderManagementPage = PageOfCollections<IRPOrderManagement>;
 export type OrdersJourneyPage = PageOfCollections<GetOrdersJourney>;
-export type ReOrderPage = PageOfCollections<ReOrder>;
 
 export type AgencyOrderManagement = {
   orderId: number;
@@ -232,6 +231,7 @@ export type AgencyOrderManagement = {
   organizationPrefix: string;
   extensionFromId?: number;
   candidates?: CandidateModel[];
+  irpOrderMetadata?: IRPMetaData;
 };
 
 export interface OrderManagementChild  {

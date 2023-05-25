@@ -24,7 +24,6 @@ import {
   OrderManagementFilter,
   OrderManagementPage,
   OrdersJourneyPage,
-  ReOrderPage,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { CandidateCancellation } from '@shared/models/candidate-cancellation.model';
@@ -574,15 +573,5 @@ export class OrderManagementContentService {
 
   public GetCandidateCancellationReasons(filter: CandidateCancellationReasonFilter): Observable<CandidateCancellationReason[]> {
     return this.http.post<CandidateCancellationReason[]>(`/api/CandidateCancellationSettings/getCandidateCancellationReason`, filter);
-  }
-
-  public GetReOrdersByOrderIdByOrderId(
-    orderId: number,
-    pageNumber: number,
-    pageSize: number,
-  ): Observable<ReOrderPage> {
-    return this.http.post<ReOrderPage>(
-      '/api/Orders/reorders/organization', { orderId, pageNumber, pageSize }
-    );
   }
 }

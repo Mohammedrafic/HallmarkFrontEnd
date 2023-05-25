@@ -415,8 +415,3 @@ export class GetCandidateCancellationReason {
   static readonly type ='[order management] Get Candidate Cancellation Reason';
   constructor(public payload:CandidateCancellationReasonFilter) {}
 }
-
-export class GetReOrdersByOrderId {
-  static readonly type = '[order management] Get ReOrders By Order Id';
-  constructor(public orderId: number, public pageNumber: number, public pageSize: number) {}
-}
