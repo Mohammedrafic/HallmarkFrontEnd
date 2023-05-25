@@ -1922,7 +1922,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public lockOrder(order: Order): void {
       this.store.dispatch(
-        new SetLock(order.id, this.isActiveSystemIRP ? false : !order.isLocked,  this.isActiveSystemIRP ? !order.isLockedIRP : false,this.filters, `${order.organizationPrefix || ''}-${order.publicId}`, this.isActiveSystemIRP, false)
+        new SetLock(order.id, this.isActiveSystemIRP ? order.isLocked! : !order.isLocked, this.isActiveSystemIRP ? !order.isLockedIRP : order.isLockedIRP!,this.filters, `${order.organizationPrefix || ''}-${order.publicId}`, this.isActiveSystemIRP, false)
       );
   }
 

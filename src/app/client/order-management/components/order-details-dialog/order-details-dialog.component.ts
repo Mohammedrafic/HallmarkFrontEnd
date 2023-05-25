@@ -297,8 +297,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     this.store.dispatch(
       new SetLock(
         this.order.id,
-        this.activeSystem === this.systemType.IRP ? false : !this.order.isLocked,
-        this.activeSystem === this.systemType.IRP ? !this.order.isLockedIRP : false,
+        this.activeSystem === this.systemType.IRP ? this.order.isLocked! : !this.order.isLocked,
+        this.activeSystem === this.systemType.IRP ? !this.order.isLockedIRP : this.order.isLockedIRP!,
         {},
         `${this.order.organizationPrefix || ''}-${this.order.publicId}`,
         this.activeSystem === this.systemType.IRP,
