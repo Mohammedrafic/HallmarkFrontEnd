@@ -38,10 +38,7 @@ export class TierService {
       departmentIds: [null, Validators.required],
       forceUpsert: [false],
       workcommitmentId : [null],
-      skillId : [null],
-      All : [true],
-      Primary : [false],
-      Secondary : [false]
+      skillId : [1],
     }) as CustomFormGroup<TierDTO>;
   }
 
@@ -78,9 +75,6 @@ export class TierService {
       departmentIds:  tier.departmentId ? [tier.departmentId] : null,
       workcommitmentId : tier.workcommitmentId,
       skillId : tier.skillId,
-      Primary : tier.Primary,
-      Secondary : tier.Secondary,
-      All : tier.All,
       forceUpsert: false
     };
   }
@@ -108,9 +102,6 @@ export class TierService {
       departmentIds: tier.departmentId ? [tier.departmentId] : null,
       organizationTierId: tier.organizationTierId,
       workcommitmentId : tier.workcommitmentId,
-      Primary : tier.Primary,
-      Secondary : tier.Secondary,
-      All : tier.All,
       skillId : tier.skillId
     }
   }

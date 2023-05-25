@@ -23,7 +23,7 @@ export interface TiersInputConfig {
 
 export interface RadioButtonGroup {
   title: string;
-  value : boolean;
+  value : number;
 }
 
 export interface TierDialogConfig {
@@ -47,9 +47,6 @@ export interface TierDetails {
   organizationTierId: number;
   workcommitmentId : number;
   skillId : number;
-  All : boolean;
-  Primary : boolean;
-  Secondary : boolean;
 }
 
 export type TiersPage = PageOfCollections<TierDetails>;

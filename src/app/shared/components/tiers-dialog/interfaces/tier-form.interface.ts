@@ -15,9 +15,6 @@ export interface TierDTO {
   systemType?: SystemType;
   workcommitmentId: number;
   skillId : number;
-  All : boolean;
-  Primary : boolean;
-  Secondary : boolean;
 }
 
 export interface TierConfig {

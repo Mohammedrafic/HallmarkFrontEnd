@@ -48,10 +48,10 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
   @Output() saveTier = new EventEmitter<TierDTO>();
-
+  @Input() workcommitments : any;
   @Input() set regionsStructure(regions: OrganizationRegion[]) {
     this.regions = regions;
-    this.dialogConfig = TiersDialogConfig(regions)[this.dialogType];
+    this.dialogConfig = TiersDialogConfig(regions, this.workcommitments)[this.dialogType];
   };
 
   @Input() set selectedTier(tier: TierDetails) {
@@ -116,7 +116,6 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     this.createForm();
     this.watchForRegions();
     this.watchForLocation();
-    this.watchForWorkcommitment();
     this.watchForCloseDialog();
     this.watchForDepartments();
     console.log(this.dialogConfig);
@@ -175,9 +174,6 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     field === 'departmentIds' && this.allDepartmentsChange(event);
   }
 
-  public watchForWorkcommitment(){
-    // this.store.dispatch(new Tiers.GetWorkCommitmentByPagebyTiers(this.orgId,this.regionSelected,this.locationSelected,this.skillSelected));
-  }
 
   public getToggleValue(field: string): boolean {
     return this.allRecords[field as FieldNames];

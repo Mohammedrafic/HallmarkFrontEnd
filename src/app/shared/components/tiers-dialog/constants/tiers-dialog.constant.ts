@@ -71,15 +71,15 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[], workcommitment
         radiobuttons : [
           {
             title : "All",
-            value : true
+            value : 1
           },
           {
             title : "Primary",
-            value : false
+            value : 2
           },
           {
             title : "Secondary",
-            value : false
+            value : 3
           },
         ]
       },

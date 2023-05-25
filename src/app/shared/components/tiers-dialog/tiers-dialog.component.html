@@ -122,9 +122,9 @@
                 <div class="input-container bootstrap">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
-                  <div class="input-group">
-                    <div class="control-block" *ngFor="let radiobtn of field?.radiobuttons">
-                      <ejs-radiobutton [formControlName]="radiobtn.title" name="radiobtn.title" label= {{radiobtn.title}}></ejs-radiobutton>
+                  <div class="input-group d_flex">
+                    <div class="control-block pt_30" *ngFor="let radiobtn of field?.radiobuttons">
+                      <ejs-radiobutton value={{radiobtn.value}} checked={{radiobtn.value}} [formControlName]="field.field" name="field.field" label= {{radiobtn.title}}></ejs-radiobutton>
                     </div>
                   </div>
                 </div>

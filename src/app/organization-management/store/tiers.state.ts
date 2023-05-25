@@ -19,7 +19,9 @@ import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 @State<TiersStateModel>({
   name: 'tiers',
   defaults: {
-    tiersByPage: null
+    tiersByPage: null,
+    isCommitmentLoading : false,
+    commitmentsPage : null
   }
 })
 @Injectable()
@@ -29,6 +31,10 @@ export class TiersState {
   @Selector()
   static tiersPage(state: TiersStateModel): TiersPage | null {
     return state.tiersByPage;
+  }
+  @Selector()
+  static workCommitmentsPageforTier(state: CommitmentStateModel): MasterCommitmentsPage | null {
+    return state.commitmentsPage;
   }
 
   @Action(Tiers.GetTiersByPage)
@@ -102,12 +108,11 @@ export class TiersState {
 
   @Action(Tiers.GetWorkCommitmentByPageforTiers)
   GetWorkCommitmentByPageforTiers(
-    { patchState }: StateContext<CommitmentStateModel>,
-    ): Observable<MasterCommitmentsPage> {
-    patchState({ isCommitmentLoading: true });
+    { patchState }: StateContext<TiersStateModel>,
+    ): Observable<TiersPage> {
 
     return this.tiersApiService.getMasterWorkCommitments().pipe(
-      tap((payload) => {
+      tap((payload : any) => {
         patchState({commitmentsPage: payload, isCommitmentLoading: false});
         return payload;
       })
