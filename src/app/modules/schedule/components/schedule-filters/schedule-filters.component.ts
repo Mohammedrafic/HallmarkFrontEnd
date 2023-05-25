@@ -5,7 +5,7 @@ import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { distinctUntilChanged, map, skip } from 'rxjs/operators';
 
 import { SystemType } from '@shared/enums/system-type.enum';
-import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
+import { AssignedSkillsByOrganization, Skill } from '@shared/models/skill.model';
 import { SkillsService } from '@shared/services/skills.service';
 import { Destroyable, isObjectsEqual } from '@core/helpers';
 import { FieldType, FilterPageName } from '@core/enums';
@@ -33,6 +33,7 @@ import { ClearPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleFiltersComponent extends Destroyable implements OnInit {
+  @Input() public selectedCandidateId: number | undefined;
   @Input() public count: number;
 
   @Output() public updateScheduleFilter: EventEmitter<ScheduleFiltersData> = new EventEmitter<ScheduleFiltersData>();
@@ -62,7 +63,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     departments: [],
   };
 
-  private autoApplyFilters = false;
+  private isHomeCostCenterFilters = false;
 
   constructor(
     private store: Store,
@@ -179,13 +180,20 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         filter((departmentsIds: number[]) => !!departmentsIds?.length),
         switchMap((departmentsIds: number[]) => {
           const params = { SystemType: SystemType.IRP, DepartmentIds: departmentsIds };
+
+          if (this.isHomeCostCenterFilters) {
+            return this.scheduleApiService.getSkillsByEmployees(departmentsIds, this.selectedCandidateId);
+          }
+
           return this.skillsService.getAssignedSkillsByOrganization({ params });
         }),
-        filter((skills: AssignedSkillsByOrganization[]) => !!skills.length),
+        filter((skills: AssignedSkillsByOrganization[] | Skill[]) => !!skills.length),
         takeUntil(this.componentDestroy())
-      ).subscribe((skills: AssignedSkillsByOrganization[]) => {
+      ).subscribe((skills: AssignedSkillsByOrganization[] | Skill[]) => {
         if (skills.length) {
-          const skillOption = ScheduleFilterHelper.adaptOrganizationSkillToOption(skills);
+          const skillOption = this.isHomeCostCenterFilters
+            ? ScheduleFilterHelper.adaptMasterSkillToOption(skills as Skill[])
+            : ScheduleFilterHelper.adaptOrganizationSkillToOption(skills as AssignedSkillsByOrganization[]);
           this.filterColumns.skillIds.dataSource = skillOption;
           const skillIds = this.isPreservedFilters ? this.filters.skillIds : [skillOption[0]?.value];
 
@@ -276,7 +284,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     let locationId: number;
     let departmentId: number;
 
-    this.autoApplyFilters = true;
+    this.isHomeCostCenterFilters = true;
 
     if (homeCostCenterDepartment) {
       departmentId = homeCostCenterDepartment.id;
@@ -307,8 +315,8 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   }
 
   private applyHomeCostCenterFilters(): void {
-    if (this.autoApplyFilters) {
-      this.autoApplyFilters = false;
+    if (this.isHomeCostCenterFilters) {
+      this.isHomeCostCenterFilters = false;
       this.setFilters(true);
     }
   }

@@ -63,13 +63,13 @@ export class ScheduleApiService {
     );
   }
 
-  getSkillsByEmployees(departmentId: number, employeeId?: number): Observable<Skill[]> {
-    const byEmployeesId = { employeeId, departmentId };
-    const byDepartmentId = { departmentId };
+  getSkillsByEmployees(departmentIds: number[], employeeId?: number): Observable<Skill[]> {
+    const byEmployeesId = { employeeId, departmentIds };
+    const byDepartmentId = { departmentIds };
 
-    return this.http.get<Skill[]>(
+    return this.http.post<Skill[]>(
       '/api/EmployeeFilterOptions/skillsByDepartment',
-      { params: employeeId ? byEmployeesId : byDepartmentId }
+      employeeId ? byEmployeesId : byDepartmentId
     );
   }
 
