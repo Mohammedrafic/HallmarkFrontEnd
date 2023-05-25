@@ -1,5 +1,12 @@
 @import "colors";
 
+.title-content{
+  width: 100%;
+  margin-top: 5px;
+}
+.app-accumulation-chart__title{
+  text-align: center;
+}
 .widget {
   display: flex;
   flex-direction: column;
@@ -44,6 +51,9 @@
 .widget__type {
  // margin: 0px 5px 0px 15px;
   align-self: center;
+  text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 .widget__title {
   padding-bottom: 4%;
