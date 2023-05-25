@@ -158,7 +158,7 @@
       </div>
     </div>
 
-    <form [formGroup]="regionFormGroup" *ngIf="isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
+    <form [formGroup]="regionFormGroup" *ngIf="isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyCreatePartialOrder ||  IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="region">Region</label>
         <div class="input-group dropdown">
@@ -170,7 +170,7 @@
       </div>
     </form>
 
-    <form [formGroup]="regionRequiredFormGroup" *ngIf="!isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
+    <form [formGroup]="regionRequiredFormGroup" *ngIf="!isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap  || IsSettingKeyCreatePartialOrder || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="regionRequired">Region <span class="required">*</span></label>
         <div class="input-group dropdown">
@@ -182,7 +182,7 @@
       </div>
     </form>
 
-    <form [formGroup]="locationFormGroup" *ngIf="!(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
+    <form [formGroup]="locationFormGroup" *ngIf="!(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyCreatePartialOrder || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="location">Location</label>
         <div class="input-group dropdown">
@@ -194,7 +194,7 @@
       </div>
     </form>
 
-    <form [formGroup]="departmentFormGroup" *ngIf="!(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
+    <form [formGroup]="departmentFormGroup" *ngIf="!(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap ||  IsSettingKeyCreatePartialOrder || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="department">Department</label>
         <div class="input-group dropdown">
@@ -205,7 +205,7 @@
         </div>
       </div>
     </form>
-    <form [formGroup]="RegionLocationSettingsMultiFormGroup" *ngIf="(IsSettingKeyOtHours||IsSettingKeyAvailabiltyOverLap || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
+    <form [formGroup]="RegionLocationSettingsMultiFormGroup" *ngIf="(IsSettingKeyOtHours||IsSettingKeyAvailabiltyOverLap || IsSettingKeyCreatePartialOrder || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
       <div class="input-container">
         <label>Region<span class="required">*</span></label>
         <div class="dropdown-wrapper">
@@ -232,6 +232,22 @@
             <ejs-switch name="allLocations" [disabled]="isParentEdit" [checked]="allLocationsSelected" (change)="allLocationsChange($event)" label="All"></ejs-switch>
             <label for="allLocations" class="switch-text">All</label>
           </div>
+      
+        </div>
+      </div>
+      <div class="input-container" *ngIf="IsSettingKeyCreatePartialOrder">
+        <label>Department<span class="required">*</span></label>
+        <div class="dropdown-wrapper">
+          <div class="input-group bootstrap">
+            <ejs-multiselect mode="CheckBox" formControlName="departmentId" placeholder="All" [fields]="optionFields"
+            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="regionBasedDepartment">
+          </ejs-multiselect>
+          </div>
+          <div class="switch">
+            <ejs-switch name="allLocations" [disabled]="isParentEdit" [checked]="allDepartmentSelected" (change)="allDepartmentChange($event)" label="All"></ejs-switch>
+            <label for="allLocations" class="switch-text">All</label>
+          </div>
+      
         </div>
       </div>
     </form>

@@ -28,7 +28,7 @@ export class OrganizationSettingChild {
   regionName?: string;
   locationId?: number;
   locationName?: string;
-  departmentId?: number;
+  departmentId?: any;
   departmentName?: string;
   isIRPConfigurationValue: boolean;
   systemType?: string | null;
@@ -45,6 +45,7 @@ export class OrganizationSettingsPost {
   value: string;
   locationId?: number[];
   regionId?: number[];
+  departmentId?:number[];
   isIRPConfigurationValue: boolean;
 }
 
