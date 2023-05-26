@@ -111,6 +111,7 @@
     <div class="mobile-group-button" *ngIf="isMobile">
       <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
     </div>
+    <!-- TODO: [class.empty-table]="!(ordersPage$ | async)?.items?.length"-->
     <ag-grid-angular
       [columnDefs]="columnDefs"
       [rowData]="(ordersPage$ | async)?.items"

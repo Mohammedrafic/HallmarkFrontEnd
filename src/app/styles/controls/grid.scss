@@ -89,6 +89,10 @@ body.dark {
 
     .e-gridcontent {
       .e-content {
+        &:has(.e-table>tbody>.e-emptyrow) {
+          background-color: $secondary-dark-blue-45;
+        }
+
         .e-virtualtrack {
           height: 0 !important;
         }
@@ -113,7 +117,6 @@ body.dark {
             height: 100%;
             position: absolute;
             width: 100%;
-            background-color: $secondary-dark-blue-45;
             display: flex;
             justify-content: center;
 

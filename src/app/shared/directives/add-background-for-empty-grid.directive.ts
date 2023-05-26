@@ -1,7 +1,7 @@
 import { Directive, ElementRef, OnInit } from '@angular/core';
 
 @Directive({
-  selector: '[appAddBackgroundForEmptyGridDirective]',
+  selector: '[appAddBackgroundForEmptyGridDirective]', // TODO: research if it is still needed
 })
 export class AddBackgroundForEmptyGridDirective implements OnInit {
 
