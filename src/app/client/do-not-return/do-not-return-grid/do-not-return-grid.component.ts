@@ -201,6 +201,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
             this.isFilterBlock = false;
           }
           this.doNotReturnFilterForm.controls['currentStatus']?.markAsTouched();  
+          this.changeDetectorRef.markForCheck();
         }
      }
     });
