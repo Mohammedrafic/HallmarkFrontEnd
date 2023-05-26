@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { Organization, OrganizationDataSource, OrganizationFilter, OrganizationPage, OrganizationStructure } from 'src/app/shared/models/organization.model';
+import {
+  Organization,
+  OrganizationDataSource,
+  OrganizationFilter,
+  OrganizationPage,
+  OrganizationStructure,
+} from 'src/app/shared/models/organization.model';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
@@ -31,8 +37,8 @@ export class OrganizationService {
   public getOrganizationStructure(): Observable<OrganizationStructure> {
     return this.http.get<OrganizationStructure>(`/api/Organizations/structure`).pipe(map((data) => ({
       ...data,
-      regions: sortByField(data.regions, 'name')
-      })));
+      regions: sortByField(data.regions, 'name'),
+    })));
   }
 
   /**

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import {
   BehaviorSubject,
   filter,
@@ -45,12 +45,13 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
-import { OrganizationRegion } from '@shared/models/organization.model';
+import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
 import { DateTimeHelper } from '@core/helpers';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-departments',
@@ -61,6 +62,9 @@ import { DateTimeHelper } from '@core/helpers';
 export class DepartmentsComponent extends AbstractPermission implements OnInit {
   @ViewChild('assignDepartment') private assignDepartment: AssignDepartmentComponent;
   @ViewChild('editDepartments') private editDepartments: EditDepartmentsComponent;
+
+  @Select(UserState.organizationStructure)
+  private readonly organizationStructure$: Observable<OrganizationStructure>;
 
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
@@ -265,8 +269,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   }
 
   private getAssignedDepartmentHierarchy(): void {
-    this.departmentsService
-      .getAssignedDepartmentHierarchy(this.departmentsService.employeeWorkCommitmentId)
+    this.organizationStructure$
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((data) => {
         this.departmentHierarchy = data.regions;
