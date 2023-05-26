@@ -653,3 +653,18 @@ svg.svg-inline--fa.fa-lock,  svg.svg-inline--fa.fa-unlock{
 .irp-candidate .comments-container {
   background: ghostwhite;
 }
+.comments-irp {
+  svg.svg-inline--fa.fa-lock, svg.svg-inline--fa.fa-unlock {
+    width: 14px;
+    height: 21px;
+  }
+  svg.svg-inline--fa.fa-user-friends {
+    width: 20px;
+    height: 20px;
+  }
+  svg.svg-inline--fa.fa-eye-slash , svg.svg-inline--fa.fa-eye{
+    width: 20px;
+    height: 20px;
+  }
+  
+}

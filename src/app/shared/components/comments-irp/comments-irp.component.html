@@ -1,4 +1,4 @@
-<section class="comments-container" [class.background]="useBackground">
+<section class="comments-container comments-irp" [class.background]="useBackground">
     <div class="comments-header">
       <div class="title">
         Comments
@@ -17,7 +17,7 @@
     <div #body class="comments-body" (scroll)="onScroll()">
       <ng-container *ngFor="let comment of comments">
         <app-commentdata
-          *ngIf="selectedFilter === commentsFilter.All || comment.isExternal === showExternal"
+          *ngIf="selectedFilter === commentsFilter.All || comment.isExternal === (showExternal  && !showPrivate) || comment.isPrivate === (showPrivate)"
           [scrolledToMessage$]="scrolledToMessage$"
           [comment]="comment"
           (onRead)="onRead(comment)"></app-commentdata>
@@ -52,8 +52,6 @@
     <ejs-tooltip
         [content]="isExternal ? 'External' : 'Internal'">
         <span class="control-wrapper visibility" (click)="visibilityHandler()">
-          <!-- <i-feather *ngIf="!isExternal" name="eye-off" class="icon"></i-feather>
-          <i-feather *ngIf="isExternal" name="eye" class="icon"></i-feather> -->
           <fa-icon *ngIf="isExternal" [icon]='faEye' class="pr-3"></fa-icon>
           <fa-icon *ngIf="!isExternal" [icon]='faEyeSlash' class="pr-3"></fa-icon>
 
