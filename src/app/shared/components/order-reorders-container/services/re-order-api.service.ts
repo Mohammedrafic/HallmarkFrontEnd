@@ -15,8 +15,10 @@ export class ReOrderApiService {
     pageSize: number,
     organizationId?: number,
   ): Observable<ReOrderPage> {
+    const businessUnitType = organizationId ? 'agency' : 'organization';
+  
     return this.http.post<ReOrderPage>(
-      '/api/Orders/reorders/organization', { orderId, pageNumber, pageSize, organizationId }
+      `/api/Orders/reorders/${businessUnitType}`, { orderId, pageNumber, pageSize, organizationId }
     );
   }
 }
