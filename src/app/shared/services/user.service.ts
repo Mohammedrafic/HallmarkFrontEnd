@@ -88,6 +88,10 @@ export class UserService {
     return this.http.get<AlertsModel[]>('/api/Alerts/GetAlertsForUser', { params: { PageNumber: pageNumber, PageSize: pageSize }});
   }
 
+  public getAlertDetailsForId(userAlertId: number =0): Observable<any> {
+    return this.http.get<any>('/api/Alerts/GetAlertsForUserById', { params: { UserAlertId: userAlertId }});
+  }
+
   public getAlertsCountForUser(): Observable<number> {
     return this.http.get<number>('/api/Alerts/GetAlertsCountForUser');
   }
