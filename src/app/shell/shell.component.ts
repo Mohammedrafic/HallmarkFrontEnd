@@ -318,7 +318,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   selectMenuItem(menuItem: MenuItem): void {
     /** Preventing the page navigation  which are not responsive*/
-    if(this.isMobile  || this.isSmallDesktop){
+    if(this.isMobile){
       if(this.nonResponsiveMenuItesm.includes(menuItem.id))
         return;
     }
