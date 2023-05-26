@@ -192,18 +192,12 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
           }
 
         }
-        if(payload.constructor.name === 'ShowFilterDialog'){
-          console.log('doNotReturnFilterForm values ===',this.doNotReturnFilterForm.value);
-          this.doNotReturnFilterForm.get(FormControlNames.BusinessUnitId)?.setValue(this.selectedOrganization.id);
-          if(this.doNotReturnFilterForm.value.currentStatus == "Blocked"){
-            this.isFilterBlock = true;
-          }
-          else{
-            this.isFilterBlock = false;
-          }
-          // this.doNotReturnFilterForm.controls['currentStatus']?.markAsTouched();  
-          // this.changeDetectorRef.markForCheck();
-          console.log('this.isFilterBlock values ===',this.isFilterBlock);
+        this.doNotReturnFilterForm.get(FormControlNames.BusinessUnitId)?.setValue(this.selectedOrganization.id);
+        if(this.doNotReturnFilterForm.value.currentStatus == "Blocked"){
+          this.isFilterBlock = true;
+        }
+        else{
+          this.isFilterBlock = false;
         }
      }
     });
@@ -457,7 +451,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
   
   public onFilterSwitcher(event: { checked: boolean }): void {
-    console.log('at onFilterSwitcher');
     this.isFilterBlock = event.checked;
     if(event.checked){
       this.doNotReturnFilterForm.get('currentStatus')?.setValue('Blocked');
@@ -716,7 +709,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       .pipe(takeWhile(() => this.isAlive))
       .subscribe((data) => {
         if(data != null && data != undefined){
-          console.log('subscribeOnBusinessUnitChange  -->');
           this.orgid=data;
           this.onFormCancelClick();
           this.onFilterClearAll();
