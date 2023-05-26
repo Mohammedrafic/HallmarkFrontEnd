@@ -8,7 +8,19 @@ import { Injectable } from '@angular/core';
 export class AddDialogHelperService {
   constructor(private fb: FormBuilder) {}
 
-  public createForm(type?: unknown): FormGroup {
+  createForm(type?: unknown): FormGroup {
     return this.fb.group([]);
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  removeTimeValidators(form: unknown): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  addTimeValidators(form: unknown): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  addTimeOutValidator(form: unknown): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  removeTimeOutValidator(form: unknown): void {}
 }

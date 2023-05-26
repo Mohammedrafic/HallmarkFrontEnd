@@ -117,6 +117,9 @@ export class TimesheetsApiService {
           text: item.billRateConfig.title,
           value: item.billRateConfig.id,
           efectiveDate: item.effectiveDate,
+          disableMealBreak: item.billRateConfig.disableMealBreak,
+          timeNotRequired: item.billRateConfig.doNotRequireTime,
+          disableTime: item.billRateConfig.disableTime,
         };
       })),
     );

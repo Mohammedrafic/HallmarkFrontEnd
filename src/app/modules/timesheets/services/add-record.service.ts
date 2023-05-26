@@ -41,6 +41,23 @@ export class AddRecordService {
         value: [null, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
       }
     ) as CustomFormGroup<AddTimsheetForm>;
+  }
 
+  removeTimeValidators(form: CustomFormGroup<AddTimsheetForm>): void {
+    form.get('timeIn')?.removeValidators(Validators.required);
+    form.get('timeOut')?.removeValidators(Validators.required);
+  }
+
+  addTimeValidators(form: CustomFormGroup<AddTimsheetForm>): void {
+    form.get('timeIn')?.addValidators(Validators.required);
+    form.get('timeOut')?.addValidators(Validators.required);
+  }
+
+  addTimeOutValidator(form: CustomFormGroup<AddTimsheetForm>): void {
+    form.get('timeOut')?.addValidators(Validators.required);
+  }
+
+  removeTimeOutValidator(form: CustomFormGroup<AddTimsheetForm>): void {
+    form.get('timeOut')?.removeValidators(Validators.required);
   }
 }
