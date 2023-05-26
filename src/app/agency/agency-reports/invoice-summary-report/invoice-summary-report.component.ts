@@ -214,7 +214,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.enable() : this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.enable() : this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.disable();
 
     });
 
