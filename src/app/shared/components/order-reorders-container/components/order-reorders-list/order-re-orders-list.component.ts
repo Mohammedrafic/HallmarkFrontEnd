@@ -115,6 +115,7 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
   }
 
   private getReOrdersByPageSettings(): void {
-    this.store.dispatch(new GetReOrdersByOrderId(this.order.id as number, this.currentPage, this.pageSize));
+    const organizationId = this.isAgency ? this.order.organizationId : undefined;
+    this.store.dispatch(new GetReOrdersByOrderId(this.order.id as number, this.currentPage, this.pageSize, organizationId));
   }
 }
