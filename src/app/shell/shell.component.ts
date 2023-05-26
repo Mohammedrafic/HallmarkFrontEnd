@@ -19,7 +19,7 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { Observable, debounceTime, distinctUntilChanged, filter, map, merge, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, filter, map, merge, takeUntil } from 'rxjs';
 
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { OrderManagementService,
@@ -146,6 +146,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   public sideBarMenuField: Object;
   public faTimes = faTimes as IconDefinition;
   public alerts: any;
+  public alerts$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   public alertsCount: number;
   public isToggleButtonDisable = false;
 
@@ -218,6 +219,21 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.attachElementToResizeObserver();
     this.watchForRouterEvents();
     this.getSiteHelpUrl();
+    this.alertStateModel$
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe((alertdata) => {
+          if(alertdata != null && alertdata.length > 0){
+            this.scrollData = true;
+            this.alerts =  [...this.alerts,...alertdata];
+            this.alerts$.next(this.alerts);
+            this.showAlertSidebar = true;
+            this.alertSidebar?.show();      
+          }else{
+            this.scrollData = false;
+            this.loadMoreCotent = "No more data found!";
+          }
+
+        });
   }
 
   ngAfterViewInit(): void {
@@ -442,21 +458,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.pageNumber = 0;
     this.alerts = [];
     this.store.dispatch(new GetAlertsForCurrentUser(this.pageNumber,this.pageSize));
-    this.alertStateModel$
-    .pipe(takeUntil(this.componentDestroy()))
-    .subscribe((alertdata) => {
-      if(alertdata != null && alertdata.length > 0){
-        this.scrollData = true;
-        this.alerts =  [...alertdata,...this.alerts]; //alertdata;
-        this.showAlertSidebar = true;
-        this.alertSidebar?.show();      
-      }else{
-        this.scrollData = false;
-        this.loadMoreCotent = "No more data found!";
-      }
-
-    });
-
   }
 
   alertSideBarCloseClick(): void {
