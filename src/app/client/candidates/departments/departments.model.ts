@@ -79,12 +79,6 @@ export interface EditDepartmentFormState {
   [EditDepartmentFields.IS_ORIENTED]: boolean;
   [EditDepartmentFields.ORIENTATION_DATE]?: Date;
 }
-export interface DepartmentHierarchy {
-  organizationId: number;
-  organizationName: string;
-  organizationPrefix: string;
-  regions: OrganizationRegion[];
-}
 
 export interface AssignDepartmentHierarchy {
   regions: OrganizationRegion[];
