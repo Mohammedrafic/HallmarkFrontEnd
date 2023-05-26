@@ -67,6 +67,8 @@ import { Comment } from '@shared/models/comment.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { ReOrderState } from '@shared/components/order-reorders-container/store/re-order.state';
 import { ReOrderPage } from '@shared/components/order-reorders-container/interfaces';
+import { CandidateModel } from '../add-edit-reorder/models/candidate.model';
+import { ONBOARDED_STATUS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -297,8 +299,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       this.disabledCloseButton = !!(this.order.activeCandidatesCount && this.order.activeCandidatesCount > 0);
     }
 
+    // Disable close btn for Filled reorder or if it has onboarded candidate.
     if (this.order?.orderType === OrderType.ReOrder && this.order.status !== OrderStatus.Filled) {
-      this.disabledCloseButton = false;
+      this.disabledCloseButton = this.order.candidates?.length
+      ? this.checkOrderCandidatesForOnboard(this.order.candidates) : false;
       return;
     }
   }
@@ -586,5 +590,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     }
 
     return this.order.status;
+  }
+
+  private checkOrderCandidatesForOnboard(candiadtes: CandidateModel[]): boolean {
+    return candiadtes.some((candidate) => candidate.status === ONBOARDED_STATUS);
   }
 }
