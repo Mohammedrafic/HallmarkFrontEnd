@@ -77,6 +77,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
+        this.candidateProfileFormService.populateHoldEndDate();
         this.candidateProfileFormService.candidateForm.markAsPristine();
         this.navigationWrapperService.areUnsavedChanges = () => false;
       });

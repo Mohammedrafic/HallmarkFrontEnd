@@ -6,6 +6,7 @@ import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
 import { CandidateTabsEnum } from '@client/candidates/enums/candidate-tabs.enum';
 import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
 import { BaseObservable } from '@core/helpers';
+import { CandidateModel } from '../candidate-profile/candidate.model';
 
 @Injectable()
 export class CandidatesService {
@@ -15,6 +16,7 @@ export class CandidatesService {
   private candidateName$: Subject<string> = new Subject<string>();
   private activeEmployeeWorkCommitment$: 
   BaseObservable<CandidateWorkCommitmentShort | null> = new BaseObservable<CandidateWorkCommitmentShort | null>(null);
+  private employeeProfile$: BehaviorSubject<CandidateModel | null> = new BehaviorSubject<CandidateModel | null>(null);
   private employeeHireDate: string;
   private terminationDate: string;
 
@@ -40,6 +42,14 @@ export class CandidatesService {
 
   public getActiveWorkCommitmentStream(): Observable<CandidateWorkCommitmentShort | null> {
     return this.activeEmployeeWorkCommitment$.getStream();
+  }
+
+  public setEmployeeProfileData(employee: CandidateModel): void {
+    this.employeeProfile$.next(employee);
+  }
+
+  public getEmployeeProfileData(): CandidateModel | null {
+    return this.employeeProfile$.getValue();
   }
 
   public changeTab(tab: CandidateTabsEnum): void {
