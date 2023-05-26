@@ -128,6 +128,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         takeUntil(this.componentDestroy()),
       )
       .subscribe((structure: ScheduleFilterStructure) => {
+        this.isHomeCostCenterFilters = false;
         this.setFilterStructure(structure);
         this.cdr.markForCheck();
       });
@@ -141,6 +142,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         takeUntil(this.componentDestroy()),
       )
       .subscribe((structure: ScheduleFilterStructure) => {
+        this.isHomeCostCenterFilters = true;
         this.setFilterStructure(structure);
         this.preSelectHomeCostCenterFilters();
         this.cdr.markForCheck();
@@ -174,7 +176,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
           if (!departmentsIds?.length) {
             this.resetSkillFilters();
             this.setFilteredItems();
-            this.applyHomeCostCenterFilters();
           }
         }),
         filter((departmentsIds: number[]) => !!departmentsIds?.length),
@@ -284,8 +285,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     let locationId: number;
     let departmentId: number;
 
-    this.isHomeCostCenterFilters = true;
-
     if (homeCostCenterDepartment) {
       departmentId = homeCostCenterDepartment.id;
       locationId = homeCostCenterDepartment.locationId as number;
@@ -316,7 +315,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   private applyHomeCostCenterFilters(): void {
     if (this.isHomeCostCenterFilters) {
-      this.isHomeCostCenterFilters = false;
       this.setFilters(true);
     }
   }

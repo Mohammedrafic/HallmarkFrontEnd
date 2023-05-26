@@ -41,6 +41,7 @@ export class OrderManagement {
   candidates: number;
   startDate: string;
   isLocked?: boolean;
+  isTemplate?: boolean;
   reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
   children: OrderManagementChild[];
@@ -230,6 +231,7 @@ export type AgencyOrderManagement = {
   organizationPrefix: string;
   extensionFromId?: number;
   candidates?: CandidateModel[];
+  irpOrderMetadata?: IRPMetaData;
 };
 
 export interface OrderManagementChild  {
@@ -791,6 +793,7 @@ export interface IrpCandidatesParams {
   PageSize: number;
   PageNumber: number;
   isAvailable: boolean;
+  searchTerm?: any;
 }
 
 export class CandidateCancellationReason{

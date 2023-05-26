@@ -193,6 +193,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
         }
         if(payload.constructor.name === 'ShowFilterDialog'){
+          console.log('doNotReturnFilterForm values ===',this.doNotReturnFilterForm.value);
           this.doNotReturnFilterForm.get(FormControlNames.BusinessUnitId)?.setValue(this.selectedOrganization.id);
           if(this.doNotReturnFilterForm.value.currentStatus == "Blocked"){
             this.isFilterBlock = true;
@@ -200,7 +201,9 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
           else{
             this.isFilterBlock = false;
           }
-          this.doNotReturnFilterForm.controls['currentStatus']?.markAsTouched();  
+          // this.doNotReturnFilterForm.controls['currentStatus']?.markAsTouched();  
+          // this.changeDetectorRef.markForCheck();
+          console.log('this.isFilterBlock values ===',this.isFilterBlock);
         }
      }
     });
@@ -449,16 +452,12 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   
   public onSwitcher(event: { checked: boolean }): void {
     this.blockunblockcandidate$.next(event.checked);
-   this.isBlock= event.checked;
-   this.status=this.isBlock?Candidatests.UnBlock:Candidatests.Block;
-   if(event.checked){
-      this.doNotReturnFilterForm.get('status')?.setValue('Blocked');
-    }else{
-      this.doNotReturnFilterForm.get('status')?.setValue('Unblocked');
-    }
+    this.isBlock= event.checked;
+    this.status=this.isBlock?Candidatests.UnBlock:Candidatests.Block;
   }
   
   public onFilterSwitcher(event: { checked: boolean }): void {
+    console.log('at onFilterSwitcher');
     this.isFilterBlock = event.checked;
     if(event.checked){
       this.doNotReturnFilterForm.get('currentStatus')?.setValue('Blocked');
@@ -717,6 +716,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       .pipe(takeWhile(() => this.isAlive))
       .subscribe((data) => {
         if(data != null && data != undefined){
+          console.log('subscribeOnBusinessUnitChange  -->');
           this.orgid=data;
           this.onFormCancelClick();
           this.onFilterClearAll();

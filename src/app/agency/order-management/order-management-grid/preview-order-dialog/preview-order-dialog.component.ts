@@ -1,6 +1,4 @@
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -22,7 +20,7 @@ import { AbstractPermission } from "@shared/helpers/permissions";
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
 import { AgencyOrderManagement, Order, OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import isNil from 'lodash/fp/isNil';
@@ -33,6 +31,8 @@ import { UserState } from '../../../../store/user.state';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { ReOrderState } from '@shared/components/order-reorders-container/store/re-order.state';
+import { ReOrderPage } from '@shared/components/order-reorders-container/interfaces';
 
 @Component({
   selector: 'app-preview-order-dialog',
@@ -69,6 +69,9 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
 
   @Select(OrderManagementState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
+
+  @Select(ReOrderState.GetReOrdersByOrderId)
+  public readonly reOrderList$: Observable<ReOrderPage | null>;
 
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');

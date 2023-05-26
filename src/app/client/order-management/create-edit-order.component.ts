@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { filter, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { ItemModel } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
@@ -9,6 +9,11 @@ import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { SetHeaderState } from '../../store/app.actions';
 import { OrderSystemConfig, SaveForLate, SubmitAsTemplate, SubmitForLater } from '@client/order-management/constants';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { AddEditOrderComponent } from '@client/order-management/components/add-edit-order/add-edit-order.component';
+import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
+
 import { Order } from '@shared/models/order-management.model';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { Destroyable } from '@core/helpers';
@@ -35,7 +40,7 @@ import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
-import { createSystem, updateSystemConfig } from '@client/order-management/helpers';
+import { createSystem, getFormsList, isFormTouched, updateSystemConfig } from '@client/order-management/helpers';
 import { GetOrganizationStructure } from '../../store/user.actions';
 
 @Component({
@@ -45,6 +50,8 @@ import { GetOrganizationStructure } from '../../store/user.actions';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateEditOrderComponent extends Destroyable implements OnInit {
+  @ViewChild(AddEditOrderComponent) vmsOrder: AddEditOrderComponent;
+
   public saveEvents: Subject<void | MenuEventArgs> = new Subject<void | MenuEventArgs>();
   public title: string;
   public orderSystemConfig:ButtonModel[] = OrderSystemConfig;
@@ -74,6 +81,8 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     private route: ActivatedRoute,
     private store: Store,
     private changeDetection: ChangeDetectorRef,
+    private confirmService: ConfirmService,
+    private irpStateService: IrpContainerStateService,
     private orderManagementService: OrderManagementService,
   ) {
     super();
@@ -92,10 +101,22 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     this.selectSystemForOrderManagement();
   }
 
-  public changeSystem(event: ButtonModel): void {
-    this.activeSystem = event.id;
-    this.setSubmitButtonConfig();
-    this.getSkillsByActiveSystem();
+  public checkOrderFormState(event: ButtonModel): void {
+    if (this.isActiveOrderFormTouched()) {
+      this.confirmService.confirm(
+        DELETE_CONFIRM_TEXT,
+        {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(take(1))
+        .subscribe((value: boolean) => {
+          this.changeSystem(event.id, value);
+        });
+    } else {
+      this.changeSystem(event.id);
+    }
   }
 
   public save(): void {
@@ -105,6 +126,43 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
 
   public selectTypeSave(saveType: MenuEventArgs): void {
     this.saveEvents.next(saveType);
+  }
+
+  private changeSystem(system: OrderSystem, updateSystem = true): void {
+    if (updateSystem) {
+      this.activeSystem = system;
+      this.setSubmitButtonConfig();
+      this.getSkillsByActiveSystem();
+    } else {
+      updateSystemConfig(this.orderSystemConfig, this.activeSystem);
+      this.orderSystemConfig = [...this.orderSystemConfig];
+    }
+
+    this.changeDetection.markForCheck();
+  }
+
+  private isActiveOrderFormTouched(): boolean {
+    if (this.activeSystem === OrderSystem.IRP) {
+      this.irpStateService.saveEvents.next();
+      const formState = this.irpStateService.getFormState();
+      const formGroupList = getFormsList(formState);
+
+      return isFormTouched(formGroupList);
+    }
+
+    if (this.activeSystem === OrderSystem.VMS) {
+      const formComponent = this.vmsOrder?.orderDetailsFormComponent;
+
+      return formComponent?.orderTypeForm?.touched
+        || formComponent?.generalInformationForm?.touched
+        || formComponent?.jobDistributionForm?.touched
+        || formComponent?.jobDescriptionForm?.touched
+        || formComponent?.contactDetailsForm?.touched
+        || formComponent?.workLocationForm?.touched
+        || formComponent?.specialProject?.touched;
+    }
+
+    return false;
   }
 
   private setOrderManagementSystem(): void {
