@@ -33,6 +33,12 @@
     display: flex;
     gap: 20px;
   }
+  .e-hidden{
+    display: none !important;
+  }
+  .e-show{
+    display: block !important
+  }
   .divider {
     margin: 24px -24px;
     background-color: $secondary-dark-blue-40;
