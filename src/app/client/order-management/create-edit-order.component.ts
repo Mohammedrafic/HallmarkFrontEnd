@@ -10,7 +10,7 @@ import { SetHeaderState } from '../../store/app.actions';
 import { OrderSystemConfig, SaveForLate, SubmitAsTemplate, SubmitForLater } from '@client/order-management/constants';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { AddEditOrderComponent } from '@client/order-management/components/add-edit-order/add-edit-order.component';
-import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
+import { IrpContainerComponent } from '@client/order-management/containers/irp-container/irp-container.component';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 
@@ -40,7 +40,7 @@ import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
-import { createSystem, getFormsList, isFormTouched, updateSystemConfig } from '@client/order-management/helpers';
+import { createSystem, updateSystemConfig } from '@client/order-management/helpers';
 import { GetOrganizationStructure } from '../../store/user.actions';
 
 @Component({
@@ -51,6 +51,7 @@ import { GetOrganizationStructure } from '../../store/user.actions';
 })
 export class CreateEditOrderComponent extends Destroyable implements OnInit {
   @ViewChild(AddEditOrderComponent) vmsOrder: AddEditOrderComponent;
+  @ViewChild(IrpContainerComponent) irpOrder: IrpContainerComponent;
 
   public saveEvents: Subject<void | MenuEventArgs> = new Subject<void | MenuEventArgs>();
   public title: string;
@@ -82,7 +83,6 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     private store: Store,
     private changeDetection: ChangeDetectorRef,
     private confirmService: ConfirmService,
-    private irpStateService: IrpContainerStateService,
     private orderManagementService: OrderManagementService,
   ) {
     super();
@@ -143,23 +143,11 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
 
   private isActiveOrderFormTouched(): boolean {
     if (this.activeSystem === OrderSystem.IRP) {
-      this.irpStateService.saveEvents.next();
-      const formState = this.irpStateService.getFormState();
-      const formGroupList = getFormsList(formState);
-
-      return isFormTouched(formGroupList);
+     return this.irpOrder?.isOrderTouched();
     }
 
     if (this.activeSystem === OrderSystem.VMS) {
-      const formComponent = this.vmsOrder?.orderDetailsFormComponent;
-
-      return formComponent?.orderTypeForm?.touched
-        || formComponent?.generalInformationForm?.touched
-        || formComponent?.jobDistributionForm?.touched
-        || formComponent?.jobDescriptionForm?.touched
-        || formComponent?.contactDetailsForm?.touched
-        || formComponent?.workLocationForm?.touched
-        || formComponent?.specialProject?.touched;
+      return this.vmsOrder?.isOrderTouched();
     }
 
     return false;
