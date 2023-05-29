@@ -83,6 +83,7 @@ export enum documentsColumnHeaderText {
   Status = 'Status',
   Comments = 'Comments',
   OrganizationName = 'Organization Name',
+  AgencyName = 'Agency Name',
   RegionName = 'Region Name',
   LocationName = 'Location Name'
 }

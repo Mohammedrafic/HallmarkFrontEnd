@@ -44,6 +44,7 @@ import { InvoicesModel } from '../../store/invoices.model';
 import { ClearPageFilters } from 'src/app/store/preserved-filters.actions';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { GetOrganizationStructure } from 'src/app/store/user.actions';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-invoices-filters-dialog',
@@ -70,6 +71,9 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   @Select(InvoicesState.invoiceFiltersColumns)
   private readonly invoiceFiltersColumns$: Observable<InvoiceFilterColumns>;
 
+  @Select(AppState.getMainContentElement)
+  public readonly targetElement$: Observable<HTMLElement | null>;
+
   @Input() selectedTabId: InvoiceTabId;
   @Input() public populateFilterForm$: BehaviorSubject<PreservedFiltersByPage<InvoicesFilterState> | null>;
 
@@ -85,6 +89,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   public filterOptionFields = filterOptionFields;
   public skillOptionFields = SkillFilterOptionFields;
   public isAgency = false;
+  public targetElement: HTMLElement | null = null;
 
   private regions: OrganizationRegion[] = [];
 
@@ -113,6 +118,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.setFormGroupValidators();
     this.startFormGroupWatching();
     this.getAgencyOrgStructure();
+    this.getFilterTargetElement();
   }
 
   ngOnChanges(): void {
@@ -340,7 +346,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       this.regions,
       this.isAgency
     );
-    
+
     const filterState = this.filterService.composeFilterState(
       this.filtersFormConfig,
       filteredStructure as Record<string, unknown>
@@ -366,5 +372,17 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     if (!this.isAgency) {
       this.store.dispatch(new GetOrganizationStructure());
     }
+  }
+
+  private getFilterTargetElement(): void {
+    this.targetElement$
+      .pipe(
+        filter((el) => !!el),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe((el: HTMLElement | null) => {
+        this.targetElement = el;
+        this.cdr.detectChanges();
+      });
   }
 }

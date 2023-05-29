@@ -1,6 +1,7 @@
 <app-filter-dialog
   [items]="filteredItems"
   [count]="(timesheets$ | async)?.totalCount"
+  [targetElement]="targetElement"
   (deleteFilter)="deleteFilter($event)"
   (clearAllFiltersClicked)="clearAllFilters()"
   (applyFilterClicked)="applyFilters()">

@@ -229,6 +229,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         this.resetAssignDepartmentForm();
         const MESSAGE = this.departmentId ? RECORD_MODIFIED : RECORD_ADDED;
         this.store.dispatch([new ShowSideDialog(false), new ShowToast(MessageTypes.Success, MESSAGE)]);
+        this.isOpen = false;
         this.departmentId = null;
         this.refreshGrid.emit();
       });

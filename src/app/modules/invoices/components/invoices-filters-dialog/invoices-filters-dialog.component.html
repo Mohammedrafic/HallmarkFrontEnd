@@ -1,6 +1,7 @@
 <app-filter-dialog
   [items]="filteredItems"
   [count]="(invoicesData$ | async)?.totalCount"
+  [targetElement]="targetElement"
   (deleteFilter)="deleteFilter($event)"
   (clearAllFiltersClicked)="clearAllFilters()"
   (applyFilterClicked)="applyFilters()">
