@@ -37,7 +37,7 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
-  DEPARTMENT_SKILL_CHANGE_WARNING,
+  IRP_DEPARTMENT_CHANGE_WARNING,
   RECORD_ADDED,
   RECORD_MODIFIED,
   WARNING_TITLE,
@@ -117,6 +117,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   protected componentDestroy: () => Observable<unknown>;
 
+  private initialIrpValue: boolean;
   private selectedRegion: Region;
   public selectedLocation: Location;
   private editedDepartmentId?: number;
@@ -315,7 +316,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       department,
       this.isIRPFlagEnabled
     );
-
+    this.initialIrpValue = !!department.includeInIRP;
     this.editedDepartmentId = department.departmentId;
     this.isLocationIRPEnabled = !!department.locationIncludeInIRP;
     this.isEdit = true;
@@ -438,9 +439,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   private updateDepartment(department: Department, ignoreWarning: boolean): void {
-    if (this.isSkillChanged()) {
+    if (this.isIRPFlagEnabled && this.isSkillChanged() || this.isDateChanged() || this.isExcludedFromIrp()) {
       this.confirmService
-        .confirm(DEPARTMENT_SKILL_CHANGE_WARNING, {
+        .confirm(IRP_DEPARTMENT_CHANGE_WARNING, {
           title: WARNING_TITLE,
           okButtonLabel: 'Yes',
           okButtonClass: 'delete-button',
@@ -617,5 +618,21 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   private isSkillChanged(): boolean {
     return !!(this.departmentsDetailsFormGroup.get('primarySkills')?.dirty ||
       this.departmentsDetailsFormGroup.get('secondarySkills')?.dirty);
+  }
+
+  /**
+   * Detects if inactivation date was changed or reactivation date was deleted
+   * @returns boolean
+   */
+  private isDateChanged(): boolean {
+    return !!(this.departmentsDetailsFormGroup.get('inactiveDate')?.dirty ||
+      (this.departmentsDetailsFormGroup.get('reactivateDate')?.dirty &&
+      !this.departmentsDetailsFormGroup.get('reactivateDate')?.value));
+  }
+
+  private isExcludedFromIrp(): boolean {
+    const wasIncludedInIrp = this.initialIrpValue === true;
+    return !!(wasIncludedInIrp && this.departmentsDetailsFormGroup.get('includeInIRP')?.dirty &&
+      !this.departmentsDetailsFormGroup.get('includeInIRP')?.value);
   }
 }

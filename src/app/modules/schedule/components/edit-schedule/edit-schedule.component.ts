@@ -789,6 +789,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       this.scheduledItem = scheduledItem;
       this.shiftTabs = GetScheduleTabItems(scheduledItem.schedule.daySchedules);
       this.selectScheduledItem(this.scheduledItem.schedule.daySchedules[0]);
+      this.setScheduleTypes();
     }
   }
 
@@ -832,7 +833,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.scheduleTypes = this.createScheduleService.getScheduleTypesWithPermissions(
       this.scheduleTypes,
       this.userPermission,
-      this.scheduleOnlyWithAvailability,
+      this.needToDisableBooking(),
       [this.scheduledItem.candidate]
     );
     this.scheduleItemType = this.createScheduleService.getFirstAllowedScheduleType(this.scheduleTypes);
@@ -967,5 +968,13 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.openPositionsConfig.showOpenPositionsPanel = false;
     this.openPositionsConfig.canFetchOpenPositions = false;
     this.openPositionsConfig.totalOpenPositions = 0;
+  }
+
+  private needToDisableBooking(): boolean {
+    if (!this.scheduleOnlyWithAvailability) {
+      return false;
+    }
+
+    return !this.editScheduleService.hasScheduleAvailability(this.scheduledItem);
   }
 }
