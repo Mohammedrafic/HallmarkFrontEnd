@@ -5,7 +5,7 @@ import { UserAgencyOrganization, UserAgencyOrganizationBusinessUnit } from '@sha
 import { DonotreturnService } from '@shared/services/donotreturn.service';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
-import { catchError, Observable, tap } from "rxjs";
+import { catchError, Observable, of, tap } from "rxjs";
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
 import { DoNotReturn } from './donotreturn.actions';
@@ -142,5 +142,34 @@ export class DonotReturnState {
       return payload
     }));
   }
+
+  @Action(DoNotReturn.GetDoNotReturnImportTemplate)
+  GetDoNotReturnImportTemplate(
+    { dispatch }: StateContext<DoNotReturnStateModel>,
+    { payload }: DoNotReturn.GetDoNotReturnImportTemplate): Observable<any> {
+    return this.DonotreturnService.getDNRImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new DoNotReturn.GetDoNotReturnImportTemplateSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(DoNotReturn.GetDoNotReturnImportErrors)
+  GetDoNotReturnImportErrors(
+    { dispatch }: StateContext<DoNotReturnStateModel>,
+    { payload }: DoNotReturn.GetDoNotReturnImportErrors
+  ): Observable<any> {
+    return this.DonotreturnService.getDNRImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new DoNotReturn.GetDoNotReturnImportErrorsSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  
 }
 

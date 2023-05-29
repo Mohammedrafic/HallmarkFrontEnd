@@ -118,6 +118,7 @@ import { InputModule } from '@shared/components/form-controls/input/input.module
 import { PreservedOrderService } from './order-management/services/preserved-order.service';
 import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
 import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-container/order-reorders-container.module';
+import { ImportDnrComponent } from './do-not-return/import-dnr/import-dnr.component';
 
 
 const gridIcons = {
@@ -173,6 +174,7 @@ const gridIcons = {
     UpdateRegRateComponent,
     DoNotReturnDetailsComponent,
     DoNotReturnGridComponent,
+    ImportDnrComponent,
   ],
   imports: [
     CommonModule,

@@ -7,7 +7,6 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Subject } from 'rxjs';
 import { DonoreturnFilters } from '@shared/models/donotreturn.model';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { DoNotReturn } from '@admin/store/donotreturn.actions';
 import { MasterDNRExportCols, TITLE } from '../donotreturn-grid.constants';
 
 @Component({
@@ -29,6 +28,7 @@ public filters: DonoreturnFilters = {};
   public columnsToExport: ExportColumn[] = MasterDNRExportCols;
   public exportDonotreturn$ = new Subject<ExportedFileType>();
   public filteredItems$ = new Subject<number>();
+  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
 
   constructor(protected override store:Store) { 
     super(store)
@@ -60,6 +60,10 @@ public filters: DonoreturnFilters = {};
 
   public addDoNotReturn(): void {
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  public openImportDialog(): void {
+    this.importDialogEvent.next(true);
   }
 
 }
