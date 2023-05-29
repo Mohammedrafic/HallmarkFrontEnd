@@ -22,6 +22,7 @@ export class RecordsAdapter {
     orgId: number,
     sheetId: number,
     type: RecordFields,
+    timeIsNull: boolean,
     ): AddRecordDto {
 
     if (type === RecordFields.Time) {
@@ -51,6 +52,7 @@ export class RecordsAdapter {
       organizationId: orgId,
       type: MapedRecordsType[type],
       ...data,
+      isTimeInNull: timeIsNull,
     };
 
     return dto;

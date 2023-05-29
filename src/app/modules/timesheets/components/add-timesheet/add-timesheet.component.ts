@@ -53,37 +53,21 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   public saveRecord(): void {
     const selectedBillRate = this.findBillRate(this.form?.get('billRateConfigId')?.value as number | null);
+
+    // If bill rate mustn't count hours - time should be null
+    const recordTimeNull = selectedBillRate?.disableTime || false;
     
     if (this.form?.valid) {
       const { organizationId, id } = this.store.snapshot().timesheets.timesheetDetails;
-      const body = RecordsAdapter.adaptRecordAddDto(this.form.value, organizationId, id, this.formType);
-      const timeInValue = this.form.get('timeIn')?.value as Date | null;
-      const timeOutValue = this.form.get('timeOut')?.value as Date | null;
-
+      const body = RecordsAdapter.adaptRecordAddDto(this.form.value, organizationId, id, this.formType, recordTimeNull);
 
       if (!this.checkBillRateDate(body.timeIn, body.billRateConfigId)) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, 'Bill rate is not effective for this date'));
         return;
       }
 
-      if (selectedBillRate && selectedBillRate.timeNotRequired && !timeInValue && !timeOutValue) {
-        this.confirmService.confirm(BillRateTimeConfirm, {
-          title: 'Reported hours',
-          okButtonLabel: 'Yes',
-          okButtonClass: 'delete-button',
-        })
-        .pipe(
-          filter((result) => result),
-          take(1),
-        )
-        .subscribe(() => {
-          this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
-          this.closeDialog();
-        });
-      } else {
-        this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
-        this.closeDialog();
-      }
+      this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency, ));
+      this.closeDialog();
 
     } else {
       this.form?.updateValueAndValidity();
