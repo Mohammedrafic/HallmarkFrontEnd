@@ -45,6 +45,7 @@ import { DateTimeHelper, findSelectedItems } from '@core/helpers';
 import { mapperSelectedItems } from '@shared/components/tiers-dialog/helper';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 
 @Component({
   selector: 'app-assign-department',
@@ -276,7 +277,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         const selectedRegions: OrganizationRegion[] = value?.length
           ? findSelectedItems(value, this.departmentHierarchy)
           : [];
-        this.dataSource.locations = mapperSelectedItems(selectedRegions, 'locations');
+        this.dataSource.locations = getIRPOrgItems(mapperSelectedItems(selectedRegions, 'locations'));
         this.departmentFormService.resetControls(this.assignDepartmentForm, ['locationIds', 'departmentIds']);
         this.cdr.markForCheck();
       });
@@ -293,7 +294,9 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         const selectedLocations: OrganizationLocation[] = value?.length
           ? findSelectedItems(value, this.dataSource.locations)
           : [];
-        const departments = mapperSelectedItems(selectedLocations, 'departments') as OrganizationDepartment[];
+        const departments = getIRPOrgItems(
+          mapperSelectedItems(selectedLocations, 'departments') as OrganizationDepartment[]
+        );
         this.dataSource.departments = departments.map((department) => ({
           ...department,
           name: departmentName(department.name, department.extDepartmentId ?? ''),

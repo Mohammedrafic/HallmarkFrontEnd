@@ -16,7 +16,7 @@ import {
 export class OrderCloseReasonInfoComponent {
   @Input() orderInformation: Order | OrderManagement | AgencyOrderManagement;
   @Input() candidate: OrderManagementChild | OrderCandidateJob;
-  @Input() showCloseData: boolean = true;
+  @Input() showCloseData = true;
   private readonly autoClosedReason = 'Job Completed';
 
   get closeReason(): string {

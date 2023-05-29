@@ -215,7 +215,7 @@
 
   <div id="listcontainer" #uiElement  (scroll)="onScrollLoadData()">
     <section class="alert-body">
-      <section class="alert-panel" *ngFor="let item of alerts">
+      <section class="alert-panel" *ngFor="let item of alerts$ | async">
         <div class="alert-panel-header">
           <div class="alert-panel-header__flex-child">
             <span>

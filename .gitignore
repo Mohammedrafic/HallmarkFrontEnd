@@ -34,6 +34,7 @@ yarn-error.log
 testem.log
 /typings
 /.scannerwork
+/.yarn
 
 # System files
 .DS_Store

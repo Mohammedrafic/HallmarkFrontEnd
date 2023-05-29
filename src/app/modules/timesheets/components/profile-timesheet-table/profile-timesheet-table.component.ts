@@ -295,7 +295,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public saveChanges(): void {
     if (!this.timesheetRecordsService.checkFormsValidation(this.formControls)) {
-      this.cd.markForCheck();
+      this.cd.detectChanges();
       return;
     }
 

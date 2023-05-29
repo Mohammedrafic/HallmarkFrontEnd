@@ -5,14 +5,14 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 @Component({
   selector: 'app-candidate-professional-summary',
   templateUrl: './candidate-professional-summary.component.html',
-  styleUrls: ['./candidate-professional-summary.component.scss']
+  styleUrls: ['./candidate-professional-summary.component.scss'],
 })
 export class CandidateProfessionalSummaryComponent {
   @Input() formGroup: FormGroup;
 
   static createFormGroup(): FormGroup {
     return new FormGroup({
-      professionalSummary: new FormControl(null, [Validators.maxLength(2000)]),
+      professionalSummary: new FormControl(null, [Validators.maxLength(500)]),
     });
   }
 }

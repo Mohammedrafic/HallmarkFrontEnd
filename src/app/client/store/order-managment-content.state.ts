@@ -61,7 +61,6 @@ import {
   UploadOrderImportFile,
   UploadOrderImportFileSucceeded,
   UpdateRegRateorder,
-  UpdateRegRateSucceeded,
   GetCandidateCancellationReason,
   ExportIRPOrders,
   ClearOrderFilterDataSources,
@@ -102,7 +101,7 @@ import {
   updateCandidateJobMessage,
   UpdateRegularRatesucceedcount,
   PerDiemReOrdersErrorMessage,
-  TravelerContracttoPermOrdersSucceedMessage
+  TravelerContracttoPermOrdersSucceedMessage,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -516,12 +515,13 @@ export class OrderManagementContentState {
   @Action(GetIrpOrderCandidates)
   GetIrpOrderCandidates(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderId, pageNumber, pageSize, isAvailable }: GetIrpOrderCandidates
+    { orderId, pageNumber, pageSize, isAvailable, searchTerm }: GetIrpOrderCandidates
   ): Observable<PageOfCollections<IrpOrderCandidate>> {
     const params: IrpCandidatesParams = {
       PageSize: pageSize,
       PageNumber: pageNumber,
       isAvailable,
+      searchTerm
     };
 
     return this.orderManagementService.getIrpCandidates(orderId, params)
@@ -1147,7 +1147,7 @@ export class OrderManagementContentState {
     ) : Observable<CandidateCancellationReason[] |null>{
       return this.orderManagementService.GetCandidateCancellationReasons(payload).pipe(tap((payload: CandidateCancellationReason[]) => {
         patchState({ candidateCancellationReasons: payload });
-        return payload
+        return payload;
       }));
     }
 

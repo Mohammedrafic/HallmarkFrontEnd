@@ -14,7 +14,7 @@
     </div>
   </div>
   <div *ngIf="showSystemToggle && !selectedOrder">
-    <app-button-group [buttonOptions]="orderSystemConfig" (buttonChange)="changeSystem($event)"></app-button-group>
+    <app-button-group [buttonOptions]="orderSystemConfig" (buttonChange)="checkOrderFormState($event)"></app-button-group>
   </div>
   <div class="controls-form desktop-btn">
     <ejs-splitbutton

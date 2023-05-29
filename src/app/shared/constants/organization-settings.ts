@@ -51,7 +51,8 @@ export enum OrganizationSettingKeys {
   ScheduleOnlyWithAvailability,
   CreateUserWhenEmployeeCreated,
   CreateEmployeeWhenUserCreated,
-  OnHoldDefault
+  OnHoldDefault,
+  CreatePartialOrder
 }
 
 export enum OrganizationalHierarchy {

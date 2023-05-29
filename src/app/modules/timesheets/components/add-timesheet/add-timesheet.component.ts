@@ -1,22 +1,28 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
 import { Select } from '@ngxs/store';
-import { filter, takeUntil, Observable, merge } from 'rxjs';
-import { switchMap, tap } from 'rxjs/operators';
+import { Observable, filter, merge, takeUntil } from 'rxjs';
+import { switchMap, take, tap } from 'rxjs/operators';
 
 import { DialogAction } from '@core/enums';
 import { AddDialogHelper, DateTimeHelper } from '@core/helpers';
+import { createUniqHashObj } from '@core/helpers/functions.helper';
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
-import { TimesheetsState } from '../../store/state/timesheets.state';
-import { AddRecordBillRate, AddTimsheetForm, TimesheetDetailsAddDialogState } from '../../interface';
-import { Timesheets } from '../../store/actions/timesheets.actions';
-import { RecordAddDialogConfig, TimesheetConfirmMessages } from '../../constants';
+import { ShowToast } from 'src/app/store/app.actions';
+import {
+  BillRateTimeConfirm, MealBreakeName, RecordAddDialogConfig, TimeInName, TimeOutName,
+  TimesheetConfirmMessages,
+} from '../../constants';
 import { RecordFields } from '../../enums';
 import { RecordsAdapter } from '../../helpers';
+import {
+  AddRecordBillRate, AddTimsheetForm, DialogConfig, DialogConfigField,
+  TimesheetDetailsAddDialogState,
+} from '../../interface';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
-import { ShowToast } from 'src/app/store/app.actions';
-import { createUniqHashObj } from '@core/helpers/functions.helper';
+import { Timesheets } from '../../store/actions/timesheets.actions';
+import { TimesheetsState } from '../../store/state/timesheets.state';
 
 @Component({
   selector: 'app-add-timesheet',
@@ -29,7 +35,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   @Input() public container: HTMLElement | null = null;
 
-  public readonly dialogConfig = RecordAddDialogConfig;
+  public dialogConfig: DialogConfig = JSON.parse(JSON.stringify(RecordAddDialogConfig));
 
   public formType: RecordFields = RecordFields.Time;
 
@@ -46,16 +52,39 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
   }
 
   public saveRecord(): void {
+    const selectedBillRate = this.findBillRate(this.form?.get('billRateConfigId')?.value as number | null);
+    
     if (this.form?.valid) {
       const { organizationId, id } = this.store.snapshot().timesheets.timesheetDetails;
       const body = RecordsAdapter.adaptRecordAddDto(this.form.value, organizationId, id, this.formType);
+      const timeInValue = this.form.get('timeIn')?.value as Date | null;
+      const timeOutValue = this.form.get('timeOut')?.value as Date | null;
+
 
       if (!this.checkBillRateDate(body.timeIn, body.billRateConfigId)) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, 'Bill rate is not effective for this date'));
         return;
       }
-      this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
-      this.closeDialog();
+
+      if (selectedBillRate && selectedBillRate.timeNotRequired && !timeInValue && !timeOutValue) {
+        this.confirmService.confirm(BillRateTimeConfirm, {
+          title: 'Reported hours',
+          okButtonLabel: 'Yes',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(
+          filter((result) => result),
+          take(1),
+        )
+        .subscribe(() => {
+          this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
+          this.closeDialog();
+        });
+      } else {
+        this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
+        this.closeDialog();
+      }
+
     } else {
       this.form?.updateValueAndValidity();
       this.cd.detectChanges();
@@ -67,6 +96,8 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
     .pipe(
       filter((value) => value.state),
       tap((value) => {
+        this.dialogConfig = JSON.parse(JSON.stringify(RecordAddDialogConfig));
+
         if (this.form) {
           this.form = null;
           this.cd.detectChanges();
@@ -83,6 +114,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
       switchMap(() => merge(
         this.watchForBillRate(),
         this.watchForDayChange(),
+        this.observaStartDate(),
       )),
       takeUntil(this.componentDestroy()),
     )
@@ -139,7 +171,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
     const billRatesDates = filteredBillRatesBySelected.map((el) => el.efectiveDate);
     const idx = DateTimeHelper.findPreviousNearestDateIndex(billRatesDates, timeIn);
 
-    if (idx === null) {
+    if (idx === null || !timeIn) {
       return true;
     }
 
@@ -155,7 +187,89 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
   private watchForBillRate(): Observable<number> {
     return this.form?.get('billRateConfigId')?.valueChanges
     .pipe(
-      tap(() => this.cd.markForCheck()),
+      tap((rateId) => {
+        const rates = this.store.snapshot().timesheets.billRateTypes as AddRecordBillRate[];
+
+        if (!rates) {
+          return;
+        }
+
+        const selectedRate = rates.find((rate) => rate.value === rateId);
+
+        if (selectedRate && this.formType === RecordFields.Time) {
+          this.checkFieldsVisiility(selectedRate);
+        }
+
+        this.cd.markForCheck();
+      }),
     ) as Observable<number>;
+  }
+  
+  private checkFieldsVisiility(rate: AddRecordBillRate): void {
+    const mealField = this.dialogConfig.timesheets.fields
+    .find((field) => field.field === MealBreakeName) as DialogConfigField;
+    const timeInField = this.dialogConfig.timesheets.fields
+    .find((field) => field.field === TimeInName) as DialogConfigField;
+    const timeOutField = this.dialogConfig.timesheets.fields
+    .find((field) => field.field === TimeOutName) as DialogConfigField;
+
+    if (rate.disableMealBreak) {
+      mealField.visible = false;
+    } else if (!rate.disableMealBreak && !mealField.visible) {
+      mealField.visible = true;
+    }
+
+    if (rate.disableTime || rate.timeNotRequired) {
+      timeInField.visible = false;
+      timeOutField.visible = false;
+
+      this.addService.removeTimeValidators(this.form);
+    } else if (!timeInField.visible && !rate.disableTime) {
+      timeInField.visible = true;
+      timeOutField.visible = true;
+      
+      this.addService.addTimeValidators(this.form);
+    }
+
+    this.form?.get('timeIn')?.updateValueAndValidity();
+    this.form?.get('timeOut')?.updateValueAndValidity();
+
+    this.cd.markForCheck();
+  }
+
+  private findBillRate(idToLook: number | null): AddRecordBillRate | undefined {
+    if (!idToLook) {
+      return undefined;
+    }
+
+    const rates = this.store.snapshot().timesheets.billRateTypes as AddRecordBillRate[];
+
+    return rates.find((rate) => rate.value === idToLook);
+  }
+
+  private observaStartDate(): Observable<Date| null> {
+    return this.form?.get('timeIn')?.valueChanges
+      .pipe(
+        tap((start: Date | null) => {
+          const rate = this.findBillRate(this.form?.get('billRateConfigId')?.value as number | null);
+          const timeOutField = this.dialogConfig.timesheets.fields
+          .find((field) => field.field === TimeOutName) as DialogConfigField;
+          const notReqAndStartExist = rate?.timeNotRequired && start ;
+          const timeRequired = !rate?.timeNotRequired && !timeOutField.required;
+          const notReqAndStartNotExist = rate?.timeNotRequired && !start;
+        
+          if (notReqAndStartExist || timeRequired) {
+            this.addService.addTimeOutValidator(this.form);
+            timeOutField.required = true;
+
+            this.cd.markForCheck();
+          } else if (notReqAndStartNotExist) {
+            this.addService.removeTimeOutValidator(this.form);
+            timeOutField.required = false;
+
+            this.cd.markForCheck();
+          }
+        })
+      ) as Observable<Date | null>;
   }
 }
