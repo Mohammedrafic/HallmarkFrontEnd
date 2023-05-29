@@ -7,7 +7,6 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Subject } from 'rxjs';
 import { DonoreturnFilters } from '@shared/models/donotreturn.model';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { DoNotReturn } from '@admin/store/donotreturn.actions';
 import { MasterDNRExportCols, TITLE } from '../donotreturn-grid.constants';
 
 @Component({

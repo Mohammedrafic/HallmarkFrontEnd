@@ -145,8 +145,8 @@ export class DonotReturnState {
 
   @Action(DoNotReturn.GetDoNotReturnImportTemplate)
   GetDoNotReturnImportTemplate(
-    { dispatch }: StateContext<any>,
-    { payload }: any): Observable<any> {
+    { dispatch }: StateContext<DoNotReturnStateModel>,
+    { payload }: DoNotReturn.GetDoNotReturnImportTemplate): Observable<any> {
     return this.DonotreturnService.getDNRImportTemplate(payload).pipe(
       tap((payload) => {
         dispatch(new DoNotReturn.GetDoNotReturnImportTemplateSucceeded(payload));
@@ -158,7 +158,7 @@ export class DonotReturnState {
 
   @Action(DoNotReturn.GetDoNotReturnImportErrors)
   GetDoNotReturnImportErrors(
-    { dispatch }: StateContext<any>,
+    { dispatch }: StateContext<DoNotReturnStateModel>,
     { payload }: DoNotReturn.GetDoNotReturnImportErrors
   ): Observable<any> {
     return this.DonotreturnService.getDNRImportTemplate(payload).pipe(

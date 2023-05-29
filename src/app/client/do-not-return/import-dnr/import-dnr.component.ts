@@ -1,17 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnChanges } from '@angular/core';
 import { Actions, Store } from '@ngxs/store';
 
-import {
-  GetDepartmentsImportErrors,
-  GetDepartmentsImportErrorsSucceeded,
-  GetDepartmentsImportTemplate,
-  GetDepartmentsImportTemplateSucceeded,
-  SaveDepartmentsImportResult,
-  SaveDepartmentsImportResultSucceeded,
-  UploadDepartmentsFile,
-  UploadDepartmentsFileSucceeded,
-} from '@organization-management/store/organization-management.actions';
-import { DoNotReturn } from '@admin/store/donotreturn.actions';
+
+import { DoNotReturn} from '@admin/store/donotreturn.actions';
 
 import { AbstractImport } from '@shared/classes/abstract-import';
 
@@ -20,10 +11,10 @@ const importConfig = {
   importError: DoNotReturn.GetDoNotReturnImportErrors,
   uploadFile: DoNotReturn.UploadDoNotReturnFile,
   saveImportResult: DoNotReturn.SaveDoNotReturnImportResult,
-  uploadFileSucceeded: { instance: DoNotReturn.UploadDoNotReturnsFileSucceeded, message: 'There are no records in the file' },
-  importTemplateSucceeded: { instance: DoNotReturn.GetDoNotReturnImportTemplateSucceeded, fileName: 'departments.xlsx' },
-  importErrorsSucceeded: { instance: DoNotReturn.GetDoNotReturnImportErrorsSucceeded, fileName: 'departments_errors.xlsx' },
-  saveImportResultSucceeded: { instance: DoNotReturn.SaveDoNotReturnImportResultSucceeded, message: 'Departments were imported' },
+  uploadFileSucceeded: { instance: DoNotReturn.UploadDoNotReturnFileSucceeded, message: 'There are no records in the file' },
+  importTemplateSucceeded: { instance: DoNotReturn.GetDoNotReturnImportTemplateSucceeded, fileName: 'dnr.xlsx' },
+  importErrorsSucceeded: { instance: DoNotReturn.GetDoNotReturnImportErrorsSucceeded, fileName: 'dnr_errors.xlsx' },
+  saveImportResultSucceeded: { instance: DoNotReturn.SaveDoNotReturnImportResultSucceeded, message: 'DoNotReturn were imported' },
 };
 
 @Component({
@@ -32,7 +23,7 @@ const importConfig = {
   styleUrls: ['./import-dnr.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ImportDnrComponent  extends AbstractImport implements OnInit {
+export class ImportDnrComponent  extends AbstractImport implements OnChanges {
 
   public titleImport: string = 'Import DNR';
 
@@ -44,7 +35,7 @@ export class ImportDnrComponent  extends AbstractImport implements OnInit {
     super(actions$, store, importConfig, cdr);
   }
 
-  override ngOnInit(): void {
+  ngOnChanges(): void {
     
   }
 

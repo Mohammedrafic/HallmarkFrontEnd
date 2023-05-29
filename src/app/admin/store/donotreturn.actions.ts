@@ -77,7 +77,7 @@ export namespace DoNotReturn {
 
   export class GetDoNotReturnImportTemplate {
     static readonly type = '[donotreturn] Get DNR Import Template';
-    constructor(public payload: any[]) {}
+    constructor(public payload: any) {}
   }
 
   export class GetDoNotReturnImportTemplateSucceeded {
@@ -87,7 +87,7 @@ export namespace DoNotReturn {
 
   export class GetDoNotReturnImportErrors {
     static readonly type = '[donotreturn] Get DNR Import Errors';
-    constructor(public payload: any[]) {}
+    constructor(public payload: any) {}
   }
   
   export class GetDoNotReturnImportErrorsSucceeded {
@@ -100,7 +100,7 @@ export namespace DoNotReturn {
     constructor(public payload: Blob) {}
   }
   
-  export class UploadDoNotReturnsFileSucceeded {
+  export class UploadDoNotReturnFileSucceeded {
     static readonly type = '[donotreturn] Upload DNR File Succeeded';
     constructor(public payload: ImportResult<any>) {}
   }
