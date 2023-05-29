@@ -13,6 +13,7 @@ import { UserState } from 'src/app/store/user.state';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { FilteredUser } from '@shared/models/user.model';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-timesheets-filter-dialog',
@@ -25,18 +26,26 @@ export class TimesheetsFilterDialogComponent
   implements OnInit, OnChanges {
   @Select(TimesheetsState.timesheets)
   readonly timesheets$: Observable<TimeSheetsPage>;
+
   @Select(TimesheetsState.filterOptions)
   readonly filterOptions$: Observable<TimesheetsFilterState>;
+
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<TimesheetsFilterState>>;
+
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
+
+  @Select(AppState.getMainContentElement)
+  public readonly targetElement$: Observable<HTMLElement | null>;
 
   @Input() isAgency: boolean;
 
   public showStatuses = true;
 
   private activeTab$: Subject<void> = new Subject();
+
+  public targetElement: HTMLElement | null = null;
 
   ngOnInit(): void {
     this.initFormGroup();
@@ -46,6 +55,7 @@ export class TimesheetsFilterDialogComponent
     this.subscribeOnUserSearch();
     this.watchForPreservedFilters();
     this.watchForSwitchTabs();
+    this.getFilterTargetElement();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -115,7 +125,6 @@ export class TimesheetsFilterDialogComponent
       map(({ state }) => this.filterPreservedFilters(state)),
       takeUntil(this.componentDestroy())
     ).subscribe((state) => { 
-      console.log('watchForSwitchTabs timeSheetMissing',JSON.parse(localStorage.getItem('timeSheetMissing') || '""') as string);
       this.applyPreservedFilters(state);
     });
   }
@@ -126,5 +135,17 @@ export class TimesheetsFilterDialogComponent
     this.getPreservedContactPerson(contactEmails);
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
+  }
+
+  private getFilterTargetElement(): void {
+    this.targetElement$
+      .pipe(
+        filter((el) => !!el),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe((el: HTMLElement | null) => {
+        this.targetElement = el;
+        this.cdr.detectChanges();
+      });
   }
 }
