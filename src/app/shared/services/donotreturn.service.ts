@@ -69,4 +69,9 @@ export class DonotreturnService {
   public getDoNotCandidateListSearch(filter: any): Observable<DoNotReturnSearchCandidate[]> {
     return this.http.post<DoNotReturnSearchCandidate[]>(`/api/DoNotReturn/candidateListsearch`, filter);
   }
+
+  public getDNRImportTemplate(errorRecords: any): Observable<any> {
+    return this.http.post('/api/donotreturn/template', errorRecords, { responseType: 'blob' });
+  }
+
 }

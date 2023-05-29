@@ -29,6 +29,7 @@ public filters: DonoreturnFilters = {};
   public columnsToExport: ExportColumn[] = MasterDNRExportCols;
   public exportDonotreturn$ = new Subject<ExportedFileType>();
   public filteredItems$ = new Subject<number>();
+  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
 
   constructor(protected override store:Store) { 
     super(store)
@@ -60,6 +61,10 @@ public filters: DonoreturnFilters = {};
 
   public addDoNotReturn(): void {
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  public openImportDialog(): void {
+    this.importDialogEvent.next(true);
   }
 
 }
