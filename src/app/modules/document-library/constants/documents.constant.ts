@@ -245,7 +245,7 @@ export const DocumentLibraryColumnsAgencyDefinition = (actionCellParams: ICellRe
     },
     {
       field: documentsColumnField.OrganizationName,
-      headerName: documentsColumnHeaderText.OrganizationName,
+      headerName: documentsColumnHeaderText.AgencyName,
       ...commonColumn
     },
     {
