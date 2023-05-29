@@ -39,7 +39,6 @@ export class CandidateProfileService {
         } else {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
-        this.candidateService.setEmployeeProfileData(candidateDateInUTC);
         this.candidateService.setEmployeeHireDate(candidateDateInUTC.hireDate as string);
         this.candidateService.setTerminationDate(candidateDateInUTC.terminationDate);
         this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
@@ -54,6 +53,7 @@ export class CandidateProfileService {
   public saveCandidate(file: Blob | null, candidateId: number): Observable<void | CandidateModel> {
     return this.saveCandidateProfile(candidateId).pipe(
       mergeMap((candidate) => {
+        this.candidateService.setEmployeeProfileData(candidate);
         this.candidateProfileForm.tabUpdate$.next(candidate.id);
         if (file) {
           return this.saveCandidatePhoto(file, candidate.id);

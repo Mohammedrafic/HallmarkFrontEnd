@@ -113,9 +113,11 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   private handleOnHoldProfileStatus(): void {
     this.isOnHoldSelected = true;
     this.isTerminatedSelected = false;
+    this.candidateForm.get('holdStartDate')?.setValue(this.today);
     this.candidateForm.get('holdStartDate')?.setValidators([
       Validators.required,
       startDateValidator(this.candidateForm, 'holdEndDate'),
+      endDateValidator(this.candidateForm, 'hireDate'),
     ]);
     this.candidateForm.get('holdEndDate')?.setValidators(endDateValidator(this.candidateForm, 'holdStartDate'));
     this.removeValidatorsAndReset(['terminationDate', 'terminationReasonId']);
@@ -124,7 +126,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   private handleTerminatedProfileStatus(): void {
     this.isTerminatedSelected = true;
     this.isOnHoldSelected = false;
-    this.candidateForm.get('terminationDate')?.setValue(new Date());
+    this.candidateForm.get('terminationDate')?.setValue(this.today);
     this.candidateForm.get('terminationDate')?.setValidators(Validators.required);
     this.candidateForm.get('terminationReasonId')?.setValidators(Validators.required);
     this.removeValidatorsAndReset(['holdStartDate', 'holdEndDate']);
