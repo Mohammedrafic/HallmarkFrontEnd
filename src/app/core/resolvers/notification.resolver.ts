@@ -16,7 +16,7 @@ export class NotificationResolver implements Resolve<boolean> {
   constructor(private router: Router, private userService:UserService) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-    let routeSnapshot = state.url.split('/'+route.params['notificationId']);
+    let routeSnapshot = state.url.split('/notification/'+route.params['notificationId']);
     // console.log('state url ===>>',state.url.split('/'+route.params['notificationId']));
     return this.userService.getAlertDetailsForId(route.params['notificationId']).pipe(
       map((data) => {
@@ -30,10 +30,10 @@ export class NotificationResolver implements Resolve<boolean> {
         if(data.title){
             window.localStorage.setItem("alertTitle",JSON.stringify(data.title));
         }      
-        this.router.navigate([routeSnapshot[0]]);
+        this.router.navigate(['/ui'+routeSnapshot[0]]);
         return true;
       }),catchError(err => {
-        this.router.navigate([routeSnapshot[0]]);
+        this.router.navigate(['/ui'+routeSnapshot[0]]);
         return of(true);
       })
     );
