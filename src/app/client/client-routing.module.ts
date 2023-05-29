@@ -36,7 +36,7 @@ const routes: Routes = [
         },
       },
       {
-        path: 'order-management/:notificationId',
+        path: 'order-management/notification/:notificationId',
         component: OrderManagementContentComponent,
         resolve: [NotificationResolver],
       },
