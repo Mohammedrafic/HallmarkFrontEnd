@@ -38,7 +38,7 @@ export class ScheduleGridService {
   }
 
   public removeCandidateSlotDay(days: ScheduleDay[], date: string): ScheduleDay[] {
-    return days.filter((day: ScheduleDay) => {
+    return days?.filter((day: ScheduleDay) => {
       return day.shiftDate.split('T')[0] !== date;
     });
   }
@@ -65,7 +65,7 @@ export class ScheduleGridService {
 
     return selectedCandidateSlots;
   }
-  
+
   public createDaysForSelectedSlots (days: ScheduleDay[], scheduleDays: ScheduleItem[]): ScheduleDay[] {
     const createdDays = this.createDays(scheduleDays);
 

@@ -120,6 +120,12 @@ export class EditScheduleService {
     return skillId as number;
   }
 
+  getLocationId(locations: DropdownOption[], id: number): number | null {
+    const locationId = locations.find((item: DropdownOption) => item.value === id) ? id : null;
+
+    return locationId;
+  }
+
   getFormClass(
     selectedType: ScheduleItemType | ScheduleType,
     type: typeof ScheduleItemType | typeof ScheduleType,

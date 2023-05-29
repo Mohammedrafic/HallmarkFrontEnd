@@ -83,6 +83,10 @@ export const isFormsValid = (forms: FormGroup[]): boolean => {
   }).every((valid: boolean) => valid);
 };
 
+export const isFormTouched = (forms: FormGroup[]): boolean => {
+  return !!forms.map((form: FormGroup) => form.touched).find((touched: boolean) => touched);
+};
+
 export const getFormsList = (list: ListOfKeyForms): FormGroup[] => {
   const formList = [];
   for (const form in list) {

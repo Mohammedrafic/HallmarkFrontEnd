@@ -1,4 +1,4 @@
-<div [ngClass]="{'app-widget-wrapper':true,'with-legend' : legend,'with-orgchart' : OrgChart}">
+<div [ngClass]="{'app-widget-wrapper':true,'with-legend' : legend, 'with-position':isLTAOrderEnding}">
   <div class="app-widget-wrapper__content">
     <h3 *ngIf="title" class="app-widget-wrapper__title">{{ title }}</h3>
     <ng-container [ngTemplateOutlet]="isLoading ? loadingTemplate : regularWidgetTemplate"></ng-container>
@@ -24,7 +24,7 @@
     <div *ngIf="mapChart" class="app-widget-wrapper__map-chart">
       <ng-container [ngTemplateOutlet]="mapChart"></ng-container>
     </div>
-    <div *ngIf="positionChart" [ngClass]="{'app-widget-wrapper__position-chart':true, 'with-isLTA' : isLTAOrderEnding,'with-isCandidate' : isCandidateApplied}">
+    <div *ngIf="positionChart" [ngClass]="{'with-isCandidate' : isCandidateApplied}">
       <ng-container [ngTemplateOutlet]="positionChart"></ng-container>
     </div>
     <div *ngIf="legend" [ngClass]="{'app-widget-wrapper__legend': true, 'line-chart-legend': lineChart, 'map-chart-legend': mapChart}">

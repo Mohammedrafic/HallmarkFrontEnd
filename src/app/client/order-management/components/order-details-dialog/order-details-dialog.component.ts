@@ -20,7 +20,7 @@ import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
 import { OrderType } from '@shared/enums/order-type';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
@@ -64,6 +64,11 @@ import { PermissionService } from '../../../../security/services/permission.serv
 import { UserState } from '../../../../store/user.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
+import { CurrentUserPermission } from '@shared/models/permission.model';
+import { ReOrderState } from '@shared/components/order-reorders-container/store/re-order.state';
+import { ReOrderPage } from '@shared/components/order-reorders-container/interfaces';
+import { CandidateModel } from '../add-edit-reorder/models/candidate.model';
+import { ONBOARDED_STATUS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -116,7 +121,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public irpCandidatesCount$: Observable<number>;
 
   @Select(UserState.currentUserPermissions)
-  public currentUserPermissions$: Observable<any[]>;
+  public currentUserPermissions$: Observable<CurrentUserPermission[]>;
+
+  @Select(ReOrderState.GetReOrdersByOrderId)
+  public readonly reOrderList$: Observable<ReOrderPage | null>;
 
   public readonly isReOrderDialogOpened$: Observable<boolean> = this.isDialogOpened();
 
@@ -290,16 +298,24 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     if (this.activeSystem === this.systemType.IRP) {
       this.disabledCloseButton = !!(this.order.activeCandidatesCount && this.order.activeCandidatesCount > 0);
     }
+
+    // Disable close btn for Filled reorder or if it has onboarded candidate.
+    if (this.order?.orderType === OrderType.ReOrder && this.order.status !== OrderStatus.Filled) {
+      this.disabledCloseButton = this.order.candidates?.length
+      ? this.checkOrderCandidatesForOnboard(this.order.candidates) : false;
+      return;
+    }
   }
 
   public lockOrder(): void {
     this.store.dispatch(
       new SetLock(
         this.order.id,
-        !this.order.isLocked,
+        this.activeSystem === this.systemType.IRP ? this.order.isLocked! : !this.order.isLocked,
+        this.activeSystem === this.systemType.IRP ? !this.order.isLockedIRP : this.order.isLockedIRP!,
         {},
         `${this.order.organizationPrefix || ''}-${this.order.publicId}`,
-        this.activeSystem=== this.systemType.IRP,
+        this.activeSystem === this.systemType.IRP,
         true
       )
     );
@@ -574,5 +590,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     }
 
     return this.order.status;
+  }
+
+  private checkOrderCandidatesForOnboard(candiadtes: CandidateModel[]): boolean {
+    return candiadtes.some((candidate) => candidate.status === ONBOARDED_STATUS);
   }
 }

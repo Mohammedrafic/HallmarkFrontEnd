@@ -10,7 +10,6 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
-import { DashboardState, DashboardStateModel } from 'src/app/dashboard/store/dashboard.state';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -22,7 +21,7 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
   public cellValue: CandidatesDetailsModel;
   public valueHelper = new GridHelper();
   isMobileScreen:boolean=false;
-  @Select(DashboardState.isMobile) public readonly isMobile$: Observable<DashboardStateModel['isMobile']>;
+  @Select(AppState.isMobileScreen) public readonly isMobile$: Observable<boolean>;
 
   constructor(private store: Store, private router: Router) {}
 

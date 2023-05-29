@@ -19,7 +19,7 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { Observable, debounceTime, distinctUntilChanged, filter, map, merge, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, filter, map, merge, takeUntil } from 'rxjs';
 
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { OrderManagementService,
@@ -33,13 +33,11 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { AnalyticsApiService } from '@shared/services/analytics-api.service';
-import { FilterService } from '@shared/services/filter.service';
 import { ResizeContentService } from '@shared/services/resize-main-content.service';
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '@client/client.config';
 import { Menu, MenuItem } from '@shared/models/menu.model';
 import { User } from '@shared/models/user.model';
-import { InitPreservedFilters } from '../store/preserved-filters.actions';
 import { GetCurrentUserPermissions, GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
 import { DismissAlert, DismissAllAlerts } from '@admin/store/alerts.actions';
@@ -53,6 +51,7 @@ import {
   SetIsFirstLoadState,
   ToggleSidebarState,
   ToggleTheme,
+  SaveMainContentElement,
 } from '../store/app.actions';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { MenuItemNames } from './shell.constant';
@@ -147,6 +146,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   public sideBarMenuField: Object;
   public faTimes = faTimes as IconDefinition;
   public alerts: any;
+  public alerts$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   public alertsCount: number;
   public isToggleButtonDisable = false;
 
@@ -184,7 +184,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     private orderManagementAgencyService: OrderManagementAgencyService,
     private actions$: Actions,
     private analyticsApiService: AnalyticsApiService<string>,
-    private filterService: FilterService,
     private readonly ngZone: NgZone,
     private ResizeContentService: ResizeContentService,
     private userService: UserService,
@@ -192,8 +191,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     public elementRef: ElementRef
   ) {
     super();
-
-    this.filterService.canPreserveFilters() && store.dispatch(new InitPreservedFilters());
 
     router.events.pipe(filter((event) => event instanceof NavigationEnd), debounceTime(50)).subscribe((data: any) => {
       if (this.tree) {
@@ -222,11 +219,27 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.attachElementToResizeObserver();
     this.watchForRouterEvents();
     this.getSiteHelpUrl();
+    this.alertStateModel$
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe((alertdata) => {
+          if(alertdata != null && alertdata.length > 0){
+            this.scrollData = true;
+            this.alerts =  [...this.alerts,...alertdata];
+            this.alerts$.next(this.alerts);
+            this.showAlertSidebar = true;
+            this.alertSidebar?.show();      
+          }else{
+            this.scrollData = false;
+            this.loadMoreCotent = "No more data found!";
+          }
+
+        });
   }
 
   ngAfterViewInit(): void {
     this.hideAnalyticsSubMenuItems();
     this.getAlertsPoollingTime();
+    this.saveMainContentElement();
   }
 
   onSelectProfileMenu(event: any): void {
@@ -305,7 +318,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   selectMenuItem(menuItem: MenuItem): void {
     /** Preventing the page navigation  which are not responsive*/
-    if(this.isMobile  || this.isSmallDesktop){
+    if(this.isMobile){
       if(this.nonResponsiveMenuItesm.includes(menuItem.id))
         return;
     }
@@ -445,21 +458,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.pageNumber = 0;
     this.alerts = [];
     this.store.dispatch(new GetAlertsForCurrentUser(this.pageNumber,this.pageSize));
-    this.alertStateModel$
-    .pipe(takeUntil(this.componentDestroy()))
-    .subscribe((alertdata) => {
-      if(alertdata != null && alertdata.length > 0){
-        this.scrollData = true;
-        this.alerts =  [...this.alerts,...alertdata]; //alertdata;
-        this.showAlertSidebar = true;
-        this.alertSidebar?.show();      
-      }else{
-        this.scrollData = false;
-        this.loadMoreCotent = "No more data found!";
-      }
-
-    });
-
   }
 
   alertSideBarCloseClick(): void {
@@ -840,5 +838,9 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         this.isMobile = screen.isMobile;
         this.isSmallDesktop = screen.isDesktopSmall;
       });
+  }
+
+  private saveMainContentElement(): void {
+    this.store.dispatch(new SaveMainContentElement(this.mainContainer.nativeElement));
   }
 }

@@ -137,6 +137,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     regionId: null,
     locationId: null,
     departmentId: null,
+    skillId: null,
     orientated: null,
     date: null,
     meal: null,
@@ -454,13 +455,19 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     ).subscribe((value: number) => {
       this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations] = this.scheduleFiltersService
         .getSelectedLocatinOptions(this.scheduleFilterStructure, [value]);
-      this.scheduleForm.patchValue({ locationId: this.selectedDaySchedule?.orderMetadata?.locationId || null });
+      const locationId = this.editScheduleService.getLocationId(
+        this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations],
+        this.selectedDaySchedule?.orderMetadata?.locationId
+      );
+      const patchValue = locationId ? { locationId } : { locationId, departmentId: null, skillId: null };
+      this.scheduleForm.patchValue(patchValue);
       this.getOpenPositions();
       this.cdr.markForCheck();
     }) || null;
 
     this.unsubscribe('locationId');
     this.subscriptions['locationId'] = this.scheduleForm.get('locationId')?.valueChanges.pipe(
+      filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
       this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = this.scheduleFiltersService
@@ -469,7 +476,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
         this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments],
         this.selectedDaySchedule?.orderMetadata?.departmentId
       );
-      this.scheduleForm.patchValue({ departmentId });
+      const patchValue = departmentId ? { departmentId } : { departmentId, skillId: null };
+      this.scheduleForm.patchValue(patchValue);
       this.getOpenPositions();
       this.cdr.markForCheck();
     }) || null;
@@ -477,7 +485,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.unsubscribe('departmentId');
     this.subscriptions['departmentId'] = this.scheduleForm.get('departmentId')?.valueChanges.pipe(
       filter(Boolean),
-      switchMap((value: number) => this.scheduleApiService.getSkillsByEmployees(value, this.scheduledItem.candidate.id)),
+      switchMap((value: number) => this.scheduleApiService.getSkillsByEmployees([value], this.scheduledItem.candidate.id)),
       takeUntil(this.componentDestroy())
     ).subscribe((skills: Skill[]) => {
       const skillOption = ScheduleFilterHelper.adaptMasterSkillToOption(skills);
@@ -489,6 +497,11 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       this.getOpenPositions();
       this.cdr.markForCheck();
     }) || null;
+
+    this.unsubscribe('skillId');
+    this.subscriptions['skillId'] = this.scheduleForm.get('skillId')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => this.getOpenPositions()) || null;
   }
 
   private watchForToggleControls(): void {

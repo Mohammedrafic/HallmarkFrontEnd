@@ -34,7 +34,6 @@ export class MonthViewGridComponent extends Destroyable implements OnInit{
     const selectedMonth = this.monthPickerService.getSelectedMonth();
     const ranges: string[] = range.map((option) => option.dateText);
     this.dateList = GetGroupedDatesByWeekday(ranges, selectedMonth);
-
     this.cdr.markForCheck();
   }
 

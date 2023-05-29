@@ -2,7 +2,7 @@
 
   <ng-template [ngSwitchCase]="false">
     <div class="init-value-wrapper">
-      <span class="value-block">
+      <span class="value-block" *ngIf="fieldVisible">
         <span *ngIf="value; else timePlaceholder" class="value">{{ value | date:'H:mm': 'UTC'}}</span>
 
         <ng-template #timePlaceholder>
@@ -13,7 +13,7 @@
   </ng-template>
 
   <ng-template [ngSwitchCase]="true">
-    <div class="wrapper" [ngClass]="{'errored': control.invalid && control.touched}">
+    <div class="wrapper" [ngClass]="{'errored': control.invalid && control.touched}" *ngIf="fieldVisible">
       <ejs-timepicker
         placeholder="HH:MM"
         format="HH:mm"

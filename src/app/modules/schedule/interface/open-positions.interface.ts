@@ -24,6 +24,7 @@ export interface Positions {
   shiftId: number;
   shiftStartTime: string;
   attributes: string;
+  candidateId?: number;
 }
 
 export interface OpenPositionState {

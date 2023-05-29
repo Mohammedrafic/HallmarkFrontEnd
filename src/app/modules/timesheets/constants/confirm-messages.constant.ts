@@ -18,4 +18,6 @@ export const TimesheetConfirmMessages: CommonDialogConformMessages = {
   confirmOrderChange: 'Are you sure you want to change timesheet without saving changes?',
   confirmEdit: 'Are you sure you want to change the timesheet? This will lead to recalculating values and generating new invoice records.',
   confirmBulkApprove: 'Please note, only timesheets in Pending Approval status may be Approved.'
-}
+};
+
+export const BillRateTimeConfirm = 'You have reported hours for this date. Do you like to proceed?';

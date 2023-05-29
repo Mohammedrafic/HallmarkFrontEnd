@@ -12,7 +12,6 @@ export class OrganizationSettingsGet {
   orderPosition: number;
   validations: OrganizationSettingValidation[];
   children?: OrganizationSettingChild[];
-  irpValue: string;
   includeInIRP: boolean;
   includeInVMS: boolean;
   separateValuesInSystems: boolean;
@@ -29,12 +28,13 @@ export class OrganizationSettingChild {
   regionName?: string;
   locationId?: number;
   locationName?: string;
-  departmentId?: number;
+  departmentId?: any;
   departmentName?: string;
   isIRPConfigurationValue: boolean;
   systemType?: string | null;
   displayValue: string;
   parsedValue?: any;
+  hidden = false;
 }
 
 export class OrganizationSettingsPost {
@@ -45,6 +45,7 @@ export class OrganizationSettingsPost {
   value: string;
   locationId?: number[];
   regionId?: number[];
+  departmentId?:number[];
   isIRPConfigurationValue: boolean;
 }
 

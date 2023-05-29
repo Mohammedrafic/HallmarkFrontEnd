@@ -83,4 +83,9 @@
   </div>
 </div>
 
-<app-schedule-filters #filters [count]="totalCount" (updateScheduleFilter)="updateScheduleFilter($event)"></app-schedule-filters>
+<app-schedule-filters
+  #filters
+  [selectedCandidateId]="selectedCandidate?.id"
+  [count]="totalCount"
+  (updateScheduleFilter)="updateScheduleFilter($event)"
+></app-schedule-filters>

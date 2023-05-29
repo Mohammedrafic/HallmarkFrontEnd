@@ -40,8 +40,8 @@
         </div>
       </ng-template>
     </e-column>
-    <e-column headerText="Emp ID" field="employeeId" [visible]="false" width=80></e-column>
-    <e-column field="lastName" [headerText]="!isIRP ? 'Name' : 'Emp Name'" width=200>
+    <e-column headerText="Emp ID" field="employeeId" [visible]="false" width="100"></e-column>
+    <e-column field="lastName" [headerText]="!isIRP ? 'Name' : 'Emp Name'" width="200">
       <ng-template #template let-data>
         <div class="name-wrapper">
           <ng-container *ngIf="false">
@@ -161,9 +161,15 @@
   (pageSizeChangeEmitter)="changePageSize($event)"
 ></app-grid-pagination>
 
-<app-filter-dialog [items]="filteredItems" [count]="(candidates$ | async)?.totalCount"
-  (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()"
-  (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+<app-filter-dialog
+  [targetElement]="targetElement$ | async"
+  [items]="filteredItems"
+  [count]="(candidates$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
   <form [formGroup]="CandidateFilterFormGroup">
     <ng-container *ngIf="!isIRP && CandidateFilterFormGroup">
       <div class="bootstrap">

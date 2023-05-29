@@ -43,22 +43,22 @@
                           [isLoading]="isLoading"
                           [timeSelection]="timeSelection" [isDarkTheme]="isDarkTheme"
                           [description]="UserType==4?widgetDescriptionEnum.AGENCY_POSITIONS_BY_TYPES:widgetDescriptionEnum.POSITIONS_BY_TYPES"></app-line-chart>
-          <app-position-chart *ngSwitchCase="widgetTypeEnum.IN_PROGRESS_POSITIONS"
+          <app-position-chart *ngSwitchCase="widgetTypeEnum.IN_PROGRESS_POSITIONS"  [isLTAOrderEnding]="true"
                               [chartData]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITIONS]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.IN_PROGRESS_POSITIONS"
                               [isDarkTheme]="isDarkTheme"></app-position-chart>
-          <app-position-chart *ngSwitchCase="widgetTypeEnum.OPEN_POSITIONS"
+          <app-position-chart *ngSwitchCase="widgetTypeEnum.OPEN_POSITIONS"  [isLTAOrderEnding]="true"
                               [chartData]="widgetsData?.[widgetTypeEnum.OPEN_POSITIONS]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.OPEN_POSITIONS"
                               [isDarkTheme]="isDarkTheme"></app-position-chart>
-          <app-position-chart *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS"
+          <app-position-chart *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS"  [isLTAOrderEnding]="true"
                               [chartData]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.FILLED_POSITIONS"
                               [isDarkTheme]="isDarkTheme"></app-position-chart>
-          <app-position-chart *ngSwitchCase="widgetTypeEnum.LTA_ORDER_ENDING" [isLTAOrderEnding]="true"
+          <app-position-chart *ngSwitchCase="widgetTypeEnum.LTA_ORDER_ENDING" [isLTAOrderEnding]="false"
                               [chartData]="widgetsData?.[widgetTypeEnum.LTA_ORDER_ENDING]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.LTA_ORDER_ENDING"

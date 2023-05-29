@@ -87,7 +87,7 @@
           <div class="inline-radio-container">
             <ejs-radiobutton formControlName="isExternal" label="Search Candidate" name="isExternal" value='false' [disabled]="!isEdit ? false : true"></ejs-radiobutton>
             &nbsp;&nbsp;
-            <ejs-radiobutton formControlName="isExternal" label="Block new candidate" name="isExternal"  value='true' [disabled]="!isEdit ? false : true"></ejs-radiobutton>
+            <ejs-radiobutton formControlName="isExternal" label="Block New Candidate" name="isExternal"  value='true' [disabled]="!isEdit ? false : true"></ejs-radiobutton>
           </div>
       </div>
     </div>
@@ -218,8 +218,8 @@
     </div>
    
     <div class="input-container bootstrap">
-      <ejs-switch id="switcher" (change)="onFilterSwitcher($event);" [checked]="isFilterBlock"></ejs-switch>
-      <label for="switcher" class="switch-text"> {{isFilterBlock ? "Blocked" : "Unblocked"}}</label>
+      <ejs-switch id="filterswitcher" (change)="onFilterSwitcher($event);" [checked]="isFilterBlock"></ejs-switch>
+      <label for="filterswitcher" class="switch-text"> {{isFilterBlock ? "Blocked" : "Unblocked"}}</label>
     </div>
     <div class="form-elemet">
       <div class="group">

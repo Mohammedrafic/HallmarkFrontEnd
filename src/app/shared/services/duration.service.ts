@@ -10,10 +10,9 @@ export class DurationService {
     jobStartDateValue: Date,
     orderDates: { jobStartDate: Date | string, jobEndDate: Date | string }
   ): Date {
-    const durationInDays = DateTimeHelper.getDateDiffInDays(
-      new Date(orderDates.jobStartDate),
-      new Date(orderDates.jobEndDate)
-    );
+    const startDate = DateTimeHelper.setInitDateHours(new Date(orderDates.jobStartDate));
+    const endDate = DateTimeHelper.setInitDateHours( new Date(orderDates.jobEndDate));
+    const durationInDays = DateTimeHelper.getDateDiffInDays(startDate, endDate);
 
     return new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + durationInDays));
   }

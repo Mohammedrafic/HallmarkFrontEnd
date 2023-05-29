@@ -1,5 +1,7 @@
 import { formatDate } from '@angular/common';
 
+import { DropdownOption } from '@core/interface';
+import { OrganizationSystems } from '@organization-management/settings/settings.constant';
 import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
 import {
   OrganizationSettingChild,
@@ -20,7 +22,10 @@ export class SettingsDataAdapter {
     return [];
   }
 
-  static adaptSettings(settings: OrganizationSettingsGet[], IRPAndVMS: boolean): OrganizationSettingsGet[] {
+  static adaptSettings(
+    settings: OrganizationSettingsGet[],
+    orgSystems: typeof OrganizationSystems
+  ): OrganizationSettingsGet[] {
     SettingsDataAdapter.setParsedValues(settings);
     return settings.map((item: OrganizationSettingsGet) => {
       if (
@@ -41,15 +46,45 @@ export class SettingsDataAdapter {
       }
 
       item.children?.forEach((child: OrganizationSettingChild) => {
-        child.systemType = IRPAndVMS ? SettingsDataAdapter.getSettingChildSystemType(child) : null;
+        child.systemType = orgSystems.IRPAndVMS ? SettingsDataAdapter.getSettingChildSystemType(child) : null;
         child.displayValue = SettingsDataAdapter.getSettingChildDisplayValue(child, item.controlType);
       });
 
-      item.systemType = IRPAndVMS ? SettingsDataAdapter.getSettingSystemType(item) : null;
-      item.displayValue = SettingsDataAdapter.getSettingDisplayValue(item);
+      item.systemType = orgSystems.IRPAndVMS ? SettingsDataAdapter.getSettingSystemType(item) : null;
+      item.displayValue = SettingsDataAdapter.getSettingDisplayValue(item, orgSystems);
 
       return item;
     });
+  }
+
+  static getParentSettingValue(parentSetting: OrganizationSettingsGet, isIRP: boolean): any {
+    if (!parentSetting.children?.length) {
+      return parentSetting.value;
+    }
+
+    if (isIRP) {
+      const setting = parentSetting.children
+        .find((item: OrganizationSettingChild) => item.isIRPConfigurationValue && !item.regionId);
+
+      return setting?.value || parentSetting.value;
+    } else {
+      const setting = parentSetting.children
+        .find((item: OrganizationSettingChild) => !item.isIRPConfigurationValue && !item.regionId);
+
+      return setting?.value || parentSetting.value;
+    }
+  }
+
+  static getParsedValue(value: any): any {
+    let parsedValue: any;
+
+    try {
+      parsedValue = JSON.parse(value);
+    } catch {
+      parsedValue = undefined;
+    }
+
+    return parsedValue;
   }
 
   private static getDropDownOptionsFromString(
@@ -129,35 +164,44 @@ export class SettingsDataAdapter {
     });
   }
 
-  private static getSettingDisplayValue(setting: OrganizationSettingsGet): string {
+  private static getSettingDisplayValue(setting: OrganizationSettingsGet, orgSystems: typeof OrganizationSystems): string {
     let displayValue: string;
+
+    if (setting.separateValuesInSystems && orgSystems.IRPAndVMS) {
+      return SettingsDataAdapter.getSharedSettingDisplayValue(setting);
+    }
 
     switch (setting.controlType) {
       case OrganizationSettingControlType.Checkbox:
-        displayValue = setting.value === 'true' ? CheckboxValue.Yes : CheckboxValue.No;
+        displayValue = SettingsDataAdapter
+          .getCheckboxDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
         break;
       case OrganizationSettingControlType.Multiselect:
       case OrganizationSettingControlType.Select:
-        displayValue = setting.value.map((item: { text: string }) => item.text).join(', ');
+        displayValue = SettingsDataAdapter
+          .getMultiselectDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
         break;
       case OrganizationSettingControlType.Text:
-        displayValue = setting.value;
+        displayValue = SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP);
         break;
       case OrganizationSettingControlType.DateTime:
-        displayValue = formatDate(setting.value, 'MM/dd/yyyy', 'en-US');
+        displayValue = formatDate(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP), 'MM/dd/yyyy', 'en-US');
         break;
       case OrganizationSettingControlType.InvoiceAutoGeneration:
-        displayValue = SettingsDataAdapter.getParsedValue(setting.value)?.isEnabled ? CheckboxValue.Yes : CheckboxValue.No;
+        displayValue = SettingsDataAdapter
+          .getInvoiceDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
         break;
       case OrganizationSettingControlType.SwitchedValue:
-        displayValue = setting.parsedValue != null && setting.parsedValue.value && setting.parsedValue.isEnabled
-          ? setting.parsedValue.value : CheckboxValue.No;
+        displayValue = SettingsDataAdapter
+          .getSwitchedDisplayValue(SettingsDataAdapter.getParentSettingParsedValue(setting, orgSystems.IRP));
         break;
       case OrganizationSettingControlType.CheckboxValue:
-        displayValue = SettingsDataAdapter.getCheckboxValue(setting);
+        displayValue = SettingsDataAdapter
+          .getCheckboxValueDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
         break;
       case OrganizationSettingControlType.PayPeriod:
-        displayValue = setting.parsedValue?.isEnabled ? CheckboxValue.Yes : CheckboxValue.No;
+        displayValue = SettingsDataAdapter
+          .getPayPeriodDisplayValue(SettingsDataAdapter.getParentSettingParsedValue(setting, orgSystems.IRP));
         break;
       default:
         displayValue = '';
@@ -166,15 +210,91 @@ export class SettingsDataAdapter {
     return displayValue;
   }
 
+  private static getSharedSettingDisplayValue(setting: OrganizationSettingsGet): string {
+    if (setting.controlType === OrganizationSettingControlType.Checkbox) {
+      const irpValue = SettingsDataAdapter
+        .getCheckboxDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, true));
+      const vmsValue = SettingsDataAdapter
+        .getCheckboxDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, false));
+
+      return `${irpValue}, ${vmsValue}`;
+    }
+
+    if (
+      setting.controlType === OrganizationSettingControlType.Multiselect
+      || setting.controlType === OrganizationSettingControlType.Select
+    ) {
+      const irpValue = SettingsDataAdapter
+        .getMultiselectDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, true));
+      const vmsValue = SettingsDataAdapter
+        .getMultiselectDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, false));
+
+      return `${irpValue}, ${vmsValue}`;
+    }
+
+
+    if (setting.controlType === OrganizationSettingControlType.Text) {
+      const irpValue = SettingsDataAdapter.getParentSettingValue(setting, true);
+      const vmsValue = SettingsDataAdapter.getParentSettingValue(setting, false);
+
+      return `${irpValue}, ${vmsValue}`;
+    }
+
+    if (setting.controlType === OrganizationSettingControlType.DateTime) {
+      const irpValue = formatDate(SettingsDataAdapter.getParentSettingValue(setting, true), 'MM/dd/yyyy', 'en-US');
+      const vmsValue = formatDate(SettingsDataAdapter.getParentSettingValue(setting, false), 'MM/dd/yyyy', 'en-US');
+
+      return `${irpValue}, ${vmsValue}`;
+    }
+
+    if (setting.controlType === OrganizationSettingControlType.InvoiceAutoGeneration) {
+      const irpValue = SettingsDataAdapter
+        .getInvoiceDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, true));
+      const vmsValue = SettingsDataAdapter
+        .getInvoiceDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, false));
+
+      return `${irpValue}, ${vmsValue}`;
+    }
+
+    if (setting.controlType === OrganizationSettingControlType.SwitchedValue) {
+      const irpValue = SettingsDataAdapter
+        .getSwitchedDisplayValue(SettingsDataAdapter.getParentSettingParsedValue(setting, true));
+      const vmsValue = SettingsDataAdapter
+        .getSwitchedDisplayValue(SettingsDataAdapter.getParentSettingParsedValue(setting, false));
+
+      return `${irpValue}, ${vmsValue}`;
+    }
+
+    if (setting.controlType === OrganizationSettingControlType.CheckboxValue) {
+      const irpValue = SettingsDataAdapter
+        .getCheckboxValueDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, true));
+      const vmsValue = SettingsDataAdapter
+        .getCheckboxValueDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, false));
+
+      return `${irpValue}, ${vmsValue}`;
+    }
+
+    if (setting.controlType === OrganizationSettingControlType.PayPeriod) {
+      const irpValue = SettingsDataAdapter
+        .getPayPeriodDisplayValue(SettingsDataAdapter.getParentSettingParsedValue(setting, true));
+      const vmsValue = SettingsDataAdapter
+        .getPayPeriodDisplayValue(SettingsDataAdapter.getParentSettingParsedValue(setting, false));
+
+      return `${irpValue}, ${vmsValue}`;
+    }
+
+    return '';
+  }
+
   private static getSettingChildDisplayValue(child: OrganizationSettingChild, type: OrganizationSettingControlType): string {
     let displayValue: string;
 
     switch (type) {
       case OrganizationSettingControlType.Checkbox:
-        displayValue = child.value === 'true' ? CheckboxValue.Yes : CheckboxValue.No;
+        displayValue = SettingsDataAdapter.getCheckboxDisplayValue(child.value);
         break;
       case OrganizationSettingControlType.Multiselect:
-        displayValue = child.value.map((item: { text: string }) => item.text).join(', ');
+        displayValue = SettingsDataAdapter.getMultiselectDisplayValue(child.value);
         break;
       case OrganizationSettingControlType.Select:
         displayValue = child.value[0]?.text;
@@ -186,8 +306,7 @@ export class SettingsDataAdapter {
         displayValue = formatDate(child.value, 'MM/dd/yyyy', 'en-US');
         break;
       case OrganizationSettingControlType.SwitchedValue:
-        displayValue = child.parsedValue != null && child.parsedValue.value && child.parsedValue.isEnabled
-          ? child.parsedValue.value : CheckboxValue.No;
+        displayValue = SettingsDataAdapter.getSwitchedDisplayValue(child.parsedValue);
         break;
       default:
         displayValue = '';
@@ -196,27 +315,67 @@ export class SettingsDataAdapter {
     return displayValue;
   }
 
-  private static getCheckboxValue(setting: OrganizationSettingsGet): string {
-    if (setting.value === null) {
+  private static getCheckboxValueDisplayValue(value: string | null): string {
+    if (value === null) {
       return CheckboxValue.No;
     }
 
-    if (SettingsDataAdapter.getParsedValue(setting.value)?.isEnabled) {
+    if (SettingsDataAdapter.getParsedValue(value)?.isEnabled) {
       return CheckboxValue.Yes;
     }
 
     return CheckboxValue.No;
   }
 
-  private static getParsedValue(value: any): any {
-    let parsedValue: any;
+  private static getCheckboxDisplayValue(value: string): CheckboxValue {
+    const result = value === 'true' ? CheckboxValue.Yes : CheckboxValue.No;
 
-    try {
-      parsedValue = JSON.parse(value);
-    } catch {
-      parsedValue = undefined;
+    return result;
+  }
+
+  private static getMultiselectDisplayValue(values: DropdownOption[]): string {
+    if (!Array.isArray(values)) {
+      return '';
     }
 
-    return parsedValue;
+    const result = values.map((item: DropdownOption) => item.text).join(', ');
+
+    return result;
+  }
+
+  private static getInvoiceDisplayValue(value: string): CheckboxValue {
+    const result = SettingsDataAdapter.getParsedValue(value)?.isEnabled ? CheckboxValue.Yes : CheckboxValue.No;
+
+    return result;
+  }
+
+  private static getSwitchedDisplayValue(parsedValue: any): string {
+    const result = parsedValue != null && parsedValue.value && parsedValue.isEnabled ? parsedValue.value : CheckboxValue.No;
+
+    return result;
+  }
+
+  private static getPayPeriodDisplayValue(parsedValue: { isEnabled: boolean }): CheckboxValue {
+    const result = parsedValue?.isEnabled ? CheckboxValue.Yes : CheckboxValue.No;
+
+    return result;
+  }
+
+  private static getParentSettingParsedValue(parentSetting: OrganizationSettingsGet, isIRP: boolean): any {
+    if (!parentSetting.children?.length) {
+      return parentSetting.parsedValue;
+    }
+
+    if (isIRP) {
+      const setting = parentSetting.children
+        .find((item: OrganizationSettingChild) => item.isIRPConfigurationValue && !item.regionId);
+
+      return setting?.parsedValue || parentSetting.parsedValue;
+    } else {
+      const setting = parentSetting.children
+        .find((item: OrganizationSettingChild) => !item.isIRPConfigurationValue && !item.regionId);
+
+      return setting?.parsedValue || parentSetting.parsedValue;
+    }
   }
 }

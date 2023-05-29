@@ -10,7 +10,6 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
 import {
   DepartmentFilterState,
-  DepartmentHierarchy,
   DepartmentPayload,
   DepartmentsPage,
 } from '@client/candidates/departments/departments.model';
@@ -105,10 +104,6 @@ export class DepartmentsService {
         return EMPTY;
       })
     );
-  }
-
-  public getAssignedDepartmentHierarchy(id: number): Observable<DepartmentHierarchy> {
-    return this.http.get<DepartmentHierarchy>(`${this.baseUrl}/hierarchy/${id}`);
   }
 
   private handleHomeCostCenter<T>(source: Observable<T>): Observable<T> {

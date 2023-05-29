@@ -1,15 +1,40 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, ViewContainerRef, TemplateRef } from '@angular/core';
-import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ViewEncapsulation,
+  ChangeDetectionStrategy,
+  ViewContainerRef,
+  TemplateRef,
+} from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import type { PanelModel, DashboardLayoutComponent } from '@syncfusion/ej2-angular-layouts';
-import { Observable, takeUntil, distinctUntilChanged, switchMap, combineLatest, map, filter, BehaviorSubject, tap } from 'rxjs';
+import {
+  Observable,
+  takeUntil,
+  distinctUntilChanged, 
+  combineLatest,
+  switchMap,
+  map,
+  filter,
+  BehaviorSubject,
+  tap,
+} from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
 import lodashMap from 'lodash/fp/map';
 
 import { SetHeaderState } from '../store/app.actions';
 import { DashboardService } from './services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, GetAllSkills, SetDashboardWidgetFilter } from './store/dashboard.actions';
+import {
+  GetDashboardData,
+  SetPanels,
+  SaveDashboard,
+  ResetState,
+  GetAllSkills,
+  SetDashboardWidgetFilter,
+} from './store/dashboard.actions';
 import { DashboardState, DashboardStateModel } from './store/dashboard.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { WidgetDataDependenciesAggregatedModel } from './models/widget-data-dependencies-aggregated.model';
@@ -36,6 +61,7 @@ import { DashboartFilterDto } from './models/dashboard-filter-dto.model';
 import { User } from '@shared/models/user.model';
 import { AllOrganizationsSkill } from './models/all-organization-skill.model';
 import { AppState } from '../store/app.state';
+import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 
 @Component({
   selector: 'app-dashboard',
@@ -54,7 +80,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(DashboardState.selectedWidgets) public readonly selectedWidgets$: Observable<WidgetTypeEnum[]>;
   @Select(DashboardState.widgets) public readonly widgets$: Observable<DashboardStateModel['widgets']>;
   @Select(DashboardState.isDashboardLoading) public readonly isLoading$: Observable<DashboardStateModel['isDashboardLoading']>;
-  @Select(DashboardState.isMobile) public readonly isMobile$: Observable<DashboardStateModel['isMobile']>;
   @Select(DashboardState.getTimeSelection) public readonly timeSelection$: Observable<DashboardStateModel['positionTrendTimeSelection']>
   @Select(DashboardState.filteredItems) public readonly fileredItem$: Observable<DashboardStateModel['filteredItems']>;
   @Select(DashboardState.getAllOrganizationSkills) public readonly allOrganizationsSkills$: Observable<AllOrganizationsSkill[]>;
@@ -65,6 +90,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   @Select(SecurityState.organisations) public readonly allOrganizations$: Observable<UserStateModel['organizations']>;
 
+  @Select(AppState.isMobileScreen) public readonly isMobile$: Observable<boolean>;
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
 
@@ -80,7 +106,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   constructor(
     private readonly store: Store,
     private readonly dashboardService: DashboardService,
-    private readonly breakpointObserver: BreakpointObserver
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Dashboard', iconName: 'home' }));
@@ -156,7 +181,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   public dashboardCreatedHandler(): void {
     this.initViewChangesListener();
-    this.getIsDashboardMobileView();
+    this.setDashboardMediaQuery();
   }
 
   public handleWidgetToggleEvent({ widget, isSelected }: WidgetToggleModel): void {
@@ -232,12 +257,8 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     return lodashMap((panel: PanelModel) => panel.id as string, panels);
   }
 
-  private getIsDashboardMobileView(): void {
-    this.dashboardSFComponent.mediaQuery = 'max-width: 640px';
-    this.breakpointObserver
-      .observe([`(${this.dashboardSFComponent.mediaQuery})`])
-      .pipe(map((breakpointState: BreakpointState) => breakpointState.matches))
-      .subscribe((isMobile) => this.store.dispatch(new IsMobile(isMobile)));
+  private setDashboardMediaQuery(): void {
+    this.dashboardSFComponent.mediaQuery = BreakpointQuery.MOBILE_MAX.replace(/[()]/g, '');
   }
 
   private initViewChangesListener() {

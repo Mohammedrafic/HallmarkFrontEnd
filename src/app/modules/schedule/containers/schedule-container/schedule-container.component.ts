@@ -68,7 +68,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     isEditMode: false,
   };
 
-  private selectedCandidate: ScheduleInt.ScheduleCandidate | null;
+  selectedCandidate: ScheduleInt.ScheduleCandidate | null;
 
   constructor(
     protected override store: Store,
