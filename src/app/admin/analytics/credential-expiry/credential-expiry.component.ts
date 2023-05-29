@@ -194,12 +194,14 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
 
   private initForm(): void {
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
+    startDate.setDate(startDate.getDate() - 7);
+    let endate= new Date(Date.now())
+    endate.setDate(endate.getDate()+7);
     this.credentialExpiryForm = this.formBuilder.group(
       {
         businessIds: new FormControl({value:[],disabled:true}, [Validators.required]),
         startDate: new FormControl(startDate, [Validators.required]),
-        endDate: new FormControl(new Date(Date.now()), [Validators.required]),
+        endDate: new FormControl(endate, [Validators.required]),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),
