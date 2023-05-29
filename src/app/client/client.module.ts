@@ -37,7 +37,7 @@ import {
   User,
   UserX,
   X,
-  XCircle
+  XCircle,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -49,7 +49,7 @@ import {
   PageService,
   ResizeService,
   SortService,
-  ToolbarService
+  ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
 import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
@@ -73,7 +73,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { OrderDetailsDialogComponent } from './order-management/components/order-details-dialog/order-details-dialog.component';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { OrderDetailsContainerComponent } from './order-management/components/order-details-container/order-details-container.component';
 import { OrderCandidatesContainerComponent } from './order-management/components/order-candidates-container/order-candidates-container.component';
 import { AgGridModule } from '@ag-grid-community/angular';
@@ -117,6 +117,7 @@ import { DocumentLibraryState } from '../modules/document-library/store/state/do
 import { InputModule } from '@shared/components/form-controls/input/input.module';
 import { PreservedOrderService } from './order-management/services/preserved-order.service';
 import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
+import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-container/order-reorders-container.module';
 
 
 const gridIcons = {
@@ -171,7 +172,7 @@ const gridIcons = {
     OrderImportComponent,
     UpdateRegRateComponent,
     DoNotReturnDetailsComponent,
-    DoNotReturnGridComponent
+    DoNotReturnGridComponent,
   ],
   imports: [
     CommonModule,
@@ -218,7 +219,13 @@ const gridIcons = {
     AutoCompleteAllModule,
     NgxMaskModule,
     //STORE
-    NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState, CandidateState,DonotReturnState,DocumentLibraryState]),
+    NgxsModule.forFeature([
+      OrderManagementContentState,
+      OrganizationManagementState,
+      CandidateState,
+      DonotReturnState,
+      DocumentLibraryState,
+    ]),
     ExtensionModule,
     ImportDialogContentModule,
     ListBoxModule,
@@ -232,7 +239,8 @@ const gridIcons = {
     OrderManagementSubrowCandidatePositionModule,
     ScrollToTopModule,
     NumericTextboxModule,
-    AutoCompleteAllModule
+    AutoCompleteAllModule,
+    OrderReOrdersContainerModule,
   ],
   providers: [
     ResizeService,

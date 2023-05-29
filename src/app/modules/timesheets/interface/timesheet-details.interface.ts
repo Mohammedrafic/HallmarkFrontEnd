@@ -142,6 +142,7 @@ export interface AddRecordDto {
   description?: string,
   value?: number;
   hadLunchBreak?: boolean;
+  isTimeInNull?: boolean;
 }
 
 export interface PutRecord {

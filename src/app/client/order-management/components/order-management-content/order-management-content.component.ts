@@ -27,7 +27,7 @@ import {
 } from '@ag-grid-community/core';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { FieldSettingsModel, FilteringEventArgs, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
+import { DetailRowService, GridComponent, RowSelectEventArgs, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
@@ -225,6 +225,7 @@ import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { OutsideZone } from '@core/decorators';
 import { PreservedOrderService } from '@client/order-management/services/preserved-order.service';
+import { GetReOrdersByOrderId } from '@shared/components/order-reorders-container/store/re-order.actions';
 
 @Component({
   selector: 'app-order-management-content',
@@ -1146,7 +1147,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.gridApi = params.api;
   }
 
-  public onRowClick(event: any): void {
+  public onRowClick(event: RowSelectEventArgs): void {
     if (event.target) {
       this.orderManagementService.excludeDeployed = false;
     }
@@ -1156,24 +1157,31 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       return;
     }
 
+    const rowData = event.data as OrderManagement;
     const pagerState = { page: this.currentPage, pageSize: this.pageSize, filters: this.filters };
+
     this.store.dispatch(new SetOrderManagementPagerState(pagerState));
 
     this.rowSelected(event, this.gridWithChildRow);
+
+    if (rowData.orderType === this.orderTypes.OpenPerDiem) {
+      this.store.dispatch(new GetReOrdersByOrderId(rowData.id, this.currentPage, this.pageSize));
+    }
+
     if (!event.isInteracted) {
-      if (event.data?.isTemplate) {
+      if (rowData?.isTemplate) {
         if (!this.canCreateOrder || this.preservedOrderService.isOrderPreserved()) {
           return;
         }
-        this.navigateToOrderTemplateForm(event.data.id);
-        this.store.dispatch(new GetSelectedOrderById(event.data.id));
+        this.navigateToOrderTemplateForm(rowData.id);
+        this.store.dispatch(new GetSelectedOrderById(rowData.id));
       } else {
-        const data = isArray(event.data) ? event.data[0] : event.data;
+        const data = isArray(rowData) ? rowData[0] as OrderManagement : rowData as OrderManagement;
         this.selectedDataRow = data;
         const options = this.getDialogNextPreviousOption(data);
         this.store.dispatch(new GetOrderById(data.id, data.organizationId, options,
           this.activeSystem === OrderManagementIRPSystemId.IRP));
-        this.dispatchAgencyOrderCandidatesList(data.id, data.organizationId, !!data.irpOrderMetadata);
+        this.dispatchAgencyOrderCandidatesList(data.id, data.organizationId, !!data?.irpOrderMetadata);
         this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
         this.openChildDialog.next(false);
         this.orderPositionSelected$.next({ state: false });
@@ -1922,7 +1930,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public lockOrder(order: Order): void {
       this.store.dispatch(
-        new SetLock(order.id, this.isActiveSystemIRP ? false : !order.isLocked,  this.isActiveSystemIRP ? !order.isLockedIRP : false,this.filters, `${order.organizationPrefix || ''}-${order.publicId}`, this.isActiveSystemIRP, false)
+        new SetLock(order.id, this.isActiveSystemIRP ? order.isLocked! : !order.isLocked, this.isActiveSystemIRP ? !order.isLockedIRP : order.isLockedIRP!,this.filters, `${order.organizationPrefix || ''}-${order.publicId}`, this.isActiveSystemIRP, false)
       );
   }
 

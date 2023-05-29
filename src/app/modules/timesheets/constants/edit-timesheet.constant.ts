@@ -2,6 +2,10 @@ import { FieldType, FieldWidthStyle } from '@core/enums';
 import { RecordFields, TableColumnAlign } from '../enums';
 import { DetailsTableConfig, DialogConfig } from '../interface';
 
+export const MealBreakeName = 'hadLunchBreak';
+export const TimeInName = 'timeIn';
+export const TimeOutName = 'timeOut';
+
 export const RecordAddDialogConfig: DialogConfig = {
   timesheets: {
     title: 'Add Timesheet Record',
@@ -13,6 +17,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Long,
+        visible: true,
       },
       {
         title: 'Time in',
@@ -21,6 +26,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Short,
+        visible: true,
       },
       {
         title: 'Time out',
@@ -29,6 +35,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Short,
+        visible: true,
       },
       {
         title: 'Cost center',
@@ -39,6 +46,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         widthStyle: FieldWidthStyle.Short,
         optionsStateKey: 'costCenterOptions',
         options: [],
+        visible: true,
       },
       {
         title: 'Bill Rate Type',
@@ -49,14 +57,16 @@ export const RecordAddDialogConfig: DialogConfig = {
         widthStyle: FieldWidthStyle.Short,
         optionsStateKey: 'billRateTypes',
         options: [],
+        visible: true,
       },
       {
         title: 'No Meal Break',
-        field: 'hadLunchBreak',
+        field: MealBreakeName,
         type: FieldType.Toggle,
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Long,
+        visible: true,
       },
     ],
   },
@@ -70,6 +80,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Short,
+        visible: true,
       },
       {
         title: 'Cost center',
@@ -80,6 +91,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         widthStyle: FieldWidthStyle.Short,
         optionsStateKey: 'costCenterOptions',
         options: [],
+        visible: true,
       },
       {
         title: 'Miles',
@@ -88,6 +100,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Short,
+        visible: true,
       },
     ],
   },
@@ -101,6 +114,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Short,
+        visible: true,
       },
       {
         title: 'Cost center',
@@ -111,6 +125,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         widthStyle: FieldWidthStyle.Short,
         optionsStateKey: 'costCenterOptions',
         options: [],
+        visible: true,
       },
       {
         title: 'Description',
@@ -119,6 +134,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Long,
+        visible: true,
       },
       {
         title: 'Expenses',
@@ -127,6 +143,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Short,
+        visible: true,
       },
     ],
   },

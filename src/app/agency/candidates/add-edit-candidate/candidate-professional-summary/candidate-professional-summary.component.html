@@ -1,6 +1,8 @@
 <div class="professional-summary">
   <div class="e-card-title-wrapper">
-    <div class="e-card-title">Professional Summary</div>
+    <div class="e-card-title">Professional Summary
+      <span class="e-card-title-description">(500 characters)</span>
+    </div>
   </div>
   <form [formGroup]="formGroup">
     <div class="bootstrap">
@@ -10,7 +12,7 @@
                        formControlName="professionalSummary"
                        cssClass="professional-summary-textbox"
                        [multiline]="true"
-                       maxlength="2000">
+                       maxlength="500">
           </ejs-textbox>
         </div>
       </div>

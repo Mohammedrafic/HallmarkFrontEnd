@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { map, Observable, switchMap } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+
+import { map, Observable, switchMap } from 'rxjs';
 
 import {
   AcceptJobDTO,
@@ -34,7 +35,12 @@ import { BillRate } from '@shared/models/bill-rate.model';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { HistoricalEvent } from '@shared/models';
 import { ExportPayload } from '@shared/models/export.model';
-import { AgencyOrderManagementTabs, OrderManagementIRPSystemId, OrderManagementIRPTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import {
+  AgencyOrderManagementTabs,
+  OrderManagementIRPSystemId,
+  OrderManagementIRPTabs,
+  OrganizationOrderManagementTabs,
+} from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper } from '@core/helpers';
 import { orderFieldsConfig } from '@client/order-management/components/add-edit-order/order-fields';
@@ -431,10 +437,10 @@ export class OrderManagementContentService {
   /**
    * Get order filter data sources
    */
-  public getOrderFilterDataSources(isIRP: boolean = false): Observable<OrderFilterDataSource> {
+  public getOrderFilterDataSources(isIRP = false): Observable<OrderFilterDataSource> {
     let url = '/api/OrdersFilteringOptions/organization';
     if (isIRP) {
-      url += '/irp'
+      url += '/irp';
     }
     return this.http.get<OrderFilterDataSource>(url).pipe(
       map((data) => {
@@ -447,7 +453,12 @@ export class OrderManagementContentService {
           specialProjectCategories: 'projectType',
           reorderStatuses: 'statusText',
         };
-          return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]));
+
+        return Object.fromEntries(
+          Object.entries(data)
+            .map(([key, value]) => 
+              [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]
+            ));
       }),
     );
   }

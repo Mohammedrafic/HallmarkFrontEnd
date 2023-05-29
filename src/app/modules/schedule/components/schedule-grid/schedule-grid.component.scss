@@ -23,6 +23,10 @@
   align-items: center;
   justify-content: space-between;
 
+  @media (max-width: 1475px) {
+   padding: 12px 8px;
+  }
+
   & .left, & .right {
     display: flex;
     align-items: center;
@@ -32,11 +36,20 @@
     width: 100%;
     justify-content: end;
     gap: 24px;
+
+    @media (max-width: 1475px) {
+      gap: 6px;
+    }
   }
 
   & .candidate-autocomplete {
     width: 224px;
     margin-right: 24px;
+
+    @media (max-width: 1475px) {
+      width: 185px;
+      margin-right: 5px;
+    }
 
     & .e-input-group.e-control-wrapper {
       padding: 0;
@@ -80,6 +93,10 @@
       line-height: 18px;
       color: $primary-active-blue-10;
       cursor: pointer;
+
+      @media (max-width: 1475px) {
+        padding: 10px 12px;
+      }
 
       &:first-child {
         border-left: 1px solid $primary-active-blue-40;

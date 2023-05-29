@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AgGridModule } from '@ag-grid-community/angular';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
 import { NgxsModule } from '@ngxs/store';
 import { FeatherModule } from 'angular-feather';

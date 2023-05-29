@@ -96,7 +96,7 @@ import {
   CandidateCancellationReason,
   CandidateCancellationReasonFilter,
 } from '@shared/models/order-management.model';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { addDays, toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
