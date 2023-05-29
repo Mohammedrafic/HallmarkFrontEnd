@@ -14,7 +14,7 @@ import { Destroyable } from '@core/helpers';
 import { GRID_CONFIG } from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportPayload } from '@shared/models/export.model';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { ActionBtnOnStatus, AgencyActionBtnOnStatus,
   NewStatusDependsOnAction } from '../../constants/invoice-detail.constant';
 import { InvoicesActionBtn, InvoiceState, INVOICES_STATUSES, PaymentDialogTitle } from '../../enums';

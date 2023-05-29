@@ -14,7 +14,7 @@ export class RecordsAdapter {
       type: MapedRecordsType[type],
       deleteIds: delIds,
       records: diffs.map((item) => this.adaptRecordToPut(item)),
-    }
+    };
   }
 
   static adaptRecordAddDto(
@@ -23,9 +23,14 @@ export class RecordsAdapter {
     sheetId: number,
     type: RecordFields,
     ): AddRecordDto {
-    data.timeIn = DateTimeHelper.toUtcFormat(data.timeIn);
 
-    if (data.day) {
+    if (type === RecordFields.Time) {
+      data.timeIn = data.timeIn ? DateTimeHelper.toUtcFormat(data.timeIn) : DateTimeHelper.toUtcFormat(data.day as Date);
+      data.timeOut =  data.timeOut ?  data.timeOut : DateTimeHelper.toUtcFormat(data.day as Date);
+      data.day = DateTimeHelper.toUtcFormat(data.day as Date);
+    }
+
+    if (data.day && data.timeIn) {
       data.timeIn = this.getDateFromParts(DateTimeHelper.toUtcFormat(data.day), data.timeIn);
     }
 
@@ -105,7 +110,7 @@ export class RecordsAdapter {
       const updatedItem = diffs.find((item) => item.id === record.id);
 
       if (updatedItem) {
-        return updatedItem
+        return updatedItem;
       }
 
       return record;

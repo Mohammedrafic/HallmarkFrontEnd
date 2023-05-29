@@ -192,15 +192,12 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
           }
 
         }
-        if(payload.constructor.name === 'ShowFilterDialog'){
-          this.doNotReturnFilterForm.get(FormControlNames.BusinessUnitId)?.setValue(this.selectedOrganization.id);
-          if(this.doNotReturnFilterForm.value.currentStatus == "Blocked"){
-            this.isFilterBlock = true;
-          }
-          else{
-            this.isFilterBlock = false;
-          }
-          this.doNotReturnFilterForm.controls['currentStatus']?.markAsTouched();  
+        this.doNotReturnFilterForm.get(FormControlNames.BusinessUnitId)?.setValue(this.selectedOrganization.id);
+        if(this.doNotReturnFilterForm.value.currentStatus == "Blocked"){
+          this.isFilterBlock = true;
+        }
+        else{
+          this.isFilterBlock = false;
         }
      }
     });
@@ -449,13 +446,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   
   public onSwitcher(event: { checked: boolean }): void {
     this.blockunblockcandidate$.next(event.checked);
-   this.isBlock= event.checked;
-   this.status=this.isBlock?Candidatests.UnBlock:Candidatests.Block;
-   if(event.checked){
-      this.doNotReturnFilterForm.get('status')?.setValue('Blocked');
-    }else{
-      this.doNotReturnFilterForm.get('status')?.setValue('Unblocked');
-    }
+    this.isBlock= event.checked;
+    this.status=this.isBlock?Candidatests.UnBlock:Candidatests.Block;
   }
   
   public onFilterSwitcher(event: { checked: boolean }): void {

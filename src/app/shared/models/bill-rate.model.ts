@@ -63,6 +63,9 @@ export type BillRateOption = {
   intervalMaxRequired: boolean;
   disableMultiplier: boolean;
   disableAdditional: boolean;
+  disableMealBreak: boolean;
+  doNotRequireTime: boolean;
+  disableTime: boolean;
 };
 
 export interface BillRate {

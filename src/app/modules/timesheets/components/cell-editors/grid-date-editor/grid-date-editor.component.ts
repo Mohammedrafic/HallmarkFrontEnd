@@ -1,13 +1,15 @@
-import { AbstractControl, FormGroup } from '@angular/forms';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { AbstractControl, FormGroup } from '@angular/forms';
 
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
+import { Store } from '@ngxs/store';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-
-import { DateTimeHelper, TimesheetDateHelper } from '@core/helpers';
-import { EditFieldTypes } from '@core/enums';
 import { Subscription, takeUntil } from 'rxjs';
+
+import { EditFieldTypes } from '@core/enums';
+import { DateTimeHelper, TimesheetDateHelper } from '@core/helpers';
+import { AddRecordBillRate } from '../../../interface';
 
 @Component({
   selector: 'app-grid-date-editor',
@@ -26,9 +28,18 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
 
   public type: EditFieldTypes;
 
+  public fieldVisible = true;
+
   private controlSub: Subscription;
 
+  private rateSub: Subscription;
+
+  private timeInSub: Subscription;
+
+  private group: FormGroup;
+
   constructor(
+    private store: Store,
     private cd: ChangeDetectorRef,
   ) {
     super();
@@ -56,17 +67,19 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
 
     this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
     this.type = (params.colDef as ColDef).cellRendererParams.type;
+    this.fieldVisible = !params.data.disableTime;
+    
     this.setdateBoundsForDay(DateTimeHelper.convertDateToUtc(params.value).toISOString());
     this.setFormControl(params);
   }
 
   private setFormControl(params: ICellRendererParams): void {
     if (params.colDef?.cellRendererParams.formGroup?.[params.data.id]) {
-      const group = params.colDef?.cellRendererParams.formGroup[params.data.id] as FormGroup;
-      this.control = group.get((params.colDef as ColDef).field as string) as AbstractControl;
+      this.group = params.colDef?.cellRendererParams.formGroup[params.data.id] as FormGroup;
+      this.control = this.group.get((params.colDef as ColDef).field as string) as AbstractControl;
 
       if (this.type === EditFieldTypes.Time) {
-        if (group.get('isTimeInNull')?.value) {
+        if (this.group.get('isTimeInNull')?.value) {
           this.dateValue = null;
           this.control.patchValue(null);
           this.control.markAsTouched();
@@ -76,6 +89,10 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
 
     if (!this.controlSub && this.control) {
       this.watchForValidation();
+    }
+
+    if (!this.rateSub && this.group) {
+      this.observeBillRate();
     }
   }
 
@@ -96,5 +113,28 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
     .subscribe(() => {
       this.cd.markForCheck();
     });
+  }
+
+  private observeBillRate(): void {
+    this.rateSub = this.group.get('billRateConfigId')?.valueChanges
+    .pipe(
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe((rateId: number) => {
+      const selectedRate = this.getCurrentBillRate(rateId);
+
+      if (selectedRate && selectedRate.disableTime || selectedRate?.timeNotRequired) {
+        this.fieldVisible = false;
+        this.group.get('timeIn')?.patchValue(null);
+        this.group.get('timeOut')?.patchValue(null);
+      } else {
+        this.fieldVisible = true;
+      }
+    }) as Subscription;
+  }
+
+  private getCurrentBillRate(rateId: number): AddRecordBillRate | undefined {
+    const rates = this.store.snapshot().timesheets.billRateTypes as AddRecordBillRate[];
+    return rates.find((rate) => rate.value === rateId);
   }
 }

@@ -24,7 +24,7 @@ cssClass="dialog short"
             <ng-container [ngSwitch]="field.type">
 
               <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
-                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                <div class="input-container" [ngClass]="field.widthStyle || ''" *ngIf="field.visible">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group dropdown">
@@ -40,7 +40,7 @@ cssClass="dialog short"
               </ng-template>
 
               <ng-template [ngSwitchCase]="FieldTypes.Time">
-                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                <div class="input-container" [ngClass]="field.widthStyle || ''" *ngIf="field.visible">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group">
@@ -60,7 +60,7 @@ cssClass="dialog short"
               </ng-template>
 
               <ng-template [ngSwitchCase]="FieldTypes.TimeCalendar">
-                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                <div class="input-container" [ngClass]="field.widthStyle || ''" *ngIf="field.visible">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group">
@@ -79,7 +79,7 @@ cssClass="dialog short"
               </ng-template>
 
               <ng-template [ngSwitchCase]="FieldTypes.Input">
-                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                <div class="input-container" [ngClass]="field.widthStyle || ''" *ngIf="field.visible">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group">
@@ -94,7 +94,7 @@ cssClass="dialog short"
               </ng-template>
 
               <ng-template [ngSwitchCase]="FieldTypes.Number">
-                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                <div class="input-container" [ngClass]="field.widthStyle || ''" *ngIf="field.visible">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group">
@@ -112,7 +112,7 @@ cssClass="dialog short"
               </ng-template>
 
               <ng-template [ngSwitchCase]="FieldTypes.Date">
-                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                <div class="input-container" [ngClass]="field.widthStyle || ''" *ngIf="field.visible">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group">
@@ -132,7 +132,7 @@ cssClass="dialog short"
 
               <ng-template [ngSwitchCase]="FieldTypes.Toggle">
                 <div
-                  *ngIf="form.get('billRateConfigId')?.value !== onCallId"
+                  *ngIf="form.get('billRateConfigId')?.value !== onCallId && field.visible"
                   class="input-container flexed"
                   [ngClass]="field.widthStyle || ''"
                   >
