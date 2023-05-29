@@ -96,7 +96,7 @@
               </span>
             </ejs-tooltip>
           </p>
-          <p class="orgcount" [ngStyle]="{'color': kpiColor}"><b>{{ (nursingCount$ | async)?.perdayTotalHoursSchedule | number:'1.0-0' }}</b></p>
+          <p class="orgcount" [ngStyle]="{'color': kpiColor}"><b>{{ (nursingCount$ | async)?.perdayTotalHoursSchedule | timeDisplay }}</b></p>
         </span>
       </div>
 
