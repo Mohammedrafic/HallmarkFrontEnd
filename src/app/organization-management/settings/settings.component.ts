@@ -927,6 +927,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private setPermissionsToManageSettings(): void {
     this.settingsAppliedToPermissions.forEach((key) => {
       this.hasPermissions[key] = this.userPermission[PermissionTypes.ManageOrganizationConfigurations];
+
+      if (key === OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired]) {
+        this.hasPermissions[key] = this.userPermission[PermissionTypes.ManageDepartmentSkillRequired];
+      }
     });
   }
 
