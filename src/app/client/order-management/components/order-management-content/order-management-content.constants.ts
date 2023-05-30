@@ -165,8 +165,8 @@ export const irpAllOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Actual End Date', column: 'ActualEndDate' },
   { text: 'Position ID', column: 'PositionID' },
   { text: 'Shift', column: 'Shift' },
-  { text: 'Irp Candid', column: 'IRPCandid' },
-  { text: 'VMS Candid', column: 'VMSCan' },
+  { text: 'Irp Candid', column: 'IRPCand' },
+  { text: 'VMS Candid', column: 'VMSCand' },
   { text: 'Creation date', column: 'CreationDate' },
 ];
 
@@ -183,8 +183,8 @@ export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Actual Start Date', column: 'ActualStartDate' },
   { text: 'Actual End Date', column: 'ActualEndDate' },
   { text: 'Shift', column: 'Shift' },
-  { text: 'Irp Candid', column: 'IRPCandid' },
-  { text: 'VMS Candid', column: 'VMSCan' },
+  { text: 'Irp Candid', column: 'IRPCand' },
+  { text: 'VMS Candid', column: 'VMSCand' },
   { text: 'Creation date', column: 'CreationDate' },
 ];
 
@@ -203,8 +203,8 @@ export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Actual End Date', column: 'ActualEndDate' },
   { text: 'Position ID', column: 'PositionID' },
   { text: 'Shift', column: 'Shift' },
-  { text: 'Irp Candid', column: 'IRPCandid' },
-  { text: 'VMS Candid', column: 'VMSCan' },
+  { text: 'Irp Candid', column: 'IRPCand' },
+  { text: 'VMS Candid', column: 'VMSCand' },
   { text: 'Creation date', column: 'CreationDate' },
 ];
 
@@ -224,8 +224,8 @@ export const irpIncompleteOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Actual End Date', column: 'ActualEndDate' },
   { text: 'Position ID', column: 'PositionID' },
   { text: 'Shift', column: 'Shift' },
-  { text: 'Irp Candid', column: 'IRPCandid' },
-  { text: 'VMS Candid', column: 'VMSCan' },
+  { text: 'Irp Candid', column: 'IRPCand' },
+  { text: 'VMS Candid', column: 'VMSCand' },
   { text: 'Creation date', column: 'CreationDate' },
 ];
 

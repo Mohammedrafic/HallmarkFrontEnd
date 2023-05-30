@@ -213,7 +213,7 @@ export const GridCellsSystemIRPTabAll = (
   ...(isIRPEnabled ? [{
     ...DefaultOrderCol,
     field: 'irpCandidatesCount',
-    headerName: isIRPEnabled && !isVMSEnabled ? 'CAND.' : 'IRP CANDID',
+    headerName: isIRPEnabled && !isVMSEnabled ? 'CAND.' : 'IRP CAND',
     width: 120,
     minWidth: 120,
     maxWidth: 120,
@@ -221,7 +221,7 @@ export const GridCellsSystemIRPTabAll = (
   ...(isVMSEnabled ? [{
     ...DefaultOrderCol,
     field: 'vmsCandidatesCount',
-    headerName: 'VMS CANDID',
+    headerName: 'VMS CAND',
     width: 120,
     minWidth: 120,
     maxWidth: 120,
