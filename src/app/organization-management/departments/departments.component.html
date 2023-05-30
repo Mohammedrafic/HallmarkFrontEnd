@@ -450,7 +450,7 @@
 
     <div *ngIf="areSkillsAvailable">
       <div class="input-container">
-        <label>Primary Skill</label>
+        <label>Primary Skill <span *ngIf="isPrimarySkillRequired" class="required">*</span> </label>
         <div class="input-group multiselect">
           <ejs-multiselect
             mode="CheckBox"
