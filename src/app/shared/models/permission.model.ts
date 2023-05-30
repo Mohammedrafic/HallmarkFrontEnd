@@ -8,6 +8,7 @@ export type PermissionsTreeItem = {
   isAssignable: boolean;
   isAvailable: boolean;
   includeInIRP:boolean;
+  htmlAttributes:object
 };
 
 export type PermissionsTree = PermissionsTreeItem[];
