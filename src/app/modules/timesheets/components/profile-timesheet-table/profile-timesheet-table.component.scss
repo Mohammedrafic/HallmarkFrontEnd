@@ -48,6 +48,10 @@
     margin-left: auto;
     margin-right: 10px;
   }
+
+  &.no-right-space {
+    margin-right: 0;
+  }
 }
 
 .timesheet-table-container {

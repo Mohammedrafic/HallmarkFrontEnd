@@ -104,7 +104,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() isOrderOverlapped: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Input() isCandidatePayRateVisible: boolean;
-
+  @Input() canEditBillRate = false;
+  @Input() canEditClosedBillRate = false;
   @Input() order: Order;
 
   public override form: FormGroup;
