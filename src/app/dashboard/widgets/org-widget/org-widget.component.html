@@ -57,7 +57,7 @@
           <p class="orgcount">{{chartData?.pendingTimeSheets}}</p>
         </span>
       </div>
-      <div class="widget">
+      <div class="widget" *ngIf="selectedSystem.isIRP">
         <span class="widget__type" (mousedown)="defineMousePosition($event)"
           (click)="toSourceContent('Unassignedworkcommitment')">
           <ul>

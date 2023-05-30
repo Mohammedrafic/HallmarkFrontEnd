@@ -1,5 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ExportPayload } from '@shared/models/export.model';
 import { LogInterfacePage, LogTimeSheetHistoryPage, OrgInterfacePage } from '@shared/models/org-interface.model';
 import { Observable } from 'rxjs';
 
@@ -61,5 +62,27 @@ export class OrgInterfaceService {
         PageSize: number,
       ): Observable<LogTimeSheetHistoryPage> {
         return this.http.post<LogTimeSheetHistoryPage>(`/api/Integration/getTimesheetStagingHistory`, { RunId, OrganizationId, PageNumber, PageSize });
+      }
+
+    /**
+     * Export the list of Timesheet Data by ExportPayload
+     * @param ExportPayload
+     *
+     * @return Blob
+     */
+      public export(payload: ExportPayload): Observable<Blob> {
+        return this.http.post(`/api/integration/export`, payload, { responseType: 'blob' });
+      }
+    /**
+       * Download LogTimeSheet History File by RunId and OrganizationId
+       * @param RunId
+       * @param OrganizationId
+       * @return OrgInterfacePage
+       */
+      public logFileDownload( RunId: string | '',OrganizationId: number | 0): Observable<any> {
+        let params = new HttpParams();
+        params = params.append("RunId", RunId);   
+        params = params.append("OrganizationId", OrganizationId);   
+        return this.http.get<any>(`/api/Integration/Download`, { params: params });
       }
 }

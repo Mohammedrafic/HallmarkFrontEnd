@@ -12,6 +12,7 @@ import { OrderManagementContentComponent,
 } from './order-management/components/order-management-content/order-management-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
+import { NotificationResolver } from '@core/resolvers/notification.resolver';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -33,6 +34,11 @@ const routes: Routes = [
         data: {
           isOrganizationArea: true,
         },
+      },
+      {
+        path: 'order-management/notification/:notificationId',
+        component: OrderManagementContentComponent,
+        resolve: [NotificationResolver],
       },
       {
         path: 'associate-list',

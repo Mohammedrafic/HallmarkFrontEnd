@@ -62,6 +62,8 @@ import {
   Schedule,
   ScheduleBook,
   ScheduleBookingErrors,
+  ScheduleCandidate,
+  ScheduleDay,
   ScheduleFormFieldConfig,
 } from '../../interface';
 import { ScheduleItemsComponent } from '../schedule-items/schedule-items.component';
@@ -80,6 +82,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
 import { EditScheduleFormSourceKeys } from '../edit-schedule/edit-schedule.constants';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_MODIFIED } from '@shared/constants';
+import { ScheduleType } from '../../enums';
 import {
   EndTimeField,
   RemoveButtonToolTip,
@@ -87,7 +90,6 @@ import {
   SideBarSettings,
   StartTimeField,
 } from './create-schedules.constant';
-import { ScheduleType } from '../../enums';
 
 @Component({
   selector: 'app-create-schedule',
@@ -101,6 +103,8 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   @Input() scheduleSelectedSlots: ScheduleInt.ScheduleSelectedSlots;
   @Input() datePickerLimitations: DatePickerLimitations;
   @Input() userPermission: Permission = {};
+  @Input() isEmployee = false;
+  @Input() scheduleOnlyWithAvailability = false;
 
   @Input() set scheduleData(page: ScheduleInt.ScheduleModelPage | null) {
     if (page) {
@@ -121,6 +125,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   scheduleType: ScheduleItemType;
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
   sideBarSettings: BarSettings = SideBarSettings;
+  disableRemoveButton = false;
 
   private readonly customShiftId = -1;
   private shiftControlSubscription: Subscription | null;
@@ -151,7 +156,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    const candidates = changes['scheduleSelectedSlots']?.currentValue.candidates;
+    const candidates: ScheduleCandidate[] = changes['scheduleSelectedSlots']?.currentValue.candidates;
 
     if(candidates?.length && !this.sideBarSettings.showScheduleForm){
       this.sideBarSettings.showScheduleForm = true;
@@ -161,6 +166,14 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.getOpenPositions();
       this.createScheduleService.setOrientationControlValue(this.scheduleSelectedSlots, this.scheduleForm);
       this.sideBarSettings.showRemoveButton = this.createScheduleService.hasSelectedSlotsWithDate(candidates);
+    }
+
+    if (candidates?.length && this.isEmployee) {
+      this.disableRemoveButton = candidates[0].days.some((day: ScheduleDay) => !day.employeeCanEdit);
+    }
+
+    if(this.scheduleOnlyWithAvailability) {
+      this.updateScheduleTypesWithPermissionAvailability();
     }
   }
 
@@ -528,8 +541,13 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     this.store.dispatch(new ShowToast(MessageTypes.Success, message));
   }
 
-  private setScheduleTypesPermissions(): void {
-    this.scheduleTypes = this.createScheduleService.getScheduleTypesWithPermissions(this.scheduleTypes, this.userPermission);
+  private updateScheduleTypesWithPermissionAvailability(): void {
+    this.scheduleTypes = this.createScheduleService.getScheduleTypesWithPermissions(
+      this.scheduleTypes,
+      this.userPermission,
+      this.scheduleOnlyWithAvailability,
+      this.scheduleSelectedSlots.candidates
+    );
     this.scheduleType = this.createScheduleService.getFirstAllowedScheduleType(this.scheduleTypes);
     this.setTypesControlValue();
     this.updateScheduleDialogConfig(this.scheduleType);
@@ -537,11 +555,9 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
 
   @OutsideZone
   private setTypesControlValue(): void {
-    if(this.scheduleType !== ScheduleItemType.Book) {
       setTimeout(() => {
         this.scheduleTypesControl.setValue(this.scheduleType);
       },0);
-    }
   }
 
   private checkBookingsOverlaps(): void {
@@ -630,7 +646,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     zip(this.getShifts(), this.getUnavailabilityReasons())
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
-        this.setScheduleTypesPermissions();
+        this.updateScheduleTypesWithPermissionAvailability();
         this.cdr.markForCheck();
       });
   }

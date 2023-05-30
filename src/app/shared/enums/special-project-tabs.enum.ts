@@ -1,8 +1,8 @@
 export enum SpecialProjectTabs {
-  SpecialProjects,
-  PurchaseOrders,
   SpecialProjectCategories,
+  SpecialProjects,
   SpecialProjectsMapping,
+  PurchaseOrders,
   PurchaseOrdersMapping
 }
 

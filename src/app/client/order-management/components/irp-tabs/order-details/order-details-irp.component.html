@@ -9,6 +9,7 @@
             appValidateWithMessage
             [allowFiltering]="true"
             [dataSource]="orderTypesDataSource"
+            (change)="changeOrderType()"
             [fields]="optionFields"
           >
           </ejs-dropdownlist>

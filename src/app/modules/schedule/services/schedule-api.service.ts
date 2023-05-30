@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
+import { DateTimeHelper } from '@core/helpers';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
 import { UnavailabilityReason } from '@shared/models/unavailability-reason.model';
@@ -16,7 +17,9 @@ import * as ScheduleInt from '../interface';
 import {
   CandidateSchedules,
   DeleteScheduleRequest,
-  EmployeesFilters, OpenPositionParams, OpenPositionsList,
+  EmployeesFilters,
+  OpenPositionParams,
+  OpenPositionsList,
   Schedule,
   ScheduleBookingErrors,
   ScheduleCandidatesPage,
@@ -46,7 +49,8 @@ export class ScheduleApiService {
   }
 
   createSchedule(employeeScheduledDays: Schedule): Observable<void> {
-    return this.http.post<void>('/api/Schedules/create', employeeScheduledDays);
+    const userLocalTime = DateTimeHelper.toUtcFormat(new Date());
+    return this.http.post<void>('/api/Schedules/create', {...employeeScheduledDays, userLocalTime });
   }
 
   createBookSchedule(employeeBookDays: ScheduleInt.ScheduleBook):Observable<ScheduleBookingErrors[]> {
@@ -59,20 +63,21 @@ export class ScheduleApiService {
     );
   }
 
-  getSkillsByEmployees(departmentId: number, employeeId?: number): Observable<Skill[]> {
-    const byEmployeesId = { employeeId, departmentId };
-    const byDepartmentId = { departmentId };
+  getSkillsByEmployees(departmentIds: number[], employeeId?: number): Observable<Skill[]> {
+    const byEmployeesId = { employeeId, departmentIds };
+    const byDepartmentId = { departmentIds };
 
-    return this.http.get<Skill[]>(
+    return this.http.post<Skill[]>(
       '/api/EmployeeFilterOptions/skillsByDepartment',
-      { params: employeeId ? byEmployeesId : byDepartmentId }
+      employeeId ? byEmployeesId : byDepartmentId
     );
   }
 
   updateScheduledShift(scheduledShift: ScheduledShift, type: ScheduleType):Observable<void> {
+    const userLocalTime = DateTimeHelper.toUtcFormat(new Date());
     return this.http.post<void>(
       type === ScheduleType.Book ? '/api/Schedules/booking/update' : '/api/Schedules/schedule/update',
-      scheduledShift
+      { ...scheduledShift, userLocalTime },
     );
   }
 

@@ -1,4 +1,4 @@
-import { ColDef } from '@ag-grid-community/core';
+import { ColDef, FilterChangedEvent, GridOptions, ICellRendererParams } from '@ag-grid-community/core';
 import { Component, OnInit, ChangeDetectionStrategy, Input, OnDestroy, ViewChild, Output, EventEmitter } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -6,7 +6,7 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { LogInterface, LogTimeSheetHistory, LogTimeSheetHistoryPage } from '@shared/models/org-interface.model';
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeWhile } from 'rxjs';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { AppState } from 'src/app/store/app.state';
@@ -15,7 +15,12 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { GRID_CONFIG } from '@shared/constants';
-import { GetLogHistoryById } from 'src/app/security/store/security.actions';
+import { ExportTimeSheetList, GetLogHistoryById } from 'src/app/security/store/security.actions';
+import { ColumnDefinitionModel } from '@shared/components/grid/models';
+import { DatePipe } from '@angular/common';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { ShowExportDialog } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-log-interface-dialog',
@@ -50,10 +55,10 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
   private unsubscribe$: Subject<void> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
     
-  public totalRecordsCount: number;
+  public totalRecordsCount$: BehaviorSubject<number> =new BehaviorSubject<number>(0);
   public gridApi: any;
   private gridColumnApi: any;
-  columnDefs: ColDef[];
+  // columnDefs: ColDef[];
   defaultColDef: ColDef = DefaultUserGridColDef;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   cacheBlockSize: any;
@@ -66,134 +71,297 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
   paginationPageSize: number;
   maxBlocksInCache: any;
   sideBar = SideBarConfig;
-  timeSheetHistoryItemList: Array<LogTimeSheetHistory> | undefined;
+  timeSheetHistoryItemList: Array<LogTimeSheetHistory>=[];
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
-
   public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
   };
+
+  public readonly columnDefs: ColumnDefinitionModel[] = [
+    {
+      field: 'id',
+      hide: true,
+      filter: false,
+    },
+    {
+      headerName: 'Timesheet ID',
+      field: 'timesheetitemid',
+      minWidth: 100,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'Employee ID',
+      field: 'employeeid',
+      minWidth: 100,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'First Name',
+      field: 'fname',
+      minWidth: 100,
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params:any) => {
+        return params.data.fname === null ? '' : params.data.fname;
+      },
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'Middle Name',
+      field: 'mname',
+      minWidth: 100,
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params:any) => {
+        return params.data.mname === null ? '' : params.data.mname;
+      },
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'Last Name',
+      field: 'lname',
+      minWidth: 100,
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params:any) => {
+        return params.data.lname === null ? '' : params.data.lname;
+      },
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },    
+    {
+      headerName: 'Location Id',
+      field: 'locationId',
+      minWidth: 125,
+      sortable: false,
+      resizable: true
+    },
+    {
+      headerName: 'Worked LocationId',
+      field: 'workedlocationid',
+      minWidth: 125,
+      sortable: false,
+      resizable: true
+    }, 
+    {
+      headerName: 'Worked DeptId',
+      field: 'workedccid',
+      minWidth: 100,
+      sortable: false,
+      resizable: true
+    },  
+    {
+      headerName: 'Shift Type',
+      field: 'shiftType',
+      minWidth: 100,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    }, 
+    {
+      headerName: 'PunchIn Date',
+      field: 'punchIndate',
+      minWidth: 100,
+      filter: 'agDateColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
+          if (cellValue == null) {
+            return 0;
+          }
+          const dateAsString = this.datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateParts = dateAsString.split('/');
+          const year = Number(dateParts[2]);
+          const month = Number(dateParts[0]) - 1;
+          const day = Number(dateParts[1]);
+
+          const cellDate = new Date(year, month, day);
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
+      },
+      cellRenderer: (params: ICellRendererParams) => {
+        if(!Number.isNaN(Date.parse(params.data?.punchIndate)))
+        {
+          const str = this.datePipe?.transform(params.data.punchIndate, 'MM/dd/yyyy') as string
+          return str?.length > 0 ? str : "";
+        }else{
+          return params.data.punchIndate;
+        }
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'PunchIn Time',
+      field: 'punchIntime',
+      minWidth: 100,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'PunchOut Date',
+      field: 'punchOutdate',
+      minWidth: 100,
+      filter: 'agDateColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
+          if (cellValue == null) {
+            return 0;
+          }
+          const dateAsString = this.datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateParts = dateAsString.split('/');
+          const year = Number(dateParts[2]);
+          const month = Number(dateParts[0]) - 1;
+          const day = Number(dateParts[1]);
+
+          const cellDate = new Date(year, month, day);
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
+      },
+      cellRenderer: (params: ICellRendererParams) => {
+        if (!Number.isNaN(Date.parse(params.data?.punchOutdate))){
+          const str = this.datePipe?.transform(params.data.punchOutdate, 'MM/dd/yyyy') as string
+          return str?.length > 0 ? str : "";
+        }else{
+          return params.data.punchOutdate;
+        }
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'PunchOut Time',
+      field: 'punchOuttime',
+      minWidth: 100,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'Lunch',
+      field: 'lunch',
+      minWidth: 50,
+      sortable: false,
+      resizable: true
+    },
+    {
+      headerName: 'Total Hours',
+      field: 'totalHours',
+      minWidth: 50,
+      resizable: true
+    },    
+    {
+      headerName: 'Job Code',
+      field: 'jobcode',
+      minWidth: 150,
+      resizable: true
+    },
+    {
+      headerName: 'Deleted',
+      field: 'deleted',
+      minWidth: 150,
+      resizable: true,
+      cellRenderer: (params:any) => {
+        return params.data.deleted == "0" ? 'No' :  params.data.deleted == "1" ? 'Yes' : params.data.deleted;
+      },      
+    },
+    {
+      headerName: 'Error Description',
+      field: 'failureReason',
+      minWidth: 150,
+      resizable: true
+    },
+  ];
+  public defaultFileName: string;
+  public fileName: string;
+  public columnsToExport: ExportColumn[] = [
+    { text: 'Timesheet ID', column: 'timesheetitemid' },
+    { text: 'Employee ID', column: 'employeeid' },
+    { text: 'First Name', column: 'fname' },
+    { text: 'Middle Name', column: 'mname' },
+    { text: 'Last Name', column: 'lname' },
+    { text: 'Location Id', column: 'locationId' },
+    { text: 'Worked LocationId', column: 'workedlocationid' },
+    { text: 'Worked DeptId', column: 'workedccid'},
+    { text: 'Shift Type', column: 'shiftType' },
+    { text: 'PunchIn Date', column: 'punchIndate' },
+    { text: 'PunchIn Time', column: 'punchIntime' },
+    { text: 'PunchOut Date', column: 'punchOutdate' },
+    { text: 'PunchOut Time', column: 'punchOuttime' },
+    { text: 'Lunch', column: 'lunch' },
+    { text: 'Total Hours', column: 'totalHours' },
+    { text: 'Job Code', column: 'jobcode' },
+    { text: 'Deleted', column: 'deleted' },
+    { text: 'Error Description', column: 'failureReason' },
+  ];
   
   constructor(
-    private store: Store,
+    private store: Store,private datePipe: DatePipe,
   ) { 
     super();
-    var self = this;
-    this.frameworkComponents = {
-      buttonRenderer: ButtonRendererComponent,
-    };
-    this.rowModelType = 'serverSide';
-    this.serverSideStoreType = 'partial';
-    (this.serverSideInfiniteScroll = true), (this.serverSideFilterOnServer = true), (this.pagination = true);
-    (this.paginationPageSize = this.pageSize), (this.cacheBlockSize = this.pageSize);
-    this.maxBlocksInCache = 1;
-
-    this.columnDefs = [
-      {
-        field: 'id',
-        hide: true,
-        filter: false,
-      },
-      {
-        headerName: 'timesheetitemid',
-        field: 'timesheetitemid',
-        minWidth: 150,
-        filter: false,
-      },
-      {
-        headerName: 'employeeid',
-        field: 'employeeid',
-        minWidth: 100,
-        hide: true,
-        filter: false,
-      },
-      {
-        headerName: 'Employee Name',
-        field: 'fname',
-        minWidth: 150,
-        filter: 'agTextColumnFilter',
-        cellRenderer: (params:any) => {
-          return params.data.fname === null ? '' : params.data.fname +' '+params.data.mname === null ? '' : params.data.mname+' '+params.data.lname === null ? '' : params.data.lname;
-        }
-      }, 
-      {
-        headerName: 'shiftType',
-        field: 'shiftType',
-        minWidth: 150,
-        filter: 'agTextColumnFilter',
-      }, 
-      {
-        headerName: 'locationId',
-        field: 'locationId',
-        minWidth: 150,
-        filter: 'agTextColumnFilter',
-      },
-      {
-        headerName: 'workedccid',
-        field: 'workedccid',
-        minWidth: 150,
-        filter: 'agTextColumnFilter',
-      },  
-      {
-        headerName: 'workedlocationid',
-        field: 'workedlocationid',
-        minWidth: 150,
-        filter: 'agTextColumnFilter',
-      },     
-      {
-        headerName: 'failureReason',
-        field: 'failureReason',
-        minWidth: 250,
-        filter: 'agTextColumnFilter',
-      },
-      {
-        headerName: 'punchIn Date&Time',
-        field: 'punchIndate',
-        minWidth: 200,
-        filter: 'agTextColumnFilter',
-        cellRenderer: (params:any) => {
-          return params.data.punchIndate ? (new Date(params.data.punchIndate)).toLocaleDateString()+' '+params.data.punchIntime : '';
-        }
-      },
-      {
-        headerName: 'punchOut Date&Time',
-        field: 'punchOutdate',
-        minWidth: 200,
-        filter: 'agTextColumnFilter',
-        cellRenderer: (params:any) => {
-          return params.data.punchOutdate ? (new Date(params.data.punchOutdate)).toLocaleDateString()+' '+params.data.punchOuttime : '';
-        }
-      },
-      {
-        headerName: 'status',
-        field: 'status',
-        minWidth: 150,
-        filter: 'agTextColumnFilter',
-      },
-      {
-        headerName: 'jobId',
-        field: 'jobId',
-        minWidth: 150,
-        filter: false,
-        sortable: false,
-      },
-      {
-        headerName: 'jobcode',
-        field: 'jobcode',
-        minWidth: 150,
-        filter: false,
-        sortable: false,
-      },
-      {
-        headerName: 'Week StartDate',
-        field: 'weekStartDate',
-        minWidth: 150,
-        filter: 'agTextColumnFilter',
-        cellRenderer: (params:any) => {
-          return params.data.weekStartDate ? (new Date(params.data.weekStartDate)).toLocaleDateString() : '';
-        }
-      },
-    ];
+    var self = this;   
   }
 
   ngOnInit(): void {
@@ -207,7 +375,41 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
         disabledBodyOverflow(false);
       }
     });
+
+    if(this.selectedLog != undefined){
+      this.dispatchNewPageRequest({currentPage:this.currentPage,pageSize:this.pageSize});
+    }
+    this.logTimeSheetHistoryPage$.pipe().subscribe((data: any) => {
+      this.timeSheetHistoryItemList = data?.items;
+      this.totalRecordsCount$.next(data?.totalCount);
+      if (!this.timeSheetHistoryItemList || !this.timeSheetHistoryItemList.length) {
+        this.gridApi?.showNoRowsOverlay();
+      } else {
+        this.gridApi?.hideOverlay();
+      }
+      this.gridApi?.setRowData(this.timeSheetHistoryItemList);
+    });
+
   }
+
+  public gridOptions: GridOptions = {
+    pagination: true,
+    cacheBlockSize: this.pageSize,
+    paginationPageSize: this.pageSize,
+    columnDefs: this.columnDefs,
+    rowData: this.timeSheetHistoryItemList,
+    sideBar: this.sideBar,
+    noRowsOverlayComponent: CustomNoRowsOverlayComponent,
+    noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
+    onFilterChanged: (event: FilterChangedEvent) => {
+      if (!event.api.getDisplayedRowCount()) {
+        this.gridApi?.showNoRowsOverlay();
+      }
+      else {
+        this.gridApi?.hideOverlay();
+      }
+    }
+  };
 
   public onClose(): void {
     this.sideDialog.hide();
@@ -218,12 +420,45 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
     this.nextPreviousLogEvent.emit(next);
   }
 
+  public override customExport(): void {
+    const currentDateTime = this.generateDateTime(this.datePipe);
+    this.fileName = `TimesheetDetails ${currentDateTime}`;
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public closeExport(): void {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = `TimesheetDetails ${this.generateDateTime(this.datePipe)}`;
+    this.store.dispatch(
+      new ExportTimeSheetList(
+        new ExportPayload(
+          fileType,
+          {
+            OrganizationId: this.selectedLog.organizationId,
+            RunId: this.selectedLog.runId,
+          },
+          options
+            ? options.columns.map((val: ExportColumn) => val.column)
+            : this.columnsToExport.map((val: ExportColumn) => val.column),
+          null,
+          options?.fileName || this.defaultFileName
+        )
+      )
+    );
+  }
+
   onGridReady(params: any) {
     this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    params.api.showLoadingOverlay();
-    var datasource = this.createServerSideDatasource();
-     params.api.setServerSideDatasource(datasource);
+    this.gridApi.setRowData(this.timeSheetHistoryItemList);
   }
 
   public dispatchNewPageRequest(postData:any): void {
@@ -231,45 +466,12 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
     this.store.dispatch(new GetLogHistoryById(this.selectedLog.runId,this.selectedLog.organizationId,postData.currentPage,postData.pageSize));
   }
 
-  createServerSideDatasource() {
-    let self = this;
-    return {
-      getRows: function (params: any) {
-        setTimeout(() => {
-          self.gridApi.hideOverlay();
-          let postData = {
-            pageNumber: params.request.endRow / self.paginationPageSize,
-            pageSize: self.paginationPageSize,
-          };
-          if(postData.pageNumber > 1){
-            self.dispatchNewPageRequest(postData);
-          }
-          self.logTimeSheetHistoryPage$.pipe().subscribe((data: any) => {
-            self.timeSheetHistoryItemList = data?.items;
-            self.totalRecordsCount = data?.totalCount;
-            if (!self.timeSheetHistoryItemList || !self.timeSheetHistoryItemList.length) {
-              self.gridApi.showNoRowsOverlay();
-            } else {
-              self.gridApi.hideOverlay();
-            }
-            params.successCallback(self.timeSheetHistoryItemList, data?.totalCount || 1);
-          });
-        }, 500);
-      },
-    };
-  }
-
   onPageSizeChanged(event: any) {
     this.cacheBlockSize = Number(event.value.toLowerCase().replace('rows', ''));
     this.paginationPageSize = Number(event.value.toLowerCase().replace('rows', ''));
     if (this.gridApi != null) {
       this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace('rows', '')));
-      this.gridApi.gridOptionsWrapper.setProperty(
-        'cacheBlockSize',
-        Number(event.value.toLowerCase().replace('rows', ''))
-      );
-       var datasource = this.createServerSideDatasource();
-       this.gridApi.setServerSideDatasource(datasource);
+      this.gridApi.setRowData(this.timeSheetHistoryItemList);
     }
   }
 

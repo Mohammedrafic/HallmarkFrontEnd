@@ -26,6 +26,7 @@ export interface CommonDialogConformMessages {
   confirmOrderChange: string;
   confirmEdit: string;
   confirmBulkApprove: string;
+  recalcTimesheets: string;
 }
 
 export interface TypedValueGetterParams<T> extends ValueGetterParams {

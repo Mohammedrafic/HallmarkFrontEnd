@@ -12,6 +12,7 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
 import { DateTimeHelper } from '@core/helpers';
 import pick from 'lodash/fp/pick';
 import { CandidatesService } from '../services/candidates.service';
+import { candidateDateFields } from '../constants';
 
 @Injectable()
 export class CandidateProfileService {
@@ -26,7 +27,7 @@ export class CandidateProfileService {
   public saveCandidateProfile(candidateId: number): Observable<CandidateModel> {
     const { value } = this.candidateProfileForm.candidateForm;
     const candidate = candidateId ? { id: candidateId, ...value } : value;
-    const candidateDateInUTC = { ...candidate, ...this.convertDatesToUTC(candidate) };
+    const candidateDateInUTC = { ...candidate, ...this.convertDatesToUTC(candidate) } as CandidateModel;
     const payload = { ...candidateDateInUTC, generalNotes: this.generalNotesService.notes$.getValue() };
     const endpoint = `/api/employee/${candidateId ? 'update' : 'create'}`;
 
@@ -38,7 +39,8 @@ export class CandidateProfileService {
         } else {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
-        this.candidateService.setEmployeeHireDate(candidateDateInUTC.hireDate);
+        this.candidateService.setEmployeeHireDate(candidateDateInUTC.hireDate as string);
+        this.candidateService.setTerminationDate(candidateDateInUTC.terminationDate);
         this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
       }),
       catchError((errorResponse: HttpErrorResponse) => {
@@ -51,6 +53,7 @@ export class CandidateProfileService {
   public saveCandidate(file: Blob | null, candidateId: number): Observable<void | CandidateModel> {
     return this.saveCandidateProfile(candidateId).pipe(
       mergeMap((candidate) => {
+        this.candidateProfileForm.populateHoldEndDate(candidate);
         this.candidateProfileForm.tabUpdate$.next(candidate.id);
         if (file) {
           return this.saveCandidatePhoto(file, candidate.id);
@@ -93,21 +96,11 @@ export class CandidateProfileService {
   }
 
   private convertDatesToUTC(candidate: CandidateModel): Partial<CandidateModel> {
-    const props = [
-      'dob',
-      'hireDate',
-      'contractStartDate',
-      'contractEndDate',
-      'holdStartDate',
-      'holdEndDate',
-      'terminationDate',
-      'organizationOrientationDate',
-    ];
-    const dates = pick(props, candidate);
+    const dates = pick(candidateDateFields, candidate);
 
     return Object.fromEntries(
       Object.entries(dates).map(([key, value]: [string, any]) => {
-        return [key, value ? DateTimeHelper.toUtcFormat(value) : value];
+        return [key, value ? DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(value)) : value];
       })
     );
   }

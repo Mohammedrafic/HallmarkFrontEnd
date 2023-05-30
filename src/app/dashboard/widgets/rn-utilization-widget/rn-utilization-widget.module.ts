@@ -11,13 +11,14 @@ import { MultiselectDropdownModule } from '@shared/components/form-controls/mult
 import { ReactiveFormsModule } from '@angular/forms';
 import { RnUtilizationFormService } from './rn-utilization-widget-service';
 import { ProgressBarAllModule } from '@syncfusion/ej2-angular-progressbar';
+import { TimeDisplayPipe } from './time-display.pipe';
 
 
 
 @NgModule({
   imports: [ProgressBarAllModule, WidgetWrapperModule,CommonModule,MultiSelectModule,MultiSelectAllModule,MultiselectDropdownModule,DropDownListModule,DatePickerModule,TooltipModule,ReactiveFormsModule,FeatherModule.pick({ Info })],
    exports: [RnUtilizationWidgetComponent],
-    declarations: [RnUtilizationWidgetComponent],
+    declarations: [RnUtilizationWidgetComponent, TimeDisplayPipe],
     providers:[RnUtilizationFormService]
 })
 export class RnUtilizationWidgetModule { }

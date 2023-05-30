@@ -1,0 +1,16 @@
+<section class="job-details">
+  <app-general-order-per-diem-info [orderInformation]="order" [system]="activeSystem"></app-general-order-per-diem-info>
+</section>
+<div class="separator"></div>
+<ng-container *ngIf="order?.orderClosureReason">
+  <app-order-close-reason-info [orderInformation]="order"></app-order-close-reason-info>
+  <div class="separator"></div>
+</ng-container>
+<app-order-reorders-list
+  [isAgency]="isAgency"
+  [reOrders]="reOrders"
+  [order]="order"
+  (selectReOrder)="selectReOrder.emit($event)"
+  (editReorder)="editReorder.emit($event)"
+>
+</app-order-reorders-list>

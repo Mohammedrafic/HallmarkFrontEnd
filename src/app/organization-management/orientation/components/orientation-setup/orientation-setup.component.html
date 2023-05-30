@@ -28,9 +28,9 @@
   </div>
   <app-orientation-grid
     #orientationGrid
-    *ngIf="isActive"
+    *ngIf="isTabActive"
     gridTitle="Orientation Setup"
-    [isActive]="isActive"
+    [isActive]="isTabActive"
     (pageChange)="pageChange($event)"
     (openDialog)="openDialog($event)"
     (onEdit)="openDialog($event)"
@@ -45,7 +45,7 @@
 </section>
 
 <app-side-dialog
-  *ngIf="isActive"
+  *ngIf="isTabActive"
   header="{{ title }} Setup"
   (formSaveClicked)="saveRecord()"
   (formCancelClicked)="closeDialog()"

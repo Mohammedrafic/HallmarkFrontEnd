@@ -29,6 +29,7 @@ import {
   AssignDepartmentHierarchy,
   DateRanges,
   DepartmentAssigned,
+  DepartmentDialogState,
   DepartmentPayload,
 } from '../departments.model';
 import { DepartmentsService } from '../services/departments.service';
@@ -40,10 +41,11 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT, RECORD_ADDED, RECORD_MODIFIED, WARNING_TITLE } from '@shared/constants';
 import { CustomFormGroup } from '@core/interface';
 import { departmentName } from '../helpers/department.helper';
-import { findSelectedItems } from '@core/helpers';
+import { DateTimeHelper, findSelectedItems } from '@core/helpers';
 import { mapperSelectedItems } from '@shared/components/tiers-dialog/helper';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 
 @Component({
   selector: 'app-assign-department',
@@ -52,7 +54,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssignDepartmentComponent extends DestroyableDirective implements OnInit, OnChanges {
-  @Input() public dialogData$: BehaviorSubject<DepartmentAssigned | null>;
+  @Input() public dialogData$: BehaviorSubject<DepartmentDialogState>;
   @Input() public saveForm$: Subject<boolean>;
   @Input() public departmentHierarchy: OrganizationRegion[];
   @Input() public dateRanges: DateRanges;
@@ -60,12 +62,15 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
   public assignDepartmentForm: CustomFormGroup<AssignDepartmentFormState>;
+  public isOpen = false;
   public dataSource: AssignDepartmentHierarchy = {
     regions: [],
     locations: [],
     departments: [],
   };
 
+  public minDate: Date | undefined;
+  public maxDate: Date | undefined;
   public readonly departmentFields = OptionFields;
   public departmentId?: number | null = null;
   public isOriented$: Subject<boolean> = new Subject();
@@ -101,13 +106,17 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       this.dataSource.regions = this.departmentHierarchy;
       this.disableToggles = !this.dataSource.regions.length;
       this.deptdatas = mapperSelectedItems(mapperSelectedItems(this.dataSource.regions, 'locations'), 'departments');
-      if(this.deptdatas.length == 0){
+      if (this.deptdatas.length == 0) {
         this.disableToggles = true;
         this.dataSource.regions = [];
       } else {
-        this.disableToggles = false
+        this.disableToggles = false;
       }
       this.cdr.markForCheck();
+    }
+
+    if (changes['dateRanges']?.currentValue) {
+      this.setMinMaxDateRange(this.dateRanges);
     }
   }
 
@@ -173,26 +182,28 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   }
 
   private subscribeOnDialogData(): void {
-    this.dialogData$.pipe(debounceTime(200), takeUntil(this.destroy$)).subscribe((data) => {
-      this.departmentId = data?.id;
+    this.dialogData$
+      .pipe(
+        debounceTime(50),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(({ data, isOpen }) => {
+        this.departmentId = data?.id;
+        this.isOpen = isOpen;
 
-      if (data && this.departmentId) {
-        this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
-        this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
-        this.dataSource.departments = [
-          {
-            name: departmentName(data.departmentName, data.extDepartmentId),
-            id: data.departmentId,
-          } as OrganizationDepartment,
-        ];
-        this.isOriented$.next(data.isOriented);
-        this.departmentFormService.patchForm(this.assignDepartmentForm, data);
-        this.disableControls();
-      } else {
-        this.resetAssignDepartmentForm();
-      }
-      this.cdr.markForCheck();
-    });
+        if (!data && isOpen) {
+          this.setMinMaxDateRange(this.dateRanges);
+        } else if (data && this.departmentId) {
+          this.setupDialogState(data);
+          this.setDataSource(data);
+          this.isOriented$.next(data.isOriented);
+          this.departmentFormService.patchForm(this.assignDepartmentForm, data);
+          this.disableControls();
+        } else {
+          this.resetAssignDepartmentForm();
+        }
+        this.cdr.markForCheck();
+      });
   }
 
   private disableControls(): void {
@@ -218,6 +229,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         this.resetAssignDepartmentForm();
         const MESSAGE = this.departmentId ? RECORD_MODIFIED : RECORD_ADDED;
         this.store.dispatch([new ShowSideDialog(false), new ShowToast(MessageTypes.Success, MESSAGE)]);
+        this.isOpen = false;
         this.departmentId = null;
         this.refreshGrid.emit();
       });
@@ -266,7 +278,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         const selectedRegions: OrganizationRegion[] = value?.length
           ? findSelectedItems(value, this.departmentHierarchy)
           : [];
-        this.dataSource.locations = mapperSelectedItems(selectedRegions, 'locations');
+        this.dataSource.locations = getIRPOrgItems(mapperSelectedItems(selectedRegions, 'locations'));
         this.departmentFormService.resetControls(this.assignDepartmentForm, ['locationIds', 'departmentIds']);
         this.cdr.markForCheck();
       });
@@ -283,7 +295,9 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         const selectedLocations: OrganizationLocation[] = value?.length
           ? findSelectedItems(value, this.dataSource.locations)
           : [];
-        const departments = mapperSelectedItems(selectedLocations, 'departments') as OrganizationDepartment[];
+        const departments = getIRPOrgItems(
+          mapperSelectedItems(selectedLocations, 'departments') as OrganizationDepartment[]
+        );
         this.dataSource.departments = departments.map((department) => ({
           ...department,
           name: departmentName(department.name, department.extDepartmentId ?? ''),
@@ -319,5 +333,32 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       this.departmentFormService.addRemoveValidator(orientationDateControl, isOriented);
       this.cdr.markForCheck();
     });
+  }
+
+  private setMinMaxDateRange({ min, max }: DateRanges): void {
+    this.minDate = min;
+    this.maxDate = max;
+  }
+
+  private setupDialogState(data: DepartmentAssigned): void {
+    const { workCommitmentStartDate, workCommitmentEndDate } = data;
+    const minDate = workCommitmentStartDate
+      ? DateTimeHelper.convertDateToUtc(workCommitmentStartDate)
+      : undefined;
+    const maxDate = workCommitmentEndDate
+      ? DateTimeHelper.convertDateToUtc(workCommitmentEndDate)
+      : undefined;
+    this.setMinMaxDateRange({ min: minDate, max: maxDate });
+  }
+
+  private setDataSource(data: DepartmentAssigned): void {
+    this.dataSource.regions = [{ name: data.regionName, id: data.regionId } as OrganizationRegion];
+    this.dataSource.locations = [{ name: data.locationName, id: data.locationId } as OrganizationLocation];
+    this.dataSource.departments = [
+      {
+        name: departmentName(data.departmentName, data.extDepartmentId),
+        id: data.departmentId,
+      } as OrganizationDepartment,
+    ];
   }
 }

@@ -7,6 +7,7 @@
   flex-flow: column;
   padding: 24px;
   height: calc(100% - 1px);
+  overflow-y: auto;
 }
 
 .sidebar-header,
@@ -17,6 +18,10 @@
 
 app-schedule-items {
   flex: 1 1 auto;
+}
+
+app-schedule-open-positions {
+  flex-grow: 1;
 }
 
 .sidebar-header {
@@ -59,9 +64,19 @@ app-schedule-items {
         margin-left: 0;
       }
 
-      &:hover,
-      &:active {
+      &:hover:not([disabled]),
+      &:active:not([disabled]) {
         opacity: 0.8;
+      }
+
+      &:disabled {
+        color: $secondary-dark-blue-30 !important;
+        border-color: $secondary-dark-blue-40 !important;
+        background-color: $secondary-dark-blue-50 !important;
+
+        i-feather {
+          color: $secondary-dark-blue-30;
+        }
       }
     }
   }

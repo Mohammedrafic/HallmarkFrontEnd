@@ -18,7 +18,8 @@ export interface ScheduleDay {
   endTime: string;
   shiftDate: string;
   startTime: string;
-  scheduleType: ScheduleType
+  scheduleType: ScheduleType;
+  employeeCanEdit: boolean;
 }
 
 export interface ScheduleCandidate {
@@ -40,6 +41,7 @@ export interface ScheduleCandidate {
   isOriented: boolean;
   fullName?: string;
   workCommitmentText?: string;
+  isOnHold: boolean;
 }
 
 export interface LtaAssignment {
@@ -66,6 +68,7 @@ export interface ScheduleItem {
   shiftId: number;
   floated: boolean;
   attributes: ScheduleItemAttributes;
+  employeeCanEdit: boolean;
   orderMetadata: {
     orderType: IrpOrderType;
     location: string;
@@ -109,6 +112,7 @@ export interface ScheduleDateItem {
   departmentStartDate: string;
   departmentEndDate: string;
   isDisabled?: boolean;
+  isOnHold: boolean;
 }
 
 export interface ScheduledItem {
@@ -137,6 +141,11 @@ export interface ScheduleEventConfig {
   shortTitle?: string;
   ltaOrder?: boolean;
   additionalAttributes?: string;
+}
+
+export interface DayCardConfig {
+  source: ScheduleEventConfig[];
+  tooltips: string[];
 }
 
 export interface ScheduleMonthCardConfig {
@@ -204,6 +213,7 @@ export interface EmployeesFilters {
   startDate: string | Date;
   endDate: string | Date;
   departmentsIds: number[];
+  userLocalTime: string;
 }
 
 export interface DatesByWeekday {

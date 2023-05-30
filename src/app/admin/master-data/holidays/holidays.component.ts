@@ -47,7 +47,7 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
   public maxDate = new Date(2099, 11, 31);
   public yearsList: number[] = [];
   public format = {
-    type:'date', format: 'MM/dd/yyyy hh:mm a'
+    type:'date', format: 'MM/dd/yyyy HH:mm'
   };
   public showForm = true;
   public columnsToExport: ExportColumn[] = [

@@ -84,6 +84,13 @@
 
 .input-container {
   margin-bottom: 15px;
+  .checkbox-container {
+    margin-top: 8px;
+
+    ejs-checkbox {
+      margin-right: 16px;
+    }
+  }
 }
 
 .radio-container {
@@ -172,6 +179,10 @@
 
     &.number-of-positions {
       width: 80%;
+
+      @media #{$max-mobile} {
+        width: 100%;
+      }
     }
 
     &:nth-child(n + 2) {
@@ -305,18 +316,6 @@
 
     & .ag-row.ag-row-level-1.ag-full-width-row {
       background: $secondary-dark-blue-50 !important;
-    }
-
-    .empty-table {
-      .ag-body-viewport {
-        height: 100px;
-        background: $secondary-dark-blue-45;
-      }
-
-      & .ag-overlay-wrapper.ag-overlay-no-rows-wrapper {
-        font-size: 14px !important;
-        color: $secondary-dark-blue-30 !important;
-      }
     }
   }
 }
@@ -455,7 +454,18 @@
       z-index: 1100;
     }
   }
+
+  .row {
+    flex-direction: column;
+
+    .input-container {
+      &:nth-child(n + 2) {
+        margin-left: 0;
+      }
+    }
+  }
 }
+
 .e-gridwithchildrow{
   height: 100% !important;
   .e-gridcontent{

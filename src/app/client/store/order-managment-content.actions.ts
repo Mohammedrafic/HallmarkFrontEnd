@@ -13,7 +13,11 @@ import {
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { ExportPayload } from '@shared/models/export.model';
-import { OrderManagementIRPSystemId, OrderManagementIRPTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import {
+  OrderManagementIRPSystemId,
+  OrderManagementIRPTabs,
+  OrganizationOrderManagementTabs,
+} from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { ImportedOrder, OrderImportResult } from '@shared/models/imported-order.model';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
@@ -26,6 +30,11 @@ export class GetOrders {
 export class GetIRPOrders {
   static readonly type = '[order management] Get IRP Orders';
   constructor(public payload: OrderManagementFilter | object) {}
+}
+
+export class GetOrdersJourney {
+  static readonly type = '[order management] Get Orders Journey';
+  constructor(public payload: OrderManagementFilter | object, public isIncomplete?: boolean | undefined) {}
 }
 
 export class ClearOrders {
@@ -49,6 +58,7 @@ export class SetLock {
   constructor(
     public id: number,
     public lockStatus: boolean,
+    public lockStatusIRP: boolean,
     public filters: OrderFilter = {},
     public prefixId: string,
     public isIrp: boolean,
@@ -81,7 +91,8 @@ export class GetIrpOrderCandidates {
     public organizationId: number,
     public pageNumber: number,
     public pageSize: number,
-    public isAvailable: boolean
+    public isAvailable: boolean,
+    public searchTerm?: any
   ) {}
 }
 
@@ -280,6 +291,11 @@ export class GetOrderFilterDataSources {
   constructor(public isIRP?: boolean) {}
 }
 
+export class ClearOrderFilterDataSources {
+  static readonly type = '[order management] Clear Order Filter Data Sources';
+  constructor() {}
+}
+
 export class GetHistoricalData {
   static readonly type = '[order management] Get Historical Data';
   constructor(public organizationId: number, public candidateJobId: number) {}
@@ -298,6 +314,12 @@ export class ExportIRPOrders {
   static readonly type = '[order management] Export IRPOrders list';
   constructor(public payload: ExportPayload,public tab: OrderManagementIRPTabs)  {}
 }
+
+export class ExportOrdersJourney {
+  static readonly type = '[order management] Export Orders Journey list';
+  constructor(public payload: ExportPayload)  {}
+}
+
 
 export class ClearSuggestions {
   static readonly type = '[order management] Clear Suggestions';
@@ -390,7 +412,12 @@ export class UpdateRegRateSucceeded {
   constructor(public payload: UpdateRegrateModel) {}
 }
 
-export class GetCandidateCancellationReason{
+export class GetCandidateCancellationReason {
   static readonly type ='[order management] Get Candidate Cancellation Reason';
   constructor(public payload:CandidateCancellationReasonFilter){}
+}
+
+export class GetAllShifts{
+  static readonly type ='[order management] Get All Shifts';
+  constructor(){}
 }

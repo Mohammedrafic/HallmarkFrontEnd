@@ -1,27 +1,27 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { Observable, switchMap, takeUntil } from 'rxjs';
+import { filter, Observable, switchMap, takeUntil } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
+import { DateTimeHelper } from '@core/helpers';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { Permission } from '@core/interface';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
-import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+import { SettingsViewService } from '@shared/services';
+import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from '../../../../store/app.actions';
 import { ScheduleGridAdapter } from '../../adapters';
-import { FilterErrorMessage, TabListConfig } from '../../constants';
-import { ActiveTabIndex } from '../../enums';
+import { FilterErrorMessage } from '../../constants';
 import * as ScheduleInt from '../../interface';
 import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { ScheduledItem, SelectedCells, SideBarSettings } from '../../interface';
 import { GetScheduleFilterByEmployees, HasNotMandatoryFilters, HasMultipleFilters, GetScheduledShift } from '../../helpers';
-import { DateTimeHelper } from '@core/helpers';
 import { ResetPageFilters } from 'src/app/store/preserved-filters.actions';
 
 @Component({
@@ -31,11 +31,6 @@ import { ResetPageFilters } from 'src/app/store/preserved-filters.actions';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleContainerComponent extends AbstractPermission implements OnInit {
-  tabsListConfig: TabsListConfig[] = TabListConfig;
-
-  activeTabIndex: ActiveTabIndex = ActiveTabIndex.Scheduling;
-
-  tabIndex = ActiveTabIndex;
 
   scheduleData: ScheduleInt.ScheduleModelPage | null;
 
@@ -59,12 +54,14 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   isEmployee = false;
 
+  scheduleOnlyWithAvailability = false;
+
   sideBarSettings: SideBarSettings = {
     isOpen: false,
     isEditMode: false,
   };
 
-  private selectedCandidate: ScheduleInt.ScheduleCandidate | null;
+  selectedCandidate: ScheduleInt.ScheduleCandidate | null;
 
   constructor(
     protected override store: Store,
@@ -73,6 +70,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     private filterService: ScheduleFiltersService,
     private scheduleFiltersService: ScheduleFiltersService,
     private createScheduleService: CreateScheduleService,
+    private settingService: SettingsViewService,
   ) {
     super(store);
 
@@ -89,10 +87,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   public override ngOnDestroy(): void {
     super.ngOnDestroy();
     this.store.dispatch(new ResetPageFilters());
-  }
-
-  changeTab(tabIndex: ActiveTabIndex): void {
-    this.activeTabIndex = tabIndex;
   }
 
   loadMoreData(pageNumber: number): void {
@@ -125,7 +119,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
  selectCells(cells: ScheduleInt.ScheduleSelectedSlots, closeBar= true): void {
-   if ((HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) && cells.dates.length) {
+   if (this.canNotSelectCells(cells)) {
      this.store.dispatch(new ShowToast(MessageTypes.Error, FilterErrorMessage));
      return;
    }
@@ -150,7 +144,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   editScheduledItem(scheduledItem: ScheduledItem): void {
-    if (HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) {
+    if ((HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) && !this.isEmployee) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, FilterErrorMessage));
       return;
     }
@@ -169,6 +163,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.scheduleFiltersService.setScheduleFiltersData(data);
     this.changeFilters(data.filters, data.skipDataUpdate);
     this.appliedFiltersAmount = data.filteredItems?.length;
+    this.checkIsScheduleAvailabilityTurn();
 
     if (!this.store.selectSnapshot(UserState.user)?.isEmployee) {
       this.chipsData = data.chipsData;
@@ -192,6 +187,22 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   deleteFilterItem(event: ChipDeleteEventType): void {
     this.filterService.deleteInlineChip(event);
+  }
+
+  private checkIsScheduleAvailabilityTurn(): void {
+    if(this.scheduleFilters?.locationIds?.length) {
+      this.settingService.getViewSettingKey(
+        OrganizationSettingKeys.ScheduleOnlyWithAvailability,
+        OrganizationalHierarchy.Location,
+        this.scheduleFilters?.locationIds[0],
+      ).pipe(
+        filter(({ScheduleOnlyWithAvailability}) => !!ScheduleOnlyWithAvailability),
+        take(1),
+      ).subscribe(({ScheduleOnlyWithAvailability}) => {
+        this.scheduleOnlyWithAvailability = JSON.parse(ScheduleOnlyWithAvailability);
+        this.cdr.markForCheck();
+      });
+    }
   }
 
   private initScheduleData(isLoadMore = false): void {
@@ -339,5 +350,12 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       .subscribe((employeeOrganizationStructure: OrganizationStructure) => {
         this.scheduleFiltersService.setEmployeeOrganizationStructure(employeeOrganizationStructure);
       });
+  }
+
+  private canNotSelectCells(cells: ScheduleInt.ScheduleSelectedSlots): boolean {
+    const filterError = ((HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters))
+      && !!cells.dates.length);
+
+    return !this.isEmployee && !!filterError;
   }
 }

@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationWrapperService } from '@shared/services/navigation-wrapper.service';
 import { CandidateProfileService } from '@client/candidates/candidate-profile/candidate-profile.service';
 import { ActivatedRoute } from '@angular/router';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
-import { EMPTY, filter, Observable, switchMap, takeUntil } from 'rxjs';
+import { EMPTY, filter, Observable, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
@@ -12,8 +12,8 @@ import { CandidateTabsEnum } from '@client/candidates/enums';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { Store } from '@ngxs/store';
 import { SystemType } from '@shared/enums/system-type.enum';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { EMPLOYEE_SKILL_CHANGE_WARNING, WARNING_TITLE } from '@shared/constants/messages';
+import { EMPLOYEE_SKILL_CHANGE_WARNING, EMPLOYEE_TERMINATED_WARNING } from '@shared/constants/messages';
+import { ProfileStatusesEnum } from './candidate-profile.constants';
 
 @Component({
   selector: 'app-candidate-profile',
@@ -24,6 +24,12 @@ import { EMPLOYEE_SKILL_CHANGE_WARNING, WARNING_TITLE } from '@shared/constants/
 export class CandidateProfileComponent extends DestroyableDirective implements OnInit, OnDestroy {
   public photo$: Observable<Blob>;
   public readonlyMode = false;
+  public $skillsConfirmDialog = new Subject<boolean>();
+  public $statusConfirmDialog = new Subject<boolean>();
+  public showSkillConfirmDialog = false;
+  public showStatusConfirmDialog = false;
+  public employeeTerminatedWaring = EMPLOYEE_TERMINATED_WARNING;
+  public employeeSkillChangeWarning = EMPLOYEE_SKILL_CHANGE_WARNING;
 
   private filesDetails: Blob | null;
   private isRemoveLogo: boolean;
@@ -37,7 +43,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     private route: ActivatedRoute,
     private navigationWrapperService: NavigationWrapperService,
     private store: Store,
-    private confirmService: ConfirmService
+    private cd: ChangeDetectorRef,
   ) {
     super();
     this.employeeIdHandler();
@@ -77,33 +83,56 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   }
 
   private isSkillChanged(): boolean {
-    return !!(this.candidateService.employeeId && 
+    return !!(this.candidateService.employeeId &&
       (this.candidateProfileFormService.candidateForm.get('primarySkillId')?.dirty || this.candidateProfileFormService.candidateForm.get('secondarySkills')?.dirty));
   }
 
+  private isEmployeeTerminated(): boolean {
+    const profileStatusControl = this.candidateProfileFormService.candidateForm.get('profileStatus');
+    return !!(this.candidateService.employeeId &&
+      (profileStatusControl?.dirty && profileStatusControl?.value === ProfileStatusesEnum.Terminated));
+  }
+
+  private profileStatusTerminatedConfirmation(): Observable<void | CandidateModel> {
+    this.showStatusConfirmDialog = true;
+    this.cd.markForCheck();
+    return this.$statusConfirmDialog.pipe(
+      tap(() => this.showStatusConfirmDialog = false),
+      filter(Boolean),
+      switchMap(() => this.saveCandidate()),
+      take(1)
+    );
+  }
+
   private skillChangeConfirmation(): Observable<void | CandidateModel> {
-    return this.confirmService
-      .confirm(EMPLOYEE_SKILL_CHANGE_WARNING, {
-        title: WARNING_TITLE,
-        okButtonLabel: 'Yes',
-        okButtonClass: 'delete-button',
-      }).pipe(
-        filter(Boolean),
-        switchMap(() => this.saveCandidate()),
-        takeUntil(this.destroy$));
+    this.showSkillConfirmDialog = true;
+    this.cd.markForCheck();
+    return this.$skillsConfirmDialog.pipe(
+      tap(() => this.showSkillConfirmDialog = false),
+      filter(Boolean),
+      switchMap(() => this.employeeTerminationHandler()),
+      take(1)
+    );
+  }
+
+  private employeeTerminationHandler(): Observable<void | CandidateModel> {
+    if (this.isEmployeeTerminated()) {
+      return this.profileStatusTerminatedConfirmation();
+    }
+    return this.saveCandidate();
   }
 
   private skillsChangeHandler(): Observable<void | CandidateModel> {
     if (this.isSkillChanged()) {
       return this.skillChangeConfirmation();
     }
-    return this.saveCandidate();
+    return this.employeeTerminationHandler();
   }
 
   private saveCandidate(): Observable<void | CandidateModel> {
     return this.candidateProfileService
-        .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId)
-        .pipe(takeUntil(this.destroy$));
+      .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId)
+      .pipe(takeUntil(this.destroy$));
   }
 
   private hasUnsavedChanges(): boolean {
@@ -129,21 +158,19 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   }
 
   private handleEditingCandidate(): void {
-    this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } })).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      if (this.candidateId) {
-        this.candidateProfileService
-          .getCandidateById(this.candidateId)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe((candidate) => {
-            this.candidateProfileFormService.populateCandidateForm(candidate);
-            this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
-            this.candidateService.setEmployeeHireDate(candidate.hireDate);
-            this.generalNotesService.notes$.next(candidate.generalNotes);
-          });
-  
-        this.photo$ = this.candidateProfileService.getCandidatePhotoById(this.candidateId);
-      }
-    });
+    this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }))
+      .pipe(
+        filter(() => !!this.candidateId),
+        tap(() => { this.photo$ = this.candidateProfileService.getCandidatePhotoById(this.candidateId); }),
+        switchMap(() => this.candidateProfileService.getCandidateById(this.candidateId)),
+        takeUntil(this.destroy$))
+      .subscribe((candidate) => {
+        this.candidateProfileFormService.populateCandidateForm(candidate);
+        this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
+        this.candidateService.setEmployeeHireDate(candidate.hireDate as string);
+        this.candidateService.setTerminationDate(candidate.terminationDate);
+        this.generalNotesService.notes$.next(candidate.generalNotes);
+      });
   }
 
   private initSelectedTab(): void {

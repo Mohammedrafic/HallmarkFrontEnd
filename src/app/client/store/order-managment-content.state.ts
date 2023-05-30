@@ -61,9 +61,12 @@ import {
   UploadOrderImportFile,
   UploadOrderImportFileSucceeded,
   UpdateRegRateorder,
-  UpdateRegRateSucceeded,
   GetCandidateCancellationReason,
-  ExportIRPOrders
+  ExportIRPOrders,
+  ClearOrderFilterDataSources,
+  GetOrdersJourney,
+  ExportOrdersJourney,
+  GetAllShifts,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -78,6 +81,7 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementPage,
+  OrdersJourneyPage,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -97,7 +101,7 @@ import {
   updateCandidateJobMessage,
   UpdateRegularRatesucceedcount,
   PerDiemReOrdersErrorMessage,
-  TravelerContracttoPermOrdersSucceedMessage
+  TravelerContracttoPermOrdersSucceedMessage,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -124,9 +128,11 @@ import { createFormData } from '@client/order-management/helpers';
 import { PageOfCollections } from '@shared/models/page.model';
 import { UpdateRegRateService } from '@client/order-management/components/update-reg-rate/update-reg-rate.service';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
+import { ScheduleShift } from '@shared/models/schedule-shift.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
+  ordersJourneyPage: OrdersJourneyPage |null;
   selectedOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
   applicantStatuses: ApplicantStatus[];
@@ -154,12 +160,14 @@ export interface OrderManagementContentStateModel {
   extensions: any;
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
   candidateCancellationReasons:CandidateCancellationReason[]|null;
+  allShifts:ScheduleShift[]|null;
 }
 
 @State<OrderManagementContentStateModel>({
   name: 'orderManagement',
   defaults: {
     ordersPage: null,
+    ordersJourneyPage:null,
     selectedOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
@@ -190,7 +198,9 @@ export interface OrderManagementContentStateModel {
     contactDetails: null,
     extensions: null,
     irpCandidates: null,
-    candidateCancellationReasons:null
+    candidateCancellationReasons:null,
+    allShifts:null
+	
   },
 })
 @Injectable()
@@ -198,6 +208,11 @@ export class OrderManagementContentState {
   @Selector()
   static ordersPage(state: OrderManagementContentStateModel): OrderManagementPage | null {
     return state.ordersPage;
+  }
+
+  @Selector()
+  static ordersJourneyPage(state:OrderManagementContentStateModel): OrdersJourneyPage | null {
+    return state.ordersJourneyPage;
   }
 
   @Selector()
@@ -363,6 +378,11 @@ export class OrderManagementContentState {
     return state.candidateCancellationReasons || null;
   }
 
+  @Selector()
+  static getAllShifts(state: OrderManagementContentStateModel): ScheduleShift[]|null {
+    return state.allShifts || null;
+  }
+
   constructor(
     private orderManagementService: OrderManagementContentService,
     private orderManagementIrpApiService: OrderManagementIrpApiService,
@@ -409,10 +429,23 @@ export class OrderManagementContentState {
     );
   }
 
+  @Action(GetOrdersJourney, { cancelUncompleted: true })
+  GetOrdersJourney(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { payload }: GetOrdersJourney
+  ) {
+    patchState({ ordersJourneyPage: null });
+
+    return this.orderManagementService.getOrdersJourney(payload).pipe(
+      tap((orders) => {
+        patchState({ ordersJourneyPage: orders as unknown as OrdersJourneyPage });
+      }),
+    );
+  }
+
   @Action(ClearOrders)
   ClearOrders(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
-    {}: ClearOrders
+    { patchState }: StateContext<OrderManagementContentStateModel>
   ): OrderManagementContentStateModel {
     return patchState({ ordersPage: null });
   }
@@ -450,11 +483,11 @@ export class OrderManagementContentState {
   @Action(SetLock)
   SetLock(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id, lockStatus, filters, prefixId,isIrp, updateOpened,  }: SetLock
+    { id, lockStatus,lockStatusIRP, filters, prefixId,isIrp, updateOpened,  }: SetLock
   ): Observable<boolean | void> {
-    return this.orderManagementService.setLock(id, lockStatus).pipe(
+    return this.orderManagementService.setLock(id, lockStatus,lockStatusIRP).pipe(
       tap(() => {
-        const message = lockStatus ? `The Order ${prefixId} is locked` : `The Order ${prefixId} is unlocked`;
+        const message = isIrp?lockStatusIRP ? `The Order ${prefixId} is locked` : `The Order ${prefixId} is unlocked`: lockStatus ? `The Order ${prefixId} is locked` : `The Order ${prefixId} is unlocked`;
         const actions = [new LockUpdatedSuccessfully(), new ShowToast(MessageTypes.Success, message),isIrp ? new GetIRPOrders(filters): new GetOrders(filters)];
         dispatch(updateOpened ? [...actions, new GetSelectedOrderById(id)] : actions);
       }),
@@ -482,12 +515,13 @@ export class OrderManagementContentState {
   @Action(GetIrpOrderCandidates)
   GetIrpOrderCandidates(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderId, pageNumber, pageSize, isAvailable }: GetIrpOrderCandidates
+    { orderId, pageNumber, pageSize, isAvailable, searchTerm }: GetIrpOrderCandidates
   ): Observable<PageOfCollections<IrpOrderCandidate>> {
     const params: IrpCandidatesParams = {
       PageSize: pageSize,
       PageNumber: pageNumber,
       isAvailable,
+      searchTerm
     };
 
     return this.orderManagementService.getIrpCandidates(orderId, params)
@@ -918,6 +952,13 @@ export class OrderManagementContentState {
       })
     );
   }
+  
+  @Action(ClearOrderFilterDataSources)
+  ClearOrderFilterDataSources(
+    { patchState }: StateContext<OrderManagementContentStateModel>
+  ): OrderManagementContentStateModel {
+    return patchState({ orderFilterDataSources: null });
+  }
 
   @Action(GetHistoricalData)
   GetHistoricalData(
@@ -961,6 +1002,16 @@ export class OrderManagementContentState {
     );
   }
   
+  @Action(ExportOrdersJourney)
+  ExportOrdersJourney({}: StateContext<OrderManagementContentStateModel>, { payload}: ExportOrdersJourney): Observable<any> {
+    return this.orderManagementService.orderJourneyexport(payload).pipe(
+      tap((file) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
+  }
+
   @Action(DuplicateOrder)
   DuplicateOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
@@ -1096,8 +1147,17 @@ export class OrderManagementContentState {
     ) : Observable<CandidateCancellationReason[] |null>{
       return this.orderManagementService.GetCandidateCancellationReasons(payload).pipe(tap((payload: CandidateCancellationReason[]) => {
         patchState({ candidateCancellationReasons: payload });
-        return payload
+        return payload;
       }));
     }
 
+    @Action(GetAllShifts)
+    GetAllShifts(
+      { patchState } : StateContext<OrderManagementContentStateModel>, {  } : GetAllShifts
+      ) : Observable<ScheduleShift[] |null>{
+        return this.orderManagementService.getAllShifts().pipe(tap((payload:ScheduleShift[]) => {
+          patchState({ allShifts: payload });
+          return payload
+        }));
+      }
 }

@@ -14,6 +14,8 @@ import { CandidateDetailsTabs } from '@shared/enums/candidate-tabs.enum';
 import {
   CandidateDetailsPage,
   CandidatesDetailsRegions,
+  CandidatesDetailsLocations,
+  CandidatesDetailsDepartments,
   NavigationTabModel
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
@@ -28,6 +30,8 @@ interface CandidateDetailsStateModel {
   candidateSkills: MasterSkillByOrganization[];
   candidateRegions: CandidatesDetailsRegions[] | null;
   isNavigate: boolean | null;
+  candidateLocations: CandidatesDetailsLocations[] | null;
+  candidateDepartments: CandidatesDetailsDepartments[] | null;
 }
 
 @State<CandidateDetailsStateModel>({
@@ -44,6 +48,8 @@ interface CandidateDetailsStateModel {
     candidateSkills: [],
     candidateRegions: null,
     isNavigate: null,
+    candidateLocations:null,
+    candidateDepartments:null,
   },
 })
 @Injectable()
@@ -83,6 +89,15 @@ export class CandidateDetailsState {
   static candidateSkills(state: CandidateDetailsStateModel): MasterSkillByOrganization[] {
     return state.candidateSkills;
   }
+
+   @Selector()
+   static candidateLocations(state: CandidateDetailsStateModel): CandidatesDetailsLocations[] | null {
+     return state.candidateLocations;
+   }
+   @Selector()
+   static candidateDepartments(state: CandidateDetailsStateModel): CandidatesDetailsDepartments[] | null {
+     return state.candidateDepartments;
+   }
 
   constructor(private candidateDetailsApiService: CandidateDetailsApiService, private skillsService: SkillsService) {}
 

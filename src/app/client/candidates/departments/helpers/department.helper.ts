@@ -30,7 +30,17 @@ export class DepartmentHelper {
 }
 
 function createDepartmentPayload(formData: DepartmentPayload): DepartmentPayload {
-  const { departmentIds, locationIds, regionIds, startDate, endDate, isOriented, isHomeCostCenter, orientationDate } = formData;
+  const {
+    departmentIds,
+    locationIds,
+    regionIds,
+    startDate,
+    endDate,
+    isOriented,
+    isHomeCostCenter,
+    orientationDate,
+  } = formData;
+
   return {
     forceUpdate: false,
     isOriented: !!isOriented,

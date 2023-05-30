@@ -34,4 +34,6 @@ export enum PermissionTypes {
   // Credentials
   ManageOrganizationCredential= 401,
   ManuallyAddCredential = 402,
+    //View Order Journey
+    ViewOrderJourney = 8001,
 }

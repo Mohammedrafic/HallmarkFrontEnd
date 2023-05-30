@@ -457,7 +457,6 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     if (user != 0) {
       this.userGuid = user;
       this.getdata = this.store.dispatch(new GetUserSubscriptionPage(businessUnit || null, user, this.currentPage, this.pageSize, sortModel, filterModel, this.filters, this.activeSystem == OrderManagementIRPSystemId.IRP));
-      this.getErrorAlert();
     }
   }
   private dispatchUserPage(businessUnitIds: number[]) {

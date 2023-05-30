@@ -120,6 +120,7 @@
               target="#template"
               (onClose)="onContextMenuClose()"
               (beforeOpen)="onBeforeContextMenuOpen($event)"
+              (beforeClose)="onBeforeContextMenuClose($event)"
               (select)="onSubMenuItemClick($event)"
             ></ejs-contextmenu>
           </section>
@@ -214,7 +215,7 @@
 
   <div id="listcontainer" #uiElement  (scroll)="onScrollLoadData()">
     <section class="alert-body">
-      <section class="alert-panel" *ngFor="let item of alerts">
+      <section class="alert-panel" *ngFor="let item of alerts$ | async">
         <div class="alert-panel-header">
           <div class="alert-panel-header__flex-child">
             <span>
@@ -229,7 +230,7 @@
               <span>{{ item.createdAt | date: 'MM/dd/yyyy' }}</span>
             </div>
             <div>
-              <span>{{ item.createdAt | date: 'hh:mm:ss a' }}</span>
+              <span>{{ item.createdAt | date: 'HH:mm:ss' }}</span>
             </div>
           </div>
         </div>

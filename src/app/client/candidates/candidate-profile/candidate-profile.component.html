@@ -14,3 +14,15 @@
     <app-general-notes></app-general-notes>
   </div>
 </div>
+
+<app-candidate-confirm-dialog
+  *ngIf="showSkillConfirmDialog"
+  [text]="employeeSkillChangeWarning"
+  [$confirmDialog]="$skillsConfirmDialog"
+></app-candidate-confirm-dialog>
+
+<app-candidate-confirm-dialog
+  *ngIf="showStatusConfirmDialog"
+  [text]="employeeTerminatedWaring"
+  [$confirmDialog]="$statusConfirmDialog"
+></app-candidate-confirm-dialog>

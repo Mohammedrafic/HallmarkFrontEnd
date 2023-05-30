@@ -5,13 +5,14 @@ import { UserAgencyOrganization, UserAgencyOrganizationBusinessUnit } from '@sha
 import { DonotreturnService } from '@shared/services/donotreturn.service';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
-import { catchError, Observable, tap } from "rxjs";
+import { catchError, Observable, of, tap } from "rxjs";
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
 import { DoNotReturn } from './donotreturn.actions';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DoNotReturnStateModel } from '@client/do-not-return/do-not-return.interface';
-import { BLOCK_RECORD_SUCCESS, RECORD_ADDED, RECORD_ALREADY_EXISTS, RECORD_MODIFIED,CANDIDATE_UNBLOCK,CANDIDATE_BLOCK } from '@shared/constants';
+import { BLOCK_RECORD_SUCCESS, RECORD_SAVED_SUCCESS, RECORD_ALREADY_EXISTS,CANDIDATE_UNBLOCK,CANDIDATE_BLOCK } from '@shared/constants';
+import { ImportResult } from '@shared/models/import.model';
 
 @State<DoNotReturnStateModel>({
   name: 'donotreturn',
@@ -63,7 +64,7 @@ export class DonotReturnState {
       tap((payload) => {
         patchState({ isLocationLoading: false });
         if (payload.id != 0) {
-          dispatch([new DoNotReturn.UpdateDonotReturnSucceeded, new ShowToast(MessageTypes.Success, RECORD_MODIFIED)]);
+          dispatch([new DoNotReturn.UpdateDonotReturnSucceeded, new ShowToast(MessageTypes.Success, RECORD_SAVED_SUCCESS)]);
           dispatch(new DoNotReturn.GetDoNotReturnPage());
         } else {
           dispatch(new ShowToast(MessageTypes.Error, RECORD_ALREADY_EXISTS));
@@ -79,7 +80,7 @@ export class DonotReturnState {
     patchState({ isLocationLoading: true });
     return this.DonotreturnService.saveDonotReturn(donotreturn).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
-      dispatch([new DoNotReturn.SaveDonotReturnSucceeded, new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED)]);
+      dispatch([new DoNotReturn.SaveDonotReturnSucceeded, new ShowToast(MessageTypes.Success, RECORD_SAVED_SUCCESS)]);
       return payload;
     }),
       catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
@@ -109,9 +110,9 @@ export class DonotReturnState {
   }
 
   @Action(DoNotReturn.DonotreturnByPage)
-  DonotreturnByPage({ patchState }: StateContext<DoNotReturnStateModel>, { pageNumber, pageSize, filters, sortBy }: DoNotReturn.DonotreturnByPage): Observable<DoNotReturnsPage> {
+  DonotreturnByPage({ patchState }: StateContext<DoNotReturnStateModel>, { businessUnitId,pageNumber, pageSize, filters, sortBy }: DoNotReturn.DonotreturnByPage): Observable<DoNotReturnsPage> {
     patchState({ donotloadings: true });
-    return this.DonotreturnService.getDonotreturn(pageNumber, pageSize, filters, sortBy).pipe(
+    return this.DonotreturnService.getDonotreturn(businessUnitId,pageNumber, pageSize, filters, sortBy).pipe(
       tap((payload) => {
         patchState({ donotloadings: false, donotreturnpage: payload });
         return payload;
@@ -142,5 +143,71 @@ export class DonotReturnState {
       return payload
     }));
   }
+
+  @Action(DoNotReturn.GetDoNotReturnImportTemplate)
+  GetDoNotReturnImportTemplate(
+    { dispatch }: StateContext<DoNotReturnStateModel>,
+    { payload }: DoNotReturn.GetDoNotReturnImportTemplate): Observable<any> {
+    return this.DonotreturnService.getDNRImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new DoNotReturn.GetDoNotReturnImportTemplateSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(DoNotReturn.GetDoNotReturnImportErrors)
+  GetDoNotReturnImportErrors(
+    { dispatch }: StateContext<DoNotReturnStateModel>,
+    { payload }: DoNotReturn.GetDoNotReturnImportErrors
+  ): Observable<any> {
+    return this.DonotreturnService.getDNRImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new DoNotReturn.GetDoNotReturnImportErrorsSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(DoNotReturn.UploadDoNotReturnFile)
+  UploadDepartmentsFile(
+    { dispatch }: StateContext<DoNotReturnStateModel>,
+    { payload }: DoNotReturn.UploadDoNotReturnFile
+  ): Observable<ImportResult<any> | Observable<void>> {
+    return this.DonotreturnService.uploadDNRFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new DoNotReturn.UploadDoNotReturnFileSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: any) =>
+        of(
+          dispatch(
+            new ShowToast(
+              MessageTypes.Error,
+              error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
+            )
+          )
+        )
+      )
+    );
+  }
+
+  @Action(DoNotReturn.SaveDoNotReturnImportResult)
+  SaveDepartmentsImportResult(
+    { dispatch }: StateContext<DoNotReturnStateModel>,
+    { payload }: DoNotReturn.SaveDoNotReturnImportResult
+  ): Observable<ImportResult<any> | Observable<void>> {
+    return this.DonotreturnService.saveDNRImportResult(payload).pipe(
+      tap((payload) => {
+        dispatch(new DoNotReturn.SaveDoNotReturnImportResultSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'DoNotReturn list were not imported'))))
+    );
+  }
+
+  
 }
 

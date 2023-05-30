@@ -3,12 +3,18 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { TakeUntilDestroy } from '@core/decorators';
 import { Select, Store } from '@ngxs/store';
 import { OrientationTab, OrientationTypeDataSource } from '@organization-management/orientation/enums/orientation-type.enum';
-import { OrientationConfiguration, OrientationConfigurationFilters, OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
+import { 
+  OrientationConfiguration,
+  OrientationConfigurationFilters,
+  OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
 import { OrientationService } from '@organization-management/orientation/services/orientation.service';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { 
+  OrganizationDepartment,
+  OrganizationLocation, OrganizationRegion,
+  OrganizationStructure } from '@shared/models/organization.model';
 import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, distinctUntilChanged, filter, Observable, take, takeUntil } from 'rxjs';
 import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
@@ -18,12 +24,19 @@ import { DateTimeHelper, findSelectedItems } from '@core/helpers';
 import { mapperSelectedItems } from '@shared/components/tiers-dialog/helper';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { SkillCategoriesPage } from '@shared/models/skill-category.model';
-import { ClearAssignedSkillsByOrganization, GetAllSkillsCategories, GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
+import { ClearAssignedSkillsByOrganization,
+  GetAllSkillsCategories,
+  GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { Skill } from '@shared/models/skill.model';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, ORIENTATION_CHANGE_CONFIRM_TITLE, ORIENTATION_CHANGE_TEXT, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  ORIENTATION_CHANGE_CONFIRM_TITLE,
+  ORIENTATION_CHANGE_TEXT,
+  RECORD_ADDED, RECORD_DELETE,
+  RECORD_MODIFIED } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrientationType } from "../../enums/orientation-type.enum";
 import { OrientationGridComponent } from '../orientation-grid/orientation-grid.component';
@@ -37,25 +50,32 @@ import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 })
 @TakeUntilDestroy
 export class OrientationSetupComponent extends AbstractPermissionGrid implements OnInit {
-  @ViewChild('orientationGrid') private orientationGrid: OrientationGridComponent
+  @ViewChild('orientationGrid') private orientationGrid: OrientationGridComponent;
   
-  @Input() public isActive: boolean;
+  @Input('isActive') set isActive(value: boolean) {
+    if (value) {
+      this.filters = { pageNumber: 1, pageSize: this.pageSize };
+      this.initSetupTab();
+    }
+    this.isTabActive = value;
+  }
+  public isTabActive: boolean;
 
   public orientationTypeSettingsForm: FormGroup = new FormGroup({
     isEnabled: new FormControl(false),
-    type: new FormControl(null, [Validators.required])
+    type: new FormControl(null, [Validators.required]),
   });
   public optionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public fields: FieldSettingsModel = { text: 'text', value: 'id' };
   public title: DialogMode;
-  public isEdit: boolean = false;
-  public isArchive: boolean = false;
+  public isEdit = false;
+  public isArchive = false;
   public orientationTypeDataSource = OrientationTypeDataSource;
   public selectedOrientationSettings: OrientationType | null;
   public regionToggleDisable = false;
   public locationToggleDisable = false;
   public departmentToggleDisable = false;
-  public disableControls: boolean =  false;
+  public disableControls =  false;
 
   public switcherValue = 'Off';
   public settingIsOff = true;
@@ -67,7 +87,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   public allRecords = {
     'regionIds': false,
     'locationIds': false,
-    'departmentIds': false
+    'departmentIds': false,
   };
   public regions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
@@ -112,14 +132,19 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     this.store.dispatch([new GetAllSkillsCategories({ params: { SystemType: SystemType.IRP } })]);
   }
 
+  private initSetupTab(): void {
+    this.getSkills();
+    this.getOrientationSettings();
+    this.getOrientationConfigs();
+  }
+
   private watchForOrgChange(): void {
     this.organizationId$
       .pipe(
+        filter(() => this.isTabActive),
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {
-        this.getSkills();
-        this.getOrientationSettings();
-        this.getOrientationConfigs();
+        this.initSetupTab();
       });
   }
 
@@ -184,7 +209,9 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       .subscribe((value: number[]) => {
         this.orientationForm?.get('skillIds')?.setValue([]);
         if (value?.length) {
-          this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP, SkillCategoryIds: value } }));
+          this.store.dispatch(
+            new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP, SkillCategoryIds: value } })
+          );
         }
       });
   }
@@ -257,7 +284,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
         this.getOrientationConfigs();
       },
-      error: (error) => this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
+      error: (error) => this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))),
     });
   }
 
@@ -308,11 +335,13 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       data.endDate = data.endDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(data.endDate)) : data.endDate;
       this.orientationService.saveOrientationConfiguration(data).subscribe({
         next: () => {
-          this.store.dispatch(new ShowToast(MessageTypes.Success, data.orientationConfigurationId ? RECORD_MODIFIED : RECORD_ADDED));
+          this.store.dispatch(
+            new ShowToast(MessageTypes.Success, data.orientationConfigurationId ? RECORD_MODIFIED : RECORD_ADDED)
+            );
           this.closeHandler();
           this.getOrientationConfigs();
         },
-        error: (error) => this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
+        error: (error) => this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))),
       });
     }
   }
@@ -389,15 +418,17 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   }
 
   public subscribeOnFormChange(): void {
-    this.orientationTypeSettingsForm.controls['isEnabled'].valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((val) => {
-      this.switcherValue = val ? 'On' : 'Off';
-      this.settingIsOff = !val;
-      this.dropdownHandler();
-      this.cd.markForCheck();
-    });
-    this.orientationTypeSettingsForm.controls['type'].valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((val) => {
-      this.cd.markForCheck();
-    });
+    this.orientationTypeSettingsForm.controls['isEnabled'].valueChanges
+      .pipe(takeUntil(this.componentDestroy())).subscribe((val) => {
+        this.switcherValue = val ? 'On' : 'Off';
+        this.settingIsOff = !val;
+        this.dropdownHandler();
+        this.cd.markForCheck();
+      });
+    this.orientationTypeSettingsForm.controls['type'].valueChanges
+      .pipe(takeUntil(this.componentDestroy())).subscribe(() => {
+        this.cd.markForCheck();
+      });
   }
 
   public saveOrientationSettingsHandler(): void {
@@ -446,7 +477,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       locationsControl?.setValue(null);
       locationsControl?.disable();
       let departments: OrganizationDepartment[] = [];
-      let locations: OrganizationLocation[] = this.locationsDataSource;
+      const locations: OrganizationLocation[] = this.locationsDataSource;
       locations?.forEach((location: OrganizationLocation) => {
         const filteredDepartments = location.departments || [];
         departments = [...departments, ...filteredDepartments] as OrganizationDepartment[];
@@ -457,7 +488,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
     }
   }
 
-  public allDepartmentsChange(event: { checked: boolean }, emitEvent: boolean = true): void {
+  public allDepartmentsChange(event: { checked: boolean }, emitEvent = true): void {
     this.allRecords['departmentIds'] = event.checked;
     const departmentsControl = this.orientationForm?.controls['departmentIds'];
     if (this.allRecords['departmentIds']) {
@@ -481,7 +512,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       e.text !== ''
         ? query.where('name', 'contains', e.text, true).take(char * 15)
         : query;
-        let departments = this.departmentsDataSource;
+        const departments = this.departmentsDataSource;
     e.updateData(departments as [], query);
-  };
+  }
 }

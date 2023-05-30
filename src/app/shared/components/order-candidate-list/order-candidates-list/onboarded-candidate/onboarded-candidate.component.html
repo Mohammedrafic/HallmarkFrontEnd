@@ -28,7 +28,7 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
-        <button ejs-button class="save-button" cssClass="e-primary" (click)="onSave()" *ngIf="!isRejected">
+        <button ejs-button class="save-button" cssClass="e-primary" (click)="onSave()" *ngIf="!isRejected && (!isCancelled || order?.orderType !== reorderType)">
           Save
         </button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
@@ -274,7 +274,7 @@
     </div>
   </section>
   <section>
-    <ng-container [ngTemplateOutlet]="isCancelled ? billRates : editBillRates"></ng-container>
+    <ng-container [ngTemplateOutlet]="(isCancelled && !canEditClosedBillRate) ? billRates : editBillRates"></ng-container>
     <ng-template #billRates>
       <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
     </ng-template>

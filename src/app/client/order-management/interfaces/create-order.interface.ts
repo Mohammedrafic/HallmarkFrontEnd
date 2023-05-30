@@ -153,3 +153,10 @@ export interface SkillParams {
     DepartmentIds?: number[];
   }
 }
+
+export interface SelectedStructureState {
+  regionId: number | null;
+  locationId: number | null;
+  departmentId: number | null;
+  skillId: number | null;
+}

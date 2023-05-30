@@ -21,7 +21,7 @@
       <app-tooltip-container
         [message]="toolTipMessage"
         [showToolTip]="!userPermission[userPermissions.CanEditCandidateProfile]">
-        <button ejs-button [isPrimary]="true" (click)="save()" [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">Save</button>
+        <button ejs-button [isPrimary]="true" id="saveCandidateDetails" #saveCandidateDetails (click)="save()" [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">Save</button>
       </app-tooltip-container>
     </ng-container>
   </ng-container>

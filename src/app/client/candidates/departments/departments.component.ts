@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import {
   BehaviorSubject,
   filter,
@@ -23,6 +23,7 @@ import {
   DateRanges,
   DepartmentAssigned,
   DepartmentConditions,
+  DepartmentDialogState,
   DepartmentFilterState,
   DepartmentsPage,
 } from '@client/candidates/departments/departments.model';
@@ -44,12 +45,13 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
-import { OrganizationRegion } from '@shared/models/organization.model';
+import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
 import { DateTimeHelper } from '@core/helpers';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-departments',
@@ -61,11 +63,14 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   @ViewChild('assignDepartment') private assignDepartment: AssignDepartmentComponent;
   @ViewChild('editDepartments') private editDepartments: EditDepartmentsComponent;
 
+  @Select(UserState.organizationStructure)
+  private readonly organizationStructure$: Observable<OrganizationStructure>;
+
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
   public readonly sideDialogTitleEnum: typeof SideDialogTitleEnum = SideDialogTitleEnum;
-  public readonly dialogData$: BehaviorSubject<DepartmentAssigned | null> =
-    new BehaviorSubject<DepartmentAssigned | null>(null);
+  public readonly dialogData$: BehaviorSubject<DepartmentDialogState> =
+    new BehaviorSubject<DepartmentDialogState>({ data: null, isOpen: false });
   public readonly saveForm$: Subject<boolean> = new Subject();
   public readonly bulkActionConfig: BulkActionConfig = {
     edit: true,
@@ -115,7 +120,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public showAssignDepartmentDialog(): void {
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.AssignDepartment);
     this.showSideDialog(true);
-    this.dialogData$.next(null);
+    this.dialogData$.next({ data: null, isOpen: true });
     this.getAssignedDepartmentHierarchy();
   }
 
@@ -140,9 +145,11 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
           this.assignDepartment?.assignDepartmentForm.reset();
           this.editDepartments?.formGroup.reset();
           this.showSideDialog(false);
+          this.dialogData$.next({ data: null, isOpen: false });
         });
     } else {
       this.showSideDialog(false);
+      this.dialogData$.next({ data: null, isOpen: false });
     }
   }
 
@@ -237,7 +244,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   private editAssignedDepartment(department: DepartmentAssigned): void {
     this.showSideDialog(true);
     this.departmentsService.setSideDialogTitle(SideDialogTitleEnum.EditAssignDepartment);
-    this.dialogData$.next(department);
+    this.dialogData$.next({ data: department, isOpen: true });
   }
 
   private deleteAssignedDepartments(departmentIds: number[] | null, isBulkAction?: boolean): void {
@@ -262,8 +269,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   }
 
   private getAssignedDepartmentHierarchy(): void {
-    this.departmentsService
-      .getAssignedDepartmentHierarchy(this.departmentsService.employeeWorkCommitmentId)
+    this.organizationStructure$
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((data) => {
         this.departmentHierarchy = data.regions;

@@ -41,7 +41,11 @@ export class PayRateService {
     return this.http.post('/api/PayRates/skillsByDepartment', {departmentIds : id});
   }
 
-  public getMasterWorkCommitments(currentPage: number, pageSize: number): Observable<MasterCommitmentsPage> {
-    return this.http.post<MasterCommitmentsPage>('/api/MasterWorkCommitment/getAll', { currentPage, pageSize });
+  public getMasterWorkCommitments( 
+    businessUnitId: number,    
+    regions: string,
+    locations: string,
+    skills: string): Observable<MasterCommitmentsPage> {
+    return this.http.get<MasterCommitmentsPage>(`/api/PayRates/getworkcommitments?businessUnitId=${businessUnitId}&regions=${regions}&locations=${locations}&skills=${skills}`);
   }
 }

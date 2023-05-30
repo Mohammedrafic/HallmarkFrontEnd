@@ -7,14 +7,19 @@ import { TimePickerModule } from "@syncfusion/ej2-angular-calendars";
 import { DropDownListModule } from "@syncfusion/ej2-angular-dropdowns";
 import { DialogModule } from "@syncfusion/ej2-angular-popups";
 import { FeatherModule } from 'angular-feather';
-import { Plus } from 'angular-feather/icons';
+import { Plus, Lock } from 'angular-feather/icons';
 
 import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { ScheduleOpenPositionsModule } from '../schedule-open-positions/schedule-open-positions.module';
 import { ReplacementOrderDialogModule } from '../replacement-order-dialog/replacement-order-dialog.module';
 import { EditScheduleService } from './edit-schedule.service';
 import { EditScheduleComponent } from './edit-schedule.component';
 
+const icons = {
+  Plus,
+  Lock,
+};
 
 @NgModule({
   declarations: [
@@ -33,7 +38,8 @@ import { EditScheduleComponent } from './edit-schedule.component';
     CheckBoxModule,
     SwitchModule,
     ReplacementOrderDialogModule,
-    FeatherModule.pick({ Plus }),
+    ScheduleOpenPositionsModule,
+    FeatherModule.pick(icons),
   ],
   exports: [EditScheduleComponent],
   providers: [EditScheduleService],

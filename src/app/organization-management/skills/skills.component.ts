@@ -148,13 +148,13 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   }
 
   override customExport(): void {
-    this.defaultFileName = 'Organization Skills ' + formatDate(Date.now(), 'MM/dd/yyyy hh:mm a', 'en-US');
+    this.defaultFileName = 'Organization Skills ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
 
   override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.defaultFileName = 'Organization Skills ' + formatDate(Date.now(), 'MM/dd/yyyy hh:mm a', 'en-US');
+    this.defaultFileName = 'Organization Skills ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
 
     this.store.dispatch(new ExportSkills(new ExportPayload(
       fileType,

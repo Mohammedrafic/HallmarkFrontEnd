@@ -40,10 +40,19 @@ export enum OrganizationSettingKeys {
   HideContactDetailsOfOrderInAgencyLogin,
   DisableAddEditTimesheetsInAgencyLogin,
   DefaultTimezone,
+  DepartmentVisibleForIRPCandidate,
+  LockIRPCandidateAvailability,
+  MandateCandidateAddress,
+  MandateCandidatePhone1,
   OTHours,
+  CreateReplacementPerDiemOrder,
   PayPeriod,
   AvailabilityOverLapRule,
-  ScheduleOnlyWithAvailability
+  ScheduleOnlyWithAvailability,
+  CreateUserWhenEmployeeCreated,
+  CreateEmployeeWhenUserCreated,
+  OnHoldDefault,
+  CreatePartialOrder
 }
 
 export enum OrganizationalHierarchy {
@@ -52,7 +61,6 @@ export enum OrganizationalHierarchy {
   Location = 3,
   Department = 4,
 }
-
 
 export enum OrganizationSettings{
   MandateCandidateAddress = "MandateCandidateAddress",

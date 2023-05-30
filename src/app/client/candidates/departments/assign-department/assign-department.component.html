@@ -68,23 +68,23 @@
     </div>
   </ng-container>
 
-  <div class="date-fields">
+  <div class="date-fields" *ngIf="isOpen">
     <app-datepicker
+      id="start-date"
+      label="Start Date"
+      controlName="startDate"
       [formGroupInstance]="assignDepartmentForm"
       [required]="true"
-      [min]="dateRanges.min"
-      [max]="dateRanges.max"
-      id="start-date"
-      controlName="startDate"
-      label="Start Date"
+      [min]="minDate"
+      [max]="maxDate"
     ></app-datepicker>
     <app-datepicker
-      [formGroupInstance]="assignDepartmentForm"
-      [min]="dateRanges.min"
-      [max]="dateRanges.max"
       id="end-date"
-      controlName="endDate"
       label="End Date"
+      controlName="endDate"
+      [formGroupInstance]="assignDepartmentForm"
+      [min]="minDate"
+      [max]="maxDate"
     ></app-datepicker>
   </div>
   <div class="toggles">
@@ -110,8 +110,8 @@
       *ngIf="isOriented$ | async as isOriented"
       [formGroupInstance]="assignDepartmentForm"
       [required]="isOriented"
-      [min]="dateRanges.min"
-      [max]="dateRanges.max"
+      [min]="minDate"
+      [max]="maxDate"
       id="start-date"
       class="orientation-date"
       controlName="orientationDate"

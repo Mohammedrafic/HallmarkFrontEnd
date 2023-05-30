@@ -56,7 +56,10 @@ export class GetPermissionsTree {
   static readonly type = '[security] Get Permissions Tree';
   constructor(public type: BusinessUnitType) {}
 }
-
+export class GetIRPPermissionsTree {
+  static readonly type = '[security] Get IRP Permissions Tree';
+  constructor(public type: BusinessUnitType) {}
+}
 export class GetNewRoleBusinessByUnitType {
   static readonly type = '[security] Get New Role Business By Unit Type';
   constructor(public type: BusinessUnitType) {}
@@ -179,6 +182,21 @@ export class GetLogInterfacePage {
 export class GetLogHistoryById {
   static readonly type = '[security log interface] Get History By Id';
   constructor(public runId: string, public organizationId: number, public pageNumber: number,public pageSize: number,public options?: DialogNextPreviousOption) {}
+}
+
+export class GetLogFileDownload {
+  static readonly type = '[security log interface] Get History log file';
+  constructor(public runId: string, public organizationId: number,) {}
+}
+
+export class GetLogFileDownloadSucceeded {
+  static readonly type = '[security log interface] Get History log file download details Succeeded';
+  constructor(public logFileDownloadDetail: any) { }
+}
+
+export class ExportTimeSheetList {
+  static readonly type = '[security] Export TimeSheet List';
+  constructor(public payload: ExportPayload) {}
 }
 
 export class GetBusinessForEmployeeType {

@@ -64,6 +64,8 @@ import { LogiReportModule } from '../../shared/components/logi-report/logi-repor
 import { ProgressBarAllModule } from '@syncfusion/ej2-angular-progressbar';
 import { VendorSCorecardState } from './vendor-scorecard/vendorscorecard.state';
 import { VendorscorecardService } from './vendor-scorecard/vendorscorecard.service';
+import { UnitProfileComponent } from './unit-profile/unit-profile.component';
+import { HoursByDepartmentComponent } from './hours-by-department/hours-by-department.component';
 
 
 @NgModule({
@@ -114,7 +116,9 @@ import { VendorscorecardService } from './vendor-scorecard/vendorscorecard.servi
     FinanceMedicareWageReportComponent,
     GrantReportComponent,
     ScheduledHoursComponent,
-    VmsInvoiceReportBetaComponent],
+    VmsInvoiceReportBetaComponent,
+    UnitProfileComponent,
+    HoursByDepartmentComponent],
   exports: [
     CandidateListComponent
   ],

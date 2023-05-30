@@ -46,6 +46,7 @@ export enum TimesheetDetailsActions {
   AddTimesheetRecord = '[timesheet details] Add timesheet record',
   NoWorkPerformed = '[timesheet details] No work performed',
   GetDetailsByDate ='[timesheet details] Get timesheet details by date',
+  RecalculateTimesheets = '[timesheet details] Recalculate timesheets by job id',
 }
 
 export enum TIMETHEETS_STATUSES {

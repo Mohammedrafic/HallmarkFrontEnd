@@ -84,8 +84,27 @@ export class OrderManagementService extends DestroyableDirective {
       poNumberIds: new FormControl(null),
       contactEmails: new FormControl(null),
       irpOnly: new FormControl(false),
+      reorderStatuses: new FormControl([]),
     });
   }
+
+  createOrderJourneyFilterForm(): FormGroup {
+    return this.fb.group({
+      orderPublicId: new FormControl(null),
+      regionIds: new FormControl([]),
+      locationIds: new FormControl([]),
+      departmentsIds: new FormControl([]),
+      skillIds: new FormControl([]),
+      orderTypes: new FormControl([]),
+      jobTitle: new FormControl(null),
+      jobStartDate: new FormControl(null),
+      jobEndDate: new FormControl(null),
+      orderStatuses: new FormControl([]),
+      includeInIRP:new FormControl(true),
+      includeInVMS:new FormControl(true),
+    });
+  }
+
 
   public setOrderManagementSystem(system: OrderManagementIRPSystemId | null) {
     this.orderManagementSystem = system;

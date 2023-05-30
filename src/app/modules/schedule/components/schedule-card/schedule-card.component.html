@@ -1,37 +1,74 @@
-<div
-  *ngIf="bigCardConfig || firstSmallCardConfig"
-  [ngClass]="{ 'selected': isSelected, 'third-event': !!thirdEventColor }"
-  [ngStyle]="{ 'border-color': thirdEventColor }"
-  class="card-wrapper"
->
-  <app-tooltip-container
-    [message]="allEventsTooltip"
-    [showToolTip]="!!allEventsTooltip"
-    position="TopCenter"
+<ng-container *ngIf="activePeriod !== dayPeriod; else dayTemplate">
+  <div
+    *ngIf="bigCardConfig || firstSmallCardConfig"
+    [ngClass]="{ 'selected': isSelected, 'third-event': !!thirdEventColor }"
+    [ngStyle]="{ 'border-color': thirdEventColor }"
+    class="card-wrapper"
   >
-    <ng-container *ngIf="bigCardConfig; else multipleEventsView">
-      <div class="event-wrapper" [style.border-left-color]="bigCardConfig.color">
-        <div class="time">
-          <span class="time__text">{{ bigCardConfig.startDate | date: 'HH:mm': 'UTC' }}</span>
-          <span class="time__text"> - </span>
-          <span class="time__text">{{ bigCardConfig.endDate | date: 'HH:mm': 'UTC' }}</span>
-          <span *ngIf="bigCardConfig.ltaOrder" class="time__text"> L </span>
+    <app-tooltip-container
+      [message]="allEventsTooltip"
+      [showToolTip]="!!allEventsTooltip"
+      position="TopCenter"
+    >
+      <ng-container *ngIf="bigCardConfig; else multipleEventsView">
+        <div class="event-wrapper" [style.border-left-color]="bigCardConfig.color">
+          <div class="time">
+            <span class="time__text">{{ bigCardConfig.startDate | date: 'HH:mm': 'UTC' }}</span>
+            <span class="time__text"> - </span>
+            <span class="time__text">{{ bigCardConfig.endDate | date: 'HH:mm': 'UTC' }}</span>
+            <span *ngIf="bigCardConfig.ltaOrder" class="time__text"> L </span>
+          </div>
+          <div class="title">
+            <span class="title__text">{{ bigCardConfig.title }}</span>
+          </div>
+          <div class="additional-attributes" *ngIf="bigCardConfig.additionalAttributes && !dateSchedule.isOnHold">
+            <span>{{bigCardConfig.additionalAttributes}}</span>
+          </div>
+          <div *ngIf="dateSchedule.isOnHold">ON HOLD</div>
         </div>
-        <div class="title">
-          <span class="title__text">{{ bigCardConfig.title }}</span>
-        </div>
-        <div class="additional-attributes" *ngIf="bigCardConfig.additionalAttributes">
-          <span>{{bigCardConfig.additionalAttributes}}</span>
-        </div>
+      </ng-container>
+
+      <ng-template #multipleEventsView>
+        <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: firstSmallCardConfig }"></ng-container>
+        <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: secondSmallCardConfig }"></ng-container>
+      </ng-template>
+    </app-tooltip-container>
+  </div>
+</ng-container>
+
+<ng-template #dayTemplate>
+  <div class="day-wrapper">
+    <ng-container *ngFor="let card of dateSchedule.daySchedules; let i = index">
+      <div
+        [ngClass]="{ 'selected': isSelected, 'third-event': !!thirdEventColor }"
+        [ngStyle]="{ 'border-color': thirdEventColor }"
+        class="card-wrapper"
+        *ngIf="dayCardConfig.source[i]"
+      >
+        <app-tooltip-container
+          [message]="dayCardConfig.tooltips[i]"
+          [showToolTip]="!!dayCardConfig.tooltips[i]"
+          position="TopCenter"
+        >
+          <div class="event-wrapper" [style.border-left-color]="dayCardConfig.source[i].color">
+            <div class="time">
+              <span class="time__text">{{ dayCardConfig.source[i].startDate | date: 'HH:mm': 'UTC' }}</span>
+              <span class="time__text"> - </span>
+              <span class="time__text">{{ dayCardConfig.source[i].endDate | date: 'HH:mm': 'UTC' }}</span>
+              <span *ngIf="dayCardConfig.source[i].ltaOrder" class="time__text"> L </span>
+            </div>
+            <div class="title">
+              <span class="title__text">{{ dayCardConfig.source[i].title }}</span>
+            </div>
+            <div class="additional-attributes" *ngIf="dayCardConfig.source[i].additionalAttributes">
+              <span>{{dayCardConfig.source[i].additionalAttributes}}</span>
+            </div>
+          </div>
+        </app-tooltip-container>
       </div>
     </ng-container>
-
-    <ng-template #multipleEventsView>
-      <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: firstSmallCardConfig }"></ng-container>
-      <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: secondSmallCardConfig }"></ng-container>
-    </ng-template>
-  </app-tooltip-container>
-</div>
+  </div>
+</ng-template>
 
 <ng-template #smallCard let-item="item">
   <div

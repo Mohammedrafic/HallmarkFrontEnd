@@ -6,6 +6,7 @@ export interface CandidateModel {
   status: string;
   id: number;
   name: string;
+  hasActiveCandidate?: boolean;
 }
 
 export interface AgencyModel {
@@ -13,4 +14,5 @@ export interface AgencyModel {
   agencyName: string;
   id: number;
   name: string;
+  hasActiveCandidate: boolean;
 }

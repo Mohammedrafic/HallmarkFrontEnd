@@ -8,6 +8,7 @@ import { PositionDragEvent } from '../../interface';
 export class CanScheduleDirective implements OnChanges {
   @Input() dragDate: string;
   @Input() dragEvent: PositionDragEvent | null;
+  @Input() candidateId?: number;
 
   constructor(
     private element: ElementRef,
@@ -27,7 +28,16 @@ export class CanScheduleDirective implements OnChanges {
   private setClassForSelectedSlot(): void {
     const dragElementDate = this.dragDate.split('T')[0];
 
-    if(dragElementDate === this.dragEvent?.date) {
+    if (dragElementDate !== this.dragEvent?.date) {
+      return;
+    }
+
+    if (!this.dragEvent?.candidateId) {
+      this.renderer.addClass(this.element.nativeElement, 'preview-drag-slots');
+      return;
+    }
+
+    if (this.dragEvent?.candidateId && this.dragEvent?.candidateId === this.candidateId) {
       this.renderer.addClass(this.element.nativeElement, 'preview-drag-slots');
     }
   }

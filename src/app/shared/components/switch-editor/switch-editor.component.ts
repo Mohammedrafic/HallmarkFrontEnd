@@ -99,7 +99,7 @@ export class SwitchEditorComponent extends Destroyable implements ICellRendererA
 
   private findDisabledRateIds(field: string): number[] {
     return (this.store.snapshot().timesheets[field] as AddRecordBillRate[])
-    .filter((rate) => rate.text.toLowerCase() === 'oncall' || rate.text.includes('OT'))
+    .filter((rate) => rate.text.toLowerCase() === 'oncall' || rate.text.includes('OT') || rate.disableMealBreak)
     .map((rate) => rate.value) as number[];
   }
 }

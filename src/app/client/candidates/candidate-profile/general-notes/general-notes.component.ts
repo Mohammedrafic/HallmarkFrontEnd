@@ -1,16 +1,18 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { DatePipe, DOCUMENT } from '@angular/common';
+import { DatePipe, DOCUMENT, formatDate } from '@angular/common';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
-import { GeneralNotesGridActionsRendererComponent } from './general-notes-grid-actions-renderer/general-notes-grid-actions-renderer.component';
+import { GeneralNotesGridActionsRendererComponent } from
+  './general-notes-grid-actions-renderer/general-notes-grid-actions-renderer.component';
 import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import { ShowExportDialog, ShowSideDialog } from '../../../../store/app.actions';
-import { AddEditNoteComponent } from '@client/candidates/candidate-profile/general-notes/add-edit-note/add-edit-note.component';
+import { AddEditNoteComponent } from
+  '@client/candidates/candidate-profile/general-notes/add-edit-note/add-edit-note.component';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
 import { Observable, Subject, filter, takeUntil } from 'rxjs';
 import { ICellRendererParams, ValueFormatterParams } from '@ag-grid-community/core';
 import { CategoryModel } from '@client/candidates/candidate-profile/general-notes/models/category.model';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { GeneralNotesGridCategoryRendererComponent } from './general-notes-grid-category-renderer/general-notes-grid-category-renderer.component';
+import { GeneralNotesGridCategoryRendererComponent } from
+  './general-notes-grid-category-renderer/general-notes-grid-category-renderer.component';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { CandidateTabsEnum } from '@client/candidates/enums';
 import { UserState } from 'src/app/store/user.state';
@@ -84,7 +86,7 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
   public targetElement: HTMLElement | null = this.document.body;
   public filters: GeneralNoteExportFilters = {
     pageNumber: 1, pageSize: 100,
-    candidateId: 0
+    candidateId: 0,
   };
   public fileName: string;
   public defaultFileName: string;
@@ -116,7 +118,6 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
   }
 
   public ngOnDestroy(): void {
-    //this.ngOnDestroy();
     this.generalNotesService.resetNoteList();
   }
 
@@ -142,7 +143,7 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
             .subscribe((candidate) => {
               this.candidateProfileFormService.populateCandidateForm(candidate);
               this.candidatesService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
-              this.candidatesService.setEmployeeHireDate(candidate.hireDate);
+              this.candidatesService.setEmployeeHireDate(candidate.hireDate as string);
               this.generalNotesService.notes$.next(candidate.generalNotes);
             });
           });
@@ -150,7 +151,7 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
   }
 
   private getFormattedDateWithFormat(date: string, format: string): string {
-    return this.datePipe.transform(date, format) ?? '';
+    return formatDate(date, format, 'en-US', 'UTC');
   }
 
   private getFormattedDate(date: string): string {

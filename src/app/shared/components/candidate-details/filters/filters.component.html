@@ -1,71 +1,14 @@
 <form [formGroup]="filtersForm">
   <div class="input-container">
-    <label>Order Type</label>
-    <div class="input-group multiselect bootstrap">
-      <ejs-multiselect
-        mode="CheckBox"
-        formControlName="orderTypes"
-        placeholder="All"
-        [fields]="typeFields"
-        [allowFiltering]="true"
-        [showDropDownIcon]="true"
-        [dataSource]="filterColumns.orderTypes.dataSource"
-      >
-      </ejs-multiselect>
-    </div>
-  </div>
-  <div class="input-container calendar">
-    <label>Start Date</label>
-    <div class="input-group datepicker">
-      <ejs-datepicker
-        id="startDate"
-        class="datepicker"
-        format="MM/dd/yyyy"
-        placeholder="MM/DD/YYYY"
-        formControlName="startDate"
-      >
-      </ejs-datepicker>
-    </div>
-  </div>
-  <div class="input-container calendar">
-    <label>End Date</label>
-    <div class="input-group datepicker">
-      <ejs-datepicker
-        id="endDate"
-        class="datepicker"
-        format="MM/dd/yyyy"
-        placeholder="MM/DD/YYYY"
-        formControlName="endDate"
-      >
-      </ejs-datepicker>
-    </div>
-  </div>
-  <div class="input-container">
-    <label>Skill</label>
-    <div class="input-group multiselect bootstrap">
-      <ejs-multiselect
-        mode="CheckBox"
-        formControlName="skillsIds"
-        placeholder="All"
-        [fields]="skillFields"
-        [allowFiltering]="true"
-        [showDropDownIcon]="true"
-        [dataSource]="filterColumns.skillsIds.dataSource"
-      >
-      </ejs-multiselect>
-    </div>
-  </div>
-  <div class="input-container">
     <label>Region</label>
     <div class="input-group multiselect bootstrap">
-      <ejs-multiselect
-        mode="CheckBox"
-        formControlName="regionsIds"
-        placeholder="All"
-        [fields]="typeFields"
-        [allowFiltering]="true"
-        [showDropDownIcon]="true"
-        [dataSource]="filterColumns.regionsIds.dataSource">
+      <ejs-multiselect mode="CheckBox"
+                       formControlName="regionsIds"
+                       placeholder="All"
+                       [fields]="typeFields"
+                       [allowFiltering]="true"
+                       [showDropDownIcon]="true"
+                       [dataSource]="filterColumns.regionsIds.dataSource">
 
         <ng-template #itemTemplate let-data>
           <div class="region-option-container" [class.admin]="isAgency">
@@ -77,4 +20,120 @@
       </ejs-multiselect>
     </div>
   </div>
+
+  <div class="input-container">
+    <label>Location</label>
+    <div class="input-group multiselect bootstrap">
+      <ejs-multiselect mode="CheckBox"
+                       formControlName="locationIds"
+                       placeholder="All"
+                       [fields]="typeFields"
+                       [allowFiltering]="true"
+                       [showDropDownIcon]="true"
+                       [dataSource]="filterColumns.locationIds.dataSource">
+
+        <ng-template #itemTemplate let-data>
+          <div class="region-option-container" [class.admin]="isAgency">
+            <span class="region-name">{{ data.name }}</span>
+            <span *ngIf="isAgency" class="org-name">{{ data.organizationName }}</span>
+          </div>
+        </ng-template>
+
+      </ejs-multiselect>
+    </div>
+  </div>
+
+
+
+  <div class="input-container">
+    <label>Department</label>
+    <div class="input-group multiselect bootstrap">
+      <ejs-multiselect mode="CheckBox"
+                       formControlName="departmentIds"
+                       placeholder="All"
+                       [fields]="typeFields"
+                       [allowFiltering]="true"
+                       [showDropDownIcon]="true"
+                       [dataSource]="filterColumns.departmentIds.dataSource">
+
+        <ng-template #itemTemplate let-data>
+          <div class="region-option-container" [class.admin]="isAgency">
+            <span class="region-name">{{ data.name }}</span>
+            <span *ngIf="isAgency" class="org-name">{{ data.organizationName }}</span>
+          </div>
+        </ng-template>
+
+      </ejs-multiselect>
+    </div>
+
+
+  </div>
+
+  <div class="input-container">
+    <label>Skill</label>
+    <div class="input-group multiselect bootstrap">
+      <ejs-multiselect mode="CheckBox"
+                       formControlName="skillsIds"
+                       placeholder="All"
+                       [fields]="skillFields"
+                       [allowFiltering]="true"
+                       [showDropDownIcon]="true"
+                       [dataSource]="filterColumns.skillsIds.dataSource">
+      </ejs-multiselect>
+    </div>
+  </div>
+
+  <div class="input-container">
+    <label>Order Type</label>
+    <div class="input-group multiselect bootstrap">
+      <ejs-multiselect mode="CheckBox"
+                       formControlName="orderTypes"
+                       placeholder="All"
+                       [fields]="typeFields"
+                       [allowFiltering]="true"
+                       [showDropDownIcon]="true"
+                       [dataSource]="filterColumns.orderTypes.dataSource">
+      </ejs-multiselect>
+    </div>
+  </div>
+  <div class="input-container">
+    <label>Order Status</label>
+    <div class="input-group multiselect bootstrap">
+      <ejs-multiselect mode="CheckBox"
+                       formControlName="applicantStatuses"
+                       placeholder="All"
+                       [fields]="typeFields"
+                       [allowFiltering]="true"
+                       [showDropDownIcon]="true"
+                       [dataSource]="filterColumns.applicantStatuses.dataSource">
+      </ejs-multiselect>
+    </div>
+  </div>
+
+  <div class="input-container calendar">
+    <label>Start Date</label>
+    <div class="input-group datepicker">
+      <ejs-datepicker id="startDate"
+                      class="datepicker"
+                      format="MM/dd/yyyy"
+                      placeholder="MM/DD/YYYY"
+                      formControlName="startDate">
+      </ejs-datepicker>
+    </div>
+  </div>
+  <div class="input-container calendar">
+    <label>End Date</label>
+    <div class="input-group datepicker">
+      <ejs-datepicker id="endDate"
+                      class="datepicker"
+                      format="MM/dd/yyyy"
+                      placeholder="MM/DD/YYYY"
+                      formControlName="endDate">
+      </ejs-datepicker>
+    </div>
+  </div>
+
+
+
+
 </form>

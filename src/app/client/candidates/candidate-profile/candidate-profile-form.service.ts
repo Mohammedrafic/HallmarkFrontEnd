@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
-import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 import { Subject } from 'rxjs';
+import pick from 'lodash/fp/pick';
+import { difference } from 'lodash';
+
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
-import pick from 'lodash/fp/pick';
+import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { ListOfSkills } from '@shared/models/skill.model';
-import { difference } from 'lodash';
+import { DateTimeHelper } from '@core/helpers';
+import { candidateDateFields } from '../constants';
+import { CandidatesService } from '../services/candidates.service';
 
 @Injectable()
 export class CandidateProfileFormService {
@@ -14,7 +19,10 @@ export class CandidateProfileFormService {
   public saveEvent$: Subject<void> = new Subject<void>();
   public tabUpdate$: Subject<number> = new Subject<number>();
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(
+    private formBuilder: FormBuilder,
+    private candidateService: CandidatesService,
+    ) { }
 
   public triggerSaveEvent(): void {
     this.saveEvent$.next();
@@ -60,7 +68,7 @@ export class CandidateProfileFormService {
         contractEndDate: [null, [Validators.required]],
         address1: [null, [Validators.maxLength(100)]],
         country: [null, [Validators.required]],
-        state: [null ],
+        state: [null],
         city: [null],
         zipCode: [null],
         personalEmail: [
@@ -70,7 +78,7 @@ export class CandidateProfileFormService {
         workEmail: [null, [Validators.email, Validators.maxLength(200)]],
         phone1: [null, [Validators.required]],
         phone2: [null],
-        professionalSummary: [null],
+        professionalSummary: [null, Validators.maxLength(500)],
         generalNotes: [],
       },
       { validators: greaterThanValidator('contractStartDate', 'contractEndDate') }
@@ -88,7 +96,14 @@ export class CandidateProfileFormService {
   }
 
   public populateCandidateForm(candidate: CandidateModel): void {
-    this.candidateForm.patchValue(this.getPartialFormValueByControls(candidate));
+    const candidateWithUTCDates = this.convertDateFildsToUtc(candidate);
+    this.candidateForm.patchValue(this.getPartialFormValueByControls(candidateWithUTCDates));
+  }
+
+  public populateHoldEndDate(candidate: CandidateModel): void {
+    if (candidate && candidate.profileStatus === ProfileStatusesEnum.OnHold) {
+      this.candidateForm.get('holdEndDate')?.setValue(candidate.holdEndDate);
+    }
   }
 
   public removeValidators(): void {
@@ -103,5 +118,16 @@ export class CandidateProfileFormService {
 
   private getPartialFormValueByControls(value: CandidateModel): any {
     return pick(Object.keys(this.candidateForm.controls), value);
+  }
+
+  private convertDateFildsToUtc(candidate: CandidateModel): CandidateModel {
+    const datesWithUtc = Object.fromEntries(candidateDateFields.map((dateName) => {
+      const date = candidate[dateName as keyof CandidateModel];
+      const dateUtc = date ? DateTimeHelper.convertDateToUtc(date as string) : null;
+
+      return [dateName, dateUtc];
+    }));
+
+    return { ...candidate, ...datesWithUtc };
   }
 }

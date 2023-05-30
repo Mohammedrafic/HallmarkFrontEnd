@@ -5,7 +5,10 @@ import { TakeUntilDestroy } from '@core/decorators';
 import { DateTimeHelper } from '@core/helpers';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { OrientationTab } from '@organization-management/orientation/enums/orientation-type.enum';
-import { OrientationConfiguration, OrientationConfigurationFilters, OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
+import {
+  OrientationConfiguration,
+  OrientationConfigurationFilters,
+  OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
 import { OrientationService } from '@organization-management/orientation/services/orientation.service';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SETUPS_ACTIVATED } from '@shared/constants';
@@ -35,7 +38,14 @@ import { ExportOrientation } from './orientation.action';
 })
 @TakeUntilDestroy
 export class OrientationHistoricalDataComponent extends AbstractPermissionGrid implements OnInit {
-  @Input() public isActive: boolean;
+  @Input('isActive') set isActive(value: boolean) {
+    if (value) {
+      this.filters = { pageNumber: 1, pageSize: this.pageSize };
+      this.getOrientationHistoricalData();
+    }
+    this.isTabActive = value;
+  }
+  public isTabActive: boolean;
   @Input() public isFilter:boolean;
   @ViewChild('grid')
   public grid: GridComponent;
@@ -43,7 +53,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   public readonly orientationTab = OrientationTab;
   public dataSource: OrientationConfigurationPage;
   public filters: OrientationConfigurationFilters = { pageNumber: 1, pageSize: this.pageSize };
-  public disableControls: boolean = false;
+  public disableControls = false;
   public orientationForm: FormGroup = this.orientationService.generateHistoricalDataForm();
   public bulkActionConfig: BulkActionConfig = { activate: true };
   public fileName: string;
@@ -82,6 +92,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   }
 
   override ngOnInit(): void {
+    super.ngOnInit();
     this.watchForDefaultExport();
   }
   private watchForSettingState(): void {
@@ -92,7 +103,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
       .subscribe(val => {
         this.disableControls = val;
         this.cd.markForCheck();
-      })
+      });
   }
 
   private watchForOrgChange(): void {
@@ -161,7 +172,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
        this.store.dispatch(new ExportOrientation(new ExportPayload(
       fileType,
       { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) ,
-        ids: this.selectedRowDatas.length ? this.selectedRowDatas.map((val) => val[this.idFieldName]) : null, },
+        ids: this.selectedRowDatas.length ? this.selectedRowDatas.map((val) => val[this.idFieldName]) : null },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column)
       ,null,
       options?.fileName || this.defaultFileName
@@ -170,7 +181,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   }
   public handleExport(event: RowNode[]): void {
     const nodes = event;
-    this.selectedRowDatas=[]
+    this.selectedRowDatas = [];
     if (nodes.length) {
       nodes.forEach(element => {
         this.selectedRowDatas.push(element.data);
@@ -216,7 +227,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
           this.closeHandler();
           this.getOrientationHistoricalData();
         },
-        error: (error) => this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
+        error: (error) => this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))),
       });
     }
   }

@@ -156,6 +156,7 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
     startDate: startDate || '',
     endDate: endDate || '',
     departmentsIds: departmentsIds ?? [],
+    userLocalTime: DateTimeHelper.toUtcFormat(new Date()),
   };
 };
 

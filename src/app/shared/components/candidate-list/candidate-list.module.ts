@@ -14,6 +14,7 @@ import { CandidateListState } from './store/candidate-list.state';
 import { CandidateListService } from './services/candidate-list.service';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { CheckBoxAllModule  } from '@syncfusion/ej2-angular-buttons';
+import { GridPaginationModule } from '../grid/grid-pagination/grid-pagination.module';
 
 const COMPONENTS = [CandidateListComponent];
 const icons = { User };
@@ -34,7 +35,8 @@ const icons = { User };
     ButtonModule,
     DatePickerModule,
     NgxsModule.forFeature([CandidateListState]),
-    CheckBoxAllModule
+    CheckBoxAllModule,
+    GridPaginationModule,
   ],
   declarations: [...COMPONENTS],
   exports: [...COMPONENTS],

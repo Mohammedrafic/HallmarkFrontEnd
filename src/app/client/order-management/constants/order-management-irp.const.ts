@@ -15,6 +15,7 @@ export const SystemGroupConfig = (
   isIRPIncluded = false,
   isVMSIncluded = false,
   selectedSystemId: OrderManagementIRPSystemId | undefined | null,
+  canViewOrderJourney =false,
 ): ButtonModel[] => {
   const buttons = [];
 
@@ -42,13 +43,13 @@ export const SystemGroupConfig = (
     });
   }
 
-  // if (isIRPIncluded && isVMSIncluded) { // TODO hide before future iterations
-  //   buttons.push({
-  //     id: OrderManagementIRPSystemId.OrderJourney,
-  //     title: 'Order Journey',
-  //     disabled: true,
-  //   });
-  // }
+  if (isIRPIncluded && isVMSIncluded && canViewOrderJourney) { // TODO hide before future iterations
+    buttons.push({
+      id: OrderManagementIRPSystemId.OrderJourney,
+      title: 'Order Journey',
+      active: selectedSystemId === OrderManagementIRPSystemId.OrderJourney && isVMSIncluded && isIRPIncluded,
+    });
+  }
 
   return buttons;
 };

@@ -1,11 +1,5 @@
  @import "colors";
-
-.ag-theme-alpine {
-    --ag-header-foreground-color: white;
-    --ag-header-background-color: grey;
-  
-}
-.app-accumulation-chart{
+ .app-accumulation-chart{
     &__title{
     width: 100%;
     display: block;
@@ -13,13 +7,14 @@
 }
 .widget-header{
     &__title{
-        border-bottom: 1px solid;
         margin-bottom: 11px!important;
         padding-bottom: 5px;
-        color: #65b265!important;
         border-bottom-color: gray;
     }
 }
 .icon{
     color: gray;
+}
+.title i-feather.icon{
+    margin-right: 10px;
 }

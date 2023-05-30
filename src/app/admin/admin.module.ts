@@ -74,6 +74,7 @@ import { OrgInterfaceDialogComponent } from './org-interface/org-interface-dialo
 import { OrgInterfaceConfigurationComponent } from './org-interface/org-interface-dialog/org-interface-configuration/org-interface-configuration.component';
 import { InputModule } from '@shared/components/form-controls/input/input.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { DonotReturnState } from './store/donotreturn.state';
 
 const sidebarIcons = {
   Download,
@@ -161,6 +162,7 @@ const sidebarIcons = {
       ManualInvoiceReasonsState,
       OrganizationManagementState,
       MasterCommitmentState,
+      DonotReturnState
     ]),
   ],
   providers: [

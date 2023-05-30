@@ -4,7 +4,7 @@ import { TAB_ADMIN_TIMESHEETS } from "../../constants/timesheets.constant";
 
 export const GetExportFileName = (tabIndex: number): string => {
     const tabLists = TAB_ADMIN_TIMESHEETS;
-    return `${tabLists[tabIndex].title} ${formatDate(Date.now(), 'MM/dd/yyyy hh:mm a', 'en-US')}`;
+    return `${tabLists[tabIndex].title} ${formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US')}`;
   };
   export const OrganizationTabsToExport: number[] = [
     

@@ -71,8 +71,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   @ViewChild('billRates') billRatesComponent: BillRatesComponent;
 
   @Input('handleSaveEvents') public handleSaveEvents$: Subject<void | MenuEventArgs>;
-  @Input() public externalCommentConfiguration ?: boolean | null; 
-  
+  @Input() public externalCommentConfiguration ?: boolean | null;
+
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order>;
 
@@ -106,6 +106,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public disableOrderType = false;
   public isSaveForTemplate = false;
   public isTemplate = false;
+
+  private isCredentialsChanged = false;
+  private isBillRatesChanged = false;
 
   public constructor(
     private orderCredentialsService: OrderCredentialsService,
@@ -232,17 +235,32 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   public onBillRatesChanged(): void {
+    this.isBillRatesChanged = true;
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   public updateOrderCredentials(credential: IOrderCredentialItem): void {
+    this.isCredentialsChanged = true;
     this.orderCredentialsService.updateOrderCredentials(this.orderCredentials, credential);
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   public deleteOrderCredential(credential: IOrderCredentialItem): void {
+    this.isCredentialsChanged = true;
     this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
     this.store.dispatch(new SetIsDirtyOrderForm(true));
+  }
+
+  public isOrderTouched(): boolean {
+    return this.orderDetailsFormComponent?.orderTypeForm?.touched
+      || this.orderDetailsFormComponent?.generalInformationForm?.touched
+      || this.orderDetailsFormComponent?.jobDistributionForm?.touched
+      || this.orderDetailsFormComponent?.jobDescriptionForm?.touched
+      || this.orderDetailsFormComponent?.contactDetailsForm?.touched
+      || this.orderDetailsFormComponent?.workLocationForm?.touched
+      || this.orderDetailsFormComponent?.specialProject?.touched
+      || this.isBillRatesChanged
+      || this.isCredentialsChanged;
   }
 
   private collectInvalidFields(): string[] {
@@ -367,7 +385,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         new Date(DateTimeHelper.formatDateUTC(this.orderDetailsFormComponent.selectedDepartment.reactivateDate, 'MM/dd/yyyy')) : null;
         locationInactiveDate && locationInactiveDate.setHours(0, 0, 0, 0);
         departmentInactiveDate && departmentInactiveDate.setHours(0, 0, 0, 0);
-      const isLocationOverlaps = IsStartEndDateOverlapWithInactivePeriod(locationInactiveDate, locationReactivateDate, jobStartDate, jobEndDate); 
+      const isLocationOverlaps = IsStartEndDateOverlapWithInactivePeriod(locationInactiveDate, locationReactivateDate, jobStartDate, jobEndDate);
       const isDepartmentOverlaps = IsStartEndDateOverlapWithInactivePeriod(departmentInactiveDate, departmentReactivateDate, jobStartDate, jobEndDate);
       const isLocationDepartmentDateSame = this.orderDetailsFormComponent.selectedLocation.inactiveDate === this.orderDetailsFormComponent.selectedDepartment.inactiveDate;
       if (isLocationOverlaps || isDepartmentOverlaps) {
@@ -756,7 +774,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     };
     const documents = this.orderDetailsFormComponent.documents;
     this.store.dispatch(new SaveOrder(extendedOrder, documents));
-    this.selectOrderTemplatesTab();
     this.closeSaveTemplateDialog();
   }
 
@@ -846,10 +863,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (!this.getOrderDetailsControl('departmentId')?.disabled) {
       this.getOrderDetailsControl('departmentId')?.markAsTouched();
     }
-  }
-
-  private selectOrderTemplatesTab(): void {
-    this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.OrderTemplates));
   }
 
   private getJobDistributionOptions(distributions: JobDistributionModel[]): number[] {

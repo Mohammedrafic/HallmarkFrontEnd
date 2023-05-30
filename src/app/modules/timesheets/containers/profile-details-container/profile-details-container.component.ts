@@ -148,6 +148,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public hasApproveRejectTimesheetRecordsPermission: boolean;
 
+  public canRecalculateTimesheet = false;
+
   public mobileMenu = [{ text: MobileMenuItems.Upload }];
 
   public isMobile = false;
@@ -155,6 +157,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public isSmallTabletScreen = false;
 
   private resizeObserver: ResizeObserverModel;
+
+  private canRecalculate: boolean;
 
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
@@ -364,7 +368,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public showCustomExportDialog(): void {
-    this.fileName = `Timesheet ${formatDate(Date.now(), 'MM/dd/yyyy hh:mm a', 'en-US')}`;
+    this.fileName = `Timesheet ${formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US')}`;
 
     this.store.dispatch(
       new ShowExportDialog(true)
@@ -462,6 +466,11 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       filter(Boolean),
       filter((details) => !details.isNotExist),
       switchMap((details) => {
+        const currentStatus = details.status;
+        const isTimesheetSubmitted = currentStatus === this.timesheetStatus.Approved
+        || currentStatus === this.timesheetStatus.PendingApproval
+        || currentStatus === this.timesheetStatus.PendingApprovalAsterix;
+        this.canRecalculateTimesheet = isTimesheetSubmitted && this.canRecalculate;
         this.timesheetId = details.id;
         this.mileageTimesheetId = details.mileageTimesheetId;
         this.isMileageStatusAvailable = details.mileageStatusText
@@ -579,6 +588,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
           this.hasApproveRejectTimesheetRecordsPermission =
             permissions[this.userPermissions.CanOrganizationApproveRejectTimesheets];
         }
+
+        this.canRecalculate = permissions[this.userPermissions.CanRecalculateTimesheets];
       });
   }
 

@@ -6,7 +6,8 @@
 >
   <div class="input-group multiselect">
     <ejs-multiselect
-      [allowFiltering]="true"
+      #selector
+      [allowFiltering]="allowFilter"
       [attr.id]="id"
       [dataSource]="dataSource"
       [fields]="fields"
@@ -18,6 +19,7 @@
       [showSelectAll]="showSelectAll"
       (selectedAll)="selectAllEmitter.emit($event)"
       [sortOrder]="sortOrder"
+      [showClearButton]="showClearAll"
       (blur)="onBlur()"
       mode="CheckBox"
     ></ejs-multiselect>

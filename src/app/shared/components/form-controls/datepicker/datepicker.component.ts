@@ -1,11 +1,12 @@
 import { Component, EventEmitter, forwardRef, Input, Output, ViewChild } from '@angular/core';
+import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
+import { ChangedEventArgs, DatePickerComponent } from '@syncfusion/ej2-angular-calendars';
 import { FormatObject } from '@syncfusion/ej2-calendars/src/datepicker/datepicker';
 import { MaskPlaceholderModel } from '@syncfusion/ej2-calendars/src/common/maskplaceholder-model';
-import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
+
+import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
 import { datepickerMask } from '@shared/constants';
-import { DatePickerComponent } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
   selector: 'app-datepicker',
@@ -27,4 +28,5 @@ export class DatepickerComponent extends BaseFormControlDirective {
   @Input() public strictMode: boolean = false;
 
   @Output() valueChange: EventEmitter<Date> = new EventEmitter();
+  @Output() change: EventEmitter<ChangedEventArgs> = new EventEmitter();
 }

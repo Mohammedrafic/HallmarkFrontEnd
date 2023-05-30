@@ -18,23 +18,38 @@
     </div>
   </div>
 
-  <div class="sidebar-content">
-    <div #tabs class="tabs-wrapper" *ngIf="selectedDaySchedule">
-      <div
-        class="tab"
-        *ngFor="let tab of shiftTabs; let tabIndex = index; trackBy: trackByTabs"
-        [class.selected]="selectedDayScheduleIndex === tabIndex"
-        (click)="changeTab(tabIndex)"
-      >
-        <div class="tab__title">{{tab.title}}</div>
-        <div class="tab__sub-title">{{tab.subTitle}}</div>
+  <div *ngIf="selectedDaySchedule" class="sidebar-items-selector">
+    <div class="sidebar-items">
+      <div #tabs class="tabs-wrapper">
+        <div
+          class="tab"
+          *ngFor="let tab of shiftTabs; let tabIndex = index; trackBy: trackByTabs"
+          [class.selected]="selectedDayScheduleIndex === tabIndex"
+          (click)="changeTab(tabIndex)"
+        >
+          <div class="tab__title">{{tab.title}}</div>
+          <div class="tab__sub-title">{{tab.subTitle}}</div>
+        </div>
+      </div>
+      <div *ngIf="!isCreateMode" class="add-btn-container">
+        <app-tooltip-container [showToolTip]="scheduleItemType === undefined">
+          <button
+            ejs-button
+            cssClass="e-outline"
+            [disabled]="scheduleItemType === undefined"
+            (click)="addNewSchedule()"
+          >
+            <i-feather name="plus" class="icon"></i-feather>
+          </button>
+        </app-tooltip-container>
       </div>
     </div>
-    <div class="add-new-schedule">
-      <div *ngIf="isCreateMode" class="input-container schedule-types">
+    <ng-container *ngIf="isCreateMode">
+      <div class="separator"></div>
+      <div class="input-container schedule-types">
         <ng-container *ngFor="let type of scheduleTypes.source">
           <div class="input-group radio">
-            <app-tooltip-container [showToolTip]="type.disabled">
+            <app-tooltip-container [message]="type.toolTipMessage" [showToolTip]="type.disabled">
               <ejs-radiobutton
                 (change)="changeScheduleType($event.value)"
                 [formControl]="scheduleTypesControl"
@@ -47,21 +62,14 @@
           </div>
         </ng-container>
       </div>
-      <div *ngIf="!isCreateMode" class="add-btn-container">
-        <app-tooltip-container [showToolTip]="scheduleItemType === undefined">
-          <button
-            ejs-button
-            cssClass="e-outline"
-            [disabled]="scheduleItemType === undefined"
-            (click)="addNewSchedule()"
-          >
-            <i-feather name="plus" class="icon"></i-feather>
-            <span>Add Schedule</span>
-          </button>
-        </app-tooltip-container>
-      </div>
+    </ng-container>
+  </div>
+
+  <div class="sidebar-content">
+    <div *ngIf="showLockedMessage" class="locked-message">
+      <i-feather name="lock" class="icon"></i-feather>
+      <span>Locked {{selectedDaySchedule?.scheduleType}}</span>
     </div>
-    <div class="separator"></div>
     <div class="form-container" *ngIf="scheduleForm">
       <form [formGroup]="scheduleForm" [class]="scheduleFormConfig.formClass">
         <ng-container *ngFor="let control of scheduleFormConfig.formFields">
@@ -84,6 +92,7 @@
                 [max]="datePickerLimitations.maxDate"
                 [formGroupInstance]="scheduleForm"
                 [disabled]="!!control.readonly"
+                (change)="checkOpenPositions($any($event))"
               ></app-datepicker>
             </ng-template>
             <ng-template [ngSwitchCase]="FieldTypes.Input">
@@ -101,12 +110,22 @@
             </ng-template>
             <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
               <div class="input-container bootstrap" [ngStyle]="{'grid-area': control.gridAreaName}">
+                <div
+                  *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Availability && control.field === 'regionId'"
+                  class="availability-open-position">
+                  <div class="separator"></div>
+                  <div class="availability-open-position__title">
+                    Matching Open Positions
+                    <span class="position-counter">{{openPositionsConfig.totalOpenPositions}}</span>
+                  </div>
+                </div>
                 <label [for]="control.field">
                   {{control.title}}
                   <span class="required" *ngIf="control.required">*</span>
                 </label>
                 <div class="input-group dropdown" *ngIf="control.sourceKey">
                   <ejs-dropdownlist
+                    (change)="checkOpenPositions($event)"
                     [dataSource]="scheduleFormSourcesMap[control.sourceKey]"
                     [fields]="dropDownFields"
                     [enabled]="!control.readonly"
@@ -127,6 +146,7 @@
                     placeholder="HH:MM"
                     [formControlName]="control.field"
                     format="HH:mm"
+                    [enabled]="!control.readonly"
                     [showClearButton]="false"
                     [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                     [enableMask]="true"
@@ -140,11 +160,22 @@
         </ng-container>
       </form>
     </div>
+    <div class="schedule-open-position-wrapper" *ngIf="openPositionsConfig.showOpenPositionsPanel">
+      <div class="position-title" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
+        Matching Open Positions
+        <span class="position-counter">{{openPositionsConfig.totalOpenPositions}}</span>
+      </div>
+      <app-schedule-open-positions [candidateId]="scheduledItem.candidate.id"></app-schedule-open-positions>
+    </div>
   </div>
 
   <div *ngIf="!isCreateMode" class="sidebar-footer">
     <div class="checkbox-container bootstrap" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
-      <ejs-checkbox [formControl]="createPerDiemOrderControl" label="Create Per Diem Order"></ejs-checkbox>
+      <ejs-checkbox
+        [disabled]="!hasEditPermissions"
+        [formControl]="createPerDiemOrderControl"
+        label="Create Per Diem Order"
+      ></ejs-checkbox>
     </div>
     <app-tooltip-container class="remove-schedule-wrapper" [showToolTip]="!hasEditPermissions">
       <button

@@ -57,11 +57,17 @@ const routes: Routes = [
       },
       {
         path: 'orginterfaces',
-        component : OrgInterfaceComponent
+        component : OrgInterfaceComponent,
+        data: {
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'loginterfaces',
-        component : LogInterfaceComponent
+        component : LogInterfaceComponent,
+        data: {
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'master-data',

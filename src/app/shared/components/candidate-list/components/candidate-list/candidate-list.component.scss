@@ -1,4 +1,5 @@
 @import "colors";
+@import "adaptive-response";
 
 .user-photo {
   background-color: $secondary-dark-blue-40;
@@ -10,6 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   .user-icon {
     color: $secondary-dark-blue-20;
   }
@@ -41,10 +43,25 @@
 .row {
   display: flex;
 }
+
 ejs-checkbox.e-checkbox-wrapper.e-wrapper {
   padding: 0px 70px 0px 0px;
 }
+
 .skill-name {
   font-size: 14px;
   line-height: 20px;
+}
+
+@media #{$max-mobile} {
+  .input-container {
+    &.candidate-id,
+    &.candidate-name {
+      width: 100%;
+    }
+  }
+
+  .row {
+    flex-direction: column;
+  }
 }

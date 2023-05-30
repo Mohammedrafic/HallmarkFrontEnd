@@ -74,6 +74,7 @@ export abstract class AbstractGridConfigurationComponent {
   idFieldName = 'id'; // Override in child component in case different id property
 
   filteredItems: FilteredItem[] = [];
+  filteredOrdersJourneyItems: FilteredItem[] = [];
   filteredCount = 0;
 
   isLoaded = false;
@@ -93,7 +94,7 @@ export abstract class AbstractGridConfigurationComponent {
    */
   generateDateTime(datePipe: DatePipe): string {
     if (datePipe) {
-      return datePipe.transform(Date.now(), 'MM/dd/yyyy hh:mm a') as string;
+      return datePipe.transform(Date.now(), 'MM/dd/yyyy HH:mm') as string;
     }
     return '';
   }

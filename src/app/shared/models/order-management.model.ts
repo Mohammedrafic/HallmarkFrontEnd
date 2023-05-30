@@ -41,6 +41,7 @@ export class OrderManagement {
   candidates: number;
   startDate: string;
   isLocked?: boolean;
+  isTemplate?: boolean;
   reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
   children: OrderManagementChild[];
@@ -60,6 +61,7 @@ export class OrderManagement {
   irpOrderMetadata?: IRPMetaData;
   irpCandidatesCount?: number;
   activeCandidatesCount?: number;
+  isLockedIRP: boolean;
 }
 
 export interface IRPOrderManagement {
@@ -97,6 +99,23 @@ export interface IRPOrderManagement {
   acceptedEmployees: null;
   isMoreMenuWithDeleteButton?: boolean;
   children: OrderManagementChild[];
+  isLockedIRP: boolean;
+}
+
+export interface GetOrdersJourney{
+  id: number;
+  orderId: string;
+  status:  string;
+  system:  string;
+  type:  string;
+  jobTitle:  string;
+  skill:  string;
+  creationDate: Date,
+  publishedInIRP: Date|null,
+  publishedInVMS: Date|null,
+  noOfDaysInIRP?: number,
+  noOfDaysInVMS?: number,
+  revokedInVMS: Date|null
 }
 
 export interface IRPCandidateForPosition {
@@ -174,6 +193,7 @@ export class OrderManagementFilter {
 
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
 export type IRPOrderManagementPage = PageOfCollections<IRPOrderManagement>;
+export type OrdersJourneyPage = PageOfCollections<GetOrdersJourney>;
 
 export type AgencyOrderManagement = {
   orderId: number;
@@ -211,6 +231,7 @@ export type AgencyOrderManagement = {
   organizationPrefix: string;
   extensionFromId?: number;
   candidates?: CandidateModel[];
+  irpOrderMetadata?: IRPMetaData;
 };
 
 export interface OrderManagementChild  {
@@ -468,6 +489,7 @@ export class Order {
   canProceedRevoke?: boolean;
   externalCommentsConfiguration?:boolean | null;
   activeCandidatesCount?: number;
+  isLockedIRP?: boolean;
 }
 
 export class ReOrder {
@@ -680,6 +702,7 @@ export class OrderFilter {
   orderType?: number | null;
   contactEmails?: string[] | string;
   irpOnly?: boolean | null;
+  reorderStatuses?: (string | number)[];
 }
 
 export class SortModel {
@@ -722,6 +745,7 @@ export class OrderFilterDataSource {
   poNumbers: { id: number; poNumber: string }[];
   projectNames: { id: number; projectName: string }[];
   specialProjectCategories: { id: number; projectType: string }[];
+  reorderStatuses: FilterOrderStatus[];
 }
 
 export type CandidateListEvent = {
@@ -769,6 +793,7 @@ export interface IrpCandidatesParams {
   PageSize: number;
   PageNumber: number;
   isAvailable: boolean;
+  searchTerm?: any;
 }
 
 export class CandidateCancellationReason{
@@ -779,4 +804,23 @@ export class CandidateCancellationReason{
 export class CandidateCancellationReasonFilter{
   regionId?:number;
   locationId?:number;
+}
+
+
+export class OrderJourneyFilter {
+  orderBy?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+  orderPublicId?: string | null;
+  skillIds?: number[];
+  orderTypes?: number[];
+  jobTitle?: string;
+  jobStartDate?: Date | null;
+  jobEndDate?: Date | null;
+  orderStatuses?: (string | number)[];
+  includeInIRP?:boolean;
+  includeInVMS?:boolean;
 }

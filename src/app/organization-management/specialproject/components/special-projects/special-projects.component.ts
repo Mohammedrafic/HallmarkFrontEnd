@@ -18,6 +18,7 @@ import { SpecialProjectState } from '../../../store/special-project.state';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '../../../../shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { SpecilaProjectCategoryTableColumns } from '@organization-management/specialproject/enums/specialproject.enum';
 
 @Component({
   selector: 'app-special-projects',
@@ -27,16 +28,17 @@ import { ConfirmService } from '@shared/services/confirm.service';
 
 export class SpecialProjectsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
+  @Input() showSelectSystem: boolean;
   @Output() onEdit = new EventEmitter<SpecialProject>();
 
-  @Select(SpecialProjectState.specialProjectPage) 
+  @Select(SpecialProjectState.specialProjectPage)
   specialProjectPage$: Observable<SpecialProjectPage>;
 
   private unsubscribe$: Subject<void> = new Subject();
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
   public gridApi!: GridApi;
-  public rowData: SpecialProject[]=[];
+  public rowData: SpecialProject[] = [];
   public rowSelection: 'single' | 'multiple' = 'single';
   public actionCellrenderParams: any = {
     handleOnEdit: (params: SpecialProject) => {
@@ -46,15 +48,27 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
       this.deleteSpecialProject(params);
     }
   }
-  constructor(private store: Store, private confirmService: ConfirmService,private datePipe: DatePipe) {
+  constructor(private store: Store, private confirmService: ConfirmService, private datePipe: DatePipe) {
     super();
   }
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = SpecialProjectColumnsDefinition(this.actionCellrenderParams, this.datePipe);
- 
+
   ngOnInit(): void {
-    
+
     this.getSpecialProjects();
+
+    this.columnDefinitions.forEach(element => {
+      if (element.field == SpecilaProjectCategoryTableColumns.System) {
+        if (this.showSelectSystem) {
+          element.hide = false
+        } else {
+          element.hide = true
+        }
+
+      }
+    });
+
   }
   ngOnDestroy(): void {
     this.unsubscribe$.next();
@@ -141,6 +155,7 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
     this.specialProjectPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (!data || !data?.items.length) {
         this.gridApi?.showNoRowsOverlay();
+        this.gridApi?.setRowData([]);
       }
       else {
         this.gridApi?.hideOverlay();
@@ -148,7 +163,7 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
         this.gridApi?.setRowData(this.rowData);
       }
     });
-  
+
   }
 
   deleteSpecialProject(params: any): void {

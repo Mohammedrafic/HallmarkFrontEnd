@@ -10,6 +10,7 @@ export interface PermissionsModel {
   canCreateOrder: boolean;
   canCloseOrder: boolean;
   canManageOrganizationConfigurations: boolean;
+  canOrderJourney:boolean;
 }
 
 export type CustomPermissionModel = { [key: string]: PermissionTypes  };
@@ -33,8 +34,9 @@ export class PermissionService extends DestroyableDirective {
         return {
           canCreateOrder: permissionIds.includes(PermissionTypes.CanCreateOrder),
           canCloseOrder: permissionIds.includes(PermissionTypes.CanCloseOrder),
-          canManageOrganizationConfigurations: permissionIds.includes(PermissionTypes.ManageOrganizationConfigurations)
-        };
+          canManageOrganizationConfigurations: permissionIds.includes(PermissionTypes.ManageOrganizationConfigurations),
+          canOrderJourney: permissionIds.includes(PermissionTypes.ViewOrderJourney)
+          };
       })
     );
   }

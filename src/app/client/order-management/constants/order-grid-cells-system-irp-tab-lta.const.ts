@@ -51,9 +51,9 @@ export const GridCellsSystemIRPTabLta = (
             action: () => {
               params.context.componentParent.lockOrder(params.data);
             },
-            iconName: params.data.isLocked ? 'lock' : 'unlock',
-            buttonClass: params.data.isLocked ? 'e-danger' : '',
-            isCustomIcon: !params.data.isLocked,
+            iconName: params.data.isLockedIRP ? 'lock' : 'unlock',
+            buttonClass: params.data.isLockedIRP ? 'e-danger' : '',
+            isCustomIcon: !params.data.isLockedIRP,
             disabled: !canCreateOrder
             || ![OrderStatus.Open, OrderStatus.InProgress, OrderStatus.Filled].includes(params.data.status)
             || !hasCreateEditOrderPermission
@@ -199,7 +199,7 @@ export const GridCellsSystemIRPTabLta = (
   ...(isIRPEnabled ? [{
     ...DefaultOrderCol,
     field: 'irpCandidatesCount',
-    headerName: isIRPEnabled && !isVMSEnabled ? 'CAND.' : 'IRP CANDID',
+    headerName: isIRPEnabled && !isVMSEnabled ? 'CAND.' : 'IRP CAND',
     width: 120,
     minWidth: 120,
     maxWidth: 120,
@@ -207,7 +207,7 @@ export const GridCellsSystemIRPTabLta = (
   ...(isVMSEnabled ? [{
     ...DefaultOrderCol,
     field: 'vmsCandidatesCount',
-    headerName: 'VMS CANDID',
+    headerName: 'VMS CAND',
     width: 120,
     minWidth: 120,
     maxWidth: 120,

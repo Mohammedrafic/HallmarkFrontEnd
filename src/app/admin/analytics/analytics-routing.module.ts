@@ -1,3 +1,5 @@
+import { HoursByDepartmentComponent } from './hours-by-department/hours-by-department.component';
+import { UnitProfileComponent } from './unit-profile/unit-profile.component';
 import { ScheduledHoursComponent } from './scheduled-hours/scheduled-hours.component';
 import { StaffListComponent } from './staff-list/staff-list.component';
 import { NgModule } from '@angular/core';
@@ -369,6 +371,20 @@ const routes: Routes = [
           isOrganizationArea: true,
         }
       },
+      {
+        path: 'unit-profile',
+        component: UnitProfileComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'hours-by-department',
+        component: HoursByDepartmentComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      }
     ],
   },
 ];

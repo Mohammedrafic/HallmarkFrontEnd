@@ -20,7 +20,7 @@ export const EDIT_CONFIRM_TEXT =
   'Are you sure you want to edit the Bill rate for Onboarded Candidate? This may lead to recalculating values and generating new invoice records.';
 export const DELETE_CONFIRM_TITLE = 'Unsaved Progress';
 export const ORIENTATION_CHANGE_CONFIRM_TITLE = 'Change Orientation Type';
-export const ORIENTATION_CHANGE_TEXT = 'Are you sure you want to provide those changes? It will cause moving all records to Historical Data grid.';
+export const ORIENTATION_CHANGE_TEXT = 'Are you sure you want to provide that change? It will cause moving all records to Historical Data grid. All unfinished Orientation processes will need to be rescheduled.';
 export const UNSAVED_TABS_TEXT = 'Are you sure you want to leave this tab without saving?';
 export const CANCEL_CONFIRM_TEXT = 'Are you sure you want to cancel? All data will be deleted.';
 export const RESEND_EMAIL_TITLE = 'Sending Welcome Email';
@@ -114,3 +114,10 @@ export const ALL_DEPARTMENTS_SELECTED = 'You can`t assign Departments manually w
 export const NO_ACTIVE_WORK_COMMITMET = 'No active Work Commitment';
 export const REASON_WARNING = 'Please select a System for Reason';
 export const EMPLOYEE_SKILL_CHANGE_WARNING = 'Are you sure, you want to update Employee Skills? It may have impact on Schedule and Orders.';
+export const IRP_DEPARTMENT_CHANGE_WARNING = 'Are you sure, you want to provide that change? It may cause deleting future schedules and canceling Employee from orders.';
+export const EMPLOYEE_TERMINATED_WARNING = 'Are you sure you want to terminate the employee?';
+export const addAvailabilityToStart = 'Add Availability to start Scheduling';
+
+export const RECORD_SAVED_SUCCESS = 'Record saved successfully';
+export const UpdateClosedPositionRate = 'Are you sure you want to update the Bill rate ' 
++ 'for Closed Position? This may lead to recalculating values and generating new invoice records.';

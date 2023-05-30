@@ -149,6 +149,12 @@ export enum UserPermissions {
   ViewUnavailabilityReasons = 2811,
   CanEditUnavailabilityReasons = 2812,
 
+  // Order management
+  CanUpdateBillRates = 8101,
+
+  //Timesheets
+  CanRecalculateTimesheets = 8102,
+
   // Organization Invoices
   OrganizationInvoices = 3500,
   CanOrganizationViewInvoices = 3501,
@@ -197,6 +203,9 @@ export enum UserPermissions {
   CanEditPayRates = 6404,
   //AgencyReports
   AgencyReports=7000,
-  CanViewAgencyFinancialTimesheet =7001
+  CanViewAgencyFinancialTimesheet = 7001,
+  CanViewAgencyInvoiceSummary = 7002,
+  //View Order Journey
+  ViewOrderJourney = 8001,
 
 }

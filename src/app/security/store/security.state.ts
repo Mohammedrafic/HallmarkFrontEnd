@@ -12,6 +12,7 @@ import {
   GetNewRoleBusinessByUnitType,
   GetRolesForCopy,
   GetPermissionsTree,
+  GetIRPPermissionsTree,
   GetRolePerUser,
   GetRolesPage,
   GetUsersPage,
@@ -37,6 +38,8 @@ import {
   GetLogHistoryById,
   GetBusinessForEmployeeType,
   GetEmployeeUsers,
+  ExportTimeSheetList,
+  GetLogFileDownload,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -44,7 +47,7 @@ import { PermissionsTree } from '@shared/models/permission.model';
 import { RoleTreeField } from '../roles-and-permissions/role-form/role-form.component';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
+import { DOCUMENT_DOWNLOAD_SUCCESS, EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UsersService } from '../services/users.service';
 import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
@@ -69,6 +72,7 @@ interface SecurityStateModel {
   rolesPage: RolesPage | null;
   rolesPerUsers: RolesPerUser[] | null;
   permissionsTree: PermissionsTree;
+  permissionsIRPTree:PermissionsTree;
   isNewRoleDataLoading: boolean;
   newRoleBussinesData: BusinessUnit[];
   userVisibilitySettingsPage: UserVisibilitySettingsPage | null;
@@ -80,6 +84,7 @@ interface SecurityStateModel {
   logDialogOptions: DialogNextPreviousOption;
   logTimeSheetHistoryPage: LogTimeSheetHistoryPage | null;
   userData: User[];
+  logFileDownloadDetail:any;
 }
 
 @State<SecurityStateModel>({
@@ -91,6 +96,7 @@ interface SecurityStateModel {
     allUsersPage: null,
     rolesPerUsers: [],
     permissionsTree: [],
+    permissionsIRPTree:[],
     isNewRoleDataLoading: false,
     newRoleBussinesData: [],
     userVisibilitySettingsPage: null,
@@ -104,7 +110,8 @@ interface SecurityStateModel {
       previous: false,
     },
     logTimeSheetHistoryPage:null,
-    userData: []
+    userData: [],
+    logFileDownloadDetail:null
   },
 })
 @Injectable()
@@ -215,6 +222,10 @@ export class SecurityState {
   static permissionsTree(state: SecurityStateModel): PermissionsTree {
     return state.permissionsTree;
   }
+  @Selector()
+  static permissionsIRPTree(state: SecurityStateModel): PermissionsTree {
+    return state.permissionsIRPTree;
+  }
 
   @Selector()
   static isNewRoleDataLoading(state: SecurityStateModel): boolean {
@@ -253,6 +264,11 @@ export class SecurityState {
   @Selector()
   static userData(state: SecurityStateModel): User[] {
     return state.userData;
+  }
+
+  @Selector()
+  static logFileDownloadDetail(state: SecurityStateModel): any | null {
+    return state.logFileDownloadDetail;
   }
 
   constructor(
@@ -377,6 +393,23 @@ export class SecurityState {
     return this.roleService.getPermissionsTree(type).pipe(
       tap((payload) => {
         patchState({ permissionsTree: payload });
+        patchState({ isNewRoleDataLoading: false });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+  @Action(GetIRPPermissionsTree)
+  GetPermissionsIRPTree(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { type }: GetIRPPermissionsTree
+  ): Observable<PermissionsTree | void> {
+    patchState({ isNewRoleDataLoading: true });
+    return this.roleService.getPermissionsIRPTree(type).pipe(
+      tap((payload) => {
+        patchState({ permissionsIRPTree: payload });
         patchState({ isNewRoleDataLoading: false });
         return payload;
       }),
@@ -657,6 +690,30 @@ export class SecurityState {
           return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
         })
       );
+  }
+  
+  @Action(GetLogFileDownload)
+  GetLogFileDownload({ patchState, dispatch }: StateContext<SecurityStateModel>, { runId,organizationId }: GetLogFileDownload): Observable<any | void> {
+    return this.orgInterfaceService.logFileDownload(runId,organizationId).pipe(
+      tap((payload) => {
+        patchState({ logFileDownloadDetail: payload });
+        dispatch(new ShowToast(MessageTypes.Success, DOCUMENT_DOWNLOAD_SUCCESS));
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(ExportTimeSheetList)
+  ExportTimeSheetList({}: StateContext<SecurityStateModel>, { payload }: ExportTimeSheetList): Observable<Blob> {
+    return this.orgInterfaceService.export(payload).pipe(
+      tap((file: Blob) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
   }
 
   @Action(GetBusinessForEmployeeType)

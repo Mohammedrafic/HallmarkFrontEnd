@@ -52,15 +52,15 @@ export class AddDialogHelper<T> extends TimesheetDateHelper {
   /**
    * TODO: rework with unique field.
    */
-  public trackByIndex(index: number): number {
+  trackByIndex(index: number): number {
     return index;
   }
 
-  public updateValidity(): void {
+  updateValidity(): void {
     this.form?.updateValueAndValidity();
   }
 
-  public cancelChanges(): void {
+  cancelChanges(): void {
     if (this.form?.touched) {
 
       /**

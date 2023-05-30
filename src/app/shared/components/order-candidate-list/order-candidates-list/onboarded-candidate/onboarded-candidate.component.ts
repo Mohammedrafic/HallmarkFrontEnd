@@ -4,11 +4,9 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import {
@@ -19,15 +17,16 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
-import { OPTION_FIELDS
+import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged } from 'rxjs';
+import {
+  OPTION_FIELDS,
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order,
   OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { DatePipe, formatDate } from '@angular/common';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { formatDate } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
@@ -66,6 +65,7 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -74,7 +74,7 @@ import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-s
   providers: [MaskedDateTimeService, UNSAVED_FORM_PROVIDERS(OnboardedCandidateComponent)],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OnboardedCandidateComponent extends UnsavedFormComponentRef implements OnInit, OnDestroy, OnChanges {
+export class OnboardedCandidateComponent extends UnsavedFormComponentRef implements OnInit, OnDestroy {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
   @Select(OrderManagementContentState.rejectionReasonsList)
@@ -95,8 +95,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Output() closeModalEvent = new EventEmitter<never>();
 
   @Input() candidate: OrderCandidatesList;
-  @Input() isTab: boolean = false;
-  @Input() isAgency: boolean = false;
+  @Input() isTab = false;
+  @Input() isAgency = false;
   @Input() orderDuration: Duration;
   @Input() actionsAllowed: boolean;
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
@@ -104,7 +104,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() isOrderOverlapped: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Input() isCandidatePayRateVisible: boolean;
-
+  @Input() canEditBillRate = false;
+  @Input() canEditClosedBillRate = false;
   @Input() order: Order;
 
   public override form: FormGroup;
@@ -122,8 +123,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public priceUtils = PriceUtils;
   public nextApplicantStatuses: ApplicantStatus[];
   public isActiveCandidateDialog$: Observable<boolean>;
-  public showHoursControl: boolean = false;
-  public showPercentage: boolean = false;
+  public showHoursControl = false;
+  public showPercentage = false;
   public orderPermissions: CurrentUserPermission[];
   public canShortlist = false;
   public canInterview = false;
@@ -134,14 +135,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public payRateSetting = CandidatePayRateSettings;
   public candidateCancellationReasons: CandidateCancellationReason[] | null;
-
-  get startDateControl(): AbstractControl | null {
-    return this.form.get('startDate');
-  }
-
-  get endDateControl(): AbstractControl | null {
-    return this.form.get('endDate');
-  }
+  public readonly reorderType: OrderType = OrderType.ReOrder;
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -184,7 +178,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public comments: Comment[] = [];
 
   constructor(
-    private datePipe: DatePipe,
     private store: Store,
     private actions$: Actions,
     private orderCandidateListViewService: OrderCandidateListViewService,
@@ -194,24 +187,19 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     private changeDetectorRef: ChangeDetectorRef
   ) {
     super();
+    this.createForm();
   }
 
   ngOnInit(): void {
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
-    this.createForm();
-    this.patchForm();
+
     this.subscribeOnReasonsList();
     this.checkRejectReason();
-    this.subscribeOnUpdateOrganisationCandidateJobError();
+    this.subscribeOnUpdateOrganizationCandidateJobError();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeOnGetStatus();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    const { candidate } = changes;
-    if (candidate?.currentValue && !candidate?.isFirstChange()) {
-      this.getComments();
-    }
+    this.observeCandidateJob();
+    this.observeStartDate();
   }
 
   ngOnDestroy(): void {
@@ -338,7 +326,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.order.jobStartDate,
         this.order.jobEndDate
       );
-      this.form.patchValue({ endDate });
+      const dateWithoutZone = DateTimeHelper.toUtcFormat(endDate);
+
+      this.form.patchValue({ endDate: DateTimeHelper.convertDateToUtc(dateWithoutZone) });
     }
   }
 
@@ -414,7 +404,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       : of(true);
   }
 
-  private patchForm(): void {
+  private observeCandidateJob(): void {
     this.candidateJobState$
       .pipe(
         takeUntil(this.unsubscribe$),
@@ -431,12 +421,15 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
           ? value.offeredStartDate : value.actualStartDate;
-          const actualEnd = this.durationService.getEndDate(value.order.duration, new Date(actualStart)).toString();
+          const actualEnd = this.durationService.getEndDate(value.order.duration, new Date(actualStart), {
+            jobStartDate: value.order.jobStartDate,
+            jobEndDate: value.order.jobEndDate,
+          }).toString();
 
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-            date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
-              DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString())],
+            date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate?.toString()),
+              DateTimeHelper.convertDateToUtc(value.order.jobEndDate?.toString())],
             billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
@@ -494,7 +487,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     }
   }
 
-  private subscribeOnUpdateOrganisationCandidateJobError(): void {
+  private subscribeOnUpdateOrganizationCandidateJobError(): void {
     this.actions$
       .pipe(ofActionSuccessful(ShowToast))
       .pipe(
@@ -625,7 +618,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       penaltyCriteria: new FormControl(''),
       rate: new FormControl(''),
       hours: new FormControl(''),
-      candidatePayRate: new FormControl(null)
+      candidatePayRate: new FormControl(null),
     });
 
     this.jobStatusControl = new FormControl('');
@@ -664,9 +657,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   private subscribeCandidateCancellationReasons() {
     if (this.candidateJob) {
-      let payload: CandidateCancellationReasonFilter = {
+      const payload: CandidateCancellationReasonFilter = {
         locationId: this.candidateJob?.order.locationId,
-        regionId: this.candidateJob?.order.regionId
+        regionId: this.candidateJob?.order.regionId,
       };
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
@@ -683,6 +676,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     jobStartDate: Date | string,
     jobEndDate: Date | string
   ): Date {
+
     return this.durationService.getEndDate(
       orderDuration,
       startDate,
@@ -709,5 +703,17 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   private checkForBillRateUpdate(rates: BillRate[]): boolean {
     return rates.some((rate) => !!rate.isUpdated);
+  }
+
+  private observeStartDate(): void {
+    this.form.get('startDate')?.valueChanges
+    .pipe(
+      distinctUntilChanged(),
+      filter((date) => !!date),
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((date: Date) => {
+      this.changeActualEndDate(date);
+    });
   }
 }

@@ -186,6 +186,7 @@
           [hasApproveRejectMileagesPermission]="
             isAgency ? true : userPermission[userPermissions.CanOrganizationApproveRejectMileages]
           "
+          [canRecalculateTimesheet]="canRecalculateTimesheet"
           (openAddSideDialog)="openAddDialog($event)"
           (uploadSideDialog)="openUploadSideDialog($event)"
           (changesSaved)="handleEditChanges($event)"

@@ -87,7 +87,7 @@ export const GeneralInformationConfigLTA = (): OrderFormsConfig  => ({
       required: true,
       show: true,
       type: FieldType.Dropdown,
-      dataSource: ORDER_MASTER_SHIFT_NAME_LIST,
+      dataSource: [],
     },
     {
       field: 'shiftStartTime',
@@ -169,7 +169,7 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
       required: true,
       show: true,
       type: FieldType.Dropdown,
-      dataSource: ORDER_MASTER_SHIFT_NAME_LIST,
+      dataSource: [],
     },
     {
       field: 'shiftStartTime',
@@ -436,7 +436,7 @@ export const SpecialConfigProject = (): OrderFormsConfig => ({
       field: 'poNumberId',
       title: 'PO#',
       required: false,
-      show: true,
+      show: false,
       type: FieldType.Dropdown,
       dataSource: [],
     },

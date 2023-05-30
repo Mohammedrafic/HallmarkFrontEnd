@@ -109,6 +109,7 @@
                         appUnsavedForm
                         (closeModalEvent)="onClose()"
                         [orderDuration]="(selectedOrder$ | async)?.duration!"
+                        [canEditClosedBillRate]="canEditClosedBillRates"
                         [actionsAllowed]="agencyActionsAllowed"
                         [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
                         [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
@@ -257,7 +258,7 @@
             </e-chips>
           </ejs-chiplist>
         </div>
-        <div class="e-card-content button-container" *ngIf="(isOnboard || isCancelled) && !isAgency">
+        <div class="e-card-content button-container" *ngIf="isOnboard && !isAgency">
           <div class="input-group dropdown bootstrap input-readonly" *ngIf="isOnboard">
             <ejs-dropdownlist
               [allowFiltering]="true"
@@ -323,7 +324,7 @@
     </section>
 
     <section class="bill-rates">
-      <ng-container [ngTemplateOutlet]="isCancelled || isAgency ? billRates : editBillRates"></ng-container>
+      <ng-container [ngTemplateOutlet]="(isCancelled && !canEditClosedBillRates) || isAgency ? billRates : editBillRates"></ng-container>
       <ng-template #billRates>
         <app-bill-rates-view-grid [billRatesData]="candidateJob?.billRates || []"></app-bill-rates-view-grid>
       </ng-template>

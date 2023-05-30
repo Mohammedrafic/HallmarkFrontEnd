@@ -11,6 +11,7 @@ import { Organization } from '../../shared/models/organization.model';
 import { AGENCYREPORTS_SETTINGS } from './agency-reports-menu.config';
 import { filter, Observable, switchMap, takeUntil, Subject } from 'rxjs';
 import { GetOrganizationById } from '../../admin/store/admin.actions';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-agency-reports',
   templateUrl: './agency-reports.component.html',
@@ -28,7 +29,7 @@ export class AgencyReportsComponent extends AbstractPermission implements OnInit
   private agencyReportSettings = AGENCYREPORTS_SETTINGS;
   private isIRPFlagEnabled = false;
   private isIRPForOrganizationEnabled = false;
-  constructor(protected override store: Store) {
+  constructor(protected override store: Store, private router: Router) {
     super(store);
 
     store.dispatch(new SetHeaderState({ title: 'Reports', iconName: 'pie-chart' }));
@@ -62,12 +63,15 @@ export class AgencyReportsComponent extends AbstractPermission implements OnInit
     const agencyReportSettingsFinal =
         this.agencyReportSettings.filter((item) => !item.isIRPOnly);
     this.sideMenuConfig = this.checkValidPermissions(agencyReportSettingsFinal);
+    if (this.sideMenuConfig.length == 0) {
+      this.router.navigate(['/']);
+    }
   }
   private startOrgIdWatching(): void {
     this.organizationId$
       .pipe(
-        //switchMap((id) =>
-        //  this.getOrganization(id)),
+        switchMap((id) =>
+          this.getOrganization(id)),
         takeUntil(this.componentDestroy())
       )
       .subscribe(() => {

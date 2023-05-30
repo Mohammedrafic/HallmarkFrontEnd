@@ -7,5 +7,11 @@ export const AGENCYREPORTS_SETTINGS: MenuSettings[] = [
     route: './financial-timesheet-report',
     permissionKeys: ['CanViewAgencyFinancialTimesheet'],
   },
+  {
+    text: 'Invoice Summary',
+    id: 2,
+    route: './invoice-summary-report',
+    permissionKeys: ['CanViewAgencyInvoiceSummary'],
+  },
   
 ];

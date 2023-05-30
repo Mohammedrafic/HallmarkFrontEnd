@@ -259,7 +259,7 @@
               <span class="share-with-text">Share With</span>
             </div>
           </div>
-          <div class="form-elemet" *ngIf="this.user?.businessUnitType!=businessUnitTypes.Agency">
+          <div class="form-elemet" *ngIf="this.businessFilterForm.get('filterBusinessUnit')?.value===3">
             <div class="group">
               <div class="input-container agency-switcher-container">
                 <div class="input-group datepicker">
@@ -299,7 +299,7 @@
               </div>
             </div>
           </div>
-          <div class="form-elemet" *ngIf="this.user?.businessUnitType!=businessUnitTypes.Organization">
+          <div class="form-elemet" *ngIf="this.businessFilterForm.get('filterBusinessUnit')?.value===4">
             <div class="group">
               <div class="input-container agency-switcher-container">
                 <div class="input-group datepicker">
@@ -356,7 +356,7 @@
           <span class="share-with-text">Share With</span>
         </div>
       </div>
-      <div class="form-elemet" *ngIf="this.user?.businessUnitType!=businessUnitTypes.Agency">
+      <div class="form-elemet" *ngIf="this.businessFilterForm.get('filterBusinessUnit')?.value===3">
         <div class="group">
           <div class="input-container agency-switcher-container">
             <div class="input-group datepicker">
@@ -396,7 +396,7 @@
           </div>
         </div>
       </div>
-      <div class="form-elemet" *ngIf="this.user?.businessUnitType!=businessUnitTypes.Organization">
+      <div class="form-elemet" *ngIf="this.businessFilterForm.get('filterBusinessUnit')?.value===4">
         <div class="group">
           <div class="input-container agency-switcher-container">
             <div class="input-group datepicker">

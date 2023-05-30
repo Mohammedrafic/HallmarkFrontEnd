@@ -130,8 +130,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
 
-  private itemsPerPage = 30;
-
   private filteredByEmployee = false;
 
   private scheduleToBook: ScheduleBook | null;
@@ -247,26 +245,32 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     }
   }
 
+  //TODO: refactor this method, avoid cyclomatic complexity
   selectDateSlot(date: string, candidate: ScheduleInt.ScheduleCandidate, schedule?: ScheduleInt.ScheduleDateItem): void {
     const candidateSelectedSlot = this.selectedCandidatesSlot.get(candidate.id);
-
-    if(schedule) {
-      candidate.days = this.scheduleGridService.createDaysForSelectedSlots(candidate.days, schedule.daySchedules);
-    }
 
     if (candidateSelectedSlot) {
       if (candidateSelectedSlot.dates.has(date)) {
         candidateSelectedSlot.dates.delete(date);
-        candidateSelectedSlot.candidate.days = candidate.days;
+        candidateSelectedSlot.candidate.days =
+          this.scheduleGridService.removeCandidateSlotDay(candidateSelectedSlot.candidate.days, date);
 
         if (!candidateSelectedSlot.dates.size) {
           this.selectedCandidatesSlot.delete(candidate.id);
         }
       } else {
         candidateSelectedSlot.dates.add(date);
+
+        if(schedule) {
+          candidateSelectedSlot.candidate.days =
+            this.scheduleGridService.createDaysForSelectedSlots(candidate.days, schedule.daySchedules);
+        }
       }
     } else {
-      this.selectedCandidatesSlot.set(candidate.id, { candidate, dates: new Set<string>().add(date) });
+      const selectedCandidateSlots =
+        this.scheduleGridService.createSelectedCandidateSlotsWithDays(candidate, date, schedule);
+
+      this.selectedCandidatesSlot.set(candidate.id, selectedCandidateSlots);
     }
   }
 
@@ -405,12 +409,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         takeUntil(this.componentDestroy()),
       )
       .subscribe(() => {
-        const { items, totalCount } = this.scheduleData || {};
-
-        if ((items?.length || 0) < (totalCount || 0)) {
-          this.loadMoreData.emit(Math.ceil((items?.length || 1) / this.itemsPerPage));
+        if (this.scheduleData) {
+          const { pageNumber, totalPages } = this.scheduleData;
+          this.loadMoreItemPerPage(pageNumber,totalPages);
         }
       });
+  }
+
+  private loadMoreItemPerPage(pageNumber: number, totalPages: number): void {
+    if (this.scheduleData && (totalPages > pageNumber)) {
+      this.loadMoreData.emit(pageNumber + 1);
+    }
   }
 
   private watchForCandidateSearch(): void {

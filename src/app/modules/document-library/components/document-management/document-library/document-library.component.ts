@@ -11,6 +11,7 @@ import { SetHeaderState, ShowDocPreviewSideDialog, ShowSideDialog, ShowToast } f
 import {
   BUSSINES_DATA_FIELDS,
   DocumentLibraryColumnsDefinition,
+  DocumentLibraryColumnsAgencyDefinition,
   UNIT_FIELDS
 } from '../../../constants/documents.constant';
 import {
@@ -397,6 +398,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
 
   public columnDefinitions: ColumnDefinitionModel[] = DocumentLibraryColumnsDefinition(this.actionCellrenderParams, this.datePipe);
+  public agencyColumnDefinitions: ColumnDefinitionModel[] = DocumentLibraryColumnsAgencyDefinition(this.actionCellrenderParams, this.datePipe);
 
   get bussinesUserData$(): Observable<BusinessUnit[]> {
     return this.businessUserData$.pipe(map((fn) => fn(this.filterBbusinessControl?.value)));
@@ -735,7 +737,21 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       }
       else {
         this.gridApi?.hideOverlay();
-        const documentData = [...new Set(data.items.map((item: ShareDocumentDto) => item.document))]
+        const documentData = [...new Set(data.items.map((item: ShareDocumentDto) => item.document))];
+        if(this.filterSelecetdBusinesType == BusinessUnitType.Agency){
+          this.agencyColumnDefinitions.forEach(element => {
+            if(element.field == "businessUnitName"){
+              element.headerName = 'Organization Name';
+            }
+          });
+        }else{
+          this.agencyColumnDefinitions.forEach(element => {
+            if(element.field == "businessUnitName"){
+              element.headerName = 'Agency Name';
+            }
+          });
+        }
+        this.gridApi.setColumnDefs(this.agencyColumnDefinitions);
         this.rowData = documentData;
         this.totalRecordsCount = data.totalCount;
         this.gridApi?.setRowData(this.rowData);
@@ -765,6 +781,24 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       }
       else {
         this.gridApi?.hideOverlay();
+        if(this.isAgency){
+          if(this.filterSelecetdBusinesType == BusinessUnitType.Agency){
+            this.agencyColumnDefinitions.forEach(element => {
+              if(element.field == "businessUnitName"){
+                element.headerName = 'Agency Name';
+              }
+            });
+          }else{
+            this.agencyColumnDefinitions.forEach(element => {
+              if(element.field == "businessUnitName"){
+                element.headerName = 'Organization Name';
+              }
+            });
+          }
+          this.gridApi.setColumnDefs(this.agencyColumnDefinitions);
+        }else{
+          this.gridApi.setColumnDefs(this.columnDefinitions);
+        }
         this.rowData = dataFilter.items;
         this.gridApi?.setRowData(this.rowData);
         this.totalRecordsCount = data.totalCount;
