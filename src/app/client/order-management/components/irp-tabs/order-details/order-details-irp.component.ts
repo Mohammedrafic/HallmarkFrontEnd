@@ -627,7 +627,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       let shiftDetails = this.allShifts.find(f=>f.id == value)
       if(shiftDetails!=null && shiftDetails.id!=0)
       {
-        console.log(shiftDetails);
         const [startH, startM, startS] = getHoursMinutesSeconds(shiftDetails.startTime);
         const [endH, endM, endS] = getHoursMinutesSeconds(shiftDetails.endTime);
         const startDate = new Date();
