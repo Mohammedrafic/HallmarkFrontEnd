@@ -92,7 +92,7 @@ export class GetIrpOrderCandidates {
     public pageNumber: number,
     public pageSize: number,
     public isAvailable: boolean,
-    public searchTerm?: any
+    public searchTerm?: string
   ) {}
 }
 
