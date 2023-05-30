@@ -650,6 +650,24 @@ svg.svg-inline--fa.fa-lock,  svg.svg-inline--fa.fa-unlock{
 .item6 .datepicker {
   width: 150px;
 }
+.irp-candidate .comments-container {
+  background: ghostwhite;
+}
+.comments-irp {
+  svg.svg-inline--fa.fa-lock, svg.svg-inline--fa.fa-unlock {
+    width: 14px;
+    height: 21px;
+  }
+  svg.svg-inline--fa.fa-user-friends {
+    width: 20px;
+    height: 20px;
+  }
+  svg.svg-inline--fa.fa-eye-slash , svg.svg-inline--fa.fa-eye{
+    width: 20px;
+    height: 20px;
+  }
+  
+}
 .app-grid__component .ag-root-wrapper {
   border: none !important;
   }

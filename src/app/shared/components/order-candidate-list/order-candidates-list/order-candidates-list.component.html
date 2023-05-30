@@ -344,6 +344,7 @@
   [handleOpenModal]="editCandidateDialogState"
   (handleCloseModal)="closeEditCandidateModal($event)"
   (handleSuccessSaveCandidate)="saveIrpCandidate()"
+  [commentContainerId] = "commentContainerId"
 ></app-edit-irp-candidate>
 
 <ejs-dialog

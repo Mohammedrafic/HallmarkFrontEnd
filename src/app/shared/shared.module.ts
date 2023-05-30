@@ -168,6 +168,7 @@ import { CustomExportDialogComponent } from './components/custom-export-dialog/c
 import { CommentsIrpComponent } from './components/comments-irp/comments-irp.component';
 import { CommentdataComponent } from './components/comments-irp/commentdata/commentdata.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { EditIrpCandidateComponent } from './components/order-candidate-list/edit-irp-candidate/edit-irp-candidate.component';
 import { OrderCloseReasonInfoModule } from './components/order-close-reason-info/order-close-reason-info.module';
 import { GeneralOrderPerDiemInfoModule } from './components/general-order-per-diem-info/general-order-per-diem-info.module';
 import { ChipsCssClassPipeModule } from './pipes/chip-css-class/chip-css-class-pipe.module';
@@ -258,7 +259,8 @@ const COMPONENTS = [
   CustomSideDialogComponent,
   CustomExportDialogComponent,
   CommentsIrpComponent,
-  CommentdataComponent,
+  EditIrpCandidateComponent,
+  CommentdataComponent
 ];
 
 @NgModule({
@@ -354,7 +356,6 @@ const COMPONENTS = [
     HideByCandidateStatusPipe,
     TabsMobileShadowDirective,
     LocalDateTimePipe,
-    CommentsIrpComponent,
     CommentsComponent,
     CommentdataComponent,
   ],

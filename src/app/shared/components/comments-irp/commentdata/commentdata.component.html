@@ -4,8 +4,11 @@
         <span class="avatar"><i-feather name="user" class="icon"></i-feather></span>{{ comment.firstName }} {{ comment.lastName }}
       </div>
       <div class="controls">
-        <i-feather *ngIf="comment.isExternal" name="eye" class="icon visibility"></i-feather>
-        <i-feather *ngIf="!comment.isExternal" name="eye-off" class="icon visibility"></i-feather>
+        <i-feather *ngIf="comment.isExternal" name="eye" class="icon visibility pr-10"></i-feather>
+        <i-feather *ngIf="!comment.isExternal" name="eye-off" class="icon visibility pr-10"></i-feather>
+        <fa-icon *ngIf="comment.isPrivate" [icon]='faUserFriends' class="icon visibility pr-3 pr-10">
+        </fa-icon>
+      
         <span class="date">{{ comment.createdAt | date: "MM/dd/yyyy" }}</span>
       </div>
     </div>
