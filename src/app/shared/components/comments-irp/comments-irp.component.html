@@ -15,9 +15,8 @@
       </div>
     </div>
     <div #body class="comments-body" (scroll)="onScroll()">
-      <ng-container *ngFor="let comment of comments">
+      <ng-container *ngFor="let comment of commentdata">
         <app-commentdata
-          *ngIf="selectedFilter === commentsFilter.All || comment.isExternal === (showExternal  && !showPrivate) || comment.isPrivate === (showPrivate)"
           [scrolledToMessage$]="scrolledToMessage$"
           [comment]="comment"
           (onRead)="onRead(comment)"></app-commentdata>
