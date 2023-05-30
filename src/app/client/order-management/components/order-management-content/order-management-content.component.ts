@@ -2217,6 +2217,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         isIrp ? this.orderManagementService.getIsAvailable() : this.orderManagementService.excludeDeployed,
+        ""
       )
     );
   }

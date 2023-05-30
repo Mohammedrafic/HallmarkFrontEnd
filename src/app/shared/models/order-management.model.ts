@@ -793,7 +793,7 @@ export interface IrpCandidatesParams {
   PageSize: number;
   PageNumber: number;
   isAvailable: boolean;
-  searchTerm?: any;
+  searchTerm?: string;
 }
 
 export class CandidateCancellationReason{
