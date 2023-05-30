@@ -132,7 +132,7 @@ body.dark {
               }
             }
 
-            .e-lastrowcell {
+            .e-lastrowcell, td {
               visibility: hidden;
             }
           }
@@ -462,13 +462,6 @@ body.dark {
     }
   }
 
-  .empty-grid {
-    background-color: $secondary-dark-blue-45 !important;
-    .e-emptyrow {
-      background-color: transparent !important;
-    }
-  }
-
   .e-gridcustomheader {
     box-shadow: $grid-box-shadow;
     background-color: $white;
@@ -590,6 +583,18 @@ body.dark {
       .ag-header-cell-text {
         text-transform: uppercase;
         font-size: 12px;
+      }
+    }
+
+    .empty-table {
+      .ag-body-viewport {
+        height: 100px;
+        background: $secondary-dark-blue-45;
+      }
+
+      & .ag-overlay-wrapper.ag-overlay-no-rows-wrapper {
+        font-size: 14px !important;
+        color: $secondary-dark-blue-30 !important;
       }
     }
   }
