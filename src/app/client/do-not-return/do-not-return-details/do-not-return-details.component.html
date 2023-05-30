@@ -46,8 +46,9 @@
         </section>
       </ng-container>
     </app-page-toolbar>
-    <app-do-not-return-grid [filteredItems$]="filteredItems$" [export$]="exportDonotreturn$"></app-do-not-return-grid> 
+    <app-do-not-return-grid [filteredItems$]="filteredItems$" [export$]="exportDonotreturn$" [refreshGrid$]="refreshGridEvent"></app-do-not-return-grid> 
   </section>
   <app-import-dnr
-    [dialogEvent]="importDialogEvent">
+    [dialogEvent]="importDialogEvent"
+    (reloadItemsList)="updatePage()">
   </app-import-dnr>
