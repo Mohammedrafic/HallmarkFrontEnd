@@ -682,7 +682,7 @@ body.dark .schedule-comp td ,body.dark .schedule-comp th, body.dark .schedule-co
 body.dark .schedule-bar, body.dark .date-cell, body.dark .schedule-items-header .header-itm, body.dark .open-position-wrapper .content {
   background: #25263b !important;
 }
-body.dark .schedule-bar h3, body.dark .schedule-items-header .header-itm , body.dark .schedule-item .date span, body.dark .schedule-item .date span, body.dark .schedule-items-container .date i-feather, body.dark .schedule-comp .card-wrapper .block span{
+body.dark .schedule-bar h3, body.dark .schedule-items-header .header-itm , body.dark .schedule-item .date span, body.dark .schedule-item .date span, body.dark .schedule-items-container .date i-feather, body.dark .schedule-comp .card-wrapper .block span, body.dark .schedule-items-container button.e-control.e-flat{
   color: white !important;
 }
 body.dark .schedule-items-container .book-circle.circle {
@@ -691,6 +691,6 @@ body.dark .schedule-items-container .book-circle.circle {
 body.dark .schedule-wrapper span.e-chip-delete.e-dlt-btn {
   color: black !important;
 }
-body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.chips-group-text, body.dark .schedule-wrapper span.chips-title{
+body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.chips-group-text, body.dark .schedule-wrapper span.chips-title, body.dark .schedule-items-container span.candidate-name {
   color: white;
 }
