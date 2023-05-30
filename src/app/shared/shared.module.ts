@@ -85,7 +85,6 @@ import { OnboardedCandidateComponent,
 import { BillRatesViewGridComponent } from './components/bill-rates-view-grid/bill-rates-view-grid.component';
 import { CommentsComponent } from './components/comments/comments.component';
 import { HighlightGridRowDirective } from '@shared/directives/hightlight-grid-row.directive';
-import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-background-for-empty-grid.directive';
 import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
 import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
 import { OfferDeploymentComponent,
@@ -213,7 +212,6 @@ const COMPONENTS = [
   HideBeforeSyncfusionLoadDirective,
   OpenFirstAccordionDirective,
   HighlightGridRowDirective,
-  AddBackgroundForEmptyGridDirective,
   ClickOutsideDirective,
   ImageUploaderComponent,
   DocumentUploaderComponent,

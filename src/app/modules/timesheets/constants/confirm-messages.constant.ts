@@ -17,7 +17,8 @@ export const TimesheetConfirmMessages: CommonDialogConformMessages = {
   confirmRecordDelete: 'Are you sure you want to delete this record?',
   confirmOrderChange: 'Are you sure you want to change timesheet without saving changes?',
   confirmEdit: 'Are you sure you want to change the timesheet? This will lead to recalculating values and generating new invoice records.',
-  confirmBulkApprove: 'Please note, only timesheets in Pending Approval status may be Approved.'
+  confirmBulkApprove: 'Please note, only timesheets in Pending Approval status may be Approved.',
+  recalcTimesheets: 'Are you sure you want to recalculate all Timesheets for this Position? This may lead to generating new invoice records.',
 };
 
 export const BillRateTimeConfirm = 'You have reported hours for this date. Do you like to proceed?';

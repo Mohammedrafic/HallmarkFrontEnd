@@ -274,7 +274,7 @@
     </div>
   </section>
   <section>
-    <ng-container [ngTemplateOutlet]="isCancelled ? billRates : editBillRates"></ng-container>
+    <ng-container [ngTemplateOutlet]="(isCancelled && !canEditClosedBillRate) ? billRates : editBillRates"></ng-container>
     <ng-template #billRates>
       <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
     </ng-template>
