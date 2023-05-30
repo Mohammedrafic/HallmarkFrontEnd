@@ -216,6 +216,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForSaveAction();
     this.watchForSelectOrder();
     this.watchForOrganizationStructure();
+    this.watchForSpecialProjectCategory();
     this.observeOrderType();
     this.setReasonAutopopulate();
   }
@@ -361,18 +362,18 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     });
   }
 
-  private getAllShifts():void{
+  private getAllShifts(): void {
     this.getAllShifts$.pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((state: ScheduleShift[]) => {
 
       const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
-     
-      this.updateDataSourceFormList('shift', [{ name: 'Custom', id: 0 },...state]);
-      setDataSource(selectedForm.fields, 'shift', [{ name: 'Custom', id: 0 },...state]);
 
-      this.allShifts = [{ name: 'Custom', id: 0 },...state];
+      this.updateDataSourceFormList('shift', [{ name: 'Custom', id: 0 }, ...state]);
+      setDataSource(selectedForm.fields, 'shift', [{ name: 'Custom', id: 0 }, ...state]);
+
+      this.allShifts = [{ name: 'Custom', id: 0 }, ...state];
       this.changeDetection.markForCheck();
     });
   }
@@ -457,8 +458,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       map((data: ProjectSpecialData) => mapSpecialProjectStructure(data)),
       takeUntil(this.componentDestroy())
     ).subscribe((data: SpecialProjectStructure) => {
-      this.updateDataSourceFormList('specialProjectCategories', data.specialProjectCategories);
-      this.updateDataSourceFormList('projectNames', data.projectNames);
+      this.updateDataSourceFormList('specialProjectCategories', data.specialProjectCategories.filter(f => f.includeInIRP == true));
+      //this.updateDataSourceFormList('projectNames', data.projectNames.filter(f=>f.includeInIRP==true));
       this.updateDataSourceFormList('poNumbers', data.poNumbers);
       this.setDataSourceForSpecialProject(data);
       this.changeDetection.markForCheck();
@@ -621,12 +622,11 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
 
     this.generalInformationForm.get('shift')?.valueChanges.pipe(
-      filter(()=>true),
+      filter(() => true),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
-      let shiftDetails = this.allShifts.find(f=>f.id == value)
-      if(shiftDetails!=null && shiftDetails.id!=0)
-      {
+      let shiftDetails = this.allShifts.find(f => f.id == value)
+      if (shiftDetails != null && shiftDetails.id != 0) {
         const [startH, startM, startS] = getHoursMinutesSeconds(shiftDetails.startTime);
         const [endH, endM, endS] = getHoursMinutesSeconds(shiftDetails.endTime);
         const startDate = new Date();
@@ -636,11 +636,11 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         this.generalInformationForm.controls['shiftStartTime'].setValue(startDate);
         this.generalInformationForm.controls['shiftEndTime'].setValue(endDate);
         this.changeDetection.markForCheck();
-      }else{
+      } else {
         this.generalInformationForm.get('shiftStartTime')?.reset();
         this.generalInformationForm.get('shiftEndTime')?.reset();
       }
-      
+
     });
 
   }
@@ -793,13 +793,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     setDataSource(
       specialProjectForm.fields,
       'projectTypeId',
-      data?.specialProjectCategories ?? this.dataSourceContainer.specialProjectCategories as SpecialProjectCategories[]
+      data?.specialProjectCategories.filter(f => f.includeInIRP == true) ?? this.dataSourceContainer.specialProjectCategories as SpecialProjectCategories[]
     );
-    setDataSource(
-      specialProjectForm.fields,
-      'projectNameId',
-      data?.projectNames ?? this.dataSourceContainer.projectNames as ProjectNames[]
-    );
+    // setDataSource(
+    //   specialProjectForm.fields,
+    //   'projectNameId',
+    //   data?.projectNames.filter(f=>f.includeInIRP==true) ?? this.dataSourceContainer.projectNames as ProjectNames[]
+    // );
     setDataSource(
       specialProjectForm.fields,
       'poNumberId',
@@ -887,5 +887,24 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     }
 
     this.changeDetection.markForCheck();
+  }
+
+  private watchForSpecialProjectCategory(): void {
+    this.specialProjectForm.get('projectTypeId')?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((id: any) => {
+      this.projectSpecialData$.pipe(
+        filter(Boolean),
+        map((data: ProjectSpecialData) => mapSpecialProjectStructure(data)),
+        takeUntil(this.componentDestroy())
+      ).subscribe((data: SpecialProjectStructure) => {
+        this.updateDataSourceFormList('projectNames', data.projectNames.filter(f => f.includeInIRP == true && f.projectTypeId == id));
+        const specialProjectForm = this.getSelectedFormConfig(SpecialProjectForm);
+        setDataSource(
+          specialProjectForm.fields,
+          'projectNameId',
+          data?.projectNames.filter(f => f.includeInIRP == true && f.projectTypeId == id) ?? this.dataSourceContainer.projectNames as ProjectNames[]
+        );
+      })
+      this.changeDetection.markForCheck();
+    })
   }
 }
