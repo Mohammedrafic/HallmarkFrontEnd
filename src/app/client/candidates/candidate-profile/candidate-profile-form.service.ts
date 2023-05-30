@@ -100,10 +100,9 @@ export class CandidateProfileFormService {
     this.candidateForm.patchValue(this.getPartialFormValueByControls(candidateWithUTCDates));
   }
 
-  public populateHoldEndDate(): void {
-    const employee = this.candidateService.getEmployeeProfileData();
-    if (employee && employee.profileStatus === ProfileStatusesEnum.OnHold) {
-      this.candidateForm.get('holdEndDate')?.setValue(employee.holdEndDate);
+  public populateHoldEndDate(candidate: CandidateModel): void {
+    if (candidate && candidate.profileStatus === ProfileStatusesEnum.OnHold) {
+      this.candidateForm.get('holdEndDate')?.setValue(candidate.holdEndDate);
     }
   }
 

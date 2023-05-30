@@ -53,7 +53,7 @@ export class CandidateProfileService {
   public saveCandidate(file: Blob | null, candidateId: number): Observable<void | CandidateModel> {
     return this.saveCandidateProfile(candidateId).pipe(
       mergeMap((candidate) => {
-        this.candidateService.setEmployeeProfileData(candidate);
+        this.candidateProfileForm.populateHoldEndDate(candidate);
         this.candidateProfileForm.tabUpdate$.next(candidate.id);
         if (file) {
           return this.saveCandidatePhoto(file, candidate.id);
