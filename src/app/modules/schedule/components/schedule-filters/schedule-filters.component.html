@@ -7,11 +7,11 @@
   (closeDialogClicked)="closeFilterDialog()"
 >
   <form [formGroup]="scheduleFilterFormGroup" [class]="formConfig.formClass">
-    <div class="bootstrap">
+    <div class="formGroup">
       <ng-container *ngFor="let item of formConfig.formFields">
         <ng-container [ngSwitch]="item.type">
           <ng-template [ngSwitchCase]="fieldTypes.MultiSelectDropdown">
-            <div class="input-container">
+            <div class="input-container bootstrap">
               <label [for]="item.field">{{ item.title }} <span *ngIf="item.required" class="required">*</span></label>
               <div class="input-group multiselect">
                 <ejs-multiselect

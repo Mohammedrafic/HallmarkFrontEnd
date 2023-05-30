@@ -25,6 +25,8 @@ export enum ScheduleFilterFormSourceKeys {
   ShowOnlyscheduledcandidates = 'ShowOnlyscheduledcandidates',
   ShowGeneralnotes = 'ShowGeneralnotes',
   ShowExcludenotoriented = 'ShowExcludenotoriented',
+  // ShiftStartTime = 'ShiftStartTime',
+  // ShiftEndTime = 'ShiftEndTime'
 }
 
 export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
@@ -68,6 +70,22 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueId: 'value',
     filterTitle: 'shift',
   },
+  // [ScheduleFilterFormSourceKeys.ShiftStartTime]: {
+  //   type: ControlTypes.Dropdown,
+  //   valueType: ValueType.Id,
+  //   dataSource: [],
+  //   valueField: 'text',
+  //   valueId: 'value',
+  //   filterTitle: 'Shift Start Time',
+  // },
+  // [ScheduleFilterFormSourceKeys.ShiftEndTime]: {
+  //   type: ControlTypes.Dropdown,
+  //   valueType: ValueType.Id,
+  //   dataSource: [],
+  //   valueField: 'text',
+  //   valueId: 'value',
+  //   filterTitle: 'Shift End Time',
+  // },
   [ScheduleFilterFormSourceKeys.ShowAvailability]: {
     type: ControlTypes.Toggle,
     valueType: ValueType.Id,
@@ -158,6 +176,20 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
     required: false,
     sourceKey: ScheduleFilterFormSourceKeys.Shift,
   },
+  // {
+  //   field: 'ShiftStartTime',
+  //   title: 'Shift Start Time',
+  //   required: true,
+  //   type: FieldType.Time,
+  //   sourceKey: ScheduleFilterFormSourceKeys.ShiftStartTime,
+  // },
+  // {
+  //   field: 'ShiftEndTime',
+  //   title: 'Shift End Time',
+  //   required: true,
+  //   type: FieldType.Time,
+  //   sourceKey: ScheduleFilterFormSourceKeys.ShiftEndTime,
+  // },
   {
     field: 'ShowAvailability',
     title: 'Show Availability',
