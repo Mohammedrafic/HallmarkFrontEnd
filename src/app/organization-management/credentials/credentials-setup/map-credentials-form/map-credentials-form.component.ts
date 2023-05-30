@@ -87,13 +87,14 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   protected componentDestroy: () => Observable<unknown>;
 
   private credentialSetupList: CredentialSetupGet[] = [];
+  private allCredentialSetupList: CredentialSetupGet[] = [];
   private pageSubject = new Subject<number>();
   private previouslySavedMappingsNumber: number;
   private isAllGroupsSelected?: boolean;
   private checkedDropdownItems: number[] = [];
-  public allRegions: boolean = false;
-  public allLocations: boolean = false;
-  public allDepartments: boolean = false;
+  public allRegions = false;
+  public allLocations = false;
+  public allDepartments = false;
   public maxDepartmentsLength = 1000;
   public query: Query = new Query().take(this.maxDepartmentsLength);
 
@@ -176,7 +177,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
         ? query.where('name', 'contains', e.text, true).take(char * 15)
         : query;
     e.updateData(this.departments as [], query);
-  };
+  }
 
   public onSelectAllGroups(selectAllEvent: ISelectAllEventArgs): void {
     this.isAllGroupsSelected = selectAllEvent.isChecked && this.groups.length > 1;
@@ -342,8 +343,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
       filter(([credentials, credentialTypes]) => credentials?.length > 0 && credentialTypes.length > 0)
     ).subscribe(([credentials, credentialTypes]) => {
       this.lastAvailablePage = this.getLastPage(credentials);
-      this.totalDataRecords = credentials.length;
-      this.credentialSetupList = [];
+      this.credentialSetupList = this.allCredentialSetupList = [];
 
       if (credentialTypes) {
         credentials.map(item => {
@@ -351,7 +351,9 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
           this.credentialSetupList.push(MapCredentialsAdapter.prepareCredentialGet(item, foundCredentialType));
         });
       }
-      this.gridDataSource = this.credentialSetupList;
+      this.allCredentialSetupList = this.credentialSetupList;
+      this.gridDataSource = this.getRowsPerPage(this.currentPage);
+      this.totalDataRecords = this.credentialSetupList.length;
 
       // reset grid invalid state
       this.isGridStateInvalid = false;
@@ -551,7 +553,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
       takeUntil(this.componentDestroy())
     ).subscribe((page) => {
       this.currentPage = page;
-      this.gridDataSource = this.getRowsPerPage(page);
+      this.gridDataSource = this.getRowsPerPage(this.currentPage);
     });
   }
 
@@ -592,9 +594,10 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
 
   private startGroupIdWatching(): void {
     this.mapCredentialsFormGroup.get('groupIds')?.valueChanges.pipe(
+      debounceTime(300),
       takeUntil(this.componentDestroy()),
     ).subscribe((groupIds: number[] | null) => {
-      let credentialSetupList = this.credentialSetupList;
+      let credentialSetupList = this.allCredentialSetupList;
 
       if (groupIds?.length) {
         const groupIdsSet = new Set(groupIds);
@@ -606,8 +609,9 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
           el.includeInIRP && isGroupHasIrp || el.includeInVMS && isGroupHasVMS
         );
       }
-
-      this.gridDataSource = credentialSetupList;
+      this.credentialSetupList = credentialSetupList;
+      this.gridDataSource = this.getRowsPerPage(this.currentPage);
+      this.totalDataRecords = this.credentialSetupList.length;
       this.grid.refresh();
     });
   }
