@@ -14,8 +14,8 @@ const importConfig = {
   uploadFile: DoNotReturn.UploadDoNotReturnFile,
   saveImportResult: DoNotReturn.SaveDoNotReturnImportResult,
   uploadFileSucceeded: { instance: DoNotReturn.UploadDoNotReturnFileSucceeded, message: 'There are no records in the file' },
-  importTemplateSucceeded: { instance: DoNotReturn.GetDoNotReturnImportTemplateSucceeded, fileName: 'dnr.xlsx' },
-  importErrorsSucceeded: { instance: DoNotReturn.GetDoNotReturnImportErrorsSucceeded, fileName: 'dnr_errors.xlsx' },
+  importTemplateSucceeded: { instance: DoNotReturn.GetDoNotReturnImportTemplateSucceeded, fileName: 'donotreturn.xlsx' },
+  importErrorsSucceeded: { instance: DoNotReturn.GetDoNotReturnImportErrorsSucceeded, fileName: 'donotreturn_errors.xlsx' },
   saveImportResultSucceeded: { instance: DoNotReturn.SaveDoNotReturnImportResultSucceeded, message: 'DoNotReturn were imported' },
 };
 
@@ -29,6 +29,12 @@ export class ImportDnrComponent  extends AbstractImport implements OnChanges {
 
   public titleImport: string = 'Import DNR';
   public columnDefs: ColDef[] = [
+    {
+      field: 'orgName',
+      width: 150,
+      headerName: 'Organization Name',
+      cellRenderer: GridErroredCellComponent,
+    },
     {
       field: 'firstName',
       width: 150,
@@ -48,27 +54,9 @@ export class ImportDnrComponent  extends AbstractImport implements OnChanges {
       cellRenderer: GridErroredCellComponent,
     },
     {
-      field: 'regionBlocked',
-      width: 200,
-      headerName: 'Region Blocked',
-      cellRenderer: GridErroredCellComponent,
-    },
-    {
-      field: 'locationBlocked',
-      width: 200,
-      headerName: 'Location Blocked',
-      cellRenderer: GridErroredCellComponent,
-    },
-    {
-      field: 'email',
+      field: 'dateOfBirth',
       width: 150,
-      headerName: 'Email',
-      cellRenderer: GridErroredCellComponent,
-    },
-    {
-      field: 'facilityEmail',
-      width: 150,
-      headerName: 'Department Email',
+      headerName: 'Date Of Birth',
       cellRenderer: GridErroredCellComponent,
     },
     {
@@ -78,35 +66,24 @@ export class ImportDnrComponent  extends AbstractImport implements OnChanges {
       cellRenderer: GridErroredCellComponent,
     },
     {
-      field: 'currentStatus',
+      field: 'email',
       width: 150,
-      headerName: 'Current Status',
+      headerName: 'Email',
       cellRenderer: GridErroredCellComponent,
     },
     {
-      field: 'lastUpdatedDate',
-      width: 150,
-      headerName: 'Last Updated Date',
+      field: 'region',
+      width: 200,
+      headerName: 'Blocked Region Name',
       cellRenderer: GridErroredCellComponent,
     },
     {
-      field: 'lastBlockedDate',
-      width: 150,
-      headerName: 'Last Blocked Date',
+      field: 'location',
+      width: 200,
+      headerName: 'Blocked Location Name',
       cellRenderer: GridErroredCellComponent,
     },
-    {
-      field: 'lastUnBlockedDate',
-      width: 150,
-      headerName: 'Last UnBlocked Date',
-      cellRenderer: GridErroredCellComponent,
-    },
-    {
-      field: 'comment',
-      width: 150,
-      headerName: 'Comment',
-      cellRenderer: GridErroredCellComponent,
-    },
+
   ]
 
 

@@ -29,6 +29,7 @@ public filters: DonoreturnFilters = {};
   public exportDonotreturn$ = new Subject<ExportedFileType>();
   public filteredItems$ = new Subject<number>();
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
+  public refreshGridEvent: Subject<boolean> = new Subject<boolean>();
 
   constructor(protected override store:Store) { 
     super(store)
@@ -38,6 +39,10 @@ public filters: DonoreturnFilters = {};
   override ngOnInit(): void {
    // this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, 1)]);
     super.ngOnInit();
+  }
+
+  public override updatePage(){
+    this.refreshGridEvent.next(true);
   }
   
   public override customExport(): void {

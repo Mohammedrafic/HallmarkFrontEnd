@@ -204,7 +204,7 @@ export class DonotReturnState {
         dispatch(new DoNotReturn.SaveDoNotReturnImportResultSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rates were not imported'))))
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'DoNotReturn list were not imported'))))
     );
   }
 
