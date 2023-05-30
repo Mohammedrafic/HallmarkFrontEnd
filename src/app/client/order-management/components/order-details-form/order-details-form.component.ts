@@ -140,7 +140,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
   @Output() orderTypeChanged = new EventEmitter<OrderType>();
   @Output() hourlyRateSync = new EventEmitter<string>();
-  @Input() public externalCommentConfiguration ?: boolean | null;
+  @Input() public externalCommentConfiguration?: boolean | null;
 
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
@@ -179,8 +179,10 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public comments: Comment[] = [];
   public isShiftTimeRequired = true;
   private filterQueryString: string;
-  private readonly highlightDropdownSearchString  = { itemCreated: (e: { item: HTMLElement; }) => {
-    highlightSearch(e.item, this.filterQueryString, true, 'Contains') }
+  private readonly highlightDropdownSearchString = {
+    itemCreated: (e: { item: HTMLElement; }) => {
+      highlightSearch(e.item, this.filterQueryString, true, 'Contains')
+    }
   }
   public optionFields: FieldSettingsModel = { ...OptionFields, ...this.highlightDropdownSearchString };
   public departmentFields: FieldSettingsModel = { ...DepartmentFields, ...this.highlightDropdownSearchString };
@@ -215,7 +217,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public skills$: Observable<ListOfSkills[]>;
   @Select(RejectReasonState.sortedOrderRequisition)
   public reasons$: Observable<RejectReasonPage>;
-  public reasons:RejectReasonwithSystem[]=[];
+  public reasons: RejectReasonwithSystem[] = [];
   @Select(OrderManagementContentState.associateAgencies)
   public associateAgencies$: Observable<AssociateAgency[]>;
   @Select(OrderManagementContentState.organizationStatesWithKeyCode)
@@ -265,6 +267,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.watchForSelectOrder();
     this.watchForSuggestedDetails();
     this.watchForDepartmentId();
+    this.watchForSpecialProjectCategory();
     this.getVMSOrderRequisition();
   }
 
@@ -297,22 +300,21 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       this.populateNewOrderForm();
     }
   }
-  public getVMSOrderRequisition()
-  {
+  public getVMSOrderRequisition() {
     this.reasons = [];
     this.reasons$
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(data => {
         data.items.forEach(item => {
-          if(item.includeInVMS===true){
-              this.reasons.push({
+          if (item.includeInVMS === true) {
+            this.reasons.push({
               id: item.id,
-              reason:item.reason,
-              businessUnitId:item.businessUnitId,
-              isAutoPopulate : item.isAutoPopulate
+              reason: item.reason,
+              businessUnitId: item.businessUnitId,
+              isAutoPopulate: item.isAutoPopulate
             });
           }
-          if(item.isAutoPopulate === true){
+          if (item.isAutoPopulate === true) {
             this.jobDescriptionForm.controls['orderRequisitionReasonId'].setValue(item.id);
           }
         });
@@ -414,8 +416,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           title: 'Warning',
           okButtonClass: 'ok-button',
         }).pipe(
-        takeUntil(this.componentDestroy())
-      ).subscribe();
+          takeUntil(this.componentDestroy())
+        ).subscribe();
     }
   }
 
@@ -450,7 +452,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         tap((data: ProjectSpecialData) => {
           this.setProjectSpecialData(data);
           this.orderTypeDataSourceHandler();
-  
+
           if (this.specialProject != null) {
             this.setRequiredFieldsForSpecialProject();
             updateValidationToForm(this.specialProject, SpecialProjectControlsConfig);
@@ -464,12 +466,12 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   private setProjectSpecialData(data: ProjectSpecialData): void {
     if (data != null) {
       this.specialProjectCategories = this.isSpecialProjectFieldsRequired
-        ? data.specialProjectCategories
-        : [{ id: null, projectType: '' }, ...data.specialProjectCategories];
+        ? data.specialProjectCategories.filter(f => f.includeInVMS == true)
+        : [{ id: null, projectType: '' }, ...data.specialProjectCategories.filter(f => f.includeInVMS == true)];
 
-      this.projectNames = this.isSpecialProjectFieldsRequired
-        ? data.projectNames
-        : [{ id: null, projectName: '' }, ...data.projectNames];
+      // this.projectNames = this.isSpecialProjectFieldsRequired
+      //   ? data.projectNames.filter(f => f.includeInVMS == true)
+      //   : [{ id: null, projectName: '' }, ...data.projectNames.filter(f => f.includeInVMS == true)];
 
       this.poNumbers = this.isSpecialProjectFieldsRequired
         ? data.poNumbers
@@ -494,7 +496,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   public addContact(): void {
-    if(this.contactDetailsFormArray.invalid) {
+    if (this.contactDetailsFormArray.invalid) {
       return;
     }
 
@@ -520,7 +522,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   public addWorkLocation(): void {
-    if(this.workLocationsFormArray.invalid) {
+    if (this.workLocationsFormArray.invalid) {
       return;
     }
 
@@ -561,7 +563,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   private removePermPlacementControls(controls: string[]): void {
     controls.forEach((control: string) => {
       this.generalInformationForm.contains(control) &&
-      this.generalInformationForm.removeControl(control, { emitEvent: false });
+        this.generalInformationForm.removeControl(control, { emitEvent: false });
     });
   }
 
@@ -696,8 +698,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         filter((val) => !!val.length),
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {
-      this.jobDistributionForm.controls['agency'].patchValue(agencyValues);
-    });
+        this.jobDistributionForm.controls['agency'].patchValue(agencyValues);
+      });
 
     this.jobDistributionForm.controls['jobDistributions'].patchValue(order.jobDistributions);
     this.jobDescriptionForm.controls['classifications'].patchValue(order.classifications);
@@ -788,7 +790,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   private disableExtensionControls(): void {
-    const extensionControlsConfig: ExtensionsControlConfig  = {
+    const extensionControlsConfig: ExtensionsControlConfig = {
       ...generateControlsConfig(['openPositions'], this.generalInformationForm),
       ...generateControlsConfig(ExtensionControls, this.jobDistributionForm),
     } as unknown as ExtensionsControlConfig;
@@ -945,22 +947,33 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         }),
         takeUntil(this.componentDestroy())
       ).subscribe(({ TieringLogic }) => {
-      this.distribution = distributionSource(TieringLogic === TierLogic.Show);
-      this.patchJobDistributionValue();
+        this.distribution = distributionSource(TieringLogic === TierLogic.Show);
+        this.patchJobDistributionValue();
 
+        this.cd.markForCheck();
+      });
+  }
+  private watchForSpecialProjectCategory(): void {
+    this.specialProject.get('projectTypeId')?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((id: any) => {
+      this.projectSpecialData$.pipe(takeUntil(this.componentDestroy())).subscribe((data: ProjectSpecialData) => {
+        this.projectNames = this.isSpecialProjectFieldsRequired
+          ? data.projectNames.filter(f => f.includeInVMS == true && f.projectTypeId ==id)
+          : [{ id: null, projectName: '' }, ...data.projectNames.filter(f => f.includeInVMS == true && f.projectTypeId ==id)];
+
+      })
       this.cd.markForCheck();
-    });
+    })
   }
 
   private patchJobDistributionValue(): void {
-    if(this.order && this.filteredJobDistributionValue) {
+    if (this.order && this.filteredJobDistributionValue) {
       this.jobDistributionForm.controls['jobDistribution'].patchValue(
         this.filteredJobDistributionValue
       );
       this.filteredJobDistributionValue = null;
     }
   }
-  
+
   private initOrderForms(): void {
     this.orderTypeForm = this.orderDetailsService.createOrderTypeForm();
     this.generalInformationForm = this.orderDetailsService.createGeneralInformationForm();
@@ -1121,9 +1134,9 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     });
 
     combineLatest([
-        this.orderControlsConfig.departmentIdControl.valueChanges,
-        this.orderControlsConfig.skillIdControl.valueChanges,
-      ]).pipe(
+      this.orderControlsConfig.departmentIdControl.valueChanges,
+      this.orderControlsConfig.skillIdControl.valueChanges,
+    ]).pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(([departmentId, skillId]) => {
       if (!departmentId || !skillId || (this.isEditMode && this.order?.status !== OrderStatus.Incomplete)) {
@@ -1177,52 +1190,52 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         debounceTime(600),
         takeUntil(this.componentDestroy())
       ).subscribe((jobDistributionId: OrderJobDistribution) => {
-      if (jobDistributionId === OrderJobDistribution.All) {
-        this.orderControlsConfig.jobDistributionControl.patchValue(OrderJobDistribution.All, { emitEvent: false });
-      }
-
-      const getAgencyId = (id: number) =>
-        this.jobDistributionForm.controls['jobDistributions'].value.find(
-          (item: JobDistributionModel) => item.agencyId === id
-        )?.id || 0;
-      this.agencyControlEnabled = jobDistributionId === OrderJobDistribution.Selected;
-      const selectedJobDistributions: JobDistributionModel[] = [];
-      if (this.agencyControlEnabled) {
-        this.orderControlsConfig.agencyControl.addValidators(Validators.required);
-        const agencyIds = this.orderControlsConfig.agencyControl.value;
-        if (agencyIds) {
-          agencyIds.forEach((agencyId: number) => {
-            selectedJobDistributions.push({
-              id: getAgencyId(agencyId),
-              orderId: this.order?.id || 0,
-              jobDistributionOption: OrderJobDistribution.Selected,
-              agencyId,
-            });
-          });
+        if (jobDistributionId === OrderJobDistribution.All) {
+          this.orderControlsConfig.jobDistributionControl.patchValue(OrderJobDistribution.All, { emitEvent: false });
         }
-      } else {
-        this.orderControlsConfig.agencyControl.removeValidators(Validators.required);
-        this.orderControlsConfig.agencyControl.reset();
-      }
-      const getJobDistId = (id: number) =>
-        this.jobDistributionForm.controls['jobDistributions'].value.find(
-          (item: JobDistributionModel) => item.jobDistributionOption === id
-        )?.id || 0;
-      this.orderControlsConfig.agencyControl.updateValueAndValidity();
 
-      const jobDistributions = {
-        id: getJobDistId(jobDistributionId),
-        orderId: this.order?.id || 0,
-        jobDistributionOption: jobDistributionId,
-        agencyId: null,
-      };
+        const getAgencyId = (id: number) =>
+          this.jobDistributionForm.controls['jobDistributions'].value.find(
+            (item: JobDistributionModel) => item.agencyId === id
+          )?.id || 0;
+        this.agencyControlEnabled = jobDistributionId === OrderJobDistribution.Selected;
+        const selectedJobDistributions: JobDistributionModel[] = [];
+        if (this.agencyControlEnabled) {
+          this.orderControlsConfig.agencyControl.addValidators(Validators.required);
+          const agencyIds = this.orderControlsConfig.agencyControl.value;
+          if (agencyIds) {
+            agencyIds.forEach((agencyId: number) => {
+              selectedJobDistributions.push({
+                id: getAgencyId(agencyId),
+                orderId: this.order?.id || 0,
+                jobDistributionOption: OrderJobDistribution.Selected,
+                agencyId,
+              });
+            });
+          }
+        } else {
+          this.orderControlsConfig.agencyControl.removeValidators(Validators.required);
+          this.orderControlsConfig.agencyControl.reset();
+        }
+        const getJobDistId = (id: number) =>
+          this.jobDistributionForm.controls['jobDistributions'].value.find(
+            (item: JobDistributionModel) => item.jobDistributionOption === id
+          )?.id || 0;
+        this.orderControlsConfig.agencyControl.updateValueAndValidity();
 
-      this.orderControlsConfig.jobDistributionsControl.patchValue(
-        [jobDistributions, ...selectedJobDistributions], { emitEvent: false }
-      );
+        const jobDistributions = {
+          id: getJobDistId(jobDistributionId),
+          orderId: this.order?.id || 0,
+          jobDistributionOption: jobDistributionId,
+          agencyId: null,
+        };
 
-      this.cd.markForCheck();
-    });
+        this.orderControlsConfig.jobDistributionsControl.patchValue(
+          [jobDistributions, ...selectedJobDistributions], { emitEvent: false }
+        );
+
+        this.cd.markForCheck();
+      });
 
     this.orderControlsConfig.agencyControl.valueChanges.pipe(
       takeUntil(this.componentDestroy())

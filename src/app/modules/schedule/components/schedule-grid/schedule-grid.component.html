@@ -33,37 +33,37 @@
     </div>
     <div class="right">
       <ng-container *ngIf="activePeriod !== monthPeriod; else monthDatePicker">
-        <app-tooltip-container [showToolTip]="!hasViewPermission">
-        <app-date-week-picker
-          [initDates]="weekPeriod"
-          [rangeType]="activePeriod"
-          [firstDayOfWeek]="orgFirstDayOfWeek"
-          [overrideInitDates]="true"
-          [disabled]="!hasViewPermission"
-        ></app-date-week-picker>
-        </app-tooltip-container>
+          <app-tooltip-container [showToolTip]="!hasViewPermission">
+            <app-date-week-picker
+              [initDates]="weekPeriod"
+              [rangeType]="activePeriod"
+              [firstDayOfWeek]="orgFirstDayOfWeek"
+              [overrideInitDates]="true"
+              [disabled]="!hasViewPermission"
+            ></app-date-week-picker>
+          </app-tooltip-container>
       </ng-container>
 
       <ng-template #monthDatePicker>
-        <app-tooltip-container [showToolTip]="!hasViewPermission">
-          <app-month-date-picker
-            [firstDayOfWeek]="orgFirstDayOfWeek"
-            [disabled]="!hasViewPermission"
-          ></app-month-date-picker>
-        </app-tooltip-container>
+          <app-tooltip-container [showToolTip]="!hasViewPermission">
+            <app-month-date-picker
+              [firstDayOfWeek]="orgFirstDayOfWeek"
+              [disabled]="!hasViewPermission"
+            ></app-month-date-picker>
+          </app-tooltip-container>
       </ng-template>
-      <app-tooltip-container [showToolTip]="!hasViewPermission">
-        <div class="date-periods">
-          <div *ngFor="let datePeriod of datesPeriods; trackBy: trackByPeriods"
-               [class.active]="datePeriod.id === activePeriod"
-               [class.disabled]="!hasViewPermission"
-               class="date-item"
-               (click)="changeActiveDatePeriod(datePeriod.id)"
-          >
-            {{ datePeriod.text }}
+        <app-tooltip-container [showToolTip]="!hasViewPermission">
+          <div class="date-periods">
+            <div *ngFor="let datePeriod of datesPeriods; trackBy: trackByPeriods"
+                 [class.active]="datePeriod.id === activePeriod"
+                 [class.disabled]="!hasViewPermission"
+                 class="date-item"
+                 (click)="changeActiveDatePeriod(datePeriod.id)"
+            >
+              {{ datePeriod.text }}
+            </div>
           </div>
-        </div>
-      </app-tooltip-container>
+        </app-tooltip-container>
     </div>
   </div>
   <div #scrollArea class="grid-body">

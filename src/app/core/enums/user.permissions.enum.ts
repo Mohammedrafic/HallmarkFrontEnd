@@ -149,6 +149,12 @@ export enum UserPermissions {
   ViewUnavailabilityReasons = 2811,
   CanEditUnavailabilityReasons = 2812,
 
+  // Order management
+  CanUpdateBillRates = 8101,
+
+  //Timesheets
+  CanRecalculateTimesheets = 8102,
+
   // Organization Invoices
   OrganizationInvoices = 3500,
   CanOrganizationViewInvoices = 3501,

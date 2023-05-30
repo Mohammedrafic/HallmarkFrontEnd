@@ -81,18 +81,45 @@ export const mapAssociateAgencyStructure = (associateAgency: AssociateAgency[]):
 
 export const mapSpecialProjectStructure = (data: ProjectSpecialData): SpecialProjectStructure => {
   return {
-    poNumbers: mapSpecialProjectDataToCorrectFormat(data.poNumbers, 'poNumber'),
-    projectNames: mapSpecialProjectDataToCorrectFormat(data.projectNames, 'projectName'),
-    specialProjectCategories: mapSpecialProjectDataToCorrectFormat(data.specialProjectCategories, 'projectType'),
+    poNumbers: mapPonumbersToCorrectFormat(data.poNumbers, 'poNumber'),
+    projectNames: mapProjectNameDataToCorrectFormat(data.projectNames.filter(f=>f.includeInIRP==true), 'projectName'),
+    specialProjectCategories: mapSpecialProjectDataToCorrectFormat(data.specialProjectCategories.filter(f=>f.includeInIRP==true), 'projectType'),
   };
 };
 
 const mapSpecialProjectDataToCorrectFormat =
-  <T extends { id: number }, U extends keyof T>(list: T[], key: U) => {
+  <T extends {
+    includeInIRP: boolean; id: number;includeInVMS: boolean 
+}, U extends keyof T>(list: T[], key: U) => {
     return list.map((itm: T) => ({
       id: itm.id,
       name: itm[key],
+      includeInIRP : itm.includeInIRP,
+      includeInVMS : itm.includeInVMS
     }));
+  };
+
+  const mapProjectNameDataToCorrectFormat =
+  <T extends {
+    includeInIRP: boolean; id: number;includeInVMS: boolean ;projectTypeId?:number
+}, U extends keyof T>(list: T[], key: U) => {
+    return list.map((itm: T) => ({
+      id: itm.id,
+      name: itm[key],
+      includeInIRP : itm.includeInIRP,
+      includeInVMS : itm.includeInVMS,
+      projectTypeId :itm.projectTypeId
+    }));
+  };
+
+  const mapPonumbersToCorrectFormat =
+  <T extends {
+   id: number;
+}, U extends keyof T>(list: T[], key: U) => {
+    return list.map((itm: T) => ({
+      id: itm.id,
+      name: itm[key],
+   }));
   };
 
 export const modifyJobDistribution = (selectedOrder: Order) => {

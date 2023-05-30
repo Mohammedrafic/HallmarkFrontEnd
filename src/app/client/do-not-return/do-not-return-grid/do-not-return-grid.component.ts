@@ -38,7 +38,6 @@ import { DocumentLibraryState } from 'src/app/modules/document-library/store/sta
 import { Region } from '@shared/models/region.model';
 import { GetLocationsByRegions, GetRegionsByOrganizations } from 'src/app/modules/document-library/store/actions/document-library.actions';
 import { Candidatests, FormControlNames } from '../enums/dnotreturn.enum';
-import { sortBy } from 'lodash';
 
 @Component({
   selector: 'app-do-not-return-grid',
@@ -109,6 +108,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   @Input() export$: Subject<ExportedFileType>;
   @Input() userPermission: Permission;
   @Input() filteredItems$: Subject<number>;
+  @Input() refreshGrid$: Subject<boolean>;
 
   @ViewChild('grid')
   public grid: GridComponent;
@@ -307,6 +307,12 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       }
       
     });
+
+    this.refreshGrid$.subscribe((res)=>{
+      if(res){
+        this.pageSubject.next(1);
+      }
+    })
   }
 
   public onFilterSSNBlur(): void {

@@ -21,9 +21,10 @@
           <div class="title">
             <span class="title__text">{{ bigCardConfig.title }}</span>
           </div>
-          <div class="additional-attributes" *ngIf="bigCardConfig.additionalAttributes">
+          <div class="additional-attributes" *ngIf="bigCardConfig.additionalAttributes && !dateSchedule.isOnHold">
             <span>{{bigCardConfig.additionalAttributes}}</span>
           </div>
+          <div *ngIf="dateSchedule.isOnHold">ON HOLD</div>
         </div>
       </ng-container>
 

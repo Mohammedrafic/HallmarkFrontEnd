@@ -41,6 +41,7 @@ export interface ScheduleCandidate {
   isOriented: boolean;
   fullName?: string;
   workCommitmentText?: string;
+  isOnHold: boolean;
 }
 
 export interface LtaAssignment {
@@ -111,6 +112,7 @@ export interface ScheduleDateItem {
   departmentStartDate: string;
   departmentEndDate: string;
   isDisabled?: boolean;
+  isOnHold: boolean;
 }
 
 export interface ScheduledItem {

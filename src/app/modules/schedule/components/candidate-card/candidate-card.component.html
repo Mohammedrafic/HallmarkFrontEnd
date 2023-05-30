@@ -22,6 +22,16 @@
         class="icon"
       ></i-feather>
     </ejs-tooltip>
+    <ejs-tooltip
+      *ngIf="candidateData.isOnHold"
+      position="TopCenter"
+      [content]="'ON HOLD'"
+      [showTipPointer]="false"
+    >
+      <div class="on-hold-status">
+        <i-feather name="slash" class="icon"></i-feather>
+      </div>
+    </ejs-tooltip>
   </div>
   <div class="block">
     <ejs-tooltip *ngIf="candidateData.displayId"

@@ -8,6 +8,7 @@ export const InvoiceConfirmMessages: CommonDialogConformMessages = {
   confirmOrderChange: 'Are you sure you want to change invoice without saving changes?',
   confirmEdit: 'Are you sure you want to change the timesheet? This will lead to recalculating values and generating new invoice records.',
   confirmBulkApprove: '',
+  recalcTimesheets: '',
 };
 
 export const ManualInvoiceMessages = {

@@ -15,7 +15,8 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
 import { combineLatest, distinctUntilChanged, filter, map, Observable, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
-import { DrawNodeEventArgs, TreeView, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
+import { DrawNodeEventArgs, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
+import { DataManager, Query } from '@syncfusion/ej2-data';
 
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { UsersAssignedToRole } from '@shared/models/user.model';
@@ -64,11 +65,6 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   @Select(SecurityState.roleTreeField)
   public roleTreeField$: Observable<RoleTreeField>;
 
-  @Select(SecurityState.permissionsTree)
-  public permissionsTree$: Observable<PermissionsTree>;
-
-  @Select(SecurityState.permissionsIRPTree)
-  public permissionsIRPTree$: Observable<PermissionsTree>;
 
   @Select(SecurityState.isNewRoleDataLoading)
   public isNewRoleDataLoading$: Observable<boolean>;
@@ -85,6 +81,11 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     text: 'name',
     value: 'id',
   };
+  public toggle:boolean=false;
+  public fields = {
+    dataSource: null, id: 'id', text: 'name',parentID: 'parentId', hasChildren: 'hasChild', htmlAttributes:'htmlAttributes'
+  }
+  public treeData:PermissionsTree;
 
   defaultBusinessValue: any;
 
@@ -120,7 +121,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.onNewRoleBussinesDataFetched();
     this.onUsersAssignedToRoleFetched();
     this.subOnBusinessUnitControlChange();
-
+    this.toggle=false;
     this.copyRoleData$ = this.store.select(SecurityState.copyRoleData)
     .pipe(
       map((roles) => {
@@ -129,8 +130,9 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       })
     );
    }
-
+  
   ngOnChanges(changes: SimpleChanges) {
+    this.toggle=false;
     if (changes['roleId']?.currentValue) {
       this.usersAssignedToRole = { userNames: [], hasUsersOutsideVisibility: false };
     }
@@ -141,8 +143,71 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngAfterViewInit():void{
-    this.showIRPOnlyToggle.nativeElement.style.display='none';
+    this.roleTreeField$.subscribe((roleTreeField) => {
+      this.treeData=roleTreeField.dataSource;
+      this.treeData.map(x=>{
+        x.htmlAttributes={class:'e-show'}
+      });
+      this.changeDataSource(this.treeData)
+    });
   }
+  public changeDataSource(data:any) {
+    for(let i=0; i < data.length;i++){
+      let dataId = data[i]["id"].toString();
+      if(this.tree.checkedNodes.indexOf(dataId) > -1 && this.permissionsControl?.value?.indexOf(dataId)===-1)
+      this.permissionsControl.value.push(dataId)
+    }
+    this.tree.fields = {
+      dataSource: data, id: 'id', text: 'name',parentID: 'parentId', hasChildren: 'hasChild'
+    }
+    
+  }
+  private setTreeFilter(val:boolean){
+    let filteredList:any=[];
+    if(val==false){
+      this.treeData.map((x)=>
+      {
+        x.htmlAttributes={class:'e-show'}
+      });
+      this.treeData = [ ...this.treeData ]
+      this.changeDataSource(this.treeData);
+    }
+    else{
+      this.treeData.forEach((x)=>
+      {
+        if(x.includeInIRP==false){
+          x.htmlAttributes={class:'e-hidden'}
+        }
+        else{
+          x.htmlAttributes={class:'e-show'}
+          filteredList.push(x);
+        }
+      });
+
+      let _array = [], _filter = [];
+      for (let j = 0; j < filteredList.length; j++) {
+        //this.treeData[j].htmlAttributes={class:'e-show'}
+        const index = this.treeData.findIndex(x => x.id === filteredList[j].id);
+        this.treeData.map((data)=>data.id==filteredList[j].id? this.treeData[index].htmlAttributes={class:'e-show'}:'')
+        _filter.push(filteredList[j]);
+        let filters = this.getFilterItems(filteredList[j], this.treeData);
+        for (let i = 0; i < filters.length; i++) {
+          const index = this.treeData.findIndex(x => x.id === filters[i]);
+          if (_array.indexOf(filters[i]) == -1 && filters[i] != null) {
+            this.treeData.map((data)=>data.id==filters[i]? this.treeData[index].htmlAttributes={class:'e-show'}:'')
+            _array.push(filters[i]);
+          }
+        }
+      }
+      this.treeData = [ ...this.treeData ]
+      var data=this.treeData;
+      this.tree.fields = {
+        dataSource: data, id: 'id', text: 'name',parentID: 'parentId', hasChildren: 'hasChild'
+      }
+      this.changeDataSource(this.treeData);
+    }
+  }
+  
   public toggleActive(): void {
     const activeControl = this.form.get('isActive');
     activeControl?.patchValue(!activeControl.value);
@@ -150,6 +215,21 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       this.store.dispatch(new GetUsersAssignedToRole(this.roleId as number));
     }
   }
+  public getFilterItems(fList:any, list:any):any[] {
+    let nodes = [];
+    nodes.push(fList["id"]);
+    let query2 = new Query().where('id', 'equal', fList["parentId"], false);
+    let fList1 = new  DataManager(list).executeLocal(query2);
+    if (fList1.length != 0) {
+        let pNode = this.getFilterItems(fList1[0], list);
+        for (let i = 0; i < pNode.length; i++) {
+            if (nodes.indexOf(pNode[i]) == -1 && pNode[i] != null)
+                nodes.push(pNode[i]);
+            }
+            return nodes;
+        }
+        return nodes;
+    }
 
   public onSelecting(): void {
     this.updatePermissionValue();
@@ -283,29 +363,8 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
   isShowIRPOnly(arg:any){
-    var elements:TreeView = this.tree;
-    if(arg.checked==true){
-      this.permissionsIRPTree$.subscribe((roleTreeField) => {
-        elements.fields={
-          dataSource:roleTreeField,
-          id: 'id',
-          parentID: 'parentId',
-          text: 'name',
-          hasChildren: 'hasChild'
-        }
-      });
-    }
-    else{
-      this.permissionsTree$.subscribe((roleTreeField) => {
-        elements.fields={
-          dataSource:roleTreeField.filter(x=>x.includeInIRP==false),
-          id: 'id',
-          parentID: 'parentId',
-          text: 'name',
-          hasChildren: 'hasChild'
-        }
-      });
-    }
+    this.toggle=arg.checked;
+    this.setTreeFilter(arg.checked)
     this.changeDetectorRef.detectChanges();
   }
  

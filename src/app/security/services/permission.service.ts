@@ -36,7 +36,7 @@ export class PermissionService extends DestroyableDirective {
           canCloseOrder: permissionIds.includes(PermissionTypes.CanCloseOrder),
           canManageOrganizationConfigurations: permissionIds.includes(PermissionTypes.ManageOrganizationConfigurations),
           canOrderJourney: permissionIds.includes(PermissionTypes.ViewOrderJourney)
-        };
+          };
       })
     );
   }

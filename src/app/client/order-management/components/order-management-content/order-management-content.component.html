@@ -81,7 +81,7 @@
         </ng-container>
 
         <app-tooltip-container
-          *ngIf="!isMobile"
+          *ngIf="!isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney"
           [message]="toolTipMessage"
           [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
         >
@@ -167,7 +167,7 @@
   </button>
 
   <app-tooltip-container
-    *ngIf="isMobile"
+    *ngIf="isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney"
     [message]="toolTipMessage"
     [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
   >
