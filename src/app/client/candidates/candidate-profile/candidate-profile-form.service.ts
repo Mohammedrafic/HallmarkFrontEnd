@@ -11,6 +11,7 @@ import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candid
 import { ListOfSkills } from '@shared/models/skill.model';
 import { DateTimeHelper } from '@core/helpers';
 import { candidateDateFields } from '../constants';
+import { CandidatesService } from '../services/candidates.service';
 
 @Injectable()
 export class CandidateProfileFormService {
@@ -18,7 +19,10 @@ export class CandidateProfileFormService {
   public saveEvent$: Subject<void> = new Subject<void>();
   public tabUpdate$: Subject<number> = new Subject<number>();
 
-  constructor(private formBuilder: FormBuilder) { }
+  constructor(
+    private formBuilder: FormBuilder,
+    private candidateService: CandidatesService,
+    ) { }
 
   public triggerSaveEvent(): void {
     this.saveEvent$.next();
@@ -94,6 +98,12 @@ export class CandidateProfileFormService {
   public populateCandidateForm(candidate: CandidateModel): void {
     const candidateWithUTCDates = this.convertDateFildsToUtc(candidate);
     this.candidateForm.patchValue(this.getPartialFormValueByControls(candidateWithUTCDates));
+  }
+
+  public populateHoldEndDate(candidate: CandidateModel): void {
+    if (candidate && candidate.profileStatus === ProfileStatusesEnum.OnHold) {
+      this.candidateForm.get('holdEndDate')?.setValue(candidate.holdEndDate);
+    }
   }
 
   public removeValidators(): void {

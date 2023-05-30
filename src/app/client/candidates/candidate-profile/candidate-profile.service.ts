@@ -27,7 +27,7 @@ export class CandidateProfileService {
   public saveCandidateProfile(candidateId: number): Observable<CandidateModel> {
     const { value } = this.candidateProfileForm.candidateForm;
     const candidate = candidateId ? { id: candidateId, ...value } : value;
-    const candidateDateInUTC = { ...candidate, ...this.convertDatesToUTC(candidate) };
+    const candidateDateInUTC = { ...candidate, ...this.convertDatesToUTC(candidate) } as CandidateModel;
     const payload = { ...candidateDateInUTC, generalNotes: this.generalNotesService.notes$.getValue() };
     const endpoint = `/api/employee/${candidateId ? 'update' : 'create'}`;
 
@@ -39,7 +39,7 @@ export class CandidateProfileService {
         } else {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
-        this.candidateService.setEmployeeHireDate(candidateDateInUTC.hireDate);
+        this.candidateService.setEmployeeHireDate(candidateDateInUTC.hireDate as string);
         this.candidateService.setTerminationDate(candidateDateInUTC.terminationDate);
         this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
       }),
@@ -53,6 +53,7 @@ export class CandidateProfileService {
   public saveCandidate(file: Blob | null, candidateId: number): Observable<void | CandidateModel> {
     return this.saveCandidateProfile(candidateId).pipe(
       mergeMap((candidate) => {
+        this.candidateProfileForm.populateHoldEndDate(candidate);
         this.candidateProfileForm.tabUpdate$.next(candidate.id);
         if (file) {
           return this.saveCandidatePhoto(file, candidate.id);
