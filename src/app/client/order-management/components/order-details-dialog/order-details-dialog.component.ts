@@ -139,6 +139,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public reOrderToEdit: Order | null;
   public reOrderDialogTitle$ = this.addEditReorderService.reOrderDialogTitle$;
   public canCreateOrder: boolean;
+  public canCreateOrderIRP: boolean;
   public canCloseOrderPermission: boolean;
   public readonly systemType = OrderManagementIRPSystemId;
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
@@ -574,9 +575,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder }) => {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder,canCreateOrderIRP }) => {
       this.canCloseOrderPermission = canCloseOrder;
       this.canCreateOrder = canCreateOrder;
+      this.canCreateOrderIRP=canCreateOrderIRP;
     });
   }
 

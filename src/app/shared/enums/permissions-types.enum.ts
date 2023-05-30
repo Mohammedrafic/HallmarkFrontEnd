@@ -36,4 +36,12 @@ export enum PermissionTypes {
   ManuallyAddCredential = 402,
     //View Order Journey
     ViewOrderJourney = 8001,
+
+    CanOrganizationViewOrdersIRP = 6406,
+  CanOrganizationEditOrdersIRP = 6407,
+  CanCreateOrdersIRP = 6408,
+  CanOnboardCandidateIRP = 6409,
+  CanRejectCandidateIRP = 6410,
+  CanEditOrderBillRateIRP = 6411,
+  CanCloseOrdersIRP = 6412,
 }

@@ -43,13 +43,13 @@
               <button
                 ejs-button
                 cssClass="e-outline edit-button"
-                [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission"
+                [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission ||canCreateOrderIRP"
                 (click)="editOrder(order)"
               >
                 <i-feather name="edit" class="icon"></i-feather>
               </button>
             </app-tooltip-container>
-            <app-tooltip-container *ngIf="!canCloseOrder" [showToolTip]="!hasCreateEditOrderPermission">
+            <app-tooltip-container *ngIf="!canCloseOrder || !canCreateOrderIRP" [showToolTip]="!hasCreateEditOrderPermission">
               <button
                 ejs-button
                 cssClass="e-outline"

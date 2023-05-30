@@ -36,12 +36,12 @@
           [ngTemplateOutlet]="filterButton"
         ></ng-container>
         <app-tooltip-container
-          *ngIf="!isActiveSystemIRP && !(isContentSmallDesktop || isMiddleTabletWidth)  && activeSystem != OrderManagementIRPSystemId.OrderJourney"
+          *ngIf="!(isActiveSystemIRP && canViewOrderIRP) && !(isContentSmallDesktop || isMiddleTabletWidth)  && activeSystem != OrderManagementIRPSystemId.OrderJourney"
           [message]="toolTipMessage"
           [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
         >
           <button
-            [disabled]="isActiveSystemIRP || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+            [disabled]="(isActiveSystemIRP && canViewOrderIRP) || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders] "
             ejs-button
             appHideBeforeSyncfusionLoad
             (click)="openImportDialog()"
@@ -86,7 +86,7 @@
           [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
         >
           <button
-            [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+            [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders] || canCreateOrderIRP||!userPermission[userPermissions.CanCreateOrdersIRP]"
             ejs-button
             appHideBeforeSyncfusionLoad
             [isPrimary]="true"

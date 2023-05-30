@@ -428,6 +428,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private organizationId: number;
   public isCondidateTab: boolean = false;
   public OrderJourney: any[] = [];
+  public canCreateOrderIRP:boolean;
+  public canViewOrderIRP:boolean;
+  public canCloseOrderIRP:boolean;
+  public threeDotsMenuOptionsIRP:Record<string, ItemModel[]>;
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -457,6 +461,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private commentsService: CommentsService,
     private readonly ngZone: NgZone,
     private preservedOrderService: PreservedOrderService,
+    
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
     super(store);
@@ -554,8 +559,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.subscribeOnUserSearch();
     this.watchForUpdateCandidate();
     this.preservedOrderHandler();
-
-    let isIrpEnabled = JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean;
+    let isIrpEnabled = this.canViewOrderIRP;
     if (isIrpEnabled === true) {
       this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
       this.activeSystem = OrderManagementIRPSystemId.IRP;
@@ -610,10 +614,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder,canOrderJourney }) => {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder,canOrderJourney,canCreateOrderIRP,canCloseOrderIRP }) => {
       this.canCreateOrder = canCreateOrder;
       this.canCloseOrder = canCloseOrder;
       this.canOrderJourney = canOrderJourney;
+      this.canCreateOrder=canCreateOrderIRP;
+      this.canCloseOrderIRP=canCloseOrderIRP
       this.initMenuItems();
       this.cd$.next(true);
     });
@@ -1964,32 +1970,55 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public getMoreMenu(order: OrderManagement): ItemModel[] {
     const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
-
     if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
       if (order.children?.some((child) => orderStatuses.includes(child.orderStatus))) {
-        return order.orderType === OrderType.OpenPerDiem
+        if(this.activeSystem===OrderManagementIRPSystemId.IRP){
+          return order.orderType === OrderType.OpenPerDiem
+          ? this.threeDotsMenuOptionsIRP['moreMenuWithCloseButton']
+          : this.threeDotsMenuOptionsIRP['moreMenu'];
+        }
+        else{
+          return order.orderType === OrderType.OpenPerDiem
           ? this.threeDotsMenuOptions['moreMenuWithCloseButton']
           : this.threeDotsMenuOptions['moreMenu'];
+        }
+       
+          
       } else if (this.activeSystem === OrderManagementIRPSystemId.IRP
         && order.activeCandidatesCount && order.activeCandidatesCount > 0) {
-        return this.threeDotsMenuOptions['moreMenu'];
+        return this.threeDotsMenuOptionsIRP['moreMenu'];
       }
     }
-    return this.canReOpen(order)
+    if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+      return this.canReOpen(order)
+      ? this.threeDotsMenuOptionsIRP['moreMenuWithReOpenButton']
+      : this.threeDotsMenuOptionsIRP['moreMenuWithCloseButton'];
+    }
+    else{
+      return this.canReOpen(order)
       ? this.threeDotsMenuOptions['moreMenuWithReOpenButton']
       : this.threeDotsMenuOptions['moreMenuWithCloseButton'];
+    }
   }
 
   public getMenuForReorders(order: OrderManagement): ItemModel[] {
     if (order.children?.some((child) => OrderStatus.Filled === child.orderStatus)) {
+      if(this.activeSystem===OrderManagementIRPSystemId.IRP)
+        return this.threeDotsMenuOptionsIRP['filledReOrdersMenu'];
+      else
       return this.threeDotsMenuOptions['filledReOrdersMenu'];
     }
 
     if (!order.children?.length && order.orderCloseDate && order.status !== OrderStatus.Closed) {
-      return this.threeDotsMenuOptions['moreMenu'];
+      if(this.activeSystem===OrderManagementIRPSystemId.IRP)
+        return this.threeDotsMenuOptionsIRP['moreMenu'];
+      else
+        return this.threeDotsMenuOptions['moreMenu'];
     }
-
-    return this.threeDotsMenuOptions['reOrdersMenu'];
+    if(this.activeSystem===OrderManagementIRPSystemId.IRP)
+        return this.threeDotsMenuOptionsIRP['reOrdersMenu'];
+      else
+        return this.threeDotsMenuOptions['reOrdersMenu'];
   }
 
   public canReOpen(order: OrderManagement): boolean {
@@ -2170,12 +2199,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private initMenuItems(): void {
     this.threeDotsMenuOptions = ThreeDotsMenuOptions(this.canCreateOrder, this.canCloseOrder, this.activeSystem);
+    this.threeDotsMenuOptionsIRP = ThreeDotsMenuOptions(this.canCreateOrderIRP, this.canCloseOrder, this.activeSystem);
   }
 
   private watchForPermissions(): void {
     this.getPermissionStream().pipe(takeUntil(this.unsubscribe$)).subscribe((permissions: Permission) => {
       this.hasCreateEditOrderPermission = permissions[this.userPermissions.CanCreateOrders]
         || permissions[this.userPermissions.CanOrganizationEditOrders];
+      this.canViewOrderIRP=permissions[this.userPermissions.CanOrganizationViewOrdersIRP]
       this.cd$.next(true);
     });
   }
@@ -2237,8 +2268,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if (!this.previousSelectedSystemId) {
         this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
       }
-
-      this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
+      this.systemGroupConfig = SystemGroupConfig(this.canViewOrderIRP, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
       this.setOrderTypesFilterDataSource();
       this.initMenuItems();
       this.initGridColumns();
@@ -2262,7 +2292,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.columnDefs = OrderManagementIrpGridHelper.prepareColDefs(
       this.activeSystem,
       this.activeIRPTabIndex,
-      this.threeDotsMenuOptions,
+      this.threeDotsMenuOptionsIRP,
       this.canCreateOrder,
       this.settings[SettingsKeys.IsReOrder]?.value,
       this.hasCreateEditOrderPermission,
@@ -2561,7 +2591,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     } else if (obj == "VMS") {
       this.activeSystem = OrderManagementIRPSystemId.VMS;
     }
-    this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem, this.canOrderJourney);
+    this.systemGroupConfig = SystemGroupConfig(this.canViewOrderIRP, this.isOrgVMSEnabled, this.activeSystem, this.canOrderJourney);
     this.clearFilters();
     this.clearOrderJourneyFilters();
     this.store.dispatch([new PreservedFilters.ResetPageFilters(), new ClearOrders()]);

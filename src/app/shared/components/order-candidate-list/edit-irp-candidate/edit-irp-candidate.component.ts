@@ -43,6 +43,7 @@ import { RejectReasonState } from '@organization-management/store/reject-reason.
 import { DurationService } from '@shared/services/duration.service';
 import { OrderType } from '@shared/enums/order-type';
 import { OrderCandidateJob } from '@shared/models/order-management.model';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -56,6 +57,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   @Input() set handleOpenModal(modalState: EditCandidateDialogState) {
     if(modalState.isOpen) {
       this.candidateModelState = {...modalState};
+      this.subscribeOnPermissions();
       this.isOnboarded = modalState.candidate.status === CandidatStatus.OnBoard;
       this.getCandidateDetails();
     }
@@ -71,6 +73,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public disableSaveButton = false;
   public dialogConfig: ReadonlyArray<CandidateField>;
   public isOnboarded = false;
+  public canOnboardCandidateIRP:boolean;
+  public canRejectedCandidateIRP:boolean;
+
 
   private candidateModelState: EditCandidateDialogState;
 
@@ -80,6 +85,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     private orderCandidateApiService: OrderCandidateApiService,
     private cdr: ChangeDetectorRef,
     private store: Store,
+    private permissionService: PermissionService,
     private orderManagementService: OrderManagementService,
     private durationService: DurationService,
   ) {
@@ -173,6 +179,18 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     
           statusConfigField.dataSource = this.editIrpCandidateService
           .createStatusOptions([...candidateDetails.availableStatuses ?? []]);
+          if(this.canOnboardCandidateIRP){
+            const objWithIdIndex = statusConfigField.dataSource.findIndex((obj:any) => obj.applicantStatus === "Onboard");
+            if (objWithIdIndex > -1) {
+              statusConfigField.dataSource.splice(objWithIdIndex, 1);
+            }
+          }
+          if(this.canRejectedCandidateIRP){
+            const objWithIdIndex = statusConfigField.dataSource.findIndex((obj:any) => obj.applicantStatus === "Reject");
+            if (objWithIdIndex > -1) {
+              statusConfigField.dataSource.splice(objWithIdIndex, 1);
+            }
+          }
           reasonConfigField.dataSource = this.editIrpCandidateService.createReasonsOptions(reasons || []);
           this.candidateForm.patchValue({
             actualStartDate: DateTimeHelper.convertDateToUtc(candidateDetails.actualStartDate as string),
@@ -266,6 +284,24 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       text: jobStatus.statusText,
       value: jobStatus.applicantStatus,
     }];
+    if(this.canOnboardCandidateIRP){
+      const objWithIdIndex = statusConfig.dataSource.findIndex((obj:any) => obj.applicantStatus === "Onboard");
+      if (objWithIdIndex > -1) {
+        statusConfig.dataSource.splice(objWithIdIndex, 1);
+      }
+    }
+    if(this.canRejectedCandidateIRP){
+      const objWithIdIndex = statusConfig.dataSource.findIndex((obj:any) => obj.applicantStatus === "Reject");
+      if (objWithIdIndex > -1) {
+        statusConfig.dataSource.splice(objWithIdIndex, 1);
+      }
+    }
+  }
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canOnboardCandidateIRP,canRejectCandidateIRP }) => {
+      this.canOnboardCandidateIRP=canOnboardCandidateIRP;
+      this.canRejectedCandidateIRP=canRejectCandidateIRP;
+    });
   }
 
   private setCloseData(job: OrderCandidateJob): void {
