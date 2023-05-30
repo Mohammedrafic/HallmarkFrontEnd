@@ -170,12 +170,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
       headerName: 'Status',
       field: 'status',
       minWidth: 250,
-      filter: 'agTextColumnFilter',
-      filterParams: {
-        buttons: ['reset'],
-        debounceMs: 1000,
-        suppressAndOrCondition: true,
-      },
+      filter: true,
       sortable: true,
       resizable: true
     },
