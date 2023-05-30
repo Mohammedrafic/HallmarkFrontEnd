@@ -7,7 +7,7 @@ export class DepartmentsAdapter {
     editedDepartmentId: number | undefined,
     selectedLocationId: number | undefined,
     formGroup: FormGroup,
-    skillsAvailable: boolean,
+    areSkillsAvailable: boolean,
   ): Department {
     const {
       extDepartmentId,
@@ -37,8 +37,8 @@ export class DepartmentsAdapter {
       facilityEmail,
       facilityContact,
       unitDescription,
-      primarySkills: skillsAvailable ? primarySkills : null,
-      secondarySkills: skillsAvailable ? secondarySkills : null,
+      primarySkills: areSkillsAvailable ? primarySkills : null,
+      secondarySkills: areSkillsAvailable ? secondarySkills : null,
       ...(typeof includeInIRP === 'boolean' && { includeInIRP }),
       id,
     };
