@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import { ExportPayload } from '@shared/models/export.model';
 import { TimesheetDetailsActions, TIMESHEETS_ACTIONS } from '../../enums';
-import { AddRecordDto, PutRecordDto } from '../../interface';
 import {
   ChangeStatusData,
   DeleteAttachmentData,
   DownloadAttachmentData,
-  TimesheetUploadFilesData
+  TimesheetUploadFilesData,
+  AddRecordDto,
+  PutRecordDto,
 } from '../../interface';
 
 export namespace TimesheetDetails {
@@ -132,5 +134,11 @@ export namespace TimesheetDetails {
       public readonly jobId: number,
       public readonly isAgency: boolean,
     ) {}
+  }
+
+  export class RecalculateTimesheets {
+    static readonly type = TimesheetDetailsActions.RecalculateTimesheets;
+
+    constructor(public readonly jobId: number) {}
   }
 }

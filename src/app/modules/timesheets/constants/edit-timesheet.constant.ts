@@ -227,3 +227,4 @@ export const PutSuccess = {
 };
 
 export const GetBydateErrMessage = 'Timesheet for selected week does not exist';
+export const RecalculateSuccess = 'Timesheets were recalculated successfully';

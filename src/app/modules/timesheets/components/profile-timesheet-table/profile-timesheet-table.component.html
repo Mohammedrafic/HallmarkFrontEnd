@@ -15,6 +15,14 @@
       </div>
 
       <div class="action-buttons">
+        <button
+          *ngIf="canRecalculateTimesheet"
+          ejs-button
+          cssClass="e-action-button"
+          class="add-action spaced no-right-space"
+          (click)="recalculateTimesheets()">
+          Recalculate
+        </button>
         <ng-container *ngIf="isEditEnabled">
           <app-tooltip-container
             [ngClass]="{ 'middle-tablet': isMiddleContentWidth }"
@@ -97,7 +105,7 @@
         [getRowStyle]="getRowStyle"
         [class.empty-table]="!recordsToShow[currentTab][currentMode].length"
         [overlayNoRowsTemplate]="gridEmptyMessage"
-        (gridReady)="onGridReady($event)"
+        (gridReady)="setGridApi($event)"
         (componentStateChanged)="onComponentStateChanged($event)"
         class="ag-theme-alpine app-grid__component"
       >
@@ -117,7 +125,7 @@
         ejs-button
         [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions"
         cssClass="e-outline privilege"
-        (click)="onRejectButtonClick()"
+        (click)="reject()"
       >
         Reject
       </button>
@@ -128,7 +136,7 @@
         [isPrimary]="true"
         [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions"
         cssClass="spinner-btn privilege"
-        (click)="handleApprove()"
+        (click)="approve()"
       >
         <div #spinner class="spinner-container" *ngIf="loading; else approvetext"></div>
         <ng-template #approvetext>
