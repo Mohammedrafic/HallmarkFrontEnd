@@ -222,8 +222,13 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = this.datePipe?.transform(params.data.punchIndate, 'MM/dd/yyyy') as string
-        return str?.length > 0 ? str : "";
+        if(!Number.isNaN(Date.parse(params.data?.punchIndate)))
+        {
+          const str = this.datePipe?.transform(params.data.punchIndate, 'MM/dd/yyyy') as string
+          return str?.length > 0 ? str : "";
+        }else{
+          return params.data.punchIndate;
+        }
       },
       sortable: true,
       resizable: true
@@ -271,8 +276,12 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = this.datePipe?.transform(params.data.punchOutdate, 'MM/dd/yyyy') as string
-        return str?.length > 0 ? str : "";
+        if (!Number.isNaN(Date.parse(params.data?.punchOutdate))){
+          const str = this.datePipe?.transform(params.data.punchOutdate, 'MM/dd/yyyy') as string
+          return str?.length > 0 ? str : "";
+        }else{
+          return params.data.punchOutdate;
+        }
       },
       sortable: true,
       resizable: true
@@ -313,7 +322,10 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       headerName: 'Deleted',
       field: 'deleted',
       minWidth: 150,
-      resizable: true
+      resizable: true,
+      cellRenderer: (params:any) => {
+        return params.data.deleted == "0" ? 'No' :  params.data.deleted == "1" ? 'Yes' : params.data.deleted;
+      },      
     },
     {
       headerName: 'Error Description',
