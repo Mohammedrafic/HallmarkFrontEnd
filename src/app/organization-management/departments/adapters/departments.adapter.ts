@@ -3,7 +3,12 @@ import { FormGroup } from '@angular/forms';
 import { DateTimeHelper } from '@core/helpers';
 
 export class DepartmentsAdapter {
-  public static prepareToSave(editedDepartmentId: number | undefined, selectedLocationId: number | undefined, formGroup: FormGroup): Department {
+  public static prepareToSave(
+    editedDepartmentId: number | undefined,
+    selectedLocationId: number | undefined,
+    formGroup: FormGroup,
+    skillsAvailable: boolean,
+  ): Department {
     const {
       extDepartmentId,
       invoiceDepartmentId,
@@ -32,9 +37,10 @@ export class DepartmentsAdapter {
       facilityEmail,
       facilityContact,
       unitDescription,
-      primarySkills, secondarySkills,
+      primarySkills: skillsAvailable ? primarySkills : null,
+      secondarySkills: skillsAvailable ? secondarySkills : null,
       ...(typeof includeInIRP === 'boolean' && { includeInIRP }),
-      id
-    }
+      id,
+    };
   }
 }

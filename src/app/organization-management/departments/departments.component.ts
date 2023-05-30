@@ -424,7 +424,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       const department: Department = DepartmentsAdapter.prepareToSave(
         this.editedDepartmentId,
         this.selectedLocation.id,
-        this.departmentsDetailsFormGroup
+        this.departmentsDetailsFormGroup,
+        this.areSkillsAvailable
       );
       this.saveOrUpdateDepartment(department, ignoreWarning);
     } else {
@@ -649,8 +650,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       primarySkillsControl?.disable();
       secondarySkillsControl?.disable();
     } else {
-      secondarySkillsControl?.reset();
-      primarySkillsControl?.reset();
       primarySkillsControl?.removeValidators(Validators.required);
       primarySkillsControl?.updateValueAndValidity();
     }
