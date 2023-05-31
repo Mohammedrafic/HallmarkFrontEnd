@@ -182,6 +182,7 @@ export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Job Date', column: 'JobDate' },
   { text: 'Actual Start Date', column: 'ActualStartDate' },
   { text: 'Actual End Date', column: 'ActualEndDate' },
+  { text: 'Position ID', column: 'PositionID' },
   { text: 'Shift', column: 'Shift' },
   { text: 'Irp Candid', column: 'IRPCand' },
   { text: 'VMS Candid', column: 'VMSCand' },
