@@ -59,6 +59,7 @@ export interface EditScheduleFormFieldConfig {
   inputType?: InputAttrType;
   sourceKey?: EditScheduleFormSourceKeys;
   show?: boolean;
+  tooltipContent?: string;
 }
 
 export interface EditScheduleFormSource {

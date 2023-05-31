@@ -27,3 +27,12 @@ export enum ScheduleAttributeKeys {
  CHG = 'CHG',
  PRC= 'PRC',
 }
+
+export enum ScheduleAttributeTitles {
+  ORI = 'Orientation',
+  CRT = 'Critical',
+  OC = 'On Call',
+  CHG = 'Charge',
+  PRC= 'Preceptor',
+  MEAL = 'Meal break',
+}

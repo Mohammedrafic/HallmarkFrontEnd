@@ -61,14 +61,16 @@
                 class="input-group"
                 [ngStyle]="{'grid-area': control.gridAreaName}"
               >
-                <ejs-switch
-                  class="switch"
-                  [formControlName]="control.field"
-                ></ejs-switch>
-                <label class="switch-label">
-                  {{control.title}}
-                  <span *ngIf="control.required" class="required">*</span>
-                </label>
+                <ejs-tooltip [content]="control.tooltipContent" position='TopCenter'>
+                  <ejs-switch
+                    class="switch"
+                    [formControlName]="control.field"
+                  ></ejs-switch>
+                  <label class="switch-label">
+                    {{control.title}}
+                    <span *ngIf="control.required" class="required">*</span>
+                  </label>
+                </ejs-tooltip>
               </div>
             </div>
           </ng-template>

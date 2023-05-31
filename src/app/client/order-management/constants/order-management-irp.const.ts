@@ -221,11 +221,6 @@ export const OrderManagementVMSSubGridCells: ColDef[] = [
     width: 160,
   },
   {
-    field: 'billRate',
-    headerName: 'Bill Rate $',
-    width: 100,
-  },
-  {
     field: 'actualStartDate',
     headerName: 'Actual start date',
     width: 140,

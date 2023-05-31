@@ -34,6 +34,7 @@ export interface ScheduleFormFieldConfig {
   show?: boolean;
   inputType?: InputAttrType;
   sourceKey?: ScheduleFormSourceKeys;
+  tooltipContent?: string;
 }
 
 export interface CreateScheduleTypesConfig {
