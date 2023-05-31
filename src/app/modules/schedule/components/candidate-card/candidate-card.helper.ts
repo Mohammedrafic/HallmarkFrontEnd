@@ -19,7 +19,7 @@ export const isCandidateOriented = (startDate: string , orientationDate: string 
     const startDateWithoutTime = startDate.split('T');
     const orientationDateWithoutTime = orientationDate?.split('T');
 
-    return new Date(startDateWithoutTime[0]) > new Date(orientationDateWithoutTime[0]);
+    return new Date(startDateWithoutTime[0]) >= new Date(orientationDateWithoutTime[0]);
   }
 
   return false;
