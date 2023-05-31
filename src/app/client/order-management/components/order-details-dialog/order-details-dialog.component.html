@@ -43,18 +43,18 @@
               <button
                 ejs-button
                 cssClass="e-outline edit-button"
-                [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission ||canCreateOrderIRP"
+                [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission || !CanEditOrderBillRateIRP"
                 (click)="editOrder(order)"
               >
                 <i-feather name="edit" class="icon"></i-feather>
               </button>
             </app-tooltip-container>
-            <app-tooltip-container *ngIf="!canCloseOrder || !canCreateOrderIRP" [showToolTip]="!hasCreateEditOrderPermission">
+            <app-tooltip-container *ngIf="!canCloseOrder" [showToolTip]="!hasCreateEditOrderPermission">
               <button
                 ejs-button
                 cssClass="e-outline"
                 [class.custom-order-btn]="showApproveAndCancel"
-                [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission"
+                [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission || !CanCloseOrdersIRP"
                 (click)="closeOrder(order)"
               >
                 Close Order

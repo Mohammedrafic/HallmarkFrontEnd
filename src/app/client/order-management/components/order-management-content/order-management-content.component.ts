@@ -206,6 +206,7 @@ import {
   StatusesByDefault,
   SystemGroupConfig,
   ThreeDotsMenuOptions,
+  ThreeDotsMenuOptionsIRP,
   initOrderManagementFilterColumns,
 } from '@client/order-management/constants';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
@@ -431,6 +432,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public canCreateOrderIRP:boolean;
   public canViewOrderIRP:boolean;
   public canCloseOrderIRP:boolean;
+  public CanEditOrderBillRateIRP:boolean;
   public threeDotsMenuOptionsIRP:Record<string, ItemModel[]>;
 
   private get contactEmails(): string | null {
@@ -614,12 +616,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder,canOrderJourney,canCreateOrderIRP,canCloseOrderIRP }) => {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder,canOrderJourney,canCreateOrderIRP,canCloseOrderIRP, CanEditOrderBillRateIRP}) => {
       this.canCreateOrder = canCreateOrder;
       this.canCloseOrder = canCloseOrder;
       this.canOrderJourney = canOrderJourney;
       this.canCreateOrder=canCreateOrderIRP;
-      this.canCloseOrderIRP=canCloseOrderIRP
+      this.canCloseOrderIRP=canCloseOrderIRP;
+      this.CanEditOrderBillRateIRP = CanEditOrderBillRateIRP;
       this.initMenuItems();
       this.cd$.next(true);
     });
@@ -2199,7 +2202,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private initMenuItems(): void {
     this.threeDotsMenuOptions = ThreeDotsMenuOptions(this.canCreateOrder, this.canCloseOrder, this.activeSystem);
-    this.threeDotsMenuOptionsIRP = ThreeDotsMenuOptions(this.canCreateOrderIRP, this.canCloseOrder, this.activeSystem);
+    this.threeDotsMenuOptionsIRP = ThreeDotsMenuOptionsIRP(this.CanEditOrderBillRateIRP, this.canCloseOrderIRP, this.activeSystem);
   }
 
   private watchForPermissions(): void {
@@ -2233,7 +2236,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         organizationId,
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
-        isIrp ? this.orderManagementService.getIsAvailable() : this.orderManagementService.excludeDeployed,
+        isIrp ? this.orderManagementService.getIsAvailable() : this.orderManagementService.excludeDeployed,""
       )
     );
   }

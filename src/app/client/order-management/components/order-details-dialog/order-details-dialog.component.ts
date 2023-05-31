@@ -83,6 +83,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   @Input() hasCreateEditOrderPermission: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
+  @Input() CanEditOrderBillRateIRP: boolean;
+  @Input() CanCloseOrdersIRP: boolean;
   @Input() activeSystem: OrderManagementIRPSystemId;
   @Input() orderComments: Comment[] = [];
   @Input() isCondidateTab: boolean;

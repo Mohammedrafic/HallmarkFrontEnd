@@ -10,6 +10,7 @@ export interface PermissionsModel {
   canCreateOrder: boolean;
   canCloseOrder: boolean;
   canCreateOrderIRP:boolean;
+  CanEditOrderBillRateIRP:boolean;
   canCloseOrderIRP:boolean;
   canOnboardCandidateIRP:boolean;
   canRejectCandidateIRP:boolean;
@@ -41,7 +42,8 @@ export class PermissionService extends DestroyableDirective {
           canManageOrganizationConfigurations: permissionIds.includes(PermissionTypes.ManageOrganizationConfigurations),
           canOrderJourney: permissionIds.includes(PermissionTypes.ViewOrderJourney),
           canCreateOrderIRP:permissionIds.includes(PermissionTypes.CanCreateOrdersIRP),
-          canCloseOrderIRP:permissionIds.includes(PermissionTypes.CanCloseOrder),
+          CanEditOrderBillRateIRP: permissionIds.includes(PermissionTypes.CanEditOrderBillRateIRP),
+          canCloseOrderIRP:permissionIds.includes(PermissionTypes.CanCloseOrdersIRP),
           canOnboardCandidateIRP:permissionIds.includes(PermissionTypes.CanOnboardCandidateIRP),
           canRejectCandidateIRP:permissionIds.includes(PermissionTypes.CanRejectCandidateIRP),
           };

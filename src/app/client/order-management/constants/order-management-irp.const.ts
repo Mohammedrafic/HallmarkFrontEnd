@@ -91,6 +91,47 @@ export const MapSystemWithTabs: Map<OrderManagementIRPSystemId, TabsListConfig[]
   new Map<OrderManagementIRPSystemId, TabsListConfig[]>()
     .set(OrderManagementIRPSystemId.IRP, IRPTabsConfig);
 
+export const ThreeDotsMenuOptionsIRP = (
+      CanEditOrderBillRateIRP: boolean,
+      CanCloseOrdersIRP: boolean,
+      isIrpSystem: OrderManagementIRPSystemId,
+    ): Record<string, ItemModel[]> => ({
+      moreMenuWithDeleteButton: [
+        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[3], id: '3', disabled: !CanEditOrderBillRateIRP },
+      ],
+      moreMenuWithCloseButton: [
+        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[2], id: '2', disabled: !CanCloseOrdersIRP },
+      ],
+      moreMenuWithReOpenButton: [
+        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[4], id: '4', disabled: !CanEditOrderBillRateIRP },
+      ],
+      moreMenu: [
+        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
+      ],
+      reOrdersMenu: [
+        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[2], id: '2', disabled: !CanCloseOrdersIRP },
+      ],
+      filledReOrdersMenu: [
+        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
+      ],
+      closedOrderMenu: [
+        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
+      ],
+      irpIncompleteMenu: [
+        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
+      ],
+    });
+
+
 export const ThreeDotsMenuOptions = (
   canCreateOrder: boolean,
   canCloseOrder: boolean,

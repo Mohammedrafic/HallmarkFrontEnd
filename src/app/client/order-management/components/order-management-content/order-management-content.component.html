@@ -36,12 +36,12 @@
           [ngTemplateOutlet]="filterButton"
         ></ng-container>
         <app-tooltip-container
-          *ngIf="!(isActiveSystemIRP && canViewOrderIRP) && !(isContentSmallDesktop || isMiddleTabletWidth)  && activeSystem != OrderManagementIRPSystemId.OrderJourney"
+          *ngIf="!isActiveSystemIRP && !(isContentSmallDesktop || isMiddleTabletWidth)  && activeSystem != OrderManagementIRPSystemId.OrderJourney"
           [message]="toolTipMessage"
           [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
         >
           <button
-            [disabled]="(isActiveSystemIRP && canViewOrderIRP) || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders] "
+            [disabled]="isActiveSystemIRP || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders]||!userPermission[userPermissions.CanCreateOrdersIRP]"
             ejs-button
             appHideBeforeSyncfusionLoad
             (click)="openImportDialog()"
@@ -86,7 +86,7 @@
           [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
         >
           <button
-            [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders] || canCreateOrderIRP||!userPermission[userPermissions.CanCreateOrdersIRP]"
+            [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
             ejs-button
             appHideBeforeSyncfusionLoad
             [isPrimary]="true"
@@ -1442,6 +1442,8 @@
   [orderPositionSelected$]="orderPositionSelected$"
   [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"
   [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
+  [CanEditOrderBillRateIRP]="userPermission[userPermissions.CanEditOrderBillRateIRP]"
+  [CanCloseOrdersIRP] = "userPermission[userPermissions.CanCloseOrdersIRP]"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid(true)"
   (closeReOrderEmitter)="onAddReorderClose()"
