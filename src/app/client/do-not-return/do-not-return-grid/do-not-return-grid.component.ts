@@ -140,10 +140,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   private lastSelectedOrganizationId$: Observable<number>;
   private isAlive = true;
 
-  get reasonControl(): AbstractControl | null {
-    return this.doNotReturnForm.get('firstName');
-  }
-
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
@@ -249,9 +245,9 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
           }else if(!this.isEdit){
             this.doNotReturnFormGroup.get('candidateProfileId')?.setValue(null);
           }
-
-      this.doNotReturnFormGroup.controls['isExternal']?.markAsTouched();  
-      this.changeDetectorRef.markForCheck();              
+          this.doNotReturnFormGroup.markAsUntouched();  
+          this.doNotReturnFormGroup.controls['isExternal']?.markAsTouched();  
+          this.changeDetectorRef.markForCheck();              
     });
 
     this.doNotReturnFormGroup.get('candidateProfileId')?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((CandidateProfileId: any) => {
@@ -481,16 +477,13 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
   getEditBasedValues(data: Donotreturn, event: any) {
-   this.selectedOrganization.id = data?.businessUnitId;
+      this.selectedOrganization.id = data?.businessUnitId;
       let regionFilter: regionFilter = {
         businessUnitId: data.businessUnitId,
         getAll: true,
         ids: [data.businessUnitId]
       };
-      this.store.dispatch(new GetRegionsByOrganizations(regionFilter)).pipe(delay(500)).subscribe(()=>
-      {
-        
-      });
+      this.store.dispatch(new GetRegionsByOrganizations(regionFilter)).pipe(delay(500)).subscribe(()=>{  });
           let locationFilter: LocationsByRegionsFilter = {
             ids: (data.regionId.split(',')).map(m => parseInt(m)),
             getAll: true,
@@ -614,8 +607,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   }
 
   onFormCancelClick(): void {
-    this.isEdit=false;
-    this.isBlock = true;
     if (this.doNotReturnFormGroup.dirty) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -631,6 +622,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
           this.maskSSNPattern = '000-00-0000';
           this.maskedSSN = '';
           this.sortByField = 1;
+          this.isEdit=false;
+          this.isBlock = true;
         });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
@@ -638,6 +631,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.removeActiveCssClass();
       this.maskSSNPattern = '000-00-0000';
       this.maskedSSN = '';
+      this.isEdit=false;
+      this.isBlock = true;
     }
     
   }
