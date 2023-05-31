@@ -4,7 +4,7 @@ import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { DonoreturnFilters } from '@shared/models/donotreturn.model';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { MasterDNRExportCols, TITLE } from '../donotreturn-grid.constants';
@@ -30,6 +30,7 @@ public filters: DonoreturnFilters = {};
   public filteredItems$ = new Subject<number>();
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
   public refreshGridEvent: Subject<boolean> = new Subject<boolean>();
+  public fliterFlag$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor(protected override store:Store) { 
     super(store)
@@ -56,6 +57,7 @@ public filters: DonoreturnFilters = {};
   }
 
   public showFilters(): void {
+    this.fliterFlag$.next(true);
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
@@ -64,6 +66,7 @@ public filters: DonoreturnFilters = {};
   }
 
   public addDoNotReturn(): void {
+    this.fliterFlag$.next(false);
     this.store.dispatch(new ShowSideDialog(true));
   }
 
