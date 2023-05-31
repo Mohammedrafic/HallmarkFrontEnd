@@ -1,5 +1,7 @@
+import { formatDate } from '@angular/common';
+
 import { DateTimeHelper } from '@core/helpers';
-import { IrpOrderCandidate, IrpOrderCandidateDto } from '@shared/models/order-management.model';
+import { IrpOrderCandidate, IrpOrderCandidateDto, OrderAvailabilityOverlap } from '@shared/models/order-management.model';
 import { PageOfCollections } from '@shared/models/page.model';
 import { getOrientationDate } from '@shared/components/order-candidate-list/edit-candidate-list.helper';
 
@@ -20,6 +22,7 @@ export const AdaptIrpCandidates = (
   const candidatesData: PageOfCollections<IrpOrderCandidate> = {
     ...response,
     items: response.items.map((candidate) => {
+      const availabilityOverlap = GetAvailabilityOverlap(candidate?.availabilityOverlap);
       const timeFormat = 'HH:mm';
       const lastTimeFrom = DateTimeHelper.formatDateUTC(candidate.lastShiftFrom, timeFormat);
       const lastTimeTo = DateTimeHelper.formatDateUTC(candidate.lastShiftTo, timeFormat);
@@ -30,6 +33,7 @@ export const AdaptIrpCandidates = (
         lastShiftTime: candidate.lastShiftFrom ? `${lastTimeFrom} - ${lastTimeTo}` : '',
         nextShiftTime: candidate.nextShiftFrom ? `${nextTimeFrom} - ${nextTimeTo}` : '',
         departmentOrientationDate: getOrientationDate(candidate.departmentOrientationDate),
+        availabilityOverlap,
       };
 
       return irpCandidate;
@@ -37,4 +41,16 @@ export const AdaptIrpCandidates = (
   };
 
   return candidatesData;
+};
+
+export const GetAvailabilityOverlap = (overlap: OrderAvailabilityOverlap): OrderAvailabilityOverlap => {
+  if(overlap) {
+    return {
+      ...overlap,
+      tooltip: `${formatDate(overlap.start, 'HH:mm', 'en-US', 'UTC')} -
+                ${formatDate(overlap.end, 'HH:mm', 'en-US', 'UTC')}`,
+    };
+  }
+
+  return {} as OrderAvailabilityOverlap;
 };

@@ -289,6 +289,7 @@ export type OrderCandidatesList = {
   agencyName?: string;
   organizationId?: number;
   workflowStepType: WorkflowStepType;
+  availabilityOverlap?: OrderAvailabilityOverlap;
 };
 
 export interface WorkflowStepType {
@@ -785,6 +786,15 @@ export interface IrpOrderCandidateDto {
   payRate: number;
   organizationOrientationDate: string | null;
   departmentOrientationDate: string | null;
+  availabilityOverlap: OrderAvailabilityOverlap;
+}
+
+export interface OrderAvailabilityOverlap {
+  end: string;
+  isFullOverlap: boolean;
+  overlapHours: number;
+  start: string;
+  tooltip: string;
 }
 
 export type IrpOrderCandidate = IrpOrderCandidateDto & IrpCandidateShiftTime;
