@@ -36,7 +36,10 @@
     [ngStyle]="{'grid-template-columns': scheduleTypes.columnsTemplate}"
   >
     <ng-container *ngFor="let type of scheduleTypes.source">
-      <div class="input-group radio">
+      <div
+        class="input-group radio" 
+        [class.e-radio-checked]="type.value === scheduleTypesControl.value"
+      >
         <app-tooltip-container [message]="type.toolTipMessage" [showToolTip]="type.disabled">
           <ejs-radiobutton
             (change)="changeScheduleType($event)"

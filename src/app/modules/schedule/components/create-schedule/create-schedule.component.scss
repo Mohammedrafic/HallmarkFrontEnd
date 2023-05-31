@@ -129,7 +129,7 @@ app-schedule-open-positions {
     min-width: 1px;
   }
 
-  .input-group:has(.e-control.e-radio:checked) {
+  .input-group.e-radio-checked {
     background-color: $primary-active-blue-10;
 
     .e-control.e-radio:checked + label {
