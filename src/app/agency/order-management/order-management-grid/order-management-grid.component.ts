@@ -371,10 +371,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private listenRedirectFromReOrder(): void {
     this.orderManagementAgencyService.orderPerDiemId$
-      .pipe(
-        debounceTime(50),
-        takeUntil(this.unsubscribe$)
-      )
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: { id: number; prefix: string }) => {
         this.orderPerDiemId = data.id;
         this.prefix = data.prefix;
@@ -408,7 +405,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     const preservedFiltes = this.store.selectSnapshot(
       PreservedFiltersState.preservedFiltersByPageName
     ) as PreservedFiltersByPage<AgencyOrderFilters>;
-
+      
     if (!preservedFiltes.isNotPreserved) {
       const { state } = preservedFiltes;
       const orderStatuses = Array.isArray(state.orderStatuses) ? [...state.orderStatuses] : [];
@@ -464,6 +461,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private setDefaultStatuses(statuses: number[], setDefaultFilters: boolean): void {
+    if(this.Organizations.length > 0){
+      this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
+      this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
+    } 
     if (setDefaultFilters) {
       let Status = [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled];
       const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText) =>
@@ -480,15 +481,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           }
           this.filteredItems$.next(this.filteredItems.length);
       }, 500);
-    } 
-    if(this.Organizations.length > 0){
-      this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
-      this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
+    } else {
+      setTimeout(() => {
+        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+        this.dispatchNewPage();
+      }, 500);
     }
-    setTimeout(() => {
-      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-      this.dispatchNewPage();
-    }, 500);
   }
 
   private onTabChange(): void {
