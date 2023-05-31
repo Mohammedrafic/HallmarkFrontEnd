@@ -621,6 +621,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           rowData.irpOrderMetadata
             ? this.orderManagementAgencyService.getIsAvailable()
             : this.orderManagementAgencyService.excludeDeployed,
+            ""
         )
       );
       this.orderPositionSelected$.next(false);
