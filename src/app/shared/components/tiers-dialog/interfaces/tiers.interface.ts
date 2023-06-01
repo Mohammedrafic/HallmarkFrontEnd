@@ -32,6 +32,12 @@ export interface TierDialogConfig {
     fields: TiersInputConfig[];
 }
 
+export enum Skillvalue {
+  All = 1,
+  Primary = 2,
+  Secondary = 3
+}
+
 export interface TierDetails {
   id: number;
   departmentId: number;
@@ -45,8 +51,10 @@ export interface TierDetails {
   regionId: number;
   regionName: string;
   organizationTierId: number;
-  workcommitmentId : number;
-  skillId : number;
+  WorkCommitmentIds : number;
+  workCommitments: any;
+  skills:any;
+  Skills : number;
 }
 
 export type TiersPage = PageOfCollections<TierDetails>;

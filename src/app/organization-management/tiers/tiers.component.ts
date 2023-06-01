@@ -78,7 +78,6 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
     this.commitmentsPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
       if(id){
         this.workcommitments = id.items;
-        console.log(this.workcommitments);
         this.cd.markForCheck();
       }
     });
@@ -97,6 +96,13 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
 
   public handleSaveTier(tier: TierDTO) {
     this.tierFormState = tier;
+    if(this.tierFormState.Skills == 1){
+      this.tierFormState.Skills = 1
+    }else if(this.tierFormState.Skills == 2){
+      this.tierFormState.Skills = 2
+    }else if(this.tierFormState.Skills == 3){
+      this.tierFormState.Skills = 3
+    }
     this.store.dispatch(new Tiers.SaveTier({
       ...this.tierFormState,
       forceUpsert: false,

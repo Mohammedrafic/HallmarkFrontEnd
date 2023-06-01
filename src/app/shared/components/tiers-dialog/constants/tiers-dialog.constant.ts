@@ -1,6 +1,6 @@
 import { Tiers } from '@shared/enums/tiers.enum';
 import { FieldType } from '@core/enums';
-import { TierDialogConfig } from '@shared/components/tiers-dialog/interfaces';
+import { Skillvalue, TierDialogConfig } from '@shared/components/tiers-dialog/interfaces';
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { FieldNames } from './tiers.constant';
 
@@ -52,7 +52,7 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[], workcommitment
       //   customFiltering: true,
       // },
       {
-        field: 'workcommitmentId',
+        field: 'WorkCommitmentIds',
         title: 'WorkCommitment',
         disabled: false,
         required: false,
@@ -61,7 +61,7 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[], workcommitment
         customFiltering: true
       },
       {
-        field: 'skillId',
+        field: 'Skills',
         title: 'Skills',
         disabled: false,
         required: true,
@@ -71,15 +71,15 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[], workcommitment
         radiobuttons : [
           {
             title : "All",
-            value : 1
+            value : Skillvalue.All
           },
           {
             title : "Primary",
-            value : 2
+            value : Skillvalue.Primary
           },
           {
             title : "Secondary",
-            value : 3
+            value : Skillvalue.Secondary
           },
         ]
       },
