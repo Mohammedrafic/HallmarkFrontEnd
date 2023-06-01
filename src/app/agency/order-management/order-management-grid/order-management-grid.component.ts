@@ -480,6 +480,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
             }
           }
           this.filteredItems$.next(this.filteredItems.length);
+          this.dispatchNewPage();
       }, 500);
     } else {
       setTimeout(() => {
