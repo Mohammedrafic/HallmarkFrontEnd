@@ -205,6 +205,8 @@ export class ManualInvoicesGridHelper {
       weekPeriod,
       vendorFeeAppliedColDef,
       rejectionReasonColDef,
+        commentColDef,
+      reasonCodeColDef,
       {
         ...attachments,
         cellRendererParams: (params: ICellRendererParams): AttachmentsListParams => {
