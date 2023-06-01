@@ -49,6 +49,7 @@ type UploadFileSucceeded = { instance: ActionType; message: string };
 type ImportErrorsSucceeded = { instance: ActionType; fileName: string };
 type ImportTemplatesSucceeded = ImportErrorsSucceeded;
 type saveImportResultSucceeded = UploadFileSucceeded;
+type saveImportResultFailAndSucess = { instance: ActionType; message: string };
 
 export interface ImportConfigModel {
   importTemplate: ImportTemplates;
@@ -59,4 +60,5 @@ export interface ImportConfigModel {
   importTemplateSucceeded: ImportTemplatesSucceeded;
   importErrorsSucceeded: ImportErrorsSucceeded;
   saveImportResultSucceeded: saveImportResultSucceeded;
+  saveImportResultFailAndSucess ?: saveImportResultFailAndSucess;
 }
