@@ -16,7 +16,8 @@ const importConfig = {
   uploadFileSucceeded: { instance: DoNotReturn.UploadDoNotReturnFileSucceeded, message: 'There are no records in the file' },
   importTemplateSucceeded: { instance: DoNotReturn.GetDoNotReturnImportTemplateSucceeded, fileName: 'donotreturn.xlsx' },
   importErrorsSucceeded: { instance: DoNotReturn.GetDoNotReturnImportErrorsSucceeded, fileName: 'donotreturn_errors.xlsx' },
-  saveImportResultSucceeded: { instance: DoNotReturn.SaveDoNotReturnImportResultSucceeded, message: 'DoNotReturn were imported' },
+  saveImportResultSucceeded: { instance: DoNotReturn.SaveDoNotReturnImportResultSucceeded, message: 'All <n> records successfully processed.' },
+  saveImportResultFailAndSucess : { instance: DoNotReturn.SaveDoNotReturnImportResultFailAndSucceeded, message: '<sn> records successfully processed. <fn> failed to process.' }
 };
 
 @Component({

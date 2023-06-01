@@ -201,7 +201,10 @@ export class DonotReturnState {
   ): Observable<ImportResult<any> | Observable<void>> {
     return this.DonotreturnService.saveDNRImportResult(payload).pipe(
       tap((payload) => {
-        dispatch(new DoNotReturn.SaveDoNotReturnImportResultSucceeded(payload));
+        if(payload.errorRecords.length > 0){
+          dispatch(new DoNotReturn.UploadDoNotReturnFileSucceeded(payload));
+        }
+        dispatch(new DoNotReturn.SaveDoNotReturnImportResultFailAndSucceeded(payload));
         return payload;
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'DoNotReturn list were not imported'))))

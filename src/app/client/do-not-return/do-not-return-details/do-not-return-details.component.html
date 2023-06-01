@@ -4,14 +4,6 @@
         <section class="org-controls-container">
           <div>
             <button
-            ejs-button
-            appHideBeforeSyncfusionLoad
-            (click)="openImportDialog()"
-            class="e-outline"
-            >
-            <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
-          </button>
-            <button
               ejs-dropdownbutton
               appHideBeforeSyncfusionLoad
               [items]="exportOptions"
@@ -22,6 +14,14 @@
               <div class="button-export-container">
                 Export <i-feather name="upload" class="icon"></i-feather>
               </div>
+            </button>
+            <button
+              ejs-button
+              appHideBeforeSyncfusionLoad
+              (click)="openImportDialog()"
+              class="e-outline"
+              >
+              <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
             </button>
             <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter"  (click)="showFilters()">
               <div class="filter-button-content">

@@ -115,4 +115,9 @@ export namespace DoNotReturn {
     constructor(public payload: ImportResult<any>) {}
   }
 
+  export class SaveDoNotReturnImportResultFailAndSucceeded {
+    static readonly type = '[donotreturn] Upload DNR Import Result Fail And Success';
+    constructor(public payload: ImportResult<any>) {}
+  }
+
 }
