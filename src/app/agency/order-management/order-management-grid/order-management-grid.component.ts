@@ -371,7 +371,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private listenRedirectFromReOrder(): void {
     this.orderManagementAgencyService.orderPerDiemId$
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(
+        debounceTime(50),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe((data: { id: number; prefix: string }) => {
         this.orderPerDiemId = data.id;
         this.prefix = data.prefix;
