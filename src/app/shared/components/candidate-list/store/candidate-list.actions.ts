@@ -1,4 +1,4 @@
-import { CandidateListExport, CandidateListRequest } from '../types/candidate-list.model';
+import { CandidateListExport, CandidateListRequest, CandidateListTableState } from '../types/candidate-list.model';
 import { CandidateStatus } from '@shared/enums/status';
 
 export class GetCandidatesByPage {
@@ -38,4 +38,14 @@ export class DeleteIRPCandidate {
   static readonly type = '[candidate list] Delete IRP Candidate';
   constructor(public id: number) {}
 
+}
+
+export class SetTableState {
+  static readonly type = '[candidate list] Set candidates table state';
+
+  constructor(public readonly candidatesTableState: CandidateListTableState) {}
+}
+
+export class ClearTableState {
+  static readonly type = '[candidate list] Clear candidates table state';
 }

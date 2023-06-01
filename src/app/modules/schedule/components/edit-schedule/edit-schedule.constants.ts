@@ -1,5 +1,6 @@
 import { FieldType, UserPermissions } from '@core/enums';
-import { ScheduleType } from '../../enums';
+
+import { ScheduleAttributeTitles, ScheduleType } from '../../enums';
 import {
   EditScheduleFormConfig,
   EditScheduleFormFieldConfig,
@@ -131,6 +132,7 @@ const scheduledShiftFormFields = (hasPermissions: boolean): EditScheduleFormFiel
       required: false,
       readonly: !hasPermissions,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.ORI,
     },
     {
       field: 'critical',
@@ -140,6 +142,7 @@ const scheduledShiftFormFields = (hasPermissions: boolean): EditScheduleFormFiel
       required: false,
       readonly: !hasPermissions,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.CRT,
     },
     {
       field: 'oncall',
@@ -149,6 +152,7 @@ const scheduledShiftFormFields = (hasPermissions: boolean): EditScheduleFormFiel
       required: false,
       readonly: !hasPermissions,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.OC,
     },
     {
       field: 'charge',
@@ -158,6 +162,7 @@ const scheduledShiftFormFields = (hasPermissions: boolean): EditScheduleFormFiel
       required: false,
       readonly: !hasPermissions,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.CHG,
     },
     {
       field: 'preceptor',
@@ -167,6 +172,7 @@ const scheduledShiftFormFields = (hasPermissions: boolean): EditScheduleFormFiel
       required: false,
       readonly: !hasPermissions,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.PRC,
     },
     {
       field: 'meal',
@@ -176,6 +182,7 @@ const scheduledShiftFormFields = (hasPermissions: boolean): EditScheduleFormFiel
       required: false,
       readonly: !hasPermissions,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.MEAL,
     },
     {
       field: 'regionId',
@@ -226,6 +233,7 @@ const newShiftFormFields = (): EditScheduleFormFieldConfig[] => {
       gridAreaName: 'toggle1',
       required: false,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.ORI,
     },
     {
       field: 'critical',
@@ -234,6 +242,7 @@ const newShiftFormFields = (): EditScheduleFormFieldConfig[] => {
       gridAreaName: 'toggle2',
       required: false,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.CRT,
     },
     {
       field: 'oncall',
@@ -242,6 +251,7 @@ const newShiftFormFields = (): EditScheduleFormFieldConfig[] => {
       gridAreaName: 'toggle3',
       required: false,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.OC,
     },
     {
       field: 'charge',
@@ -250,6 +260,7 @@ const newShiftFormFields = (): EditScheduleFormFieldConfig[] => {
       gridAreaName: 'toggle4',
       required: false,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.CHG,
     },
     {
       field: 'preceptor',
@@ -258,6 +269,7 @@ const newShiftFormFields = (): EditScheduleFormFieldConfig[] => {
       gridAreaName: 'toggle5',
       required: false,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.PRC,
     },
     {
       field: 'meal',
@@ -266,6 +278,7 @@ const newShiftFormFields = (): EditScheduleFormFieldConfig[] => {
       gridAreaName: 'meal',
       required: false,
       show: true,
+      tooltipContent: ScheduleAttributeTitles.MEAL,
     },
   ];
 };

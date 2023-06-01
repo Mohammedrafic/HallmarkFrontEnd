@@ -36,7 +36,10 @@
     [ngStyle]="{'grid-template-columns': scheduleTypes.columnsTemplate}"
   >
     <ng-container *ngFor="let type of scheduleTypes.source">
-      <div class="input-group radio">
+      <div
+        class="input-group radio" 
+        [class.e-radio-checked]="type.value === scheduleTypesControl.value"
+      >
         <app-tooltip-container [message]="type.toolTipMessage" [showToolTip]="type.disabled">
           <ejs-radiobutton
             (change)="changeScheduleType($event)"
@@ -61,14 +64,16 @@
                 class="input-group"
                 [ngStyle]="{'grid-area': control.gridAreaName}"
               >
-                <ejs-switch
-                  class="switch"
-                  [formControlName]="control.field"
-                ></ejs-switch>
-                <label class="switch-label">
-                  {{control.title}}
-                  <span *ngIf="control.required" class="required">*</span>
-                </label>
+                <ejs-tooltip [content]="control.tooltipContent" position='TopCenter'>
+                  <ejs-switch
+                    class="switch"
+                    [formControlName]="control.field"
+                  ></ejs-switch>
+                  <label class="switch-label">
+                    {{control.title}}
+                    <span *ngIf="control.required" class="required">*</span>
+                  </label>
+                </ejs-tooltip>
               </div>
             </div>
           </ng-template>

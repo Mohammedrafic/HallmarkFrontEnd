@@ -77,8 +77,10 @@
             <ng-template [ngSwitchCase]="FieldTypes.Toggle">
               <div class="switch-wrap">
                 <div *ngIf="control.show" class="input-group" [ngStyle]="{'grid-area': control.gridAreaName}">
-                  <ejs-switch class="switch" [formControlName]="control.field" [disabled]="!!control.readonly"></ejs-switch>
-                  <label class="switch-label">{{control.title}}</label>
+                  <ejs-tooltip [content]="control.tooltipContent" position='TopCenter'>
+                    <ejs-switch class="switch" [formControlName]="control.field" [disabled]="!!control.readonly"></ejs-switch>
+                    <label class="switch-label">{{control.title}}</label>
+                  </ejs-tooltip>
                 </div>
               </div>
             </ng-template>

@@ -21,10 +21,11 @@
           <div class="title">
             <span class="title__text">{{ bigCardConfig.title }}</span>
           </div>
-          <div class="additional-attributes" *ngIf="bigCardConfig.additionalAttributes && !dateSchedule.isOnHold">
+          <div 
+            *ngIf="bigCardConfig.additionalAttributes && !dateSchedule.isOnHold; else onHoldText"
+            class="additional-attributes">
             <span>{{bigCardConfig.additionalAttributes}}</span>
           </div>
-          <div *ngIf="dateSchedule.isOnHold">ON HOLD</div>
         </div>
       </ng-container>
 
@@ -79,7 +80,13 @@
       <span class="time__text">{{ item.startDate | date: 'HH:mm': 'UTC' }}</span>
       <span *ngIf="item.ltaOrder" class="time__text"> L</span>
       <span *ngIf="item.shortTitle || item.additionalAttributes" class="time__text"> -</span>
-      <span class="time__short-title"> {{ item.additionalAttributes ? item.additionalAttributes : item.shortTitle }}</span>
+      <span *ngIf="!dateSchedule.isOnHold; else onHoldText" class="time__short-title"> 
+        {{ item.additionalAttributes ? item.additionalAttributes : item.shortTitle }}
+      </span>
     </span>
   </div>
+</ng-template>
+
+<ng-template #onHoldText>
+  <span *ngIf="dateSchedule.isOnHold"> ON HOLD</span>
 </ng-template>

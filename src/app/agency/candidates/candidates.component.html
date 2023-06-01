@@ -7,7 +7,8 @@
       <ejs-switch
         id="switcher"
         (change)="onSwitcher($event);"
-        [checked]="true"
+        [(checked)]="includeDeployed"
+        (created)="observeIncludeDeployed()"
       ></ejs-switch>
       <label for="switcher" class="switch-text">Include Deployed Candidates</label>
       <app-tooltip-container [showToolTip]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">
