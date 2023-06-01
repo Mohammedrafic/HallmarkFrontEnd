@@ -11,7 +11,7 @@
 <div successful class="grid-wrapper">
   <app-import-grid
     class="import-grid"
-    gridName="DoNotReturn"
+    gridName="Do Not Return"
     *ngIf="importResponse?.succesfullRecords?.length"
     [importedItems]="importResponse?.succesfullRecords || []"
     [columnDefs]="columnDefs"
@@ -20,7 +20,7 @@
 <div errors class="grid-wrapper">
   <app-import-grid
     class="import-grid"
-    gridName="DoNotReturn"
+    gridName="Do Not Return"
     *ngIf="importResponse?.errorRecords?.length"
     [importedItems]="importResponse?.errorRecords || []"
     [columnDefs]="columnDefs"
