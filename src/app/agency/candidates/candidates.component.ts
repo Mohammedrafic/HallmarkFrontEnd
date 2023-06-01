@@ -21,6 +21,7 @@ export class CandidatesComponent extends AbstractPermissionGrid implements OnIni
   public search$ = new Subject<string>();
   public exportUsers$ = new Subject<ExportedFileType>();
   public agencyActionsAllowed = true;
+  public includeDeployed = true;
 
   private openImportDialog: Subject<void> = new Subject<void>();
   private isAlive = true;
@@ -71,6 +72,17 @@ export class CandidatesComponent extends AbstractPermissionGrid implements OnIni
 
   public override defaultExport(fileType: ExportedFileType): void {
     this.exportUsers$.next(fileType);
+  }
+
+  public observeIncludeDeployed(): void {
+    this,this.includeDeployedCandidates$.asObservable()
+    .pipe(
+      distinctUntilChanged(),
+      takeWhile(() => this.isAlive)
+    )
+    .subscribe((value) => {
+      this.includeDeployed = value;
+    });
   }
 
   private checkForAgencyStatus(): void {

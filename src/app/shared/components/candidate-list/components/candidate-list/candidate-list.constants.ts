@@ -1,7 +1,8 @@
 import { ProfileStatuses } from '@client/candidates/candidate-profile/candidate-profile.constants';
+import { ExportColumn } from '@shared/models/export.model';
 import { ControlTypes, ValueType } from '../../../../enums/control-types.enum';
 import { CandidateStatusOptions } from '../../../../enums/status';
-import { CandidateListFiltersColumn } from '../../types/candidate-list.model';
+import { CandidateListFilters, CandidateListFiltersColumn } from '../../types/candidate-list.model';
 
 export const filterColumns: CandidateListFiltersColumn = {
   regionsNames: {
@@ -225,4 +226,42 @@ export const IRPCandidates = [
     fieldName: 'orgOrientation',
     visible: true,
   },
+];
+
+export const CandidatesTableFilters: CandidateListFilters = {
+  candidateName: null,
+  profileStatuses: [],
+  regionsNames: [],
+  skillsIds: [],
+  tab: 0,
+  expiry : {
+    endDate : undefined,
+    startDate : undefined,
+    type : [],
+  },
+  endDate : null,
+  startDate : null,
+  credType : [],
+};
+
+
+export const CandidatesExportCols: ExportColumn[] = [
+  { text: 'Name', column: 'Name' },
+  { text: 'Profile Status', column: 'ProfileStatus' },
+  { text: 'Candidate Status', column: 'CandidateStatus' },
+  { text: 'Skills', column: 'Skill' },
+  { text: 'Current Assignment End Date', column: 'CurrentAssignmentEndDate' },
+  { text: 'Region', column: 'Region' },
+];
+
+export const IrpCandidateExportCols: ExportColumn[] = [
+  { text: 'Emp Id', column: 'EmpId' },
+  { text: 'Emp Name', column: 'EmpName' },
+  { text: 'Profile Status', column: 'ProfileStatus' },
+  { text: 'Primary Skill', column: 'PrimarySkill' },
+  { text: 'Secondary Skill', column: 'SecondarySkill' },
+  { text: 'Location', column: 'Location' },
+  { text: 'Department', column: 'Department' },
+  { text: 'Work Commitment', column: 'WorkCommitment' },
+  { text: 'Hire Date', column: 'HireDate' },
 ];
