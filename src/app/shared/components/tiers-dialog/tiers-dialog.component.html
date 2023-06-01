@@ -89,15 +89,6 @@
                       >
                       </ejs-multiselect>
                     </div>
-                    <div class="switch" *ngIf="field.showAllToggle">
-                      <ejs-switch
-                        [name]="'all' + field.field"
-                        [checked]="getToggleValue(field.field)"
-                        (change)="allRecordsChange($event, field.field)"
-                        label="All"
-                      ></ejs-switch>
-                      <label [for]="'all' + field.field" class="switch-text">All</label>
-                    </div>
                   </div>
                 </div>
               </ng-template>
@@ -124,7 +115,7 @@
                   </label>
                   <div class="input-group d_flex">
                     <div class="control-block pt_30" *ngFor="let radiobtn of field?.radiobuttons">
-                      <ejs-radiobutton value={{radiobtn.value}} [formControlName]="field.field" name="field.field" label= {{radiobtn.title}}></ejs-radiobutton>
+                      <ejs-radiobutton value={{radiobtn.value}} checked={{radiobtn.value}} [formControlName]="field.field" name="field.field" label= {{radiobtn.title}}></ejs-radiobutton>
                     </div>
                   </div>
                 </div>

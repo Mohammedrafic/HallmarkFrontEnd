@@ -36,14 +36,14 @@ export const TiersColumnsDefinition = ( editCallback: (tier: TierDetails) => voi
       field: 'skills',
       headerName: 'Skills',
       sortable: true,
-      valueGetter: (params: {data: TierDetails}) => skillgridValue(params.data.skills)
+      valueGetter: (params: {data: any}) => skillgridValue(params.data.skills)
     },
     {
       field: 'workCommitments',
       headerName: 'Work Commitment',
       sortable: true,
-      valueGetter: (params: {data: TierDetails}) => workcommitgridValue(params.data.workCommitments)
-    }
+      valueGetter: (params: {data: any}) => workcommitgridValue(params.data.workCommitments)
+    },
     // {
     //   field: 'regionName',
     //   headerName: 'REGION',

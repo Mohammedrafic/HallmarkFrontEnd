@@ -1,14 +1,5 @@
 export const getCorrectFieldValue = (value: string | null) => value === null ? 'All' : value;
 
-export const workcommitgridValue = (value : any) => value.length > 0 ? value.map((m: { name: any; })=>m.name).join(',' ) : "";
+export const workcommitgridValue = (value : any) => value.length > 0 ? value.map((m: { workCommitmentName: any; })=>m.workCommitmentName).join(',' ) : "";
 
-export const skillgridValue = (value : any) => {
-    console.log(value);
-    if(value == 0){
-        value = "All";
-    } else if(value == 2){
-        value = "Primary";
-    } else if(value == 3){
-        value = "Secondary";
-    }
-};
+export const skillgridValue = (value : any) =>  value === 3 ? "Secondary" : (value === 2 ? "Primary" : (value === 1 ? "All" : ""));
