@@ -955,13 +955,21 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
   private watchForSpecialProjectCategory(): void {
     this.specialProject.get('projectTypeId')?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((id: any) => {
-      this.projectSpecialData$.pipe(takeUntil(this.componentDestroy())).subscribe((data: ProjectSpecialData) => {
-        this.projectNames = this.isSpecialProjectFieldsRequired
-          ? data.projectNames.filter(f => f.includeInVMS == true && f.projectTypeId ==id)
-          : [{ id: null, projectName: '' }, ...data.projectNames.filter(f => f.includeInVMS == true && f.projectTypeId ==id)];
-
-      })
-      this.cd.markForCheck();
+      if(id){
+        this.specialProject.controls['projectNameId'].reset();
+        this.projectNames=[];
+        this.projectSpecialData$.pipe(takeUntil(this.componentDestroy())).subscribe((data: ProjectSpecialData) => {
+          this.projectNames = this.isSpecialProjectFieldsRequired
+            ? data.projectNames.filter(f => f.includeInVMS == true && f.projectTypeId ==id)
+            : [{ id: null, projectName: '' }, ...data.projectNames.filter(f => f.includeInVMS == true && f.projectTypeId ==id)];
+  
+        })
+        this.cd.markForCheck();
+      }else{
+        this.specialProject.controls['projectNameId'].reset();
+        this.projectNames=[];
+      }
+     
     })
   }
 
