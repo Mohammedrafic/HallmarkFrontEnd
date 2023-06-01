@@ -17,8 +17,14 @@ export const MasterDNRExportCols: MasterDoNotReturnExportColumn[] = [
 ];
 
 export const doNotReturnFilterConfig: FilterConfig = {
-  candidatename: { type: ControlTypes.Text, valueType: ValueType.Text },
+  firstName: { type: ControlTypes.Text, valueType: ValueType.Text },
+  middleName: { type: ControlTypes.Text, valueType: ValueType.Text },
+  lastName: { type: ControlTypes.Text, valueType: ValueType.Text },
   ssn: { type: ControlTypes.Text, valueType: ValueType.Text },
+  regionBlocked: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
+  locationBlocked: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
+  email: { type: ControlTypes.Text, valueType: ValueType.Text },
+  currentStatus: { type: ControlTypes.Text, valueType: ValueType.Text },
 };
 
 export const TITLE = 'Do Not Return';

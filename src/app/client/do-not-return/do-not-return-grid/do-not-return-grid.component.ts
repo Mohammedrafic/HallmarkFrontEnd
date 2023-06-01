@@ -718,23 +718,41 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public onFilterApply(): void {
-    this.sortByField = 1;
-    this.isFilterBlock = false;
-    this.filters = this.doNotReturnFilterForm.getRawValue();
-    if(this.filters.businessUnitId === null || this.filters.businessUnitId === undefined){
-      this.filters.businessUnitId = this.selectedOrganization?.id == undefined ? this.orgid : this.selectedOrganization?.id;
+  public onFilterDelete(data:any){
+    if(data.column == 'currentStatus'){
+      this.doNotReturnFilterForm.get(data.column)?.setValue('Blocked');
+      this.isFilterBlock = false;
+    }else if(data.column == 'ssn'){
+      this.maskedFilterSSN = '';
+      this.filterSSNPattern = '000-00-0000';
+      this.doNotReturnFilterForm.get(data.column)?.setValue('');
     }
-    this.filters.ssn = this.maskedFilterSSN == '' ? null : parseInt(this.maskedFilterSSN);
-    this.filters.locationBlocked = this.doNotReturnFilterForm.value.locationBlocked?.join(',');
-    this.filters.regionBlocked = this.doNotReturnFilterForm.value.regionBlocked?.join(',');
-    this.filters.currentStatus = this.filters.currentStatus === null ? Candidatests.UnBlock : this.filters.currentStatus;
-    this.filters.pageNumber = 1;
-    this.filters.pageSize = this.pageSize;
-    this.filteredItems = this.filterService.generateChips(this.doNotReturnFilterForm, this.filterColumns);
-    this.getDoNotReturn();
-    this.store.dispatch(new ShowFilterDialog(false));
-    this.filteredItems$.next(this.filteredItems.length);
+    else{
+      this.doNotReturnFilterForm.get(data.column)?.setValue('');
+    }
+    
+  }
+
+  public onFilterApply(): void {
+    if (this.doNotReturnFilterForm.valid) {
+      this.sortByField = 1;
+      this.isFilterBlock = false;
+      this.filters = this.doNotReturnFilterForm.getRawValue();
+      if(this.filters.businessUnitId === null || this.filters.businessUnitId === undefined){
+        this.filters.businessUnitId = this.selectedOrganization?.id == undefined ? this.orgid : this.selectedOrganization?.id;
+      }
+      this.filters.ssn = this.maskedFilterSSN == '' ? null : parseInt(this.maskedFilterSSN);
+      this.filters.locationBlocked = this.doNotReturnFilterForm.value.locationBlocked?.join(',');
+      this.filters.regionBlocked = this.doNotReturnFilterForm.value.regionBlocked?.join(',');
+      this.filters.currentStatus = this.filters.currentStatus === null ? Candidatests.UnBlock : this.filters.currentStatus;
+      this.filters.pageNumber = 1;
+      this.filters.pageSize = this.pageSize;
+      this.filteredItems = this.filterService.generateChips(this.doNotReturnFilterForm, this.filterColumns);
+      console.log(this.filteredItems);
+      this.getDoNotReturn();
+      this.store.dispatch(new ShowFilterDialog(false));
+      this.filteredItems$.next(this.filteredItems.length);
+    }
   }
 
   public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {

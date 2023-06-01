@@ -48,8 +48,14 @@ export interface donotreturnFilterConfigItem<T> {
 }
 
 export interface FilterConfig {
-  candidatename?:donotreturnFilterConfigItem<string>;
+  firstName?:donotreturnFilterConfigItem<string>;
+  middleName?:donotreturnFilterConfigItem<string>;
+  lastName?:donotreturnFilterConfigItem<string>;
   ssn?: donotreturnFilterConfigItem<number>;
+  regionBlocked?:donotreturnFilterConfigItem<string>;
+  locationBlocked?:donotreturnFilterConfigItem<string>;
+  email?:donotreturnFilterConfigItem<string>;
+  currentStatus?:donotreturnFilterConfigItem<string>;
 }
 
 export interface DoNotReturnFilterForm {
