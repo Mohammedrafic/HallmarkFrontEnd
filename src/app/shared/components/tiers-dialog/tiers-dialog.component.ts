@@ -285,6 +285,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
 
     this.actions$.pipe(ofActionDispatched(ShowSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
+        this.createForm();
         this.allRecords.regionIds = false;
         this.allRecords.locationIds = false;
         this.allRecords.departmentIds = false;
