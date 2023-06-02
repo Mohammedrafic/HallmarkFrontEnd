@@ -121,7 +121,6 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.onNewRoleBussinesDataFetched();
     this.onUsersAssignedToRoleFetched();
     this.subOnBusinessUnitControlChange();
-    this.toggle=false;
     this.copyRoleData$ = this.store.select(SecurityState.copyRoleData)
     .pipe(
       map((roles) => {
@@ -132,7 +131,6 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
    }
   
   ngOnChanges(changes: SimpleChanges) {
-    this.toggle=false;
     if (changes['roleId']?.currentValue) {
       this.usersAssignedToRole = { userNames: [], hasUsersOutsideVisibility: false };
     }
@@ -144,11 +142,8 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
 
   ngAfterViewInit():void{
     this.roleTreeField$.subscribe((roleTreeField) => {
-      this.treeData=roleTreeField.dataSource;
-      this.treeData.map(x=>{
-        x.htmlAttributes={class:'e-show'}
-      });
-      this.changeDataSource(this.treeData)
+    this.treeData=roleTreeField.dataSource;
+    this.setTreeFilter(this.toggle);
     });
   }
   public changeDataSource(data:any) {
@@ -167,7 +162,12 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     if(val==false){
       this.treeData.map((x)=>
       {
-        x.htmlAttributes={class:'e-show'}
+        if(x.includeInIRP==false){
+          x.htmlAttributes={class:'e-show'}
+        }
+        else{
+          x.htmlAttributes={class:'e-hidden'}
+        }
       });
       this.treeData = [ ...this.treeData ]
       this.changeDataSource(this.treeData);
@@ -183,10 +183,9 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
           filteredList.push(x);
         }
       });
-
+      debugger;
       let _array = [], _filter = [];
       for (let j = 0; j < filteredList.length; j++) {
-        //this.treeData[j].htmlAttributes={class:'e-show'}
         const index = this.treeData.findIndex(x => x.id === filteredList[j].id);
         this.treeData.map((data)=>data.id==filteredList[j].id? this.treeData[index].htmlAttributes={class:'e-show'}:'')
         _filter.push(filteredList[j]);
