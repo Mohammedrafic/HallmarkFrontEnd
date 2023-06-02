@@ -61,9 +61,6 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
       this.allRecords.locationIds = !tier.locationId;
       this.allRecords.departmentIds = !tier.departmentId;
       this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, tier, this.regions));
-      // this.allRegionsChange({ checked: this.allRecords.regionIds });
-      // this.allLocationsChange({ checked: this.allRecords.locationIds });
-      // this.allDepartmentsChange({ checked: this.allRecords.departmentIds }, false);
     }
   };
 
@@ -114,10 +111,10 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   ngOnInit(): void {
     this.watchForShowDialog();
     this.createForm();
-    // this.watchForRegions();
-    // this.watchForLocation();
+    this.watchForRegions();
+    this.watchForLocation();
     this.watchForCloseDialog();
-    // this.watchForDepartments();
+    this.watchForDepartments();
   }
 
   public allRegionsChange(event: { checked: boolean }): void {

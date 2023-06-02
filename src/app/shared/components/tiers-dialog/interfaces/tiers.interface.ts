@@ -23,7 +23,7 @@ export interface TiersInputConfig {
 
 export interface RadioButtonGroup {
   title: string;
-  value : number;
+  value : string;
 }
 
 export interface TierDialogConfig {
@@ -33,9 +33,9 @@ export interface TierDialogConfig {
 }
 
 export enum Skillvalue {
-  All = 1,
-  Primary = 2,
-  Secondary = 3
+  All = "1",
+  Primary = "2",
+  Secondary = "3"
 }
 
 export interface TierDetails {
@@ -51,10 +51,10 @@ export interface TierDetails {
   regionId: number;
   regionName: string;
   organizationTierId: number;
-  WorkCommitmentIds : number;
+  WorkCommitmentIds : any;
   workCommitments: any;
   skills:any;
-  Skills : number;
+  Skills : any;
 }
 
 export type TiersPage = PageOfCollections<TierDetails>;

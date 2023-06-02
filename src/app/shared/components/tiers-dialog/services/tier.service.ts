@@ -33,12 +33,9 @@ export class TierService {
       organizationTierId: [null],
       name: ['', Validators.required],
       hours: [null, Validators.required],
-      // regionIds: [null, Validators.required],
-      // locationIds: [null, Validators.required],
-      // departmentIds: [null, Validators.required],
       forceUpsert: [false],
-      WorkCommitmentIds : [null],
-      Skills : [null, Validators.required],
+      workCommitments : [null],
+      skills : ["1", Validators.required],
     }) as CustomFormGroup<TierDTO>;
   }
 
@@ -75,7 +72,9 @@ export class TierService {
       departmentIds:  tier.departmentId ? [tier.departmentId] : null,
       WorkCommitmentIds : tier.WorkCommitmentIds,
       Skills : tier.Skills,
-      forceUpsert: false
+      forceUpsert: false,
+      workCommitments: tier.workCommitments,
+      skills : tier.skills
     };
   }
 
@@ -102,7 +101,9 @@ export class TierService {
       departmentIds: tier.departmentId ? [tier.departmentId] : null,
       organizationTierId: tier.organizationTierId,
       WorkCommitmentIds : tier.WorkCommitmentIds,
-      Skills : tier.Skills
+      Skills : tier.Skills,
+      workCommitments : tier.workCommitments,
+      skills : tier.skills
     }
   }
 }

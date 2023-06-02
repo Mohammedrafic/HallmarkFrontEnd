@@ -66,10 +66,10 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.getWorkCommitment();
     this.watchForRegionStructure();
     this.watchForOverrideTier();
     this.watchForOrganization();
-    this.getWorkCommitment();
   }
 
   public getWorkCommitment():void {
@@ -96,13 +96,15 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
 
   public handleSaveTier(tier: TierDTO) {
     this.tierFormState = tier;
-    if(this.tierFormState.Skills == 1){
+    if(this.tierFormState.Skills == "1"){
       this.tierFormState.Skills = 1
-    }else if(this.tierFormState.Skills == 2){
+    }else if(this.tierFormState.Skills == "2"){
       this.tierFormState.Skills = 2
-    }else if(this.tierFormState.Skills == 3){
+    }else if(this.tierFormState.Skills == "3"){
       this.tierFormState.Skills = 3
-    }
+    } 
+    this.tierFormState.WorkCommitmentIds = this.tierFormState.workCommitments;
+    this.tierFormState.Skills = this.tierFormState.skills;
     this.store.dispatch(new Tiers.SaveTier({
       ...this.tierFormState,
       forceUpsert: false,
@@ -114,6 +116,8 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
 
   public handleEditTier(tier: TierDetails): void {
     this.isEdit = true;
+    tier.workCommitments = tier.workCommitments.map((m: { workCommitmentId: any; }) => m.workCommitmentId);
+    tier.skills == 1 ? tier.skills = "1" : (tier.skills == 2 ? tier.skills = "2" : (tier.skills == 3 ? tier.skills = "3" : ""));
     this.selectedTier = {...tier};
     this.store.dispatch(new ShowSideDialog(true));
   }
