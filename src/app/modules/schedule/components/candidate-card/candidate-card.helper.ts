@@ -1,13 +1,28 @@
 import { formatDate } from '@angular/common';
 
+import { EmployeeIcons } from '../../enums';
 import { LtaAssignment, ScheduleCandidate } from '../../interface';
 
-export const CreateTooltipForOrientation = (candidate: ScheduleCandidate, startDate: string): string => {
+export const GetIconTooltipMessage = (
+  candidateIconName: EmployeeIcons | null,
+  candidate: ScheduleCandidate,
+  startDate: string
+): string => {
+  if (candidateIconName === EmployeeIcons.Compass) {
+    return createTooltipForOrientation(candidate, startDate);
+  }
+
+  if (candidateIconName === EmployeeIcons.Flag) {
+    return candidate.employeeNote || '';
+  }
+
+  return '';
+};
+
+const createTooltipForOrientation = (candidate: ScheduleCandidate, startDate: string): string => {
   const candidateOrientation = isCandidateOriented(startDate, candidate.orientationDate);
 
-  if(candidate.orientationDate && candidateOrientation) {
-    return '';
-  } else if(candidate.orientationDate && !candidateOrientation) {
+  if (candidate.orientationDate && !candidateOrientation) {
     return `Oriented from ${formatDate(candidate.orientationDate, 'MM/dd/yyyy', 'en-US', 'UTC')}`;
   }
 

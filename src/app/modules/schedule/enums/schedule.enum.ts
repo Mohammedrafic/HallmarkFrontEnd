@@ -36,3 +36,8 @@ export enum ScheduleAttributeTitles {
   PRC= 'Preceptor',
   MEAL = 'Meal break',
 }
+
+export enum EmployeeIcons {
+  Compass = 'compass',
+  Flag = 'flag',
+}
