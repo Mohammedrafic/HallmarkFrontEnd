@@ -71,6 +71,7 @@ export const SettingsAppliedToPermissions: string[] = [
   'PayPeriod',
   'OnHoldDefault',
   'DepartmentSkillRequired',
+  'CreatePartialOrder'
 ];
 
 export const DisabledSettingsByDefault = [
