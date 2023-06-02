@@ -183,7 +183,6 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
           filteredList.push(x);
         }
       });
-      debugger;
       let _array = [], _filter = [];
       for (let j = 0; j < filteredList.length; j++) {
         const index = this.treeData.findIndex(x => x.id === filteredList[j].id);
