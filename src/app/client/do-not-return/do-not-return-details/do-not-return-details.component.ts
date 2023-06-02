@@ -27,7 +27,7 @@ public filters: DonoreturnFilters = {};
   public isdnrActive=true;
   public columnsToExport: ExportColumn[] = MasterDNRExportCols;
   public exportDonotreturn$ = new Subject<ExportedFileType>();
-  public filteredItems$ = new Subject<number>();
+  public filteredcnt:number = 0;
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
   public refreshGridEvent: Subject<boolean> = new Subject<boolean>();
   public fliterFlag$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -72,6 +72,10 @@ public filters: DonoreturnFilters = {};
 
   public openImportDialog(): void {
     this.importDialogEvent.next(true);
+  }
+
+  public appliedFilters($event:number){
+    this.filteredcnt = $event;
   }
 
 }

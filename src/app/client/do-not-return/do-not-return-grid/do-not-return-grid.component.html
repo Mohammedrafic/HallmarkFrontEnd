@@ -204,7 +204,7 @@
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
   (export)="export($event)"></app-export-dialog>
 
-<app-filter-dialog [items]="filteredItems" [count]="(donotreturnpage$ | async)?.totalCount" (clearAllFiltersClicked)="onFilterClearAll()"
+<app-filter-dialog *ngIf="filteredItemsData$ | async as items" [items]="items" [count]="(donotreturnpage$ | async)?.totalCount" (clearAllFiltersClicked)="onFilterClearAll()"
   (applyFilterClicked)="onFilterApply()" (deleteFilter)="onFilterDelete($event)">
   <form class="donotreturn-form" [formGroup]="doNotReturnFilterForm">
     <div class="input-container bootstrap" [hidden]="true">

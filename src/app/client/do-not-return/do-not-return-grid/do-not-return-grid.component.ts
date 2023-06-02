@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, OnDestroy, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, OnDestroy, NgZone, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { DonotReturnState } from '@admin/store/donotreturn.state';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserPermissions } from '@core/enums';
@@ -103,6 +103,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   sortByField : number = 1;
   fliterFlag:boolean = false;
   requestAPIData:boolean = false;
+  public filteredItemsData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
   @Input() fliterFlag$:BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   @Input() isActive = false;
@@ -110,7 +111,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   @Input() public userIsAdmin: boolean;
   @Input() export$: Subject<ExportedFileType>;
   @Input() userPermission: Permission;
-  @Input() filteredItems$: Subject<number>;
+  @Output() appliedFilteredItems: EventEmitter<number> = new EventEmitter<number>();
   @Input() refreshGrid$: Subject<boolean>;
 
   @ViewChild('grid')
@@ -238,9 +239,18 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       }
      });
 
+     this.regions$.pipe(takeUntil(this.unsubscribe$)).subscribe((regions: any) => {
+        if(this.filterColumns.regionBlocked){
+          this.filterColumns.regionBlocked.dataSource = regions;
+        }
+     });
+
      this.locations$.pipe(takeUntil(this.unsubscribe$)).subscribe((locations: any) => {
         this.requestAPIData = false;
         let selectedLoactions:any; 
+        if(this.filterColumns.locationBlocked){
+          this.filterColumns.locationBlocked.dataSource = locations;
+        }
         if(locations != null && locations.length > 0){
           if(this.fliterFlag)
             selectedLoactions = this.doNotReturnFilterForm.get('locationBlocked')?.value;
@@ -709,28 +719,36 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.sortByField = 1;
     this.doNotReturnFilterForm.reset();
     this.filteredItems = [];
+    this.filteredItemsData$.next(this.filteredItems);
     this.currentPage = 1;
     this.filters = {};
     this.maskedFilterSSN = '';
     this.filterSSNPattern = '000-00-0000';
     this.getDoNotReturn();
-    this.filteredItems$.next(this.filteredItems.length);
+    this.appliedFilteredItems.emit(this.filteredItems.length);
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
   public onFilterDelete(data:any){
     if(data.column == 'currentStatus'){
-      this.doNotReturnFilterForm.get(data.column)?.setValue('Blocked');
+      this.doNotReturnFilterForm.get(data.column)?.setValue('Unblocked');
       this.isFilterBlock = false;
     }else if(data.column == 'ssn'){
       this.maskedFilterSSN = '';
       this.filterSSNPattern = '000-00-0000';
       this.doNotReturnFilterForm.get(data.column)?.setValue('');
-    }
-    else{
+    }else if(data.column == 'regionBlocked' || data.column == 'locationBlocked'){
+      const newArr: any[] = this.doNotReturnFilterForm.get(data.column)?.value.filter((element:any) => {
+        return element !== data.value;
+      });
+      this.doNotReturnFilterForm.get(data.column)?.setValue(newArr);    
+      setTimeout(() =>{
+          this.filteredItems = this.filterService.generateChips(this.doNotReturnFilterForm, this.filterColumns);
+          this.filteredItemsData$.next(this.filteredItems);
+        }, 1000);
+    }else{
       this.doNotReturnFilterForm.get(data.column)?.setValue('');
     }
-    
   }
 
   public onFilterApply(): void {
@@ -748,10 +766,10 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.filters.pageNumber = 1;
       this.filters.pageSize = this.pageSize;
       this.filteredItems = this.filterService.generateChips(this.doNotReturnFilterForm, this.filterColumns);
-      console.log(this.filteredItems);
+      this.filteredItemsData$.next(this.filteredItems);
       this.getDoNotReturn();
       this.store.dispatch(new ShowFilterDialog(false));
-      this.filteredItems$.next(this.filteredItems.length);
+      this.appliedFilteredItems.emit(this.filteredItems.length);
     }
   }
 

@@ -52,8 +52,8 @@ export interface FilterConfig {
   middleName?:donotreturnFilterConfigItem<string>;
   lastName?:donotreturnFilterConfigItem<string>;
   ssn?: donotreturnFilterConfigItem<number>;
-  regionBlocked?:donotreturnFilterConfigItem<string>;
-  locationBlocked?:donotreturnFilterConfigItem<string>;
+  regionBlocked?:donotreturnFilterConfigItem<any>;
+  locationBlocked?:donotreturnFilterConfigItem<any>;
   email?:donotreturnFilterConfigItem<string>;
   currentStatus?:donotreturnFilterConfigItem<string>;
 }
