@@ -68,6 +68,12 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
     }
   }
 
+  public navigateTo(page: number): void {
+    if (page) {
+      this.navigateToPageEmitter.emit(page);
+    }
+  }
+
   public handlePagerClickEvent({ currentPage, oldProp }: PagerChangeEventModel): void {
     if (oldProp?.totalRecordsCount) {
       return;

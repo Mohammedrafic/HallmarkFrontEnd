@@ -16,7 +16,7 @@
         controlName="pageSize"
       ></app-dropdown>
       <app-numeric-textbox
-        (changeValueEmitter)="navigateToPageEmitter.emit($event)"
+        (changeValueEmitter)="navigateTo($event)"
         [formGroupInstance]="paginationFormGroup"
         [max]="totalPages"
         [min]="1"
