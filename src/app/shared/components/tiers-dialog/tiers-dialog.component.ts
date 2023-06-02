@@ -48,10 +48,10 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
   @Output() saveTier = new EventEmitter<TierDTO>();
-
+  @Input() workcommitments : any;
   @Input() set regionsStructure(regions: OrganizationRegion[]) {
     this.regions = regions;
-    this.dialogConfig = TiersDialogConfig(regions)[this.dialogType];
+    this.dialogConfig = TiersDialogConfig(regions, this.workcommitments)[this.dialogType];
   };
 
   @Input() set selectedTier(tier: TierDetails) {
@@ -61,9 +61,6 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
       this.allRecords.locationIds = !tier.locationId;
       this.allRecords.departmentIds = !tier.departmentId;
       this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, tier, this.regions));
-      this.allRegionsChange({ checked: this.allRecords.regionIds });
-      this.allLocationsChange({ checked: this.allRecords.locationIds });
-      this.allDepartmentsChange({ checked: this.allRecords.departmentIds }, false);
     }
   };
 
@@ -79,6 +76,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   public regions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
   public tierForm: CustomFormGroup<TierDTO> | null;
+  public workcommitmentIds : any;
   public readonly FieldTypes = FieldType;
   public optionFields: FieldSettingsModel = OPTION_FIELDS;
   public isTierSettingsDialog: boolean;
@@ -171,6 +169,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     field === 'locationIds' && this.allLocationsChange(event);
     field === 'departmentIds' && this.allDepartmentsChange(event);
   }
+
 
   public getToggleValue(field: string): boolean {
     return this.allRecords[field as FieldNames];
@@ -286,6 +285,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
 
     this.actions$.pipe(ofActionDispatched(ShowSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
+        this.createForm();
         this.allRecords.regionIds = false;
         this.allRecords.locationIds = false;
         this.allRecords.departmentIds = false;

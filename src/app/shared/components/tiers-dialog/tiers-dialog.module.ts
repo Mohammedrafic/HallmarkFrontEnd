@@ -8,7 +8,7 @@ import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { TierService } from '@shared/components/tiers-dialog/services';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
-import { ButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 
 
 @NgModule({
@@ -24,6 +24,7 @@ import { ButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
     DialogModule,
     ButtonModule,
     SwitchModule,
+    RadioButtonModule
   ],
   providers: [TierService],
   exports: [TiersDialogComponent]

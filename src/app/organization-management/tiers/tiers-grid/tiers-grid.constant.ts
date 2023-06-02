@@ -1,6 +1,6 @@
 import { GridActionRendererComponent } from "@organization-management/tiers/tiers-grid/grid-action-renderer/grid-action-renderer.component";
 import { TierDetails } from '@shared/components/tiers-dialog/interfaces';
-import { getCorrectFieldValue } from '@organization-management/tiers/helpres';
+import { getCorrectFieldValue, skillgridValue, workcommitgridValue } from '@organization-management/tiers/helpres';
 
 export const TiersColumnsDefinition = ( editCallback: (tier: TierDetails) => void ) => (
   [
@@ -33,22 +33,16 @@ export const TiersColumnsDefinition = ( editCallback: (tier: TierDetails) => voi
       sortable: true,
     },
     {
-      field: 'regionName',
-      headerName: 'REGION',
+      field: 'skills',
+      headerName: 'Skills',
       sortable: true,
-      valueGetter: (params: {data: TierDetails}) => getCorrectFieldValue(params.data.regionName)
+      valueGetter: (params: {data: any}) => skillgridValue(params.data.skills)
     },
     {
-      field: 'locationName',
-      headerName: 'LOCATION',
+      field: 'workCommitments',
+      headerName: 'Work Commitment',
       sortable: true,
-      valueGetter: (params: {data: TierDetails}) => getCorrectFieldValue(params.data.locationName)
-    },
-    {
-      field: 'departmentName',
-      headerName: 'DEPARTMENT',
-      sortable: true,
-      valueGetter: (params: {data: TierDetails}) => getCorrectFieldValue(params.data.departmentName)
+      valueGetter: (params: {data: any}) => workcommitgridValue(params.data.workCommitments)
     }
   ]
 );
