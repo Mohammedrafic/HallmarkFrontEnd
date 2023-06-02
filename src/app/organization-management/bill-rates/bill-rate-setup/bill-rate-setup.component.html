@@ -502,6 +502,7 @@
               id="considerForWeeklyOt"
               label="Consider for Weekly OT"
               formControlName="considerForWeeklyOt"
+              [disabled]="!otInputsEnabled"
             ></ejs-checkbox>
           </div>
         </div>
@@ -512,6 +513,7 @@
               id="considerForDailyOt"
               label="Consider for Daily OT"
               formControlName="considerForDailyOt"
+              [disabled]="!otInputsEnabled"
             ></ejs-checkbox>
           </div>
         </div>
@@ -522,6 +524,7 @@
               id="considerFor7thDayOt"
               label="Consider for 7th Day OT"
               formControlName="considerFor7thDayOt"
+              [disabled]="!otInputsEnabled"
             ></ejs-checkbox>
           </div>
         </div>
@@ -724,19 +727,22 @@
       <div class="checkbox-container">
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox label="Consider for Weekly OT" formControlName="considerForWeeklyOt"></ejs-checkbox>
+            <ejs-checkbox label="Consider for Weekly OT" formControlName="considerForWeeklyOt"
+            [disabled]="!otInputsEnabled"></ejs-checkbox>
           </div>
         </div>
 
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox label="Consider for Daily OT" formControlName="considerForDailyOt"></ejs-checkbox>
+            <ejs-checkbox label="Consider for Daily OT" formControlName="considerForDailyOt"
+            [disabled]="!otInputsEnabled"></ejs-checkbox>
           </div>
         </div>
 
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox label="Consider for 7th Day OT" formControlName="considerFor7thDayOt"></ejs-checkbox>
+            <ejs-checkbox label="Consider for 7th Day OT" formControlName="considerFor7thDayOt"
+            [disabled]="!otInputsEnabled"></ejs-checkbox>
           </div>
         </div>
 
