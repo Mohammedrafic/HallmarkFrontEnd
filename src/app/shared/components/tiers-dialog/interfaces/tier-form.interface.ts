@@ -15,7 +15,6 @@ export interface TierDTO {
   systemType?: SystemType;
   WorkCommitmentIds: any;
   workCommitments: any;
-  Skills : any;
   skills : any;
 }
 

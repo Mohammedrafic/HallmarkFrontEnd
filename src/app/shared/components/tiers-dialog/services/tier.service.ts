@@ -71,7 +71,6 @@ export class TierService {
       locationIds: tier.locationId ? [tier.locationId] : null,
       departmentIds:  tier.departmentId ? [tier.departmentId] : null,
       WorkCommitmentIds : tier.WorkCommitmentIds,
-      Skills : tier.Skills,
       forceUpsert: false,
       workCommitments: tier.workCommitments,
       skills : tier.skills
@@ -101,7 +100,6 @@ export class TierService {
       departmentIds: tier.departmentId ? [tier.departmentId] : null,
       organizationTierId: tier.organizationTierId,
       WorkCommitmentIds : tier.WorkCommitmentIds,
-      Skills : tier.Skills,
       workCommitments : tier.workCommitments,
       skills : tier.skills
     }

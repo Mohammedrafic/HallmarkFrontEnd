@@ -54,7 +54,6 @@ export interface TierDetails {
   WorkCommitmentIds : any;
   workCommitments: any;
   skills:any;
-  Skills : any;
 }
 
 export type TiersPage = PageOfCollections<TierDetails>;

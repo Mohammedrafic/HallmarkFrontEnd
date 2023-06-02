@@ -96,15 +96,14 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
 
   public handleSaveTier(tier: TierDTO) {
     this.tierFormState = tier;
-    if(this.tierFormState.Skills == "1"){
-      this.tierFormState.Skills = 1
-    }else if(this.tierFormState.Skills == "2"){
-      this.tierFormState.Skills = 2
-    }else if(this.tierFormState.Skills == "3"){
-      this.tierFormState.Skills = 3
+    if(this.tierFormState.skills == "1"){
+      this.tierFormState.skills = 1
+    }else if(this.tierFormState.skills == "2"){
+      this.tierFormState.skills = 2
+    }else if(this.tierFormState.skills == "3"){
+      this.tierFormState.skills = 3
     } 
     this.tierFormState.WorkCommitmentIds = this.tierFormState.workCommitments;
-    this.tierFormState.Skills = this.tierFormState.skills;
     this.store.dispatch(new Tiers.SaveTier({
       ...this.tierFormState,
       forceUpsert: false,

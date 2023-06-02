@@ -43,24 +43,6 @@ export const TiersColumnsDefinition = ( editCallback: (tier: TierDetails) => voi
       headerName: 'Work Commitment',
       sortable: true,
       valueGetter: (params: {data: any}) => workcommitgridValue(params.data.workCommitments)
-    },
-    // {
-    //   field: 'regionName',
-    //   headerName: 'REGION',
-    //   sortable: true,
-    //   valueGetter: (params: {data: TierDetails}) => getCorrectFieldValue(params.data.regionName)
-    // },
-    // {
-    //   field: 'locationName',
-    //   headerName: 'LOCATION',
-    //   sortable: true,
-    //   valueGetter: (params: {data: TierDetails}) => getCorrectFieldValue(params.data.locationName)
-    // },
-    // {
-    //   field: 'departmentName',
-    //   headerName: 'DEPARTMENT',
-    //   sortable: true,
-    //   valueGetter: (params: {data: TierDetails}) => getCorrectFieldValue(params.data.departmentName)
-    // }
+    }
   ]
 );
