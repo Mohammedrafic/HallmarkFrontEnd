@@ -1,13 +1,16 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild } from '@angular/core';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { DonoreturnFilters } from '@shared/models/donotreturn.model';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { MasterDNRExportCols, TITLE } from '../donotreturn-grid.constants';
+import { UserState } from 'src/app/store/user.state';
+import { Permission } from '@core/interface';
+import { UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-do-not-return-details',
@@ -22,6 +25,9 @@ public filters: DonoreturnFilters = {};
   @ViewChild('grid')
   public grid: GridComponent;
 
+  @Select(UserState.userPermission)
+  currentUserPermissions$: Observable<Permission>;
+
   public fileName: string;
   public defaultFileName: string;
   public isdnrActive=true;
@@ -31,6 +37,7 @@ public filters: DonoreturnFilters = {};
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
   public refreshGridEvent: Subject<boolean> = new Subject<boolean>();
   public fliterFlag$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public override userPermissions = UserPermissions;
 
   constructor(protected override store:Store) { 
     super(store)
