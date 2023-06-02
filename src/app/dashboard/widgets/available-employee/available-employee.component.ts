@@ -21,8 +21,8 @@ export class AvailableEmployeeComponent  implements OnInit {
   public rowData: AvailableEmployeeModel[] ;
   public columnDefs:ColDef[] = [
     { field: 'fullName', headerName:"Name",width:180},
-    { field: 'startDateTime', headerName:"Start Date Time",width:170},
-    { field: 'endDateTime', headerName:"End Date Time",width:165},
+    { field: 'startDateTime', headerName:"Start Date Time",width:160},
+    { field: 'endDateTime', headerName:"End Date Time",width:160},
   ];
   
  
