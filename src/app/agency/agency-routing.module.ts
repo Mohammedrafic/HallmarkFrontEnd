@@ -11,6 +11,7 @@ import { OrderManagementComponent } from './order-management/order-management.co
 import { PendingChangesGuard } from '@shared/guards/pending-changes.guard';
 import { CandidateDetailsComponent } from '@shared/components/candidate-details/candidate-details.component';
 import { AssociateListComponent } from '@shared/components/associate-list/associate-list.component';
+import { NotificationResolver } from '@core/resolvers/notification.resolver';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -119,6 +120,11 @@ const routes: Routes = [
         data: {
           isAgencyArea: true,
         },
+      },
+      {
+        path: 'order-management/notification/:notificationId',
+        component: OrderManagementComponent,
+        resolve: [NotificationResolver],
       },
       {
         path: 'reports',
