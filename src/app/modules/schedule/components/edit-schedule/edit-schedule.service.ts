@@ -8,7 +8,7 @@ import { EMPTY, Observable } from 'rxjs';
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { ScheduleItem } from 'src/app/modules/schedule/interface';
+import { ScheduledItem, ScheduleItem } from 'src/app/modules/schedule/interface';
 import { ShowToast } from 'src/app/store/app.actions';
 
 import { ScheduleItemType } from '../../constants';
@@ -120,6 +120,12 @@ export class EditScheduleService {
     return skillId as number;
   }
 
+  getLocationId(locations: DropdownOption[], id: number): number | null {
+    const locationId = locations.find((item: DropdownOption) => item.value === id) ? id : null;
+
+    return locationId;
+  }
+
   getFormClass(
     selectedType: ScheduleItemType | ScheduleType,
     type: typeof ScheduleItemType | typeof ScheduleType,
@@ -152,5 +158,10 @@ export class EditScheduleService {
     }
 
     return formClass;
+  }
+
+  hasScheduleAvailability(scheduledItem: ScheduledItem): boolean {
+    return scheduledItem.schedule.daySchedules
+      .some((day: ScheduleItem) => day.scheduleType === ScheduleType.Availability);
   }
 }

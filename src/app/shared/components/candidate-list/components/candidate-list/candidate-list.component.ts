@@ -1,34 +1,67 @@
+import { DatePipe } from '@angular/common';
 import { Component, Inject, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
+import { SelectionSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
+import { isNil } from 'lodash';
 import {
   debounceTime,
+  distinctUntilChanged,
   filter,
+  fromEvent,
   map,
   Observable,
   Subject,
+  Subscription,
   switchMap,
   takeUntil,
   takeWhile,
   tap,
-  fromEvent,
-  Subscription,
-  distinctUntilChanged,
 } from 'rxjs';
-import { FormGroup } from '@angular/forms';
-import { AbstractGridConfigurationComponent }
-  from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
-import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { CandidatesStatusText, CandidateStatus, EmployeeStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
-import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { UserState } from '../../../../../store/user.state';
+
 import { GetAllSkills, SaveCandidateSucceeded } from '@agency/store/candidate.actions';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { CredentialParams } from '@shared/models/candidate-credential.model';
-import { FilterService } from '@shared/services/filter.service';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowToast } from '../../../../../store/app.actions';
-import { FilteredItem } from '@shared/models/filter.model';
-import { SelectionSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
+import { CandidateState } from '@agency/store/candidate.state';
+import { DepartmentHelper } from '@client/candidates/departments/helpers/department.helper';
+import { OutsideZone } from '@core/decorators';
+import { UserPermissions } from '@core/enums';
+import { FilterPageName } from '@core/enums/filter-page-name.enum';
+import { DateTimeHelper } from '@core/helpers';
+import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
+import { Permission } from '@core/interface';
+import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
+import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
+import { GlobalWindow } from '@core/tokens';
+import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { END_DATE_REQUIRED, ERROR_START_LESS_END_DATE, optionFields, regionFields } from '@shared/constants';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { MessageTypes } from '@shared/enums/message-types';
+import { CandidatesStatusText, CandidateStatus, EmployeeStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { SystemType } from '@shared/enums/system-type.enum';
+import { CredentialParams } from '@shared/models/candidate-credential.model';
+import { Candidate } from '@shared/models/candidate.model';
+import { ExportColumn, ExportOptions } from '@shared/models/export.model';
+import { FilteredItem } from '@shared/models/filter.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationStructure } from '@shared/models/organization.model';
+import { ListOfSkills, MasterSkill } from '@shared/models/skill.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { FilterService } from '@shared/services/filter.service';
+import { AppState } from 'src/app/store/app.state';
+import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowToast } from '../../../../../store/app.actions';
+import { UserState } from '../../../../../store/user.state';
+import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
+import {
+  AbstractGridConfigurationComponent,
+} from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
+import { CandidateListService } from '../../services/candidate-list.service';
+import * as CandidateListActions from '../../store/candidate-list.actions';
 import { CandidateListState } from '../../store/candidate-list.state';
 import {
   CandidateList,
@@ -38,47 +71,13 @@ import {
   CandidateListRequest,
   CandidateRow,
   IRPCandidate,
-  IRPCandidateList
+  IRPCandidateList,
+  CandidatePagingState,
+  CandidateListStateModel,
 } from '../../types/candidate-list.model';
-import { Candidate } from '@shared/models/candidate.model';
-import {
-  ChangeCandidateProfileStatus,
-  DeleteIRPCandidate,
-  ExportCandidateList,
-  ExportIRPCandidateList,
-  GetCandidatesByPage,
-  GetIRPCandidatesByPage,
-  GetRegionList
-} from '../../store/candidate-list.actions';
-import { ListOfSkills, MasterSkill } from '@shared/models/skill.model';
-import { CandidateState } from '@agency/store/candidate.state';
-import { ExportColumn, ExportOptions } from '@shared/models/export.model';
-import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { DatePipe } from '@angular/common';
-import { isNil } from 'lodash';
-import { END_DATE_REQUIRED, ERROR_START_LESS_END_DATE, optionFields, regionFields } from '@shared/constants';
-import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
-import { filterColumns, IRPCandidates, IRPFilterColumns, VMSCandidates } from './candidate-list.constants';
-import { Permission } from '@core/interface';
-import { UserPermissions } from '@core/enums';
-import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { CandidateListService } from '../../services/candidate-list.service';
-import { OrganizationDepartment, OrganizationLocation, OrganizationStructure } from '@shared/models/organization.model';
-import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
-import { DepartmentHelper } from '@client/candidates/departments/helpers/department.helper';
-import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
-import { SystemType } from '@shared/enums/system-type.enum';
-import { DateTimeHelper } from '@core/helpers';
-import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
-import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
-import { FilterPageName } from '@core/enums/filter-page-name.enum';
-import { MessageTypes } from '@shared/enums/message-types';
-import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
+import { CandidatesExportCols, CandidatesTableFilters, filterColumns,
+  IrpCandidateExportCols, IRPCandidates, IRPFilterColumns, VMSCandidates } from './candidate-list.constants';
 import { CandidateListScroll } from './candidate-list.enum';
-import { OutsideZone } from '@core/decorators';
-import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-candidate-list',
@@ -113,6 +112,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   assignedSkills$: Observable<ListOfSkills[]>;
 
+  @Select(AppState.getMainContentElement)
+  public readonly targetElement$: Observable<HTMLElement | null>;
+
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;
 
@@ -133,22 +135,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       this.dispatchNewPage();
     }
   }
-  @Input() public isMobileScreen: boolean = false;
-  public filters: CandidateListFilters = {
-    candidateName: null,
-    profileStatuses: [],
-    regionsNames: [],
-    skillsIds: [],
-    tab: 0,
-    expiry : {
-      endDate : undefined,
-      startDate : undefined,
-      type : [],
-    },
-    endDate : null,
-    startDate : null,
-    credType : []
-  };
+  @Input() public isMobileScreen = false;
+  public filters: CandidateListFilters = CandidatesTableFilters;
   public CandidateFilterFormGroup: FormGroup;
   public filterColumns: CandidateListFiltersColumn;
   public allLocations: OrganizationLocation[];
@@ -157,26 +145,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public readonly candidateStatus = CandidatesStatusText;
   public candidates$: Observable<CandidateList | IRPCandidateList>;
   public readonly userPermissions = UserPermissions;
-  public selecteditmesids : any[]=[];
-  public columnsToExport: ExportColumn[] = [
-    { text: 'Name', column: 'Name' },
-    { text: 'Profile Status', column: 'ProfileStatus' },
-    { text: 'Candidate Status', column: 'CandidateStatus' },
-    { text: 'Skills', column: 'Skill' },
-    { text: 'Current Assignment End Date', column: 'CurrentAssignmentEndDate' },
-    { text: 'Region', column: 'Region' },
-  ];
-  public columnsToExportIrp: ExportColumn[] = [
-    { text: 'Emp Id', column: 'EmpId' },
-    { text: 'Emp Name', column: 'EmpName' },
-    { text: 'Profile Status', column: 'ProfileStatus' },
-    { text: 'Primary Skill', column: 'PrimarySkill' },
-    { text: 'Secondary Skill', column: 'SecondarySkill' },
-    { text: 'Location', column: 'Location' },
-    { text: 'Department', column: 'Department' },
-    { text: 'Work Commitment', column: 'WorkCommitment' },
-    { text: 'Hire Date', column: 'HireDate' },
-  ];
+  public selecteditmesids: any[] = [];
+  public columnsToExport = CandidatesExportCols;
+  public columnsToExportIrp = IrpCandidateExportCols;
   public exportUsers$ = new Subject<ExportedFileType>();
   public defaultFileName: string;
   public fileName: string;
@@ -210,7 +181,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis
   ) {
     super();
-    this.unassignedworkCommitment = JSON.parse(localStorage.getItem('unassignedworkcommitment') || '"false"') as boolean; 
+    this.unassignedworkCommitment = JSON.parse(localStorage.getItem('unassignedworkcommitment') || 'false') as boolean; 
   }
 
   ngOnInit(): void {
@@ -301,6 +272,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.store.dispatch(new ShowFilterDialog(false));
       }
     }
+    this.setTableState();
   }
 
   public onFilterClose(): void {
@@ -321,6 +293,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public changePageSize(event: number): void {
     this.pageSize = event;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
+    this.setTableState();
   }
 
   public changePageNumber(page: number): void {
@@ -383,9 +356,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     };
     let exportRequest;
     if (this.isIRP) {
-      exportRequest = new ExportIRPCandidateList(requestBody);
+      exportRequest = new CandidateListActions.ExportIRPCandidateList(requestBody);
     } else {
-      exportRequest = new ExportCandidateList(requestBody);
+      exportRequest = new CandidateListActions.ExportCandidateList(requestBody);
     }
 
     this.store.dispatch(exportRequest);
@@ -393,17 +366,17 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public dispatchNewPage(firstDispatch = false): void {
-
     const candidateListRequest: CandidateListRequest = {
       ...this.getFilterValues(),
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
       orderBy: this.orderBy,
     };
+    
     this.store.dispatch(
       this.isIRP
-        ? new GetIRPCandidatesByPage(candidateListRequest)
-        : new GetCandidatesByPage(candidateListRequest)
+        ? new CandidateListActions.GetIRPCandidatesByPage(candidateListRequest)
+        : new CandidateListActions.GetCandidatesByPage(candidateListRequest)
     );
 
     if (!firstDispatch) {
@@ -515,8 +488,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private inactivateCandidate(id: number) {
     const ChangeCandidateStatusAction = this.isIRP
-      ? new DeleteIRPCandidate(id)
-      : new ChangeCandidateProfileStatus(id, CandidateStatus.Inactive);
+      ? new CandidateListActions.DeleteIRPCandidate(id)
+      : new CandidateListActions.ChangeCandidateProfileStatus(id, CandidateStatus.Inactive);
 
     this.store
       .dispatch(ChangeCandidateStatusAction)
@@ -558,19 +531,34 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       switchMap(() => this.preservedFiltersByPageName$),
       filter(({ dispatch }) => dispatch),
       tap((filters) => {
+        const tableState = (this.store.snapshot().candidateList as CandidateListStateModel).tableState;
 
+        this.currentPage = tableState?.pageNumber || this.currentPage;
+        this.pageSettings.pageSize = tableState?.pageSize || this.pageSettings.pageSize;
+  
         if (!filters.isNotPreserved) {
           this.filters = { ...filters.state };
+        }
+
+        if (filters.isNotPreserved && tableState) {
+          this.filters = { ...tableState };
         }
 
         if(this.credStartDate != undefined){
           this.filters.startDate = DateTimeHelper.toUtcFormat(this.credStartDate);
         }
+
         if(this.credEndDate != undefined){
           this.filters.endDate = DateTimeHelper.toUtcFormat(this.credEndDate);
         }
+
         if(this.credType != null){
           this.filters.credType = [this.credType];
+        }
+
+        if (tableState) {
+          this.includeDeployedCandidates = tableState.includeDeployedCandidates;
+          this.includeDeployedCandidates$.next(tableState.includeDeployedCandidates);
         }
 
         this.dispatchNewPage(true);
@@ -589,10 +577,14 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       });
   }
 
-
   private subscribeOnPageSubject(): void {
-    this.pageSubject.pipe(debounceTime(1), takeUntil(this.unsubscribe$)).subscribe((page) => {
+    this.pageSubject
+    .pipe(
+      debounceTime(1),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((page) => {
       this.currentPage = page;
+      this.setTableState();
       this.dispatchNewPage();
     });
   }
@@ -614,8 +606,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private subscribeOnDeploydCandidates(): void {
-    this.includeDeployedCandidates$.pipe(takeUntil(this.unsubscribe$)).subscribe((isInclude: boolean) => {
+    this.includeDeployedCandidates$.asObservable()
+    .pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((isInclude: boolean) => {
       this.includeDeployedCandidates = isInclude;
+      this.setTableState();
       this.dispatchNewPage();
     });
   }
@@ -712,11 +708,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private getRegions(): void {
-
     this.getLastSelectedBusinessUnitId()
       .pipe(
         filter(Boolean),
-        switchMap(() => this.store.dispatch(new GetRegionList())),
+        switchMap(() => this.store.dispatch(new CandidateListActions.GetRegionList())),
         takeUntil(this.unsubscribe$)
       ).subscribe();
   }
@@ -786,7 +781,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     }
   }
 
-  public checkScrollPosition(): void {
+  private checkScrollPosition(): void {  
     const scrollValue = this.scrollService.getScrollPosition(CandidateListScroll.CandidateList);
 
     if (scrollValue === undefined) {
@@ -798,5 +793,20 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private restoreScrollPosition(position: number): void {
     this.grid.element.querySelectorAll('.e-content')[0].scrollTop = position;
+  }
+
+  private setTableState(): void {
+    const paging: CandidatePagingState = {
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize,
+    };
+
+    const data = {
+      ...this.filters,
+      ...paging,
+      includeDeployedCandidates: this.includeDeployedCandidates,
+    };
+
+    this.store.dispatch(new CandidateListActions.SetTableState(data));
   }
 }

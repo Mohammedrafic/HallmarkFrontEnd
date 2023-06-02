@@ -64,12 +64,18 @@ export interface SpecialProjectStructure {
 
 export interface SpecialProjectCategories {
   id: number;
-  projectType?: string
+  projectType?: string;
+  includeInIRP:boolean;
+  includeInVMS:boolean;
+
 }
 
 export interface ProjectNames {
   id: number;
   projectName?: string;
+  includeInIRP:boolean;
+  includeInVMS:boolean;
+  projectTypeId?:number;
 }
 
 export interface PoNumbers {

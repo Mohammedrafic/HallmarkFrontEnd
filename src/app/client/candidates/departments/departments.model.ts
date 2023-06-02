@@ -23,6 +23,8 @@ export interface DepartmentAssigned {
   isHomeCostCenter: boolean;
   orientationDate: string | null;
   extDepartmentId: string;
+  workCommitmentEndDate: string;
+  workCommitmentStartDate: string;
 }
 
 interface Skill {
@@ -77,12 +79,6 @@ export interface EditDepartmentFormState {
   [EditDepartmentFields.IS_ORIENTED]: boolean;
   [EditDepartmentFields.ORIENTATION_DATE]?: Date;
 }
-export interface DepartmentHierarchy {
-  organizationId: number;
-  organizationName: string;
-  organizationPrefix: string;
-  regions: OrganizationRegion[];
-}
 
 export interface AssignDepartmentHierarchy {
   regions: OrganizationRegion[];
@@ -114,6 +110,11 @@ export interface DepartmentConditions {
 export interface DateRanges {
   min?: Date;
   max?: Date;
+}
+
+export interface DepartmentDialogState {
+  data: DepartmentAssigned | null;
+  isOpen: boolean;
 }
 
 export type DepartmentsPage = PageOfCollections<DepartmentAssigned>;

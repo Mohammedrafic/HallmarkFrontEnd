@@ -1,6 +1,5 @@
 import { FieldType } from '@core/enums';
 import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
-import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { JobClassifications } from '@client/order-management/constants';
 import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
 import { ButtonType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
@@ -87,7 +86,7 @@ export const GeneralInformationConfigLTA = (): OrderFormsConfig  => ({
       required: true,
       show: true,
       type: FieldType.Dropdown,
-      dataSource: ORDER_MASTER_SHIFT_NAME_LIST,
+      dataSource: [],
     },
     {
       field: 'shiftStartTime',
@@ -169,7 +168,7 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
       required: true,
       show: true,
       type: FieldType.Dropdown,
-      dataSource: ORDER_MASTER_SHIFT_NAME_LIST,
+      dataSource: [],
     },
     {
       field: 'shiftStartTime',
@@ -446,6 +445,7 @@ export const SpecialConfigProject = (): OrderFormsConfig => ({
 export const ContactDetailsForm = (): OrderFormInput[] => [
   {
     field: 'title',
+    cssClass: 'itm0',
     title: 'Title',
     required: true,
     type: FieldType.Dropdown,
@@ -453,7 +453,7 @@ export const ContactDetailsForm = (): OrderFormInput[] => [
   },
   {
     field: 'editContact',
-    cssClass: 'edit-button-container',
+    cssClass: 'edit-button-container itm1',
     icon: 'edit3',
     show: true,
     required: false,
@@ -462,6 +462,7 @@ export const ContactDetailsForm = (): OrderFormInput[] => [
   },
   {
     field: 'name',
+    cssClass: 'itm2',
     title: 'Contact Person',
     required: true,
     maxLength: 50,
@@ -469,6 +470,7 @@ export const ContactDetailsForm = (): OrderFormInput[] => [
   },
   {
     field: 'mobilePhone',
+    cssClass: 'itm3',
     title: 'Mobile Phone',
     required: false,
     maxLength: 20,
@@ -476,6 +478,7 @@ export const ContactDetailsForm = (): OrderFormInput[] => [
   },
   {
     field: 'email',
+    cssClass: 'itm4',
     title: 'Email',
     required: true,
     maxLength: 100,
@@ -483,6 +486,7 @@ export const ContactDetailsForm = (): OrderFormInput[] => [
   },
   {
     field: 'isPrimaryContact',
+    cssClass: 'itm5',
     title: 'Primary',
     show: false,
     required: false,
@@ -490,7 +494,7 @@ export const ContactDetailsForm = (): OrderFormInput[] => [
   },
   {
     field: 'removeContact',
-    cssClass: 'remove-button-container',
+    cssClass: 'remove-button-container itm6',
     icon: 'trash2',
     required: false,
     show: false,
@@ -502,6 +506,7 @@ export const ContactDetailsForm = (): OrderFormInput[] => [
 export const WorkLocationFrom = (stateSource?: AssociateAgency[]): OrderFormInput[] => [
   {
     field: 'address',
+    cssClass: 'itm0',
     title: 'Address',
     required: true,
     maxLength: 100,
@@ -509,6 +514,7 @@ export const WorkLocationFrom = (stateSource?: AssociateAgency[]): OrderFormInpu
   },
   {
     field: 'state',
+    cssClass: 'itm1',
     title: 'State',
     required: true,
     type: FieldType.Dropdown,
@@ -516,6 +522,7 @@ export const WorkLocationFrom = (stateSource?: AssociateAgency[]): OrderFormInpu
   },
   {
     field: 'city',
+    cssClass: 'itm2',
     title: 'City',
     required: true,
     maxLength: 20,
@@ -523,6 +530,7 @@ export const WorkLocationFrom = (stateSource?: AssociateAgency[]): OrderFormInpu
   },
   {
     field: 'zipCode',
+    cssClass: 'itm3',
     title: 'Zip Code',
     required: true,
     maxLength: 6,
@@ -530,7 +538,7 @@ export const WorkLocationFrom = (stateSource?: AssociateAgency[]): OrderFormInpu
   },
   {
     field: 'removeWork',
-    cssClass: 'remove-button-container',
+    cssClass: 'remove-button-container itm4',
     icon: 'trash2',
     required: false,
     show: false,

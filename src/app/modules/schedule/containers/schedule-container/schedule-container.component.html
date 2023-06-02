@@ -6,14 +6,11 @@
   <div class="left-bar">
     <div class="control-container">
       <div class="control-group ">
-        <app-tabs-list
-          class="table-tabs irp"
-          [tabConfig]="tabsListConfig"
-          (changeTab)="changeTab($event)"
-        >
-        </app-tabs-list>
+        <div class="title">
+          Scheduling
+        </div>
         <div>
-          <app-tooltip-container *ngIf="activeTabIndex === tabIndex.Scheduling" [showToolTip]="!hasViewPermission">
+          <app-tooltip-container [showToolTip]="!hasViewPermission">
             <button
               *ngIf="!isEmployee"
               ejs-button
@@ -37,7 +34,6 @@
       </div>
     </div>
     <div class="content">
-      <ng-container *ngIf="activeTabIndex === tabIndex.Scheduling">
         <app-schedule-grid
           [hasViewPermission]="hasViewPermission"
           [hasSchedulePermission]="hasSchedulePermission"
@@ -49,9 +45,6 @@
           (editCell)="editScheduledItem($event)"
           (selectCandidate)="selectCandidate($event)"
         ></app-schedule-grid>
-      </ng-container>
-      <ng-container *ngIf="activeTabIndex === tabIndex.Analytics">
-      </ng-container>
     </div>
   </div>
   <div class="right-bar">
@@ -83,4 +76,9 @@
   </div>
 </div>
 
-<app-schedule-filters #filters [count]="totalCount" (updateScheduleFilter)="updateScheduleFilter($event)"></app-schedule-filters>
+<app-schedule-filters
+  #filters
+  [selectedCandidateId]="selectedCandidate?.id"
+  [count]="totalCount"
+  (updateScheduleFilter)="updateScheduleFilter($event)"
+></app-schedule-filters>

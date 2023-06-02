@@ -26,7 +26,7 @@
               <div *ngIf="order" class="order-other-statuses">
                 <span class="custom-chip" *ngIf="!isReOrder">{{ order.orderType | orderTypeName: activeSystem ===  systemType.IRP }}</span>
                 <span *ngIf="orderType.ReOrder !== order?.orderType" class="custom-chip">
-                  {{ order.isLocked ? 'Locked' : 'Unlocked' }}</span
+                  {{ activeSystem ===  systemType.IRP ? order.isLockedIRP ? 'Locked' : 'Unlocked' : order.isLocked ? 'Locked' : 'Unlocked' }}</span
                 >
                 <span class="custom-chip" *ngIf="activeSystem ===  systemType.IRP">IRP</span>
               </div>
@@ -126,7 +126,7 @@
                 (click)="lockOrder()"
                 [disabled]="disabledLock || !canCreateOrder || !hasCreateEditOrderPermission"
               >
-                {{ order?.isLocked ? 'Unlock' : 'Lock' }}
+                {{ activeSystem ===  systemType.IRP ? order?.isLockedIRP ? 'Unlock' : 'Lock' : order?.isLocked ? 'Unlock' : 'Lock' }}
                 <i-feather *ngIf="!order?.isLocked" name="lock" class="icon"></i-feather>
                 <app-custom-icon *ngIf="order?.isLocked" name="unlock" class="icon"></app-custom-icon>
               </button>
@@ -190,7 +190,7 @@
             <e-tabitem *ngIf="orderType.OpenPerDiem === order?.orderType">
               <ng-template #headerText>
                 Re-Orders
-                <span class="e-badge e-badge-success e-badge-pill"> {{ order?.reOrders?.length || '0' }}</span>
+                <span class="e-badge e-badge-success e-badge-pill"> {{ (reOrderList$ | async)?.totalCount || '0' }}</span>
               </ng-template>
               <ng-template #content>
                 <app-order-reorders-container
@@ -198,6 +198,7 @@
                   (editReorder)="editNestedReOrder($event)"
                   [currentOrder]="order"
                   [activeSystem]="activeSystem"
+                  [reOrders]="reOrderList$ | async"
                 >
                 </app-order-reorders-container>
               </ng-template>

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
@@ -19,7 +20,7 @@ import { LogiReportState } from '@organization-management/store/logi-report.stat
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
-import {  AgencyInvoiceSummaryConstants, ORGANIZATION_DATA_FIELDS } from '../constants/agency-reports.constants';
+import {  accrualReportTypesList,AgencyInvoiceSummaryConstants, ORGANIZATION_DATA_FIELDS } from '../constants/agency-reports.constants';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
@@ -41,8 +42,7 @@ import { InvoiceStatus, invoiceStatusListWithReject } from '../../../admin/analy
 @Component({
   selector: 'app-invoice-summary-report',
   templateUrl: './invoice-summary-report.component.html',
-  styleUrls: ['./invoice-summary-report.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./invoice-summary-report.component.scss']
 })
 export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
 
@@ -167,7 +167,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
     private readonly ngZone: NgZone,
     @Inject(APP_SETTINGS) private appSettings: AppSettings) {
     this.baseUrl = this.appSettings.host.replace("https://", "").replace("http://", "");
-    this.store.dispatch(new SetHeaderState({ title: "Reports", iconName: 'file' }));
+    this.store.dispatch(new SetHeaderState({ title: "Reports", iconName: 'pie-chart' }));
     this.initForm();
     this.user = this.store.selectSnapshot(UserState.user);
     //if (this.user?.id != null) {
@@ -195,8 +195,8 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
                 this.organizations = uniqBy(data, 'organizationId');
                 this.filterColumns.businessIds.dataSource = this.organizations;
                 this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
-                this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.businessIds)?.setValue(this.defaultOrganizations);
-                this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.invoiceStatus)?.setValue(this.defaultInvoiceStatus);
+                this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
+                this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.InvoiceStatuses)?.setValue(this.defaultInvoiceStatus);
                 this.changeDetectorRef.detectChanges();
               }
             });
@@ -214,7 +214,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.businessIds)?.enable() : this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.businessIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.enable() : this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.disable();
 
     });
 
@@ -245,13 +245,13 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
 
 
   public onFilterControlValueChangedHandler(): void {
-    this.bussinessControl = this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.businessIds) as AbstractControl;
+    this.bussinessControl = this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds) as AbstractControl;
     this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
-    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.businessIds)?.setValue(this.defaultOrganizations);
+    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
     
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.regionIds)?.setValue([]);
+      this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.isAlive = true;
         this.previousOrgId = data;
@@ -310,7 +310,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
         }
         else {
           this.isClearAll = false;
-          this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.regionIds)?.setValue([]);
+          this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }
     });
@@ -319,12 +319,12 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
 
   public onFilterRegionChangedHandler(): void {
 
-    this.regionIdControl = this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.regionIds) as AbstractControl;
+    this.regionIdControl = this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = [];
       this.locations = [];
-      this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.locationIds)?.setValue([]);
-      this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.departmentIds)?.setValue([]);
+      this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.LocationIds)?.setValue([]);
+      this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.regionIdControl.value.length > 0) {
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
@@ -334,26 +334,26 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
       }
       else {
         this.filterColumns.locationIds.dataSource = [];
-        this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.locationIds)?.setValue([]);
-        this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.departmentIds)?.setValue([]);
+        this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.LocationIds)?.setValue([]);
+        this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
 
   public onFilterLocationChangedHandler(): void {
-    this.locationIdControl = this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.locationIds) as AbstractControl;
+    this.locationIdControl = this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.departmentIds)?.setValue([]);
+      this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.locationIdControl.value.length > 0) {
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
       }
       else {
         this.filterColumns.departmentIds.dataSource = [];
-        this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.departmentIds)?.setValue([]);
+        this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
-    this.departmentIdControl = this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.departmentIds) as AbstractControl;
+    this.departmentIdControl = this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
@@ -374,7 +374,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
     regionIds = regionIds.length > 0 ? regionIds.join(",") : '';
     locationIds = locationIds.length > 0 ? locationIds.join(",") : '';
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : '';
-   
+    invoiceStatus = invoiceStatus.length > 0 ? invoiceStatus.join(",") : '';
     this.paramsData =
     {
       AgenciesAIS: this.defaultAgency,
@@ -470,16 +470,16 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 14);
-    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.regionIds)?.setValue([]);
-    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.locationIds)?.setValue([]);
-    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.departmentIds)?.setValue([]);
-    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.candidateName)?.setValue(null);
+    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.RegionIds)?.setValue([]);
+    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.LocationIds)?.setValue([]);
+    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.CandidateName)?.setValue(null);
     this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.candidateStatuses)?.setValue([]);
-    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.invoiceStatus)?.setValue(this.defaultInvoiceStatus);
+    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.InvoiceStatuses)?.setValue(this.defaultInvoiceStatus);
     //this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.invoiceStatus)?.setValue([]);
     this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.startDate)?.setValue(startDate);
     this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.endDate)?.setValue(new Date(Date.now()));
-    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.invoiceID)?.setValue(null);
+    this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.InvoiceID)?.setValue(null);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];

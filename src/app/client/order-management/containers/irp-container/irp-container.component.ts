@@ -18,6 +18,7 @@ import {
   getFormsList,
   getValuesFromList,
   isFormsValid,
+  isFormTouched,
   showInvalidFormControl,
   showMessageForInvalidCredentials,
 } from '@client/order-management/helpers';
@@ -46,6 +47,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public orderCredentials: IOrderCredentialItem[] = [];
 
   private selectedOrderType: OrderType;
+  private isCredentialsChanged = false;
 
   constructor(
     private orderCredentialsService: OrderCredentialsService,
@@ -73,16 +75,26 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public trackByFn: TrackByFunction<TabsConfig> = (_: number, tab: TabsConfig) => tab.id;
 
   public updateOrderCredentials(credential: IOrderCredentialItem): void {
+    this.isCredentialsChanged = true;
     this.orderCredentialsService.updateOrderCredentials(this.orderCredentials, credential);
   }
 
   public deleteOrderCredential(credential: IOrderCredentialItem): void {
+    this.isCredentialsChanged = true;
     this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
   }
 
   public changeTabConfig(orderType: OrderType): void {
     this.tabsConfig = IrpTabConfig(orderType !== OrderType.ReOrder);
     this.selectedOrderType = orderType;
+  }
+
+  public isOrderTouched(): boolean {
+    this.irpStateService.saveEvents.next();
+    const formState = this.irpStateService.getFormState();
+    const formGroupList = getFormsList(formState);
+
+    return isFormTouched(formGroupList) || this.isCredentialsChanged;
   }
 
   private watchForSucceededSaveOrder(): void {
@@ -121,7 +133,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       this.checkIsCredentialsValid(formState);
     }
   }
- 
+
   private checkIsCredentialsValid(formState: ListOfKeyForms): void {
     const credentialsValid = this.orderCredentials?.length || this.selectedOrder?.orderType === OrderType.ReOrder
     || this.selectedOrderType === OrderType.ReOrder;

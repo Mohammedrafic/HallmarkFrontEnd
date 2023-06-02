@@ -1,13 +1,3 @@
-export enum TabTitleConfig {
-  Scheduling = 'Scheduling',
-  Analytics = 'Analytics',
-}
-
-export enum ActiveTabIndex {
-  Scheduling,
-  Analytics,
-}
-
 export enum DatePeriodId {
   Day = 'Day',
   Week = 'Week',
@@ -36,4 +26,18 @@ export enum ScheduleAttributeKeys {
  OC = 'OC',
  CHG = 'CHG',
  PRC= 'PRC',
+}
+
+export enum ScheduleAttributeTitles {
+  ORI = 'Orientation',
+  CRT = 'Critical',
+  OC = 'On Call',
+  CHG = 'Charge',
+  PRC= 'Preceptor',
+  MEAL = 'Meal break',
+}
+
+export enum EmployeeIcons {
+  Compass = 'compass',
+  Flag = 'flag',
 }

@@ -166,6 +166,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.getOpenPositions();
       this.createScheduleService.setOrientationControlValue(this.scheduleSelectedSlots, this.scheduleForm);
       this.sideBarSettings.showRemoveButton = this.createScheduleService.hasSelectedSlotsWithDate(candidates);
+      this.scheduleItemsService.setErrors([]);
     }
 
     if (candidates?.length && this.isEmployee) {

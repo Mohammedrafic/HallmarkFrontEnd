@@ -1,169 +1,185 @@
-<ejs-grid #grid [dataSource]="(candidates$ | async)?.items" [allowSelection]="true" [allowPaging]="false"
-  [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight" [enableVirtualization]="false"
-  [resizeSettings]="resizeSettings" [allowSorting]="allowSorting" [allowResizing]="allowResizing"
-  (dataBound)="dataBound()"
+<div class="table-container">
+  <ejs-grid #grid
+  [dataSource]="(candidates$ | async)?.items"
+  [allowSelection]="true"
+  [allowPaging]="false"
+  [pageSettings]="pageSettings"
+  [height]="fullScreenGridHeight"
+  [rowHeight]="rowHeight"
+  [enableVirtualization]="false"
+  [resizeSettings]="resizeSettings"
+  [allowSorting]="allowSorting"
+  [allowResizing]="allowResizing"
   [selectionSettings]="selectionOptions"
-  (rowSelected)="rowSelected($event, grid)"
   [enablePersistence]="true"
+  (dataBound)="dataBound()"
+  (rowSelected)="rowSelected($event, grid)"
   (rowDeselected)="rowDeselected($event, grid)">
-  <e-columns>
-    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-    <e-column textAlign="Right" width="80" *ngIf="isAgency">
-      <ng-template #template let-data>
-        <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
-            <span><i-feather name="edit" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button
-            [disabled]="!agencyActionsAllowed || data.candidateStatus === candidateStatus.Onboard || !userPermission[userPermissions.CanEditCandidateProfile]"
-            cssClass="e-flat secondary-icon-button enabled-button" (click)="onRemove(data.candidateProfileId)">
-            <span><i-feather name="trash-2" class="icon"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
-    </e-column>
-    <e-column headerText="" field="actions" textAlign="Left" width="150" [visible]="false">
-      <ng-template #template let-data>
-        <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)" *ngIf="!isMobileScreen">
-            <span><i-feather name="edit" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button enabled-button"
-            [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id)">
-            <span><i-feather name="trash-2" class="icon"></i-feather></span>
-          </button>
-          <ejs-tooltip *ngIf="data.hasRedFlag" [content]="data.redFlagDescription" position="TopCenter">
-            <button ejs-button cssClass="e-flat secondary-icon-button enabled-button">
-              <span><i-feather name="flag" class="icon"></i-feather></span>
+    <e-columns>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+      <e-column textAlign="Right" width="80" *ngIf="isAgency">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons" [class.hidden]="!isLoaded">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+              <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-          </ejs-tooltip>
-        </div>
-      </ng-template>
-    </e-column>
-    <e-column headerText="Emp ID" field="employeeId" [visible]="false" width=80></e-column>
-    <e-column field="lastName" [headerText]="!isIRP ? 'Name' : 'Emp Name'" width=200>
-      <ng-template #template let-data>
-        <div class="name-wrapper">
-          <ng-container *ngIf="false">
-            <!--TODO: user icon-->
-            <div class="user-photo">
-              <ng-container *ngIf="data.photo; else defaultPhoto">
+            <button ejs-button
+              [disabled]="!agencyActionsAllowed || data.candidateStatus === candidateStatus.Onboard || !userPermission[userPermissions.CanEditCandidateProfile]"
+              cssClass="e-flat secondary-icon-button enabled-button" (click)="onRemove(data.candidateProfileId)">
+              <span><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column headerText="" field="actions" textAlign="Left" width="150" [visible]="false">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons" [class.hidden]="!isLoaded">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)" *ngIf="!isMobileScreen">
+              <span><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button enabled-button"
+              [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id)">
+              <span><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+            <ejs-tooltip *ngIf="data.hasRedFlag" [content]="data.redFlagDescription" position="TopCenter">
+              <button ejs-button cssClass="e-flat secondary-icon-button enabled-button">
+                <span><i-feather name="flag" class="icon"></i-feather></span>
+              </button>
+            </ejs-tooltip>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column headerText="Emp ID" field="employeeId" [visible]="false" width="100"></e-column>
+      <e-column field="lastName" [headerText]="!isIRP ? 'Name' : 'Emp Name'" width="200">
+        <ng-template #template let-data>
+          <div class="name-wrapper">
+            <ng-container *ngIf="false">
+              <!--TODO: user icon-->
+              <div class="user-photo">
+                <ng-container *ngIf="data.photo; else defaultPhoto">
 
-              </ng-container>
-              <ng-template #defaultPhoto>
-                <i-feather name="user" class="user-icon"></i-feather>
-              </ng-template>
-            </div>
+                </ng-container>
+                <ng-template #defaultPhoto>
+                  <i-feather name="user" class="user-icon"></i-feather>
+                </ng-template>
+              </div>
+            </ng-container>
+            {{data.lastName}}, {{data.firstName}} {{data.middleName}}
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="profileStatus" headerText="Profile Status" width=200>
+        <ng-template #template let-data>
+          <div>
+            <ejs-chiplist class="events-off">
+              <e-chips>
+                <e-chip [text]="statusEnum[data.profileStatus] || employeeStatusEnum[data.employeeStatusId]"
+                  [cssClass]="getChipCssClass(statusEnum[data.profileStatus] || data.employeeStatus)">
+                </e-chip>
+              </e-chips>
+            </ejs-chiplist>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column headerText="Primary Skill" field="primarySkillName" [visible]="false" width=200></e-column>
+      <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200 *ngIf="isIRP">
+        <ng-template #template let-data>
+          <!-- <div  *ngFor="let skill of (data.candidateProfileSkills || data.employeeSkills)">{{skill.skillDescription || skill}}</div>  -->
+          <ng-container *ngIf="data.employeeSkills?.length === 2 || data.employeeSkills?.length === 1">
+            <span *ngFor="let skill of data.employeeSkills; let i = index" class="skill-name">
+              {{skill }}
+              <span class="skill-name" *ngIf="i !== data.employeeSkills.length - 1">, </span>
+            </span>
           </ng-container>
-          {{data.lastName}}, {{data.firstName}} {{data.middleName}}
-        </div>
-      </ng-template>
-    </e-column>
-    <e-column field="profileStatus" headerText="Profile Status" width=200>
-      <ng-template #template let-data>
-        <div>
-          <ejs-chiplist class="events-off">
-            <e-chips>
-              <e-chip [text]="statusEnum[data.profileStatus] || employeeStatusEnum[data.employeeStatusId]"
-                [cssClass]="getChipCssClass(statusEnum[data.profileStatus] || data.employeeStatus)">
-              </e-chip>
-            </e-chips>
-          </ejs-chiplist>
-        </div>
-      </ng-template>
-    </e-column>
-    <e-column headerText="Primary Skill" field="primarySkillName" [visible]="false" width=200></e-column>
-    <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200 *ngIf="isIRP">
-      <ng-template #template let-data>
-        <!-- <div  *ngFor="let skill of (data.candidateProfileSkills || data.employeeSkills)">{{skill.skillDescription || skill}}</div>  -->
-        <ng-container *ngIf="data.employeeSkills?.length === 2 || data.employeeSkills?.length === 1">
-          <span *ngFor="let skill of data.employeeSkills; let i = index" class="skill-name">
-            {{skill }}
-            <span class="skill-name" *ngIf="i !== data.employeeSkills.length - 1">, </span>
-          </span>
-        </ng-container>
-        <ng-container *ngIf="data.employeeSkills?.length >= 2">
-          <ejs-tooltip content="{{ data.employeeSkills.join(', ') }}" target="#skillName">
-            <span id="skillName" class="skill-name">Multiple Skills</span>
-          </ejs-tooltip>
-        </ng-container>
-      </ng-template>
-    </e-column>
-    <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200 *ngIf="!isIRP">
-      <ng-template #template let-data>
-        <ng-container *ngIf="data.candidateProfileSkills?.length === 2 || data.candidateProfileSkills?.length === 1">
-          <span *ngFor="let skill of data.candidateProfileSkills; let i = index" class="skill-name">
-            {{skill }}
-            <span class="skill-name" *ngIf="i !== data.candidateProfileSkills.length - 1">, </span>
-          </span>
-        </ng-container>
-        <ng-container *ngIf="data.candidateProfileSkills?.length >= 2">
-          <ejs-tooltip content="{{ data.candidateProfileSkills.join(', ') }}" target="#skillName">
-            <span id="skillName" class="skill-name">Multiple Skills</span>
-          </ejs-tooltip>
-        </ng-container>
-      </ng-template>
-    </e-column>
-    <e-column headerText="Location" field="locationName" [visible]="false" width=200></e-column>
-    <e-column headerText="DEpartment" field="departmentName" [visible]="false" width=200></e-column>
-    <e-column headerText="Work Commitment" field="employeeWorkCommitments" width=200 *ngIf="isIRP">
-      <ng-template #template let-data>
-        <ng-container *ngIf="data.employeeWorkCommitments">
-          {{data.employeeWorkCommitments}}
-        </ng-container>
-        <ng-container *ngIf="!data.employeeWorkCommitments">
-          No Work Commitment
-        </ng-container>
-      </ng-template>
-    </e-column>
-    <e-column headerText="Hire Date" field="hireDate" textAlign="Left" [visible]="false" width=200>
-      <ng-template #template let-data>
-        {{data.hireDate | date: 'MM/dd/yyy': 'UTC'}}
-      </ng-template>
-    </e-column>
-    <!-- <e-column headerText="Org. Orientation" field="orgOrientation" textAlign="Left"  [visible]="false" width=200>
-      <ng-template #template let-data>
-        {{data.orgOrientation | date: 'MM/dd/yyy': 'UTC'}}
-      </ng-template>
-    </e-column> -->
-    <e-column textAlign="Left" field="lastAssignmentEndDate" headerText="Current Assignment End Date">
-      <ng-template #template let-data>
-        {{data.lastAssignmentEndDate | date: 'MM/dd/yyy': 'UTC'}}
-      </ng-template>
-    </e-column>
-    <e-column field="candidateStatus" headerText="Candidate status" textAlign="Left" width="150">
-      <ng-template #template let-data>
-        <div class="status-cell" *ngIf="showCandidateStatus(data.candidateStatus)">
-          <ejs-chiplist>
-            <e-chips>
-              <e-chip [text]="data.candidateStatus | candidateStatusName"
-                [cssClass]="data.candidateStatus | candidateStatusName | chipsCssClass"></e-chip>
-            </e-chips>
-          </ejs-chiplist>
-        </div>
-      </ng-template>
-    </e-column>
-    <e-column headerText="Region" field="candidateProfileRegions">
-      <ng-template #template let-data>
-        <div *ngFor="let region of data.candidateProfileRegions; trackBy: regionTrackBy">{{ region.regionDescription ||
-          region }}</div>
-      </ng-template>
-    </e-column>
-  </e-columns>
-  <ng-template #pagerTemplate let-data>
-  </ng-template>
-</ejs-grid>
-<app-grid-pagination
-  [currentPage]="currentPage"
-  [pageSize]="pageSize"
-  [totalRecordsCount]="(candidates$ | async)?.totalCount ?? 0"
-  (navigateToPageEmitter)="changePageNumber($event)"
-  (pageSizeChangeEmitter)="changePageSize($event)"
-></app-grid-pagination>
+          <ng-container *ngIf="data.employeeSkills?.length >= 2">
+            <ejs-tooltip content="{{ data.employeeSkills.join(', ') }}" target="#skillName">
+              <span id="skillName" class="skill-name">Multiple Skills</span>
+            </ejs-tooltip>
+          </ng-container>
+        </ng-template>
+      </e-column>
+      <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200 *ngIf="!isIRP">
+        <ng-template #template let-data>
+          <ng-container *ngIf="data.candidateProfileSkills?.length === 2 || data.candidateProfileSkills?.length === 1">
+            <span *ngFor="let skill of data.candidateProfileSkills; let i = index" class="skill-name">
+              {{skill }}
+              <span class="skill-name" *ngIf="i !== data.candidateProfileSkills.length - 1">, </span>
+            </span>
+          </ng-container>
+          <ng-container *ngIf="data.candidateProfileSkills?.length >= 2">
+            <ejs-tooltip content="{{ data.candidateProfileSkills.join(', ') }}" target="#skillName">
+              <span id="skillName" class="skill-name">Multiple Skills</span>
+            </ejs-tooltip>
+          </ng-container>
+        </ng-template>
+      </e-column>
+      <e-column headerText="Location" field="locationName" [visible]="false" width=200></e-column>
+      <e-column headerText="DEpartment" field="departmentName" [visible]="false" width=200></e-column>
+      <e-column headerText="Work Commitment" field="employeeWorkCommitments" width=200 *ngIf="isIRP">
+        <ng-template #template let-data>
+          <ng-container *ngIf="data.employeeWorkCommitments">
+            {{data.employeeWorkCommitments}}
+          </ng-container>
+          <ng-container *ngIf="!data.employeeWorkCommitments">
+            No Work Commitment
+          </ng-container>
+        </ng-template>
+      </e-column>
+      <e-column headerText="Hire Date" field="hireDate" textAlign="Left" [visible]="false" width=200>
+        <ng-template #template let-data>
+          {{data.hireDate | date: 'MM/dd/yyy': 'UTC'}}
+        </ng-template>
+      </e-column>
+      <!-- <e-column headerText="Org. Orientation" field="orgOrientation" textAlign="Left"  [visible]="false" width=200>
+        <ng-template #template let-data>
+          {{data.orgOrientation | date: 'MM/dd/yyy': 'UTC'}}
+        </ng-template>
+      </e-column> -->
+      <e-column textAlign="Left" field="lastAssignmentEndDate" headerText="Current Assignment End Date">
+        <ng-template #template let-data>
+          {{data.lastAssignmentEndDate | date: 'MM/dd/yyy': 'UTC'}}
+        </ng-template>
+      </e-column>
+      <e-column field="candidateStatus" headerText="Candidate status" textAlign="Left" width="150">
+        <ng-template #template let-data>
+          <div class="status-cell" *ngIf="showCandidateStatus(data.candidateStatus)">
+            <ejs-chiplist>
+              <e-chips>
+                <e-chip [text]="data.candidateStatus | candidateStatusName"
+                  [cssClass]="data.candidateStatus | candidateStatusName | chipsCssClass"></e-chip>
+              </e-chips>
+            </ejs-chiplist>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column headerText="Region" field="candidateProfileRegions">
+        <ng-template #template let-data>
+          <div *ngFor="let region of data.candidateProfileRegions; trackBy: regionTrackBy">{{ region.regionDescription ||
+            region }}</div>
+        </ng-template>
+      </e-column>
+    </e-columns>
+    <ng-template #pagerTemplate let-data>
+    </ng-template>
+  </ejs-grid>
+  <app-grid-pagination
+    [currentPage]="currentPage"
+    [pageSize]="pageSize"
+    [totalRecordsCount]="(candidates$ | async)?.totalCount ?? 0"
+    (navigateToPageEmitter)="changePageNumber($event)"
+    (pageSizeChangeEmitter)="changePageSize($event)"
+  ></app-grid-pagination>
+</div>
 
-<app-filter-dialog [items]="filteredItems" [count]="(candidates$ | async)?.totalCount"
-  (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()"
-  (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+<app-filter-dialog
+  [targetElement]="targetElement$ | async"
+  [items]="filteredItems"
+  [count]="(candidates$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
   <form [formGroup]="CandidateFilterFormGroup">
     <ng-container *ngIf="!isIRP && CandidateFilterFormGroup">
       <div class="bootstrap">

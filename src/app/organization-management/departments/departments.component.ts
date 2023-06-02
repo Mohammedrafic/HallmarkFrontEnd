@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
@@ -23,20 +23,26 @@ import {
   SaveDepartment,
   SaveDepartmentConfirm,
   SaveDepartmentSucceeded,
-  UpdateDepartment
+  UpdateDepartment,
 } from '../store/organization-management.actions';
 import { Region } from '@shared/models/region.model';
 import { Location } from '@shared/models/location.model';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { MessageTypes } from '@shared/enums/message-types';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import {
+  AbstractGridConfigurationComponent,
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
+  IRP_DEPARTMENT_CHANGE_WARNING,
+  OrganizationalHierarchy,
+  OrganizationSettingKeys,
   RECORD_ADDED,
-  RECORD_MODIFIED
+  RECORD_MODIFIED,
+  WARNING_TITLE,
 } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
@@ -56,6 +62,7 @@ import { DateTimeHelper } from '@core/helpers';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { difference } from 'lodash';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { SettingsViewService } from '@shared/services';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
@@ -110,9 +117,11 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   primarySkills: ListOfSkills[] = [];
   secondarySkills: ListOfSkills[] = [];
   areSkillsAvailable: boolean;
+  isPrimarySkillRequired: boolean;
 
   protected componentDestroy: () => Observable<unknown>;
 
+  private initialIrpValue: boolean;
   private selectedRegion: Region;
   public selectedLocation: Location;
   private editedDepartmentId?: number;
@@ -134,7 +143,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     private datePipe: DatePipe,
     private filterService: FilterService,
     private departmentService: DepartmentService,
-    private action$: Actions
+    private action$: Actions,
+    private settingsViewService: SettingsViewService,
   ) {
     super();
 
@@ -157,6 +167,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.getSkills();
     this.listenPrimarySkill();
     this.listenIncludeInIRPToggleChanges();
+    this.getDepartmentSkillConfig();
   }
 
   ngOnDestroy(): void {
@@ -311,13 +322,16 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       department,
       this.isIRPFlagEnabled
     );
-
+    this.initialIrpValue = !!department.includeInIRP;
     this.editedDepartmentId = department.departmentId;
     this.isLocationIRPEnabled = !!department.locationIncludeInIRP;
     this.isEdit = true;
     this.reactivationDateHandler(department);
     this.store.dispatch(new ShowSideDialog(true));
-    this.inactivateDateHandler(this.departmentsDetailsFormGroup.controls['inactiveDate'], department.inactiveDate, department.reactivateDate);
+    this.inactivateDateHandler(
+      this.departmentsDetailsFormGroup.controls['inactiveDate'],
+      department.inactiveDate, department.reactivateDate
+    );
   }
 
   private inactivateDateHandler(field: AbstractControl, value: string | null, reactivateValue: string | null): void {
@@ -327,7 +341,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       inactiveDate.setHours(0, 0, 0, 0);
       const now = new Date();
       now.setHours(0, 0, 0, 0);
-      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, now)) && DateTimeHelper.isDateBefore(inactiveDate, now)) {
+      const areDatesInThePast = (reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, now)) &&
+        DateTimeHelper.isDateBefore(inactiveDate, now);
+      if (!areDatesInThePast) {
         field.disable();
       } else {
         field.enable();
@@ -359,7 +375,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       const reactivationDateField = this.departmentsDetailsFormGroup.controls['reactivateDate'];
       const reactivateDate = this.selectedLocation.reactivateDate ? new Date(this.selectedLocation.reactivateDate) : null;
       const inactiveDate = this.selectedLocation.inactiveDate ? new Date(this.selectedLocation.inactiveDate) : null;
-      this.minReactivateDate = reactivateDate ? DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy') : null;
+      this.minReactivateDate = reactivateDate ?
+        DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy') :
+        null;
       this.maxInactivateDate = inactiveDate ? DateTimeHelper.formatDateUTC(inactiveDate.toISOString(), 'MM/dd/yyyy') : null;
       if (!this.selectedLocation.reactivateDate && this.selectedLocation.isDeactivated) {
         reactivationDateField.disable();
@@ -394,18 +412,10 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
           filter(Boolean),
           takeUntil(this.componentDestroy()),
       ).subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-        this.isEdit = false;
-        this.editedDepartmentId = undefined;
-        this.departmentsDetailsFormGroup.reset();
-        this.removeActiveCssClass();
+        this.closeDepartmentWindow();
       });
     } else {
-      this.store.dispatch(new ShowSideDialog(false));
-      this.isEdit = false;
-      this.editedDepartmentId = undefined;
-      this.departmentsDetailsFormGroup.reset();
-      this.removeActiveCssClass();
+      this.closeDepartmentWindow();
     }
   }
 
@@ -414,7 +424,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       const department: Department = DepartmentsAdapter.prepareToSave(
         this.editedDepartmentId,
         this.selectedLocation.id,
-        this.departmentsDetailsFormGroup
+        this.departmentsDetailsFormGroup,
+        this.areSkillsAvailable
       );
       this.saveOrUpdateDepartment(department, ignoreWarning);
     } else {
@@ -426,9 +437,35 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.importDialogEvent.next(true);
   }
 
+  private closeDepartmentWindow(): void {
+    this.store.dispatch(new ShowSideDialog(false));
+    this.isEdit = false;
+    this.editedDepartmentId = undefined;
+    this.departmentsDetailsFormGroup.reset();
+    this.removeActiveCssClass();
+  }
+
+  private updateDepartment(department: Department, ignoreWarning: boolean): void {
+    if (this.isIRPFlagEnabled && this.isSkillChanged() || this.isDateChanged() || this.isExcludedFromIrp()) {
+      this.confirmService
+        .confirm(IRP_DEPARTMENT_CHANGE_WARNING, {
+          title: WARNING_TITLE,
+          okButtonLabel: 'Yes',
+          okButtonClass: 'delete-button',
+        }).pipe(
+          filter(Boolean),
+          takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
+        this.store.dispatch(new UpdateDepartment(department, this.filters, ignoreWarning));
+      });
+    } else {
+      this.store.dispatch(new UpdateDepartment(department, this.filters, ignoreWarning));
+    }
+  }
+
   private saveOrUpdateDepartment(department: Department, ignoreWarning: boolean): void {
     if (this.isEdit) {
-      this.store.dispatch(new UpdateDepartment(department, this.filters, ignoreWarning));
+      this.updateDepartment(department, ignoreWarning);
     } else {
       this.store.dispatch(new SaveDepartment(department, this.filters));
     }
@@ -464,7 +501,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   private createDepartmentsForm(): void {
-    this.departmentsDetailsFormGroup = this.departmentService.createDepartmentDetailForm(this.isIRPFlagEnabled, this.isOrgUseIRPAndVMS);
+    this.departmentsDetailsFormGroup =
+      this.departmentService.createDepartmentDetailForm(this.isIRPFlagEnabled, this.isOrgUseIRPAndVMS);
     this.DepartmentFilterFormGroup = this.departmentService.createDepartmentFilterForm(this.isIRPFlagEnabled);
     this.addDatesValidation();
   }
@@ -553,11 +591,13 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   private listenPrimarySkill(): void {
-    this.departmentsDetailsFormGroup.get('primarySkills')?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((formValue) => {
-      const diff = difference(this.primarySkills.map(({ masterSkillId }: ListOfSkills) => masterSkillId), formValue);
-      this.secondarySkills = this.primarySkills.filter(({ masterSkillId }: ListOfSkills) => diff.includes(masterSkillId));
-      this.departmentsDetailsFormGroup.get('secondarySkills')?.reset();
-    })
+    this.departmentsDetailsFormGroup.get('primarySkills')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((formValue) => {
+        const diff = difference(this.primarySkills.map(({ masterSkillId }: ListOfSkills) => masterSkillId), formValue);
+        this.secondarySkills = this.primarySkills.filter(({ masterSkillId }: ListOfSkills) => diff.includes(masterSkillId));
+        this.departmentsDetailsFormGroup.get('secondarySkills')?.reset();
+      });
   }
 
   private listenIncludeInIRPToggleChanges(): void {
@@ -569,16 +609,66 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
           takeUntil(this.componentDestroy())
         )
         .subscribe((state: boolean) => {
-          if (state && this.isIRPFlagEnabled && preferences?.isIRPEnabled) {
-            this.areSkillsAvailable = true;
-          } else {
-            this.areSkillsAvailable = false;
-            this.departmentsDetailsFormGroup.get('primarySkills')?.reset();
-            this.departmentsDetailsFormGroup.get('secondarySkills')?.reset();
-          }
+          const isIncludedInIRP = !!(state && this.isIRPFlagEnabled && preferences?.isIRPEnabled);
+          this.areSkillsAvailable = isIncludedInIRP;
+          this.configureSkillDropdowns(isIncludedInIRP);
         });
     } else {
       this.areSkillsAvailable = this.isIRPFlagEnabled && !!preferences?.isIRPEnabled;
+    }
+  }
+
+  private isSkillChanged(): boolean {
+    return !!(this.departmentsDetailsFormGroup.get('primarySkills')?.dirty ||
+      this.departmentsDetailsFormGroup.get('secondarySkills')?.dirty);
+  }
+
+  /**
+   * Detects if inactivation date was changed or reactivation date was deleted
+   * @returns boolean
+   */
+  private isDateChanged(): boolean {
+    return !!(this.departmentsDetailsFormGroup.get('inactiveDate')?.dirty ||
+      (this.departmentsDetailsFormGroup.get('reactivateDate')?.dirty &&
+      !this.departmentsDetailsFormGroup.get('reactivateDate')?.value));
+  }
+
+  private isExcludedFromIrp(): boolean {
+    const wasIncludedInIrp = this.initialIrpValue === true;
+    return !!(wasIncludedInIrp && this.departmentsDetailsFormGroup.get('includeInIRP')?.dirty &&
+      !this.departmentsDetailsFormGroup.get('includeInIRP')?.value);
+  }
+
+  private configureSkillDropdowns(isIRP: boolean): void {
+    const primarySkillsControl = this.departmentsDetailsFormGroup.get('primarySkills');
+    const secondarySkillsControl = this.departmentsDetailsFormGroup.get('secondarySkills');
+
+    if (this.isPrimarySkillRequired && isIRP) {
+      primarySkillsControl?.setValidators(Validators.required);
+    } else if (!this.isPrimarySkillRequired && isIRP) {
+      primarySkillsControl?.removeValidators(Validators.required);
+      primarySkillsControl?.disable();
+      secondarySkillsControl?.disable();
+    } else {
+      primarySkillsControl?.removeValidators(Validators.required);
+      primarySkillsControl?.updateValueAndValidity();
+    }
+  }
+
+  private getDepartmentSkillConfig(): void {
+    const organizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
+    if (organizationId) {
+      this.settingsViewService.getViewSettingKey(
+        OrganizationSettingKeys.DepartmentSkillRequired,
+        OrganizationalHierarchy.Organization,
+        organizationId,
+        organizationId
+      )
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe((data) => {
+          const areSkillsRequired = data[OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired]];
+          this.isPrimarySkillRequired = areSkillsRequired === 'true';
+        });
     }
   }
 }

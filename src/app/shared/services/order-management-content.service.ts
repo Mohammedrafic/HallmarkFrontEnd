@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { map, Observable, switchMap } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+
+import { map, Observable, switchMap } from 'rxjs';
 
 import {
   AcceptJobDTO,
@@ -34,7 +35,12 @@ import { BillRate } from '@shared/models/bill-rate.model';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { HistoricalEvent } from '@shared/models';
 import { ExportPayload } from '@shared/models/export.model';
-import { AgencyOrderManagementTabs, OrderManagementIRPSystemId, OrderManagementIRPTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import {
+  AgencyOrderManagementTabs,
+  OrderManagementIRPSystemId,
+  OrderManagementIRPTabs,
+  OrganizationOrderManagementTabs,
+} from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper } from '@core/helpers';
 import { orderFieldsConfig } from '@client/order-management/components/add-edit-order/order-fields';
@@ -44,6 +50,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { PageOfCollections } from '@shared/models/page.model';
 import { AdaptIrpCandidates } from '@shared/components/order-candidate-list/order-candidate-list.utils';
 import { GetQueryParams } from '@core/helpers/functions.helper';
+import { ScheduleShift } from '@shared/models/schedule-shift.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -97,8 +104,8 @@ export class OrderManagementContentService {
   /**
    * Lock/Unlock the order
    */
-  public setLock(orderId: number, lockStatus: boolean): Observable<boolean> {
-    return this.http.post<boolean>(`/api/Orders/setLock`, { orderId, lockStatus });
+  public setLock(orderId: number, lockStatus: boolean,lockStatusIRP:boolean): Observable<boolean> {
+    return this.http.post<boolean>(`/api/Orders/setLock`, { orderId, lockStatus ,lockStatusIRP});
   }
 
   /**
@@ -430,10 +437,10 @@ export class OrderManagementContentService {
   /**
    * Get order filter data sources
    */
-  public getOrderFilterDataSources(isIRP: boolean = false): Observable<OrderFilterDataSource> {
+  public getOrderFilterDataSources(isIRP = false): Observable<OrderFilterDataSource> {
     let url = '/api/OrdersFilteringOptions/organization';
     if (isIRP) {
-      url += '/irp'
+      url += '/irp';
     }
     return this.http.get<OrderFilterDataSource>(url).pipe(
       map((data) => {
@@ -446,7 +453,12 @@ export class OrderManagementContentService {
           specialProjectCategories: 'projectType',
           reorderStatuses: 'statusText',
         };
-          return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]));
+
+        return Object.fromEntries(
+          Object.entries(data)
+            .map(([key, value]) => 
+              [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]
+            ));
       }),
     );
   }
@@ -562,5 +574,9 @@ export class OrderManagementContentService {
 
   public GetCandidateCancellationReasons(filter: CandidateCancellationReasonFilter): Observable<CandidateCancellationReason[]> {
     return this.http.post<CandidateCancellationReason[]>(`/api/CandidateCancellationSettings/getCandidateCancellationReason`, filter);
+  }
+
+  public getAllShifts(): Observable<ScheduleShift[]> {
+    return this.http.get<ScheduleShift[]>(`/api/MasterShifts/all`);
   }
 }

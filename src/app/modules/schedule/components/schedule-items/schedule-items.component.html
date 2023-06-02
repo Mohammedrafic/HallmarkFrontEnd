@@ -1,10 +1,9 @@
 <div class="schedule-items-container">
-  <div *ngIf="!scheduleItems.length" class="empty-list-text">At least one Candidate and date is required to Schedule a shift</div>
   <div class="schedule-items-header" *ngIf="!selectedType">
     <div
       *ngIf="scheduleItems.length"
       class="header-itm">
-      Candidates Selected <span class="header-itm__count">{{scheduleItems.length}}</span>
+      Employees Selected <span class="header-itm__count">{{scheduleItems.length}}</span>
     </div>
     <div class="group-error" *ngIf="itemsErrorCounter && scheduleItems.length">
       <div class="header-itm">

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { DonoreturnFilters, DonoreturnAddedit, DoNotReturnsPage, GetLocationByOrganization, DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
+import { ImportResult } from '@shared/models/import.model';
 
 @Injectable({ providedIn: 'root' })
 export class DonotreturnService {
@@ -69,4 +70,19 @@ export class DonotreturnService {
   public getDoNotCandidateListSearch(filter: any): Observable<DoNotReturnSearchCandidate[]> {
     return this.http.post<DoNotReturnSearchCandidate[]>(`/api/DoNotReturn/candidateListsearch`, filter);
   }
+
+  public getDNRImportTemplate(errorRecords: any): Observable<any> {
+    return this.http.post('/api/donotreturn/template', errorRecords, { responseType: 'blob' });
+  }
+
+  public uploadDNRFile(file: Blob): Observable<ImportResult<any>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ImportResult<any>>('/api/donotreturn/import', formData);
+  }
+
+  public saveDNRImportResult(successfulRecords: any[]): Observable<ImportResult<any>> {
+    return this.http.post<ImportResult<any>>('/api/donotreturn/saveimport', successfulRecords);
+  }
+
 }

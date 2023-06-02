@@ -15,6 +15,7 @@ export interface DialogConfigField {
   required: boolean;
   options?: DropdownOption[];
   valueType?: string;
+  visible: boolean;
   widthStyle?: FieldWidthStyle;
   optionsStateKey?: keyof TimesheetsModel;
 }
@@ -111,4 +112,9 @@ export interface CostCentersDto {
   [key: string]: CostCenter | CostCenter[];
 }
 
-export type AddRecordBillRate = DropdownOption & { efectiveDate: string };
+export type AddRecordBillRate = DropdownOption & {
+  efectiveDate: string;
+  timeNotRequired: boolean;
+  disableMealBreak: boolean;
+  disableTime: boolean;
+};

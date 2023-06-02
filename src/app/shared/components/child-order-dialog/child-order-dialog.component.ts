@@ -18,7 +18,9 @@ import { OrganizationManagementState } from "@organization-management/store/orga
 import { ExpiredCredentialsMessage } from "@shared/components/child-order-dialog/child-order-dialog.constants";
 import { ChildOrderDialogService } from "@shared/components/child-order-dialog/child-order-dialog.service";
 import { MissingCredentialsRequestBody, MissingCredentialsResponse } from "@shared/models/credential.model";
-import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
+import {
+  OPTION_FIELDS,
+} from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { AbstractPermission } from "@shared/helpers/permissions";
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 
@@ -29,7 +31,14 @@ import {
   SelectingEventArgs,
   TabComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { ClearAgencyCandidateJob, ClearAgencyOrderCandidatesList, GetAgencyExtensions, GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import {
+  ClearAgencyCandidateJob,
+  ClearAgencyOrderCandidatesList,
+  GetAgencyExtensions,
+  GetCandidateJob,
+  GetDeployedCandidateOrderInfo,
+  GetOrderApplicantsData,
+} from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { ReOpenOrderService } from '@client/order-management/components/reopen-order/reopen-order.service';
 import {
@@ -55,7 +64,14 @@ import { ExtensionSidebarComponent } from '@shared/components/extension/extensio
 import {
   AcceptFormComponent,
 } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, OrganizationalHierarchy, OrganizationSettingKeys, SET_READONLY_STATUS } from '@shared/constants';
+import {
+  CANCEL_CONFIRM_TEXT,
+  DELETE_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  OrganizationalHierarchy,
+  OrganizationSettingKeys,
+  SET_READONLY_STATUS,
+} from '@shared/constants';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { UnsavedFormDirective } from '@shared/directives/unsaved-form.directive';
 import {
@@ -80,7 +96,7 @@ import {
   CandidateCancellationReason,
   CandidateCancellationReasonFilter,
 } from '@shared/models/order-management.model';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { addDays, toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
@@ -98,6 +114,7 @@ import { PermissionService } from '../../../security/services/permission.service
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { SettingsViewService } from '@shared/services';
+import { UserPermissions } from '@core/enums';
 
 enum Template {
   accept,
@@ -206,6 +223,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private isAlive = true;
   private isLastExtension = false;
   private ignoreMissingCredentials = false;
+  private readonly permissions = UserPermissions;
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
@@ -213,6 +231,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   get isCancelled(): boolean {
     return this.candidateJob?.applicantStatus.applicantStatus === CandidatStatus.Cancelled;
+  }
+
+  get canEditClosedBillRates(): boolean {
+    return this.userPermission[this.permissions.CanUpdateBillRates];
   }
 
   get isOnboard(): boolean {
@@ -671,13 +693,15 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private getComments(): void {
-    this.candidateJob?.commentContainerId && this.commentsService
+    if (this.isReorderType && this.candidateJob?.commentContainerId) {
+      this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
         this.changeDetectorRef.markForCheck();
       });
+    }
   }
 
   private subscribeOnCandidateJob(): void {
@@ -910,12 +934,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     return rates.some((rate) => !!rate.isUpdated);
   }
 
-  
+
   private subscribeCandidateCancellationReasons() {
     if (this.candidateJob) {
-      let payload: CandidateCancellationReasonFilter = {
+      const payload: CandidateCancellationReasonFilter = {
         locationId: this.candidateJob?.order.locationId,
-        regionId: this.candidateJob?.order.regionId
+        regionId: this.candidateJob?.order.regionId,
       };
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$

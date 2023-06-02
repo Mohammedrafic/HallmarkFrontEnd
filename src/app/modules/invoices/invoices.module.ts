@@ -27,7 +27,7 @@ import { map, of, switchMap } from 'rxjs';
 
 import { SharedModule } from '@shared/shared.module';
 import { DateWeekPickerModule } from '@shared/components/date-week-picker/date-week-picker.module';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { GridModule } from '@shared/components/grid/grid.module';
 import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
 import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';

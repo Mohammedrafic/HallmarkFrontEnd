@@ -1,4 +1,5 @@
 @import "colors";
+@import 'adaptive-response';
 
 .order-container {
   display: flex;
@@ -16,7 +17,8 @@
       width: 30%;
     }
 
-    .input-container, .dropdown-container {
+    .input-container,
+    .dropdown-container {
       margin-bottom: 15px;
       margin-right: 10px;
     }
@@ -47,6 +49,7 @@ ejs-textbox.e-control {
 
 .order-form-container {
   display: flex;
+
   .left-section {
     width: 70%;
     padding-right: 20px;
@@ -78,6 +81,7 @@ ejs-textbox.e-control {
       border-radius: 8px;
       cursor: pointer;
       color: $primary-active-blue-10;
+
       &:hover,
       &:focus {
         background-color: $primary-active-blue-70;
@@ -92,7 +96,7 @@ ejs-textbox.e-control {
 
   .form-list {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-around;
     gap: 16px;
     margin: 10px 0;
@@ -121,7 +125,7 @@ ejs-textbox.e-control {
       margin-bottom: 10px;
     }
 
-    ejs-radiobutton{
+    ejs-radiobutton {
       margin-right: 10px;
     }
   }
@@ -133,6 +137,7 @@ ejs-textbox.e-control {
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(4, 1fr);
   gap: 16px;
+  align-items: end;
   grid-template-areas:
     "item1 item1 item2 item2"
     "item3 item3 item4 item4"
@@ -140,10 +145,21 @@ ejs-textbox.e-control {
     "item9 item10 item11 .";
 }
 
-.item1 { grid-area: item1; }
-.item2 { grid-area: item2; }
-.item3 { grid-area: item3; }
-.item4 { grid-area: item4; }
+.item1 {
+  grid-area: item1;
+}
+
+.item2 {
+  grid-area: item2;
+}
+
+.item3 {
+  grid-area: item3;
+}
+
+.item4 {
+  grid-area: item4;
+}
 
 .general-information-po-wrapper {
   display: grid;
@@ -158,8 +174,13 @@ ejs-textbox.e-control {
     "item7 item8 item9 .";
 }
 
-.item5 { grid-area: item5 }
-.item6 { grid-area: item6 }
+.item5 {
+  grid-area: item5
+}
+
+.item6 {
+  grid-area: item6
+}
 
 .special-project-wrapper {
   width: 70%;
@@ -187,20 +208,43 @@ ejs-textbox.e-control {
     "itm1 itm1 itm2 itm2 itm3 itm3 itm3 itm3"
     "itm4 itm4 itm4 itm4 itm5 itm5 itm5 itm5";
 
-  .itm1 { grid-area: itm1; }
-  .itm2 { grid-area: itm2; }
+  .itm1 {
+    grid-area: itm1;
+  }
+
+  .itm2 {
+    grid-area: itm2;
+  }
+
   .itm3 {
     grid-area: itm3;
     margin-top: 15px;
     display: flex;
   }
-  .itm4 { grid-area: itm4; }
-  .itm5 { grid-area: itm5; }
 
-  .order-box { margin-left: 17%; }
-  .order-box1 { margin-left: 39%; }
-  .order-box2 { margin-left: 64%; }
-  .order-box3 { margin-left: 85%; }
+  .itm4 {
+    grid-area: itm4;
+  }
+
+  .itm5 {
+    grid-area: itm5;
+  }
+
+  .order-box {
+    margin-left: 17%;
+  }
+
+  .order-box1 {
+    margin-left: 39%;
+  }
+
+  .order-box2 {
+    margin-left: 64%;
+  }
+
+  .order-box3 {
+    margin-left: 85%;
+  }
 }
 
 .job-description-po-wrapper {
@@ -212,19 +256,227 @@ ejs-textbox.e-control {
     "itm1 itm1 itm2 itm2 itm3 itm4 itm5 itm6 itm7 itm8"
     "itm9 itm9 itm9 itm9 itm9 itm10 itm10 itm10 itm10 itm10";
 
-  .itm1 { grid-area: itm1; }
-  .itm2 { grid-area: itm2; }
-  .itm3 { grid-area: itm3; }
-  .itm4 { grid-area: itm4; }
-  .itm5 { grid-area: itm5; }
-  .itm6 { grid-area: itm6; }
-  .itm7 { grid-area: itm7; }
-  .itm8 { grid-area: itm8; }
-  .itm9 { grid-area: itm9; }
-  .itm10 { grid-area: itm10; }
+  .itm1 {
+    grid-area: itm1;
+  }
 
-  .itm3,.itm4,.itm5,
-  .itm6,.itm7,.itm8 {
+  .itm2 {
+    grid-area: itm2;
+  }
+
+  .itm3 {
+    grid-area: itm3;
+  }
+
+  .itm4 {
+    grid-area: itm4;
+  }
+
+  .itm5 {
+    grid-area: itm5;
+  }
+
+  .itm6 {
+    grid-area: itm6;
+  }
+
+  .itm7 {
+    grid-area: itm7;
+  }
+
+  .itm8 {
+    grid-area: itm8;
+  }
+
+  .itm9 {
+    grid-area: itm9;
+  }
+
+  .itm10 {
+    grid-area: itm10;
+  }
+
+  .itm3,
+  .itm4,
+  .itm5,
+  .itm6,
+  .itm7,
+  .itm8 {
     margin-top: 30px;
+  }
+}
+
+@media #{$max-desktop-small} {
+  .order-form-container {
+    flex-direction: column;
+
+    .left-section {
+      width: 100%;
+      padding: 0 0 20px 0;
+    }
+
+    .right-section {
+      width: 100%;
+    }
+  }
+}
+
+@media #{$max-tablet} {
+  .order-container {
+    .left-section {
+      width: 100%;
+      padding-right: 16px;
+
+      form {
+        padding: 0;
+      }
+
+      .order-type-container,
+      .order-status-container {
+        width: 50%;
+      }
+    }
+
+    .right-section {
+      display: none;
+    }
+  }
+
+  .order-form-container {
+    padding-right: 16px;
+  }
+
+  .job-description-wrapper {
+    gap: 12;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas:
+      "itm1 itm1 itm2 itm2"
+      "itm3 itm3 itm3 itm3"
+      "itm4 itm4 itm5 itm5";
+  }
+
+  .special-project-wrapper {
+    width: 100%;
+  }
+}
+
+@media #{$max-mobile} {
+
+  .general-information-wrapper,
+  .job-distribution-wrapper,
+  .special-project-wrapper,
+  .job-description-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    & .input-container,
+    & .checkbox-container {
+      margin: 0 !important;
+      width: 100%;
+    }
+  }
+
+  .form-array-section {
+    display: grid;
+
+    .contactDetailsList {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      align-items: start;
+      row-gap: 8px;
+      grid-template-areas:
+        "itm0 itm0 itm0 itm0 itm0 itm1"
+        "itm2 itm2 itm2 itm2 itm2 itm2"
+        "itm3 itm3 itm3 itm3 itm3 itm3"
+        "itm4 itm4 itm4 itm4 itm4 itm4"
+        "itm5 auto auto auto auto itm6";
+
+      .itm0 {
+        grid-area: itm0;
+      }
+
+      .itm1 {
+        grid-area: itm1;
+      }
+
+      .itm2 {
+        grid-area: itm2;
+      }
+
+      .itm3 {
+        grid-area: itm3;
+      }
+
+      .itm4 {
+        grid-area: itm4;
+      }
+
+      .itm5 {
+        grid-area: itm5;
+      }
+
+      .itm6 {
+        grid-area: itm6;
+      }
+
+      .radio-button {
+        display: flex;
+        width: unset !important;
+        height: unset;
+        flex-direction: row-reverse;
+        align-items: center;
+        column-gap: 16px;
+        margin: 16px 0 0 -2px;
+
+        ejs-radiobutton {
+          margin-bottom: 16px;
+        }
+      }
+    }
+
+    .workLocationList,
+    .contactDetailsList {
+      &:not(:last-child) {
+        border-bottom: 1px solid $secondary-dark-blue-45;
+        padding-bottom: 20px;
+      }
+
+      .remove-button-container {
+        margin-top: 8px;
+      }
+    }
+
+    .workLocationList {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-areas:
+        "itm0 itm0 itm0 itm0 itm0 itm0"
+        "itm1 itm1 itm1 itm1 itm1 itm1"
+        "itm2 itm2 itm2 itm2 itm2 itm2"
+        "itm3 itm3 itm3 itm3 itm3 itm3"
+        "auto auto auto auto auto itm4";
+
+      .itm0 {
+        grid-area: itm0;
+      }
+
+      .itm1 {
+        grid-area: itm1;
+      }
+
+      .itm2 {
+        grid-area: itm2;
+      }
+
+      .itm3 {
+        grid-area: itm3;
+      }
+
+      .itm4 {
+        grid-area: itm4;
+      }
+    }
   }
 }

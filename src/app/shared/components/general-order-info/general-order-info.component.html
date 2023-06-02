@@ -95,7 +95,7 @@
       [class.extension]="orderInformation.extensionFromId"
       [ngSwitch]="orderInformation.orderType"
     >
-      <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="irpSkillTemplate"></ng-container>
       <div class="column">
         <div class="icon">
           <i-feather name="folder" class="icon"></i-feather>
@@ -249,6 +249,18 @@
     </div>
     <div>
       <div class="title">{{ orderInformation?.skillName }}</div>
+      <div class="sup-title">Skill</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #irpSkillTemplate>
+  <div class="column">
+    <div class="icon">
+      <i-feather name="briefcase" class="icon"></i-feather>
+    </div>
+    <div>
+      <div class="title">{{ orderInformation?.irpOrderMetadata?.skillName }}</div>
       <div class="sup-title">Skill</div>
     </div>
   </div>

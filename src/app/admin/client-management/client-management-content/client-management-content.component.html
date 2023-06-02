@@ -8,7 +8,7 @@
     <ng-container right>
       <section class="org-controls-container">
         <div>
-          <app-tooltip-container [hidden]="isMobile || isSmallDesktop"
+          <app-tooltip-container [hidden]="isMobile"
             [message]="toolTipMessage"
             [showToolTip]="!userPermission[userPermissions.CanCreateDeleteOrganization]">
            <button
@@ -77,7 +77,7 @@
               <button ejs-button cssClass="e-flat default-icon-button">
                 <span><i-feather name="map-pin" class="icon"></i-feather></span>
               </button>
-              <button ejs-button cssClass="e-flat primary-icon-button" (click)="editOrganization(data)" *ngIf="!isMobile && !isSmallDesktop">
+              <button ejs-button cssClass="e-flat primary-icon-button" (click)="editOrganization(data)" *ngIf="!isMobile">
                 <span><i-feather name="edit" class="icon"></i-feather></span>
               </button>
             </div>

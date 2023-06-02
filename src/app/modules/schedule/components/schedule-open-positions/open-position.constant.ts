@@ -12,4 +12,4 @@ export const InitialDragEvent: PositionDragEvent = {
 };
 
 export const MissingMatchDate = 'The Order date does not match to the selected date';
-export const NotOrientEmployee = 'The Employee is not Oriented';
+export const DifferentEmployee = 'Booking cannot be scheduled for different employee than the one being edited';

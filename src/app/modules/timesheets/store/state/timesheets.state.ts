@@ -27,7 +27,7 @@ import {
 } from '../../enums';
 import {
   AddSuccessMessage, BulkApproveSuccessMessage, DefaultFiltersState, DefaultTimesheetCollection, DefaultTimesheetState,
-  filteringOptionsMapping, GetBydateErrMessage, PutSuccess, SavedFiltersParams, TimesheetConfirmMessages,
+  filteringOptionsMapping, GetBydateErrMessage, PutSuccess, RecalculateSuccess, SavedFiltersParams, TimesheetConfirmMessages,
 } from '../../constants';
 import {
   AddMileageDto,
@@ -835,6 +835,22 @@ export class TimesheetsState {
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+      }),
+    );
+  }
+
+  @Action(TimesheetDetails.RecalculateTimesheets)
+  RecalculateTimesheets(
+    { dispatch }: StateContext<TimesheetsModel>,
+    { jobId }: TimesheetDetails.RecalculateTimesheets,
+  ): Observable<boolean | void> {
+    return this.timesheetDetailsApiService.recalculateTimesheet(jobId)
+    .pipe(
+      tap(() => {
+        dispatch(new ShowToast(MessageTypes.Success, RecalculateSuccess));
       }),
       catchError((err: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));

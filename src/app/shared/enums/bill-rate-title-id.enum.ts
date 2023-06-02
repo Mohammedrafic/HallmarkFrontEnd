@@ -14,4 +14,7 @@ export enum BillRateTitleId {
   WeeklyOT = 14,
   DayOT7th = 15,
   DayPremiumOT7th = 16,
+  MissedMeal = 26,
+  FacilityCalledOff = 27,
+  ResourceCalledOff = 28,
 }

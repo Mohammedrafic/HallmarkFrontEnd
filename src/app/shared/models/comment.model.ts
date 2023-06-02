@@ -8,5 +8,6 @@ export class Comment {
   lastName: string;
   new?: boolean;
   isRead?: boolean;
+  isPrivate? : boolean;
 }
   

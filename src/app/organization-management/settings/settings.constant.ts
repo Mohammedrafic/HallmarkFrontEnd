@@ -3,11 +3,13 @@ import { SystemType } from '@shared/enums/system-type.enum';
 import { ButtonModel } from '@shared/models/buttons-group.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { SettingsFilterColsConfig } from './settings.interface';
+import { OrganizationSettingKeys } from '@shared/constants';
 
 export const AssociatedLink = '/client/associate-list';
 export const TierSettingsKey = 'TieringLogic';
 export const BillingSettingsKey = 'BillingContactEmails';
 export const InvoiceGeneratingSettingsKey = 'InvoiceAutoGeneration';
+export const DepartmentSkillRequired = OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired];
 
 export const SettingsSystemFilterCols = {
   includeInIRP: {
@@ -68,6 +70,7 @@ export const SettingsAppliedToPermissions: string[] = [
   'OTHours',
   'PayPeriod',
   'OnHoldDefault',
+  'DepartmentSkillRequired',
 ];
 
 export const DisabledSettingsByDefault = [
@@ -83,10 +86,12 @@ export const DisabledSettingsByDefault = [
   'CreateReplacementPerDiemOrder',
   'PayPeriod',
   'OnHoldDefault',
+  'LockIRPCandidateAvailability',
+  'DepartmentSkillRequired',
 ];
 
-export const GetSettingSystemButtons = (isIRP: boolean): ButtonModel[] => {
-  return [
+export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {
+  const buttons = [
     {
       id: SystemType.IRP,
       title: SystemType[SystemType.IRP],
@@ -98,6 +103,12 @@ export const GetSettingSystemButtons = (isIRP: boolean): ButtonModel[] => {
       active: !isIRP,
     },
   ];
+
+  if (showOnlyActive) {
+    return buttons.filter((item) => item.active);
+  }
+
+  return buttons;
 };
 
 export const DropdownCheckboxValueDataSource = [

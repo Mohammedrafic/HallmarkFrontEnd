@@ -1,4 +1,4 @@
-<div [class.grid-title]="gridTitle" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
+<div [class.grid-title]="gridTitle" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'" class="grid-table-container">
   <div class="app-grid__header">
     <p *ngIf="gridTitle" class="title">{{ gridTitle }}</p>
     <div class="action-button">

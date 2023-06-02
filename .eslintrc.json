@@ -16,9 +16,17 @@
   ],
   "ignorePatterns": ["src/**/*.spec.ts"],
   "rules": {
+    "@typescript-eslint/no-explicit-any": "error",
+    "no-unused-private-class-members": "error",
+    "max-lines-per-function": ["error", 75],
+    "no-console": "error",
+    "curly": "error",
+    "no-var": "error",
     "max-len": ["error", { "code": 125 }],
+    "no-extend-native": "error",
     "class-methods-use-this": "off",
     "lines-between-class-members": "off",
+    "max-params": ["warn", 10],
     "@typescript-eslint/unbound-method": [
       "error",
       {

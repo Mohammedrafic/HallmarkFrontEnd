@@ -41,6 +41,7 @@ export class OrderManagement {
   candidates: number;
   startDate: string;
   isLocked?: boolean;
+  isTemplate?: boolean;
   reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
   children: OrderManagementChild[];
@@ -60,6 +61,7 @@ export class OrderManagement {
   irpOrderMetadata?: IRPMetaData;
   irpCandidatesCount?: number;
   activeCandidatesCount?: number;
+  isLockedIRP: boolean;
 }
 
 export interface IRPOrderManagement {
@@ -97,6 +99,7 @@ export interface IRPOrderManagement {
   acceptedEmployees: null;
   isMoreMenuWithDeleteButton?: boolean;
   children: OrderManagementChild[];
+  isLockedIRP: boolean;
 }
 
 export interface GetOrdersJourney{
@@ -104,7 +107,7 @@ export interface GetOrdersJourney{
   orderId: string;
   status:  string;
   system:  string;
-  orderTypes:  string;
+  type:  string;
   jobTitle:  string;
   skill:  string;
   creationDate: Date,
@@ -228,6 +231,7 @@ export type AgencyOrderManagement = {
   organizationPrefix: string;
   extensionFromId?: number;
   candidates?: CandidateModel[];
+  irpOrderMetadata?: IRPMetaData;
 };
 
 export interface OrderManagementChild  {
@@ -285,6 +289,7 @@ export type OrderCandidatesList = {
   agencyName?: string;
   organizationId?: number;
   workflowStepType: WorkflowStepType;
+  availabilityOverlap?: OrderAvailabilityOverlap;
 };
 
 export interface WorkflowStepType {
@@ -485,6 +490,7 @@ export class Order {
   canProceedRevoke?: boolean;
   externalCommentsConfiguration?:boolean | null;
   activeCandidatesCount?: number;
+  isLockedIRP?: boolean;
 }
 
 export class ReOrder {
@@ -780,6 +786,15 @@ export interface IrpOrderCandidateDto {
   payRate: number;
   organizationOrientationDate: string | null;
   departmentOrientationDate: string | null;
+  availabilityOverlap: OrderAvailabilityOverlap | null;
+}
+
+export interface OrderAvailabilityOverlap {
+  end: string;
+  isFullOverlap: boolean;
+  overlapHours: number;
+  start: string;
+  tooltip: string;
 }
 
 export type IrpOrderCandidate = IrpOrderCandidateDto & IrpCandidateShiftTime;
@@ -788,6 +803,7 @@ export interface IrpCandidatesParams {
   PageSize: number;
   PageNumber: number;
   isAvailable: boolean;
+  searchTerm?: string;
 }
 
 export class CandidateCancellationReason{

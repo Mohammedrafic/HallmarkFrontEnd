@@ -49,7 +49,7 @@ import { SettingsGroupInvoicesOptions } from 'src/app/modules/invoices/constants
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { AppState } from 'src/app/store/app.state';
 
-import { ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
+import { ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { UserState } from '../../store/user.state';
 import {
@@ -68,6 +68,7 @@ import {
   AssociatedLink,
   BillingSettingsKey,
   DepartmentFields,
+  DepartmentSkillRequired,
   DisabledSettingsByDefault,
   DropdownCheckboxValueDataSource,
   DropdownFields,
@@ -82,6 +83,7 @@ import {
   TierSettingsKey,
 } from './settings.constant';
 import { AutoGenerationPayload, PayPeriodPayload, SwitchValuePayload } from './settings.interface';
+import { MessageTypes } from '@shared/enums/message-types';
 
 /**
  * TODO: component needs to be rework with configurable dialog and form.
@@ -152,22 +154,26 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   IsSettingKeyOtHours = false;
   allRegionsSelected = false;
   allLocationsSelected = false;
+  allDepartmentSelected = false;
   IsSettingKeyPayPeriod = false;
   separateValuesInSystems = false;
   IsSettingKeyScheduleOnlyWithAvailability: boolean = false;
   IsSettingKeyAvailabiltyOverLap: boolean = false;
+  IsSettingKeyCreatePartialOrder: boolean = false;
   systemButtons: ButtonModel[] = [];
   isEdit = false;
   isParentEdit = false;
   isFormShown = false;
   formControlType: number;
   showToggleMessage = false;
+  showDepartmentSkillToggleMessage = false;
   showBillingMessage = false;
   textFieldType: number;
   maxFieldLength = 100;
   hasPermissions: Record<string, boolean> = {};
   regularLocalRatesToggleMessage = false;
   dialogHeader = 'Add Settings';
+  numericValueLabel = 'Value';
 
 
   private readonly settingsAppliedToPermissions = SettingsAppliedToPermissions;
@@ -185,6 +191,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private filters: OrganizationSettingFilter = {};
   private configurationSystemType: SystemType = SystemType.VMS;
   private organizationSettingKey: OrganizationSettingKeys;
+  regionBasedDepartment: any;
 
   get switcherValue(): string {
     return this.organizationSettingsFormGroup.controls['value'].value ? 'on' : 'off';
@@ -225,7 +232,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.configurationSystemType = system;
 
     if (updateButtons) {
-      this.systemButtons = GetSettingSystemButtons(this.configurationSystemType === SystemType.IRP);
+      this.systemButtons =
+        GetSettingSystemButtons(this.configurationSystemType === SystemType.IRP, !!this.selectedChildRecord);
     }
 
     if (updateForm && this.selectedParentRecord) {
@@ -269,16 +277,17 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   openOverrideSettingDialog(data: OrganizationSettingsGet): void {
     this.setSelectedRecords(data);
+    this.setOrganizationSettingKey(data.settingKey);
     this.setConfigurationSystemType(this.getParentConfigurationSystemType(), true);
     this.separateValuesInSystems = data.separateValuesInSystems;
     this.enableOtForm();
     this.IsSettingKeyOtHours = OrganizationSettingKeys[OrganizationSettingKeys['OTHours']].toString() == data.settingKey;
     this.IsSettingKeyPayPeriod = OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == data.settingKey;
     this.IsSettingKeyAvailabiltyOverLap = OrganizationSettingKeys[OrganizationSettingKeys['AvailabilityOverLapRule']].toString() == data.settingKey;
+    this.IsSettingKeyCreatePartialOrder = OrganizationSettingKeys[OrganizationSettingKeys['CreatePartialOrder']].toString() == data.settingKey;
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == data.settingKey;
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
-    this.setOrganizationSettingKey(data.settingKey);
     this.formControlType = data.controlType;
     this.disableDepForInvoiceGeneration();
     this.regionFormGroup.reset();
@@ -292,7 +301,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.setFormValidation(data);
     this.setFormValuesForOverride(data);
     this.store.dispatch(new ShowSideDialog(true));
-    if (this.IsSettingKeyAvailabiltyOverLap) {
+    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
       this.switchedValueForm.controls["value"].setValue(4)
       this.switchedValueForm.controls['isEnabled'].setValue(true)
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
@@ -310,6 +319,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     event: MouseEvent
   ): void {
     this.setSelectedRecords(parentRecord, childRecord);
+    this.setOrganizationSettingKey(parentRecord.settingKey);
     this.separateValuesInSystems = parentRecord.separateValuesInSystems;
     this.IsSettingKeyOtHours =
       OrganizationSettingKeys[OrganizationSettingKeys['OTHours']].toString() == parentRecord.settingKey;
@@ -317,16 +327,16 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == parentRecord.settingKey;
     this.IsSettingKeyAvailabiltyOverLap = OrganizationSettingKeys[OrganizationSettingKeys['AvailabilityOverLapRule']].toString() == parentRecord.settingKey;
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == parentRecord.settingKey;
-
+    this.setNumericValueLabel(parentRecord.settingKey);
+    this.IsSettingKeyCreatePartialOrder = OrganizationSettingKeys[OrganizationSettingKeys['CreatePartialOrder']].toString() == parentRecord.settingKey;
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
     this.isFormShown = true;
     this.addActiveCssClass(event);
     this.setEditMode();
-    this.setOrganizationSettingKey(parentRecord.settingKey);
     this.regularLocalRatesToggleMessage = OrganizationSettings.MandateCandidateAddress === parentRecord.settingKey &&
-      this.dataSource.find((data: OrganizationSettingsGet) => data.settingKey === OrganizationSettings.EnableRegularLocalRates)?.value == 'true';
+    this.dataSource.find((data: OrganizationSettingsGet) => data.settingKey === OrganizationSettings.EnableRegularLocalRates)?.value == 'true';
     this.formControlType = parentRecord.controlType;
     this.disableDepForInvoiceGeneration();
     this.setFormValidation(parentRecord);
@@ -335,16 +345,17 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.setChildRecordData(childRecord);
     this.setFormValuesForEdit(parentRecord, childRecord || null);
     this.store.dispatch(new ShowSideDialog(true));
-    if (this.IsSettingKeyAvailabiltyOverLap) {
+    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
-    } else{
-     this.switchedValueForm.get('value')?.clearValidators();
+    } else {
+      this.switchedValueForm.get('value')?.clearValidators();
     }
-    if (this.isParentEdit && (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability)) {
+    if (this.isParentEdit && (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyOtHours || this.IsSettingKeyCreatePartialOrder)) {
       this.RegionLocationSettingsMultiFormGroup.disable();
       this.allRegionsSelected = true;
       this.allLocationsSelected = true;
+      this.allDepartmentSelected = true
     }
   }
 
@@ -379,6 +390,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.isEdit) {
       this.editSetting();
       return;
+    }
+
+    if (this.allDepartmentSelected == true) {
+      this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue(null)
     }
 
     if (
@@ -419,6 +434,32 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       }
     }
 
+    if(this.IsSettingKeyCreatePartialOrder){
+      if (this.IsSettingKeyCreatePartialOrder && this.allLocationsSelected && this.allRegionsSelected && this.allDepartmentSelected) {
+        this.organizationHierarchy = OrganizationHierarchy.Organization;
+        this.organizationHierarchyId = this.organizationId;
+        if (this.switchedValueForm.valid) {
+          this.sendForm();
+        } else {
+          this.switchedValueForm.markAllAsTouched();
+        }
+      }
+      else if (this.RegionLocationSettingsMultiFormGroup.valid ||this.RegionLocationSettingsMultiFormGroup.get("departmentId")?.value) {
+        this.organizationHierarchy = OrganizationHierarchy.Organization;
+        this.organizationHierarchyId = this.organizationId;
+        if (this.switchedValueForm.valid) {
+          this.sendForm();
+        } else {
+          this.switchedValueForm.markAllAsTouched();
+        }
+      }else{
+        this.RegionLocationSettingsMultiFormGroup.markAllAsTouched();
+        this.store.dispatch(new ShowToast(MessageTypes.Error, "Please select a Department"));
+        return;
+       
+      }     
+    }
+   
     if (this.RegionLocationSettingsMultiFormGroup.valid) {
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = this.organizationId;
@@ -434,7 +475,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.sendForm();
       } else {
         this.switchedValueForm.markAllAsTouched();
-      }
+      }   
     }
 
     this.RegionLocationSettingsMultiFormGroup.markAllAsTouched();
@@ -521,11 +562,21 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         takeUntil(this.unsubscribe$),
       )
       .subscribe((data: OrganizationSettingsGet[]) => {
-        const adaptedData = SettingsDataAdapter.adaptSettings(data, this.orgSystems.IRPAndVMS);
+        const adaptedData = SettingsDataAdapter.adaptSettings(data, this.orgSystems);
 
         this.configurations = data;
         this.lastAvailablePage = this.getLastPage(data);
-        this.gridDataSource = this.getRowsPerPage(adaptedData, this.currentPagerPage);
+        let settingData = this.getRowsPerPage(adaptedData, this.currentPagerPage);
+        settingData.forEach(element => {
+          if (element?.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
+            element.children?.forEach(e => {
+              if (e.regionId == null && e.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
+                e.hidden = true;
+              }
+            })
+          }
+        });
+        this.gridDataSource = settingData;
         this.totalDataRecords = adaptedData.length;
         this.dataSource = adaptedData;
         this.grid?.refresh();
@@ -594,6 +645,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       value: dynamicValue,
       regionId: this.RegionLocationSettingsMultiFormGroup.controls['regionId'].value || null,
       locationId: this.RegionLocationSettingsMultiFormGroup.controls['locationId'].value || null,
+      departmentId: this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].value || null,
       isIRPConfigurationValue: this.configurationSystemType === SystemType.IRP,
     };
 
@@ -606,7 +658,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private setFormValidation(data: OrganizationSettingsGet): void {
-    this.maxFieldLength =100;
+    this.maxFieldLength = 100;
     const validators: ValidatorFn[] = [];
 
     data.validations.forEach((validation: OrganizationSettingValidation) => {
@@ -738,7 +790,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isPayPeriod: true };
     }
 
-    if (dynamicValue.isCheckboxValue) {
+    if (dynamicValue?.isCheckboxValue) {
       this.checkboxValueForm.setValue({
         value: dynamicValue.value ? dynamicValue.value : '',
         isEnabled: dynamicValue.isEnabled ? dynamicValue.isEnabled : false,
@@ -747,8 +799,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     if (dynamicValue?.isPayPeriod) {
       this.payPeriodFormGroup.setValue({
-        date: dynamicValue.date,
-        noOfWeek: dynamicValue.noOfWeek,
+        date: dynamicValue.date || dynamicValue.Date,
+        noOfWeek: dynamicValue.noOfWeek || dynamicValue.NoOfWeek,
       });
     }
 
@@ -825,8 +877,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.regionRequiredFormGroup = this.formBuilder.group({ regionId: [null, Validators.required] });
     this.RegionLocationSettingsMultiFormGroup = this.formBuilder.group({
       regionId: [null, Validators.required],
-      locationId: [null, Validators.required]
+      locationId: [null, Validators.required],
+      departmentId: []
     });
+
     this.locationFormGroup = this.formBuilder.group({ locationId: [null] });
     this.departmentFormGroup = this.formBuilder.group({ departmentId: [{ value: null, disabled: true }] });
     this.pushStartDateFormGroup = this.formBuilder.group({
@@ -873,6 +927,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private setPermissionsToManageSettings(): void {
     this.settingsAppliedToPermissions.forEach((key) => {
       this.hasPermissions[key] = this.userPermission[PermissionTypes.ManageOrganizationConfigurations];
+
+      if (key === OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired]) {
+        this.hasPermissions[key] = this.userPermission[PermissionTypes.ManageDepartmentSkillRequired];
+      }
     });
   }
 
@@ -963,6 +1021,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private handleShowToggleMessage(key: string): void {
     this.showToggleMessage = key === TierSettingsKey;
+    this.showDepartmentSkillToggleMessage = key === DepartmentSkillRequired;
     this.showBillingMessage = key === BillingSettingsKey || key === InvoiceGeneratingSettingsKey;
   }
 
@@ -1059,6 +1118,32 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           this.RegionLocationSettingsMultiFormGroup.get('locationId')?.setValue([]);
         }
       });
+    this.RegionLocationSettingsMultiFormGroup.get('locationId')?.valueChanges
+      .pipe(
+        takeUntil(this.unsubscribe$),
+      )
+      .subscribe((val: number[]) => {
+        if (val?.length) {
+          const selectedLocations: OrganizationLocation[] = [];
+          const departments: OrganizationDepartment[] = [];
+          val.forEach((id) =>
+            selectedLocations.push(
+              this.regionBasedLocations
+                .find((location: OrganizationLocation) => location.id === id) as OrganizationLocation,
+            )
+          );
+          this.regionBasedDepartment = [];
+          selectedLocations.forEach((location) => {
+            departments.push(...(location.departments as []));
+          });
+          this.regionBasedDepartment = sortByField(departments, 'name');
+        } else {
+          this.regionBasedDepartment = [];
+          this.RegionLocationSettingsMultiFormGroup.get('departmentId')?.setValue([]);
+
+        }
+      });
+
   }
 
   public allRegionsChange(event: { checked: boolean }): void {
@@ -1088,6 +1173,16 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
+  public allDepartmentChange(event: { checked: boolean }): void {
+    this.allDepartmentSelected = event.checked;
+    if (this.allDepartmentSelected) {
+      this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue(null)
+      this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].disable();
+    } else {
+      this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].enable({ emitEvent: false });
+    }
+  }
+
   public otHoursRegionChangesEdit(regionId: number): void {
     if (regionId == null) {
       this.allRegionsSelected = true;
@@ -1095,6 +1190,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     } else {
       this.RegionLocationSettingsMultiFormGroup.controls['regionId'].enable();
       this.RegionLocationSettingsMultiFormGroup.controls['regionId'].setValue([regionId]);
+      this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue([regionId]);
     }
 
   }
@@ -1110,14 +1206,18 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.organizationHierarchyId = locationId;
       this.RegionLocationSettingsMultiFormGroup.controls['locationId'].enable();
       this.RegionLocationSettingsMultiFormGroup.controls['locationId'].setValue([locationId]);
+
     }
 
   }
   public enableOtForm() {
     this.allLocationsSelected = false;
     this.allRegionsSelected = false;
+    this.allDepartmentSelected = false
     this.RegionLocationSettingsMultiFormGroup.controls['locationId'].enable();
     this.RegionLocationSettingsMultiFormGroup.controls['regionId'].enable();
+    this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].enable();
+
   }
   onlyNumerics(event: any) {
     if (event.key === '.') {
@@ -1147,10 +1247,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private getParentConfigurationSystemType(): SystemType {
-    if (this.selectedParentRecord) {
-      const type = !this.selectedParentRecord.includeInIRP && this.selectedParentRecord.includeInVMS
-        ? SystemType.VMS
-        : SystemType.IRP;
+    if (this.selectedParentRecord && this.orgSystems.IRPAndVMS) {
+      const sharedConfiguration = this.selectedParentRecord.includeInIRP && this.selectedParentRecord.includeInVMS;
+      const sharedConfigurationWithTheSameValue = sharedConfiguration && !this.selectedParentRecord.separateValuesInSystems;
+      const type = (!this.selectedParentRecord.includeInIRP && this.selectedParentRecord.includeInVMS)
+        || sharedConfigurationWithTheSameValue ? SystemType.VMS : SystemType.IRP;
 
       return type;
     }
@@ -1192,13 +1293,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
 
     if (childRecord.regionId) {
-      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability) {
+      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyCreatePartialOrder) {
         this.otHoursRegionChangesEdit(childRecord.regionId);
       } else {
         this.regionChanged(childRecord.regionId);
       }
     } else {
-      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability) {
+      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyCreatePartialOrder) {
         this.otHoursRegionChangesEdit(childRecord.regionId as number);
       }
 
@@ -1207,24 +1308,51 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
 
     if (childRecord.locationId) {
-      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability) {
+      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyCreatePartialOrder) {
         this.otHoursLocationsEdit(childRecord.locationId);
       } else {
         this.locationChanged(childRecord.locationId);
       }
     } else {
-      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability) {
+      if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyCreatePartialOrder) {
         this.otHoursLocationsEdit(childRecord.locationId as number);
       }
 
       this.store.dispatch(new ClearDepartmentList());
     }
+    if (this.IsSettingKeyCreatePartialOrder) {
+      if (childRecord.departmentId == null) {
+        this.allDepartmentSelected = true;
+        this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].disable();
+
+      }
+      else {
+        this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue([childRecord.departmentId]);
+
+      }
+    }
+
 
     if (childRecord.departmentId) {
+
       this.departmentChanged(childRecord.departmentId);
+
+
     }
   }
 
+  setDepartmentvalue(departmentId: number) {
+    if (departmentId == null) {
+      this.allDepartmentSelected = true;
+      this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue(null);
+
+
+    }
+    else {
+      this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue([departmentId]);
+
+    }
+  }
   private closeSettingDialog(): void {
     this.store.dispatch(new ShowSideDialog(false));
     this.setSelectedRecords();
@@ -1256,7 +1384,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.RegionLocationSettingsMultiFormGroup.markAllAsTouched();
         return
       }
-    } else if (this.IsSettingKeyAvailabiltyOverLap) {
+    } else if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
       if (this.allLocationsSelected && this.allRegionsSelected) {
         this.organizationHierarchy = OrganizationHierarchy.Organization;
         this.organizationHierarchyId = this.organizationId;
@@ -1325,7 +1453,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         });
       }
 
-      if (dynamicValue.isSwitchedValue) {
+      if (dynamicValue?.isSwitchedValue) {
         this.switchedValueForm.setValue({
           value: dynamicValue.value,
           isEnabled: dynamicValue.isEnabled,
@@ -1336,7 +1464,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   disableSettingsValue(event?: any, obj?: any) {
-    if (this.IsSettingKeyAvailabiltyOverLap) {
+    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
       if (event?.checked || obj) {
         this.switchedValueForm.get("value")?.enable();
       } else {
@@ -1361,5 +1489,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   ): void {
     this.selectedParentRecord = parentRecord;
     this.selectedChildRecord = childRecord;
+  }
+
+  private setNumericValueLabel(settingKey: string): void {
+    const isOnHold = OrganizationSettingKeys[OrganizationSettingKeys['OnHoldDefault']].toString() === settingKey;
+    this.numericValueLabel = isOnHold ? 'Value (Weeks)' : 'Value';
   }
 }

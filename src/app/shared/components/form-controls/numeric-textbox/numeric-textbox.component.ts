@@ -16,7 +16,7 @@ import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 })
 export class NumericTextboxComponent extends BaseFormControlDirective {
   @Input() public min: number;
-  @Input() public max: number;
+  @Input() public max?: number;
   @Input() public format: string;
   @Input() public strictMode: boolean;
   @Input() public fieldValue: number | null;

@@ -86,10 +86,10 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
     {
       headerName: 'View',
       cellRenderer: ButtonRendererComponent,
-      minWidth: 50,
+      width: 100,
       cellRendererParams: {
         onClick: this.onEdit.bind(this),
-        label: 'View Errors',
+        label: 'View',
         suppressMovable: true,
         filter: false,
         sortable: false,
@@ -170,12 +170,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
       headerName: 'Status',
       field: 'status',
       minWidth: 250,
-      filter: 'agTextColumnFilter',
-      filterParams: {
-        buttons: ['reset'],
-        debounceMs: 1000,
-        suppressAndOrCondition: true,
-      },
+      filter: true,
       sortable: true,
       resizable: true
     },
@@ -227,7 +222,9 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
           });
 
           this.logInterfacePage$.pipe().subscribe((data: any) => {
-              this.itemList = data?.items;
+              this.itemList = data?.items?.sort(function(a:any,b:any){
+                return b.processDate.localeCompare(a.processDate);
+              });
               this.totalRecordsCount$.next(data?.totalCount);
               if (!data || !data?.items.length) {
                 this.gridApi?.showNoRowsOverlay();

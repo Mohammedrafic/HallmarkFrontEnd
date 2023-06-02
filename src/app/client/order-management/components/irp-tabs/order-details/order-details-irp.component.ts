@@ -101,6 +101,7 @@ import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from 
 import { UserState } from '../../../../../store/user.state';
 import { Organization, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import {
+  GetAllShifts,
   GetContactDetails,
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
@@ -112,6 +113,8 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
+import { ScheduleShift } from '@shared/models/schedule-shift.model';
+import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -123,7 +126,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   @Input() set system(value: SelectSystem) {
     this.selectedSystem = value;
 
-    if(!this.selectedOrder) {
+    if (!this.selectedOrder) {
       this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem);
       this.setConfigDataSources();
     }
@@ -160,13 +163,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public regionsStructure: OrganizationRegion[] = [];
   public comments: Comment[] = [];
   public commentContainerId = 0;
-  @Input() public externalCommentConfiguration ?: boolean | null;
+  @Input() public externalCommentConfiguration?: boolean | null;
 
   private dataSourceContainer: OrderDataSourceContainer = {};
   private selectedSystem: SelectSystem;
   private isTieringLogicLoad = true;
   public AutopopulateId: number | undefined;
   private reason: OrderRequisitionReason[] = [];
+  public allShifts: any[];
   private selectedStructureState: SelectedStructureState;
 
   @Select(RejectReasonState.sortedOrderRequisition)
@@ -187,6 +191,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private suggestedDetails$: Observable<SuggestedDetails | null>;
   @Select(OrganizationManagementState.organization)
   private readonly organization$: Observable<Organization>;
+  @Select(OrderManagementContentState.getAllShifts)
+  private getAllShifts$: Observable<ScheduleShift[]>;
 
   constructor(
     private orderDetailsService: OrderDetailsIrpService,
@@ -210,6 +216,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForSaveAction();
     this.watchForSelectOrder();
     this.watchForOrganizationStructure();
+    this.watchForSpecialProjectCategory();
     this.observeOrderType();
     this.setReasonAutopopulate();
   }
@@ -222,7 +229,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public addFields(config: OrderFormsArrayConfig): void {
     const selectedConfig = this.getSelectedArrayFormsConfig(config);
 
-    if(config.buttonType === ButtonType.addContact) {
+    if (config.buttonType === ButtonType.addContact) {
       selectedConfig?.forms.push(ContactDetailsForm());
       this.contactDetailsFormsList.push(
         this.orderDetailsService.createContactDetailsForm(this.contactDetailsFormsList.length)
@@ -272,7 +279,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
   public selectPrimaryContact(formIndex: number): void {
     this.contactDetailsFormsList.forEach((contact: FormGroup, index: number) => {
-      if(formIndex !== index) {
+      if (formIndex !== index) {
         contact.get('isPrimaryContact')?.patchValue(false);
       }
     });
@@ -286,7 +293,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.specialProjectForm = this.orderDetailsService.createSpecialProject();
     this.workLocationForm = this.orderDetailsService.createWorkLocationForm();
 
-   if(!this.selectedOrder) {
+    if (!this.selectedOrder) {
       this.contactDetailsFormsList.push(this.contactDetailsForm);
       this.workLocationFormsList.push(this.workLocationForm);
     }
@@ -304,14 +311,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private initGeneralForms(isLongTermAssignment: boolean): void {
-    if(isLongTermAssignment) {
+    if (isLongTermAssignment) {
       this.jobDistributionForm = this.orderDetailsService.createJobDistributionForm();
       this.generalInformationForm = this.orderDetailsService.createGeneralInformationForm();
-      this.jobDescriptionForm =  this.orderDetailsService.createJobDescriptionForm();
+      this.jobDescriptionForm = this.orderDetailsService.createJobDescriptionForm();
     } else {
       this.generalInformationForm = this.orderDetailsService.createGeneralInformationPOForm();
       this.jobDistributionForm = this.orderDetailsService.createJobDistributionPOForm();
-      this.jobDescriptionForm =  this.orderDetailsService.createJobDescriptionPOForm();
+      this.jobDescriptionForm = this.orderDetailsService.createJobDescriptionPOForm();
     }
   }
 
@@ -334,13 +341,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.setConfigDataSources();
       this.setReasonAutopopulate();
       this.populateSelectedOrganizationStructure();
-
+      this.getAllShifts();
       this.changeDetection.markForCheck();
     });
   }
 
   private populateSelectedOrganizationStructure(): void {
-    if(!this.selectedOrder && this.selectedStructureState) {
+    if (!this.selectedOrder && this.selectedStructureState) {
       this.setStructureFormValue();
     }
   }
@@ -349,9 +356,25 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     Object.keys(this.selectedStructureState).forEach((key: string) => {
       const value = (this.selectedStructureState)[key as keyof SelectedStructureState];
 
-      if(value) {
+      if (value) {
         this.generalInformationForm.controls[key].patchValue(value);
       }
+    });
+  }
+
+  private getAllShifts(): void {
+    this.getAllShifts$.pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy())
+    ).subscribe((state: ScheduleShift[]) => {
+
+      const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
+
+      this.updateDataSourceFormList('shift', [{ name: 'Custom', id: 0 }, ...state]);
+      setDataSource(selectedForm.fields, 'shift', [{ name: 'Custom', id: 0 }, ...state]);
+
+      this.allShifts = [{ name: 'Custom', id: 0 }, ...state];
+      this.changeDetection.markForCheck();
     });
   }
 
@@ -369,8 +392,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
     if (this.dataSourceContainer.reasons != undefined) {
       setDataSource(jobDescriptionForm.fields, 'orderRequisitionReasonId',
-      this.getIRPOrderRequisition(this.dataSourceContainer.reasons as RejectReasonwithSystem[]));
-      }
+        this.getIRPOrderRequisition(this.dataSourceContainer.reasons as RejectReasonwithSystem[]));
+    }
 
     this.setDataSourceForSpecialProject();
     this.setDataSourceForWorkLocationList();
@@ -379,25 +402,25 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private setReasonAutopopulate() {
-    if(this.jobDescriptionForm != undefined && this.AutopopulateId != undefined){
+    if (this.jobDescriptionForm != undefined && this.AutopopulateId != undefined) {
       this.jobDescriptionForm.controls["orderRequisitionReasonId"].patchValue(this.AutopopulateId);
       this.changeDetection.detectChanges();
     }
   }
 
-  private getIRPOrderRequisition(orderRequisition:RejectReasonwithSystem[]):OrderRequisitionReason[]{
-    if(orderRequisition.length>0){
+  private getIRPOrderRequisition(orderRequisition: RejectReasonwithSystem[]): OrderRequisitionReason[] {
+    if (orderRequisition.length > 0) {
       orderRequisition.forEach(element => {
-        if(element.includeInIRP===true){
+        if (element.includeInIRP === true) {
           this.reason.push(
             {
-              id:element.id,
-              name:element.reason,
-              businessUnitId:element.businessUnitId
+              id: element.id,
+              name: element.reason,
+              businessUnitId: element.businessUnitId
             }
           )
         }
-        if(element.isAutoPopulate === true){
+        if (element.isAutoPopulate === true) {
           this.AutopopulateId = element.id;
         }
       });
@@ -405,6 +428,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     return this.reason;
   }
   private watchForDataSources(): void {
+    this.store.dispatch(new GetAllShifts()).subscribe(data => {
+
+    });
     this.reasons$.pipe(
       filter(Boolean),
       map((reasons: RejectReasonPage) => mapReasonsStructure(reasons.items)),
@@ -432,8 +458,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       map((data: ProjectSpecialData) => mapSpecialProjectStructure(data)),
       takeUntil(this.componentDestroy())
     ).subscribe((data: SpecialProjectStructure) => {
-      this.updateDataSourceFormList('specialProjectCategories', data.specialProjectCategories);
-      this.updateDataSourceFormList('projectNames', data.projectNames);
+      this.updateDataSourceFormList('specialProjectCategories', data.specialProjectCategories.filter(f => f.includeInIRP == true));
+      //this.updateDataSourceFormList('projectNames', data.projectNames.filter(f=>f.includeInIRP==true));
       this.updateDataSourceFormList('poNumbers', data.poNumbers);
       this.setDataSourceForSpecialProject(data);
       this.changeDetection.markForCheck();
@@ -464,6 +490,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       const { address, state, city, zipCode } = suggestedDetails.workLocation;
       this.workLocationForm.patchValue({ address, state, city, zipCode });
     });
+
+    this.getAllShifts();
   }
 
   private watchForFormValueChanges(): void {
@@ -492,7 +520,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.updateDataSourceFormList('departments', departments);
       const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
       setDataSource(selectedForm.fields, 'departmentId', departments);
-      if(!this.selectedOrder) {
+      if (!this.selectedOrder) {
         this.store.dispatch(new GetSuggestedDetails(value));
       }
       this.changeDetection.markForCheck();
@@ -519,7 +547,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       ).subscribe((skills: ListOfSkills[]) => {
         this.setSkillFilters(skills);
 
-        if(!this.selectedOrder && this.selectedStructureState.skillId) {
+        if (!this.selectedOrder && this.selectedStructureState.skillId) {
           this.generalInformationForm.controls['skillId'].patchValue(this.selectedStructureState.skillId);
         }
       });
@@ -564,7 +592,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       const jobDistributionForm = this.getSelectedFormConfig(JobDistributionForm);
       const sourceForJobDistribution = getDataSourceForJobDistribution(this.selectedSystem);
 
-      if(TieringLogic && this.selectedSystem.isIRP && this.selectedSystem.isVMS) {
+      if (TieringLogic && this.selectedSystem.isIRP && this.selectedSystem.isVMS) {
         setDataSource(jobDistributionForm.fields, 'jobDistribution', [
           sourceForJobDistribution[0],
           sourceForJobDistribution[1],
@@ -591,11 +619,35 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
       this.changeDetection.markForCheck();
     });
+
+
+    this.generalInformationForm.get('shift')?.valueChanges.pipe(
+      filter(() => true),
+      takeUntil(this.componentDestroy())
+    ).subscribe((value: number) => {
+      let shiftDetails = this.allShifts.find(f => f.id == value)
+      if (shiftDetails != null && shiftDetails.id != 0) {
+        const [startH, startM, startS] = getHoursMinutesSeconds(shiftDetails.startTime);
+        const [endH, endM, endS] = getHoursMinutesSeconds(shiftDetails.endTime);
+        const startDate = new Date();
+        const endDate = new Date();
+        startDate.setHours(startH, startM, startS);
+        endDate.setHours(endH, endM, endS);
+        this.generalInformationForm.controls['shiftStartTime'].setValue(startDate);
+        this.generalInformationForm.controls['shiftEndTime'].setValue(endDate);
+        this.changeDetection.markForCheck();
+      } else {
+        this.generalInformationForm.get('shiftStartTime')?.reset();
+        this.generalInformationForm.get('shiftEndTime')?.reset();
+      }
+
+    });
+
   }
 
   private showDistributionErrorMessage(): void {
     const distributionControl = this.jobDistributionForm.get('jobDistribution');
-    if(distributionControl?.errors) {
+    if (distributionControl?.errors) {
       distributionControl.markAsTouched();
       this.store.dispatch(new ShowToast(MessageTypes.Error, distributionControl?.errors['errorMessage']));
     }
@@ -633,14 +685,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private getSelectedConfigFromList(formName: string): OrderFormsArrayConfig {
     return this.orderFormsArrayConfig.find(
       (config: OrderFormsArrayConfig) => config.formList === formName
-    ) as  OrderFormsArrayConfig;
+    ) as OrderFormsArrayConfig;
   }
 
   private watchForSaveAction(): void {
     this.irpStateService.saveEvents.pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
-      if(this.selectedOrder) {
+      if (this.selectedOrder) {
         this.irpStateService.deleteDocuments(this.deleteDocumentsGuids);
       }
 
@@ -692,14 +744,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.jobDescriptionForm.patchValue(selectedOrder);
     this.specialProjectForm.patchValue(selectedOrder);
 
-    if(selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
+    if (selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
       const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
       changeTypeField(generalInformationConfig.fields, 'jobDates', FieldType.Date);
     }
   }
 
   private setConfigType(selectedOrder: Order): void {
-    if(selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
+    if (selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
       this.orderFormsConfig = perDiemConfig(this.selectedSystem);
     } else {
       this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem);
@@ -707,10 +759,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private createPatchContactDetails(selectedOrder: Order): void {
-    const selectedConfig = this.getSelectedArrayFormsConfig({formList: ContactDetailsList} as OrderFormsArrayConfig);
+    const selectedConfig = this.getSelectedArrayFormsConfig({ formList: ContactDetailsList } as OrderFormsArrayConfig);
 
     selectedOrder.contactDetails.forEach((contact: OrderContactDetails, index: number) => {
-      if(!ORDER_CONTACT_DETAIL_TITLES.includes(contact.name)) {
+      if (!ORDER_CONTACT_DETAIL_TITLES.includes(contact.name)) {
         changeTypeEditButton(selectedConfig, index);
       }
 
@@ -724,7 +776,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private createPatchWorkLocation(selectedOrder: Order): void {
-    const selectedConfig = this.getSelectedArrayFormsConfig({formList: WorkLocationList} as OrderFormsArrayConfig);
+    const selectedConfig = this.getSelectedArrayFormsConfig({ formList: WorkLocationList } as OrderFormsArrayConfig);
 
     selectedOrder.workLocations.forEach((workLocation: OrderWorkLocation) => {
       const workLocationForm = this.orderDetailsService.createWorkLocationForm();
@@ -741,13 +793,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     setDataSource(
       specialProjectForm.fields,
       'projectTypeId',
-      data?.specialProjectCategories ?? this.dataSourceContainer.specialProjectCategories as SpecialProjectCategories[]
+      data?.specialProjectCategories.filter(f => f.includeInIRP == true) ?? this.dataSourceContainer.specialProjectCategories as SpecialProjectCategories[]
     );
-    setDataSource(
-      specialProjectForm.fields,
-      'projectNameId',
-      data?.projectNames ?? this.dataSourceContainer.projectNames as ProjectNames[]
-    );
+    // setDataSource(
+    //   specialProjectForm.fields,
+    //   'projectNameId',
+    //   data?.projectNames.filter(f=>f.includeInIRP==true) ?? this.dataSourceContainer.projectNames as ProjectNames[]
+    // );
     setDataSource(
       specialProjectForm.fields,
       'poNumberId',
@@ -758,7 +810,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private setDataSourceForWorkLocationList(state?: StateList[]): void {
     const workLocationForm = this.getSelectedConfigFromList(WorkLocationList);
     workLocationForm.forms.forEach((form: OrderFormInput[]) => {
-      setDataSource(form,'state', state ?? this.dataSourceContainer.state as StateList[]);
+      setDataSource(form, 'state', state ?? this.dataSourceContainer.state as StateList[]);
     });
   }
 
@@ -771,14 +823,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         ),
         takeUntil(this.componentDestroy())
       ).subscribe((structure: OrganizationRegion[]) => {
-        if(!this.selectedOrder) {
+        if (!this.selectedOrder) {
           this.generalInformationForm.get('regionId')?.reset();
         }
         this.updateDataSourceFormList('regions', structure);
         const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
         setDataSource(selectedForm.fields, 'regionId', structure);
         this.changeDetection.markForCheck();
-    });
+      });
 
     this.organization$.pipe(
       filter((organisation: Organization) => !!organisation && !this.selectedOrder),
@@ -800,14 +852,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private getContactDetailsById(id: number): number {
-    if(!this.selectedOrder) {
+    if (!this.selectedOrder) {
       this.store.dispatch(new GetContactDetails(id));
     }
     return id;
   }
 
   private setJobDistributionValue(): void {
-    if(this.isTieringLogicLoad && this.selectedOrder) {
+    if (this.isTieringLogicLoad && this.selectedOrder) {
       this.jobDistributionForm.get('jobDistribution')?.patchValue(this.selectedOrder.jobDistributionValue);
       this.isTieringLogicLoad = false;
     }
@@ -815,12 +867,12 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
   private observeOrderType(): void {
     this.orderTypeForm.get('orderType')?.valueChanges
-    .pipe(
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe((orderType) => {
-      this.orderTypeChanged.emit(orderType);
-    });
+      .pipe(
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe((orderType) => {
+        this.orderTypeChanged.emit(orderType);
+      });
   }
 
   private setSkillFilters(skills: ListOfSkills[]): void {
@@ -835,5 +887,45 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     }
 
     this.changeDetection.markForCheck();
+  }
+
+  private watchForSpecialProjectCategory(): void {
+    this.specialProjectForm.get('projectTypeId')?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((id: any) => {
+      if(id){
+        this.specialProjectForm.controls['projectNameId'].reset();
+        this.updateDataSourceFormList('projectNames', []);
+          const specialProjectForm = this.getSelectedFormConfig(SpecialProjectForm);
+          setDataSource(
+            specialProjectForm.fields,
+            'projectNameId',
+            []
+          );
+        this.projectSpecialData$.pipe(
+          filter(Boolean),
+          map((data: ProjectSpecialData) => mapSpecialProjectStructure(data)),
+          takeUntil(this.componentDestroy())
+        ).subscribe((data: SpecialProjectStructure) => {
+          this.updateDataSourceFormList('projectNames', data.projectNames.filter(f => f.includeInIRP == true && f.projectTypeId == id));
+          const specialProjectForm = this.getSelectedFormConfig(SpecialProjectForm);
+          setDataSource(
+            specialProjectForm.fields,
+            'projectNameId',
+            data?.projectNames.filter(f => f.includeInIRP == true && f.projectTypeId == id) ?? this.dataSourceContainer.projectNames as ProjectNames[]
+          );
+          this.changeDetection.markForCheck();
+        })
+      }else{
+        this.specialProjectForm.controls['projectNameId'].reset()
+        this.updateDataSourceFormList('projectNames', []);
+          const specialProjectForm = this.getSelectedFormConfig(SpecialProjectForm);
+          setDataSource(
+            specialProjectForm.fields,
+            'projectNameId',
+            []
+          );
+      }
+      
+      this.changeDetection.markForCheck();
+    })
   }
 }

@@ -29,6 +29,30 @@ export const InvoiceExportCols : ExportColumn[] = [
   { text:'Hours / Miles', column: 'hoursMiles' },
   { text:'Bill Rate', column: 'billRate' },
   { text:'Total', column: 'total' },
+  { text:'Status', column: 'Status' },
+  { text:'LocationID', column: 'LocationID' },
+  { text:'Comment', column: 'Comment' },
+];
+
+export const AgencyInvoiceExportCols : ExportColumn[] = [
+  { text:'Invoice ID', column: 'invoiceId' },
+  { text:'Location Name', column: 'locationName' },
+  { text:'Week', column: 'week' },
+  { text:'Time In', column: 'timeIn' },
+  { text:'Time Out', column: 'timeOut' },
+  { text:'Bill Rate Type / Expenses Code Reason', column: 'billRateTypeCodeReason' },
+  { text:'Cost Centre', column: 'costCenter' },
+  { text:'Job ID', column: 'jobId' },
+  { text:'Candidate Name', column: 'candidateName' },
+  { text:'Agency', column: 'agency' },
+  { text:'Skill', column: 'skill' },
+  { text:'Hours / Miles', column: 'hoursMiles' },
+  { text:'Bill Rate', column: 'billRate' },
+  { text:'Total', column: 'total' },
+  { text:'Status', column: 'Status' },
+  { text:'LocationID', column: 'LocationID' },
+  { text:'Comment', column: 'Comment' },
+  { text:'Fee', column: 'Fee' },
 ];
 
 export const GetTabLists = (isAgency: boolean): InvoicesTabItem[] => {

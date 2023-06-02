@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
 import { Comment } from '@shared/models/comment.model';
 import { Subject, Subscription } from 'rxjs';
+import { faUserFriends } from '@fortawesome/free-solid-svg-icons';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 @Component({
   selector: 'app-commentdata',
@@ -20,6 +22,7 @@ export class CommentdataComponent {
   public messageRef: ElementRef;
 
   private unreadObserverSubscription: Subscription;
+  faUserFriends = faUserFriends as IconProp;
 
   constructor(private cd: ChangeDetectorRef) { }
 

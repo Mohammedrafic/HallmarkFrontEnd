@@ -77,6 +77,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
         event.currentPage,
         event.pageSize,
         event.isAvailable,
+        event.searchTerm||""
       ));
     } else {
       this.store.dispatch(new GetAgencyOrderCandidatesList(

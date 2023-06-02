@@ -31,7 +31,6 @@ import { ProfileDetailsContainerComponent } from '../profile-details-container/p
 import { AppState } from '../../../../store/app.state';
 import { TimesheetsTabsComponent } from '../../components/timesheets-tabs/timesheets-tabs.component';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { FilterService } from '@shared/services/filter.service';
 import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fields-settings';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
@@ -109,7 +108,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private cd: ChangeDetectorRef,
     private route: ActivatedRoute,
     private location: Location,
-    private filterService: FilterService,
     private router: Router,
     @Inject(DOCUMENT) private document: Document,
   ) {
@@ -303,7 +301,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         distinctUntilChanged(),
         switchMap((organizationId: number) => {
           this.orgId = organizationId;
-          this.filterService.setPreservedFIltersTimesheets({ organizationIds: [organizationId] });
           return this.store.dispatch([
             new Timesheets.UpdateFiltersState({ organizationId }, this.activeTabIdx !== 0),
             new Timesheets.SelectOrganization(organizationId),

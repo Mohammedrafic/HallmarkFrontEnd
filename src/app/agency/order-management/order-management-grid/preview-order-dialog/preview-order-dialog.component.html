@@ -78,10 +78,15 @@
             <ng-container *ngIf="currentOrder">
               <e-tabitem *ngIf="orderType.OpenPerDiem === currentOrder.orderType">
                 <ng-template #headerText>
-                  Re-Orders <span class="e-badge e-badge-success e-badge-pill">{{ currentOrder?.reOrders?.length || '0' }}</span>
+                  Re-Orders <span class="e-badge e-badge-success e-badge-pill">{{ (reOrderList$ | async)?.totalCount || '0' }}</span>
                 </ng-template>
                 <ng-template #content>
-                  <app-order-reorders-container (selectReOrder)="selectReOrder.emit($event)" [isAgency]="true" [currentOrder]="currentOrder"></app-order-reorders-container>
+                  <app-order-reorders-container
+                    [isAgency]="true"
+                    [currentOrder]="currentOrder"
+                    [reOrders]="reOrderList$ | async"
+                    (selectReOrder)="selectReOrder.emit($event)"
+                  ></app-order-reorders-container>
                 </ng-template>
               </e-tabitem>
 

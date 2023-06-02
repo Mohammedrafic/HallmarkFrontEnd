@@ -15,11 +15,18 @@
                 Export <i-feather name="upload" class="icon"></i-feather>
               </div>
             </button>
+            <button  *ngIf="(currentUserPermissions$ | async) as userPermission"
+              ejs-button
+              appHideBeforeSyncfusionLoad
+              (click)="openImportDialog()"
+              class="e-outline"
+              [disabled]="!userPermission[userPermissions.CanAddEditDoNotReturn]"
+              >
+              <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
+            </button>
             <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter"  (click)="showFilters()">
               <div class="filter-button-content">
-                <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{
-                  filteredItems.length
-                }}</span>
+                <span  *ngIf="filteredcnt != 0" class="e-badge e-badge-success e-badge-pill">{{filteredcnt}}</span>
                 Filters <i-feather name="sliders" class="icon"></i-feather>
               </div>
             </button>
@@ -27,16 +34,21 @@
             <app-tooltip-container
             [message]="toolTipMessage"
             >
-            <button
+            <button *ngIf="(currentUserPermissions$ | async) as userPermission"
               ejs-button
               appHideBeforeSyncfusionLoad
               id="addDepartmentButton"
               (click)="addDoNotReturn()"
+              [disabled]="!userPermission[userPermissions.CanAddEditDoNotReturn]"
               [isPrimary]="true">Add Candidate</button>
           </app-tooltip-container>
           </div>
         </section>
       </ng-container>
     </app-page-toolbar>
-    <app-do-not-return-grid [filteredItems$]="filteredItems$" [export$]="exportDonotreturn$"></app-do-not-return-grid> 
+    <app-do-not-return-grid [fliterFlag$]="fliterFlag$" (appliedFilteredItems)="appliedFilters($event)" [export$]="exportDonotreturn$" [refreshGrid$]="refreshGridEvent"></app-do-not-return-grid> 
   </section>
+  <app-import-dnr
+    [dialogEvent]="importDialogEvent"
+    (reloadItemsList)="updatePage()">
+  </app-import-dnr>

@@ -6,7 +6,7 @@ export interface AddTimsheetForm {
   amount: number;
   description: string;
   hadLunchBreak: boolean;
-  day?: Date;
+  day?: Date | string;
 }
 
 export interface TimsheetForm {
