@@ -15,11 +15,12 @@
                 Export <i-feather name="upload" class="icon"></i-feather>
               </div>
             </button>
-            <button
+            <button  *ngIf="(currentUserPermissions$ | async) as userPermission"
               ejs-button
               appHideBeforeSyncfusionLoad
               (click)="openImportDialog()"
               class="e-outline"
+              [disabled]="!userPermission[userPermissions.CanAddEditDoNotReturn]"
               >
               <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
             </button>
@@ -35,11 +36,12 @@
             <app-tooltip-container
             [message]="toolTipMessage"
             >
-            <button
+            <button *ngIf="(currentUserPermissions$ | async) as userPermission"
               ejs-button
               appHideBeforeSyncfusionLoad
               id="addDepartmentButton"
               (click)="addDoNotReturn()"
+              [disabled]="!userPermission[userPermissions.CanAddEditDoNotReturn]"
               [isPrimary]="true">Add Candidate</button>
           </app-tooltip-container>
           </div>

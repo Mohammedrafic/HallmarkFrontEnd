@@ -208,4 +208,9 @@ export enum UserPermissions {
   //View Order Journey
   ViewOrderJourney = 8001,
 
+  //DoNotReturn
+  CanViewDoNotReturnList = 6003,
+  CanAddEditDoNotReturn = 6004,
+
+
 }

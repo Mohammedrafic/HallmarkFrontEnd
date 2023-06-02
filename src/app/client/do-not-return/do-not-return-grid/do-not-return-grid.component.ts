@@ -117,6 +117,9 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   public grid: GridComponent;
   @ViewChild('locationMultiselect') public locationMultiselect: MultiSelectComponent;
 
+  @Select(UserState.userPermission)
+  currentUserPermissions$: Observable<Permission>;
+
   @Select(DonotReturnState.donotreturnpage)
   public donotreturnpage$: Observable<DoNotReturnsPage>;
 
