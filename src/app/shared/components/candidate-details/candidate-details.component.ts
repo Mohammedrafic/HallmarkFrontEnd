@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -52,6 +52,7 @@ import { PreservedFiltersByPage } from '@core/interface';
 import { FilterPageName } from '@core/enums';
 import { GetMasterRegions } from '@organization-management/store/organization-management.actions';
 import { adaptToNameEntity } from '@shared/helpers/dropdown-options.helper';
+import { FiltersComponent } from './filters/filters.component';
 
 @Component({
   selector: 'app-candidate-details',
@@ -98,6 +99,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   @Select(CandidateDetailsState.candidateRegions)
   regions$: Observable<string[]>;
+  @ViewChild(FiltersComponent, { static: false }) filterco: FiltersComponent;
 
   public filtersForm: FormGroup;
   public filters: FiltersModal | null;
@@ -118,8 +120,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   regionBasedLocations: OrganizationLocation[] = [];
   private orgStructure: OrganizationStructure;
   private orgRegions: OrganizationRegion[] = [];
-
-
+  public isClear:boolean=false;
   constructor(
     private store: Store,
     private router: Router,
@@ -168,6 +169,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   public onFilterClearAll(): void {
     this.clearFilters();
+    this.patchFormValue();
+    this.store.dispatch(new ShowFilterDialog(true));
     this.store.dispatch(new PreservedFilters.ClearPageFilters(this.getPageName()));
     this.updatePage();
   }
@@ -360,6 +363,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     this.pageNumber = GRID_CONFIG.initialPage;
     this.pageSize = GRID_CONFIG.initialRowsPerPage;
     this.filtersForm.reset();
+    this.isClear=true;
     this.filteredItems = [];
     this.filters = null;
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);

@@ -38,8 +38,10 @@
   [count]="(candidates$ | async)?.totalCount"
 >
   <app-filters
+  #filterco
     [filtersForm]="filtersForm"
     [filterColumns]="filterColumns"
+    [isClear]="isClear"
     [isAgency]="isAgency"
   ></app-filters>
 </app-filter-dialog>
