@@ -81,6 +81,8 @@ export class FilterService {
                 organizationId: filteredItem?.organizationId || filteredItem?.businessUnitId || null,
                 regionId: filteredItem?.regionId || null,
                 locationId: filteredItem?.locationId || null,
+                regionBlocked: filteredItem?.regionBlocked || null,
+                locationBlocked: filteredItem?.locationBlocked || null,
               });
             });
             break;
