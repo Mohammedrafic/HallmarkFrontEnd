@@ -39,19 +39,19 @@ export class ImportDnrComponent  extends AbstractImport implements OnChanges {
     {
       field: 'firstName',
       width: 150,
-      headerName: 'FirstName',
+      headerName: 'First Name',
       cellRenderer: GridErroredCellComponent,
     },
     {
       field: 'middleName',
       width: 150,
-      headerName: 'MiddleName',
+      headerName: 'Middle Name',
       cellRenderer: GridErroredCellComponent,
     },
     {
       field: 'lastName',
       width: 200,
-      headerName: 'LastName',
+      headerName: 'Last Name',
       cellRenderer: GridErroredCellComponent,
     },
     {
