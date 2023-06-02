@@ -18,7 +18,7 @@
       <app-numeric-textbox
         (changeValueEmitter)="navigateToPageEmitter.emit($event)"
         [formGroupInstance]="paginationFormGroup"
-        [max]="10 || 1"
+        [max]="totalPages"
         [min]="1"
         format="#"
         controlName="navigateTo"
