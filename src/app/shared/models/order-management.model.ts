@@ -786,7 +786,7 @@ export interface IrpOrderCandidateDto {
   payRate: number;
   organizationOrientationDate: string | null;
   departmentOrientationDate: string | null;
-  availabilityOverlap: OrderAvailabilityOverlap;
+  availabilityOverlap: OrderAvailabilityOverlap | null;
 }
 
 export interface OrderAvailabilityOverlap {

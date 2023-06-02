@@ -33,7 +33,7 @@ export const AdaptIrpCandidates = (
         lastShiftTime: candidate.lastShiftFrom ? `${lastTimeFrom} - ${lastTimeTo}` : '',
         nextShiftTime: candidate.nextShiftFrom ? `${nextTimeFrom} - ${nextTimeTo}` : '',
         departmentOrientationDate: getOrientationDate(candidate.departmentOrientationDate),
-        availabilityOverlap,
+        availabilityOverlap: availabilityOverlap,
       };
 
       return irpCandidate;
@@ -43,7 +43,7 @@ export const AdaptIrpCandidates = (
   return candidatesData;
 };
 
-export const GetAvailabilityOverlap = (overlap: OrderAvailabilityOverlap): OrderAvailabilityOverlap => {
+export const GetAvailabilityOverlap = (overlap: OrderAvailabilityOverlap | null): OrderAvailabilityOverlap | null => {
   if(overlap) {
     return {
       ...overlap,
@@ -52,5 +52,5 @@ export const GetAvailabilityOverlap = (overlap: OrderAvailabilityOverlap): Order
     };
   }
 
-  return {} as OrderAvailabilityOverlap;
+  return null;
 };

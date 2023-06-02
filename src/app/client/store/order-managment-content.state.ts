@@ -200,7 +200,7 @@ export interface OrderManagementContentStateModel {
     irpCandidates: null,
     candidateCancellationReasons:null,
     allShifts:null
-	
+
   },
 })
 @Injectable()
@@ -952,7 +952,7 @@ export class OrderManagementContentState {
       })
     );
   }
-  
+
   @Action(ClearOrderFilterDataSources)
   ClearOrderFilterDataSources(
     { patchState }: StateContext<OrderManagementContentStateModel>
@@ -1001,7 +1001,7 @@ export class OrderManagementContentState {
       })
     );
   }
-  
+
   @Action(ExportOrdersJourney)
   ExportOrdersJourney({}: StateContext<OrderManagementContentStateModel>, { payload}: ExportOrdersJourney): Observable<any> {
     return this.orderManagementService.orderJourneyexport(payload).pipe(
@@ -1128,9 +1128,9 @@ export class OrderManagementContentState {
     return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
       tap((data) => {
         const count = data.length;
-        if(count>0 && payload.perDiemIds.length===0) 
+        if(count>0 && payload.perDiemIds.length===0)
           dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
-        else if(count==0 && payload.perDiemIds.length===0) 
+        else if(count==0 && payload.perDiemIds.length===0)
           dispatch(new ShowToast(MessageTypes.Error, TravelerContracttoPermOrdersSucceedMessage));
         else if(payload.perDiemIds.length===payload.orderIds.length)
           dispatch(new ShowToast(MessageTypes.Error, PerDiemReOrdersErrorMessage));

@@ -39,6 +39,7 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
   { text: 'Candidate Agency', column: 'CandidateAgency' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
 ];
 
 export const perDiemColumnsToExport: ExportColumn[] = [
@@ -62,6 +63,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
   { text: 'Candidate Agency', column: 'CandidateAgency' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
 ];
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
@@ -88,6 +90,7 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
   { text: 'Candidate Agency', column: 'CandidateAgency' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
@@ -147,6 +150,7 @@ export const permPlacementColumnsToExport: ExportColumn[] = [
   { text: 'Candidate Agency', column: 'CandidateAgency' },
   { text: 'Annual Salary From', column: 'AnnualSalaryFrom' },
   { text: 'Annual Salary To', column: 'AnnualSalaryTo' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
 ];
 
 export const irpAllOrdersColumnsToExport: ExportColumn[] = [
@@ -168,6 +172,8 @@ export const irpAllOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Irp Candid', column: 'IRPCand' },
   { text: 'VMS Candid', column: 'VMSCand' },
   { text: 'Creation date', column: 'CreationDate' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
+  
 ];
 
 export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
@@ -187,6 +193,7 @@ export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Irp Candid', column: 'IRPCand' },
   { text: 'VMS Candid', column: 'VMSCand' },
   { text: 'Creation date', column: 'CreationDate' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
 ];
 
 export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
@@ -207,6 +214,7 @@ export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Irp Candid', column: 'IRPCand' },
   { text: 'VMS Candid', column: 'VMSCand' },
   { text: 'Creation date', column: 'CreationDate' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
 ];
 
 export const irpIncompleteOrdersColumnsToExport: ExportColumn[] = [
@@ -228,6 +236,7 @@ export const irpIncompleteOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Irp Candid', column: 'IRPCand' },
   { text: 'VMS Candid', column: 'VMSCand' },
   { text: 'Creation date', column: 'CreationDate' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
 ];
 
 export const orderJourneyColumnsToExport: ExportColumn[] = [

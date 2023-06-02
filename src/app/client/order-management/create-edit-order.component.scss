@@ -48,6 +48,12 @@
   display: none;
 }
 
+@media #{$max-tablet} {
+  .create-order-header {
+    padding-right: 16px;
+  }
+}
+
 @media #{$max-mobile} {
   .desktop-btn {
     display: none;
