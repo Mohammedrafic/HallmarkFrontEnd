@@ -891,19 +891,40 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
   private watchForSpecialProjectCategory(): void {
     this.specialProjectForm.get('projectTypeId')?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((id: any) => {
-      this.projectSpecialData$.pipe(
-        filter(Boolean),
-        map((data: ProjectSpecialData) => mapSpecialProjectStructure(data)),
-        takeUntil(this.componentDestroy())
-      ).subscribe((data: SpecialProjectStructure) => {
-        this.updateDataSourceFormList('projectNames', data.projectNames.filter(f => f.includeInIRP == true && f.projectTypeId == id));
-        const specialProjectForm = this.getSelectedFormConfig(SpecialProjectForm);
-        setDataSource(
-          specialProjectForm.fields,
-          'projectNameId',
-          data?.projectNames.filter(f => f.includeInIRP == true && f.projectTypeId == id) ?? this.dataSourceContainer.projectNames as ProjectNames[]
-        );
-      })
+      if(id){
+        this.specialProjectForm.controls['projectNameId'].reset();
+        this.updateDataSourceFormList('projectNames', []);
+          const specialProjectForm = this.getSelectedFormConfig(SpecialProjectForm);
+          setDataSource(
+            specialProjectForm.fields,
+            'projectNameId',
+            []
+          );
+        this.projectSpecialData$.pipe(
+          filter(Boolean),
+          map((data: ProjectSpecialData) => mapSpecialProjectStructure(data)),
+          takeUntil(this.componentDestroy())
+        ).subscribe((data: SpecialProjectStructure) => {
+          this.updateDataSourceFormList('projectNames', data.projectNames.filter(f => f.includeInIRP == true && f.projectTypeId == id));
+          const specialProjectForm = this.getSelectedFormConfig(SpecialProjectForm);
+          setDataSource(
+            specialProjectForm.fields,
+            'projectNameId',
+            data?.projectNames.filter(f => f.includeInIRP == true && f.projectTypeId == id) ?? this.dataSourceContainer.projectNames as ProjectNames[]
+          );
+          this.changeDetection.markForCheck();
+        })
+      }else{
+        this.specialProjectForm.controls['projectNameId'].reset()
+        this.updateDataSourceFormList('projectNames', []);
+          const specialProjectForm = this.getSelectedFormConfig(SpecialProjectForm);
+          setDataSource(
+            specialProjectForm.fields,
+            'projectNameId',
+            []
+          );
+      }
+      
       this.changeDetection.markForCheck();
     })
   }

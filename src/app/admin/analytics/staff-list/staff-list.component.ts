@@ -511,7 +511,7 @@ export class StaffListComponent implements OnInit {
     workCommitmentIds = workCommitmentIds.length > 0 ? workCommitmentIds.join(',') : '';
     let employeeId = employeeName != null && employeeName != '' ? parseInt(employeeName) : 0;    
     
-    if(showOnlyDepartmentUnassignedCandidates)
+    if(showOnlyDepartmentUnassignedCandidates == true)
       this.reportName.name = this.DeptUnassignedReportName; 
     else this.reportName.name = this.RegularReportName; 
 
@@ -527,6 +527,7 @@ export class StaffListComponent implements OnInit {
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
+    this.changeDetectorRef.detectChanges();
   }
 
   getLastWeek() {

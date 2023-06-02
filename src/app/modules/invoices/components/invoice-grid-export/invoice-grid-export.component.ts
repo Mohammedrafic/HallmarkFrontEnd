@@ -9,7 +9,7 @@ import { ShowExportDialog } from '../../../../store/app.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { InvoiceGridSelections } from '../../interfaces';
-import { GetExportFileName, GetInvoiceState, GetTabsToExport, InvoiceExportCols } from './invoice-export.constant';
+import { AgencyInvoiceExportCols, GetExportFileName, GetInvoiceState, GetTabsToExport, InvoiceExportCols } from './invoice-export.constant';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoiceState } from '../../enums';
 import { Invoices } from '../../store/actions/invoices.actions';
@@ -32,7 +32,7 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
   public showExport = false;
   public fileName = '';
   public defaultFileName = '';
-  public columnsToExport: ExportColumn[] = InvoiceExportCols;
+  public columnsToExport: ExportColumn[];
 
   private selectedTabIndex = 0;
   private invoiceState: InvoiceState | null;
@@ -59,9 +59,21 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
     this.closeExport();
     this.defaultExport(event.fileType, event);
   }
+public exportColumns():void{
+  if (this.isAgency)
+  {
+this.columnsToExport=AgencyInvoiceExportCols
+  }
+  else
+  {
+    this.columnsToExport=InvoiceExportCols
+  }
 
+}
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    
+    this.exportColumns();
     const filters = this.store.selectSnapshot(InvoicesState.invoicesFilters);
     const ids = this.selectedRows.selectedInvoiceIds.length ? this.selectedRows.selectedInvoiceIds : null;
     const filterQuery = {

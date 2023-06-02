@@ -645,9 +645,9 @@
                 <b (click)="onClickSystem('IRP')">IRP,</b>&nbsp;<b (click)="onClickSystem('VMS')">VMS</b>
               </div>
             </ng-template>
-            
+
           </ng-template>
-         
+
         </e-column>
         <e-column field="type" headerText="Type" textAlign="Center" width="85" minWidth="70" maxWidth="110">
         </e-column>
@@ -664,7 +664,7 @@
           <ng-template #template let-data>
             <ng-container *ngIf="data.publishedInIRP !=null">
               <div >{{data.publishedInIRP | date: "MM/dd/yyyy" }}</div>
-            </ng-container>           
+            </ng-container>
           </ng-template>
         </e-column>
         <e-column field="noOfDaysInIRP" headerText="#Of Days In IRP" width=150>
@@ -673,7 +673,7 @@
           <ng-template #template let-data>
             <ng-container *ngIf="data.publishedInVMS !=null">
               <div >{{data.publishedInVMS | date: "MM/dd/yyyy" }}</div>
-            </ng-container>           
+            </ng-container>
           </ng-template>
         </e-column>
         <e-column field="noOfDaysInVMS" headerText="#Of Days In VMS" width=150>
@@ -1255,7 +1255,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="filter-row bootstrap">
       <div
         class="input-container"
@@ -1296,7 +1296,7 @@
           </ejs-multiselect>
         </div>
       </div>
-    </div>    
+    </div>
     <div class="bootstrap" *ngIf="!isActiveSystemIRP">
       <div class="input-container">
         <label>Job Title</label>

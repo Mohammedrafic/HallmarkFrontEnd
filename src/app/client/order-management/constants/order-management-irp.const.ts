@@ -190,7 +190,7 @@ export const DefaultOrderManagementSubGridCells: ColDef[] = [
   },
   {
     field: 'name',
-    headerName: 'Candidate Name',
+    headerName: 'Employee Name',
     width: 140,
   },
 ];

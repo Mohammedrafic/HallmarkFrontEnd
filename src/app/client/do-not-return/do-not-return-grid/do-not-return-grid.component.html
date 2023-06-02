@@ -8,10 +8,10 @@
 
 
     <e-columns>
-      <e-column textAlign="Right" width="120">
+      <e-column textAlign="Right" width="120" *ngIf="(currentUserPermissions$ | async) as userPermission">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editDonotReturn(data, $event)">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editDonotReturn(data, $event)" [disabled]="!userPermission[userPermissions.CanAddEditDoNotReturn]">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
           </div>
