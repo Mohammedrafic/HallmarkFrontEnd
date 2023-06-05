@@ -15,4 +15,8 @@
   ></app-order-close-reason-info>
   <div class="separator"></div>
 </ng-container>
-<app-order-details [currentOrder]="order" [comments]="comments" [activeSystem]="activeSystem"></app-order-details>
+<app-order-details [currentOrder]="order" 
+      [comments]="comments" 
+      [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP" 
+      [CanOrganizationViewOrdersIRP]="CanOrganizationViewOrdersIRP"
+      [activeSystem]="activeSystem"></app-order-details>

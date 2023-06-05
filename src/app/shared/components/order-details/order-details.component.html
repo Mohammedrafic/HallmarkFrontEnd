@@ -30,9 +30,11 @@
     </div>
     <div class="comments" *ngIf="!isPosition && activeSystem !== systemTypes.VMS">
       <app-comments-irp
+        *ngIf="CanOrganizationViewOrdersIRP"
         [comments]="comments"
         [orderId]="order.id"
         [commentContainerId]="order.commentContainerId || 0"
+        [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
         [externalCommentConfiguration]="order.externalCommentsConfiguration"
       ></app-comments-irp>
     </div>
