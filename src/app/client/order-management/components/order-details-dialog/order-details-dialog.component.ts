@@ -86,7 +86,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() activeSystem: OrderManagementIRPSystemId;
   @Input() orderComments: Comment[] = [];
   @Input() isCondidateTab: boolean;
-
+  @Input() CanOrganizationEditOrdersIRP:boolean;
+  @Input() CanOrganizationViewOrdersIRP:boolean;
   @Output() nextPreviousOrderEvent = new EventEmitter<{ next: boolean, isIrpOrder: boolean}>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() closeReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();

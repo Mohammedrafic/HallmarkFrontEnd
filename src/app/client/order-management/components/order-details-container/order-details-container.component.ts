@@ -16,7 +16,8 @@ import { Comment } from '@shared/models/comment.model';
 export class OrderDetailsContainerComponent {
   @Input() activeSystem: OrderManagementIRPSystemId;
   @Input() comments: Comment[] = [];
-
+  @Input() CanOrganizationEditOrdersIRP: boolean;
+  @Input() CanOrganizationViewOrdersIRP: boolean;
   public orderType = OrderType;
   public isClosedOrder = false;
   public readonly reasonClosure = {

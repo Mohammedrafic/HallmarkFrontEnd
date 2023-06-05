@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { Select, Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Comment } from '@shared/models/comment.model';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, take, takeUntil } from 'rxjs';
 import { UserState } from 'src/app/store/user.state';
 import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments-irp.actions';
 import { CommentsState } from './store/comments-irp.state';
@@ -24,7 +24,7 @@ enum CommentsFilter {
   styleUrls: ['./comments-irp.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CommentsIrpComponent {
+export class CommentsIrpComponent implements OnInit{
   
   faUnlock = faUnlock as IconProp;
   faLock = faLock as IconProp;
@@ -35,6 +35,7 @@ export class CommentsIrpComponent {
   @Input() useBackground: boolean = true;
   @Input() disabled: boolean = false;
   @Input() orderId: number;
+  @Input() CanOrganizationEditOrdersIRP:boolean;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
     this.commentdata = value;
@@ -122,6 +123,10 @@ export class CommentsIrpComponent {
     if (this.isAgencyUser || this.CommentConfiguration === true) {
       this.isExternal = true;
     }
+  }
+
+  ngOnInit(): void {
+    console.log(this.CanOrganizationEditOrdersIRP);
   }
 
   ngOnDestroy(): void {
