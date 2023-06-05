@@ -349,6 +349,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
             this.filterColumns.skillIds.dataSource = [];
             this.payRateFilterFormGroup.get("skillIds")?.setValue(null);
           }
+          this.getWorkCommitment();
           this.cd.markForCheck();
         });
       }
@@ -382,7 +383,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
           }
         });
     });
-    this.getWorkCommitment();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -461,11 +461,11 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     } else {
       departmentsControl.enable();
     }
+    this.getWorkCommitment();
   }
 
   public loadData(): void {
     this.store.dispatch(new GetAssignedSkillsByOrganization());
-    this.getWorkCommitment();
     this.filters = this.PayRatesFormGroup.getRawValue();
     this.store.dispatch(new GetPayRates({  
       pageNumber: this.currentPage, 
@@ -783,6 +783,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   }
 
   private setupFormValues(data: PayRateSetup): void {
+    this.getWorkCommitment();
     this.allRegionsChange({ checked: !data.regionId });
     this.allLocationsChange({ checked: !data.locationId });
     this.allDepartmentsChange({ checked: !data.departmentId });
@@ -823,15 +824,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       this.PayRatesFormGroup.controls['orderTypes'].setValue(data.orderTypes);
     }
 
-    if (data.workCommitments.length === 0) {
-      this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(null);
-    } else {
-      this.workcommitmentsedit = [];
-      for(let i=0; i < data.workCommitments.length; i++){
-        this.workcommitmentsedit.push(data.workCommitments[i].workCommitmentId);
-      }
-      this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(this.workcommitmentsedit);
-    }
+    
     
     this.PayRatesFormGroup.controls['amountMultiplier'].setValue(data.amountMultiplier);
     this.PayRatesFormGroup.controls['effectiveDate'].setValue(data.effectiveDate);
@@ -850,6 +843,13 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
           this.skillsEdit.push(data.skills[i].skillId);
         }
         this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
+      }
+      if (data.workCommitments.length === 0) {
+        this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(null);
+      } else {
+        this.workcommitmentsedit = [];
+        this.workcommitmentsedit = data.workCommitments.map((x: { workCommitmentId: any; }) => x.workCommitmentId)
+        this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(this.workcommitmentsedit);
       }
     },1000)
   }
