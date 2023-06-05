@@ -342,6 +342,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.setReasonAutopopulate();
       this.populateSelectedOrganizationStructure();
       this.getAllShifts();
+      this.watchForSpecialProjectCategory();
       this.changeDetection.markForCheck();
     });
   }
