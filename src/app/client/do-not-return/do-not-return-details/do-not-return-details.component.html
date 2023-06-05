@@ -3,6 +3,17 @@
       <ng-container right>
         <section class="org-controls-container">
           <div>
+            <app-tooltip-container
+            [message]="toolTipMessage"
+            >
+              <button *ngIf="(currentUserPermissions$ | async) as userPermission"
+                ejs-button
+                appHideBeforeSyncfusionLoad
+                id="addDepartmentButton"
+                (click)="addDoNotReturn()"
+                [disabled]="!userPermission[userPermissions.CanAddEditDoNotReturn]"
+                [isPrimary]="true">Add Candidate</button>
+            </app-tooltip-container>
             <button
               ejs-dropdownbutton
               appHideBeforeSyncfusionLoad
@@ -31,17 +42,7 @@
               </div>
             </button>
 
-            <app-tooltip-container
-            [message]="toolTipMessage"
-            >
-            <button *ngIf="(currentUserPermissions$ | async) as userPermission"
-              ejs-button
-              appHideBeforeSyncfusionLoad
-              id="addDepartmentButton"
-              (click)="addDoNotReturn()"
-              [disabled]="!userPermission[userPermissions.CanAddEditDoNotReturn]"
-              [isPrimary]="true">Add Candidate</button>
-          </app-tooltip-container>
+
           </div>
         </section>
       </ng-container>
