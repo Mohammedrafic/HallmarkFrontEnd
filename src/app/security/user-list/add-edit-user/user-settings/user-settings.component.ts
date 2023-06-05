@@ -98,7 +98,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
       )
       .subscribe((value) => {
         this.businessValue = value;
-          if(this.businessUnitControl?.value === BusinessUnitType.Hallmark) {
+          if(this.businessUnitControl?.value === BusinessUnitType.Hallmark && this.firstLoadModal && value && value.length > 0) {
             this.businessUnitIdControl?.setValue(value[0].id);
           }
         });
