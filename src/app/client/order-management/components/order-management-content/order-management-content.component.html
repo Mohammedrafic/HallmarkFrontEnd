@@ -1442,7 +1442,7 @@
   [orderPositionSelected$]="orderPositionSelected$"
   [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"
   [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
-  [CanOrganizationEditOrdersIRP]="userPermission[userPermissions.CanEditOrderBillRateIRP]"
+  [CanOrganizationEditOrdersIRP]="userPermission[userPermissions.CanCreateOrdersIRP]"
   [CanOrganizationViewOrdersIRP]="userPermission[userPermissions.CanOrganizationViewOrdersIRP]"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid(true)"

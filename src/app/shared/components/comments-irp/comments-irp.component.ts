@@ -24,7 +24,7 @@ enum CommentsFilter {
   styleUrls: ['./comments-irp.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CommentsIrpComponent implements OnInit{
+export class CommentsIrpComponent {
   
   faUnlock = faUnlock as IconProp;
   faLock = faLock as IconProp;
@@ -123,10 +123,6 @@ export class CommentsIrpComponent implements OnInit{
     if (this.isAgencyUser || this.CommentConfiguration === true) {
       this.isExternal = true;
     }
-  }
-
-  ngOnInit(): void {
-    console.log(this.CanOrganizationEditOrdersIRP);
   }
 
   ngOnDestroy(): void {

@@ -99,8 +99,6 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
       this.accrdDescription?.expandItem(true, 1);
       this.accrdHistorical?.expandItem(false);
       this.subscribeForSettings();
-
-      console.log("CanOrganizationViewOrdersIRP", this.CanOrganizationViewOrdersIRP);
     }
   }
 
