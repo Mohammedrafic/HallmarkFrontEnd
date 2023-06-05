@@ -545,6 +545,11 @@
             <span>{{ data.endDate | date: formatDate:'UTC' }}</span>
           </ng-template>
         </e-column>
+        <e-column field="shiftName" headerText="Shift Name" width="160" minWidth="80" maxWidth="200">
+          <ng-template #template let-data>
+            <span>{{ data.shiftName }}</span>
+          </ng-template>
+        </e-column>
         <e-column field="shiftStartTime" headerText="SHIFT" width="160" minWidth="80" maxWidth="200">
           <ng-template #template let-data>
             <span>{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}-{{ data.shiftEndTime | date: 'HH:mm':'UTC' }}</span>
@@ -1442,6 +1447,8 @@
   [orderPositionSelected$]="orderPositionSelected$"
   [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"
   [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
+  [CanOrganizationEditOrdersIRP]="userPermission[userPermissions.CanCreateOrdersIRP]"
+  [CanOrganizationViewOrdersIRP]="userPermission[userPermissions.CanOrganizationViewOrdersIRP]"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid(true)"
   (closeReOrderEmitter)="onAddReorderClose()"

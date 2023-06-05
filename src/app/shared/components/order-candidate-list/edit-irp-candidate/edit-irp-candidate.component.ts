@@ -77,6 +77,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public isOnboarded = false;
   public comments: Comment[] = [];
   @Input() public externalCommentConfiguration ?: boolean | null;
+  @Input() CanOrganizationViewOrdersIRP: boolean;
 
   private candidateModelState: EditCandidateDialogState;
 

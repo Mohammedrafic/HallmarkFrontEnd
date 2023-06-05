@@ -327,6 +327,7 @@
   (handleCloseModal)="closeEditCandidateModal($event)"
   (handleSuccessSaveCandidate)="saveIrpCandidate()"
   [commentContainerId] = "commentContainerId"
+  [CanOrganizationViewOrdersIRP]="userPermission[userPermissions.CanOrganizationViewOrdersIRP]"
 ></app-edit-irp-candidate>
 
 <ejs-dialog

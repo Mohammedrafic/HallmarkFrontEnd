@@ -82,7 +82,7 @@
         </ng-container>
       </form>
     </div>
-    <app-comments-irp [comments]="comments" [commentContainerId]="commentContainerId" [useBackground]="false"
+    <app-comments-irp *ngIf="CanOrganizationViewOrdersIRP" [comments]="comments" [commentContainerId]="commentContainerId" [useBackground]="false"
       [externalCommentConfiguration]="externalCommentConfiguration"></app-comments-irp>
   </div>
 </ejs-dialog>
