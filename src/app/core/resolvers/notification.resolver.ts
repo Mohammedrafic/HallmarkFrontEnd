@@ -30,10 +30,10 @@ export class NotificationResolver implements Resolve<boolean> {
         if(data.title){
             window.localStorage.setItem("alertTitle",JSON.stringify(data.title));
         }      
-        this.router.navigate(['/ui'+routeSnapshot[0]]);
+        this.router.navigate([routeSnapshot[0]]);
         return true;
       }),catchError(err => {
-        this.router.navigate(['/ui'+routeSnapshot[0]]);
+        this.router.navigate([+routeSnapshot[0]]);
         return of(true);
       })
     );
