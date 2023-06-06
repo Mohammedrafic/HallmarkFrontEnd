@@ -138,6 +138,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public maxDepartmentsLength = 1000;
   public query: Query = new Query().take(this.maxDepartmentsLength);
   public otInputsEnabled = true;
+  public amountDisabled = false;
 
   private billRateToPost?: BillRateSetupPost;
   private filters: BillRateFilters = {};
@@ -618,6 +619,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       });
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private billRatesTitleChangedHandler(): void {
     this.billRatesFormGroup
       .get('billRateTitleId')
@@ -672,6 +674,15 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
         if (typeId === BillRateTitleId.MissedMeal) {
           this.billRatesFormGroup.get('billRateValueRateTimes')?.patchValue(1);
+        }
+
+        if (typeId === BillRateTitleId.FacilityCalledOff || typeId === BillRateTitleId.ResourceCalledOff) {
+          this.amountDisabled = true;
+          this.billRatesFormGroup.get('billRateValueRateTimes')?.patchValue(0);
+          this.billRatesFormGroup.get('billRateValueRateTimes')?.removeValidators(Validators.required);
+        } else {
+          this.amountDisabled = false;
+          this.billRatesFormGroup.get('billRateValueRateTimes')?.addValidators(Validators.required);
         }
 
         if (typeId === BillRateTitleId.MissedMeal
