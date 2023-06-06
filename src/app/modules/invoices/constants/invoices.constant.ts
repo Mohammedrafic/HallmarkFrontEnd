@@ -1,6 +1,7 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
-import { InvoiceFilterColumns, InvoiceFilterFieldConfig, InvoicesTabItem, InvoiceTabId } from '../interfaces';
+import { InvoiceFilterColumns, InvoiceFilterFieldConfig, InvoicesTabItem, InvoiceTabId,
+  TypedInvoiceKey } from '../interfaces';
 import {
   FilteringInvoicesOptionsFields, FilteringManualPendingInvoiceRecordsOptionsFields,
   FilteringPendingInvoiceRecordsOptionsFields,
@@ -161,6 +162,7 @@ export const ApproveInvoiceConfirmDialogConfig = {
   getMessage: (invoiceId: number) => `Are you sure you want to approve invoice ${invoiceId}?`,
 };
 
+// eslint-disable-next-line max-lines-per-function
 export const ManualInvoicesFiltersFormConfig = (isAgency: boolean): InvoiceFilterFieldConfig[] => [
   ...(isAgency ? [{
     type: ControlTypes.Multiselect,
@@ -246,6 +248,7 @@ export const ManualInvoicesFiltersFormConfig = (isAgency: boolean): InvoiceFilte
   },
 ];
 
+// eslint-disable-next-line max-lines-per-function
 export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: InvoiceTabId): InvoiceFilterFieldConfig[] => [
   {
     type: ControlTypes.Text,
@@ -453,4 +456,17 @@ export const InvoiceDefaulPerPageOptions: { text: string, value: number }[] = [
   { text: '30 Rows', value: 30 },
   { text: '50 Rows', value: 50 },
   { text: '100 Rows', value: 100 },
+];
+
+export const FiltersDateFields: TypedInvoiceKey[] = [
+  'issueDateFrom',
+  'issueDateTo',
+  'dueDateFrom',
+  'dueDateTo',
+  'paidDateFrom',
+  'paidDateTo',
+  'weekPeriodFrom',
+  'weekPeriodTo',
+  'serviceDateFrom',
+  'serviceDateTo',
 ];

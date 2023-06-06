@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -9,42 +10,43 @@ import {
   Output,
   TrackByFunction,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { combineLatest, debounceTime, Observable, takeUntil, switchMap, BehaviorSubject, tap } from 'rxjs';
+import { BehaviorSubject, Observable, combineLatest, debounceTime, switchMap, takeUntil, tap } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 
-import { Destroyable } from '@core/helpers';
+import { SkillFilterOptionFields, filterOptionFields } from '@core/constants/filters-helper.constant';
 import { FilterPageName } from '@core/enums';
+import { Destroyable } from '@core/helpers';
 import { CustomFormGroup, DataSourceItem, PreservedFiltersByPage } from '@core/interface';
-import { filterOptionFields, SkillFilterOptionFields } from '@core/constants/filters-helper.constant';
-import { PageOfCollections } from '@shared/models/page.model';
-import { FilterService } from '@shared/services/filter.service';
-import { FilteredItem } from '@shared/models/filter.model';
 import { ControlTypes } from '@shared/enums/control-types.enum';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { FilteredItem } from '@shared/models/filter.model';
 import {
   OrganizationDepartment, OrganizationLocation, OrganizationRegion,
   OrganizationStructure,
 } from '@shared/models/organization.model';
-import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { PageOfCollections } from '@shared/models/page.model';
+import { FilterService } from '@shared/services/filter.service';
+import { ShowFilterDialog } from 'src/app/store/app.actions';
+import { AppState } from 'src/app/store/app.state';
+import { ClearPageFilters } from 'src/app/store/preserved-filters.actions';
+import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { UserState } from '../../../../store/user.state';
-import { InvoicesState } from '../../store/state/invoices.state';
-import { Invoices } from '../../store/actions/invoices.actions';
-import { InvoicesFiltersService, InvoicesService } from '../../services';
-import {
-  InvoiceFilterColumns, InvoiceFilterFieldConfig, InvoiceRecord, InvoicesFilterState,
-  InvoiceTabId,
-} from '../../interfaces';
+import { InvoiceFiltersAdapter } from '../../adapters';
 import { DetectFormConfigBySelectedType } from '../../constants';
 import { InvoicesAgencyTabId, InvoicesOrgTabId, InvoicesTableFiltersColumns } from '../../enums';
-import { InvoiceFiltersAdapter } from '../../adapters';
+import {
+  InvoiceFilterColumns, InvoiceFilterFieldConfig, InvoiceRecord,
+  InvoiceTabId,
+  InvoicesFilterState,
+} from '../../interfaces';
+import { InvoicesFiltersService, InvoicesService } from '../../services';
+import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
-import { ClearPageFilters } from 'src/app/store/preserved-filters.actions';
-import { ShowFilterDialog } from 'src/app/store/app.actions';
-import { GetOrganizationStructure } from 'src/app/store/user.actions';
-import { AppState } from 'src/app/store/app.state';
+import { InvoicesState } from '../../store/state/invoices.state';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 
 @Component({
   selector: 'app-invoices-filters-dialog',
@@ -74,8 +76,10 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   @Select(AppState.getMainContentElement)
   public readonly targetElement$: Observable<HTMLElement | null>;
 
+  @Select(PreservedFiltersState.preservedFiltersByPageName)
+  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<InvoicesFilterState>>;
+
   @Input() selectedTabId: InvoiceTabId;
-  @Input() public populateFilterForm$: BehaviorSubject<PreservedFiltersByPage<InvoicesFilterState> | null>;
 
   @Output() readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();
   @Output() readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
@@ -104,13 +108,13 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   ) {
     super();
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
+    this.initFormGroup();
   }
 
   trackByFn: TrackByFunction<InvoiceFilterFieldConfig>
     = (_: number, item: InvoiceFilterFieldConfig): InvoicesTableFiltersColumns => item.field;
 
   ngOnInit(): void {
-    this.initFormGroup();
     this.initFiltersDataSources();
     this.initFiltersColumns();
     this.watchForOrganizationStructure();
@@ -231,7 +235,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       }),
       switchMap(() => this.getOrganizationStructure()),
       filter((structure) => !!structure),
-      switchMap(() => this.populateFilterForm$),
+      switchMap(() => this.preservedFiltersByPageName$),
       filter((filters) => !!filters),
       debounceTime(200),
 
@@ -239,6 +243,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     )
       .subscribe((filters) => {
         this.applyPreservedFilters(filters?.state || {});
+
         this.cdr.detectChanges();
       });
   }
@@ -353,6 +358,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     );
 
     this.formGroup.reset();
+    this.invoicesFiltersService.setCurrentTimezone(filterState);
     this.formGroup.patchValue({
       ...JSON.parse(JSON.stringify(filterState)),
     });

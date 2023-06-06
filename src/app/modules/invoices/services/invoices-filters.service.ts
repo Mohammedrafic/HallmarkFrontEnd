@@ -18,11 +18,12 @@ import {
   FilteringPendingInvoiceRecordsOptionsFields,
 } from '../enums';
 import {
+  FiltersDateFields,
   InvoicesFilteringOptionsMapping,
   ManualPendingInvoiceRecordsFilteringOptionsMapping,
   PendingInvoiceRecordsFilteringOptionsMapping,
 } from '../constants';
-import { BaseObservable } from '@core/helpers';
+import { BaseObservable, DateTimeHelper } from '@core/helpers';
 import { filter, Observable } from 'rxjs';
 import { OrganizationRegion } from '@shared/models/organization.model';
 
@@ -183,5 +184,11 @@ export class InvoicesFiltersService {
       };
 
     return filterData;
+  }
+
+  setCurrentTimezone(filters: Record<string, unknown>): void {
+    FiltersDateFields.filter((key) => !!filters[key]).forEach((key) => {
+      filters[key] = DateTimeHelper.convertDateToUtc(filters[key] as string);
+    });
   }
 }
