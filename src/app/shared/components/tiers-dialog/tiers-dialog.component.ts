@@ -37,6 +37,7 @@ import { TierList } from '@shared/components/associate-list/interfaces';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { Query } from "@syncfusion/ej2-data";
 import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
+import { SystemType } from '@shared/enums/system-type.enum';
 
 @Component({
   selector: 'app-tiers-dialog',
@@ -53,7 +54,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     this.regions = regions;
     this.dialogConfig = TiersDialogConfig(regions, this.workcommitments)[this.dialogType];
   };
-
+  @Input() systemType: SystemType;
   @Input() set selectedTier(tier: TierDetails) {
     if (tier) {
       this.selectedTierDetails = tier;
@@ -98,7 +99,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   public tierList$: Observable<TierList[]>;
 
   constructor(
-    @Inject(TIER_DIALOG_TYPE) protected readonly dialogType: Tiers,
+    @Inject(TIER_DIALOG_TYPE) public dialogType: Tiers,
     private tierService: TierService,
     private changeDetection: ChangeDetectorRef,
     private confirmService: ConfirmService,
@@ -109,12 +110,26 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   }
 
   ngOnInit(): void {
+    this.watchForSystemType();
     this.watchForShowDialog();
     this.createForm();
     this.watchForRegions();
     this.watchForLocation();
     this.watchForCloseDialog();
     this.watchForDepartments();
+  }
+
+  public watchForSystemType() {
+    if(this.systemType == 0){
+      this.dialogType = Tiers.tierSettings
+    } else {
+      this.dialogType = Tiers.tierSettingsIRP
+    }
+  }
+
+  ngOnChanges(): void {
+    this.watchForSystemType();
+    this.watchForShowDialog();
   }
 
   public allRegionsChange(event: { checked: boolean }): void {
@@ -281,8 +296,11 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   }
 
   private watchForShowDialog(): void {
-    this.isTierSettingsDialog = this.dialogType === Tiers.tierSettings;
-
+    if(this.systemType == 0){
+      this.isTierSettingsDialog = this.dialogType === Tiers.tierSettings
+    } else {
+      this.isTierSettingsDialog = this.dialogType === Tiers.tierSettingsIRP
+    }
     this.actions$.pipe(ofActionDispatched(ShowSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
         this.createForm();
