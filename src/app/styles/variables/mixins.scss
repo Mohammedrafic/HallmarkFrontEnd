@@ -111,24 +111,6 @@
   }
 }
 
-@mixin table-container {
-  height: auto;
-
-  &::ng-deep {
-    .empty-table {
-      .ag-body-viewport {
-        height: 100px;
-        background: #eaecf2;
-      }
-
-      & .ag-overlay-wrapper.ag-overlay-no-rows-wrapper {
-        font-size: 14px !important;
-        color: #9198ac !important;
-      }
-    }
-  }
-}
-
 @mixin action-buttons {
   button.e-control.e-btn {
     i-feather {

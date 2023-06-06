@@ -371,7 +371,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private listenRedirectFromReOrder(): void {
     this.orderManagementAgencyService.orderPerDiemId$
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(
+        debounceTime(50),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe((data: { id: number; prefix: string }) => {
         this.orderPerDiemId = data.id;
         this.prefix = data.prefix;
@@ -454,13 +457,17 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         if(this.Organizations.length > 0){
           this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
           this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
-        } 
+        }
         this.generateFilterChips();
         this.dispatchNewPage();
       });
   }
 
   private setDefaultStatuses(statuses: number[], setDefaultFilters: boolean): void {
+    if(this.Organizations.length > 0){
+      this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
+      this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
+    } 
     if (setDefaultFilters) {
       let Status = [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled];
       const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText) =>
@@ -476,16 +483,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
             }
           }
           this.filteredItems$.next(this.filteredItems.length);
+          this.dispatchNewPage();
       }, 500);
-    } 
-    if(this.Organizations.length > 0){
-      this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
-      this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
-    } 
-    setTimeout(() => {
-      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-      this.dispatchNewPage();
-    }, 500);
+    } else {
+      setTimeout(() => {
+        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+        this.dispatchNewPage();
+      }, 500);
+    }
   }
 
   private onTabChange(): void {
@@ -594,7 +599,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     const rowData = event.data as AgencyOrderManagement;
     const pageSettings = { page: this.currentPage, pageSize: this.pageSize, filters: this.filters };
-    
+
     this.store.dispatch(new SetOrderManagementPagerState(pageSettings));
 
     this.rowSelected(event, this.gridWithChildRow);
@@ -621,6 +626,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           rowData.irpOrderMetadata
             ? this.orderManagementAgencyService.getIsAvailable()
             : this.orderManagementAgencyService.excludeDeployed,
+          ""
         )
       );
       this.orderPositionSelected$.next(false);

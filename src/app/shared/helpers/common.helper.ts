@@ -11,4 +11,9 @@ export class CommonHelper{
         }    
         return Object.values(candidateAddress).filter(ele => ele === null || ele === '').length > 0;
       }
+
+    public static formatTheSSN(data:any){
+      data.ssn = data.ssn.substring(0,3) + "-" + data.ssn.substring(3,5)+ "-" + data.ssn.substring(5);
+      return data;
+    }
 }

@@ -55,30 +55,30 @@
           <div class="">
             <ejs-progressbar id='mainprogress{{i}}' [startAngle]="startAngle"
                              [endAngle]="endAngle" type='Circular'
-                             height='150' value={{agencies.vendorOverallScore}} width="150"
-                             progressColor="{{agencies.vendorOverallScore>=80 ?'#15ce48':
-              agencies.vendorOverallScore>=60?'#0f82bf':
-              agencies.vendorOverallScore>=40?'#36b3ef':
-              agencies.vendorOverallScore>=20?'#f9c679':
+                             height='150' value={{agencies.vendorOverallScorePercent}} width="150"
+                             progressColor="{{agencies.vendorOverallScorePercent>=80 ?'#15ce48':
+              agencies.vendorOverallScorePercent>=60?'#0f82bf':
+              agencies.vendorOverallScorePercent>=40?'#36b3ef':
+              agencies.vendorOverallScorePercent>=20?'#f9c679':
               '#f5602e'}}"
                              progressThickness="15" trackThickness="15">
             </ejs-progressbar>
-            <p class="mainscore">{{agencies.vendorOverallScore}}%</p>
+            <p class="mainscore">{{agencies.vendorOverallScorePercent}}%</p>
           </div>
         </div>
         <div class="col3 graph-heading">
           <h4>Vendor Rating</h4>
-          <div class="Rating" [ngStyle]="{'color':agencies.vendorOverallScore>=80 ?'#15ce48':
-            agencies.vendorOverallScore>=60?'#0f82bf':
-            agencies.vendorOverallScore>=40?'#36b3ef':
-            agencies.vendorOverallScore>=20?'#f9c679':
+          <div class="Rating" [ngStyle]="{'color':agencies.vendorOverallScorePercent>=80 ?'#15ce48':
+            agencies.vendorOverallScorePercent>=60?'#0f82bf':
+            agencies.vendorOverallScorePercent>=40?'#36b3ef':
+            agencies.vendorOverallScorePercent>=20?'#f9c679':
             '#f5602e'}">
-            <h3>{{agencies.vendorOverallScore>=80 ?'A':
-              agencies.vendorOverallScore>=60?'B':
-              agencies.vendorOverallScore>=40?'C':
-              agencies.vendorOverallScore>=20?'D':
-              'E'}}</h3>
-            <h3>{{agencies.vendorOverallScorePercent}}</h3>
+            <span>{{agencies.vendorOverallScorePercent>=80 ?'A':
+              agencies.vendorOverallScorePercent>=60?'B':
+              agencies.vendorOverallScorePercent>=40?'C':
+              agencies.vendorOverallScorePercent>=20?'D':
+              'E'}}</span>
+            <span>{{agencies.vendorOverallScore}}</span>
           </div>
           <div class="vendor_details">
             <div class="label-sec">
@@ -177,7 +177,7 @@
         </div>
         <div class="col4">
           <div class="order-cound">
-            <h4>Order Count 5</h4>
+            <h4>Order Count {{agencies.totalOrders}}</h4>
             <p>
               ( <span>{{VendorReportForm.controls['startDate'].value| date: 'MM/dd/yyyy'}}</span> -
               <span>{{VendorReportForm.controls['endDate'].value| date: 'MM/dd/yyyy'}}</span> )

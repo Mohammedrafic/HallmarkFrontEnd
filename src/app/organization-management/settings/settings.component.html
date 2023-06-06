@@ -411,6 +411,12 @@
             Without these settings, Order will be distributed to all Associated Agencies.
           </div>
         </ng-container>
+
+        <ng-container *ngIf="showDepartmentSkillToggleMessage">
+          <div class="toggle-message">
+            Switching between ON and OFF will not trigger Departments recalculation
+          </div>
+        </ng-container>
       </ng-template>
 
       <div class="input-container datepicker bootstrap" *ngSwitchCase="organizationSettingControlType.DateTime">

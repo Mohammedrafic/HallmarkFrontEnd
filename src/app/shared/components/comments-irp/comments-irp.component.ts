@@ -1,15 +1,15 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { Select, Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Comment } from '@shared/models/comment.model';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, take, takeUntil } from 'rxjs';
 import { UserState } from 'src/app/store/user.state';
 import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments-irp.actions';
 import { CommentsState } from './store/comments-irp.state';
-import { faUnlock, faLock, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faUnlock, faLock, faUserFriends, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 enum CommentsFilter {
   All = 'All',
@@ -28,12 +28,17 @@ export class CommentsIrpComponent {
   
   faUnlock = faUnlock as IconProp;
   faLock = faLock as IconProp;
-  faUsers = faUsers as IconProp;
+  faUserFriends = faUserFriends as IconProp;
+  faEye = faEye as IconProp;
+  faEyeSlash = faEyeSlash as IconProp;
+  public commentdata: any;
   @Input() useBackground: boolean = true;
   @Input() disabled: boolean = false;
   @Input() orderId: number;
+  @Input() CanOrganizationEditOrdersIRP:boolean;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
+    this.commentdata = value;
     if (value.length) {
       this.hasUnreadMessages = this.hasUnread();
       this.initView$.next();
@@ -203,9 +208,10 @@ export class CommentsIrpComponent {
   }
 
   public onFilterChange(event: SelectEventArgs): void {
-    this.showExternal = event.itemData.value === CommentsFilter.External;
-    this.showInternal = event.itemData.value === CommentsFilter.Internal;
-    this.showPrivate = event.itemData.value === CommentsFilter.Private;
+    this.commentdata = this.commentsList;
+    event.itemData.value === CommentsFilter.External ? this.commentdata = this.commentdata.filter((x: { isExternal: boolean; }) => x.isExternal === true) : this.commentdata;
+    event.itemData.value === CommentsFilter.Internal ? this.commentdata = this.commentdata.filter((x: { isExternal: boolean; }) => x.isExternal === false) : this.commentdata;
+    event.itemData.value === CommentsFilter.Private ? this.commentdata = this.commentdata.filter((x: { isPrivate: boolean; }) => x.isPrivate === true) : this.commentdata;
     this.scroll$.next(null);
   }
 }

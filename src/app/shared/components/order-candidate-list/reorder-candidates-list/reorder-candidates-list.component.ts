@@ -176,7 +176,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     }
 
     this.orderCandidateApiService.createIrpCandidate(
-      CreateCandidateDto(candidate.candidateProfileId, this.selectedOrder.id)
+      CreateCandidateDto(candidate, this.selectedOrder.id)
     ).pipe(
       catchError((error: HttpErrorResponse) => this.orderCandidateApiService.handleError(error)),
       filter(Boolean),

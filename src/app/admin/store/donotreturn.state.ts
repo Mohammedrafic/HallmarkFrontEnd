@@ -12,6 +12,8 @@ import { DoNotReturn } from './donotreturn.actions';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DoNotReturnStateModel } from '@client/do-not-return/do-not-return.interface';
 import { BLOCK_RECORD_SUCCESS, RECORD_SAVED_SUCCESS, RECORD_ALREADY_EXISTS,CANDIDATE_UNBLOCK,CANDIDATE_BLOCK } from '@shared/constants';
+import { ImportResult } from '@shared/models/import.model';
+import { CommonHelper } from '@shared/helpers/common.helper';
 
 @State<DoNotReturnStateModel>({
   name: 'donotreturn',
@@ -167,6 +169,58 @@ export class DonotReturnState {
         return payload;
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(DoNotReturn.UploadDoNotReturnFile)
+  UploadDepartmentsFile(
+    { dispatch }: StateContext<DoNotReturnStateModel>,
+    { payload }: DoNotReturn.UploadDoNotReturnFile
+  ): Observable<ImportResult<any> | Observable<void>> {
+    return this.DonotreturnService.uploadDNRFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new DoNotReturn.UploadDoNotReturnFileSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: any) =>
+        of(
+          dispatch(
+            new ShowToast(
+              MessageTypes.Error,
+              error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
+            )
+          )
+        )
+      )
+    );
+  }
+
+  @Action(DoNotReturn.SaveDoNotReturnImportResult)
+  SaveDepartmentsImportResult(
+    { dispatch }: StateContext<DoNotReturnStateModel>,
+    { payload }: DoNotReturn.SaveDoNotReturnImportResult
+  ): Observable<ImportResult<any> | Observable<void>> {
+    return this.DonotreturnService.saveDNRImportResult(payload).pipe(
+      tap((payload) => {
+        if(payload.errorRecords.length > 0){          
+          payload.errorRecords.forEach(data=>{
+            if(data.ssn != ''){
+              data = CommonHelper.formatTheSSN(data);
+            }
+          })
+          dispatch(new DoNotReturn.UploadDoNotReturnFileSucceeded(payload));
+        }
+        if(payload.succesfullRecords.length > 0){          
+          payload.succesfullRecords.forEach(data=>{
+            if(data.ssn != ''){
+              data = CommonHelper.formatTheSSN(data);
+            }
+          })
+        }
+        dispatch(new DoNotReturn.SaveDoNotReturnImportResultFailAndSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'DoNotReturn list were not imported'))))
     );
   }
 

@@ -2167,7 +2167,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.dispatchAgencyOrderCandidatesList(this.selectedCandidate.orderId, this.selectedCandidate.organizationId,
         this.selectedCandidate.irpOrderMetadata);
     });
-  } 
+  }
 
   private handleRedirectFromQuickOrderToast(): void {
     if (this.isRedirectedFromToast) {

@@ -5,7 +5,7 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { ButtonModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { TimePickerModule } from "@syncfusion/ej2-angular-calendars";
 import { DropDownListModule } from "@syncfusion/ej2-angular-dropdowns";
-import { DialogModule } from "@syncfusion/ej2-angular-popups";
+import { DialogModule, TooltipModule } from "@syncfusion/ej2-angular-popups";
 import { FeatherModule } from 'angular-feather';
 import { Plus, Lock } from 'angular-feather/icons';
 
@@ -39,6 +39,7 @@ const icons = {
     SwitchModule,
     ReplacementOrderDialogModule,
     ScheduleOpenPositionsModule,
+    TooltipModule,
     FeatherModule.pick(icons),
   ],
   exports: [EditScheduleComponent],

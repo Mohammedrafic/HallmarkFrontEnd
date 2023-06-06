@@ -1,6 +1,6 @@
 <div class="card-wrapper">
   <div class="block block--name">
-    <ejs-tooltip content="Candidate Name" position="TopCenter" [showTipPointer]="false">
+    <ejs-tooltip content="Employee Name" position="TopCenter" [showTipPointer]="false">
       <p class="name">{{ candidateData.lastName }}, {{ candidateData.firstName }}</p>
     </ejs-tooltip>
     <ejs-tooltip
@@ -12,7 +12,7 @@
       <p class="order-type">L</p>
     </ejs-tooltip>
     <ejs-tooltip
-      *ngIf="candidateIconName && iconTooltipMessage.length"
+      *ngIf="candidateIconName"
       [content]="iconTooltipMessage"
       position="TopCenter"
       [showTipPointer]="false"

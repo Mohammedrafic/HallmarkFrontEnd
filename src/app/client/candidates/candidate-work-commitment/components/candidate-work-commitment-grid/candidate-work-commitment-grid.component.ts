@@ -52,7 +52,7 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
     private candidateWorkCommitmentService: CandidateWorkCommitmentService,
     private store: Store,
     private confirmService: ConfirmService,
-    private candidateSevice: CandidatesService,
+    private candidateService: CandidatesService,
   ) {
     super();
     const todayDate = new Date();
@@ -77,7 +77,7 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
       tap((page) => {
         this.candidateWorkCommitmentsPage = page;
       }),
-      switchMap(() => this.candidateSevice.getEmployeeWorkCommitments())
+      switchMap(() => this.candidateService.getEmployeeWorkCommitments())
     ).subscribe(() => {
       this.cd.markForCheck();
     });
@@ -108,7 +108,7 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
     this.candidateWorkCommitmentService.deleteCandidateWorkCommitmentById(commitment.id as number).pipe(
       tap(() => {
         const numberPageRecords = this.candidateWorkCommitmentsPage?.items?.length || 0;
-        this.pageNumber = this.candidateSevice.getGridPageNumber(numberPageRecords, this.pageNumber);
+        this.pageNumber = this.candidateService.getGridPageNumber(numberPageRecords, this.pageNumber);
 
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
         this.refreshSubject$.next();

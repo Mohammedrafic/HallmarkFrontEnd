@@ -1,10 +1,11 @@
-import { ApplicantStatus, IrpOrderCandidate, Order } from '@shared/models/order-management.model';
+import { ApplicantStatus, IrpOrderCandidate, Order, OrderAvailabilityOverlap } from '@shared/models/order-management.model';
 
 export interface CreateIrpCandidateDto {
   employeeId: number;
   orderId: number;
   actualStartDate: string | null;
   actualEndDate: string | null;
+  availabilityOverlap: OrderAvailabilityOverlap | null;
 }
 
 export interface UpdateIrpCandidateDto {

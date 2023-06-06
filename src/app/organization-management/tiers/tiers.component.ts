@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 
 import { Actions, ofActionDispatched, Select, Store } from "@ngxs/store";
-import { filter, Observable, switchMap, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { OrganizationManagementState } from "@organization-management/store/organization-management.state";
 import { Tiers } from '@organization-management/store/tiers.actions';
@@ -21,6 +21,8 @@ import { UserState } from '../../store/user.state';
 import { TiersService } from "./services/tiers.service";
 import { TiersGridComponent } from "./tiers-grid/tiers-grid.component";
 import { SystemButtons } from "./tiers.constants";
+import { TiersState } from '@organization-management/store/tiers.state';
+import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 
 @Component({
   selector: 'app-tiers',
@@ -37,15 +39,20 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
   public showSystemButtons = false;
   public systemButtons: ButtonModel[] = SystemButtons;
   public selectedSystemType: SystemType = SystemType.VMS;
-
+  public pageSize : number = 30;
+  public pageNumber : number = 1;
   private tierFormState: TierDTO;
   private readonly isIrpFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
-
+  private unsubscribe$: Subject<void> = new Subject();
+  public workcommitments:any;
   @Select(UserState.tireOrganizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;
 
   @Select(OrganizationManagementState.organization)
   private readonly organization$: Observable<Organization>;
+
+  @Select(TiersState.workCommitmentsPageforTier)
+  public commitmentsPage$: Observable<MasterCommitmentsPage>;
 
   constructor(
     protected override store: Store,
@@ -59,10 +66,24 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.getWorkCommitment();
     this.watchForRegionStructure();
     this.watchForOverrideTier();
     this.watchForOrganization();
   }
+
+  public getWorkCommitment():void {
+    let payload = {pageSize : this.pageSize, pageNumber : this.pageNumber};
+    this.store.dispatch(new Tiers.GetWorkCommitmentByPageforTiers(payload));   
+    this.commitmentsPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
+      if(id){
+        this.workcommitments = id.items;
+        this.cd.markForCheck();
+      }
+    });
+ 
+  }
+
 
   ngAfterViewInit(): void {
     this.getTiersPage(this.selectedSystemType);
@@ -75,6 +96,14 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
 
   public handleSaveTier(tier: TierDTO) {
     this.tierFormState = tier;
+    if(this.tierFormState.skills == "1"){
+      this.tierFormState.skills = 1
+    }else if(this.tierFormState.skills == "2"){
+      this.tierFormState.skills = 2
+    }else if(this.tierFormState.skills == "3"){
+      this.tierFormState.skills = 3
+    } 
+    this.tierFormState.WorkCommitmentIds = this.tierFormState.workCommitments;
     this.store.dispatch(new Tiers.SaveTier({
       ...this.tierFormState,
       forceUpsert: false,
@@ -86,6 +115,8 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
 
   public handleEditTier(tier: TierDetails): void {
     this.isEdit = true;
+    tier.workCommitments = tier.workCommitments.map((m: { workCommitmentId: any; }) => m.workCommitmentId);
+    tier.skills == 1 ? tier.skills = "1" : (tier.skills == 2 ? tier.skills = "2" : (tier.skills == 3 ? tier.skills = "3" : ""));
     this.selectedTier = {...tier};
     this.store.dispatch(new ShowSideDialog(true));
   }

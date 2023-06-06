@@ -12,7 +12,7 @@ import {
   DownloadRecordAttachmentRequestData,
   MileageCreateResponse,
   TimesheetDetailsModel,
-  TimesheetFileData
+  TimesheetFileData,
 } from '../interface';
 
 @Injectable()
@@ -35,7 +35,7 @@ export class TimesheetDetailsApiService {
     orgId: number,
     isAgency: boolean,
   ): Observable<TimesheetDetailsModel> {
-    const endpoint = !isAgency ? `/api/Timesheets/${id}` : `/api/Timesheets/${id}/organization/${orgId}`
+    const endpoint = !isAgency ? `/api/Timesheets/${id}` : `/api/Timesheets/${id}/organization/${orgId}`;
     return this.http.get<TimesheetDetailsModel>(endpoint);
   }
 
@@ -53,14 +53,14 @@ export class TimesheetDetailsApiService {
 
   public organizationUploadFiles(timesheetId: number, files: TimesheetFileData[]): Observable<void> {
     const formData = new FormData();
-    files.forEach((file) => formData.append('files', file.blob, file.fileName))
+    files.forEach((file) => formData.append('files', file.blob, file.fileName));
 
     return this.http.post<void>(`/api/Timesheets/${timesheetId}/files`, formData);
   }
 
   public agencyUploadFiles(timesheetId: number, organizationId: number, files: TimesheetFileData[]): Observable<void> {
     const formData = new FormData();
-    files.forEach((file) => formData.append('files', file.blob, file.fileName))
+    files.forEach((file) => formData.append('files', file.blob, file.fileName));
 
     return this.http.post<void>(`/api/Timesheets/${timesheetId}/organization/${organizationId}/files`, formData);
   }
@@ -83,7 +83,8 @@ export class TimesheetDetailsApiService {
       this.agencyDownloadAttachment(fileId, organizationId);
   }
 
-  public downloadRecordAttachment({ timesheetRecordId, fileId, organizationId}: DownloadRecordAttachmentRequestData): Observable<Blob> {
+  public downloadRecordAttachment({ timesheetRecordId, fileId,
+    organizationId}: DownloadRecordAttachmentRequestData): Observable<Blob> {
     return organizationId === null ?
       this.organizationRecordDownloadAttachment(timesheetRecordId, fileId) :
       this.agencyRecordDownloadAttachment(timesheetRecordId, fileId, organizationId);
@@ -119,6 +120,10 @@ export class TimesheetDetailsApiService {
     return this.http.post<MileageCreateResponse>('/api/Timesheets/createmileage', body);
   }
 
+  public recalculateTimesheet(jobId: number): Observable<boolean> {
+    return this.http.post<boolean>('/api/Timesheets/performRecalculation', { jobIds: [jobId] });
+  }
+
   private organizationDownloadAttachment(fileId: number): Observable<Blob> {
     return this.http.get(`/api/Timesheets/files/${fileId}`, {
       responseType: 'blob',
@@ -133,25 +138,26 @@ export class TimesheetDetailsApiService {
 
   private organizationDownloadPDFAttachment(fileId: number): Observable<Blob> {
     return this.http.get(`/api/Timesheets/files/${fileId}/pdf`, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
   }
 
   private organizationRecordDownloadPDFAttachment(timesheetRecordId: number, fileId: number): Observable<Blob> {
     return this.http.get(`/api/TimesheetRecords/${timesheetRecordId}/files/${fileId}/pdf`, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
   }
 
   private agencyDownloadAttachment(fileId: number, organizationId: number): Observable<Blob> {
     return this.http.get(`/api/Timesheets/organization/${organizationId}/files/${fileId}`, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
   }
 
-  private agencyRecordDownloadAttachment(timesheetRecordId: number, fileId: number, organizationId: number): Observable<Blob> {
+  private agencyRecordDownloadAttachment(timesheetRecordId: number, fileId: number,
+    organizationId: number): Observable<Blob> {
     return this.http.get(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files/${fileId}`, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
   }
 
@@ -161,7 +167,8 @@ export class TimesheetDetailsApiService {
     });
   }
 
-  private agencyRecordDownloadPDFAttachment(timesheetRecordId: number, fileId: number, organizationId: number): Observable<Blob> {
+  private agencyRecordDownloadPDFAttachment(timesheetRecordId: number,
+    fileId: number, organizationId: number): Observable<Blob> {
     return this.http.get(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files/${fileId}/pdf`, {
       responseType: 'blob',
     });
@@ -180,6 +187,7 @@ export class TimesheetDetailsApiService {
   }
 
   private agencyRecordDeleteAttachment(timesheetRecordId: number, fileId: number, organizationId: number): Observable<void> {
-    return this.http.delete<void>(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files/${fileId}`);
+    return this.http
+    .delete<void>(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files/${fileId}`);
   }
 }

@@ -68,6 +68,7 @@ import {
   AssociatedLink,
   BillingSettingsKey,
   DepartmentFields,
+  DepartmentSkillRequired,
   DisabledSettingsByDefault,
   DropdownCheckboxValueDataSource,
   DropdownFields,
@@ -165,6 +166,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   isFormShown = false;
   formControlType: number;
   showToggleMessage = false;
+  showDepartmentSkillToggleMessage = false;
   showBillingMessage = false;
   textFieldType: number;
   maxFieldLength = 100;
@@ -275,6 +277,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   openOverrideSettingDialog(data: OrganizationSettingsGet): void {
     this.setSelectedRecords(data);
+    this.setOrganizationSettingKey(data.settingKey);
     this.setConfigurationSystemType(this.getParentConfigurationSystemType(), true);
     this.separateValuesInSystems = data.separateValuesInSystems;
     this.enableOtForm();
@@ -285,7 +288,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == data.settingKey;
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
-    this.setOrganizationSettingKey(data.settingKey);
     this.formControlType = data.controlType;
     this.disableDepForInvoiceGeneration();
     this.regionFormGroup.reset();
@@ -317,6 +319,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     event: MouseEvent
   ): void {
     this.setSelectedRecords(parentRecord, childRecord);
+    this.setOrganizationSettingKey(parentRecord.settingKey);
     this.separateValuesInSystems = parentRecord.separateValuesInSystems;
     this.IsSettingKeyOtHours =
       OrganizationSettingKeys[OrganizationSettingKeys['OTHours']].toString() == parentRecord.settingKey;
@@ -332,7 +335,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.isFormShown = true;
     this.addActiveCssClass(event);
     this.setEditMode();
-    this.setOrganizationSettingKey(parentRecord.settingKey);
     this.regularLocalRatesToggleMessage = OrganizationSettings.MandateCandidateAddress === parentRecord.settingKey &&
     this.dataSource.find((data: OrganizationSettingsGet) => data.settingKey === OrganizationSettings.EnableRegularLocalRates)?.value == 'true';
     this.formControlType = parentRecord.controlType;
@@ -925,6 +927,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private setPermissionsToManageSettings(): void {
     this.settingsAppliedToPermissions.forEach((key) => {
       this.hasPermissions[key] = this.userPermission[PermissionTypes.ManageOrganizationConfigurations];
+
+      if (key === OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired]) {
+        this.hasPermissions[key] = this.userPermission[PermissionTypes.ManageDepartmentSkillRequired];
+      }
     });
   }
 
@@ -1015,6 +1021,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private handleShowToggleMessage(key: string): void {
     this.showToggleMessage = key === TierSettingsKey;
+    this.showDepartmentSkillToggleMessage = key === DepartmentSkillRequired;
     this.showBillingMessage = key === BillingSettingsKey || key === InvoiceGeneratingSettingsKey;
   }
 

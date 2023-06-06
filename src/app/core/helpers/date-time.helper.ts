@@ -38,16 +38,22 @@ export class DateTimeHelper {
     return day;
   }
 
-  public static toUtcFormat(date: string | Date): string {
+  public static toUtcFormat(date: string | Date, zeroTime = false): string {
     if (typeof date === 'string') {
       const gmt = new Date(this.convertDateToUtc(date));
+      const hours = zeroTime ? 0 : gmt.getHours();
+      const minuets = zeroTime ? 0 : gmt.getMinutes();
+
       return new Date(
-        Date.UTC(gmt.getFullYear(), gmt.getMonth(), gmt.getDate(), gmt.getHours(), gmt.getMinutes())
+        Date.UTC(gmt.getFullYear(), gmt.getMonth(), gmt.getDate(), hours, minuets)
       ).toISOString();
     }
 
+    const hours = zeroTime ? 0 : date.getHours();
+    const minuets = zeroTime ? 0 : date.getMinutes();
+
     return new Date(
-      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes())
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), hours, minuets)
     ).toISOString();
   }
 

@@ -372,7 +372,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public openAddDialog(): void {
     this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Open));
-    this.store.dispatch(new Invoices.GetInvoicesReasons(this.organizationControl.value||this.store.selectSnapshot(UserState.lastSelectedOrganizationId)));
+    this.store.dispatch(new Invoices.GetInvoicesReasons(this.organizationControl.value 
+      || this.store.selectSnapshot(UserState.lastSelectedOrganizationId)));
   }
 
   public changeFiltersAmount(amount: number): void {
@@ -387,7 +388,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       const preservedFilters = this.store.selectSnapshot(
         PreservedFiltersState.preservedFiltersByPageName) as
         PreservedFiltersByPage<Interfaces.InvoicesFilterState>;
-      this.populateFilterForm(preservedFilters);
+
+      const filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency);
+      this.filterState = this.filterService.composeFilterState(
+        filtersFormConfig,
+        preservedFilters.state as Record<string, unknown>
+      );
+
       filters = this.filterState;
     }
 
@@ -464,6 +471,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public changePageSize(pageSize: number): void {
     const useFilterState = !!this.navigatedInvoiceId;
+
     this.store.dispatch(new Invoices.UpdateFiltersState({
       ...this.filterState,
       pageSize,
@@ -713,24 +721,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   private watchForPreservedFilters(): void {
     this.preservedFiltersByPageName$.pipe(
+      filter((filters) => filters.dispatch),
       takeUntil(this.componentDestroy())
     )
-      .subscribe((filters) => {
-        if (filters.dispatch) {
-          this.store.dispatch(new Invoices.UpdateFiltersState({ ...filters.state }));
-        }
-
-        this.populateFilterForm(filters);
-      });
-  }
-
-  private populateFilterForm(filters: PreservedFiltersByPage<Interfaces.InvoicesFilterState>): void {
-    const filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency);
-    this.filterState = this.filterService.composeFilterState(
-      filtersFormConfig,
-      filters.state as Record<string, unknown>
-    );
-    this.populateFilterForm$.next({ ...filters, state: { ...this.filterState } });
+    .subscribe((filters) => {
+      this.store.dispatch(new Invoices.UpdateFiltersState({ ...filters.state }));
+    });
   }
 
   public clearStructure(): void {

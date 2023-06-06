@@ -13,6 +13,9 @@ export interface TierDTO {
   includeInIRP?: boolean;
   includeInVMS?: boolean;
   systemType?: SystemType;
+  WorkCommitmentIds: any;
+  workCommitments: any;
+  skills : any;
 }
 
 export interface TierConfig {

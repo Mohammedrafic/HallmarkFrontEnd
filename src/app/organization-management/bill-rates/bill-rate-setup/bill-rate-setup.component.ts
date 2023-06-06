@@ -1,25 +1,22 @@
-import { ChangeDetectorRef, Component, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
-import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { UserState } from '../../../store/user.state';
-import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { Skill } from '@shared/models/skill.model';
-import { ConfirmService } from '@shared/services/confirm.service';
+import { DatePipe } from '@angular/common';
 import {
-  CANCEL_CONFIRM_TEXT,
-  DATA_OVERRIDE_TEXT,
-  DATA_OVERRIDE_TITLE,
-  DELETE_CONFIRM_TITLE,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE
-} from '@shared/constants';
-import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
+  ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit,
+  SimpleChanges, ViewChild,
+} from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+import { Actions, Select, Store, ofActionDispatched, ofActionSuccessful } from '@ngxs/store';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
+import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
+import { Query } from "@syncfusion/ej2-data";
+import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
+import { Observable, Subject, filter, switchMap, take, takeUntil, throttleTime } from 'rxjs';
+
+import { UserPermissions } from '@core/enums';
+import { DateTimeHelper } from '@core/helpers';
+import { Permission } from '@core/interface';
 import {
   DeleteBillRatesById,
   ExportBillRateSetup,
@@ -27,9 +24,26 @@ import {
   GetBillRates,
   SaveUpdateBillRate,
   SaveUpdateBillRateSucceed,
-  ShowConfirmationPopUp
+  ShowConfirmationPopUp,
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
+import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import {
+  AbstractGridConfigurationComponent,
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import {
+  CANCEL_CONFIRM_TEXT,
+  DATA_OVERRIDE_TEXT,
+  DATA_OVERRIDE_TITLE,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+} from '@shared/constants';
+import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { OrderTypeOptions } from '@shared/enums/order-type';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import {
   BillRateCalculationType,
   BillRateCategory,
@@ -40,27 +54,22 @@ import {
   BillRateSetupPost,
   BillRateType,
   BillRateTypes,
-  BillRateUnit
+  BillRateUnit,
 } from '@shared/models/bill-rate.model';
-import { OrderTypeOptions } from '@shared/enums/order-type';
-import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
-import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
-import { FilteredItem } from '@shared/models/filter.model';
-import { FilterService } from '@shared/services/filter.service';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
-import { DatePipe } from '@angular/common';
+import { FilteredItem } from '@shared/models/filter.model';
+import {
+  OrganizationDepartment, OrganizationLocation, OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
+import { Skill } from '@shared/models/skill.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { FilterService } from '@shared/services/filter.service';
 import { valuesOnly } from '@shared/utils/enum.utils';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { DateTimeHelper } from '@core/helpers';
-import { UserPermissions } from '@core/enums';
-import { Permission } from '@core/interface';
-import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
-import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { Query } from "@syncfusion/ej2-data";
-import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
+import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
+import { UserState } from '../../../store/user.state';
+import { RateSetupFilters, rateColumnsToExport } from './bill-rate-setup.constant';
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -71,7 +80,7 @@ import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
 export class BillRateSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('rateHours') rateHoursInput: MaskedTextBoxComponent;
-  @Input() isActive: boolean = false;
+  @Input() isActive = false;
   @Input() export$: Subject<ExportedFileType> | undefined;
   @Input() filteredItems$: Subject<number>;
   @Input() importDialogEvent: Subject<boolean>;
@@ -106,297 +115,92 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public orderTypes = OrderTypeOptions;
   public orderTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
   public fields: FieldSettingsModel = { text: 'name', value: 'id' };
-  public isEdit = false;
   public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
   public BillRateUnitList = BillRateUnit;
-  public isIntervalMinEnabled = true;
-  public isIntervalMaxEnabled = true;
   public isIntervalMaxRequired = true;
   public isIntervalMinRequired = true;
   public billRatesFormGroup: FormGroup;
   public billRateFilterFormGroup: FormGroup;
-  public intervalMinField: AbstractControl;
-  public intervalMaxField: AbstractControl;
   public billRateCategory = BillRateCategory;
   public billRateTypesOptions = BillRateTypes;
   public billRateType = BillRateType;
-  public filters: BillRateFilters = {};
   public filterColumns: any;
-  public billRateToPost?: BillRateSetupPost;
   public additionalLableForMinMax: string | null = null;
   public hideFilds = new Set<string>();
   public isWeeklyOT = false;
+  public columnsToExport: ExportColumn[] = rateColumnsToExport;
+  public fileName: string;
+  public format = '#';
+  public allRegionsSelected = false;
+  public allLocationsSelected = false;
+  public allDepartmentsSelected = false;
+  public maxDepartmentsLength = 1000;
+  public query: Query = new Query().take(this.maxDepartmentsLength);
+  public otInputsEnabled = true;
+  public amountDisabled = false;
 
-  get dialogHeader(): string {
-    return this.isEdit ? 'Edit' : 'Add New';
-  }
-
-  private formBuilder: FormBuilder;
+  private billRateToPost?: BillRateSetupPost;
+  private filters: BillRateFilters = {};
+  private intervalMinField: AbstractControl;
+  private intervalMaxField: AbstractControl;
+  private isIntervalMinEnabled = true;
+  private isIntervalMaxEnabled = true;
+  private isEdit = false;
+  private defaultFileName: string;
+  private isMileageTitleType: boolean;
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
 
-  public columnsToExport: ExportColumn[] = [
-    { text: 'Region', column: 'Region' },
-    { text: 'Location', column: 'Location' },
-    { text: 'Department', column: 'Department' },
-    { text: 'Skill', column: 'Skill' },
-    { text: 'Order Type', column: 'OrderType' },
-    { text: 'Bill Rate Title', column: 'BillRateTitle' },
-    { text: 'Bill Rate Category', column: 'BillRateCategory' },
-    { text: 'Bill Rate Type', column: 'BillRateType' },
-    { text: 'Effective Date', column: 'EffectiveDate' },
-    { text: 'Bill Rate Value (Rate/Times)', column: 'BillRateValue' },
-    { text: 'Interval Min', column: 'IntervalMin' },
-    { text: 'Interval Max', column: 'IntervalMax' },
-    { text: 'Consider For Weekly OT', column: 'ConsiderForWeeklyOT' },
-    { text: 'Consider For Daily OT', column: 'ConsiderForDailyOT' },
-    { text: 'Consider For 7th Day OT', column: 'ConsiderFor7thDayOT' },
-    { text: 'Display In Job', column: 'DisplayInJob' },
-  ];
-  public fileName: string;
-  public defaultFileName: string;
-  public isMileageTitleType: boolean;
-  public format = '#';
-  public allRegionsSelected: boolean = false;
-  public allLocationsSelected: boolean = false;
-  public allDepartmentsSelected: boolean = false;
-  public maxDepartmentsLength = 1000;
-  public query: Query = new Query().take(this.maxDepartmentsLength);
-
   constructor(
     private store: Store,
     private actions$: Actions,
-    @Inject(FormBuilder) private builder: FormBuilder,
+    private formBuilder: FormBuilder,
     private confirmService: ConfirmService,
     private filterService: FilterService,
     private datePipe: DatePipe,
     private cd: ChangeDetectorRef
   ) {
     super();
-    this.formBuilder = builder;
     this.createFormGroups();
   }
 
+  get dialogHeader(): string {
+    if (this.isEdit) {
+      return 'Edit';
+    }
+    
+    return 'Add New';
+  }
+
   ngOnInit(): void {
+    this.filterColumns = RateSetupFilters;
     this.idFieldName = 'billRateSettingId';
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
-      if (val.isDialogShown) {
-        this.defaultFileName = 'Bill Rates/Bill Rate Setup ' + this.generateDateTime(this.datePipe);
-        this.fileName = this.defaultFileName;
-      }
-    });
-    this.export$?.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
-      this.defaultFileName = 'Bill Rates/Bill Rate Setup ' + this.generateDateTime(this.datePipe);
-      this.defaultExport(event);
-    });
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
-      this.clearFilters();
-      this.loadData();
-    });
-
-    this.filterColumns = {
-      regionIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      locationIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      departmentIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      skillIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'skillDescription',
-        valueId: 'id',
-      },
-      billRateConfigIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'title',
-        valueId: 'id',
-      },
-      orderTypes: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      billRateCategories: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      billRateTypes: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      effectiveDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      intervalMin: { type: ControlTypes.Text, valueType: ValueType.Text },
-      intervalMax: { type: ControlTypes.Text, valueType: ValueType.Text },
-      considerForWeeklyOt: {
-        type: ControlTypes.Checkbox,
-        valueType: ValueType.Text,
-        checkBoxTitle: 'Consider for Weekly OT',
-      },
-      considerForDailyOt: {
-        type: ControlTypes.Checkbox,
-        valueType: ValueType.Text,
-        checkBoxTitle: 'Consider for Daily OT',
-      },
-      considerFor7thDayOt: {
-        type: ControlTypes.Checkbox,
-        valueType: ValueType.Text,
-        checkBoxTitle: 'Consider for 7th Day OT',
-      },
-      displayInJob: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Display in Job' },
-    };
-
-    this.filterColumns.billRateCategories.dataSource = Object.values(BillRateCategory)
-      .filter(valuesOnly)
-      .map((name) => ({ name, id: BillRateCategory[name as BillRateCategory] }));
-
-    this.filterColumns.billRateTypes.dataSource = BillRateTypes
-
-    this.organizationStructure$
-      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
-      .subscribe((structure: OrganizationStructure) => {
-        this.orgRegions = structure.regions;
-        this.allRegions = [...this.orgRegions];
-        this.filterColumns.regionIds.dataSource = this.allRegions;
-      });
-
-    this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills) => {
-      if (skills && skills.length > 0) {
-        this.allSkills = skills;
-        this.filterColumns.skillIds.dataSource = skills;
-      }
-    });
-
-    this.billRatesOptions$.pipe(takeUntil(this.unsubscribe$)).subscribe((options) => {
-      if (options && options.length > 0) {
-        this.billRatesOptions = options;
-        this.filterColumns.billRateConfigIds.dataSource = options;
-      }
-    });
-
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
-      this.currentPage = page;
-      this.filters.pageNumber = page;
-      this.store.dispatch(new GetBillRates(this.filters));
-    });
-
+    this.filterColumns.billRateTypes.dataSource = BillRateTypes;
     this.filterColumns.orderTypes.dataSource = OrderTypeOptions;
-
     this.intervalMinField = this.billRatesFormGroup.get('intervalMin') as AbstractControl;
-    this.intervalMinField.addValidators(intervalMinValidator(this.billRatesFormGroup, 'intervalMax'));
-    this.intervalMinField.valueChanges.subscribe(() =>
-      this.intervalMaxField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
-    );
-
     this.intervalMaxField = this.billRatesFormGroup.get('intervalMax') as AbstractControl;
-    this.intervalMaxField.addValidators(intervalMaxValidator(this.billRatesFormGroup, 'intervalMin'));
-    this.intervalMaxField.valueChanges.subscribe(() =>
-      this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
-    );
 
+    this.observeExportAction();
+    this.observeOrgId();
+    this.observeExportEvent();
+    this.observaStructure();
+    this.observeSkills();
+    this.observeRateOptions();
+    this.observePaging();
+    this.observeIntervalMin();
+    this.observeIntervalMax();
     this.regionChangedHandler();
     this.locationChangedHandler();
     this.billRatesTitleChangedHandler();
-
-    this.billRateFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
-      if (val?.length) {
-        const selectedRegions: OrganizationRegion[] = [];
-        val.forEach((id) =>
-          selectedRegions.push(this.orgRegions.find((region) => region.id === id) as OrganizationRegion)
-        );
-        this.filterColumns.locationIds.dataSource = [];
-        const locations: OrganizationLocation[] = [];
-        selectedRegions.forEach((region) => {
-          region.locations?.forEach((location) => (location.regionName = region.name));
-          locations.push(...(region.locations as []));
-        });
-        this.filterColumns.locationIds.dataSource = sortByField(locations, 'name');
-      } else {
-        this.filterColumns.locationIds.dataSource = [];
-        this.billRateFilterFormGroup.get('locationIds')?.setValue([]);
-        this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
-        this.filteredItems$.next(this.filteredItems.length);
-      }
-      this.cd.markForCheck();
-    });
-
-    this.billRateFilterFormGroup.get('locationIds')?.valueChanges.subscribe((locationIds: number[]) => {
-      if (locationIds && locationIds.length > 0) {
-        this.filterColumns.departmentIds.dataSource = [];
-        const departments: OrganizationDepartment[] = [];
-        locationIds.forEach((id) => {
-          const selectedLocation = this.filterColumns.locationIds.dataSource.find(
-            (location: OrganizationLocation) => location.id === id
-          );
-          departments.push(...(selectedLocation?.departments as []));
-        });
-        this.filterColumns.departmentIds.dataSource = sortByField(departments, 'name');
-      } else {
-        this.filterColumns.departmentIds.dataSource = [];
-        this.billRateFilterFormGroup.get('departmentIds')?.setValue([]);
-        this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
-        this.filteredItems$.next(this.filteredItems.length);
-      }
-      this.cd.markForCheck();
-    });
-
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUpdateBillRateSucceed)).subscribe(() => {
-      this.store.dispatch(new ShowSideDialog(false));
-      this.clearFormDetails();
-    });
-
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ShowConfirmationPopUp)).subscribe(() => {
-      this.confirmService
-        .confirm(DATA_OVERRIDE_TEXT, {
-          title: DATA_OVERRIDE_TITLE,
-          okButtonLabel: 'Confirm',
-          okButtonClass: '',
-        })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
-          if (this.billRateToPost) {
-            const filters = {
-              pageNumber: this.currentPage,
-              pageSize: this.pageSize,
-              ...this.filters,
-            };
-            this.billRateToPost.forceUpsert = true; // set force override flag for BE
-            this.store.dispatch(new SaveUpdateBillRate(this.billRateToPost, filters));
-          } else {
-            this.store.dispatch(new ShowSideDialog(false));
-            this.clearFormDetails();
-          }
-        });
-    });
+    this.setBillRatesCtegories();
+    this.intervalMinField.addValidators(intervalMinValidator(this.billRatesFormGroup, 'intervalMax'));
+    this.intervalMaxField.addValidators(intervalMaxValidator(this.billRatesFormGroup, 'intervalMin'));
+    this.observeRegionControl();
+    this.observeLocationControl();
+    this.observeSaveAction();
+    this.observeConfirmAction();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -465,12 +269,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         ? query.where('name', 'contains', e.text, true).take(char * 15)
         : query;
     e.updateData(this.departments as [], query);
-  };
-
-  public loadData(): void {
-    this.store.dispatch(new GetAssignedSkillsByOrganization());
-    this.store.dispatch(new GetBillRates({ pageNumber: this.currentPage, pageSize: this.pageSize }));
-    this.store.dispatch(new GetBillRateOptions());
   }
 
   public closeExport() {
@@ -510,7 +308,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1),
+        )
         .subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
           this.clearFormDetails();
@@ -599,6 +400,9 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })
+      .pipe(
+        take(1),
+      )
       .subscribe((confirm) => {
         if (confirm) {
           const filters = {
@@ -641,14 +445,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public onFilterDelete(event: FilteredItem): void {
     this.filterService.removeValue(event, this.billRateFilterFormGroup, this.filterColumns);
-  }
-
-  private clearFilters(): void {
-    this.billRateFilterFormGroup.reset();
-    this.filteredItems = [];
-    this.filteredItems$.next(this.filteredItems.length);
-    this.currentPage = 1;
-    this.filters = {};
   }
 
   public onFilterClearAll(): void {
@@ -716,6 +512,20 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         ...this.filters,
       })
     );
+  }
+
+  private clearFilters(): void {
+    this.billRateFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.filteredItems$.next(this.filteredItems.length);
+    this.currentPage = 1;
+    this.filters = {};
+  }
+
+  private loadData(): void {
+    this.store.dispatch(new GetAssignedSkillsByOrganization());
+    this.store.dispatch(new GetBillRates({ pageNumber: this.currentPage, pageSize: this.pageSize }));
+    this.store.dispatch(new GetBillRateOptions());
   }
 
   private createFormGroups(): void {
@@ -809,10 +619,13 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       });
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private billRatesTitleChangedHandler(): void {
     this.billRatesFormGroup
       .get('billRateTitleId')
-      ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
+      ?.valueChanges
+      .pipe(takeUntil(this.unsubscribe$))
+      // eslint-disable-next-line max-lines-per-function
       .subscribe((typeId: number) => {
         this.isMileageTitleType = typeId !== BillRateTitleId.Mileage;
         const foundBillRateOption = this.billRatesOptions.find((option) => option.id === typeId);
@@ -860,6 +673,30 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           intervalMaxControl?.disable();
         }
 
+        if (typeId === BillRateTitleId.MissedMeal) {
+          this.billRatesFormGroup.get('billRateValueRateTimes')?.patchValue(1);
+        }
+
+        if (typeId === BillRateTitleId.FacilityCalledOff || typeId === BillRateTitleId.ResourceCalledOff) {
+          this.amountDisabled = true;
+          this.billRatesFormGroup.get('billRateValueRateTimes')?.patchValue(0);
+          this.billRatesFormGroup.get('billRateValueRateTimes')?.removeValidators(Validators.required);
+        } else {
+          this.amountDisabled = false;
+          this.billRatesFormGroup.get('billRateValueRateTimes')?.addValidators(Validators.required);
+        }
+
+        if (typeId === BillRateTitleId.MissedMeal
+          || typeId === BillRateTitleId.FacilityCalledOff || typeId === BillRateTitleId.ResourceCalledOff) {
+            this.otInputsEnabled = false;
+            this.billRatesFormGroup.get('considerForWeeklyOt')?.patchValue(false);
+            this.billRatesFormGroup.get('considerForDailyOt')?.patchValue(false);
+            this.billRatesFormGroup.get('considerFor7thDayOt')?.patchValue(false);
+            
+        } else if (!this.otInputsEnabled) {
+          this.otInputsEnabled = true;
+        }
+
         this.changeFieldsSettingByType(typeId);
 
         this.billRatesFormGroup.updateValueAndValidity();
@@ -898,13 +735,14 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     }
   }
 
-  setBillRateTypes(billRateOption: BillRateOption): void {
+  private setBillRateTypes(billRateOption: BillRateOption): void {
     this.billRateTypesOptions = BillRateTypes.filter((type) => billRateOption.billTypes.includes(type.id));
   }
 
   private onClickedCheckboxHandler(data: any, controlName: string, isChecked: boolean): void {
     this.editRecordId = data.billRateSettingId;
     this.setupFormValues(data);
+
     setTimeout(() => {
       this.billRatesFormGroup.controls[controlName].setValue(isChecked);
       this.onFormSaveClick();
@@ -981,5 +819,200 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     const isBillRateUnitHours = this.selectedBillRateUnit === this.BillRateUnitList.Hours;
     this.format = isBillRateUnitHours ? '#' : this.isMileageTitleType ? '###.00' : '###.000';
     this.decimals = isBillRateUnitHours ? 0 : this.isMileageTitleType ? 2 : 3;
+  }
+
+  private observeExportAction(): void {
+    this.actions$
+    .pipe(
+      ofActionDispatched(ShowExportDialog),
+      filter((val) => !!val.isDialogShown),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.defaultFileName = 'Bill Rates/Bill Rate Setup ' + this.generateDateTime(this.datePipe);
+      this.fileName = this.defaultFileName;
+    });
+  }
+
+  private observeOrgId(): void {
+    this.organizationId$
+    .pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.clearFilters();
+      this.loadData();
+    });
+  }
+
+  private observeExportEvent(): void {
+    this.export$?.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((event: ExportedFileType) => {
+      this.defaultFileName = 'Bill Rates/Bill Rate Setup ' + this.generateDateTime(this.datePipe);
+      this.defaultExport(event);
+    });
+  }
+
+  private observaStructure(): void {
+    this.organizationStructure$
+    .pipe(
+      filter((structure) => !!structure),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((structure: OrganizationStructure) => {
+      this.orgRegions = structure.regions;
+      this.allRegions = [...this.orgRegions];
+      this.filterColumns.regionIds.dataSource = this.allRegions;
+    });
+  }
+
+  private observeSkills(): void {
+    this.skills$
+    .pipe(
+      filter((skills) => skills && skills.length > 0),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((skills) => {
+      this.allSkills = skills;
+      this.filterColumns.skillIds.dataSource = skills;
+    });
+  }
+
+  private observeRateOptions(): void {
+    this.billRatesOptions$
+    .pipe(
+      filter((options) => options && options.length > 0),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((options) => {
+      this.billRatesOptions = options;
+      this.filterColumns.billRateConfigIds.dataSource = options;
+    });
+  }
+
+  private observePaging(): void {
+    this.pageSubject
+    .pipe(
+      throttleTime(100),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((page) => {
+      this.currentPage = page;
+      this.filters.pageNumber = page;
+      this.store.dispatch(new GetBillRates(this.filters));
+    });
+  }
+
+  private observeIntervalMin(): void {
+    this.intervalMinField.valueChanges
+    .pipe(
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe(() =>
+      this.intervalMaxField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
+    );
+  }
+
+  private observeIntervalMax(): void {
+    this.intervalMaxField.valueChanges
+    .pipe(
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe(() =>{
+      this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    });
+  }
+
+  private setBillRatesCtegories(): void {
+    this.filterColumns.billRateCategories.dataSource = Object.values(BillRateCategory)
+    .filter(valuesOnly)
+    .map((name) => ({ name, id: BillRateCategory[name as BillRateCategory] }));
+  }
+
+  private observeRegionControl(): void {
+    this.billRateFilterFormGroup.get('regionIds')?.valueChanges
+    .pipe(
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((val: number[]) => {
+      if (val?.length) {
+        const selectedRegions: OrganizationRegion[] = [];
+        val.forEach((id) =>
+          selectedRegions.push(this.orgRegions.find((region) => region.id === id) as OrganizationRegion)
+        );
+        this.filterColumns.locationIds.dataSource = [];
+        const locations: OrganizationLocation[] = [];
+        selectedRegions.forEach((region) => {
+          region.locations?.forEach((location) => (location.regionName = region.name));
+          locations.push(...(region.locations as []));
+        });
+        this.filterColumns.locationIds.dataSource = sortByField(locations, 'name');
+      } else {
+        this.filterColumns.locationIds.dataSource = [];
+        this.billRateFilterFormGroup.get('locationIds')?.setValue([]);
+        this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
+        this.filteredItems$.next(this.filteredItems.length);
+      }
+      this.cd.markForCheck();
+    });
+  }
+
+  private observeLocationControl(): void {
+    this.billRateFilterFormGroup.get('locationIds')?.valueChanges
+    .pipe(
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((locationIds: number[]) => {
+      if (locationIds && locationIds.length > 0) {
+        this.filterColumns.departmentIds.dataSource = [];
+        const departments: OrganizationDepartment[] = [];
+        locationIds.forEach((id) => {
+          const selectedLocation = this.filterColumns.locationIds.dataSource.find(
+            (location: OrganizationLocation) => location.id === id
+          );
+          departments.push(...(selectedLocation?.departments as []));
+        });
+        this.filterColumns.departmentIds.dataSource = sortByField(departments, 'name');
+      } else {
+        this.filterColumns.departmentIds.dataSource = [];
+        this.billRateFilterFormGroup.get('departmentIds')?.setValue([]);
+        this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
+        this.filteredItems$.next(this.filteredItems.length);
+      }
+      this.cd.markForCheck();
+    });
+  }
+
+  private observeSaveAction(): void {
+    this.actions$
+    .pipe(
+      ofActionSuccessful(SaveUpdateBillRateSucceed),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.clearFormDetails();
+    });
+  }
+
+  private observeConfirmAction(): void {
+    this.actions$.pipe(
+      takeUntil(this.unsubscribe$),
+      ofActionSuccessful(ShowConfirmationPopUp),
+      switchMap(() => this.confirmService
+      .confirm(DATA_OVERRIDE_TEXT, {
+        title: DATA_OVERRIDE_TITLE,
+        okButtonLabel: 'Confirm',
+        okButtonClass: '',
+      })),
+      filter((confirm) => confirm)
+    ).subscribe(() => {
+      if (this.billRateToPost) {
+        const filters = {
+          pageNumber: this.currentPage,
+          pageSize: this.pageSize,
+          ...this.filters,
+        };
+        this.billRateToPost.forceUpsert = true; // set force override flag for BE
+        this.store.dispatch(new SaveUpdateBillRate(this.billRateToPost, filters));
+      } else {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.clearFormDetails();
+      }
+    });
   }
 }

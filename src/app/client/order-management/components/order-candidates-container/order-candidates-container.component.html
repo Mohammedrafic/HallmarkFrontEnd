@@ -41,6 +41,7 @@
     (getCandidatesList)="onGetCandidatesList($event)"
     [system]="activeSystem"
     [order]="orderCandidates"
+    [orderDetails] = "order" 
     [orderManagementPagerState]="orderManagementPagerState$ | async"
     >
   </app-order-candidates-list>

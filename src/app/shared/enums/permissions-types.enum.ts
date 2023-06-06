@@ -1,7 +1,5 @@
 export enum PermissionTypes {
   CanCreateDeleteOrganization = 102,
-  ViewOrganizationConfigurations = 1500,
-  ManageOrganizationConfigurations = 1501,
   CanOrganizationEditOrders = 1801,
 
   // Order
@@ -29,15 +27,19 @@ export enum PermissionTypes {
   WidgetLTAOrderEnding = 3403,
   OpenAndInProgressPositionsWidget = 6100,
 
-
-
   // Credentials
   ManageOrganizationCredential= 401,
   ManuallyAddCredential = 402,
-    //View Order Journey
-    ViewOrderJourney = 8001,
 
-    CanOrganizationViewOrdersIRP = 6406,
+  //Organization Configuration
+  ViewOrganizationConfigurations = 1500,
+  ManageOrganizationConfigurations = 1501,
+  ViewDepartmentSkillRequired = 8105,
+  ManageDepartmentSkillRequired = 8106,
+
+  //View Order Journey
+  ViewOrderJourney = 8001,
+  CanOrganizationViewOrdersIRP = 6406,
   CanOrganizationEditOrdersIRP = 6407,
   CanCreateOrdersIRP = 6408,
   CanOnboardCandidateIRP = 6409,

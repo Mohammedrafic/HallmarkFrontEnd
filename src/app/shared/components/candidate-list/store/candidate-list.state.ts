@@ -1,32 +1,17 @@
-import { Injectable } from '@angular/core';
-import { CandidateList, IRPCandidateList } from '../types/candidate-list.model';
-import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { catchError, Observable, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ShowToast } from 'src/app/store/app.actions';
-import { getAllErrors } from '@shared/utils/error.utils';
-import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateListService } from '../services/candidate-list.service';
-import {
-  ChangeCandidateProfileStatus,
-  DeleteIRPCandidate,
-  ExportCandidateList,
-  ExportIRPCandidateList,
-  GetAllSkills,
-  GetCandidatesByPage,
-  GetIRPCandidatesByPage,
-  GetRegionList
-} from './candidate-list.actions';
-import { ListOfSkills } from '@shared/models/skill.model';
-import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { Injectable } from '@angular/core';
 
-export interface CandidateListStateModel {
-  isCandidateLoading: boolean;
-  candidateList: CandidateList | null;
-  IRPCandidateList: IRPCandidateList | null;
-  listOfSkills: ListOfSkills[] | null;
-  listOfRegions: string[] | null;
-}
+import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { Observable, catchError, tap } from 'rxjs';
+
+import { MessageTypes } from '@shared/enums/message-types';
+import { ListOfSkills } from '@shared/models/skill.model';
+import { getAllErrors } from '@shared/utils/error.utils';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { ShowToast } from 'src/app/store/app.actions';
+import { CandidateListService } from '../services/candidate-list.service';
+import { CandidateList, CandidateListStateModel, IRPCandidateList } from '../types/candidate-list.model';
+import * as CandidateListActions from './candidate-list.actions';
 
 @State<CandidateListStateModel>({
   name: 'candidateList',
@@ -35,7 +20,8 @@ export interface CandidateListStateModel {
     candidateList: null,
     IRPCandidateList: null,
     listOfSkills: null,
-    listOfRegions: null
+    listOfRegions: null,
+    tableState: null,
   },
 })
 @Injectable()
@@ -62,10 +48,10 @@ export class CandidateListState {
 
   constructor(private candidateListService: CandidateListService) {}
 
-  @Action(GetCandidatesByPage, { cancelUncompleted: true })
+  @Action(CandidateListActions.GetCandidatesByPage, { cancelUncompleted: true })
   GetCandidatesByPage(
     { patchState, dispatch }: StateContext<CandidateListStateModel>,
-    { payload }: GetCandidatesByPage
+    { payload }: CandidateListActions.GetCandidatesByPage
   ): Observable<CandidateList | unknown> {
     patchState({ isCandidateLoading: true });
     return this.candidateListService.getCandidates(payload).pipe(
@@ -80,10 +66,10 @@ export class CandidateListState {
     );
   }
 
-  @Action(GetIRPCandidatesByPage, { cancelUncompleted: true })
+  @Action(CandidateListActions.GetIRPCandidatesByPage, { cancelUncompleted: true })
   GetIRPCandidatesByPage(
     { patchState, dispatch }: StateContext<CandidateListStateModel>,
-    { payload }: GetIRPCandidatesByPage
+    { payload }: CandidateListActions.GetIRPCandidatesByPage
   ): Observable<IRPCandidateList | unknown> {
     patchState({ isCandidateLoading: true });
     return this.candidateListService.getIRPCandidates(payload).pipe(
@@ -98,8 +84,10 @@ export class CandidateListState {
     );
   }
 
-  @Action(ExportIRPCandidateList)
-  ExportUserListIRP({}: StateContext<CandidateListStateModel>, { payload }: ExportCandidateList): Observable<Blob> {
+  @Action(CandidateListActions.ExportIRPCandidateList)
+  ExportUserListIRP(
+    ctx: StateContext<CandidateListStateModel>,
+    { payload }: CandidateListActions.ExportCandidateList): Observable<Blob> {
     return this.candidateListService.exportIrp(payload).pipe(
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
@@ -108,23 +96,30 @@ export class CandidateListState {
     );
   }
 
-  @Action(GetAllSkills)
+  @Action(CandidateListActions.GetAllSkills)
   GetAllSkills({ patchState }: StateContext<CandidateListStateModel>): Observable<ListOfSkills[]> {
-    return this.candidateListService.getAllSkills().pipe(tap((data) => patchState({ listOfSkills: data.map(({id, masterSkillId, skillDescription}) => ({id, masterSkillId, name: skillDescription})) })));
+    return this.candidateListService.getAllSkills()
+    .pipe(
+      tap((data) => {
+        patchState({ listOfSkills: data.map(({id, masterSkillId, skillDescription}) =>
+        ({id, masterSkillId, name: skillDescription})) });
+      }));
   }
 
-  @Action(ChangeCandidateProfileStatus)
+  @Action(CandidateListActions.ChangeCandidateProfileStatus)
   ChangeCandidateProfileStatus(
     { dispatch }: StateContext<CandidateListStateModel>,
-    { candidateProfileId, profileStatus }: ChangeCandidateProfileStatus
+    { candidateProfileId, profileStatus }: CandidateListActions.ChangeCandidateProfileStatus
   ): Observable<void> {
     return this.candidateListService.changeCandidateStatus(candidateProfileId, profileStatus).pipe(
       catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }
 
-  @Action(ExportCandidateList)
-  ExportUserList({}: StateContext<CandidateListStateModel>, { payload }: ExportCandidateList): Observable<Blob> {
+  @Action(CandidateListActions.ExportCandidateList)
+  ExportUserList(
+    ctx: StateContext<CandidateListStateModel>,
+    { payload }: CandidateListActions.ExportCandidateList): Observable<Blob> {
     return this.candidateListService.export(payload).pipe(
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
@@ -133,7 +128,7 @@ export class CandidateListState {
     );
   }
 
-  @Action(GetRegionList)
+  @Action(CandidateListActions.GetRegionList)
   GetRegionList({patchState}: StateContext<CandidateListStateModel>): Observable<string[]> {
     return this.candidateListService.getRegions().pipe(tap((data)=> {
       patchState({
@@ -142,10 +137,31 @@ export class CandidateListState {
     }));
   }
 
-  @Action(DeleteIRPCandidate)
-  DeleteIRPCandidate({dispatch}: StateContext<CandidateListStateModel>, { id }: DeleteIRPCandidate): Observable<void> {
+  @Action(CandidateListActions.DeleteIRPCandidate)
+  DeleteIRPCandidate(
+    {dispatch}: StateContext<CandidateListStateModel>,
+    { id }: CandidateListActions.DeleteIRPCandidate): Observable<void> {
     return this.candidateListService.deleteIRPCandidate(id).pipe(
       catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
+  }
+
+  @Action(CandidateListActions.SetTableState)
+  SetTableState(
+    { patchState }: StateContext<CandidateListStateModel>,
+    { candidatesTableState }: CandidateListActions.SetTableState,
+  ): void {
+    patchState({
+      tableState: candidatesTableState,
+    });
+  }
+
+  @Action(CandidateListActions.ClearTableState)
+  ClearTableState(
+    { patchState }: StateContext<CandidateListStateModel>,
+  ): void {
+    patchState({
+      tableState: null,
+    });
   }
 }

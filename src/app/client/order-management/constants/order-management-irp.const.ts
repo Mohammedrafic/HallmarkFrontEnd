@@ -231,7 +231,7 @@ export const DefaultOrderManagementSubGridCells: ColDef[] = [
   },
   {
     field: 'name',
-    headerName: 'Candidate Name',
+    headerName: 'Employee Name',
     width: 140,
   },
 ];
@@ -260,11 +260,6 @@ export const OrderManagementVMSSubGridCells: ColDef[] = [
     field: 'agency',
     headerName: 'Agency',
     width: 160,
-  },
-  {
-    field: 'billRate',
-    headerName: 'Bill Rate $',
-    width: 100,
   },
   {
     field: 'actualStartDate',

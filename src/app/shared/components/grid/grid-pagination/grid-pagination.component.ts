@@ -21,17 +21,25 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
   @Input() public currentPage: number;
   @Input() public pageSize: number;
   @Input() public totalRecordsCount: number;
-  @Input() public selectedTableRowsAmount: number = 0;
-  @Input() public allowBulkSelection: boolean = false;
-  @Input() public disableBulkButton: boolean = false;
+  @Input() public selectedTableRowsAmount = 0;
+  @Input() public allowBulkSelection = false;
+  @Input() public disableBulkButton = false;
   @Input() public isDarkTheme?: boolean | null;
   @Input() public customRowsPerPageDropDownObject: { text: string; value: number }[];
-  @Input() public disableRowsPerPageDropdown: boolean = false;
+  @Input() public disableRowsPerPageDropdown = false;
   @Input() public bulkActionConfig: BulkActionConfig = {};
 
   @Output() public navigateToPageEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output() public pageSizeChangeEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output() public bulkEventEmitter: EventEmitter<BulkTypeAction> = new EventEmitter<BulkTypeAction>();
+
+  get totalPages(): number | undefined {
+    if (this.pageSize && this.totalRecordsCount) {
+      return Math.ceil(this.totalRecordsCount / this.pageSize);
+    }
+
+    return undefined;
+  }
 
   public paginationFormGroup: FormGroup;
 
@@ -57,6 +65,12 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
       this.paginationFormGroup.controls['pageSize'].disable();
     } else {
       this.paginationFormGroup.controls['pageSize'].enable();
+    }
+  }
+
+  public navigateTo(page: number): void {
+    if (page) {
+      this.navigateToPageEmitter.emit(page);
     }
   }
 

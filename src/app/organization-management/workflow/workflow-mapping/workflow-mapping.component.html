@@ -26,7 +26,6 @@
   <ejs-grid
     class="grid grid-component"
     #grid
-    appAddBackgroundForEmptyGridDirective
     (rowDataBound)="rowDataBound($event)"
     [dataSource]="(workflowMappings$ | async)?.items"
     [allowPaging]="allowPaging"

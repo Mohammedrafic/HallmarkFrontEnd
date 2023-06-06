@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
@@ -29,7 +29,7 @@ import { Region } from '@shared/models/region.model';
 import { Location } from '@shared/models/location.model';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { MessageTypes } from '@shared/enums/message-types';
-import { 
+import {
   AbstractGridConfigurationComponent,
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
@@ -38,6 +38,8 @@ import {
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
   IRP_DEPARTMENT_CHANGE_WARNING,
+  OrganizationalHierarchy,
+  OrganizationSettingKeys,
   RECORD_ADDED,
   RECORD_MODIFIED,
   WARNING_TITLE,
@@ -60,6 +62,7 @@ import { DateTimeHelper } from '@core/helpers';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { difference } from 'lodash';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { SettingsViewService } from '@shared/services';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
@@ -114,6 +117,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   primarySkills: ListOfSkills[] = [];
   secondarySkills: ListOfSkills[] = [];
   areSkillsAvailable: boolean;
+  isPrimarySkillRequired: boolean;
 
   protected componentDestroy: () => Observable<unknown>;
 
@@ -139,7 +143,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     private datePipe: DatePipe,
     private filterService: FilterService,
     private departmentService: DepartmentService,
-    private action$: Actions
+    private action$: Actions,
+    private settingsViewService: SettingsViewService,
   ) {
     super();
 
@@ -162,6 +167,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.getSkills();
     this.listenPrimarySkill();
     this.listenIncludeInIRPToggleChanges();
+    this.getDepartmentSkillConfig();
   }
 
   ngOnDestroy(): void {
@@ -369,8 +375,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       const reactivationDateField = this.departmentsDetailsFormGroup.controls['reactivateDate'];
       const reactivateDate = this.selectedLocation.reactivateDate ? new Date(this.selectedLocation.reactivateDate) : null;
       const inactiveDate = this.selectedLocation.inactiveDate ? new Date(this.selectedLocation.inactiveDate) : null;
-      this.minReactivateDate = reactivateDate ? 
-        DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy') : 
+      this.minReactivateDate = reactivateDate ?
+        DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy') :
         null;
       this.maxInactivateDate = inactiveDate ? DateTimeHelper.formatDateUTC(inactiveDate.toISOString(), 'MM/dd/yyyy') : null;
       if (!this.selectedLocation.reactivateDate && this.selectedLocation.isDeactivated) {
@@ -418,7 +424,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       const department: Department = DepartmentsAdapter.prepareToSave(
         this.editedDepartmentId,
         this.selectedLocation.id,
-        this.departmentsDetailsFormGroup
+        this.departmentsDetailsFormGroup,
+        this.areSkillsAvailable
       );
       this.saveOrUpdateDepartment(department, ignoreWarning);
     } else {
@@ -494,7 +501,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   private createDepartmentsForm(): void {
-    this.departmentsDetailsFormGroup = 
+    this.departmentsDetailsFormGroup =
       this.departmentService.createDepartmentDetailForm(this.isIRPFlagEnabled, this.isOrgUseIRPAndVMS);
     this.DepartmentFilterFormGroup = this.departmentService.createDepartmentFilterForm(this.isIRPFlagEnabled);
     this.addDatesValidation();
@@ -602,13 +609,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
           takeUntil(this.componentDestroy())
         )
         .subscribe((state: boolean) => {
-          if (state && this.isIRPFlagEnabled && preferences?.isIRPEnabled) {
-            this.areSkillsAvailable = true;
-          } else {
-            this.areSkillsAvailable = false;
-            this.departmentsDetailsFormGroup.get('primarySkills')?.reset();
-            this.departmentsDetailsFormGroup.get('secondarySkills')?.reset();
-          }
+          const isIncludedInIRP = !!(state && this.isIRPFlagEnabled && preferences?.isIRPEnabled);
+          this.areSkillsAvailable = isIncludedInIRP;
+          this.configureSkillDropdowns(isIncludedInIRP);
         });
     } else {
       this.areSkillsAvailable = this.isIRPFlagEnabled && !!preferences?.isIRPEnabled;
@@ -634,5 +637,43 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     const wasIncludedInIrp = this.initialIrpValue === true;
     return !!(wasIncludedInIrp && this.departmentsDetailsFormGroup.get('includeInIRP')?.dirty &&
       !this.departmentsDetailsFormGroup.get('includeInIRP')?.value);
+  }
+
+  private configureSkillDropdowns(isIRP: boolean): void {
+    const primarySkillsControl = this.departmentsDetailsFormGroup.get('primarySkills');
+    const secondarySkillsControl = this.departmentsDetailsFormGroup.get('secondarySkills');
+
+    if (this.isPrimarySkillRequired && isIRP) {
+      primarySkillsControl?.setValidators(Validators.required);
+    } else if (!this.isPrimarySkillRequired && isIRP) {
+      primarySkillsControl?.removeValidators(Validators.required);
+      primarySkillsControl?.disable();
+      secondarySkillsControl?.disable();
+    } else {
+      primarySkillsControl?.removeValidators(Validators.required);
+      primarySkillsControl?.updateValueAndValidity();
+    }
+  }
+
+  private getDepartmentSkillConfig(): void {
+    const organizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
+    if (organizationId) {
+      this.settingsViewService.getViewSettingKey(
+        OrganizationSettingKeys.DepartmentSkillRequired,
+        OrganizationalHierarchy.Organization,
+        organizationId,
+        organizationId
+      )
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe((data) => {
+          const { isVMCEnabled } = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences ?? {};
+          const areSkillsRequired = data[OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired]];
+          this.isPrimarySkillRequired = areSkillsRequired === 'true';
+
+          if (!isVMCEnabled) {
+            this.configureSkillDropdowns(this.areSkillsAvailable);
+          }
+        });
+    }
   }
 }

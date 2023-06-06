@@ -11,9 +11,10 @@ import {
 import { take } from 'rxjs';
 
 import { DateWeekService } from '@core/services';
+import { EmployeeIcons } from '../../enums';
 import { ScheduleCandidate, ScheduleFilters, ScheduleModel } from '../../interface';
 import { CandidateIconName } from '../../constants';
-import { CreateTooltipForOrientation, GetCandidateTypeTooltip, PrepareCandidate } from './candidate-card.helper';
+import { GetCandidateTypeTooltip, GetIconTooltipMessage, PrepareCandidate } from './candidate-card.helper';
 
 @Component({
   selector: 'app-candidate-card',
@@ -30,7 +31,7 @@ export class CandidateCardComponent implements OnInit, OnChanges {
   @Input() showScheduledHours = true;
 
   candidateData: ScheduleCandidate;
-  candidateIconName: string;
+  candidateIconName: EmployeeIcons | null;
   iconTooltipMessage = '';
   candidateTypeTooltip: string;
   startDate: string;
@@ -42,10 +43,8 @@ export class CandidateCardComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.watchForDateRangeChanges();
-
-    this.candidateIconName = CandidateIconName(this.candidateData, this.selectedFilters);
-    this.iconTooltipMessage = this.candidateIconName === 'compass' ?
-      CreateTooltipForOrientation(this.candidateData, this.startDate) : this.candidateData.employeeNote;
+    this.candidateIconName = CandidateIconName(this.candidateData, this.selectedFilters, this.startDate);
+    this.iconTooltipMessage = GetIconTooltipMessage(this.candidateIconName, this.candidateData, this.startDate);
   }
 
   private watchForDateRangeChanges(): void {

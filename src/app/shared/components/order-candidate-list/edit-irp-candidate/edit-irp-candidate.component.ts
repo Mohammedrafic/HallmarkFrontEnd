@@ -9,10 +9,11 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of } from 'rxjs';
+import { Comment } from '@shared/models/comment.model';
+import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of, map, Observable } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import {
@@ -42,8 +43,11 @@ import {
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { DurationService } from '@shared/services/duration.service';
 import { OrderType } from '@shared/enums/order-type';
-import { OrderCandidateJob } from '@shared/models/order-management.model';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { Order, OrderCandidateJob } from '@shared/models/order-management.model';
+import { adaptOrder } from '@client/order-management/components/irp-tabs/order-details/helpers';
+import { UserState } from 'src/app/store/user.state';
+import { CommentsService } from '@shared/services/comments.service';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -65,7 +69,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   @Output() handleCloseModal: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() handleSuccessSaveCandidate: EventEmitter<void> = new EventEmitter<void>();
-
+  @Input() public commentContainerId:number;
   public readonly optionFields: FieldSettingsModel = OptionField;
   public readonly title: string = CandidateTitle;
   public readonly FieldTypes = FieldType;
@@ -76,6 +80,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public canOnboardCandidateIRP:boolean;
   public canRejectedCandidateIRP:boolean;
 
+  public comments: Comment[] = [];
+  @Input() public externalCommentConfiguration ?: boolean | null;
+  @Input() CanOrganizationViewOrdersIRP: boolean;
 
   private candidateModelState: EditCandidateDialogState;
 
@@ -88,6 +95,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     private permissionService: PermissionService,
     private orderManagementService: OrderManagementService,
     private durationService: DurationService,
+    private commentsService: CommentsService,
   ) {
     super();
     this.dialogConfig = CandidateDialogConfig();
@@ -97,6 +105,15 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   ngOnInit(): void {
     this.observeCloseControl();
     this.watchForActualDateValues();
+    this.getComments();
+  }
+
+  private getComments(): void {
+    this.commentsService.getComments(this.commentContainerId, null)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+    });
   }
 
   public closeModal(): void {
@@ -154,7 +171,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
             };
 
             return this.orderCandidateApiService.closeIrpPosition(closeDto);
-      
+
           }),
           take(1),
         ).subscribe(() => {
@@ -176,7 +193,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           const statusConfigField = GetConfigField(this.dialogConfig, StatusField);
           const reasonConfigField = GetConfigField(this.dialogConfig, CloseReasonField);
           const reasons = this.store.selectSnapshot(RejectReasonState.closureReasonsPage)?.items;
-    
+
           statusConfigField.dataSource = this.editIrpCandidateService
           .createStatusOptions([...candidateDetails.availableStatuses ?? []]);
           if(!this.canOnboardCandidateIRP){
@@ -204,7 +221,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
                 OrganizationId: this.candidateModelState.order.organizationId as number,
                 JobId: this.candidateModelState.candidate.candidateJobId,
               };
-          
+
             return this.orderCandidateApiService.getPositionDetails(jobDto)
             .pipe(
               tap((job) => {

@@ -26,7 +26,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order,
   OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { formatDate } from '@angular/common';
+import { formatDate, formatNumber } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
@@ -63,7 +63,7 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
-import { DateTimeHelper } from '@core/helpers';
+import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { OrderType } from '@shared/enums/order-type';
 
@@ -104,7 +104,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() isOrderOverlapped: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Input() isCandidatePayRateVisible: boolean;
-
+  @Input() canEditBillRate = false;
+  @Input() canEditClosedBillRate = false;
   @Input() order: Order;
 
   public override form: FormGroup;
@@ -439,7 +440,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             comments: value.requestComment,
             workWeek: value.guaranteedWorkWeek ? value.guaranteedWorkWeek : '',
             clockId: value.clockId ? value.clockId : '',
-            offeredBillRate: value.offeredBillRate ? PriceUtils.formatNumbers(value.offeredBillRate) : null,
+            offeredBillRate: formatNumber(CheckNumberValue(value.offeredBillRate), 'en', '0.2-2'),
             allow: value.allowDeployCredentials,
             startDate: DateTimeHelper.convertDateToUtc(actualStart),
             endDate: DateTimeHelper.convertDateToUtc(actualEnd),

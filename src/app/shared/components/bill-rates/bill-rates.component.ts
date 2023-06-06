@@ -2,20 +2,23 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { filter, Observable, take, takeUntil } from 'rxjs';
+import { Observable, filter, take, takeUntil } from 'rxjs';
 
-import { ConfirmService } from '@shared/services/confirm.service';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { DateTimeHelper } from '@core/helpers';
+import {
+  ADD_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE,
+  EDIT_CONFIRM_TEXT, UpdateClosedPositionRate,
+} from '@shared/constants';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
 import { AbstractPermission } from '@shared/helpers/permissions';
+import { BillRate, BillRateOption, BillRateUnit } from '@shared/models/bill-rate.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-form.component';
-import { ADD_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, EDIT_CONFIRM_TEXT } from '@shared/constants';
-import { BillRate, BillRateOption, BillRateUnit } from '@shared/models/bill-rate.model';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
-import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { CandidatStatus } from '@shared/enums/applicant-status.enum';
-import { DateTimeHelper } from '@core/helpers';
-import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
 
 @Component({
   selector: 'app-bill-rates',
@@ -77,7 +80,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     );
   }
 
-  public onAddBillRate(): void {
+  public addBillRate(): void {
     this.editBillRateIndex = null;
     this.billRateForm.reset();
     this.billRateFormHeader = 'Add Bill Rate';
@@ -94,7 +97,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onEditBillRate({ index, ...value }: BillRatesGridEvent): void {
+  public editBillRate({ index, ...value }: BillRatesGridEvent): void {
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
 
@@ -146,7 +149,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onRemoveBillRate({ index }: BillRatesGridEvent): void {
+  public removeBillRate({ index }: BillRatesGridEvent): void {
     this.confirmService
       .confirm('Are you sure you want to delete it?', {
         okButtonLabel: 'Delete',
@@ -164,7 +167,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       });
   }
 
-  public onDialogCancel(): void {
+  public cancelChanges(): void {
     if (this.billRateForm.dirty) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {
@@ -185,7 +188,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     }
   }
 
-  public onDialogOk(): void {
+  public saveChanges(): void {
     this.billRateForm.markAllAsTouched();
 
     if (this.billRateForm.valid) {
@@ -223,41 +226,37 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
         this.billRateForm.get('effectiveDate')?.patchValue(value.effectiveDate);
       }
 
-      const applicantStatus = this.store.selectSnapshot(OrderManagementContentState.candidatesJob)?.applicantStatus.applicantStatus;
-
-      if (applicantStatus === CandidatStatus.OnBoard && !this.isOrderPage) {
+      const applicantStatus = this.store
+      .selectSnapshot(OrderManagementContentState.candidatesJob)?.applicantStatus.applicantStatus;
+      const isCandidateCanceled = applicantStatus === CandidatStatus.Cancelled
+      || applicantStatus === CandidatStatus.Offboard;
+      const showWarnMessage = (applicantStatus === CandidatStatus.OnBoard && !this.isOrderPage) || isCandidateCanceled;
+      
+      if (showWarnMessage) {
         const confirmText = this.editBillRateIndex ? EDIT_CONFIRM_TEXT : ADD_CONFIRM_TEXT;
+        const messageToShow = isCandidateCanceled ? UpdateClosedPositionRate : confirmText;
 
         this.confirmService
-          .confirm(confirmText, {
+          .confirm(messageToShow, {
             title: 'Warning',
             okButtonLabel: 'Yes',
             okButtonClass: 'ok-button',
           })
           .pipe(
-            filter(Boolean),
-            takeUntil(this.componentDestroy())
+            filter((confirm) => confirm),
+            take(1),
           )
           .subscribe(() => {
-            if (!this.editBillRateIndex) {
-              this.billRatesControl.push(this.fromValueToBillRate(value));
-            }
-            this.billRatesChanged.emit(this.billRateForm.value);
-            this.billRateForm.reset();
-            this.store.dispatch(new ShowSideDialog(false));
+            this.saveBillRate(value);
           });
+
       } else {
-        if (!this.editBillRateIndex) {
-          this.billRatesControl.push(this.fromValueToBillRate(value));
-        }
-        this.billRatesChanged.emit(this.billRateForm.value);
-        this.billRateForm.reset();
-        this.store.dispatch(new ShowSideDialog(false));
+        this.saveBillRate(value);
       }
     }
   }
 
-  syncBillRateHourlyRate(billRate: BillRate): void {
+  public syncBillRateHourlyRate(billRate: BillRate): void {
     if (billRate.billRateConfig.id !== 1) {
       return;
     }
@@ -281,5 +280,15 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     ).subscribe((options: BillRateOption[]) => {
       this.billRatesOptions = options;
     });
+  }
+
+  private saveBillRate(rate: BillRate): void {
+    if (!this.editBillRateIndex) {
+      this.billRatesControl.push(this.fromValueToBillRate(rate));
+    }
+
+    this.billRatesChanged.emit(this.billRateForm.value);
+    this.billRateForm.reset();
+    this.store.dispatch(new ShowSideDialog(false));
   }
 }

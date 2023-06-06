@@ -8,10 +8,10 @@
 
 
     <e-columns>
-      <e-column textAlign="Right" width="120">
+      <e-column textAlign="Right" width="120" *ngIf="(currentUserPermissions$ | async) as userPermission">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editDonotReturn(data, $event)">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editDonotReturn(data, $event)" [disabled]="!userPermission[userPermissions.CanAddEditDoNotReturn]">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
           </div>
@@ -176,7 +176,7 @@
         <div class="input-container">
           <label for="locationIds">Location blocked <span class="required">*</span></label>
           <div class="input-group bootstrap">
-            <ejs-multiselect id="locationIds" mode="CheckBox" formControlName="locationIds" placeholder="All"
+            <ejs-multiselect id="locationIds" mode="CheckBox" formControlName="locationIds" placeholder="All"  [enabled]="!requestAPIData"
               [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true" appValidateWithMessage
               [dataSource]="locations$ | async" [selectAllText]='allOption' [showSelectAll]="true" tabindex="3">
             </ejs-multiselect>
@@ -204,9 +204,9 @@
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
   (export)="export($event)"></app-export-dialog>
 
-<app-filter-dialog [items]="filteredItems" (clearAllFiltersClicked)="onFilterClearAll()"
-  (applyFilterClicked)="onFilterApply()">
-  <form class="bootstrap" [formGroup]="doNotReturnFilterForm">
+<app-filter-dialog *ngIf="filteredItemsData$ | async as items" [items]="items" [count]="(donotreturnpage$ | async)?.totalCount" (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()" (deleteFilter)="onFilterDelete($event)">
+  <form class="donotreturn-form" [formGroup]="doNotReturnFilterForm">
     <div class="input-container bootstrap" [hidden]="true">
       <label>Organization<span class="required">*</span></label>
       <div class="input-group">
@@ -261,7 +261,7 @@
         <div class="input-container">
           <label for="locationIds">Location blocked</label>
           <div class="input-group bootstrap">
-            <ejs-multiselect id="locationIds" mode="CheckBox" formControlName="locationBlocked" placeholder="All"
+            <ejs-multiselect id="locationIds" mode="CheckBox" formControlName="locationBlocked" placeholder="All" [enabled]="!requestAPIData"
               [fields]="optionFields" [allowFiltering]="true" [showDropDownIcon]="true" appValidateWithMessage
               [dataSource]="locations$ | async" [selectAllText]='allOption' [showSelectAll]="true" tabindex="3">
             </ejs-multiselect>

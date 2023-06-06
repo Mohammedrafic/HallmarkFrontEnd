@@ -1,13 +1,16 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild } from '@angular/core';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { DonoreturnFilters } from '@shared/models/donotreturn.model';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { MasterDNRExportCols, TITLE } from '../donotreturn-grid.constants';
+import { UserState } from 'src/app/store/user.state';
+import { Permission } from '@core/interface';
+import { UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-do-not-return-details',
@@ -22,13 +25,19 @@ public filters: DonoreturnFilters = {};
   @ViewChild('grid')
   public grid: GridComponent;
 
+  @Select(UserState.userPermission)
+  currentUserPermissions$: Observable<Permission>;
+
   public fileName: string;
   public defaultFileName: string;
   public isdnrActive=true;
   public columnsToExport: ExportColumn[] = MasterDNRExportCols;
   public exportDonotreturn$ = new Subject<ExportedFileType>();
-  public filteredItems$ = new Subject<number>();
+  public filteredcnt:number = 0;
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
+  public refreshGridEvent: Subject<boolean> = new Subject<boolean>();
+  public fliterFlag$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public override userPermissions = UserPermissions;
 
   constructor(protected override store:Store) { 
     super(store)
@@ -38,6 +47,10 @@ public filters: DonoreturnFilters = {};
   override ngOnInit(): void {
    // this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, 1)]);
     super.ngOnInit();
+  }
+
+  public override updatePage(){
+    this.refreshGridEvent.next(true);
   }
   
   public override customExport(): void {
@@ -51,6 +64,7 @@ public filters: DonoreturnFilters = {};
   }
 
   public showFilters(): void {
+    this.fliterFlag$.next(true);
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
@@ -59,11 +73,16 @@ public filters: DonoreturnFilters = {};
   }
 
   public addDoNotReturn(): void {
+    this.fliterFlag$.next(false);
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public openImportDialog(): void {
     this.importDialogEvent.next(true);
+  }
+
+  public appliedFilters($event:number){
+    this.filteredcnt = $event;
   }
 
 }

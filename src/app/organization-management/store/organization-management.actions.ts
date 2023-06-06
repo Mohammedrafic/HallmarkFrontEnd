@@ -304,6 +304,11 @@ export class GetCredential {
   constructor(public payload?: CredentialFilter) {}
 }
 
+export class ClearCredentialsAndTypes {
+  static readonly type = '[organizationManagement] Clear Credentials nad Types list';
+  constructor() {}
+}
+
 export class GetCredentialForSettings {
   static readonly type = '[organizationManagement] Get Credential list for Settings';
   constructor(public filters: CredentialFilter) {}

@@ -398,7 +398,7 @@
             >Multiplier <span class="required">*</span></label
           >
           <label *ngIf="selectedBillRateUnit === BillRateUnitList.Currency"
-            >Amount <span class="required">*</span></label
+            >Amount <span class="required" *ngIf="!amountDisabled">*</span></label
           >
           <label *ngIf="selectedBillRateUnit === BillRateUnitList.Hours">Hours <span class="required">*</span></label>
           <div class="input-group">
@@ -412,6 +412,7 @@
               [showSpinButton]="false"
               [format]="format"
               [decimals]="decimals"
+              [enabled]="!amountDisabled"
             >
             </ejs-numerictextbox>
           </div>
@@ -502,6 +503,7 @@
               id="considerForWeeklyOt"
               label="Consider for Weekly OT"
               formControlName="considerForWeeklyOt"
+              [disabled]="!otInputsEnabled"
             ></ejs-checkbox>
           </div>
         </div>
@@ -512,6 +514,7 @@
               id="considerForDailyOt"
               label="Consider for Daily OT"
               formControlName="considerForDailyOt"
+              [disabled]="!otInputsEnabled"
             ></ejs-checkbox>
           </div>
         </div>
@@ -522,6 +525,7 @@
               id="considerFor7thDayOt"
               label="Consider for 7th Day OT"
               formControlName="considerFor7thDayOt"
+              [disabled]="!otInputsEnabled"
             ></ejs-checkbox>
           </div>
         </div>
@@ -724,19 +728,22 @@
       <div class="checkbox-container">
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox label="Consider for Weekly OT" formControlName="considerForWeeklyOt"></ejs-checkbox>
+            <ejs-checkbox label="Consider for Weekly OT" formControlName="considerForWeeklyOt"
+            [disabled]="!otInputsEnabled"></ejs-checkbox>
           </div>
         </div>
 
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox label="Consider for Daily OT" formControlName="considerForDailyOt"></ejs-checkbox>
+            <ejs-checkbox label="Consider for Daily OT" formControlName="considerForDailyOt"
+            [disabled]="!otInputsEnabled"></ejs-checkbox>
           </div>
         </div>
 
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox label="Consider for 7th Day OT" formControlName="considerFor7thDayOt"></ejs-checkbox>
+            <ejs-checkbox label="Consider for 7th Day OT" formControlName="considerFor7thDayOt"
+            [disabled]="!otInputsEnabled"></ejs-checkbox>
           </div>
         </div>
 

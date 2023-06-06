@@ -82,10 +82,9 @@
         <div class="input-container bootstrap">
           <label>Invoice Status</label>
           <div class="input-group dropdown">
-            <ejs-multiselect mode="CheckBox" formControlName="invoiceStatus" placeholder="All"
-                             [allowFiltering]="true" [showDropDownIcon]="true"
+            <ejs-multiselect mode="CheckBox" formControlName="invoiceStatus" 
                              [dataSource]="invoiceStatusListwithreject"
-                             [fields]="InvoiceStatus" [selectAllText]='allOption'>
+                             [fields]="InvoiceStatus" [allowFiltering]="true" [showDropDownIcon]="true" placeholder="All">
             </ejs-multiselect>
           </div>
         </div>
