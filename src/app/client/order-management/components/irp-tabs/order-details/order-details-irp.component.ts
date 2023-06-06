@@ -339,9 +339,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
       this.initForms(value);
       this.setConfigDataSources();
+      this.getAllShifts();
       this.setReasonAutopopulate();
       this.populateSelectedOrganizationStructure();
-      this.getAllShifts();
       this.watchForSpecialProjectCategory();
       this.changeDetection.markForCheck();
     });
@@ -751,7 +751,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.commentContainerId = selectedOrder.commentContainerId as number;
       this.getComments();
       this.orderStatus = selectedOrder.statusText;
-
+      this.getAllShifts();
       this.setConfigType(selectedOrder);
       this.patchFormValues(selectedOrder);
       this.createPatchContactDetails(selectedOrder);
@@ -771,11 +771,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       jobStartDate: selectedOrder.jobStartDate,
       jobEndDate: selectedOrder.jobEndDate,
     })
-    this.generalInformationForm.patchValue({
-      shift: selectedOrder.shift,
-      shiftStartTime: selectedOrder.shiftStartTime,
-      shiftEndTime: selectedOrder.shiftEndTime
-    }, { emitEvent: false })
+    setTimeout(()=>{
+      this.generalInformationForm.patchValue({
+        shift: selectedOrder.shift,
+        shiftStartTime: selectedOrder.shiftStartTime,
+        shiftEndTime: selectedOrder.shiftEndTime
+      }, { emitEvent: false })
+    },1000)
+   
 
     // this.generalInformationForm.patchValue(selectedOrder);
     this.jobDistributionForm.patchValue(selectedOrder);
@@ -783,6 +786,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.specialProjectForm.patchValue(selectedOrder);
 
     if (selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
+      this.generalInformationForm.patchValue({
+        jobDates: selectedOrder.jobDates,
+      })
       const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
       changeTypeField(generalInformationConfig.fields, 'jobDates', FieldType.Date);
     }
