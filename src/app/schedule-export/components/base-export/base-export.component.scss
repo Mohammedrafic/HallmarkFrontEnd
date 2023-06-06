@@ -1,0 +1,38 @@
+//import bootstrap reboot
+@import "~/../../../styles/bootstrap-reboot";
+@import "~/../../../styles/bootstrap-grid";
+@import "~/../../../styles/bootstrap-utilities";
+
+//define vairables for colors
+$homeDept: #060715;
+$otherDept: #2368EE;
+$available: #5AA658;
+$unavailable: #E24D4D;
+
+
+@media print{
+  html {
+    font-size:xx-small
+  }
+}
+
+.text-home-dept {
+  color: $homeDept;
+}
+
+.text-other-dept {
+  color: $otherDept;
+}
+
+.text-available {
+  color: $available;
+}
+
+.text-unavailable {
+  color: $unavailable;
+}
+
+
+.text-bold {
+  font-weight: bold;
+}
