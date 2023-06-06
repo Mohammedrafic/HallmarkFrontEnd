@@ -128,7 +128,6 @@ export class CandidateProfileFormService {
 
       return [dateName, dateUtc];
     }));
-console.error(datesWithUtc);
 
     return { ...candidate, ...datesWithUtc };
   }
