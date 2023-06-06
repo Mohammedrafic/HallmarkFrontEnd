@@ -16,6 +16,7 @@ export class SpecialProjectTableComponent extends AbstractGridConfigurationCompo
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   @Input() gridOptions: GridOptions;
   @Input() totalRecordsCount: number;
+  @Input() fitColumns:boolean = false;
 
   @Output() onGridReadyEvent: EventEmitter<GridReadyEvent> = new EventEmitter<GridReadyEvent>();
   @Output() onGridPageSizeChanged = new EventEmitter<any>();
@@ -32,6 +33,10 @@ export class SpecialProjectTableComponent extends AbstractGridConfigurationCompo
     this.onGridPageSizeChanged.next(event);
   }
   onGridReady(params: GridReadyEvent) {
+    if(this.fitColumns)
+    {
+      this.gridOptions.api?.sizeColumnsToFit();
+    }
     this.onGridReadyEvent.next(params);
   }
 }
