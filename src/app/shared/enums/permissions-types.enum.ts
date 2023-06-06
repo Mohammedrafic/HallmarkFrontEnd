@@ -31,16 +31,14 @@ export enum PermissionTypes {
   ManageOrganizationCredential= 401,
   ManuallyAddCredential = 402,
 
-  //View Order Journey
-  ViewOrderJourney = 8001,
-
   //Organization Configuration
   ViewOrganizationConfigurations = 1500,
   ManageOrganizationConfigurations = 1501,
   ViewDepartmentSkillRequired = 8105,
   ManageDepartmentSkillRequired = 8106,
 
-
+  //View Order Journey
+  ViewOrderJourney = 8001,
   CanOrganizationViewOrdersIRP = 6406,
   CanOrganizationEditOrdersIRP = 6407,
   CanCreateOrdersIRP = 6408,

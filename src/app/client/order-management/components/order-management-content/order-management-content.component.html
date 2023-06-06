@@ -70,7 +70,7 @@
         </button>
 
         <button *ngIf="isActiveSystemIRP" ejs-dropdownbutton appHideBeforeSyncfusionLoad [items]="exportOptions" (select)="exportSelected($event)"
-          id="importButton" cssClass="e-outline button-export">
+          id="importButton" cssClass="e-outline button-export" [disabled]="!canCreateOrderIRP || !userPermission[userPermissions.CanCreateOrdersIRP]">
           <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
         </button>
 
@@ -81,7 +81,23 @@
         </ng-container>
 
         <app-tooltip-container
-          *ngIf="!isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney"
+          *ngIf="!isMobile && isActiveSystemIRP"
+          [message]="toolTipMessage"
+          [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
+        >
+          <button
+            [disabled]="!canCreateOrderIRP || !userPermission[userPermissions.CanCreateOrdersIRP]"
+            ejs-button
+            appHideBeforeSyncfusionLoad
+            [isPrimary]="true"
+            (click)="navigateToOrderForm()"
+          >
+            Create Order
+          </button>
+        </app-tooltip-container>
+
+        <app-tooltip-container
+          *ngIf="!isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney && !isActiveSystemIRP"
           [message]="toolTipMessage"
           [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
         >
@@ -1447,6 +1463,8 @@
   [orderPositionSelected$]="orderPositionSelected$"
   [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"
   [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
+  [CanEditOrderBillRateIRP]="userPermission[userPermissions.CanEditOrderBillRateIRP]"
+  [CanCloseOrdersIRP] = "userPermission[userPermissions.CanCloseOrdersIRP]"
   [CanOrganizationEditOrdersIRP]="userPermission[userPermissions.CanCreateOrdersIRP]"
   [CanOrganizationViewOrdersIRP]="userPermission[userPermissions.CanOrganizationViewOrdersIRP]"
   (selectReOrder)="selectReOrder($event)"
