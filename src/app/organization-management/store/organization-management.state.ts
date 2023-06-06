@@ -12,6 +12,7 @@ import { OrganizationService } from '@shared/services/organization.service';
 
 import {
   ClearAssignedSkillsByOrganization,
+  ClearCredentialsAndTypes,
   ClearDepartmentList,
   ClearLocationList,
   DeleteDepartmentById,
@@ -1143,6 +1144,13 @@ export class OrganizationManagementState {
         return payload;
       })
     );
+  }
+
+  @Action(ClearCredentialsAndTypes)
+  ClearCredentialsAndTypes(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+  ): OrganizationManagementStateModel {
+    return patchState({ credentials: [], credentialTypes: [] });
   }
 
   @Action(GetCredentialForSettings)
