@@ -1,5 +1,6 @@
 <section>
-  <app-special-project-table [gridOptions]="gridOptions"
+  <app-special-project-table [fitColumns]="true"
+                             [gridOptions]="gridOptions"
                              [totalRecordsCount]="rowData.length"
                              (onGridReadyEvent)="onGridReady($event)"
                              (onGridPageSizeChanged)="onPageSizeChanged($event)"></app-special-project-table>
