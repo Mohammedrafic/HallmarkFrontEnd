@@ -666,8 +666,13 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       )
         .pipe(takeUntil(this.componentDestroy()))
         .subscribe((data) => {
+          const { isVMCEnabled } = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences ?? {};
           const areSkillsRequired = data[OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired]];
           this.isPrimarySkillRequired = areSkillsRequired === 'true';
+
+          if (!isVMCEnabled) {
+            this.configureSkillDropdowns(this.areSkillsAvailable);
+          }
         });
     }
   }
