@@ -13,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { DoNotReturnStateModel } from '@client/do-not-return/do-not-return.interface';
 import { BLOCK_RECORD_SUCCESS, RECORD_SAVED_SUCCESS, RECORD_ALREADY_EXISTS,CANDIDATE_UNBLOCK,CANDIDATE_BLOCK } from '@shared/constants';
 import { ImportResult } from '@shared/models/import.model';
+import { CommonHelper } from '@shared/helpers/common.helper';
 
 @State<DoNotReturnStateModel>({
   name: 'donotreturn',
@@ -201,7 +202,12 @@ export class DonotReturnState {
   ): Observable<ImportResult<any> | Observable<void>> {
     return this.DonotreturnService.saveDNRImportResult(payload).pipe(
       tap((payload) => {
-        if(payload.errorRecords.length > 0){
+        if(payload.errorRecords.length > 0){          
+          payload.errorRecords.forEach(data=>{
+            if(data.ssn != ''){
+              data = CommonHelper.formatTheSSN(data);
+            }
+          })
           dispatch(new DoNotReturn.UploadDoNotReturnFileSucceeded(payload));
         }
         dispatch(new DoNotReturn.SaveDoNotReturnImportResultFailAndSucceeded(payload));
