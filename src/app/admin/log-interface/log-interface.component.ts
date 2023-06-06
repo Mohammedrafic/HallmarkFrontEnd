@@ -276,10 +276,8 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
         this.logFileDownloadDetail$.pipe(takeUntil(this.unsubscribe$))
           .subscribe((data: any) => {
             if (data) {
-              if (this.downloadedFileName != data.fileName) {
                 this.downloadedFileName = data.fileName;
                 this.createLinkToDownload(data.fileAsBase64, data.fileName, data.contentType);
-              }
             }
           });
     }
